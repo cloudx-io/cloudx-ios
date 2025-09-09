@@ -1,5 +1,0 @@
-${PODS_ROOT}/Target Support Files/Pods-CloudXDemo-CloudXDemoUITests/Pods-CloudXDemo-CloudXDemoUITests-frameworks.sh
-${BUILT_PRODUCTS_DIR}/CloudXCore/CloudXCore.framework
-${BUILT_PRODUCTS_DIR}/CloudXDSPAdapter/CloudXDSPAdapter.framework
-${BUILT_PRODUCTS_DIR}/CloudXDemoAdapter/CloudXTestVastNetworkAdapter.framework
-${BUILT_PRODUCTS_DIR}/Sentry/Sentry.framework

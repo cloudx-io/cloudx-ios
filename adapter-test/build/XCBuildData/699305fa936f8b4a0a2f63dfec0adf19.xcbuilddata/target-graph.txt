@@ -1,2 +1,0 @@
-Target dependency graph (1 target)
-Target 'CloudXDemoAdapter' in project 'CloudXDemoAdapter' (no dependencies)

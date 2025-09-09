@@ -1,5 +1,0 @@
-#import <Foundation/Foundation.h>
-@interface PodsDummy_Pods_CloudXMintegralAdapter_CloudXMintegralAdapterTests : NSObject
-@end
-@implementation PodsDummy_Pods_CloudXMintegralAdapter_CloudXMintegralAdapterTests
-@end

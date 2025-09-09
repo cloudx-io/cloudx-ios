@@ -1,4 +1,0 @@
-framework module CloudXCore {
-  header "CloudXCore-Swift.h"
-  requires objc
-}

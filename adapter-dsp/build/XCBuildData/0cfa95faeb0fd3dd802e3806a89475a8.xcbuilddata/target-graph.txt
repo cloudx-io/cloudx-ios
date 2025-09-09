@@ -1,6 +1,0 @@
-Target dependency graph (3 targets)
-Target 'Pods-CloudXDemoAdapter-CloudXDemoAdapterTests' in project 'Pods'
-➜ Explicit dependency on target 'CloudX' in project 'Pods'
-Target 'Pods-CloudXDemoAdapter' in project 'Pods'
-➜ Explicit dependency on target 'CloudX' in project 'Pods'
-Target 'CloudX' in project 'Pods' (no dependencies)

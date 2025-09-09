@@ -1,6 +1,0 @@
-framework module CloudXCore {
-  umbrella header "CloudXCore-umbrella.h"
-
-  export *
-  module * { export * }
-}

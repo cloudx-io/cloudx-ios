@@ -1,6 +1,0 @@
-framework module Pods_CloudXMintegralAdapter_CloudXMintegralAdapterTests {
-  umbrella header "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-umbrella.h"
-
-  export *
-  module * { export * }
-}

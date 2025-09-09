@@ -1,5 +1,0 @@
- extern const unsigned char Pods_CloudXDemoAdapter_CloudXDemoAdapterTestsVersionString[];
- extern const double Pods_CloudXDemoAdapter_CloudXDemoAdapterTestsVersionNumber;
-
- const unsigned char Pods_CloudXDemoAdapter_CloudXDemoAdapterTestsVersionString[] __attribute__ ((used)) = "@(#)PROGRAM:Pods_CloudXDemoAdapter_CloudXDemoAdapterTests  PROJECT:Pods-1" "\n";
- const double Pods_CloudXDemoAdapter_CloudXDemoAdapterTestsVersionNumber __attribute__ ((used)) = (double)1.;
