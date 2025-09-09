@@ -1,0 +1,20 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '14.0'
+
+target 'CloudXSwiftRemotePods' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  pod 'CloudXCore'
+  pod 'CloudXTestVastNetworkAdapter', :path => '../cloudexchange.sdk.ios.testAdapter'  
+
+  target 'CloudXSwiftRemotePodsTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'CloudXSwiftRemotePodsUITests' do
+    # Pods for testing
+  end
+
+end

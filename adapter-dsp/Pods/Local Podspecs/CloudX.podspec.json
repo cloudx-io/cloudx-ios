@@ -1,0 +1,49 @@
+{
+  "name": "CloudX",
+  "version": "1.0.0",
+  "summary": "Mobile SDK for CloudX",
+  "authors": "CloudX.",
+  "homepage": "https://www.example.com/",
+  "license": {
+    "type": "Copyright",
+    "text": "\nCopyright 2024 CloudX, Inc. All rights reserved.\n\n"
+  },
+  "module_name": "CloudX",
+  "platforms": {
+    "ios": "13.0"
+  },
+  "source": {
+    "http": "file:/Users/bkorda/Work/cloudx/Frameworks/CloudXCore.xcframework.zip",
+    "type": "zip",
+    "flatten": false
+  },
+  "frameworks": [
+    "AVFoundation",
+    "AVKit",
+    "AdSupport",
+    "CoreGraphics",
+    "CoreLocation",
+    "CoreTelephony",
+    "Foundation",
+    "StoreKit",
+    "SystemConfiguration",
+    "UIKit"
+  ],
+  "weak_frameworks": [
+    "Combine",
+    "CryptoKit",
+    "SafariServices",
+    "SwiftUI",
+    "WebKit"
+  ],
+  "pod_target_xcconfig": {
+    "VALID_ARCHS[sdk=iphoneos*]": "arm64 armv7",
+    "VALID_ARCHS[sdk=iphonesimulator*]": "x86_64 arm64"
+  },
+  "user_target_xcconfig": {
+    "OTHER_LDFLAGS": "-ObjC"
+  },
+  "vendored_frameworks": "CloudXCore.xcframework",
+  "description": "Mobile SDK for CloudX iOS",
+  "swift_version": "5.0"
+}

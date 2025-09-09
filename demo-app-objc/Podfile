@@ -1,0 +1,21 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '14.0'
+
+target 'CloudXObjCRemotePods' do
+  use_frameworks! :linkage => :static
+
+  # Pods for CloudXObjCRemotePods
+  pod 'CloudXCore', :path => '../cloudexchange.sdk.ios.coreObjC'
+  pod 'CloudXTestVastNetworkAdapter', :path => '../cloudexchange.sdk.ios.testAdapter'
+  pod 'CloudXMetaAdapter', :path => '../cloudexchange.sdk.ios.MetaAdapter'
+
+  target 'CloudXObjCRemotePodsTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'CloudXObjCRemotePodsUITests' do
+    # Pods for testing
+  end
+
+end

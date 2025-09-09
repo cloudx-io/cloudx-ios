@@ -1,0 +1,35 @@
+PODS:
+  - CloudXCore (1.1.34)
+  - CloudXMetaAdapter (1.1.3):
+    - CloudXCore
+    - FBAudienceNetwork (= 6.16.0)
+  - CloudXTestVastNetworkAdapter (1.0.0):
+    - CloudXCore
+  - FBAudienceNetwork (6.16.0)
+
+DEPENDENCIES:
+  - CloudXCore (from `../cloudexchange.sdk.ios.coreObjC`)
+  - CloudXMetaAdapter (from `../cloudexchange.sdk.ios.MetaAdapter`)
+  - CloudXTestVastNetworkAdapter (from `../cloudexchange.sdk.ios.testAdapter`)
+
+SPEC REPOS:
+  trunk:
+    - FBAudienceNetwork
+
+EXTERNAL SOURCES:
+  CloudXCore:
+    :path: "../cloudexchange.sdk.ios.coreObjC"
+  CloudXMetaAdapter:
+    :path: "../cloudexchange.sdk.ios.MetaAdapter"
+  CloudXTestVastNetworkAdapter:
+    :path: "../cloudexchange.sdk.ios.testAdapter"
+
+SPEC CHECKSUMS:
+  CloudXCore: 13f9d021452f13b40ae585263513c2fb32fa9e18
+  CloudXMetaAdapter: 3f932fc259d9b3248ee8a8bace43e7764e1f0bad
+  CloudXTestVastNetworkAdapter: b6c9f23b79eae41779c722c6e34be243e7852e17
+  FBAudienceNetwork: d1670939884e3a2e0ad98dca98d7e0c841417228
+
+PODFILE CHECKSUM: c8fec15c10ad5cf9ee5f7bea937eb44e95d9080f
+
+COCOAPODS: 1.16.2

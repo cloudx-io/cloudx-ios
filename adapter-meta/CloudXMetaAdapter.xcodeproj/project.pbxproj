@@ -1,0 +1,738 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1973D7602E28ED7900DCCF08 /* CLXMetaInitializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7492E28ED7900DCCF08 /* CLXMetaInitializer.h */; };
+		1973D7612E28ED7900DCCF08 /* CLXMetaNative.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7512E28ED7900DCCF08 /* CLXMetaNative.h */; };
+		1973D7622E28ED7900DCCF08 /* CLXMetaBannerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7452E28ED7900DCCF08 /* CLXMetaBannerFactory.h */; };
+		1973D7632E28ED7900DCCF08 /* CLXMetaRewardedFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7582E28ED7900DCCF08 /* CLXMetaRewardedFactory.h */; };
+		1973D7642E28ED7900DCCF08 /* CLXMetaRewarded.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7562E28ED7900DCCF08 /* CLXMetaRewarded.h */; };
+		1973D7652E28ED7900DCCF08 /* CLXMetaInterstitial.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D74C2E28ED7900DCCF08 /* CLXMetaInterstitial.h */; };
+		1973D7662E28ED7900DCCF08 /* CLXMetaInterstitialFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D74E2E28ED7900DCCF08 /* CLXMetaInterstitialFactory.h */; };
+		1973D7672E28ED7900DCCF08 /* CLXMetaBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7432E28ED7900DCCF08 /* CLXMetaBanner.h */; };
+		1973D7682E28ED7900DCCF08 /* CLXMetaNativeFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7532E28ED7900DCCF08 /* CLXMetaNativeFactory.h */; };
+		1973D7692E28ED7900DCCF08 /* CloudXMetaAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D75B2E28ED7900DCCF08 /* CloudXMetaAdapter.h */; };
+		1973D76A2E28ED7900DCCF08 /* CLXMetaInterstitial.m in Sources */ = {isa = PBXBuildFile; fileRef = 1973D74D2E28ED7900DCCF08 /* CLXMetaInterstitial.m */; };
+		1973D76B2E28ED7900DCCF08 /* CLXMetaBannerFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 1973D7462E28ED7900DCCF08 /* CLXMetaBannerFactory.m */; };
+		1973D76C2E28ED7900DCCF08 /* CLXMetaNative.m in Sources */ = {isa = PBXBuildFile; fileRef = 1973D7522E28ED7900DCCF08 /* CLXMetaNative.m */; };
+		1973D76D2E28ED7900DCCF08 /* CLXMetaNativeFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 1973D7542E28ED7900DCCF08 /* CLXMetaNativeFactory.m */; };
+		1973D76E2E28ED7900DCCF08 /* CLXMetaRewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = 1973D7572E28ED7900DCCF08 /* CLXMetaRewarded.m */; };
+		1973D76F2E28ED7900DCCF08 /* CLXMetaInitializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1973D74A2E28ED7900DCCF08 /* CLXMetaInitializer.m */; };
+		1973D7702E28ED7900DCCF08 /* CLXMetaBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 1973D7442E28ED7900DCCF08 /* CLXMetaBanner.m */; };
+		1973D7712E28ED7900DCCF08 /* CLXMetaInterstitialFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 1973D74F2E28ED7900DCCF08 /* CLXMetaInterstitialFactory.m */; };
+		1973D7722E28ED7900DCCF08 /* CLXMetaRewardedFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 1973D7592E28ED7900DCCF08 /* CLXMetaRewardedFactory.m */; };
+		7939568B33E2BE7927F56011 /* Pods_CloudXMetaAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30F449A87DD41E124E5E79E9 /* Pods_CloudXMetaAdapter.framework */; };
+		948510983B3BC2DC83481F66 /* Pods_CloudXMetaAdapter_CloudXMetaAdapterTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3B8390555932722B534EB02 /* Pods_CloudXMetaAdapter_CloudXMetaAdapterTests.framework */; };
+		C03E43D92C7F36DF001AB933 /* CloudXMetaAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C03E43CE2C7F36DF001AB933 /* CloudXMetaAdapter.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C03E43DA2C7F36DF001AB933 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C03E43C52C7F36DF001AB933 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C03E43CD2C7F36DF001AB933;
+			remoteInfo = CloudXMetaAdapter;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		12652B13D1A6D05E518EB07B /* Pods-CloudXMetaAdapter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXMetaAdapter.debug.xcconfig"; path = "Target Support Files/Pods-CloudXMetaAdapter/Pods-CloudXMetaAdapter.debug.xcconfig"; sourceTree = "<group>"; };
+		1973D7432E28ED7900DCCF08 /* CLXMetaBanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaBanner.h; sourceTree = "<group>"; };
+		1973D7442E28ED7900DCCF08 /* CLXMetaBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaBanner.m; sourceTree = "<group>"; };
+		1973D7452E28ED7900DCCF08 /* CLXMetaBannerFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaBannerFactory.h; sourceTree = "<group>"; };
+		1973D7462E28ED7900DCCF08 /* CLXMetaBannerFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaBannerFactory.m; sourceTree = "<group>"; };
+		1973D7492E28ED7900DCCF08 /* CLXMetaInitializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaInitializer.h; sourceTree = "<group>"; };
+		1973D74A2E28ED7900DCCF08 /* CLXMetaInitializer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaInitializer.m; sourceTree = "<group>"; };
+		1973D74C2E28ED7900DCCF08 /* CLXMetaInterstitial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaInterstitial.h; sourceTree = "<group>"; };
+		1973D74D2E28ED7900DCCF08 /* CLXMetaInterstitial.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaInterstitial.m; sourceTree = "<group>"; };
+		1973D74E2E28ED7900DCCF08 /* CLXMetaInterstitialFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaInterstitialFactory.h; sourceTree = "<group>"; };
+		1973D74F2E28ED7900DCCF08 /* CLXMetaInterstitialFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaInterstitialFactory.m; sourceTree = "<group>"; };
+		1973D7512E28ED7900DCCF08 /* CLXMetaNative.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaNative.h; sourceTree = "<group>"; };
+		1973D7522E28ED7900DCCF08 /* CLXMetaNative.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaNative.m; sourceTree = "<group>"; };
+		1973D7532E28ED7900DCCF08 /* CLXMetaNativeFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaNativeFactory.h; sourceTree = "<group>"; };
+		1973D7542E28ED7900DCCF08 /* CLXMetaNativeFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaNativeFactory.m; sourceTree = "<group>"; };
+		1973D7562E28ED7900DCCF08 /* CLXMetaRewarded.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaRewarded.h; sourceTree = "<group>"; };
+		1973D7572E28ED7900DCCF08 /* CLXMetaRewarded.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaRewarded.m; sourceTree = "<group>"; };
+		1973D7582E28ED7900DCCF08 /* CLXMetaRewardedFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaRewardedFactory.h; sourceTree = "<group>"; };
+		1973D7592E28ED7900DCCF08 /* CLXMetaRewardedFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaRewardedFactory.m; sourceTree = "<group>"; };
+		1973D75B2E28ED7900DCCF08 /* CloudXMetaAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CloudXMetaAdapter.h; sourceTree = "<group>"; };
+		1973D75C2E28ED7900DCCF08 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1973D75D2E28ED7900DCCF08 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
+		30F449A87DD41E124E5E79E9 /* Pods_CloudXMetaAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXMetaAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		76B9EF8DFC96391110464EB3 /* Pods-CloudXMetaAdapter-CloudXMetaAdapterTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXMetaAdapter-CloudXMetaAdapterTests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests.debug.xcconfig"; sourceTree = "<group>"; };
+		84133EA9A08333E7971E8340 /* Pods-CloudXMetaAdapter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXMetaAdapter.release.xcconfig"; path = "Target Support Files/Pods-CloudXMetaAdapter/Pods-CloudXMetaAdapter.release.xcconfig"; sourceTree = "<group>"; };
+		B3B8390555932722B534EB02 /* Pods_CloudXMetaAdapter_CloudXMetaAdapterTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXMetaAdapter_CloudXMetaAdapterTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BEE920BCF4D140A0F6212F67 /* Pods-CloudXMetaAdapter-CloudXMetaAdapterTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXMetaAdapter-CloudXMetaAdapterTests.release.xcconfig"; path = "Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests.release.xcconfig"; sourceTree = "<group>"; };
+		C03E43CE2C7F36DF001AB933 /* CloudXMetaAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXMetaAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C03E43D82C7F36DF001AB933 /* CloudXMetaAdapterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXMetaAdapterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C03E43CB2C7F36DF001AB933 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7939568B33E2BE7927F56011 /* Pods_CloudXMetaAdapter.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C03E43D52C7F36DF001AB933 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C03E43D92C7F36DF001AB933 /* CloudXMetaAdapter.framework in Frameworks */,
+				948510983B3BC2DC83481F66 /* Pods_CloudXMetaAdapter_CloudXMetaAdapterTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		02DDB44C650C994036296AEF /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				12652B13D1A6D05E518EB07B /* Pods-CloudXMetaAdapter.debug.xcconfig */,
+				84133EA9A08333E7971E8340 /* Pods-CloudXMetaAdapter.release.xcconfig */,
+				76B9EF8DFC96391110464EB3 /* Pods-CloudXMetaAdapter-CloudXMetaAdapterTests.debug.xcconfig */,
+				BEE920BCF4D140A0F6212F67 /* Pods-CloudXMetaAdapter-CloudXMetaAdapterTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		1973D7472E28ED7900DCCF08 /* Banner */ = {
+			isa = PBXGroup;
+			children = (
+				1973D7432E28ED7900DCCF08 /* CLXMetaBanner.h */,
+				1973D7442E28ED7900DCCF08 /* CLXMetaBanner.m */,
+				1973D7452E28ED7900DCCF08 /* CLXMetaBannerFactory.h */,
+				1973D7462E28ED7900DCCF08 /* CLXMetaBannerFactory.m */,
+			);
+			path = Banner;
+			sourceTree = "<group>";
+		};
+		1973D7482E28ED7900DCCF08 /* include */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		1973D74B2E28ED7900DCCF08 /* Initializers */ = {
+			isa = PBXGroup;
+			children = (
+				1973D7492E28ED7900DCCF08 /* CLXMetaInitializer.h */,
+				1973D74A2E28ED7900DCCF08 /* CLXMetaInitializer.m */,
+			);
+			path = Initializers;
+			sourceTree = "<group>";
+		};
+		1973D7502E28ED7900DCCF08 /* Interstitial */ = {
+			isa = PBXGroup;
+			children = (
+				1973D74C2E28ED7900DCCF08 /* CLXMetaInterstitial.h */,
+				1973D74D2E28ED7900DCCF08 /* CLXMetaInterstitial.m */,
+				1973D74E2E28ED7900DCCF08 /* CLXMetaInterstitialFactory.h */,
+				1973D74F2E28ED7900DCCF08 /* CLXMetaInterstitialFactory.m */,
+			);
+			path = Interstitial;
+			sourceTree = "<group>";
+		};
+		1973D7552E28ED7900DCCF08 /* Native */ = {
+			isa = PBXGroup;
+			children = (
+				1973D7512E28ED7900DCCF08 /* CLXMetaNative.h */,
+				1973D7522E28ED7900DCCF08 /* CLXMetaNative.m */,
+				1973D7532E28ED7900DCCF08 /* CLXMetaNativeFactory.h */,
+				1973D7542E28ED7900DCCF08 /* CLXMetaNativeFactory.m */,
+			);
+			path = Native;
+			sourceTree = "<group>";
+		};
+		1973D75A2E28ED7900DCCF08 /* Rewarded */ = {
+			isa = PBXGroup;
+			children = (
+				1973D7562E28ED7900DCCF08 /* CLXMetaRewarded.h */,
+				1973D7572E28ED7900DCCF08 /* CLXMetaRewarded.m */,
+				1973D7582E28ED7900DCCF08 /* CLXMetaRewardedFactory.h */,
+				1973D7592E28ED7900DCCF08 /* CLXMetaRewardedFactory.m */,
+			);
+			path = Rewarded;
+			sourceTree = "<group>";
+		};
+		1973D75E2E28ED7900DCCF08 /* CloudXMetaAdapter */ = {
+			isa = PBXGroup;
+			children = (
+				1973D7472E28ED7900DCCF08 /* Banner */,
+				1973D7482E28ED7900DCCF08 /* include */,
+				1973D74B2E28ED7900DCCF08 /* Initializers */,
+				1973D7502E28ED7900DCCF08 /* Interstitial */,
+				1973D7552E28ED7900DCCF08 /* Native */,
+				1973D75A2E28ED7900DCCF08 /* Rewarded */,
+				1973D75B2E28ED7900DCCF08 /* CloudXMetaAdapter.h */,
+				1973D75C2E28ED7900DCCF08 /* Info.plist */,
+				1973D75D2E28ED7900DCCF08 /* module.modulemap */,
+			);
+			path = CloudXMetaAdapter;
+			sourceTree = "<group>";
+		};
+		1973D75F2E28ED7900DCCF08 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				1973D75E2E28ED7900DCCF08 /* CloudXMetaAdapter */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		5A41EEEE1E28CA336CF6E543 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				30F449A87DD41E124E5E79E9 /* Pods_CloudXMetaAdapter.framework */,
+				B3B8390555932722B534EB02 /* Pods_CloudXMetaAdapter_CloudXMetaAdapterTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C03E43C42C7F36DF001AB933 = {
+			isa = PBXGroup;
+			children = (
+				1973D75F2E28ED7900DCCF08 /* Sources */,
+				C03E43E92C7F38E7001AB933 /* Tests */,
+				C03E43CF2C7F36DF001AB933 /* Products */,
+				02DDB44C650C994036296AEF /* Pods */,
+				5A41EEEE1E28CA336CF6E543 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		C03E43CF2C7F36DF001AB933 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C03E43CE2C7F36DF001AB933 /* CloudXMetaAdapter.framework */,
+				C03E43D82C7F36DF001AB933 /* CloudXMetaAdapterTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C03E43E82C7F38E7001AB933 /* CloudXMetaAdapterTests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = CloudXMetaAdapterTests;
+			sourceTree = "<group>";
+		};
+		C03E43E92C7F38E7001AB933 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				C03E43E82C7F38E7001AB933 /* CloudXMetaAdapterTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		C03E43C92C7F36DF001AB933 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1973D7602E28ED7900DCCF08 /* CLXMetaInitializer.h in Headers */,
+				1973D7612E28ED7900DCCF08 /* CLXMetaNative.h in Headers */,
+				1973D7622E28ED7900DCCF08 /* CLXMetaBannerFactory.h in Headers */,
+				1973D7632E28ED7900DCCF08 /* CLXMetaRewardedFactory.h in Headers */,
+				1973D7642E28ED7900DCCF08 /* CLXMetaRewarded.h in Headers */,
+				1973D7652E28ED7900DCCF08 /* CLXMetaInterstitial.h in Headers */,
+				1973D7662E28ED7900DCCF08 /* CLXMetaInterstitialFactory.h in Headers */,
+				1973D7672E28ED7900DCCF08 /* CLXMetaBanner.h in Headers */,
+				1973D7682E28ED7900DCCF08 /* CLXMetaNativeFactory.h in Headers */,
+				1973D7692E28ED7900DCCF08 /* CloudXMetaAdapter.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		C03E43CD2C7F36DF001AB933 /* CloudXMetaAdapter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C03E43E22C7F36DF001AB933 /* Build configuration list for PBXNativeTarget "CloudXMetaAdapter" */;
+			buildPhases = (
+				B10BC1BBDF4911A03C7E5B36 /* [CP] Check Pods Manifest.lock */,
+				C03E43C92C7F36DF001AB933 /* Headers */,
+				C03E43CA2C7F36DF001AB933 /* Sources */,
+				C03E43CB2C7F36DF001AB933 /* Frameworks */,
+				C03E43CC2C7F36DF001AB933 /* Resources */,
+				8032ADF01A95BDACEAE1050D /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CloudXMetaAdapter;
+			productName = CloudXMetaAdapter;
+			productReference = C03E43CE2C7F36DF001AB933 /* CloudXMetaAdapter.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		C03E43D72C7F36DF001AB933 /* CloudXMetaAdapterTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C03E43E52C7F36DF001AB933 /* Build configuration list for PBXNativeTarget "CloudXMetaAdapterTests" */;
+			buildPhases = (
+				48FC84BB126E7A617F11639F /* [CP] Check Pods Manifest.lock */,
+				C03E43D42C7F36DF001AB933 /* Sources */,
+				C03E43D52C7F36DF001AB933 /* Frameworks */,
+				C03E43D62C7F36DF001AB933 /* Resources */,
+				2B17868E76FE3CD86CA28229 /* [CP] Copy Pods Resources */,
+				ACC6A4ABEA44014F7FA1D853 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C03E43DB2C7F36DF001AB933 /* PBXTargetDependency */,
+			);
+			name = CloudXMetaAdapterTests;
+			productName = CloudXMetaAdapterTests;
+			productReference = C03E43D82C7F36DF001AB933 /* CloudXMetaAdapterTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C03E43C52C7F36DF001AB933 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					C03E43CD2C7F36DF001AB933 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					C03E43D72C7F36DF001AB933 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = C03E43C82C7F36DF001AB933 /* Build configuration list for PBXProject "CloudXMetaAdapter" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C03E43C42C7F36DF001AB933;
+			productRefGroup = C03E43CF2C7F36DF001AB933 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C03E43CD2C7F36DF001AB933 /* CloudXMetaAdapter */,
+				C03E43D72C7F36DF001AB933 /* CloudXMetaAdapterTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C03E43CC2C7F36DF001AB933 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1973D7732E28ED7900DCCF08 /* Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C03E43D62C7F36DF001AB933 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2B17868E76FE3CD86CA28229 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		48FC84BB126E7A617F11639F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8032ADF01A95BDACEAE1050D /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter/Pods-CloudXMetaAdapter-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter/Pods-CloudXMetaAdapter-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter/Pods-CloudXMetaAdapter-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		ACC6A4ABEA44014F7FA1D853 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B10BC1BBDF4911A03C7E5B36 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXMetaAdapter-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C03E43CA2C7F36DF001AB933 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1973D76A2E28ED7900DCCF08 /* CLXMetaInterstitial.m in Sources */,
+				1973D76B2E28ED7900DCCF08 /* CLXMetaBannerFactory.m in Sources */,
+				1973D76C2E28ED7900DCCF08 /* CLXMetaNative.m in Sources */,
+				1973D76D2E28ED7900DCCF08 /* CLXMetaNativeFactory.m in Sources */,
+				1973D76E2E28ED7900DCCF08 /* CLXMetaRewarded.m in Sources */,
+				1973D76F2E28ED7900DCCF08 /* CLXMetaInitializer.m in Sources */,
+				1973D7702E28ED7900DCCF08 /* CLXMetaBanner.m in Sources */,
+				1973D7712E28ED7900DCCF08 /* CLXMetaInterstitialFactory.m in Sources */,
+				1973D7722E28ED7900DCCF08 /* CLXMetaRewardedFactory.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C03E43D42C7F36DF001AB933 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C03E43DB2C7F36DF001AB933 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C03E43CD2C7F36DF001AB933 /* CloudXMetaAdapter */;
+			targetProxy = C03E43DA2C7F36DF001AB933 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		C03E43E02C7F36DF001AB933 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		C03E43E12C7F36DF001AB933 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C03E43E32C7F36DF001AB933 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 12652B13D1A6D05E518EB07B /* Pods-CloudXMetaAdapter.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/CloudXMetaAdapter/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cloudx.CloudXMetaAdapter;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C03E43E42C7F36DF001AB933 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 84133EA9A08333E7971E8340 /* Pods-CloudXMetaAdapter.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/CloudXMetaAdapter/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cloudx.CloudXMetaAdapter;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C03E43E62C7F36DF001AB933 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 76B9EF8DFC96391110464EB3 /* Pods-CloudXMetaAdapter-CloudXMetaAdapterTests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Tests/CloudXMetaAdapterTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cloudx.CloudXMetaAdapterTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CloudXMetaAdapter.framework/CloudXMetaAdapter";
+			};
+			name = Debug;
+		};
+		C03E43E72C7F36DF001AB933 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BEE920BCF4D140A0F6212F67 /* Pods-CloudXMetaAdapter-CloudXMetaAdapterTests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Tests/CloudXMetaAdapterTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cloudx.CloudXMetaAdapterTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CloudXMetaAdapter.framework/CloudXMetaAdapter";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C03E43C82C7F36DF001AB933 /* Build configuration list for PBXProject "CloudXMetaAdapter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C03E43E02C7F36DF001AB933 /* Debug */,
+				C03E43E12C7F36DF001AB933 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C03E43E22C7F36DF001AB933 /* Build configuration list for PBXNativeTarget "CloudXMetaAdapter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C03E43E32C7F36DF001AB933 /* Debug */,
+				C03E43E42C7F36DF001AB933 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C03E43E52C7F36DF001AB933 /* Build configuration list for PBXNativeTarget "CloudXMetaAdapterTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C03E43E62C7F36DF001AB933 /* Debug */,
+				C03E43E72C7F36DF001AB933 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C03E43C52C7F36DF001AB933 /* Project object */;
+}

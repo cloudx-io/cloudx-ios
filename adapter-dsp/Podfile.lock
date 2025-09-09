@@ -1,0 +1,16 @@
+PODS:
+  - CloudX (1.0.0)
+
+DEPENDENCIES:
+  - CloudX (from `/Users/xenoss/Downloads/cloudx/CloudXCore/CloudX.podspec.json`)
+
+EXTERNAL SOURCES:
+  CloudX:
+    :path: "/Users/xenoss/Downloads/cloudx/CloudXCore/CloudX.podspec.json"
+
+SPEC CHECKSUMS:
+  CloudX: fdceb0c12ef2dfee14f7b482d8091b7c42f90086
+
+PODFILE CHECKSUM: bbd83f77dd9353add4ad2cc7abd5fba7c77bfab4
+
+COCOAPODS: 1.16.2

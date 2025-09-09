@@ -1,0 +1,27 @@
+dependencies: \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/build/CloudXCore.build/Release-iphoneos/CloudXCore.build/module.modulemap \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/AdReporting/RillImpressions/CLXRillImpressionInitService.m \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXRillImpressionInitService.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/Foundation.framework/Modules/module.modulemap \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXRillImpressionModel.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXConfigImpressionModel.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXSDKConfig.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXNativeTemplate.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/UIKit.framework/Modules/module.modulemap \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXSDKConfigRequest.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXSDKConfigBidder.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXSDKConfigPlacement.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXBiddingConfig.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/CoreLocation.framework/Modules/module.modulemap \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXAdType.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXSystemInformation.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/NSString+CLXSemicolon.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXRillImpressionDefaultModel.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXBidResponse.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXBidAdSource.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXBidTokenSource.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXAdNetworkFactories.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXError.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXRillImpressionProperties.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXTrackingFieldResolver.h \
+  /Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/Sources/CloudXCore/CLXLogger.h

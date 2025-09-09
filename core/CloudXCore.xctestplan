@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "Default Configuration",
+      "name" : "Configuration 1",
+      "options" : {
+        "maximumTestExecutionTimeAllowance" : 60,
+        "testExecutionOrdering" : "alphabetical",
+        "testTimeoutsEnabled" : true
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "maximumTestExecutionTimeAllowance" : 60,
+    "testExecutionOrdering" : "alphabetical",
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:CloudXCore.xcodeproj",
+        "identifier" : "19C724792E2390420012CFC7",
+        "name" : "CloudXCoreTests"
+      }
+    }
+  ],
+  "version" : 1
+}

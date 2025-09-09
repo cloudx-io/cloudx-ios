@@ -1,0 +1,1737 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0021BF86C2C4ACCC26D22EF68CC43B7F /* CLXExponentialBackoffStrategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 25B78FF62BC1F25625535048D1CD55B8 /* CLXExponentialBackoffStrategy.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		06F3CBAB1A82A096C316145326BC117F /* CLXSDKInitNetworkService.h in Headers */ = {isa = PBXBuildFile; fileRef = 161D87E1E0CA6132B899DDACCA673240 /* CLXSDKInitNetworkService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		08FA7009EE7DD87F50C6D7C9F6E0967E /* CLXCacheableAd.h in Headers */ = {isa = PBXBuildFile; fileRef = 8A409758A13F6B369AFCE93763E2657B /* CLXCacheableAd.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0C52E6E6A5129D510913C4A4F4E47858 /* CLXAppSessionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D19310DBBB4199A84B5B75DC68265C05 /* CLXAppSessionModel.m */; };
+		0D532491BD6BF0F9020E9D40F89FBFC2 /* CLXCacheAdQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 033F466FCFB28EF3C5D9C1BDF2C8B187 /* CLXCacheAdQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0D83FA26B5396F51A5A14D81EDEA3402 /* CLXBidderConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = FEF7D53AD07D534FC2D3C7A76765B83C /* CLXBidderConfig.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0E09C224E547EBE8F94201DA22031900 /* CLXReachabilityService.h in Headers */ = {isa = PBXBuildFile; fileRef = 443918A3BD18D1631FF228946FC293D6 /* CLXReachabilityService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0E1B2FA19149AD448AE3958C222FB3F8 /* CLXSessionMetricPerformance.h in Headers */ = {isa = PBXBuildFile; fileRef = B1BBBCECA7B0D90F511896F082D7F1A7 /* CLXSessionMetricPerformance.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1037348179DFC79CCDCFCAC4A56A5BFF /* CLXCoreDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 17B69A1D47C1D1FB6A6CB4599D5961D6 /* CLXCoreDataManager.m */; };
+		104F7B9B9E4847318477C01F07A12366 /* CLXBannerAdView.h in Headers */ = {isa = PBXBuildFile; fileRef = 1265B546547182000199055AB3E29915 /* CLXBannerAdView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		10F7D09F315E9FE8AD814AC83AC56EB7 /* CLXSDKConfigRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E85E5918755302CA3C7A4D5A3EFE9C0C /* CLXSDKConfigRequest.m */; };
+		11B860B5BC1C455F8E6CBE4CBF6EF44A /* CLXAdapterBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CC1AA3FE2ED115029D302D21A19D41F /* CLXAdapterBanner.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1322AA63E799E3F04078D263721EC18E /* URLSession+CLX.h in Headers */ = {isa = PBXBuildFile; fileRef = EF91DD9039D699522FCD8ED5A7F70284 /* URLSession+CLX.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		14B9F2BEFAA9FE95D7C1077515F9A07A /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1771E9E369D36686052B8C5F75E2695 /* CoreData.framework */; };
+		153C5850196D6028131DDF4D0E18AD68 /* CLXSystemInformation.h in Headers */ = {isa = PBXBuildFile; fileRef = DD72DDAF93A6C16BE3F685487458EBCB /* CLXSystemInformation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		171CDB83FEC415F7590BB1D35C425EC5 /* CLXDIContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 026372AB964BEB9B374021A044E49A51 /* CLXDIContainer.m */; };
+		1999F0AE5806F4A2FD61D6CBC7D53328 /* CLXBackgroundTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = ABE1C406CCC3DB00EBE539D8D59F6EB2 /* CLXBackgroundTimer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1CAD6D0436682043F84A3B48B35C92BE /* CLXBidNetworkService.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2FBBC358BACC0A82A1450D08FC6966 /* CLXBidNetworkService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1DBC7CDE5A892ECB97397B3819EE00DE /* CLXNativeAdView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AB1FC59789D6EEB8686781A97C88841 /* CLXNativeAdView.m */; };
+		24043185F8BBEF6BEA240B00AB435C49 /* CloudXCoreError.h in Headers */ = {isa = PBXBuildFile; fileRef = 0CBE44A4AC3912C9CEB806FB637378DE /* CloudXCoreError.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		27025458A0DAEE0661490F17707A901D /* CLXAppSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 73FEB1B50B5538A731244995E98535BE /* CLXAppSession.m */; };
+		28B8D42D219A686CB1617C0F0A4C50B4 /* CloudXDataModel.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 296A6EAB8D91C697F8306D4F055B4F32 /* CloudXDataModel.xcdatamodeld */; };
+		2AE7E92E2A1611AEAD9152669D375DB8 /* CLXSystemInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = A2293611758F792F33242687EC601CE3 /* CLXSystemInformation.m */; };
+		2B1ACDC3C838D90874E5A5B48B79B4F9 /* CLXAppSessionModel+Update.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A1BE158273A91513890D02B6BB00B58 /* CLXAppSessionModel+Update.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2BB864E622A1E27982622C781645281A /* CLXRillImpressionDefaultModel.m in Sources */ = {isa = PBXBuildFile; fileRef = CBDEFBDEE42A01E5F269E6675D38FFB1 /* CLXRillImpressionDefaultModel.m */; };
+		2DEDB1BB1438761774BD28A4E3803BCA /* CLXBidNetworkServiceImplementation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8EDAABE539F1E69E50C2BA550728FDF5 /* CLXBidNetworkServiceImplementation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2E267C2960BC9CEEE88201F7E31DCA1D /* CLXBannerAdView.m in Sources */ = {isa = PBXBuildFile; fileRef = 44B34F35216609499E62B8994D05C7EF /* CLXBannerAdView.m */; };
+		2E3A4F9FE075A6CE0E1B6E9D415767C8 /* CLXAdapterBannerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = E2D8E9935C7850482087DEED2DE24D1A /* CLXAdapterBannerFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2EC1D11844F07DAA8BEB952AD774393A /* CloudXCore-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B6D7132A9EE24EA7F20617927C76187 /* CloudXCore-dummy.m */; };
+		2FCDF32D05BB3CDB4FF1FE1141BBD29D /* CLXMetricsNetworkService.m in Sources */ = {isa = PBXBuildFile; fileRef = 63E06A1A05E3B93181890BABA5D581BE /* CLXMetricsNetworkService.m */; };
+		3003C0958A3B886AC91EC209974252AF /* CLXBaseAdDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 740BCBFA59A8796FBDA9D823F2633598 /* CLXBaseAdDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		307329E634DFD1F6FB33CD724D02CB7D /* CLXCacheAdQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F69D37CBABA13E69E37734701A8CE89 /* CLXCacheAdQueue.m */; };
+		30CB7BAED68B2B3AFCDDD90A2376FC0C /* CLXInitMetricsModel+Update.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B5D18D8CC8BD1B93A7D85D458422689 /* CLXInitMetricsModel+Update.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		30FB9CD95D841A4EEF6C39B410D6B473 /* CLXPublisherBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = 246FD1A391F70120CAA5CF78F28E7773 /* CLXPublisherBanner.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		319854E3E1132A6881C6A769DE385DB5 /* CLXBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = 367F068BAE283D2D66347ABD4968E084 /* CLXBanner.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		31C24EBF08F126E13509F8535F9340EB /* CLXPublisherBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B47CC73D10E86291958E8BF18F353B9 /* CLXPublisherBanner.m */; };
+		32337DEFC65195C43B45FB5BD5461A12 /* CLXSessionMetricPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 38E0DC51F940729AA6403FF297364AC3 /* CLXSessionMetricPerformance.m */; };
+		32902A133D6C004FAE7FCC81D8B74333 /* CLXPublisherNative.h in Headers */ = {isa = PBXBuildFile; fileRef = 305040C096B79DAADCEAEC50B2637A0F /* CLXPublisherNative.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		334467ECCA34A470D7D6E9B55260A679 /* CLXPublisherFullscreenAd.h in Headers */ = {isa = PBXBuildFile; fileRef = C7A4FA962DBA5C21A5114CFB22DACC4A /* CLXPublisherFullscreenAd.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3357610A45CCEC87F9516AFA57866B90 /* CLXBaseNetworkService.m in Sources */ = {isa = PBXBuildFile; fileRef = 42E4FB928FD68602B184FBF243A8CC80 /* CLXBaseNetworkService.m */; };
+		344AA41807F4768CF59D2BBCDEB60B25 /* CLXAdapterRewarded.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BF26A06CFE63AAE9972AAACAE081543 /* CLXAdapterRewarded.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3607D4D60746AE25E4B0A3F07B22437B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FE299F631DE1AC354265B757F879A1F /* Foundation.framework */; };
+		3671573750ED8B71309D4EF1AF4FA3AB /* CLXBidAdSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5C276DA09CAF64EAB22D6F17FF0143 /* CLXBidAdSource.m */; };
+		3726D47F6E8043371907AEC0DDA1043D /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE8D3605D56BBC7529C5FEA9CBD1F3B /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		381EFCD7D4D07D3BEACED7338AA71656 /* CLXBannerTimerService.m in Sources */ = {isa = PBXBuildFile; fileRef = B3FA11A7730291A18C981A0EC0977BA0 /* CLXBannerTimerService.m */; };
+		3A253BB4A3306056C6B151D84CC072C8 /* CLXDestroyable.h in Headers */ = {isa = PBXBuildFile; fileRef = FE9B0A226E1412772B40A9B5A6837B12 /* CLXDestroyable.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3BB1F80712BE40FCC0C359401A12FD52 /* CLXConfigImpressionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C5D54E7266E7511F5F946472A66E33F0 /* CLXConfigImpressionModel.m */; };
+		3DA7454B867D44123D0FEEF2EC118E1D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FE299F631DE1AC354265B757F879A1F /* Foundation.framework */; };
+		3E518D6F6AC52C4E3896FF25493664E5 /* CLXBiddingConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B03AA551D3D541FB242541DC062977 /* CLXBiddingConfig.m */; };
+		41094AD9E70CAABF70997D05AD63C786 /* CLXURLProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 15DB95B032A069FFFFB48A27F06B9DD0 /* CLXURLProvider.m */; };
+		453FC07B1D95D79F14D9DE4029DC568D /* CLXCacheAdService.h in Headers */ = {isa = PBXBuildFile; fileRef = 01FFC2157DFFD4FE6C643B9EBD634455 /* CLXCacheAdService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		45BB4859ED5B92B8E96C71E2D2493A9C /* CLXSessionMetric.h in Headers */ = {isa = PBXBuildFile; fileRef = A591A56339485F0E76AA908A711627AE /* CLXSessionMetric.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		46F6F2DF18E78B9CBCBB1D23DC231A49 /* CLXPerformanceMetricModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AFE7C344FDD27DA18AEBE5E0318A565 /* CLXPerformanceMetricModel.m */; };
+		47C24BF8E3AFB13D8A1D74B87ED10303 /* CLXSessionMetricSpend.m in Sources */ = {isa = PBXBuildFile; fileRef = B0C80E7B701A10ACCE8B037FE7BFA31C /* CLXSessionMetricSpend.m */; };
+		49B18EC5123B60DD74FBB8A769722464 /* CLXPerformanceMetricModel+Update.h in Headers */ = {isa = PBXBuildFile; fileRef = AED1D00E9A1547830020DCA11812C1DB /* CLXPerformanceMetricModel+Update.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		49CC35B8CB448EFDC28C8AF606BDBFAD /* CLXSDKConfigPlacement.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C8B90FF250A8FA7F77EC4486D963BC8 /* CLXSDKConfigPlacement.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C5247BF10B4E4BF7A1E34904AE20661 /* CLXBaseNetworkService.h in Headers */ = {isa = PBXBuildFile; fileRef = 917F82EA38E646EFE780AD7A4A86EC40 /* CLXBaseNetworkService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C64A704A934A9BE007D9014F65BC765 /* NSString+CLXSemicolon.h in Headers */ = {isa = PBXBuildFile; fileRef = 67F20BBCF143E0EF211474206A63EB94 /* NSString+CLXSemicolon.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4F6B16804E31870B26468AC41F2BB6C0 /* CLXInterstitialDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 141411BB73CC0F221613F9A7DE07C72A /* CLXInterstitialDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5089DD44E3400FF858BC053649B4B411 /* CLXAdTrackingService.h in Headers */ = {isa = PBXBuildFile; fileRef = 1845A3E771B6834987C2ADBF26A57E15 /* CLXAdTrackingService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		51373B02B56D6B227B471AC18B776194 /* CLXRillImpressionProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = 3884800E72D67AD8EF32313E1F59F1A9 /* CLXRillImpressionProperties.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5384EF679CD067CEFCA715FFCC8DFF14 /* CLXAdapterNative.h in Headers */ = {isa = PBXBuildFile; fileRef = 8C139D36F8E29DD08E234338B2C78884 /* CLXAdapterNative.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		54B38A5C5DD570EB3E33F7C74F8EC042 /* CLXAppSessionServiceImplementation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4FD4C91F219000BB9C2BDE082E7AD /* CLXAppSessionServiceImplementation.m */; };
+		554977899B47D64C8F60A8235375479B /* NSString+CLXSemicolon.m in Sources */ = {isa = PBXBuildFile; fileRef = 64B1ABEA18DCC3E409945500EE7DCF3B /* NSString+CLXSemicolon.m */; };
+		563BA1D457647A5F4526AA133930E8C1 /* CLXNativeTemplate.h in Headers */ = {isa = PBXBuildFile; fileRef = B8E179DAAC817AECFDA5B55E78EED3A2 /* CLXNativeTemplate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		57B88140817EFCFB3DF75F0122E552EF /* CLXRillImpressionModel.h in Headers */ = {isa = PBXBuildFile; fileRef = C4957301BBB5D155E683A9E771B5A59B /* CLXRillImpressionModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5980554645D4B5E07ABF82E227CD6C86 /* CLXSessionMetricType.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FB08DA02D9DEF33F8E25C3BC6DDDFCA /* CLXSessionMetricType.m */; };
+		5E26487A00BAB182D0DB6590358EB371 /* CLXCachedRewarded.h in Headers */ = {isa = PBXBuildFile; fileRef = 67029890223BDB1F23D918F11A6B0458 /* CLXCachedRewarded.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5EEEF7FCAB8FBB7F7F7564CEFD893D36 /* CLXBidResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = DA6A7F4476277ABDF2C9D5F5D2EB8D68 /* CLXBidResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		612E8BAD248A7F06735F81166C53359B /* CLXConfigImpressionModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 6A7801D65848F24EB134E39DD4AB334E /* CLXConfigImpressionModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		61FBB9A892899B4E30D777151FB0C4F2 /* CloudXCore.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B9D44EE7D89774136B075A1570108E6 /* CloudXCore.m */; };
+		62B4313522A4C1D20FD0C3DD806A55F4 /* CLXCachedInterstitial.m in Sources */ = {isa = PBXBuildFile; fileRef = BF92A0833C01016C98D8005D26E80188 /* CLXCachedInterstitial.m */; };
+		64D023B4168744C9D54A30CBC792C56B /* CLXInitMetricsModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 999A070D01135A40F64E63BE486E76C6 /* CLXInitMetricsModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		64FD12CD6128871D69F7753FDDE4315F /* CloudXCore.h in Headers */ = {isa = PBXBuildFile; fileRef = B3750099B60F1BDB194EF6994E14DA22 /* CloudXCore.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		683C52C823EF82DDEBD6E506ECF87192 /* CLXAdapterFactoryResolver.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A7E933DDD772CBDD8E7F247474B5FA5 /* CLXAdapterFactoryResolver.m */; };
+		6AC26B223D657BE75500A9544D287908 /* CLXAdNetworkFactories.m in Sources */ = {isa = PBXBuildFile; fileRef = D90E405D8E8EB9C4BB9A2C1987EBD1E6 /* CLXAdNetworkFactories.m */; };
+		6D265C0685502BF1FFBE72FE7EA70775 /* CLXSessionMetricType.h in Headers */ = {isa = PBXBuildFile; fileRef = F8A1048EC74CF7BAE28BF772E374408E /* CLXSessionMetricType.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6E2BD64017EABF3D3F912B7BCF7FD043 /* CLXAdEventReporting.h in Headers */ = {isa = PBXBuildFile; fileRef = D47567E946A9CF134089FC52931422E8 /* CLXAdEventReporting.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		70C2E0AA612C6FD4860AC039F9805FE9 /* CLXSessionMetricModel+Update.h in Headers */ = {isa = PBXBuildFile; fileRef = D5363938BE935F9B214C522FFC29948C /* CLXSessionMetricModel+Update.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		71C33C927C744C9BD6854944058416C0 /* CLXBannerTimerService.h in Headers */ = {isa = PBXBuildFile; fileRef = 8870CA359A2CAEEA027B74EBD64402EF /* CLXBannerTimerService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		71F0AB3865CA607A52697B516BFF8083 /* CLXBaseAd.h in Headers */ = {isa = PBXBuildFile; fileRef = EF1D888A2A425FB9BAC2737CED464749 /* CLXBaseAd.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		74AB3BE8C185BFE560E5205B75BD3B0D /* CLXSDKConfigEndpointObject.m in Sources */ = {isa = PBXBuildFile; fileRef = A6F36CBAC10FF6B970A96E76593409BC /* CLXSDKConfigEndpointObject.m */; };
+		7C309B1F4E890AAF34BEDDAC8F23774A /* CLXAdReportingNetworkService.h in Headers */ = {isa = PBXBuildFile; fileRef = 5377E8A02E8732380B1F3971D4E5840A /* CLXAdReportingNetworkService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7CECDC32591002DD8748CB8496A75338 /* CLXSKAdNetworkService.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C2EC65727F820F1D273A14EAA2A98E3 /* CLXSKAdNetworkService.m */; };
+		7ED227F78C38B86FF8263A47B7B18175 /* CLXMetricsNetworkService.h in Headers */ = {isa = PBXBuildFile; fileRef = 0359CDB0AAD3E93E57C93314FC9AD84A /* CLXMetricsNetworkService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7F9655FDEE504D1119F6FFC50687A053 /* CLXRillImpressionDefaultModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 570A07FAEF0BD39F67B25955E98EC914 /* CLXRillImpressionDefaultModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		801B04B8E1CCCCE7FFB6ECD6CBE66FB3 /* CLXPerformanceMetricModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 21B758D5E9D3F25F780F75AEBC215D0B /* CLXPerformanceMetricModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		807354591352B592D1693841EC892502 /* CLXNativeDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 1809406805D4084977E7DDC993E0622A /* CLXNativeDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		80E780479430D9487E2FDC509D760477 /* CLXReachabilityService.m in Sources */ = {isa = PBXBuildFile; fileRef = 432A0FFD3763FE3C9673582236433B72 /* CLXReachabilityService.m */; };
+		8385D0FC17FDCA252334F0A83C4907F1 /* CloudXCore-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = F7A47B06AA8D4415A341335727C772F3 /* CloudXCore-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		845DE818749B0E6B5806C339FA409076 /* CLXBidTokenSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BEB17AFCCD258990FE1E9EB1B33153B /* CLXBidTokenSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		86CD43A9F70944D8BE3C6531C78A5C33 /* CLXInterstitial.h in Headers */ = {isa = PBXBuildFile; fileRef = 345E1346AC0543D198BAE3BF17B7C659 /* CLXInterstitial.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		87F2C1891827D5478363F2F41201A40C /* URLSession+CLX.m in Sources */ = {isa = PBXBuildFile; fileRef = AE1B93D0ADB00C9DD7FB9BBAD2FC2FFD /* URLSession+CLX.m */; };
+		88A0757979C263129521D7C1E3021A8B /* CLXAdNetworkFactories.h in Headers */ = {isa = PBXBuildFile; fileRef = F332734237A790CE0D2C37C5328A10C8 /* CLXAdNetworkFactories.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		88CEF0532694F4B5146CC6D14A148AA6 /* CLXAdEventReporter.h in Headers */ = {isa = PBXBuildFile; fileRef = 28BAB82FF4ED3BD3D37ED49C7E64AC68 /* CLXAdEventReporter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8A3DA2244757CF01395439293D1E02FB /* CLXSDKConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 40E953FF1D613986C190F48B8319A9AE /* CLXSDKConfig.m */; };
+		8A6931D6F200C5593C6A514AA2768F5A /* CLXAppSession.h in Headers */ = {isa = PBXBuildFile; fileRef = F25E877D7DDD214AFABDEF140A67D9E2 /* CLXAppSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8A7A348425CB3399BB50BCF59C89BA45 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 669E30157F9AC145A7404D55DA3F9D69 /* SafariServices.framework */; };
+		8F887C2C25C493F23F1C78482394B257 /* CLXNativeTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA708FC15A7DC45E3DA660CA03069B8 /* CLXNativeTemplate.m */; };
+		8FF25456C7CF30863BDC63E0546D5D2F /* CLXSessionMetricModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C3D41B00A993F14A9970B7561F2670F /* CLXSessionMetricModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		91C9E6EEA8047BBC8FED5ED4E4950F6B /* CLXLiveInitService.h in Headers */ = {isa = PBXBuildFile; fileRef = 2DF7D011A6504B7F7956AB70CCD1A79D /* CLXLiveInitService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		923AE2C741B434411645B4AC49CA7A7C /* CLXBidAdSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 386C58EA5CC82A9555CDFB61088DBB5D /* CLXBidAdSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		92C4A72A2ED113EAAE945F45DCE08757 /* CLXBannerType.h in Headers */ = {isa = PBXBuildFile; fileRef = 94E4ABC279B171324B32E762B486C422 /* CLXBannerType.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		98C0A72EA6076A9BB094EE0EC91BD154 /* CLXInitService.h in Headers */ = {isa = PBXBuildFile; fileRef = CB031DEA5226F844B75F64D0705A467A /* CLXInitService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		992D2AA27E2311FF947233E8AF1F4A58 /* CLXAd.h in Headers */ = {isa = PBXBuildFile; fileRef = AFE412AA6EF3C10AF106CE5691BC61D0 /* CLXAd.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C12C80A8A60AFB855B76394331B723D /* CLXXorEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = FDF53DDC17438956A8AA1C1761459AE6 /* CLXXorEncryption.m */; };
+		9C8468187E42930C7995F6A79E1AF7B5 /* CLXLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = D0DCD3583FD8EC6861AB2B51AFDC5303 /* CLXLogger.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9D2F8AC018F7B21274029FF54023EF30 /* CLXExponentialBackoffStrategy.m in Sources */ = {isa = PBXBuildFile; fileRef = 66196FB488CDD26030FFA9F5996F669E /* CLXExponentialBackoffStrategy.m */; };
+		9FDA3EB8D8AEBA9EB907632DDAB5587E /* CLXCachedRewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C3A94D87E54ACE176FCCA58B58AE14A /* CLXCachedRewarded.m */; };
+		A1F46256C0C07C33F938E921024F9693 /* CLXURLProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A777CA5D92C8163F1D6DC2DE68779E2 /* CLXURLProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A2D51D333FD6E27F9C099D812F372D8F /* CLXBidResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = F8417395B8228F828213B58ECD5D4D34 /* CLXBidResponse.m */; };
+		A3279028759A2C88BEF2356A32D82F9C /* CLXRillImpressionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA661A0FD862A1DBAD98544CADCDBF4 /* CLXRillImpressionModel.m */; };
+		A343C066BC81E3360B27C15895E6CF1B /* CLXCoreDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 5DAC7FF075C5B41645B36276783E9BB7 /* CLXCoreDataManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A34A9C53248EA40BCDB8E5596F9EECAB /* CLXInitService.m in Sources */ = {isa = PBXBuildFile; fileRef = F0E5DEE9C22865DBC0213F5D31E708D2 /* CLXInitService.m */; };
+		A9DEB0643DC8A771788F83D0C00AD76B /* CLXSDKConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = D74A516FEEA1A5487BE0B1A3CE7DD87D /* CLXSDKConfig.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA690D9451A3202343D035A4DAF4B9B7 /* CLXAppSessionServiceImplementation.h in Headers */ = {isa = PBXBuildFile; fileRef = E116EAE76520B19DE28F1DEC2F3E23BF /* CLXAppSessionServiceImplementation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AAF5509E890D5AD6F2F212FDF21F7286 /* CLXInitMetricsModel+Update.m in Sources */ = {isa = PBXBuildFile; fileRef = DD1D42AEFC0F0FC175EA9A536F509292 /* CLXInitMetricsModel+Update.m */; };
+		ABDF88DE98D0A6D361BAD96D10229F5B /* CLXAdapterFactoryResolver.h in Headers */ = {isa = PBXBuildFile; fileRef = 425426814E4053F56E90E9F2E522DD52 /* CLXAdapterFactoryResolver.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AD5C728F8511D7D1E936083CA75B08EB /* CLXBiddingConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D1B0727103B53CE12924F7CC85DB233 /* CLXBiddingConfig.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AD82CE4FE90F7BDDDF618CAD22E069C2 /* CLXNativeAdView.h in Headers */ = {isa = PBXBuildFile; fileRef = C29C7A8B41A738F154D7AD83E27CAC12 /* CLXNativeAdView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ADC024E70CC1E2A93A9C5E27FCD61AAC /* CLXCachedInterstitial.h in Headers */ = {isa = PBXBuildFile; fileRef = 8D09AE713C6806564B198AC95449ADF7 /* CLXCachedInterstitial.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AECD4CB51845EBB5F3FE975863B6D973 /* CLXSDKConfigEndpointObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 074692A2BACD2207B5EAA2F3F201DA99 /* CLXSDKConfigEndpointObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AF98E3A5FAD4173BD4048BEC72EBDA25 /* CLXSessionMetricSpend.h in Headers */ = {isa = PBXBuildFile; fileRef = BDA4948950188481A47A75846E92B238 /* CLXSessionMetricSpend.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B754E0CEF7689D4E4E494FA606A054BE /* CloudXCore-CloudXCore in Resources */ = {isa = PBXBuildFile; fileRef = 603AF072D81D54B810C04FA244ACC0CA /* CloudXCore-CloudXCore */; };
+		B8ECC6FFE7DC8CC45B192B3560953D60 /* UIDevice+CLXIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6CBEADE01926F9B921B0EBD6A0DDA7 /* UIDevice+CLXIdentifier.m */; };
+		B90BA1EECA4A7AC14C13CB17333C5A16 /* CLXRillImpressionInitService.h in Headers */ = {isa = PBXBuildFile; fileRef = 307ED412019CD023904878D152CADBE2 /* CLXRillImpressionInitService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B9D115475AF9E7A0EB3C16CFC69844E0 /* CLXBackgroundTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 944ABB0AB9FA97A0B2FABADCA7226ACE /* CLXBackgroundTimer.m */; };
+		BB5480484579BDAF4059B3E207D877D9 /* CLXLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = DD8C356E1CBAEB1CB719C64A15F06349 /* CLXLogger.m */; };
+		BD25FAEDB24AF2693CBAB7E7F33F2860 /* CLXCacheAdService.m in Sources */ = {isa = PBXBuildFile; fileRef = C56353D23B86F1F990A9FE8F30DFCA85 /* CLXCacheAdService.m */; };
+		BF8A5A51AAD77F2A84AB517FC6DA4137 /* CLXAdapterRewardedFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 9E340971F687A4A7609B250ACF0495A9 /* CLXAdapterRewardedFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C013E51F37C4DA74688E761CD0E11E2F /* CLXSessionMetricModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EA2850D47F1A678A88E188B66FB3629 /* CLXSessionMetricModel.m */; };
+		C0631FC69259E37D535198B36464FC6D /* CLXPerformanceMetricModel+Update.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D5AFB5ABBA7B789F5372E6B3EEECF56 /* CLXPerformanceMetricModel+Update.m */; };
+		C3E4150E2EB93448EAE2FE4D468D372D /* CLXLiveInitService.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F4B03E80BF4286A3F2B6366A751D1F6 /* CLXLiveInitService.m */; };
+		C3F9D829742C692228E9D24E97BE09F8 /* CLXGeoLocationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 47513E97FA546F5530043B15D824A2B6 /* CLXGeoLocationService.m */; };
+		C4A7C632C1D598ABC2125433DB83DD63 /* Pods-CloudXDemoAdapter-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = DADB211EE5713F900248336680DCD367 /* Pods-CloudXDemoAdapter-dummy.m */; };
+		C91505A337D42C8B5E784A53DAFFC987 /* CLXSKAdNetworkService.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D27865730ECD12E6998CE5ACF0B93BF /* CLXSKAdNetworkService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CAA70DF76A147A7825CE5D5C40C8E410 /* CLXCoreError.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267D0B72BE820869AF11A66B5B2391F /* CLXCoreError.m */; };
+		CCEBE86903538D67A0BEE52D5B191F7E /* CLXSDKInitNetworkService.m in Sources */ = {isa = PBXBuildFile; fileRef = 89224F8781F0E1BF795821AE5306BE13 /* CLXSDKInitNetworkService.m */; };
+		CDEBA33897070E4B5848C4AD766DFD26 /* CLXSDKConfigBidder.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C6278802974AFB05FD2492E204D5D63 /* CLXSDKConfigBidder.m */; };
+		D1E1654E4A7E9677CFDE0AE1840F396A /* CLXGeoLocationService.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A3901D05EACB9C27DD8B842C65661A /* CLXGeoLocationService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D1EFE4C5267DEC1C6D065A68851FEC4F /* CLXBidderConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 04AA793465EBFC84A3D1D1A52BE32E47 /* CLXBidderConfig.m */; };
+		D5AFEA1D9AAD3E2F0980051B8960771D /* CLXDIContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = F9A4D0F1B2B590C93BB6F0375B9060D8 /* CLXDIContainer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D63EE87265F21870DD4E184C1CE22595 /* CLXMetricsTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 967BB0243959EC3FB2B622A3EAAC1F68 /* CLXMetricsTracker.m */; };
+		D989D5B60B33F1FF049C3616006FE05C /* CLXBannerDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E8F9D161C4CA7899D2AE3E34DD29BB9 /* CLXBannerDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DB2B6F571CA6B27AB844B96DBFE055EE /* CLXInitMetricsModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B5F469B38753B048847BF679BDED207 /* CLXInitMetricsModel.m */; };
+		DE449279E3A3253EEC03B5613760748C /* CloudXCoreAPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 22721261BD2A0B783CDE7B378D5E460B /* CloudXCoreAPI.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DF4D17D5EF79E40B4F8D44A367B0334E /* CLXAdTrackingService.m in Sources */ = {isa = PBXBuildFile; fileRef = C57F655B9199F5DDD3B92CC2549DA5CA /* CLXAdTrackingService.m */; };
+		E259A62DE15489F7D9E49BE20772D1FA /* CLXRillImpressionInitService.m in Sources */ = {isa = PBXBuildFile; fileRef = 03FAC953296130DAD8D04889F88AA76A /* CLXRillImpressionInitService.m */; };
+		E49D2501A2F7AAFFF38E057CC1D533E4 /* CLXSDKConfigRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F7C104EFE8FCD3D0B0DB9765AFC3C9E /* CLXSDKConfigRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E61F59F550D0256D640F0CE8BF2A573D /* CLXPublisherNative.m in Sources */ = {isa = PBXBuildFile; fileRef = 63EC22B513DE47611FDAF068256DC755 /* CLXPublisherNative.m */; };
+		E6402A45D5EAD649849630D5CE672243 /* CLXAdapterInterstitialFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A27E11440F0406A91EFFBEA8DFE7DAD /* CLXAdapterInterstitialFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7136DC119577405E76ABE36D03E5A54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FE299F631DE1AC354265B757F879A1F /* Foundation.framework */; };
+		E7CFFE83CA8A9CEE4A73AE5A319439C4 /* Pods-CloudXDemoAdapter-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = CBFADA0CF3C8371B87C263A6ABD498FF /* Pods-CloudXDemoAdapter-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EABC61667066E67DB6566E0413BA276C /* CLXAdNetworkInitializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C5BFB232B1A0365E954104CA89B42B8 /* CLXAdNetworkInitializer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EBF0AF6C71382AAA670391B22AEA1A9D /* CLXAppSessionService.h in Headers */ = {isa = PBXBuildFile; fileRef = D4EF35CE587584027A66AB0EEE0922B2 /* CLXAppSessionService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EC6B4C9AFD317E74246CC24C02598C89 /* UIDevice+CLXIdentifier.h in Headers */ = {isa = PBXBuildFile; fileRef = B0BF73DC4BB2771A3E145E9687E8C5B8 /* UIDevice+CLXIdentifier.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EDE44366C25D324ECB013D78F5280CBC /* CLXMetricsTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 43509A1DB401C2E630FA7713E931C6C4 /* CLXMetricsTracker.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EE4651B83490251267D8DB9745D9E309 /* CLXSDKConfigPlacement.m in Sources */ = {isa = PBXBuildFile; fileRef = ABE523ACBADBB6B38C7A33C58473A052 /* CLXSDKConfigPlacement.m */; };
+		EF48AEB4A271B410457DE43BBC6DF6FA /* CLXBidNetworkService.m in Sources */ = {isa = PBXBuildFile; fileRef = 61D55D971AE1FCDD025DF52BB075ECE7 /* CLXBidNetworkService.m */; };
+		F1619357C10AD5D5F3960EE95BE198B4 /* CLXAppSessionModel+Update.m in Sources */ = {isa = PBXBuildFile; fileRef = 77A8FF11B4A66E1E7DDABEBADF575A0F /* CLXAppSessionModel+Update.m */; };
+		F1D434B102406DCE854A5C698AB46C35 /* CLXAppSessionModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 89AA40D56DFB381D7028B64E9DED5CD8 /* CLXAppSessionModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F1D4737B601F3FE3127B02BA7A1376BE /* CLXRewardedInterstitial.h in Headers */ = {isa = PBXBuildFile; fileRef = D1EC7D0E60A7E397E5FF1B28238ED0A7 /* CLXRewardedInterstitial.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F67AC9BAD6B1D41E435C4C55B5AA9DEB /* CLXRillImpressionProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 6535FBF00FE7184647F4CC08917910E4 /* CLXRillImpressionProperties.m */; };
+		F69EC3C840A8B66554CF739C2232FAAD /* CLXXorEncryption.h in Headers */ = {isa = PBXBuildFile; fileRef = 07B4300767BF5CD3646369FB3D9E783C /* CLXXorEncryption.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F8483A5DEF3005882944AD42F330E52B /* CLXAdEventReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AA0D9F96850D6CA863121D59F409B7C /* CLXAdEventReporter.m */; };
+		F87EF55F741FC0EFBA416F5BA7306282 /* CLXSessionMetricModel+Update.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D0CE64A492B69ED9DBCACE8592A8D4E /* CLXSessionMetricModel+Update.m */; };
+		F95B83A75C5AE87C790AD8BCD9D1EDEE /* CLXAdapterNativeFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DC6585FD80CC3FBA81B65FD3CF08DCF /* CLXAdapterNativeFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F994C17F709A39069CCA747009E520F8 /* CLXNative.h in Headers */ = {isa = PBXBuildFile; fileRef = 1255ED9B198D5F9D57F31DA5E8BE0482 /* CLXNative.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FA0E13E86072DC3AF596C54A620FDB67 /* CLXBidNetworkServiceImplementation.m in Sources */ = {isa = PBXBuildFile; fileRef = D010E75B3B48F5360B2DA15DF20AA83C /* CLXBidNetworkServiceImplementation.m */; };
+		FA281B1B0BAE9B143B83CDD59CAF7D19 /* CLXPublisherFullscreenAd.m in Sources */ = {isa = PBXBuildFile; fileRef = 103B001FD4B209AFB302145CAD6D0271 /* CLXPublisherFullscreenAd.m */; };
+		FAD77B3376EBACB5161CAB6203E7D646 /* CLXSDKConfigBidder.h in Headers */ = {isa = PBXBuildFile; fileRef = A246E1A7DC6D55230327752EC74D5052 /* CLXSDKConfigBidder.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FBAB5CDE335EE45357BA5D7A708B5C0F /* CLXAdReportingNetworkService.m in Sources */ = {isa = PBXBuildFile; fileRef = B4A3104E236FABCFBDFBA0E429FBCC67 /* CLXAdReportingNetworkService.m */; };
+		FC9633DD590A669D8E5ED04EA901B5C0 /* CLXFullscreenAd.h in Headers */ = {isa = PBXBuildFile; fileRef = 1222560F0E69BFA68F6C0FA57CA3D391 /* CLXFullscreenAd.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FE29379BFA0F55F7446C5B4AFDF16878 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 707A4267EA85930A7535FCA11F99D1E8 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-dummy.m */; };
+		FE432A07D180BB8A9F9CEDC5AF8BE48A /* CLXInitMetrics.h in Headers */ = {isa = PBXBuildFile; fileRef = 458A53E7F0A59CC719EBC0029CCBF4EC /* CLXInitMetrics.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FED0D6914F64DEED18238F156CE75B1F /* CLXRewardedDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3800180FF782D715D6AEDA67FC9FBED2 /* CLXRewardedDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FEFDC69C2A671343529778337189A95E /* CLXAdapterInterstitial.h in Headers */ = {isa = PBXBuildFile; fileRef = A322B7C560C1EE82F16CC276B3106E19 /* CLXAdapterInterstitial.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FFB2CA90BE4D08D5595E3B6F2DDF204D /* CLXInitMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = 181A3EE7CA31B7809FF8C26F3309866E /* CLXInitMetrics.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		504FC7EAD8D3767B67F782CB2EB31212 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2A20F62AB9EA6B4E32DB3D197EA89852;
+			remoteInfo = "CloudXCore-CloudXCore";
+		};
+		68C69B7EF95C36763E44842DD427F183 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A532F36DE5630BB28D7AC5C6E8B8CB4C;
+			remoteInfo = CloudXCore;
+		};
+		ABA43345387E6D089D044208077E2581 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A532F36DE5630BB28D7AC5C6E8B8CB4C;
+			remoteInfo = CloudXCore;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		01FFC2157DFFD4FE6C643B9EBD634455 /* CLXCacheAdService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXCacheAdService.h; path = Sources/CloudXCore/CLXCacheAdService.h; sourceTree = "<group>"; };
+		026372AB964BEB9B374021A044E49A51 /* CLXDIContainer.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXDIContainer.m; sourceTree = "<group>"; };
+		033F466FCFB28EF3C5D9C1BDF2C8B187 /* CLXCacheAdQueue.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXCacheAdQueue.h; path = Sources/CloudXCore/CLXCacheAdQueue.h; sourceTree = "<group>"; };
+		0359CDB0AAD3E93E57C93314FC9AD84A /* CLXMetricsNetworkService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXMetricsNetworkService.h; path = Sources/CloudXCore/CLXMetricsNetworkService.h; sourceTree = "<group>"; };
+		03FAC953296130DAD8D04889F88AA76A /* CLXRillImpressionInitService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXRillImpressionInitService.m; sourceTree = "<group>"; };
+		04AA793465EBFC84A3D1D1A52BE32E47 /* CLXBidderConfig.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXBidderConfig.m; sourceTree = "<group>"; };
+		074692A2BACD2207B5EAA2F3F201DA99 /* CLXSDKConfigEndpointObject.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXSDKConfigEndpointObject.h; path = Sources/CloudXCore/CLXSDKConfigEndpointObject.h; sourceTree = "<group>"; };
+		07B4300767BF5CD3646369FB3D9E783C /* CLXXorEncryption.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXXorEncryption.h; path = Sources/CloudXCore/CLXXorEncryption.h; sourceTree = "<group>"; };
+		0B5F469B38753B048847BF679BDED207 /* CLXInitMetricsModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXInitMetricsModel.m; sourceTree = "<group>"; };
+		0C3EE7FA411B3149FCE1B316B80E0D47 /* Pods-CloudXDemoAdapter-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-CloudXDemoAdapter-acknowledgements.markdown"; sourceTree = "<group>"; };
+		0CBE44A4AC3912C9CEB806FB637378DE /* CloudXCoreError.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CloudXCoreError.h; path = Sources/CloudXCore/CloudXCoreError.h; sourceTree = "<group>"; };
+		0EA2850D47F1A678A88E188B66FB3629 /* CLXSessionMetricModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXSessionMetricModel.m; sourceTree = "<group>"; };
+		103B001FD4B209AFB302145CAD6D0271 /* CLXPublisherFullscreenAd.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXPublisherFullscreenAd.m; sourceTree = "<group>"; };
+		1222560F0E69BFA68F6C0FA57CA3D391 /* CLXFullscreenAd.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXFullscreenAd.h; path = Sources/CloudXCore/CLXFullscreenAd.h; sourceTree = "<group>"; };
+		1255ED9B198D5F9D57F31DA5E8BE0482 /* CLXNative.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXNative.h; path = Sources/CloudXCore/CLXNative.h; sourceTree = "<group>"; };
+		1265B546547182000199055AB3E29915 /* CLXBannerAdView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBannerAdView.h; path = Sources/CloudXCore/CLXBannerAdView.h; sourceTree = "<group>"; };
+		141411BB73CC0F221613F9A7DE07C72A /* CLXInterstitialDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXInterstitialDelegate.h; path = Sources/CloudXCore/CLXInterstitialDelegate.h; sourceTree = "<group>"; };
+		15DB95B032A069FFFFB48A27F06B9DD0 /* CLXURLProvider.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXURLProvider.m; sourceTree = "<group>"; };
+		161D87E1E0CA6132B899DDACCA673240 /* CLXSDKInitNetworkService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXSDKInitNetworkService.h; path = Sources/CloudXCore/CLXSDKInitNetworkService.h; sourceTree = "<group>"; };
+		17B69A1D47C1D1FB6A6CB4599D5961D6 /* CLXCoreDataManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXCoreDataManager.m; sourceTree = "<group>"; };
+		1809406805D4084977E7DDC993E0622A /* CLXNativeDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXNativeDelegate.h; path = Sources/CloudXCore/CLXNativeDelegate.h; sourceTree = "<group>"; };
+		181A3EE7CA31B7809FF8C26F3309866E /* CLXInitMetrics.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXInitMetrics.m; sourceTree = "<group>"; };
+		1845A3E771B6834987C2ADBF26A57E15 /* CLXAdTrackingService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdTrackingService.h; path = Sources/CloudXCore/CLXAdTrackingService.h; sourceTree = "<group>"; };
+		1A7E933DDD772CBDD8E7F247474B5FA5 /* CLXAdapterFactoryResolver.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterFactoryResolver.m; sourceTree = "<group>"; };
+		1DC6585FD80CC3FBA81B65FD3CF08DCF /* CLXAdapterNativeFactory.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdapterNativeFactory.h; path = Sources/CloudXCore/CLXAdapterNativeFactory.h; sourceTree = "<group>"; };
+		1E8F9D161C4CA7899D2AE3E34DD29BB9 /* CLXBannerDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBannerDelegate.h; path = Sources/CloudXCore/CLXBannerDelegate.h; sourceTree = "<group>"; };
+		1F939B5FCF5388AE7CA83B29663EFDCE /* Pods-CloudXDemoAdapter.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-CloudXDemoAdapter.modulemap"; sourceTree = "<group>"; };
+		1FE299F631DE1AC354265B757F879A1F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		21B758D5E9D3F25F780F75AEBC215D0B /* CLXPerformanceMetricModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXPerformanceMetricModel.h; path = Sources/CloudXCore/CLXPerformanceMetricModel.h; sourceTree = "<group>"; };
+		22721261BD2A0B783CDE7B378D5E460B /* CloudXCoreAPI.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CloudXCoreAPI.h; path = Sources/CloudXCore/CloudXCoreAPI.h; sourceTree = "<group>"; };
+		246FD1A391F70120CAA5CF78F28E7773 /* CLXPublisherBanner.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXPublisherBanner.h; path = Sources/CloudXCore/CLXPublisherBanner.h; sourceTree = "<group>"; };
+		25B78FF62BC1F25625535048D1CD55B8 /* CLXExponentialBackoffStrategy.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXExponentialBackoffStrategy.h; path = Sources/CloudXCore/CLXExponentialBackoffStrategy.h; sourceTree = "<group>"; };
+		28BAB82FF4ED3BD3D37ED49C7E64AC68 /* CLXAdEventReporter.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdEventReporter.h; path = Sources/CloudXCore/CLXAdEventReporter.h; sourceTree = "<group>"; };
+		2C3A94D87E54ACE176FCCA58B58AE14A /* CLXCachedRewarded.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXCachedRewarded.m; sourceTree = "<group>"; };
+		2DF7D011A6504B7F7956AB70CCD1A79D /* CLXLiveInitService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXLiveInitService.h; path = Sources/CloudXCore/CLXLiveInitService.h; sourceTree = "<group>"; };
+		305040C096B79DAADCEAEC50B2637A0F /* CLXPublisherNative.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXPublisherNative.h; path = Sources/CloudXCore/CLXPublisherNative.h; sourceTree = "<group>"; };
+		307ED412019CD023904878D152CADBE2 /* CLXRillImpressionInitService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXRillImpressionInitService.h; path = Sources/CloudXCore/CLXRillImpressionInitService.h; sourceTree = "<group>"; };
+		312441858E7A8DA3F334F1138E4A058C /* Pods-CloudXDemoAdapter */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-CloudXDemoAdapter"; path = Pods_CloudXDemoAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3408CD1FA58D9EA49BDB2804A49E1F77 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-acknowledgements.plist"; sourceTree = "<group>"; };
+		345E1346AC0543D198BAE3BF17B7C659 /* CLXInterstitial.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXInterstitial.h; path = Sources/CloudXCore/CLXInterstitial.h; sourceTree = "<group>"; };
+		367F068BAE283D2D66347ABD4968E084 /* CLXBanner.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBanner.h; path = Sources/CloudXCore/CLXBanner.h; sourceTree = "<group>"; };
+		3800180FF782D715D6AEDA67FC9FBED2 /* CLXRewardedDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXRewardedDelegate.h; path = Sources/CloudXCore/CLXRewardedDelegate.h; sourceTree = "<group>"; };
+		386C58EA5CC82A9555CDFB61088DBB5D /* CLXBidAdSource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBidAdSource.h; path = Sources/CloudXCore/CLXBidAdSource.h; sourceTree = "<group>"; };
+		3884800E72D67AD8EF32313E1F59F1A9 /* CLXRillImpressionProperties.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXRillImpressionProperties.h; path = Sources/CloudXCore/CLXRillImpressionProperties.h; sourceTree = "<group>"; };
+		38E0DC51F940729AA6403FF297364AC3 /* CLXSessionMetricPerformance.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXSessionMetricPerformance.m; sourceTree = "<group>"; };
+		3A27E11440F0406A91EFFBEA8DFE7DAD /* CLXAdapterInterstitialFactory.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdapterInterstitialFactory.h; path = Sources/CloudXCore/CLXAdapterInterstitialFactory.h; sourceTree = "<group>"; };
+		3AFE7C344FDD27DA18AEBE5E0318A565 /* CLXPerformanceMetricModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXPerformanceMetricModel.m; sourceTree = "<group>"; };
+		3BF26A06CFE63AAE9972AAACAE081543 /* CLXAdapterRewarded.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdapterRewarded.h; path = Sources/CloudXCore/CLXAdapterRewarded.h; sourceTree = "<group>"; };
+		3C3D41B00A993F14A9970B7561F2670F /* CLXSessionMetricModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXSessionMetricModel.h; path = Sources/CloudXCore/CLXSessionMetricModel.h; sourceTree = "<group>"; };
+		3CC1AA3FE2ED115029D302D21A19D41F /* CLXAdapterBanner.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdapterBanner.h; path = Sources/CloudXCore/CLXAdapterBanner.h; sourceTree = "<group>"; };
+		3DA661A0FD862A1DBAD98544CADCDBF4 /* CLXRillImpressionModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXRillImpressionModel.m; sourceTree = "<group>"; };
+		3F4B03E80BF4286A3F2B6366A751D1F6 /* CLXLiveInitService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXLiveInitService.m; sourceTree = "<group>"; };
+		40E953FF1D613986C190F48B8319A9AE /* CLXSDKConfig.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXSDKConfig.m; sourceTree = "<group>"; };
+		425426814E4053F56E90E9F2E522DD52 /* CLXAdapterFactoryResolver.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdapterFactoryResolver.h; path = Sources/CloudXCore/CLXAdapterFactoryResolver.h; sourceTree = "<group>"; };
+		42E4FB928FD68602B184FBF243A8CC80 /* CLXBaseNetworkService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXBaseNetworkService.m; sourceTree = "<group>"; };
+		432A0FFD3763FE3C9673582236433B72 /* CLXReachabilityService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXReachabilityService.m; sourceTree = "<group>"; };
+		43509A1DB401C2E630FA7713E931C6C4 /* CLXMetricsTracker.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXMetricsTracker.h; path = Sources/CloudXCore/CLXMetricsTracker.h; sourceTree = "<group>"; };
+		443918A3BD18D1631FF228946FC293D6 /* CLXReachabilityService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXReachabilityService.h; path = Sources/CloudXCore/CLXReachabilityService.h; sourceTree = "<group>"; };
+		44B34F35216609499E62B8994D05C7EF /* CLXBannerAdView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXBannerAdView.m; sourceTree = "<group>"; };
+		458A53E7F0A59CC719EBC0029CCBF4EC /* CLXInitMetrics.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXInitMetrics.h; path = Sources/CloudXCore/CLXInitMetrics.h; sourceTree = "<group>"; };
+		47513E97FA546F5530043B15D824A2B6 /* CLXGeoLocationService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXGeoLocationService.m; sourceTree = "<group>"; };
+		4BE8D3605D56BBC7529C5FEA9CBD1F3B /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-umbrella.h"; sourceTree = "<group>"; };
+		4C5BFB232B1A0365E954104CA89B42B8 /* CLXAdNetworkInitializer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdNetworkInitializer.h; path = Sources/CloudXCore/CLXAdNetworkInitializer.h; sourceTree = "<group>"; };
+		4D2FBBC358BACC0A82A1450D08FC6966 /* CLXBidNetworkService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBidNetworkService.h; path = Sources/CloudXCore/CLXBidNetworkService.h; sourceTree = "<group>"; };
+		4D5C276DA09CAF64EAB22D6F17FF0143 /* CLXBidAdSource.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXBidAdSource.m; sourceTree = "<group>"; };
+		4E295108D1AFB39D13A4C4D266C8802A /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests.debug.xcconfig"; sourceTree = "<group>"; };
+		500217CDC93B6923034617C89CA36771 /* ResourceBundle-CloudXCore-CloudXCore-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-CloudXCore-CloudXCore-Info.plist"; sourceTree = "<group>"; };
+		5377E8A02E8732380B1F3971D4E5840A /* CLXAdReportingNetworkService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdReportingNetworkService.h; path = Sources/CloudXCore/CLXAdReportingNetworkService.h; sourceTree = "<group>"; };
+		545CDA28099F7A4F1DC3290154820E43 /* Pods-CloudXDemoAdapter-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-CloudXDemoAdapter-acknowledgements.plist"; sourceTree = "<group>"; };
+		550DDD77DF15AE77B2C6E19B2A3A12D0 /* Model.xcdatamodel */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		570A07FAEF0BD39F67B25955E98EC914 /* CLXRillImpressionDefaultModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXRillImpressionDefaultModel.h; path = Sources/CloudXCore/CLXRillImpressionDefaultModel.h; sourceTree = "<group>"; };
+		58163CCB1A227C43405569470D64B2E7 /* Pods-CloudXDemoAdapter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-CloudXDemoAdapter.debug.xcconfig"; sourceTree = "<group>"; };
+		5A1BE158273A91513890D02B6BB00B58 /* CLXAppSessionModel+Update.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "CLXAppSessionModel+Update.h"; path = "Sources/CloudXCore/CLXAppSessionModel+Update.h"; sourceTree = "<group>"; };
+		5C2EC65727F820F1D273A14EAA2A98E3 /* CLXSKAdNetworkService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXSKAdNetworkService.m; sourceTree = "<group>"; };
+		5D9117815BBD43AA4CF50D16275464AC /* CloudXCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CloudXCore.debug.xcconfig; sourceTree = "<group>"; };
+		5DAC7FF075C5B41645B36276783E9BB7 /* CLXCoreDataManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXCoreDataManager.h; path = Sources/CloudXCore/CLXCoreDataManager.h; sourceTree = "<group>"; };
+		5FB08DA02D9DEF33F8E25C3BC6DDDFCA /* CLXSessionMetricType.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXSessionMetricType.m; sourceTree = "<group>"; };
+		603AF072D81D54B810C04FA244ACC0CA /* CloudXCore-CloudXCore */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "CloudXCore-CloudXCore"; path = CloudXCore.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		61D55D971AE1FCDD025DF52BB075ECE7 /* CLXBidNetworkService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXBidNetworkService.m; sourceTree = "<group>"; };
+		63E06A1A05E3B93181890BABA5D581BE /* CLXMetricsNetworkService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsNetworkService.m; sourceTree = "<group>"; };
+		63EC22B513DE47611FDAF068256DC755 /* CLXPublisherNative.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXPublisherNative.m; sourceTree = "<group>"; };
+		64B1ABEA18DCC3E409945500EE7DCF3B /* NSString+CLXSemicolon.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "NSString+CLXSemicolon.m"; sourceTree = "<group>"; };
+		6535FBF00FE7184647F4CC08917910E4 /* CLXRillImpressionProperties.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXRillImpressionProperties.m; sourceTree = "<group>"; };
+		66196FB488CDD26030FFA9F5996F669E /* CLXExponentialBackoffStrategy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXExponentialBackoffStrategy.m; sourceTree = "<group>"; };
+		669E30157F9AC145A7404D55DA3F9D69 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/SafariServices.framework; sourceTree = DEVELOPER_DIR; };
+		67029890223BDB1F23D918F11A6B0458 /* CLXCachedRewarded.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXCachedRewarded.h; path = Sources/CloudXCore/CLXCachedRewarded.h; sourceTree = "<group>"; };
+		67F20BBCF143E0EF211474206A63EB94 /* NSString+CLXSemicolon.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSString+CLXSemicolon.h"; path = "Sources/CloudXCore/NSString+CLXSemicolon.h"; sourceTree = "<group>"; };
+		6A7801D65848F24EB134E39DD4AB334E /* CLXConfigImpressionModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXConfigImpressionModel.h; path = Sources/CloudXCore/CLXConfigImpressionModel.h; sourceTree = "<group>"; };
+		6B5D18D8CC8BD1B93A7D85D458422689 /* CLXInitMetricsModel+Update.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "CLXInitMetricsModel+Update.h"; path = "Sources/CloudXCore/CLXInitMetricsModel+Update.h"; sourceTree = "<group>"; };
+		707A4267EA85930A7535FCA11F99D1E8 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-dummy.m"; sourceTree = "<group>"; };
+		71ECEDC0E77C678185457F11A5286CAC /* CloudXCore.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = CloudXCore.modulemap; sourceTree = "<group>"; };
+		7267D0B72BE820869AF11A66B5B2391F /* CLXCoreError.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXCoreError.m; sourceTree = "<group>"; };
+		73FEB1B50B5538A731244995E98535BE /* CLXAppSession.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXAppSession.m; sourceTree = "<group>"; };
+		740BCBFA59A8796FBDA9D823F2633598 /* CLXBaseAdDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBaseAdDelegate.h; path = Sources/CloudXCore/CLXBaseAdDelegate.h; sourceTree = "<group>"; };
+		77A8FF11B4A66E1E7DDABEBADF575A0F /* CLXAppSessionModel+Update.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "CLXAppSessionModel+Update.m"; sourceTree = "<group>"; };
+		7A777CA5D92C8163F1D6DC2DE68779E2 /* CLXURLProvider.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXURLProvider.h; path = Sources/CloudXCore/CLXURLProvider.h; sourceTree = "<group>"; };
+		7B376FAACEE40D871AF98BE9DE537819 /* CloudXCore-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "CloudXCore-Info.plist"; sourceTree = "<group>"; };
+		7C6278802974AFB05FD2492E204D5D63 /* CLXSDKConfigBidder.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXSDKConfigBidder.m; sourceTree = "<group>"; };
+		7D27865730ECD12E6998CE5ACF0B93BF /* CLXSKAdNetworkService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXSKAdNetworkService.h; path = Sources/CloudXCore/CLXSKAdNetworkService.h; sourceTree = "<group>"; };
+		7D5AFB5ABBA7B789F5372E6B3EEECF56 /* CLXPerformanceMetricModel+Update.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "CLXPerformanceMetricModel+Update.m"; sourceTree = "<group>"; };
+		7F69D37CBABA13E69E37734701A8CE89 /* CLXCacheAdQueue.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXCacheAdQueue.m; sourceTree = "<group>"; };
+		8014771E2AB7B0F5FC5ABCDEC07D10B1 /* Model 3.xcdatamodel */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcdatamodel; path = "Model 3.xcdatamodel"; sourceTree = "<group>"; };
+		8870CA359A2CAEEA027B74EBD64402EF /* CLXBannerTimerService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBannerTimerService.h; path = Sources/CloudXCore/CLXBannerTimerService.h; sourceTree = "<group>"; };
+		891BE81810379BBEAD1BD534DD0DA0F8 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-frameworks.sh"; sourceTree = "<group>"; };
+		89224F8781F0E1BF795821AE5306BE13 /* CLXSDKInitNetworkService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXSDKInitNetworkService.m; sourceTree = "<group>"; };
+		89AA40D56DFB381D7028B64E9DED5CD8 /* CLXAppSessionModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAppSessionModel.h; path = Sources/CloudXCore/CLXAppSessionModel.h; sourceTree = "<group>"; };
+		8A409758A13F6B369AFCE93763E2657B /* CLXCacheableAd.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXCacheableAd.h; path = Sources/CloudXCore/CLXCacheableAd.h; sourceTree = "<group>"; };
+		8AB1FC59789D6EEB8686781A97C88841 /* CLXNativeAdView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXNativeAdView.m; sourceTree = "<group>"; };
+		8ADA33D950D2F8DE6BA3702F27E568F5 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-acknowledgements.markdown"; sourceTree = "<group>"; };
+		8AE4FD4C91F219000BB9C2BDE082E7AD /* CLXAppSessionServiceImplementation.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXAppSessionServiceImplementation.m; sourceTree = "<group>"; };
+		8B47CC73D10E86291958E8BF18F353B9 /* CLXPublisherBanner.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXPublisherBanner.m; sourceTree = "<group>"; };
+		8B6D7132A9EE24EA7F20617927C76187 /* CloudXCore-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "CloudXCore-dummy.m"; sourceTree = "<group>"; };
+		8B9D44EE7D89774136B075A1570108E6 /* CloudXCore.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = CloudXCore.m; path = Sources/CloudXCore/CloudXCore.m; sourceTree = "<group>"; };
+		8BEB17AFCCD258990FE1E9EB1B33153B /* CLXBidTokenSource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBidTokenSource.h; path = Sources/CloudXCore/CLXBidTokenSource.h; sourceTree = "<group>"; };
+		8C139D36F8E29DD08E234338B2C78884 /* CLXAdapterNative.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdapterNative.h; path = Sources/CloudXCore/CLXAdapterNative.h; sourceTree = "<group>"; };
+		8C6CBEADE01926F9B921B0EBD6A0DDA7 /* UIDevice+CLXIdentifier.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+CLXIdentifier.m"; sourceTree = "<group>"; };
+		8D09AE713C6806564B198AC95449ADF7 /* CLXCachedInterstitial.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXCachedInterstitial.h; path = Sources/CloudXCore/CLXCachedInterstitial.h; sourceTree = "<group>"; };
+		8D0CE64A492B69ED9DBCACE8592A8D4E /* CLXSessionMetricModel+Update.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "CLXSessionMetricModel+Update.m"; sourceTree = "<group>"; };
+		8EDAABE539F1E69E50C2BA550728FDF5 /* CLXBidNetworkServiceImplementation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBidNetworkServiceImplementation.h; path = Sources/CloudXCore/CLXBidNetworkServiceImplementation.h; sourceTree = "<group>"; };
+		8F7C104EFE8FCD3D0B0DB9765AFC3C9E /* CLXSDKConfigRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXSDKConfigRequest.h; path = Sources/CloudXCore/CLXSDKConfigRequest.h; sourceTree = "<group>"; };
+		917F82EA38E646EFE780AD7A4A86EC40 /* CLXBaseNetworkService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBaseNetworkService.h; path = Sources/CloudXCore/CLXBaseNetworkService.h; sourceTree = "<group>"; };
+		944ABB0AB9FA97A0B2FABADCA7226ACE /* CLXBackgroundTimer.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXBackgroundTimer.m; sourceTree = "<group>"; };
+		94E4ABC279B171324B32E762B486C422 /* CLXBannerType.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBannerType.h; path = Sources/CloudXCore/CLXBannerType.h; sourceTree = "<group>"; };
+		967BB0243959EC3FB2B622A3EAAC1F68 /* CLXMetricsTracker.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsTracker.m; sourceTree = "<group>"; };
+		999A070D01135A40F64E63BE486E76C6 /* CLXInitMetricsModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXInitMetricsModel.h; path = Sources/CloudXCore/CLXInitMetricsModel.h; sourceTree = "<group>"; };
+		9AA0D9F96850D6CA863121D59F409B7C /* CLXAdEventReporter.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXAdEventReporter.m; sourceTree = "<group>"; };
+		9BA708FC15A7DC45E3DA660CA03069B8 /* CLXNativeTemplate.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXNativeTemplate.m; sourceTree = "<group>"; };
+		9C8B90FF250A8FA7F77EC4486D963BC8 /* CLXSDKConfigPlacement.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXSDKConfigPlacement.h; path = Sources/CloudXCore/CLXSDKConfigPlacement.h; sourceTree = "<group>"; };
+		9D1B0727103B53CE12924F7CC85DB233 /* CLXBiddingConfig.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBiddingConfig.h; path = Sources/CloudXCore/CLXBiddingConfig.h; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9DAB05829AF7E0900A60E9335897EE2B /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests.release.xcconfig"; sourceTree = "<group>"; };
+		9E340971F687A4A7609B250ACF0495A9 /* CLXAdapterRewardedFactory.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdapterRewardedFactory.h; path = Sources/CloudXCore/CLXAdapterRewardedFactory.h; sourceTree = "<group>"; };
+		A1771E9E369D36686052B8C5F75E2695 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/CoreData.framework; sourceTree = DEVELOPER_DIR; };
+		A17758DDB86FF600253F2954A9435A7F /* Model 2.xcdatamodel */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcdatamodel; path = "Model 2.xcdatamodel"; sourceTree = "<group>"; };
+		A2293611758F792F33242687EC601CE3 /* CLXSystemInformation.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXSystemInformation.m; sourceTree = "<group>"; };
+		A246E1A7DC6D55230327752EC74D5052 /* CLXSDKConfigBidder.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXSDKConfigBidder.h; path = Sources/CloudXCore/CLXSDKConfigBidder.h; sourceTree = "<group>"; };
+		A2A3901D05EACB9C27DD8B842C65661A /* CLXGeoLocationService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXGeoLocationService.h; path = Sources/CloudXCore/CLXGeoLocationService.h; sourceTree = "<group>"; };
+		A322B7C560C1EE82F16CC276B3106E19 /* CLXAdapterInterstitial.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdapterInterstitial.h; path = Sources/CloudXCore/CLXAdapterInterstitial.h; sourceTree = "<group>"; };
+		A591A56339485F0E76AA908A711627AE /* CLXSessionMetric.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXSessionMetric.h; path = Sources/CloudXCore/CLXSessionMetric.h; sourceTree = "<group>"; };
+		A5DEC49A2268B096A6783D11285DF573 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests.modulemap"; sourceTree = "<group>"; };
+		A6F36CBAC10FF6B970A96E76593409BC /* CLXSDKConfigEndpointObject.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXSDKConfigEndpointObject.m; sourceTree = "<group>"; };
+		A8FABC8087B5AC4E9A98B55DB3FDF67B /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE; sourceTree = "<group>"; };
+		ABBEED5D540DA92D3AB3BD3A2D1303BA /* Pods-CloudXDemoAdapter-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-CloudXDemoAdapter-Info.plist"; sourceTree = "<group>"; };
+		ABE1C406CCC3DB00EBE539D8D59F6EB2 /* CLXBackgroundTimer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBackgroundTimer.h; path = Sources/CloudXCore/CLXBackgroundTimer.h; sourceTree = "<group>"; };
+		ABE523ACBADBB6B38C7A33C58473A052 /* CLXSDKConfigPlacement.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXSDKConfigPlacement.m; sourceTree = "<group>"; };
+		AE1B93D0ADB00C9DD7FB9BBAD2FC2FFD /* URLSession+CLX.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "URLSession+CLX.m"; sourceTree = "<group>"; };
+		AED1D00E9A1547830020DCA11812C1DB /* CLXPerformanceMetricModel+Update.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "CLXPerformanceMetricModel+Update.h"; path = "Sources/CloudXCore/CLXPerformanceMetricModel+Update.h"; sourceTree = "<group>"; };
+		AFE412AA6EF3C10AF106CE5691BC61D0 /* CLXAd.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAd.h; path = Sources/CloudXCore/CLXAd.h; sourceTree = "<group>"; };
+		B0BF73DC4BB2771A3E145E9687E8C5B8 /* UIDevice+CLXIdentifier.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIDevice+CLXIdentifier.h"; path = "Sources/CloudXCore/UIDevice+CLXIdentifier.h"; sourceTree = "<group>"; };
+		B0C80E7B701A10ACCE8B037FE7BFA31C /* CLXSessionMetricSpend.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXSessionMetricSpend.m; sourceTree = "<group>"; };
+		B1BBBCECA7B0D90F511896F082D7F1A7 /* CLXSessionMetricPerformance.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXSessionMetricPerformance.h; path = Sources/CloudXCore/CLXSessionMetricPerformance.h; sourceTree = "<group>"; };
+		B3750099B60F1BDB194EF6994E14DA22 /* CloudXCore.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CloudXCore.h; path = Sources/CloudXCore/CloudXCore.h; sourceTree = "<group>"; };
+		B39420C8F72B25327D10099A84AF359A /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-Info.plist"; sourceTree = "<group>"; };
+		B3FA11A7730291A18C981A0EC0977BA0 /* CLXBannerTimerService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXBannerTimerService.m; sourceTree = "<group>"; };
+		B4A3104E236FABCFBDFBA0E429FBCC67 /* CLXAdReportingNetworkService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXAdReportingNetworkService.m; sourceTree = "<group>"; };
+		B5B03AA551D3D541FB242541DC062977 /* CLXBiddingConfig.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXBiddingConfig.m; sourceTree = "<group>"; };
+		B6790F4717084F4D5DC79D66AAA8BDB5 /* CloudXCore */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = CloudXCore; path = CloudXCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8E179DAAC817AECFDA5B55E78EED3A2 /* CLXNativeTemplate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXNativeTemplate.h; path = Sources/CloudXCore/CLXNativeTemplate.h; sourceTree = "<group>"; };
+		BDA4948950188481A47A75846E92B238 /* CLXSessionMetricSpend.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXSessionMetricSpend.h; path = Sources/CloudXCore/CLXSessionMetricSpend.h; sourceTree = "<group>"; };
+		BF92A0833C01016C98D8005D26E80188 /* CLXCachedInterstitial.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXCachedInterstitial.m; sourceTree = "<group>"; };
+		C29C7A8B41A738F154D7AD83E27CAC12 /* CLXNativeAdView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXNativeAdView.h; path = Sources/CloudXCore/CLXNativeAdView.h; sourceTree = "<group>"; };
+		C2D17B96F62E81A1A4F3C7BD579220B8 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
+		C4957301BBB5D155E683A9E771B5A59B /* CLXRillImpressionModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXRillImpressionModel.h; path = Sources/CloudXCore/CLXRillImpressionModel.h; sourceTree = "<group>"; };
+		C56353D23B86F1F990A9FE8F30DFCA85 /* CLXCacheAdService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXCacheAdService.m; sourceTree = "<group>"; };
+		C57F655B9199F5DDD3B92CC2549DA5CA /* CLXAdTrackingService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXAdTrackingService.m; sourceTree = "<group>"; };
+		C5D54E7266E7511F5F946472A66E33F0 /* CLXConfigImpressionModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXConfigImpressionModel.m; sourceTree = "<group>"; };
+		C7A4FA962DBA5C21A5114CFB22DACC4A /* CLXPublisherFullscreenAd.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXPublisherFullscreenAd.h; path = Sources/CloudXCore/CLXPublisherFullscreenAd.h; sourceTree = "<group>"; };
+		CB031DEA5226F844B75F64D0705A467A /* CLXInitService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXInitService.h; path = Sources/CloudXCore/CLXInitService.h; sourceTree = "<group>"; };
+		CBDEFBDEE42A01E5F269E6675D38FFB1 /* CLXRillImpressionDefaultModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXRillImpressionDefaultModel.m; sourceTree = "<group>"; };
+		CBFADA0CF3C8371B87C263A6ABD498FF /* Pods-CloudXDemoAdapter-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-CloudXDemoAdapter-umbrella.h"; sourceTree = "<group>"; };
+		D010E75B3B48F5360B2DA15DF20AA83C /* CLXBidNetworkServiceImplementation.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXBidNetworkServiceImplementation.m; sourceTree = "<group>"; };
+		D0DCD3583FD8EC6861AB2B51AFDC5303 /* CLXLogger.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXLogger.h; path = Sources/CloudXCore/CLXLogger.h; sourceTree = "<group>"; };
+		D19310DBBB4199A84B5B75DC68265C05 /* CLXAppSessionModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXAppSessionModel.m; sourceTree = "<group>"; };
+		D1EC7D0E60A7E397E5FF1B28238ED0A7 /* CLXRewardedInterstitial.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXRewardedInterstitial.h; path = Sources/CloudXCore/CLXRewardedInterstitial.h; sourceTree = "<group>"; };
+		D47567E946A9CF134089FC52931422E8 /* CLXAdEventReporting.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdEventReporting.h; path = Sources/CloudXCore/CLXAdEventReporting.h; sourceTree = "<group>"; };
+		D4EF35CE587584027A66AB0EEE0922B2 /* CLXAppSessionService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAppSessionService.h; path = Sources/CloudXCore/CLXAppSessionService.h; sourceTree = "<group>"; };
+		D5363938BE935F9B214C522FFC29948C /* CLXSessionMetricModel+Update.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "CLXSessionMetricModel+Update.h"; path = "Sources/CloudXCore/CLXSessionMetricModel+Update.h"; sourceTree = "<group>"; };
+		D74A516FEEA1A5487BE0B1A3CE7DD87D /* CLXSDKConfig.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXSDKConfig.h; path = Sources/CloudXCore/CLXSDKConfig.h; sourceTree = "<group>"; };
+		D90E405D8E8EB9C4BB9A2C1987EBD1E6 /* CLXAdNetworkFactories.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXAdNetworkFactories.m; sourceTree = "<group>"; };
+		DA6A7F4476277ABDF2C9D5F5D2EB8D68 /* CLXBidResponse.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBidResponse.h; path = Sources/CloudXCore/CLXBidResponse.h; sourceTree = "<group>"; };
+		DADB211EE5713F900248336680DCD367 /* Pods-CloudXDemoAdapter-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-CloudXDemoAdapter-dummy.m"; sourceTree = "<group>"; };
+		DD1D42AEFC0F0FC175EA9A536F509292 /* CLXInitMetricsModel+Update.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "CLXInitMetricsModel+Update.m"; sourceTree = "<group>"; };
+		DD72DDAF93A6C16BE3F685487458EBCB /* CLXSystemInformation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXSystemInformation.h; path = Sources/CloudXCore/CLXSystemInformation.h; sourceTree = "<group>"; };
+		DD8C356E1CBAEB1CB719C64A15F06349 /* CLXLogger.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXLogger.m; sourceTree = "<group>"; };
+		E0C54B85E6B360A85327A1F853F4B690 /* CloudXCore.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = CloudXCore.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		E0EE354132ACEEEA0C119F461BF91F4B /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests"; path = Pods_CloudXDemoAdapter_CloudXDemoAdapterTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E116EAE76520B19DE28F1DEC2F3E23BF /* CLXAppSessionServiceImplementation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAppSessionServiceImplementation.h; path = Sources/CloudXCore/CLXAppSessionServiceImplementation.h; sourceTree = "<group>"; };
+		E2D8E9935C7850482087DEED2DE24D1A /* CLXAdapterBannerFactory.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdapterBannerFactory.h; path = Sources/CloudXCore/CLXAdapterBannerFactory.h; sourceTree = "<group>"; };
+		E85E5918755302CA3C7A4D5A3EFE9C0C /* CLXSDKConfigRequest.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXSDKConfigRequest.m; sourceTree = "<group>"; };
+		EBF51B87DB5F8F5B60281FB3DE72B20A /* CloudXCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CloudXCore.release.xcconfig; sourceTree = "<group>"; };
+		EF1D888A2A425FB9BAC2737CED464749 /* CLXBaseAd.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBaseAd.h; path = Sources/CloudXCore/CLXBaseAd.h; sourceTree = "<group>"; };
+		EF91DD9039D699522FCD8ED5A7F70284 /* URLSession+CLX.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "URLSession+CLX.h"; path = "Sources/CloudXCore/URLSession+CLX.h"; sourceTree = "<group>"; };
+		F0E5DEE9C22865DBC0213F5D31E708D2 /* CLXInitService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXInitService.m; sourceTree = "<group>"; };
+		F25E877D7DDD214AFABDEF140A67D9E2 /* CLXAppSession.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAppSession.h; path = Sources/CloudXCore/CLXAppSession.h; sourceTree = "<group>"; };
+		F332734237A790CE0D2C37C5328A10C8 /* CLXAdNetworkFactories.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXAdNetworkFactories.h; path = Sources/CloudXCore/CLXAdNetworkFactories.h; sourceTree = "<group>"; };
+		F4309669CF38C0DCCE4BFB695812B0B6 /* CloudXCore-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "CloudXCore-prefix.pch"; sourceTree = "<group>"; };
+		F7A47B06AA8D4415A341335727C772F3 /* CloudXCore-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "CloudXCore-umbrella.h"; sourceTree = "<group>"; };
+		F8417395B8228F828213B58ECD5D4D34 /* CLXBidResponse.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXBidResponse.m; sourceTree = "<group>"; };
+		F8A1048EC74CF7BAE28BF772E374408E /* CLXSessionMetricType.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXSessionMetricType.h; path = Sources/CloudXCore/CLXSessionMetricType.h; sourceTree = "<group>"; };
+		F9A4D0F1B2B590C93BB6F0375B9060D8 /* CLXDIContainer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXDIContainer.h; path = Sources/CloudXCore/CLXDIContainer.h; sourceTree = "<group>"; };
+		FABD032D5B6E63E185B7EB178E12AB4A /* Pods-CloudXDemoAdapter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-CloudXDemoAdapter.release.xcconfig"; sourceTree = "<group>"; };
+		FDF53DDC17438956A8AA1C1761459AE6 /* CLXXorEncryption.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXXorEncryption.m; sourceTree = "<group>"; };
+		FE9B0A226E1412772B40A9B5A6837B12 /* CLXDestroyable.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXDestroyable.h; path = Sources/CloudXCore/CLXDestroyable.h; sourceTree = "<group>"; };
+		FEF7D53AD07D534FC2D3C7A76765B83C /* CLXBidderConfig.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CLXBidderConfig.h; path = Sources/CloudXCore/CLXBidderConfig.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		13FD5A982A2ED3B9577D54613372A5F3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				14B9F2BEFAA9FE95D7C1077515F9A07A /* CoreData.framework in Frameworks */,
+				3607D4D60746AE25E4B0A3F07B22437B /* Foundation.framework in Frameworks */,
+				8A7A348425CB3399BB50BCF59C89BA45 /* SafariServices.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		499545B0910F37598D93FD9A06ACEECC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E7136DC119577405E76ABE36D03E5A54 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C456EE21508762840A6D0FD743C1A9E2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DA7454B867D44123D0FEEF2EC118E1D /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FDAD83081E28E22519FA46880EB30299 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		01FDB3784DE2C4D2D09C67FC4BD4C1A3 /* EventsTracker */ = {
+			isa = PBXGroup;
+			children = (
+				9AA0D9F96850D6CA863121D59F409B7C /* CLXAdEventReporter.m */,
+				B4A3104E236FABCFBDFBA0E429FBCC67 /* CLXAdReportingNetworkService.m */,
+			);
+			name = EventsTracker;
+			path = EventsTracker;
+			sourceTree = "<group>";
+		};
+		03C5C200A0787E300053CFA8F53CA094 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				24DF3688DF3D636828BCD8F1CB0571B8 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		03ECF657898F9B576D5B6F30AF5E8AF2 /* AdSource */ = {
+			isa = PBXGroup;
+			children = (
+				4D5C276DA09CAF64EAB22D6F17FF0143 /* CLXBidAdSource.m */,
+			);
+			name = AdSource;
+			path = Sources/CloudXCore/AdSource;
+			sourceTree = "<group>";
+		};
+		0CC8AF76EA3543C430C0B847D43AB70C /* Pod */ = {
+			isa = PBXGroup;
+			children = (
+				E0C54B85E6B360A85327A1F853F4B690 /* CloudXCore.podspec */,
+				A8FABC8087B5AC4E9A98B55DB3FDF67B /* LICENSE */,
+				C2D17B96F62E81A1A4F3C7BD579220B8 /* README.md */,
+			);
+			name = Pod;
+			sourceTree = "<group>";
+		};
+		23A08F498ECF8C2A1B6E259B9B65A96B /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				42E4FB928FD68602B184FBF243A8CC80 /* CLXBaseNetworkService.m */,
+				DD8C356E1CBAEB1CB719C64A15F06349 /* CLXLogger.m */,
+				A2293611758F792F33242687EC601CE3 /* CLXSystemInformation.m */,
+				15DB95B032A069FFFFB48A27F06B9DD0 /* CLXURLProvider.m */,
+				8C6CBEADE01926F9B921B0EBD6A0DDA7 /* UIDevice+CLXIdentifier.m */,
+				AE1B93D0ADB00C9DD7FB9BBAD2FC2FFD /* URLSession+CLX.m */,
+			);
+			name = Utils;
+			path = Sources/CloudXCore/Utils;
+			sourceTree = "<group>";
+		};
+		24DF3688DF3D636828BCD8F1CB0571B8 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				A1771E9E369D36686052B8C5F75E2695 /* CoreData.framework */,
+				1FE299F631DE1AC354265B757F879A1F /* Foundation.framework */,
+				669E30157F9AC145A7404D55DA3F9D69 /* SafariServices.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		2A2FA55068A36498C735B4F1D8B5675F /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				71ECEDC0E77C678185457F11A5286CAC /* CloudXCore.modulemap */,
+				8B6D7132A9EE24EA7F20617927C76187 /* CloudXCore-dummy.m */,
+				7B376FAACEE40D871AF98BE9DE537819 /* CloudXCore-Info.plist */,
+				F4309669CF38C0DCCE4BFB695812B0B6 /* CloudXCore-prefix.pch */,
+				F7A47B06AA8D4415A341335727C772F3 /* CloudXCore-umbrella.h */,
+				5D9117815BBD43AA4CF50D16275464AC /* CloudXCore.debug.xcconfig */,
+				EBF51B87DB5F8F5B60281FB3DE72B20A /* CloudXCore.release.xcconfig */,
+				500217CDC93B6923034617C89CA36771 /* ResourceBundle-CloudXCore-CloudXCore-Info.plist */,
+			);
+			name = "Support Files";
+			path = "../cloudexchange.sdk.ios.testAdapter/Pods/Target Support Files/CloudXCore";
+			sourceTree = "<group>";
+		};
+		41BE88AD78A9E992A0FE7690FD7C248F /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				17B69A1D47C1D1FB6A6CB4599D5961D6 /* CLXCoreDataManager.m */,
+			);
+			name = CoreData;
+			path = CoreData;
+			sourceTree = "<group>";
+		};
+		4F51D7D7029E6D8061913FC6A74E5661 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B6790F4717084F4D5DC79D66AAA8BDB5 /* CloudXCore */,
+				603AF072D81D54B810C04FA244ACC0CA /* CloudXCore-CloudXCore */,
+				312441858E7A8DA3F334F1138E4A058C /* Pods-CloudXDemoAdapter */,
+				E0EE354132ACEEEA0C119F461BF91F4B /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		54B57035D68ABE32A82314686FFDDBD9 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests */ = {
+			isa = PBXGroup;
+			children = (
+				A5DEC49A2268B096A6783D11285DF573 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests.modulemap */,
+				8ADA33D950D2F8DE6BA3702F27E568F5 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-acknowledgements.markdown */,
+				3408CD1FA58D9EA49BDB2804A49E1F77 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-acknowledgements.plist */,
+				707A4267EA85930A7535FCA11F99D1E8 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-dummy.m */,
+				891BE81810379BBEAD1BD534DD0DA0F8 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-frameworks.sh */,
+				B39420C8F72B25327D10099A84AF359A /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-Info.plist */,
+				4BE8D3605D56BBC7529C5FEA9CBD1F3B /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-umbrella.h */,
+				4E295108D1AFB39D13A4C4D266C8802A /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests.debug.xcconfig */,
+				9DAB05829AF7E0900A60E9335897EE2B /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests.release.xcconfig */,
+			);
+			name = "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests";
+			path = "Target Support Files/Pods-CloudXDemoAdapter-CloudXDemoAdapterTests";
+			sourceTree = "<group>";
+		};
+		6A6DC3C730741E4A4FA1CE4CB62F3BC0 /* RillImpressions */ = {
+			isa = PBXGroup;
+			children = (
+				B5B03AA551D3D541FB242541DC062977 /* CLXBiddingConfig.m */,
+				C5D54E7266E7511F5F946472A66E33F0 /* CLXConfigImpressionModel.m */,
+				CBDEFBDEE42A01E5F269E6675D38FFB1 /* CLXRillImpressionDefaultModel.m */,
+				03FAC953296130DAD8D04889F88AA76A /* CLXRillImpressionInitService.m */,
+				3DA661A0FD862A1DBAD98544CADCDBF4 /* CLXRillImpressionModel.m */,
+				6535FBF00FE7184647F4CC08917910E4 /* CLXRillImpressionProperties.m */,
+				64B1ABEA18DCC3E409945500EE7DCF3B /* NSString+CLXSemicolon.m */,
+			);
+			name = RillImpressions;
+			path = RillImpressions;
+			sourceTree = "<group>";
+		};
+		7F0E07B04D273BFD9FF81DFB5B73FB60 /* CloudXCore */ = {
+			isa = PBXGroup;
+			children = (
+				B3750099B60F1BDB194EF6994E14DA22 /* CloudXCore.h */,
+				8B9D44EE7D89774136B075A1570108E6 /* CloudXCore.m */,
+				22721261BD2A0B783CDE7B378D5E460B /* CloudXCoreAPI.h */,
+				0CBE44A4AC3912C9CEB806FB637378DE /* CloudXCoreError.h */,
+				296A6EAB8D91C697F8306D4F055B4F32 /* CloudXDataModel.xcdatamodeld */,
+				AFE412AA6EF3C10AF106CE5691BC61D0 /* CLXAd.h */,
+				3CC1AA3FE2ED115029D302D21A19D41F /* CLXAdapterBanner.h */,
+				E2D8E9935C7850482087DEED2DE24D1A /* CLXAdapterBannerFactory.h */,
+				425426814E4053F56E90E9F2E522DD52 /* CLXAdapterFactoryResolver.h */,
+				A322B7C560C1EE82F16CC276B3106E19 /* CLXAdapterInterstitial.h */,
+				3A27E11440F0406A91EFFBEA8DFE7DAD /* CLXAdapterInterstitialFactory.h */,
+				8C139D36F8E29DD08E234338B2C78884 /* CLXAdapterNative.h */,
+				1DC6585FD80CC3FBA81B65FD3CF08DCF /* CLXAdapterNativeFactory.h */,
+				3BF26A06CFE63AAE9972AAACAE081543 /* CLXAdapterRewarded.h */,
+				9E340971F687A4A7609B250ACF0495A9 /* CLXAdapterRewardedFactory.h */,
+				28BAB82FF4ED3BD3D37ED49C7E64AC68 /* CLXAdEventReporter.h */,
+				D47567E946A9CF134089FC52931422E8 /* CLXAdEventReporting.h */,
+				F332734237A790CE0D2C37C5328A10C8 /* CLXAdNetworkFactories.h */,
+				4C5BFB232B1A0365E954104CA89B42B8 /* CLXAdNetworkInitializer.h */,
+				5377E8A02E8732380B1F3971D4E5840A /* CLXAdReportingNetworkService.h */,
+				1845A3E771B6834987C2ADBF26A57E15 /* CLXAdTrackingService.h */,
+				F25E877D7DDD214AFABDEF140A67D9E2 /* CLXAppSession.h */,
+				89AA40D56DFB381D7028B64E9DED5CD8 /* CLXAppSessionModel.h */,
+				5A1BE158273A91513890D02B6BB00B58 /* CLXAppSessionModel+Update.h */,
+				D4EF35CE587584027A66AB0EEE0922B2 /* CLXAppSessionService.h */,
+				E116EAE76520B19DE28F1DEC2F3E23BF /* CLXAppSessionServiceImplementation.h */,
+				ABE1C406CCC3DB00EBE539D8D59F6EB2 /* CLXBackgroundTimer.h */,
+				367F068BAE283D2D66347ABD4968E084 /* CLXBanner.h */,
+				1265B546547182000199055AB3E29915 /* CLXBannerAdView.h */,
+				1E8F9D161C4CA7899D2AE3E34DD29BB9 /* CLXBannerDelegate.h */,
+				8870CA359A2CAEEA027B74EBD64402EF /* CLXBannerTimerService.h */,
+				94E4ABC279B171324B32E762B486C422 /* CLXBannerType.h */,
+				EF1D888A2A425FB9BAC2737CED464749 /* CLXBaseAd.h */,
+				740BCBFA59A8796FBDA9D823F2633598 /* CLXBaseAdDelegate.h */,
+				917F82EA38E646EFE780AD7A4A86EC40 /* CLXBaseNetworkService.h */,
+				386C58EA5CC82A9555CDFB61088DBB5D /* CLXBidAdSource.h */,
+				FEF7D53AD07D534FC2D3C7A76765B83C /* CLXBidderConfig.h */,
+				9D1B0727103B53CE12924F7CC85DB233 /* CLXBiddingConfig.h */,
+				4D2FBBC358BACC0A82A1450D08FC6966 /* CLXBidNetworkService.h */,
+				8EDAABE539F1E69E50C2BA550728FDF5 /* CLXBidNetworkServiceImplementation.h */,
+				DA6A7F4476277ABDF2C9D5F5D2EB8D68 /* CLXBidResponse.h */,
+				8BEB17AFCCD258990FE1E9EB1B33153B /* CLXBidTokenSource.h */,
+				8A409758A13F6B369AFCE93763E2657B /* CLXCacheableAd.h */,
+				033F466FCFB28EF3C5D9C1BDF2C8B187 /* CLXCacheAdQueue.h */,
+				01FFC2157DFFD4FE6C643B9EBD634455 /* CLXCacheAdService.h */,
+				8D09AE713C6806564B198AC95449ADF7 /* CLXCachedInterstitial.h */,
+				67029890223BDB1F23D918F11A6B0458 /* CLXCachedRewarded.h */,
+				6A7801D65848F24EB134E39DD4AB334E /* CLXConfigImpressionModel.h */,
+				5DAC7FF075C5B41645B36276783E9BB7 /* CLXCoreDataManager.h */,
+				FE9B0A226E1412772B40A9B5A6837B12 /* CLXDestroyable.h */,
+				F9A4D0F1B2B590C93BB6F0375B9060D8 /* CLXDIContainer.h */,
+				25B78FF62BC1F25625535048D1CD55B8 /* CLXExponentialBackoffStrategy.h */,
+				1222560F0E69BFA68F6C0FA57CA3D391 /* CLXFullscreenAd.h */,
+				A2A3901D05EACB9C27DD8B842C65661A /* CLXGeoLocationService.h */,
+				458A53E7F0A59CC719EBC0029CCBF4EC /* CLXInitMetrics.h */,
+				999A070D01135A40F64E63BE486E76C6 /* CLXInitMetricsModel.h */,
+				6B5D18D8CC8BD1B93A7D85D458422689 /* CLXInitMetricsModel+Update.h */,
+				CB031DEA5226F844B75F64D0705A467A /* CLXInitService.h */,
+				345E1346AC0543D198BAE3BF17B7C659 /* CLXInterstitial.h */,
+				141411BB73CC0F221613F9A7DE07C72A /* CLXInterstitialDelegate.h */,
+				2DF7D011A6504B7F7956AB70CCD1A79D /* CLXLiveInitService.h */,
+				D0DCD3583FD8EC6861AB2B51AFDC5303 /* CLXLogger.h */,
+				0359CDB0AAD3E93E57C93314FC9AD84A /* CLXMetricsNetworkService.h */,
+				43509A1DB401C2E630FA7713E931C6C4 /* CLXMetricsTracker.h */,
+				1255ED9B198D5F9D57F31DA5E8BE0482 /* CLXNative.h */,
+				C29C7A8B41A738F154D7AD83E27CAC12 /* CLXNativeAdView.h */,
+				1809406805D4084977E7DDC993E0622A /* CLXNativeDelegate.h */,
+				B8E179DAAC817AECFDA5B55E78EED3A2 /* CLXNativeTemplate.h */,
+				21B758D5E9D3F25F780F75AEBC215D0B /* CLXPerformanceMetricModel.h */,
+				AED1D00E9A1547830020DCA11812C1DB /* CLXPerformanceMetricModel+Update.h */,
+				246FD1A391F70120CAA5CF78F28E7773 /* CLXPublisherBanner.h */,
+				C7A4FA962DBA5C21A5114CFB22DACC4A /* CLXPublisherFullscreenAd.h */,
+				305040C096B79DAADCEAEC50B2637A0F /* CLXPublisherNative.h */,
+				443918A3BD18D1631FF228946FC293D6 /* CLXReachabilityService.h */,
+				3800180FF782D715D6AEDA67FC9FBED2 /* CLXRewardedDelegate.h */,
+				D1EC7D0E60A7E397E5FF1B28238ED0A7 /* CLXRewardedInterstitial.h */,
+				570A07FAEF0BD39F67B25955E98EC914 /* CLXRillImpressionDefaultModel.h */,
+				307ED412019CD023904878D152CADBE2 /* CLXRillImpressionInitService.h */,
+				C4957301BBB5D155E683A9E771B5A59B /* CLXRillImpressionModel.h */,
+				3884800E72D67AD8EF32313E1F59F1A9 /* CLXRillImpressionProperties.h */,
+				D74A516FEEA1A5487BE0B1A3CE7DD87D /* CLXSDKConfig.h */,
+				A246E1A7DC6D55230327752EC74D5052 /* CLXSDKConfigBidder.h */,
+				074692A2BACD2207B5EAA2F3F201DA99 /* CLXSDKConfigEndpointObject.h */,
+				9C8B90FF250A8FA7F77EC4486D963BC8 /* CLXSDKConfigPlacement.h */,
+				8F7C104EFE8FCD3D0B0DB9765AFC3C9E /* CLXSDKConfigRequest.h */,
+				161D87E1E0CA6132B899DDACCA673240 /* CLXSDKInitNetworkService.h */,
+				A591A56339485F0E76AA908A711627AE /* CLXSessionMetric.h */,
+				3C3D41B00A993F14A9970B7561F2670F /* CLXSessionMetricModel.h */,
+				D5363938BE935F9B214C522FFC29948C /* CLXSessionMetricModel+Update.h */,
+				B1BBBCECA7B0D90F511896F082D7F1A7 /* CLXSessionMetricPerformance.h */,
+				BDA4948950188481A47A75846E92B238 /* CLXSessionMetricSpend.h */,
+				F8A1048EC74CF7BAE28BF772E374408E /* CLXSessionMetricType.h */,
+				7D27865730ECD12E6998CE5ACF0B93BF /* CLXSKAdNetworkService.h */,
+				DD72DDAF93A6C16BE3F685487458EBCB /* CLXSystemInformation.h */,
+				7A777CA5D92C8163F1D6DC2DE68779E2 /* CLXURLProvider.h */,
+				07B4300767BF5CD3646369FB3D9E783C /* CLXXorEncryption.h */,
+				67F20BBCF143E0EF211474206A63EB94 /* NSString+CLXSemicolon.h */,
+				B0BF73DC4BB2771A3E145E9687E8C5B8 /* UIDevice+CLXIdentifier.h */,
+				EF91DD9039D699522FCD8ED5A7F70284 /* URLSession+CLX.h */,
+				DE74D6A2DA916148893B1B657259E116 /* Adapter */,
+				916C35762F676D850EB1BA24E42B4072 /* AdCache */,
+				9B09F3B69873B1C78583567DA87C5519 /* AdReporting */,
+				03ECF657898F9B576D5B6F30AF5E8AF2 /* AdSource */,
+				A1175010E070F42259C03C0B5C808D00 /* Common */,
+				95CC0EEFDC916BAA977AF9404DFC8B03 /* DIContainer */,
+				F3DC4D98648DC3D0342BA8AF5EA98F60 /* Model */,
+				0CC8AF76EA3543C430C0B847D43AB70C /* Pod */,
+				DD6D4E17774C86DA4F658B7C0A55DF55 /* PublisherAds */,
+				8CCC918B5E83F77AB2359A1CC8E98729 /* Services */,
+				2A2FA55068A36498C735B4F1D8B5675F /* Support Files */,
+				23A08F498ECF8C2A1B6E259B9B65A96B /* Utils */,
+			);
+			name = CloudXCore;
+			path = ../../cloudexchange.sdk.ios.coreObjC;
+			sourceTree = "<group>";
+		};
+		8AC591C18FF6260B89092BE116143B25 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				D88787B07F7491D6D091401C52FEC063 /* Pods-CloudXDemoAdapter */,
+				54B57035D68ABE32A82314686FFDDBD9 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		8CCC918B5E83F77AB2359A1CC8E98729 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				C57F655B9199F5DDD3B92CC2549DA5CA /* CLXAdTrackingService.m */,
+				944ABB0AB9FA97A0B2FABADCA7226ACE /* CLXBackgroundTimer.m */,
+				B3FA11A7730291A18C981A0EC0977BA0 /* CLXBannerTimerService.m */,
+				61D55D971AE1FCDD025DF52BB075ECE7 /* CLXBidNetworkService.m */,
+				D010E75B3B48F5360B2DA15DF20AA83C /* CLXBidNetworkServiceImplementation.m */,
+				7F69D37CBABA13E69E37734701A8CE89 /* CLXCacheAdQueue.m */,
+				C56353D23B86F1F990A9FE8F30DFCA85 /* CLXCacheAdService.m */,
+				66196FB488CDD26030FFA9F5996F669E /* CLXExponentialBackoffStrategy.m */,
+				47513E97FA546F5530043B15D824A2B6 /* CLXGeoLocationService.m */,
+				F0E5DEE9C22865DBC0213F5D31E708D2 /* CLXInitService.m */,
+				3F4B03E80BF4286A3F2B6366A751D1F6 /* CLXLiveInitService.m */,
+				432A0FFD3763FE3C9673582236433B72 /* CLXReachabilityService.m */,
+				89224F8781F0E1BF795821AE5306BE13 /* CLXSDKInitNetworkService.m */,
+				5C2EC65727F820F1D273A14EAA2A98E3 /* CLXSKAdNetworkService.m */,
+				FDF53DDC17438956A8AA1C1761459AE6 /* CLXXorEncryption.m */,
+			);
+			name = Services;
+			path = Sources/CloudXCore/Services;
+			sourceTree = "<group>";
+		};
+		916C35762F676D850EB1BA24E42B4072 /* AdCache */ = {
+			isa = PBXGroup;
+			children = (
+				BF92A0833C01016C98D8005D26E80188 /* CLXCachedInterstitial.m */,
+				2C3A94D87E54ACE176FCCA58B58AE14A /* CLXCachedRewarded.m */,
+			);
+			name = AdCache;
+			path = Sources/CloudXCore/AdCache;
+			sourceTree = "<group>";
+		};
+		95CC0EEFDC916BAA977AF9404DFC8B03 /* DIContainer */ = {
+			isa = PBXGroup;
+			children = (
+				026372AB964BEB9B374021A044E49A51 /* CLXDIContainer.m */,
+			);
+			name = DIContainer;
+			path = Sources/CloudXCore/DIContainer;
+			sourceTree = "<group>";
+		};
+		9B09F3B69873B1C78583567DA87C5519 /* AdReporting */ = {
+			isa = PBXGroup;
+			children = (
+				41BE88AD78A9E992A0FE7690FD7C248F /* CoreData */,
+				01FDB3784DE2C4D2D09C67FC4BD4C1A3 /* EventsTracker */,
+				D0DEAC0F7767A5696DF3F8E284C2B9AB /* MetricsTracker */,
+				6A6DC3C730741E4A4FA1CE4CB62F3BC0 /* RillImpressions */,
+				F4D74EA0BEB93EFED339095C8E543D89 /* Session */,
+			);
+			name = AdReporting;
+			path = Sources/CloudXCore/AdReporting;
+			sourceTree = "<group>";
+		};
+		A1175010E070F42259C03C0B5C808D00 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				7267D0B72BE820869AF11A66B5B2391F /* CLXCoreError.m */,
+			);
+			name = Common;
+			path = Sources/CloudXCore/Common;
+			sourceTree = "<group>";
+		};
+		A6A62EE6B806DF4856225256F7C81679 /* Development Pods */ = {
+			isa = PBXGroup;
+			children = (
+				7F0E07B04D273BFD9FF81DFB5B73FB60 /* CloudXCore */,
+			);
+			name = "Development Pods";
+			sourceTree = "<group>";
+		};
+		CF1408CF629C7361332E53B88F7BD30C = {
+			isa = PBXGroup;
+			children = (
+				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
+				A6A62EE6B806DF4856225256F7C81679 /* Development Pods */,
+				03C5C200A0787E300053CFA8F53CA094 /* Frameworks */,
+				4F51D7D7029E6D8061913FC6A74E5661 /* Products */,
+				8AC591C18FF6260B89092BE116143B25 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		D0DEAC0F7767A5696DF3F8E284C2B9AB /* MetricsTracker */ = {
+			isa = PBXGroup;
+			children = (
+				181A3EE7CA31B7809FF8C26F3309866E /* CLXInitMetrics.m */,
+				0B5F469B38753B048847BF679BDED207 /* CLXInitMetricsModel.m */,
+				DD1D42AEFC0F0FC175EA9A536F509292 /* CLXInitMetricsModel+Update.m */,
+				63E06A1A05E3B93181890BABA5D581BE /* CLXMetricsNetworkService.m */,
+				967BB0243959EC3FB2B622A3EAAC1F68 /* CLXMetricsTracker.m */,
+				7D5AFB5ABBA7B789F5372E6B3EEECF56 /* CLXPerformanceMetricModel+Update.m */,
+				8D0CE64A492B69ED9DBCACE8592A8D4E /* CLXSessionMetricModel+Update.m */,
+				38E0DC51F940729AA6403FF297364AC3 /* CLXSessionMetricPerformance.m */,
+				B0C80E7B701A10ACCE8B037FE7BFA31C /* CLXSessionMetricSpend.m */,
+				5FB08DA02D9DEF33F8E25C3BC6DDDFCA /* CLXSessionMetricType.m */,
+			);
+			name = MetricsTracker;
+			path = MetricsTracker;
+			sourceTree = "<group>";
+		};
+		D88787B07F7491D6D091401C52FEC063 /* Pods-CloudXDemoAdapter */ = {
+			isa = PBXGroup;
+			children = (
+				1F939B5FCF5388AE7CA83B29663EFDCE /* Pods-CloudXDemoAdapter.modulemap */,
+				0C3EE7FA411B3149FCE1B316B80E0D47 /* Pods-CloudXDemoAdapter-acknowledgements.markdown */,
+				545CDA28099F7A4F1DC3290154820E43 /* Pods-CloudXDemoAdapter-acknowledgements.plist */,
+				DADB211EE5713F900248336680DCD367 /* Pods-CloudXDemoAdapter-dummy.m */,
+				ABBEED5D540DA92D3AB3BD3A2D1303BA /* Pods-CloudXDemoAdapter-Info.plist */,
+				CBFADA0CF3C8371B87C263A6ABD498FF /* Pods-CloudXDemoAdapter-umbrella.h */,
+				58163CCB1A227C43405569470D64B2E7 /* Pods-CloudXDemoAdapter.debug.xcconfig */,
+				FABD032D5B6E63E185B7EB178E12AB4A /* Pods-CloudXDemoAdapter.release.xcconfig */,
+			);
+			name = "Pods-CloudXDemoAdapter";
+			path = "Target Support Files/Pods-CloudXDemoAdapter";
+			sourceTree = "<group>";
+		};
+		DD6D4E17774C86DA4F658B7C0A55DF55 /* PublisherAds */ = {
+			isa = PBXGroup;
+			children = (
+				44B34F35216609499E62B8994D05C7EF /* CLXBannerAdView.m */,
+				8AB1FC59789D6EEB8686781A97C88841 /* CLXNativeAdView.m */,
+				8B47CC73D10E86291958E8BF18F353B9 /* CLXPublisherBanner.m */,
+				103B001FD4B209AFB302145CAD6D0271 /* CLXPublisherFullscreenAd.m */,
+				63EC22B513DE47611FDAF068256DC755 /* CLXPublisherNative.m */,
+			);
+			name = PublisherAds;
+			path = Sources/CloudXCore/PublisherAds;
+			sourceTree = "<group>";
+		};
+		DE74D6A2DA916148893B1B657259E116 /* Adapter */ = {
+			isa = PBXGroup;
+			children = (
+				1A7E933DDD772CBDD8E7F247474B5FA5 /* CLXAdapterFactoryResolver.m */,
+				D90E405D8E8EB9C4BB9A2C1987EBD1E6 /* CLXAdNetworkFactories.m */,
+			);
+			name = Adapter;
+			path = Sources/CloudXCore/Adapter;
+			sourceTree = "<group>";
+		};
+		F3DC4D98648DC3D0342BA8AF5EA98F60 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				04AA793465EBFC84A3D1D1A52BE32E47 /* CLXBidderConfig.m */,
+				F8417395B8228F828213B58ECD5D4D34 /* CLXBidResponse.m */,
+				9BA708FC15A7DC45E3DA660CA03069B8 /* CLXNativeTemplate.m */,
+				3AFE7C344FDD27DA18AEBE5E0318A565 /* CLXPerformanceMetricModel.m */,
+				40E953FF1D613986C190F48B8319A9AE /* CLXSDKConfig.m */,
+				7C6278802974AFB05FD2492E204D5D63 /* CLXSDKConfigBidder.m */,
+				A6F36CBAC10FF6B970A96E76593409BC /* CLXSDKConfigEndpointObject.m */,
+				ABE523ACBADBB6B38C7A33C58473A052 /* CLXSDKConfigPlacement.m */,
+				E85E5918755302CA3C7A4D5A3EFE9C0C /* CLXSDKConfigRequest.m */,
+				0EA2850D47F1A678A88E188B66FB3629 /* CLXSessionMetricModel.m */,
+			);
+			name = Model;
+			path = Sources/CloudXCore/Model;
+			sourceTree = "<group>";
+		};
+		F4D74EA0BEB93EFED339095C8E543D89 /* Session */ = {
+			isa = PBXGroup;
+			children = (
+				73FEB1B50B5538A731244995E98535BE /* CLXAppSession.m */,
+				D19310DBBB4199A84B5B75DC68265C05 /* CLXAppSessionModel.m */,
+				77A8FF11B4A66E1E7DDABEBADF575A0F /* CLXAppSessionModel+Update.m */,
+				8AE4FD4C91F219000BB9C2BDE082E7AD /* CLXAppSessionServiceImplementation.m */,
+			);
+			name = Session;
+			path = Session;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		1853764AB8F011E196A9AFB887E55575 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3726D47F6E8043371907AEC0DDA1043D /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		720DFD4524D0556D83CDCCDB138C6872 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E7CFFE83CA8A9CEE4A73AE5A319439C4 /* Pods-CloudXDemoAdapter-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E479A812A2F172455758A2E6D91CFD42 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				64FD12CD6128871D69F7753FDDE4315F /* CloudXCore.h in Headers */,
+				8385D0FC17FDCA252334F0A83C4907F1 /* CloudXCore-umbrella.h in Headers */,
+				DE449279E3A3253EEC03B5613760748C /* CloudXCoreAPI.h in Headers */,
+				24043185F8BBEF6BEA240B00AB435C49 /* CloudXCoreError.h in Headers */,
+				992D2AA27E2311FF947233E8AF1F4A58 /* CLXAd.h in Headers */,
+				11B860B5BC1C455F8E6CBE4CBF6EF44A /* CLXAdapterBanner.h in Headers */,
+				2E3A4F9FE075A6CE0E1B6E9D415767C8 /* CLXAdapterBannerFactory.h in Headers */,
+				ABDF88DE98D0A6D361BAD96D10229F5B /* CLXAdapterFactoryResolver.h in Headers */,
+				FEFDC69C2A671343529778337189A95E /* CLXAdapterInterstitial.h in Headers */,
+				E6402A45D5EAD649849630D5CE672243 /* CLXAdapterInterstitialFactory.h in Headers */,
+				5384EF679CD067CEFCA715FFCC8DFF14 /* CLXAdapterNative.h in Headers */,
+				F95B83A75C5AE87C790AD8BCD9D1EDEE /* CLXAdapterNativeFactory.h in Headers */,
+				344AA41807F4768CF59D2BBCDEB60B25 /* CLXAdapterRewarded.h in Headers */,
+				BF8A5A51AAD77F2A84AB517FC6DA4137 /* CLXAdapterRewardedFactory.h in Headers */,
+				88CEF0532694F4B5146CC6D14A148AA6 /* CLXAdEventReporter.h in Headers */,
+				6E2BD64017EABF3D3F912B7BCF7FD043 /* CLXAdEventReporting.h in Headers */,
+				88A0757979C263129521D7C1E3021A8B /* CLXAdNetworkFactories.h in Headers */,
+				EABC61667066E67DB6566E0413BA276C /* CLXAdNetworkInitializer.h in Headers */,
+				7C309B1F4E890AAF34BEDDAC8F23774A /* CLXAdReportingNetworkService.h in Headers */,
+				5089DD44E3400FF858BC053649B4B411 /* CLXAdTrackingService.h in Headers */,
+				8A6931D6F200C5593C6A514AA2768F5A /* CLXAppSession.h in Headers */,
+				F1D434B102406DCE854A5C698AB46C35 /* CLXAppSessionModel.h in Headers */,
+				2B1ACDC3C838D90874E5A5B48B79B4F9 /* CLXAppSessionModel+Update.h in Headers */,
+				EBF0AF6C71382AAA670391B22AEA1A9D /* CLXAppSessionService.h in Headers */,
+				AA690D9451A3202343D035A4DAF4B9B7 /* CLXAppSessionServiceImplementation.h in Headers */,
+				1999F0AE5806F4A2FD61D6CBC7D53328 /* CLXBackgroundTimer.h in Headers */,
+				319854E3E1132A6881C6A769DE385DB5 /* CLXBanner.h in Headers */,
+				104F7B9B9E4847318477C01F07A12366 /* CLXBannerAdView.h in Headers */,
+				D989D5B60B33F1FF049C3616006FE05C /* CLXBannerDelegate.h in Headers */,
+				71C33C927C744C9BD6854944058416C0 /* CLXBannerTimerService.h in Headers */,
+				92C4A72A2ED113EAAE945F45DCE08757 /* CLXBannerType.h in Headers */,
+				71F0AB3865CA607A52697B516BFF8083 /* CLXBaseAd.h in Headers */,
+				3003C0958A3B886AC91EC209974252AF /* CLXBaseAdDelegate.h in Headers */,
+				4C5247BF10B4E4BF7A1E34904AE20661 /* CLXBaseNetworkService.h in Headers */,
+				923AE2C741B434411645B4AC49CA7A7C /* CLXBidAdSource.h in Headers */,
+				0D83FA26B5396F51A5A14D81EDEA3402 /* CLXBidderConfig.h in Headers */,
+				AD5C728F8511D7D1E936083CA75B08EB /* CLXBiddingConfig.h in Headers */,
+				1CAD6D0436682043F84A3B48B35C92BE /* CLXBidNetworkService.h in Headers */,
+				2DEDB1BB1438761774BD28A4E3803BCA /* CLXBidNetworkServiceImplementation.h in Headers */,
+				5EEEF7FCAB8FBB7F7F7564CEFD893D36 /* CLXBidResponse.h in Headers */,
+				845DE818749B0E6B5806C339FA409076 /* CLXBidTokenSource.h in Headers */,
+				08FA7009EE7DD87F50C6D7C9F6E0967E /* CLXCacheableAd.h in Headers */,
+				0D532491BD6BF0F9020E9D40F89FBFC2 /* CLXCacheAdQueue.h in Headers */,
+				453FC07B1D95D79F14D9DE4029DC568D /* CLXCacheAdService.h in Headers */,
+				ADC024E70CC1E2A93A9C5E27FCD61AAC /* CLXCachedInterstitial.h in Headers */,
+				5E26487A00BAB182D0DB6590358EB371 /* CLXCachedRewarded.h in Headers */,
+				612E8BAD248A7F06735F81166C53359B /* CLXConfigImpressionModel.h in Headers */,
+				A343C066BC81E3360B27C15895E6CF1B /* CLXCoreDataManager.h in Headers */,
+				3A253BB4A3306056C6B151D84CC072C8 /* CLXDestroyable.h in Headers */,
+				D5AFEA1D9AAD3E2F0980051B8960771D /* CLXDIContainer.h in Headers */,
+				0021BF86C2C4ACCC26D22EF68CC43B7F /* CLXExponentialBackoffStrategy.h in Headers */,
+				FC9633DD590A669D8E5ED04EA901B5C0 /* CLXFullscreenAd.h in Headers */,
+				D1E1654E4A7E9677CFDE0AE1840F396A /* CLXGeoLocationService.h in Headers */,
+				FE432A07D180BB8A9F9CEDC5AF8BE48A /* CLXInitMetrics.h in Headers */,
+				64D023B4168744C9D54A30CBC792C56B /* CLXInitMetricsModel.h in Headers */,
+				30CB7BAED68B2B3AFCDDD90A2376FC0C /* CLXInitMetricsModel+Update.h in Headers */,
+				98C0A72EA6076A9BB094EE0EC91BD154 /* CLXInitService.h in Headers */,
+				86CD43A9F70944D8BE3C6531C78A5C33 /* CLXInterstitial.h in Headers */,
+				4F6B16804E31870B26468AC41F2BB6C0 /* CLXInterstitialDelegate.h in Headers */,
+				91C9E6EEA8047BBC8FED5ED4E4950F6B /* CLXLiveInitService.h in Headers */,
+				9C8468187E42930C7995F6A79E1AF7B5 /* CLXLogger.h in Headers */,
+				7ED227F78C38B86FF8263A47B7B18175 /* CLXMetricsNetworkService.h in Headers */,
+				EDE44366C25D324ECB013D78F5280CBC /* CLXMetricsTracker.h in Headers */,
+				F994C17F709A39069CCA747009E520F8 /* CLXNative.h in Headers */,
+				AD82CE4FE90F7BDDDF618CAD22E069C2 /* CLXNativeAdView.h in Headers */,
+				807354591352B592D1693841EC892502 /* CLXNativeDelegate.h in Headers */,
+				563BA1D457647A5F4526AA133930E8C1 /* CLXNativeTemplate.h in Headers */,
+				801B04B8E1CCCCE7FFB6ECD6CBE66FB3 /* CLXPerformanceMetricModel.h in Headers */,
+				49B18EC5123B60DD74FBB8A769722464 /* CLXPerformanceMetricModel+Update.h in Headers */,
+				30FB9CD95D841A4EEF6C39B410D6B473 /* CLXPublisherBanner.h in Headers */,
+				334467ECCA34A470D7D6E9B55260A679 /* CLXPublisherFullscreenAd.h in Headers */,
+				32902A133D6C004FAE7FCC81D8B74333 /* CLXPublisherNative.h in Headers */,
+				0E09C224E547EBE8F94201DA22031900 /* CLXReachabilityService.h in Headers */,
+				FED0D6914F64DEED18238F156CE75B1F /* CLXRewardedDelegate.h in Headers */,
+				F1D4737B601F3FE3127B02BA7A1376BE /* CLXRewardedInterstitial.h in Headers */,
+				7F9655FDEE504D1119F6FFC50687A053 /* CLXRillImpressionDefaultModel.h in Headers */,
+				B90BA1EECA4A7AC14C13CB17333C5A16 /* CLXRillImpressionInitService.h in Headers */,
+				57B88140817EFCFB3DF75F0122E552EF /* CLXRillImpressionModel.h in Headers */,
+				51373B02B56D6B227B471AC18B776194 /* CLXRillImpressionProperties.h in Headers */,
+				A9DEB0643DC8A771788F83D0C00AD76B /* CLXSDKConfig.h in Headers */,
+				FAD77B3376EBACB5161CAB6203E7D646 /* CLXSDKConfigBidder.h in Headers */,
+				AECD4CB51845EBB5F3FE975863B6D973 /* CLXSDKConfigEndpointObject.h in Headers */,
+				49CC35B8CB448EFDC28C8AF606BDBFAD /* CLXSDKConfigPlacement.h in Headers */,
+				E49D2501A2F7AAFFF38E057CC1D533E4 /* CLXSDKConfigRequest.h in Headers */,
+				06F3CBAB1A82A096C316145326BC117F /* CLXSDKInitNetworkService.h in Headers */,
+				45BB4859ED5B92B8E96C71E2D2493A9C /* CLXSessionMetric.h in Headers */,
+				8FF25456C7CF30863BDC63E0546D5D2F /* CLXSessionMetricModel.h in Headers */,
+				70C2E0AA612C6FD4860AC039F9805FE9 /* CLXSessionMetricModel+Update.h in Headers */,
+				0E1B2FA19149AD448AE3958C222FB3F8 /* CLXSessionMetricPerformance.h in Headers */,
+				AF98E3A5FAD4173BD4048BEC72EBDA25 /* CLXSessionMetricSpend.h in Headers */,
+				6D265C0685502BF1FFBE72FE7EA70775 /* CLXSessionMetricType.h in Headers */,
+				C91505A337D42C8B5E784A53DAFFC987 /* CLXSKAdNetworkService.h in Headers */,
+				153C5850196D6028131DDF4D0E18AD68 /* CLXSystemInformation.h in Headers */,
+				A1F46256C0C07C33F938E921024F9693 /* CLXURLProvider.h in Headers */,
+				F69EC3C840A8B66554CF739C2232FAAD /* CLXXorEncryption.h in Headers */,
+				4C64A704A934A9BE007D9014F65BC765 /* NSString+CLXSemicolon.h in Headers */,
+				EC6B4C9AFD317E74246CC24C02598C89 /* UIDevice+CLXIdentifier.h in Headers */,
+				1322AA63E799E3F04078D263721EC18E /* URLSession+CLX.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		2A20F62AB9EA6B4E32DB3D197EA89852 /* CloudXCore-CloudXCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1A8C11DA6578A1A307489DC43E329210 /* Build configuration list for PBXNativeTarget "CloudXCore-CloudXCore" */;
+			buildPhases = (
+				A970B8E182F0C188107A822BAACA6111 /* Sources */,
+				FDAD83081E28E22519FA46880EB30299 /* Frameworks */,
+				85854791580A5CDC34983F878EB5D9B2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CloudXCore-CloudXCore";
+			productName = CloudXCore;
+			productReference = 603AF072D81D54B810C04FA244ACC0CA /* CloudXCore-CloudXCore */;
+			productType = "com.apple.product-type.bundle";
+		};
+		329BF790BC31D47922FBB9734BE5F911 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BA942F2A2910D3026D1B17D2D075F457 /* Build configuration list for PBXNativeTarget "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests" */;
+			buildPhases = (
+				1853764AB8F011E196A9AFB887E55575 /* Headers */,
+				0882C34BA1BE13AAC07B2FCE439EB6F7 /* Sources */,
+				499545B0910F37598D93FD9A06ACEECC /* Frameworks */,
+				ACF8DC31487CFF0C4DCA9FD65258AF6D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				60499C81E239ED40286755F4269EE96F /* PBXTargetDependency */,
+			);
+			name = "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests";
+			productName = Pods_CloudXDemoAdapter_CloudXDemoAdapterTests;
+			productReference = E0EE354132ACEEEA0C119F461BF91F4B /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests */;
+			productType = "com.apple.product-type.framework";
+		};
+		4FE4CCA5A1A885F05E5AC16F735EC191 /* Pods-CloudXDemoAdapter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C9704BA7193B209EC23FD29CC51E0DA5 /* Build configuration list for PBXNativeTarget "Pods-CloudXDemoAdapter" */;
+			buildPhases = (
+				720DFD4524D0556D83CDCCDB138C6872 /* Headers */,
+				9EE30287ABF795FF9FD27ECA7601037C /* Sources */,
+				C456EE21508762840A6D0FD743C1A9E2 /* Frameworks */,
+				1B6308B79E1A14DEC8EBAC57388163C3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9EC971045AAFE6479247B81E477B8E44 /* PBXTargetDependency */,
+			);
+			name = "Pods-CloudXDemoAdapter";
+			productName = Pods_CloudXDemoAdapter;
+			productReference = 312441858E7A8DA3F334F1138E4A058C /* Pods-CloudXDemoAdapter */;
+			productType = "com.apple.product-type.framework";
+		};
+		A532F36DE5630BB28D7AC5C6E8B8CB4C /* CloudXCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 18865C945C118036F77425EB6DBD3B82 /* Build configuration list for PBXNativeTarget "CloudXCore" */;
+			buildPhases = (
+				E479A812A2F172455758A2E6D91CFD42 /* Headers */,
+				AC1FB6F701838E85ADB406A4017738FE /* Sources */,
+				13FD5A982A2ED3B9577D54613372A5F3 /* Frameworks */,
+				59A6E6532738475A29868899F19D0A81 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A4988C08845930A7B1A09DBF77306DA8 /* PBXTargetDependency */,
+			);
+			name = CloudXCore;
+			productName = CloudXCore;
+			productReference = B6790F4717084F4D5DC79D66AAA8BDB5 /* CloudXCore */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
+			minimizedProjectReferenceProxies = 0;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 4F51D7D7029E6D8061913FC6A74E5661 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A532F36DE5630BB28D7AC5C6E8B8CB4C /* CloudXCore */,
+				2A20F62AB9EA6B4E32DB3D197EA89852 /* CloudXCore-CloudXCore */,
+				4FE4CCA5A1A885F05E5AC16F735EC191 /* Pods-CloudXDemoAdapter */,
+				329BF790BC31D47922FBB9734BE5F911 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1B6308B79E1A14DEC8EBAC57388163C3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		59A6E6532738475A29868899F19D0A81 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B754E0CEF7689D4E4E494FA606A054BE /* CloudXCore-CloudXCore in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85854791580A5CDC34983F878EB5D9B2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28B8D42D219A686CB1617C0F0A4C50B4 /* CloudXDataModel.xcdatamodeld in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ACF8DC31487CFF0C4DCA9FD65258AF6D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0882C34BA1BE13AAC07B2FCE439EB6F7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE29379BFA0F55F7446C5B4AFDF16878 /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9EE30287ABF795FF9FD27ECA7601037C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C4A7C632C1D598ABC2125433DB83DD63 /* Pods-CloudXDemoAdapter-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A970B8E182F0C188107A822BAACA6111 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AC1FB6F701838E85ADB406A4017738FE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				61FBB9A892899B4E30D777151FB0C4F2 /* CloudXCore.m in Sources */,
+				2EC1D11844F07DAA8BEB952AD774393A /* CloudXCore-dummy.m in Sources */,
+				683C52C823EF82DDEBD6E506ECF87192 /* CLXAdapterFactoryResolver.m in Sources */,
+				F8483A5DEF3005882944AD42F330E52B /* CLXAdEventReporter.m in Sources */,
+				6AC26B223D657BE75500A9544D287908 /* CLXAdNetworkFactories.m in Sources */,
+				FBAB5CDE335EE45357BA5D7A708B5C0F /* CLXAdReportingNetworkService.m in Sources */,
+				DF4D17D5EF79E40B4F8D44A367B0334E /* CLXAdTrackingService.m in Sources */,
+				27025458A0DAEE0661490F17707A901D /* CLXAppSession.m in Sources */,
+				0C52E6E6A5129D510913C4A4F4E47858 /* CLXAppSessionModel.m in Sources */,
+				F1619357C10AD5D5F3960EE95BE198B4 /* CLXAppSessionModel+Update.m in Sources */,
+				54B38A5C5DD570EB3E33F7C74F8EC042 /* CLXAppSessionServiceImplementation.m in Sources */,
+				B9D115475AF9E7A0EB3C16CFC69844E0 /* CLXBackgroundTimer.m in Sources */,
+				2E267C2960BC9CEEE88201F7E31DCA1D /* CLXBannerAdView.m in Sources */,
+				381EFCD7D4D07D3BEACED7338AA71656 /* CLXBannerTimerService.m in Sources */,
+				3357610A45CCEC87F9516AFA57866B90 /* CLXBaseNetworkService.m in Sources */,
+				3671573750ED8B71309D4EF1AF4FA3AB /* CLXBidAdSource.m in Sources */,
+				D1EFE4C5267DEC1C6D065A68851FEC4F /* CLXBidderConfig.m in Sources */,
+				3E518D6F6AC52C4E3896FF25493664E5 /* CLXBiddingConfig.m in Sources */,
+				EF48AEB4A271B410457DE43BBC6DF6FA /* CLXBidNetworkService.m in Sources */,
+				FA0E13E86072DC3AF596C54A620FDB67 /* CLXBidNetworkServiceImplementation.m in Sources */,
+				A2D51D333FD6E27F9C099D812F372D8F /* CLXBidResponse.m in Sources */,
+				307329E634DFD1F6FB33CD724D02CB7D /* CLXCacheAdQueue.m in Sources */,
+				BD25FAEDB24AF2693CBAB7E7F33F2860 /* CLXCacheAdService.m in Sources */,
+				62B4313522A4C1D20FD0C3DD806A55F4 /* CLXCachedInterstitial.m in Sources */,
+				9FDA3EB8D8AEBA9EB907632DDAB5587E /* CLXCachedRewarded.m in Sources */,
+				3BB1F80712BE40FCC0C359401A12FD52 /* CLXConfigImpressionModel.m in Sources */,
+				1037348179DFC79CCDCFCAC4A56A5BFF /* CLXCoreDataManager.m in Sources */,
+				CAA70DF76A147A7825CE5D5C40C8E410 /* CLXCoreError.m in Sources */,
+				171CDB83FEC415F7590BB1D35C425EC5 /* CLXDIContainer.m in Sources */,
+				9D2F8AC018F7B21274029FF54023EF30 /* CLXExponentialBackoffStrategy.m in Sources */,
+				C3F9D829742C692228E9D24E97BE09F8 /* CLXGeoLocationService.m in Sources */,
+				FFB2CA90BE4D08D5595E3B6F2DDF204D /* CLXInitMetrics.m in Sources */,
+				DB2B6F571CA6B27AB844B96DBFE055EE /* CLXInitMetricsModel.m in Sources */,
+				AAF5509E890D5AD6F2F212FDF21F7286 /* CLXInitMetricsModel+Update.m in Sources */,
+				A34A9C53248EA40BCDB8E5596F9EECAB /* CLXInitService.m in Sources */,
+				C3E4150E2EB93448EAE2FE4D468D372D /* CLXLiveInitService.m in Sources */,
+				BB5480484579BDAF4059B3E207D877D9 /* CLXLogger.m in Sources */,
+				2FCDF32D05BB3CDB4FF1FE1141BBD29D /* CLXMetricsNetworkService.m in Sources */,
+				D63EE87265F21870DD4E184C1CE22595 /* CLXMetricsTracker.m in Sources */,
+				1DBC7CDE5A892ECB97397B3819EE00DE /* CLXNativeAdView.m in Sources */,
+				8F887C2C25C493F23F1C78482394B257 /* CLXNativeTemplate.m in Sources */,
+				46F6F2DF18E78B9CBCBB1D23DC231A49 /* CLXPerformanceMetricModel.m in Sources */,
+				C0631FC69259E37D535198B36464FC6D /* CLXPerformanceMetricModel+Update.m in Sources */,
+				31C24EBF08F126E13509F8535F9340EB /* CLXPublisherBanner.m in Sources */,
+				FA281B1B0BAE9B143B83CDD59CAF7D19 /* CLXPublisherFullscreenAd.m in Sources */,
+				E61F59F550D0256D640F0CE8BF2A573D /* CLXPublisherNative.m in Sources */,
+				80E780479430D9487E2FDC509D760477 /* CLXReachabilityService.m in Sources */,
+				2BB864E622A1E27982622C781645281A /* CLXRillImpressionDefaultModel.m in Sources */,
+				E259A62DE15489F7D9E49BE20772D1FA /* CLXRillImpressionInitService.m in Sources */,
+				A3279028759A2C88BEF2356A32D82F9C /* CLXRillImpressionModel.m in Sources */,
+				F67AC9BAD6B1D41E435C4C55B5AA9DEB /* CLXRillImpressionProperties.m in Sources */,
+				8A3DA2244757CF01395439293D1E02FB /* CLXSDKConfig.m in Sources */,
+				CDEBA33897070E4B5848C4AD766DFD26 /* CLXSDKConfigBidder.m in Sources */,
+				74AB3BE8C185BFE560E5205B75BD3B0D /* CLXSDKConfigEndpointObject.m in Sources */,
+				EE4651B83490251267D8DB9745D9E309 /* CLXSDKConfigPlacement.m in Sources */,
+				10F7D09F315E9FE8AD814AC83AC56EB7 /* CLXSDKConfigRequest.m in Sources */,
+				CCEBE86903538D67A0BEE52D5B191F7E /* CLXSDKInitNetworkService.m in Sources */,
+				C013E51F37C4DA74688E761CD0E11E2F /* CLXSessionMetricModel.m in Sources */,
+				F87EF55F741FC0EFBA416F5BA7306282 /* CLXSessionMetricModel+Update.m in Sources */,
+				32337DEFC65195C43B45FB5BD5461A12 /* CLXSessionMetricPerformance.m in Sources */,
+				47C24BF8E3AFB13D8A1D74B87ED10303 /* CLXSessionMetricSpend.m in Sources */,
+				5980554645D4B5E07ABF82E227CD6C86 /* CLXSessionMetricType.m in Sources */,
+				7CECDC32591002DD8748CB8496A75338 /* CLXSKAdNetworkService.m in Sources */,
+				2AE7E92E2A1611AEAD9152669D375DB8 /* CLXSystemInformation.m in Sources */,
+				41094AD9E70CAABF70997D05AD63C786 /* CLXURLProvider.m in Sources */,
+				9C12C80A8A60AFB855B76394331B723D /* CLXXorEncryption.m in Sources */,
+				554977899B47D64C8F60A8235375479B /* NSString+CLXSemicolon.m in Sources */,
+				B8ECC6FFE7DC8CC45B192B3560953D60 /* UIDevice+CLXIdentifier.m in Sources */,
+				87F2C1891827D5478363F2F41201A40C /* URLSession+CLX.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		60499C81E239ED40286755F4269EE96F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CloudXCore;
+			target = A532F36DE5630BB28D7AC5C6E8B8CB4C /* CloudXCore */;
+			targetProxy = ABA43345387E6D089D044208077E2581 /* PBXContainerItemProxy */;
+		};
+		9EC971045AAFE6479247B81E477B8E44 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CloudXCore;
+			target = A532F36DE5630BB28D7AC5C6E8B8CB4C /* CloudXCore */;
+			targetProxy = 68C69B7EF95C36763E44842DD427F183 /* PBXContainerItemProxy */;
+		};
+		A4988C08845930A7B1A09DBF77306DA8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "CloudXCore-CloudXCore";
+			target = 2A20F62AB9EA6B4E32DB3D197EA89852 /* CloudXCore-CloudXCore */;
+			targetProxy = 504FC7EAD8D3767B67F782CB2EB31212 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		17E6FA5B13340CFCE728D52AC579F743 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4E295108D1AFB39D13A4C4D266C8802A /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-CloudXDemoAdapter-CloudXDemoAdapterTests/Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-CloudXDemoAdapter-CloudXDemoAdapterTests/Pods-CloudXDemoAdapter-CloudXDemoAdapterTests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		2DB27AEAD0FB1880E28BE8CBEA2584D8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EBF51B87DB5F8F5B60281FB3DE72B20A /* CloudXCore.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/CloudXCore";
+				IBSC_MODULE = CloudXCore;
+				INFOPLIST_FILE = "Target Support Files/CloudXCore/ResourceBundle-CloudXCore-CloudXCore-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_NAME = CloudXCore;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+		3158D4518DE8DC298915003BF52FFEFD /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EBF51B87DB5F8F5B60281FB3DE72B20A /* CloudXCore.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				GCC_PREFIX_HEADER = "Target Support Files/CloudXCore/CloudXCore-prefix.pch";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Target Support Files/CloudXCore/CloudXCore-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/CloudXCore/CloudXCore.modulemap";
+				PRODUCT_MODULE_NAME = CloudXCore;
+				PRODUCT_NAME = CloudXCore;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_INSTALL_OBJC_HEADER = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		4BC7450F9457737EE3E637BA155B56F7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_DEBUG=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+		5F7C946549B20B872BD46D6EF628C5FC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D9117815BBD43AA4CF50D16275464AC /* CloudXCore.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				GCC_PREFIX_HEADER = "Target Support Files/CloudXCore/CloudXCore-prefix.pch";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Target Support Files/CloudXCore/CloudXCore-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/CloudXCore/CloudXCore.modulemap";
+				PRODUCT_MODULE_NAME = CloudXCore;
+				PRODUCT_NAME = CloudXCore;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_INSTALL_OBJC_HEADER = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		6FEE188F2F3ED42EA259067245D74C0E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9DAB05829AF7E0900A60E9335897EE2B /* Pods-CloudXDemoAdapter-CloudXDemoAdapterTests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-CloudXDemoAdapter-CloudXDemoAdapterTests/Pods-CloudXDemoAdapter-CloudXDemoAdapterTests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-CloudXDemoAdapter-CloudXDemoAdapterTests/Pods-CloudXDemoAdapter-CloudXDemoAdapterTests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		74EE5AF54AC597DEC9C6CE4961D73848 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 58163CCB1A227C43405569470D64B2E7 /* Pods-CloudXDemoAdapter.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-CloudXDemoAdapter/Pods-CloudXDemoAdapter-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-CloudXDemoAdapter/Pods-CloudXDemoAdapter.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		7C71D2047A71E43DBB99087D992A36C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FABD032D5B6E63E185B7EB178E12AB4A /* Pods-CloudXDemoAdapter.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-CloudXDemoAdapter/Pods-CloudXDemoAdapter-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-CloudXDemoAdapter/Pods-CloudXDemoAdapter.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		8B5A46FF8D3C1289CDEE3BAFACABCD2A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Release;
+		};
+		A99D1F346AC63CDC4C4B0EBCBEC00C67 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D9117815BBD43AA4CF50D16275464AC /* CloudXCore.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/CloudXCore";
+				IBSC_MODULE = CloudXCore;
+				INFOPLIST_FILE = "Target Support Files/CloudXCore/ResourceBundle-CloudXCore-CloudXCore-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_NAME = CloudXCore;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		18865C945C118036F77425EB6DBD3B82 /* Build configuration list for PBXNativeTarget "CloudXCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5F7C946549B20B872BD46D6EF628C5FC /* Debug */,
+				3158D4518DE8DC298915003BF52FFEFD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1A8C11DA6578A1A307489DC43E329210 /* Build configuration list for PBXNativeTarget "CloudXCore-CloudXCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A99D1F346AC63CDC4C4B0EBCBEC00C67 /* Debug */,
+				2DB27AEAD0FB1880E28BE8CBEA2584D8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4BC7450F9457737EE3E637BA155B56F7 /* Debug */,
+				8B5A46FF8D3C1289CDEE3BAFACABCD2A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BA942F2A2910D3026D1B17D2D075F457 /* Build configuration list for PBXNativeTarget "Pods-CloudXDemoAdapter-CloudXDemoAdapterTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				17E6FA5B13340CFCE728D52AC579F743 /* Debug */,
+				6FEE188F2F3ED42EA259067245D74C0E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C9704BA7193B209EC23FD29CC51E0DA5 /* Build configuration list for PBXNativeTarget "Pods-CloudXDemoAdapter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				74EE5AF54AC597DEC9C6CE4961D73848 /* Debug */,
+				7C71D2047A71E43DBB99087D992A36C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		296A6EAB8D91C697F8306D4F055B4F32 /* CloudXDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				550DDD77DF15AE77B2C6E19B2A3A12D0 /* Model.xcdatamodel */,
+				A17758DDB86FF600253F2954A9435A7F /* Model 2.xcdatamodel */,
+				8014771E2AB7B0F5FC5ABCDEC07D10B1 /* Model 3.xcdatamodel */,
+			);
+			currentVersion = 8014771E2AB7B0F5FC5ABCDEC07D10B1 /* Model 3.xcdatamodel */;
+			name = CloudXDataModel.xcdatamodeld;
+			path = Sources/CloudXCore/AdReporting/CoreData/CloudXDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+}

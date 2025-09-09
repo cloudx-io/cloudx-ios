@@ -1,0 +1,24 @@
+PODS:
+  - CloudXCore (1.1.34)
+  - CloudXTestVastNetworkAdapter (1.0.0):
+    - CloudXCore
+
+DEPENDENCIES:
+  - CloudXCore
+  - CloudXTestVastNetworkAdapter (from `../cloudexchange.sdk.ios.testAdapter`)
+
+SPEC REPOS:
+  trunk:
+    - CloudXCore
+
+EXTERNAL SOURCES:
+  CloudXTestVastNetworkAdapter:
+    :path: "../cloudexchange.sdk.ios.testAdapter"
+
+SPEC CHECKSUMS:
+  CloudXCore: a03a18e4410fbf490e547c56e71e5b624a0f1add
+  CloudXTestVastNetworkAdapter: b6c9f23b79eae41779c722c6e34be243e7852e17
+
+PODFILE CHECKSUM: 58eb0ffe333d7ae116643847c89f749481ab5b46
+
+COCOAPODS: 1.16.2

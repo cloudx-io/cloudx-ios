@@ -1,0 +1,67 @@
+{
+    "id": "123",
+    "seatbid": [
+        {
+            "bid": [
+                {
+                    "id": "test-bid-int1",
+                    "impid": "",
+                    "price": 0.1,
+                    "adm": "1541952",
+                    "adid": "test-ad-id-1",
+                    "adomain": [
+                        "example.com"
+                    ],
+                    "crid": "test-creative-id-1",
+                    "w": 320,
+                    "h": 50,
+                    "ext": {
+                        "origbidcpm": 0.1,
+                        "origbidcur": "USD",
+                        "cloudx": {
+                            "meta": {
+                                "adaptercode": "mintegral"
+                            },
+                            "adapter_extras": {
+                                "bid_id": "1111",
+                                "placement_id": "328874"
+                            },
+                            "type": "interstitial",
+                            "rank": 2
+                        }
+                    }
+                },
+                {
+                    "id": "test-bid-int2",
+                    "impid": "2",
+                    "price": 0.1,
+                    "adm": "1541952",
+                    "adid": "test-ad-id-1",
+                    "adomain": [
+                        "example.com"
+                    ],
+                    "crid": "test-creative-id-1",
+                    "w": 320,
+                    "h": 50,
+                    "ext": {
+                        "origbidcpm": 0.1,
+                        "origbidcur": "USD",
+                        "cloudx": {
+                            "meta": {
+                                "adaptercode": "mintegral"
+                            },
+                            "adapter_extras": {
+                                "bid_id": "66b1286e87bc0300fc317ba7-1722886254_nl-new-cdn-ssplib-europe-west4-c_9E6EC5D4EF184687A5B9748D94A3720C",
+                                "placement_id": "328874"
+                            },
+                            "type": "interstitial",
+                            "rank": 1
+                        }
+                    }
+                }
+            ],
+            "seat": "testbidder"
+        }
+    ],
+    "cur": "USD"
+}

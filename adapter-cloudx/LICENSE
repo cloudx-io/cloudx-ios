@@ -1,0 +1,30 @@
+Source Available License
+
+Copyright (c) 2024 CloudX, Inc.
+
+This software is source available, meaning you may view, modify, and use the source code for your own projects. However, this license grants limited rights compared to open source licenses.
+
+PERMITTED USES:
+- View and examine the source code
+- Modify the source code for your own use
+- Use the software in your applications
+- Create derivative works for internal use
+
+RESTRICTIONS:
+- You may not distribute, publish, or make available the source code to third parties
+- You may not sublicense or sell the software or its derivatives
+- You may not use this software to create competing products or services
+- Any modifications must be for your own use only
+
+ATTRIBUTION:
+- You must retain the original copyright notice
+- You must include a notice that the software is based on CloudX PrebidAdapter
+
+DISCLAIMER:
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. 

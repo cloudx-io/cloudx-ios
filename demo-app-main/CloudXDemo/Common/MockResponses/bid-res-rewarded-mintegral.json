@@ -1,0 +1,54 @@
+{
+  "id": "070b976d-774d-45e9-910f-7de151e6c3f4",
+  "seatbid": [
+    {
+      "bid": [
+        {
+          "id": "9VJoj26--3sCkTUEkCLW7",
+          "impid": "8097023e-a810-436e-8dfe-db45625617c4",
+          "price": 0.51,
+          "adm": "1542101",
+          "adid": "test-ad-id-RG3XV_lpygUDu7ICz3OaD",
+          "adomain": [
+            "cloudx.io"
+          ],
+          "crid": "test-cr-id-QHUov8SdZGhqI468d6zKN",
+          "w": 300,
+          "h": 250,
+          "ext": {
+            "origbidcpm": 0.51,
+            "origbidcur": "USD",
+            "cloudx": {
+              "meta": {
+                "adaptercode": "mintegral"
+              },
+              "adapter_extras": {
+                "bid_id": "89e3a366-5915-4b3c-87cf-afbf34b0857f",
+                "placement_id": "290651"
+              },
+              "rank": 1
+            }
+          }
+        }
+      ],
+      "seat": "mintegral"
+    }
+  ],
+  "cur": "USD",
+  "ext": {
+    "warnings": {
+      "general": [
+        {
+          "code": 10002,
+          "message": "debugturnedoffforaccount"
+        }
+      ]
+    },
+    "responsetimemillis": {
+      "googleAdManager": 9
+    },
+    "prebid": {
+      "auctiontimestamp": 1722420561219
+    }
+  }
+}

@@ -1,0 +1,259 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "CloudXMintegralAdapter",
+    "printedName": "CloudXMintegralAdapter",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "MTGSDKBidding",
+        "printedName": "MTGSDKBidding",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "MTGSDKNativeAdvanced",
+        "printedName": "MTGSDKNativeAdvanced",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "CloudXCore",
+        "printedName": "CloudXCore",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "CloudXCore",
+        "printedName": "CloudXCore",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "MTGSDKBanner",
+        "printedName": "MTGSDKBanner",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "MTGSDKBidding",
+        "printedName": "MTGSDKBidding",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "CloudXCore",
+        "printedName": "CloudXCore",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "CloudXCore",
+        "printedName": "CloudXCore",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "MTGSDKNewInterstitial",
+        "printedName": "MTGSDKNewInterstitial",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "MTGSDKBidding",
+        "printedName": "MTGSDKBidding",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "CloudXCore",
+        "printedName": "CloudXCore",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "MTGSDK",
+        "printedName": "MTGSDK",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "CloudXCore",
+        "printedName": "CloudXCore",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "CloudXCore",
+        "printedName": "CloudXCore",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "MTGSDKBidding",
+        "printedName": "MTGSDKBidding",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "CloudXCore",
+        "printedName": "CloudXCore",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "CloudXCore",
+        "printedName": "CloudXCore",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "MTGSDKReward",
+        "printedName": "MTGSDKReward",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "MTGSDKBidding",
+        "printedName": "MTGSDKBidding",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      },
+      {
+        "kind": "Import",
+        "name": "CloudXCore",
+        "printedName": "CloudXCore",
+        "declKind": "Import",
+        "moduleName": "CloudXMintegralAdapter"
+      }
+    ],
+    "json_format_version": 8
+  },
+  "ConstValues": [
+    {
+      "filePath": "\/Users\/bryanboyko\/Coding\/CloudX\/cloudexchange.sdk.ios.MintegralAdapter\/Sources\/CloudXMintegralAdapter\/Native\/CloudXMintegralNative.swift",
+      "kind": "BooleanLiteral",
+      "offset": 291,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Users\/bryanboyko\/Coding\/CloudX\/cloudexchange.sdk.ios.MintegralAdapter\/Sources\/CloudXMintegralAdapter\/Banner\/CloudXMintegralBanner.swift",
+      "kind": "BooleanLiteral",
+      "offset": 296,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Users\/bryanboyko\/Coding\/CloudX\/cloudexchange.sdk.ios.MintegralAdapter\/Sources\/CloudXMintegralAdapter\/Interstitial\/CloudXMintegralInterstitial.swift",
+      "kind": "BooleanLiteral",
+      "offset": 464,
+      "length": 4,
+      "value": "true"
+    },
+    {
+      "filePath": "\/Users\/bryanboyko\/Coding\/CloudX\/cloudexchange.sdk.ios.MintegralAdapter\/Sources\/CloudXMintegralAdapter\/Initializers\/CloudXMintegralInitializer.swift",
+      "kind": "BooleanLiteral",
+      "offset": 234,
+      "length": 5,
+      "value": "false"
+    }
+  ]
+}

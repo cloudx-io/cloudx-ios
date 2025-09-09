@@ -1,0 +1,3 @@
+${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-frameworks.sh
+${BUILT_PRODUCTS_DIR}/CloudXTestVastNetworkAdapter/CloudXTestVastNetworkAdapter.framework
+${PODS_XCFRAMEWORKS_BUILD_DIR}/CloudXCore/CloudXCore.framework/CloudXCore

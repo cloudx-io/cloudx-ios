@@ -1,0 +1,5 @@
+ extern const unsigned char Pods_CloudXDSPAdapter_CloudXDSPAdapterTestsVersionString[];
+ extern const double Pods_CloudXDSPAdapter_CloudXDSPAdapterTestsVersionNumber;
+
+ const unsigned char Pods_CloudXDSPAdapter_CloudXDSPAdapterTestsVersionString[] __attribute__ ((used)) = "@(#)PROGRAM:Pods_CloudXDSPAdapter_CloudXDSPAdapterTests  PROJECT:Pods-1" "\n";
+ const double Pods_CloudXDSPAdapter_CloudXDSPAdapterTestsVersionNumber __attribute__ ((used)) = (double)1.;

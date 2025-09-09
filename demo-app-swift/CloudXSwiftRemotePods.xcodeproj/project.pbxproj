@@ -1,0 +1,729 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA6091F34501450C44CE235B /* Pods_CloudXSwiftRemotePods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 659F7871632D0095B93A24E0 /* Pods_CloudXSwiftRemotePods.framework */; };
+		D0727341A39FC2E4458236F9 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0842745C86DDEB98C4A950 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */; };
+		DD4B147631BFC6EECE76503B /* Pods_CloudXSwiftRemotePodsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 090BB6A1C5F30DB6AB4AC37D /* Pods_CloudXSwiftRemotePodsTests.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		195FD5AD2DE3C8000026F997 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 195FD58E2DE3C7FF0026F997 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 195FD5952DE3C7FF0026F997;
+			remoteInfo = CloudXSwiftRemotePods;
+		};
+		195FD5B72DE3C8000026F997 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 195FD58E2DE3C7FF0026F997 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 195FD5952DE3C7FF0026F997;
+			remoteInfo = CloudXSwiftRemotePods;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		090BB6A1C5F30DB6AB4AC37D /* Pods_CloudXSwiftRemotePodsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePodsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		195FD5962DE3C7FF0026F997 /* CloudXSwiftRemotePods.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CloudXSwiftRemotePods.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		195FD5AC2DE3C8000026F997 /* CloudXSwiftRemotePodsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXSwiftRemotePodsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		195FD5B62DE3C8000026F997 /* CloudXSwiftRemotePodsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXSwiftRemotePodsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3C7003472EB5F92286A75236 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		43FB304D2DB51846954A4E13 /* Pods-CloudXSwiftRemotePods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods.debug.xcconfig"; sourceTree = "<group>"; };
+		6451984C4E272796BD051AB5 /* Pods-CloudXSwiftRemotePodsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePodsTests.release.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePodsTests/Pods-CloudXSwiftRemotePodsTests.release.xcconfig"; sourceTree = "<group>"; };
+		659F7871632D0095B93A24E0 /* Pods_CloudXSwiftRemotePods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6AD0A49818EBC8C8B3110F09 /* Pods-CloudXSwiftRemotePodsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePodsTests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePodsTests/Pods-CloudXSwiftRemotePodsTests.debug.xcconfig"; sourceTree = "<group>"; };
+		6D34D888225D15201D0ACFBC /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig"; sourceTree = "<group>"; };
+		AA3687AE82F34B6CA4C1C6C3 /* Pods-CloudXSwiftRemotePods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods.release.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods.release.xcconfig"; sourceTree = "<group>"; };
+		FB0842745C86DDEB98C4A950 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		195FD5BE2DE3C8000026F997 /* Exceptions for "CloudXSwiftRemotePods" folder in "CloudXSwiftRemotePods" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 195FD5952DE3C7FF0026F997 /* CloudXSwiftRemotePods */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		195FD5982DE3C7FF0026F997 /* CloudXSwiftRemotePods */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				195FD5BE2DE3C8000026F997 /* Exceptions for "CloudXSwiftRemotePods" folder in "CloudXSwiftRemotePods" target */,
+			);
+			path = CloudXSwiftRemotePods;
+			sourceTree = "<group>";
+		};
+		195FD5AF2DE3C8000026F997 /* CloudXSwiftRemotePodsTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = CloudXSwiftRemotePodsTests;
+			sourceTree = "<group>";
+		};
+		195FD5B92DE3C8000026F997 /* CloudXSwiftRemotePodsUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = CloudXSwiftRemotePodsUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		195FD5932DE3C7FF0026F997 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA6091F34501450C44CE235B /* Pods_CloudXSwiftRemotePods.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		195FD5A92DE3C8000026F997 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD4B147631BFC6EECE76503B /* Pods_CloudXSwiftRemotePodsTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		195FD5B32DE3C8000026F997 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0727341A39FC2E4458236F9 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		195FD58D2DE3C7FF0026F997 = {
+			isa = PBXGroup;
+			children = (
+				195FD5982DE3C7FF0026F997 /* CloudXSwiftRemotePods */,
+				195FD5AF2DE3C8000026F997 /* CloudXSwiftRemotePodsTests */,
+				195FD5B92DE3C8000026F997 /* CloudXSwiftRemotePodsUITests */,
+				195FD5972DE3C7FF0026F997 /* Products */,
+				E1698230A3F518F2A8E30456 /* Pods */,
+				2340A29557E491EBD0A069A0 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		195FD5972DE3C7FF0026F997 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				195FD5962DE3C7FF0026F997 /* CloudXSwiftRemotePods.app */,
+				195FD5AC2DE3C8000026F997 /* CloudXSwiftRemotePodsTests.xctest */,
+				195FD5B62DE3C8000026F997 /* CloudXSwiftRemotePodsUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2340A29557E491EBD0A069A0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				659F7871632D0095B93A24E0 /* Pods_CloudXSwiftRemotePods.framework */,
+				FB0842745C86DDEB98C4A950 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */,
+				090BB6A1C5F30DB6AB4AC37D /* Pods_CloudXSwiftRemotePodsTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E1698230A3F518F2A8E30456 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				43FB304D2DB51846954A4E13 /* Pods-CloudXSwiftRemotePods.debug.xcconfig */,
+				AA3687AE82F34B6CA4C1C6C3 /* Pods-CloudXSwiftRemotePods.release.xcconfig */,
+				3C7003472EB5F92286A75236 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig */,
+				6D34D888225D15201D0ACFBC /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig */,
+				6AD0A49818EBC8C8B3110F09 /* Pods-CloudXSwiftRemotePodsTests.debug.xcconfig */,
+				6451984C4E272796BD051AB5 /* Pods-CloudXSwiftRemotePodsTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		195FD5952DE3C7FF0026F997 /* CloudXSwiftRemotePods */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 195FD5BF2DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXSwiftRemotePods" */;
+			buildPhases = (
+				FA86DD2C059127A049DB624C /* [CP] Check Pods Manifest.lock */,
+				195FD5922DE3C7FF0026F997 /* Sources */,
+				195FD5932DE3C7FF0026F997 /* Frameworks */,
+				195FD5942DE3C7FF0026F997 /* Resources */,
+				9E9E2608511D6D23C99031C6 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				195FD5982DE3C7FF0026F997 /* CloudXSwiftRemotePods */,
+			);
+			name = CloudXSwiftRemotePods;
+			productName = CloudXSwiftRemotePods;
+			productReference = 195FD5962DE3C7FF0026F997 /* CloudXSwiftRemotePods.app */;
+			productType = "com.apple.product-type.application";
+		};
+		195FD5AB2DE3C8000026F997 /* CloudXSwiftRemotePodsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 195FD5C42DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXSwiftRemotePodsTests" */;
+			buildPhases = (
+				477D9E988781F0E479ABB122 /* [CP] Check Pods Manifest.lock */,
+				195FD5A82DE3C8000026F997 /* Sources */,
+				195FD5A92DE3C8000026F997 /* Frameworks */,
+				195FD5AA2DE3C8000026F997 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				195FD5AE2DE3C8000026F997 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				195FD5AF2DE3C8000026F997 /* CloudXSwiftRemotePodsTests */,
+			);
+			name = CloudXSwiftRemotePodsTests;
+			productName = CloudXSwiftRemotePodsTests;
+			productReference = 195FD5AC2DE3C8000026F997 /* CloudXSwiftRemotePodsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		195FD5B52DE3C8000026F997 /* CloudXSwiftRemotePodsUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 195FD5C72DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXSwiftRemotePodsUITests" */;
+			buildPhases = (
+				4B0724EB22025E6924ED7AD3 /* [CP] Check Pods Manifest.lock */,
+				195FD5B22DE3C8000026F997 /* Sources */,
+				195FD5B32DE3C8000026F997 /* Frameworks */,
+				195FD5B42DE3C8000026F997 /* Resources */,
+				FC9A861DFA856D1ED8E2B9A4 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				195FD5B82DE3C8000026F997 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				195FD5B92DE3C8000026F997 /* CloudXSwiftRemotePodsUITests */,
+			);
+			name = CloudXSwiftRemotePodsUITests;
+			productName = CloudXSwiftRemotePodsUITests;
+			productReference = 195FD5B62DE3C8000026F997 /* CloudXSwiftRemotePodsUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		195FD58E2DE3C7FF0026F997 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					195FD5952DE3C7FF0026F997 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					195FD5AB2DE3C8000026F997 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 195FD5952DE3C7FF0026F997;
+					};
+					195FD5B52DE3C8000026F997 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 195FD5952DE3C7FF0026F997;
+					};
+				};
+			};
+			buildConfigurationList = 195FD5912DE3C7FF0026F997 /* Build configuration list for PBXProject "CloudXSwiftRemotePods" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 195FD58D2DE3C7FF0026F997;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 195FD5972DE3C7FF0026F997 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				195FD5952DE3C7FF0026F997 /* CloudXSwiftRemotePods */,
+				195FD5AB2DE3C8000026F997 /* CloudXSwiftRemotePodsTests */,
+				195FD5B52DE3C8000026F997 /* CloudXSwiftRemotePodsUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		195FD5942DE3C7FF0026F997 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		195FD5AA2DE3C8000026F997 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		195FD5B42DE3C8000026F997 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		477D9E988781F0E479ABB122 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXSwiftRemotePodsTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4B0724EB22025E6924ED7AD3 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9E9E2608511D6D23C99031C6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FA86DD2C059127A049DB624C /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXSwiftRemotePods-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FC9A861DFA856D1ED8E2B9A4 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		195FD5922DE3C7FF0026F997 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		195FD5A82DE3C8000026F997 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		195FD5B22DE3C8000026F997 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		195FD5AE2DE3C8000026F997 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 195FD5952DE3C7FF0026F997 /* CloudXSwiftRemotePods */;
+			targetProxy = 195FD5AD2DE3C8000026F997 /* PBXContainerItemProxy */;
+		};
+		195FD5B82DE3C8000026F997 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 195FD5952DE3C7FF0026F997 /* CloudXSwiftRemotePods */;
+			targetProxy = 195FD5B72DE3C8000026F997 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		195FD5C02DE3C8000026F997 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 43FB304D2DB51846954A4E13 /* Pods-CloudXSwiftRemotePods.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SFK4FBZQ9F;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CloudXSwiftRemotePods/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cloudx.CloudXSwiftRemotePods;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		195FD5C12DE3C8000026F997 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA3687AE82F34B6CA4C1C6C3 /* Pods-CloudXSwiftRemotePods.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SFK4FBZQ9F;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CloudXSwiftRemotePods/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cloudx.CloudXSwiftRemotePods;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		195FD5C22DE3C8000026F997 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		195FD5C32DE3C8000026F997 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		195FD5C52DE3C8000026F997 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6AD0A49818EBC8C8B3110F09 /* Pods-CloudXSwiftRemotePodsTests.debug.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SFK4FBZQ9F;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cloudx.CloudXSwiftRemotePodsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CloudXSwiftRemotePods.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CloudXSwiftRemotePods";
+			};
+			name = Debug;
+		};
+		195FD5C62DE3C8000026F997 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6451984C4E272796BD051AB5 /* Pods-CloudXSwiftRemotePodsTests.release.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SFK4FBZQ9F;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cloudx.CloudXSwiftRemotePodsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CloudXSwiftRemotePods.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CloudXSwiftRemotePods";
+			};
+			name = Release;
+		};
+		195FD5C82DE3C8000026F997 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3C7003472EB5F92286A75236 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SFK4FBZQ9F;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cloudx.CloudXSwiftRemotePodsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CloudXSwiftRemotePods;
+			};
+			name = Debug;
+		};
+		195FD5C92DE3C8000026F997 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6D34D888225D15201D0ACFBC /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SFK4FBZQ9F;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cloudx.CloudXSwiftRemotePodsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CloudXSwiftRemotePods;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		195FD5912DE3C7FF0026F997 /* Build configuration list for PBXProject "CloudXSwiftRemotePods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				195FD5C22DE3C8000026F997 /* Debug */,
+				195FD5C32DE3C8000026F997 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		195FD5BF2DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXSwiftRemotePods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				195FD5C02DE3C8000026F997 /* Debug */,
+				195FD5C12DE3C8000026F997 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		195FD5C42DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXSwiftRemotePodsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				195FD5C52DE3C8000026F997 /* Debug */,
+				195FD5C62DE3C8000026F997 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		195FD5C72DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXSwiftRemotePodsUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				195FD5C82DE3C8000026F997 /* Debug */,
+				195FD5C92DE3C8000026F997 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 195FD58E2DE3C7FF0026F997 /* Project object */;
+}

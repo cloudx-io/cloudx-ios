@@ -1,0 +1,788 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0E843D2C5442D5EB847F6C69 /* Pods_CloudXPrebidAdapter_CloudXPrebidAdapterTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 131F609E0EEE3DEFABFC22F0 /* Pods_CloudXPrebidAdapter_CloudXPrebidAdapterTests.framework */; };
+		19D063A82E30F0B000B3B99C /* CloudXPrebidAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19D0639D2E30F0B000B3B99C /* CloudXPrebidAdapter.framework */; };
+		19D064882E30F5DB00B3B99C /* CLXPerformanceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064632E30F5DB00B3B99C /* CLXPerformanceManager.m */; };
+		19D064892E30F5DB00B3B99C /* CloudXPrebidAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064852E30F5DB00B3B99C /* CloudXPrebidAdapter.m */; };
+		19D0648A2E30F5DB00B3B99C /* CLXMRAIDManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064612E30F5DB00B3B99C /* CLXMRAIDManager.m */; };
+		19D0648B2E30F5DB00B3B99C /* CLXViewabilityTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064682E30F5DB00B3B99C /* CLXViewabilityTracker.m */; };
+		19D0648C2E30F5DB00B3B99C /* CLXPrebidRewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D0647D2E30F5DB00B3B99C /* CLXPrebidRewarded.m */; };
+		19D0648D2E30F5DB00B3B99C /* CLXPrebidRewardedFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D0647F2E30F5DB00B3B99C /* CLXPrebidRewardedFactory.m */; };
+		19D0648E2E30F5DB00B3B99C /* CLXPrebidInterstitialFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064702E30F5DB00B3B99C /* CLXPrebidInterstitialFactory.m */; };
+		19D0648F2E30F5DB00B3B99C /* CLXPrebidError.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064652E30F5DB00B3B99C /* CLXPrebidError.m */; };
+		19D064902E30F5DB00B3B99C /* CLXFullscreenStaticContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D0645F2E30F5DB00B3B99C /* CLXFullscreenStaticContainerViewController.m */; };
+		19D064912E30F5DB00B3B99C /* CLXPrebidInitializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D0646B2E30F5DB00B3B99C /* CLXPrebidInitializer.m */; };
+		19D064922E30F5DB00B3B99C /* CLXPrebidBannerFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D0645A2E30F5DB00B3B99C /* CLXPrebidBannerFactory.m */; };
+		19D064932E30F5DB00B3B99C /* CLXPrebidNativeFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064772E30F5DB00B3B99C /* CLXPrebidNativeFactory.m */; };
+		19D064942E30F5DB00B3B99C /* CLXPrebidInterstitial.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D0646E2E30F5DB00B3B99C /* CLXPrebidInterstitial.m */; };
+		19D064952E30F5DB00B3B99C /* CLXWKScriptHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064822E30F5DB00B3B99C /* CLXWKScriptHelper.m */; };
+		19D064962E30F5DB00B3B99C /* CLXNativeAdData.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064732E30F5DB00B3B99C /* CLXNativeAdData.m */; };
+		19D064972E30F5DB00B3B99C /* CLXPrebidNative.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064752E30F5DB00B3B99C /* CLXPrebidNative.m */; };
+		19D064982E30F5DB00B3B99C /* CLXDemoAdapterError.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D0645D2E30F5DB00B3B99C /* CLXDemoAdapterError.m */; };
+		19D064992E30F5DB00B3B99C /* CLXPrebidBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064582E30F5DB00B3B99C /* CLXPrebidBanner.m */; };
+		19D0649A2E30F5DB00B3B99C /* CLXPrebidWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D0647A2E30F5DB00B3B99C /* CLXPrebidWebView.m */; };
+		19D0649B2E30F5DB00B3B99C /* CLXPrebidInterstitial.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D0646D2E30F5DB00B3B99C /* CLXPrebidInterstitial.h */; };
+		19D0649C2E30F5DB00B3B99C /* CLXPerformanceManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064622E30F5DB00B3B99C /* CLXPerformanceManager.h */; };
+		19D0649D2E30F5DB00B3B99C /* CLXVASTParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064662E30F5DB00B3B99C /* CLXVASTParser.h */; };
+		19D0649E2E30F5DB00B3B99C /* CLXPrebidNative.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064742E30F5DB00B3B99C /* CLXPrebidNative.h */; };
+		19D0649F2E30F5DB00B3B99C /* CLXPrebidBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064572E30F5DB00B3B99C /* CLXPrebidBanner.h */; };
+		19D064A02E30F5DB00B3B99C /* CLXPrebidBannerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064592E30F5DB00B3B99C /* CLXPrebidBannerFactory.h */; };
+		19D064A12E30F5DB00B3B99C /* CLXFullscreenStaticContainerViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D0645E2E30F5DB00B3B99C /* CLXFullscreenStaticContainerViewController.h */; };
+		19D064A22E30F5DB00B3B99C /* CLXPrebidInterstitialFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D0646F2E30F5DB00B3B99C /* CLXPrebidInterstitialFactory.h */; };
+		19D064A32E30F5DB00B3B99C /* CLXMRAIDManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064602E30F5DB00B3B99C /* CLXMRAIDManager.h */; };
+		19D064A42E30F5DB00B3B99C /* CLXNativeAdData.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064722E30F5DB00B3B99C /* CLXNativeAdData.h */; };
+		19D064A52E30F5DB00B3B99C /* CLXPrebidRewarded.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D0647C2E30F5DB00B3B99C /* CLXPrebidRewarded.h */; };
+		19D064A62E30F5DB00B3B99C /* CLXPrebidInitializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D0646A2E30F5DB00B3B99C /* CLXPrebidInitializer.h */; };
+		19D064A72E30F5DB00B3B99C /* CloudXPrebidAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064842E30F5DB00B3B99C /* CloudXPrebidAdapter.h */; };
+		19D064A82E30F5DB00B3B99C /* CLXPrebidError.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064642E30F5DB00B3B99C /* CLXPrebidError.h */; };
+		19D064A92E30F5DB00B3B99C /* CLXPrebidNativeFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064762E30F5DB00B3B99C /* CLXPrebidNativeFactory.h */; };
+		19D064AA2E30F5DB00B3B99C /* CLXWKScriptHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064812E30F5DB00B3B99C /* CLXWKScriptHelper.h */; };
+		19D064AB2E30F5DB00B3B99C /* CLXDemoAdapterError.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D0645C2E30F5DB00B3B99C /* CLXDemoAdapterError.h */; };
+		19D064AC2E30F5DB00B3B99C /* CLXPrebidRewardedFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D0647E2E30F5DB00B3B99C /* CLXPrebidRewardedFactory.h */; };
+		19D064AD2E30F5DB00B3B99C /* CLXViewabilityTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064672E30F5DB00B3B99C /* CLXViewabilityTracker.h */; };
+		19D064AE2E30F5DB00B3B99C /* CLXPrebidWebView.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064792E30F5DB00B3B99C /* CLXPrebidWebView.h */; };
+		44C704E2D9102EEA69674156 /* Pods_CloudXPrebidAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B32A6CD8F250BA4A8A8C85 /* Pods_CloudXPrebidAdapter.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		19D063A92E30F0B000B3B99C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 19D063942E30F0B000B3B99C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 19D0639C2E30F0B000B3B99C;
+			remoteInfo = CloudXPrebidAdapter;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		131F609E0EEE3DEFABFC22F0 /* Pods_CloudXPrebidAdapter_CloudXPrebidAdapterTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXPrebidAdapter_CloudXPrebidAdapterTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		1816A8DB4D8FBB34DD46438A /* Pods-CloudXPrebidAdapter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXPrebidAdapter.debug.xcconfig"; path = "Target Support Files/Pods-CloudXPrebidAdapter/Pods-CloudXPrebidAdapter.debug.xcconfig"; sourceTree = "<group>"; };
+		19D0639D2E30F0B000B3B99C /* CloudXPrebidAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXPrebidAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		19D063A72E30F0B000B3B99C /* CloudXPrebidAdapterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXPrebidAdapterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		19D064572E30F5DB00B3B99C /* CLXPrebidBanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPrebidBanner.h; sourceTree = "<group>"; };
+		19D064582E30F5DB00B3B99C /* CLXPrebidBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPrebidBanner.m; sourceTree = "<group>"; };
+		19D064592E30F5DB00B3B99C /* CLXPrebidBannerFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPrebidBannerFactory.h; sourceTree = "<group>"; };
+		19D0645A2E30F5DB00B3B99C /* CLXPrebidBannerFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPrebidBannerFactory.m; sourceTree = "<group>"; };
+		19D0645C2E30F5DB00B3B99C /* CLXDemoAdapterError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXDemoAdapterError.h; sourceTree = "<group>"; };
+		19D0645D2E30F5DB00B3B99C /* CLXDemoAdapterError.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXDemoAdapterError.m; sourceTree = "<group>"; };
+		19D0645E2E30F5DB00B3B99C /* CLXFullscreenStaticContainerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXFullscreenStaticContainerViewController.h; sourceTree = "<group>"; };
+		19D0645F2E30F5DB00B3B99C /* CLXFullscreenStaticContainerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXFullscreenStaticContainerViewController.m; sourceTree = "<group>"; };
+		19D064602E30F5DB00B3B99C /* CLXMRAIDManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMRAIDManager.h; sourceTree = "<group>"; };
+		19D064612E30F5DB00B3B99C /* CLXMRAIDManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMRAIDManager.m; sourceTree = "<group>"; };
+		19D064622E30F5DB00B3B99C /* CLXPerformanceManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPerformanceManager.h; sourceTree = "<group>"; };
+		19D064632E30F5DB00B3B99C /* CLXPerformanceManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPerformanceManager.m; sourceTree = "<group>"; };
+		19D064642E30F5DB00B3B99C /* CLXPrebidError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPrebidError.h; sourceTree = "<group>"; };
+		19D064652E30F5DB00B3B99C /* CLXPrebidError.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPrebidError.m; sourceTree = "<group>"; };
+		19D064662E30F5DB00B3B99C /* CLXVASTParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVASTParser.h; sourceTree = "<group>"; };
+		19D064672E30F5DB00B3B99C /* CLXViewabilityTracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXViewabilityTracker.h; sourceTree = "<group>"; };
+		19D064682E30F5DB00B3B99C /* CLXViewabilityTracker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXViewabilityTracker.m; sourceTree = "<group>"; };
+		19D0646A2E30F5DB00B3B99C /* CLXPrebidInitializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPrebidInitializer.h; sourceTree = "<group>"; };
+		19D0646B2E30F5DB00B3B99C /* CLXPrebidInitializer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPrebidInitializer.m; sourceTree = "<group>"; };
+		19D0646D2E30F5DB00B3B99C /* CLXPrebidInterstitial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPrebidInterstitial.h; sourceTree = "<group>"; };
+		19D0646E2E30F5DB00B3B99C /* CLXPrebidInterstitial.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPrebidInterstitial.m; sourceTree = "<group>"; };
+		19D0646F2E30F5DB00B3B99C /* CLXPrebidInterstitialFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPrebidInterstitialFactory.h; sourceTree = "<group>"; };
+		19D064702E30F5DB00B3B99C /* CLXPrebidInterstitialFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPrebidInterstitialFactory.m; sourceTree = "<group>"; };
+		19D064722E30F5DB00B3B99C /* CLXNativeAdData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXNativeAdData.h; sourceTree = "<group>"; };
+		19D064732E30F5DB00B3B99C /* CLXNativeAdData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXNativeAdData.m; sourceTree = "<group>"; };
+		19D064742E30F5DB00B3B99C /* CLXPrebidNative.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPrebidNative.h; sourceTree = "<group>"; };
+		19D064752E30F5DB00B3B99C /* CLXPrebidNative.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPrebidNative.m; sourceTree = "<group>"; };
+		19D064762E30F5DB00B3B99C /* CLXPrebidNativeFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPrebidNativeFactory.h; sourceTree = "<group>"; };
+		19D064772E30F5DB00B3B99C /* CLXPrebidNativeFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPrebidNativeFactory.m; sourceTree = "<group>"; };
+		19D064792E30F5DB00B3B99C /* CLXPrebidWebView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPrebidWebView.h; sourceTree = "<group>"; };
+		19D0647A2E30F5DB00B3B99C /* CLXPrebidWebView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPrebidWebView.m; sourceTree = "<group>"; };
+		19D0647C2E30F5DB00B3B99C /* CLXPrebidRewarded.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPrebidRewarded.h; sourceTree = "<group>"; };
+		19D0647D2E30F5DB00B3B99C /* CLXPrebidRewarded.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPrebidRewarded.m; sourceTree = "<group>"; };
+		19D0647E2E30F5DB00B3B99C /* CLXPrebidRewardedFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPrebidRewardedFactory.h; sourceTree = "<group>"; };
+		19D0647F2E30F5DB00B3B99C /* CLXPrebidRewardedFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPrebidRewardedFactory.m; sourceTree = "<group>"; };
+		19D064812E30F5DB00B3B99C /* CLXWKScriptHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXWKScriptHelper.h; sourceTree = "<group>"; };
+		19D064822E30F5DB00B3B99C /* CLXWKScriptHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXWKScriptHelper.m; sourceTree = "<group>"; };
+		19D064842E30F5DB00B3B99C /* CloudXPrebidAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CloudXPrebidAdapter.h; sourceTree = "<group>"; };
+		19D064852E30F5DB00B3B99C /* CloudXPrebidAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CloudXPrebidAdapter.m; sourceTree = "<group>"; };
+		567DC775B0126D2EA8DD65D5 /* Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests.debug.xcconfig"; sourceTree = "<group>"; };
+		766EE519075158CB6B184951 /* Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests.release.xcconfig"; path = "Target Support Files/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests.release.xcconfig"; sourceTree = "<group>"; };
+		96B32A6CD8F250BA4A8A8C85 /* Pods_CloudXPrebidAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXPrebidAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2FCB439174687C2BF071729 /* Pods-CloudXPrebidAdapter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXPrebidAdapter.release.xcconfig"; path = "Target Support Files/Pods-CloudXPrebidAdapter/Pods-CloudXPrebidAdapter.release.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		19D063AB2E30F0B000B3B99C /* CloudXPrebidAdapterTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = CloudXPrebidAdapterTests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		19D0639A2E30F0B000B3B99C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				44C704E2D9102EEA69674156 /* Pods_CloudXPrebidAdapter.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		19D063A42E30F0B000B3B99C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				19D063A82E30F0B000B3B99C /* CloudXPrebidAdapter.framework in Frameworks */,
+				0E843D2C5442D5EB847F6C69 /* Pods_CloudXPrebidAdapter_CloudXPrebidAdapterTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		19D063932E30F0B000B3B99C = {
+			isa = PBXGroup;
+			children = (
+				19D064872E30F5DB00B3B99C /* Sources */,
+				19D063AB2E30F0B000B3B99C /* CloudXPrebidAdapterTests */,
+				19D0639E2E30F0B000B3B99C /* Products */,
+				39380452FF4F07436AD1711B /* Pods */,
+				655330FDA40C131E9B1D2018 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		19D0639E2E30F0B000B3B99C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				19D0639D2E30F0B000B3B99C /* CloudXPrebidAdapter.framework */,
+				19D063A72E30F0B000B3B99C /* CloudXPrebidAdapterTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		19D0645B2E30F5DB00B3B99C /* Banner */ = {
+			isa = PBXGroup;
+			children = (
+				19D064572E30F5DB00B3B99C /* CLXPrebidBanner.h */,
+				19D064582E30F5DB00B3B99C /* CLXPrebidBanner.m */,
+				19D064592E30F5DB00B3B99C /* CLXPrebidBannerFactory.h */,
+				19D0645A2E30F5DB00B3B99C /* CLXPrebidBannerFactory.m */,
+			);
+			path = Banner;
+			sourceTree = "<group>";
+		};
+		19D064692E30F5DB00B3B99C /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				19D0645C2E30F5DB00B3B99C /* CLXDemoAdapterError.h */,
+				19D0645D2E30F5DB00B3B99C /* CLXDemoAdapterError.m */,
+				19D0645E2E30F5DB00B3B99C /* CLXFullscreenStaticContainerViewController.h */,
+				19D0645F2E30F5DB00B3B99C /* CLXFullscreenStaticContainerViewController.m */,
+				19D064602E30F5DB00B3B99C /* CLXMRAIDManager.h */,
+				19D064612E30F5DB00B3B99C /* CLXMRAIDManager.m */,
+				19D064622E30F5DB00B3B99C /* CLXPerformanceManager.h */,
+				19D064632E30F5DB00B3B99C /* CLXPerformanceManager.m */,
+				19D064642E30F5DB00B3B99C /* CLXPrebidError.h */,
+				19D064652E30F5DB00B3B99C /* CLXPrebidError.m */,
+				19D064662E30F5DB00B3B99C /* CLXVASTParser.h */,
+				19D064672E30F5DB00B3B99C /* CLXViewabilityTracker.h */,
+				19D064682E30F5DB00B3B99C /* CLXViewabilityTracker.m */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		19D0646C2E30F5DB00B3B99C /* Initializers */ = {
+			isa = PBXGroup;
+			children = (
+				19D0646A2E30F5DB00B3B99C /* CLXPrebidInitializer.h */,
+				19D0646B2E30F5DB00B3B99C /* CLXPrebidInitializer.m */,
+			);
+			path = Initializers;
+			sourceTree = "<group>";
+		};
+		19D064712E30F5DB00B3B99C /* Interstitial */ = {
+			isa = PBXGroup;
+			children = (
+				19D0646D2E30F5DB00B3B99C /* CLXPrebidInterstitial.h */,
+				19D0646E2E30F5DB00B3B99C /* CLXPrebidInterstitial.m */,
+				19D0646F2E30F5DB00B3B99C /* CLXPrebidInterstitialFactory.h */,
+				19D064702E30F5DB00B3B99C /* CLXPrebidInterstitialFactory.m */,
+			);
+			path = Interstitial;
+			sourceTree = "<group>";
+		};
+		19D064782E30F5DB00B3B99C /* Native */ = {
+			isa = PBXGroup;
+			children = (
+				19D064722E30F5DB00B3B99C /* CLXNativeAdData.h */,
+				19D064732E30F5DB00B3B99C /* CLXNativeAdData.m */,
+				19D064742E30F5DB00B3B99C /* CLXPrebidNative.h */,
+				19D064752E30F5DB00B3B99C /* CLXPrebidNative.m */,
+				19D064762E30F5DB00B3B99C /* CLXPrebidNativeFactory.h */,
+				19D064772E30F5DB00B3B99C /* CLXPrebidNativeFactory.m */,
+			);
+			path = Native;
+			sourceTree = "<group>";
+		};
+		19D0647B2E30F5DB00B3B99C /* PrebidWrapper */ = {
+			isa = PBXGroup;
+			children = (
+				19D064792E30F5DB00B3B99C /* CLXPrebidWebView.h */,
+				19D0647A2E30F5DB00B3B99C /* CLXPrebidWebView.m */,
+			);
+			path = PrebidWrapper;
+			sourceTree = "<group>";
+		};
+		19D064802E30F5DB00B3B99C /* Rewarded */ = {
+			isa = PBXGroup;
+			children = (
+				19D0647C2E30F5DB00B3B99C /* CLXPrebidRewarded.h */,
+				19D0647D2E30F5DB00B3B99C /* CLXPrebidRewarded.m */,
+				19D0647E2E30F5DB00B3B99C /* CLXPrebidRewardedFactory.h */,
+				19D0647F2E30F5DB00B3B99C /* CLXPrebidRewardedFactory.m */,
+			);
+			path = Rewarded;
+			sourceTree = "<group>";
+		};
+		19D064832E30F5DB00B3B99C /* WKScriptHelper */ = {
+			isa = PBXGroup;
+			children = (
+				19D064812E30F5DB00B3B99C /* CLXWKScriptHelper.h */,
+				19D064822E30F5DB00B3B99C /* CLXWKScriptHelper.m */,
+			);
+			path = WKScriptHelper;
+			sourceTree = "<group>";
+		};
+		19D064862E30F5DB00B3B99C /* CloudXPrebidAdapter */ = {
+			isa = PBXGroup;
+			children = (
+				19D0645B2E30F5DB00B3B99C /* Banner */,
+				19D064692E30F5DB00B3B99C /* Core */,
+				19D0646C2E30F5DB00B3B99C /* Initializers */,
+				19D064712E30F5DB00B3B99C /* Interstitial */,
+				19D064782E30F5DB00B3B99C /* Native */,
+				19D0647B2E30F5DB00B3B99C /* PrebidWrapper */,
+				19D064802E30F5DB00B3B99C /* Rewarded */,
+				19D064832E30F5DB00B3B99C /* WKScriptHelper */,
+				19D064842E30F5DB00B3B99C /* CloudXPrebidAdapter.h */,
+				19D064852E30F5DB00B3B99C /* CloudXPrebidAdapter.m */,
+			);
+			path = CloudXPrebidAdapter;
+			sourceTree = "<group>";
+		};
+		19D064872E30F5DB00B3B99C /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				19D064862E30F5DB00B3B99C /* CloudXPrebidAdapter */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		39380452FF4F07436AD1711B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				1816A8DB4D8FBB34DD46438A /* Pods-CloudXPrebidAdapter.debug.xcconfig */,
+				F2FCB439174687C2BF071729 /* Pods-CloudXPrebidAdapter.release.xcconfig */,
+				567DC775B0126D2EA8DD65D5 /* Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests.debug.xcconfig */,
+				766EE519075158CB6B184951 /* Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		655330FDA40C131E9B1D2018 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				96B32A6CD8F250BA4A8A8C85 /* Pods_CloudXPrebidAdapter.framework */,
+				131F609E0EEE3DEFABFC22F0 /* Pods_CloudXPrebidAdapter_CloudXPrebidAdapterTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		19D063982E30F0B000B3B99C /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				19D0649B2E30F5DB00B3B99C /* CLXPrebidInterstitial.h in Headers */,
+				19D0649C2E30F5DB00B3B99C /* CLXPerformanceManager.h in Headers */,
+				19D0649D2E30F5DB00B3B99C /* CLXVASTParser.h in Headers */,
+				19D0649E2E30F5DB00B3B99C /* CLXPrebidNative.h in Headers */,
+				19D0649F2E30F5DB00B3B99C /* CLXPrebidBanner.h in Headers */,
+				19D064A02E30F5DB00B3B99C /* CLXPrebidBannerFactory.h in Headers */,
+				19D064A12E30F5DB00B3B99C /* CLXFullscreenStaticContainerViewController.h in Headers */,
+				19D064A22E30F5DB00B3B99C /* CLXPrebidInterstitialFactory.h in Headers */,
+				19D064A32E30F5DB00B3B99C /* CLXMRAIDManager.h in Headers */,
+				19D064A42E30F5DB00B3B99C /* CLXNativeAdData.h in Headers */,
+				19D064A52E30F5DB00B3B99C /* CLXPrebidRewarded.h in Headers */,
+				19D064A62E30F5DB00B3B99C /* CLXPrebidInitializer.h in Headers */,
+				19D064A72E30F5DB00B3B99C /* CloudXPrebidAdapter.h in Headers */,
+				19D064A82E30F5DB00B3B99C /* CLXPrebidError.h in Headers */,
+				19D064A92E30F5DB00B3B99C /* CLXPrebidNativeFactory.h in Headers */,
+				19D064AA2E30F5DB00B3B99C /* CLXWKScriptHelper.h in Headers */,
+				19D064AB2E30F5DB00B3B99C /* CLXDemoAdapterError.h in Headers */,
+				19D064AC2E30F5DB00B3B99C /* CLXPrebidRewardedFactory.h in Headers */,
+				19D064AD2E30F5DB00B3B99C /* CLXViewabilityTracker.h in Headers */,
+				19D064AE2E30F5DB00B3B99C /* CLXPrebidWebView.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		19D0639C2E30F0B000B3B99C /* CloudXPrebidAdapter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 19D063B02E30F0B000B3B99C /* Build configuration list for PBXNativeTarget "CloudXPrebidAdapter" */;
+			buildPhases = (
+				EBB2CA586273657F7D3EB1B3 /* [CP] Check Pods Manifest.lock */,
+				19D063982E30F0B000B3B99C /* Headers */,
+				19D063992E30F0B000B3B99C /* Sources */,
+				19D0639A2E30F0B000B3B99C /* Frameworks */,
+				19D0639B2E30F0B000B3B99C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CloudXPrebidAdapter;
+			productName = CloudXPrebidAdapter;
+			productReference = 19D0639D2E30F0B000B3B99C /* CloudXPrebidAdapter.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		19D063A62E30F0B000B3B99C /* CloudXPrebidAdapterTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 19D063B52E30F0B000B3B99C /* Build configuration list for PBXNativeTarget "CloudXPrebidAdapterTests" */;
+			buildPhases = (
+				669B8F355B22EFBCCD1A0432 /* [CP] Check Pods Manifest.lock */,
+				19D063A32E30F0B000B3B99C /* Sources */,
+				19D063A42E30F0B000B3B99C /* Frameworks */,
+				19D063A52E30F0B000B3B99C /* Resources */,
+				4195E9F691CDCB93AB55AD7A /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				19D063AA2E30F0B000B3B99C /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				19D063AB2E30F0B000B3B99C /* CloudXPrebidAdapterTests */,
+			);
+			name = CloudXPrebidAdapterTests;
+			productName = CloudXPrebidAdapterTests;
+			productReference = 19D063A72E30F0B000B3B99C /* CloudXPrebidAdapterTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		19D063942E30F0B000B3B99C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					19D0639C2E30F0B000B3B99C = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					19D063A62E30F0B000B3B99C = {
+						CreatedOnToolsVersion = 16.2;
+					};
+				};
+			};
+			buildConfigurationList = 19D063972E30F0B000B3B99C /* Build configuration list for PBXProject "CloudXPrebidAdapter" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 19D063932E30F0B000B3B99C;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 19D0639E2E30F0B000B3B99C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				19D0639C2E30F0B000B3B99C /* CloudXPrebidAdapter */,
+				19D063A62E30F0B000B3B99C /* CloudXPrebidAdapterTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		19D0639B2E30F0B000B3B99C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		19D063A52E30F0B000B3B99C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4195E9F691CDCB93AB55AD7A /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		669B8F355B22EFBCCD1A0432 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		EBB2CA586273657F7D3EB1B3 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXPrebidAdapter-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		19D063992E30F0B000B3B99C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				19D064882E30F5DB00B3B99C /* CLXPerformanceManager.m in Sources */,
+				19D064892E30F5DB00B3B99C /* CloudXPrebidAdapter.m in Sources */,
+				19D0648A2E30F5DB00B3B99C /* CLXMRAIDManager.m in Sources */,
+				19D0648B2E30F5DB00B3B99C /* CLXViewabilityTracker.m in Sources */,
+				19D0648C2E30F5DB00B3B99C /* CLXPrebidRewarded.m in Sources */,
+				19D0648D2E30F5DB00B3B99C /* CLXPrebidRewardedFactory.m in Sources */,
+				19D0648E2E30F5DB00B3B99C /* CLXPrebidInterstitialFactory.m in Sources */,
+				19D0648F2E30F5DB00B3B99C /* CLXPrebidError.m in Sources */,
+				19D064902E30F5DB00B3B99C /* CLXFullscreenStaticContainerViewController.m in Sources */,
+				19D064912E30F5DB00B3B99C /* CLXPrebidInitializer.m in Sources */,
+				19D064922E30F5DB00B3B99C /* CLXPrebidBannerFactory.m in Sources */,
+				19D064932E30F5DB00B3B99C /* CLXPrebidNativeFactory.m in Sources */,
+				19D064942E30F5DB00B3B99C /* CLXPrebidInterstitial.m in Sources */,
+				19D064952E30F5DB00B3B99C /* CLXWKScriptHelper.m in Sources */,
+				19D064962E30F5DB00B3B99C /* CLXNativeAdData.m in Sources */,
+				19D064972E30F5DB00B3B99C /* CLXPrebidNative.m in Sources */,
+				19D064982E30F5DB00B3B99C /* CLXDemoAdapterError.m in Sources */,
+				19D064992E30F5DB00B3B99C /* CLXPrebidBanner.m in Sources */,
+				19D0649A2E30F5DB00B3B99C /* CLXPrebidWebView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		19D063A32E30F0B000B3B99C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		19D063AA2E30F0B000B3B99C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 19D0639C2E30F0B000B3B99C /* CloudXPrebidAdapter */;
+			targetProxy = 19D063A92E30F0B000B3B99C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		19D063B12E30F0B000B3B99C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1816A8DB4D8FBB34DD46438A /* Pods-CloudXPrebidAdapter.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = SFK4FBZQ9F;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = cloudx.CloudXPrebidAdapter;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		19D063B22E30F0B000B3B99C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F2FCB439174687C2BF071729 /* Pods-CloudXPrebidAdapter.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = SFK4FBZQ9F;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = cloudx.CloudXPrebidAdapter;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		19D063B32E30F0B000B3B99C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		19D063B42E30F0B000B3B99C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		19D063B62E30F0B000B3B99C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 567DC775B0126D2EA8DD65D5 /* Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SFK4FBZQ9F;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cloudx.CloudXPrebidAdapterTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		19D063B72E30F0B000B3B99C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 766EE519075158CB6B184951 /* Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SFK4FBZQ9F;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cloudx.CloudXPrebidAdapterTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		19D063972E30F0B000B3B99C /* Build configuration list for PBXProject "CloudXPrebidAdapter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				19D063B32E30F0B000B3B99C /* Debug */,
+				19D063B42E30F0B000B3B99C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		19D063B02E30F0B000B3B99C /* Build configuration list for PBXNativeTarget "CloudXPrebidAdapter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				19D063B12E30F0B000B3B99C /* Debug */,
+				19D063B22E30F0B000B3B99C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		19D063B52E30F0B000B3B99C /* Build configuration list for PBXNativeTarget "CloudXPrebidAdapterTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				19D063B62E30F0B000B3B99C /* Debug */,
+				19D063B72E30F0B000B3B99C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 19D063942E30F0B000B3B99C /* Project object */;
+}

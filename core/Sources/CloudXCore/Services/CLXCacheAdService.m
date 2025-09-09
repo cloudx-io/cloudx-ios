@@ -1,0 +1,283 @@
+/*
+ * Copyright (c) 2024 CloudX. All rights reserved.
+ */
+
+/**
+ * @file CacheAdService.m
+ * @brief Cache ad service implementation
+ */
+
+#import <CloudXCore/CLXCacheAdService.h>
+#import <CloudXCore/CLXBidAdSource.h>
+#import <CloudXCore/CLXAdEventReporting.h>
+#import <CloudXCore/CLXCacheableAd.h>
+#import <CloudXCore/CLXDestroyable.h>
+#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXCacheAdQueue.h>
+#import <CloudXCore/CLXExponentialBackoffStrategy.h>
+#import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXReachabilityService.h>
+#import <CloudXCore/CLXSettings.h>
+#import <CloudXCore/CLXAdType.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface CLXCacheAdService ()
+
+@property (nonatomic, strong, nullable) id<CLXBidAdSourceProtocol> bidAdSource;
+@property (nonatomic, assign) NSTimeInterval bidLoadTimeout;
+@property (nonatomic, copy) id<CLXCacheableAd> _Nullable (^createCacheableAd)(id _Nullable destroyable);
+@property (nonatomic, strong, nullable) CLXReachabilityService *reachabilityService;
+@property (nonatomic, strong) CLXSDKConfigPlacement *placement;
+@property (nonatomic, strong) CLXCacheAdQueue *cachedQueue;
+@property (nonatomic, assign) NSInteger showCount;
+@property (nonatomic, strong) CLXExponentialBackoffStrategy *waterfallBackoffAlgorithm;
+@property (nonatomic, strong, nullable) id willResignActiveObserver;
+@property (nonatomic, strong, nullable) id didBecomeActiveNotification;
+@property (nonatomic, strong) CLXLogger *logger;
+@property (nonatomic, assign) BOOL winSuccess;
+@property (nonatomic, assign) BOOL isSuspended;
+@property (nonatomic, strong) CLXSettings *settings;
+@property (nonatomic, assign) NSInteger adType;
+
+@end
+
+@implementation CLXCacheAdService
+
+// Helper method to check if retries are enabled for the current ad type
+- (BOOL)shouldEnableRetries {
+    BOOL enabled = NO;
+    NSString *adTypeName = @"unknown";
+    
+    switch (self.adType) {
+        case CLXAdTypeBanner:
+        case CLXAdTypeMrec:
+            enabled = [self.settings shouldEnableBannerRetries];
+            adTypeName = @"banner";
+            break;
+        case CLXAdTypeInterstitial:
+            enabled = [self.settings shouldEnableInterstitialRetries];
+            adTypeName = @"interstitial";
+            break;
+        case CLXAdTypeRewarded:
+            enabled = [self.settings shouldEnableRewardedRetries];
+            adTypeName = @"rewarded";
+            break;
+        case CLXAdTypeNative:
+            enabled = [self.settings shouldEnableNativeRetries];
+            adTypeName = @"native";
+            break;
+        default:
+            break;
+    }
+    
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CacheAdService] %@ retries: %@", adTypeName, enabled ? @"enabled" : @"disabled"]];
+    return enabled;
+}
+
+
+
+- (instancetype)initWithPlacement:(CLXSDKConfigPlacement *)placement
+                      bidAdSource:(nullable id<CLXBidAdSourceProtocol>)bidAdSource
+            waterfallMaxBackOffTime:(nullable NSNumber *)waterfallMaxBackOffTime
+                          cacheSize:(NSInteger)cacheSize
+                     bidLoadTimeout:(NSTimeInterval)bidLoadTimeout
+                   reportingService:(id<AdEventReporting>)reportingService
+                           settings:(CLXSettings *)settings
+                            adType:(NSInteger)adType
+                  createCacheableAd:(id<CLXCacheableAd> _Nullable (^)(id _Nullable destroyable))createCacheableAd {
+    self = [super init];
+    if (self) {
+        _bidAdSource = bidAdSource;
+        _placement = placement;
+        _bidLoadTimeout = bidLoadTimeout;
+        _createCacheableAd = [createCacheableAd copy];
+        _reachabilityService = [[CLXReachabilityService alloc] init];
+        _waterfallBackoffAlgorithm = [[CLXExponentialBackoffStrategy alloc] initWithInitialDelay:1.0
+                                                                                      maxDelay:waterfallMaxBackOffTime ? waterfallMaxBackOffTime.doubleValue : 60.0];
+        _cachedQueue = [[CLXCacheAdQueue alloc] initWithMaxCapacity:cacheSize
+                                                reportingService:reportingService
+                                                     placementID:placement.id];
+        _logger = [[CLXLogger alloc] initWithCategory:@"CacheAdService"];
+        _winSuccess = NO;
+        _isSuspended = NO;
+        _settings = settings;
+        _adType = adType;
+        
+        // Set up notification observers
+        _didBecomeActiveNotification = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
+                                                                                         object:nil
+                                                                                          queue:[NSOperationQueue mainQueue]
+                                                                                     usingBlock:^(NSNotification * _Nonnull note) {
+            [self continueLoading];
+        }];
+        
+        _willResignActiveObserver = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillResignActiveNotification
+                                                                                      object:nil
+                                                                                       queue:[NSOperationQueue mainQueue]
+                                                                                  usingBlock:^(NSNotification * _Nonnull note) {
+            [self suspendLoading];
+        }];
+        
+        [self startLoading];
+    }
+    return self;
+}
+
+- (void)dealloc {
+    if (self.didBecomeActiveNotification) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self.didBecomeActiveNotification];
+    }
+    
+    if (self.willResignActiveObserver) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self.willResignActiveObserver];
+    }
+}
+
+- (BOOL)hasAds {
+    BOOL hasItems = self.cachedQueue.hasItems;
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CacheAdService] hasAds called - cachedQueue: %@, hasItems: %d", self.cachedQueue, hasItems]];
+    return hasItems;
+}
+
+- (nullable id<CLXCacheableAd>)first {
+    return self.cachedQueue.first;
+}
+
+- (void)startLoading {
+    // Implement async loading logic following Swift SDK pattern
+    [self.logger debug:@"Start filling fullscreen ad queue"];
+    
+    // Start loading queue items
+    [self loadQueueItem];
+}
+
+- (void)loadQueueItem {
+    // Implement actual queue item loading with async/await pattern
+    if (!self.bidAdSource || self.isSuspended) {
+        [self.logger debug:self.isSuspended ? @"Queue loading is suspended" : @"No bid ad source available"];
+        return;
+    }
+    
+    __weak typeof(self) weakSelf = self;
+    [self.bidAdSource requestBidWithAdUnitID:self.placement.id
+                           storedImpressionId:self.placement.id
+                                    impModel:nil
+                                   successWin:self.winSuccess
+                                   completion:^(CLXBidAdSourceResponse * _Nullable response, NSError * _Nullable error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        if (error) {
+            [strongSelf.logger error:[NSString stringWithFormat:@"❌ [CacheAdService] Bid failed: %@ (domain:%@, code:%ld)", error.localizedDescription, error.domain, (long)error.code]];
+            
+            // Check if retries are enabled for this ad type
+            if (![strongSelf shouldEnableRetries]) {
+                [strongSelf.logger info:@"🚫 [CacheAdService] Retries disabled for this ad type - failing immediately"];
+                return; // Exit without retrying
+            }
+            
+            // Log retry attempt
+            [strongSelf.logger debug:@"🔄 [CacheAdService] Retries enabled - will retry after backoff delay"];
+            
+            // Implement waterfall backoff delay logic
+            NSError *backoffError;
+            NSTimeInterval delay = [strongSelf.waterfallBackoffAlgorithm nextDelayWithError:&backoffError];
+            if (backoffError) {
+                delay = 1.0; // Default delay if backoff fails
+            }
+            
+            [strongSelf.logger debug:[NSString stringWithFormat:@"Sleep for %f seconds", delay]];
+            
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                if (strongSelf.cachedQueue.isEnoughSpace && !strongSelf.isSuspended) {
+                    [strongSelf loadQueueItem];
+                }
+            });
+        } else {
+            strongSelf.winSuccess = YES;
+            
+            // Reset waterfall backoff algorithm
+            NSTimeInterval delay = [strongSelf.waterfallBackoffAlgorithm reset];
+            
+            // Create cacheable ad from response
+            if (strongSelf.createCacheableAd && response) {
+                [strongSelf.logger debug:[NSString stringWithFormat:@"🔧 [CacheAdService] Creating cacheable ad: network=%@, bidID=%@", response.networkName, response.bidID]];
+                
+                // Call createBidAd block without parameters (it captures parameters internally)
+                id destroyable = response.createBidAd();
+                [strongSelf.logger debug:[NSString stringWithFormat:@"📊 [CacheAdService] Destroyable created: %@", destroyable]];
+                
+                if (destroyable) {
+                    id<CLXCacheableAd> cacheableAd = strongSelf.createCacheableAd(destroyable);
+                    [strongSelf.logger debug:[NSString stringWithFormat:@"📊 [CacheAdService] Cacheable ad created: %@", cacheableAd]];
+                    
+                    if (cacheableAd) {
+                        // Set the bid response on the cacheable ad for NURL firing
+                        CLXBidResponse *bidResponse = [strongSelf.bidAdSource getCurrentBidResponse];
+                        cacheableAd.bidResponse = bidResponse;
+                        [strongSelf.logger debug:[NSString stringWithFormat:@"🔧 [CacheAdService] Set bidResponse on cacheable ad: %@", bidResponse]];
+                        [strongSelf.logger debug:[NSString stringWithFormat:@"🔧 [CacheAdService] Enqueueing ad to service: %@, queue: %@", strongSelf, strongSelf.cachedQueue]];
+                        [strongSelf.cachedQueue enqueueAdWithPrice:response.price
+                                                       loadTimeout:strongSelf.bidLoadTimeout
+                                                             bidID:response.bidID
+                                                                ad:cacheableAd
+                                                        completion:^(NSError * _Nullable error) {
+                            if (error) {
+                                [strongSelf.logger error:[NSString stringWithFormat:@"Failed to enqueue ad: %@", error.localizedDescription]];
+                            } else {
+                                [strongSelf.logger info:[NSString stringWithFormat:@"✅ [CacheAdService] Ad successfully enqueued to service: %@", strongSelf]];
+                            }
+                        }];
+                    } else {
+                        [strongSelf.logger error:@"❌ [CacheAdService] Failed to create cacheable ad from destroyable"];
+                    }
+                } else {
+                    [strongSelf.logger error:@"❌ [CacheAdService] Failed to create destroyable from bid response"];
+                }
+            } else {
+                [strongSelf.logger error:[NSString stringWithFormat:@"❌ [CacheAdService] Missing createCacheableAd block (%d) or response (%d)", strongSelf.createCacheableAd != nil, response != nil]];
+            }
+            
+            // Schedule next load
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                if (strongSelf.cachedQueue.isEnoughSpace && !strongSelf.isSuspended) {
+                    [strongSelf loadQueueItem];
+                }
+            });
+        }
+    }];
+}
+
+- (void)suspendLoading {
+    // Implement pause queue loading
+    [self.logger debug:@"Suspending queue loading"];
+    // TODO: Add a flag to track suspended state and prevent new loads
+    self.isSuspended = YES;
+}
+
+- (void)continueLoading {
+    // Implement continue queue loading
+    [self.logger debug:@"Continuing queue loading"];
+    self.isSuspended = NO;
+    [self startLoading];
+}
+
+- (void)destroy {
+    [self.cachedQueue destroy];
+}
+
+- (nullable id<CLXCacheableAd>)popAd {
+    id<CLXCacheableAd> ad = [self.cachedQueue popAd];
+    [self startLoading];
+    return ad;
+}
+
+- (void)adError:(id)ad {
+    [self.cachedQueue removeAd:ad];
+    [self startLoading];
+}
+
+@end
+
+NS_ASSUME_NONNULL_END 

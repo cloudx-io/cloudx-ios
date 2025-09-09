@@ -1,0 +1,52 @@
+{
+  "buildCommand" : {
+    "command" : "prepareForIndexing",
+    "enableIndexBuildArena" : false,
+    "targets" : null
+  },
+  "configuredTargets" : [
+    {
+      "guid" : "bfdfe7dc352907fc980b868725387e983134d9951ec2b06e6866a6e9c2374742"
+    },
+    {
+      "guid" : "bfdfe7dc352907fc980b868725387e98f73126ed75a1c3169a48d52be61ee890"
+    },
+    {
+      "guid" : "bfdfe7dc352907fc980b868725387e98c6358f4fa983f557f337ebe12f1691d8"
+    }
+  ],
+  "containerPath" : "/Users/xenoss/Documents/cloudexchange.sdk.ios.cloudxdspAdapter/Pods/Pods.xcodeproj",
+  "continueBuildingAfterErrors" : true,
+  "dependencyScope" : "workspace",
+  "enableIndexBuildArena" : false,
+  "hideShellScriptEnvironment" : false,
+  "parameters" : {
+    "action" : "build",
+    "arenaInfo" : {
+      "buildIntermediatesPath" : "",
+      "buildProductsPath" : "",
+      "derivedDataPath" : "/Users/xenoss/Library/Developer/Xcode/DerivedData",
+      "indexDataStoreFolderPath" : "/Users/xenoss/Library/Developer/Xcode/DerivedData/Pods-bgsritnehnylluansdqnpvnhbllh/Index.noindex/DataStore",
+      "indexEnableDataStore" : true,
+      "indexPCHPath" : "/Users/xenoss/Library/Developer/Xcode/DerivedData/Pods-bgsritnehnylluansdqnpvnhbllh/Index.noindex/PrecompiledHeaders",
+      "pchPath" : ""
+    },
+    "configurationName" : "Debug",
+    "overrides" : {
+      "synthesized" : {
+        "table" : {
+          "ENABLE_PREVIEWS" : "NO",
+          "ENABLE_XOJIT_PREVIEWS" : "NO",
+          "ONLY_ACTIVE_ARCH" : "YES"
+        }
+      }
+    }
+  },
+  "qos" : "default",
+  "schemeCommand" : "launch",
+  "showNonLoggedProgress" : true,
+  "useDryRun" : true,
+  "useImplicitDependencies" : true,
+  "useLegacyBuildLocations" : false,
+  "useParallelTargets" : true
+}

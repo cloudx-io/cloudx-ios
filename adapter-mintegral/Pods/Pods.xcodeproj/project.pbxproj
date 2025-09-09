@@ -1,0 +1,1107 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		396FEEFBFD0F2124F8A266DB6506001E /* MintegralAdSDK */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = AF63FB7BAD8C3C6866DA12175B1D2052 /* Build configuration list for PBXAggregateTarget "MintegralAdSDK" */;
+			buildPhases = (
+				913B196655DE10582268512F07EAAD65 /* [CP] Copy XCFrameworks */,
+			);
+			dependencies = (
+				3624D75E22643141D2864516F6546A2E /* PBXTargetDependency */,
+			);
+			name = MintegralAdSDK;
+		};
+		A532F36DE5630BB28D7AC5C6E8B8CB4C /* CloudXCore */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 0711DEAA72F06B438820A90084806A85 /* Build configuration list for PBXAggregateTarget "CloudXCore" */;
+			buildPhases = (
+				85E06B7AF614B1853D16C2801599223D /* [CP] Copy XCFrameworks */,
+			);
+			dependencies = (
+			);
+			name = CloudXCore;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		5AFF314EECD25ABF84232FD732F43E07 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
+		5BAEF4DE5721BD0B991BE1B1AB756398 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 45ED81D7485079A2C248C3385E1E92E8 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5C828B7F3DFB3D01803861C9A966E859 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */; };
+		612D3D1EC8D7027BB609A661C421DF26 /* Pods-CloudXMintegralAdapter-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B3461ACBE65D39A5C7EC097CC969A41 /* Pods-CloudXMintegralAdapter-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8BB5DF41CEF6E92288F0AFF9785CD38B /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = B6EF12C148D8A2B81D501F5719AD44C3 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-dummy.m */; };
+		DDB0BEBE2FD91C0040A98A4D6D8809FE /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 00AFEB54203C5DAE29E40F31C979DC47 /* PrivacyInfo.xcprivacy */; };
+		FD272AA87014F9FE27C8190F665953A9 /* Pods-CloudXMintegralAdapter-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 046770AD31B8B1DD2793C4579C07E4B8 /* Pods-CloudXMintegralAdapter-dummy.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		121FAC727C30AB7C242733846F80A6F6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A532F36DE5630BB28D7AC5C6E8B8CB4C;
+			remoteInfo = CloudXCore;
+		};
+		2B21805C41CE7440098BD6E83E1AF899 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 396FEEFBFD0F2124F8A266DB6506001E;
+			remoteInfo = MintegralAdSDK;
+		};
+		2B7A422FC279160A3741966DB8268F87 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A532F36DE5630BB28D7AC5C6E8B8CB4C;
+			remoteInfo = CloudXCore;
+		};
+		4B2FFBA51037916CC47C194662B9AC4F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EB37911E28FB45D4C95E571C72EAF7BA;
+			remoteInfo = "MintegralAdSDK-MTGSDK";
+		};
+		63444D4A66F17A520608DB37C1BC0251 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 396FEEFBFD0F2124F8A266DB6506001E;
+			remoteInfo = MintegralAdSDK;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		00AFEB54203C5DAE29E40F31C979DC47 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = "Fmk/MTGSDK.xcframework/ios-arm64/MTGSDK.framework/PrivacyInfo.xcprivacy"; sourceTree = "<group>"; };
+		046770AD31B8B1DD2793C4579C07E4B8 /* Pods-CloudXMintegralAdapter-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-CloudXMintegralAdapter-dummy.m"; sourceTree = "<group>"; };
+		05F948E52B94708CA913CE322280C02F /* CloudXCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CloudXCore.release.xcconfig; sourceTree = "<group>"; };
+		0E32C723129BAD5889A3DA4E658A7E60 /* MintegralAdSDK.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = MintegralAdSDK.debug.xcconfig; sourceTree = "<group>"; };
+		13CAC048F42350DA49E66BFBF494F719 /* Pods-CloudXMintegralAdapter */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-CloudXMintegralAdapter"; path = Pods_CloudXMintegralAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		154EEB1CA9E1DDC72CEEAD145197ADB4 /* Pods-CloudXMintegralAdapter-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-CloudXMintegralAdapter-acknowledgements.plist"; sourceTree = "<group>"; };
+		17B01BAE1C60FD7964872F2E6DC7D7FA /* ResourceBundle-MTGSDK-MintegralAdSDK-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-MTGSDK-MintegralAdSDK-Info.plist"; sourceTree = "<group>"; };
+		1E2A19C082E4833CB581FC32086DDC45 /* Pods-CloudXMintegralAdapter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-CloudXMintegralAdapter.debug.xcconfig"; sourceTree = "<group>"; };
+		33561E97960B92B133D5A11B4C11DAA6 /* Pods-CloudXMintegralAdapter.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-CloudXMintegralAdapter.modulemap"; sourceTree = "<group>"; };
+		374CAC9FFBCA47ABA0EB04B01C096224 /* MTGSDK.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = MTGSDK.xcframework; path = Fmk/MTGSDK.xcframework; sourceTree = "<group>"; };
+		384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		407009B1C677C250F6837E3F3F4FA5AB /* MintegralAdSDK-MTGSDK */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "MintegralAdSDK-MTGSDK"; path = MTGSDK.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		45ED81D7485079A2C248C3385E1E92E8 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-umbrella.h"; sourceTree = "<group>"; };
+		4B3461ACBE65D39A5C7EC097CC969A41 /* Pods-CloudXMintegralAdapter-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-CloudXMintegralAdapter-umbrella.h"; sourceTree = "<group>"; };
+		4B9CC13590C617CC13186D6FAA901DF5 /* MintegralAdSDK.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = MintegralAdSDK.release.xcconfig; sourceTree = "<group>"; };
+		4F37C1982FCAE1640B8AB9DF2B15B317 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-frameworks.sh"; sourceTree = "<group>"; };
+		51C6768641E26CDABF586DD570289795 /* MTGSDKInterstitialVideo.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = MTGSDKInterstitialVideo.xcframework; path = Fmk/MTGSDKInterstitialVideo.xcframework; sourceTree = "<group>"; };
+		5AFC092085FA0B6054EEE53FB5D10F06 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-resources.sh"; sourceTree = "<group>"; };
+		61FC43B0C880413B875BED8D334F248D /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-Info.plist"; sourceTree = "<group>"; };
+		65C9CBEE7DCC95573A56AE5C26F10BE9 /* CloudXCore.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = CloudXCore.xcframework; sourceTree = "<group>"; };
+		67109486B05975C32730EC184A95A974 /* CloudXCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CloudXCore.debug.xcconfig; sourceTree = "<group>"; };
+		69B4DADA89F93C103ED28FA99A591589 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests.release.xcconfig"; sourceTree = "<group>"; };
+		8514C1E6542D4EC3D0E3AE4BD1CC6BB3 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests"; path = Pods_CloudXMintegralAdapter_CloudXMintegralAdapterTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		88111A3DECB6DDEFC1341371FEF35F76 /* Pods-CloudXMintegralAdapter-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-CloudXMintegralAdapter-resources.sh"; sourceTree = "<group>"; };
+		8C995496B2AB9801FC2CA54F324AAA9A /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests.modulemap"; sourceTree = "<group>"; };
+		9A2F67412D81E36FCDE6819A7981A646 /* MTGSDKBidding.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = MTGSDKBidding.xcframework; path = Fmk/MTGSDKBidding.xcframework; sourceTree = "<group>"; };
+		9D0FEE8F8B33A4B0B6FA2EF46159D908 /* MintegralAdSDK-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "MintegralAdSDK-xcframeworks.sh"; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		A5979673D9ABDD4EC76C96AB9D9F1307 /* MTGSDKNewInterstitial.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = MTGSDKNewInterstitial.xcframework; path = Fmk/MTGSDKNewInterstitial.xcframework; sourceTree = "<group>"; };
+		AD98E2B3E84A896AEFB246262A186AF5 /* Pods-CloudXMintegralAdapter-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-CloudXMintegralAdapter-Info.plist"; sourceTree = "<group>"; };
+		B6EF12C148D8A2B81D501F5719AD44C3 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-dummy.m"; sourceTree = "<group>"; };
+		B73B8EF7F3AE0C1E1D09F14059AD7260 /* MTGSDKBanner.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = MTGSDKBanner.xcframework; path = Fmk/MTGSDKBanner.xcframework; sourceTree = "<group>"; };
+		B891CDDF03CC42D70C32721FE858E78C /* MTGSDKNativeAdvanced.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = MTGSDKNativeAdvanced.xcframework; path = Fmk/MTGSDKNativeAdvanced.xcframework; sourceTree = "<group>"; };
+		B8C5C1629B392055C6680EA2FEEC61DE /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-acknowledgements.plist"; sourceTree = "<group>"; };
+		BE0DB3D80F9C7DB54531E171980AEAFC /* CloudXCore-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "CloudXCore-xcframeworks.sh"; sourceTree = "<group>"; };
+		D99A96976FB7B903F9E63D219F1D5A25 /* Pods-CloudXMintegralAdapter-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-CloudXMintegralAdapter-acknowledgements.markdown"; sourceTree = "<group>"; };
+		E1C1650E7B95A811F477876EC93197BE /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests.debug.xcconfig"; sourceTree = "<group>"; };
+		F20BA9EEC1C349B547D383B89C56CE1B /* Pods-CloudXMintegralAdapter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-CloudXMintegralAdapter.release.xcconfig"; sourceTree = "<group>"; };
+		FDDC784CD75CF6F1309C724CDEEB26E7 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-acknowledgements.markdown"; sourceTree = "<group>"; };
+		FFBB9BFD86DD0022EA2F7CDAA18D0C3B /* MTGSDKReward.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = MTGSDKReward.xcframework; path = Fmk/MTGSDKReward.xcframework; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0A48D6E95E97BAE16144A85091F1DFF0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		93ABF32172BBE31C8D0D8C8934014749 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5C828B7F3DFB3D01803861C9A966E859 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CBD294CC65F584F65BE61361D9008AE4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AFF314EECD25ABF84232FD732F43E07 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		162CAD7EF0E3AB30FA7036C996A65773 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A5979673D9ABDD4EC76C96AB9D9F1307 /* MTGSDKNewInterstitial.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		19F292CE86269A526D52BCB70097E209 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				407009B1C677C250F6837E3F3F4FA5AB /* MintegralAdSDK-MTGSDK */,
+				13CAC048F42350DA49E66BFBF494F719 /* Pods-CloudXMintegralAdapter */,
+				8514C1E6542D4EC3D0E3AE4BD1CC6BB3 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		23CAF4A7490A5AA76BD6DB2191E73D1B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				374CAC9FFBCA47ABA0EB04B01C096224 /* MTGSDK.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3346BC140166CD3D0AFB8FA459C965EF /* InterstitialVideoAd */ = {
+			isa = PBXGroup;
+			children = (
+				453A0914A5601383C7BD48D976600176 /* Frameworks */,
+			);
+			name = InterstitialVideoAd;
+			sourceTree = "<group>";
+		};
+		3D9618823E6908B9C77B4A07F7503C0B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9A2F67412D81E36FCDE6819A7981A646 /* MTGSDKBidding.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		453A0914A5601383C7BD48D976600176 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				51C6768641E26CDABF586DD570289795 /* MTGSDKInterstitialVideo.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		464145C2E15DCEF95F4BBBACDB0FFC27 /* BidNativeAd */ = {
+			isa = PBXGroup;
+			children = (
+				3D9618823E6908B9C77B4A07F7503C0B /* Frameworks */,
+			);
+			name = BidNativeAd;
+			sourceTree = "<group>";
+		};
+		46E8C8219D451CFC0DEADEF9923A1B89 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				55D52DF5F3C200EBFEE35F34129D87BD /* Pods-CloudXMintegralAdapter */,
+				A88194F77E886B1AF6185088F7706E59 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		4AB30A984B563256FE27FE33D0A69EDE /* RewardVideoAd */ = {
+			isa = PBXGroup;
+			children = (
+				695642E01BFDE8A361A160AF7EA07E8F /* Frameworks */,
+			);
+			name = RewardVideoAd;
+			sourceTree = "<group>";
+		};
+		50770844ECFBFED9DA2874E9F31AAB64 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				DEC774FE94E493D0724E736D6347C278 /* CloudXCore */,
+				A4E7CB604266FC8DDB40133A4DD3ABAF /* MintegralAdSDK */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		55D52DF5F3C200EBFEE35F34129D87BD /* Pods-CloudXMintegralAdapter */ = {
+			isa = PBXGroup;
+			children = (
+				33561E97960B92B133D5A11B4C11DAA6 /* Pods-CloudXMintegralAdapter.modulemap */,
+				D99A96976FB7B903F9E63D219F1D5A25 /* Pods-CloudXMintegralAdapter-acknowledgements.markdown */,
+				154EEB1CA9E1DDC72CEEAD145197ADB4 /* Pods-CloudXMintegralAdapter-acknowledgements.plist */,
+				046770AD31B8B1DD2793C4579C07E4B8 /* Pods-CloudXMintegralAdapter-dummy.m */,
+				AD98E2B3E84A896AEFB246262A186AF5 /* Pods-CloudXMintegralAdapter-Info.plist */,
+				88111A3DECB6DDEFC1341371FEF35F76 /* Pods-CloudXMintegralAdapter-resources.sh */,
+				4B3461ACBE65D39A5C7EC097CC969A41 /* Pods-CloudXMintegralAdapter-umbrella.h */,
+				1E2A19C082E4833CB581FC32086DDC45 /* Pods-CloudXMintegralAdapter.debug.xcconfig */,
+				F20BA9EEC1C349B547D383B89C56CE1B /* Pods-CloudXMintegralAdapter.release.xcconfig */,
+			);
+			name = "Pods-CloudXMintegralAdapter";
+			path = "Target Support Files/Pods-CloudXMintegralAdapter";
+			sourceTree = "<group>";
+		};
+		598CE8974151F387B2AC05C3B0D3872B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				00AFEB54203C5DAE29E40F31C979DC47 /* PrivacyInfo.xcprivacy */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		5ACD6D54D64B381C56472BB834A85159 /* NativeAd */ = {
+			isa = PBXGroup;
+			children = (
+				23CAF4A7490A5AA76BD6DB2191E73D1B /* Frameworks */,
+				598CE8974151F387B2AC05C3B0D3872B /* Resources */,
+			);
+			name = NativeAd;
+			sourceTree = "<group>";
+		};
+		695642E01BFDE8A361A160AF7EA07E8F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FFBB9BFD86DD0022EA2F7CDAA18D0C3B /* MTGSDKReward.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		84B3B3D03B55BD9F95F09EC554E1AEAA /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				BE0DB3D80F9C7DB54531E171980AEAFC /* CloudXCore-xcframeworks.sh */,
+				67109486B05975C32730EC184A95A974 /* CloudXCore.debug.xcconfig */,
+				05F948E52B94708CA913CE322280C02F /* CloudXCore.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/CloudXCore";
+			sourceTree = "<group>";
+		};
+		A4E7CB604266FC8DDB40133A4DD3ABAF /* MintegralAdSDK */ = {
+			isa = PBXGroup;
+			children = (
+				CFB76BD2BE183FFDE29D40D7AC26E55B /* BannerAd */,
+				464145C2E15DCEF95F4BBBACDB0FFC27 /* BidNativeAd */,
+				3346BC140166CD3D0AFB8FA459C965EF /* InterstitialVideoAd */,
+				5ACD6D54D64B381C56472BB834A85159 /* NativeAd */,
+				FB5ECAB2E36BE63D8A19D906DF094697 /* NativeAdvancedAd */,
+				FBA396AEAD26F6B37C24B0C08D3D2B73 /* NewInterstitialAd */,
+				4AB30A984B563256FE27FE33D0A69EDE /* RewardVideoAd */,
+				F3B5F473897FEC4BCEF7DBA1F919BFB1 /* Support Files */,
+			);
+			name = MintegralAdSDK;
+			path = MintegralAdSDK;
+			sourceTree = "<group>";
+		};
+		A88194F77E886B1AF6185088F7706E59 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests */ = {
+			isa = PBXGroup;
+			children = (
+				8C995496B2AB9801FC2CA54F324AAA9A /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests.modulemap */,
+				FDDC784CD75CF6F1309C724CDEEB26E7 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-acknowledgements.markdown */,
+				B8C5C1629B392055C6680EA2FEEC61DE /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-acknowledgements.plist */,
+				B6EF12C148D8A2B81D501F5719AD44C3 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-dummy.m */,
+				4F37C1982FCAE1640B8AB9DF2B15B317 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-frameworks.sh */,
+				61FC43B0C880413B875BED8D334F248D /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-Info.plist */,
+				5AFC092085FA0B6054EEE53FB5D10F06 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-resources.sh */,
+				45ED81D7485079A2C248C3385E1E92E8 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-umbrella.h */,
+				E1C1650E7B95A811F477876EC93197BE /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests.debug.xcconfig */,
+				69B4DADA89F93C103ED28FA99A591589 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests.release.xcconfig */,
+			);
+			name = "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests";
+			path = "Target Support Files/Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests";
+			sourceTree = "<group>";
+		};
+		CF1408CF629C7361332E53B88F7BD30C = {
+			isa = PBXGroup;
+			children = (
+				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
+				D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */,
+				50770844ECFBFED9DA2874E9F31AAB64 /* Pods */,
+				19F292CE86269A526D52BCB70097E209 /* Products */,
+				46E8C8219D451CFC0DEADEF9923A1B89 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		CFB76BD2BE183FFDE29D40D7AC26E55B /* BannerAd */ = {
+			isa = PBXGroup;
+			children = (
+				D80ED0088F302D79D22455CF6C01042C /* Frameworks */,
+			);
+			name = BannerAd;
+			sourceTree = "<group>";
+		};
+		D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E4801F62A6B08CD9B5410329F1A18FDE /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D7885DEBE17B00D1AFBF73E922854909 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B891CDDF03CC42D70C32721FE858E78C /* MTGSDKNativeAdvanced.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D80ED0088F302D79D22455CF6C01042C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B73B8EF7F3AE0C1E1D09F14059AD7260 /* MTGSDKBanner.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DEC774FE94E493D0724E736D6347C278 /* CloudXCore */ = {
+			isa = PBXGroup;
+			children = (
+				EDAB2B3D9029E9BBAFE9129DB39FA16C /* Frameworks */,
+				84B3B3D03B55BD9F95F09EC554E1AEAA /* Support Files */,
+			);
+			name = CloudXCore;
+			path = CloudXCore;
+			sourceTree = "<group>";
+		};
+		E4801F62A6B08CD9B5410329F1A18FDE /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				384DDA2CB25005BD6479B5987C619DD4 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		EDAB2B3D9029E9BBAFE9129DB39FA16C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				65C9CBEE7DCC95573A56AE5C26F10BE9 /* CloudXCore.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F3B5F473897FEC4BCEF7DBA1F919BFB1 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				9D0FEE8F8B33A4B0B6FA2EF46159D908 /* MintegralAdSDK-xcframeworks.sh */,
+				0E32C723129BAD5889A3DA4E658A7E60 /* MintegralAdSDK.debug.xcconfig */,
+				4B9CC13590C617CC13186D6FAA901DF5 /* MintegralAdSDK.release.xcconfig */,
+				17B01BAE1C60FD7964872F2E6DC7D7FA /* ResourceBundle-MTGSDK-MintegralAdSDK-Info.plist */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/MintegralAdSDK";
+			sourceTree = "<group>";
+		};
+		FB5ECAB2E36BE63D8A19D906DF094697 /* NativeAdvancedAd */ = {
+			isa = PBXGroup;
+			children = (
+				D7885DEBE17B00D1AFBF73E922854909 /* Frameworks */,
+			);
+			name = NativeAdvancedAd;
+			sourceTree = "<group>";
+		};
+		FBA396AEAD26F6B37C24B0C08D3D2B73 /* NewInterstitialAd */ = {
+			isa = PBXGroup;
+			children = (
+				162CAD7EF0E3AB30FA7036C996A65773 /* Frameworks */,
+			);
+			name = NewInterstitialAd;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		2DDC6842646D5D640E28AB0D7821FE05 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5BAEF4DE5721BD0B991BE1B1AB756398 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		745F67F2BD9C48835D2085D0E61ACEE8 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				612D3D1EC8D7027BB609A661C421DF26 /* Pods-CloudXMintegralAdapter-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		4F6BC48E31262F7E8CC1415D92DA2A35 /* Pods-CloudXMintegralAdapter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0D5B0ADDAFDF35A2352F704C1E9C6604 /* Build configuration list for PBXNativeTarget "Pods-CloudXMintegralAdapter" */;
+			buildPhases = (
+				745F67F2BD9C48835D2085D0E61ACEE8 /* Headers */,
+				BD49CC10D587C5FA9AEC7663C3F767BB /* Sources */,
+				93ABF32172BBE31C8D0D8C8934014749 /* Frameworks */,
+				AE09D674D2866E8335FB09EF91BE23A4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				43F74E4F25C0D03D1A416B340567D4FA /* PBXTargetDependency */,
+				3B0BB3727C29E80A6334B4FE71C887B5 /* PBXTargetDependency */,
+			);
+			name = "Pods-CloudXMintegralAdapter";
+			productName = Pods_CloudXMintegralAdapter;
+			productReference = 13CAC048F42350DA49E66BFBF494F719 /* Pods-CloudXMintegralAdapter */;
+			productType = "com.apple.product-type.framework";
+		};
+		A5700E3CF51057046C86C56F2CC3DE3B /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4E582E827371D8F88B25DC77C9FA05FE /* Build configuration list for PBXNativeTarget "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests" */;
+			buildPhases = (
+				2DDC6842646D5D640E28AB0D7821FE05 /* Headers */,
+				5C0B7F6AF3373BF1644128EE86375D97 /* Sources */,
+				CBD294CC65F584F65BE61361D9008AE4 /* Frameworks */,
+				BE77FB71AC6DB0A5059AFF0ECA73F726 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A4216E880470C83497B57F6EAFCCA402 /* PBXTargetDependency */,
+				760DA66B843234905C22E78D2F1B6D65 /* PBXTargetDependency */,
+			);
+			name = "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests";
+			productName = Pods_CloudXMintegralAdapter_CloudXMintegralAdapterTests;
+			productReference = 8514C1E6542D4EC3D0E3AE4BD1CC6BB3 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests */;
+			productType = "com.apple.product-type.framework";
+		};
+		EB37911E28FB45D4C95E571C72EAF7BA /* MintegralAdSDK-MTGSDK */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 40B56C111CA78C590508B03A24C7A810 /* Build configuration list for PBXNativeTarget "MintegralAdSDK-MTGSDK" */;
+			buildPhases = (
+				717D041AD4E6A164FA6E8CB2C8057CF5 /* Sources */,
+				0A48D6E95E97BAE16144A85091F1DFF0 /* Frameworks */,
+				66A8C9E42450A38F44206D853EA6EAEF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "MintegralAdSDK-MTGSDK";
+			productName = MTGSDK;
+			productReference = 407009B1C677C250F6837E3F3F4FA5AB /* MintegralAdSDK-MTGSDK */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
+			minimizedProjectReferenceProxies = 0;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 19F292CE86269A526D52BCB70097E209 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A532F36DE5630BB28D7AC5C6E8B8CB4C /* CloudXCore */,
+				396FEEFBFD0F2124F8A266DB6506001E /* MintegralAdSDK */,
+				EB37911E28FB45D4C95E571C72EAF7BA /* MintegralAdSDK-MTGSDK */,
+				4F6BC48E31262F7E8CC1415D92DA2A35 /* Pods-CloudXMintegralAdapter */,
+				A5700E3CF51057046C86C56F2CC3DE3B /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		66A8C9E42450A38F44206D853EA6EAEF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DDB0BEBE2FD91C0040A98A4D6D8809FE /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AE09D674D2866E8335FB09EF91BE23A4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE77FB71AC6DB0A5059AFF0ECA73F726 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		85E06B7AF614B1853D16C2801599223D /* [CP] Copy XCFrameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/CloudXCore/CloudXCore-xcframeworks-input-files.xcfilelist",
+			);
+			name = "[CP] Copy XCFrameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/CloudXCore/CloudXCore-xcframeworks-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/CloudXCore/CloudXCore-xcframeworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		913B196655DE10582268512F07EAAD65 /* [CP] Copy XCFrameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/MintegralAdSDK/MintegralAdSDK-xcframeworks-input-files.xcfilelist",
+			);
+			name = "[CP] Copy XCFrameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/MintegralAdSDK/MintegralAdSDK-xcframeworks-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/MintegralAdSDK/MintegralAdSDK-xcframeworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5C0B7F6AF3373BF1644128EE86375D97 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BB5DF41CEF6E92288F0AFF9785CD38B /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		717D041AD4E6A164FA6E8CB2C8057CF5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BD49CC10D587C5FA9AEC7663C3F767BB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FD272AA87014F9FE27C8190F665953A9 /* Pods-CloudXMintegralAdapter-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3624D75E22643141D2864516F6546A2E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "MintegralAdSDK-MTGSDK";
+			target = EB37911E28FB45D4C95E571C72EAF7BA /* MintegralAdSDK-MTGSDK */;
+			targetProxy = 4B2FFBA51037916CC47C194662B9AC4F /* PBXContainerItemProxy */;
+		};
+		3B0BB3727C29E80A6334B4FE71C887B5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MintegralAdSDK;
+			target = 396FEEFBFD0F2124F8A266DB6506001E /* MintegralAdSDK */;
+			targetProxy = 63444D4A66F17A520608DB37C1BC0251 /* PBXContainerItemProxy */;
+		};
+		43F74E4F25C0D03D1A416B340567D4FA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CloudXCore;
+			target = A532F36DE5630BB28D7AC5C6E8B8CB4C /* CloudXCore */;
+			targetProxy = 2B7A422FC279160A3741966DB8268F87 /* PBXContainerItemProxy */;
+		};
+		760DA66B843234905C22E78D2F1B6D65 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MintegralAdSDK;
+			target = 396FEEFBFD0F2124F8A266DB6506001E /* MintegralAdSDK */;
+			targetProxy = 2B21805C41CE7440098BD6E83E1AF899 /* PBXContainerItemProxy */;
+		};
+		A4216E880470C83497B57F6EAFCCA402 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CloudXCore;
+			target = A532F36DE5630BB28D7AC5C6E8B8CB4C /* CloudXCore */;
+			targetProxy = 121FAC727C30AB7C242733846F80A6F6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		558B34DB3E3239C4AD844F886D77FC40 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0E32C723129BAD5889A3DA4E658A7E60 /* MintegralAdSDK.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		63900F2F13216B4638930CC62C0B67F4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4B9CC13590C617CC13186D6FAA901DF5 /* MintegralAdSDK.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6A08D3A0A72BCBA3DF8C0D9D3C6EE7E8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0E32C723129BAD5889A3DA4E658A7E60 /* MintegralAdSDK.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/MintegralAdSDK";
+				IBSC_MODULE = MintegralAdSDK;
+				INFOPLIST_FILE = "Target Support Files/MintegralAdSDK/ResourceBundle-MTGSDK-MintegralAdSDK-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				PRODUCT_NAME = MTGSDK;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		73BEA4D0F3308FDAFE539CA2D4FB6798 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 67109486B05975C32730EC184A95A974 /* CloudXCore.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7D99DC3AE8D39B2508BFA7C578A2701C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1E2A19C082E4833CB581FC32086DDC45 /* Pods-CloudXMintegralAdapter.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-CloudXMintegralAdapter/Pods-CloudXMintegralAdapter-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-CloudXMintegralAdapter/Pods-CloudXMintegralAdapter.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		8A2014F2C92D4A45CCFDC26EADA9B694 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E1C1650E7B95A811F477876EC93197BE /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests/Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests/Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		8B01157B651BBEA6DB97855BA0B9F1DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F20BA9EEC1C349B547D383B89C56CE1B /* Pods-CloudXMintegralAdapter.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-CloudXMintegralAdapter/Pods-CloudXMintegralAdapter-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-CloudXMintegralAdapter/Pods-CloudXMintegralAdapter.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		8BCB3D2489CC943DD796A7ACCDA5EA09 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 05F948E52B94708CA913CE322280C02F /* CloudXCore.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		8DE5143C03248BB6CD542DE3963D6F3A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_DEBUG=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+		9E406C6AAF85E580207CD97B0044DEAB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Release;
+		};
+		AE79ABAB48D9C7FD475D11AEA3B79102 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4B9CC13590C617CC13186D6FAA901DF5 /* MintegralAdSDK.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/MintegralAdSDK";
+				IBSC_MODULE = MintegralAdSDK;
+				INFOPLIST_FILE = "Target Support Files/MintegralAdSDK/ResourceBundle-MTGSDK-MintegralAdSDK-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				PRODUCT_NAME = MTGSDK;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+		C6A47B38698DEF0CFEDF15FA82F0F386 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 69B4DADA89F93C103ED28FA99A591589 /* Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = "Target Support Files/Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests/Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests/Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0711DEAA72F06B438820A90084806A85 /* Build configuration list for PBXAggregateTarget "CloudXCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				73BEA4D0F3308FDAFE539CA2D4FB6798 /* Debug */,
+				8BCB3D2489CC943DD796A7ACCDA5EA09 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0D5B0ADDAFDF35A2352F704C1E9C6604 /* Build configuration list for PBXNativeTarget "Pods-CloudXMintegralAdapter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7D99DC3AE8D39B2508BFA7C578A2701C /* Debug */,
+				8B01157B651BBEA6DB97855BA0B9F1DF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		40B56C111CA78C590508B03A24C7A810 /* Build configuration list for PBXNativeTarget "MintegralAdSDK-MTGSDK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A08D3A0A72BCBA3DF8C0D9D3C6EE7E8 /* Debug */,
+				AE79ABAB48D9C7FD475D11AEA3B79102 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8DE5143C03248BB6CD542DE3963D6F3A /* Debug */,
+				9E406C6AAF85E580207CD97B0044DEAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4E582E827371D8F88B25DC77C9FA05FE /* Build configuration list for PBXNativeTarget "Pods-CloudXMintegralAdapter-CloudXMintegralAdapterTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8A2014F2C92D4A45CCFDC26EADA9B694 /* Debug */,
+				C6A47B38698DEF0CFEDF15FA82F0F386 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AF63FB7BAD8C3C6866DA12175B1D2052 /* Build configuration list for PBXAggregateTarget "MintegralAdSDK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				558B34DB3E3239C4AD844F886D77FC40 /* Debug */,
+				63900F2F13216B4638930CC62C0B67F4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+}

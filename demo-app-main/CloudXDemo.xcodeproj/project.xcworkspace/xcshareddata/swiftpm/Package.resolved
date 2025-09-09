@@ -1,0 +1,24 @@
+{
+  "originHash" : "cea1a4dae0e3eaa48ce93b07fb5ba8917e38bbba0b206c8d69a409a45098a221",
+  "pins" : [
+    {
+      "identity" : "swifter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/httpswift/swifter.git",
+      "state" : {
+        "revision" : "9483a5d459b45c3ffd059f7b55f9638e268632fd",
+        "version" : "1.5.0"
+      }
+    },
+    {
+      "identity" : "toastview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/PhilippeWeidmann/ToastView.git",
+      "state" : {
+        "revision" : "5a010e6cd2d727559aff0a3369d5e040d3705929",
+        "version" : "1.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}

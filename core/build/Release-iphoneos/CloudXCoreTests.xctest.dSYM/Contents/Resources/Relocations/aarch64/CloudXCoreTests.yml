@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/bryanboyko/Coding/CloudX/cloudexchange.sdk.ios.coreObjC/build/Release-iphoneos/CloudXCoreTests.xctest/CloudXCoreTests'
+relocations:     []
+...

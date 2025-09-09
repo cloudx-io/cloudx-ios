@@ -1,0 +1,16 @@
+PODS:
+  - CloudXCore (1.1.34)
+
+DEPENDENCIES:
+  - CloudXCore (from `../cloudexchange.sdk.ios.coreObjC`)
+
+EXTERNAL SOURCES:
+  CloudXCore:
+    :path: "../cloudexchange.sdk.ios.coreObjC"
+
+SPEC CHECKSUMS:
+  CloudXCore: 13f9d021452f13b40ae585263513c2fb32fa9e18
+
+PODFILE CHECKSUM: 06da9f4d3da0d48ec8ae59b9463ccd278f2143f6
+
+COCOAPODS: 1.16.2

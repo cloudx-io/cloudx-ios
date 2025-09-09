@@ -1,0 +1,3 @@
+${PODS_ROOT}/Target Support Files/Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests/Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests-resources.sh
+${PODS_CONFIGURATION_BUILD_DIR}/CloudXCore/CloudXCore.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/FBAudienceNetwork/FBAudienceNetwork.bundle

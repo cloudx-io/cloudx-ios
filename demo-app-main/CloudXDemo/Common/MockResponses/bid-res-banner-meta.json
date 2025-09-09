@@ -1,0 +1,35 @@
+{
+    "id": "123",
+    "seatbid": [
+        {
+            "bid": [
+                {
+                    "id": "test-bid-banner",
+                    "impid": "1234",
+                    "price": 0.1,
+                    "adm": "",
+                    "adid": "YOUR_PLACEMENT_ID",
+                    "adomain": [
+                        "example.com"
+                    ],
+                    "crid": "test-creative-id-1",
+                    "w": 320,
+                    "h": 50,
+                    "ext": {
+                        "origbidcpm": 0.1,
+                        "origbidcur": "USD",
+                        "cloudx": {
+                            "meta": {
+                                "adaptercode": "meta"
+                            },
+                            "type": "banner",
+                            "rank" : 1
+                        }
+                    }
+                }
+            ],
+            "seat": "meta"
+        }
+    ],
+    "cur": "USD"
+}

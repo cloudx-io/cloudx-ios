@@ -1,0 +1,6 @@
+framework module Pods_CloudXObjCRemotePods_CloudXObjCRemotePodsUITests {
+  umbrella header "Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}

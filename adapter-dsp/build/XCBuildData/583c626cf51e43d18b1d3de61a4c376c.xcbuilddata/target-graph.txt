@@ -1,0 +1,6 @@
+Target dependency graph (3 targets)
+Target 'Pods-CloudXDSPAdapter-CloudXDSPAdapterTests' in project 'Pods'
+➜ Explicit dependency on target 'CloudX' in project 'Pods'
+Target 'Pods-CloudXDSPAdapter' in project 'Pods'
+➜ Explicit dependency on target 'CloudX' in project 'Pods'
+Target 'CloudX' in project 'Pods' (no dependencies)

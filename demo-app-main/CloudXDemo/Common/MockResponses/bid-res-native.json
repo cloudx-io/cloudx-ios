@@ -1,0 +1,66 @@
+{
+    "id": "123",
+    "seatbid": [
+        {
+            "bid": [
+                {
+                    "id": "test-bid-int1",
+                    "impid": "1234",
+                    "price": 0.1,
+                    "adm": "{\"native\": {\"ver\": \"1.2\",\"assets\": [ { \"id\": 1, \"required\": 1, \"title\": { \"text\": \"Example Title\" } }, { \"id\": 2, \"required\": 1, \"img\": { \"url\": \"https:\/\/example.com\/image.jpg\",  \"w\": 200,  \"h\": 200 } }, { \"id\": 3,  \"required\": 0, \"data\": {  \"value\": \"This is an example description for the native ad.\" }  }, {  \"id\": 4, \"required\": 0, \"data\": { \"value\": \"Learn More\"    } } ], \"link\": { \"url\": \"https:\/\/example.com\/call_to_action\" },  \"imptrackers\": [ \"https:\/\/example.com\/impression_tracker1\",    \"https:\/\/example.com\/impression_tracker2\" ], \"jstracker\": \"https:\/\/example.com\/js_tracker\" }, \"bid\": 0.25, \"adomain\": [\"example.com\"]}",
+                    "adid": "test-ad-id-1",
+                    "adomain": [
+                        "example.com"
+                    ],
+                    "crid": "test-creative-id-1",
+                    "w": 320,
+                    "h": 50,
+                    "ext": {
+                        "origbidcpm": 0.1,
+                        "origbidcur": "USD",
+                        "cloudx": {
+                            "meta": {
+                                "adaptercode": "testbidder"
+                            },
+                            "type": "interstitial",
+                            "rank" : 2
+                        }
+                    }
+                }
+            ],
+            "seat": "testbidder"
+        },
+        
+        {
+            "bid": [
+                {
+                    "id": "test-bid-int2",
+                    "impid": "123456",
+                    "price": 0.1,
+                    "adm": "{\"native\": {\"ver\": \"1.2\",\"assets\": [ { \"id\": 1, \"required\": 1, \"title\": { \"text\": \"Example Title\" } }, { \"id\": 2, \"required\": 1, \"img\": { \"url\": \"https:\/\/example.com\/image.jpg\",  \"w\": 200,  \"h\": 200 } }, { \"id\": 3,  \"required\": 0, \"data\": {  \"value\": \"This is an example description for the native ad.\" }  }, {  \"id\": 4, \"required\": 0, \"data\": { \"value\": \"Learn More\"    } } ], \"link\": { \"url\": \"https:\/\/example.com\/call_to_action\" },  \"imptrackers\": [ \"https:\/\/example.com\/impression_tracker1\",    \"https:\/\/example.com\/impression_tracker2\" ], \"jstracker\": \"https:\/\/example.com\/js_tracker\" }, \"bid\": 0.25, \"adomain\": [\"example.com\"]}",
+                    "adid": "test-ad-id-1",
+                    "adomain": [
+                        "example.com"
+                    ],
+                    "crid": "test-creative-id-2",
+                    "w": 320,
+                    "h": 50,
+                    "ext": {
+                        "origbidcpm": 0.1,
+                        "origbidcur": "USD",
+                        "cloudx": {
+                            "meta": {
+                                "adaptercode": "testbidder"
+                            },
+                            "type": "interstitial",
+                            "rank" : 1
+                        }
+                    }
+                }
+            ],
+            "seat": "testbidder2"
+        }
+    ],
+    "cur": "USD"
+}
+

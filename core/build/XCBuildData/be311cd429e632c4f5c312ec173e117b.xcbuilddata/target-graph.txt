@@ -1,0 +1,4 @@
+Target dependency graph (2 targets)
+Target 'CloudXCoreTests' in project 'CloudXCore'
+➜ Explicit dependency on target 'CloudXCore' in project 'CloudXCore'
+Target 'CloudXCore' in project 'CloudXCore' (no dependencies)

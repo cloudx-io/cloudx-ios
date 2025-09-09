@@ -1,0 +1,6 @@
+framework module Pods_CloudXDemoTests {
+  umbrella header "Pods-CloudXDemoTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

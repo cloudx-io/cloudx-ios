@@ -1,0 +1,5 @@
+#import <Foundation/Foundation.h>
+@interface PodsDummy_Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests : NSObject
+@end
+@implementation PodsDummy_Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests
+@end

@@ -1,0 +1,6 @@
+framework module CloudXTestVastNetworkAdapter {
+  umbrella header "CloudXTestVastNetworkAdapter-umbrella.h"
+
+  export *
+  module * { export * }
+}
