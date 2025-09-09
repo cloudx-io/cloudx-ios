@@ -2,53 +2,15 @@
 
 The CloudX iOS SDK is a comprehensive mobile advertising solution that provides programmatic advertising capabilities for iOS applications. This monorepo contains the complete CloudX iOS SDK ecosystem including the core SDK and various adapter implementations.
 
-## Repository Structure
-
-This monorepo is organized into five main components:
-
-```
-cloudexchange.ios.sdk/
-├── core/                    # CloudX Core SDK (Objective-C)
-├── adapter-meta/           # Meta (Facebook) Adapter
-├── adapter-cloudx/         # CloudX Prebid Adapter
-├── demo-app-objc/          # Objective-C Demo Application
-├── demo-app-swift/         # Swift Demo Application
-└── README.md              # This file
-```
-
 ### Components
 
-- **`core/`** - The foundational CloudX Core SDK written in Objective-C that provides the base functionality for programmatic advertising
-- **`adapter-meta/`** - Meta (Facebook Audience Network) adapter for integrating Meta's advertising platform
-- **`adapter-cloudx/`** - Prebid adapter for header bidding integration with CloudX's programmatic platform
-- **`demo-app-objc/`** - Complete Objective-C demo application showcasing CloudX SDK integration and usage patterns
-- **`demo-app-swift/`** - Complete Swift demo application demonstrating CloudX SDK implementation in Swift projects
+- **[`core/`](core/README.md)** - The foundational CloudX Core SDK written in Objective-C that provides the base functionality for programmatic advertising
+- **[`adapter-meta/`](adapter-meta/README.md)** - Meta (Facebook Audience Network) adapter for integrating Meta's advertising platform
+- **[`adapter-cloudx/`](adapter-cloudx/README.md)** - Prebid adapter for header bidding integration with CloudX's programmatic platform
+- **[`demo-app-objc/`](demo-app-objc/)** - Complete Objective-C demo application showcasing CloudX SDK integration and usage patterns
+- **[`demo-app-swift/`](demo-app-swift/)** - Complete Swift demo application demonstrating CloudX SDK implementation in Swift projects
 
-## Installation
-
-Each component can be installed independently using CocoaPods or Swift Package Manager.
-
-### CocoaPods
-
-Add the desired components to your `Podfile`:
-
-```ruby
-# Core SDK (required)
-pod 'CloudXCore', :git => 'https://github.com/cloudx-xenoss/cloudexchange.ios.sdk.git', :tag => 'core-v1.0.0'
-
-# Meta Adapter (optional)
-pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-xenoss/cloudexchange.ios.sdk.git', :tag => 'meta-adapter-v1.0.0'
-
-# CloudX Prebid Adapter (optional)
-pod 'CloudXPrebidAdapter', :git => 'https://github.com/cloudx-xenoss/cloudexchange.ios.sdk.git', :tag => 'prebid-adapter-v1.0.0'
-```
-
-### Swift Package Manager
-
-Add the repository URL to your Xcode project:
-```
-https://github.com/cloudx-xenoss/cloudexchange.ios.sdk.git
-```
+For detailed installation instructions and usage examples, please refer to the individual component READMEs linked above.
 
 ## Release Strategy
 
@@ -104,97 +66,14 @@ CloudXiOSSDK-Complete-v1.2.3.zip # Optional: All components bundled
 - **Clear Versioning**: Each component's version is clearly indicated in the filename
 - **Backward Compatibility**: Easy to identify compatible versions across components
 
-## Development
-
-### Prerequisites
-
-- Xcode 14.0 or later
-- iOS 12.0 or later
-- CocoaPods 1.10.0 or later (if using CocoaPods)
-
-### Building
-
-Each component can be built independently:
-
-```bash
-# Build Core SDK
-cd core/
-xcodebuild -workspace CloudXCore.xcworkspace -scheme CloudXCore -configuration Release
-
-# Build Meta Adapter  
-cd adapter-meta/
-xcodebuild -workspace CloudXMetaAdapter.xcworkspace -scheme CloudXMetaAdapter -configuration Release
-
-# Build Prebid Adapter
-cd adapter-cloudx/
-xcodebuild -workspace CloudXPrebidAdapter.xcworkspace -scheme CloudXPrebidAdapter -configuration Release
-```
-
-### Testing
-
-Run tests for each component:
-
-```bash
-# Test Core SDK
-cd core/
-xcodebuild test -workspace CloudXCore.xcworkspace -scheme CloudXCore -destination 'platform=iOS Simulator,name=iPhone 14'
-
-# Test adapters (if test targets exist)
-cd adapter-meta/
-xcodebuild test -workspace CloudXMetaAdapter.xcworkspace -scheme CloudXMetaAdapter -destination 'platform=iOS Simulator,name=iPhone 14'
-```
-
-## Demo Applications
-
-The repository includes two complete demo applications that showcase CloudX SDK integration patterns and best practices.
-
-### Objective-C Demo App (`demo-app-objc/`)
-
-A comprehensive Objective-C demo application that demonstrates:
-- CloudX Core SDK integration
-- Meta Adapter implementation
-- Banner, interstitial, and native ad formats
-- Error handling and logging
-- Privacy compliance implementation
-
-#### Running the Objective-C Demo
-```bash
-cd demo-app-objc/
-pod install
-open CloudXObjCRemotePods.xcworkspace
-```
-
-### Swift Demo App (`demo-app-swift/`)
-
-A complete Swift demo application showcasing:
-- CloudX SDK integration in Swift projects
-- Modern Swift coding patterns
-- Ad format implementations
-- SDK configuration examples
-- Best practices for Swift developers
-
-#### Running the Swift Demo
-```bash
-cd demo-app-swift/
-pod install
-open CloudXSwiftRemotePods.xcworkspace
-```
-
-### Demo App Features
-
-Both demo applications include:
-- **Multiple Ad Formats**: Banner, interstitial, native, and rewarded ads
-- **Configuration Examples**: Various SDK configuration scenarios
-- **Error Handling**: Comprehensive error handling and logging
-- **UI Examples**: Different ad placement and integration patterns
-- **Testing Tools**: Built-in testing and debugging features
-
 ## Documentation
 
-- **Core SDK**: See `core/README.md` for detailed core SDK documentation
-- **Meta Adapter**: See `adapter-meta/README.md` for Meta integration guide
-- **Prebid Adapter**: See `adapter-cloudx/README.md` for Prebid integration guide
-- **Demo Apps**: Explore the `demo-app-objc/` and `demo-app-swift/` directories for complete integration examples
+For detailed documentation, installation instructions, and usage examples, please refer to the individual component READMEs:
+
+- **[Core SDK](core/README.md)** - Detailed core SDK documentation and installation
+- **[Meta Adapter](adapter-meta/README.md)** - Meta integration guide and setup
+- **[Prebid Adapter](adapter-cloudx/README.md)** - Prebid integration guide and configuration
+- **Demo Apps** - Explore the demo application directories for complete integration examples
 
 ## Contributing
 
