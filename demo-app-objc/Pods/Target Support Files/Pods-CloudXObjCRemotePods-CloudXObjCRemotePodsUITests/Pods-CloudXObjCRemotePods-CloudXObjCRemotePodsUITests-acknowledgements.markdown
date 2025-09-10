@@ -29,28 +29,9 @@ SOFTWARE.
 
 Copyright 2024 CloudX, Inc. All rights reserved.
 
-## CloudXTestVastNetworkAdapter
+## CloudXPrebidAdapter
 
-Business Source License 1.1
-
-Parameters
-
-Licensor: CloudX
-Licensed Work: CloudXTestVastNetworkAdapter and all associated source code in this repository
-Additional Use Grant: None
-Change Date: 2028-05-10 (4 years from today)
-Change License: Apache 2.0
-
-Terms
-
-The Licensed Work is made available under the terms of the Business Source License 1.1 (BUSL-1.1), as published by MariaDB Corporation Ab. See the full text at https://mariadb.com/bsl11.
-
-Use Limitation: You may use, copy, modify, and prepare derivative works of the Licensed Work, in each case for non-production use only. Production use requires a commercial license from CloudX.
-
-Change Date: On the Change Date, the Licensed Work will be made available under the Change License.
-
-THE LICENSED WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE LICENSED WORK OR THE USE OR OTHER DEALINGS IN THE LICENSED WORK.
-
+Copyright 2024 CloudX, Inc. All rights reserved.
 
 ## FBAudienceNetwork
 
