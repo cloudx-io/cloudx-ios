@@ -1,0 +1,103 @@
+# CloudX iOS Umbrella Repo - Global .gitignore
+
+# Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/*.xcscheme
+!*.xcodeproj/xcshareddata/
+*.xcworkspace/*
+!*.xcworkspace/contents.xcworkspacedata
+!*.xcworkspace/xcshareddata/
+
+# User-specific files
+*.xcuserstate
+*.xcuserdatad/
+xcuserdata/
+
+# Build products
+build/
+DerivedData/
+*.build/
+*.dSYM.zip
+*.dSYM
+
+# CocoaPods
+Pods/
+*.xcworkspace/xcuserdata/
+Podfile.lock
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+
+# Carthage
+Carthage/Build/
+Carthage/Checkouts/
+
+# Frameworks
+*.framework/
+*.xcframework/
+
+# Archives
+*.ipa
+*.app
+
+# Provisioning profiles
+*.mobileprovision
+*.provisionprofile
+
+# Code signing
+*.p12
+*.cer
+*.certSigningRequest
+
+# Simulator logs
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Flutter specific (for flutter subproject)
+**/flutter/.packages
+**/flutter/.flutter-plugins
+**/flutter/.flutter-plugins-dependencies
+**/flutter/.dart_tool/
+**/flutter/build/
+
+# Demo app specific
+**/demo-app-*/build.log
+**/demo-app-*/last_build.log
+**/demo-app-*/all_logs_combined.txt
+
+# Documentation artifacts
+*.pdf
+*.docx
+!README.md
+!CHANGELOG.md
+!LICENSE
+
+# Test artifacts
+*.gcda
+*.gcno
+coverage/
+test-results/
+
+# Backup files
+*.bak
+*.backup
+*.orig
