@@ -1,5 +1,6 @@
 #import "BannerViewController.h"
 #import <CloudXCore/CloudXCore.h>
+#import "DemoAppLogger.h"
 
 @interface BannerViewController ()
 @property (nonatomic, strong) CLXBannerAdView *bannerAd;
@@ -297,6 +298,7 @@
 - (void)didLoadWithAd:(CLXAd *)ad {
     NSLog(@"[BannerViewController] ✅ didLoadWithAd delegate called");
     NSLog(@"[BannerViewController] Ad object: %@", ad);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ Banner didLoadWithAd - Ad: %@", ad]];
     
     [self logBannerProperties:@"In didLoadWithAd - Before State Update"];
     
@@ -331,6 +333,7 @@
     NSLog(@"[BannerViewController] ❌ failToLoadWithAd delegate called");
     NSLog(@"[BannerViewController] Ad object: %@", ad);
     NSLog(@"[BannerViewController] Error: %@", error);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failToLoadWithAd - Error: %@", error.localizedDescription]];
     NSLog(@"[BannerViewController] Error domain: %@", error.domain);
     NSLog(@"[BannerViewController] Error code: %ld", (long)error.code);
     NSLog(@"[BannerViewController] Error description: %@", error.localizedDescription);
@@ -349,6 +352,7 @@
 - (void)didShowWithAd:(CLXAd *)ad {
     NSLog(@"[BannerViewController] didShowWithAd delegate called");
     NSLog(@"[BannerViewController] Ad object: %@", ad);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 Banner didShowWithAd - Ad: %@", ad]];
     [self logBannerProperties:@"In didShowWithAd"];
 }
 
@@ -356,6 +360,7 @@
     NSLog(@"[BannerViewController] ❌ failToShowWithAd delegate called");
     NSLog(@"[BannerViewController] Ad object: %@", ad);
     NSLog(@"[BannerViewController] Error: %@", error);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failToShowWithAd - Error: %@", error.localizedDescription]];
     
     self.bannerAd = nil;
     
@@ -368,24 +373,28 @@
 - (void)didHideWithAd:(CLXAd *)ad {
     NSLog(@"[BannerViewController] didHideWithAd delegate called");
     NSLog(@"[BannerViewController] Ad object: %@", ad);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 Banner didHideWithAd - Ad: %@", ad]];
     self.bannerAd = nil;
 }
 
 - (void)didClickWithAd:(CLXAd *)ad {
     NSLog(@"[BannerViewController] didClickWithAd delegate called");
     NSLog(@"[BannerViewController] Ad object: %@", ad);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 Banner didClickWithAd - Ad: %@", ad]];
     [self logBannerProperties:@"In didClickWithAd"];
 }
 
 - (void)impressionOn:(CLXAd *)ad {
     NSLog(@"[BannerViewController] impressionOn delegate called");
     NSLog(@"[BannerViewController] Ad object: %@", ad);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ Banner impressionOn - Ad: %@", ad]];
     [self logBannerProperties:@"In impressionOn"];
 }
 
 - (void)revenuePaid:(CLXAd *)ad {
     NSLog(@"[BannerViewController] 💰 revenuePaid delegate called");
     NSLog(@"[BannerViewController] Ad object: %@", ad);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 Banner revenuePaid - Ad: %@", ad]];
     
     // Show revenue alert to demonstrate the callback
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -397,6 +406,7 @@
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
     NSLog(@"[BannerViewController] closedByUserActionWithAd delegate called");
     NSLog(@"[BannerViewController] Ad object: %@", ad);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ Banner closedByUserActionWithAd - Ad: %@", ad]];
     [self logBannerProperties:@"In closedByUserActionWithAd"];
     self.bannerAd = nil;
 }
@@ -405,6 +415,7 @@
 - (void)didExpandAd:(CLXAd *)ad {
     NSLog(@"[BannerViewController] 🔍 didExpandAd delegate called - NEW MAX SDK FEATURE");
     NSLog(@"[BannerViewController] Ad object: %@", ad);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔍 Banner didExpandAd - Ad: %@", ad]];
     [self logBannerProperties:@"In didExpandAd"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -416,6 +427,7 @@
 - (void)didCollapseAd:(CLXAd *)ad {
     NSLog(@"[BannerViewController] 🔍 didCollapseAd delegate called - NEW MAX SDK FEATURE");
     NSLog(@"[BannerViewController] Ad object: %@", ad);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔍 Banner didCollapseAd - Ad: %@", ad]];
     [self logBannerProperties:@"In didCollapseAd"];
     
     dispatch_async(dispatch_get_main_queue(), ^{

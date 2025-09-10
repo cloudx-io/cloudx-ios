@@ -3,6 +3,8 @@
 #import "BaseAdViewController.h"
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import "LogsModalViewController.h"
+#import "DemoAppLogger.h"
 
 @implementation BaseAdViewController
 
@@ -18,7 +20,21 @@
     [super viewDidLoad];
     NSLog(@"[BaseAdViewController] viewDidLoad");
     [self setupStatusUI];
+    [self setupShowLogsButton];
     [self updateStatusUIWithState:AdStateNoAd];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    // Clear logs when view appears to ensure clean state for this ad format
+    [[DemoAppLogger sharedInstance] clearLogs];
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"[%@] View will appear - logs cleared", NSStringFromClass([self class])]];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    // Clear logs when view disappears to prevent cross-contamination between ad formats
+    [[DemoAppLogger sharedInstance] clearLogs];
 }
 
 - (void)showAlertWithTitle:(NSString *)title message:(NSString *)message {
@@ -176,6 +192,34 @@
         [button.widthAnchor constraintEqualToConstant:200],
         [button.heightAnchor constraintEqualToConstant:44]
     ]];
+}
+
+- (void)setupShowLogsButton {
+    UIButton *showLogsButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [showLogsButton setTitle:@"Show Logs" forState:UIControlStateNormal];
+    showLogsButton.titleLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightMedium];
+    showLogsButton.backgroundColor = [UIColor systemOrangeColor];
+    [showLogsButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    showLogsButton.layer.cornerRadius = 6;
+    showLogsButton.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [showLogsButton addTarget:self action:@selector(showLogsModal) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.view addSubview:showLogsButton];
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [showLogsButton.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:20],
+        [showLogsButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-20],
+        [showLogsButton.widthAnchor constraintEqualToConstant:100],
+        [showLogsButton.heightAnchor constraintEqualToConstant:32]
+    ]];
+}
+
+- (void)showLogsModal {
+    LogsModalViewController *logsModal = [[LogsModalViewController alloc] initWithTitle:@"Logs"];
+    logsModal.modalPresentationStyle = UIModalPresentationPageSheet;
+    
+    [self presentViewController:logsModal animated:YES completion:nil];
 }
 
 

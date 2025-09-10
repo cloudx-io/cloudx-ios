@@ -20,6 +20,11 @@
     [self updateStatusUIWithState:self.isSDKInitialized ? AdStateReady : AdStateNoAd];
 }
 
+// Override to prevent show logs button from appearing in InitViewController
+- (void)setupShowLogsButton {
+    // Do nothing - no show logs button for InitViewController
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     NSLog(@"[InitViewController] viewWillAppear");
