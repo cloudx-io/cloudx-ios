@@ -101,10 +101,7 @@ static CloudXCore *_sharedInstance = nil;
         _defaultAuctionURL = @"https://au-dev.cloudx.io/openrtb2/auction";
         _logsData = [NSDictionary dictionary];
         
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] AB Test Value: %f", _abTestValue]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] AB Test Name: %@", _abTestName]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Default Auction URL: %@", _defaultAuctionURL]];
-        [self.logger info:@"✅ [CloudXCore] CloudXCore instance initialized successfully"];
+        [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] Instance initialized - AB Test: %@ (%.3f), Default URL: %@", _abTestName, _abTestValue, _defaultAuctionURL]];
     }
     return self;
 }
@@ -115,13 +112,10 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (NSString *)sdkVersion {
-            NSString *version = [CLXSystemInformation shared].sdkVersion;
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] SDK Version: %@", version]];
-    return version;
+    return [CLXSystemInformation shared].sdkVersion;
 }
 
 - (BOOL)isInitialised {
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Checking initialization status: %@", _isInitialised ? @"YES" : @"NO"]];
     return _isInitialised;
 }
 
@@ -150,10 +144,9 @@ static CloudXCore *_sharedInstance = nil;
     [self.logger debug:@"🔧 [CloudXCore] Starting SDK initialization process"];
     _appKey = [appKey copy];
     
-            // Get init service from DI container
-        [self.logger debug:@"🔧 [CloudXCore] Getting InitService from DI container"];
-        CLXDIContainer *container = [CLXDIContainer shared];
-        _initService = [container resolveType:ServiceTypeSingleton class:[CLXLiveInitService class]];
+    // Get init service from DI container
+    CLXDIContainer *container = [CLXDIContainer shared];
+    _initService = [container resolveType:ServiceTypeSingleton class:[CLXLiveInitService class]];
     
     if (!_initService) {
         [self.logger error:@"❌ [CloudXCore] Failed to resolve InitService from DI container"];
@@ -163,12 +156,9 @@ static CloudXCore *_sharedInstance = nil;
         return;
     }
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] InitService resolved successfully: %@", NSStringFromClass([_initService class])]];
+    [self.logger info:@"✅ [CloudXCore] InitService resolved, calling initSDKWithAppKey"];
     
-    // Call the init service
-    [self.logger debug:@"🔧 [CloudXCore] Calling InitService initSDKWithAppKey"];
     [_initService initSDKWithAppKey:appKey completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
-        [self.logger debug:@"📥 [CloudXCore] InitService completion called"];
         
         if (error) {
             [self.logger error:[NSString stringWithFormat:@"❌ [CloudXCore] InitService failed with error: %@", error]];
@@ -247,7 +237,7 @@ static CloudXCore *_sharedInstance = nil;
         
         NSString* encodedString = [CLXRillImpressionInitService createDataStringWithRillImpressionModel:model];
         
-        [self.logger info:@"✅ [CloudXCore] InitService returned config successfully"];
+        [self.logger info:@"✅ [CloudXCore] InitService returned config, processing"];
         [self processSDKConfig:config completion:completion];
         
         NSString *accountId = impModel.accountID;
@@ -271,11 +261,7 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (void)processSDKConfig:(CLXSDKConfigResponse *)config completion:(void (^)(BOOL, NSError * _Nullable))completion {
-    [self.logger debug:@"🔧 [CloudXCore] Processing SDK config"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Config App Key: %@", _appKey]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Config Session ID: %@", config.sessionID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Config Account ID: %@", config.accountID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Config Bidders Count: %lu", (unsigned long)config.bidders.count]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [CloudXCore] Processing SDK config - Session: %@, Account: %@, Bidders: %lu", config.sessionID, config.accountID, (unsigned long)config.bidders.count]];
     
     _sdkConfig = config;
     
@@ -288,44 +274,31 @@ static CloudXCore *_sharedInstance = nil;
     // Filter config (like Swift SDK does)
     [self filterConfig];
     
-    [self.logger debug:@"📊 [CloudXCore] Adapter resolution complete"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Banner factories: %lu", (unsigned long)_adNetworkFactories.banners.count]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Bid token sources: %lu", (unsigned long)_adNetworkFactories.bidTokenSources.count]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Ad placements: %lu", (unsigned long)_adPlacements.count]];
+    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Adapter resolution complete - Banners: %lu, Tokens: %lu, Placements: %lu", (unsigned long)_adNetworkFactories.banners.count, (unsigned long)_adNetworkFactories.bidTokenSources.count, (unsigned long)_adPlacements.count]];
     
     // Process bidders
-    [self.logger debug:@"🔧 [CloudXCore] Processing bidders"];
     if (config.bidders && config.bidders.count > 0) {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Found %lu bidders", (unsigned long)config.bidders.count]];
-        for (CLXSDKConfigBidder *bidder in config.bidders) {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Bidder Network Name: %@", bidder.networkName]];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Bidder Init Data: %@", bidder.bidderInitData]];
-        }
+        [self.logger debug:[NSString stringWithFormat:@"🔧 [CloudXCore] Processing %lu bidders", (unsigned long)config.bidders.count]];
     } else {
         [self.logger debug:@"⚠️ [CloudXCore] No bidders found in config"];
     }
     
-    // Initialize network bidder adapters (like Swift SDK)
-    [self.logger debug:@"🔧 [CloudXCore] Initializing network bidder adapters"];
+    // Initialize network bidder adapters 
     NSDictionary *adNetworkInitializers = _adNetworkFactories.initializers;
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Available initializers: %@", [adNetworkInitializers allKeys]]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [CloudXCore] Initializing adapters - Available: %@", [adNetworkInitializers allKeys]]];
     
     if (adNetworkInitializers && adNetworkInitializers.count > 0) {
         for (CLXSDKConfigBidder *adNetworkConfig in config.bidders) {
             NSString *mappedNetworkName = adNetworkConfig.networkNameMapped;
-            [self.logger debug:[NSString stringWithFormat:@"🔧 [CloudXCore] Processing bidder - Original: %@, Mapped: %@", adNetworkConfig.networkName, mappedNetworkName]];
             
             id<CLXAdNetworkInitializer> initializer = adNetworkInitializers[mappedNetworkName];
             if (!initializer) {
-                [self.logger error:[NSString stringWithFormat:@"❌ [CloudXCore] No initializer found for network: %@ (mapped from %@). Available initializers: %@", mappedNetworkName, adNetworkConfig.networkName, [adNetworkInitializers allKeys]]];
+                [self.logger error:[NSString stringWithFormat:@"❌ [CloudXCore] No initializer found for network: %@ (mapped from %@)", mappedNetworkName, adNetworkConfig.networkName]];
                 continue;
             }
             
-            [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] Found initializer for network: %@ - %@", mappedNetworkName, initializer]];
-            
-            // Convert SDKConfigBidder to CloudXBidderConfig (like Swift SDK)
+            // Convert SDKConfigBidder to CloudXBidderConfig 
             CLXBidderConfig *bidderConfig = [[CLXBidderConfig alloc] initWithInitializationData:adNetworkConfig.bidderInitData networkName:adNetworkConfig.networkName];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Bidder config created with init data: %@", adNetworkConfig.bidderInitData]];
             
             [initializer initializeWithConfig:bidderConfig completion:^(BOOL success, NSError * _Nullable error) {
                 if (success) {
@@ -339,21 +312,21 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger debug:@"⚠️ [CloudXCore] No ad network initializers found"];
     }
     
-    // Store app key and account ID (like Swift SDK)
+    // Store app key and account ID 
     [[NSUserDefaults standardUserDefaults] setValue:_appKey forKey:kCLXCoreAppKeyKey];
     [[NSUserDefaults standardUserDefaults] setValue:config.accountID forKey:kCLXCoreAccountIDKey];
     
-    // Initialize reporting service (like Swift SDK)
+    // Initialize reporting service 
     NSString *metricsEndpointURL = @"https://ads.cloudx.io/metrics?a=test";
     if (config.metricsEndpointURL) {
         metricsEndpointURL = config.metricsEndpointURL;
     }
     
-    // Select endpoints with A/B testing (like Swift SDK)
+    // Select endpoints with A/B testing 
     NSString *auctionEndpointUrl = @"https://au-dev.cloudx.io/openrtb2/auction";
     NSString *cdpEndpointUrl = @"";
     
-    // Check if auction endpoint is a string or object (like Swift SDK)
+    // Check if auction endpoint is a string or object 
     if (config.auctionEndpointURL) {
         id auctionValue = [config.auctionEndpointURL value];
         if ([auctionValue isKindOfClass:[NSString class]]) {
@@ -363,31 +336,26 @@ static CloudXCore *_sharedInstance = nil;
         }
     }
     
-    // Check if CDP endpoint is an object (like Swift SDK)
+    // Check if CDP endpoint is an object 
     if (config.cdpEndpointURL) {
         cdpEndpointUrl = [self chooseEndpointWithObject:config.cdpEndpointURL value:1.0 - _abTestValue];
     }
     
-    [self.logger debug:@"📊 [CloudXCore] ========================="];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] choosenAuctionEndpoint: %@", auctionEndpointUrl]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] choosenCDPEndpoint: %@", cdpEndpointUrl]];
-    [self.logger debug:@"📊 [CloudXCore] ========================="];
+    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Endpoints - Auction: %@, CDP: %@", auctionEndpointUrl, cdpEndpointUrl]];
     
-    // Store endpoint data in logs (like Swift SDK)
+    // Store endpoint data in logs 
     NSString *endpointData = [NSString stringWithFormat:@"choosenAuctionEndpoint: %@ ||| choosenCDPEndpoint: %@", auctionEndpointUrl, cdpEndpointUrl];
     _logsData = @{@"endpointData": endpointData};
     
-            // Register services in DI container (like Swift SDK)
+            // Register services in DI container 
         CLXDIContainer *container = [CLXDIContainer shared];
     [container registerType:[CLXAppSessionServiceImplementation class] instance:[[CLXAppSessionServiceImplementation alloc] initWithSessionID:config.sessionID ?: @"" appKey:_appKey url:metricsEndpointURL]];
     [container registerType:[CLXBidNetworkServiceClass class] instance:[[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:auctionEndpointUrl cdpEndpointUrl:cdpEndpointUrl]];
     [container resolveType:ServiceTypeSingleton class:[CLXAppSessionServiceImplementation class]];
     
-    // Check if adapters are empty (like Swift SDK)
+    // Check if adapters are empty 
     if (_adNetworkFactories.isEmpty) {
         [self.logger error:@"⚠️ [CloudXCore] WARNING: CloudX SDK was not initialized with any adapters. At least one adapter is required to show ads."];
-    } else {
-        [self.logger info:@"✅ [CloudXCore] CloudX SDK initialised"];
     }
     
     // Mark as initialized
@@ -416,9 +384,7 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (void)initSDKWithAppKey:(NSString *)appKey hashedUserID:(NSString *)hashedUserID completion:(void (^)(BOOL, NSError * _Nullable))completion {
-    [self.logger info:@"🚀 [CloudXCore] initSDKWithAppKey:hashedUserID called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] AppKey: %@", appKey]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] HashedUserID: %@", hashedUserID]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [CloudXCore] initSDKWithAppKey:hashedUserID called - AppKey: %@", appKey]];
     
     // Store hashed user ID
     [self provideUserDetailsWithHashedUserID:hashedUserID];
@@ -430,10 +396,7 @@ static CloudXCore *_sharedInstance = nil;
             for (CLXSDKConfigPlacement *placement in self->_sdkConfig.placements) {
                 [(NSMutableDictionary *)self->_adPlacements setObject:placement forKey:placement.name];
             }
-            [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] LOG: Successfully loaded %lu ad placements:", (unsigned long)self->_adPlacements.count]];
-            for (NSString *placementID in self->_adPlacements) {
-                [self.logger debug:[NSString stringWithFormat:@"   -> LOG: Loaded Placement ID: '%@'", placementID]];
-            }
+            [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] Successfully loaded %lu ad placements", (unsigned long)self->_adPlacements.count]];
             completion(YES, nil);
         } else {
             completion(NO, error);
@@ -453,22 +416,17 @@ static CloudXCore *_sharedInstance = nil;
         metricsDict[@"method_set_hashed_user_id"] = @"1";
     }
     [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsDictKey];
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CloudXCore] Storing hashed user ID: %@", hashedUserID]];
     [[NSUserDefaults standardUserDefaults] setValue:hashedUserID forKey:kCLXCoreHashedUserIDKey];
     [self.logger info:@"✅ [CloudXCore] Hashed user ID stored successfully"];
 }
 
 - (void)useHashedKeyValueWithKey:(NSString *)key value:(NSString *)value {
-    [self.logger debug:@"🔧 [CloudXCore] Storing hashed key-value pair"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Key: %@", key]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Value: %@", value]];
     [[NSUserDefaults standardUserDefaults] setValue:key forKey:kCLXCoreHashedKeyKey];
     [[NSUserDefaults standardUserDefaults] setValue:value forKey:kCLXCoreHashedValueKey];
     [self.logger info:@"✅ [CloudXCore] Hashed key-value pair stored successfully"];
 }
 
 - (void)useKeyValuesWithUserDictionary:(NSDictionary<NSString *,NSString *> *)userDictionary {
-    [self.logger debug:@"🔧 [CloudXCore] Storing user dictionary"];
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
     if ([metricsDict.allKeys containsObject:@"method_set_user_key_values"]) {
@@ -480,7 +438,6 @@ static CloudXCore *_sharedInstance = nil;
         metricsDict[@"method_set_user_key_values"] = @"1";
     }
     [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsDictKey];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Dictionary: %@", userDictionary]];
     [[NSUserDefaults standardUserDefaults] setObject:userDictionary forKey:kCLXCoreUserKeyValueKey];
     [self.logger info:@"✅ [CloudXCore] User dictionary stored successfully"];
 }
@@ -495,7 +452,7 @@ static CloudXCore *_sharedInstance = nil;
 
 // Method called by the timer
 - (void)timerFired:(NSTimer *)timer {
-    NSLog(@"Timer fired!");
+    [self.logger debug:@"⏰ [CloudXCore] Timer fired - sending analytics"];
     
     //Send Analytics
     [self.reportingService metricsTrackingWithActionString:@"sdkmetricenc"];
@@ -503,10 +460,6 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (void)useBidderKeyValueWithBidder:(NSString *)bidder key:(NSString *)key value:(NSString *)value {
-    [self.logger debug:@"🔧 [CloudXCore] Storing bidder key-value pair"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Bidder: %@", bidder]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Key: %@", key]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Value: %@", value]];
     [[NSUserDefaults standardUserDefaults] setValue:bidder forKey:kCLXCoreUserBidderKey];
     [[NSUserDefaults standardUserDefaults] setValue:key forKey:kCLXCoreUserBidderKeyKey];
     [[NSUserDefaults standardUserDefaults] setValue:value forKey:kCLXCoreUserBidderValueKey];
@@ -518,9 +471,6 @@ static CloudXCore *_sharedInstance = nil;
                                          delegate:(id<CLXBannerDelegate>)delegate
                                              tmax:(NSNumber *)tmax {
     [self.logger debug:[NSString stringWithFormat:@"🔧 [CloudXCore] Creating banner for placement: %@", placement]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] ViewController: %@", viewController]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Delegate: %@", delegate]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] TMax: %@", tmax]];
     
     // Get placement from config
     CLXSDKConfigPlacement *placementConfig = _adPlacements[placement];
@@ -565,7 +515,6 @@ static CloudXCore *_sharedInstance = nil;
 - (CLXBannerAdView *)createMRECWithPlacement:(NSString *)placement
                                  viewController:(UIViewController *)viewController
                                       delegate:(id<CLXBannerDelegate>)delegate {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CloudXCore] Creating MREC for placement: %@", placement]];
     
     // Get placement from config
     CLXSDKConfigPlacement *placementConfig = _adPlacements[placement];
@@ -609,7 +558,6 @@ static CloudXCore *_sharedInstance = nil;
 
 - (id<CLXInterstitial>)createInterstitialWithPlacement:(NSString *)placement
                                                  delegate:(id<CLXInterstitialDelegate>)delegate {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CloudXCore] Creating interstitial for placement: %@", placement]];
     
     // Get placement from config
     CLXSDKConfigPlacement *placementConfig = _adPlacements[placement];
@@ -652,7 +600,6 @@ static CloudXCore *_sharedInstance = nil;
 
 - (id<CLXRewardedInterstitial>)createRewardedWithPlacement:(NSString *)placement
                                                     delegate:(id<CLXRewardedDelegate>)delegate {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CloudXCore] Creating rewarded for placement: %@", placement]];
     
     // Get placement from config
     CLXSDKConfigPlacement *placementConfig = _adPlacements[placement];
@@ -694,8 +641,7 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (nullable CLXNativeAdView *)createNativeAdWithPlacement:(NSString *)placement viewController:(UIViewController *)viewController delegate:(id)delegate {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CloudXCore] LOG: Attempting to create native ad for placement: '%@'", placement]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] LOG: Available Placements are: %@", [self->_adPlacements allKeys]]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [CloudXCore] Creating native ad for placement: %@", placement]];
 
     // Get placement from config
     CLXSDKConfigPlacement *placementConfig = _adPlacements[placement];
@@ -743,19 +689,16 @@ static CloudXCore *_sharedInstance = nil;
 #pragma mark - Private Helper Methods
 
 - (void)resolveAdapters {
-    [self.logger debug:@"🔧 [CloudXCore] Resolving adapters"];
     CLXAdapterFactoryResolver *adapterResolver = [[CLXAdapterFactoryResolver alloc] init];
     NSDictionary *factoriesDict = [adapterResolver resolveAdNetworkFactories];
     _adNetworkFactories = [[CLXAdNetworkFactories alloc] initWithDictionary:factoriesDict];
 }
 
 - (void)filterConfig {
-    [self.logger debug:@"🔧 [CloudXCore] Filtering config"];
     NSMutableDictionary *placementsDict = [NSMutableDictionary dictionary];
     if (_sdkConfig.placements && _sdkConfig.placements.count > 0) {
         for (CLXSDKConfigPlacement *placement in _sdkConfig.placements) {
             placementsDict[placement.name] = placement; // Use name as key like Swift SDK
-            [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Added placement: %@", placement.name]];
         }
     }
     _adPlacements = [placementsDict copy];
@@ -765,7 +708,6 @@ static CloudXCore *_sharedInstance = nil;
     if (_sdkConfig.bidders && _sdkConfig.bidders.count > 0) {
         for (CLXSDKConfigBidder *bidder in _sdkConfig.bidders) {
             configsDict[bidder.networkName] = bidder;
-            [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Added bidder config: %@", bidder.networkName]];
         }
     }
     _adNetworkConfigs = [configsDict copy];
@@ -821,14 +763,14 @@ static CloudXCore *_sharedInstance = nil;
     // Get the shared instance to access reporting service
     CloudXCore *sharedInstance = [CloudXCore shared];
     if (!sharedInstance.reportingService) {
-        NSLog(@"⚠️ [CloudXCore] Cannot track SDK error - reporting service not initialized");
+        [sharedInstance.logger error:@"❌ [CloudXCore] Cannot track SDK error - reporting service not initialized"];
         return;
     }
     
     // Get stored encoded string and campaign ID from UserDefaults (set during SDK init)
     NSString *encodedString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreEncodedStringKey];
     if (!encodedString || encodedString.length == 0) {
-        NSLog(@"⚠️ [CloudXCore] Cannot track SDK error - no encoded string available");
+        [sharedInstance.logger error:@"❌ [CloudXCore] Cannot track SDK error - no encoded string available"];
         return;
     }
     
@@ -842,7 +784,7 @@ static CloudXCore *_sharedInstance = nil;
     NSString *accountId = sharedInstance.sdkConfig.accountID;
     
     if (!accountId || accountId.length == 0) {
-        NSLog(@"⚠️ [CloudXCore] Cannot track SDK error - no account ID available");
+        [sharedInstance.logger error:@"❌ [CloudXCore] Cannot track SDK error - no account ID available"];
         return;
     }
     
@@ -861,7 +803,7 @@ static CloudXCore *_sharedInstance = nil;
                                                        campaignId:safeCampaignId 
                                                     encodedString:safeErrorEncrypted];
     
-    NSLog(@"📤 [CloudXCore] Sent SDK error Rill tracking event: %@", errorMessage);
+    [sharedInstance.logger info:@"📤 [CloudXCore] Sent SDK error Rill tracking event"];
 }
 
 #pragma mark - Privacy Settings

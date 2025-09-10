@@ -233,11 +233,7 @@
                             error:(NSError **)error
 {
     // Debug logging for Rill tracking parameters
-    [self.logger debug:@"🔍 [RillTracking] ===== RILL TRACKING DEBUG ====="];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] actionString: '%@'", actionString ?: @"(nil)"]];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] campaignId: '%@'", campaignId ?: @"(nil)"]];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] encodedString length: %lu", (unsigned long)(encodedString.length)]];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] encodedString: '%@'", encodedString ?: @"(nil)"]];
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Action: %@, Campaign: %@, EncodedLength: %lu", actionString ?: @"(nil)", campaignId ?: @"(nil)", (unsigned long)(encodedString.length)]];
     
     //https://tracker-dev.cloudx.io/t/     https://tracker-stage.cloudx.io/t/sdkimp/
     NSMutableString *urlString = [NSMutableString stringWithString:@"https://tracker-dev.cloudx.io/t/"];
@@ -271,8 +267,7 @@
     NSURL *fullURL = [NSURL URLWithString:fullURLString];
     
     // Debug logging for constructed URL
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] eventName: '%@'", eventName]];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Full URL: '%@'", fullURLString]];
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Event: %@, URL: %@", eventName, fullURLString]];
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:fullURL];
     request.HTTPMethod = @"GET";
@@ -286,7 +281,6 @@
         } else {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
             [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] SUCCESS - Status: %ld", (long)[httpResponse statusCode]]];
-            [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Response headers: %@", httpResponse.allHeaderFields]];
             
             if (data && data.length > 0) {
                 NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
@@ -296,8 +290,7 @@
             }
             
             // Legacy log for compatibility
-            [self.logger debug:[NSString stringWithFormat:@"CloudX: rillTracking: %@", fullURL]];
-            [self.logger debug:[NSString stringWithFormat:@"CloudX: Tracking response status code: %ld", (long)[httpResponse statusCode]]];
+            [self.logger debug:[NSString stringWithFormat:@"CloudX: rillTracking response - Status: %ld", (long)[httpResponse statusCode]]];
         }
         [self.logger debug:@"🔍 [RillTracking] ===== END RILL TRACKING DEBUG ====="];
         

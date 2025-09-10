@@ -71,8 +71,6 @@
     
     [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Creating bid request - adUnit:%@, type:%ld", adUnitID, (long)adType]];
     
-    [_logger debug:[NSString stringWithFormat:@"Creating bid request for ad unit: %@", adUnitID]];
-    
     // Get screen dimensions
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     NSInteger screenWidth = (NSInteger)screenRect.size.width;
@@ -366,10 +364,7 @@
 - (void)startAuctionWithBidRequest:(NSDictionary *)bidRequest
                             appKey:(NSString *)appKey
                         completion:(void (^)(CLXBidResponse * _Nullable response, NSError * _Nullable error))completion {
-    [self.logger info:@"🚀 [BidNetworkService] startAuctionWithBidRequest called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] AppKey: %@", appKey]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] Base URL: %@", self.baseNetworkService.baseURL]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] Endpoint: %@", [self.baseNetworkService.baseURL stringByAppendingString:self.endpoint]]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [BidNetworkService] startAuctionWithBidRequest called - AppKey: %@", appKey]];
     
     // Convert bidRequest to JSON data
     NSError *jsonError;
@@ -398,10 +393,7 @@
                                                delay:0
                                           completion:^(id _Nullable response, NSError * _Nullable error) {
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Auction request failed: %@", error]];
-            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Error domain: %@", error.domain]];
-            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Error code: %ld", (long)error.code]];
-            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Error user info: %@", error.userInfo]];
+            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Auction request failed - %@ (Domain: %@, Code: %ld)", error.localizedDescription, error.domain, (long)error.code]];
             if (completion) {
                 completion(nil, error);
             }
@@ -414,9 +406,7 @@
         if ([response isKindOfClass:[NSDictionary class]]) {
             [self.logger debug:@"🔧 [BidNetworkService] Creating BidResponse from dictionary..."];
             CLXBidResponse *bidResponse = [CLXBidResponse parseBidResponseFromDictionary:response];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] BidResponse created: %@", bidResponse]];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] BidResponse ID: %@", bidResponse.id]];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] BidResponse seatbid count: %lu", (unsigned long)bidResponse.seatbid.count]];
+            [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] BidResponse created - ID: %@, Seatbid count: %lu", bidResponse.id, (unsigned long)bidResponse.seatbid.count]];
             
             if (completion) {
                 completion(bidResponse, nil);

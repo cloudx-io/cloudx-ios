@@ -178,8 +178,7 @@ NS_ASSUME_NONNULL_BEGIN
     QueueItem *item = self.sortedQueue.firstObject;
     [self.sortedQueue removeObjectAtIndex:0];
     
-    [self.logger debug:[NSString stringWithFormat:@"pop ad from queue %@", item]];
-    [self.logger debug:[NSString stringWithFormat:@"Queue contains %lu item(s)", (unsigned long)self.sortedQueue.count]];
+    [self.logger debug:[NSString stringWithFormat:@"pop ad from queue - %lu item(s) remaining", (unsigned long)self.sortedQueue.count]];
     
     return item.ad;
 }

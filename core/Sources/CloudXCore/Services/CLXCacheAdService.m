@@ -202,11 +202,10 @@ NS_ASSUME_NONNULL_BEGIN
             
             // Create cacheable ad from response
             if (strongSelf.createCacheableAd && response) {
-                [strongSelf.logger debug:[NSString stringWithFormat:@"🔧 [CacheAdService] Creating cacheable ad: network=%@, bidID=%@", response.networkName, response.bidID]];
+                [strongSelf.logger debug:[NSString stringWithFormat:@"🔧 [CacheAdService] Creating cacheable ad - Network: %@, BidID: %@", response.networkName, response.bidID]];
                 
                 // Call createBidAd block without parameters (it captures parameters internally)
                 id destroyable = response.createBidAd();
-                [strongSelf.logger debug:[NSString stringWithFormat:@"📊 [CacheAdService] Destroyable created: %@", destroyable]];
                 
                 if (destroyable) {
                     id<CLXCacheableAd> cacheableAd = strongSelf.createCacheableAd(destroyable);
@@ -216,8 +215,7 @@ NS_ASSUME_NONNULL_BEGIN
                         // Set the bid response on the cacheable ad for NURL firing
                         CLXBidResponse *bidResponse = [strongSelf.bidAdSource getCurrentBidResponse];
                         cacheableAd.bidResponse = bidResponse;
-                        [strongSelf.logger debug:[NSString stringWithFormat:@"🔧 [CacheAdService] Set bidResponse on cacheable ad: %@", bidResponse]];
-                        [strongSelf.logger debug:[NSString stringWithFormat:@"🔧 [CacheAdService] Enqueueing ad to service: %@, queue: %@", strongSelf, strongSelf.cachedQueue]];
+                        [strongSelf.logger debug:@"🔧 [CacheAdService] Set bidResponse on cacheable ad and enqueueing"];
                         [strongSelf.cachedQueue enqueueAdWithPrice:response.price
                                                        loadTimeout:strongSelf.bidLoadTimeout
                                                              bidID:response.bidID

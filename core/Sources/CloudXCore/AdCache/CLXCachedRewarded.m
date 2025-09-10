@@ -84,11 +84,7 @@ static void initializeLogger() {
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
-    [logger debug:@"🔧 [CachedRewarded] showFromViewController called"];
-    [logger debug:[NSString stringWithFormat:@"📊 [CachedRewarded] - ViewController: %@", viewController]];
-    [logger debug:[NSString stringWithFormat:@"📊 [CachedRewarded] - Rewarded: %@", self.rewarded]];
-    [logger debug:[NSString stringWithFormat:@"📊 [CachedRewarded] - Rewarded class: %@", NSStringFromClass([self.rewarded class])]];
-    [logger debug:[NSString stringWithFormat:@"📊 [CachedRewarded] - Rewarded isReady: %d", self.rewarded.isReady]];
+    [logger debug:[NSString stringWithFormat:@"🔧 [CachedRewarded] showFromViewController called - Ready: %d", self.rewarded.isReady]];
     
     [self.rewarded showFromViewController:viewController];
     [logger info:@"✅ [CachedRewarded] showFromViewController call completed"];

@@ -199,9 +199,7 @@ static void initializeLogger() {
         impression.impressionID = [[NSUUID UUID] UUIDString];
         impression.tagid = storedImpressionId;
         
-        [logger debug:[NSString stringWithFormat:@"🔧 [BiddingConfig] Creating impression for adType: %ld", (long)adType]];
-        [logger debug:[NSString stringWithFormat:@"🔍 Screen dimensions - width: %ld, height: %ld", (long)screenWidth, (long)screenHeight]];
-        [logger debug:[NSString stringWithFormat:@"🔍 RECEIVED adType: '%ld'", (long)adType]];
+        [logger debug:[NSString stringWithFormat:@"🔧 [BiddingConfig] Creating impression - AdType: %ld, Dimensions: %ldx%ld", (long)adType, (long)screenWidth, (long)screenHeight]];
         
         impression.instl = (adType == CLXAdTypeInterstitial || adType == CLXAdTypeRewarded) ? @1 : @0;
         
@@ -465,9 +463,7 @@ static void initializeLogger() {
     }
     
     // Debug logging
-    [logger debug:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] Final bid request keys: %@", [json allKeys]]];
-    [logger debug:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] Imp array count: %lu", (unsigned long)[json[@"imp"] count]]];
-    [logger debug:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] Imp array: %@", json[@"imp"]]];
+    [logger debug:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] Final bid request - Keys: %@, Imp count: %lu", [json allKeys], (unsigned long)[json[@"imp"] count]]];
     
     // Log the complete JSON structure
     NSError *error;

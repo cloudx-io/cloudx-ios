@@ -39,8 +39,6 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     NSString *actualBaseURL = [NSString stringWithFormat:@"%@://%@", url.scheme, url.host];
     NSString *endpointPath = url.path ?: @"/";
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Extracted base URL: %@", actualBaseURL]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Extracted endpoint path: %@", endpointPath]];
     
     // Call parent's initWithBaseURL method with the actual base URL
     self = [super initWithBaseURL:actualBaseURL urlSession:urlSession];
@@ -48,8 +46,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         _endpoint = endpointPath;
         _logger = [[CLXLogger alloc] initWithCategory:@"SDKInitNetworkService"];
         _backOffStrategy = [[CLXExponentialBackoffStrategy alloc] initWithInitialDelay:1 maxDelay:60 maxAttempts:5];
-        [self.logger info:[NSString stringWithFormat:@"✅ [SDKInitNetworkService] Initialized with endpoint: %@", _endpoint]];
-        [self.logger info:[NSString stringWithFormat:@"✅ [SDKInitNetworkService] BaseURL set: %@", self.baseURL]];
+        [self.logger info:[NSString stringWithFormat:@"✅ [SDKInitNetworkService] Initialized - endpoint: %@, baseURL: %@", _endpoint, self.baseURL]];
     }
     return self;
 }
@@ -70,9 +67,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
  * @param completion Completion handler called with the SDK configuration or error
  */
 - (void)initSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable, NSError * _Nullable))completion {
-    [self.logger info:@"🚀 [SDKInitNetworkService] initSDKWithAppKey called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] AppKey: %@", appKey]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Endpoint: %@", _endpoint]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [SDKInitNetworkService] initSDKWithAppKey called - AppKey: %@, Endpoint: %@", appKey, _endpoint]];
     [self tryInitSDKWithAppKey:appKey completion:completion];
 }
 
@@ -108,9 +103,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     
     [self.logger debug:@"🔧 [SDKInitNetworkService] Scheduling network request"];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self.logger debug:@"🌐 [SDKInitNetworkService] Executing network request"];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Endpoint: %@", self.endpoint]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Request body: %@", request.json]];
+        [self.logger debug:[NSString stringWithFormat:@"🌐 [SDKInitNetworkService] Executing network request - Endpoint: %@", self.endpoint]];
         
         // Serialize the JSON dictionary to NSData
         NSError *jsonError;
@@ -133,12 +126,10 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
             [self.logger debug:@"📥 [SDKInitNetworkService] Network request completion called"];
             
             if (error) {
-                [self.logger error:[NSString stringWithFormat:@"❌ [SDKInitNetworkService] Network request failed with error: %@", error]];
-                [self.logger error:[NSString stringWithFormat:@"Attempt failed to init SDK with error: %@", error]];
+                [self.logger error:[NSString stringWithFormat:@"❌ [SDKInitNetworkService] Network request failed: %@", error.localizedDescription]];
                 [self tryInitSDKWithAppKey:appKey completion:completion];
             } else {
                 [self.logger info:@"✅ [SDKInitNetworkService] Network request succeeded"];
-                [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Response: %@", response]];
                 
                 // Parse the response into SDKConfig object
                 CLXSDKConfigResponse *config = [self parseSDKConfigFromResponse:response];
@@ -169,13 +160,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     NSString *idfa = [CLXSystemInformation shared].idfa ?: @"00000-00000-00000-000000";
     NSString *idfv = [CLXSystemInformation shared].idfv ?: @"00000-00000-00000-000000";
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] IDFA: %@", idfa]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] IDFV: %@", idfv]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Bundle: %@", [CLXSystemInformation shared].appBundleIdentifier]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] OS Version: %@", [CLXSystemInformation shared].osVersion]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Device Model: %@", [UIDevice deviceIdentifier]]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] SDK Version: %@", [CLXSystemInformation shared].sdkVersion]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] DNT: %@", [CLXSystemInformation shared].dnt ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Device info - IDFA: %@, Bundle: %@, OS: %@", idfa, [CLXSystemInformation shared].appBundleIdentifier, [CLXSystemInformation shared].osVersion]];
     
     CLXSDKConfigRequest *request = [[CLXSDKConfigRequest alloc] init];
     request.bundle = [CLXSystemInformation shared].appBundleIdentifier;
@@ -191,8 +176,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     request.id = [[NSUUID UUID] UUIDString];
     request.urlParams = @{}; // Empty dictionary as in Swift
     
-    [self.logger info:@"✅ [SDKInitNetworkService] Request created successfully"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Request ID: %@", request.id]];
+    [self.logger info:[NSString stringWithFormat:@"✅ [SDKInitNetworkService] Request created successfully - ID: %@", request.id]];
     
     return request;
 }
@@ -312,11 +296,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         config.tracking = [trackingArray copy];
     }
     
-    [self.logger info:@"✅ [SDKInitNetworkService] SDK config parsed successfully"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Account ID: %@", config.accountID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Session ID: %@", config.sessionID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Bidders count: %lu", (unsigned long)config.bidders.count]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Placements count: %lu", (unsigned long)config.placements.count]];
+    [self.logger info:[NSString stringWithFormat:@"✅ [SDKInitNetworkService] SDK config parsed - Account: %@, Session: %@, Bidders: %lu, Placements: %lu", config.accountID, config.sessionID, (unsigned long)config.bidders.count, (unsigned long)config.placements.count]];
     
     return config;
 }
