@@ -1,5 +1,6 @@
 #import "RewardedInterstitialViewController.h"
 #import <CloudXCore/CloudXCore.h>
+#import "DemoAppLogger.h"
 
 @interface RewardedInterstitialViewController ()
 @property (nonatomic, strong) id<CLXRewardedInterstitial> rewardedInterstitialAd;
@@ -102,12 +103,14 @@
 
 - (void)didLoadWithAd:(CLXAd *)ad {
     NSLog(@"✅ Rewarded interstitial ad loaded successfully");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ RewardedInterstitial didLoadWithAd - Ad: %@", ad]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
 }
 
 - (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
     NSLog(@"❌ Failed to load Rewarded Interstitial Ad: %@", error);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ RewardedInterstitial failToLoadWithAd - Error: %@", error.localizedDescription]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -122,10 +125,12 @@
 
 - (void)didShowWithAd:(CLXAd *)ad {
     NSLog(@"👀 Rewarded interstitial ad did show");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 RewardedInterstitial didShowWithAd - Ad: %@", ad]];
 }
 
 - (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
     NSLog(@"❌ Rewarded interstitial ad fail to show: %@", error);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ RewardedInterstitial failToShowWithAd - Error: %@", error.localizedDescription]];
     [self updateStatusUIWithState:AdStateNoAd];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -138,6 +143,7 @@
 
 - (void)didHideWithAd:(CLXAd *)ad {
     NSLog(@"🔚 Rewarded interstitial ad did hide");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 RewardedInterstitial didHideWithAd - Ad: %@", ad]];
     self.rewardedInterstitialAd = nil;
     [self loadRewardedInterstitial];
     [self updateStatusUIWithState:AdStateNoAd];
@@ -145,14 +151,17 @@
 
 - (void)didClickWithAd:(CLXAd *)ad {
     NSLog(@"👆 Rewarded interstitial ad did click");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 RewardedInterstitial didClickWithAd - Ad: %@", ad]];
 }
 
 - (void)impressionOn:(CLXAd *)ad {
     NSLog(@"👁️ Rewarded interstitial ad impression recorded");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ RewardedInterstitial impressionOn - Ad: %@", ad]];
 }
 
 - (void)revenuePaid:(CLXAd *)ad {
     NSLog(@"💰 Rewarded interstitial ad revenue paid callback triggered");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 RewardedInterstitial revenuePaid - Ad: %@", ad]];
     
     // Show revenue alert to demonstrate the callback
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -163,6 +172,7 @@
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
     NSLog(@"✋ Rewarded interstitial ad closed by user action");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ RewardedInterstitial closedByUserActionWithAd - Ad: %@", ad]];
     self.rewardedInterstitialAd = nil;
     [self loadRewardedInterstitial];
     [self updateStatusUIWithState:AdStateNoAd];
@@ -170,6 +180,7 @@
 
 - (void)userRewarded:(CLXAd *)ad {
     NSLog(@"🎁 User rewarded!");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🎁 RewardedInterstitial userRewarded - Ad: %@", ad]];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showAlertWithTitle:@"Reward" message:@"User has earned a reward from interstitial!"];
     });
@@ -177,10 +188,12 @@
 
 - (void)rewardedVideoStarted:(CLXAd *)ad {
     NSLog(@"▶️ Rewarded interstitial started");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"▶️ RewardedInterstitial rewardedVideoStarted - Ad: %@", ad]];
 }
 
 - (void)rewardedVideoCompleted:(CLXAd *)ad {
     NSLog(@"✅ Rewarded interstitial completed");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ RewardedInterstitial rewardedVideoCompleted - Ad: %@", ad]];
 }
 
 @end

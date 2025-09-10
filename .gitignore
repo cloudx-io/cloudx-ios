@@ -13,6 +13,7 @@
 *.xcuserstate
 *.xcuserdatad/
 xcuserdata/
+*.xcbkptlist
 
 # Build products
 build/

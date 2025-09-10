@@ -1,5 +1,6 @@
 #import "RewardedViewController.h"
 #import <CloudXCore/CloudXCore.h>
+#import "DemoAppLogger.h"
 
 @interface RewardedViewController ()
 @property (nonatomic, strong) id<CLXRewardedInterstitial> rewardedAd;
@@ -162,6 +163,7 @@
 
 - (void)didLoadWithAd:(CLXAd *)ad {
     NSLog(@"✅ Rewarded ad loaded successfully");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ Rewarded didLoadWithAd - Ad: %@", ad]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
     // Do NOT show the ad here!
@@ -169,6 +171,7 @@
 
 - (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
     NSLog(@"❌ Failed to load Rewarded Ad: %@", error);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failToLoadWithAd - Error: %@", error.localizedDescription]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -182,10 +185,12 @@
 
 - (void)didShowWithAd:(CLXAd *)ad {
     NSLog(@"👀 Rewarded ad did show");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 Rewarded didShowWithAd - Ad: %@", ad]];
 }
 
 - (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
     NSLog(@"❌ Rewarded ad fail to show: %@", error);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failToShowWithAd - Error: %@", error.localizedDescription]];
     [self updateStatusUIWithState:AdStateNoAd];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -197,6 +202,7 @@
 
 - (void)didHideWithAd:(CLXAd *)ad {
     NSLog(@"🔚 Rewarded ad did hide");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 Rewarded didHideWithAd - Ad: %@", ad]];
     self.rewardedAd = nil;
     // Create new ad instance for next time
     [self createRewardedAd];
@@ -205,14 +211,17 @@
 
 - (void)didClickWithAd:(CLXAd *)ad {
     NSLog(@"👆 Rewarded ad did click");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 Rewarded didClickWithAd - Ad: %@", ad]];
 }
 
 - (void)impressionOn:(CLXAd *)ad {
     NSLog(@"👁️ Rewarded ad impression recorded");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ Rewarded impressionOn - Ad: %@", ad]];
 }
 
 - (void)revenuePaid:(CLXAd *)ad {
     NSLog(@"💰 Rewarded ad revenue paid callback triggered");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 Rewarded revenuePaid - Ad: %@", ad]];
     
     // Show revenue alert to demonstrate the callback
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -223,6 +232,7 @@
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
     NSLog(@"✋ Rewarded ad closed by user action");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ Rewarded closedByUserActionWithAd - Ad: %@", ad]];
     self.rewardedAd = nil;
     // Create new ad instance for next time
     [self createRewardedAd];
@@ -231,6 +241,7 @@
 
 - (void)userRewarded:(CLXAd *)ad {
     NSLog(@"🎁 User rewarded!");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🎁 Rewarded userRewarded - Ad: %@", ad]];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showAlertWithTitle:@"Reward" message:@"User has earned a reward!"];
     });
@@ -238,10 +249,12 @@
 
 - (void)rewardedVideoStarted:(CLXAd *)ad {
     NSLog(@"▶️ Rewarded video started");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"▶️ Rewarded rewardedVideoStarted - Ad: %@", ad]];
 }
 
 - (void)rewardedVideoCompleted:(CLXAd *)ad {
     NSLog(@"✅ Rewarded video completed");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ Rewarded rewardedVideoCompleted - Ad: %@", ad]];
 }
 
 @end 

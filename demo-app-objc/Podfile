@@ -4,10 +4,10 @@ platform :ios, '14.0'
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
-  # Pods for CloudXObjCRemotePods
-  pod 'CloudXCore', :path => '../cloudexchange.sdk.ios.coreObjC'
-  pod 'CloudXTestVastNetworkAdapter', :path => '../cloudexchange.sdk.ios.testAdapter'
-  pod 'CloudXMetaAdapter', :path => '../cloudexchange.sdk.ios.MetaAdapter'
+  # Pods for CloudXObjCRemotePods - Updated paths for consolidated repo
+  pod 'CloudXCore', :path => '../core'
+  pod 'CloudXPrebidAdapter', :path => '../adapter-cloudx'
+  pod 'CloudXMetaAdapter', :path => '../adapter-meta'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths
