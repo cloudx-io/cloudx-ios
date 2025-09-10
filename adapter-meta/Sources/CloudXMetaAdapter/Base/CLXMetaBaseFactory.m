@@ -20,8 +20,8 @@
     NSString *metaPlacementID = extras[@"placement_id"];
     
     if (!metaPlacementID || metaPlacementID.length == 0) {
-        [logger debug:[NSString stringWithFormat:@"🔧 No placement_id found in adapter extras, using fallback: %@", adId]];
         metaPlacementID = adId; // Fallback to original behavior
+        [logger debug:[NSString stringWithFormat:@"🔧 No placement_id found in adapter extras, using fallback: %@", adId]];
     } else {
         [logger debug:[NSString stringWithFormat:@"✅ Using placement ID from adapter extras: %@", metaPlacementID]];
     }

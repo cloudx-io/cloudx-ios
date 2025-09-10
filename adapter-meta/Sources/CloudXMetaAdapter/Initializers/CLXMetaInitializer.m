@@ -133,13 +133,13 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
     NSMutableArray<NSString *> *placementIDs = [NSMutableArray array];
     
     if (config && config.initializationData) {
-        [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"🔍 [CLXMetaInitializer] Found bidder init data: %@", config.initializationData]];
-        
-        // Check for placementIds array in initializationData (server uses camelCase)
         NSArray *configPlacementIDs = config.initializationData[@"placementIds"];
         if ([configPlacementIDs isKindOfClass:[NSArray class]] && configPlacementIDs.count > 0) {
             [placementIDs addObjectsFromArray:configPlacementIDs];
-            [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"✅ [CLXMetaInitializer] Found %lu placement IDs in bidder init data", (unsigned long)placementIDs.count]];
+            [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"🔍 [CLXMetaInitializer] Found bidder init data: %@ | Added %lu placement IDs", 
+                                               config.initializationData, (unsigned long)placementIDs.count]];
+        } else {
+            [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"🔍 [CLXMetaInitializer] Found bidder init data: %@ | No valid placement IDs array", config.initializationData]];
         }
     }
     
@@ -148,11 +148,10 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
         [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"✅ [CLXMetaInitializer] Initializing Meta FAN SDK with %lu placement IDs: %@", (unsigned long)placementIDs.count, [placementIDs componentsJoinedByString:@", "]]];
         
         void (^facebookCompletionHandler)(FBAdInitResults *results) = ^(FBAdInitResults *initResult) {
-            if ([initResult isSuccess]) {
-                [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"✅ [CLXMetaInitializer] Meta FAN SDK initialization successful: %@", initResult.message ?: @"No message"]];
-            } else {
-                [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"⚠️ [CLXMetaInitializer] Meta FAN SDK initialization completed: %@", initResult.message ?: @"No message"]];
-            }
+            [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"%@ [CLXMetaInitializer] Meta FAN SDK initialization %@: %@", 
+                                               [initResult isSuccess] ? @"✅" : @"⚠️",
+                                               [initResult isSuccess] ? @"successful" : @"completed",
+                                               initResult.message ?: @"No message"]];
         };
         
         // Init FAN SDK with placement IDs for improved performance
@@ -164,11 +163,10 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
         
         // Still need to initialize Meta FAN SDK even without placement IDs
         void (^facebookCompletionHandler)(FBAdInitResults *results) = ^(FBAdInitResults *initResult) {
-            if ([initResult isSuccess]) {
-                [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"✅ [CLXMetaInitializer] Meta FAN SDK default initialization successful: %@", initResult.message ?: @"No message"]];
-            } else {
-                [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"⚠️ [CLXMetaInitializer] Meta FAN SDK default initialization completed: %@", initResult.message ?: @"No message"]];
-            }
+            [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"%@ [CLXMetaInitializer] Meta FAN SDK default initialization %@: %@", 
+                                               [initResult isSuccess] ? @"✅" : @"⚠️",
+                                               [initResult isSuccess] ? @"successful" : @"completed",
+                                               initResult.message ?: @"No message"]];
         };
         
         // Initialize without placement IDs - Meta SDK will work with individual ad requests
@@ -194,9 +192,9 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
     NSString *deviceHash = [FBAdSettings testDeviceHash];
     if (deviceHash && deviceHash.length > 0) {
         [FBAdSettings addTestDevice:deviceHash];
-        [[CLXMetaInitializer logger] debug:@"Test device registered dynamically"];
+        [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Test device registered dynamically: %@", deviceHash ? @"SUCCESS" : @"FAILED"]];
     } else {
-        [[CLXMetaInitializer logger] info:@"Unable to retrieve device test hash"];
+        [[CLXMetaInitializer logger] debug:@"Unable to retrieve device test hash"];
     }
     
     // Set logging level for better debugging during development
@@ -205,8 +203,7 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
     // Check and log test mode status
     BOOL isTestMode = [FBAdSettings isTestMode];
     
-    [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Meta test mode: %@", isTestMode ? @"enabled" : @"disabled"]];
-    [[CLXMetaInitializer logger] debug:@"Meta debug logging enabled"];
+    [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Meta test mode: %@ | Debug logging enabled", isTestMode ? @"enabled" : @"disabled"]];
 }
 
 // Ensure classes are loaded for static frameworks

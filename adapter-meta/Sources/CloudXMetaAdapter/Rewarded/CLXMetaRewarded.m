@@ -217,12 +217,7 @@
 }
 
 - (void)rewardedVideoAdServerRewardDidFail:(FBRewardedVideoAd *)rewardedVideoAd {
-    [self.logger error:@"❌ [CLXMetaRewarded] Server reward validation failed"];
-    
-    // Following standard approach: Don't grant reward to user
-    // Server-side validation failed, but we don't have specific callbacks for this
-    // Let the server handle reward validation via S2S callbacks if needed
-    [self.logger error:@"⚠️ [CLXMetaRewarded] Server validation failed - no reward granted"];
+    [self.logger error:@"❌ [CLXMetaRewarded] Server reward validation failed - no reward granted | Server-side validation failed, letting server handle reward validation via S2S callbacks if needed"];
 }
 
 - (void)rewardedVideoAdServerRewardDidSucceed:(FBRewardedVideoAd *)rewardedVideoAd {

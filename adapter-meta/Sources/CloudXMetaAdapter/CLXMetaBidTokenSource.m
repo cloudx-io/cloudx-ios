@@ -56,12 +56,9 @@
         @try {
             // Get Meta bidder token - this is required for every bid request
             NSString *bidderToken = [FBAdSettings bidderToken];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [CLXMetaBidTokenSource] Meta bidder token: %@", bidderToken ? @"[RECEIVED]" : @"[NIL]"]];
-            
-            // Get IFA from centralized CLXSettings instead of directly from ASIdentifierManager
-            // This ensures test mode and production consistency
             NSString *idfa = [[CLXSettings sharedInstance] getIFA];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [CLXMetaBidTokenSource] IDFA from CLXSettings: %@", idfa ? @"[AVAILABLE]" : @"[NIL]"]];
+            [self.logger debug:[NSString stringWithFormat:@"📊 [CLXMetaBidTokenSource] Meta bidder token: %@ | IDFA from CLXSettings: %@", 
+                               bidderToken ? @"[RECEIVED]" : @"[NIL]", idfa ? @"[AVAILABLE]" : @"[NIL]"]];
             
             // Create token dictionary with Meta-specific data
             NSMutableDictionary<NSString *, NSString *> *tokenDict = [NSMutableDictionary dictionary];

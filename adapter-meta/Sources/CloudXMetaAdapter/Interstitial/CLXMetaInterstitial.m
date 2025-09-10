@@ -183,11 +183,11 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
 }
 
 - (void)interstitialAdWillLogImpression:(FBInterstitialAd *)interstitialAd {
-    [self.logger info:[NSString stringWithFormat:@"📊 [CLXMetaInterstitial] Impression tracked - self.bidID: %@, self: %p, _bidID: %@", self.bidID, self, _bidID]];
+    [self.logger info:[NSString stringWithFormat:@"📊 [CLXMetaInterstitial] Impression tracked - bidID: %@, self: %p | Forwarding to delegate: %@", 
+                       self.bidID, self, [self.delegate respondsToSelector:@selector(impressionWithInterstitial:)] ? @"YES" : @"NO"]];
     
     // Forward to CloudX delegate if it supports impression tracking
     if ([self.delegate respondsToSelector:@selector(impressionWithInterstitial:)]) {
-        [self.logger info:[NSString stringWithFormat:@"📊 [CLXMetaInterstitial] Calling impressionWithInterstitial delegate with self: %p", self]];
         [self.delegate impressionWithInterstitial:self];
     }
 }

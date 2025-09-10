@@ -96,8 +96,7 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
     // Handle specific error codes with custom logic
     switch (errorCode) {
         case CLXMetaErrorCodeNoFill:
-            [logger info:[NSString stringWithFormat:@"📊 [CLXMetaErrorHandler] %@ No Fill (1001) - No ads available for placement %@", context, placementID]];
-            [logger info:@"💡 [CLXMetaErrorHandler] Recommendation: Do not retry immediately. Consider waterfall to next adapter."];
+            [logger info:[NSString stringWithFormat:@"📊 [CLXMetaErrorHandler] %@ No Fill (1001) - No ads available for placement %@ | Recommendation: Do not retry immediately. Consider waterfall to next adapter.", context, placementID]];
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"No immediate retry - use waterfall";
             break;
             
@@ -172,9 +171,10 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
     BOOL isRetryable = [self isRetryableError:error];
     NSTimeInterval suggestedDelay = [self suggestedDelayForError:error];
     
-    [logger info:[NSString stringWithFormat:@"🔄 [CLXMetaErrorHandler] Is Retryable: %@", isRetryable ? @"YES" : @"NO"]];
     if (suggestedDelay > 0) {
-        [logger info:[NSString stringWithFormat:@"⏱️ [CLXMetaErrorHandler] Suggested Delay: %.1f seconds", suggestedDelay]];
+        [logger info:[NSString stringWithFormat:@"🔄 [CLXMetaErrorHandler] Is Retryable: %@ | Suggested Delay: %.1f seconds", isRetryable ? @"YES" : @"NO", suggestedDelay]];
+    } else {
+        [logger info:[NSString stringWithFormat:@"🔄 [CLXMetaErrorHandler] Is Retryable: %@", isRetryable ? @"YES" : @"NO"]];
     }
     
     // Get user-friendly message for the error

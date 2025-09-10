@@ -156,10 +156,10 @@
         return;
     }
     
-    [self.logger info:@"✅ [CLXMetaBanner] Ad loaded successfully and is valid"];
+    [self.logger info:[NSString stringWithFormat:@"✅ [CLXMetaBanner] Ad loaded successfully and is valid | Delegate responds to didLoadBanner: %@", 
+                       [self.delegate respondsToSelector:@selector(didLoadBanner:)] ? @"YES" : @"NO"]];
     
     if ([self.delegate respondsToSelector:@selector(didLoadBanner:)]) {
-        [self.logger info:@"✅ [CLXMetaBanner] Calling didLoadBanner delegate"];
         [self.delegate didLoadBanner:self];
     } else {
         [self.logger error:@"❌ [CLXMetaBanner] Delegate does not respond to didLoadBanner"];
