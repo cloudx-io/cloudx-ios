@@ -59,9 +59,7 @@
  */
 - (instancetype)initWithFrame:(CGRect)frame placementType:(CLXMRAIDPlacementType)placementType {
     self.logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidWebView"];
-    [self.logger info:@"🚀 [INIT] CLXPrebidWebView initialization started"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [INIT] Frame: %@", NSStringFromCGRect(frame)]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [INIT] Placement type: %ld", (long)placementType]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [INIT] CLXPrebidWebView initialization started - Frame: %@, Placement type: %ld", NSStringFromCGRect(frame), (long)placementType]];
     
     self = [super initWithFrame:frame];
     if (self) {
@@ -76,23 +74,13 @@
         _hasFinishedLoading = NO;
         _hasReportedReady = NO;
         
-        [self.logger debug:@"📊 [INIT] Default configuration:"];
-        [self.logger debug:@"  📍 Viewability tracking: Enabled"];
-        [self.logger debug:@"  📍 Performance optimization: Enabled"];
-        [self.logger debug:@"  📍 Resource preloading: Enabled"];
-        [self.logger debug:@"  📍 Viewability standard: IAB"];
+        [self.logger debug:@"📊 [INIT] Default configuration - Viewability: Enabled, Performance: Enabled, Preloading: Enabled, Standard: IAB"];
         
         // Set up core components
         [self setupWebView];
-        [self.logger info:@"✅ [INIT] WebView setup completed"];
-        
         [self setupMRAIDManager];
-        [self.logger info:@"✅ [INIT] MRAID manager setup completed"];
-        
         [self setupViewabilityTracking];
-        [self.logger info:@"✅ [INIT] Viewability tracking setup completed"];
-        
-        [self.logger info:@"🎯 [INIT] CLXPrebidWebView initialization completed successfully"];
+        [self.logger info:@"🎯 [INIT] CLXPrebidWebView initialization completed successfully - All components setup completed"];
     } else {
         [self.logger error:@"❌ [INIT] Super init failed"];
     }
@@ -141,7 +129,6 @@
     configuration.allowsAirPlayForMediaPlayback = YES;
     configuration.allowsPictureInPictureMediaPlayback = NO; // Disable for ad content
     
-    [self.logger debug:@"✅ [SETUP] Basic WebView configuration completed"];
     
     // User content controller for MRAID and performance optimization
     WKUserContentController *userContentController = [[WKUserContentController alloc] init];
@@ -195,8 +182,7 @@
     
     [self addSubview:self.webView];
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [SETUP] WKWebView created and configured: %p", self.webView]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SETUP] WebView frame: %@", NSStringFromCGRect(self.webView.frame)]];
+    [self.logger info:[NSString stringWithFormat:@"✅ [SETUP] WKWebView created and configured: %p, Frame: %@", self.webView, NSStringFromCGRect(self.webView.frame)]];
 }
 
 - (void)setupMRAIDManager {
@@ -205,8 +191,7 @@
     self.mraidManager = [[CLXMRAIDManager alloc] initWithWebView:self.webView placementType:self.placementType];
     self.mraidManager.delegate = self;
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [SETUP] MRAID manager created: %p", self.mraidManager]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SETUP] MRAID placement type: %ld", (long)self.placementType]];
+    [self.logger info:[NSString stringWithFormat:@"✅ [SETUP] MRAID manager created: %p, Placement type: %ld", self.mraidManager, (long)self.placementType]];
 }
 
 - (void)setupViewabilityTracking {
@@ -242,10 +227,7 @@
 #pragma mark - Public Methods
 
 - (void)loadOptimizedHTML:(NSString *)html baseURL:(nullable NSURL *)baseURL completion:(nullable void (^)(BOOL success, NSError *error))completion {
-    [self.logger info:@"🚀 [LOAD] Starting optimized HTML load"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] HTML length: %lu characters", (unsigned long)html.length]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] Base URL: %@", baseURL ?: @"nil"]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] Completion handler: %@", completion ? @"Present" : @"nil"]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [LOAD] Starting optimized HTML load - Length: %lu chars, Base URL: %@, Completion: %@", (unsigned long)html.length, baseURL ?: @"nil", completion ? @"Present" : @"nil"]];
     
     if (!html || html.length == 0) {
         [self.logger error:@"❌ [LOAD] Cannot load - HTML content is empty or nil"];
@@ -286,9 +268,7 @@
     __block void (^storedCompletion)(BOOL, NSError *) = completion;
     
     // Start loading
-    [self.logger info:@"🌐 [LOAD] Loading HTML into WKWebView"];
-    [self.logger info:[NSString stringWithFormat:@"📊 [LOAD] HTML content length: %lu characters", (unsigned long)finalHTML.length]];
-    [self.logger info:[NSString stringWithFormat:@"📊 [LOAD] Base URL: %@", baseURL ? baseURL.absoluteString : @"nil"]];
+    [self.logger info:[NSString stringWithFormat:@"🌐 [LOAD] Loading HTML into WKWebView - Length: %lu chars, Base URL: %@", (unsigned long)finalHTML.length, baseURL ? baseURL.absoluteString : @"nil"]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if (finalHTML && finalHTML.length > 0) {

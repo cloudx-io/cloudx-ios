@@ -68,9 +68,7 @@
 - (instancetype)initWithDelegate:(id<CLXFullscreenStaticContainerViewControllerDelegate>)delegate
                             adm:(NSString *)adm {
     self.logger = [[CLXLogger alloc] initWithCategory:@"CLXFullscreenStaticContainerViewController"];
-    [self.logger info:@"🚀 [INIT] CLXFullscreenStaticContainerViewController initialization started"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [INIT] Delegate: %@", delegate ? @"Present" : @"nil"]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [INIT] Ad markup length: %lu characters", (unsigned long)(adm ? adm.length : 0)]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [INIT] CLXFullscreenStaticContainerViewController initialization started - Delegate: %@, Ad markup: %lu chars", delegate ? @"Present" : @"nil", (unsigned long)(adm ? adm.length : 0)]];
     
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
@@ -98,9 +96,7 @@
         self.modalPresentationStyle = UIModalPresentationFullScreen;
         
         [self setupUI];
-        [self.logger info:@"✅ [INIT] UI setup completed"];
-        
-        [self.logger info:@"🎯 [INIT] CLXFullscreenStaticContainerViewController initialization completed successfully"];
+        [self.logger info:@"🎯 [INIT] CLXFullscreenStaticContainerViewController initialization completed successfully - UI setup completed"];
     } else {
         [self.logger error:@"❌ [INIT] Super init failed"];
     }

@@ -70,13 +70,7 @@
                viewController:(UIViewController *)viewController
                      delegate:(id<CLXAdapterBannerDelegate>)delegate {
     self.logger = [[CLXLogger alloc] initWithCategory:@"CloudXPrebidBanner"];
-    [self.logger info:@"🚀 [INIT] CloudXPrebidBanner initialization started"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [INIT] Ad markup length: %lu characters", (unsigned long)adm.length]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [INIT] Ad markup preview: %@...", [adm substringToIndex:MIN(100, adm.length)]]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [INIT] Has close button: %@", hasClosedButton ? @"YES" : @"NO"]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [INIT] Banner type: %ld", (long)type]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [INIT] View controller: %@", NSStringFromClass([viewController class])]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [INIT] Delegate: %@", delegate ? @"Present" : @"nil"]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [INIT] CloudXPrebidBanner initialization started - Ad markup: %lu chars, Type: %ld, CloseBtn: %@, Delegate: %@", (unsigned long)adm.length, (long)type, hasClosedButton ? @"YES" : @"NO", delegate ? @"Present" : @"nil"]];
     
     // Start performance tracking for initialization
     [[CLXPerformanceManager sharedManager] startLoadTimerForKey:[NSString stringWithFormat:@"banner_%p", self]];
@@ -92,12 +86,7 @@
         self.type = type;
         self.hasClosedButton = hasClosedButton;
         
-        [self.logger debug:@"📊 [INIT] Properties configured:"];
-        [self.logger debug:[NSString stringWithFormat:@"  📍 Delegate: %@", self.delegate ? @"Set" : @"nil"]];
-        [self.logger debug:[NSString stringWithFormat:@"  📍 Ad markup length: %lu", (unsigned long)self.adm.length]];
-        [self.logger debug:[NSString stringWithFormat:@"  📍 View controller: %@", NSStringFromClass([self.viewController class])]];
-        [self.logger debug:[NSString stringWithFormat:@"  📍 Banner type: %ld", (long)self.type]];
-        [self.logger debug:[NSString stringWithFormat:@"  📍 Close button enabled: %@", self.hasClosedButton ? @"YES" : @"NO"]];
+        [self.logger debug:[NSString stringWithFormat:@"📊 [INIT] Properties configured - Delegate: %@, Markup: %lu chars, VC: %@, Type: %ld, CloseBtn: %@", self.delegate ? @"Set" : @"nil", (unsigned long)self.adm.length, NSStringFromClass([self.viewController class]), (long)self.type, self.hasClosedButton ? @"YES" : @"NO"]];
         
         // Validate ad markup content
         if (!self.adm || self.adm.length == 0) {
@@ -108,20 +97,17 @@
         
         // Create close button on main thread for UI safety
         dispatch_sync(dispatch_get_main_queue(), ^{
-            [self.logger debug:@"🔧 [INIT] Creating close button on main thread"];
+            [self.logger info:@"🔧 [INIT] Creating close button on main thread"];
             self.closeButton = [UIButton buttonWithType:UIButtonTypeClose];
             self.closeButton.translatesAutoresizingMaskIntoConstraints = NO;
-            [self.logger info:@"✅ [INIT] Close button created successfully"];
         });
         
-        [self.logger info:@"✅ [INIT] CloudXPrebidBanner initialization completed successfully"];
+        [self.logger info:[NSString stringWithFormat:@"🎯 [INIT] CloudXPrebidBanner initialization completed successfully - Banner instance ready: %p", self]];
     } else {
         [self.logger error:@"❌ [INIT] Super init failed - banner initialization failed"];
         [[CLXPerformanceManager sharedManager] endLoadTimerForKey:[NSString stringWithFormat:@"banner_%p", self]];
         return nil;
     }
-    
-    [self.logger info:[NSString stringWithFormat:@"🎯 [INIT] Banner instance ready: %p", self]];
     return self;
 }
 
@@ -159,13 +145,7 @@
  */
 - (void)load {
     [self.logger info:@"🚀 [LOAD] Banner load() method called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] Current thread: %@", [NSThread currentThread].isMainThread ? @"Main" : @"Background"]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] Banner instance: %p", self]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] Ad markup length: %lu characters", (unsigned long)self.adm.length]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] Banner type: %ld", (long)self.type]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] Close button enabled: %@", self.hasClosedButton ? @"YES" : @"NO"]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] View controller available: %@", self.viewController ? @"YES" : @"NO"]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] Delegate set: %@", self.delegate ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] Thread: %@, Instance: %p, Markup: %lu chars, Type: %ld, CloseBtn: %@, VC: %@, Delegate: %@", [NSThread currentThread].isMainThread ? @"Main" : @"Background", self, (unsigned long)self.adm.length, (long)self.type, self.hasClosedButton ? @"YES" : @"NO", self.viewController ? @"YES" : @"NO", self.delegate ? @"YES" : @"NO"]];
     
     // Pre-load validation
     if (!self.adm || self.adm.length == 0) {
@@ -189,7 +169,6 @@
     [self.logger info:@"✅ [LOAD] Pre-load validation passed, proceeding with load"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.logger info:@"🔧 [LOAD] Starting banner load on main queue"];
         
         // Start render timer
         [[CLXPerformanceManager sharedManager] startRenderTimerForKey:[NSString stringWithFormat:@"banner_%p", self]];
@@ -207,9 +186,7 @@
         }
         
         CGRect frame = CGRectMake(0, 0, bannerSize.width, bannerSize.height);
-        [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] WebView frame: %@", NSStringFromCGRect(frame)]];
-        
-        [self.logger debug:@"🔧 [LOAD] Creating CLXPrebidWebView with MRAID 3.0 support..."];
+        [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] WebView frame: %@, Creating CLXPrebidWebView with MRAID 3.0 support", NSStringFromCGRect(frame)]];
         self.webView = [[CLXPrebidWebView alloc] initWithFrame:frame placementType:CLXMRAIDPlacementTypeInline];
         
         if (self.webView) {
@@ -219,12 +196,11 @@
             self.webView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
             
             // Configure advanced features
-            [self.logger debug:@"🔧 [LOAD] Configuring advanced webview features..."];
+            [self.logger info:@"🔧 [LOAD] Configuring advanced webview features - performance optimization, viewability tracking, resource preloading"];
             self.webView.optimizeForPerformance = YES;
             self.webView.enableViewabilityTracking = YES;
             self.webView.preloadResources = YES;
             self.webView.viewabilityStandard = CLXViewabilityStandardIAB;
-            [self.logger info:@"✅ [LOAD] Advanced features configured: performance optimization, viewability tracking, resource preloading"];
             
             // Generate optimized HTML with performance enhancements
             [self.logger debug:@"🔧 [LOAD] Generating optimized HTML with viewport and styles..."];
@@ -248,9 +224,7 @@
             
             NSString *htmlString = [NSString stringWithFormat:@"<!DOCTYPE html><html><head>%@%@</head><body>%@</body></html>", viewport, style, optimizedAdm];
             
-            [self.logger info:[NSString stringWithFormat:@"✅ [LOAD] HTML generated - Total length: %lu characters", (unsigned long)htmlString.length]];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] Optimized ad markup length: %lu characters", (unsigned long)optimizedAdm.length]];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] HTML preview: %@...", [htmlString substringToIndex:MIN(200, htmlString.length)]]];
+            [self.logger info:[NSString stringWithFormat:@"✅ [LOAD] HTML generated - Total: %lu chars, Optimized markup: %lu chars, Preview: %@...", (unsigned long)htmlString.length, (unsigned long)optimizedAdm.length, [htmlString substringToIndex:MIN(200, htmlString.length)]]];
             
             // Check for video content
             BOOL hasVideo = [self.adm containsString:@"<video"] || [self.adm containsString:@"<VAST"] || [self.adm containsString:@".mp4"] || [self.adm containsString:@".webm"];

@@ -63,8 +63,7 @@
  */
 - (instancetype)initWithView:(UIView *)view {
     self.logger = [[CLXLogger alloc] initWithCategory:@"CLXViewabilityTracker"];
-    [self.logger info:@"🚀 [VIEWABILITY-INIT] CLXViewabilityTracker initialization started"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [VIEWABILITY-INIT] Tracked view: %p (%@)", view, NSStringFromClass([view class])]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [VIEWABILITY-INIT] CLXViewabilityTracker initialization started - Tracked view: %p (%@)", view, NSStringFromClass([view class])]];
     
     self = [super init];
     if (self) {
@@ -79,16 +78,11 @@
         _currentMeasurement = [[CLXViewabilityMeasurement alloc] init];
         _hasMetThreshold = NO;
         
-        [self.logger debug:@"📊 [VIEWABILITY-INIT] Standard: IAB (50% for 1 second)"];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [VIEWABILITY-INIT] Viewability threshold: %.1f%%", _viewabilityThreshold * 100]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [VIEWABILITY-INIT] Time threshold: %.1f seconds", _timeThreshold]];
-        [self.logger debug:@"📊 [VIEWABILITY-INIT] Measurement history initialized"];
+        [self.logger debug:[NSString stringWithFormat:@"📊 [VIEWABILITY-INIT] Standard: IAB (50%% for 1 second), Viewability threshold: %.1f%%, Time threshold: %.1f seconds, Measurement history initialized", _viewabilityThreshold * 100, _timeThreshold]];
         
         // Register for app lifecycle notifications
         [self setupNotifications];
-        [self.logger info:@"✅ [VIEWABILITY-INIT] Notifications configured"];
-        
-        [self.logger info:@"🎯 [VIEWABILITY-INIT] CLXViewabilityTracker initialization completed successfully"];
+        [self.logger info:@"🎯 [VIEWABILITY-INIT] CLXViewabilityTracker initialization completed successfully - Notifications configured"];
     } else {
         [self.logger error:@"❌ [VIEWABILITY-INIT] Super init failed"];
     }
@@ -216,9 +210,8 @@
     CLXViewabilityMeasurement *measurement = [self calculateViewabilityMeasurement];
     
     if (shouldLog) {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [VIEWABILITY-MEASURE] Calculated exposure: %.1f%% (threshold: %.1f%%)", 
-              measurement.exposedPercentage * 100, self.viewabilityThreshold * 100]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [VIEWABILITY-MEASURE] Exposed rect: %@", NSStringFromCGRect(measurement.exposedRect)]];
+        [self.logger debug:[NSString stringWithFormat:@"📊 [VIEWABILITY-MEASURE] Calculated exposure: %.1f%% (threshold: %.1f%%), Exposed rect: %@", 
+              measurement.exposedPercentage * 100, self.viewabilityThreshold * 100, NSStringFromCGRect(measurement.exposedRect)]];
     }
     
     // Update current measurement
