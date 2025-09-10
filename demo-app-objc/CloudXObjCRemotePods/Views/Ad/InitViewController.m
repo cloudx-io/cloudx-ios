@@ -38,25 +38,7 @@
         return;
     }
     
-    // ⚠️⚠️⚠️ DEBUG-ONLY TEST MODE CONFIGURATION ⚠️⚠️⚠️
-    // Test mode configuration - can be overridden via UserDefaults
-#ifdef DEBUG
-    // Check if test mode is already configured via UserDefaults
-    BOOL testModeEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"CLXTestModeEnabled"];
-    BOOL metaTestModeEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"CLXMetaTestModeEnabled"];
-    
-    NSLog(@"🔧 [InitViewController] Current test mode settings:");
-    NSLog(@"🔧 [InitViewController] CLXTestModeEnabled: %@", testModeEnabled ? @"YES" : @"NO");
-    NSLog(@"🔧 [InitViewController] CLXMetaTestModeEnabled: %@", metaTestModeEnabled ? @"YES" : @"NO");
-    
-    if (testModeEnabled) {
-        NSLog(@"🧪 [InitViewController] *** TEST MODE ENABLED - USING HARDCODED TEST IFA ***");
-    } else {
-        NSLog(@"📱 [InitViewController] *** TEST MODE DISABLED - USING REAL DEVICE IDFA ***");
-    }
-#else
-    NSLog(@"🔒 [InitViewController] Production build - test mode disabled");
-#endif
+    // SDK automatically handles IDFA and configuration - no manual setup needed
     
     [self updateStatusUIWithState:AdStateLoading];
     NSLog(@"[InitViewController] Calling CloudXCore initSDKWithAppKey:hashedUserID:completion:");

@@ -13,10 +13,10 @@
 @implementation CLXURLProvider
 
 + (NSURL *)initApiUrl {
-    static NSString *const prodInitApiUrl = @"https://pro-dev.cloudx.io/sdk";
+    static NSString *const prodInitApiUrl = @"https://pro.cloudx.io/sdk";
     
 #if DEBUG
-    NSString *urlString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreCloudXInitURLKey];
+    NSString *urlString = @"https://pro-dev.cloudx.io/sdk"
     if (urlString.length > 0) {
         return [NSURL URLWithString:urlString];
     }
