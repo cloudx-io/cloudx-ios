@@ -46,30 +46,10 @@
         if (completion) completion(NO, [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"API key is missing."}]);
         return;
     }
-    //https://pro-dev.cloudx.io/sdk  https://provisioning.cloudx.io/sdk
-    [[NSUserDefaults standardUserDefaults] setObject:@"https://pro-dev.cloudx.io/sdk" forKey:kCLXCoreCloudXInitURLKey];
-    NSDictionary *loopInfo = @{@"loop-index": @"0"};
-    [[NSUserDefaults standardUserDefaults] setObject:loopInfo forKey:kCLXCoreUserKeyValueKey];
+    // SDK automatically manages loop-index internally - no manual configuration needed
     
-    // ⚠️⚠️⚠️ DEBUG-ONLY TEST MODE CONFIGURATION ⚠️⚠️⚠️
-    // Test mode configuration - can be overridden via UserDefaults
-#ifdef DEBUG
-    // Check if test mode is already configured via UserDefaults
-    BOOL testModeEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"CLXTestModeEnabled"];
-    BOOL metaTestModeEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"CLXMetaTestModeEnabled"];
-    
-    NSLog(@"🔧 [BaseAdViewController] Current test mode settings:");
-    NSLog(@"🔧 [BaseAdViewController] CLXTestModeEnabled: %@", testModeEnabled ? @"YES" : @"NO");
-    NSLog(@"🔧 [BaseAdViewController] CLXMetaTestModeEnabled: %@", metaTestModeEnabled ? @"YES" : @"NO");
-    
-    if (testModeEnabled) {
-        NSLog(@"🧪 [BaseAdViewController] *** TEST MODE ENABLED - USING HARDCODED TEST IFA ***");
-    } else {
-        NSLog(@"📱 [BaseAdViewController] *** TEST MODE DISABLED - USING REAL DEVICE IDFA ***");
-    }
-#else
-    NSLog(@"🔒 [BaseAdViewController] Production build - test mode disabled");
-#endif
+    // SDK automatically handles IDFA configuration with proper priority:
+    // 1. UserDefaults override (for testing) 2. Real device IDFA 3. Fallback placeholder
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSString *testUserID = @"test-user-123";
