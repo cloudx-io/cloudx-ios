@@ -48,8 +48,7 @@
         // Try to load interstitial factory class
         Class interstitialClass = [self loadClassInstanceWithNamespace:namespace className:[NSString stringWithFormat:@"CLX%@InterstitialFactory", className]];
         if (interstitialClass) {
-            [self.logger info:[NSString stringWithFormat:@"InterstitialFactory found for adapter: %@", adapterName]];
-            [self.logger info:[NSString stringWithFormat:@"InterstitialFactory class: %@", NSStringFromClass(interstitialClass)]];
+            [self.logger info:[NSString stringWithFormat:@"InterstitialFactory found for adapter: %@ (%@)", adapterName, NSStringFromClass(interstitialClass)]];
             // Create an instance of the interstitial factory
             id<CLXAdapterInterstitialFactory> interstitialInstance = [interstitialClass createInstance];
             if (interstitialInstance) {
@@ -59,8 +58,7 @@
                 [self.logger error:[NSString stringWithFormat:@"Failed to create InterstitialFactory instance for adapter: %@", adapterName]];
             }
         } else {
-            [self.logger info:[NSString stringWithFormat:@"InterstitialFactory NOT found for adapter: %@", adapterName]];
-            [self.logger info:[NSString stringWithFormat:@"Looking for class: CLX%@InterstitialFactory in namespace: %@", className, namespace]];
+            [self.logger info:[NSString stringWithFormat:@"InterstitialFactory NOT found for adapter: %@ (Looking for: CLX%@InterstitialFactory in %@)", adapterName, className, namespace]];
         }
         
         // Try to load rewarded factory class

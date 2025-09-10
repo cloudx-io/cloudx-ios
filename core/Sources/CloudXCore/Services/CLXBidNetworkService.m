@@ -56,8 +56,7 @@
                             impModel:(nullable CLXConfigImpressionModel *)impModel
                            completion:(void (^)(id _Nullable, NSError * _Nullable))completion {
     
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Creating bid request for ad unit: %@", adUnitID]];
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] AdType numeric: %d", (int)adType]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Creating bid request - AdUnit: %@, Type: %d", adUnitID, (int)adType]];
     
     CLXBiddingConfigRequest *bidRequest = [[CLXBiddingConfigRequest alloc] initWithAdType:adType
                                                                              adUnitID:adUnitID
@@ -83,8 +82,7 @@
 - (void)startAuctionWithBidRequest:(NSDictionary *)bidRequest
                             appKey:(NSString *)appKey
                         completion:(void (^)(CLXBidResponse * _Nullable response, NSError * _Nullable error))completion {
-    [self.logger info:@"🚀 [BidNetworkService] startAuctionWithBidRequest called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] AppKey: %@", appKey]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [BidNetworkService] startAuctionWithBidRequest called - AppKey: %@", appKey]];
     
     // Log the actual bid request JSON
     if (bidRequest) {
@@ -92,12 +90,8 @@
         NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bidRequest options:NSJSONWritingPrettyPrinted error:&jsonError];
         if (jsonData && !jsonError) {
             NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] BidRequest JSON:\n%@", jsonString]];
-        } else {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] BidRequest: %@", bidRequest]];
+            [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] BidRequest JSON (%lu chars)", (unsigned long)jsonString.length]];
         }
-    } else {
-        [self.logger debug:@"📊 [BidNetworkService] BidRequest: (null)"];
     }
     
     [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Bid request: ID=%@, IMPs=%lu, URL=%@%@", 
@@ -125,10 +119,7 @@
     NSError *jsonError;
     NSData *requestBodyData = [NSJSONSerialization dataWithJSONObject:bidRequest options:0 error:&jsonError];
     if (jsonError) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] JSON serialization failed: %@", jsonError]];
-        [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] JSON error domain: %@", jsonError.domain]];
-        [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] JSON error code: %ld", (long)jsonError.code]];
-        [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] JSON error user info: %@", jsonError.userInfo]];
+        [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] JSON serialization failed - %@ (Domain: %@, Code: %ld)", jsonError.localizedDescription, jsonError.domain, (long)jsonError.code]];
         if (completion) completion(nil, jsonError);
         return;
     }
@@ -136,8 +127,6 @@
     // Log request body details
     NSString *requestBodyString = [[NSString alloc] initWithData:requestBodyData encoding:NSUTF8StringEncoding];
     [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Request body size: %lu bytes", (unsigned long)requestBodyData.length]];
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Request body preview (first 500 chars): %@", [requestBodyString substringToIndex:MIN(500, requestBodyString.length)]]];
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Full request body: %@", requestBodyString]];
     
     // Validate JSON structure
     id jsonObject = [NSJSONSerialization JSONObjectWithData:requestBodyData options:0 error:&jsonError];

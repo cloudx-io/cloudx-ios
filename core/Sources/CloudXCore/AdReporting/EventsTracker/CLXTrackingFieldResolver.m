@@ -119,8 +119,7 @@
     }
     
     NSString *payload = [values componentsJoinedByString:@";"];
-    [self.logger debug:[NSString stringWithFormat:@"Built payload with %lu fields for auction: %@", (unsigned long)values.count, auctionId]];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [PayloadDebug] Unencrypted payload: %@", payload]];
+    [self.logger debug:[NSString stringWithFormat:@"Built payload with %lu fields for auction: %@ - Payload: %@", (unsigned long)values.count, auctionId, payload]];
     
     return payload;
 }

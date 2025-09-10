@@ -157,11 +157,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)load {
     if (self.isLoading) {
-        [self.logger debug:[NSString stringWithFormat:@"Native load already in progress for placement: %@", self.placementID]];
+        [self.logger debug:@"Native load already in progress"];
         return;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"Starting native load process for placement: %@", self.placementID]];
+    [self.logger debug:@"Starting native load process"];
     self.isLoading = YES;
     
     // Implement async native update request
@@ -177,10 +177,7 @@ NS_ASSUME_NONNULL_BEGIN
         return;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"Requesting native update for placement: %@", self.placementID]];
-    
-    // Implement async bid request logic
-    [self.logger debug:[NSString stringWithFormat:@"Sending loop-index: %ld for adId: %@", (long)self.loadNativeTimesCount, self.placementID]];
+    [self.logger debug:[NSString stringWithFormat:@"Requesting native update - loop-index: %ld", (long)self.loadNativeTimesCount]];
     
     // Request bid from bid ad source
     __weak typeof(self) weakSelf = self;

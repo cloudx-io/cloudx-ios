@@ -229,15 +229,11 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 #pragma mark - CloudXInterstitial Protocol
 
 - (void)load {
-    [self.logger debug:@"🔧 [PublisherFullscreenAd] load called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Placement ID: %@", _placementID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Ad Type: %ld", (long)_adType]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Current State: %ld", (long)self.currentState]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherFullscreenAd] load called - Placement: %@, Type: %ld, State: %ld", _placementID, (long)_adType, (long)self.currentState]];
     
     // Check current state to determine if loading is allowed
     switch (self.currentState) {
         case CLXInterstitialStateIDLE:
-            [self.logger debug:@"📊 [PublisherFullscreenAd] State is IDLE - proceeding with load"];
             break;
         case CLXInterstitialStateLOADING:
             [self.logger debug:@"⚠️ [PublisherFullscreenAd] Already loading, ignoring load request"];
@@ -293,17 +289,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     }
     
     // Create adapter instance from bid response
-    [self.logger debug:@"🔧 [PublisherFullscreenAd] createBidAd block called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - AdID: %@", response.bid.adid]];
-    [self.logger debug:[NSString stringWithFormat:@"🎯 [PublisherFullscreenAd] - BidID: %@ (THIS IS THE KEY FOR NURL LOOKUP)", response.bidID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Network: %@", response.networkName]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Price: %.2f", response.price]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - ADM preview (first 100 chars): %@", response.bid.adm.length > 100 ? [response.bid.adm substringToIndex:100] : response.bid.adm]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Adapter extras: %@", response.bid.ext.cloudx.adapterExtras]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - BURL: %@", response.bid.burl]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - NURL: %@", response.nurl]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - weakSelf: %@", self]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - weakSelf class: %@", NSStringFromClass([self class])]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherFullscreenAd] createBidAd - AdID: %@, BidID: %@, Network: %@", response.bid.adid, response.bidID, response.networkName]];
     
     id adapter = response.createBidAd();
     if (!adapter) {
@@ -377,11 +363,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
-    [self.logger debug:@"🔧 [PublisherFullscreenAd] showFromViewController called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - ViewController: %@", viewController]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - isReady: %d", self.isReady]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Ad Type: %ld", (long)_adType]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Current State: %ld", (long)self.currentState]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherFullscreenAd] showFromViewController called - Ready: %d, State: %ld", self.isReady, (long)self.currentState]];
     
     // Verify ad is ready before attempting to show
     if (self.currentState != CLXInterstitialStateREADY) {
@@ -485,8 +467,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Get factory for network
     id<CLXAdapterInterstitialFactory> factory = self.adFactories.interstitials[network];
     if (!factory) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [PublisherFullscreenAd] No factory found for network: %@", network]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Available interstitials keys: %@", [self.adFactories.interstitials allKeys]]];
+        [self.logger error:[NSString stringWithFormat:@"❌ [PublisherFullscreenAd] No factory found for network: %@ (Available: %@)", network, [self.adFactories.interstitials allKeys]]];
         
         // Try to find the factory with different key variations
         for (NSString *key in [self.adFactories.interstitials allKeys]) {
@@ -499,8 +480,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         }
         
         if (!factory) {
-            [self.logger error:@"❌ [PublisherFullscreenAd] Still no factory found after checking all keys"];
-            [self.logger debug:@"📊 [PublisherFullscreenAd] This suggests the TestVastNetworkInterstitialFactory is not being loaded properly"];
+            [self.logger error:@"❌ [PublisherFullscreenAd] Still no factory found after checking all keys - TestVastNetworkInterstitialFactory not loaded properly"];
             return nil;
         }
     }
@@ -520,11 +500,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         return nil;
     }
     
-    [self.logger info:@"✅ [PublisherFullscreenAd] Interstitial created successfully"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Interstitial class: %@", NSStringFromClass([interstitial class])]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Interstitial network: %@", interstitial.network]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Interstitial bidID: %@", interstitial.bidID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Interstitial sdkVersion: %@", interstitial.sdkVersion]];
+    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherFullscreenAd] Interstitial created - Network: %@, BidID: %@", interstitial.network, interstitial.bidID]];
     
     return interstitial;
 }
@@ -535,13 +511,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
                                 adapterExtras:(NSDictionary<NSString *, NSString *> *)adapterExtras
                                          burl:(nullable NSString *)burl
                                        network:(NSString *)network {
-    [self.logger debug:@"🔧 [PublisherFullscreenAd] createRewardedInstanceWithAdId called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - AdID: %@", adId]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - BidID: %@", bidId]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Network: %@", network]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - ADM length: %lu", (unsigned long)adm.length]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Adapter extras: %@", adapterExtras]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - BURL: %@", burl]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherFullscreenAd] createRewardedInstanceWithAdId - AdID: %@, BidID: %@, Network: %@", adId, bidId, network]];
     
     // Check if adFactories exists
     if (!self.adFactories) {
@@ -549,14 +519,12 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         return nil;
     }
     
-    [self.logger info:@"📊 [PublisherFullscreenAd] adFactories exists: YES"];
     [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] adFactories.rewardedInterstitials: %@", self.adFactories.rewardedInterstitials]];
     
     // Get factory for network
     id<CLXAdapterRewardedFactory> factory = self.adFactories.rewardedInterstitials[network];
     if (!factory) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [PublisherFullscreenAd] No factory found for network: %@", network]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Available rewardedInterstitials keys: %@", [self.adFactories.rewardedInterstitials allKeys]]];
+        [self.logger error:[NSString stringWithFormat:@"❌ [PublisherFullscreenAd] No rewarded factory found for network: %@ (Available: %@)", network, [self.adFactories.rewardedInterstitials allKeys]]];
         return nil;
     }
     
@@ -575,11 +543,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         return nil;
     }
     
-    [self.logger info:@"✅ [PublisherFullscreenAd] Rewarded created successfully"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Rewarded class: %@", NSStringFromClass([rewarded class])]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Rewarded network: %@", rewarded.network]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Rewarded bidID: %@", rewarded.bidID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Rewarded sdkVersion: %@", rewarded.sdkVersion]];
+    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherFullscreenAd] Rewarded created - Network: %@, BidID: %@", rewarded.network, rewarded.bidID]];
     
     return rewarded;
 }
@@ -587,9 +551,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 #pragma mark - CloudXAdapterInterstitialDelegate
 
 - (void)didLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
-    [self.logger debug:@"🔧 [PublisherFullscreenAd] didLoadWithInterstitial delegate called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Interstitial object: %@", interstitial]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Interstitial class: %@", NSStringFromClass([(NSObject *)interstitial class])]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherFullscreenAd] didLoadWithInterstitial - Class: %@", NSStringFromClass([(NSObject *)interstitial class])]];
     
     // Cache the adapter
     self.currentInterstitialAdapter = interstitial;
@@ -628,8 +590,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 }
 
 - (void)didShowWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
-    [self.logger debug:@"🔧 [PublisherFullscreenAd] didShowWithInterstitial delegate called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Interstitial: %@", interstitial]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherFullscreenAd] didShowWithInterstitial - %@", interstitial]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.interstitialDelegate respondsToSelector:@selector(didShowWithAd:)]) {
@@ -651,9 +612,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     [self.rillTrackingService sendImpressionEvent];
     
     // Debug: Log detailed information about bid response and bid ID
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [PublisherFullscreenAd] Debugging NURL firing - bidID: %@", interstitial.bidID]];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [PublisherFullscreenAd] currentBidResponse: %@", self.currentBidResponse]];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [PublisherFullscreenAd] currentBidResponse.id: %@", self.currentBidResponse.id]];
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [PublisherFullscreenAd] NURL firing debug - bidID: %@, response: %@", interstitial.bidID, self.currentBidResponse.id]];
     
     NSArray<CLXBidResponseBid *> *allBids = [self.currentBidResponse allBids];
     [self.logger debug:[NSString stringWithFormat:@"🔍 [PublisherFullscreenAd] Total bids in response: %lu", (unsigned long)allBids.count]];

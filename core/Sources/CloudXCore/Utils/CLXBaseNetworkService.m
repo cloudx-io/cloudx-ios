@@ -63,14 +63,7 @@
                           delay:(NSTimeInterval)delay
                      completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion {
     
-    [self.logger debug:@"🔧 [BaseNetworkService] executeRequestWithEndpoint called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] - Endpoint: %@", endpoint]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] - Base URL: %@", self.baseURL]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] - URL Parameters: %@", urlParameters]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] - Request Body Size: %lu bytes", (unsigned long)requestBody.length]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] - Headers: %@", headers]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] - Max Retries: %ld", (long)maxRetries]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] - Delay: %f", delay]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [BaseNetworkService] executeRequestWithEndpoint - Endpoint: %@, Retries: %ld", endpoint, (long)maxRetries]];
     
     NSURLComponents *components = [[NSURLComponents alloc] initWithString:[self.baseURL stringByAppendingString:endpoint]];
     
@@ -102,20 +95,15 @@
     [requestHeaders addEntriesFromDictionary:headers ?: @{}];
     request.allHTTPHeaderFields = requestHeaders;
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP Method: %@", request.HTTPMethod]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] Final Headers: %@", request.allHTTPHeaderFields]];
+    [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP %@ request prepared", request.HTTPMethod]];
     
     [self.logger debug:@"🔧 [BaseNetworkService] Creating URLSessionDataTask..."];
     NSURLSessionDataTask *task = [self.urlSession dataTaskWithRequest:request
                                                   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        [self.logger debug:@"🔧 [BaseNetworkService] URLSessionDataTask completion handler called"];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] - Data received: %d", data != nil]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] - Response received: %d", response != nil]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] - Error: %@", error]];
+        [self.logger debug:[NSString stringWithFormat:@"🔧 [BaseNetworkService] Request completed - Data: %@, Error: %@", data ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
         
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Network request failed with error: %@", error]];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] Current retry count: %ld, Max retries: %ld", (long)self.currentRetryCount, (long)maxRetries]];
+            [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Network request failed - Error: %@, Retry: %ld/%ld", error.localizedDescription, (long)self.currentRetryCount, (long)maxRetries]];
             
             if (self.currentRetryCount < maxRetries) {
                 self.currentRetryCount++;
@@ -142,14 +130,12 @@
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
         
         // Log HTTP status code
-        [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP status code: %ld", (long)httpResponse.statusCode]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP response headers: %@", httpResponse.allHeaderFields]];
+        [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP response - Status: %ld", (long)httpResponse.statusCode]];
         
         // Log response body
         if (data) {
             NSString *responseBody = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
             [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] Response body length: %lu", (unsigned long)responseBody.length]];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] Response body preview (first 500 chars): %@", responseBody.length > 500 ? [responseBody substringToIndex:500] : responseBody]];
         } else {
             [self.logger debug:@"📊 [BaseNetworkService] No response data received"];
         }

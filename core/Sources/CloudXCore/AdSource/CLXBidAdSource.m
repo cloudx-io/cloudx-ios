@@ -146,22 +146,7 @@ NS_ASSUME_NONNULL_BEGIN
                       successWin:(BOOL)successWin
                       completion:(void (^)(CLXBidAdSourceResponse * _Nullable response, NSError * _Nullable error))completion {
     
-    [self.logger info:@"🚀 [CLXBidAdSource] requestBidWithAdUnitID called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] AdUnitID: %@", adUnitID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] StoredImpressionId: %@", storedImpressionId]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] SuccessWin: %d", successWin]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] PlacementID: %@", self.placementID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] DealID: %@", self.dealID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] PublisherID: %@", self.publisherID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] UserID: %@", self.userID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] AdType: %ld", (long)self.adType]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] HasCloseButton: %d", self.hasCloseButton]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] TMax: %@", self.tmax]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] BidTokenSources count: %lu", (unsigned long)self.bidTokenSources.count]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] BidNetworkService: %@", self.bidNetworkService]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] AppSessionService: %@", self.appSessionService]];
-    
-    [self.logger debug:[NSString stringWithFormat:@"Requesting bid for adUnitID: %@", adUnitID]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [CLXBidAdSource] requestBidWithAdUnitID called - AdUnit: %@, Placement: %@, AdType: %ld", adUnitID, self.placementID, (long)self.adType]];
     
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
@@ -249,8 +234,7 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 return;
             }
-            [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] AppKey: %@", currentAppKey]];
-            [self.logger debug:@"🔧 [CLXBidAdSource] Starting auction..."];
+            [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXBidAdSource] Starting auction with AppKey: %@", currentAppKey]];
             [strongSelf.bidNetworkService startAuctionWithBidRequest:bidRequest
                                                               appKey:currentAppKey
                                                           completion:^(CLXBidResponse * _Nullable response, NSError * _Nullable error) {
@@ -263,9 +247,7 @@ NS_ASSUME_NONNULL_BEGIN
                     return;
                 }
 
-                [self.logger debug:@"📥 [CLXBidAdSource] Auction completion called"];
-                [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] Response: %@", response]];
-                [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] Error: %@", error]];
+                [self.logger debug:[NSString stringWithFormat:@"📥 [CLXBidAdSource] Auction completion - Response: %@, Error: %@", response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
                 
                 if (error) {
                     [self.logger error:[NSString stringWithFormat:@"❌ [CLXBidAdSource] Auction failed with error: %@", error.localizedDescription]];
