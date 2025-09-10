@@ -65,9 +65,7 @@
  */
 - (instancetype)initWithWebView:(WKWebView *)webView placementType:(CLXMRAIDPlacementType)placementType {
     self.logger = [[CLXLogger alloc] initWithCategory:@"CLXMRAIDManager"];
-    [self.logger info:@"🚀 [MRAID-INIT] CLXMRAIDManager initialization started"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID-INIT] WebView: %p", webView]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID-INIT] Placement type: %ld", (long)placementType]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [MRAID-INIT] CLXMRAIDManager initialization started - WebView: %p, Placement type: %ld", webView, (long)placementType]];
     
     self = [super init];
     if (self) {
@@ -87,13 +85,10 @@
         _pendingJavaScriptQueue = [NSMutableArray array];
         _webViewReady = NO;
         
-        [self.logger debug:@"📊 [MRAID-INIT] Initial state: Loading"];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID-INIT] Supports inline video: %@", _supportsInlineVideo ? @"YES" : @"NO"]];
-        [self.logger debug:@"📊 [MRAID-INIT] Initial viewable state: NO"];
+        [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID-INIT] Initial state: Loading, Supports inline video: %@, Initial viewable: NO", _supportsInlineVideo ? @"YES" : @"NO"]];
         
         // Configure screen properties for device capabilities
         [self setupScreenProperties];
-        [self.logger info:@"✅ [MRAID-INIT] Screen properties configured"];
         
         // Register for system notifications
         [self setupNotifications];
