@@ -188,13 +188,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - CloudXBanner Protocol
 
 - (void)load {
-    [self.logger info:[NSString stringWithFormat:@"🚀 [PublisherBanner] load() called for placement: %@", self.placementID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Current isLoading state: %d", self.isLoading]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Current forceStop state: %d", self.forceStop]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Current bannerOnScreen: %@", self.bannerOnScreen]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Current currentLoadingBanner: %@", self.currentLoadingBanner]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] CLXBidAdSource exists: %d", self.bidAdSource != nil]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] AdFactories count: %lu", (unsigned long)self.adFactories.count]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [PublisherBanner] load() called for placement: %@ (loading:%d, stopped:%d, onScreen:%@, bidSource:%d)", self.placementID, self.isLoading, self.forceStop, self.bannerOnScreen ? @"YES" : @"NO", self.bidAdSource != nil]];
     
     if (self.isLoading) {
         [self.logger debug:[NSString stringWithFormat:@"⚠️ [PublisherBanner] Banner load already in progress for placement: %@", self.placementID]];
@@ -223,11 +217,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Private Methods
 
 - (void)requestBannerUpdate {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherBanner] requestBannerUpdate() called for placement: %@", self.placementID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] forceStop state: %d", self.forceStop]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] isLoading state: %d", self.isLoading]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] loadBannerTimesCount: %ld", (long)self.loadBannerTimesCount]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] successWin state: %d", self.successWin]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherBanner] requestBannerUpdate() called for placement: %@ (forceStop:%d, loading:%d, count:%ld, successWin:%d)", self.placementID, self.forceStop, self.isLoading, (long)self.loadBannerTimesCount, self.successWin]];
     
     if (self.forceStop) {
         [self.logger debug:@"⚠️ [PublisherBanner] Request stopped due to forceStop flag"];
@@ -260,15 +250,10 @@ NS_ASSUME_NONNULL_BEGIN
             return;
         }
         
-        [self.logger debug:@"📥 [PublisherBanner] Bid request completion called"];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Response: %@", response]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Error: %@", error]];
-        
+        [self.logger debug:[NSString stringWithFormat:@"📥 [PublisherBanner] Bid request completion - Response: %@, Error: %@", response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
+
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] Bid request failed with error: %@", error.localizedDescription]];
-            [self.logger error:[NSString stringWithFormat:@"📊 [PublisherBanner] Error domain: %@", error.domain]];
-            [self.logger error:[NSString stringWithFormat:@"📊 [PublisherBanner] Error code: %ld", (long)error.code]];
-            [self.logger error:[NSString stringWithFormat:@"📊 [PublisherBanner] Error user info: %@", error.userInfo]];
+            [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] Bid request failed - %@ (Domain: %@, Code: %ld)", error.localizedDescription, error.domain, (long)error.code]];
             
             // Continue with waterfall - let continueBannerChain handle the error
             [strongSelf continueBannerChain];
@@ -317,11 +302,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)continueBannerChain {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherBanner] continueBannerChain() called for placement: %@", self.placementID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] forceStop state: %d", self.forceStop]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] isLoading state: %d", self.isLoading]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] lastBidResponse exists: %d", self.lastBidResponse != nil]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] createBidAd function exists: %d", self.lastBidResponse.createBidAd != nil]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherBanner] continueBannerChain() called for placement: %@ (forceStop:%d, loading:%d, hasResponse:%d, hasCreateBidAd:%d)", self.placementID, self.forceStop, self.isLoading, self.lastBidResponse != nil, self.lastBidResponse.createBidAd != nil]];
     
     if (self.forceStop) {
         [self.logger debug:@"⚠️ [PublisherBanner] Banner chain stopped due to forceStop flag"];
@@ -334,15 +315,11 @@ NS_ASSUME_NONNULL_BEGIN
     if (self.lastBidResponse && self.lastBidResponse.createBidAd) {
         [self.logger debug:@"🔧 [PublisherBanner] Calling createBidAd function..."];
         id bidItem = self.lastBidResponse.createBidAd();
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] createBidAd returned: %@", bidItem]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Bid item class: %@", NSStringFromClass([bidItem class])]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Bid item conforms to CLXAdapterBanner: %d", [bidItem conformsToProtocol:@protocol(CLXAdapterBanner)]]];
-        
+        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] createBidAd returned: %@ (class: %@, conforms: %d)", bidItem, NSStringFromClass([bidItem class]), [bidItem conformsToProtocol:@protocol(CLXAdapterBanner)]]];
+
         if ([bidItem conformsToProtocol:@protocol(CLXAdapterBanner)]) {
             id<CLXAdapterBanner> banner = (id<CLXAdapterBanner>)bidItem;
-            [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Successfully created banner from bid for placement: %@", self.placementID]];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Banner object: %@", banner]];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Banner class: %@", NSStringFromClass([(NSObject *)banner class])]];
+            [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Successfully created banner from bid for placement: %@ (%@)", self.placementID, NSStringFromClass([(NSObject *)banner class])]];
             [self loadAdItem:banner];
         } else {
             [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] Bid item creation failed - Item: %@, ConformsToProtocol: %d", bidItem, bidItem ? [bidItem conformsToProtocol:@protocol(CLXAdapterBanner)] : NO]];
