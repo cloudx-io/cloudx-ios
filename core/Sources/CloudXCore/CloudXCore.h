@@ -16,7 +16,6 @@
 #import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXAppSessionServiceImplementation.h>
 #import <CloudXCore/CLXBidNetworkService.h>
-#import <CloudXCore/CLXBidNetworkServiceImplementation.h>
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXPrivacyService.h>

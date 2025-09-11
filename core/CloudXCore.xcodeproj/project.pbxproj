@@ -96,7 +96,6 @@
 		19C7259D2E2390810012CFC7 /* CLXNativeTemplate.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C725222E2390810012CFC7 /* CLXNativeTemplate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C7259E2E2390810012CFC7 /* CLXRewardedDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C725292E2390810012CFC7 /* CLXRewardedDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C7259F2E2390810012CFC7 /* CLXBannerAdView.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C724FB2E2390810012CFC7 /* CLXBannerAdView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		19C725A02E2390810012CFC7 /* CLXBidNetworkServiceImplementation.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C725062E2390810012CFC7 /* CLXBidNetworkServiceImplementation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C725A12E2390810012CFC7 /* CLXAdTrackingService.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C724F32E2390810012CFC7 /* CLXAdTrackingService.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C725A22E2390810012CFC7 /* CLXAdapterBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C724E52E2390810012CFC7 /* CLXAdapterBanner.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C725A32E2390810012CFC7 /* CLXCachedRewarded.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C7250D2E2390810012CFC7 /* CLXCachedRewarded.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -339,7 +338,6 @@
 		19C725032E2390810012CFC7 /* CLXBidderConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXBidderConfig.h; sourceTree = "<group>"; };
 		19C725042E2390810012CFC7 /* CLXBiddingConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXBiddingConfig.h; sourceTree = "<group>"; };
 		19C725052E2390810012CFC7 /* CLXBidNetworkService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXBidNetworkService.h; sourceTree = "<group>"; };
-		19C725062E2390810012CFC7 /* CLXBidNetworkServiceImplementation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXBidNetworkServiceImplementation.h; sourceTree = "<group>"; };
 		19C725072E2390810012CFC7 /* CLXBidResponse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXBidResponse.h; sourceTree = "<group>"; };
 		19C725082E2390810012CFC7 /* CLXBidTokenSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXBidTokenSource.h; sourceTree = "<group>"; };
 		19C725092E2390810012CFC7 /* CLXCacheableAd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXCacheableAd.h; sourceTree = "<group>"; };
@@ -779,7 +777,6 @@
 				19C725032E2390810012CFC7 /* CLXBidderConfig.h */,
 				19C725042E2390810012CFC7 /* CLXBiddingConfig.h */,
 				19C725052E2390810012CFC7 /* CLXBidNetworkService.h */,
-				19C725062E2390810012CFC7 /* CLXBidNetworkServiceImplementation.h */,
 				19C725072E2390810012CFC7 /* CLXBidResponse.h */,
 				19C725082E2390810012CFC7 /* CLXBidTokenSource.h */,
 				19C725092E2390810012CFC7 /* CLXCacheableAd.h */,
@@ -969,7 +966,6 @@
 				19D926B52E610FFB00C84DAE /* CLXSettings.h in Headers */,
 				19D926BD2E61101200C84DAE /* CLXRetryHelper.h in Headers */,
 				19C7259F2E2390810012CFC7 /* CLXBannerAdView.h in Headers */,
-				19C725A02E2390810012CFC7 /* CLXBidNetworkServiceImplementation.h in Headers */,
 				19C725A12E2390810012CFC7 /* CLXAdTrackingService.h in Headers */,
 				19C725A22E2390810012CFC7 /* CLXAdapterBanner.h in Headers */,
 				19C725A32E2390810012CFC7 /* CLXCachedRewarded.h in Headers */,
