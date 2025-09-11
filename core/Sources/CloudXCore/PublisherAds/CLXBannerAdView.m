@@ -92,8 +92,11 @@ static void initializeLogger() {
         [(CLXPublisherBanner *)self.banner setVisible:isVisible];
     }
     
-    if (self.superview) {
-        [self.banner load];
+    // Call didShowWithAd when banner is added to superview (becomes visible)
+    if (self.superview && [self.banner isKindOfClass:[CLXPublisherBanner class]]) {
+        if ([self.banner respondsToSelector:@selector(didShowBanner:)]) {
+            [(CLXPublisherBanner *)self.banner didShowBanner:nil];
+        }
     }
 }
 
