@@ -188,26 +188,27 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - CloudXBanner Protocol
 
 - (void)load {
-    [self.logger info:[NSString stringWithFormat:@"🚀 [PublisherBanner] load() called for placement: %@ (loading:%d, stopped:%d)", self.placementID, self.isLoading, self.forceStop]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [PublisherBanner] load() called for placement: %@ (loading:%d, stopped:%d, onScreen:%@, bidSource:%d)", self.placementID, self.isLoading, self.forceStop, self.bannerOnScreen ? @"YES" : @"NO", self.bidAdSource != nil]];
     
     if (self.isLoading) {
-        [self.logger debug:@"⚠️ [PublisherBanner] Banner load already in progress"];
+        [self.logger debug:[NSString stringWithFormat:@"⚠️ [PublisherBanner] Banner load already in progress for placement: %@", self.placementID]];
         return;
     }
     
     if (self.forceStop) {
-        [self.logger debug:@"⚠️ [PublisherBanner] Banner load stopped due to forceStop flag"];
+        [self.logger debug:[NSString stringWithFormat:@"⚠️ [PublisherBanner] Banner load stopped due to forceStop flag for placement: %@", self.placementID]];
         return;
     }
     
     if (!self.bidAdSource) {
-        [self.logger error:@"❌ [PublisherBanner] No CLXBidAdSource available"];
+        [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] No CLXBidAdSource available for placement: %@", self.placementID]];
         return;
     }
     
-    [self.logger info:@"✅ [PublisherBanner] Starting banner load process"];
+    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Starting banner load process for placement: %@", self.placementID]];
     self.isLoading = YES;
     self.adLoadStartTime = [NSDate date];
+    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Ad load start time set: %@", self.adLoadStartTime]];
     
     // Implement async banner update request
     [self requestBannerUpdate];
@@ -216,7 +217,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Private Methods
 
 - (void)requestBannerUpdate {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherBanner] requestBannerUpdate() called (forceStop: %d, loading: %d, count: %ld)", self.forceStop, self.isLoading, (long)self.loadBannerTimesCount]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherBanner] requestBannerUpdate() called for placement: %@ (forceStop:%d, loading:%d, count:%ld, successWin:%d)", self.placementID, self.forceStop, self.isLoading, (long)self.loadBannerTimesCount, self.successWin]];
     
     if (self.forceStop) {
         [self.logger debug:@"⚠️ [PublisherBanner] Request stopped due to forceStop flag"];
@@ -250,7 +251,7 @@ NS_ASSUME_NONNULL_BEGIN
         }
         
         [self.logger debug:[NSString stringWithFormat:@"📥 [PublisherBanner] Bid request completion - Response: %@, Error: %@", response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
-        
+
         if (error) {
             [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] Bid request failed - %@ (Domain: %@, Code: %ld)", error.localizedDescription, error.domain, (long)error.code]];
             
@@ -267,7 +268,7 @@ NS_ASSUME_NONNULL_BEGIN
             return;
         }
         
-        [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Bid response received - Network: %@, BidID: %@, Price: %.2f", response.networkName, response.bidID, response.price]];
+        [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Bid response received - Network: %@, BidID: %@, Price: %.2f, CreateBidAd: %d", response.networkName, response.bidID, response.price, response.createBidAd != nil]];
         
         strongSelf.lastBidResponse = response;
         
@@ -301,7 +302,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)continueBannerChain {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherBanner] continueBannerChain() called (forceStop: %d, loading: %d, hasResponse: %d)", self.forceStop, self.isLoading, self.lastBidResponse != nil]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherBanner] continueBannerChain() called for placement: %@ (forceStop:%d, loading:%d, hasResponse:%d, hasCreateBidAd:%d)", self.placementID, self.forceStop, self.isLoading, self.lastBidResponse != nil, self.lastBidResponse.createBidAd != nil]];
     
     if (self.forceStop) {
         [self.logger debug:@"⚠️ [PublisherBanner] Banner chain stopped due to forceStop flag"];
@@ -314,14 +315,14 @@ NS_ASSUME_NONNULL_BEGIN
     if (self.lastBidResponse && self.lastBidResponse.createBidAd) {
         [self.logger debug:@"🔧 [PublisherBanner] Calling createBidAd function..."];
         id bidItem = self.lastBidResponse.createBidAd();
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] createBidAd returned: %@ (conforms: %d)", NSStringFromClass([bidItem class]), [bidItem conformsToProtocol:@protocol(CLXAdapterBanner)]]];
-        
+        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] createBidAd returned: %@ (class: %@, conforms: %d)", bidItem, NSStringFromClass([bidItem class]), [bidItem conformsToProtocol:@protocol(CLXAdapterBanner)]]];
+
         if ([bidItem conformsToProtocol:@protocol(CLXAdapterBanner)]) {
             id<CLXAdapterBanner> banner = (id<CLXAdapterBanner>)bidItem;
-            [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Successfully created banner from bid (%@)", NSStringFromClass([(NSObject *)banner class])]];
+            [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Successfully created banner from bid for placement: %@ (%@)", self.placementID, NSStringFromClass([(NSObject *)banner class])]];
             [self loadAdItem:banner];
         } else {
-            [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] Bid item creation failed - Item: %@, Conforms: %d", bidItem, bidItem ? [bidItem conformsToProtocol:@protocol(CLXAdapterBanner)] : NO]];
+            [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] Bid item creation failed - Item: %@, ConformsToProtocol: %d", bidItem, bidItem ? [bidItem conformsToProtocol:@protocol(CLXAdapterBanner)] : NO]];
             
             // Treat as technical error - create appropriate error and handle per spec
             NSError *technicalError = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
@@ -330,7 +331,7 @@ NS_ASSUME_NONNULL_BEGIN
             [self failToLoadBanner:nil error:technicalError];
         }
     } else {
-        [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] No valid bid response or createBidAd function - waterfall exhausted (Response: %@)", self.lastBidResponse ? @"YES" : @"NO"]];
+        [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] Waterfall exhausted - lastBidResponse: %@, createBidAd: %@", self.lastBidResponse, self.lastBidResponse.createBidAd]];
         
         // Waterfall exhausted - create NO_FILL error and handle per spec
         NSError *noFillError = [CLXError errorWithCode:CLXErrorCodeNoFill 
@@ -499,26 +500,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Reporting win for bidID=%@", self.lastBidResponse.bidID]];
         [self.reportingService winWithBidID:self.lastBidResponse.bidID];
         
-        // Fire NURL for banner impression with revenue callback
-        if (self.lastBidResponse.nurl) {
-            [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherBanner] Firing NURL for banner impression with revenue callback: bidID=%@, price=%.2f", self.lastBidResponse.bidID, self.lastBidResponse.price]];
-            
-            __weak typeof(self) weakSelf = self;
-            [self.reportingService fireNurlForRevenueWithPrice:self.lastBidResponse.price nUrl:self.lastBidResponse.nurl completion:^(BOOL success, CLXAd * _Nullable ad) {
-                __strong typeof(weakSelf) strongSelf = weakSelf;
-                if (!strongSelf) return;
-                
-                if (success) {
-                    // Create CLXAd object and trigger revenue callback
-                    CLXAd *adObject = [CLXAd adFromBid:strongSelf.lastBidResponse.bid placementId:strongSelf.placementID];
-                    if (strongSelf.delegate && [strongSelf.delegate respondsToSelector:@selector(revenuePaid:)]) {
-                        [strongSelf.delegate revenuePaid:adObject];
-                    }
-                }
-            }];
-        } else {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] No NURL to fire for banner: bidID=%@", self.lastBidResponse.bidID]];
-        }
+        // Revenue tracking moved to impression callback - don't fire NURL on load
     } else {
         [self.logger debug:@"⚠️ [PublisherBanner] No lastBidResponse to report win"];
     }
@@ -662,6 +644,25 @@ NS_ASSUME_NONNULL_BEGIN
         [self.appSessionService addImpressionWithPlacementID:self.placementID];
         [self.appSessionService addSpendWithPlacementID:self.placementID spend:self.lastBidResponse.price];
         [self.reportingService impressionWithBidID:self.lastBidResponse.bidID];
+        
+        // Fire NURL for revenue tracking on impression (industry standard)
+        if (self.lastBidResponse.nurl && self.lastBidResponse.nurl.length > 0) {
+            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Firing NURL on impression for bidID=%@", self.lastBidResponse.bidID]];
+            __weak typeof(self) weakSelf = self;
+            [self.reportingService fireNurlForRevenueWithPrice:self.lastBidResponse.price nUrl:self.lastBidResponse.nurl completion:^(BOOL success, CLXAd * _Nullable ad) {
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) return;
+                if (success) {
+                    CLXAd *adObject = [CLXAd adFromBid:strongSelf.lastBidResponse.bid placementId:strongSelf.placementID];
+                    if (strongSelf.delegate && [strongSelf.delegate respondsToSelector:@selector(revenuePaid:)]) {
+                        [strongSelf.delegate revenuePaid:adObject];
+                    }
+                }
+            }];
+        } else {
+            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] No NURL to fire on impression for bidID=%@", self.lastBidResponse.bidID]];
+        }
+        
         // Send Rill tracking impression event
         [self.rillTrackingService sendImpressionEvent];
     }
