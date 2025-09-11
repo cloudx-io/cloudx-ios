@@ -283,12 +283,7 @@ NS_ASSUME_NONNULL_BEGIN
             return;
         }
         
-        [self.logger info:@"✅ [PublisherBanner] Bid response received successfully"];
-        [self.logger debug:@"📊 [PublisherBanner] Response details:"];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] - Network: %@", response.networkName]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] - Bid ID: %@", response.bidID]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] - Price: %f", response.price]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] - Create bid ad function exists: %d", response.createBidAd != nil]];
+        [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Bid response received - Network: %@, BidID: %@, Price: %.2f, CreateBidAd: %d", response.networkName, response.bidID, response.price, response.createBidAd != nil]];
         
         strongSelf.lastBidResponse = response;
         
@@ -350,9 +345,7 @@ NS_ASSUME_NONNULL_BEGIN
             [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Banner class: %@", NSStringFromClass([(NSObject *)banner class])]];
             [self loadAdItem:banner];
         } else {
-            [self.logger error:@"❌ [PublisherBanner] Bid item creation failed or does not conform to protocol"];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Bid item: %@", bidItem]];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Conforms to protocol: %d", bidItem ? [bidItem conformsToProtocol:@protocol(CLXAdapterBanner)] : NO]];
+            [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] Bid item creation failed - Item: %@, ConformsToProtocol: %d", bidItem, bidItem ? [bidItem conformsToProtocol:@protocol(CLXAdapterBanner)] : NO]];
             
             // Treat as technical error - create appropriate error and handle per spec
             NSError *technicalError = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
@@ -361,9 +354,7 @@ NS_ASSUME_NONNULL_BEGIN
             [self failToLoadBanner:nil error:technicalError];
         }
     } else {
-        [self.logger error:@"❌ [PublisherBanner] No valid bid response or createBidAd function - waterfall exhausted"];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] lastBidResponse: %@", self.lastBidResponse]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] createBidAd function: %@", self.lastBidResponse.createBidAd]];
+        [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] Waterfall exhausted - lastBidResponse: %@, createBidAd: %@", self.lastBidResponse, self.lastBidResponse.createBidAd]];
         
         // Waterfall exhausted - create NO_FILL error and handle per spec
         NSError *noFillError = [CLXError errorWithCode:CLXErrorCodeNoFill 
