@@ -88,4 +88,3 @@ RillImpressionBidRequestProperty const RillImpressionBidRequestPropertyImpSecure
 RillImpressionBidRequestProperty const RillImpressionBidRequestPropertyImpExtPrebidStoredimpressionId = @"bidRequest.imp.ext.prebid.storedimpression.id";
 RillImpressionBidRequestProperty const RillImpressionBidRequestPropertyImpBannerFormatW = @"bidRequest.imp.banner.format.w";
 RillImpressionBidRequestProperty const RillImpressionBidRequestPropertyImpBannerFormatH = @"bidRequest.imp.banner.format.h";
-RillImpressionBidRequestProperty const RillImpressionBidRequestPropertyUserExtPrebidBuyeruidsCloudx = @"bidRequest.user.ext.prebid.buyeruids.cloudx"; 

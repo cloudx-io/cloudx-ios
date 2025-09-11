@@ -78,15 +78,6 @@ typedef NS_ENUM(NSInteger, DeviceType) {
 /** The display manager */
 @property (nonatomic, readonly) NSString *displayManager;
 
-/**
- * Extracts buyeruid from adapter info for OpenRTB user.buyeruid field.
- * Adapter-agnostic approach that works with any adapter providing buyeruid.
- * @param adapterInfo Dictionary containing adapter information
- * @param logger Logger instance for debugging (optional)
- * @return Adapter-provided buyeruid or fallback value
- */
-+ (NSString *)extractBuyeruidFromAdapterInfo:(nullable NSDictionary *)adapterInfo 
-                                      logger:(nullable CLXLogger *)logger;
 
 @end
 

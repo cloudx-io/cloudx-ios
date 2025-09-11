@@ -179,8 +179,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXBiddingConfigUserExt : NSObject
 //@property (nonatomic, copy) NSString *consent;
-//@property (nonatomic, strong, nullable) CLXBiddingConfigUserExtPrebid *prebid;
-//@property (nonatomic, strong, nullable) CLXBiddingConfigUserExtCloudX *cloudx;
 @property (nonatomic, strong) NSDictionary<NSString *, NSString *> *data;
 @property (nonatomic, strong) NSArray<CLXBiddingConfigUserExtEids *> *eids;
 
