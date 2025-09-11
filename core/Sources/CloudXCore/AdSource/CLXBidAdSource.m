@@ -20,7 +20,6 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBidNetworkService.h>
 #import <CloudXCore/CLXAppSessionService.h>
-#import <CloudXCore/CLXBidNetworkServiceImplementation.h>
 #import <CloudXCore/CLXAppSessionServiceImplementation.h>
 #import <CloudXCore/CLXBiddingConfig.h>
 #import <CloudXCore/CLXDIContainer.h>

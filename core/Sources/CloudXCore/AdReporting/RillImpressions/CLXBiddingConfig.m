@@ -795,7 +795,7 @@ static void initializeLogger() {
     
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
     if (self.ext.adapterExtras) {
-        json[@"adapter_extras"] = self.ext.adapterExtras;
+        json[@"cloudx"] = @{@"adapter_extras": self.ext.adapterExtras};
     }
     if (self.ext.prebid) {
         json[@"prebid"] = [self convertPrebidDebugToJSON:self.ext.prebid];
