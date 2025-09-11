@@ -24,6 +24,7 @@ typedef NS_ENUM(NSInteger, AdState) {
 - (void)initializeSDK;
 - (void)initializeSDKWithCompletion:(void (^)(BOOL success, NSError *error))completion;
 - (void)setupCenteredButtonWithTitle:(NSString *)title action:(SEL)action;
+- (void)showLogsModal;
 
 @end
 

@@ -1,5 +1,6 @@
 #import "NativeViewController.h"
 #import <CloudXCore/CloudXCore.h>
+#import "DemoAppLogger.h"
 
 @interface NativeViewController ()
 @property (nonatomic, strong) CLXNativeAdView *nativeAd;
@@ -150,6 +151,7 @@
 
 - (void)didLoadWithAd:(CLXAd *)ad {
     NSLog(@"✅ Native ad loaded successfully");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ Native didLoadWithAd - Ad: %@", ad]];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self updateStatusUIWithState:AdStateReady];
     });
@@ -157,6 +159,7 @@
 
 - (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
     NSLog(@"❌ Failed to load Native Ad: %@", error);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Native failToLoadWithAd - Error: %@", error.localizedDescription]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeAd = nil;
@@ -167,10 +170,12 @@
 
 - (void)didShowWithAd:(CLXAd *)ad {
     NSLog(@"👀 Native ad did show");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 Native didShowWithAd - Ad: %@", ad]];
 }
 
 - (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
     NSLog(@"❌ Native ad fail to show: %@", error);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Native failToShowWithAd - Error: %@", error.localizedDescription]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeAd = nil;
@@ -181,19 +186,23 @@
 
 - (void)didHideWithAd:(CLXAd *)ad {
     NSLog(@"🔚 Native ad did hide");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 Native didHideWithAd - Ad: %@", ad]];
     self.nativeAd = nil;
 }
 
 - (void)didClickWithAd:(CLXAd *)ad {
     NSLog(@"👆 Native ad did click");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 Native didClickWithAd - Ad: %@", ad]];
 }
 
 - (void)impressionOn:(CLXAd *)ad {
     NSLog(@"👁️ Native ad impression recorded");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ Native impressionOn - Ad: %@", ad]];
 }
 
 - (void)revenuePaid:(CLXAd *)ad {
     NSLog(@"💰 Native ad revenue paid callback triggered");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 Native revenuePaid - Ad: %@", ad]];
     
     // Show revenue alert to demonstrate the callback
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -204,6 +213,7 @@
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
     NSLog(@"✋ Native ad closed by user action");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ Native closedByUserActionWithAd - Ad: %@", ad]];
     self.nativeAd = nil;
 }
 

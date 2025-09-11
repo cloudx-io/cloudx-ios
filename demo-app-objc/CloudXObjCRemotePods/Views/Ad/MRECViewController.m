@@ -1,5 +1,6 @@
 #import "MRECViewController.h"
 #import <CloudXCore/CloudXCore.h>
+#import "DemoAppLogger.h"
 
 @interface MRECViewController ()
 @property (nonatomic, strong) CLXBannerAdView *mrecAd;
@@ -70,11 +71,13 @@
 
 - (void)didLoadWithAd:(CLXAd *)ad {
     NSLog(@"✅ MREC loaded successfully");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ MREC didLoadWithAd - Ad: %@", ad]];
     self.isLoading = NO;
 }
 
 - (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
     NSLog(@"❌ Failed to load MREC Ad: %@", error);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ MREC failToLoadWithAd - Error: %@", error.localizedDescription]];
     self.isLoading = NO;
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -85,10 +88,12 @@
 
 - (void)didShowWithAd:(CLXAd *)ad {
     NSLog(@"👀 MREC did show");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 MREC didShowWithAd - Ad: %@", ad]];
 }
 
 - (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
     NSLog(@"❌ MREC fail to show: %@", error);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ MREC failToShowWithAd - Error: %@", error.localizedDescription]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
@@ -98,19 +103,23 @@
 
 - (void)didHideWithAd:(CLXAd *)ad {
     NSLog(@"🔚 MREC did hide");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 MREC didHideWithAd - Ad: %@", ad]];
     self.mrecAd = nil;
 }
 
 - (void)didClickWithAd:(CLXAd *)ad {
     NSLog(@"👆 MREC did click");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 MREC didClickWithAd - Ad: %@", ad]];
 }
 
 - (void)impressionOn:(CLXAd *)ad {
     NSLog(@"👁️ MREC impression recorded");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ MREC impressionOn - Ad: %@", ad]];
 }
 
 - (void)revenuePaid:(CLXAd *)ad {
     NSLog(@"💰 MREC revenue paid callback triggered");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 MREC revenuePaid - Ad: %@", ad]];
     
     // Show revenue alert to demonstrate the callback
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -121,6 +130,7 @@
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
     NSLog(@"✋ MREC closed by user action");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ MREC closedByUserActionWithAd - Ad: %@", ad]];
     self.mrecAd = nil;
 }
 

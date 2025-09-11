@@ -1,5 +1,6 @@
 #import "InterstitialViewController.h"
 #import <CloudXCore/CloudXCore.h>
+#import "DemoAppLogger.h"
 
 @interface InterstitialViewController ()
 @property (nonatomic, strong) id<CLXInterstitial> interstitialAd;
@@ -125,6 +126,7 @@
 
 - (void)didLoadWithAd:(CLXAd *)ad {
     NSLog(@"✅ Interstitial ad loaded successfully");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ Interstitial didLoadWithAd - Ad: %@", ad]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
 
@@ -137,6 +139,7 @@
 
 - (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
     NSLog(@"❌ Failed to load Interstitial Ad: %@", error);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Interstitial failToLoadWithAd - Error: %@", error.localizedDescription]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -152,10 +155,12 @@
 
 - (void)didShowWithAd:(CLXAd *)ad {
     NSLog(@"👀 Interstitial ad did show");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 Interstitial didShowWithAd - Ad: %@", ad]];
 }
 
 - (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
     NSLog(@"❌ Interstitial ad fail to show: %@", error);
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Interstitial failToShowWithAd - Error: %@", error.localizedDescription]];
     [self updateStatusUIWithState:AdStateNoAd];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -168,6 +173,7 @@
 
 - (void)didHideWithAd:(CLXAd *)ad {
     NSLog(@"🔚 Interstitial ad did hide");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 Interstitial didHideWithAd - Ad: %@", ad]];
     NSLog(@"📊 [InterstitialViewController] Current state before auto-load:");
     NSLog(@"📊 [InterstitialViewController] - isLoading: %d", self.isLoading);
     NSLog(@"📊 [InterstitialViewController] - showAdWhenLoaded: %d", self.showAdWhenLoaded);
@@ -183,16 +189,18 @@
 }
 
 - (void)didClickWithAd:(CLXAd *)ad {
-
     NSLog(@"👆 Interstitial ad did click");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 Interstitial didClickWithAd - Ad: %@", ad]];
 }
 
 - (void)impressionOn:(CLXAd *)ad {
     NSLog(@"👁️ Interstitial ad impression recorded");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ Interstitial impressionOn - Ad: %@", ad]];
 }
 
 - (void)revenuePaid:(CLXAd *)ad {
     NSLog(@"💰 Interstitial ad revenue paid callback triggered");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 Interstitial revenuePaid - Ad: %@", ad]];
     
     // Show revenue alert to demonstrate the callback
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -203,6 +211,7 @@
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
     NSLog(@"✋ Interstitial ad closed by user action");
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ Interstitial closedByUserActionWithAd - Ad: %@", ad]];
     self.showAdWhenLoaded = NO;
     self.interstitialAd = nil;
     // Create new ad instance for next time
