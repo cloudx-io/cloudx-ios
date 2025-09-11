@@ -224,7 +224,7 @@
                                headers:headers
                             maxRetries:3
                                 delay:1.0
-                           completion:^(id _Nullable response, NSError * _Nullable error) {
+                           completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
         if (error) {
             [self.logger error:[NSString stringWithFormat:@"Failed to track end session: %@", error.localizedDescription]];
             if (completion) {

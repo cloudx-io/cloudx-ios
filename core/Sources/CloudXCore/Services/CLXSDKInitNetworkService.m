@@ -122,12 +122,17 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
                               headers:headers
                            maxRetries:1
                                delay:0
-                          completion:^(id _Nullable response, NSError * _Nullable error) {
+                          completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
             [self.logger debug:@"📥 [SDKInitNetworkService] Network request completion called"];
             
             if (error) {
                 [self.logger error:[NSString stringWithFormat:@"❌ [SDKInitNetworkService] Network request failed: %@", error.localizedDescription]];
                 [self tryInitSDKWithAppKey:appKey completion:completion];
+            } if (isKillSwitchEnabled) {
+                NSError *sdkDisabledError = [CLXError errorWithCode:CLXErrorCodeSDKDisabled description:@"No response data"];
+                [self.logger error:@"❌ [BidNetworkService] kill switch in on received"];
+                if (completion) completion(nil, sdkDisabledError);
+                return;
             } else {
                 [self.logger info:@"✅ [SDKInitNetworkService] Network request succeeded"];
                 
