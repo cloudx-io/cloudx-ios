@@ -1,6 +1,0 @@
-framework module Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests {
-  umbrella header "Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-umbrella.h"
-
-  export *
-  module * { export * }
-}
