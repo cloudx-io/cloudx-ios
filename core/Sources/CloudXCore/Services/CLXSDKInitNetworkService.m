@@ -121,7 +121,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
                           requestBody:requestBodyData
                               headers:headers
                            maxRetries:1
-                               delay:0
+                               delay:1
                           completion:^(id _Nullable response, NSError * _Nullable error) {
             [self.logger debug:@"📥 [SDKInitNetworkService] Network request completion called"];
             

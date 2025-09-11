@@ -104,18 +104,30 @@
         
         if (error) {
             [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Network request failed - Error: %@, Retry: %ld/%ld", error.localizedDescription, (long)self.currentRetryCount, (long)maxRetries]];
-            
+        }
+        
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        
+        // Log HTTP status code
+        [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP response - Status: %ld", (long)httpResponse.statusCode]];
+        
+        if ((httpResponse.statusCode >= 500 && httpResponse.statusCode < 600) || (httpResponse.statusCode == 429)) {
+            NSTimeInterval localDelay = delay;
+            if (httpResponse.statusCode == 429) {
+                int remoteDelay = [[httpResponse.allHeaderFields objectForKey:@"Retry-After"] intValue];
+                localDelay = remoteDelay;
+            }
             if (self.currentRetryCount < maxRetries) {
                 self.currentRetryCount++;
                 [self.logger debug:[NSString stringWithFormat:@"🔄 [BaseNetworkService] Retrying request (attempt %ld)", (long)self.currentRetryCount]];
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(localDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     [self executeRequestWithEndpoint:endpoint
-                                     urlParameters:urlParameters
-                                      requestBody:requestBody
-                                          headers:headers
-                                       maxRetries:maxRetries
-                                           delay:delay
-                                      completion:completion];
+                                       urlParameters:urlParameters
+                                         requestBody:requestBody
+                                             headers:headers
+                                          maxRetries:maxRetries
+                                               delay:delay
+                                          completion:completion];
                 });
             } else {
                 [self.logger error:@"❌ [BaseNetworkService] Max retries reached, calling completion with error"];
@@ -124,13 +136,7 @@
                     completion(nil, error);
                 }
             }
-            return;
         }
-        
-        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-        
-        // Log HTTP status code
-        [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP response - Status: %ld", (long)httpResponse.statusCode]];
         
         // Log response body
         if (data) {

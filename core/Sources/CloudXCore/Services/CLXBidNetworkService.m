@@ -145,8 +145,8 @@
                                          urlParameters:nil
                                           requestBody:requestBodyData
                                               headers:headers
-                                           maxRetries:0
-                                               delay:0
+                                           maxRetries:1
+                                               delay:1
                                           completion:^(id _Nullable response, NSError * _Nullable error) {
         [self.logger debug:@"📥 [BidNetworkService] Network request completion called"];
         
@@ -194,8 +194,8 @@
                                          urlParameters:nil
                                           requestBody:jsonData
                                               headers:headers
-                                           maxRetries:0
-                                               delay:0
+                                           maxRetries:1
+                                               delay:1
                                           completion:^(id _Nullable response, NSError * _Nullable error) {
         if (completion) {
             completion(response, error);
