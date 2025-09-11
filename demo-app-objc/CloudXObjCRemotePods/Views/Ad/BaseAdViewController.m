@@ -18,7 +18,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    NSLog(@"[BaseAdViewController] viewDidLoad");
     [self setupStatusUI];
     [self setupShowLogsButton];
     [self updateStatusUIWithState:AdStateNoAd];
@@ -33,8 +32,7 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    // Clear logs when view disappears to prevent cross-contamination between ad formats
-    [[DemoAppLogger sharedInstance] clearLogs];
+    // Don't clear logs when leaving - let user see the complete ad lifecycle
 }
 
 - (void)showAlertWithTitle:(NSString *)title message:(NSString *)message {
@@ -56,29 +54,19 @@
 }
 
 - (void)initializeSDKWithCompletion:(void (^)(BOOL success, NSError *error))completion {
-    NSLog(@"[BaseAdViewController] initializeSDKWithCompletion called");
     NSString *appKey = [self appKey];
     if (!appKey || [appKey length] == 0) {
         if (completion) completion(NO, [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"API key is missing."}]);
         return;
     }
-    // SDK automatically manages loop-index internally - no manual configuration needed
-    
-    // SDK automatically handles IDFA configuration with proper priority:
-    // 1. UserDefaults override (for testing) 2. Real device IDFA 3. Fallback placeholder
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSString *testUserID = @"test-user-123";
         [self updateStatusUIWithState:AdStateLoading];
-        NSLog(@"[BaseAdViewController] Calling CloudXCore initSDKWithAppKey:hashedUserID:completion:");
         [[CloudXCore shared] initSDKWithAppKey:appKey hashedUserID:testUserID completion:^(BOOL success, NSError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (success) {
-                    NSLog(@"✅ SDK Initialized: YES");
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"cloudXSDKInitialized" object:nil];
-                } else {
-                    NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-                    NSLog(@"❌ SDK Init Failed: %@", errorMessage);
                 }
                 if (completion) completion(success, error);
             });
@@ -87,14 +75,12 @@
 }
 
 - (void)initializeSDK {
-    NSLog(@"[BaseAdViewController] initializeSDK called");
     [self initializeSDKWithCompletion:^(BOOL success, NSError * _Nullable error) {
         // No action needed for this convenience method
     }];
 }
 
 - (void)updateStatusUIWithState:(AdState)state {
-    NSLog(@"[BaseAdViewController] updateStatusUIWithState: %ld", (long)state);
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString *text;
         UIColor *color;
@@ -114,7 +100,6 @@
                 break;
         }
         
-        NSLog(@"[StatusUI] Updating status label: %@ (color: %@)", text, color);
         self.statusLabel.text = text;
         self.statusLabel.textColor = color;
         self.statusIndicator.backgroundColor = color;
@@ -122,7 +107,6 @@
 }
 
 - (void)setupStatusUI {
-    NSLog(@"[BaseAdViewController] setupStatusUI");
     // Setup status indicator stack
     self.statusStack = [[UIStackView alloc] init];
     self.statusStack.axis = UILayoutConstraintAxisHorizontal;
@@ -154,7 +138,6 @@
 }
 
 - (void)setupCenteredButtonWithTitle:(NSString *)title action:(SEL)action {
-    NSLog(@"[BaseAdViewController] setupCenteredButtonWithTitle: %@", title);
     if (!title) title = @"Button";
     UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
     [button setTitle:title forState:UIControlStateNormal];

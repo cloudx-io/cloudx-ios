@@ -15,11 +15,8 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    NSLog(@"[MRECViewController] viewWillAppear");
     if ([[CloudXCore shared] isInitialised]) {
         [self createMRECAd];
-    } else {
-        NSLog(@"[MRECViewController] SDK not initialized, MREC will be loaded once SDK is initialized.");
     }
 }
 
@@ -31,14 +28,7 @@
 - (void)createMRECAd {
     if (self.mrecAd) return;
     NSString *placement = [self placementName];
-    NSLog(@"[MRECViewController] Creating new MREC ad instance with placement: %@", placement);
-    // SDK config debugging removed to avoid undeclared selector warnings
     self.mrecAd = [[CloudXCore shared] createMRECWithPlacement:placement viewController:self delegate:self];
-    if (self.mrecAd) {
-        NSLog(@"✅ MREC ad instance created successfully: %@", self.mrecAd);
-    } else {
-        NSLog(@"❌ Failed to create MREC ad instance for placement: %@", placement);
-    }
 }
 
 - (void)showMRECAd {
@@ -70,13 +60,11 @@
 #pragma mark - CLXBannerDelegate
 
 - (void)didLoadWithAd:(CLXAd *)ad {
-    NSLog(@"✅ MREC loaded successfully");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ MREC didLoadWithAd - Ad: %@", ad]];
     self.isLoading = NO;
 }
 
 - (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    NSLog(@"❌ Failed to load MREC Ad: %@", error);
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ MREC failToLoadWithAd - Error: %@", error.localizedDescription]];
     self.isLoading = NO;
     
@@ -87,12 +75,10 @@
 }
 
 - (void)didShowWithAd:(CLXAd *)ad {
-    NSLog(@"👀 MREC did show");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 MREC didShowWithAd - Ad: %@", ad]];
 }
 
 - (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    NSLog(@"❌ MREC fail to show: %@", error);
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ MREC failToShowWithAd - Error: %@", error.localizedDescription]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -102,23 +88,19 @@
 }
 
 - (void)didHideWithAd:(CLXAd *)ad {
-    NSLog(@"🔚 MREC did hide");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 MREC didHideWithAd - Ad: %@", ad]];
     self.mrecAd = nil;
 }
 
 - (void)didClickWithAd:(CLXAd *)ad {
-    NSLog(@"👆 MREC did click");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 MREC didClickWithAd - Ad: %@", ad]];
 }
 
 - (void)impressionOn:(CLXAd *)ad {
-    NSLog(@"👁️ MREC impression recorded");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ MREC impressionOn - Ad: %@", ad]];
 }
 
 - (void)revenuePaid:(CLXAd *)ad {
-    NSLog(@"💰 MREC revenue paid callback triggered");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 MREC revenuePaid - Ad: %@", ad]];
     
     // Show revenue alert to demonstrate the callback
@@ -129,9 +111,27 @@
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
-    NSLog(@"✋ MREC closed by user action");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ MREC closedByUserActionWithAd - Ad: %@", ad]];
     self.mrecAd = nil;
+}
+
+// Banner-specific delegate methods (MREC is a banner type)
+- (void)didExpandAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔍 MREC didExpandAd - Ad: %@", ad]];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self showAlertWithTitle:@"MREC Expanded!" 
+                         message:@"MREC ad expanded to full screen."];
+    });
+}
+
+- (void)didCollapseAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔍 MREC didCollapseAd - Ad: %@", ad]];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self showAlertWithTitle:@"MREC Collapsed!" 
+                         message:@"MREC ad collapsed from full screen."];
+    });
 }
 
 - (NSString *)placementName {
@@ -140,39 +140,25 @@
 }
 
 - (void)loadMREC {
-    NSLog(@"[MRECViewController] loadMREC called");
     if (![[CloudXCore shared] isInitialised]) {
-        NSLog(@"[MRECViewController] SDK not initialized");
         return;
     }
 
     if (self.isLoading || self.mrecAd) {
-        NSLog(@"[MRECViewController] MREC ad process already started");
         return;
     }
 
-    NSLog(@"[MRECViewController] Starting MREC ad load process...");
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
 
     NSString *placement = [self placementName];
-    NSLog(@"[MRECViewController] Using placement: %@", placement);
-    
-    // Log SDK configuration details
-    NSLog(@"[MRECViewController] SDK initialization status: %d", [[CloudXCore shared] isInitialised]);
-    
-    // Create MREC with comprehensive logging
-    NSLog(@"[MRECViewController] Calling createMRECWithPlacement: %@", placement);
     self.mrecAd = [[CloudXCore shared] createMRECWithPlacement:placement
                                                  viewController:self
                                                       delegate:self];
     
     if (self.mrecAd) {
-        NSLog(@"[MRECViewController] ✅ MREC ad instance created successfully: %@", self.mrecAd);
-        NSLog(@"[MRECViewController] Loading MREC ad instance...");
         [self.mrecAd load];
     } else {
-        NSLog(@"[MRECViewController] ❌ Failed to create MREC with placement: %@", placement);
         self.isLoading = NO;
         [self updateStatusUIWithState:AdStateNoAd];
         [self showAlertWithTitle:@"Error" message:@"Failed to create MREC."];

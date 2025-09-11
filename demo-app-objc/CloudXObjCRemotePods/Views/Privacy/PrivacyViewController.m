@@ -29,7 +29,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    NSLog(@"[PrivacyViewController] viewDidLoad");
     self.title = @"Privacy Settings";
     
     [self setupScrollView];
@@ -66,8 +65,6 @@
 }
 
 - (void)setupPrivacyButtons {
-    NSLog(@"[PrivacyViewController] setupPrivacyButtons");
-    
     // GDPR Only Button
     self.setGDPRButton = [self createButtonWithTitle:@"Set GDPR Only" 
                                      backgroundColor:[UIColor systemBlueColor] 
@@ -137,8 +134,6 @@
 }
 
 - (void)setupStatusUI {
-    NSLog(@"[PrivacyViewController] setupStatusUI");
-    
     // Setup status indicator stack
     self.statusStack = [[UIStackView alloc] init];
     self.statusStack.axis = UILayoutConstraintAxisHorizontal;
@@ -179,7 +174,6 @@
 }
 
 - (void)setCCPAOnly {
-    NSLog(@"[PrivacyViewController] setCCPAOnly called");
     [self updateStatusWithMessage:@"Setting CCPA..." color:[UIColor systemYellowColor]];
     
     @try {
@@ -189,14 +183,10 @@
         NSString *ccpaPrivacyString = @"1YNN"; // CCPA opt-out string
         [CloudXCore setCCPAPrivacyString:ccpaPrivacyString];
         
-        NSLog(@"✅ [PrivacyViewController] CCPA Only set successfully");
-        NSLog(@"   CCPA Privacy: %@", ccpaPrivacyString);
-        
         [self updateStatusWithMessage:@"CCPA Only Set" color:[UIColor systemOrangeColor]];
         [self showAlertWithTitle:@"CCPA Set" message:@"Only CCPA privacy data has been set.\n\nTest if bid requests work with CCPA only."];
         
     } @catch (NSException *exception) {
-        NSLog(@"❌ [PrivacyViewController] Exception setting CCPA: %@", exception);
         [self updateStatusWithMessage:@"CCPA Error" color:[UIColor systemRedColor]];
         [self showAlertWithTitle:@"CCPA Error" message:[NSString stringWithFormat:@"Failed to set CCPA: %@", exception.reason]];
     }
@@ -213,19 +203,15 @@
 }
 
 - (void)clearAllPrivacyData {
-    NSLog(@"[PrivacyViewController] clearAllPrivacyData called");
     [self updateStatusWithMessage:@"Clearing All..." color:[UIColor systemYellowColor]];
     
     @try {
         [self clearAllPrivacyDataSilently];
         
-        NSLog(@"✅ [PrivacyViewController] All privacy data cleared successfully");
-        
         [self updateStatusWithMessage:@"All Privacy Cleared" color:[UIColor systemGreenColor]];
         [self showAlertWithTitle:@"Privacy Cleared" message:@"All privacy data has been cleared.\n\nBid requests will not include any privacy regulations."];
         
     } @catch (NSException *exception) {
-        NSLog(@"❌ [PrivacyViewController] Exception clearing privacy data: %@", exception);
         [self updateStatusWithMessage:@"Clear Error" color:[UIColor systemRedColor]];
         [self showAlertWithTitle:@"Clear Error" message:[NSString stringWithFormat:@"Failed to clear privacy data: %@", exception.reason]];
     }
