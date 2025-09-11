@@ -386,24 +386,6 @@
         [self.logger info:@"⚠️ [DELEGATE] Delegate does not respond to didLoadBanner"];
     }
     
-    [self.logger debug:@"🔧 [SUCCESS] Notifying delegate: didShowBanner..."];
-    if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
-        [self.logger info:@"✅ [DELEGATE] Calling didShowBanner on delegate"];
-        [self.delegate didShowBanner:self];
-        [self.logger debug:@"✅ [DELEGATE] didShowBanner call completed"];
-    } else {
-        [self.logger info:@"⚠️ [DELEGATE] Delegate does not respond to didShowBanner"];
-    }
-    
-    [self.logger debug:@"🔧 [SUCCESS] Notifying delegate: impressionBanner..."];
-    if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
-        [self.logger info:@"✅ [DELEGATE] Calling impressionBanner on delegate"];
-        [self.delegate impressionBanner:self];
-        [self.logger debug:@"✅ [DELEGATE] impressionBanner call completed"];
-    } else {
-        [self.logger info:@"⚠️ [DELEGATE] Delegate does not respond to impressionBanner"];
-    }
-    
     [self.logger info:@"🎯 [SUCCESS] Banner load sequence completed successfully"];
 }
 
