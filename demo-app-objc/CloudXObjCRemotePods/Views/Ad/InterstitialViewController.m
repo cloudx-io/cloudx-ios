@@ -11,14 +11,51 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self setupCenteredButtonWithTitle:@"Show Interstitial" action:@selector(showInterstitialAd)];
+    
+    // Create a vertical stack for buttons
+    UIStackView *buttonStack = [[UIStackView alloc] init];
+    buttonStack.axis = UILayoutConstraintAxisVertical;
+    buttonStack.spacing = 16;
+    buttonStack.alignment = UIStackViewAlignmentCenter;
+    buttonStack.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:buttonStack];
+    
+    // Load Interstitial button
+    UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [loadButton setTitle:@"Load Interstitial" forState:UIControlStateNormal];
+    [loadButton addTarget:self action:@selector(loadInterstitialAd) forControlEvents:UIControlEventTouchUpInside];
+    loadButton.backgroundColor = [UIColor systemGreenColor];
+    [loadButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    loadButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    loadButton.layer.cornerRadius = 8;
+    loadButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:loadButton];
+    
+    // Show Interstitial button
+    UIButton *showButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [showButton setTitle:@"Show Interstitial" forState:UIControlStateNormal];
+    [showButton addTarget:self action:@selector(showInterstitialAd) forControlEvents:UIControlEventTouchUpInside];
+    showButton.backgroundColor = [UIColor systemBlueColor];
+    [showButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    showButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    showButton.layer.cornerRadius = 8;
+    showButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:showButton];
+    
+    // Button constraints
+    [NSLayoutConstraint activateConstraints:@[
+        [buttonStack.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
+        [loadButton.widthAnchor constraintEqualToConstant:200],
+        [loadButton.heightAnchor constraintEqualToConstant:44],
+        [showButton.widthAnchor constraintEqualToConstant:200],
+        [showButton.heightAnchor constraintEqualToConstant:44]
+    ]];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    if ([[CloudXCore shared] isInitialised]) {
-        [self loadInterstitial];
-    }
+    // No auto-loading - user must press Load Interstitial button
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -33,6 +70,25 @@
 - (NSString *)placementName {
     // Use actual CloudX placement name from server config
     return @"metaInterstitial";
+}
+
+- (void)loadInterstitialAd {
+    if (![[CloudXCore shared] isInitialised]) {
+        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
+        return;
+    }
+    
+    if (self.isLoading) {
+        [self showAlertWithTitle:@"Info" message:@"Interstitial is already loading."];
+        return;
+    }
+    
+    if (self.interstitialAd) {
+        [self showAlertWithTitle:@"Info" message:@"Interstitial already loaded. Use Show Interstitial to display it."];
+        return;
+    }
+    
+    [self loadInterstitial];
 }
 
 - (void)loadInterstitial {
@@ -62,16 +118,25 @@
 
 
 - (void)showInterstitialAd {
+    if (![[CloudXCore shared] isInitialised]) {
+        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
+        return;
+    }
+    
+    if (!self.interstitialAd) {
+        [self showAlertWithTitle:@"Error" message:@"No interstitial loaded. Please load an interstitial first."];
+        return;
+    }
+    
+    if (self.isLoading) {
+        [self showAlertWithTitle:@"Info" message:@"Interstitial is still loading. Please wait."];
+        return;
+    }
+    
     if (self.interstitialAd.isReady) {
         [self.interstitialAd showFromViewController:self];
     } else {
-        self.showAdWhenLoaded = YES;
-        if (!self.isLoading && self.interstitialAd) {
-            [self.interstitialAd load];
-        } else if (!self.isLoading) {
-            [self loadInterstitial];
-        }
-        [self updateStatusUIWithState:AdStateLoading];
+        [self showAlertWithTitle:@"Error" message:@"Interstitial is not ready. Please try loading again."];
     }
 }
 
@@ -85,18 +150,13 @@
 #pragma mark - CLXInterstitialDelegate
 
 - (void)didLoadWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ Interstitial didLoadWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Interstitial didLoadWithAd" ad:ad];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
-
-    if (self.showAdWhenLoaded) {
-        self.showAdWhenLoaded = NO; // Reset flag
-        [self.interstitialAd showFromViewController:self];
-    }
 }
 
 - (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Interstitial failToLoadWithAd - Error: %@", error.localizedDescription]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Interstitial failToLoadWithAd" ad:ad];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -108,11 +168,11 @@
 }
 
 - (void)didShowWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 Interstitial didShowWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Interstitial didShowWithAd" ad:ad];
 }
 
 - (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Interstitial failToShowWithAd - Error: %@", error.localizedDescription]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Interstitial failToShowWithAd" ad:ad];
     [self updateStatusUIWithState:AdStateNoAd];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -123,32 +183,25 @@
 }
 
 - (void)didHideWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 Interstitial didHideWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Interstitial didHideWithAd" ad:ad];
     
     self.showAdWhenLoaded = NO;
     self.interstitialAd = nil;
     
-    // Create new ad instance for next time
-    [self loadInterstitial];
+    // Don't auto-load - user must press Load Interstitial button
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
 - (void)didClickWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 Interstitial didClickWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Interstitial didClickWithAd" ad:ad];
 }
 
 - (void)impressionOn:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ Interstitial impressionOn - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Interstitial impressionOn" ad:ad];
 }
 
 - (void)revenuePaid:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 Interstitial revenuePaid - Ad: %@", ad]];
-    
-    // Show revenue alert to demonstrate the callback
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self showAlertWithTitle:@"Revenue Paid!" 
-                         message:@"NURL was successfully sent to server. Revenue callback triggered for interstitial ad."];
-    });
+    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Interstitial revenuePaid" ad:ad];
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {

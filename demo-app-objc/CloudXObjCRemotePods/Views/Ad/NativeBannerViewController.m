@@ -20,7 +20,20 @@
     mainStack.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:mainStack];
     
-    // Create the button
+    // Load Native Banner button
+    UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [loadButton setTitle:@"Load Native Banner" forState:UIControlStateNormal];
+    loadButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    loadButton.backgroundColor = [UIColor systemGreenColor];
+    [loadButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    loadButton.layer.cornerRadius = 8;
+    loadButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [loadButton addTarget:self action:@selector(loadNativeBannerAd) forControlEvents:UIControlEventTouchUpInside];
+    [mainStack addArrangedSubview:loadButton];
+    [loadButton.widthAnchor constraintEqualToConstant:200].active = YES;
+    [loadButton.heightAnchor constraintEqualToConstant:44].active = YES;
+    
+    // Show Native Banner button
     UIButton *showButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [showButton setTitle:@"Show Native Banner" forState:UIControlStateNormal];
     showButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
@@ -51,12 +64,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    NSLog(@"[NativeBannerViewController] viewWillAppear");
-    if ([[CloudXCore shared] isInitialised]) {
-        [self loadNativeBanner];
-    } else {
-        NSLog(@"[NativeBannerViewController] SDK not initialized, native banner will be loaded once SDK is initialized.");
-    }
+    // No auto-loading - user must press Load Native Banner button
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -71,6 +79,25 @@
 - (NSString *)placementName {
     // Use actual CloudX placement name from server config (using native placement for native banner)
     return @"metaNative";
+}
+
+- (void)loadNativeBannerAd {
+    if (![[CloudXCore shared] isInitialised]) {
+        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
+        return;
+    }
+    
+    if (self.isLoading) {
+        [self showAlertWithTitle:@"Info" message:@"Native banner is already loading."];
+        return;
+    }
+    
+    if (self.nativeBannerAd) {
+        [self showAlertWithTitle:@"Info" message:@"Native banner already loaded. Use Show Native Banner to display it."];
+        return;
+    }
+    
+    [self loadNativeBanner];
 }
 
 - (void)loadNativeBanner {
@@ -150,7 +177,7 @@
 #pragma mark - CLXNativeDelegate
 
 - (void)didLoadWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ NativeBanner didLoadWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ NativeBanner didLoadWithAd" ad:ad];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self updateStatusUIWithState:AdStateReady];
     });
@@ -167,7 +194,7 @@
 }
 
 - (void)didShowWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 NativeBanner didShowWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 NativeBanner didShowWithAd" ad:ad];
 }
 
 - (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
@@ -190,17 +217,11 @@
 }
 
 - (void)impressionOn:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ NativeBanner impressionOn - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ NativeBanner impressionOn" ad:ad];
 }
 
 - (void)revenuePaid:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 NativeBanner revenuePaid - Ad: %@", ad]];
-    
-    // Show revenue alert to demonstrate the callback
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self showAlertWithTitle:@"Revenue Paid!" 
-                         message:@"NURL was successfully sent to server. Revenue callback triggered for native banner ad."];
-    });
+    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 NativeBanner revenuePaid" ad:ad];
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {

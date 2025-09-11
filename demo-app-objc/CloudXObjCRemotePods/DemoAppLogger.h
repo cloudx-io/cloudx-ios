@@ -1,5 +1,7 @@
 #import <Foundation/Foundation.h>
 
+@class CLXAd;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DemoAppLogEntry : NSObject
@@ -15,9 +17,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 - (void)logMessage:(NSString *)message;
+- (void)logAdEvent:(NSString *)eventName ad:(nullable CLXAd *)ad;
 - (void)clearLogs;
 - (NSArray<DemoAppLogEntry *> *)getAllLogs;
 - (NSInteger)logCount;
+
+// Helper method to format CLXAd details
++ (NSString *)formatAdDetails:(nullable CLXAd *)ad;
 
 @end
 

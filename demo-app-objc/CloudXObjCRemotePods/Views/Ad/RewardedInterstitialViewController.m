@@ -10,7 +10,46 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self setupCenteredButtonWithTitle:@"Show Rewarded Interstitial" action:@selector(showRewardedInterstitialAd)];
+    
+    // Create a vertical stack for buttons
+    UIStackView *buttonStack = [[UIStackView alloc] init];
+    buttonStack.axis = UILayoutConstraintAxisVertical;
+    buttonStack.spacing = 16;
+    buttonStack.alignment = UIStackViewAlignmentCenter;
+    buttonStack.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:buttonStack];
+    
+    // Load Rewarded Interstitial button
+    UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [loadButton setTitle:@"Load Rewarded Interstitial" forState:UIControlStateNormal];
+    [loadButton addTarget:self action:@selector(loadRewardedInterstitialAd) forControlEvents:UIControlEventTouchUpInside];
+    loadButton.backgroundColor = [UIColor systemGreenColor];
+    [loadButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    loadButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    loadButton.layer.cornerRadius = 8;
+    loadButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:loadButton];
+    
+    // Show Rewarded Interstitial button
+    UIButton *showButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [showButton setTitle:@"Show Rewarded Interstitial" forState:UIControlStateNormal];
+    [showButton addTarget:self action:@selector(showRewardedInterstitialAd) forControlEvents:UIControlEventTouchUpInside];
+    showButton.backgroundColor = [UIColor systemBlueColor];
+    [showButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    showButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    showButton.layer.cornerRadius = 8;
+    showButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:showButton];
+    
+    // Button constraints
+    [NSLayoutConstraint activateConstraints:@[
+        [buttonStack.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
+        [loadButton.widthAnchor constraintEqualToConstant:250],
+        [loadButton.heightAnchor constraintEqualToConstant:44],
+        [showButton.widthAnchor constraintEqualToConstant:250],
+        [showButton.heightAnchor constraintEqualToConstant:44]
+    ]];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -154,12 +193,6 @@
 
 - (void)revenuePaid:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 RewardedInterstitial revenuePaid - Ad: %@", ad]];
-    
-    // Show revenue alert to demonstrate the callback
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self showAlertWithTitle:@"Revenue Paid!" 
-                         message:@"NURL was successfully sent to server. Revenue callback triggered for rewarded interstitial ad."];
-    });
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {

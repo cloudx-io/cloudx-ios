@@ -20,51 +20,64 @@
 }
 
 - (void)setupUI {
-    // Setup main show banner button
-    [self setupCenteredButtonWithTitle:@"Show Banner" action:@selector(showBannerAd)];
+    // Create a vertical stack for buttons
+    UIStackView *buttonStack = [[UIStackView alloc] init];
+    buttonStack.axis = UILayoutConstraintAxisVertical;
+    buttonStack.spacing = 16;
+    buttonStack.alignment = UIStackViewAlignmentCenter;
+    buttonStack.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:buttonStack];
     
-    // Setup auto-refresh toggle button
+    // Load Banner button
+    UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [loadButton setTitle:@"Load Banner" forState:UIControlStateNormal];
+    [loadButton addTarget:self action:@selector(loadBannerAd) forControlEvents:UIControlEventTouchUpInside];
+    loadButton.backgroundColor = [UIColor systemGreenColor];
+    [loadButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    loadButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    loadButton.layer.cornerRadius = 8;
+    loadButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:loadButton];
+    
+    // Show Banner button
+    UIButton *showButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [showButton setTitle:@"Show Banner" forState:UIControlStateNormal];
+    [showButton addTarget:self action:@selector(showBannerAd) forControlEvents:UIControlEventTouchUpInside];
+    showButton.backgroundColor = [UIColor systemBlueColor];
+    [showButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    showButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    showButton.layer.cornerRadius = 8;
+    showButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:showButton];
+    
+    // Auto-refresh toggle button
     self.autoRefreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [self.autoRefreshButton setTitle:@"Stop Auto-Refresh" forState:UIControlStateNormal];
     [self.autoRefreshButton addTarget:self action:@selector(toggleAutoRefresh) forControlEvents:UIControlEventTouchUpInside];
-    self.autoRefreshButton.backgroundColor = [UIColor systemBlueColor];
+    self.autoRefreshButton.backgroundColor = [UIColor systemPurpleColor];
     [self.autoRefreshButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    self.autoRefreshButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
     self.autoRefreshButton.layer.cornerRadius = 8;
     self.autoRefreshButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:self.autoRefreshButton];
     
-    [self.view addSubview:self.autoRefreshButton];
     
+    // Button constraints
     [NSLayoutConstraint activateConstraints:@[
-        [self.autoRefreshButton.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
-        [self.autoRefreshButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [buttonStack.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
+        [loadButton.widthAnchor constraintEqualToConstant:200],
+        [loadButton.heightAnchor constraintEqualToConstant:44],
+        [showButton.widthAnchor constraintEqualToConstant:200],
+        [showButton.heightAnchor constraintEqualToConstant:44],
         [self.autoRefreshButton.widthAnchor constraintEqualToConstant:200],
         [self.autoRefreshButton.heightAnchor constraintEqualToConstant:44]
-    ]];
-    
-    // Add placement test button
-    UIButton *placementButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [placementButton setTitle:@"Test Placement Property" forState:UIControlStateNormal];
-    [placementButton addTarget:self action:@selector(testPlacementProperty) forControlEvents:UIControlEventTouchUpInside];
-    placementButton.backgroundColor = [UIColor systemOrangeColor];
-    [placementButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    placementButton.layer.cornerRadius = 8;
-    placementButton.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    [self.view addSubview:placementButton];
-    
-    [NSLayoutConstraint activateConstraints:@[
-        [placementButton.topAnchor constraintEqualToAnchor:self.autoRefreshButton.bottomAnchor constant:20],
-        [placementButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
-        [placementButton.widthAnchor constraintEqualToConstant:200],
-        [placementButton.heightAnchor constraintEqualToConstant:44]
     ]];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    if ([[CloudXCore shared] isInitialised] && !self.bannerAd) {
-        [self loadBanner];
-    }
+    // No auto-loading - user must press Load Banner button
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -79,6 +92,25 @@
 - (NSString *)placementName {
     // Use actual CloudX placement name from server config
     return @"metaBanner";
+}
+
+- (void)loadBannerAd {
+    if (![[CloudXCore shared] isInitialised]) {
+        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
+        return;
+    }
+    
+    if (self.isLoading) {
+        [self showAlertWithTitle:@"Info" message:@"Banner is already loading."];
+        return;
+    }
+    
+    if (self.bannerAd) {
+        [self showAlertWithTitle:@"Info" message:@"Banner already loaded. Use Show Banner to display it."];
+        return;
+    }
+    
+    [self loadBanner];
 }
 
 - (void)loadBanner {
@@ -98,7 +130,13 @@
     
     if (!self.bannerAd) {
         [self showAlertWithTitle:@"Error" message:@"Failed to create banner."];
+        return;
     }
+    
+    // Start loading
+    self.isLoading = YES;
+    [self updateStatusUIWithState:AdStateLoading];
+    [self.bannerAd load];
 }
 
 - (void)showBannerAd {
@@ -107,35 +145,24 @@
         return;
     }
     
+    if (!self.bannerAd) {
+        [self showAlertWithTitle:@"Error" message:@"No banner loaded. Please load a banner first."];
+        return;
+    }
+    
     if (self.isLoading) {
+        [self showAlertWithTitle:@"Info" message:@"Banner is still loading. Please wait."];
         return;
     }
     
     // Check if banner is already in the view hierarchy
-    if (self.bannerAd && self.bannerAd.superview) {
+    if (self.bannerAd.superview) {
+        [self showAlertWithTitle:@"Info" message:@"Banner is already showing."];
         return;
     }
     
-    // If we already have a loaded banner, add it to view hierarchy
-    if (self.bannerAd && self.bannerAd.isReady) {
-        [self addBannerToViewHierarchy];
-        return;
-    }
-    
-    // Create and load a new banner ad instance
-    if (!self.bannerAd) {
-        [self loadBanner];
-    }
-    
-    if (!self.bannerAd) {
-        [self showAlertWithTitle:@"Error" message:@"Failed to create banner."];
-        return;
-    }
-    
-    // Start loading - banner will be added to view in didLoadWithAd callback
-    self.isLoading = YES;
-    [self updateStatusUIWithState:AdStateLoading];
-    [self.bannerAd load];
+    // Add banner to view hierarchy
+    [self addBannerToViewHierarchy];
 }
 
 - (void)addBannerToViewHierarchy {
@@ -177,21 +204,6 @@
     }
 }
 
-- (void)testPlacementProperty {
-    if (!self.bannerAd) {
-        return;
-    }
-    
-    // Test setting the placement property
-    NSString *originalPlacement = self.bannerAd.placement;
-    NSString *testPlacement = @"testPlacementValue123";
-    
-    self.bannerAd.placement = testPlacement;
-    
-    // Restore original placement
-    self.bannerAd.placement = originalPlacement;
-}
-
 #pragma mark - Property Logging
 
 
@@ -218,17 +230,16 @@
 
 #pragma mark - CLXBannerDelegate
 - (void)didLoadWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ Banner didLoadWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Banner didLoadWithAd" ad:ad];
     
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
     
-    // Add banner to view hierarchy now that it's loaded - this should trigger didShowWithAd and impressionOn
-    [self addBannerToViewHierarchy];
+    // Don't auto-show - user must press Show Banner button
 }
 
 - (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failToLoadWithAd - Error: %@", error.localizedDescription]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Banner failToLoadWithAd" ad:ad];
     
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
@@ -241,11 +252,11 @@
 }
 
 - (void)didShowWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 Banner didShowWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Banner didShowWithAd" ad:ad];
 }
 
 - (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failToShowWithAd - Error: %@", error.localizedDescription]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Banner failToShowWithAd" ad:ad];
     
     self.bannerAd = nil;
     
@@ -256,36 +267,30 @@
 }
 
 - (void)didHideWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 Banner didHideWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Banner didHideWithAd" ad:ad];
     self.bannerAd = nil;
 }
 
 - (void)didClickWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 Banner didClickWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Banner didClickWithAd" ad:ad];
 }
 
 - (void)impressionOn:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ Banner impressionOn - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Banner impressionOn" ad:ad];
 }
 
 - (void)revenuePaid:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 Banner revenuePaid - Ad: %@", ad]];
-    
-    // Show revenue alert to demonstrate the callback
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self showAlertWithTitle:@"Revenue Paid!" 
-                         message:@"NURL was successfully sent to server. Revenue callback triggered."];
-    });
+    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Banner revenuePaid" ad:ad];
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ Banner closedByUserActionWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"✋ Banner closedByUserActionWithAd" ad:ad];
     self.bannerAd = nil;
 }
 
 // NEW MAX SDK Compatibility Delegate Methods
 - (void)didExpandAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔍 Banner didExpandAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"🔍 Banner didExpandAd" ad:ad];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showAlertWithTitle:@"Banner Expanded!" 
@@ -294,7 +299,7 @@
 }
 
 - (void)didCollapseAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔍 Banner didCollapseAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"🔍 Banner didCollapseAd" ad:ad];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showAlertWithTitle:@"Banner Collapsed!" 

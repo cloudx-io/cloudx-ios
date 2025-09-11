@@ -25,9 +25,20 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    // Clear logs when view appears to ensure clean state for this ad format
-    [[DemoAppLogger sharedInstance] clearLogs];
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"[%@] View will appear - logs cleared", NSStringFromClass([self class])]];
+    
+    // Clear logs when switching between different ad formats (tabs)
+    NSString *currentAdFormat = NSStringFromClass([self class]);
+    static NSString *lastAdFormat = nil;
+    
+    if (lastAdFormat && ![lastAdFormat isEqualToString:currentAdFormat]) {
+        // Switching between different ad formats - clear logs for clean slate
+        [[DemoAppLogger sharedInstance] clearLogs];
+        [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"[%@] Switched from %@ - logs cleared", currentAdFormat, lastAdFormat]];
+    }
+    // No log for same format - keep it clean
+    
+    // Remember current ad format for next time (session only)
+    lastAdFormat = currentAdFormat;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

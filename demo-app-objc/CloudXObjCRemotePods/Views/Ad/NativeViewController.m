@@ -20,7 +20,20 @@
     mainStack.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:mainStack];
     
-    // Create the button
+    // Load Native button
+    UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [loadButton setTitle:@"Load Native" forState:UIControlStateNormal];
+    loadButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    loadButton.backgroundColor = [UIColor systemGreenColor];
+    [loadButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    loadButton.layer.cornerRadius = 8;
+    loadButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [loadButton addTarget:self action:@selector(loadNativeAd) forControlEvents:UIControlEventTouchUpInside];
+    [mainStack addArrangedSubview:loadButton];
+    [loadButton.widthAnchor constraintEqualToConstant:200].active = YES;
+    [loadButton.heightAnchor constraintEqualToConstant:44].active = YES;
+    
+    // Show Native button
     UIButton *showButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [showButton setTitle:@"Show Native" forState:UIControlStateNormal];
     showButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
@@ -51,9 +64,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    if ([[CloudXCore shared] isInitialised]) {
-        [self loadNative];
-    }
+    // No auto-loading - user must press Load Native button
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -68,6 +79,25 @@
 - (NSString *)placementName {
     // Use actual CloudX placement name from server config
     return @"metaNative";
+}
+
+- (void)loadNativeAd {
+    if (![[CloudXCore shared] isInitialised]) {
+        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
+        return;
+    }
+    
+    if (self.isLoading) {
+        [self showAlertWithTitle:@"Info" message:@"Native ad is already loading."];
+        return;
+    }
+    
+    if (self.nativeAd) {
+        [self showAlertWithTitle:@"Info" message:@"Native ad already loaded. Use Show Native to display it."];
+        return;
+    }
+    
+    [self loadNative];
 }
 
 - (void)loadNative {
@@ -98,18 +128,22 @@
 
 - (void)showNativeAd {
     if (![[CloudXCore shared] isInitialised]) {
-        [self showAlertWithTitle:@"SDK Not Ready" message:@"Please wait for SDK initialization to complete."];
+        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
         return;
     }
     
     if (!self.nativeAd) {
-        [self loadNative];
+        [self showAlertWithTitle:@"Error" message:@"No native ad loaded. Please load a native ad first."];
+        return;
+    }
+    
+    if (self.isLoading) {
+        [self showAlertWithTitle:@"Info" message:@"Native ad is still loading. Please wait."];
         return;
     }
     
     if (!self.nativeAd.isReady) {
-        [self updateStatusUIWithState:AdStateLoading];
-        [self.nativeAd load];
+        [self showAlertWithTitle:@"Error" message:@"Native ad is not ready. Please try loading again."];
         return;
     }
     
@@ -131,14 +165,17 @@
 #pragma mark - CLXNativeDelegate
 
 - (void)didLoadWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ Native didLoadWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Native didLoadWithAd" ad:ad];
     dispatch_async(dispatch_get_main_queue(), ^{
+        self.isLoading = NO;
         [self updateStatusUIWithState:AdStateReady];
     });
+    
+    // Don't auto-show - user must press Show Native button
 }
 
 - (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Native failToLoadWithAd - Error: %@", error.localizedDescription]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Native failToLoadWithAd" ad:ad];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeAd = nil;
@@ -148,11 +185,11 @@
 }
 
 - (void)didShowWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 Native didShowWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Native didShowWithAd" ad:ad];
 }
 
 - (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Native failToShowWithAd - Error: %@", error.localizedDescription]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Native failToShowWithAd" ad:ad];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeAd = nil;
@@ -162,30 +199,24 @@
 }
 
 - (void)didHideWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 Native didHideWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Native didHideWithAd" ad:ad];
     self.nativeAd = nil;
 }
 
 - (void)didClickWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 Native didClickWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Native didClickWithAd" ad:ad];
 }
 
 - (void)impressionOn:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ Native impressionOn - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Native impressionOn" ad:ad];
 }
 
 - (void)revenuePaid:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 Native revenuePaid - Ad: %@", ad]];
-    
-    // Show revenue alert to demonstrate the callback
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self showAlertWithTitle:@"Revenue Paid!" 
-                         message:@"NURL was successfully sent to server. Revenue callback triggered for native ad."];
-    });
+    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Native revenuePaid" ad:ad];
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ Native closedByUserActionWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"✋ Native closedByUserActionWithAd" ad:ad];
     self.nativeAd = nil;
 }
 
