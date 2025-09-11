@@ -10,17 +10,51 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self setupCenteredButtonWithTitle:@"Show Rewarded" action:@selector(showRewardedAd)];
+    
+    // Create a vertical stack for buttons
+    UIStackView *buttonStack = [[UIStackView alloc] init];
+    buttonStack.axis = UILayoutConstraintAxisVertical;
+    buttonStack.spacing = 16;
+    buttonStack.alignment = UIStackViewAlignmentCenter;
+    buttonStack.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:buttonStack];
+    
+    // Load Rewarded button
+    UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [loadButton setTitle:@"Load Rewarded" forState:UIControlStateNormal];
+    [loadButton addTarget:self action:@selector(loadRewardedAd) forControlEvents:UIControlEventTouchUpInside];
+    loadButton.backgroundColor = [UIColor systemGreenColor];
+    [loadButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    loadButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    loadButton.layer.cornerRadius = 8;
+    loadButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:loadButton];
+    
+    // Show Rewarded button
+    UIButton *showButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [showButton setTitle:@"Show Rewarded" forState:UIControlStateNormal];
+    [showButton addTarget:self action:@selector(showRewardedAd) forControlEvents:UIControlEventTouchUpInside];
+    showButton.backgroundColor = [UIColor systemBlueColor];
+    [showButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    showButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    showButton.layer.cornerRadius = 8;
+    showButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:showButton];
+    
+    // Button constraints
+    [NSLayoutConstraint activateConstraints:@[
+        [buttonStack.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
+        [loadButton.widthAnchor constraintEqualToConstant:200],
+        [loadButton.heightAnchor constraintEqualToConstant:44],
+        [showButton.widthAnchor constraintEqualToConstant:200],
+        [showButton.heightAnchor constraintEqualToConstant:44]
+    ]];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    NSLog(@"[RewardedViewController] viewWillAppear");
-    if ([[CloudXCore shared] isInitialised]) {
-        [self loadRewarded];
-    } else {
-        NSLog(@"[RewardedViewController] SDK not initialized, rewarded ad will be loaded once SDK is initialized.");
-    }
+    // No auto-loading - user must press Load Rewarded button
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -35,6 +69,25 @@
 - (NSString *)placementName {
     // Use actual CloudX placement name from server config
     return @"metaRewarded";
+}
+
+- (void)loadRewardedAd {
+    if (![[CloudXCore shared] isInitialised]) {
+        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
+        return;
+    }
+    
+    if (self.isLoading) {
+        [self showAlertWithTitle:@"Info" message:@"Rewarded ad is already loading."];
+        return;
+    }
+    
+    if (self.rewardedAd) {
+        [self showAlertWithTitle:@"Info" message:@"Rewarded ad already loaded. Use Show Rewarded to display it."];
+        return;
+    }
+    
+    [self loadRewarded];
 }
 
 - (void)loadRewarded {
@@ -162,15 +215,13 @@
 #pragma mark - CLXRewardedDelegate
 
 - (void)didLoadWithAd:(CLXAd *)ad {
-    NSLog(@"✅ Rewarded ad loaded successfully");
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ Rewarded didLoadWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Rewarded didLoadWithAd" ad:ad];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
     // Do NOT show the ad here!
 }
 
 - (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    NSLog(@"❌ Failed to load Rewarded Ad: %@", error);
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failToLoadWithAd - Error: %@", error.localizedDescription]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
@@ -184,12 +235,10 @@
 }
 
 - (void)didShowWithAd:(CLXAd *)ad {
-    NSLog(@"👀 Rewarded ad did show");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 Rewarded didShowWithAd - Ad: %@", ad]];
 }
 
 - (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    NSLog(@"❌ Rewarded ad fail to show: %@", error);
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failToShowWithAd - Error: %@", error.localizedDescription]];
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -201,7 +250,6 @@
 }
 
 - (void)didHideWithAd:(CLXAd *)ad {
-    NSLog(@"🔚 Rewarded ad did hide");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 Rewarded didHideWithAd - Ad: %@", ad]];
     self.rewardedAd = nil;
     // Create new ad instance for next time
@@ -210,28 +258,18 @@
 }
 
 - (void)didClickWithAd:(CLXAd *)ad {
-    NSLog(@"👆 Rewarded ad did click");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 Rewarded didClickWithAd - Ad: %@", ad]];
 }
 
 - (void)impressionOn:(CLXAd *)ad {
-    NSLog(@"👁️ Rewarded ad impression recorded");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ Rewarded impressionOn - Ad: %@", ad]];
 }
 
 - (void)revenuePaid:(CLXAd *)ad {
-    NSLog(@"💰 Rewarded ad revenue paid callback triggered");
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 Rewarded revenuePaid - Ad: %@", ad]];
-    
-    // Show revenue alert to demonstrate the callback
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self showAlertWithTitle:@"Revenue Paid!" 
-                         message:@"NURL was successfully sent to server. Revenue callback triggered for rewarded ad."];
-    });
+    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Rewarded revenuePaid" ad:ad];
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
-    NSLog(@"✋ Rewarded ad closed by user action");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ Rewarded closedByUserActionWithAd - Ad: %@", ad]];
     self.rewardedAd = nil;
     // Create new ad instance for next time
@@ -240,7 +278,6 @@
 }
 
 - (void)userRewarded:(CLXAd *)ad {
-    NSLog(@"🎁 User rewarded!");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🎁 Rewarded userRewarded - Ad: %@", ad]];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showAlertWithTitle:@"Reward" message:@"User has earned a reward!"];
@@ -248,12 +285,10 @@
 }
 
 - (void)rewardedVideoStarted:(CLXAd *)ad {
-    NSLog(@"▶️ Rewarded video started");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"▶️ Rewarded rewardedVideoStarted - Ad: %@", ad]];
 }
 
 - (void)rewardedVideoCompleted:(CLXAd *)ad {
-    NSLog(@"✅ Rewarded video completed");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ Rewarded rewardedVideoCompleted - Ad: %@", ad]];
 }
 

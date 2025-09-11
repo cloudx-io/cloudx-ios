@@ -10,7 +10,46 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self setupCenteredButtonWithTitle:@"Show Rewarded Interstitial" action:@selector(showRewardedInterstitialAd)];
+    
+    // Create a vertical stack for buttons
+    UIStackView *buttonStack = [[UIStackView alloc] init];
+    buttonStack.axis = UILayoutConstraintAxisVertical;
+    buttonStack.spacing = 16;
+    buttonStack.alignment = UIStackViewAlignmentCenter;
+    buttonStack.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:buttonStack];
+    
+    // Load Rewarded Interstitial button
+    UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [loadButton setTitle:@"Load Rewarded Interstitial" forState:UIControlStateNormal];
+    [loadButton addTarget:self action:@selector(loadRewardedInterstitialAd) forControlEvents:UIControlEventTouchUpInside];
+    loadButton.backgroundColor = [UIColor systemGreenColor];
+    [loadButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    loadButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    loadButton.layer.cornerRadius = 8;
+    loadButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:loadButton];
+    
+    // Show Rewarded Interstitial button
+    UIButton *showButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [showButton setTitle:@"Show Rewarded Interstitial" forState:UIControlStateNormal];
+    [showButton addTarget:self action:@selector(showRewardedInterstitialAd) forControlEvents:UIControlEventTouchUpInside];
+    showButton.backgroundColor = [UIColor systemBlueColor];
+    [showButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    showButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    showButton.layer.cornerRadius = 8;
+    showButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:showButton];
+    
+    // Button constraints
+    [NSLayoutConstraint activateConstraints:@[
+        [buttonStack.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
+        [loadButton.widthAnchor constraintEqualToConstant:250],
+        [loadButton.heightAnchor constraintEqualToConstant:44],
+        [showButton.widthAnchor constraintEqualToConstant:250],
+        [showButton.heightAnchor constraintEqualToConstant:44]
+    ]];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -102,14 +141,12 @@
 #pragma mark - CLXRewardedInterstitialDelegate
 
 - (void)didLoadWithAd:(CLXAd *)ad {
-    NSLog(@"✅ Rewarded interstitial ad loaded successfully");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ RewardedInterstitial didLoadWithAd - Ad: %@", ad]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
 }
 
 - (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    NSLog(@"❌ Failed to load Rewarded Interstitial Ad: %@", error);
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ RewardedInterstitial failToLoadWithAd - Error: %@", error.localizedDescription]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
@@ -124,12 +161,10 @@
 }
 
 - (void)didShowWithAd:(CLXAd *)ad {
-    NSLog(@"👀 Rewarded interstitial ad did show");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 RewardedInterstitial didShowWithAd - Ad: %@", ad]];
 }
 
 - (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    NSLog(@"❌ Rewarded interstitial ad fail to show: %@", error);
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ RewardedInterstitial failToShowWithAd - Error: %@", error.localizedDescription]];
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -142,7 +177,6 @@
 }
 
 - (void)didHideWithAd:(CLXAd *)ad {
-    NSLog(@"🔚 Rewarded interstitial ad did hide");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 RewardedInterstitial didHideWithAd - Ad: %@", ad]];
     self.rewardedInterstitialAd = nil;
     [self loadRewardedInterstitial];
@@ -150,28 +184,18 @@
 }
 
 - (void)didClickWithAd:(CLXAd *)ad {
-    NSLog(@"👆 Rewarded interstitial ad did click");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 RewardedInterstitial didClickWithAd - Ad: %@", ad]];
 }
 
 - (void)impressionOn:(CLXAd *)ad {
-    NSLog(@"👁️ Rewarded interstitial ad impression recorded");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ RewardedInterstitial impressionOn - Ad: %@", ad]];
 }
 
 - (void)revenuePaid:(CLXAd *)ad {
-    NSLog(@"💰 Rewarded interstitial ad revenue paid callback triggered");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 RewardedInterstitial revenuePaid - Ad: %@", ad]];
-    
-    // Show revenue alert to demonstrate the callback
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self showAlertWithTitle:@"Revenue Paid!" 
-                         message:@"NURL was successfully sent to server. Revenue callback triggered for rewarded interstitial ad."];
-    });
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
-    NSLog(@"✋ Rewarded interstitial ad closed by user action");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ RewardedInterstitial closedByUserActionWithAd - Ad: %@", ad]];
     self.rewardedInterstitialAd = nil;
     [self loadRewardedInterstitial];
@@ -179,7 +203,6 @@
 }
 
 - (void)userRewarded:(CLXAd *)ad {
-    NSLog(@"🎁 User rewarded!");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🎁 RewardedInterstitial userRewarded - Ad: %@", ad]];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showAlertWithTitle:@"Reward" message:@"User has earned a reward from interstitial!"];
@@ -187,12 +210,10 @@
 }
 
 - (void)rewardedVideoStarted:(CLXAd *)ad {
-    NSLog(@"▶️ Rewarded interstitial started");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"▶️ RewardedInterstitial rewardedVideoStarted - Ad: %@", ad]];
 }
 
 - (void)rewardedVideoCompleted:(CLXAd *)ad {
-    NSLog(@"✅ Rewarded interstitial completed");
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ RewardedInterstitial rewardedVideoCompleted - Ad: %@", ad]];
 }
 
