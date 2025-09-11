@@ -131,41 +131,6 @@ static CLXSystemInformation *sharedInstance = nil;
     return @"CLOUDX";
 }
 
-+ (NSString *)extractBuyeruidFromAdapterInfo:(nullable NSDictionary *)adapterInfo 
-                                    logger:(nullable CLXLogger *)logger {
-    // Generic buyeruid extraction - adapter-agnostic approach
-    // Adapters can provide buyeruid through their adapterInfo
-    
-    if (adapterInfo) {
-        // Check for generic buyeruid first
-        if (adapterInfo[@"buyeruid"]) {
-            NSString *buyeruid = adapterInfo[@"buyeruid"];
-            if (logger) {
-                [logger info:[NSString stringWithFormat:@"✅ Using adapter-provided buyeruid: %@", buyeruid ? @"[SET]" : @"[NIL]"]];
-            }
-            return buyeruid;
-        }
-        
-        // Fallback: check for any adapter-specific token structures
-        // This allows adapters to provide tokens in their own format
-        for (NSString *adapterKey in adapterInfo) {
-            NSDictionary *adapterData = adapterInfo[adapterKey];
-            if ([adapterData isKindOfClass:[NSDictionary class]] && adapterData[@"bidder_token"]) {
-                NSString *token = adapterData[@"bidder_token"];
-                if (logger && [logger respondsToSelector:@selector(info:)]) {
-                    [logger info:[NSString stringWithFormat:@"✅ Using %@ bidder token as buyeruid: %@", adapterKey, token ? @"[SET]" : @"[NIL]"]];
-                }
-                return token;
-            }
-        }
-    }
-    
-    // Fallback to default if no adapter provides buyeruid
-    if (logger && [logger respondsToSelector:@selector(info:)]) {
-        [logger info:@"⚠️ No adapter buyeruid found, using fallback"];
-    }
-    return @"user-test-123";
-}
 
 @end
 

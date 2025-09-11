@@ -304,18 +304,6 @@ static void initializeLogger() {
         NSString *aiPrompt = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAIPromptKey];
         NSString *userKeywords = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserKeywordsKey];
         
-//        BiddingConfigUserExtPrebid *userPrebid = nil;
-//        if (hashedUserId && hashedUserId.length > 0) {
-//            userPrebid = [[BiddingConfigUserExtPrebid alloc] init];
-//            userPrebid.buyeruids = @{@"cloudx": hashedUserId};
-//        }
-//        
-//        BiddingConfigUserExtCloudX *userCloudX = nil;
-//        if (aiPrompt && aiPrompt.length > 0) {
-//            userCloudX = [[BiddingConfigUserExtCloudX alloc] init];
-//            userCloudX.ai_prompt = aiPrompt;
-       // }
-        
         CLXBiddingConfigUserExtUids * uids = [[CLXBiddingConfigUserExtUids alloc] init];
         uids.id = @"29060c8606954ec90fbcde825b2783b0b9261585793db9dfcbe6b870a05a9ee3";
         uids.atype = @"3";
@@ -702,8 +690,6 @@ static void initializeLogger() {
         json[@"keywords"] = self.user.keywords;
     }
     
-    // Add buyeruid from adapter info (possibly just relevant for Meta/FAN?)
-    json[@"buyeruid"] = [CLXSystemInformation extractBuyeruidFromAdapterInfo:self.adapterInfo logger:logger];
     
     if (self.user.ext) {
         json[@"ext"] = [self convertUserExtToJSON:self.user.ext];
@@ -737,17 +723,6 @@ static void initializeLogger() {
     return [impUsr copy];
 }
 
-//- (NSDictionary *)convertUserPrebidToJSON:(BiddingConfigUserExtPrebid *)prebid {
-//    return @{@"buyeruids": prebid.buyeruids ?: @{}};
-//}
-//
-//- (NSDictionary *)convertUserCloudXToJSON:(BiddingConfigUserExtCloudX *)cloudx {
-//    NSMutableDictionary *json = [NSMutableDictionary dictionary];
-//    if (cloudx.ai_prompt) {
-//        json[@"ai_prompt"] = cloudx.ai_prompt;
-//    }
-//    return [json copy];
-//}
 
 - (NSDictionary *)convertRegulationsToJSON {
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
