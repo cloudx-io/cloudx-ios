@@ -1,6 +1,0 @@
-framework module CloudXMetaAdapter {
-  umbrella header "CloudXMetaAdapter-umbrella.h"
-
-  export *
-  module * { export * }
-}

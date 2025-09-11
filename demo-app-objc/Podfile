@@ -4,7 +4,7 @@ platform :ios, '14.0'
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
-  # Pods for CloudXObjCRemotePods - Updated paths for consolidated repo
+  # Pods for CloudXObjCRemotePods
   pod 'CloudXCore', :path => '../core'
   pod 'CloudXPrebidAdapter', :path => '../adapter-cloudx'
   pod 'CloudXMetaAdapter', :path => '../adapter-meta'
