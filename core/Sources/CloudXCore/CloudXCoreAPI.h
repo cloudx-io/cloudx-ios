@@ -167,7 +167,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Set whether user is age-restricted (COPPA)
  * @param isAgeRestrictedUser YES if user is age-restricted, NO otherwise
- * @discussion ⚠️ COPPA is not yet supported by CloudX servers. Please contact CloudX if you need COPPA support. CCPA is fully supported.
+ * @discussion COPPA is now supported with GPP implementation and will be included in bid requests.
  */
 + (void)setIsAgeRestrictedUser:(BOOL)isAgeRestrictedUser;
 
@@ -177,6 +177,36 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion CCPA "do not sell my personal information" flag - converts to CCPA privacy string format
  */
 + (void)setIsDoNotSell:(BOOL)isDoNotSell;
+
+#pragma mark - GPP (Global Privacy Platform) Settings
+
+/**
+ * Set GPP consent string
+ * @param gppString The GPP consent string from IAB framework
+ * @discussion GPP (Global Privacy Platform) compliance string for comprehensive privacy management
+ */
++ (void)setGPPString:(nullable NSString *)gppString;
+
+/**
+ * Get GPP consent string
+ * @return The current GPP consent string, or nil if not set
+ * @discussion Retrieves the stored GPP consent string
+ */
++ (nullable NSString *)getGPPString;
+
+/**
+ * Set GPP section IDs
+ * @param gppSid Array of GPP section IDs indicating applicable privacy frameworks
+ * @discussion GPP section identifiers (e.g., @[@7, @8] for US-National and US-CA)
+ */
++ (void)setGPPSid:(nullable NSArray<NSNumber *> *)gppSid;
+
+/**
+ * Get GPP section IDs
+ * @return Array of GPP section IDs, or nil if not set
+ * @discussion Retrieves the stored GPP section identifiers
+ */
++ (nullable NSArray<NSNumber *> *)getGPPSid;
 
 @end
 

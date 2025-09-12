@@ -6,6 +6,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXMetricsTracker.h>
+#import <CloudXCore/CLXGPPProvider.h>
 @class CLXAppSessionService;
 #import <CloudXCore/CLXBidNetworkService.h>
 #import <CloudXCore/CLXAdEventReporter.h>
@@ -822,6 +823,24 @@ static CloudXCore *_sharedInstance = nil;
 
 + (void)setIsDoNotSell:(BOOL)isDoNotSell {
     [[CLXPrivacyService sharedInstance] setDoNotSell:@(isDoNotSell)];
+}
+
+#pragma mark - GPP (Global Privacy Platform) Settings
+
++ (void)setGPPString:(nullable NSString *)gppString {
+    [[CLXGPPProvider sharedInstance] setGppString:gppString];
+}
+
++ (nullable NSString *)getGPPString {
+    return [[CLXGPPProvider sharedInstance] gppString];
+}
+
++ (void)setGPPSid:(nullable NSArray<NSNumber *> *)gppSid {
+    [[CLXGPPProvider sharedInstance] setGppSid:gppSid];
+}
+
++ (nullable NSArray<NSNumber *> *)getGPPSid {
+    return [[CLXGPPProvider sharedInstance] gppSid];
 }
 
 @end 

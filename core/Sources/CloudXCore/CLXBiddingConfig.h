@@ -204,6 +204,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXBiddingConfigRegulationsExtIAB *iab;
 @property (nonatomic, strong, nullable) NSNumber *gdpr;
 @property (nonatomic, strong, nullable) NSNumber *ccpa;
+@property (nonatomic, copy, nullable) NSString *gpp;
+@property (nonatomic, strong, nullable) NSArray<NSNumber *> *gppSid;
 @end
 
 @interface CLXBiddingConfigRegulationsExtIAB : NSObject

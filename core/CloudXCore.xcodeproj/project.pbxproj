@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1979919A2E74921400EBA0A3 /* CLXGPPProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 197991992E74921400EBA0A3 /* CLXGPPProvider.m */; };
+		1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919B2E74923900EBA0A3 /* CLXGppConsent.h */; };
+		1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */; };
+		197991A02E74924100EBA0A3 /* CLXGppConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 1979919F2E74924100EBA0A3 /* CLXGppConsent.m */; };
 		19C7247B2E2390420012CFC7 /* CloudXCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C724702E2390420012CFC7 /* CloudXCore.framework */; };
 		19C725472E2390810012CFC7 /* CLXURLProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C7253D2E2390810012CFC7 /* CLXURLProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C725482E2390810012CFC7 /* CLXSessionMetricSpend.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C725392E2390810012CFC7 /* CLXSessionMetricSpend.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -152,7 +156,6 @@
 		19C725D62E2390810012CFC7 /* CLXGeoLocationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724CF2E2390810012CFC7 /* CLXGeoLocationService.m */; };
 		19C725D72E2390810012CFC7 /* CLXRillImpressionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724A62E2390810012CFC7 /* CLXRillImpressionModel.m */; };
 		19C725D82E2390810012CFC7 /* CLXBannerTimerService.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724C92E2390810012CFC7 /* CLXBannerTimerService.m */; };
-		19C725D92E2390810012CFC7 /* CLXBidNetworkServiceImplementation.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724CB2E2390810012CFC7 /* CLXBidNetworkServiceImplementation.m */; };
 		19C725DA2E2390810012CFC7 /* CLXInitMetricsModel+Update.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724992E2390810012CFC7 /* CLXInitMetricsModel+Update.m */; };
 		19C725DB2E2390810012CFC7 /* CLXAppSessionModel+Update.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724AC2E2390810012CFC7 /* CLXAppSessionModel+Update.m */; };
 		19C725DC2E2390810012CFC7 /* CLXSystemInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724D92E2390810012CFC7 /* CLXSystemInformation.m */; };
@@ -231,6 +234,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		197991992E74921400EBA0A3 /* CLXGPPProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGPPProvider.m; sourceTree = "<group>"; };
+		1979919B2E74923900EBA0A3 /* CLXGppConsent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGppConsent.h; sourceTree = "<group>"; };
+		1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGPPProvider.h; sourceTree = "<group>"; };
+		1979919F2E74924100EBA0A3 /* CLXGppConsent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGppConsent.m; sourceTree = "<group>"; };
 		19C724702E2390420012CFC7 /* CloudXCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		19C7247A2E2390420012CFC7 /* CloudXCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		19C7248B2E2390810012CFC7 /* CLXAdapterFactoryResolver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterFactoryResolver.m; sourceTree = "<group>"; };
@@ -282,7 +289,6 @@
 		19C724C82E2390810012CFC7 /* CLXBackgroundTimer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBackgroundTimer.m; sourceTree = "<group>"; };
 		19C724C92E2390810012CFC7 /* CLXBannerTimerService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBannerTimerService.m; sourceTree = "<group>"; };
 		19C724CA2E2390810012CFC7 /* CLXBidNetworkService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidNetworkService.m; sourceTree = "<group>"; };
-		19C724CB2E2390810012CFC7 /* CLXBidNetworkServiceImplementation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidNetworkServiceImplementation.m; sourceTree = "<group>"; };
 		19C724CC2E2390810012CFC7 /* CLXCacheAdQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXCacheAdQueue.m; sourceTree = "<group>"; };
 		19C724CD2E2390810012CFC7 /* CLXCacheAdService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXCacheAdService.m; sourceTree = "<group>"; };
 		19C724CE2E2390810012CFC7 /* CLXExponentialBackoffStrategy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXExponentialBackoffStrategy.m; sourceTree = "<group>"; };
@@ -649,6 +655,7 @@
 		19C724C02E2390810012CFC7 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				1979919F2E74924100EBA0A3 /* CLXGppConsent.m */,
 				19C724A22E2390810012CFC7 /* CLXBiddingConfig.m */,
 				19C724B62E2390810012CFC7 /* CLXBidderConfig.m */,
 				19C724B72E2390810012CFC7 /* CLXBidResponse.m */,
@@ -680,13 +687,13 @@
 		19C724D62E2390810012CFC7 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				197991992E74921400EBA0A3 /* CLXGPPProvider.m */,
 				19D928BF2E63F44B00C84DAE /* CLXPrivacyService.m */,
 				19D927B82E62314500C84DAE /* CLXSettings.m */,
 				19C724C72E2390810012CFC7 /* CLXAdTrackingService.m */,
 				19C724C82E2390810012CFC7 /* CLXBackgroundTimer.m */,
 				19C724C92E2390810012CFC7 /* CLXBannerTimerService.m */,
 				19C724CA2E2390810012CFC7 /* CLXBidNetworkService.m */,
-				19C724CB2E2390810012CFC7 /* CLXBidNetworkServiceImplementation.m */,
 				19C724CC2E2390810012CFC7 /* CLXCacheAdQueue.m */,
 				19C724CD2E2390810012CFC7 /* CLXCacheAdService.m */,
 				19C724CE2E2390810012CFC7 /* CLXExponentialBackoffStrategy.m */,
@@ -719,6 +726,8 @@
 		19C725422E2390810012CFC7 /* CloudXCore */ = {
 			isa = PBXGroup;
 			children = (
+				1979919B2E74923900EBA0A3 /* CLXGppConsent.h */,
+				1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */,
 				19D92C9F2E6E099C00C84DAE /* CLXUserDefaultsKeys.h */,
 				19D92A4D2E68C6DC00C84DAE /* CLXAdFormat.h */,
 				19D92A472E68C54C00C84DAE /* CLXAd.m */,
@@ -925,6 +934,8 @@
 				19C725792E2390810012CFC7 /* CLXInterstitialDelegate.h in Headers */,
 				19C7257A2E2390810012CFC7 /* CLXBidNetworkService.h in Headers */,
 				19C7257B2E2390810012CFC7 /* CLXSessionMetricModel+Update.h in Headers */,
+				1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */,
+				1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */,
 				19C7257C2E2390810012CFC7 /* CLXNativeAdView.h in Headers */,
 				19C7257D2E2390810012CFC7 /* CLXBanner.h in Headers */,
 				19C7257E2E2390810012CFC7 /* CLXRewardedInterstitial.h in Headers */,
@@ -1105,6 +1116,7 @@
 				19C725B92E2390810012CFC7 /* CLXBidResponse.m in Sources */,
 				19C725BA2E2390810012CFC7 /* CLXAppSessionServiceImplementation.m in Sources */,
 				19D926C52E61103C00C84DAE /* CLXError.m in Sources */,
+				1979919A2E74921400EBA0A3 /* CLXGPPProvider.m in Sources */,
 				19C725BB2E2390810012CFC7 /* CLXNativeTemplate.m in Sources */,
 				19C725BC2E2390810012CFC7 /* CLXURLProvider.m in Sources */,
 				19C725BD2E2390810012CFC7 /* CLXCachedRewarded.m in Sources */,
@@ -1138,7 +1150,6 @@
 				19C725D72E2390810012CFC7 /* CLXRillImpressionModel.m in Sources */,
 				19D928C02E63F44B00C84DAE /* CLXPrivacyService.m in Sources */,
 				19C725D82E2390810012CFC7 /* CLXBannerTimerService.m in Sources */,
-				19C725D92E2390810012CFC7 /* CLXBidNetworkServiceImplementation.m in Sources */,
 				19D9277A2E62307500C84DAE /* CLXRetryHelper.m in Sources */,
 				19C725DA2E2390810012CFC7 /* CLXInitMetricsModel+Update.m in Sources */,
 				19C725DB2E2390810012CFC7 /* CLXAppSessionModel+Update.m in Sources */,
@@ -1146,6 +1157,7 @@
 				19C725DD2E2390810012CFC7 /* CLXCachedInterstitial.m in Sources */,
 				19C725DE2E2390810012CFC7 /* CLXPerformanceMetricModel+Update.m in Sources */,
 				19C725DF2E2390810012CFC7 /* CLXBiddingConfig.m in Sources */,
+				197991A02E74924100EBA0A3 /* CLXGppConsent.m in Sources */,
 				19C725E02E2390810012CFC7 /* CloudXCore.docc in Sources */,
 				19C725E12E2390810012CFC7 /* CLXInitMetrics.m in Sources */,
 				19C725E22E2390810012CFC7 /* CLXAdNetworkFactories.m in Sources */,

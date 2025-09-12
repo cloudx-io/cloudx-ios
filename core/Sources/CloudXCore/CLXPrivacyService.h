@@ -103,6 +103,29 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)setDoNotSell:(nullable NSNumber *)doNotSell;
 
+#pragma mark - GPP Methods
+
+/**
+ * @brief Gets the GPP consent string
+ * @return The GPP string if available, nil otherwise
+ * @discussion GPP (Global Privacy Platform) compliance string
+ */
+- (nullable NSString *)gppString;
+
+/**
+ * @brief Gets the GPP section IDs
+ * @return Array of GPP section IDs if available, nil otherwise
+ * @discussion GPP section identifiers for applicable privacy frameworks
+ */
+- (nullable NSArray<NSNumber *> *)gppSid;
+
+/**
+ * @brief Comprehensive privacy check including GPP, COPPA, and ATT
+ * @return YES if personal data should be cleared, NO otherwise
+ * @discussion Enhanced privacy logic with geographic targeting and GPP consent evaluation
+ */
+- (BOOL)shouldClearPersonalDataWithGPP;
+
 @end
 
 NS_ASSUME_NONNULL_END
