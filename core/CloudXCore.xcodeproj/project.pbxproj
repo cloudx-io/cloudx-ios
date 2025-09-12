@@ -11,6 +11,11 @@
 		1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919B2E74923900EBA0A3 /* CLXGppConsent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		197991A02E74924100EBA0A3 /* CLXGppConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 1979919F2E74924100EBA0A3 /* CLXGppConsent.m */; };
+		197991A62E74B0D600EBA0A3 /* CLXBiddingConfigGPPTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197991A12E74B0D600EBA0A3 /* CLXBiddingConfigGPPTests.m */; };
+		197991A72E74B0D600EBA0A3 /* CLXGeoLocationServiceGPPTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197991A22E74B0D600EBA0A3 /* CLXGeoLocationServiceGPPTests.m */; };
+		197991A82E74B0D600EBA0A3 /* CLXGppConsentTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197991A32E74B0D600EBA0A3 /* CLXGppConsentTests.m */; };
+		197991A92E74B0D600EBA0A3 /* CLXGPPIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197991A42E74B0D600EBA0A3 /* CLXGPPIntegrationTests.m */; };
+		197991AA2E74B0D600EBA0A3 /* CLXGPPProviderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197991A52E74B0D600EBA0A3 /* CLXGPPProviderTests.m */; };
 		19C7247B2E2390420012CFC7 /* CloudXCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C724702E2390420012CFC7 /* CloudXCore.framework */; };
 		19C725472E2390810012CFC7 /* CLXURLProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C7253D2E2390810012CFC7 /* CLXURLProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C725482E2390810012CFC7 /* CLXSessionMetricSpend.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C725392E2390810012CFC7 /* CLXSessionMetricSpend.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -237,6 +242,11 @@
 		1979919B2E74923900EBA0A3 /* CLXGppConsent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGppConsent.h; sourceTree = "<group>"; };
 		1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGPPProvider.h; sourceTree = "<group>"; };
 		1979919F2E74924100EBA0A3 /* CLXGppConsent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGppConsent.m; sourceTree = "<group>"; };
+		197991A12E74B0D600EBA0A3 /* CLXBiddingConfigGPPTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBiddingConfigGPPTests.m; sourceTree = "<group>"; };
+		197991A22E74B0D600EBA0A3 /* CLXGeoLocationServiceGPPTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGeoLocationServiceGPPTests.m; sourceTree = "<group>"; };
+		197991A32E74B0D600EBA0A3 /* CLXGppConsentTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGppConsentTests.m; sourceTree = "<group>"; };
+		197991A42E74B0D600EBA0A3 /* CLXGPPIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGPPIntegrationTests.m; sourceTree = "<group>"; };
+		197991A52E74B0D600EBA0A3 /* CLXGPPProviderTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGPPProviderTests.m; sourceTree = "<group>"; };
 		19C724702E2390420012CFC7 /* CloudXCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		19C7247A2E2390420012CFC7 /* CloudXCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		19C7248B2E2390810012CFC7 /* CLXAdapterFactoryResolver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterFactoryResolver.m; sourceTree = "<group>"; };
@@ -503,6 +513,11 @@
 		19C7247E2E2390420012CFC7 /* CloudXCoreTests */ = {
 			isa = PBXGroup;
 			children = (
+				197991A12E74B0D600EBA0A3 /* CLXBiddingConfigGPPTests.m */,
+				197991A22E74B0D600EBA0A3 /* CLXGeoLocationServiceGPPTests.m */,
+				197991A32E74B0D600EBA0A3 /* CLXGppConsentTests.m */,
+				197991A42E74B0D600EBA0A3 /* CLXGPPIntegrationTests.m */,
+				197991A52E74B0D600EBA0A3 /* CLXGPPProviderTests.m */,
 				19D92D2A2E6E3F0600C84DAE /* Helper */,
 				19D92CA32E6E235500C84DAE /* CLXActualUserDefaultsTests.m */,
 				19D92C8F2E6DE89A00C84DAE /* CLXBidAdSourceUserDefaultsTests.m */,
@@ -1203,6 +1218,11 @@
 				19D92C9A2E6DE89A00C84DAE /* CLXReportingUserDefaultsTests.m in Sources */,
 				19D92C9B2E6DE89A00C84DAE /* CLXUserDefaultsIntegrationTests.m in Sources */,
 				19D92C9C2E6DE89A00C84DAE /* CLXUserDefaultsConcurrencyTests.m in Sources */,
+				197991A62E74B0D600EBA0A3 /* CLXBiddingConfigGPPTests.m in Sources */,
+				197991A72E74B0D600EBA0A3 /* CLXGeoLocationServiceGPPTests.m in Sources */,
+				197991A82E74B0D600EBA0A3 /* CLXGppConsentTests.m in Sources */,
+				197991A92E74B0D600EBA0A3 /* CLXGPPIntegrationTests.m in Sources */,
+				197991AA2E74B0D600EBA0A3 /* CLXGPPProviderTests.m in Sources */,
 				19D92C9E2E6DE89A00C84DAE /* CLXPublisherAdsUserDefaultsTests.m in Sources */,
 				19D927C62E624FE700C84DAE /* CLXRillTrackingTests.m in Sources */,
 			);
