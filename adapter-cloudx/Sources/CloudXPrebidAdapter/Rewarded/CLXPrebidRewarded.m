@@ -25,25 +25,15 @@
                       bidID:(NSString *)bidID
                    delegate:(id<CLXAdapterRewardedDelegate>)delegate {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidRewarded"];
-    [logger info:@"🚀 [INIT] CLXPrebidRewarded initialization started"];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT] Ad markup length: %lu characters", (unsigned long)adm.length]];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT] Bid ID: %@", bidID ?: @"nil"]];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT] Delegate: %@", delegate ? @"Present" : @"nil"]];
+    [logger info:[NSString stringWithFormat:@"🚀 [INIT] CLXPrebidRewarded initialization - Markup: %lu chars, BidID: %@", (unsigned long)adm.length, bidID ?: @"nil"]];
     
     self = [super init];
     if (self) {
-        [logger info:@"✅ [INIT] Super init successful"];
-        
         self.adm = adm;
         self.bidID = bidID;
         self.delegate = delegate;
         
-        [logger debug:@"📊 [INIT] Properties configured:"];
-        [logger debug:[NSString stringWithFormat:@"  📍 Ad markup length: %lu", (unsigned long)self.adm.length]];
-        [logger debug:[NSString stringWithFormat:@"  📍 Bid ID: %@", self.bidID ?: @"nil"]];
-        [logger debug:[NSString stringWithFormat:@"  📍 Delegate: %@", self.delegate ? @"Set" : @"nil"]];
-        
-        [logger info:@"🎯 [INIT] CLXPrebidRewarded initialization completed successfully"];
+        [logger info:@"✅ [INIT] CLXPrebidRewarded initialization completed successfully"];
     } else {
         [logger error:@"❌ [INIT] Super init failed"];
     }
@@ -71,43 +61,30 @@
 
 - (void)load {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidRewarded"];
-    [logger debug:@"🔧 [CLXPrebidRewarded] load called"];
-    [logger debug:[NSString stringWithFormat:@"📊 [CLXPrebidRewarded] - ADM: %@", self.adm]];
-    [logger debug:[NSString stringWithFormat:@"📊 [CLXPrebidRewarded] - Delegate: %@", self.delegate]];
+    [logger info:@"🚀 [LOAD] CLXPrebidRewarded load called"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [logger debug:@"🔧 [CLXPrebidRewarded] Creating containerViewController..."];
         self.containerViewController = [[CLXFullscreenStaticContainerViewController alloc] initWithDelegate:self adm:self.adm];
-        
-        [logger debug:[NSString stringWithFormat:@"📊 [CLXPrebidRewarded] ContainerViewController created: %@", self.containerViewController]];
-        [logger debug:@"📊 [CLXPrebidRewarded] Calling loadHTML..."];
         [self.containerViewController loadHTML];
-        [logger info:@"✅ [CLXPrebidRewarded] loadHTML called"];
+        [logger info:@"✅ [LOAD] Container created and HTML load initiated"];
     });
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidRewarded"];
-    [logger debug:@"🔧 [CLXPrebidRewarded] showFromViewController called"];
-    [logger debug:[NSString stringWithFormat:@"📊 [CLXPrebidRewarded] - ViewController: %@", viewController]];
-    [logger debug:[NSString stringWithFormat:@"📊 [CLXPrebidRewarded] - ContainerViewController: %@", self.containerViewController]];
-    [logger debug:[NSString stringWithFormat:@"📊 [CLXPrebidRewarded] - isReady: %d", self.isReady]];
-    [logger debug:[NSString stringWithFormat:@"📊 [CLXPrebidRewarded] - Delegate: %@", self.delegate]];
+    [logger info:@"🚀 [SHOW] CLXPrebidRewarded showFromViewController called"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.containerViewController) {
-            [logger info:@"✅ [CLXPrebidRewarded] ContainerViewController exists, presenting..."];
-            [viewController presentViewController:self.containerViewController animated:YES completion:^{
-                [logger info:@"✅ [CLXPrebidRewarded] Present completion called"];
-            }];
+            [viewController presentViewController:self.containerViewController animated:YES completion:nil];
             [self didShow];
             
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [logger debug:@"🔧 [CLXPrebidRewarded] Calling impression after 1 second delay"];
                 [self impression];
             });
+            [logger info:@"✅ [SHOW] Ad presentation initiated successfully"];
         } else {
-            [logger error:@"❌ [CLXPrebidRewarded] ContainerViewController is nil!"];
+            [logger error:@"❌ [SHOW] ContainerViewController is nil!"];
             NSError *error = [NSError errorWithDomain:@"CloudXTestVastNetworkAdapter" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Ad failed to show: containerViewController was nil."}];
             [self didFailToShowWithError:error];
         }
