@@ -224,20 +224,12 @@ NS_ASSUME_NONNULL_BEGIN
         return;
     }
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Requesting banner update for placement: %@", self.placementID]];
-    
-    // Implement async bid request logic
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Sending loop-index: %ld for adId: %@", (long)self.loadBannerTimesCount, self.placementID]];
-    
     // Update bid request with loop index
     [self updateBidRequestWithLoopIndex];
     
     // Use placement ID directly as stored impression ID
     NSString *storedImpressionId = self.placementID;
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Using placement ID as stored impression ID: %@", storedImpressionId]];
-    
     // Request bid from bid ad source
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherBanner] Calling bidAdSource requestBidWithAdUnitID: %@", self.placementID]];
     __weak typeof(self) weakSelf = self;
     [self.bidAdSource requestBidWithAdUnitID:self.placementID
                            storedImpressionId:storedImpressionId
@@ -309,13 +301,10 @@ NS_ASSUME_NONNULL_BEGIN
         return;
     }
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Continuing banner chain for placement: %@", self.placementID]];
-    
     // Implement actual banner creation from bid response
     if (self.lastBidResponse && self.lastBidResponse.createBidAd) {
         [self.logger debug:@"🔧 [PublisherBanner] Calling createBidAd function..."];
         id bidItem = self.lastBidResponse.createBidAd();
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] createBidAd returned: %@ (class: %@, conforms: %d)", bidItem, NSStringFromClass([bidItem class]), [bidItem conformsToProtocol:@protocol(CLXAdapterBanner)]]];
 
         if ([bidItem conformsToProtocol:@protocol(CLXAdapterBanner)]) {
             id<CLXAdapterBanner> banner = (id<CLXAdapterBanner>)bidItem;
@@ -420,22 +409,15 @@ NS_ASSUME_NONNULL_BEGIN
         self.adLoadStartTime = [NSDate date];
         [self.logger debug:@"📊 [PublisherBanner] Calling item.load()"];
         [item load];
-        [self.logger info:@"✅ [PublisherBanner] load() called successfully on AdapterBanner"];
     });
 }
 
 #pragma mark - CloudXAdapterBannerDelegate
 
 - (void)didLoadBanner:(id<CLXAdapterBanner>)banner {
-    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] didLoadBanner delegate called for placement: %@", self.placementID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Banner object: %@", banner]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Banner class: %@", NSStringFromClass([(NSObject *)banner class])]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Banner timeout: %d", banner.timeout]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Banner bannerView: %@", banner.bannerView]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Banner sdkVersion: %@", banner.sdkVersion]];
+    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] didLoadBanner called for placement: %@ (class: %@, timeout: %d)", self.placementID, NSStringFromClass([(NSObject *)banner class]), banner.timeout]];
 
     if (banner.timeout) {
-        [self.logger debug:@"⚠️ [PublisherBanner] Banner had timeout=true, destroying banner"];
         [banner destroy];
         return;
     }
@@ -444,7 +426,7 @@ NS_ASSUME_NONNULL_BEGIN
     if (self.adLoadStartTime) {
         latency = [[NSDate date] timeIntervalSinceDate:self.adLoadStartTime] * 1000;
     }
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Ad loaded with latency: %f ms", latency]];
+    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Ad loaded with latency: %.1f ms", latency]];
     [self.appSessionService adLoadedWithPlacementID:self.placementID latency:latency];
     
     // SECOND PHASE - Winner has successfully loaded, now fire lurls for all losing bids
@@ -465,41 +447,29 @@ NS_ASSUME_NONNULL_BEGIN
 
     [self.logger debug:@"🔧 [PublisherBanner] Cleaning up previous banner..."];
     if (self.previousBanner) {
-        [self.logger debug:@"📊 [PublisherBanner] Previous banner exists, cleaning up"];
+        [self.logger debug:@"🔧 [PublisherBanner] Cleaning up previous banner"];
         self.previousBanner.delegate = nil;
         [self.previousBanner destroy];
         [self.previousBanner.bannerView removeFromSuperview];
-    } else {
-        [self.logger debug:@"📊 [PublisherBanner] No previous banner to clean up"];
     }
 
-    [self.logger debug:@"🔧 [PublisherBanner] Setting banner states..."];
     self.successWin = YES;
     self.isReady = YES;
     self.isLoading = NO;
     
     // Handle visibility-aware display and prefetching
     if (self.isVisible) {
-        [self.logger debug:@"📱 [PublisherBanner] Banner is visible - displaying immediately"];
+        [self.logger debug:@"📱 [PublisherBanner] Banner visible - displaying immediately"];
         self.bannerOnScreen = self.currentLoadingBanner;
     } else {
-        [self.logger debug:@"👁️ [PublisherBanner] Banner is hidden - prefetching for later display"];
+        [self.logger debug:@"👁️ [PublisherBanner] Banner hidden - prefetching for later display"];
         self.prefetchedBanner = self.currentLoadingBanner;
     }
-    
-    [self.logger debug:@"📊 [PublisherBanner] States updated:"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] - bannerOnScreen: %@", self.bannerOnScreen]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] - prefetchedBanner: %@", self.prefetchedBanner]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] - successWin: %d", self.successWin]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] - isReady: %d", self.isReady]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] - isLoading: %d", self.isLoading]];
 
-    [self.logger info:@"✅ [PublisherBanner] Banner did load successfully"];
 
     if (self.lastBidResponse) {
         [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Reporting win for bidID=%@", self.lastBidResponse.bidID]];
         [self.reportingService winWithBidID:self.lastBidResponse.bidID];
-        
         // Revenue tracking moved to impression callback - don't fire NURL on load
     } else {
         [self.logger debug:@"⚠️ [PublisherBanner] No lastBidResponse to report win"];
@@ -531,8 +501,6 @@ NS_ASSUME_NONNULL_BEGIN
     } else {
         [self.logger debug:@"⏸️ [PublisherBanner] Auto-refresh disabled - not starting timer"];
     }
-    
-    [self.logger info:@"✅ [PublisherBanner] didLoadBanner delegate method completed successfully"];
 }
 
 - (void)fireLosingBidLurls {
@@ -567,19 +535,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (void)failToLoadBanner:(nullable id<CLXAdapterBanner>)banner error:(nullable NSError *)error {
-    [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] failToLoadBanner delegate called for placement: %@", self.placementID]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Banner object: %@", banner]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Banner class: %@", banner ? NSStringFromClass([(NSObject *)banner class]) : @"nil"]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Error: %@", error]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Error domain: %@", error.domain]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Error code: %ld", (long)error.code]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Error description: %@", error.localizedDescription]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Error user info: %@", error.userInfo]];
+    [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] failToLoadBanner for placement: %@ - %@", self.placementID, error.localizedDescription ?: @"Unknown error"]];
     
     [self.appSessionService adFailedToLoadWithPlacementID:self.placementID];
 
     // Destroy the failed banner
-    [self.logger debug:@"🔧 [PublisherBanner] Cleaning up failed banner..."];
     [banner destroy];
     
     // Fire LURL for technical errors
@@ -589,7 +549,6 @@ NS_ASSUME_NONNULL_BEGIN
     }
     
     // Reset state for next interval
-    [self.logger debug:@"📊 [PublisherBanner] Resetting state for next interval"];
     self.lastBidResponse = nil;
     self.currentBidResponse = nil;
     self.successWin = NO;
@@ -603,12 +562,10 @@ NS_ASSUME_NONNULL_BEGIN
             // Convert waterfall exhaustion to NO_FILL error
             delegateError = [CLXError errorWithCode:CLXErrorCodeNoFill 
                                          description:@"No ad available - waterfall exhausted"];
-            [self.logger debug:@"🔄 [PublisherBanner] Converted CLXBidAdSource error to CLXErrorCodeNoFill"];
         } else {
             // Convert other bid source errors to generic load failed
             delegateError = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
                                          description:error.localizedDescription ?: @"Ad failed to load"];
-            [self.logger debug:@"🔄 [PublisherBanner] Converted CLXBidAdSource error to CLXErrorCodeLoadFailed"];
         }
     }
     
@@ -620,15 +577,12 @@ NS_ASSUME_NONNULL_BEGIN
     }];
     
     // Emit error to delegate
-    [self.logger debug:@"🔧 [PublisherBanner] Calling delegate failToLoadWithAd..."];
     if ([self.delegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-        [self.logger info:@"✅ [PublisherBanner] Delegate responds to failToLoadWithAd:error:, calling..."];
         [self.delegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID] error:delegateError];
     } else {
         [self.logger debug:@"⚠️ [PublisherBanner] Delegate does not respond to failToLoadWithAd:error:"];
     }
-    
-    [self.logger info:@"✅ [PublisherBanner] failToLoadBanner delegate method completed"];
+   
 }
 
 - (void)didShowBanner:(id<CLXAdapterBanner>)banner {
@@ -823,7 +777,6 @@ NS_ASSUME_NONNULL_BEGIN
     self.autoRefreshEnabled = NO;
     
     // Stop the current timer
-    [self.logger debug:@"🔧 [PublisherBanner] Stopping timer service..."];
     [self.timerService stop];
 }
 
