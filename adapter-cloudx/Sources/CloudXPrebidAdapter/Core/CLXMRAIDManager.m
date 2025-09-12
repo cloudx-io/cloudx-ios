@@ -92,11 +92,9 @@
         
         // Register for system notifications
         [self setupNotifications];
-        [self.logger info:@"✅ [MRAID-INIT] Notifications registered"];
         
         // Inject MRAID 3.0 JavaScript API
         [self injectMRAIDJavaScript];
-        [self.logger info:@"✅ [MRAID-INIT] MRAID 3.0 JavaScript injected"];
         
         // Run diagnostic after a short delay to ensure WebView is ready
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -108,7 +106,7 @@
             [self checkWebViewReadiness];
         });
         
-        [self.logger info:@"🎯 [MRAID-INIT] CLXMRAIDManager initialization completed successfully"];
+        [self.logger info:@"✅ [MRAID-INIT] CLXMRAIDManager initialization completed"];
     } else {
         [self.logger error:@"❌ [MRAID-INIT] Super init failed"];
     }

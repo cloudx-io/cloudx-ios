@@ -70,15 +70,13 @@
                viewController:(UIViewController *)viewController
                      delegate:(id<CLXAdapterBannerDelegate>)delegate {
     self.logger = [[CLXLogger alloc] initWithCategory:@"CloudXPrebidBanner"];
-    [self.logger info:[NSString stringWithFormat:@"🚀 [INIT] CloudXPrebidBanner initialization started - Ad markup: %lu chars, Type: %ld, CloseBtn: %@, Delegate: %@", (unsigned long)adm.length, (long)type, hasClosedButton ? @"YES" : @"NO", delegate ? @"Present" : @"nil"]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [INIT] CloudXPrebidBanner initialization - Markup: %lu chars, Type: %ld, CloseBtn: %@", (unsigned long)adm.length, (long)type, hasClosedButton ? @"YES" : @"NO"]];
     
     // Start performance tracking for initialization
     [[CLXPerformanceManager sharedManager] startLoadTimerForKey:[NSString stringWithFormat:@"banner_%p", self]];
     
     self = [super init];
     if (self) {
-        [self.logger info:@"✅ [INIT] Super init successful, setting properties"];
-        
         // Configure core properties
         self.delegate = delegate;
         self.adm = adm;
@@ -86,25 +84,20 @@
         self.type = type;
         self.hasClosedButton = hasClosedButton;
         
-        [self.logger debug:[NSString stringWithFormat:@"📊 [INIT] Properties configured - Delegate: %@, Markup: %lu chars, VC: %@, Type: %ld, CloseBtn: %@", self.delegate ? @"Set" : @"nil", (unsigned long)self.adm.length, NSStringFromClass([self.viewController class]), (long)self.type, self.hasClosedButton ? @"YES" : @"NO"]];
-        
         // Validate ad markup content
         if (!self.adm || self.adm.length == 0) {
             [self.logger error:@"❌ [INIT] Invalid ad markup - empty or nil"];
-        } else {
-            [self.logger info:[NSString stringWithFormat:@"✅ [INIT] Ad markup validated - %lu characters", (unsigned long)self.adm.length]];
         }
         
         // Create close button on main thread for UI safety
         dispatch_sync(dispatch_get_main_queue(), ^{
-            [self.logger info:@"🔧 [INIT] Creating close button on main thread"];
             self.closeButton = [UIButton buttonWithType:UIButtonTypeClose];
             self.closeButton.translatesAutoresizingMaskIntoConstraints = NO;
         });
         
-        [self.logger info:[NSString stringWithFormat:@"🎯 [INIT] CloudXPrebidBanner initialization completed successfully - Banner instance ready: %p", self]];
+        [self.logger info:[NSString stringWithFormat:@"✅ [INIT] CloudXPrebidBanner initialization completed - Instance: %p", self]];
     } else {
-        [self.logger error:@"❌ [INIT] Super init failed - banner initialization failed"];
+        [self.logger error:@"❌ [INIT] Super init failed"];
         [[CLXPerformanceManager sharedManager] endLoadTimerForKey:[NSString stringWithFormat:@"banner_%p", self]];
         return nil;
     }
@@ -145,7 +138,6 @@
  */
 - (void)load {
     [self.logger info:@"🚀 [LOAD] Banner load() method called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] Thread: %@, Instance: %p, Markup: %lu chars, Type: %ld, CloseBtn: %@, VC: %@, Delegate: %@", [NSThread currentThread].isMainThread ? @"Main" : @"Background", self, (unsigned long)self.adm.length, (long)self.type, self.hasClosedButton ? @"YES" : @"NO", self.viewController ? @"YES" : @"NO", self.delegate ? @"YES" : @"NO"]];
     
     // Pre-load validation
     if (!self.adm || self.adm.length == 0) {
@@ -166,10 +158,7 @@
         return;
     }
     
-    [self.logger info:@"✅ [LOAD] Pre-load validation passed, proceeding with load"];
-    
     dispatch_async(dispatch_get_main_queue(), ^{
-        
         // Start render timer
         [[CLXPerformanceManager sharedManager] startRenderTimerForKey:[NSString stringWithFormat:@"banner_%p", self]];
         
@@ -186,7 +175,6 @@
         }
         
         CGRect frame = CGRectMake(0, 0, bannerSize.width, bannerSize.height);
-        [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] WebView frame: %@, Creating CLXPrebidWebView with MRAID 3.0 support", NSStringFromCGRect(frame)]];
         self.webView = [[CLXPrebidWebView alloc] initWithFrame:frame placementType:CLXMRAIDPlacementTypeInline];
         
         if (self.webView) {
@@ -196,14 +184,12 @@
             self.webView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
             
             // Configure advanced features
-            [self.logger info:@"🔧 [LOAD] Configuring advanced webview features - performance optimization, viewability tracking, resource preloading"];
             self.webView.optimizeForPerformance = YES;
             self.webView.enableViewabilityTracking = YES;
             self.webView.preloadResources = YES;
             self.webView.viewabilityStandard = CLXViewabilityStandardIAB;
             
             // Generate optimized HTML with performance enhancements
-            [self.logger debug:@"🔧 [LOAD] Generating optimized HTML with viewport and styles..."];
             NSString *viewport = [NSString stringWithFormat:@"<meta name='viewport' content='width=%d, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>", (int)bannerSize.width];
             NSString *style = @"<style>"
                               @"html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }"
@@ -219,17 +205,16 @@
             // Use original adm if optimization failed
             if (!optimizedAdm) {
                 optimizedAdm = self.adm ?: @"";
-                [self.logger debug:@"⚠️ [LOAD] HTML optimization failed, using original ad markup"];
             }
             
             NSString *htmlString = [NSString stringWithFormat:@"<!DOCTYPE html><html><head>%@%@</head><body>%@</body></html>", viewport, style, optimizedAdm];
             
-            [self.logger info:[NSString stringWithFormat:@"✅ [LOAD] HTML generated - Total: %lu chars, Optimized markup: %lu chars, Preview: %@...", (unsigned long)htmlString.length, (unsigned long)optimizedAdm.length, [htmlString substringToIndex:MIN(200, htmlString.length)]]];
+            [self.logger info:[NSString stringWithFormat:@"✅ [LOAD] HTML generated - %lu chars", (unsigned long)htmlString.length]];
             
             // Check for video content
             BOOL hasVideo = [self.adm containsString:@"<video"] || [self.adm containsString:@"<VAST"] || [self.adm containsString:@".mp4"] || [self.adm containsString:@".webm"];
             if (hasVideo) {
-                [self.logger info:@"📹 [LOAD] Video content detected in ad markup"];
+                [self.logger info:@"📹 [LOAD] Video content detected"];
                 self.webView.allowsInlineMediaPlayback = YES;
                 self.webView.requiresUserActionForPlayback = NO;
             }
@@ -237,7 +222,7 @@
             // Check for MRAID content
             BOOL hasMRAID = [self.adm containsString:@"mraid"] || [self.adm containsString:@"expand"] || [self.adm containsString:@"resize"];
             if (hasMRAID) {
-                [self.logger info:@"📱 [LOAD] MRAID content detected in ad markup"];
+                [self.logger info:@"📱 [LOAD] MRAID content detected"];
             }
             
             [self.logger info:@"🚀 [LOAD] Loading HTML into CLXPrebidWebView with advanced features enabled"];
@@ -252,11 +237,9 @@
             
             if (@available(iOS 16.4, *)) {
                 self.webView.inspectable = YES;
-                [self.logger debug:@"📊 [TestVastNetworkBanner] WebView inspectable enabled"];
             }
             
             if (self.hasClosedButton) {
-                [self.logger debug:@"🔧 [TestVastNetworkBanner] Adding close button..."];
                 [self.closeButton addTarget:self action:@selector(closeBanner:) forControlEvents:UIControlEventTouchUpInside];
                 [self.webView addSubview:self.closeButton];
                 
@@ -264,12 +247,9 @@
                     [self.webView.trailingAnchor constraintEqualToAnchor:self.closeButton.trailingAnchor],
                     [self.webView.topAnchor constraintEqualToAnchor:self.closeButton.topAnchor]
                 ]];
-                [self.logger info:@"✅ [TestVastNetworkBanner] Close button added and constrained"];
-            } else {
-                [self.logger debug:@"📊 [TestVastNetworkBanner] No close button needed"];
+                [self.logger info:@"✅ [TestVastNetworkBanner] Close button added"];
             }
             
-            [self.logger info:@"✅ [TestVastNetworkBanner] Banner load setup completed"];
         } else {
             [self.logger error:@"❌ [TestVastNetworkBanner] Failed to create WKWebView"];
         }
@@ -285,6 +265,7 @@
  * @param viewController The view controller from which to present the banner.
  */
 - (void)showFromViewController:(UIViewController *)viewController {
+    [self.logger debug:@"Banner show called"];
     // Banner is already shown when loaded, this method is called for consistency
     if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
         [self.delegate didShowBanner:self];
