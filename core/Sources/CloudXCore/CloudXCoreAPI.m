@@ -195,7 +195,7 @@ static CloudXCore *_sharedInstance = nil;
         if (config.metricsEndpointURL) {
             metricsEndpointURL = config.metricsEndpointURL;
         }
-        _reportingService = [[CLXLiveAdEventReporter alloc] initWithEndpoint:config.eventTrackingURL ?: metricsEndpointURL];
+        _reportingService = [[CLXAdEventReporter alloc] initWithEndpoint:config.eventTrackingURL ?: metricsEndpointURL];
         
         NSMutableDictionary *geoHeaders = [NSMutableDictionary dictionary];
         if (config.geoHeaders) {

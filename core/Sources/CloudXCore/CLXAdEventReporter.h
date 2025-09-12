@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)fireLurlWithUrl:(nullable NSString *)lUrl reason:(NSInteger)reason;
 @end
 
-@interface CLXLiveAdEventReporter : NSObject <CLXAdEventReporting>
+@interface CLXAdEventReporter : NSObject <CLXAdEventReporting>
 
 - (instancetype)initWithEndpoint:(NSString *)endpoint;
 
