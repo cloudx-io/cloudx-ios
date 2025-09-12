@@ -591,13 +591,10 @@
 		19C724A92E2390810012CFC7 /* RillImpressions */ = {
 			isa = PBXGroup;
 			children = (
-				19C724A22E2390810012CFC7 /* CLXBiddingConfig.m */,
-				19C724A32E2390810012CFC7 /* CLXConfigImpressionModel.m */,
 				19C724A42E2390810012CFC7 /* CLXRillImpressionDefaultModel.m */,
 				19C724A52E2390810012CFC7 /* CLXRillImpressionInitService.m */,
 				19C724A62E2390810012CFC7 /* CLXRillImpressionModel.m */,
 				19C724A72E2390810012CFC7 /* CLXRillImpressionProperties.m */,
-				19C724A82E2390810012CFC7 /* NSString+CLXSemicolon.m */,
 			);
 			path = RillImpressions;
 			sourceTree = "<group>";
@@ -652,8 +649,10 @@
 		19C724C02E2390810012CFC7 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				19C724A22E2390810012CFC7 /* CLXBiddingConfig.m */,
 				19C724B62E2390810012CFC7 /* CLXBidderConfig.m */,
 				19C724B72E2390810012CFC7 /* CLXBidResponse.m */,
+				19C724A32E2390810012CFC7 /* CLXConfigImpressionModel.m */,
 				19C724B82E2390810012CFC7 /* CLXNativeTemplate.m */,
 				19C724B92E2390810012CFC7 /* CLXPerformanceMetricModel.m */,
 				19C724BA2E2390810012CFC7 /* CLXSDKConfig.m */,
@@ -705,9 +704,10 @@
 		19C724DD2E2390810012CFC7 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				19D927792E62307500C84DAE /* CLXRetryHelper.m */,
 				19C724D72E2390810012CFC7 /* CLXBaseNetworkService.m */,
 				19C724D82E2390810012CFC7 /* CLXLogger.m */,
+				19C724A82E2390810012CFC7 /* NSString+CLXSemicolon.m */,
+				19D927792E62307500C84DAE /* CLXRetryHelper.m */,
 				19C724D92E2390810012CFC7 /* CLXSystemInformation.m */,
 				19C724DA2E2390810012CFC7 /* CLXURLProvider.m */,
 				19C724DB2E2390810012CFC7 /* UIDevice+CLXIdentifier.m */,
