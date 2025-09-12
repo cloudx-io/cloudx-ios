@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1979919A2E74921400EBA0A3 /* CLXGPPProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 197991992E74921400EBA0A3 /* CLXGPPProvider.m */; };
-		1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919B2E74923900EBA0A3 /* CLXGppConsent.h */; };
-		1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */; };
+		1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919B2E74923900EBA0A3 /* CLXGppConsent.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		197991A02E74924100EBA0A3 /* CLXGppConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 1979919F2E74924100EBA0A3 /* CLXGppConsent.m */; };
 		19C7247B2E2390420012CFC7 /* CloudXCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C724702E2390420012CFC7 /* CloudXCore.framework */; };
 		19C725472E2390810012CFC7 /* CLXURLProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C7253D2E2390810012CFC7 /* CLXURLProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -210,7 +210,6 @@
 		19D92C7E2E6A57DD00C84DAE /* CLXAdapterInitializationUnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D92C7B2E6A57DD00C84DAE /* CLXAdapterInitializationUnitTests.m */; };
 		19D92C7F2E6A57DD00C84DAE /* CLXRevenueCallbackArchitectureTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D92C7C2E6A57DD00C84DAE /* CLXRevenueCallbackArchitectureTests.m */; };
 		19D92C812E6B7F7300C84DAE /* CLXBannerAdViewUnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D92C802E6B7F7300C84DAE /* CLXBannerAdViewUnitTests.m */; };
-		19D92C872E6BA17700C84DAE /* CLXBidNetworkServiceImplementationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D92C862E6BA17700C84DAE /* CLXBidNetworkServiceImplementationTests.m */; };
 		19D92C972E6DE89A00C84DAE /* CLXBidAdSourceUserDefaultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D92C8F2E6DE89A00C84DAE /* CLXBidAdSourceUserDefaultsTests.m */; };
 		19D92C982E6DE89A00C84DAE /* CLXBiddingConfigUserDefaultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D92C902E6DE89A00C84DAE /* CLXBiddingConfigUserDefaultsTests.m */; };
 		19D92C992E6DE89A00C84DAE /* CLXCoreUserDefaultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D92C912E6DE89A00C84DAE /* CLXCoreUserDefaultsTests.m */; };
@@ -441,7 +440,6 @@
 		19D92C7C2E6A57DD00C84DAE /* CLXRevenueCallbackArchitectureTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXRevenueCallbackArchitectureTests.m; sourceTree = "<group>"; };
 		19D92C802E6B7F7300C84DAE /* CLXBannerAdViewUnitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBannerAdViewUnitTests.m; sourceTree = "<group>"; };
 		19D92C832E6BA08200C84DAE /* CLXBannerMocks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXBannerMocks.h; sourceTree = "<group>"; };
-		19D92C862E6BA17700C84DAE /* CLXBidNetworkServiceImplementationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidNetworkServiceImplementationTests.m; sourceTree = "<group>"; };
 		19D92C8F2E6DE89A00C84DAE /* CLXBidAdSourceUserDefaultsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidAdSourceUserDefaultsTests.m; sourceTree = "<group>"; };
 		19D92C902E6DE89A00C84DAE /* CLXBiddingConfigUserDefaultsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBiddingConfigUserDefaultsTests.m; sourceTree = "<group>"; };
 		19D92C912E6DE89A00C84DAE /* CLXCoreUserDefaultsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXCoreUserDefaultsTests.m; sourceTree = "<group>"; };
@@ -514,7 +512,6 @@
 				19D92C932E6DE89A00C84DAE /* CLXReportingUserDefaultsTests.m */,
 				19D92C942E6DE89A00C84DAE /* CLXUserDefaultsConcurrencyTests.m */,
 				19D92C952E6DE89A00C84DAE /* CLXUserDefaultsIntegrationTests.m */,
-				19D92C862E6BA17700C84DAE /* CLXBidNetworkServiceImplementationTests.m */,
 				19D92C842E6BA08200C84DAE /* Mocks */,
 				19D92C802E6B7F7300C84DAE /* CLXBannerAdViewUnitTests.m */,
 				19D92C7A2E6A57DD00C84DAE /* CLXAdapterInitializationIntegrationTests.m */,
@@ -934,8 +931,6 @@
 				19C725792E2390810012CFC7 /* CLXInterstitialDelegate.h in Headers */,
 				19C7257A2E2390810012CFC7 /* CLXBidNetworkService.h in Headers */,
 				19C7257B2E2390810012CFC7 /* CLXSessionMetricModel+Update.h in Headers */,
-				1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */,
-				1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */,
 				19C7257C2E2390810012CFC7 /* CLXNativeAdView.h in Headers */,
 				19C7257D2E2390810012CFC7 /* CLXBanner.h in Headers */,
 				19C7257E2E2390810012CFC7 /* CLXRewardedInterstitial.h in Headers */,
@@ -985,6 +980,8 @@
 				19D92A4E2E68C6DC00C84DAE /* CLXAdFormat.h in Headers */,
 				19D928C12E63F44B00C84DAE /* CLXPrivacyService.h in Headers */,
 				19C725A52E2390810012CFC7 /* CLXSDKInitNetworkService.h in Headers */,
+				1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */,
+				1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */,
 				19D92CA22E6E099C00C84DAE /* CLXUserDefaultsKeys.h in Headers */,
 				19C725A62E2390810012CFC7 /* CLXSessionMetricModel.h in Headers */,
 				19C725A72E2390810012CFC7 /* CLXLogger.h in Headers */,
@@ -1186,7 +1183,6 @@
 				19D929C42E6644BB00C84DAE /* CLXPublisherBannerUnitTests.m in Sources */,
 				19D92C392E6A3B8E00C84DAE /* CLXPublisherBannerBasicTests.m in Sources */,
 				19D92C3E2E6A3B8E00C84DAE /* CLXRevenueCallbackEdgeCaseTests.m in Sources */,
-				19D92C872E6BA17700C84DAE /* CLXBidNetworkServiceImplementationTests.m in Sources */,
 				19D929012E6403E000C84DAE /* CLXPrivacyServiceTests.m in Sources */,
 				19D929022E6403E000C84DAE /* CLXPrivacyIntegrationTests.m in Sources */,
 				19D929032E6403E000C84DAE /* CLXTrackingFieldResolverPrivacyTests.m in Sources */,

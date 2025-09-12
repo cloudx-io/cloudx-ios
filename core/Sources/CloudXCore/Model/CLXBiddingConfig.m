@@ -347,9 +347,6 @@ static void initializeLogger() {
         
         _user = user;
         
-        // Create regulations with privacy service integration
-        CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
-        
         // Create regulations with GPP support
         CLXBiddingConfigRegulationsExtIAB *iab = [[CLXBiddingConfigRegulationsExtIAB alloc] init];
         iab.usPrivacyString = [privacyService ccpaPrivacyString]; // Legacy CCPA support

@@ -167,7 +167,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Set whether user is age-restricted (COPPA)
  * @param isAgeRestrictedUser YES if user is age-restricted, NO otherwise
- * @discussion COPPA is now supported with GPP implementation and will be included in bid requests.
+ * @discussion COPPA is fully supported and will be included in bid requests when enabled.
  */
 + (void)setIsAgeRestrictedUser:(BOOL)isAgeRestrictedUser;
 

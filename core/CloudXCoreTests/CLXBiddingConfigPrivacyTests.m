@@ -145,8 +145,8 @@
     XCTAssertEqualObjects(config.regulations.ext.iab.usPrivacyString, testCCPAString, @"US privacy string should match CCPA string");
 }
 
-// Test that COPPA applicable flag is NOT included in bidding config (server not supported)
-- (void)testCOPPAApplicable_ShouldNotBeIncludedInBiddingConfig {
+// Test that COPPA applicable flag is included in bidding config when enabled
+- (void)testCOPPAApplicable_ShouldBeIncludedInBiddingConfig {
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyCOPPAAppliesKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
@@ -168,11 +168,11 @@
                       impModel:nil
                       settings:[CLXSettings sharedInstance]];
     
-    // COPPA should NOT be included in bidding config as server doesn't support it yet
-    XCTAssertNil(config.regulations.coppa, @"COPPA should not be included in bidding config (server not supported)");
+    // COPPA should be included in bidding config when enabled (now supported with GPP)
+    XCTAssertEqualObjects(config.regulations.coppa, @YES, @"COPPA should be included in bidding config when enabled");
 }
 
-// Test that only CCPA privacy settings are included in bidding config (server supported)
+// Test that CCPA and COPPA privacy settings are included in bidding config
 - (void)testCCPAPrivacySettings_ShouldBeIncludedInBiddingConfig {
     [self clearPrivacySettings]; // Ensure clean state
     
@@ -217,13 +217,15 @@
     XCTAssertNotNil(config.regulations.ext, @"Regulations ext should be present");
     XCTAssertNotNil(config.regulations.ext.iab, @"IAB ext should be present");
     
-    // Only CCPA should be included (server supported)
+    // CCPA should be included (server supported)
     XCTAssertEqualObjects(config.regulations.ext.iab.usPrivacyString, testCCPAString, @"US privacy string should match CCPA string");
     
-    // GDPR and COPPA should NOT be included (server not supported)
+    // COPPA should be included when enabled (now supported with GPP)
+    XCTAssertEqualObjects(config.regulations.coppa, @YES, @"COPPA should be included when enabled");
+    
+    // GDPR should NOT be included (server not supported yet)
     XCTAssertNil(config.regulations.ext.iab.gdprApplies, @"GDPR applies should not be included (server not supported)");
     XCTAssertNil(config.regulations.ext.iab.tcString, @"TC string should not be included (server not supported)");
-    XCTAssertNil(config.regulations.coppa, @"COPPA should not be included (server not supported)");
 }
 
 @end
