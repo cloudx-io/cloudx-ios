@@ -224,7 +224,8 @@
            skadRequestParameters:@{}
                           tmax:@3.0
                       impModel:nil
-                      settings:[CLXSettings sharedInstance]];
+                      settings:[CLXSettings sharedInstance]
+                privacyService:self.privacyService];
 }
 
 - (CLXBiddingConfigRequest *)createTestBiddingConfigWithPrivacyService {

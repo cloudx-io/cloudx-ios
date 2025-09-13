@@ -71,7 +71,7 @@
 
 - (BOOL)shouldClearPersonalDataIgnoringATT {
     // ⚠️ INTERNAL METHOD: This method includes GDPR/COPPA checks that are not yet supported by server in bid requests
-    // Used for testing and internal logic - should not be exposed to publishers
+    // Internal method includes comprehensive privacy checks - should not be exposed to publishers
     
     // Check GDPR consent (INTERNAL - server not supported yet)
     NSString *gdprConsent = [self gdprConsentString];

@@ -38,7 +38,7 @@
                           tmax:(NSNumber *)tmax
                       impModel:(nullable CLXConfigImpressionModel *)impModel
                       settings:(CLXSettings *)settings
-                privacyService:(CLXPrivacyService *)privacyService; // SOLID: Dependency injection for testing
+                privacyService:(CLXPrivacyService *)privacyService;
 @end
 
 @interface CLXBiddingConfigRequestPrivacyTests : XCTestCase
@@ -96,7 +96,8 @@
            skadRequestParameters:@{}
                           tmax:@3.0
                       impModel:nil
-                      settings:[CLXSettings sharedInstance]];
+                      settings:[CLXSettings sharedInstance]
+            privacyService:[CLXPrivacyService sharedInstance]];
     
     // GDPR should NOT be included in bidding config as server doesn't support it yet
     XCTAssertNil(config.regulations.ext.iab.tcString, @"TC string should not be included (server not supported)");
@@ -166,7 +167,8 @@
            skadRequestParameters:@{}
                           tmax:@3.0
                       impModel:nil
-                      settings:[CLXSettings sharedInstance]];
+                      settings:[CLXSettings sharedInstance]
+            privacyService:[CLXPrivacyService sharedInstance]];
     
     // COPPA is temporarily disabled until server is ready
     XCTAssertNil(config.regulations.coppa, @"COPPA should be disabled until server is ready");

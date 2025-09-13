@@ -56,14 +56,14 @@ extern NSString * const kIABGPP_GppSID;
 - (nullable CLXGppConsent *)decodeGppForTarget:(nullable NSNumber *)target;
 
 /**
- * @brief Sets the GPP consent string (for testing and publisher API)
+ * @brief Sets the GPP consent string for privacy compliance
  * @param gppString The GPP string to store
  * @discussion Stores to standard IAB UserDefaults key
  */
 - (void)setGppString:(nullable NSString *)gppString;
 
 /**
- * @brief Sets the GPP section IDs (for testing and publisher API)
+ * @brief Sets the GPP section IDs for privacy compliance
  * @param gppSid Array of section IDs to store
  * @discussion Stores to standard IAB UserDefaults key with underscore delimiter
  */

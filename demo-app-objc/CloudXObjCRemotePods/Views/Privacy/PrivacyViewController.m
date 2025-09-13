@@ -559,7 +559,8 @@
        skadRequestParameters:@{}
                       tmax:@3.0
                   impModel:nil
-                  settings:[CLXSettings sharedInstance]];
+                  settings:[CLXSettings sharedInstance]
+            privacyService:[CLXPrivacyService sharedInstance]];
         
         // Debug: Log bid request generation
         [[DemoAppLogger sharedInstance] logMessage:@"🔍 [DEBUG] Generated test bid request for privacy testing"];

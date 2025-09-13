@@ -10,6 +10,7 @@
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXPrivacyService.h>
 #import <WebKit/WebKit.h>
 
 @interface CLXBidNetworkServiceClass ()
@@ -73,7 +74,8 @@
                                                                skadRequestParameters:nil
                                                                                tmax:tmax
                                                                            impModel:impModel
-                                                                           settings:[CLXSettings sharedInstance]];
+                                                                           settings:[CLXSettings sharedInstance]
+                                                                     privacyService:[CLXPrivacyService sharedInstance]];
     if (completion) {
         completion([bidRequest json], nil);
     }

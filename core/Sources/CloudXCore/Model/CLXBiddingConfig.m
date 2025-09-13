@@ -24,26 +24,7 @@
 - (nullable NSNumber *)coppaApplies;
 @end
 
-// Test category for dependency injection (SOLID: Interface Segregation)
-@interface CLXBiddingConfigRequest (Testing)
-- (instancetype)initWithAdType:(CLXAdType)adType
-                     adUnitID:(NSString *)adUnitID
-            storedImpressionId:(NSString *)storedImpressionId
-                        dealID:(NSString *)dealID
-                     bidFloor:(NSNumber *)bidFloor
-                displayManager:(NSString *)displayManager
-            displayManagerVer:(NSString *)displayManagerVer
-                   publisherID:(NSString *)publisherID
-                      location:(CLLocation *)location
-                     userAgent:(NSString *)userAgent
-                   adapterInfo:(NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)adapterInfo
-           nativeAdRequirements:(id)nativeAdRequirements
-           skadRequestParameters:(id)skadRequestParameters
-                          tmax:(NSNumber *)tmax
-                      impModel:(nullable CLXConfigImpressionModel *)impModel
-                      settings:(CLXSettings *)settings
-                privacyService:(CLXPrivacyService *)privacyService;
-@end
+// Privacy service parameter is now required in main interface - no separate testing category needed
 
 #pragma mark - CLXBiddingConfig
 @implementation CLXBiddingConfig
@@ -80,6 +61,7 @@ static void initializeLogger() {
                            tmax:(NSNumber *)tmax
                       impModel:(nullable CLXConfigImpressionModel *)impModel
                       settings:(CLXSettings *)settings
+                privacyService:(CLXPrivacyService *)privacyService
 {
     self = [super init];
     if (self) {
@@ -333,8 +315,8 @@ static void initializeLogger() {
         
         _user = user;
         
-        // Create regulations with privacy service integration
-        CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
+        // Store the privacy service for use in JSON conversion
+        _privacyService = privacyService;
         
         // Create regulations - only CCPA is supported by server currently
         // ⚠️ GDPR and COPPA are temporarily disabled as server support is not yet implemented
@@ -345,16 +327,8 @@ static void initializeLogger() {
         CLXBiddingConfigRegulationsExt *regExt = [[CLXBiddingConfigRegulationsExt alloc] init];
         regExt.iab = iab;
         
-        // Add GPP data like Android does - should be included in all bid requests
-        NSString *gppString = [privacyService gppString];
-        if (gppString) {
-            regExt.gpp = gppString;
-        }
-        
-        NSArray<NSNumber *> *gppSid = [privacyService gppSid];
-        if (gppSid && gppSid.count > 0) {
-            regExt.gppSid = gppSid;
-        }
+        // Include GPP compliance data in bid request regulations
+        [self populateGPPDataForRegulationsExt:regExt withPrivacyService:privacyService];
 
         CLXBiddingConfigRegulations *regulations = [[CLXBiddingConfigRegulations alloc] init];
         regulations.ext = regExt;
@@ -366,6 +340,19 @@ static void initializeLogger() {
         // regulations.coppa = [privacyService coppaApplies];
 
         _regulations = regulations;
+        
+        // Apply privacy-aware data clearing when required
+        BOOL shouldClearPersonalData = [privacyService shouldClearPersonalDataWithGPP];
+        if (shouldClearPersonalData) {
+            _device.ifa = @"";
+            
+            // Clear geo coordinates but keep UTC offset
+            if (_device.geo) {
+                _device.geo.lat = nil;
+                _device.geo.lon = nil;
+                _device.geo.accuracy = nil;
+            }
+        }
         
         // Create request ext
         NSMutableDictionary *adapterExtras = [NSMutableDictionary dictionary];
@@ -396,86 +383,7 @@ static void initializeLogger() {
     return self;
 }
 
-// SOLID: Test-only initializer with dependency injection (Interface Segregation)
-- (instancetype)initWithAdType:(CLXAdType)adType
-                     adUnitID:(NSString *)adUnitID
-            storedImpressionId:(NSString *)storedImpressionId
-                        dealID:(NSString *)dealID
-                     bidFloor:(NSNumber *)bidFloor
-                displayManager:(NSString *)displayManager
-            displayManagerVer:(NSString *)displayManagerVer
-                   publisherID:(NSString *)publisherID
-                      location:(CLLocation *)location
-                     userAgent:(NSString *)userAgent
-                   adapterInfo:(NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)adapterInfo
-           nativeAdRequirements:(id)nativeAdRequirements
-           skadRequestParameters:(id)skadRequestParameters
-                          tmax:(NSNumber *)tmax
-                      impModel:(nullable CLXConfigImpressionModel *)impModel
-                      settings:(CLXSettings *)settings
-                privacyService:(CLXPrivacyService *)privacyService {
-    
-    // Call the standard initializer first
-    self = [self initWithAdType:adType
-                       adUnitID:adUnitID
-              storedImpressionId:storedImpressionId
-                          dealID:dealID
-                       bidFloor:bidFloor
-                  displayManager:displayManager
-              displayManagerVer:displayManagerVer
-                     publisherID:publisherID
-                        location:location
-                       userAgent:userAgent
-                     adapterInfo:adapterInfo
-             nativeAdRequirements:nativeAdRequirements
-             skadRequestParameters:skadRequestParameters
-                            tmax:tmax
-                        impModel:impModel
-                        settings:settings];
-    
-      if (self) {
-          // Store the privacy service for use in JSON conversion
-          _privacyService = privacyService;
-          
-          // Override regulations with the injected privacy service
-          CLXBiddingConfigRegulationsExtIAB *iab = [[CLXBiddingConfigRegulationsExtIAB alloc] init];
-          iab.usPrivacyString = [privacyService ccpaPrivacyString]; // Use injected service
-          
-          CLXBiddingConfigRegulationsExt *regExt = [[CLXBiddingConfigRegulationsExt alloc] init];
-          regExt.iab = iab;
-          
-          // Add GPP data from injected service
-          NSString *gppString = [privacyService gppString];
-          if (gppString) {
-              regExt.gpp = gppString;
-          }
-          
-          NSArray<NSNumber *> *gppSid = [privacyService gppSid];
-          if (gppSid && gppSid.count > 0) {
-              regExt.gppSid = gppSid;
-          }
-          
-          CLXBiddingConfigRegulations *regulations = [[CLXBiddingConfigRegulations alloc] init];
-          regulations.ext = regExt;
-          
-          _regulations = regulations;
-          
-          // Override device data with privacy-aware values
-          BOOL shouldClearPersonalData = [privacyService shouldClearPersonalDataWithGPP];
-          if (shouldClearPersonalData) {
-              _device.ifa = @"";
-              
-              // Clear geo coordinates but keep UTC offset
-              if (_device.geo) {
-                  _device.geo.lat = nil;
-                  _device.geo.lon = nil;
-                  _device.geo.accuracy = nil;
-              }
-          }
-      }
-    
-    return self;
-}
+// Privacy service parameter is now required in main initializer - no separate method needed
 
 - (NSDictionary *)json {
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
@@ -715,6 +623,28 @@ static void initializeLogger() {
     return [json copy];
 }
 
+#pragma mark - Privacy Helper Methods
+
+/**
+ * Populates GPP compliance data for regulations extension
+ * @param regExt The regulations extension to populate
+ * @param privacyService The privacy service containing GPP data
+ */
+- (void)populateGPPDataForRegulationsExt:(CLXBiddingConfigRegulationsExt *)regExt 
+                      withPrivacyService:(CLXPrivacyService *)privacyService {
+    NSString *gppString = [privacyService gppString];
+    if (gppString) {
+        regExt.gpp = gppString;
+    }
+    
+    NSArray<NSNumber *> *gppSid = [privacyService gppSid];
+    if (gppSid && gppSid.count > 0) {
+        regExt.gppSid = gppSid;
+    }
+}
+
+#pragma mark - JSON Conversion Methods
+
 - (NSDictionary *)convertDeviceExtToJSON:(CLXBiddingConfigDeviceExt *)ext {
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
     if (ext.ifv) {
@@ -793,7 +723,7 @@ static void initializeLogger() {
     if (ext.ccpa) {
         json[@"ccpa"] = ext.ccpa;
     }
-    // Add GPP data like Android does
+    // Include GPP compliance data in bid request regulations
     if (ext.gpp) {
         json[@"gpp"] = ext.gpp;
     }
