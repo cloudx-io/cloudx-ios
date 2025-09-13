@@ -136,13 +136,13 @@
     XCTAssertFalse([self.geoService isUSUser], @"Should not detect US user with empty country");
     XCTAssertFalse([self.geoService isCaliforniaUser], @"Should not detect California user with empty region");
     
-    // Test nil values in dictionary
+    // Test nil values in dictionary (using empty strings since NSUserDefaults can't store NSNull)
     [self setGeoHeaders:@{
-        @"cloudfront-viewer-country-iso3": [NSNull null],
-        @"cloudfront-viewer-country-region": [NSNull null]
+        @"cloudfront-viewer-country-iso3": @"",
+        @"cloudfront-viewer-country-region": @""
     }];
-    XCTAssertFalse([self.geoService isUSUser], @"Should handle NSNull values gracefully");
-    XCTAssertFalse([self.geoService isCaliforniaUser], @"Should handle NSNull values gracefully");
+    XCTAssertFalse([self.geoService isUSUser], @"Should handle empty string values gracefully");
+    XCTAssertFalse([self.geoService isCaliforniaUser], @"Should handle empty string values gracefully");
     
     // Test non-string values
     [self setGeoHeaders:@{

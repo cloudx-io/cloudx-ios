@@ -182,8 +182,8 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
         }
     }
     
-    if (payloads.count < 2) {
-        [self.logger error:@"❌ [CLXGPPProvider] GPP string has insufficient sections"];
+    if (payloads.count == 0) {
+        [self.logger error:@"❌ [CLXGPPProvider] GPP string has no payload sections"];
         return nil;
     }
     

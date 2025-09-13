@@ -167,7 +167,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Set whether user is age-restricted (COPPA)
  * @param isAgeRestrictedUser YES if user is age-restricted, NO otherwise
- * @discussion COPPA is fully supported and will be included in bid requests when enabled.
+ * @discussion COPPA data clearing is implemented but not included in bid requests (server limitation). Android parity for data clearing behavior.
  */
 + (void)setIsAgeRestrictedUser:(BOOL)isAgeRestrictedUser;
 

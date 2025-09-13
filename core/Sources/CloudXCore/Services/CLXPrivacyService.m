@@ -5,7 +5,7 @@
 /**
  * @file CLXPrivacyService.m
  * @brief Implementation of privacy service for CCPA and personal data protection
- * @discussion GDPR and COPPA methods are temporarily internal until server support is added
+ * @discussion GDPR methods are temporarily internal until server support is added. COPPA data clearing is implemented but not sent to server.
  */
 
 #import <CloudXCore/CLXPrivacyService.h>
@@ -23,7 +23,7 @@
 @end
 
 // Internal methods category - these are NOT in the public header
-// ⚠️ Server does not support GDPR/COPPA yet - including this data causes 502 errors
+// ⚠️ Server does not support GDPR or COPPA in bid requests yet - COPPA data clearing is implemented
 @interface CLXPrivacyService (Internal)
 - (nullable NSString *)gdprConsentString;
 - (nullable NSNumber *)gdprApplies;
@@ -58,7 +58,7 @@
         return YES;
     }
     
-    // Only check CCPA for public API (GDPR/COPPA are internal until server support is added)
+    // Only check CCPA for public API (GDPR is internal until server support is added, COPPA data clearing via GPP)
     NSString *ccpaString = [self ccpaPrivacyString];
     if (ccpaString && [ccpaString containsString:@"Y"]) {
         [self.logger debug:@"🔒 [CLXPrivacyService] CCPA opt-out detected - clearing personal data"];
@@ -70,7 +70,7 @@
 }
 
 - (BOOL)shouldClearPersonalDataIgnoringATT {
-    // ⚠️ INTERNAL METHOD: This method includes GDPR/COPPA checks that are not yet supported by server
+    // ⚠️ INTERNAL METHOD: This method includes GDPR/COPPA checks that are not yet supported by server in bid requests
     // Used for testing and internal logic - should not be exposed to publishers
     
     // Check GDPR consent (INTERNAL - server not supported yet)

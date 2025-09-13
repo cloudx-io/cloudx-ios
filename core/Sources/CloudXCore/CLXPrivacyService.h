@@ -6,8 +6,8 @@
  * @file CLXPrivacyService.h
  * @brief Privacy service for handling CCPA and personal data protection
  * @details This service provides privacy compliance functionality for CCPA.
- *          GDPR and COPPA support are temporarily internal as server-side support
- *          is not yet implemented.
+ *          GDPR support is temporarily internal as server-side support is not yet implemented.
+ *          COPPA data clearing is implemented but not included in bid requests (server limitation).
  */
 
 #import <Foundation/Foundation.h>
@@ -18,8 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
  * @class CLXPrivacyService
  * @brief Service for handling privacy compliance and personal data protection
  * @discussion This service manages privacy settings for CCPA compliance and
- * determines when personal data should be cleared. GDPR and COPPA support are
- * temporarily internal until server-side implementation is complete.
+ * determines when personal data should be cleared. GDPR support is temporarily internal
+ * until server-side implementation is complete. COPPA data clearing is implemented but not sent to server.
  */
 @interface CLXPrivacyService : NSObject
 
@@ -92,9 +92,16 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @brief Sets whether the user is age-restricted (COPPA)
  * @param isAgeRestrictedUser YES if user is age-restricted, NO otherwise, nil to clear
- * @discussion ⚠️ COPPA is not yet supported by CloudX servers. Please contact CloudX if you need COPPA support. CCPA is fully supported.
+ * @discussion COPPA data clearing is implemented but not included in bid requests (server limitation). CCPA is fully supported.                                                                                               
  */
 - (void)setIsAgeRestrictedUser:(nullable NSNumber *)isAgeRestrictedUser;
+
+/**
+ * @brief Gets whether COPPA applies (user is age-restricted)
+ * @return YES if COPPA applies, NO otherwise
+ * @discussion Returns the current COPPA status set via setIsAgeRestrictedUser
+ */
+- (BOOL)isCoppaEnabled;
 
 /**
  * @brief Sets the "do not sell" preference (CCPA)
@@ -120,7 +127,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSArray<NSNumber *> *)gppSid;
 
 /**
- * @brief Comprehensive privacy check including GPP, COPPA, and ATT
+ * @brief Comprehensive privacy check including GPP, COPPA (data clearing only), and ATT
  * @return YES if personal data should be cleared, NO otherwise
  * @discussion Enhanced privacy logic with geographic targeting and GPP consent evaluation
  */

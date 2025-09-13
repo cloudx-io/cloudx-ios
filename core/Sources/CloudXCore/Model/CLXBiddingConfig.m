@@ -57,6 +57,11 @@ static void initializeLogger() {
 }
 
 #pragma mark - CLXBiddingConfigRequest
+
+@interface CLXBiddingConfigRequest ()
+@property (nonatomic, strong, nullable) CLXPrivacyService *privacyService;
+@end
+
 @implementation CLXBiddingConfigRequest
 
 - (instancetype)initWithAdType:(CLXAdType)adType
@@ -263,7 +268,7 @@ static void initializeLogger() {
         
         _application = application;
         
-        // Create device with privacy-aware geo data (will be used later for privacy check)
+        // Create device
         CLXBiddingConfigDeviceGeo *geo = [[CLXBiddingConfigDeviceGeo alloc] init];
         geo.lat = location ? @(location.coordinate.latitude) : nil;
         geo.lon = location ? @(location.coordinate.longitude) : nil;
@@ -277,10 +282,6 @@ static void initializeLogger() {
         // This handles all configuration scenarios with proper debug/production safety
         NSString *ifa = [settings getIFA];
         
-        // Apply privacy-aware data handling (matching Android implementation)
-        CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
-        BOOL shouldClearPersonalData = [privacyService shouldClearPersonalDataWithGPP];
-        
         CLXBiddingConfigDevice *device = [[CLXBiddingConfigDevice alloc] init];
         device.ua = userAgent ?: @"ua";
         device.make = @"Apple";
@@ -289,9 +290,7 @@ static void initializeLogger() {
         device.osv = [[UIDevice currentDevice] systemVersion];
         device.hwv = [[UIDevice currentDevice] systemVersion];
         device.language = [[NSLocale currentLocale] languageCode];
-        
-        // Apply privacy-aware IFA handling (matching Android implementation)
-        device.ifa = shouldClearPersonalData ? @"" : ifa;
+        device.ifa = ifa;
         device.dnt = @0;
         device.devicetype = @([CLXSystemInformation shared].deviceType); // Use robust device type detection
         device.h = @(screenHeight);
@@ -300,46 +299,33 @@ static void initializeLogger() {
         device.connectiontype = @([CLXReachabilityService shared].currentReachabilityType); // Use robust connection type detection
         device.lmt = nil;
         device.pxratio = @([[UIScreen mainScreen] scale]);
-        
-        // Apply privacy-aware geo data handling (matching Android implementation)
-        if (shouldClearPersonalData) {
-            // Clear precise location data but keep timezone and type
-            geo.lat = nil;
-            geo.lon = nil;
-            geo.accuracy = nil;
-        }
         device.geo = geo;
         device.ext = deviceExt;
         
         _device = device;
         
-        // Create user with privacy-aware data handling
+        // Create user
         NSString *hashedUserId = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedUserIDKey];
         NSString *aiPrompt = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAIPromptKey];
         NSString *userKeywords = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserKeywordsKey];
         
-        CLXBiddingConfigUserExt *userExt = [[CLXBiddingConfigUserExt alloc] init];
+        CLXBiddingConfigUserExtUids * uids = [[CLXBiddingConfigUserExtUids alloc] init];
+        uids.id = @"29060c8606954ec90fbcde825b2783b0b9261585793db9dfcbe6b870a05a9ee3";
+        uids.atype = @"3";
         
-        // Apply privacy-aware user data handling (matching Android implementation)
-        if (!shouldClearPersonalData) {
-            // Only include personal user data when privacy allows
-            CLXBiddingConfigUserExtUids * uids = [[CLXBiddingConfigUserExtUids alloc] init];
-            uids.id = @"29060c8606954ec90fbcde825b2783b0b9261585793db9dfcbe6b870a05a9ee3";
-            uids.atype = @"3";
-            
-            CLXBiddingConfigUserExtEids *eids = [[CLXBiddingConfigUserExtEids alloc] init];
-            eids.source = bundle;
-            eids.uids = uids;
-            
-            NSDictionary *userValue = @{
-                @"userKey1": @"userValue1",
-                @"userKey2": @"userValue2",
-                @"userKey3": @"userValue3"};
-            
-            userExt.data = userValue;
-            userExt.eids = eids;
-        }
-        // When personal data should be cleared, userExt remains minimal with no personal identifiers
+        CLXBiddingConfigUserExtEids *eids = [[CLXBiddingConfigUserExtEids alloc] init];
+        eids.source = bundle;
+        eids.uids = uids;
+        
+        NSDictionary *userValue = @{
+            @"userKey1": @"userValue1",
+            @"userKey2": @"userValue2",
+            @"userKey3": @"userValue3"};
+        
+        CLXBiddingConfigUserExt *userExt = [[CLXBiddingConfigUserExt alloc] init];
+        //userExt.consent = @"gdpr-consent-string";
+        userExt.data = userValue;
+        userExt.eids = eids;
         
         CLXBiddingConfigUser *user = [[CLXBiddingConfigUser alloc] init];
         user.keywords = userKeywords.length > 0 ? userKeywords : nil;
@@ -347,14 +333,19 @@ static void initializeLogger() {
         
         _user = user;
         
-        // Create regulations with GPP support
+        // Create regulations with privacy service integration
+        CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
+        
+        // Create regulations - only CCPA is supported by server currently
+        // ⚠️ GDPR and COPPA are temporarily disabled as server support is not yet implemented
+        // Including GDPR/COPPA data causes 502 bid request errors
         CLXBiddingConfigRegulationsExtIAB *iab = [[CLXBiddingConfigRegulationsExtIAB alloc] init];
-        iab.usPrivacyString = [privacyService ccpaPrivacyString]; // Legacy CCPA support
+        iab.usPrivacyString = [privacyService ccpaPrivacyString]; // CCPA is server-supported
 
         CLXBiddingConfigRegulationsExt *regExt = [[CLXBiddingConfigRegulationsExt alloc] init];
         regExt.iab = iab;
         
-        // Add GPP data to regulations ext
+        // Add GPP data like Android does - should be included in all bid requests
         NSString *gppString = [privacyService gppString];
         if (gppString) {
             regExt.gpp = gppString;
@@ -367,17 +358,12 @@ static void initializeLogger() {
 
         CLXBiddingConfigRegulations *regulations = [[CLXBiddingConfigRegulations alloc] init];
         regulations.ext = regExt;
-        
-        // Enable COPPA in bid requests (now supported with GPP implementation)
-        if ([privacyService respondsToSelector:@selector(isCoppaEnabled)] && 
-            [(id)privacyService performSelector:@selector(isCoppaEnabled)]) {
-            regulations.coppa = @YES;
-        }
 
-        // TODO: Re-enable GDPR once server support is implemented
+        // TODO: Re-enable GDPR and COPPA once server support is implemented
         // iab.gdprApplies = [privacyService gdprApplies];
         // iab.tcString = [privacyService gdprConsentString];
         // regExt.gdpr = [privacyService gdprApplies];
+        // regulations.coppa = [privacyService coppaApplies];
 
         _regulations = regulations;
         
@@ -447,36 +433,46 @@ static void initializeLogger() {
                         impModel:impModel
                         settings:settings];
     
-    if (self) {
-        // Override regulations with the injected privacy service
-        CLXBiddingConfigRegulationsExtIAB *iab = [[CLXBiddingConfigRegulationsExtIAB alloc] init];
-        iab.usPrivacyString = [privacyService ccpaPrivacyString]; // Use injected service
-        
-        CLXBiddingConfigRegulationsExt *regExt = [[CLXBiddingConfigRegulationsExt alloc] init];
-        regExt.iab = iab;
-        
-        // Add GPP data from injected service
-        NSString *gppString = [privacyService gppString];
-        if (gppString) {
-            regExt.gpp = gppString;
-        }
-        
-        NSArray<NSNumber *> *gppSid = [privacyService gppSid];
-        if (gppSid && gppSid.count > 0) {
-            regExt.gppSid = gppSid;
-        }
-        
-        CLXBiddingConfigRegulations *regulations = [[CLXBiddingConfigRegulations alloc] init];
-        regulations.ext = regExt;
-        
-        // Enable COPPA in bid requests with injected service
-        if ([privacyService respondsToSelector:@selector(isCoppaEnabled)] && 
-            [(id)privacyService performSelector:@selector(isCoppaEnabled)]) {
-            regulations.coppa = @YES;
-        }
-        
-        _regulations = regulations;
-    }
+      if (self) {
+          // Store the privacy service for use in JSON conversion
+          _privacyService = privacyService;
+          
+          // Override regulations with the injected privacy service
+          CLXBiddingConfigRegulationsExtIAB *iab = [[CLXBiddingConfigRegulationsExtIAB alloc] init];
+          iab.usPrivacyString = [privacyService ccpaPrivacyString]; // Use injected service
+          
+          CLXBiddingConfigRegulationsExt *regExt = [[CLXBiddingConfigRegulationsExt alloc] init];
+          regExt.iab = iab;
+          
+          // Add GPP data from injected service
+          NSString *gppString = [privacyService gppString];
+          if (gppString) {
+              regExt.gpp = gppString;
+          }
+          
+          NSArray<NSNumber *> *gppSid = [privacyService gppSid];
+          if (gppSid && gppSid.count > 0) {
+              regExt.gppSid = gppSid;
+          }
+          
+          CLXBiddingConfigRegulations *regulations = [[CLXBiddingConfigRegulations alloc] init];
+          regulations.ext = regExt;
+          
+          _regulations = regulations;
+          
+          // Override device data with privacy-aware values
+          BOOL shouldClearPersonalData = [privacyService shouldClearPersonalDataWithGPP];
+          if (shouldClearPersonalData) {
+              _device.ifa = @"";
+              
+              // Clear geo coordinates but keep UTC offset
+              if (_device.geo) {
+                  _device.geo.lat = nil;
+                  _device.geo.lon = nil;
+                  _device.geo.accuracy = nil;
+              }
+          }
+      }
     
     return self;
 }
@@ -745,9 +741,13 @@ static void initializeLogger() {
 }
 
 - (NSDictionary *)convertUserExtToJSON:(CLXBiddingConfigUserExt *)ext {
-    NSMutableDictionary *json = [NSMutableDictionary dictionary];
-    //json[@"consent"] = ext.consent ?: @"";
+    // Check if privacy service requires data clearing
+    if (_privacyService && [_privacyService shouldClearPersonalDataWithGPP]) {
+        // Return empty dictionary when privacy requires data clearing
+        return @{};
+    }
     
+    // Return the working hardcoded structure for production
     NSMutableDictionary *impUsr = @{
           @"data": @{
             @"userKey1": @"userValue1",
@@ -793,6 +793,7 @@ static void initializeLogger() {
     if (ext.ccpa) {
         json[@"ccpa"] = ext.ccpa;
     }
+    // Add GPP data like Android does
     if (ext.gpp) {
         json[@"gpp"] = ext.gpp;
     }

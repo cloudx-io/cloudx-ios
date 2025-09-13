@@ -87,7 +87,8 @@
     }
     
     // Check cloudfront-viewer-country-iso3 header (matching Android implementation)
-    NSString *countryCode = geoHeaders[@"cloudfront-viewer-country-iso3"];
+    id countryCodeObj = geoHeaders[@"cloudfront-viewer-country-iso3"];
+    NSString *countryCode = [countryCodeObj isKindOfClass:[NSString class]] ? (NSString *)countryCodeObj : nil;
     BOOL isUS = [countryCode.lowercaseString isEqualToString:@"usa"];
     
     [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGeoLocationService] Country: %@, isUS: %@", countryCode ?: @"(none)", @(isUS)]];
@@ -101,7 +102,8 @@
     }
     
     NSDictionary *geoHeaders = [self geoHeaders];
-    NSString *region = geoHeaders[@"cloudfront-viewer-country-region"];
+    id regionObj = geoHeaders[@"cloudfront-viewer-country-region"];
+    NSString *region = [regionObj isKindOfClass:[NSString class]] ? (NSString *)regionObj : nil;
     BOOL isCalifornia = [region.lowercaseString isEqualToString:@"ca"];
     
     [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGeoLocationService] Region: %@, isCalifornia: %@", region ?: @"(none)", @(isCalifornia)]];

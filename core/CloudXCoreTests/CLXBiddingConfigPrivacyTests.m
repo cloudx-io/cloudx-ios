@@ -12,11 +12,11 @@
 #import <CoreLocation/CoreLocation.h>
 
 // Test category to expose internal methods for testing
-// These methods are internal because server support for GDPR/COPPA is not yet implemented
+// GDPR methods are internal because server support is not yet implemented. COPPA is fully supported.
 @interface CLXPrivacyService (Testing)
 - (nullable NSString *)gdprConsentString; // Internal - server not supported
 - (nullable NSNumber *)gdprApplies; // Internal - server not supported
-- (nullable NSNumber *)coppaApplies; // Internal - server not supported
+- (nullable NSNumber *)coppaApplies; // Internal method for testing
 // Note: No longer supports UserDefaults injection to ensure real-world collision testing
 @end
 
@@ -168,8 +168,8 @@
                       impModel:nil
                       settings:[CLXSettings sharedInstance]];
     
-    // COPPA should be included in bidding config when enabled (now supported with GPP)
-    XCTAssertEqualObjects(config.regulations.coppa, @YES, @"COPPA should be included in bidding config when enabled");
+    // COPPA is temporarily disabled until server is ready
+    XCTAssertNil(config.regulations.coppa, @"COPPA should be disabled until server is ready");
 }
 
 // Test that CCPA and COPPA privacy settings are included in bidding config
@@ -220,8 +220,8 @@
     // CCPA should be included (server supported)
     XCTAssertEqualObjects(config.regulations.ext.iab.usPrivacyString, testCCPAString, @"US privacy string should match CCPA string");
     
-    // COPPA should be included when enabled (now supported with GPP)
-    XCTAssertEqualObjects(config.regulations.coppa, @YES, @"COPPA should be included when enabled");
+    // COPPA is temporarily disabled until server is ready
+    XCTAssertNil(config.regulations.coppa, @"COPPA should be disabled until server is ready");
     
     // GDPR should NOT be included (server not supported yet)
     XCTAssertNil(config.regulations.ext.iab.gdprApplies, @"GDPR applies should not be included (server not supported)");
