@@ -10,6 +10,8 @@
 #import <CloudXCore/CLXAppSessionModel.h>
 #import <CloudXCore/CLXSessionMetricSpend.h>
 
+@class CLXErrorReporter;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -69,6 +71,17 @@ typedef NS_ENUM(NSInteger, MetricsNetworkError) {
  * and sends the data via HTTP POST requests.
  */
 @interface CLXMetricsNetworkService : CLXBaseNetworkService
+
+/**
+ * @brief Initializes the service with dependency injection for error reporting
+ * @param baseURL The base URL for the metrics service
+ * @param urlSession The URL session to use for network requests
+ * @param errorReporter Optional error reporter for exception tracking
+ * @return An initialized CLXMetricsNetworkService instance
+ */
+- (instancetype)initWithBaseURL:(NSString *)baseURL 
+                     urlSession:(NSURLSession *)urlSession 
+                  errorReporter:(nullable CLXErrorReporter *)errorReporter;
 
 /**
  * @brief Tracks the end of a session by sending metrics to the server

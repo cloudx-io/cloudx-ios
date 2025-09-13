@@ -7,6 +7,7 @@
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXMetricsTracker.h>
 #import <CloudXCore/CLXGPPProvider.h>
+#import <CloudXCore/CLXErrorReporter.h>
 @class CLXAppSessionService;
 #import <CloudXCore/CLXBidNetworkService.h>
 #import <CloudXCore/CLXAdEventReporter.h>
@@ -351,7 +352,7 @@ static CloudXCore *_sharedInstance = nil;
             // Register services in DI container 
         CLXDIContainer *container = [CLXDIContainer shared];
     [container registerType:[CLXAppSessionServiceImplementation class] instance:[[CLXAppSessionServiceImplementation alloc] initWithSessionID:config.sessionID ?: @"" appKey:_appKey url:metricsEndpointURL]];
-    [container registerType:[CLXBidNetworkServiceClass class] instance:[[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:auctionEndpointUrl cdpEndpointUrl:cdpEndpointUrl]];
+    [container registerType:[CLXBidNetworkServiceClass class] instance:[[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:auctionEndpointUrl cdpEndpointUrl:cdpEndpointUrl errorReporter:[CLXErrorReporter shared]]];
     [container resolveType:ServiceTypeSingleton class:[CLXAppSessionServiceImplementation class]];
     
     // Check if adapters are empty 

@@ -10,6 +10,7 @@
 
 #import <CloudXCore/CLXGPPProvider.h>
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXErrorReporter.h>
 
 // IAB GPP UserDefaults keys
 NSString * const kIABGPP_GppString = @"IABGPP_HDR_GppString";
@@ -18,6 +19,11 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
 @interface CLXGPPProvider ()
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, strong) NSUserDefaults *userDefaults;
+@property (nonatomic, strong, nullable) CLXErrorReporter *errorReporter;
+@end
+
+@interface CLXGPPProvider (ErrorReporting)
+- (void)reportException:(NSException *)exception context:(NSDictionary<NSString *, NSString *> *)context;
 @end
 
 @implementation CLXGPPProvider
@@ -26,16 +32,21 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     static CLXGPPProvider *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedInstance = [[self alloc] init];
+        sharedInstance = [[self alloc] initWithErrorReporter:[CLXErrorReporter shared]];
     });
     return sharedInstance;
 }
 
 - (instancetype)init {
+    return [self initWithErrorReporter:nil];
+}
+
+- (instancetype)initWithErrorReporter:(nullable CLXErrorReporter *)errorReporter {
     self = [super init];
     if (self) {
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXGPPProvider"];
         _userDefaults = [NSUserDefaults standardUserDefaults];
+        _errorReporter = errorReporter;
     }
     return self;
 }
@@ -294,17 +305,23 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
         return nil;
     }
     
-    NSString *bitSubstring = [bits substringWithRange:NSMakeRange(start, length)];
-    NSInteger value = 0;
-    
-    for (NSUInteger i = 0; i < length; i++) {
-        unichar bit = [bitSubstring characterAtIndex:i];
-        if (bit == '1') {
-            value |= (1 << (length - 1 - i));
+    @try {
+        NSString *bitSubstring = [bits substringWithRange:NSMakeRange(start, length)];
+        NSInteger value = 0;
+        
+        for (NSUInteger i = 0; i < length; i++) {
+            unichar bit = [bitSubstring characterAtIndex:i];
+            if (bit == '1') {
+                value |= (1 << (length - 1 - i));
+            }
         }
+        return @(value);
+    } @catch (NSException *exception) {
+        [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] Exception in bit_string_parsing: %@ - %@", 
+                           exception.name ?: @"unknown", exception.reason ?: @"no reason"]];
+        [self reportException:exception context:@{@"operation": @"bit_string_parsing", @"start": [@(start) stringValue], @"length": [@(length) stringValue]}];
+        return nil;
     }
-    
-    return @(value);
 }
 
 #pragma mark - Publisher API Methods
@@ -333,6 +350,19 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
         [self.userDefaults removeObjectForKey:kIABGPP_GppSID];
     }
     [self.userDefaults synchronize];
+}
+
+@end
+
+#pragma mark - Error Reporting Helper
+
+@implementation CLXGPPProvider (ErrorReporting)
+
+- (void)reportException:(NSException *)exception context:(NSDictionary<NSString *, NSString *> *)context {
+    // Only report if error reporter was injected
+    if (self.errorReporter) {
+        [self.errorReporter reportException:exception context:context];
+    }
 }
 
 @end

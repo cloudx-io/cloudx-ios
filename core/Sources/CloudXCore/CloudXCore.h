@@ -11,6 +11,9 @@
 // Services
 #import <CloudXCore/CLXInitService.h>
 #import <CloudXCore/CLXMetricsTracker.h>
+#import <CloudXCore/CLXMetricsTracker+ErrorTracking.h>
+#import <CloudXCore/CLXErrorReporter.h>
+#import <CloudXCore/CLXErrorMetricType.h>
 #import <CloudXCore/CLXCoreDataManager.h>
 #import <CloudXCore/CLXGeoLocationService.h>
 #import <CloudXCore/CLXAppSessionService.h>

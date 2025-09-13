@@ -16,7 +16,12 @@
     static NSString *const prodInitApiUrl = @"https://pro.cloudx.io/sdk";
     
 #if DEBUG
-    NSString *urlString = @"https://pro-dev.cloudx.io/sdk";
+    // DEV
+    // NSString *urlString = @"https://pro-dev.cloudx.io/sdk";
+
+    // STAGING
+    NSString *urlString = @"https://app-stage.cloudx.io/sdk";
+
     if (urlString.length > 0) {
         return [NSURL URLWithString:urlString];
     }
