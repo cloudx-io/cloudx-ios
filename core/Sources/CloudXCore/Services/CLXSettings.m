@@ -26,7 +26,7 @@ static CLXLogger *logger;
 - (NSString *)getIFA {
     NSString *ifa = nil;
     
-    // 1. IFA from UserDefaults (can be set by app for testing or specific scenarios)
+    // 1. IFA from UserDefaults (can be set by app for specific scenarios)
     ifa = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreIFAConfigKey];
     if (ifa && ifa.length > 0) {
         [logger info:[NSString stringWithFormat:@"🔧 [CLXSettings] Using configured IFA from UserDefaults: %@", ifa]];
