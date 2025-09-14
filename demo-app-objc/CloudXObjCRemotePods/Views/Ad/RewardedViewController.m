@@ -1,6 +1,7 @@
 #import "RewardedViewController.h"
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
+#import "CLXDemoConfigManager.h"
 
 @interface RewardedViewController ()
 @property (nonatomic, strong) id<CLXRewardedInterstitial> rewardedAd;
@@ -67,8 +68,7 @@
 }
 
 - (NSString *)placementName {
-    // Use actual CloudX placement name from server config
-    return @"metaRewarded";
+    return [[CLXDemoConfigManager sharedManager] currentConfig].rewardedPlacement;
 }
 
 - (void)loadRewardedAd {

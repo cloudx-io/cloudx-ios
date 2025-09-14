@@ -1,6 +1,7 @@
 #import "BannerViewController.h"
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
+#import "CLXDemoConfigManager.h"
 
 @interface BannerViewController ()
 @property (nonatomic, strong) CLXBannerAdView *bannerAd;
@@ -90,8 +91,7 @@
 }
 
 - (NSString *)placementName {
-    // Use actual CloudX placement name from server config
-    return @"metaBanner";
+    return [[CLXDemoConfigManager sharedManager] currentConfig].bannerPlacement;
 }
 
 - (void)loadBannerAd {

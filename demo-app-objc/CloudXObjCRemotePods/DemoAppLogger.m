@@ -50,6 +50,9 @@
         DemoAppLogEntry *entry = [[DemoAppLogEntry alloc] initWithMessage:message];
         [self.logs addObject:entry];
         
+        // Also log to console for Xcode debugging
+        NSLog(@"📱 [DemoApp] %@", message);
+        
         // Keep only the last 500 logs to prevent memory issues
         if (self.logs.count > 500) {
             [self.logs removeObjectAtIndex:0];
