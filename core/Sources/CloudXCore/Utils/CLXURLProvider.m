@@ -20,7 +20,7 @@
     NSString *urlString = @"https://pro-dev.cloudx.io/sdk";
 
     // STAGING
-    // NSString *urlString = @"https://app-stage.cloudx.io/sdk";
+    // NSString *urlString = @"https://pro-stage.cloudx.io/sdk";
 
     if (urlString.length > 0) {
         return [NSURL URLWithString:urlString];
