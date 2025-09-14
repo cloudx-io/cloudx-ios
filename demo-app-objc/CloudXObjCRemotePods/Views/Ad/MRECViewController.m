@@ -1,6 +1,7 @@
 #import "MRECViewController.h"
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
+#import "CLXDemoConfigManager.h"
 
 @interface MRECViewController ()
 @property (nonatomic, strong) CLXBannerAdView *mrecAd;
@@ -258,8 +259,7 @@
 }
 
 - (NSString *)placementName {
-    // Use actual CloudX placement name from server config
-    return @"metaMREC";
+    return [[CLXDemoConfigManager sharedManager] currentConfig].mrecPlacement;
 }
 
 - (void)loadMREC {

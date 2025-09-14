@@ -1,6 +1,7 @@
 #import "NativeViewController.h"
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
+#import "CLXDemoConfigManager.h"
 
 @interface NativeViewController ()
 @property (nonatomic, strong) CLXNativeAdView *nativeAd;
@@ -77,8 +78,7 @@
 }
 
 - (NSString *)placementName {
-    // Use actual CloudX placement name from server config
-    return @"metaNative";
+    return [[CLXDemoConfigManager sharedManager] currentConfig].nativePlacement;
 }
 
 - (void)loadNativeAd {

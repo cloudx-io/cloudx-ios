@@ -1,6 +1,7 @@
 #import "InterstitialViewController.h"
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
+#import "CLXDemoConfigManager.h"
 
 @interface InterstitialViewController ()
 @property (nonatomic, strong) id<CLXInterstitial> interstitialAd;
@@ -68,8 +69,7 @@
 }
 
 - (NSString *)placementName {
-    // Use actual CloudX placement name from server config
-    return @"metaInterstitial";
+    return [[CLXDemoConfigManager sharedManager] currentConfig].interstitialPlacement;
 }
 
 - (void)loadInterstitialAd {

@@ -1,6 +1,7 @@
 #import "InitViewController.h"
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
+#import "CLXDemoConfigManager.h"
 
 
 @interface InitViewController ()
@@ -13,6 +14,9 @@
     [super viewDidLoad];
     self.title = @"ObjC Demo";
     [self setupCenteredButtonWithTitle:@"Initialize SDK" action:@selector(initializeSDK)];
+    
+    // Set default environment to Development for external InitViewController
+    [[CLXDemoConfigManager sharedManager] setEnvironment:CLXDemoEnvironmentDev];
     
     // Check if SDK is already initialized
     self.isSDKInitialized = [[CloudXCore shared] isInitialised];
@@ -67,8 +71,10 @@
     }
     
     [self updateStatusUIWithState:AdStateLoading];
-    [[CloudXCore shared] initSDKWithAppKey:@"g0PdN9_0ilfIcuNXhBopl" 
-                              hashedUserID:@"test-user-123" 
+    
+    CLXDemoConfig *config = [[CLXDemoConfigManager sharedManager] currentConfig];
+    [[CloudXCore shared] initSDKWithAppKey:config.appId
+                              hashedUserID:config.hashedUserId 
                                 completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             [[DemoAppLogger sharedInstance] logMessage:@"SDK initialized successfully"];

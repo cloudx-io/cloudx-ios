@@ -1,6 +1,7 @@
 #import "NativeBannerViewController.h"
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
+#import "CLXDemoConfigManager.h"
 
 @interface NativeBannerViewController ()
 @property (nonatomic, strong) CLXNativeAdView *nativeBannerAd;
@@ -77,8 +78,7 @@
 }
 
 - (NSString *)placementName {
-    // Use actual CloudX placement name from server config (using native placement for native banner)
-    return @"metaNative";
+    return [[CLXDemoConfigManager sharedManager] currentConfig].nativeBannerPlacement;
 }
 
 - (void)loadNativeBannerAd {

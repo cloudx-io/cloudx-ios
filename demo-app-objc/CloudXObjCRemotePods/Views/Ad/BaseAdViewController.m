@@ -5,15 +5,12 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import "LogsModalViewController.h"
 #import "DemoAppLogger.h"
+#import "CLXDemoConfigManager.h"
 
 @implementation BaseAdViewController
 
 - (NSString *)appKey {
-//    return @"1c3589a1-rgto-4573-zdae-644c65074537";
-//    return @"JP61DHwkf7zPcDN_lrt32";
-//    return @"BwWU3Z8kHZrnAx-cBPMHw";
-//    return @"qT9U-tJ0FRb0x4gXb-pF0";
-    return @"g0PdN9_0ilfIcuNXhBopl";
+    return [[CLXDemoConfigManager sharedManager] currentConfig].appId;
 }
 
 - (void)viewDidLoad {
@@ -72,9 +69,10 @@
     }
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSString *testUserID = @"test-user-123";
+        CLXDemoConfig *config = [[CLXDemoConfigManager sharedManager] currentConfig];
+        NSString *hashedUserId = config.hashedUserId;
         [self updateStatusUIWithState:AdStateLoading];
-        [[CloudXCore shared] initSDKWithAppKey:appKey hashedUserID:testUserID completion:^(BOOL success, NSError * _Nullable error) {
+        [[CloudXCore shared] initSDKWithAppKey:appKey hashedUserID:hashedUserId completion:^(BOOL success, NSError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (success) {
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"cloudXSDKInitialized" object:nil];
