@@ -11,7 +11,6 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CLXBidResponse.h>
 #import <CloudXCore/CLXErrorReporter.h>
-#import <CloudXCore/CLXMetricsTracker+ErrorTracking.h>
 #import "Helper/CLXUserDefaultsTestHelper.h"
 
 @interface CLXBidResponseParsingIntegrationTests : XCTestCase

@@ -10,9 +10,8 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CLXErrorReporter.h>
-#import <CloudXCore/CLXMetricsTracker+ErrorTracking.h>
-#import <CloudXCore/CLXErrorMetricType.h>
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CloudXCore.h>
 
 @interface CLXErrorReporterTests : XCTestCase
 @property (nonatomic, strong) CLXErrorReporter *errorReporter;

@@ -10,12 +10,11 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CLXErrorReporter.h>
-#import <CloudXCore/CLXMetricsTracker+ErrorTracking.h>
-#import <CloudXCore/CLXErrorMetricType.h>
 #import <CloudXCore/CLXGPPProvider.h>
 #import <CloudXCore/CLXBidNetworkService.h>
 #import <CloudXCore/CLXMetricsNetworkService.h>
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CloudXCore.h>
 #import "Helper/CLXUserDefaultsTestHelper.h"
 
 /**
@@ -232,10 +231,12 @@
     
     // Component 4: Metrics tracker direct usage
     [queue addOperationWithBlock:^{
-        CLXMetricsTracker *tracker = [CLXMetricsTracker shared];
-        // Test that direct metrics tracking doesn't crash
-        XCTAssertNoThrow([tracker trackError:CLXErrorMetricTypeNetworkTimeout placementID:@"component_4" context:@{@"source": @"direct_metrics"}],
-                        @"Direct metrics tracking should work");
+        // Test that direct SDK error tracking doesn't crash (replacing deleted metrics tracker)
+        NSError *testError = [NSError errorWithDomain:@"IntegrationTest" 
+                                                 code:4001 
+                                             userInfo:@{NSLocalizedDescriptionKey: @"Component 4 test error"}];
+        XCTAssertNoThrow([CloudXCore trackSDKError:testError],
+                        @"Direct SDK error tracking should work");
         
         @synchronized(self) {
             completedComponents++;

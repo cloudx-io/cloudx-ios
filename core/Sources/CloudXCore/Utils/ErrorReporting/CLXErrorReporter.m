@@ -8,8 +8,8 @@
  */
 
 #import <CloudXCore/CLXErrorReporter.h>
-#import <CloudXCore/CLXMetricsTracker+ErrorTracking.h>
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CloudXCore.h>
 
 @interface CLXErrorReporter ()
 @property (nonatomic, strong) CLXLogger *logger;
@@ -57,15 +57,31 @@
         [self.logger debug:[NSString stringWithFormat:@"📊 [ErrorReporter] Reporting exception: %@ (placement: %@)", 
                           exception.name ?: @"unknown", placementID ?: @"global"]];
         
-        // Route through metrics tracker for actual reporting
-        [[CLXMetricsTracker shared] trackException:exception placementID:placementID context:context];
+        // Create NSError from NSException for Rill tracking
+        NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+        userInfo[NSLocalizedDescriptionKey] = exception.reason ?: @"Unknown exception";
+        userInfo[@"exception_name"] = exception.name ?: @"UnknownException";
+        
+        // Add placement and context info
+        if (placementID) {
+            userInfo[@"placement_id"] = placementID;
+        }
+        if (context) {
+            for (NSString *key in context.allKeys) {
+                userInfo[[NSString stringWithFormat:@"context_%@", key]] = context[key];
+            }
+        }
+        
+        NSError *errorForTracking = [NSError errorWithDomain:@"CLXErrorReporter" 
+                                                        code:1001 
+                                                    userInfo:[userInfo copy]];
+        
+        // Send via Rill SDK Error tracking
+        [CloudXCore trackSDKError:errorForTracking];
         
     } @catch (NSException *reportingException) {
         // ABSOLUTE SILENCE - cannot risk affecting business logic
-        // Only log in debug builds to console for development
-        #if DEBUG
-        NSLog(@"[CLXErrorReporter] Error reporting failed silently: %@", reportingException.reason);
-        #endif
+        // No logging to avoid potential recursive issues in error handling
     }
 }
 
@@ -82,15 +98,29 @@
         [self.logger debug:[NSString stringWithFormat:@"📊 [ErrorReporter] Reporting error: %@ (placement: %@)", 
                           error.localizedDescription ?: @"unknown", placementID ?: @"global"]];
         
-        // Route through metrics tracker for actual reporting
-        [[CLXMetricsTracker shared] trackNSError:error placementID:placementID context:context];
+        // Enhance error with placement and context info for Rill tracking
+        NSMutableDictionary *enhancedUserInfo = [NSMutableDictionary dictionaryWithDictionary:error.userInfo ?: @{}];
+        
+        // Add placement and context info
+        if (placementID) {
+            enhancedUserInfo[@"placement_id"] = placementID;
+        }
+        if (context) {
+            for (NSString *key in context.allKeys) {
+                enhancedUserInfo[[NSString stringWithFormat:@"context_%@", key]] = context[key];
+            }
+        }
+        
+        NSError *enhancedError = [NSError errorWithDomain:error.domain 
+                                                     code:error.code 
+                                                 userInfo:[enhancedUserInfo copy]];
+        
+        // Send via Rill SDK Error tracking
+        [CloudXCore trackSDKError:enhancedError];
         
     } @catch (NSException *reportingException) {
         // ABSOLUTE SILENCE - cannot risk affecting business logic
-        // Only log in debug builds to console for development
-        #if DEBUG
-        NSLog(@"[CLXErrorReporter] Error reporting failed silently: %@", reportingException.reason);
-        #endif
+        // No logging to avoid potential recursive issues in error handling
     }
 }
 
