@@ -11,6 +11,8 @@
 #import <Foundation/Foundation.h>
 #import <CloudXCore/CLXGppConsent.h>
 
+@class CLXErrorReporter;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -32,6 +34,13 @@ extern NSString * const kIABGPP_GppSID;
  * @return The singleton instance
  */
 + (instancetype)sharedInstance;
+
+/**
+ * @brief Initializes GPP provider with dependency injection for error reporting
+ * @param errorReporter Optional error reporter for exception tracking
+ * @return An initialized CLXGPPProvider instance
+ */
+- (instancetype)initWithErrorReporter:(nullable CLXErrorReporter *)errorReporter;
 
 /**
  * @brief Gets the GPP consent string from UserDefaults

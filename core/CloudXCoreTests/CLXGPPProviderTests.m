@@ -17,7 +17,7 @@
 
 - (void)setUp {
     [super setUp];
-    self.gppProvider = [[CLXGPPProvider alloc] init];
+    self.gppProvider = [[CLXGPPProvider alloc] initWithErrorReporter:nil];
     [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
 }
 

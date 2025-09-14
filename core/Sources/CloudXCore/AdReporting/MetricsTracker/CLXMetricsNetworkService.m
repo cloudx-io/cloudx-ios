@@ -10,9 +10,15 @@
 #import <CloudXCore/CLXPerformanceMetricModel.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
+#import <CloudXCore/CLXErrorReporter.h>
 
 @interface CLXMetricsNetworkService ()
 @property (nonatomic, strong) CLXLogger *logger;
+@property (nonatomic, strong, nullable) CLXErrorReporter *errorReporter;
+@end
+
+@interface CLXMetricsNetworkService (ErrorReporting)
+- (void)reportException:(NSException *)exception context:(NSDictionary<NSString *, NSString *> *)context;
 @end
 
 @implementation CLXMetricsNetworkServiceRequestSessionMetric
@@ -74,9 +80,14 @@
 @implementation CLXMetricsNetworkService
 
 - (instancetype)initWithBaseURL:(NSString *)baseURL urlSession:(NSURLSession *)urlSession {
+    return [self initWithBaseURL:baseURL urlSession:urlSession errorReporter:nil];
+}
+
+- (instancetype)initWithBaseURL:(NSString *)baseURL urlSession:(NSURLSession *)urlSession errorReporter:(nullable CLXErrorReporter *)errorReporter {
     self = [super initWithBaseURL:baseURL urlSession:urlSession];
     if (self) {
         _logger = [[CLXLogger alloc] initWithCategory:@"MetricsNetworkService"];
+        _errorReporter = errorReporter;
     }
     return self;
 }
@@ -203,9 +214,14 @@
     
     // Log request for debugging
     if (requestJSON) {
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:requestJSON options:NSJSONWritingPrettyPrinted error:nil];
-        NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        [self.logger debug:[NSString stringWithFormat:@"Metrics request JSON: %@", jsonString]];
+        @try {
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:requestJSON options:NSJSONWritingPrettyPrinted error:nil];
+            NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+            [self.logger debug:[NSString stringWithFormat:@"Metrics request JSON: %@", jsonString]];
+        } @catch (NSException *exception) {
+            [self reportException:exception context:@{@"operation": @"metrics_json_debug_logging"}];
+            // Continue execution - debug logging failure should not affect metrics sending
+        }
     }
     
     // Create headers
@@ -214,7 +230,12 @@
     // Serialize request body
     NSData *requestBody = nil;
     if (requestJSON) {
-        requestBody = [NSJSONSerialization dataWithJSONObject:requestJSON options:0 error:nil];
+        @try {
+            requestBody = [NSJSONSerialization dataWithJSONObject:requestJSON options:0 error:nil];
+        } @catch (NSException *exception) {
+            [self reportException:exception context:@{@"operation": @"metrics_json_serialization"}];
+            // Continue with nil requestBody - the network service will handle this gracefully
+        }
     }
     
     // Execute request using BaseNetworkService method
@@ -278,6 +299,24 @@
     }
     
     return [json copy];
+}
+
+@end
+
+#pragma mark - Error Reporting Helper
+
+@implementation CLXMetricsNetworkService (ErrorReporting)
+
+- (void)reportException:(NSException *)exception context:(NSDictionary<NSString *, NSString *> *)context {
+    // Always log the exception for visibility
+    NSString *operation = context[@"operation"] ?: @"unknown_operation";
+    [self.logger error:[NSString stringWithFormat:@"❌ [MetricsNetworkService] Exception in %@: %@ - %@", 
+                       operation, exception.name ?: @"unknown", exception.reason ?: @"no reason"]];
+    
+    // Also report via metrics if error reporter was injected
+    if (self.errorReporter) {
+        [self.errorReporter reportException:exception context:context];
+    }
 }
 
 @end 
