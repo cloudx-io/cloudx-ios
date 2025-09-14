@@ -22,6 +22,12 @@
 		197992942E75E3B700EBA0A3 /* CLXMetricsTracker+ErrorTracking.h in Headers */ = {isa = PBXBuildFile; fileRef = 197992922E75E3B700EBA0A3 /* CLXMetricsTracker+ErrorTracking.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		197992952E75E3B700EBA0A3 /* CLXErrorReporter.h in Headers */ = {isa = PBXBuildFile; fileRef = 197992912E75E3B700EBA0A3 /* CLXErrorReporter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		197992972E75E3DB00EBA0A3 /* CLXMetricsTracker+ErrorTracking.m in Sources */ = {isa = PBXBuildFile; fileRef = 197992962E75E3DB00EBA0A3 /* CLXMetricsTracker+ErrorTracking.m */; };
+		197993312E772E4700EBA0A3 /* CLXGeoLocationServiceGPPTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197993302E772E4700EBA0A3 /* CLXGeoLocationServiceGPPTests.m */; };
+		197993372E772E5000EBA0A3 /* CLXBidResponseParsingIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197993322E772E5000EBA0A3 /* CLXBidResponseParsingIntegrationTests.m */; };
+		197993382E772E5000EBA0A3 /* CLXErrorReporterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197993332E772E5000EBA0A3 /* CLXErrorReporterTests.m */; };
+		197993392E772E5000EBA0A3 /* CLXErrorReportingFlowIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197993342E772E5000EBA0A3 /* CLXErrorReportingFlowIntegrationTests.m */; };
+		1979933A2E772E5000EBA0A3 /* CLXMetricsTrackerErrorTrackingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197993352E772E5000EBA0A3 /* CLXMetricsTrackerErrorTrackingTests.m */; };
+		1979933B2E772E5000EBA0A3 /* CLXProtectedOperationsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197993362E772E5000EBA0A3 /* CLXProtectedOperationsTests.m */; };
 		19C7247B2E2390420012CFC7 /* CloudXCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C724702E2390420012CFC7 /* CloudXCore.framework */; };
 		19C725472E2390810012CFC7 /* CLXURLProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C7253D2E2390810012CFC7 /* CLXURLProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C725482E2390810012CFC7 /* CLXSessionMetricSpend.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C725392E2390810012CFC7 /* CLXSessionMetricSpend.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -259,6 +265,12 @@
 		197992912E75E3B700EBA0A3 /* CLXErrorReporter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXErrorReporter.h; sourceTree = "<group>"; };
 		197992922E75E3B700EBA0A3 /* CLXMetricsTracker+ErrorTracking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CLXMetricsTracker+ErrorTracking.h"; sourceTree = "<group>"; };
 		197992962E75E3DB00EBA0A3 /* CLXMetricsTracker+ErrorTracking.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "CLXMetricsTracker+ErrorTracking.m"; sourceTree = "<group>"; };
+		197993302E772E4700EBA0A3 /* CLXGeoLocationServiceGPPTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGeoLocationServiceGPPTests.m; sourceTree = "<group>"; };
+		197993322E772E5000EBA0A3 /* CLXBidResponseParsingIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidResponseParsingIntegrationTests.m; sourceTree = "<group>"; };
+		197993332E772E5000EBA0A3 /* CLXErrorReporterTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXErrorReporterTests.m; sourceTree = "<group>"; };
+		197993342E772E5000EBA0A3 /* CLXErrorReportingFlowIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXErrorReportingFlowIntegrationTests.m; sourceTree = "<group>"; };
+		197993352E772E5000EBA0A3 /* CLXMetricsTrackerErrorTrackingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsTrackerErrorTrackingTests.m; sourceTree = "<group>"; };
+		197993362E772E5000EBA0A3 /* CLXProtectedOperationsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXProtectedOperationsTests.m; sourceTree = "<group>"; };
 		19C724702E2390420012CFC7 /* CloudXCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		19C7247A2E2390420012CFC7 /* CloudXCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		19C7248B2E2390810012CFC7 /* CLXAdapterFactoryResolver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterFactoryResolver.m; sourceTree = "<group>"; };
@@ -534,6 +546,12 @@
 		19C7247E2E2390420012CFC7 /* CloudXCoreTests */ = {
 			isa = PBXGroup;
 			children = (
+				197993322E772E5000EBA0A3 /* CLXBidResponseParsingIntegrationTests.m */,
+				197993332E772E5000EBA0A3 /* CLXErrorReporterTests.m */,
+				197993342E772E5000EBA0A3 /* CLXErrorReportingFlowIntegrationTests.m */,
+				197993352E772E5000EBA0A3 /* CLXMetricsTrackerErrorTrackingTests.m */,
+				197993362E772E5000EBA0A3 /* CLXProtectedOperationsTests.m */,
+				197993302E772E4700EBA0A3 /* CLXGeoLocationServiceGPPTests.m */,
 				197991A12E74B0D600EBA0A3 /* CLXBiddingConfigGPPTests.m */,
 				197991A22E74B0D600EBA0A3 /* CLXGeoLocationServiceGPPTests.m */,
 				197991A32E74B0D600EBA0A3 /* CLXGppConsentTests.m */,
@@ -1252,9 +1270,15 @@
 				19D92C9C2E6DE89A00C84DAE /* CLXUserDefaultsConcurrencyTests.m in Sources */,
 				197991A62E74B0D600EBA0A3 /* CLXBiddingConfigGPPTests.m in Sources */,
 				197991A72E74B0D600EBA0A3 /* CLXGeoLocationServiceGPPTests.m in Sources */,
+				197993312E772E4700EBA0A3 /* CLXGeoLocationServiceGPPTests.m in Sources */,
 				197991A82E74B0D600EBA0A3 /* CLXGppConsentTests.m in Sources */,
 				197991A92E74B0D600EBA0A3 /* CLXGPPIntegrationTests.m in Sources */,
 				197991AA2E74B0D600EBA0A3 /* CLXGPPProviderTests.m in Sources */,
+				197993372E772E5000EBA0A3 /* CLXBidResponseParsingIntegrationTests.m in Sources */,
+				197993382E772E5000EBA0A3 /* CLXErrorReporterTests.m in Sources */,
+				197993392E772E5000EBA0A3 /* CLXErrorReportingFlowIntegrationTests.m in Sources */,
+				1979933A2E772E5000EBA0A3 /* CLXMetricsTrackerErrorTrackingTests.m in Sources */,
+				1979933B2E772E5000EBA0A3 /* CLXProtectedOperationsTests.m in Sources */,
 				19D92C9E2E6DE89A00C84DAE /* CLXPublisherAdsUserDefaultsTests.m in Sources */,
 				19D927C62E624FE700C84DAE /* CLXRillTrackingTests.m in Sources */,
 			);

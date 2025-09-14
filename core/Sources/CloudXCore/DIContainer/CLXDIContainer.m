@@ -60,4 +60,9 @@
     }
 }
 
+- (void)reset {
+    [self.factories removeAllObjects];
+    [self.cache removeAllObjects];
+}
+
 @end 
