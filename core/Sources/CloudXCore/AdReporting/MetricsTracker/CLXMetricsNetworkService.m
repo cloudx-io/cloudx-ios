@@ -243,7 +243,7 @@
                         urlParameters:@{}
                            requestBody:requestBody
                                headers:headers
-                            maxRetries:3
+                            maxRetries:1
                                 delay:1.0
                            completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
         if (error) {
