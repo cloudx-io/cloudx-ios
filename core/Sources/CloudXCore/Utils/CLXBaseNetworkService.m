@@ -102,6 +102,8 @@
                                                   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         [self.logger debug:[NSString stringWithFormat:@"🔧 [BaseNetworkService] Request completed - Data: %@, Error: %@", data ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
         
+        BOOL isKillSwitchEnabled = NO;
+        
         if (error) {
             [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Network request failed - Error: %@, Retry: %ld/%ld", error.localizedDescription, (long)self.currentRetryCount, (long)maxRetries]];
             
@@ -121,7 +123,7 @@
                 [self.logger error:@"❌ [BaseNetworkService] Max retries reached, calling completion with error"];
                 self.currentRetryCount = 0;
                 if (completion) {
-                    completion(nil, error, false);
+                    completion(nil, error, isKillSwitchEnabled);
                 }
             }
             return;
@@ -131,8 +133,6 @@
         
         // Log HTTP status code
         [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP response - Status: %ld", (long)httpResponse.statusCode]];
-        
-        BOOL isKillSwitchEnabled = NO;
         
         // Log response body
         if (data) {
