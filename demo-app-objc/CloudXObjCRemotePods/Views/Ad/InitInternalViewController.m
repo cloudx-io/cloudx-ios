@@ -1,8 +1,8 @@
 #import "InitInternalViewController.h"
 #import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXDIContainer.h>
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
-#import "CLXLiveInitService+Internal.h"
 
 @interface InitInternalViewController ()
 @property (nonatomic, assign) BOOL isSDKInitialized;
@@ -185,32 +185,50 @@
     
     [self updateStatusUIWithState:AdStateLoading];
     
+    // Clear DI container to force fresh services with new environment
+    [[CLXDIContainer shared] reset];
+    
+    // Set environment selection for URLProvider FIRST (before any SDK calls)
+    NSString *environmentKey;
+    switch (environment) {
+        case CLXDemoEnvironmentDev:
+            environmentKey = @"dev";
+            break;
+        case CLXDemoEnvironmentStaging:
+            environmentKey = @"staging";
+            break;
+        case CLXDemoEnvironmentProduction:
+            environmentKey = @"production";
+            break;
+    }
+    
+    [[NSUserDefaults standardUserDefaults] setObject:environmentKey forKey:@"CLXDemoEnvironment"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Initializing SDK with %@ environment", environmentName]];
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"AppId: %@", config.appId]];
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"HashedUserId: %@", config.hashedUserId]];
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"BaseURL: %@", config.baseURL]];
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Environment set to: %@", environmentKey]];
     
-    // Use internal method to initialize with custom URL for proper environment testing
-    CLXLiveInitService *liveInitService = [[CLXLiveInitService alloc] init];
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Using standard SDK init with %@ environment", environmentName]];
     
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Using internal init method with custom URL: %@", config.baseURL]];
-    
-    [liveInitService initSDKWithAppKey:config.appId 
-                         customInitURL:config.baseURL 
-                            completion:^(CLXSDKConfigResponse * _Nullable sdkConfig, NSError * _Nullable configError) {
-        if (sdkConfig && !configError) {
-            // Config fetch successful! For demo purposes, this is sufficient.
-            // We don't call the main SDK init to avoid the duplicate network call with wrong URL.
-            [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ Internal SDK init successful with %@ environment", environmentName]];
-            [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"📊 Config fetched - Session: %@, Account: %@", sdkConfig.sessionID ?: @"N/A", sdkConfig.accountID ?: @"N/A"]];
-            [[DemoAppLogger sharedInstance] logMessage:@"🎯 Demo app can now test ad loading with this config"];
-            
+    // Use standard CloudXCore initialization which will now use our environment override
+    [[CloudXCore shared] initSDKWithAppKey:config.appId 
+                              hashedUserID:config.hashedUserId 
+                                completion:^(BOOL success, NSError * _Nullable error) {
+        // Clear environment override after initialization (success or failure)
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CLXDemoEnvironment"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        if (success) {
+            [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ SDK initialized successfully with %@ environment", environmentName]];
             self.isSDKInitialized = YES;
             [self updateStatusUIWithState:AdStateReady];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"cloudXSDKInitialized" object:nil];
         } else {
-            NSString *errorMessage = configError ? configError.localizedDescription : @"Unknown error occurred during config fetch";
-            [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Internal SDK init failed: %@", errorMessage]];
+            NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
+            [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ SDK init failed: %@", errorMessage]];
             [self updateStatusUIWithState:AdStateNoAd];
             [self showAlertWithTitle:@"SDK Init Failed" message:errorMessage];
         }
