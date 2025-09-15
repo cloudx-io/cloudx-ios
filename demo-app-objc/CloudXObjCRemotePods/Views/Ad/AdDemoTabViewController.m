@@ -1,5 +1,6 @@
 #import "AdDemoTabViewController.h"
 #import "InitViewController.h"
+#import "InitInternalViewController.h"
 #import "BannerViewController.h"
 #import "InterstitialViewController.h"
 #import "RewardedViewController.h"
@@ -8,6 +9,7 @@
 #import "NativeBannerViewController.h"
 #import "RewardedInterstitialViewController.h"
 #import "PrivacyViewController.h"
+#import "SettingsViewController.h"
 
 @implementation AdDemoTabViewController
 
@@ -17,6 +19,9 @@
     // Create view controllers
     InitViewController *initVC = [[InitViewController alloc] init];
     initVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Init" image:[UIImage systemImageNamed:@"power"] tag:0];
+    
+    InitInternalViewController *initInternalVC = [[InitInternalViewController alloc] init];
+    initInternalVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Init Internal" image:[UIImage systemImageNamed:@"gear"] tag:9];
     
     BannerViewController *bannerVC = [[BannerViewController alloc] init];
     bannerVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Banner" image:[UIImage systemImageNamed:@"rectangle"] tag:1];
@@ -42,7 +47,11 @@
     PrivacyViewController *privacyVC = [[PrivacyViewController alloc] init];
     privacyVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Privacy" image:[UIImage systemImageNamed:@"hand.raised"] tag:8];
     
-    // Set view controllers
+    SettingsViewController *settinsVC = [[SettingsViewController alloc] init];
+    settinsVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:[UIImage systemImageNamed:@"star"] tag:9];
+
+    
+    // Set view controllers - InitInternalVC moved to end so it appears in "More" section
     self.viewControllers = @[
         [[UINavigationController alloc] initWithRootViewController:initVC],
         [[UINavigationController alloc] initWithRootViewController:bannerVC],
@@ -52,7 +61,9 @@
         [[UINavigationController alloc] initWithRootViewController:nativeVC],
         [[UINavigationController alloc] initWithRootViewController:nativeBannerVC],
         [[UINavigationController alloc] initWithRootViewController:rewardedInterstitialVC],
-        [[UINavigationController alloc] initWithRootViewController:privacyVC]
+        [[UINavigationController alloc] initWithRootViewController:privacyVC],
+        [[UINavigationController alloc] initWithRootViewController:initInternalVC],
+        [[UINavigationController alloc] initWithRootViewController:settinsVC]
     ];
 }
 

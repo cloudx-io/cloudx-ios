@@ -10,6 +10,8 @@
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXPrivacyService.h>
+#import <CloudXCore/CLXErrorReporter.h>
 #import <WebKit/WebKit.h>
 
 @interface CLXBidNetworkServiceClass ()
@@ -18,18 +20,30 @@
 @property (nonatomic, strong) CLXBaseNetworkService *baseNetworkService;
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, copy) NSString *userAgent;
+@property (nonatomic, strong, nullable) CLXErrorReporter *errorReporter;
+@end
+
+@interface CLXBidNetworkServiceClass (ErrorReporting)
+- (void)reportException:(NSException *)exception context:(NSDictionary<NSString *, NSString *> *)context;
 @end
 
 @implementation CLXBidNetworkServiceClass
 
 - (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
                            cdpEndpointUrl:(NSString *)cdpEndpointUrl {
+    return [self initWithAuctionEndpointUrl:auctionEndpointUrl cdpEndpointUrl:cdpEndpointUrl errorReporter:nil];
+}
+
+- (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
+                           cdpEndpointUrl:(NSString *)cdpEndpointUrl
+                            errorReporter:(nullable CLXErrorReporter *)errorReporter {
     self = [super init];
     if (self) {
         _endpoint = [auctionEndpointUrl copy];
         _cdpEndpoint = [cdpEndpointUrl copy];
         _isCDPEndpointEmpty = cdpEndpointUrl.length == 0;
         _logger = [[CLXLogger alloc] initWithCategory:@"BidNetworkService"];
+        _errorReporter = errorReporter;
         
         // Initialize user agent like Swift SDK
         _userAgent = [self generateUserAgent];
@@ -73,7 +87,8 @@
                                                                skadRequestParameters:nil
                                                                                tmax:tmax
                                                                            impModel:impModel
-                                                                           settings:[CLXSettings sharedInstance]];
+                                                                           settings:[CLXSettings sharedInstance]
+                                                                     privacyService:[CLXPrivacyService sharedInstance]];
     if (completion) {
         completion([bidRequest json], nil);
     }
@@ -86,11 +101,18 @@
     
     // Log the actual bid request JSON
     if (bidRequest) {
-        NSError *jsonError;
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bidRequest options:NSJSONWritingPrettyPrinted error:&jsonError];
-        if (jsonData && !jsonError) {
-            NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] BidRequest JSON (%lu chars)", (unsigned long)jsonString.length]];
+        @try {
+            NSError *jsonError;
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bidRequest options:NSJSONWritingPrettyPrinted error:&jsonError];
+            if (jsonData && !jsonError) {
+                NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+                [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] BidRequest JSON (%lu chars)", (unsigned long)jsonString.length]];
+            }
+        } @catch (NSException *exception) {
+            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Exception in bid_request_json_logging: %@ - %@", 
+                               exception.name ?: @"unknown", exception.reason ?: @"no reason"]];
+            [self reportException:exception context:@{@"operation": @"bid_request_json_logging"}];
+            // Continue execution - debug logging failure should not affect bid request
         }
     }
     
@@ -221,6 +243,19 @@
         // If not on main thread, use a fallback user agent
         // This prevents the Main Thread Checker warning
         return @"Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148";
+    }
+}
+
+@end
+
+#pragma mark - Error Reporting Helper
+
+@implementation CLXBidNetworkServiceClass (ErrorReporting)
+
+- (void)reportException:(NSException *)exception context:(NSDictionary<NSString *, NSString *> *)context {
+    // Only report if error reporter was injected
+    if (self.errorReporter) {
+        [self.errorReporter reportException:exception context:context];
     }
 }
 

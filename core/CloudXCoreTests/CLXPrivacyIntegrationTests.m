@@ -125,7 +125,8 @@
            skadRequestParameters:@{}
                           tmax:@3.0
                       impModel:nil
-                      settings:[CLXSettings sharedInstance]];
+                      settings:[CLXSettings sharedInstance]
+            privacyService:privacyService];
     // GDPR should NOT be included in bidding config as server doesn't support it yet
     XCTAssertNil(biddingConfig.regulations.ext.iab.tcString, @"Bidding config should not include GDPR consent (server not supported)");
     XCTAssertNil(biddingConfig.regulations.ext.iab.gdprApplies, @"Bidding config should not include GDPR applies (server not supported)");
@@ -215,7 +216,8 @@
            skadRequestParameters:@{}
                           tmax:@3.0
                       impModel:nil
-                      settings:[CLXSettings sharedInstance]];
+                      settings:[CLXSettings sharedInstance]
+            privacyService:privacyService];
     
     // Test privacy logic ignoring ATT to focus on CCPA logic
     XCTAssertFalse([privacyService shouldClearPersonalDataIgnoringATT], @"Initially, privacy should allow personal data (ignoring ATT)");

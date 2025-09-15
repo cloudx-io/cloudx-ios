@@ -25,7 +25,8 @@
 
 + (nullable instancetype)parseFromJSON:(NSString *)jsonString {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXNativeAdData"];
-    [logger debug:[NSString stringWithFormat:@"[CloudXNativeAdData] parseFromJSON called with jsonString: %@", jsonString]];
+    [logger debug:@"[CloudXNativeAdData] parseFromJSON called"];
+    
     NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
     if (!jsonData) {
         [logger error:@"[CloudXNativeAdData] Failed to convert jsonString to NSData."];

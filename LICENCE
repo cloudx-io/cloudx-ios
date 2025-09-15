@@ -1,0 +1,56 @@
+Elastic License 2.0
+
+## License
+
+The Elastic License 2.0 ("ELv2") applies to all software that is subject
+to the terms of this license.
+
+You may copy, modify, create derivative works, and redistribute the
+software, but you may not provide the software to third parties as a
+hosted or managed service, where the service provides users with access
+to any substantial set of the features or functionality of the software.
+
+## Grant of Rights
+
+Subject to the limitations below, you are granted a non-exclusive,
+non-transferable, royalty-free license to use, copy, modify, create
+derivative works, and redistribute the software, in source code or
+object form.
+
+## Limitations
+
+You may not provide the software to third parties as a hosted or managed
+service, where the service provides users with access to any substantial
+set of the features or functionality of the software.
+
+You may not remove or obscure any licensing, copyright, or other notices
+contained in the software.
+
+## Patent Grant
+
+You are granted a patent license to make, use, sell, offer for sale,
+import and otherwise transfer the software, where such license applies
+only to those patent claims licensable by the licensor that are
+necessarily infringed by their contribution(s) alone or by combination
+of their contribution(s) with the software to which such contribution(s)
+was submitted.
+
+## Termination
+
+If you violate the terms of this license, your rights under this license
+will terminate automatically.
+
+## No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+------------------------------------------------------------------------
+
+Notice: This license is not an Open Source license. For more
+information, visit: https://www.elastic.co/licensing/elastic-license

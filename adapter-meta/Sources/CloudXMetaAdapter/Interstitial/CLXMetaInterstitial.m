@@ -109,6 +109,12 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
     
     if (ready) {
         [self.logger info:@"🔧 [CLXMetaInterstitial] Showing interstitial ad"];
+        
+        // Call didShowWithAd before showing the ad
+        if ([self.delegate respondsToSelector:@selector(didShowWithInterstitial:)]) {
+            [self.delegate didShowWithInterstitial:self];
+        }
+        
         [_interstitial showAdFromRootViewController:viewController];
     } else {
         [self.logger error:@"❌ [CLXMetaInterstitial] Cannot show ad - not ready"];
@@ -123,7 +129,19 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
 }
 
 - (void)destroy {
-    self.interstitial = nil;
+    [self.logger debug:@"🧹 [CLXMetaInterstitial] Destroying interstitial"];
+    
+    if (self.interstitial) {
+        // Properly clean up Meta SDK state
+        self.interstitial.delegate = nil;
+        self.interstitial = nil;
+    }
+    
+    // Clear delegate to prevent callbacks after destruction
+    self.delegate = nil;
+    _isLoading = NO;
+    
+    [self.logger debug:@"✅ [CLXMetaInterstitial] Destruction complete"];
 }
 
 #pragma mark - FBInterstitialAdDelegate

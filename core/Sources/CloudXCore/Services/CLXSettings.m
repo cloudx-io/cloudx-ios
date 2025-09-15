@@ -2,6 +2,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXErrorReporter.h>
 #import <AdSupport/AdSupport.h> // For ASIdentifierManager
 
 static CLXLogger *logger;
@@ -26,7 +27,7 @@ static CLXLogger *logger;
 - (NSString *)getIFA {
     NSString *ifa = nil;
     
-    // 1. IFA from UserDefaults (can be set by app for testing or specific scenarios)
+    // 1. IFA from UserDefaults (can be set by app for specific scenarios)
     ifa = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreIFAConfigKey];
     if (ifa && ifa.length > 0) {
         [logger info:[NSString stringWithFormat:@"🔧 [CLXSettings] Using configured IFA from UserDefaults: %@", ifa]];
@@ -59,15 +60,25 @@ static CLXLogger *logger;
 
 - (BOOL)shouldEnableBannerRetries {
     // Default to NO (disabled) for IDFA protection unless explicitly enabled
-    NSNumber *setting = [[NSUserDefaults standardUserDefaults] objectForKey:kCLXCoreEnableBannerRetriesKey];
-    if (setting == nil) {
-        return NO; // Default disabled for protection
+    @try {
+        NSNumber *setting = [[NSUserDefaults standardUserDefaults] objectForKey:kCLXCoreEnableBannerRetriesKey];
+        if (setting == nil) {
+            return NO; // Default disabled for protection
+        }
+        BOOL enabled = [setting boolValue];
+        if (!enabled) {
+            [logger debug:@"🚫 [CLXSettings] Banner retries disabled via UserDefaults."];
+        }
+        return enabled;
+    } @catch (NSException *exception) {
+        [logger error:[NSString stringWithFormat:@"❌ [CLXSettings] Exception in banner_retries_userdefaults_read: %@ - %@", 
+                       exception.name ?: @"unknown", exception.reason ?: @"no reason"]];
+        // Note: CLXSettings is a static class, so we use shared instance for error reporting
+        // This is acceptable since Settings is a utility class without dependency injection
+        [[CLXErrorReporter shared] reportException:exception context:@{@"operation": @"banner_retries_userdefaults_read"}];
+        // Return safe default on exception
+        return NO;
     }
-    BOOL enabled = [setting boolValue];
-    if (!enabled) {
-        [logger debug:@"🚫 [CLXSettings] Banner retries disabled via UserDefaults."];
-    }
-    return enabled;
 }
 
 - (BOOL)shouldEnableInterstitialRetries {

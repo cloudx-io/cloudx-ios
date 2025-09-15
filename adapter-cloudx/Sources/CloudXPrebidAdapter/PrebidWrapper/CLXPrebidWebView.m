@@ -59,12 +59,10 @@
  */
 - (instancetype)initWithFrame:(CGRect)frame placementType:(CLXMRAIDPlacementType)placementType {
     self.logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidWebView"];
-    [self.logger info:[NSString stringWithFormat:@"🚀 [INIT] CLXPrebidWebView initialization started - Frame: %@, Placement type: %ld", NSStringFromCGRect(frame), (long)placementType]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [INIT] CLXPrebidWebView initialization - Frame: %@, Placement: %ld", NSStringFromCGRect(frame), (long)placementType]];
     
     self = [super initWithFrame:frame];
     if (self) {
-        [self.logger info:@"✅ [INIT] Super init successful"];
-        
         // Initialize default configuration
         _placementType = placementType;
         _enableViewabilityTracking = YES;
@@ -74,13 +72,11 @@
         _hasFinishedLoading = NO;
         _hasReportedReady = NO;
         
-        [self.logger debug:@"📊 [INIT] Default configuration - Viewability: Enabled, Performance: Enabled, Preloading: Enabled, Standard: IAB"];
-        
         // Set up core components
         [self setupWebView];
         [self setupMRAIDManager];
         [self setupViewabilityTracking];
-        [self.logger info:@"🎯 [INIT] CLXPrebidWebView initialization completed successfully - All components setup completed"];
+        [self.logger info:@"✅ [INIT] CLXPrebidWebView initialization completed successfully"];
     } else {
         [self.logger error:@"❌ [INIT] Super init failed"];
     }
@@ -102,9 +98,7 @@
  * Ensures proper cleanup of WebView, MRAID manager, and viewability tracker
  */
 - (void)dealloc {
-    [self.logger info:@"🗑️ [DEALLOC] CLXPrebidWebView deallocation started"];
     [self cleanup];
-    [self.logger info:@"✅ [DEALLOC] CLXPrebidWebView deallocation completed"];
 }
 
 #pragma mark - Setup Methods
@@ -120,8 +114,6 @@
  * - User interaction handling
  */
 - (void)setupWebView {
-    [self.logger info:@"🔧 [SETUP] Setting up WKWebView with advanced configuration"];
-    
     // Create enhanced configuration for ad content
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     configuration.allowsInlineMediaPlayback = YES;
@@ -158,7 +150,6 @@
                                                               injectionTime:WKUserScriptInjectionTimeAtDocumentStart
                                                            forMainFrameOnly:YES];
         [userContentController addUserScript:perfUserScript];
-        [self.logger debug:@"✅ [SETUP] Performance optimization script added"];
     }
     
     configuration.userContentController = userContentController;
@@ -182,25 +173,20 @@
     
     [self addSubview:self.webView];
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [SETUP] WKWebView created and configured: %p, Frame: %@", self.webView, NSStringFromCGRect(self.webView.frame)]];
+    [self.logger info:[NSString stringWithFormat:@"✅ [SETUP] WKWebView created and configured: %p", self.webView]];
 }
 
 - (void)setupMRAIDManager {
-    [self.logger info:@"🔧 [SETUP] Setting up MRAID 3.0 manager"];
-    
     self.mraidManager = [[CLXMRAIDManager alloc] initWithWebView:self.webView placementType:self.placementType];
     self.mraidManager.delegate = self;
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [SETUP] MRAID manager created: %p, Placement type: %ld", self.mraidManager, (long)self.placementType]];
+    [self.logger info:@"✅ [SETUP] MRAID manager created"];
 }
 
 - (void)setupViewabilityTracking {
     if (!self.enableViewabilityTracking) {
-        [self.logger debug:@"⏭️ [SETUP] Viewability tracking disabled, skipping setup"];
         return;
     }
-    
-    [self.logger info:@"🔧 [SETUP] Setting up viewability tracking"];
     
     self.viewabilityTracker = [[CLXViewabilityTracker alloc] initWithView:self];
     self.viewabilityTracker.delegate = self;
@@ -209,25 +195,22 @@
     switch (self.viewabilityStandard) {
         case CLXViewabilityStandardIAB:
             [self.viewabilityTracker configureCustomStandard:0.5 timeRequirement:1.0]; // 50% for 1 second
-            [self.logger debug:@"📊 [SETUP] Configured IAB viewability standard (50% for 1 second)"];
             break;
         case CLXViewabilityStandardMRC:
             [self.viewabilityTracker configureCustomStandard:0.5 timeRequirement:1.0]; // 50% for 1 second
-            [self.logger debug:@"📊 [SETUP] Configured MRC viewability standard (50% for 1 second)"];
             break;
         case CLXViewabilityStandardCustom:
             // Keep existing configuration
-            [self.logger debug:@"📊 [SETUP] Using custom viewability standard"];
             break;
     }
     
-    [self.logger info:@"✅ [SETUP] Viewability tracker configured and ready"];
+    [self.logger info:@"✅ [SETUP] Viewability tracker configured"];
 }
 
 #pragma mark - Public Methods
 
 - (void)loadOptimizedHTML:(NSString *)html baseURL:(nullable NSURL *)baseURL completion:(nullable void (^)(BOOL success, NSError *error))completion {
-    [self.logger info:[NSString stringWithFormat:@"🚀 [LOAD] Starting optimized HTML load - Length: %lu chars, Base URL: %@, Completion: %@", (unsigned long)html.length, baseURL ?: @"nil", completion ? @"Present" : @"nil"]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [LOAD] Starting optimized HTML load - %lu chars", (unsigned long)html.length]];
     
     if (!html || html.length == 0) {
         [self.logger error:@"❌ [LOAD] Cannot load - HTML content is empty or nil"];
@@ -242,7 +225,6 @@
     
     // Preload resources if enabled
     if (self.preloadResources) {
-        [self.logger info:@"🔄 [LOAD] Preloading resources from HTML"];
         CLXPreloadRequest *request = [[CLXPreloadRequest alloc] init];
         request.adMarkup = html;
         request.baseURL = baseURL;
@@ -254,13 +236,9 @@
     // Optimize HTML if performance optimization is enabled
     NSString *finalHTML = html;
     if (self.optimizeForPerformance) {
-        [self.logger info:@"⚡ [LOAD] Optimizing HTML for performance"];
         NSString *optimizedHTML = [[CLXPerformanceManager sharedManager] optimizeHTMLContent:html forSize:self.bounds.size];
         if (optimizedHTML) {
             finalHTML = optimizedHTML;
-            [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] Optimized HTML length: %lu characters", (unsigned long)finalHTML.length]];
-        } else {
-            [self.logger debug:@"⚠️ [LOAD] HTML optimization failed, using original HTML"];
         }
     }
     
@@ -268,12 +246,10 @@
     __block void (^storedCompletion)(BOOL, NSError *) = completion;
     
     // Start loading
-    [self.logger info:[NSString stringWithFormat:@"🌐 [LOAD] Loading HTML into WKWebView - Length: %lu chars, Base URL: %@", (unsigned long)finalHTML.length, baseURL ? baseURL.absoluteString : @"nil"]];
-    
     dispatch_async(dispatch_get_main_queue(), ^{
         if (finalHTML && finalHTML.length > 0) {
             [self.webView loadHTMLString:finalHTML baseURL:baseURL];
-            [self.logger debug:@"✅ [LOAD] HTML load initiated successfully"];
+            [self.logger info:@"✅ [LOAD] HTML load initiated successfully"];
             
             // Log content analysis
             [self logContentAnalysis:finalHTML];
@@ -293,16 +269,12 @@
 
 - (void)startViewabilityTracking {
     if (self.viewabilityTracker && self.enableViewabilityTracking) {
-        [self.logger info:@"👁️ [VIEWABILITY] Starting viewability tracking"];
         [self.viewabilityTracker startTracking];
-    } else {
-        [self.logger debug:@"⏭️ [VIEWABILITY] Viewability tracking not available or disabled"];
     }
 }
 
 - (void)stopViewabilityTracking {
     if (self.viewabilityTracker) {
-        [self.logger info:@"⏹️ [VIEWABILITY] Stopping viewability tracking"];
         [self.viewabilityTracker stopTracking];
     }
 }
@@ -310,11 +282,11 @@
 #pragma mark - WKNavigationDelegate
 
 - (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
-    [self.logger info:@"🌐 [NAV] WebView started provisional navigation"];
+    [self.logger debug:@"🌐 [NAV] WebView started provisional navigation"];
 }
 
 - (void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation {
-    [self.logger info:@"🌐 [NAV] WebView committed navigation"];
+    [self.logger debug:@"🌐 [NAV] WebView committed navigation"];
 }
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
@@ -322,25 +294,10 @@
     
     self.hasFinishedLoading = YES;
     
-    // Log content metrics for debugging
-    [webView evaluateJavaScript:@"document.body.scrollHeight" completionHandler:^(id _Nullable result, NSError * _Nullable error) {
-        if (!error && result) {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [NAV] Content height: %@ pixels", result]];
-        }
-    }];
-    
-    [webView evaluateJavaScript:@"document.body.scrollWidth" completionHandler:^(id _Nullable result, NSError * _Nullable error) {
-        if (!error && result) {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [NAV] Content width: %@ pixels", result]];
-        }
-    }];
-    
     // Check for MRAID content
     [webView evaluateJavaScript:@"typeof window.mraid !== 'undefined'" completionHandler:^(id _Nullable result, NSError * _Nullable error) {
         if (!error && [result boolValue]) {
             [self.logger info:@"📱 [NAV] MRAID detected in content"];
-        } else {
-            [self.logger debug:@"📊 [NAV] No MRAID detected in content"];
         }
     }];
     
@@ -349,7 +306,6 @@
     
     // Update MRAID state
     if (self.mraidManager) {
-        [self.logger debug:@"🔧 [NAV] Updating MRAID manager state"];
         [self.mraidManager updateState:CLXMRAIDStateDefault];
         [self.mraidManager updateViewability:YES];
     }
@@ -357,7 +313,7 @@
     // Report ready to delegate
     if (!self.hasReportedReady) {
         self.hasReportedReady = YES;
-        [self.logger info:@"🎉 [SUCCESS] WebView ready to display - notifying delegate"];
+        [self.logger info:@"🎉 [SUCCESS] WebView ready to display"];
         
         if ([self.delegate respondsToSelector:@selector(webViewReadyToDisplay:)]) {
             [self.delegate webViewReadyToDisplay:self];
@@ -371,10 +327,7 @@
 }
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
-    [self.logger error:@"❌ [NAV] WebView navigation failed"];
-    [self.logger error:[NSString stringWithFormat:@"📊 [NAV] Error domain: %@", error.domain]];
-    [self.logger error:[NSString stringWithFormat:@"📊 [NAV] Error code: %ld", (long)error.code]];
-    [self.logger error:[NSString stringWithFormat:@"📊 [NAV] Error description: %@", error.localizedDescription]];
+    [self.logger error:[NSString stringWithFormat:@"❌ [NAV] WebView navigation failed: %@", error.localizedDescription]];
     
     if ([self.delegate respondsToSelector:@selector(webView:failedToLoadWithError:)]) {
         [self.delegate webView:self failedToLoadWithError:error];
@@ -388,8 +341,6 @@
 
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
     NSURL *url = navigationAction.request.URL;
-    [self.logger debug:[NSString stringWithFormat:@"🔗 [NAV] Navigation action: %@ to %@", 
-                      @(navigationAction.navigationType), url.absoluteString]];
     
     if (navigationAction.navigationType == WKNavigationTypeLinkActivated) {
         [self.logger info:[NSString stringWithFormat:@"🔗 [CLICK] User clicked link: %@", url.absoluteString]];
@@ -406,11 +357,11 @@
 #pragma mark - CLXMRAIDManagerDelegate
 
 - (void)mraidManager:(CLXMRAIDManager *)manager didChangeState:(CLXMRAIDState)state {
-    [self.logger info:[NSString stringWithFormat:@"📱 [MRAID] State changed to: %ld", (long)state]];
+    [self.logger debug:[NSString stringWithFormat:@"📱 [MRAID] State changed to: %ld", (long)state]];
 }
 
 - (void)mraidManager:(CLXMRAIDManager *)manager didChangeViewable:(BOOL)viewable {
-    [self.logger info:[NSString stringWithFormat:@"👁️ [MRAID] Viewability changed to: %@", viewable ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"👁️ [MRAID] Viewability changed to: %@", viewable ? @"YES" : @"NO"]];
 }
 
 - (void)mraidManager:(CLXMRAIDManager *)manager didRequestOpenURL:(NSURL *)url {
@@ -421,25 +372,24 @@
 }
 
 - (void)mraidManager:(CLXMRAIDManager *)manager didReceiveCloseRequest:(nullable NSDictionary *)parameters {
-    [self.logger info:@"❌ [MRAID] Close request received"];
+    [self.logger debug:@"❌ [MRAID] Close request received"];
     // Handle close request based on placement type
 }
 
 - (void)mraidManager:(CLXMRAIDManager *)manager didRequestExpand:(nullable NSURL *)url {
-    [self.logger info:[NSString stringWithFormat:@"📱 [MRAID] Expand requested with URL: %@", url ? url.absoluteString : @"none"]];
+    [self.logger debug:[NSString stringWithFormat:@"📱 [MRAID] Expand requested with URL: %@", url ? url.absoluteString : @"none"]];
     // Handle expand request
 }
 
 - (void)mraidManager:(CLXMRAIDManager *)manager didRequestResize:(CGSize)size {
-    [self.logger info:[NSString stringWithFormat:@"🔄 [MRAID] Resize requested to: %@", NSStringFromCGSize(size)]];
+    [self.logger debug:[NSString stringWithFormat:@"🔄 [MRAID] Resize requested to: %@", NSStringFromCGSize(size)]];
     // Handle resize request
 }
 
 #pragma mark - CLXViewabilityTrackerDelegate
 
 - (void)viewabilityTracker:(CLXViewabilityTracker *)tracker didChangeViewability:(BOOL)viewable measurement:(CLXViewabilityMeasurement *)measurement {
-    [self.logger info:[NSString stringWithFormat:@"👁️ [VIEWABILITY] Changed to: %@ (%.1f%% exposed)", 
-                      viewable ? @"VIEWABLE" : @"NOT_VIEWABLE", measurement.exposedPercentage * 100]];
+    [self.logger debug:[NSString stringWithFormat:@"👁️ [VIEWABILITY] Changed to: %@", viewable ? @"VIEWABLE" : @"NOT_VIEWABLE"]];
     
     // Update MRAID
     if (self.mraidManager) {
@@ -592,8 +542,6 @@
 #pragma mark - Cleanup
 
 - (void)cleanup {
-    [self.logger info:@"🧹 [CLEANUP] Starting CLXPrebidWebView cleanup"];
-    
     [self stopViewabilityTracking];
     
     if (self.webView) {
@@ -602,24 +550,21 @@
         self.webView.UIDelegate = nil;
         [self.webView removeFromSuperview];
         self.webView = nil;
-        [self.logger debug:@"✅ [CLEANUP] WebView cleaned up"];
     }
     
     if (self.mraidManager) {
         self.mraidManager.delegate = nil;
         self.mraidManager = nil;
-        [self.logger debug:@"✅ [CLEANUP] MRAID manager cleaned up"];
     }
     
     if (self.viewabilityTracker) {
         self.viewabilityTracker.delegate = nil;
         self.viewabilityTracker = nil;
-        [self.logger debug:@"✅ [CLEANUP] Viewability tracker cleaned up"];
     }
     
     self.loadCompletion = nil;
     
-    [self.logger info:@"🎯 [CLEANUP] CLXPrebidWebView cleanup completed"];
+    [self.logger info:@"✅ [CLEANUP] CLXPrebidWebView cleanup completed"];
 }
 
 #pragma mark - Content Analysis

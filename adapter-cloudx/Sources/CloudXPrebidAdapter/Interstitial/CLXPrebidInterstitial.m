@@ -25,25 +25,15 @@
                       bidID:(NSString *)bidID
                    delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidInterstitial"];
-    [logger info:@"🚀 [INIT] CLXPrebidInterstitial initialization started"];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT] Ad markup length: %lu characters", (unsigned long)adm.length]];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT] Bid ID: %@", bidID ?: @"nil"]];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT] Delegate: %@", delegate ? @"Present" : @"nil"]];
+    [logger info:[NSString stringWithFormat:@"🚀 [INIT] CLXPrebidInterstitial initialization - Markup: %lu chars, BidID: %@", (unsigned long)adm.length, bidID ?: @"nil"]];
     
     self = [super init];
     if (self) {
-        [logger info:@"✅ [INIT] Super init successful"];
-        
         self.adm = adm;
         self.bidID = bidID;
         self.delegate = delegate;
         
-        [logger debug:@"📊 [INIT] Properties configured:"];
-        [logger debug:[NSString stringWithFormat:@"  📍 Ad markup length: %lu", (unsigned long)self.adm.length]];
-        [logger debug:[NSString stringWithFormat:@"  📍 Bid ID: %@", self.bidID ?: @"nil"]];
-        [logger debug:[NSString stringWithFormat:@"  📍 Delegate: %@", self.delegate ? @"Set" : @"nil"]];
-        
-        [logger info:@"🎯 [INIT] CLXPrebidInterstitial initialization completed successfully"];
+        [logger info:@"✅ [INIT] CLXPrebidInterstitial initialization completed successfully"];
     } else {
         [logger error:@"❌ [INIT] Super init failed"];
     }
@@ -72,41 +62,27 @@
 - (void)load {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidInterstitial"];
     [logger info:@"🚀 [LOAD] CLXPrebidInterstitial load() method called"];
-    [logger debug:[NSString stringWithFormat:@"📊 [LOAD] Ad markup length: %lu characters", (unsigned long)self.adm.length]];
-    [logger debug:[NSString stringWithFormat:@"📊 [LOAD] Bid ID: %@", self.bidID ?: @"nil"]];
-    [logger debug:[NSString stringWithFormat:@"📊 [LOAD] Delegate: %@", self.delegate ? @"Present" : @"nil"]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [logger info:@"🔧 [LOAD] Creating container view controller on main queue"];
-        
         self.containerViewController = [[CLXFullscreenStaticContainerViewController alloc] initWithDelegate:self adm:self.adm];
-        [logger info:@"✅ [LOAD] Container view controller created successfully"];
-        
-        [logger info:@"🌐 [LOAD] Loading HTML content"];
         [self.containerViewController loadHTML];
-        [logger info:@"✅ [LOAD] HTML load initiated"];
+        [logger info:@"✅ [LOAD] Container created and HTML load initiated"];
     });
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidInterstitial"];
     [logger info:@"🚀 [SHOW] CLXPrebidInterstitial show() method called"];
-    [logger debug:[NSString stringWithFormat:@"📊 [SHOW] View controller: %@", NSStringFromClass([viewController class])]];
-    [logger debug:[NSString stringWithFormat:@"📊 [SHOW] Container controller: %@", self.containerViewController ? @"Present" : @"nil"]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.containerViewController) {
-            [logger info:@"✅ [SHOW] Container view controller is valid, presenting ad"];
             [viewController presentViewController:self.containerViewController animated:YES completion:nil];
-            [logger info:@"✅ [SHOW] Ad presentation initiated successfully"];
-            
             [self didShow];
-            [logger info:@"✅ [SHOW] didShow() called"];
             
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [logger info:@"📊 [SHOW] Triggering impression after 1 second delay"];
                 [self impression];
             });
+            [logger info:@"✅ [SHOW] Ad presentation initiated successfully"];
         } else {
             [logger error:@"❌ [SHOW] FAILED to show ad: containerViewController is NIL"];
             NSError *error = [NSError errorWithDomain:@"CloudXPrebidAdapter" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Ad failed to show: containerViewController was nil."}];

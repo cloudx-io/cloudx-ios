@@ -6,6 +6,8 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXMetricsTracker.h>
+#import <CloudXCore/CLXGPPProvider.h>
+#import <CloudXCore/CLXErrorReporter.h>
 @class CLXAppSessionService;
 #import <CloudXCore/CLXBidNetworkService.h>
 #import <CloudXCore/CLXAdEventReporter.h>
@@ -82,17 +84,41 @@ static CloudXCore *_sharedInstance = nil;
 + (CloudXCore *)shared {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        CLXDIContainer *container = [CLXDIContainer shared];
-        [container registerType:[CLXLiveInitService class] instance:[[CLXLiveInitService alloc] init]];
-        [container registerType:[CLXMetricsTracker class] instance:[[CLXMetricsTracker alloc] init]];
         _sharedInstance = [[CloudXCore alloc] init];
     });
     return _sharedInstance;
 }
 
+/**
+ * Ensures DI container is properly set up with core dependencies
+ * This method is idempotent and safe to call multiple times
+ * Critical for tests that bypass +shared singleton pattern
+ */
+- (void)ensureDIContainerSetup {
+    CLXDIContainer *container = [CLXDIContainer shared];
+    
+    // Thread-safe registration using @synchronized
+    // This prevents race conditions during concurrent CloudXCore initialization
+    @synchronized([CLXDIContainer class]) {
+        // Register core dependencies that other services depend on
+        // Check-then-register pattern is now thread-safe within the synchronized block
+        if (![container resolveType:ServiceTypeSingleton class:[CLXMetricsTracker class]]) {
+            [container registerType:[CLXMetricsTracker class] instance:[[CLXMetricsTracker alloc] init]];
+        }
+        
+        if (![container resolveType:ServiceTypeSingleton class:[CLXLiveInitService class]]) {
+            [container registerType:[CLXLiveInitService class] instance:[[CLXLiveInitService alloc] init]];
+        }
+    }
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
+        // Ensure DI container is always properly initialized, regardless of how CloudXCore is instantiated
+        // This is critical for tests that create new instances instead of using +shared
+        [self ensureDIContainerSetup];
+        
         _logger = [[CLXLogger alloc] initWithCategory:@"CloudXCoreAPI.m"];
         [self.logger debug:@"🔧 [CloudXCore] Initializing CloudXCore instance"];
         _isInitialised = NO;
@@ -122,23 +148,27 @@ static CloudXCore *_sharedInstance = nil;
 - (void)initSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL, NSError * _Nullable))completion {
     [self.logger info:[NSString stringWithFormat:@"🚀 [CloudXCore] initSDKWithAppKey called with appKey: %@", appKey]];
     
-    NSDictionary *dict = @{};
-    [[NSUserDefaults standardUserDefaults] setObject:dict forKey:kCLXCoreMetricsDictKey];
-    
-    if (!appKey || appKey.length == 0) {
-        [self.logger error:@"❌ [CloudXCore] AppKey is nil or empty"];
-        if (completion) {
-            completion(NO, [CLXError errorWithCode:CLXErrorCodeNotInitialized]);
+    // Thread-safe initialization check and setup
+    @synchronized(self) {
+        if (!appKey || appKey.length == 0) {
+            [self.logger error:@"❌ [CloudXCore] AppKey is nil or empty"];
+            if (completion) {
+                completion(NO, [CLXError errorWithCode:CLXErrorCodeNotInitialized]);
+            }
+            return;
         }
-        return;
-    }
-    
-    if (_isInitialised) {
-        [self.logger debug:@"⚠️ [CloudXCore] SDK already initialized, returning early"];
-        if (completion) {
-            completion(YES, nil);
+        
+        if (_isInitialised) {
+            [self.logger debug:@"⚠️ [CloudXCore] SDK already initialized, returning early"];
+            if (completion) {
+                completion(YES, nil);
+            }
+            return;
         }
-        return;
+        
+        // Reset metrics dictionary at start of initialization
+        NSDictionary *dict = @{};
+        [[NSUserDefaults standardUserDefaults] setObject:dict forKey:kCLXCoreMetricsDictKey];
     }
     
     [self.logger debug:@"🔧 [CloudXCore] Starting SDK initialization process"];
@@ -146,14 +176,25 @@ static CloudXCore *_sharedInstance = nil;
     
     // Get init service from DI container
     CLXDIContainer *container = [CLXDIContainer shared];
+    [self.logger debug:@"🔧 [CloudXCore] Attempting to resolve CLXLiveInitService from DI container"];
     _initService = [container resolveType:ServiceTypeSingleton class:[CLXLiveInitService class]];
     
     if (!_initService) {
         [self.logger error:@"❌ [CloudXCore] Failed to resolve InitService from DI container"];
-        if (completion) {
-            completion(NO, [CLXError errorWithCode:CLXErrorCodeNotInitialized]);
+        // Try to register it again as a fallback
+        [self ensureDIContainerSetup];
+        _initService = [container resolveType:ServiceTypeSingleton class:[CLXLiveInitService class]];
+        if (!_initService) {
+            [self.logger error:@"❌ [CloudXCore] Still failed to resolve InitService after re-registration"];
+            if (completion) {
+                completion(NO, [CLXError errorWithCode:CLXErrorCodeNotInitialized]);
+            }
+            return;
+        } else {
+            [self.logger debug:@"✅ [CloudXCore] InitService resolved after re-registration"];
         }
-        return;
+    } else {
+        [self.logger debug:@"✅ [CloudXCore] InitService resolved successfully"];
     }
     
     [self.logger info:@"✅ [CloudXCore] InitService resolved, calling initSDKWithAppKey"];
@@ -195,7 +236,7 @@ static CloudXCore *_sharedInstance = nil;
         if (config.metricsEndpointURL) {
             metricsEndpointURL = config.metricsEndpointURL;
         }
-        _reportingService = [[CLXLiveAdEventReporter alloc] initWithEndpoint:config.eventTrackingURL ?: metricsEndpointURL];
+        _reportingService = [[CLXAdEventReporter alloc] initWithEndpoint:config.eventTrackingURL ?: metricsEndpointURL];
         
         NSMutableDictionary *geoHeaders = [NSMutableDictionary dictionary];
         if (config.geoHeaders) {
@@ -350,7 +391,7 @@ static CloudXCore *_sharedInstance = nil;
             // Register services in DI container 
         CLXDIContainer *container = [CLXDIContainer shared];
     [container registerType:[CLXAppSessionServiceImplementation class] instance:[[CLXAppSessionServiceImplementation alloc] initWithSessionID:config.sessionID ?: @"" appKey:_appKey url:metricsEndpointURL]];
-    [container registerType:[CLXBidNetworkServiceClass class] instance:[[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:auctionEndpointUrl cdpEndpointUrl:cdpEndpointUrl]];
+    [container registerType:[CLXBidNetworkServiceClass class] instance:[[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:auctionEndpointUrl cdpEndpointUrl:cdpEndpointUrl errorReporter:[CLXErrorReporter shared]]];
     [container resolveType:ServiceTypeSingleton class:[CLXAppSessionServiceImplementation class]];
     
     // Check if adapters are empty 
@@ -377,6 +418,11 @@ static CloudXCore *_sharedInstance = nil;
     
     [self startTimer];
     
+    // Mark SDK as successfully initialized
+    @synchronized(self) {
+        _isInitialised = YES;
+    }
+    [self.logger info:@"✅ [CloudXCore] SDK initialization completed successfully"];
     
     if (completion) {
         completion(YES, nil);
@@ -822,6 +868,24 @@ static CloudXCore *_sharedInstance = nil;
 
 + (void)setIsDoNotSell:(BOOL)isDoNotSell {
     [[CLXPrivacyService sharedInstance] setDoNotSell:@(isDoNotSell)];
+}
+
+#pragma mark - GPP (Global Privacy Platform) Settings
+
++ (void)setGPPString:(nullable NSString *)gppString {
+    [[CLXGPPProvider sharedInstance] setGppString:gppString];
+}
+
++ (nullable NSString *)getGPPString {
+    return [[CLXGPPProvider sharedInstance] gppString];
+}
+
++ (void)setGPPSid:(nullable NSArray<NSNumber *> *)gppSid {
+    [[CLXGPPProvider sharedInstance] setGppSid:gppSid];
+}
+
++ (nullable NSArray<NSNumber *> *)getGPPSid {
+    return [[CLXGPPProvider sharedInstance] gppSid];
 }
 
 @end 

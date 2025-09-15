@@ -11,6 +11,7 @@
 // Services
 #import <CloudXCore/CLXInitService.h>
 #import <CloudXCore/CLXMetricsTracker.h>
+#import <CloudXCore/CLXErrorReporter.h>
 #import <CloudXCore/CLXCoreDataManager.h>
 #import <CloudXCore/CLXGeoLocationService.h>
 #import <CloudXCore/CLXAppSessionService.h>
@@ -19,6 +20,7 @@
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXPrivacyService.h>
+#import <CloudXCore/CLXGPPProvider.h>
 
 // AdReporting Services
 #import <CloudXCore/CLXAdEventReporter.h>
@@ -38,6 +40,7 @@
 #import <CloudXCore/CLXSessionMetric.h>
 #import <CloudXCore/CLXSessionMetricType.h>
 #import <CloudXCore/CLXBiddingConfig.h>
+#import <CloudXCore/CLXGppConsent.h>
 
 // RillImpressions
 #import <CloudXCore/CLXConfigImpressionModel.h>

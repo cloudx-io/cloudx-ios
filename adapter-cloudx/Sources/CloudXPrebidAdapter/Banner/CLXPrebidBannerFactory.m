@@ -66,16 +66,7 @@
                                                      extras:(NSDictionary<NSString *, NSString *> *)extras
                                                    delegate:(id<CLXAdapterBannerDelegate>)delegate {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXPrebidBannerFactory"];
-    [logger info:@"🏭 [FACTORY] CloudXPrebidBannerFactory create method called"];
-    [logger debug:[NSString stringWithFormat:@"📊 [FACTORY] Parameters:"]];
-    [logger debug:[NSString stringWithFormat:@"  📍 ViewController: %@ (%@)", viewController ? @"Present" : @"nil", viewController ? NSStringFromClass([viewController class]) : @"N/A"]];
-    [logger debug:[NSString stringWithFormat:@"  📍 Banner type: %ld", (long)type]];
-    [logger debug:[NSString stringWithFormat:@"  📍 Ad ID: %@", adId ?: @"nil"]];
-    [logger debug:[NSString stringWithFormat:@"  📍 Bid ID: %@", bidId ?: @"nil"]];
-    [logger debug:[NSString stringWithFormat:@"  📍 Ad markup length: %lu characters", (unsigned long)(adm ? adm.length : 0)]];
-    [logger debug:[NSString stringWithFormat:@"  📍 Has close button: %@", hasClosedButton ? @"YES" : @"NO"]];
-    [logger debug:[NSString stringWithFormat:@"  📍 Extras: %@", extras ?: @"{}"]];
-    [logger debug:[NSString stringWithFormat:@"  📍 Delegate: %@", delegate ? @"Present" : @"nil"]];
+    [logger info:[NSString stringWithFormat:@"🏭 [FACTORY] Creating banner - Type: %ld, Markup: %lu chars, CloseBtn: %@", (long)type, (unsigned long)(adm ? adm.length : 0), hasClosedButton ? @"YES" : @"NO"]];
     
     // Validate required parameters
     if (!viewController) {
@@ -89,7 +80,7 @@
     }
     
     if (!delegate) {
-        [logger info:@"⚠️ [FACTORY] Creating banner without delegate - callbacks will not work"];
+        [logger info:@"⚠️ [FACTORY] Creating banner without delegate"];
     }
     
     [logger info:@"✅ [FACTORY] Validation passed, creating CloudXPrebidBanner instance..."];
@@ -109,10 +100,6 @@
     
     if (banner) {
         [logger info:[NSString stringWithFormat:@"✅ [FACTORY] CloudXPrebidBanner created successfully: %p", banner]];
-        [logger debug:[NSString stringWithFormat:@"📊 [FACTORY] Banner class: %@", NSStringFromClass([banner class])]];
-        [logger debug:[NSString stringWithFormat:@"📊 [FACTORY] Conforms to CLXAdapterBanner: %@", [banner conformsToProtocol:@protocol(CLXAdapterBanner)] ? @"YES" : @"NO"]];
-        [logger debug:[NSString stringWithFormat:@"📊 [FACTORY] Banner SDK version: %@", [banner sdkVersion]]];
-        [logger info:@"🎯 [FACTORY] Banner creation completed successfully"];
         return banner;
     } else {
         [logger error:@"❌ [FACTORY] Failed to create CloudXPrebidBanner instance"];

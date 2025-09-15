@@ -7,6 +7,7 @@
 
 #import "CLXUserDefaultsTestHelper.h"
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXDIContainer.h>
 
 @implementation CLXUserDefaultsTestHelper
 
@@ -35,6 +36,10 @@
     [userDefaults removeObjectForKey:kCLXCoreIfaConfigKey];
     
     [userDefaults synchronize];
+    
+    // Reset DI container to ensure test isolation
+    // This is critical for preventing shared state contamination between tests
+    [[CLXDIContainer shared] reset];
 }
 
 + (NSArray<NSString *> *)allPrefixedKeys {
