@@ -1,0 +1,22 @@
+framework module CloudXVungleAdapter {
+    umbrella header "CloudXVungleAdapter.h"
+    
+    export *
+    module * { export * }
+    
+    // Explicit module for VungleAds SDK dependency
+    link "VungleAdsSDK"
+    
+    // Required frameworks
+    link framework "Foundation"
+    link framework "UIKit"
+    link framework "WebKit"
+    link framework "AVFoundation"
+    link framework "CoreMedia"
+    link framework "AudioToolbox"
+    link framework "CFNetwork"
+    link framework "CoreGraphics"
+    link framework "CoreTelephony"
+    link framework "SystemConfiguration"
+    link framework "StoreKit"
+}
