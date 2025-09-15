@@ -2,15 +2,18 @@
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
+#import "UserDefaultsSettings.h"
 
 @interface RewardedViewController ()
 @property (nonatomic, strong) id<CLXRewardedInterstitial> rewardedAd;
+@property (nonatomic, strong) UserDefaultsSettings *settings;
 @end
 
 @implementation RewardedViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.settings = [UserDefaultsSettings sharedSettings];
     
     // Create a vertical stack for buttons
     UIStackView *buttonStack = [[UIStackView alloc] init];
@@ -107,6 +110,9 @@
     [self updateStatusUIWithState:AdStateLoading];
 
     NSString *placement = [self placementName];
+    if (_settings.rewardedPlacement.length > 0) {
+        placement = _settings.rewardedPlacement;
+    }
     NSLog(@"[RewardedViewController] Using placement: %@", placement);
     
     // Log SDK configuration details

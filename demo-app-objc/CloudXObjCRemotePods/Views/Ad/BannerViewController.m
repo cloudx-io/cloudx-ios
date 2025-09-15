@@ -2,6 +2,7 @@
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
+#import "UserDefaultsSettings.h"
 
 @interface BannerViewController ()
 @property (nonatomic, strong) CLXBannerAdView *bannerAd;
@@ -9,6 +10,7 @@
 @property (nonatomic, assign) AdState adState;
 @property (nonatomic, strong) UIButton *autoRefreshButton;
 @property (nonatomic, assign) BOOL autoRefreshEnabled;
+@property (nonatomic, strong) UserDefaultsSettings *settings;
 @end
 
 @implementation BannerViewController
@@ -17,6 +19,7 @@
     [super viewDidLoad];
     self.autoRefreshEnabled = YES; // Default to enabled
     [self setupUI];
+    self.settings = [UserDefaultsSettings sharedSettings];
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
@@ -121,8 +124,13 @@
     if (self.bannerAd) {
         return;
     }
-
+    
     NSString *placement = [self placementName];
+
+    if (_settings.bannerPlacement.length > 0) {
+        placement = _settings.bannerPlacement;
+    }
+    
     self.bannerAd = [[CloudXCore shared] createBannerWithPlacement:placement
                                                       viewController:self
                                                           delegate:self

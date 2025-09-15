@@ -2,10 +2,12 @@
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
+#import "UserDefaultsSettings.h"
 
 
 @interface InitViewController ()
 @property (nonatomic, assign) BOOL isSDKInitialized;
+@property (nonatomic, strong) UserDefaultsSettings *settings;
 @end
 
 @implementation InitViewController
@@ -20,6 +22,7 @@
     
     // Check if SDK is already initialized
     self.isSDKInitialized = [[CloudXCore shared] isInitialised];
+    self.settings = [UserDefaultsSettings sharedSettings];
     [self updateStatusUIWithState:self.isSDKInitialized ? AdStateReady : AdStateNoAd];
 }
 
@@ -73,8 +76,14 @@
     [self updateStatusUIWithState:AdStateLoading];
     
     CLXDemoConfig *config = [[CLXDemoConfigManager sharedManager] currentConfig];
-    [[CloudXCore shared] initSDKWithAppKey:config.appId
-                              hashedUserID:config.hashedUserId 
+    
+    NSString *appId = config.appId;
+    
+    if (_settings.bannerPlacement.length > 0) {
+        appId = _settings.appKey;
+    }
+    [[CloudXCore shared] initSDKWithAppKey:appId
+                              hashedUserID:config.hashedUserId
                                 completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             [[DemoAppLogger sharedInstance] logMessage:@"SDK initialized successfully"];

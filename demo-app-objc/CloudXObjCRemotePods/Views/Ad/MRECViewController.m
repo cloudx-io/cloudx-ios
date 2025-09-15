@@ -2,11 +2,13 @@
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
+#import "UserDefaultsSettings.h"
 
 @interface MRECViewController ()
 @property (nonatomic, strong) CLXBannerAdView *mrecAd;
 @property (nonatomic, strong) UIButton *autoRefreshButton;
 @property (nonatomic, assign) BOOL autoRefreshEnabled;
+@property (nonatomic, strong) UserDefaultsSettings *settings;
 @end
 
 @implementation MRECViewController
@@ -14,6 +16,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.autoRefreshEnabled = YES; // Default to enabled
+    self.settings = [UserDefaultsSettings sharedSettings];
     
     // Create a vertical stack for buttons
     UIStackView *buttonStack = [[UIStackView alloc] init];
@@ -113,6 +116,9 @@
 - (void)createMRECAd {
     if (self.mrecAd) return;
     NSString *placement = [self placementName];
+    if (_settings.mrecPlacement.length > 0) {
+        placement = _settings.mrecPlacement;
+    }
     self.mrecAd = [[CloudXCore shared] createMRECWithPlacement:placement viewController:self delegate:self];
     
     if (!self.mrecAd) {

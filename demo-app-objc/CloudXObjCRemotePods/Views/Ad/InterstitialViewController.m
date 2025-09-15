@@ -2,16 +2,20 @@
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
+#import "UserDefaultsSettings.h"
 
 @interface InterstitialViewController ()
 @property (nonatomic, strong) id<CLXInterstitial> interstitialAd;
 @property (nonatomic, assign) BOOL showAdWhenLoaded;
+@property (nonatomic, strong) UserDefaultsSettings *settings;
 @end
 
 @implementation InterstitialViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.settings = [UserDefaultsSettings sharedSettings];
     
     // Create a vertical stack for buttons
     UIStackView *buttonStack = [[UIStackView alloc] init];
@@ -104,6 +108,11 @@
     [self updateStatusUIWithState:AdStateLoading];
 
     NSString *placement = [self placementName];
+    
+    if (_settings.interstitialPlacement.length > 0) {
+        placement = _settings.interstitialPlacement;
+    }
+    
     self.interstitialAd = [[CloudXCore shared] createInterstitialWithPlacement:placement
                                                                         delegate:self];
     

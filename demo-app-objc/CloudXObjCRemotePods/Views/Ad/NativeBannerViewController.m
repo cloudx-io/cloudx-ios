@@ -2,16 +2,19 @@
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
+#import "UserDefaultsSettings.h"
 
 @interface NativeBannerViewController ()
 @property (nonatomic, strong) CLXNativeAdView *nativeBannerAd;
 @property (nonatomic, strong) UIView *adContainerView;
+@property (nonatomic, strong) UserDefaultsSettings *settings;
 @end
 
 @implementation NativeBannerViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.settings = [UserDefaultsSettings sharedSettings];
     
     // Create a vertical stack container for button and ad
     UIStackView *mainStack = [[UIStackView alloc] init];
@@ -117,6 +120,9 @@
     [self updateStatusUIWithState:AdStateLoading];
 
     NSString *placement = [self placementName];
+    if (_settings.nativeMediumPlacement.length > 0) {
+        placement = _settings.nativeMediumPlacement;
+    }
     NSLog(@"[NativeBannerViewController] LOG: Using placement: '%@'", placement);
     
     self.nativeBannerAd = [[CloudXCore shared] createNativeAdWithPlacement:placement
