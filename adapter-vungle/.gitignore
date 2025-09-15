@@ -1,0 +1,37 @@
+# CloudX Vungle Adapter - .gitignore
+
+# User-specific files
+*.xcuserstate
+*.xcuserdatad/
+xcuserdata/
+*.xcbkptlist
+
+# Build products
+build/
+DerivedData/
+*.build/
+*.dSYM.zip
+*.dSYM
+
+# CocoaPods
+Pods/
+*.xcworkspace/xcuserdata/
+Podfile.lock
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+*~
