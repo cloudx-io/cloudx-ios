@@ -169,7 +169,7 @@
                                               headers:headers
                                            maxRetries:0
                                                delay:0
-                                          completion:^(id _Nullable response, NSError * _Nullable error) {
+                                          completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
         [self.logger debug:@"📥 [BidNetworkService] Network request completion called"];
         
         if (error) {
@@ -185,6 +185,13 @@
             NSError *noDataError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse description:@"No response data"];
             [self.logger error:@"❌ [BidNetworkService] No response data received"];
             if (completion) completion(nil, noDataError);
+            return;
+        }
+        
+        if (isKillSwitchEnabled) {
+            NSError *adsDisabledError = [CLXError errorWithCode:CLXErrorCodeAdsDisabled description:@"No response data"];
+            [self.logger error:@"❌ [BidNetworkService] kill switch in on received"];
+            if (completion) completion(nil, adsDisabledError);
             return;
         }
         
@@ -218,7 +225,7 @@
                                               headers:headers
                                            maxRetries:0
                                                delay:0
-                                          completion:^(id _Nullable response, NSError * _Nullable error) {
+                                          completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
         if (completion) {
             completion(response, error);
         }

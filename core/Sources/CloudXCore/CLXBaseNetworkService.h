@@ -55,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
                          headers:(nullable NSDictionary *)headers
                       maxRetries:(NSInteger)maxRetries
                           delay:(NSTimeInterval)delay
-                     completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion;
+                     completion:(void (^)(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled))completion;
 
 @end
 
