@@ -29,40 +29,23 @@
               viewController:(UIViewController *)viewController
                                        delegate:(id<CLXAdapterNativeDelegate>)delegate {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidNative"];
-    [logger info:@"🚀 [INIT] CLXPrebidNative initialization started"];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT] Ad markup length: %lu characters", (unsigned long)adm.length]];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT] Native template type: %ld", (long)type]];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT] View controller: %@", NSStringFromClass([viewController class])]];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT] Delegate: %@", delegate ? @"Present" : @"nil"]];
+    [logger info:[NSString stringWithFormat:@"🚀 [INIT] CLXPrebidNative initialization - Markup: %lu chars, Type: %ld", (unsigned long)adm.length, (long)type]];
     
     self = [super init];
     if (self) {
-        [logger info:@"✅ [INIT] Super init successful"];
-        
         self.delegate = delegate;
         self.type = type;
         self.nativeAdData = [CloudXNativeAdData parseFromJSON:adm];
         self.viewController = viewController;
         self.timeout = NO;
         
-        [logger debug:@"📊 [INIT] Properties configured:"];
-        [logger debug:[NSString stringWithFormat:@"  📍 Delegate: %@", self.delegate ? @"Set" : @"nil"]];
-        [logger debug:[NSString stringWithFormat:@"  📍 Template type: %ld", (long)self.type]];
-        [logger debug:[NSString stringWithFormat:@"  📍 View controller: %@", NSStringFromClass([self.viewController class])]];
-        [logger debug:[NSString stringWithFormat:@"  📍 Timeout: %@", self.timeout ? @"YES" : @"NO"]];
-        
         if (self.nativeAdData) {
             [logger info:@"✅ [INIT] Native ad data parsed successfully"];
-            [logger debug:[NSString stringWithFormat:@"📊 [INIT] Title: %@", self.nativeAdData.title ?: @"nil"]];
-            [logger debug:[NSString stringWithFormat:@"📊 [INIT] Description: %@", self.nativeAdData.descriptionText ?: @"nil"]];
-            [logger debug:[NSString stringWithFormat:@"📊 [INIT] CTA text: %@", self.nativeAdData.ctatext ?: @"nil"]];
-            [logger debug:[NSString stringWithFormat:@"📊 [INIT] Main image URL: %@", self.nativeAdData.mainImgURL ?: @"nil"]];
-            [logger debug:[NSString stringWithFormat:@"📊 [INIT] App icon URL: %@", self.nativeAdData.appIconURL ?: @"nil"]];
         } else {
             [logger error:@"❌ [INIT] Failed to parse native ad data from adm"];
         }
         
-        [logger info:@"🎯 [INIT] CLXPrebidNative initialization completed"];
+        [logger info:@"✅ [INIT] CLXPrebidNative initialization completed"];
     } else {
         [logger error:@"❌ [INIT] Super init failed"];
     }
@@ -85,13 +68,8 @@
 - (void)load {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidNative"];
     [logger info:@"🚀 [LOAD] CLXPrebidNative load() method called"];
-    [logger debug:[NSString stringWithFormat:@"📊 [LOAD] Native ad data: %@", self.nativeAdData ? @"Present" : @"nil"]];
-    [logger debug:[NSString stringWithFormat:@"📊 [LOAD] Template type: %ld", (long)self.type]];
-    [logger debug:[NSString stringWithFormat:@"📊 [LOAD] Delegate: %@", self.delegate ? @"Present" : @"nil"]];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [logger info:@"🔄 [LOAD] Starting native ad load on background queue"];
-        
         if (!self.nativeAdData) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [logger error:@"❌ [LOAD] Load failed: nativeAdData is nil"];
@@ -211,7 +189,7 @@
 
 - (void)showFromViewController:(UIViewController *)viewController {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidNative"];
-    [logger debug:@"[CLXPrebidNative] showFromViewController called."];
+    [logger debug:@"[CLXPrebidNative] showFromViewController called"];
     // Native ad is already shown when loaded, this method is called for consistency
     if ([self.delegate respondsToSelector:@selector(didShowWithNative:)]) {
         [self.delegate didShowWithNative:self];

@@ -174,7 +174,7 @@
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     NSString *encodedString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreEncodedStringKey];
     
-    NSMutableArray<NSDictionary<NSString *, NSString *> *> *items = @[];
+    NSMutableArray<NSDictionary<NSString *, NSString *> *> *items = [NSMutableArray array];
     
     NSString *accountId = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAccountIDKey];
    

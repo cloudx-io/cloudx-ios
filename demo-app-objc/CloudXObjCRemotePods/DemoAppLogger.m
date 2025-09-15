@@ -1,4 +1,5 @@
 #import "DemoAppLogger.h"
+#import <CloudXCore/CloudXCore.h>
 
 @implementation DemoAppLogEntry
 
@@ -49,11 +50,22 @@
         DemoAppLogEntry *entry = [[DemoAppLogEntry alloc] initWithMessage:message];
         [self.logs addObject:entry];
         
+        // Also log to console for Xcode debugging
+        NSLog(@"📱 [DemoApp] %@", message);
+        
         // Keep only the last 500 logs to prevent memory issues
         if (self.logs.count > 500) {
             [self.logs removeObjectAtIndex:0];
         }
     });
+}
+
+- (void)logAdEvent:(NSString *)eventName ad:(nullable CLXAd *)ad {
+    if (!eventName) return;
+    
+    NSString *adDetails = [DemoAppLogger formatAdDetails:ad];
+    NSString *fullMessage = [NSString stringWithFormat:@"%@%@", eventName, adDetails];
+    [self logMessage:fullMessage];
 }
 
 - (void)clearLogs {
@@ -76,6 +88,51 @@
         count = self.logs.count;
     });
     return count;
+}
+
++ (NSString *)formatAdDetails:(nullable CLXAd *)ad {
+    if (!ad) {
+        return @" - Ad: (null)";
+    }
+    
+    NSMutableString *details = [NSMutableString stringWithString:@" - Ad Details:"];
+    
+    // Placement Name
+    if (ad.placementName) {
+        [details appendFormat:@"\n  📍 Placement: %@", ad.placementName];
+    } else {
+        [details appendString:@"\n  📍 Placement: (null)"];
+    }
+    
+    // Placement ID
+    if (ad.placementId) {
+        [details appendFormat:@"\n  🆔 Placement ID: %@", ad.placementId];
+    } else {
+        [details appendString:@"\n  🆔 Placement ID: (null)"];
+    }
+    
+    // Bidder/Network
+    if (ad.bidder) {
+        [details appendFormat:@"\n  🏢 Bidder: %@", ad.bidder];
+    } else {
+        [details appendString:@"\n  🏢 Bidder: (null)"];
+    }
+    
+    // External Placement ID
+    if (ad.externalPlacementId) {
+        [details appendFormat:@"\n  🔗 External ID: %@", ad.externalPlacementId];
+    } else {
+        [details appendString:@"\n  🔗 External ID: (null)"];
+    }
+    
+    // Revenue
+    if (ad.revenue) {
+        [details appendFormat:@"\n  💰 Revenue: $%.6f", [ad.revenue doubleValue]];
+    } else {
+        [details appendString:@"\n  💰 Revenue: (null)"];
+    }
+    
+    return [details copy];
 }
 
 @end

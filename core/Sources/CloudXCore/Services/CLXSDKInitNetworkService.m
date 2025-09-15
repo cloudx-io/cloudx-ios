@@ -37,7 +37,14 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     // Extract the base URL and endpoint from the full URL
     NSURL *url = [NSURL URLWithString:baseURL];
     NSString *actualBaseURL = [NSString stringWithFormat:@"%@://%@", url.scheme, url.host];
-    NSString *endpointPath = url.path ?: @"/";
+    NSString *endpointPath = url.path;
+    
+    // Handle empty or nil path
+    if (!endpointPath || endpointPath.length == 0) {
+        endpointPath = @"/";
+    }
+    
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [SDKInitNetworkService] URL parsing - Original: %@, Base: %@, Path: '%@'", baseURL, actualBaseURL, endpointPath]];
     
     
     // Call parent's initWithBaseURL method with the actual base URL
@@ -107,7 +114,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         
         // Serialize the JSON dictionary to NSData
         NSError *jsonError;
-        NSData *requestBodyData = [NSJSONSerialization dataWithJSONObject:request.json options:0 error:&jsonError];
+        NSData *requestBodyData = [NSJSONSerialization dataWithJSONObject:request.json options:NSJSONWritingPrettyPrinted error:&jsonError];
         if (jsonError) {
             [self.logger error:[NSString stringWithFormat:@"❌ [SDKInitNetworkService] JSON serialization failed: %@", jsonError]];
             if (completion) {
@@ -116,18 +123,27 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
             return;
         }
         
+        // Debug: Print the request payload
+        NSString *requestPayloadString = [[NSString alloc] initWithData:requestBodyData encoding:NSUTF8StringEncoding];
+        [self.logger debug:[NSString stringWithFormat:@"📋 [SDKInitNetworkService] Request Payload:\n%@", requestPayloadString]];
+        
         [self executeRequestWithEndpoint:self.endpoint
                          urlParameters:nil
                           requestBody:requestBodyData
                               headers:headers
                            maxRetries:1
-                               delay:1
-                          completion:^(id _Nullable response, NSError * _Nullable error) {
+                               delay:0
+                          completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
             [self.logger debug:@"📥 [SDKInitNetworkService] Network request completion called"];
             
             if (error) {
                 [self.logger error:[NSString stringWithFormat:@"❌ [SDKInitNetworkService] Network request failed: %@", error.localizedDescription]];
                 [self tryInitSDKWithAppKey:appKey completion:completion];
+            } if (isKillSwitchEnabled) {
+                NSError *sdkDisabledError = [CLXError errorWithCode:CLXErrorCodeSDKDisabled description:@"No response data"];
+                [self.logger error:@"❌ [BidNetworkService] kill switch in on received"];
+                if (completion) completion(nil, sdkDisabledError);
+                return;
             } else {
                 [self.logger info:@"✅ [SDKInitNetworkService] Network request succeeded"];
                 

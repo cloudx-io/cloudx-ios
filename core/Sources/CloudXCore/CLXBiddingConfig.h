@@ -10,6 +10,8 @@
 #import <CloudXCore/CLXAdType.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 
+@class CLXPrivacyService;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class CLXNativeAdRequirements;
@@ -101,7 +103,8 @@ NS_ASSUME_NONNULL_BEGIN
            skadRequestParameters:(id)skadRequestParameters
                           tmax:(NSNumber *)tmax
                       impModel:(nullable CLXConfigImpressionModel *)impModel
-                      settings:(CLXSettings *)settings;
+                      settings:(CLXSettings *)settings
+                privacyService:(CLXPrivacyService *)privacyService;
 
 /**
  * Converts the bid request to a JSON dictionary for network transmission
@@ -204,6 +207,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXBiddingConfigRegulationsExtIAB *iab;
 @property (nonatomic, strong, nullable) NSNumber *gdpr;
 @property (nonatomic, strong, nullable) NSNumber *ccpa;
+@property (nonatomic, copy, nullable) NSString *gpp;
+@property (nonatomic, strong, nullable) NSArray<NSNumber *> *gppSid;
 @end
 
 @interface CLXBiddingConfigRegulationsExtIAB : NSObject

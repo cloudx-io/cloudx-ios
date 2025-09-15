@@ -3,6 +3,8 @@
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXAdType.h>
 
+@class CLXErrorReporter;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol CLXBidNetworkService <NSObject>
@@ -37,6 +39,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
                            cdpEndpointUrl:(NSString *)cdpEndpointUrl;
+
+- (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
+                           cdpEndpointUrl:(NSString *)cdpEndpointUrl
+                            errorReporter:(nullable CLXErrorReporter *)errorReporter;
 
 @end
 

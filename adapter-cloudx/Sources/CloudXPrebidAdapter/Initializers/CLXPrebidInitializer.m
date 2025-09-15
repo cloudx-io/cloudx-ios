@@ -39,8 +39,6 @@ static BOOL isInitialized = NO;
  * @return YES if adapter has been initialized, NO otherwise
  */
 + (BOOL)isInitialized {
-    CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXPrebidInitializer"];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT-CHECK] isInitialized called, current state: %@", isInitialized ? @"YES" : @"NO"]];
     return isInitialized;
 }
 
@@ -57,7 +55,6 @@ static BOOL isInitialized = NO;
     [logger info:@"🏭 [FACTORY] CloudXPrebidInitializer createInstance called"];
     
     CLXPrebidInitializer *instance = [[CLXPrebidInitializer alloc] init];
-    [logger info:[NSString stringWithFormat:@"✅ [FACTORY] CloudXPrebidInitializer instance created: %p", instance]];
     return instance;
 }
 
@@ -73,12 +70,9 @@ static BOOL isInitialized = NO;
 - (BOOL)initializeWithConfig:(CLXBidderConfig *)config {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXPrebidInitializer"];
     [logger info:@"🚀 [INIT-SYNC] CloudXPrebidInitializer synchronous initialization started"];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT-SYNC] Config provided: %@", config ? @"YES" : @"NO"]];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT-SYNC] Config class: %@", config ? NSStringFromClass([config class]) : @"N/A"]];
     
     // Prebid adapter is rendering-only, no special initialization needed
-    [logger info:@"✅ [INIT-SYNC] Prebid adapter is rendering-only - no special initialization required"];
-    [logger info:@"🎯 [INIT-SYNC] Synchronous initialization completed successfully"];
+    [logger info:@"✅ [INIT-SYNC] Synchronous initialization completed successfully"];
     
     return YES;
 }
@@ -96,28 +90,17 @@ static BOOL isInitialized = NO;
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXPrebidInitializer"];
     [logger info:@"🚀 [INIT-ASYNC] CloudXPrebidInitializer async initialization started"];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT-ASYNC] Config provided: %@", config ? @"YES" : @"NO"]];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT-ASYNC] Config class: %@", config ? NSStringFromClass([config class]) : @"N/A"]];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT-ASYNC] Completion handler: %@", completion ? @"Present" : @"nil"]];
-    [logger debug:[NSString stringWithFormat:@"📊 [INIT-ASYNC] Previous initialization state: %@", isInitialized ? @"Already initialized" : @"Not initialized"]];
     
     // Prebid adapter is rendering-only, no special initialization needed
-    [logger info:@"✅ [INIT-ASYNC] Prebid adapter is rendering-only - no special initialization required"];
-    
     // Set initialization state to true
     isInitialized = YES;
-    [logger info:@"📊 [INIT-ASYNC] Initialization state set to: YES"];
     
     // Call completion handler with success result
     if (completion) {
-        [logger info:@"📞 [INIT-ASYNC] Calling completion handler with success=YES"];
         completion(YES, nil);
-        [logger debug:@"✅ [INIT-ASYNC] Completion handler call completed"];
-    } else {
-        [logger info:@"⚠️ [INIT-ASYNC] No completion handler provided - success result will not be reported"];
     }
     
-    [logger info:@"🎯 [INIT-ASYNC] Async initialization completed successfully"];
+    [logger info:@"✅ [INIT-ASYNC] Async initialization completed successfully"];
 }
 
 @end 

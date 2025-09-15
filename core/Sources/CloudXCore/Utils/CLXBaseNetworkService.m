@@ -61,7 +61,7 @@
                          headers:(nullable NSDictionary *)headers
                       maxRetries:(NSInteger)maxRetries
                           delay:(NSTimeInterval)delay
-                     completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion {
+                     completion:(void (^)(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled))completion {
     
     [self.logger debug:[NSString stringWithFormat:@"🔧 [BaseNetworkService] executeRequestWithEndpoint - Endpoint: %@, Retries: %ld", endpoint, (long)maxRetries]];
     
@@ -102,6 +102,8 @@
                                                   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         [self.logger debug:[NSString stringWithFormat:@"🔧 [BaseNetworkService] Request completed - Data: %@, Error: %@", data ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
         
+        BOOL isKillSwitchEnabled = NO;
+        
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
         
         // Log HTTP status code
@@ -130,7 +132,7 @@
                 [self.logger error:@"❌ [BaseNetworkService] Max retries reached, calling completion with error"];
                 self.currentRetryCount = 0;
                 if (completion) {
-                    completion(nil, error);
+                    completion(nil, error, isKillSwitchEnabled);
                 }
             }
             return;
@@ -145,6 +147,12 @@
         }
         
         if (httpResponse.statusCode >= 200 && httpResponse.statusCode < 300) {
+            if (httpResponse.statusCode == 204) {
+                if ([[httpResponse.allHeaderFields objectForKey:@"X-CloudX-Status"] isEqual:@"ADS_DISABLED"] || [[httpResponse.allHeaderFields objectForKey:@"X-CloudX-Status"] isEqual:@"SDK_DISABLED"]) {
+                    isKillSwitchEnabled = YES;
+                }
+                
+            }
             [self.logger info:@"✅ [BaseNetworkService] HTTP status code indicates success"];
             if (data) {
                 NSError *jsonError;
@@ -152,24 +160,24 @@
                 if (jsonError) {
                     [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] JSON parsing failed: %@", jsonError]];
                     if (completion) {
-                        completion(nil, jsonError);
+                        completion(nil, jsonError, isKillSwitchEnabled);
                     }
                 } else {
                     [self.logger info:@"✅ [BaseNetworkService] JSON parsing successful, calling completion with response"];
                     if (completion) {
-                        completion(jsonResponse, nil);
+                        completion(jsonResponse, nil, isKillSwitchEnabled);
                     }
                 }
             } else {
                 [self.logger debug:@"📊 [BaseNetworkService] No data to parse, calling completion with nil"];
                 if (completion) {
-                    completion(nil, nil);
+                    completion(nil, nil, false);
                 }
             }
         } else {
             [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] HTTP status code indicates error: %ld", (long)httpResponse.statusCode]];
             if (completion) {
-                completion(nil, [CLXError errorWithCode:CLXErrorCodeLoadFailed]);
+                completion(nil, [CLXError errorWithCode:CLXErrorCodeLoadFailed], false);
             }
         }
     }];

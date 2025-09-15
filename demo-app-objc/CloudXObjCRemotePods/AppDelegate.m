@@ -9,6 +9,7 @@
 #import <CloudXCore/CloudXCore.h>
 #import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <AdSupport/AdSupport.h>
+#import "DemoAppLogger.h"
 
 @interface AppDelegate ()
 
@@ -27,33 +28,28 @@
 }
 
 - (void)requestAppTrackingTransparencyPermission {
-    NSLog(@"🔧 [AppDelegate] Requesting App Tracking Transparency permission");
-    
     // iOS 14+ ATT compliance
     if (@available(iOS 14, *)) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:^(ATTrackingManagerAuthorizationStatus status) {
                 switch (status) {
                     case ATTrackingManagerAuthorizationStatusAuthorized:
-                        NSLog(@"✅ [AppDelegate] App Tracking authorized");
+                        [[DemoAppLogger sharedInstance] logMessage:@"App Tracking authorized"];
                         break;
                     case ATTrackingManagerAuthorizationStatusDenied:
-                        NSLog(@"❌ [AppDelegate] App Tracking denied");
+                        [[DemoAppLogger sharedInstance] logMessage:@"App Tracking denied"];
                         break;
                     case ATTrackingManagerAuthorizationStatusNotDetermined:
-                        NSLog(@"⚠️ [AppDelegate] App Tracking not determined");
+                        [[DemoAppLogger sharedInstance] logMessage:@"App Tracking not determined"];
                         break;
                     case ATTrackingManagerAuthorizationStatusRestricted:
-                        NSLog(@"🚫 [AppDelegate] App Tracking restricted");
+                        [[DemoAppLogger sharedInstance] logMessage:@"App Tracking restricted"];
                         break;
                     default:
                         break;
                 }
             }];
         });
-    } else {
-        // Pre-iOS 14
-        NSLog(@"✅ [AppDelegate] Pre-iOS 14: Tracking handled");
     }
 }
 

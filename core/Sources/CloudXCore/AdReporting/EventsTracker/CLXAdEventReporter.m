@@ -5,12 +5,12 @@
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXAdDelegate.h>
 
-@interface CLXLiveAdEventReporter ()
+@interface CLXAdEventReporter ()
 @property (nonatomic, strong) CLXAdReportingNetworkService *reportNetworkService;
 @property (nonatomic, strong) CLXLogger *logger;
 @end
 
-@implementation CLXLiveAdEventReporter
+@implementation CLXAdEventReporter
 
 - (instancetype)initWithEndpoint:(NSString *)endpoint {
     self = [super init];

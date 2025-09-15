@@ -667,6 +667,79 @@ static MockRillEventReporter *sharedInstance = nil;
     XCTAssertNoThrow([CloudXCore trackSDKError:testError]);
 }
 
+// Test CLXErrorReporter integration with Rill tracking
+- (void)testErrorReporter_Exception_ShouldFireRillEvent {
+    // Given: Mock Rill event reporter is set up
+    [MockRillEventReporter reset];
+    
+    // Given: SDK is initialized with mock reporter
+    [[CloudXCore shared] setValue:self.mockReporter forKey:@"reportingService"];
+    
+    // Given: An exception occurs
+    NSException *testException = [NSException exceptionWithName:@"TestException"
+                                                         reason:@"Test exception for Rill tracking"
+                                                       userInfo:@{@"test": @"data"}];
+    
+    // When: Report exception via CLXErrorReporter
+    [[CLXErrorReporter shared] reportException:testException 
+                                   placementID:kTestPlacementID 
+                                       context:@{@"operation": @"test_error_reporting"}];
+    
+    // Then: Should fire Rill SDK error event
+    MockRillEventReporter *mockReporter = [MockRillEventReporter shared];
+    
+    // Verify Rill tracking was called
+    XCTAssertGreaterThan(mockReporter.firedRillEvents.count, 0, @"Should fire at least one Rill event");
+    
+    // Verify it's an SDK error event (sdkerrorenc)
+    BOOL foundSDKErrorEvent = NO;
+    for (NSString *actionString in mockReporter.firedActionStrings) {
+        if ([actionString isEqualToString:@"sdkerrorenc"]) {
+            foundSDKErrorEvent = YES;
+            break;
+        }
+    }
+    XCTAssertTrue(foundSDKErrorEvent, @"Should fire SDK error Rill event with 'sdkerrorenc' action");
+}
+
+// Test CLXErrorReporter integration with NSError
+- (void)testErrorReporter_NSError_ShouldFireRillEvent {
+    // Given: Mock Rill event reporter is set up
+    [MockRillEventReporter reset];
+    
+    // Given: SDK is initialized with mock reporter
+    [[CloudXCore shared] setValue:self.mockReporter forKey:@"reportingService"];
+    
+    // Given: An NSError occurs
+    NSError *testError = [NSError errorWithDomain:@"TestErrorDomain"
+                                             code:2001
+                                         userInfo:@{
+                                             NSLocalizedDescriptionKey: @"Test error for Rill tracking",
+                                             @"custom_info": @"additional_data"
+                                         }];
+    
+    // When: Report error via CLXErrorReporter
+    [[CLXErrorReporter shared] reportError:testError 
+                               placementID:kTestPlacementID 
+                                   context:@{@"operation": @"test_error_reporting"}];
+    
+    // Then: Should fire Rill SDK error event
+    MockRillEventReporter *mockReporter = [MockRillEventReporter shared];
+    
+    // Verify Rill tracking was called
+    XCTAssertGreaterThan(mockReporter.firedRillEvents.count, 0, @"Should fire at least one Rill event");
+    
+    // Verify it's an SDK error event (sdkerrorenc)
+    BOOL foundSDKErrorEvent = NO;
+    for (NSString *actionString in mockReporter.firedActionStrings) {
+        if ([actionString isEqualToString:@"sdkerrorenc"]) {
+            foundSDKErrorEvent = YES;
+            break;
+        }
+    }
+    XCTAssertTrue(foundSDKErrorEvent, @"Should fire SDK error Rill event with 'sdkerrorenc' action");
+}
+
 #pragma mark - SDK Metrics Tests
 
 // Test SDK metrics tracking (if implemented)

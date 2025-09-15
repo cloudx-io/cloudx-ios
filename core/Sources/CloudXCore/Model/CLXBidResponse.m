@@ -182,13 +182,20 @@ static void initializeLogger() {
     bid.cid = dictionary[@"cid"];
     bid.crid = dictionary[@"crid"];
     bid.dealid = dictionary[@"dealid"];
-    bid.price = [dictionary[@"price"] doubleValue];
-    bid.w = [dictionary[@"w"] integerValue];
-    bid.h = [dictionary[@"h"] integerValue];
+    // Safe parsing with NSNull handling
+    id priceValue = dictionary[@"price"];
+    bid.price = (priceValue && ![priceValue isKindOfClass:[NSNull class]]) ? [priceValue doubleValue] : 0.0;
     
-    // Parse optional fields
-    if (dictionary[@"abTestId"]) {
-        bid.abTestId = [dictionary[@"abTestId"] longLongValue];
+    id wValue = dictionary[@"w"];
+    bid.w = (wValue && ![wValue isKindOfClass:[NSNull class]]) ? [wValue integerValue] : 0;
+    
+    id hValue = dictionary[@"h"];
+    bid.h = (hValue && ![hValue isKindOfClass:[NSNull class]]) ? [hValue integerValue] : 0;
+    
+    // Parse optional fields with NSNull safety
+    id abTestIdValue = dictionary[@"abTestId"];
+    if (abTestIdValue && ![abTestIdValue isKindOfClass:[NSNull class]]) {
+        bid.abTestId = [abTestIdValue longLongValue];
     }
     if (dictionary[@"abTestGroup"]) {
         bid.abTestGroup = dictionary[@"abTestGroup"];
@@ -221,9 +228,10 @@ static void initializeLogger() {
     
     CLXBidResponseExt *ext = [[CLXBidResponseExt alloc] init];
     
-    // Parse origbidcpm and origbidcur
-    if (dictionary[@"origbidcpm"]) {
-        ext.origbidcpm = [dictionary[@"origbidcpm"] doubleValue];
+    // Parse origbidcpm and origbidcur with NSNull safety
+    id origbidcpmValue = dictionary[@"origbidcpm"];
+    if (origbidcpmValue && ![origbidcpmValue isKindOfClass:[NSNull class]]) {
+        ext.origbidcpm = [origbidcpmValue doubleValue];
     }
     ext.origbidcur = dictionary[@"origbidcur"];
     
@@ -305,9 +313,10 @@ static void initializeLogger() {
         return nil;
     }
     CLXBidResponseCloudX *cloudx = [[CLXBidResponseCloudX alloc] init];
-    // Parse rank
-    if (dictionary[@"rank"]) {
-        cloudx.rank = [dictionary[@"rank"] integerValue];
+    // Parse rank with NSNull safety
+    id rankValue = dictionary[@"rank"];
+    if (rankValue && ![rankValue isKindOfClass:[NSNull class]]) {
+        cloudx.rank = [rankValue integerValue];
     }
     // Parse adapterExtras
     NSDictionary *adapterExtrasDict = dictionary[@"adapter_extras"];
