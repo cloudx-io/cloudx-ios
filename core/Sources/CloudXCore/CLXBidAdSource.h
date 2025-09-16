@@ -14,7 +14,7 @@
 #import <CloudXCore/CLXAdNetworkFactories.h>
 #import <CloudXCore/CLXError.h>
 
-@class CLXBidResponseBid, CLXBiddingConfigRequest, CLXBidResponse, CLXAd;
+@class CLXBidResponseBid, CLXBiddingConfigRequest, CLXBidResponse, CLXAd, CLXEnvironmentConfig;
 @protocol CLXAdEventReporting;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -97,6 +97,8 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
  * @param bidTokenSources Dictionary of bid token sources by adapter name
  * @param nativeAdRequirements Native ad requirements (optional)
  * @param tmax Timeout for bid requests (optional)
+ * @param reportingService Reporting service for events
+ * @param environmentConfig Environment configuration for URLs
  * @param createBidAd Block to create bid ads
  * @return Initialized bid ad source
  */
@@ -110,6 +112,7 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
          nativeAdRequirements:(nullable id)nativeAdRequirements
                           tmax:(nullable NSNumber *)tmax
                reportingService:(id<CLXAdEventReporting>)reportingService
+              environmentConfig:(CLXEnvironmentConfig *)environmentConfig
                    createBidAd:(id (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network))createBidAd;
 
 @end

@@ -170,6 +170,7 @@ NS_ASSUME_NONNULL_BEGIN
                                      nativeAdRequirements:nil
                                                       tmax:tmax
                                            reportingService:_reportingService
+                                          environmentConfig:environmentConfig
                                                createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
             __strong typeof(weakSelf) strongSelf = weakSelf;
             if (!strongSelf) return nil;

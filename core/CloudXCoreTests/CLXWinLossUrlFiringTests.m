@@ -176,6 +176,7 @@ static MockCLXAdEventReporter *sharedInstance = nil;
         nativeAdRequirements:nil
         tmax:@(5000)
         reportingService:reporter
+        environmentConfig:[CLXEnvironmentConfig shared]
         createBidAd:createBidAdBlock];
 }
 
@@ -347,6 +348,7 @@ static MockCLXAdEventReporter *sharedInstance = nil;
         nativeAdRequirements:nil
         tmax:@(5000)
         reportingService:[MockCLXAdEventReporter shared]
+        environmentConfig:[CLXEnvironmentConfig shared]
         createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
             // Mock createBidAd - return nil to simulate failure, or a mock object to simulate success
             if ([bidId isEqualToString:@"successful-bid"]) {
@@ -565,6 +567,7 @@ static MockCLXAdEventReporter *sharedInstance = nil;
         nativeAdRequirements:nil
         tmax:@(5000)
         reportingService:[MockCLXAdEventReporter shared]
+        environmentConfig:[CLXEnvironmentConfig shared]
         createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
             // Mock createBidAd - return nil to simulate failure
             return nil;
@@ -629,6 +632,7 @@ static MockCLXAdEventReporter *sharedInstance = nil;
         nativeAdRequirements:nil
         tmax:@(5000)
         reportingService:[MockCLXAdEventReporter shared]
+        environmentConfig:[CLXEnvironmentConfig shared]
         createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
             // Mock createBidAd - return nil to simulate failure for all bids
             return nil;

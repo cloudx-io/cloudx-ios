@@ -125,9 +125,23 @@ static NSString *const kCLXDebugEnvironmentKey = @"CLXDebugEnvironment";
 - (instancetype)init {
     self = [super init];
     if (self) {
-        [self selectEnvironmentConfiguration];
+        [self setDefaultConfiguration];
     }
     return self;
+}
+
+- (void)setDefaultConfiguration {
+#ifdef DEBUG
+    // Always start with dev in DEBUG builds
+    _currentConfig = kDevEnvironmentConfig;
+    _environmentName = @"development";
+    _isDebugEnvironment = YES;
+#else
+    // Production build always uses production config
+    _currentConfig = kProductionEnvironmentConfig;
+    _environmentName = @"production";
+    _isDebugEnvironment = NO;
+#endif
 }
 
 - (void)selectEnvironmentConfiguration {
@@ -175,6 +189,17 @@ static NSString *const kCLXDebugEnvironmentKey = @"CLXDebugEnvironment";
     return @[@"dev", @"staging"];
 #else
     return @[];
+#endif
+}
+
++ (void)resetToDefault {
+#ifdef DEBUG
+    // Remove the debug environment preference to fall back to default
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXDebugEnvironmentKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    // Reset to default configuration
+    [[CLXEnvironmentConfig shared] setDefaultConfiguration];
 #endif
 }
 

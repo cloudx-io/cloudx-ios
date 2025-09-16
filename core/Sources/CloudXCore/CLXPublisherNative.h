@@ -20,6 +20,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol CLXAdEventReporting;
+@class CLXEnvironmentConfig;
 
 /**
  * CLXPublisherNative implements the CLXNative protocol and handles native ad loading,
@@ -59,6 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param bidTokenSources Dictionary of bid token sources
  * @param bidRequestTimeout Bid request timeout
  * @param reportingService The reporting service
+ * @param environmentConfig Environment configuration for URLs
  * @return Initialized CLXPublisherNative instance
  */
 - (instancetype)initWithViewController:(UIViewController *)viewController
@@ -73,7 +75,8 @@ NS_ASSUME_NONNULL_BEGIN
                               adFactories:(NSDictionary<NSString *, id<CLXAdapterNativeFactory>> *)adFactories
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
-                         reportingService:(id<CLXAdEventReporting>)reportingService;
+                         reportingService:(id<CLXAdEventReporting>)reportingService
+                        environmentConfig:(CLXEnvironmentConfig *)environmentConfig;
 
 @end
 

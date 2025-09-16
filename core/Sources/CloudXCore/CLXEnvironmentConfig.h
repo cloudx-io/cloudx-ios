@@ -75,6 +75,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)setDebugEnvironment:(NSString *)environment;
 
 /**
+ * Reset to default environment (dev in DEBUG, production in release)
+ */
++ (void)resetToDefault;
+
+/**
  * Get list of available debug environments
  * @return Array of environment names, empty in production builds
  */

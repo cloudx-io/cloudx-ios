@@ -731,7 +731,8 @@ static CloudXCore *_sharedInstance = nil;
                                                                     adFactories:_adNetworkFactories.native
                                                                 bidTokenSources:_adNetworkFactories.bidTokenSources
                                                               bidRequestTimeout:3.0
-                                                              reportingService:_reportingService];
+                                                              reportingService:_reportingService
+                                                             environmentConfig:[CLXEnvironmentConfig shared]];
     
     if (!native) {
         [self.logger error:@"❌ [CloudXCore] Failed to create native ad"];
