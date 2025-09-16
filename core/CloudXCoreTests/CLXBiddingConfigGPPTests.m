@@ -127,7 +127,7 @@
     NSDictionary *json = [config json];
     
     NSString *ifa = json[@"device"][@"ifa"];
-    XCTAssertEqualObjects(ifa, @"00000000000000000000", @"IFA should be set to zeros when privacy requires it");
+    XCTAssertEqualObjects(ifa, @"00000000-0000-0000-0000-000000000000", @"IFA should be set to zero IDFA when privacy requires data clearing (unified privacy architecture)");
 }
 
 // Test geo coordinates are cleared when privacy requires it
@@ -153,10 +153,10 @@
     [self.privacyService setIsAgeRestrictedUser:@YES];
     
     // Debug: Check what the privacy service is actually returning
-    BOOL shouldClear = [self.privacyService shouldClearPersonalDataWithGPP];
-    NSLog(@"🔍 DEBUG: shouldClearPersonalDataWithGPP returned: %@", shouldClear ? @"YES" : @"NO");
+    BOOL shouldClear = [self.privacyService shouldClearPersonalData];
+    NSLog(@"🔍 DEBUG: shouldClearPersonalData returned: %@", shouldClear ? @"YES" : @"NO");
     
-    XCTAssertTrue(shouldClear, @"Privacy service should require data clearing when COPPA is enabled");
+    XCTAssertTrue(shouldClear, @"Privacy service should require data clearing when COPPA is enabled (unified privacy architecture)");
     
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
     NSDictionary *json = [config json];
@@ -284,6 +284,30 @@
         @"cloudfront-viewer-country-region": @"ON"
     };
     [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreGeoHeadersKey];
+}
+
+// Test unified privacy architecture - ATT-first behavior
+- (void)testUnifiedPrivacyArchitectureATTFirst {
+    // Test that unified privacy method respects ATT as primary control
+    // Note: In test environment, ATT status may vary
+    
+    BOOL shouldClear = [self.privacyService shouldClearPersonalData];
+    
+    // Create config and verify IFA behavior matches privacy decision
+    CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
+    NSDictionary *json = [config json];
+    NSString *ifa = json[@"device"][@"ifa"];
+    
+    if (shouldClear) {
+        XCTAssertEqualObjects(ifa, @"00000000-0000-0000-0000-000000000000", 
+                             @"When privacy clearing required, IFA should be zero IDFA");
+    } else {
+        XCTAssertNotEqualObjects(ifa, @"00000000-0000-0000-0000-000000000000", 
+                                @"When privacy allows data, IFA should not be zero IDFA");
+    }
+    
+    NSLog(@"🔍 Unified Privacy Test - shouldClear: %@, IFA: %@", 
+          shouldClear ? @"YES" : @"NO", ifa);
 }
 
 @end

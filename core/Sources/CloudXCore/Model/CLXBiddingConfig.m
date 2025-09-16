@@ -342,15 +342,19 @@ static void initializeLogger() {
         _regulations = regulations;
         
         // Apply privacy-aware data clearing when required
-        BOOL shouldClearPersonalData = [privacyService shouldClearPersonalDataWithGPP];
+        // Note: IFA is already privacy-aware at source level (CLXSettings.getIFA)
+        BOOL shouldClearPersonalData = [privacyService shouldClearPersonalData];
         if (shouldClearPersonalData) {
-            _device.ifa = @"00000000000000000000";
-            
-            // Clear geo coordinates but keep UTC offset
+            // Clear all personal geo data but preserve timezone information
             if (_device.geo) {
                 _device.geo.lat = nil;
                 _device.geo.lon = nil;
                 _device.geo.accuracy = nil;
+                _device.geo.city = nil;
+                _device.geo.zip = nil;
+                _device.geo.metro = nil;
+                // Keep country and region for compliance geo-targeting
+                // Keep utcoffset for timezone-based functionality
             }
         }
         
@@ -620,6 +624,24 @@ static void initializeLogger() {
     }
     json[@"type"] = geo.type ?: @0;
     json[@"utcoffset"] = geo.utcoffset ?: @0;
+    
+    // Enhanced geo fields
+    if (geo.country) {
+        json[@"country"] = geo.country;
+    }
+    if (geo.region) {
+        json[@"region"] = geo.region;
+    }
+    if (geo.city) {
+        json[@"city"] = geo.city;
+    }
+    if (geo.zip) {
+        json[@"zip"] = geo.zip;
+    }
+    if (geo.metro) {
+        json[@"metro"] = geo.metro;
+    }
+    
     return [json copy];
 }
 
@@ -672,7 +694,7 @@ static void initializeLogger() {
 
 - (NSDictionary *)convertUserExtToJSON:(CLXBiddingConfigUserExt *)ext {
     // Check if privacy service requires data clearing
-    if (_privacyService && [_privacyService shouldClearPersonalDataWithGPP]) {
+    if (_privacyService && [_privacyService shouldClearPersonalData]) {
         // Return empty dictionary when privacy requires data clearing
         return @{};
     }

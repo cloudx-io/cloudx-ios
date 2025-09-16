@@ -52,20 +52,49 @@
 }
 
 - (BOOL)shouldClearPersonalData {
-    // Check iOS ATT status first
+    // iOS ATT is the primary privacy control - platform-first approach
     if (![CLXAdTrackingService isIDFAAccessAllowed]) {
         [self.logger debug:@"🔒 [CLXPrivacyService] iOS ATT not authorized - clearing personal data"];
         return YES;
     }
     
-    // Only check CCPA for public API (GDPR is internal until server support is added, COPPA data clearing via GPP)
-    NSString *ccpaString = [self ccpaPrivacyString];
-    if (ccpaString && [ccpaString containsString:@"Y"]) {
-        [self.logger debug:@"🔒 [CLXPrivacyService] CCPA opt-out detected - clearing personal data"];
+    // If ATT allows, check additional compliance requirements
+    return [self shouldClearPersonalDataForCompliance];
+}
+
+- (BOOL)shouldClearPersonalDataForCompliance {
+    CLXGeoLocationService *geoService = [CLXGeoLocationService shared];
+    
+    // Non-US users: no additional restrictions (matching Android)
+    if (![geoService isUSUser]) {
+        [self.logger debug:@"✅ [CLXPrivacyService] Non-US user - no additional restrictions"];
+        return NO;
+    }
+    
+    // US users: COPPA always takes precedence (matching Android)
+    if ([self isCoppaEnabled]) {
+        [self.logger debug:@"🔒 [CLXPrivacyService] COPPA enabled for US user - clearing personal data"];
         return YES;
     }
     
-    [self.logger debug:@"✅ [CLXPrivacyService] Personal data can be used (CCPA check passed)"];
+    // US users: GPP consent evaluation based on geography (matching Android)
+    CLXGPPProvider *gppProvider = [CLXGPPProvider sharedInstance];
+    NSNumber *targetSid = [geoService isCaliforniaUser] ? @(CLXGppTargetUSCA) : @(CLXGppTargetUSNational);
+    
+    CLXGppConsent *gppConsent = [gppProvider decodeGppForTarget:targetSid];
+    if (gppConsent && [gppConsent requiresPiiRemoval]) {
+        [self.logger debug:[NSString stringWithFormat:@"🔒 [CLXPrivacyService] GPP consent (SID %@) requires PII removal - clearing personal data", targetSid]];
+        return YES;
+    }
+    
+    // Legacy CCPA string check for backward compatibility
+    NSString *ccpaString = [self ccpaPrivacyString];
+    if (ccpaString && [ccpaString containsString:@"Y"]) {
+        [self.logger debug:@"🔒 [CLXPrivacyService] Legacy CCPA opt-out detected - clearing personal data"];
+        return YES;
+    }
+    
+    [self.logger debug:@"✅ [CLXPrivacyService] Personal data can be used (all compliance checks passed)"];
     return NO;
 }
 
@@ -252,47 +281,26 @@
     return gppSid;
 }
 
-- (BOOL)shouldClearPersonalDataWithGPP {
-    // Check iOS ATT status first
-    if (![CLXAdTrackingService isIDFAAccessAllowed]) {
-        [self.logger debug:@"🔒 [CLXPrivacyService] iOS ATT not authorized - clearing personal data"];
-        return YES;
+#pragma mark - Publisher GPP API
+
+- (void)setGppString:(NSString *)gppString {
+    [[CLXGPPProvider sharedInstance] setGppString:gppString];
+    if (gppString) {
+        [self.logger info:[NSString stringWithFormat:@"🔧 [CLXPrivacyService] GPP string set: %@", gppString]];
+    } else {
+        [self.logger info:@"🔧 [CLXPrivacyService] GPP string cleared"];
     }
-    
-    CLXGeoLocationService *geoService = [CLXGeoLocationService shared];
-    
-    // Non-US users: no privacy restrictions
-    if (![geoService isUSUser]) {
-        [self.logger debug:@"🔒 [CLXPrivacyService] Non-US user - no privacy restrictions"];
-        return NO;
-    }
-    
-    // US users: Check COPPA first (always takes precedence)
-    if ([self isCoppaEnabled]) {
-        [self.logger debug:@"🔒 [CLXPrivacyService] COPPA enabled for US user - clearing personal data"];
-        return YES;
-    }
-    
-    // US users: Check GPP consent based on geography
-    CLXGPPProvider *gppProvider = [CLXGPPProvider sharedInstance];
-    NSNumber *targetSid = [geoService isCaliforniaUser] ? @(CLXGppTargetUSCA) : @(CLXGppTargetUSNational);
-    
-    CLXGppConsent *gppConsent = [gppProvider decodeGppForTarget:targetSid];
-    if (gppConsent && [gppConsent requiresPiiRemoval]) {
-        [self.logger debug:[NSString stringWithFormat:@"🔒 [CLXPrivacyService] GPP consent (SID %@) requires PII removal - clearing personal data", targetSid]];
-        return YES;
-    }
-    
-    // Fallback to legacy CCPA string check for backward compatibility
-    NSString *ccpaString = [self ccpaPrivacyString];
-    if (ccpaString && [ccpaString containsString:@"Y"]) {
-        [self.logger debug:@"🔒 [CLXPrivacyService] Legacy CCPA opt-out detected - clearing personal data"];
-        return YES;
-    }
-    
-    [self.logger debug:@"✅ [CLXPrivacyService] Personal data can be used (all privacy checks passed)"];
-    return NO;
 }
+
+- (void)setGppSid:(NSArray<NSNumber *> *)gppSid {
+    [[CLXGPPProvider sharedInstance] setGppSid:gppSid];
+    if (gppSid && gppSid.count > 0) {
+        [self.logger info:[NSString stringWithFormat:@"🔧 [CLXPrivacyService] GPP SID set: %@", gppSid]];
+    } else {
+        [self.logger info:@"🔧 [CLXPrivacyService] GPP SID cleared"];
+    }
+}
+
 
 - (BOOL)isCoppaEnabled {
     NSNumber *coppaApplies = [self coppaApplies];
