@@ -8,6 +8,7 @@
  */
 
 #import <CloudXCore/CLXCacheAdQueue.h>
+#import <CloudXCore/CLXEnvironmentConfig.h>
 #import <CloudXCore/CLXAdEventReporting.h>
 #import <CloudXCore/CLXAdEventReporter.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
@@ -73,7 +74,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithMaxCapacity:(NSInteger)maxCapacity
                    reportingService:(id<CLXAdEventReporting>)reportingService
-                        placementID:(NSString *)placementID {
+                        placementID:(NSString *)placementID
+                  environmentConfig:(CLXEnvironmentConfig *)environmentConfig {
     self = [super init];
     if (self) {
         _maxCapacity = maxCapacity;
@@ -88,8 +90,8 @@ NS_ASSUME_NONNULL_BEGIN
         NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey] ?: @"";
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
-                                                                                  appKey:appKey
-                                                                                     url:@"https://ads.cloudx.io/metrics?a=test"];
+                                                                                 appKey:appKey
+                                                                                    url:environmentConfig.metricsEndpointURL];
     }
     return self;
 }

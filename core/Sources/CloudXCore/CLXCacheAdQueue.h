@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol AdEventReporting;
 @protocol CLXCacheableAd;
 @protocol CLXAppSessionService;
+@class CLXEnvironmentConfig;
 
 /**
  * Error types for cache ad queue operations
@@ -62,11 +63,13 @@ typedef NS_ENUM(NSInteger, CacheAdQueueError) {
  * @param maxCapacity Maximum capacity of the queue
  * @param reportingService Service for reporting events
  * @param placementID Placement identifier
+ * @param environmentConfig Environment configuration for URLs
  * @return Initialized cache ad queue
  */
 - (instancetype)initWithMaxCapacity:(NSInteger)maxCapacity
                    reportingService:(id<AdEventReporting>)reportingService
-                        placementID:(NSString *)placementID;
+                        placementID:(NSString *)placementID
+                  environmentConfig:(CLXEnvironmentConfig *)environmentConfig;
 
 /**
  * Enqueue an ad with price and load timeout

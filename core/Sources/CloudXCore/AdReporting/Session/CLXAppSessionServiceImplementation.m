@@ -3,6 +3,7 @@
 #import <CloudXCore/CLXAppSession.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXCoreDataManager.h>
+#import <CloudXCore/CLXEnvironmentConfig.h>
 
 @interface CLXAppSessionServiceImplementation ()
 @property (nonatomic, strong) CLXAppSession *currentSession;
@@ -21,7 +22,8 @@
         // Create URL from string
         NSURL *sessionURL = [NSURL URLWithString:url];
         if (!sessionURL) {
-            sessionURL = [NSURL URLWithString:@"https://ads.cloudx.io/metrics?a=test"];
+            CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
+            sessionURL = [NSURL URLWithString:env.metricsEndpointURL];
         }
         
         // Create current session

@@ -20,6 +20,7 @@
 #import <CloudXCore/CLXBidderConfig.h>
 #import <CloudXCore/CLXXorEncryption.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
+#import <CloudXCore/CLXEnvironmentConfig.h>
 
 // Adapter Protocols
 #import <CloudXCore/CLXAdapterNative.h>
@@ -124,7 +125,8 @@ static CloudXCore *_sharedInstance = nil;
         _isInitialised = NO;
         _abTestValue = (double)arc4random() / UINT32_MAX;
         _abTestName = @"RandomTest";
-        _defaultAuctionURL = @"https://au-dev.cloudx.io/openrtb2/auction";
+        CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
+        _defaultAuctionURL = env.auctionEndpointURL;
         _logsData = [NSDictionary dictionary];
         
         [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] Instance initialized - AB Test: %@ (%.3f), Default URL: %@", _abTestName, _abTestValue, _defaultAuctionURL]];
@@ -232,7 +234,8 @@ static CloudXCore *_sharedInstance = nil;
         }
         [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsDictKey];
 
-        NSString *metricsEndpointURL = @"https://ads.cloudx.io/metrics?a=test";
+        CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
+        NSString *metricsEndpointURL = env.metricsEndpointURL;
         if (config.metricsEndpointURL) {
             metricsEndpointURL = config.metricsEndpointURL;
             [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsUrlKey];
@@ -359,13 +362,14 @@ static CloudXCore *_sharedInstance = nil;
     [[NSUserDefaults standardUserDefaults] setValue:config.accountID forKey:kCLXCoreAccountIDKey];
     
     // Initialize reporting service 
-    NSString *metricsEndpointURL = @"https://ads.cloudx.io/metrics?a=test";
+    CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
+    NSString *metricsEndpointURL = env.metricsEndpointURL;
     if (config.metricsEndpointURL) {
         metricsEndpointURL = config.metricsEndpointURL;
     }
     
     // Select endpoints with A/B testing 
-    NSString *auctionEndpointUrl = @"https://au-dev.cloudx.io/openrtb2/auction";
+    NSString *auctionEndpointUrl = env.auctionEndpointURL;
     NSString *cdpEndpointUrl = @"";
     
     // Check if auction endpoint is a string or object 
@@ -554,7 +558,8 @@ static CloudXCore *_sharedInstance = nil;
                                                               bidRequestTimeout:3.0
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
-                                                                           tmax:tmax];
+                                                                           tmax:tmax
+                                                              environmentConfig:[CLXEnvironmentConfig shared]];
     
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeW320H50 delegate:delegate];
 }
@@ -598,7 +603,8 @@ static CloudXCore *_sharedInstance = nil;
                                                               bidRequestTimeout:3.0
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
-                                                                           tmax:nil];
+                                                                           tmax:nil
+                                                              environmentConfig:[CLXEnvironmentConfig shared]];
     
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeMREC delegate:delegate];
 }
@@ -640,7 +646,8 @@ static CloudXCore *_sharedInstance = nil;
         bidRequestTimeout:3.0
         reportingService:_reportingService
         settings:[CLXSettings sharedInstance]
-        adType:CLXAdTypeInterstitial];
+        adType:CLXAdTypeInterstitial
+        environmentConfig:[CLXEnvironmentConfig shared]];
     
     return interstitial;
 }
@@ -682,7 +689,8 @@ static CloudXCore *_sharedInstance = nil;
         bidRequestTimeout:3.0
         reportingService:_reportingService
         settings:[CLXSettings sharedInstance]
-        adType:CLXAdTypeRewarded];
+        adType:CLXAdTypeRewarded
+        environmentConfig:[CLXEnvironmentConfig shared]];
     
     return rewarded;
 }
@@ -723,7 +731,8 @@ static CloudXCore *_sharedInstance = nil;
                                                                     adFactories:_adNetworkFactories.native
                                                                 bidTokenSources:_adNetworkFactories.bidTokenSources
                                                               bidRequestTimeout:3.0
-                                                              reportingService:_reportingService];
+                                                              reportingService:_reportingService
+                                                             environmentConfig:[CLXEnvironmentConfig shared]];
     
     if (!native) {
         [self.logger error:@"❌ [CloudXCore] Failed to create native ad"];

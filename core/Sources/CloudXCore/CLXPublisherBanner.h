@@ -20,6 +20,7 @@
 #import <CloudXCore/CLXBannerDelegate.h>
 #import <CloudXCore/CLXSettings.h>
 
+@class CLXEnvironmentConfig;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -114,7 +115,8 @@ NS_ASSUME_NONNULL_BEGIN
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                          reportingService:(id<AdEventReporting>)reportingService
                               settings:(CLXSettings *)settings
-                                     tmax:(nullable NSNumber *)tmax;
+                                     tmax:(nullable NSNumber *)tmax
+                        environmentConfig:(CLXEnvironmentConfig *)environmentConfig;
 
 /**
  * Updates the visibility state of the banner.

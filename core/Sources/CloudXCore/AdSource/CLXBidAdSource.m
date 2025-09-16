@@ -8,6 +8,7 @@
  */
 
 #import <CloudXCore/CLXBidAdSource.h>
+#import <CloudXCore/CLXEnvironmentConfig.h>
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXSDKConfigPlacement.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
@@ -108,6 +109,7 @@ NS_ASSUME_NONNULL_BEGIN
          nativeAdRequirements:(nullable id)nativeAdRequirements
                           tmax:(nullable NSNumber *)tmax
                reportingService:(id<CLXAdEventReporting>)reportingService
+              environmentConfig:(CLXEnvironmentConfig *)environmentConfig
                    createBidAd:(id (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network))createBidAd {
     self = [super init];
     if (self) {
@@ -134,7 +136,7 @@ NS_ASSUME_NONNULL_BEGIN
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
                                                                                   appKey:appKey
-                                                                                     url:@"https://ads.cloudx.io/metrics?a=test"];
+                                                                                     url:environmentConfig.metricsEndpointURL];
     }
     return self;
 }

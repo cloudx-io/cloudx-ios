@@ -4,6 +4,7 @@
 #import <CloudXCore/URLSession+CLX.h>
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXAdDelegate.h>
+#import <CloudXCore/CLXEnvironmentConfig.h>
 
 @interface CLXAdEventReporter ()
 @property (nonatomic, strong) CLXAdReportingNetworkService *reportNetworkService;
@@ -15,7 +16,8 @@
 - (instancetype)initWithEndpoint:(NSString *)endpoint {
     self = [super init];
     if (self) {
-        NSString *endpointString = endpoint.length > 0 ? endpoint : @"https://ads.cloudx.io/event?a=test";
+        CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
+        NSString *endpointString = endpoint.length > 0 ? endpoint : env.eventTrackingEndpointURL;
         NSURL *endpointURL = [NSURL URLWithString:endpointString];
         NSURLSession *urlSession = [NSURLSession cloudxSessionWithIdentifier:@"event"];
         _reportNetworkService = [[CLXAdReportingNetworkService alloc] initWithBaseURL:endpointURL urlSession:urlSession];
