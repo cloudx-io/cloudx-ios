@@ -14,6 +14,9 @@
     // Clear any existing debug environment setting
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CLXDebugEnvironment"];
     [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    // Force the shared instance to reset to default configuration
+    [CLXEnvironmentConfig resetToDefault];
 }
 
 - (void)tearDown {

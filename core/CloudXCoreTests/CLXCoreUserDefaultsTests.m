@@ -31,12 +31,18 @@
 - (void)setUp {
     [super setUp];
     
+    // Reset DI container to ensure clean state
+    [[CLXDIContainer shared] reset];
+    
     // Set up mock init service for fast, reliable unit tests
     self.mockInitService = [[CLXMockInitService alloc] initWithSuccess:YES];
     
     // Inject mock into DI container BEFORE any CloudXCore instances are created
     CLXDIContainer *container = [CLXDIContainer shared];
     [container registerType:[CLXLiveInitService class] instance:self.mockInitService];
+    
+    // Register environment config for proper DI
+    [container registerType:[CLXEnvironmentConfig class] instance:[CLXEnvironmentConfig shared]];
     
     // Don't clear UserDefaults in setUp - let tearDown handle cleanup to avoid race conditions
 }
@@ -72,9 +78,15 @@
 // Test that demonstrates account ID storage collision risk (bypassing network init)
 - (void)testSDKInitializationStoresAccountID {
     XCTestExpectation *expectation = [self expectationWithDescription:@"SDK initialization"];
+    __block BOOL completionCalled = NO;
     
     CloudXCore *sdk = [[CloudXCore alloc] init];
     [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+        if (completionCalled) {
+            XCTFail(@"Completion block called multiple times - this should not happen");
+            return;
+        }
+        completionCalled = YES;
         XCTAssertTrue(success, @"Mock SDK initialization should succeed");
         [expectation fulfill];
     }];
