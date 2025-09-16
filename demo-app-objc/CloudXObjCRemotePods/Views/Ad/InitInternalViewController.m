@@ -1,6 +1,7 @@
 #import "InitInternalViewController.h"
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXDIContainer.h>
+#import <CloudXCore/CLXEnvironmentConfig.h>
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
 
@@ -188,7 +189,7 @@
     // Clear DI container to force fresh services with new environment
     [[CLXDIContainer shared] reset];
     
-    // Set environment selection for URLProvider FIRST (before any SDK calls)
+    // Set environment in our centralized config FIRST (before any SDK calls)
     NSString *environmentKey;
     switch (environment) {
         case CLXDemoEnvironmentDev:
@@ -198,10 +199,17 @@
             environmentKey = @"staging";
             break;
         case CLXDemoEnvironmentProduction:
+            // Production doesn't need environment override - it's the default for non-DEBUG
             environmentKey = @"production";
             break;
     }
     
+    // Set the debug environment in our centralized config
+    if (environment != CLXDemoEnvironmentProduction) {
+        [CLXEnvironmentConfig setDebugEnvironment:environmentKey];
+    }
+    
+    // Also set the old key for backward compatibility with demo app config
     [[NSUserDefaults standardUserDefaults] setObject:environmentKey forKey:@"CLXDemoEnvironment"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
@@ -211,15 +219,25 @@
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"BaseURL: %@", config.baseURL]];
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Environment set to: %@", environmentKey]];
     
+    // Log the actual URLs that will be used from our centralized config
+    CLXEnvironmentConfig *envConfig = [CLXEnvironmentConfig shared];
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔧 Environment Config - %@:", envConfig.environmentName]];
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"  Auction: %@", envConfig.auctionEndpointURL]];
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"  Tracker: %@", envConfig.trackerRillBaseURL]];
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"  Metrics: %@", envConfig.metricsEndpointURL]];
+    
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Using standard SDK init with %@ environment", environmentName]];
     
     // Use standard CloudXCore initialization which will now use our environment override
     [[CloudXCore shared] initSDKWithAppKey:config.appId 
                               hashedUserID:config.hashedUserId 
                                 completion:^(BOOL success, NSError * _Nullable error) {
-        // Clear environment override after initialization (success or failure)
+        // Clear old environment override after initialization (success or failure)
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CLXDemoEnvironment"];
         [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        // Note: We keep the CLXDebugEnvironment setting in our centralized config
+        // so it persists for subsequent SDK operations
         
         if (success) {
             [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ SDK initialized successfully with %@ environment", environmentName]];

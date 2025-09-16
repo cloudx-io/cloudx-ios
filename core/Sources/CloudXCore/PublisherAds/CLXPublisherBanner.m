@@ -30,6 +30,7 @@
 #import <CloudXCore/CLXRillImpressionInitService.h>
 #import <CloudXCore/CLXRillImpressionModel.h>
 #import <CloudXCore/CLXRillTrackingService.h>
+#import <CloudXCore/CLXEnvironmentConfig.h>
 
 #import <CloudXCore/CLXXorEncryption.h>
 #import <Foundation/Foundation.h>
@@ -150,8 +151,8 @@ NS_ASSUME_NONNULL_BEGIN
         NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreBannerAppKeyKey] ?: @"";
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreBannerSessionIDKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
-                                                                                  appKey:appKey
-                                                                                     url:@"https://ads.cloudx.io/metrics?a=test"];
+                                                                                 appKey:appKey
+                                                                                    url:[CLXEnvironmentConfig shared].metricsEndpointURL];
         
         // Initialize bid ad source
         BOOL hasCloseButton = placement.hasCloseButton ?: NO;

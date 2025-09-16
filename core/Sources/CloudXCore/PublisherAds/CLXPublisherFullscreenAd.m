@@ -25,6 +25,7 @@
 #import <CloudXCore/CLXDestroyable.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXRillTrackingService.h>
+#import <CloudXCore/CLXEnvironmentConfig.h>
 #import <objc/runtime.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -129,8 +130,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey] ?: @"";
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
-                                                                                  appKey:appKey
-                                                                                     url:@"https://ads.cloudx.io/metrics?a=test"];
+                                                                                 appKey:appKey
+                                                                                    url:[CLXEnvironmentConfig shared].metricsEndpointURL];
         
         // Configure bid source for ad request management
         BOOL hasCloseButton = placement.hasCloseButton ?: NO;

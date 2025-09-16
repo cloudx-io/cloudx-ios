@@ -27,6 +27,7 @@
 #import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXAdEventReporting.h>
 #import <CloudXCore/CLXRillTrackingService.h>
+#import <CloudXCore/CLXEnvironmentConfig.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -117,8 +118,8 @@ NS_ASSUME_NONNULL_BEGIN
         NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey] ?: @"";
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
-                                                                                  appKey:appKey
-                                                                                     url:@"https://ads.cloudx.io/metrics?a=test"];
+                                                                                 appKey:appKey
+                                                                                    url:[CLXEnvironmentConfig shared].metricsEndpointURL];
         
         // Get app key from UserDefaults (matching Swift SDK behavior)
         __weak typeof(self) weakSelf = self;

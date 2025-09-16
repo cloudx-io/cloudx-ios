@@ -20,6 +20,7 @@
 #import <CloudXCore/CLXBidderConfig.h>
 #import <CloudXCore/CLXXorEncryption.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
+#import <CloudXCore/CLXEnvironmentConfig.h>
 
 // Adapter Protocols
 #import <CloudXCore/CLXAdapterNative.h>
@@ -124,7 +125,8 @@ static CloudXCore *_sharedInstance = nil;
         _isInitialised = NO;
         _abTestValue = (double)arc4random() / UINT32_MAX;
         _abTestName = @"RandomTest";
-        _defaultAuctionURL = @"https://au-dev.cloudx.io/openrtb2/auction";
+        CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
+        _defaultAuctionURL = env.auctionEndpointURL;
         _logsData = [NSDictionary dictionary];
         
         [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] Instance initialized - AB Test: %@ (%.3f), Default URL: %@", _abTestName, _abTestValue, _defaultAuctionURL]];
@@ -232,7 +234,8 @@ static CloudXCore *_sharedInstance = nil;
         }
         [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsDictKey];
 
-        NSString *metricsEndpointURL = @"https://ads.cloudx.io/metrics?a=test";
+        CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
+        NSString *metricsEndpointURL = env.metricsEndpointURL;
         if (config.metricsEndpointURL) {
             metricsEndpointURL = config.metricsEndpointURL;
             [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsUrlKey];
@@ -359,13 +362,14 @@ static CloudXCore *_sharedInstance = nil;
     [[NSUserDefaults standardUserDefaults] setValue:config.accountID forKey:kCLXCoreAccountIDKey];
     
     // Initialize reporting service 
-    NSString *metricsEndpointURL = @"https://ads.cloudx.io/metrics?a=test";
+    CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
+    NSString *metricsEndpointURL = env.metricsEndpointURL;
     if (config.metricsEndpointURL) {
         metricsEndpointURL = config.metricsEndpointURL;
     }
     
     // Select endpoints with A/B testing 
-    NSString *auctionEndpointUrl = @"https://au-dev.cloudx.io/openrtb2/auction";
+    NSString *auctionEndpointUrl = env.auctionEndpointURL;
     NSString *cdpEndpointUrl = @"";
     
     // Check if auction endpoint is a string or object 

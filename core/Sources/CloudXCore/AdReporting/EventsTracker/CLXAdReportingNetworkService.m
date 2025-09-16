@@ -4,6 +4,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXXorEncryption.h>
 #import <CloudXCore/NSString+CLXSemicolon.h>
+#import <CloudXCore/CLXEnvironmentConfig.h>
 
 @interface CLXAdReportingNetworkService ()
 @property (nonatomic, strong) CLXBaseNetworkService *baseNetworkService;
@@ -158,8 +159,8 @@
 }
 
 - (void)metricsTrackingWithActionString:(NSString *)actionString error:(NSError **)error {
-    //https://tracker-dev.cloudx.io/t/     https://tracker-stage.cloudx.io/t/sdkimp/
-    NSMutableString *urlString = [NSMutableString stringWithString:@"https://tracker-stage.cloudx.io/t/bulk?debug=true"];
+    CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
+    NSMutableString *urlString = [NSMutableString stringWithString:env.trackerBulkEndpointURL];
     NSURL *fullURL = [NSURL URLWithString:urlString];
     if (!fullURL) {
         [self.logger error:[NSString stringWithFormat:@"CloudX: can't parse metricsTracking to URL: %@", urlString]];
@@ -232,10 +233,12 @@
                             error:(NSError **)error
 {
     // Debug logging for Rill tracking parameters
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Action: %@, Campaign: %@, EncodedLength: %lu", actionString ?: @"(nil)", campaignId ?: @"(nil)", (unsigned long)(encodedString.length)]];
+    CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Environment: %@, Action: %@, Campaign: %@, EncodedLength: %lu", env.environmentName, actionString ?: @"(nil)", campaignId ?: @"(nil)", (unsigned long)(encodedString.length)]];
     
-    NSString * trackingString = @"https://tracker-dev.cloudx.io/t/";
+    NSString *trackingString = env.trackerRillBaseURL;
     
+    // Allow override via user defaults for testing
     if ([[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey]) {
         trackingString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey];
     }
@@ -269,8 +272,13 @@
     NSString *fullURLString = [NSString stringWithFormat:@"%@?%@", urlString, queryString];
     NSURL *fullURL = [NSURL URLWithString:fullURLString];
     
-    // Debug logging for constructed URL
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Event: %@, URL: %@", eventName, fullURLString]];
+    // Print the complete request JSON
+    NSDictionary *requestJSON = @{
+        @"method": @"GET",
+        @"url": fullURLString,
+        @"parameters": params
+    };
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Request JSON: %@", requestJSON]];
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:fullURL];
     request.HTTPMethod = @"GET";
@@ -279,23 +287,26 @@
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
                                             completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        // Print the complete response JSON
+        NSMutableDictionary *responseJSON = [NSMutableDictionary dictionary];
+        
         if (error) {
+            responseJSON[@"error"] = error.localizedDescription;
             [self.logger error:[NSString stringWithFormat:@"🔍 [RillTracking] ERROR: %@", error]];
         } else {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-            [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] SUCCESS - Status: %ld", (long)[httpResponse statusCode]]];
+            responseJSON[@"statusCode"] = @(httpResponse.statusCode);
+            responseJSON[@"headers"] = httpResponse.allHeaderFields ?: @{};
             
             if (data && data.length > 0) {
                 NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-                [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Response body: %@", responseString]];
+                responseJSON[@"body"] = responseString ?: @"(could not decode)";
             } else {
-                [self.logger debug:@"🔍 [RillTracking] No response body"];
+                responseJSON[@"body"] = @"(empty)";
             }
-            
-            // Legacy log for compatibility
-            [self.logger debug:[NSString stringWithFormat:@"CloudX: rillTracking response - Status: %ld", (long)[httpResponse statusCode]]];
         }
-        [self.logger debug:@"🔍 [RillTracking] ===== END RILL TRACKING DEBUG ====="];
+        
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Response JSON: %@", responseJSON]];
         
         if (error && blockError) {
             *blockError = error;

@@ -8,6 +8,7 @@
  */
 
 #import <CloudXCore/CLXBidAdSource.h>
+#import <CloudXCore/CLXEnvironmentConfig.h>
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXSDKConfigPlacement.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
@@ -134,7 +135,7 @@ NS_ASSUME_NONNULL_BEGIN
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
                                                                                   appKey:appKey
-                                                                                     url:@"https://ads.cloudx.io/metrics?a=test"];
+                                                                                     url:[CLXEnvironmentConfig shared].metricsEndpointURL];
     }
     return self;
 }
