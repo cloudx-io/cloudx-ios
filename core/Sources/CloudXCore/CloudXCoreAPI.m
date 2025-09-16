@@ -235,6 +235,7 @@ static CloudXCore *_sharedInstance = nil;
         NSString *metricsEndpointURL = @"https://ads.cloudx.io/metrics?a=test";
         if (config.metricsEndpointURL) {
             metricsEndpointURL = config.metricsEndpointURL;
+            [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsUrlKey];
         }
         _reportingService = [[CLXAdEventReporter alloc] initWithEndpoint:config.eventTrackingURL ?: metricsEndpointURL];
         

@@ -152,6 +152,7 @@
                 }
             }
             [self.logger debug:[NSString stringWithFormat:@"CloudX: geoHeaders response status code: %ld", (long)[httpResponse statusCode]]];
+            [self.logger debug:[NSString stringWithFormat:@"CloudX: geoHeaders response: %@", finalArray]];
             //completion(finalArray, nil);
         }
     }];
@@ -235,8 +236,12 @@
     // Debug logging for Rill tracking parameters
     [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Action: %@, Campaign: %@, EncodedLength: %lu", actionString ?: @"(nil)", campaignId ?: @"(nil)", (unsigned long)(encodedString.length)]];
     
-    //https://tracker-dev.cloudx.io/t/     https://tracker-stage.cloudx.io/t/sdkimp/
-    NSMutableString *urlString = [NSMutableString stringWithString:@"https://tracker-dev.cloudx.io/t/"];
+    NSString * trackingString = @"https://tracker-dev.cloudx.io/t/";
+    
+    if ([[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey]) {
+        trackingString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey];
+    }
+    NSMutableString *urlString = [NSMutableString stringWithString:trackingString];
     [urlString appendString:actionString];
     NSURL *url = [NSURL URLWithString:urlString];
     if (!url) {

@@ -50,6 +50,11 @@
         [resolver saveLoadedBid:auctionId bidId:rillImpressionModel.lastBidResponse.bid.id ?: @""];
     }
     
+    //Set server config
+    if (rillImpressionModel.impModel.sdkConfig) {
+        [resolver setConfig:rillImpressionModel.impModel.sdkConfig];
+    }
+    
     // Build payload using server-driven fields
     NSString *serverDrivenPayload = [resolver buildPayload:auctionId];
     if (serverDrivenPayload && serverDrivenPayload.length > 0) {
