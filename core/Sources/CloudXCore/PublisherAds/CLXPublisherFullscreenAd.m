@@ -98,7 +98,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
                            bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                             reportingService:(id<CLXAdEventReporting>)reportingService
                                     settings:(CLXSettings *)settings
-                                     adType:(NSInteger)adType {
+                                     adType:(NSInteger)adType
+                        environmentConfig:(CLXEnvironmentConfig *)environmentConfig {
     self = [super init];
     if (self) {
         // Set up logging for this fullscreen ad instance
@@ -131,7 +132,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
                                                                                  appKey:appKey
-                                                                                    url:[CLXEnvironmentConfig shared].metricsEndpointURL];
+                                                                                    url:environmentConfig.metricsEndpointURL];
         
         // Configure bid source for ad request management
         BOOL hasCloseButton = placement.hasCloseButton ?: NO;

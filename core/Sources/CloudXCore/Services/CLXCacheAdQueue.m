@@ -74,7 +74,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithMaxCapacity:(NSInteger)maxCapacity
                    reportingService:(id<CLXAdEventReporting>)reportingService
-                        placementID:(NSString *)placementID {
+                        placementID:(NSString *)placementID
+                  environmentConfig:(CLXEnvironmentConfig *)environmentConfig {
     self = [super init];
     if (self) {
         _maxCapacity = maxCapacity;
@@ -90,7 +91,7 @@ NS_ASSUME_NONNULL_BEGIN
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
                                                                                  appKey:appKey
-                                                                                    url:[CLXEnvironmentConfig shared].metricsEndpointURL];
+                                                                                    url:environmentConfig.metricsEndpointURL];
     }
     return self;
 }

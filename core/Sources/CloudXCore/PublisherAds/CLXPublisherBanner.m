@@ -107,7 +107,8 @@ NS_ASSUME_NONNULL_BEGIN
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                          reportingService:(id<CLXAdEventReporting>)reportingService
                               settings:(CLXSettings *)settings
-                                     tmax:(nullable NSNumber *)tmax {
+                                     tmax:(nullable NSNumber *)tmax
+                        environmentConfig:(CLXEnvironmentConfig *)environmentConfig {
     self = [super init];
     if (self) {
         _settings = settings;
@@ -152,7 +153,7 @@ NS_ASSUME_NONNULL_BEGIN
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreBannerSessionIDKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
                                                                                  appKey:appKey
-                                                                                    url:[CLXEnvironmentConfig shared].metricsEndpointURL];
+                                                                                    url:environmentConfig.metricsEndpointURL];
         
         // Initialize bid ad source
         BOOL hasCloseButton = placement.hasCloseButton ?: NO;
