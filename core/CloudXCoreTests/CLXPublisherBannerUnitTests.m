@@ -190,7 +190,8 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                   bidRequestTimeout:kTestTimeout
                                                    reportingService:self.mockReportingService
                                                             settings:self.testSettings
-                                                               tmax:@30];
+                                                               tmax:@30
+                                                  environmentConfig:[CLXEnvironmentConfig shared]];
 }
 
 - (void)tearDown {
@@ -235,7 +236,8 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                                        bidRequestTimeout:kTestTimeout
                                                                         reportingService:self.mockReportingService
                                                                                  settings:self.testSettings
-                                                                                    tmax:@30];
+                                                                                    tmax:@30
+                                                                       environmentConfig:[CLXEnvironmentConfig shared]];
     
     XCTAssertEqual(customBanner.refreshSeconds, customInterval, @"Refresh interval should match custom placement config");
     [customBanner destroy];

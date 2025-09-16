@@ -558,7 +558,8 @@ static CloudXCore *_sharedInstance = nil;
                                                               bidRequestTimeout:3.0
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
-                                                                           tmax:tmax];
+                                                                           tmax:tmax
+                                                              environmentConfig:[CLXEnvironmentConfig shared]];
     
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeW320H50 delegate:delegate];
 }
@@ -602,7 +603,8 @@ static CloudXCore *_sharedInstance = nil;
                                                               bidRequestTimeout:3.0
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
-                                                                           tmax:nil];
+                                                                           tmax:nil
+                                                              environmentConfig:[CLXEnvironmentConfig shared]];
     
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeMREC delegate:delegate];
 }
@@ -644,7 +646,8 @@ static CloudXCore *_sharedInstance = nil;
         bidRequestTimeout:3.0
         reportingService:_reportingService
         settings:[CLXSettings sharedInstance]
-        adType:CLXAdTypeInterstitial];
+        adType:CLXAdTypeInterstitial
+        environmentConfig:[CLXEnvironmentConfig shared]];
     
     return interstitial;
 }
@@ -686,7 +689,8 @@ static CloudXCore *_sharedInstance = nil;
         bidRequestTimeout:3.0
         reportingService:_reportingService
         settings:[CLXSettings sharedInstance]
-        adType:CLXAdTypeRewarded];
+        adType:CLXAdTypeRewarded
+        environmentConfig:[CLXEnvironmentConfig shared]];
     
     return rewarded;
 }

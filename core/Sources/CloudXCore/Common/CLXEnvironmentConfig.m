@@ -161,13 +161,12 @@ static NSString *const kCLXDebugEnvironmentKey = @"CLXDebugEnvironment";
 
 + (void)setDebugEnvironment:(NSString *)environment {
 #ifdef DEBUG
-    if ([environment isEqualToString:@"dev"] || [environment isEqualToString:@"staging"]) {
-        [[NSUserDefaults standardUserDefaults] setObject:environment forKey:kCLXDebugEnvironmentKey];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        
-        // Force re-initialization of shared instance
-        [[CLXEnvironmentConfig shared] selectEnvironmentConfiguration];
-    }
+    // Store the environment preference (even if invalid)
+    [[NSUserDefaults standardUserDefaults] setObject:environment forKey:kCLXDebugEnvironmentKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    // Force re-initialization of shared instance to pick up the change
+    [[CLXEnvironmentConfig shared] selectEnvironmentConfiguration];
 #endif
 }
 
