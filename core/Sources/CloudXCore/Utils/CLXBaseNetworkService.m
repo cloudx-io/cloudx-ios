@@ -119,7 +119,7 @@
             if (self.currentRetryCount < maxRetries) {
                 self.currentRetryCount++;
                 [self.logger debug:[NSString stringWithFormat:@"🔄 [BaseNetworkService] Retrying request (attempt %ld)", (long)self.currentRetryCount]];
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(localDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(localDelay * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
                     [self executeRequestWithEndpoint:endpoint
                                        urlParameters:urlParameters
                                          requestBody:requestBody
