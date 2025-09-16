@@ -12,7 +12,6 @@
 #import <CloudXCore/CLXLogger.h>
 
 @interface CLXBaseNetworkService ()
-@property (nonatomic, assign) NSInteger currentRetryCount;
 @property (nonatomic, strong) CLXLogger *logger;
 @end
 
@@ -29,7 +28,6 @@
     if (self) {
         _baseURL = [baseURL copy];
         _urlSession = urlSession;
-        _currentRetryCount = 0;
         _logger = [[CLXLogger alloc] initWithCategory:@"BaseNetworkService"];
     }
     return self;
@@ -61,6 +59,40 @@
                          headers:(nullable NSDictionary *)headers
                       maxRetries:(NSInteger)maxRetries
                           delay:(NSTimeInterval)delay
+                     completion:(void (^)(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled))completion {
+    [self executeRequestWithEndpoint:endpoint
+                      urlParameters:urlParameters
+                        requestBody:requestBody
+                            headers:headers
+                         maxRetries:maxRetries
+                             delay:delay
+                      currentAttempt:0
+                         completion:completion];
+}
+
+/**
+ * @brief Internal method that executes a network request with per-request retry tracking
+ * 
+ * Uses per-request retry state instead of shared instance variables to eliminate race conditions.
+ * This prevents concurrent requests from corrupting each other's retry counts, ensuring thread-safe
+ * operation when multiple network requests are executing simultaneously.
+ * 
+ * @param endpoint The API endpoint to call
+ * @param urlParameters Dictionary of URL parameters
+ * @param requestBody The request body data
+ * @param headers Dictionary of request headers
+ * @param maxRetries Maximum number of retry attempts
+ * @param delay Delay between retry attempts in seconds
+ * @param currentAttempt Current attempt number (0 = initial request)
+ * @param completion Completion handler called with the response or error
+ */
+- (void)executeRequestWithEndpoint:(NSString *)endpoint
+                    urlParameters:(nullable NSDictionary *)urlParameters
+                     requestBody:(nullable NSData *)requestBody
+                         headers:(nullable NSDictionary *)headers
+                      maxRetries:(NSInteger)maxRetries
+                          delay:(NSTimeInterval)delay
+                    currentAttempt:(NSInteger)currentAttempt
                      completion:(void (^)(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled))completion {
     
     [self.logger debug:[NSString stringWithFormat:@"🔧 [BaseNetworkService] executeRequestWithEndpoint - Endpoint: %@, Retries: %ld", endpoint, (long)maxRetries]];
@@ -110,15 +142,15 @@
         [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP response - Status: %ld", (long)httpResponse.statusCode]];
         
         if ((httpResponse.statusCode >= 500 && httpResponse.statusCode < 600) || (httpResponse.statusCode == 429)) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Network request failed - Error: %@, Retry: %ld/%ld", error.localizedDescription, (long)self.currentRetryCount, (long)maxRetries]];
+            [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Network request failed - Error: %@, Attempt: %ld/%ld", error.localizedDescription, (long)(currentAttempt + 1), (long)(maxRetries + 1)]];
             NSTimeInterval localDelay = delay;
             if (httpResponse.statusCode == 429) {
                 int remoteDelay = [[httpResponse.allHeaderFields objectForKey:@"Retry-After"] intValue];
                 localDelay = remoteDelay;
             }
-            if (self.currentRetryCount < maxRetries) {
-                self.currentRetryCount++;
-                [self.logger debug:[NSString stringWithFormat:@"🔄 [BaseNetworkService] Retrying request (attempt %ld)", (long)self.currentRetryCount]];
+            if (currentAttempt < maxRetries) {
+                NSInteger nextAttempt = currentAttempt + 1;
+                [self.logger debug:[NSString stringWithFormat:@"🔄 [BaseNetworkService] Retrying request (attempt %ld)", (long)(nextAttempt + 1)]];
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(localDelay * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
                     [self executeRequestWithEndpoint:endpoint
                                        urlParameters:urlParameters
@@ -126,11 +158,11 @@
                                              headers:headers
                                           maxRetries:maxRetries
                                                delay:delay
+                                       currentAttempt:nextAttempt
                                           completion:completion];
                 });
             } else {
                 [self.logger error:@"❌ [BaseNetworkService] Max retries reached, calling completion with error"];
-                self.currentRetryCount = 0;
                 if (completion) {
                     completion(nil, error, isKillSwitchEnabled);
                 }
