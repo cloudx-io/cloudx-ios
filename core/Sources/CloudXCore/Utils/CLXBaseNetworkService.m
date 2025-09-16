@@ -139,33 +139,60 @@
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
         
         // Log HTTP status code
-        [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP response - Status: %ld", (long)httpResponse.statusCode]];
+        if (httpResponse) {
+            [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP response - Status: %ld", (long)httpResponse.statusCode]];
+        } else {
+            [self.logger debug:@"📊 [BaseNetworkService] No HTTP response (network/timeout error)"];
+        }
         
-        if ((httpResponse.statusCode >= 500 && httpResponse.statusCode < 600) || (httpResponse.statusCode == 429)) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Network request failed - Error: %@, Attempt: %ld/%ld", error.localizedDescription, (long)(currentAttempt + 1), (long)(maxRetries + 1)]];
-            NSTimeInterval localDelay = delay;
+        // Check for retryable conditions per V1 spec
+        BOOL shouldRetry = NO;
+        NSTimeInterval retryDelay = delay;
+        
+        if (error != nil && (!httpResponse || [self isNetworkTimeoutError:error])) {
+            // Network/timeout errors: retry once after 1s delay
+            [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Network/timeout error - Error: %@, Attempt: %ld/%ld", error.localizedDescription, (long)(currentAttempt + 1), (long)(maxRetries + 1)]];
+            shouldRetry = YES;
+            retryDelay = 1.0; // V1 spec: 1-second delay for network errors
+        } else if (httpResponse && ((httpResponse.statusCode >= 500 && httpResponse.statusCode < 600) || httpResponse.statusCode == 429)) {
+            // 5xx server errors or 429 rate limiting
+            [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Server error %ld - Attempt: %ld/%ld", (long)httpResponse.statusCode, (long)(currentAttempt + 1), (long)(maxRetries + 1)]];
+            shouldRetry = YES;
+            
             if (httpResponse.statusCode == 429) {
-                int remoteDelay = [[httpResponse.allHeaderFields objectForKey:@"Retry-After"] intValue];
-                localDelay = remoteDelay;
-            }
-            if (currentAttempt < maxRetries) {
-                NSInteger nextAttempt = currentAttempt + 1;
-                [self.logger debug:[NSString stringWithFormat:@"🔄 [BaseNetworkService] Retrying request (attempt %ld)", (long)(nextAttempt + 1)]];
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(localDelay * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
-                    [self executeRequestWithEndpoint:endpoint
-                                       urlParameters:urlParameters
-                                         requestBody:requestBody
-                                             headers:headers
-                                          maxRetries:maxRetries
-                                               delay:delay
-                                       currentAttempt:nextAttempt
-                                          completion:completion];
-                });
+                // Parse Retry-After header with fallback to 1s
+                NSString *retryAfterHeader = httpResponse.allHeaderFields[@"Retry-After"];
+                NSTimeInterval parsedDelay = [self parseRetryAfterHeader:retryAfterHeader];
+                retryDelay = parsedDelay > 0 ? parsedDelay : 1.0; // V1 spec: default 1s if missing
             } else {
-                [self.logger error:@"❌ [BaseNetworkService] Max retries reached, calling completion with error"];
-                if (completion) {
-                    completion(nil, error, isKillSwitchEnabled);
-                }
+                retryDelay = 1.0; // V1 spec: 1-second delay for 5xx errors
+            }
+        }
+        
+        if (shouldRetry && currentAttempt < maxRetries) {
+            NSInteger nextAttempt = currentAttempt + 1;
+            [self.logger debug:[NSString stringWithFormat:@"🔄 [BaseNetworkService] Retrying request (attempt %ld) after %.1fs delay", (long)(nextAttempt + 1), retryDelay]];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(retryDelay * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+                [self executeRequestWithEndpoint:endpoint
+                                   urlParameters:urlParameters
+                                     requestBody:requestBody
+                                         headers:headers
+                                      maxRetries:maxRetries
+                                           delay:delay
+                                   currentAttempt:nextAttempt
+                                      completion:completion];
+            });
+            return;
+        }
+        
+        // Max retries reached or non-retryable error
+        if (shouldRetry) {
+            [self.logger error:@"❌ [BaseNetworkService] Max retries reached, calling completion with error"];
+        }
+        
+        if (error) {
+            if (completion) {
+                completion(nil, error, isKillSwitchEnabled);
             }
             return;
         }
@@ -217,6 +244,57 @@
     [self.logger debug:@"🔧 [BaseNetworkService] Starting URLSessionDataTask..."];
     [task resume];
     [self.logger info:@"✅ [BaseNetworkService] URLSessionDataTask started"];
+}
+
+#pragma mark - Private Helper Methods
+
+/**
+ * @brief Determines if an error is a network/timeout error that should be retried
+ * @param error The NSError to check
+ * @return YES if this is a retryable network/timeout error
+ */
+- (BOOL)isNetworkTimeoutError:(NSError *)error {
+    if ([error.domain isEqualToString:NSURLErrorDomain]) {
+        return (error.code == NSURLErrorTimedOut ||
+                error.code == NSURLErrorCannotFindHost ||
+                error.code == NSURLErrorCannotConnectToHost ||
+                error.code == NSURLErrorNetworkConnectionLost ||
+                error.code == NSURLErrorNotConnectedToInternet);
+    }
+    return NO;
+}
+
+/**
+ * @brief Parses Retry-After header supporting both seconds and HTTP-date formats
+ * @param retryAfterHeader The Retry-After header value
+ * @return Parsed delay in seconds, or 0 if invalid/missing
+ */
+- (NSTimeInterval)parseRetryAfterHeader:(NSString *)retryAfterHeader {
+    if (!retryAfterHeader || retryAfterHeader.length == 0) {
+        return 0;
+    }
+    
+    // Try parsing as integer seconds first
+    NSInteger seconds = [retryAfterHeader integerValue];
+    if (seconds > 0) {
+        // Clamp to reasonable bounds (V1 spec safety)
+        return MIN(seconds, 60); // Max 60 seconds to avoid long UI blocks
+    }
+    
+    // Try parsing as HTTP-date (RFC 7231)
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    formatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    formatter.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+    formatter.dateFormat = @"EEE, dd MMM yyyy HH:mm:ss z";
+    
+    NSDate *retryDate = [formatter dateFromString:retryAfterHeader];
+    if (retryDate) {
+        NSTimeInterval delay = [retryDate timeIntervalSinceNow];
+        // Clamp to reasonable bounds and ensure positive
+        return MAX(0, MIN(delay, 60));
+    }
+    
+    return 0; // Invalid format
 }
 
 @end 
