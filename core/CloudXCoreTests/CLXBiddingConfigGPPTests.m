@@ -127,7 +127,7 @@
     NSDictionary *json = [config json];
     
     NSString *ifa = json[@"device"][@"ifa"];
-    XCTAssertEqualObjects(ifa, @"00000000000000000000", @"IFA should be set to zeros when privacy requires it");
+    XCTAssertEqualObjects(ifa, @"", @"IFA should be cleared (empty string) when privacy requires data clearing");
 }
 
 // Test geo coordinates are cleared when privacy requires it

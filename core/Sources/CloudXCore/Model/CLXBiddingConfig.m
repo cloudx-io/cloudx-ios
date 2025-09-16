@@ -344,7 +344,8 @@ static void initializeLogger() {
         // Apply privacy-aware data clearing when required
         BOOL shouldClearPersonalData = [privacyService shouldClearPersonalDataWithGPP];
         if (shouldClearPersonalData) {
-            _device.ifa = @"00000000000000000000";
+            // Clear IFA when personal data must be removed
+            _device.ifa = @"";
             
             // Clear geo coordinates but keep UTC offset
             if (_device.geo) {
