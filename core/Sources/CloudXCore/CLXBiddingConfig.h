@@ -142,6 +142,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSNumber *accuracy;
 @property (nonatomic, strong) NSNumber *type;
 @property (nonatomic, strong) NSNumber *utcoffset;
+// Enhanced geo fields for comprehensive location data
+@property (nonatomic, copy, nullable) NSString *country;
+@property (nonatomic, copy, nullable) NSString *region;
+@property (nonatomic, copy, nullable) NSString *city;
+@property (nonatomic, copy, nullable) NSString *zip;
+@property (nonatomic, strong, nullable) NSNumber *metro;
 @end
 
 @interface CLXBiddingConfigDeviceExt : NSObject
