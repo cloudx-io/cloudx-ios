@@ -108,31 +108,29 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     headers[@"Authorization"] = [NSString stringWithFormat:@"Bearer %@", appKey];
     [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Headers: %@", headers]];
     
-    [self.logger debug:@"🔧 [SDKInitNetworkService] Scheduling network request"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self.logger debug:[NSString stringWithFormat:@"🌐 [SDKInitNetworkService] Executing network request - Endpoint: %@", self.endpoint]];
-        
-        // Serialize the JSON dictionary to NSData
-        NSError *jsonError;
-        NSData *requestBodyData = [NSJSONSerialization dataWithJSONObject:request.json options:NSJSONWritingPrettyPrinted error:&jsonError];
-        if (jsonError) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [SDKInitNetworkService] JSON serialization failed: %@", jsonError]];
-            if (completion) {
-                completion(nil, jsonError);
-            }
-            return;
+    [self.logger debug:[NSString stringWithFormat:@"🌐 [SDKInitNetworkService] Executing network request - Endpoint: %@", self.endpoint]];
+    
+    // Serialize the JSON dictionary to NSData
+    NSError *jsonError;
+    NSData *requestBodyData = [NSJSONSerialization dataWithJSONObject:request.json options:NSJSONWritingPrettyPrinted error:&jsonError];
+    if (jsonError) {
+        [self.logger error:[NSString stringWithFormat:@"❌ [SDKInitNetworkService] JSON serialization failed: %@", jsonError]];
+        if (completion) {
+            completion(nil, jsonError);
         }
-        
-        // Debug: Print the request payload
-        NSString *requestPayloadString = [[NSString alloc] initWithData:requestBodyData encoding:NSUTF8StringEncoding];
-        [self.logger debug:[NSString stringWithFormat:@"📋 [SDKInitNetworkService] Request Payload:\n%@", requestPayloadString]];
-        
-        [self executeRequestWithEndpoint:self.endpoint
-                         urlParameters:nil
-                          requestBody:requestBodyData
-                              headers:headers
-                           maxRetries:1
-                               delay:0
+        return;
+    }
+    
+    // Debug: Print the request payload
+    NSString *requestPayloadString = [[NSString alloc] initWithData:requestBodyData encoding:NSUTF8StringEncoding];
+    [self.logger debug:[NSString stringWithFormat:@"📋 [SDKInitNetworkService] Request Payload:\n%@", requestPayloadString]];
+    
+    [self executeRequestWithEndpoint:self.endpoint
+                     urlParameters:nil
+                      requestBody:requestBodyData
+                          headers:headers
+                       maxRetries:1
+                           delay:delay
                           completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
             [self.logger debug:@"📥 [SDKInitNetworkService] Network request completion called"];
             
@@ -162,7 +160,6 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
                 }
             }
         }];
-    });
 }
 
 /**

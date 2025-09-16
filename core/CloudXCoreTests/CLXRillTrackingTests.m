@@ -109,6 +109,10 @@ static MockRillEventReporter *sharedInstance = nil;
 - (instancetype)init {
     self = [super init];
     if (self) {
+        // Set required properties for error tracking
+        self.accountID = kTestAccountID;
+        self.sessionID = kTestSessionID;
+        
         // Use the tracking configuration from the user's init response
         self.testTracking = @[
             @"bid.ext.prebid.meta.adaptercode",
@@ -672,8 +676,14 @@ static MockRillEventReporter *sharedInstance = nil;
     // Given: Mock Rill event reporter is set up
     [MockRillEventReporter reset];
     
-    // Given: SDK is initialized with mock reporter
+    // Given: SDK is initialized with mock reporter and required UserDefaults
     [[CloudXCore shared] setValue:self.mockReporter forKey:@"reportingService"];
+    [[CloudXCore shared] setValue:self.mockConfig forKey:@"sdkConfig"];
+    
+    // Set up required UserDefaults for SDK error tracking
+    [[NSUserDefaults standardUserDefaults] setObject:@"test_encoded_string_for_error_tracking" forKey:kCLXCoreEncodedStringKey];
+    [[NSUserDefaults standardUserDefaults] setObject:kTestAccountID forKey:kCLXCoreAccountIDKey];
+    [[NSUserDefaults standardUserDefaults] setObject:kTestSessionID forKey:kCLXCoreSessionIDKey];
     
     // Given: An exception occurs
     NSException *testException = [NSException exceptionWithName:@"TestException"
@@ -707,8 +717,14 @@ static MockRillEventReporter *sharedInstance = nil;
     // Given: Mock Rill event reporter is set up
     [MockRillEventReporter reset];
     
-    // Given: SDK is initialized with mock reporter
+    // Given: SDK is initialized with mock reporter and required UserDefaults
     [[CloudXCore shared] setValue:self.mockReporter forKey:@"reportingService"];
+    [[CloudXCore shared] setValue:self.mockConfig forKey:@"sdkConfig"];
+    
+    // Set up required UserDefaults for SDK error tracking
+    [[NSUserDefaults standardUserDefaults] setObject:@"test_encoded_string_for_error_tracking" forKey:kCLXCoreEncodedStringKey];
+    [[NSUserDefaults standardUserDefaults] setObject:kTestAccountID forKey:kCLXCoreAccountIDKey];
+    [[NSUserDefaults standardUserDefaults] setObject:kTestSessionID forKey:kCLXCoreSessionIDKey];
     
     // Given: An NSError occurs
     NSError *testError = [NSError errorWithDomain:@"TestErrorDomain"

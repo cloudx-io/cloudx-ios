@@ -160,15 +160,15 @@
     [self.logger info:@"✅ [BidNetworkService] JSON validation successful"];
     
     // Use empty endpoint string like Swift version to avoid double URL
-    [self.logger debug:@"🔧 [BidNetworkService] Starting network request..."];
+    [self.logger debug:@"🔧 [BidNetworkService] Starting auction request with V1 retry policy (maxRetries:1, delay:1.0s)"];
     [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Headers: %@", headers]];
     
     [self.baseNetworkService executeRequestWithEndpoint:@""
                                          urlParameters:nil
                                           requestBody:requestBodyData
                                               headers:headers
-                                           maxRetries:0
-                                               delay:0
+                                           maxRetries:1
+                                               delay:1.0
                                           completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
         [self.logger debug:@"📥 [BidNetworkService] Network request completion called"];
         
@@ -219,12 +219,13 @@
         return;
     }
     
+    [self.logger debug:@"🔧 [BidNetworkService] Starting CDP request with V1 retry policy (maxRetries:1, delay:1.0s)"];
     [self.baseNetworkService executeRequestWithEndpoint:self.cdpEndpoint
                                          urlParameters:nil
                                           requestBody:jsonData
                                               headers:headers
-                                           maxRetries:0
-                                               delay:0
+                                           maxRetries:1
+                                               delay:1.0
                                           completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
         if (completion) {
             completion(response, error);

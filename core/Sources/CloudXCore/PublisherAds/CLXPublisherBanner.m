@@ -609,7 +609,9 @@ NS_ASSUME_NONNULL_BEGIN
                 if (success) {
                     CLXAd *adObject = [CLXAd adFromBid:strongSelf.lastBidResponse.bid placementId:strongSelf.placementID];
                     if (strongSelf.delegate && [strongSelf.delegate respondsToSelector:@selector(revenuePaid:)]) {
-                        [strongSelf.delegate revenuePaid:adObject];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [strongSelf.delegate revenuePaid:adObject];
+                        });
                     }
                 }
             }];
