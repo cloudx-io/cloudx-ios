@@ -94,25 +94,7 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     /// Banner view is nil or invalid
     CLXErrorCodeInvalidBannerView = 503,
     /// Native view is nil or invalid
-    CLXErrorCodeInvalidNativeView = 504,
-    
-    // LEGACY ERROR CODES (for backwards compatibility - using 900+ range to avoid conflicts)
-    /// @deprecated Use CLXErrorCodeLoadFailed instead
-    CLXErrorCodeGeneralAdError = 900,
-    /// @deprecated Use CLXErrorCodeInvalidBannerView instead  
-    CLXErrorCodeBannerViewError = 901,
-    /// @deprecated Use CLXErrorCodeInvalidNativeView instead
-    CLXErrorCodeNativeViewError = 902,
-    /// @deprecated Use CLXErrorCodeNoFill instead
-    CLXErrorCodeNoAdsLoaded = 903,
-    /// @deprecated Use CLXErrorCodeNotInitialized instead
-    CLXErrorCodeFailToInitSDK = 904,
-    /// @deprecated Use CLXErrorCodeInitializationInProgress instead
-    CLXErrorCodeSDKInitialisationInProgress = 905,
-    /// @deprecated Use CLXErrorCodeNoAdaptersFound instead
-    CLXErrorCodeSDKInitializedWithoutAdapters = 906,
-    /// @deprecated Use CLXErrorCodeNotInitialized instead
-    CLXErrorCodeNoBidTokenSource = 907
+    CLXErrorCodeInvalidNativeView = 504
 };
 
 /**

@@ -132,24 +132,6 @@ NSString * const CLXErrorDomain = @"CLXErrorDomain";
         case CLXErrorCodeInvalidNativeView:
             return @"Native view is nil or invalid.";
             
-        // LEGACY ERROR CODES (backwards compatibility)
-        case CLXErrorCodeGeneralAdError:
-            return @"General ad error occurred.";
-        case CLXErrorCodeBannerViewError:
-            return @"Banner view error occurred.";
-        case CLXErrorCodeNativeViewError:
-            return @"Native view error occurred.";
-        case CLXErrorCodeNoAdsLoaded:
-            return @"No ads were loaded.";
-        case CLXErrorCodeFailToInitSDK:
-            return @"Failed to initialize SDK.";
-        case CLXErrorCodeSDKInitialisationInProgress:
-            return @"SDK initialization is already in progress.";
-        case CLXErrorCodeSDKInitializedWithoutAdapters:
-            return @"SDK initialized but no adapters were found.";
-        case CLXErrorCodeNoBidTokenSource:
-            return @"No bid token source available.";
-            
         default:
             return @"Unknown error occurred.";
     }
