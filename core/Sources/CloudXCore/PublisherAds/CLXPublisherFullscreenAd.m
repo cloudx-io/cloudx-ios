@@ -635,7 +635,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
                 // Create CLXAd object and trigger revenue callback
                 CLXAd *adObject = [CLXAd adFromBid:strongSelf.lastBidResponse.bid placementId:strongSelf.placementID];
                 if (strongSelf.interstitialDelegate && [strongSelf.interstitialDelegate respondsToSelector:@selector(revenuePaid:)]) {
-                    [strongSelf.interstitialDelegate revenuePaid:adObject];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [strongSelf.interstitialDelegate revenuePaid:adObject];
+                    });
                 }
             }
         }];
@@ -779,7 +781,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
                 // Create CLXAd object and trigger revenue callback
                 CLXAd *adObject = [CLXAd adFromBid:strongSelf.lastBidResponse.bid placementId:strongSelf.placementID];
                 if (strongSelf.rewardedDelegate && [strongSelf.rewardedDelegate respondsToSelector:@selector(revenuePaid:)]) {
-                    [strongSelf.rewardedDelegate revenuePaid:adObject];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [strongSelf.rewardedDelegate revenuePaid:adObject];
+                    });
                 }
             }
         }];

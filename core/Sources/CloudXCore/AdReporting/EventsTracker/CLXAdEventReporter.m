@@ -62,9 +62,7 @@
         __strong typeof(weakSelf) strongSelf = weakSelf;
         if (!strongSelf) {
             if (completion) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    completion(NO, nil);
-                });
+                completion(NO, nil);
             }
             return;
         }
@@ -80,11 +78,9 @@
                 [strongSelf.logger error:[NSString stringWithFormat:@"❌ Failed to fire NURL for revenue callback: %@", error.localizedDescription ?: @"Unknown error"]];
             }
             
-            // Call completion on main queue - let the caller handle the revenue callback
+            // Call completion - caller will handle threading for revenue callback
             if (completion) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    completion(success, nil); // Ad will be created by the caller
-                });
+                completion(success, nil); // Ad will be created by the caller
             }
         }];
     });

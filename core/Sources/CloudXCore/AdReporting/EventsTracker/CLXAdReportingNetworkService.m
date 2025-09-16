@@ -104,9 +104,7 @@
         }
         
         if (completion) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion(success, networkError);
-            });
+            completion(success, networkError);
         }
     }];
     [task resume];
