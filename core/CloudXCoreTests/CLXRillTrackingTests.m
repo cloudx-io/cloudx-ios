@@ -771,6 +771,23 @@ static MockRillEventReporter *sharedInstance = nil;
 
 #pragma mark - Payload Validation Tests
 
+// Test that bidder field is correctly resolved using direct JSON access
+- (void)testBidderFieldResolution_ShouldUseDirectJSONAccess {
+    // Given: Test data with Meta bidder
+    [self setupTestData];
+    
+    // When: Build payload with bidder field resolution
+    NSString *payload = [self.resolver buildPayload:kTestAuctionID];
+    
+    // Then: Should start with "meta" (first field in tracking config)
+    XCTAssertNotNil(payload, @"Payload should not be nil");
+    XCTAssertTrue([payload hasPrefix:@"meta;"], @"Payload should start with 'meta;' from direct JSON access");
+    
+    // Verify no corruption occurred (old bug would show "ext.premeta.adaptercode")
+    XCTAssertFalse([payload containsString:@"premeta"], @"Should not contain corrupted 'premeta' string");
+    XCTAssertFalse([payload containsString:@"ext.premeta.adaptercode"], @"Should not contain corrupted path");
+}
+
 // Test that server-driven payload contains all expected fields
 - (void)testServerDrivenPayload_ShouldContainAllConfiguredFields {
     // Given: Resolver is set up with test data
@@ -790,6 +807,9 @@ static MockRillEventReporter *sharedInstance = nil;
         // Note: The exact format depends on server configuration
         XCTAssertTrue(payload.length > 0, @"Payload should not be empty");
         XCTAssertTrue([payload containsString:kTestAccountID], @"Should contain account ID");
+        
+        // Verify bidder field is correctly resolved (should be "meta" from test data)
+        XCTAssertTrue([payload hasPrefix:@"meta;"], @"Payload should start with bidder 'meta;'");
         
         // Log the payload for debugging
         NSLog(@"Generated payload: %@", payload);
