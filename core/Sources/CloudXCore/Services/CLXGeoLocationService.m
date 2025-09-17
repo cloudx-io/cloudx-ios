@@ -110,4 +110,25 @@
     return isCalifornia;
 }
 
+- (nullable NSString *)countryCode {
+    NSDictionary *geoHeaders = [self geoHeaders];
+    if (!geoHeaders) {
+        [self.logger debug:@"📊 [CLXGeoLocationService] No geo headers - no country code available"];
+        return nil;
+    }
+    
+    // Get cloudfront-viewer-country-iso3 header (matching Android implementation)
+    id countryCodeObj = geoHeaders[@"cloudfront-viewer-country-iso3"];
+    NSString *countryCode = [countryCodeObj isKindOfClass:[NSString class]] ? (NSString *)countryCodeObj : nil;
+    
+    // Handle placeholder values from simulator/development environment
+    if ([countryCode isEqualToString:@"country"] || [countryCode isEqualToString:@"COUNTRY"]) {
+        [self.logger debug:@"📊 [CLXGeoLocationService] Detected placeholder country value, defaulting to USA"];
+        countryCode = @"USA";
+    }
+    
+    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGeoLocationService] Country code: %@", countryCode ?: @"(none)"]];
+    return countryCode;
+}
+
 @end 

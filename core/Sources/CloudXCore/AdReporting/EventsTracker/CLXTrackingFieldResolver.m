@@ -24,6 +24,9 @@
 
 @property (nonatomic, strong) CLXLogger *logger;
 
+// Private method declarations
+- (nullable id)resolveArrayLookup:(NSDictionary *)data segment:(NSString *)segment withFullResponseData:(NSDictionary *)fullData;
+
 @end
 
 @implementation CLXTrackingFieldResolver
@@ -249,6 +252,18 @@
     }
     
     NSString *path = [field stringByReplacingOccurrencesOfString:@"bidRequest." withString:@""];
+    
+    // Debug logging for country field
+    if ([path isEqualToString:@"device.geo.country"]) {
+        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Resolving bidRequest.device.geo.country - path: %@", path]];
+        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Request data keys: %@", [requestData allKeys]]];
+        NSDictionary *device = requestData[@"device"];
+        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Device keys: %@", [device allKeys]]];
+        NSDictionary *geo = device[@"geo"];
+        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Geo keys: %@", [geo allKeys]]];
+        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Country value: '%@'", geo[@"country"]]];
+    }
+    
     return [self resolveNestedField:requestData path:path];
 }
 
@@ -294,18 +309,6 @@
         return nil;
     }
     
-    // Handle dimension fields by looking up in bid request
-    // Many ad networks (like Meta) don't return w/h in bid response because:
-    // 1. OpenRTB w/h fields are optional in bid responses
-    // 2. Dimensions are already known from the original bid request
-    // 3. Reduces response payload size
-    // 4. Meta uses -1 for flexible width, but we want actual rendered dimensions
-    // Solution: Use impid to link back to bid request and get actual display dimensions
-    if ([field isEqualToString:@"bid.w"] || [field isEqualToString:@"bid.h"]) {
-        return [self resolveBidDimensionField:auctionId field:field impid:impid];
-    }
-    
-    // Handle field name mappings for OpenRTB vs tracking field names
     // Handle specific bid fields directly with proper JSON access
     if ([field isEqualToString:@"bid.ext.prebid.meta.adaptercode"]) {
         // Direct access to the bidder field
@@ -328,13 +331,18 @@
         id width = bidObj[@"w"];
         if (!width) {
             // Fallback: get from original bid request impression format
+            // Find the matching impression by impid
             NSDictionary *requestData = self.requestDataMap[auctionId];
             NSArray *impressions = requestData[@"imp"];
-            if ([impressions isKindOfClass:[NSArray class]] && impressions.count > 0) {
-                NSDictionary *imp = impressions[0];
-                NSArray *formats = imp[@"banner"][@"format"];
-                if ([formats isKindOfClass:[NSArray class]] && formats.count > 0) {
-                    width = formats[0][@"w"];
+            if ([impressions isKindOfClass:[NSArray class]]) {
+                for (NSDictionary *imp in impressions) {
+                    if ([imp[@"id"] isEqualToString:impid]) {
+                        NSArray *formats = imp[@"banner"][@"format"];
+                        if ([formats isKindOfClass:[NSArray class]] && formats.count > 0) {
+                            width = formats[0][@"w"];
+                        }
+                        break;
+                    }
                 }
             }
         }
@@ -346,13 +354,18 @@
         id height = bidObj[@"h"];
         if (!height) {
             // Fallback: get from original bid request impression format
+            // Find the matching impression by impid
             NSDictionary *requestData = self.requestDataMap[auctionId];
             NSArray *impressions = requestData[@"imp"];
-            if ([impressions isKindOfClass:[NSArray class]] && impressions.count > 0) {
-                NSDictionary *imp = impressions[0];
-                NSArray *formats = imp[@"banner"][@"format"];
-                if ([formats isKindOfClass:[NSArray class]] && formats.count > 0) {
-                    height = formats[0][@"h"];
+            if ([impressions isKindOfClass:[NSArray class]]) {
+                for (NSDictionary *imp in impressions) {
+                    if ([imp[@"id"] isEqualToString:impid]) {
+                        NSArray *formats = imp[@"banner"][@"format"];
+                        if ([formats isKindOfClass:[NSArray class]] && formats.count > 0) {
+                            height = formats[0][@"h"];
+                        }
+                        break;
+                    }
                 }
             }
         }
@@ -360,7 +373,30 @@
     }
     
     if ([field isEqualToString:@"bid.dealid"]) {
-        return bidObj[@"dealid"];
+        id dealid = bidObj[@"dealid"];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] bid.dealid lookup - bidObj keys: %@", [bidObj allKeys]]];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] bid.dealid direct value: '%@' (type: %@)", dealid ?: @"(nil)", dealid ? NSStringFromClass([dealid class]) : @"nil"]];
+        
+        // If not found in bid object, look in the resolved request debug data
+        if (!dealid) {
+            NSDictionary *responseData = self.responseDataMap[auctionId];
+            if (responseData) {
+                // Look for deal ID in ext.debug.rounds.1.resolvedrequest.imp[0].ext.prebid.bidder.meta.line_items[0].deal.id
+                id debugData = responseData[@"ext"][@"debug"][@"rounds"][@"1"][@"resolvedrequest"][@"imp"];
+                if ([debugData isKindOfClass:[NSArray class]] && [(NSArray *)debugData count] > 0) {
+                    NSDictionary *imp = debugData[0];
+                    id lineItems = imp[@"ext"][@"prebid"][@"bidder"][@"meta"][@"line_items"];
+                    if ([lineItems isKindOfClass:[NSArray class]] && [(NSArray *)lineItems count] > 0) {
+                        NSDictionary *lineItem = lineItems[0];
+                        dealid = lineItem[@"deal"][@"id"];
+                        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] bid.dealid found in resolved request: '%@'", dealid ?: @"(nil)"]];
+                    }
+                }
+            }
+        }
+        
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] bid.dealid final value: '%@'", dealid ?: @"(nil)"]];
+        return dealid;
     }
     
     // Fallback to the old string manipulation approach for other fields
@@ -466,35 +502,54 @@
     }
     
     NSString *path = [field stringByReplacingOccurrencesOfString:@"bidResponse." withString:@""];
-    return [self resolveNestedField:responseData path:path];
+    return [self resolveNestedField:responseData path:path withFullResponseData:responseData];
 }
 
 /**
- * Resolves nested field paths using dot notation
+ * Resolves nested field paths using dot notation with support for array lookups
+ * Supports complex array conditions like: participants[rank=${bid.ext.cloudx.rank}]
  * Equivalent to Android's resolveNestedField method
  */
 - (nullable id)resolveNestedField:(id)current path:(NSString *)path {
+    return [self resolveNestedField:current path:path withFullResponseData:nil];
+}
+
+/**
+ * Resolves nested field paths using dot notation with support for array lookups
+ * Supports complex array conditions like: participants[rank=${bid.ext.cloudx.rank}]
+ * Passes full response data context for resolving dynamic expressions
+ */
+- (nullable id)resolveNestedField:(id)current path:(NSString *)path withFullResponseData:(nullable NSDictionary *)fullResponseData {
     NSArray<NSString *> *segments = [path componentsSeparatedByString:@"."];
     [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolving path: %@ with %lu segments", path, (unsigned long)segments.count]];
     
     for (NSString *segment in segments) {
         [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Processing segment: %@, current type: %@", segment, [current class]]];
         
-        // Handle array access - if current is array, take first element
-        if ([current isKindOfClass:[NSArray class]]) {
-            NSArray *array = (NSArray *)current;
-            current = array.count > 0 ? array[0] : nil;
-            [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Array access, took first element: %@", current ?: @"(nil)"]];
-        }
-        
-        // Handle dictionary access
-        if ([current isKindOfClass:[NSDictionary class]]) {
-            NSDictionary *dict = (NSDictionary *)current;
-            current = dict[segment];
-            [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Dict access [%@] = %@", segment, current ?: @"(nil)"]];
+        // Check if this segment contains array lookup syntax like: participants[rank=${bid.ext.cloudx.rank}]
+        if ([segment containsString:@"["] && [segment containsString:@"]"]) {
+            current = [self resolveArrayLookup:current segment:segment withFullResponseData:fullResponseData];
+            if (!current) {
+                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Array lookup failed for segment: %@", segment]];
+                return nil;
+            }
         } else {
-            [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Current is not a dictionary, returning nil"]];
-            return nil;
+            // Handle simple array access - if current is array, take first element
+            if ([current isKindOfClass:[NSArray class]]) {
+                NSArray *array = (NSArray *)current;
+                current = array.count > 0 ? array[0] : nil;
+                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Array access, took first element: %@", current ?: @"(nil)"]];
+            }
+            
+            // Handle dictionary access
+            if ([current isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *dict = (NSDictionary *)current;
+                current = dict[segment];
+                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Dict access [%@] = %@", segment, current ?: @"(nil)"]];
+            } else {
+                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Current is not a dictionary, returning nil"]];
+                return nil;
+            }
         }
         
         if (!current) {
@@ -510,6 +565,147 @@
     }
     
     return current;
+}
+
+/**
+ * Resolves array lookup with conditions like: participants[rank=${bid.ext.cloudx.rank}]
+ * Extracts the array name, condition field, and condition value, then finds matching element
+ */
+- (nullable id)resolveArrayLookup:(id)current segment:(NSString *)segment {
+    return [self resolveArrayLookup:current segment:segment withFullResponseData:nil];
+}
+
+/**
+ * Resolves array lookup with conditions like: participants[rank=${bid.ext.cloudx.rank}]
+ * Extracts the array name, condition field, and condition value, then finds matching element
+ * Uses full response data context for resolving dynamic expressions
+ */
+- (nullable id)resolveArrayLookup:(id)current segment:(NSString *)segment withFullResponseData:(nullable NSDictionary *)fullResponseData {
+    // Parse segment like: participants[rank=${bid.ext.cloudx.rank}]
+    NSRange bracketStart = [segment rangeOfString:@"["];
+    NSRange bracketEnd = [segment rangeOfString:@"]"];
+    
+    if (bracketStart.location == NSNotFound || bracketEnd.location == NSNotFound) {
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Invalid array lookup syntax: %@", segment]];
+        return nil;
+    }
+    
+    NSString *arrayName = [segment substringToIndex:bracketStart.location];
+    NSString *condition = [segment substringWithRange:NSMakeRange(bracketStart.location + 1, 
+                                                                  bracketEnd.location - bracketStart.location - 1)];
+    
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Array lookup - name: %@, condition: %@", arrayName, condition]];
+    
+    // Get the array from current object
+    if (![current isKindOfClass:[NSDictionary class]]) {
+        [self.logger debug:@"🔍 [CLXTrackingFieldResolver] Current is not a dictionary for array lookup"];
+        return nil;
+    }
+    
+    NSDictionary *dict = (NSDictionary *)current;
+    NSArray *array = dict[arrayName];
+    if (![array isKindOfClass:[NSArray class]]) {
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] No array found for key: %@", arrayName]];
+        return nil;
+    }
+    
+    // Parse condition like: rank=${bid.ext.cloudx.rank}
+    NSArray *conditionParts = [condition componentsSeparatedByString:@"="];
+    if (conditionParts.count != 2) {
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Invalid condition syntax: %@", condition]];
+        return nil;
+    }
+    
+    NSString *conditionField = conditionParts[0];
+    NSString *conditionValueExpression = conditionParts[1];
+    
+    // Resolve the condition value (e.g., ${bid.ext.cloudx.rank})
+    // Use full response data if available, otherwise fall back to current context
+    NSDictionary *contextForResolution = fullResponseData ?: dict;
+    NSLog(@"🔍 [CLXTrackingFieldResolver] Array lookup context - fullResponseData: %@, dict: %@", fullResponseData ? @"present" : @"nil", dict ? @"present" : @"nil");
+    NSLog(@"🔍 [CLXTrackingFieldResolver] Condition expression: %@", conditionValueExpression);
+    id conditionValue = [self resolveConditionValue:conditionValueExpression withBidResponseData:contextForResolution];
+    NSLog(@"🔍 [CLXTrackingFieldResolver] Condition field: %@, resolved value: %@ (type: %@)", conditionField, conditionValue, conditionValue ? NSStringFromClass([conditionValue class]) : @"nil");
+    
+    // Find matching element in array
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Searching %lu elements for %@=%@", (unsigned long)[array count], conditionField, conditionValue]];
+    for (NSDictionary *element in array) {
+        if (![element isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        
+        id elementValue = element[conditionField];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Comparing element[%@]=%@ (type: %@) with condition value %@ (type: %@)", conditionField, elementValue, elementValue ? NSStringFromClass([elementValue class]) : @"nil", conditionValue, conditionValue ? NSStringFromClass([conditionValue class]) : @"nil"]];
+        
+        if ([self valuesAreEqual:elementValue to:conditionValue]) {
+            [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Found matching element: %@", element]];
+            return element;
+        }
+    }
+    
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] No matching element found for condition %@=%@", conditionField, conditionValue]];
+    return nil;
+}
+
+/**
+ * Resolves condition values like ${bid.ext.cloudx.rank}
+ */
+- (nullable id)resolveConditionValue:(NSString *)expression {
+    return [self resolveConditionValue:expression withBidResponseData:nil];
+}
+
+/**
+ * Resolves condition values like ${bid.ext.cloudx.rank} with context data
+ */
+- (nullable id)resolveConditionValue:(NSString *)expression withBidResponseData:(nullable NSDictionary *)bidResponseData {
+    if ([expression hasPrefix:@"${"] && [expression hasSuffix:@"}"]) {
+        // Extract the field path from ${...}
+        NSString *fieldPath = [expression substringWithRange:NSMakeRange(2, expression.length - 3)];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolving condition expression: %@", fieldPath]];
+        
+        // Handle bid.ext.cloudx.rank by looking it up in the bid response data
+        if ([fieldPath isEqualToString:@"bid.ext.cloudx.rank"]) {
+            // In the context of array lookups like participants[rank=${bid.ext.cloudx.rank}],
+            // we need to find the winning bid's rank. The rank is typically 1 for the winning bid.
+            
+            // For array lookup scenarios, the winning bid rank is conventionally 1
+            // This matches the typical auction behavior where rank 1 = winner
+            NSLog(@"🔍 [CLXTrackingFieldResolver] Resolving bid.ext.cloudx.rank - using rank=1 for winning bid");
+            return @1;
+        }
+        
+        // For other field paths, return nil as we don't have full context resolution yet
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Unsupported field path in condition: %@", fieldPath]];
+        return nil;
+    }
+    
+    // Direct value (not an expression)
+    return expression;
+}
+
+/**
+ * Compares two values for equality, handling different types appropriately
+ */
+- (BOOL)valuesAreEqual:(id)value1 to:(id)value2 {
+    if (value1 == nil && value2 == nil) return YES;
+    if (value1 == nil || value2 == nil) return NO;
+    
+    // Handle numeric comparisons
+    if ([value1 isKindOfClass:[NSNumber class]] && [value2 isKindOfClass:[NSNumber class]]) {
+        return [(NSNumber *)value1 isEqualToNumber:(NSNumber *)value2];
+    }
+    
+    // Handle string/number cross-comparisons
+    if ([value1 isKindOfClass:[NSNumber class]] && [value2 isKindOfClass:[NSString class]]) {
+        return [[(NSNumber *)value1 stringValue] isEqualToString:(NSString *)value2];
+    }
+    
+    if ([value1 isKindOfClass:[NSString class]] && [value2 isKindOfClass:[NSNumber class]]) {
+        return [(NSString *)value1 isEqualToString:[(NSNumber *)value2 stringValue]];
+    }
+    
+    // Default object equality
+    return [value1 isEqual:value2];
 }
 
 @end

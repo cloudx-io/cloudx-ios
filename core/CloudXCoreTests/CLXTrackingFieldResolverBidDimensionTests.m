@@ -270,6 +270,120 @@
     XCTAssertNil(dealId, @"Deal ID should be nil when field doesn't exist");
 }
 
+/**
+ * Test bid.dealid extraction from debug data
+ * Validates fallback to resolved request debug data when dealid not in bid object
+ */
+- (void)testBidDealId_ShouldExtractFromDebugData {
+    // Given: Bid response with deal ID in debug data structure (like real Meta responses)
+    NSDictionary *bidResponse = @{
+        @"id": self.testAuctionId,
+        @"seatbid": @[@{
+            @"bid": @[@{
+                @"id": self.testBidId,
+                @"impid": self.testImpId,
+                @"price": @99.99
+                // No dealid field in bid object
+            }]
+        }],
+        @"ext": @{
+            @"debug": @{
+                @"rounds": @{
+                    @"1": @{
+                        @"resolvedrequest": @{
+                            @"imp": @[@{
+                                @"id": self.testImpId,
+                                @"ext": @{
+                                    @"prebid": @{
+                                        @"bidder": @{
+                                            @"meta": @{
+                                                @"line_items": @[@{
+                                                    @"id": @"test-line-item-123",
+                                                    @"deal": @{
+                                                        @"id": @"cloudx-usd-YJRQzEHC",
+                                                        @"wseat": @[@"meta"]
+                                                    }
+                                                }]
+                                            }
+                                        }
+                                    }
+                                }
+                            }]
+                        }
+                    }
+                }
+            }
+        }
+    };
+    
+    [self.resolver setResponseData:self.testAuctionId bidResponseJSON:bidResponse];
+    [self.resolver saveLoadedBid:self.testAuctionId bidId:self.testBidId];
+    
+    // When: Resolve bid.dealid field
+    id dealId = [self.resolver resolveBidField:self.testAuctionId field:@"bid.dealid"];
+    
+    // Then: Should extract deal ID from debug data
+    XCTAssertNotNil(dealId, @"Deal ID should be extracted from debug data");
+    XCTAssertEqualObjects(dealId, @"cloudx-usd-YJRQzEHC", @"Should return correct deal ID from debug data");
+}
+
+/**
+ * Test bid.dealid direct extraction from bid object takes precedence
+ * Validates that direct dealid field is preferred over debug data
+ */
+- (void)testBidDealId_DirectFieldTakesPrecedence {
+    // Given: Bid response with deal ID in both bid object and debug data
+    NSDictionary *bidResponse = @{
+        @"id": self.testAuctionId,
+        @"seatbid": @[@{
+            @"bid": @[@{
+                @"id": self.testBidId,
+                @"impid": self.testImpId,
+                @"price": @99.99,
+                @"dealid": @"direct-deal-456"  // Direct field should take precedence
+            }]
+        }],
+        @"ext": @{
+            @"debug": @{
+                @"rounds": @{
+                    @"1": @{
+                        @"resolvedrequest": @{
+                            @"imp": @[@{
+                                @"id": self.testImpId,
+                                @"ext": @{
+                                    @"prebid": @{
+                                        @"bidder": @{
+                                            @"meta": @{
+                                                @"line_items": @[@{
+                                                    @"id": @"test-line-item-123",
+                                                    @"deal": @{
+                                                        @"id": @"debug-deal-789",
+                                                        @"wseat": @[@"meta"]
+                                                    }
+                                                }]
+                                            }
+                                        }
+                                    }
+                                }
+                            }]
+                        }
+                    }
+                }
+            }
+        }
+    };
+    
+    [self.resolver setResponseData:self.testAuctionId bidResponseJSON:bidResponse];
+    [self.resolver saveLoadedBid:self.testAuctionId bidId:self.testBidId];
+    
+    // When: Resolve bid.dealid field
+    id dealId = [self.resolver resolveBidField:self.testAuctionId field:@"bid.dealid"];
+    
+    // Then: Should return direct field value, not debug data value
+    XCTAssertNotNil(dealId, @"Deal ID should be resolved");
+    XCTAssertEqualObjects(dealId, @"direct-deal-456", @"Should prefer direct dealid field over debug data");
+}
+
 #pragma mark - Error Handling Tests
 
 /**

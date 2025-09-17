@@ -28,6 +28,8 @@
 		197994752E7A087B00EBA0A3 /* CLXEnvironmentConfigTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197994742E7A087B00EBA0A3 /* CLXEnvironmentConfigTests.m */; };
 		197994812E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197994802E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m */; };
 		197994822E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1979947F2E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m */; };
+		197994842E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197994832E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m */; };
+		197994862E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197994852E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m */; };
 		19C7247B2E2390420012CFC7 /* CloudXCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C724702E2390420012CFC7 /* CloudXCore.framework */; };
 		19C725472E2390810012CFC7 /* CLXURLProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C7253D2E2390810012CFC7 /* CLXURLProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C725482E2390810012CFC7 /* CLXSessionMetricSpend.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C725392E2390810012CFC7 /* CLXSessionMetricSpend.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -271,6 +273,8 @@
 		197994742E7A087B00EBA0A3 /* CLXEnvironmentConfigTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXEnvironmentConfigTests.m; sourceTree = "<group>"; };
 		1979947F2E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidNetworkServiceHybridTests.m; sourceTree = "<group>"; };
 		197994802E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXTrackingFieldResolverBidDimensionTests.m; sourceTree = "<group>"; };
+		197994832E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSDKInitNetworkServiceTests.m; sourceTree = "<group>"; };
+		197994852E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXTrackingFieldResolverArrayLookupTests.m; sourceTree = "<group>"; };
 		19C724702E2390420012CFC7 /* CloudXCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		19C7247A2E2390420012CFC7 /* CloudXCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		19C7248B2E2390810012CFC7 /* CLXAdapterFactoryResolver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterFactoryResolver.m; sourceTree = "<group>"; };
@@ -545,6 +549,8 @@
 		19C7247E2E2390420012CFC7 /* CloudXCoreTests */ = {
 			isa = PBXGroup;
 			children = (
+				197994852E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m */,
+				197994832E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m */,
 				1979947F2E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m */,
 				197994802E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m */,
 				197994742E7A087B00EBA0A3 /* CLXEnvironmentConfigTests.m */,
@@ -1245,6 +1251,7 @@
 				19D929C32E6644BB00C84DAE /* CLXPublisherBannerIntegrationTests.m in Sources */,
 				19D929C42E6644BB00C84DAE /* CLXPublisherBannerUnitTests.m in Sources */,
 				19D92C392E6A3B8E00C84DAE /* CLXPublisherBannerBasicTests.m in Sources */,
+				197994842E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m in Sources */,
 				19D92C3E2E6A3B8E00C84DAE /* CLXRevenueCallbackEdgeCaseTests.m in Sources */,
 				19D929012E6403E000C84DAE /* CLXPrivacyServiceTests.m in Sources */,
 				19D929022E6403E000C84DAE /* CLXPrivacyIntegrationTests.m in Sources */,
@@ -1271,6 +1278,7 @@
 				197991A72E74B0D600EBA0A3 /* CLXGeoLocationServiceGPPTests.m in Sources */,
 				197993312E772E4700EBA0A3 /* CLXGeoLocationServiceGPPTests.m in Sources */,
 				197994812E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m in Sources */,
+				197994862E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m in Sources */,
 				197994822E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m in Sources */,
 				197991A82E74B0D600EBA0A3 /* CLXGppConsentTests.m in Sources */,
 				197991A92E74B0D600EBA0A3 /* CLXGPPIntegrationTests.m in Sources */,

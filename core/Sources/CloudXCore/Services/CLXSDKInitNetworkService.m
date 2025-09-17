@@ -137,7 +137,8 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
             if (error) {
                 [self.logger error:[NSString stringWithFormat:@"❌ [SDKInitNetworkService] Network request failed: %@", error.localizedDescription]];
                 [self tryInitSDKWithAppKey:appKey completion:completion];
-            } if (isKillSwitchEnabled) {
+                return;
+            } else if (isKillSwitchEnabled) {
                 NSError *sdkDisabledError = [CLXError errorWithCode:CLXErrorCodeSDKDisabled description:@"No response data"];
                 [self.logger error:@"❌ [BidNetworkService] kill switch in on received"];
                 if (completion) completion(nil, sdkDisabledError);
@@ -226,6 +227,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         config.tracking = [trackingArray copy];
         [self.logger info:[NSString stringWithFormat:@"✅ [TRACKING_DEBUG] Parsed %lu tracking fields: %@", (unsigned long)trackingArray.count, trackingArray]];
     } else {
+        config.tracking = nil;  // Explicitly set to nil when missing or malformed
         [self.logger error:@"⚠️ [TRACKING_DEBUG] No tracking array found in SDK init response - Rill tracking may not work properly"];
     }
     
