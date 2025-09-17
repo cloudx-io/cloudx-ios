@@ -62,8 +62,12 @@
             bidder = bidResponse.ext.cloudx.adapterExtras[@"bidder"] ?: bidResponse.ext.cloudx.adapterExtras[@"adapter"];
         }
         
-        // Use placement ID as placement name if no specific name is available
-        placementName = placementId;
+        // Try to get placement name from adapter extras, fallback to placement ID
+        if (bidResponse.ext && bidResponse.ext.cloudx && bidResponse.ext.cloudx.adapterExtras) {
+            placementName = bidResponse.ext.cloudx.adapterExtras[@"placementName"] ?: placementId;
+        } else {
+            placementName = placementId;
+        }
     }
 
     // Only create CLXAd if we have valid bid data AND required fields
@@ -78,5 +82,6 @@
     // Return nil if we don't have valid bid data or required fields
     return nil;
 }
+
 
 @end

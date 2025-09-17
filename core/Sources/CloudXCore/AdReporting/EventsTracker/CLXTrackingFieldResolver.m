@@ -393,6 +393,62 @@
     return [self resolveNestedField:self.configDataMap path:path];
 }
 
+/**
+ * Resolves placement-specific fields using dynamic tagid lookup
+ * Handles syntax like: config.placements[id=${bidRequest.imp.tagid}].name
+ */
+- (nullable id)resolvePlacementField:(NSString *)auctionId field:(NSString *)field {
+    // Extract the field name after the placement lookup
+    NSString *placementFieldName = nil;
+    if ([field hasSuffix:@".name"]) {
+        placementFieldName = @"name";
+    } else if ([field hasSuffix:@".externalId"]) {
+        placementFieldName = @"externalId";
+    } else {
+        [self.logger debug:[NSString stringWithFormat:@"Unknown placement field: %@", field]];
+        return nil;
+    }
+    
+    // Get the tagid from the specific auction's bid request
+    NSDictionary *requestData = self.requestDataMap[auctionId];
+    if (!requestData) {
+        [self.logger debug:[NSString stringWithFormat:@"No request data found for auction: %@", auctionId]];
+        return nil;
+    }
+    
+    NSArray *impressions = requestData[@"imp"];
+    if (![impressions isKindOfClass:[NSArray class]] || impressions.count == 0) {
+        [self.logger debug:[NSString stringWithFormat:@"No impressions found in request for auction: %@", auctionId]];
+        return nil;
+    }
+    
+    // Get tagid from the first impression
+    NSDictionary *firstImp = impressions[0];
+    NSString *tagid = firstImp[@"tagid"];
+    
+    if (!tagid) {
+        [self.logger debug:[NSString stringWithFormat:@"No tagid found in impression for auction: %@", auctionId]];
+        return nil;
+    }
+    
+    // Look up placement data using tagid
+    NSDictionary *placements = self.configDataMap[@"placements"];
+    if (![placements isKindOfClass:[NSDictionary class]]) {
+        [self.logger debug:@"No placements data in config"];
+        return nil;
+    }
+    
+    NSDictionary *placementData = placements[tagid];
+    if (![placementData isKindOfClass:[NSDictionary class]]) {
+        [self.logger debug:[NSString stringWithFormat:@"No placement data found for tagid: %@", tagid]];
+        return nil;
+    }
+    
+    id result = placementData[placementFieldName];
+    [self.logger debug:[NSString stringWithFormat:@"🎯 [PlacementResolver] Auction %@: tagid=%@ → %@=%@", auctionId, tagid, placementFieldName, result ?: @"(nil)"]];
+    return result;
+}
+
 - (nullable id)resolveBidResponseField:(NSString *)auctionId field:(NSString *)field {
     NSDictionary *responseData = self.responseDataMap[auctionId];
     if (!responseData) {
