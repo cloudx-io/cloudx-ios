@@ -207,6 +207,9 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     
     [self.logger debug:@"🔧 [SDKInitNetworkService] Parsing SDK config from response"];
     
+    // 🔍 DEBUG: Print the full SDK init response to examine tracking configuration
+    [self.logger info:[NSString stringWithFormat:@"📋 [SDK_INIT_RESPONSE] Full response: %@", response]];
+    
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     
     // Parse basic fields
@@ -215,6 +218,16 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     config.sessionID = response[@"sessionID"];
     config.preCacheSize = [response[@"preCacheSize"] integerValue];
     config.geoDataEndpointURL = response[@"geoDataEndpointURL"];
+    
+    // Parse tracking array for Rill analytics
+    NSArray *trackingArray = response[@"tracking"];
+    [self.logger info:[NSString stringWithFormat:@"🔍 [TRACKING_DEBUG] Raw tracking from response: %@", trackingArray]];
+    if (trackingArray && [trackingArray isKindOfClass:[NSArray class]]) {
+        config.tracking = [trackingArray copy];
+        [self.logger info:[NSString stringWithFormat:@"✅ [TRACKING_DEBUG] Parsed %lu tracking fields: %@", (unsigned long)trackingArray.count, trackingArray]];
+    } else {
+        [self.logger error:@"⚠️ [TRACKING_DEBUG] No tracking array found in SDK init response - Rill tracking may not work properly"];
+    }
     
     // Parse auction endpoint URL
     NSDictionary *auctionEndpointDict = response[@"auctionEndpointURL"];
@@ -301,12 +314,6 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
             [placements addObject:placement];
         }
         config.placements = [placements copy];
-    }
-    
-    // Parse tracking array
-    NSArray *trackingArray = response[@"tracking"];
-    if (trackingArray && [trackingArray isKindOfClass:[NSArray class]]) {
-        config.tracking = [trackingArray copy];
     }
     
     [self.logger info:[NSString stringWithFormat:@"✅ [SDKInitNetworkService] SDK config parsed - Account: %@, Session: %@, Bidders: %lu, Placements: %lu", config.accountID, config.sessionID, (unsigned long)config.bidders.count, (unsigned long)config.placements.count]];

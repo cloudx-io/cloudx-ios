@@ -255,17 +255,20 @@
 - (nullable id)resolveBidField:(NSString *)auctionId field:(NSString *)field {
     NSString *bidId = self.loadedBidMap[auctionId];
     if (!bidId) {
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] No bidId found for auction: %@", auctionId]];
         return nil;
     }
     
     NSDictionary *responseData = self.responseDataMap[auctionId];
     if (!responseData) {
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] No response data for auction: %@", auctionId]];
         return nil;
     }
     
     // Find the winning bid object in seatbid array
     NSArray *seatbids = responseData[@"seatbid"];
     if (![seatbids isKindOfClass:[NSArray class]]) {
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] No seatbid array found in response"]];
         return nil;
     }
     
@@ -279,6 +282,7 @@
             if ([bid[@"id"] isEqualToString:bidId]) {
                 bidObj = bid;
                 impid = bid[@"impid"];  // 🔗 Get the impression ID
+                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Found bid object for bidId: %@", bidId]];
                 break;
             }
         }
@@ -286,6 +290,7 @@
     }
     
     if (!bidObj) {
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] No bid object found for bidId: %@", bidId]];
         return nil;
     }
     
@@ -301,14 +306,75 @@
     }
     
     // Handle field name mappings for OpenRTB vs tracking field names
-    if ([field isEqualToString:@"bid.creativeId"]) {
-        // Map bid.creativeId to bid.crid (OpenRTB standard field name)
-        return [self resolveNestedField:bidObj path:@"crid"];
+    // Handle specific bid fields directly with proper JSON access
+    if ([field isEqualToString:@"bid.ext.prebid.meta.adaptercode"]) {
+        // Direct access to the bidder field
+        id result = bidObj[@"ext"][@"prebid"][@"meta"][@"adaptercode"];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Direct access to bidder: %@", result ?: @"(nil)"]];
+        return result;
     }
     
-    // Resolve field path within bid object
-    NSString *path = [field stringByReplacingOccurrencesOfString:@"bid." withString:@""];
-    return [self resolveNestedField:bidObj path:path];
+    if ([field isEqualToString:@"bid.creativeId"]) {
+        // Map bid.creativeId to bid.crid (OpenRTB standard field name)
+        return bidObj[@"crid"];
+    }
+    
+    if ([field isEqualToString:@"bid.price"]) {
+        return bidObj[@"price"];
+    }
+    
+    if ([field isEqualToString:@"bid.w"]) {
+        // Get width from bid response or fallback to request data
+        id width = bidObj[@"w"];
+        if (!width) {
+            // Fallback: get from original bid request impression format
+            NSDictionary *requestData = self.requestDataMap[auctionId];
+            NSArray *impressions = requestData[@"imp"];
+            if ([impressions isKindOfClass:[NSArray class]] && impressions.count > 0) {
+                NSDictionary *imp = impressions[0];
+                NSArray *formats = imp[@"banner"][@"format"];
+                if ([formats isKindOfClass:[NSArray class]] && formats.count > 0) {
+                    width = formats[0][@"w"];
+                }
+            }
+        }
+        return width;
+    }
+    
+    if ([field isEqualToString:@"bid.h"]) {
+        // Get height from bid response or fallback to request data
+        id height = bidObj[@"h"];
+        if (!height) {
+            // Fallback: get from original bid request impression format
+            NSDictionary *requestData = self.requestDataMap[auctionId];
+            NSArray *impressions = requestData[@"imp"];
+            if ([impressions isKindOfClass:[NSArray class]] && impressions.count > 0) {
+                NSDictionary *imp = impressions[0];
+                NSArray *formats = imp[@"banner"][@"format"];
+                if ([formats isKindOfClass:[NSArray class]] && formats.count > 0) {
+                    height = formats[0][@"h"];
+                }
+            }
+        }
+        return height;
+    }
+    
+    if ([field isEqualToString:@"bid.dealid"]) {
+        return bidObj[@"dealid"];
+    }
+    
+    // Fallback to the old string manipulation approach for other fields
+    NSString *path;
+    if ([field hasPrefix:@"bid."]) {
+        path = [field substringFromIndex:4]; // Remove "bid." (4 characters)
+    } else {
+        path = field;
+    }
+    
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Fallback path resolution for '%@' -> '%@'", field, path]];
+    id result = [self resolveNestedField:bidObj path:path];
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Result for %@: %@", field, result ?: @"(nil)"]];
+    return result;
 }
 
 /**
@@ -393,62 +459,6 @@
     return [self resolveNestedField:self.configDataMap path:path];
 }
 
-/**
- * Resolves placement-specific fields using dynamic tagid lookup
- * Handles syntax like: config.placements[id=${bidRequest.imp.tagid}].name
- */
-- (nullable id)resolvePlacementField:(NSString *)auctionId field:(NSString *)field {
-    // Extract the field name after the placement lookup
-    NSString *placementFieldName = nil;
-    if ([field hasSuffix:@".name"]) {
-        placementFieldName = @"name";
-    } else if ([field hasSuffix:@".externalId"]) {
-        placementFieldName = @"externalId";
-    } else {
-        [self.logger debug:[NSString stringWithFormat:@"Unknown placement field: %@", field]];
-        return nil;
-    }
-    
-    // Get the tagid from the specific auction's bid request
-    NSDictionary *requestData = self.requestDataMap[auctionId];
-    if (!requestData) {
-        [self.logger debug:[NSString stringWithFormat:@"No request data found for auction: %@", auctionId]];
-        return nil;
-    }
-    
-    NSArray *impressions = requestData[@"imp"];
-    if (![impressions isKindOfClass:[NSArray class]] || impressions.count == 0) {
-        [self.logger debug:[NSString stringWithFormat:@"No impressions found in request for auction: %@", auctionId]];
-        return nil;
-    }
-    
-    // Get tagid from the first impression
-    NSDictionary *firstImp = impressions[0];
-    NSString *tagid = firstImp[@"tagid"];
-    
-    if (!tagid) {
-        [self.logger debug:[NSString stringWithFormat:@"No tagid found in impression for auction: %@", auctionId]];
-        return nil;
-    }
-    
-    // Look up placement data using tagid
-    NSDictionary *placements = self.configDataMap[@"placements"];
-    if (![placements isKindOfClass:[NSDictionary class]]) {
-        [self.logger debug:@"No placements data in config"];
-        return nil;
-    }
-    
-    NSDictionary *placementData = placements[tagid];
-    if (![placementData isKindOfClass:[NSDictionary class]]) {
-        [self.logger debug:[NSString stringWithFormat:@"No placement data found for tagid: %@", tagid]];
-        return nil;
-    }
-    
-    id result = placementData[placementFieldName];
-    [self.logger debug:[NSString stringWithFormat:@"🎯 [PlacementResolver] Auction %@: tagid=%@ → %@=%@", auctionId, tagid, placementFieldName, result ?: @"(nil)"]];
-    return result;
-}
-
 - (nullable id)resolveBidResponseField:(NSString *)auctionId field:(NSString *)field {
     NSDictionary *responseData = self.responseDataMap[auctionId];
     if (!responseData) {
@@ -465,23 +475,30 @@
  */
 - (nullable id)resolveNestedField:(id)current path:(NSString *)path {
     NSArray<NSString *> *segments = [path componentsSeparatedByString:@"."];
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolving path: %@ with %lu segments", path, (unsigned long)segments.count]];
     
     for (NSString *segment in segments) {
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Processing segment: %@, current type: %@", segment, [current class]]];
+        
         // Handle array access - if current is array, take first element
         if ([current isKindOfClass:[NSArray class]]) {
             NSArray *array = (NSArray *)current;
             current = array.count > 0 ? array[0] : nil;
+            [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Array access, took first element: %@", current ?: @"(nil)"]];
         }
         
         // Handle dictionary access
         if ([current isKindOfClass:[NSDictionary class]]) {
             NSDictionary *dict = (NSDictionary *)current;
             current = dict[segment];
+            [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Dict access [%@] = %@", segment, current ?: @"(nil)"]];
         } else {
+            [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Current is not a dictionary, returning nil"]];
             return nil;
         }
         
         if (!current) {
+            [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Current is nil after segment %@, returning nil", segment]];
             return nil;
         }
     }

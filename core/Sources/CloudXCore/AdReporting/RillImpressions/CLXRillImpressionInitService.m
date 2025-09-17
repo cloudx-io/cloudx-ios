@@ -56,7 +56,12 @@
     
     //Set server config
     if (rillImpressionModel.impModel.sdkConfig) {
+        [logger debug:[NSString stringWithFormat:@"🔍 [SDK_CONFIG_DEBUG] SDK config available with %lu tracking fields: %@", 
+                       (unsigned long)rillImpressionModel.impModel.sdkConfig.tracking.count, 
+                       rillImpressionModel.impModel.sdkConfig.tracking]];
         [resolver setConfig:rillImpressionModel.impModel.sdkConfig];
+    } else {
+        [logger debug:@"⚠️ [SDK_CONFIG_DEBUG] No SDK config available in impression model"];
     }
     
     // Build payload using server-driven fields

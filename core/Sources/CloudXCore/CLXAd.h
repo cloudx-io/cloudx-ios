@@ -60,10 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)adFromBid:(id)bid placementId:(NSString *)placementId;
 
 /**
- * Factory method to create CLXAd from bid response data with placement name
- * @param bid The bid response data
- * @param placementId The placement identifier (encoded)
- * @param placementName The human-readable placement name
+ * Factory method to create CLXAd from bid response data with original placement name
  */
 + (instancetype)adFromBid:(id)bid placementId:(NSString *)placementId placementName:(NSString *)placementName;
 

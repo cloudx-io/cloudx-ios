@@ -107,14 +107,19 @@
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
 
-    NSString *placement = [self placementName];
+    // Always preserve the original human-readable placement name for display purposes
+    NSString *originalPlacementName = [self placementName];
     
+    // Use settings placement ID for SDK call if provided, otherwise use original name
+    NSString *placement = originalPlacementName;
     if (_settings.interstitialPlacement.length > 0) {
         placement = _settings.interstitialPlacement;
     }
     
     self.interstitialAd = [[CloudXCore shared] createInterstitialWithPlacement:placement
                                                                         delegate:self];
+    
+    // Note: The interstitial ad will internally preserve the original placement name through our CLXAd factory method updates
     
     if (self.interstitialAd) {
         [self.interstitialAd load];

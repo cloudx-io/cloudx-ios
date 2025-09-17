@@ -59,6 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSTimeInterval refreshSeconds;
 @property (nonatomic, strong) CLXBannerTimerService *timerService;
 @property (nonatomic, copy) NSString *placementID;
+@property (nonatomic, copy) NSString *placementName;
 @property (nonatomic, copy, nullable) NSString *dealID;
 @property (nonatomic, strong) id<CLXAdEventReporting> reportingService;
 @property (nonatomic, strong, nullable) id requestBannerTask;
@@ -120,6 +121,7 @@ NS_ASSUME_NONNULL_BEGIN
         _viewController = viewController;
         _refreshSeconds = (placement.bannerRefreshRateMs ?: 10000) / 1000.0;
         _placementID = [placement.id copy];
+        _placementName = [placement.name copy];
         _dealID = [placement.dealId copy];
         _reportingService = reportingService;
         _impModel = impModel;
@@ -481,7 +483,7 @@ NS_ASSUME_NONNULL_BEGIN
     // Call the publisher delegate immediately upon successful load (industry standard)
     // This follows Google AdMob, AppLovin MAX, IronSource pattern
     if ([self.delegate respondsToSelector:@selector(didLoadWithAd:)]) {
-        [self.delegate didLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+        [self.delegate didLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
     }
 
     // Set manual refresh time to prevent impression fraud through rapid refresh manipulation.
@@ -581,7 +583,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     // Emit error to delegate
     if ([self.delegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-        [self.delegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID] error:delegateError];
+        [self.delegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:delegateError];
     } else {
         [self.logger debug:@"⚠️ [PublisherBanner] Delegate does not respond to failToLoadWithAd:error:"];
     }
@@ -590,7 +592,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)didShowBanner:(id<CLXAdapterBanner>)banner {
     if ([self.delegate respondsToSelector:@selector(didShowWithAd:)]) {
-        [self.delegate didShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+        [self.delegate didShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
     }
 }
 
@@ -626,7 +628,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.rillTrackingService sendImpressionEvent];
     }
     if ([self.delegate respondsToSelector:@selector(impressionOn:)]) {
-        [self.delegate impressionOn:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+        [self.delegate impressionOn:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
     }
 }
 
@@ -636,7 +638,7 @@ NS_ASSUME_NONNULL_BEGIN
     // Send Rill tracking click event
     [self.rillTrackingService sendClickEvent];
     if ([self.delegate respondsToSelector:@selector(didClickWithAd:)]) {
-        [self.delegate didClickWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+        [self.delegate didClickWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
     }
 }
 
@@ -645,7 +647,7 @@ NS_ASSUME_NONNULL_BEGIN
     [self.appSessionService addCloseWithPlacementID:self.placementID latency:1.0];
     self.loadBannerTimesCount = 0;
     if ([self.delegate respondsToSelector:@selector(closedByUserActionWithAd:)]) {
-        CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID];
+        CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
         [self.delegate closedByUserActionWithAd:adObject];
     }
 }
@@ -653,7 +655,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didExpandBanner:(id<CLXAdapterBanner>)banner {
     [self.logger debug:[NSString stringWithFormat:@"[CloudX][Banner] didExpandBanner delegate called for placement: %@", self.placementID]];
     if ([self.delegate respondsToSelector:@selector(didExpandAd:)]) {
-        CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID];
+        CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
         [self.delegate didExpandAd:adObject];
     }
 }
@@ -661,7 +663,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didCollapseBanner:(id<CLXAdapterBanner>)banner {
     [self.logger debug:[NSString stringWithFormat:@"[CloudX][Banner] didCollapseBanner delegate called for placement: %@", self.placementID]];
     if ([self.delegate respondsToSelector:@selector(didCollapseAd:)]) {
-        CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID];
+        CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
         [self.delegate didCollapseAd:adObject];
     }
 }
