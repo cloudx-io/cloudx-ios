@@ -139,17 +139,18 @@
     [headers setObject:self.userAgent ?: @"" forKey:@"User-Agent"];
     
     // Convert bidRequest dictionary to NSData
+    // Validate bid request before JSON serialization
+    if (!bidRequest) {
+        NSError *invalidRequestError = [CLXError errorWithCode:CLXErrorCodeInvalidRequest description:@"Bid request cannot be nil"];
+        [self.logger error:@"❌ [BidNetworkService] Bid request is nil"];
+        if (completion) completion(nil, nil, invalidRequestError);
+        return;
+    }
+    
     NSError *jsonError;
     NSData *requestBodyData = [NSJSONSerialization dataWithJSONObject:bidRequest options:0 error:&jsonError];
     if (jsonError) {
         [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] JSON serialization failed - %@ (Domain: %@, Code: %ld)", jsonError.localizedDescription, jsonError.domain, (long)jsonError.code]];
-        if (completion) completion(nil, nil, jsonError);
-        return;
-    }
-    
-    // JSON valididation error
-    if (jsonError) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] JSON validation failed: %@", jsonError]];
         if (completion) completion(nil, nil, jsonError);
         return;
     }
