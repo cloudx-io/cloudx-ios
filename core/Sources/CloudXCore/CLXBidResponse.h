@@ -115,6 +115,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable CLXBidResponseSeatBid *)parseSeatBidFromDictionary:(NSDictionary *)dictionary;
 + (nullable CLXBidResponseBid *)parseBidFromDictionary:(NSDictionary *)dictionary;
 
+// Marshaling methods for tracking field resolution
+- (NSDictionary *)marshalToJSONDictionary;
++ (NSDictionary *)marshalBidToJSONDictionary:(CLXBidResponseBid *)bid;
+
 @end
 
 NS_ASSUME_NONNULL_END 

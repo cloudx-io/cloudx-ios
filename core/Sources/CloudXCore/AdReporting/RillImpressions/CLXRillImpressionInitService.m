@@ -30,11 +30,15 @@
     CLXTrackingFieldResolver *resolver = [CLXTrackingFieldResolver shared];
     
     // Set up tracking data in resolver
-    NSString *auctionId = rillImpressionModel.impModel.auctionID;
+    // Use actual auction ID from bid response if available, fallback to account ID
+    NSString *auctionId = rillImpressionModel.lastBidResponse.auctionId ?: rillImpressionModel.impModel.auctionID;
     if (!auctionId) {
         [logger debug:@"No auction ID available for server-driven tracking"];
         return @"";
     }
+    
+    [logger debug:[NSString stringWithFormat:@"Using auction ID for tracking: %@ (from %@)", 
+                   auctionId, rillImpressionModel.lastBidResponse.auctionId ? @"bid response" : @"account ID"]];
     
     // Set session data
     [resolver setSessionConstData:rillImpressionModel.impModel.sessionID ?: @""
@@ -59,6 +63,7 @@
     NSString *serverDrivenPayload = [resolver buildPayload:auctionId];
     if (serverDrivenPayload && serverDrivenPayload.length > 0) {
         [logger debug:@"Using server-driven tracking payload"];
+        [logger debug:[NSString stringWithFormat:@"🔍 [PAYLOAD DEBUG] Raw payload before encryption: %@", serverDrivenPayload]];
         return serverDrivenPayload;
     }
     

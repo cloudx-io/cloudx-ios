@@ -111,6 +111,8 @@
     
     NSMutableArray<NSString *> *values = [NSMutableArray array];
     
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [PAYLOAD DEBUG] Building payload for auction: %@ with %lu fields", auctionId, (unsigned long)self.tracking.count]];
+    
     for (NSString *field in self.tracking) {
         id resolvedValue = [self resolveField:auctionId field:field];
         NSString *stringValue = resolvedValue ? [resolvedValue description] : @"";
@@ -268,6 +270,7 @@
     }
     
     NSDictionary *bidObj = nil;
+    NSString *impid = nil;
     for (NSDictionary *seatbid in seatbids) {
         NSArray *bids = seatbid[@"bid"];
         if (![bids isKindOfClass:[NSArray class]]) continue;
@@ -275,6 +278,7 @@
         for (NSDictionary *bid in bids) {
             if ([bid[@"id"] isEqualToString:bidId]) {
                 bidObj = bid;
+                impid = bid[@"impid"];  // 🔗 Get the impression ID
                 break;
             }
         }
@@ -285,9 +289,98 @@
         return nil;
     }
     
+    // Handle dimension fields by looking up in bid request
+    // Many ad networks (like Meta) don't return w/h in bid response because:
+    // 1. OpenRTB w/h fields are optional in bid responses
+    // 2. Dimensions are already known from the original bid request
+    // 3. Reduces response payload size
+    // 4. Meta uses -1 for flexible width, but we want actual rendered dimensions
+    // Solution: Use impid to link back to bid request and get actual display dimensions
+    if ([field isEqualToString:@"bid.w"] || [field isEqualToString:@"bid.h"]) {
+        return [self resolveBidDimensionField:auctionId field:field impid:impid];
+    }
+    
+    // Handle field name mappings for OpenRTB vs tracking field names
+    if ([field isEqualToString:@"bid.creativeId"]) {
+        // Map bid.creativeId to bid.crid (OpenRTB standard field name)
+        return [self resolveNestedField:bidObj path:@"crid"];
+    }
+    
     // Resolve field path within bid object
     NSString *path = [field stringByReplacingOccurrencesOfString:@"bid." withString:@""];
     return [self resolveNestedField:bidObj path:path];
+}
+
+/**
+ * Resolves bid dimension fields (w/h) by looking them up in the original bid request.
+ * 
+ * This is necessary because many ad networks don't include width/height in their bid responses:
+ * - Meta returns w:-1 (flexible width) or omits w/h entirely
+ * - Dimensions are redundant since they're already in the bid request
+ * - This approach gives us the actual rendered dimensions (e.g., 320x50)
+ * 
+ * Process:
+ * 1. Use the winning bid's impid to find the matching impression in bid request
+ * 2. Extract dimensions from imp.banner.format[0].{w,h}
+ * 3. Return the actual display dimensions that were requested and rendered
+ *
+ * @param auctionId The auction identifier to look up request data
+ * @param field The field being resolved ("bid.w" or "bid.h")
+ * @param impid The impression ID from the winning bid response
+ * @return The width or height value from the bid request, or nil if not found
+ */
+- (nullable id)resolveBidDimensionField:(NSString *)auctionId field:(NSString *)field impid:(NSString *)impid {
+    if (!impid) {
+        return nil;
+    }
+    
+    NSDictionary *requestData = self.requestDataMap[auctionId];
+    if (!requestData) {
+        return nil;
+    }
+    
+    // Find the matching impression in the bid request
+    NSArray *impressions = requestData[@"imp"];
+    if (![impressions isKindOfClass:[NSArray class]]) {
+        return nil;
+    }
+    
+    NSDictionary *matchingImp = nil;
+    for (NSDictionary *imp in impressions) {
+        if ([imp[@"id"] isEqualToString:impid]) {
+            matchingImp = imp;
+            break;
+        }
+    }
+    
+    if (!matchingImp) {
+        return nil;
+    }
+    
+    // Get dimensions from banner format
+    NSDictionary *banner = matchingImp[@"banner"];
+    if (![banner isKindOfClass:[NSDictionary class]]) {
+        return nil;
+    }
+    
+    NSArray *formats = banner[@"format"];
+    if (![formats isKindOfClass:[NSArray class]] || formats.count == 0) {
+        return nil;
+    }
+    
+    // Use the first format (primary size)
+    NSDictionary *format = formats[0];
+    if (![format isKindOfClass:[NSDictionary class]]) {
+        return nil;
+    }
+    
+    if ([field isEqualToString:@"bid.w"]) {
+        return format[@"w"];
+    } else if ([field isEqualToString:@"bid.h"]) {
+        return format[@"h"];
+    }
+    
+    return nil;
 }
 
 - (nullable id)resolveConfigField:(NSString *)field {
