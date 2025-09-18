@@ -8,10 +8,9 @@
  */
 
 #import <CloudXCore/CLXCacheAdQueue.h>
-#import <CloudXCore/CLXEnvironmentConfig.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXAdEventReporting.h>
 #import <CloudXCore/CLXAdEventReporter.h>
-#import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXCacheableAd.h>
 #import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXLogger.h>
@@ -74,8 +73,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithMaxCapacity:(NSInteger)maxCapacity
                    reportingService:(id<CLXAdEventReporting>)reportingService
-                        placementID:(NSString *)placementID
-                  environmentConfig:(CLXEnvironmentConfig *)environmentConfig {
+                        placementID:(NSString *)placementID {
     self = [super init];
     if (self) {
         _maxCapacity = maxCapacity;
@@ -89,9 +87,11 @@ NS_ASSUME_NONNULL_BEGIN
         // Get app key from UserDefaults (matching Swift SDK behavior)
         NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey] ?: @"";
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
+        // Use metrics URL from SDK response (stored in user defaults)
+        NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
                                                                                  appKey:appKey
-                                                                                    url:environmentConfig.metricsEndpointURL];
+                                                                                    url:metricsURL];
     }
     return self;
 }

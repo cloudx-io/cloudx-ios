@@ -8,10 +8,9 @@
  */
 
 #import <CloudXCore/CLXBidAdSource.h>
-#import <CloudXCore/CLXEnvironmentConfig.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXSDKConfigPlacement.h>
-#import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXAdNetworkFactories.h>
 #import <CloudXCore/CLXError.h>
@@ -109,7 +108,6 @@ NS_ASSUME_NONNULL_BEGIN
          nativeAdRequirements:(nullable id)nativeAdRequirements
                           tmax:(nullable NSNumber *)tmax
                reportingService:(id<CLXAdEventReporting>)reportingService
-              environmentConfig:(CLXEnvironmentConfig *)environmentConfig
                    createBidAd:(id (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network))createBidAd {
     self = [super init];
     if (self) {
@@ -134,9 +132,11 @@ NS_ASSUME_NONNULL_BEGIN
         // Get app key from UserDefaults (matching Swift SDK behavior)
         NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey] ?: @"";
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
+        // Use metrics URL from SDK response (stored in user defaults)
+        NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
                                                                                   appKey:appKey
-                                                                                     url:environmentConfig.metricsEndpointURL];
+                                                                                     url:metricsURL];
     }
     return self;
 }

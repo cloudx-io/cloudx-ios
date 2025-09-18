@@ -41,8 +41,7 @@
     CLXDIContainer *container = [CLXDIContainer shared];
     [container registerType:[CLXLiveInitService class] instance:self.mockInitService];
     
-    // Register environment config for proper DI
-    [container registerType:[CLXEnvironmentConfig class] instance:[CLXEnvironmentConfig shared]];
+    // Environment config no longer needed - removed in refactoring
     
     // Don't clear UserDefaults in setUp - let tearDown handle cleanup to avoid race conditions
 }

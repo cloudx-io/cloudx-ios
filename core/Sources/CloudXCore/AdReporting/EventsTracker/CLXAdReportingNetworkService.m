@@ -4,7 +4,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXXorEncryption.h>
 #import <CloudXCore/NSString+CLXSemicolon.h>
-#import <CloudXCore/CLXEnvironmentConfig.h>
+#import <CloudXCore/CLXURLProvider.h>
 
 @interface CLXAdReportingNetworkService ()
 @property (nonatomic, strong) CLXBaseNetworkService *baseNetworkService;
@@ -159,8 +159,16 @@
 }
 
 - (void)metricsTrackingWithActionString:(NSString *)actionString error:(NSError **)error {
-    CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
-    NSMutableString *urlString = [NSMutableString stringWithString:env.trackerBulkEndpointURL];
+    // Use metrics URL from SDK response (stored in user defaults)
+    NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey];
+    if (!metricsURL) {
+        [self.logger error:@"❌ [CloudXCore] No metrics URL available - metrics tracking disabled"];
+        if (error) {
+            *error = [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"No metrics URL configured"}];
+        }
+        return;
+    }
+    NSMutableString *urlString = [NSMutableString stringWithString:metricsURL];
     NSURL *fullURL = [NSURL URLWithString:urlString];
     if (!fullURL) {
         [self.logger error:[NSString stringWithFormat:@"CloudX: can't parse metricsTracking to URL: %@", urlString]];
@@ -232,17 +240,35 @@
                     encodedString:(NSString *)encodedString
                             error:(NSError **)error
 {
-    // Debug logging for Rill tracking parameters
-    CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Environment: %@, Action: %@, Campaign: %@, EncodedLength: %lu", env.environmentName, actionString ?: @"(nil)", campaignId ?: @"(nil)", (unsigned long)(encodedString.length)]];
+    // Debug logging for Rill tracking parameters  
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Environment: %@, Action: %@, Campaign: %@, EncodedLength: %lu", [CLXURLProvider environmentName], actionString ?: @"(nil)", campaignId ?: @"(nil)", (unsigned long)(encodedString.length)]];
     
-    NSString *trackingString = env.trackerRillBaseURL;
+    // Use impression tracker URL from SDK response for Rill tracking
+    NSString *trackingString = nil;
     
-    // Allow override via user defaults for testing
+    // Allow override via user defaults for testing (existing behavior)
     if ([[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey]) {
         trackingString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey];
+    } else {
+        // Use impression tracker URL for Rill tracking, fallback to metrics URL
+        trackingString = [[NSUserDefaults standardUserDefaults] stringForKey:@"CLXCore_impressionTrackerUrl"];
+        if (!trackingString) {
+            trackingString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey];
+        }
+    }
+    
+    if (!trackingString) {
+        [self.logger error:@"❌ [CloudXCore] No tracking URL available - Rill tracking disabled"];
+        if (error) {
+            *error = [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"No tracking URL configured"}];
+        }
+        return;
     }
     NSMutableString *urlString = [NSMutableString stringWithString:trackingString];
+    // Ensure trailing slash for proper path construction (server gives us "/t" but we need "/t/")
+    if (![urlString hasSuffix:@"/"]) {
+        [urlString appendString:@"/"];
+    }
     [urlString appendString:actionString];
     NSURL *url = [NSURL URLWithString:urlString];
     if (!url) {

@@ -4,7 +4,7 @@
 #import <CloudXCore/URLSession+CLX.h>
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXAdDelegate.h>
-#import <CloudXCore/CLXEnvironmentConfig.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 
 @interface CLXAdEventReporter ()
 @property (nonatomic, strong) CLXAdReportingNetworkService *reportNetworkService;
@@ -16,8 +16,9 @@
 - (instancetype)initWithEndpoint:(NSString *)endpoint {
     self = [super init];
     if (self) {
-        CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
-        NSString *endpointString = endpoint.length > 0 ? endpoint : env.eventTrackingEndpointURL;
+        // Use provided endpoint or fallback to stored event tracking URL from SDK response
+        NSString *fallbackURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @"";
+        NSString *endpointString = endpoint.length > 0 ? endpoint : fallbackURL;
         NSURL *endpointURL = [NSURL URLWithString:endpointString];
         NSURLSession *urlSession = [NSURLSession cloudxSessionWithIdentifier:@"event"];
         _reportNetworkService = [[CLXAdReportingNetworkService alloc] initWithBaseURL:endpointURL urlSession:urlSession];

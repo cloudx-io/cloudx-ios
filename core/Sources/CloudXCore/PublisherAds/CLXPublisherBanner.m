@@ -30,7 +30,7 @@
 #import <CloudXCore/CLXRillImpressionInitService.h>
 #import <CloudXCore/CLXRillImpressionModel.h>
 #import <CloudXCore/CLXRillTrackingService.h>
-#import <CloudXCore/CLXEnvironmentConfig.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 
 #import <CloudXCore/CLXXorEncryption.h>
 #import <Foundation/Foundation.h>
@@ -108,8 +108,7 @@ NS_ASSUME_NONNULL_BEGIN
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                          reportingService:(id<CLXAdEventReporting>)reportingService
                               settings:(CLXSettings *)settings
-                                     tmax:(nullable NSNumber *)tmax
-                        environmentConfig:(CLXEnvironmentConfig *)environmentConfig {
+                                     tmax:(nullable NSNumber *)tmax {
     self = [super init];
     if (self) {
         _settings = settings;
@@ -153,9 +152,11 @@ NS_ASSUME_NONNULL_BEGIN
         // Initialize app session service (singleton)
         NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreBannerAppKeyKey] ?: @"";
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreBannerSessionIDKey] ?: @"";
+        // Use metrics URL from SDK response (stored in user defaults)
+        NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
                                                                                  appKey:appKey
-                                                                                    url:environmentConfig.metricsEndpointURL];
+                                                                                    url:metricsURL];
         
         // Initialize bid ad source
         BOOL hasCloseButton = placement.hasCloseButton ?: NO;
@@ -172,7 +173,6 @@ NS_ASSUME_NONNULL_BEGIN
                                      nativeAdRequirements:nil
                                                       tmax:tmax
                                            reportingService:_reportingService
-                                          environmentConfig:environmentConfig
                                                createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
             __strong typeof(weakSelf) strongSelf = weakSelf;
             if (!strongSelf) return nil;
