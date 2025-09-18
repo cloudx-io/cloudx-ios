@@ -10,7 +10,7 @@
 #import <CloudXCore/CLXCacheAdService.h>
 #import <CloudXCore/CLXBidAdSource.h>
 #import <CloudXCore/CLXAdEventReporting.h>
-#import <CloudXCore/CLXEnvironmentConfig.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXCacheableAd.h>
 #import <CloudXCore/CLXDestroyable.h>
 #import <CloudXCore/CLXSDKConfigPlacement.h>
@@ -98,8 +98,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                                       maxDelay:waterfallMaxBackOffTime ? waterfallMaxBackOffTime.doubleValue : 60.0];
         _cachedQueue = [[CLXCacheAdQueue alloc] initWithMaxCapacity:cacheSize
                                                 reportingService:reportingService
-                                                     placementID:placement.id
-                                               environmentConfig:[CLXEnvironmentConfig shared]];
+                                                     placementID:placement.id];
         _logger = [[CLXLogger alloc] initWithCategory:@"CacheAdService"];
         _winSuccess = NO;
         _isSuspended = NO;

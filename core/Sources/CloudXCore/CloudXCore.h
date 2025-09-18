@@ -7,7 +7,7 @@
 // Common
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXAdType.h>
-#import <CloudXCore/CLXEnvironmentConfig.h>
+#import <CloudXCore/CLXURLProvider.h>
 
 // Services
 #import <CloudXCore/CLXInitService.h>

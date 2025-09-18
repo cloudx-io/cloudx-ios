@@ -1,7 +1,7 @@
 #import "InitInternalViewController.h"
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXDIContainer.h>
-#import <CloudXCore/CLXEnvironmentConfig.h>
+#import <CloudXCore/CLXURLProvider.h>
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
 
@@ -206,7 +206,7 @@
     
     // Set the debug environment in our centralized config
     if (environment != CLXDemoEnvironmentProduction) {
-        [CLXEnvironmentConfig setDebugEnvironment:environmentKey];
+        [CLXURLProvider setEnvironment:environmentKey];
     }
     
     // Also set the old key for backward compatibility with demo app config
@@ -219,12 +219,10 @@
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"BaseURL: %@", config.baseURL]];
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Environment set to: %@", environmentKey]];
     
-    // Log the actual URLs that will be used from our centralized config
-    CLXEnvironmentConfig *envConfig = [CLXEnvironmentConfig shared];
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔧 Environment Config - %@:", envConfig.environmentName]];
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"  Auction: %@", envConfig.auctionEndpointURL]];
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"  Tracker: %@", envConfig.trackerRillBaseURL]];
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"  Metrics: %@", envConfig.metricsEndpointURL]];
+    // Log the environment and bootstrap URL (other URLs come from SDK response)
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔧 Environment Config - %@:", [CLXURLProvider environmentName]]];
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"  Bootstrap URL: %@", [CLXURLProvider initApiUrl]]];
+    [[DemoAppLogger sharedInstance] logMessage:@"  Other URLs (tracker, metrics, etc.) will come from SDK init response"];
     
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Using standard SDK init with %@ environment", environmentName]];
     

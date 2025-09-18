@@ -115,8 +115,7 @@ NS_ASSUME_NONNULL_BEGIN
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                          reportingService:(id<AdEventReporting>)reportingService
                               settings:(CLXSettings *)settings
-                                     tmax:(nullable NSNumber *)tmax
-                        environmentConfig:(CLXEnvironmentConfig *)environmentConfig;
+                                     tmax:(nullable NSNumber *)tmax;
 
 /**
  * Updates the visibility state of the banner.

@@ -285,17 +285,9 @@ static MockRillEventReporter *sharedInstance = nil;
 // Creates a test CLXConfigImpressionModel
 - (CLXConfigImpressionModel *)createTestImpressionModel {
     CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] 
-                                          initWithSessionID:kTestSessionID
+                                          initWithSDKConfig:self.mockConfig
                                                   auctionID:kTestAuctionID
-                                       impressionTrackerURL:@"https://tracker-dev.cloudx.io/t/"
-                                             organizationID:@"test-org-123"
-                                                  accountID:kTestAccountID
-                                                  sdkConfig:self.mockConfig
-                                              testGroupName:@"RandomTest"
-                                               appKeyValues:@""
-                                                       eids:@""
-                                         placementLoopIndex:@"0"
-                                              userKeyValues:@""];
+                                              testGroupName:@"test-group"];
     return impModel;
 }
 

@@ -76,8 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
                            bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                             reportingService:(id<CLXAdEventReporting>)reportingService
                                     settings:(CLXSettings *)settings
-                                     adType:(NSInteger)adType
-                        environmentConfig:(CLXEnvironmentConfig *)environmentConfig;
+                                     adType:(NSInteger)adType;
 
 @end
 

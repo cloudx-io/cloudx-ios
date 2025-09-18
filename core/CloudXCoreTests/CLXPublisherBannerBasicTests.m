@@ -198,7 +198,7 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
                                                    reportingService:nil
                                                             settings:self.testSettings
                                                                tmax:@30
-                                                  environmentConfig:[CLXEnvironmentConfig shared]];
+];
 }
 
 - (void)tearDown {
