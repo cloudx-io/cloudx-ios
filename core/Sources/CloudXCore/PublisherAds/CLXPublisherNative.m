@@ -122,7 +122,7 @@ NS_ASSUME_NONNULL_BEGIN
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
                                                                                  appKey:appKey
-                                                                                    url:[CLXEnvironmentConfig shared].metricsEndpointURL];
+                                                                                    url:[[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @""];
         
         // Get app key from UserDefaults (matching Swift SDK behavior)
         __weak typeof(self) weakSelf = self;

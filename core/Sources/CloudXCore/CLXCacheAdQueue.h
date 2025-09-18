@@ -68,8 +68,7 @@ typedef NS_ENUM(NSInteger, CacheAdQueueError) {
  */
 - (instancetype)initWithMaxCapacity:(NSInteger)maxCapacity
                    reportingService:(id<AdEventReporting>)reportingService
-                        placementID:(NSString *)placementID
-                  environmentConfig:(CLXEnvironmentConfig *)environmentConfig;
+                        placementID:(NSString *)placementID;
 
 /**
  * Enqueue an ad with price and load timeout

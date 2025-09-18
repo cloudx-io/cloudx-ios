@@ -125,8 +125,8 @@ static CloudXCore *_sharedInstance = nil;
         _isInitialised = NO;
         _abTestValue = (double)arc4random() / UINT32_MAX;
         _abTestName = @"RandomTest";
-        CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
-        _defaultAuctionURL = env.auctionEndpointURL;
+        // Default auction URL now comes from SDK response only
+        _defaultAuctionURL = @"";
         _logsData = [NSDictionary dictionary];
         
         [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] Instance initialized - AB Test: %@ (%.3f), Default URL: %@", _abTestName, _abTestValue, _defaultAuctionURL]];
@@ -234,13 +234,11 @@ static CloudXCore *_sharedInstance = nil;
         }
         [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsDictKey];
 
-        CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
-        NSString *metricsEndpointURL = env.metricsEndpointURL;
-        if (config.metricsEndpointURL) {
-            metricsEndpointURL = config.metricsEndpointURL;
-            [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsUrlKey];
+        // Use SDK response URLs exclusively - no fallbacks
+        if (!config.eventTrackingURL) {
+            [self.logger error:@"❌ [CloudXCore] SDK init missing eventTrackingURL - reporting service will not work"];
         }
-        _reportingService = [[CLXAdEventReporter alloc] initWithEndpoint:config.eventTrackingURL ?: metricsEndpointURL];
+        _reportingService = [[CLXAdEventReporter alloc] initWithEndpoint:config.eventTrackingURL];
         
         NSMutableDictionary *geoHeaders = [NSMutableDictionary dictionary];
         if (config.geoHeaders) {
@@ -251,17 +249,11 @@ static CloudXCore *_sharedInstance = nil;
             [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreGeoHeadersKey];
         }
         
-        CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSessionID:config.sessionID ?: @""
-                                                                                  auctionID:config.accountID ?: @""
-                                                                      impressionTrackerURL:config.impressionTrackerURL ?: @""
-                                                                            organizationID:config.organizationID ?: @""
-                                                                                  accountID:config.accountID ?: @""
-                                                                                  sdkConfig:config
-                                                                              testGroupName:_abTestName ?: @""
-                                                                              appKeyValues:config.keyValuePaths.appKeyValues
-                                                                                     eids: config.keyValuePaths.eids
-                                                                       placementLoopIndex:config.keyValuePaths.placementLoopIndex
-                                                                            userKeyValues:config.keyValuePaths.userKeyValues];
+        // Generate unique auction ID for this impression
+        NSString *auctionID = [[NSUUID UUID] UUIDString];
+        CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:config
+                                                                                      auctionID:auctionID
+                                                                                  testGroupName:_abTestName];
         
         if (config.geoDataEndpointURL) { // @"https://geoip.cloudx.io"
             [self.reportingService geoTrackingWithURLString:config.geoDataEndpointURL extras:geoHeaders];
@@ -357,22 +349,23 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger debug:@"⚠️ [CloudXCore] No ad network initializers found"];
     }
     
-    // Store app key and account ID 
+    // Store app key, account ID, and URLs from SDK response
     [[NSUserDefaults standardUserDefaults] setValue:_appKey forKey:kCLXCoreAppKeyKey];
     [[NSUserDefaults standardUserDefaults] setValue:config.accountID forKey:kCLXCoreAccountIDKey];
+    [[NSUserDefaults standardUserDefaults] setValue:config.metricsEndpointURL forKey:kCLXCoreMetricsUrlKey];
     
-    // Initialize reporting service 
-    CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
-    NSString *metricsEndpointURL = env.metricsEndpointURL;
-    if (config.metricsEndpointURL) {
-        metricsEndpointURL = config.metricsEndpointURL;
+    // Store impression tracker URL for Rill tracking (reuse metrics key for now)
+    if (config.impressionTrackerURL) {
+        // For Rill tracking, use impression tracker URL if available, otherwise use metrics URL
+        [[NSUserDefaults standardUserDefaults] setValue:config.impressionTrackerURL forKey:@"CLXCore_impressionTrackerUrl"];
     }
     
-    // Select endpoints with A/B testing 
-    NSString *auctionEndpointUrl = env.auctionEndpointURL;
+    // Use SDK response URLs exclusively - no fallbacks
+    NSString *auctionEndpointUrl = @"";
     NSString *cdpEndpointUrl = @"";
+    NSString *metricsEndpointURL = config.metricsEndpointURL ?: @"";
     
-    // Check if auction endpoint is a string or object 
+    // Extract auction endpoint URL from SDK response
     if (config.auctionEndpointURL) {
         id auctionValue = [config.auctionEndpointURL value];
         if ([auctionValue isKindOfClass:[NSString class]]) {
@@ -380,11 +373,18 @@ static CloudXCore *_sharedInstance = nil;
         } else if ([auctionValue isKindOfClass:[CLXSDKConfigEndpointObject class]]) {
             auctionEndpointUrl = [self chooseEndpointWithObject:auctionValue value:_abTestValue];
         }
+    } else {
+        [self.logger error:@"❌ [CloudXCore] SDK init missing auctionEndpointURL - auction requests will fail"];
     }
     
-    // Check if CDP endpoint is an object 
+    // Extract CDP endpoint URL from SDK response
     if (config.cdpEndpointURL) {
         cdpEndpointUrl = [self chooseEndpointWithObject:config.cdpEndpointURL value:1.0 - _abTestValue];
+    }
+    
+    // Log missing metrics URL
+    if (!config.metricsEndpointURL) {
+        [self.logger error:@"❌ [CloudXCore] SDK init missing metricsEndpointURL - metrics tracking may not work"];
     }
     
     [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Endpoints - Auction: %@, CDP: %@", auctionEndpointUrl, cdpEndpointUrl]];
@@ -530,18 +530,11 @@ static CloudXCore *_sharedInstance = nil;
         return nil;
     }
     
-    // Create impression model
-    CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSessionID:_sdkConfig.sessionID ?: @""
-                                                                                  auctionID:_sdkConfig.accountID ?: @""
-                                                                      impressionTrackerURL:_sdkConfig.impressionTrackerURL ?: @""
-                                                                            organizationID:_sdkConfig.organizationID ?: @""
-                                                                                  accountID:_sdkConfig.accountID ?: @""
-                                                                                  sdkConfig:_sdkConfig
-                                                                              testGroupName:_abTestName ?: @""
-                                                                              appKeyValues:_sdkConfig.keyValuePaths.appKeyValues
-                                                                                     eids: _sdkConfig.keyValuePaths.eids
-                                                                       placementLoopIndex:_sdkConfig.keyValuePaths.placementLoopIndex
-                                                                            userKeyValues:_sdkConfig.keyValuePaths.userKeyValues];
+    // Generate unique auction ID for this banner impression
+    NSString *auctionID = [[NSUUID UUID] UUIDString];
+    CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
+                                                                                  auctionID:auctionID
+                                                                              testGroupName:_abTestName];
     
     // Create banner using real adNetworkFactories
     CLXPublisherBanner *banner = [[CLXPublisherBanner alloc] initWithViewController:viewController
@@ -559,7 +552,7 @@ static CloudXCore *_sharedInstance = nil;
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
                                                                            tmax:tmax
-                                                              environmentConfig:[CLXEnvironmentConfig shared]];
+                                                              environmentConfig:nil];
     
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeW320H50 delegate:delegate];
 }
@@ -575,18 +568,11 @@ static CloudXCore *_sharedInstance = nil;
         return nil;
     }
     
-    // Create impression model
-    CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSessionID:_sdkConfig.sessionID ?: @""
-                                                                                  auctionID:_sdkConfig.accountID ?: @""
-                                                                  impressionTrackerURL:_sdkConfig.impressionTrackerURL ?: @""
-                                                                        organizationID:_sdkConfig.organizationID ?: @""
-                                                                              accountID:_sdkConfig.accountID ?: @""
-                                                                              sdkConfig:_sdkConfig
-                                                                          testGroupName:_abTestName ?: @""
-                                                                          appKeyValues:_sdkConfig.keyValuePaths.appKeyValues
-                                                                                  eids: _sdkConfig.keyValuePaths.eids
-                                                                    placementLoopIndex:_sdkConfig.keyValuePaths.placementLoopIndex
-                                                                         userKeyValues:_sdkConfig.keyValuePaths.userKeyValues];
+    // Generate unique auction ID for this MREC impression
+    NSString *auctionID = [[NSUUID UUID] UUIDString];
+    CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
+                                                                                  auctionID:auctionID
+                                                                              testGroupName:_abTestName];
     
     // Create banner using real adNetworkFactories
     CLXPublisherBanner *banner = [[CLXPublisherBanner alloc] initWithViewController:viewController
@@ -604,7 +590,7 @@ static CloudXCore *_sharedInstance = nil;
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
                                                                            tmax:nil
-                                                              environmentConfig:[CLXEnvironmentConfig shared]];
+                                                              environmentConfig:nil];
     
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeMREC delegate:delegate];
 }
@@ -619,18 +605,11 @@ static CloudXCore *_sharedInstance = nil;
         return nil;
     }
     
-    // Create impression model
-    CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSessionID:_sdkConfig.sessionID ?: @""
-                                                                                  auctionID:_sdkConfig.accountID ?: @""
-                                                                      impressionTrackerURL:_sdkConfig.impressionTrackerURL ?: @""
-                                                                            organizationID:_sdkConfig.organizationID ?: @""
-                                                                                  accountID:_sdkConfig.accountID ?: @""
-                                                                                  sdkConfig:_sdkConfig
-                                                                              testGroupName:_abTestName ?: @""
-                                                                              appKeyValues:_sdkConfig.keyValuePaths.appKeyValues
-                                                                                     eids: _sdkConfig.keyValuePaths.eids
-                                                                       placementLoopIndex:_sdkConfig.keyValuePaths.placementLoopIndex
-                                                                            userKeyValues:_sdkConfig.keyValuePaths.userKeyValues];
+    // Generate unique auction ID for this interstitial impression
+    NSString *auctionID = [[NSUUID UUID] UUIDString];
+    CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
+                                                                                  auctionID:auctionID
+                                                                              testGroupName:_abTestName];
     
     // Create interstitial with simplified state-based management
     CLXPublisherFullscreenAd *interstitial = [[CLXPublisherFullscreenAd alloc] initWithInterstitialDelegate:delegate
@@ -662,18 +641,11 @@ static CloudXCore *_sharedInstance = nil;
         return nil;
     }
     
-    // Create impression model
-    CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSessionID:_sdkConfig.sessionID ?: @""
-                                                                                  auctionID:_sdkConfig.accountID ?: @""
-                                                                      impressionTrackerURL:_sdkConfig.impressionTrackerURL ?: @""
-                                                                            organizationID:_sdkConfig.organizationID ?: @""
-                                                                                  accountID:_sdkConfig.accountID ?: @""
-                                                                                  sdkConfig:_sdkConfig
-                                                                              testGroupName:_abTestName ?: @""
-                                                                              appKeyValues:_sdkConfig.keyValuePaths.appKeyValues
-                                                                                     eids: _sdkConfig.keyValuePaths.eids
-                                                                       placementLoopIndex:_sdkConfig.keyValuePaths.placementLoopIndex
-                                                                            userKeyValues:_sdkConfig.keyValuePaths.userKeyValues];
+    // Generate unique auction ID for this rewarded impression
+    NSString *auctionID = [[NSUUID UUID] UUIDString];
+    CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
+                                                                                  auctionID:auctionID
+                                                                              testGroupName:_abTestName];
     
     // Create rewarded with simplified state-based management
     CLXPublisherFullscreenAd *rewarded = [[CLXPublisherFullscreenAd alloc] initWithInterstitialDelegate:nil
@@ -705,18 +677,11 @@ static CloudXCore *_sharedInstance = nil;
         return nil;
     }
     
-    // Create impression model
-    CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSessionID:_sdkConfig.sessionID ?: @""
-                                                                                  auctionID:_sdkConfig.accountID ?: @""
-                                                                  impressionTrackerURL:_sdkConfig.impressionTrackerURL ?: @""
-                                                                        organizationID:_sdkConfig.organizationID ?: @""
-                                                                              accountID:_sdkConfig.accountID ?: @""
-                                                                              sdkConfig:_sdkConfig
-                                                                          testGroupName:_abTestName ?: @""
-                                                                          appKeyValues:_sdkConfig.keyValuePaths.appKeyValues
-                                                                                  eids: _sdkConfig.keyValuePaths.eids
-                                                                    placementLoopIndex:_sdkConfig.keyValuePaths.placementLoopIndex
-                                                                         userKeyValues:_sdkConfig.keyValuePaths.userKeyValues];
+    // Generate unique auction ID for this native impression
+    NSString *auctionID = [[NSUUID UUID] UUIDString];
+    CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
+                                                                                  auctionID:auctionID
+                                                                              testGroupName:_abTestName];
     
     // Create native using real adNetworkFactories
     CLXPublisherNative *native = [[CLXPublisherNative alloc] initWithViewController:viewController

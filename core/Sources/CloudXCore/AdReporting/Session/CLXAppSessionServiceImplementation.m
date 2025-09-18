@@ -22,8 +22,9 @@
         // Create URL from string
         NSURL *sessionURL = [NSURL URLWithString:url];
         if (!sessionURL) {
-            CLXEnvironmentConfig *env = [CLXEnvironmentConfig shared];
-            sessionURL = [NSURL URLWithString:env.metricsEndpointURL];
+            // Fallback to stored metrics URL from SDK response
+            NSString *fallbackURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @"";
+            sessionURL = [NSURL URLWithString:fallbackURL];
         }
         
         // Create current session

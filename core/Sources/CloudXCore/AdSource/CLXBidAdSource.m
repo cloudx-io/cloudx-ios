@@ -134,9 +134,11 @@ NS_ASSUME_NONNULL_BEGIN
         // Get app key from UserDefaults (matching Swift SDK behavior)
         NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey] ?: @"";
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
+        // Use metrics URL from SDK response (stored in user defaults)
+        NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @"";
         _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
                                                                                   appKey:appKey
-                                                                                     url:environmentConfig.metricsEndpointURL];
+                                                                                     url:metricsURL];
     }
     return self;
 }

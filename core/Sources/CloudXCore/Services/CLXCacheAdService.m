@@ -98,8 +98,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                                       maxDelay:waterfallMaxBackOffTime ? waterfallMaxBackOffTime.doubleValue : 60.0];
         _cachedQueue = [[CLXCacheAdQueue alloc] initWithMaxCapacity:cacheSize
                                                 reportingService:reportingService
-                                                     placementID:placement.id
-                                               environmentConfig:[CLXEnvironmentConfig shared]];
+                                                     placementID:placement.id];
         _logger = [[CLXLogger alloc] initWithCategory:@"CacheAdService"];
         _winSuccess = NO;
         _isSuspended = NO;

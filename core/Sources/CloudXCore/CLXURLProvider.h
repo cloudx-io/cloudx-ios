@@ -39,6 +39,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (NSString *)metricsApiUrl;
 
+// MARK: - Environment Utilities
+
+/**
+ * Get the current environment name (for logging)
+ * @return Environment name: "development", "staging", or "production"
+ */
++ (NSString *)environmentName;
+
+/**
+ * Set debug environment preference (dev, staging, or production)
+ * Only available in DEBUG builds, ignored in production
+ * @param environment "dev", "staging", or "production"
+ */
++ (void)setEnvironment:(NSString *)environment;
+
 @end
 
 NS_ASSUME_NONNULL_END 

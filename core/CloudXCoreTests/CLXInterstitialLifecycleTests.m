@@ -327,18 +327,16 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     placement.id = kTestPlacementID;
     
     // Create impression model for the test
+    // Create mock SDK config for test
+    CLXSDKConfigResponse *mockConfig = [[CLXSDKConfigResponse alloc] init];
+    mockConfig.sessionID = @"test-session-id";
+    mockConfig.organizationID = @"test-org-id";
+    mockConfig.accountID = @"test-account-id";
+    
     CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] 
-        initWithSessionID:@"test-session-id"
+        initWithSDKConfig:mockConfig
                 auctionID:@"test-auction-id"
-     impressionTrackerURL:@"https://test.tracker.url"
-           organizationID:@"test-org-id"
-                accountID:@"test-account-id"
-                sdkConfig:nil
-            testGroupName:@"test-group"
-             appKeyValues:@""
-                     eids:@""
-       placementLoopIndex:@"0"
-            userKeyValues:@""];
+            testGroupName:@"test-group"];
     
     self.interstitial = [[CLXPublisherFullscreenAd alloc] initWithInterstitialDelegate:self.mockDelegate
                                                                       rewardedDelegate:nil
