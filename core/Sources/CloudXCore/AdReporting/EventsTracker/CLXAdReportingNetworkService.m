@@ -1,3 +1,26 @@
+/*
+ * CloudX Ad Reporting Network Service
+ * 
+ * This service manages multiple tracking systems:
+ * 
+ * 1. SDK PERFORMANCE METRICS:
+ *    - metricsEndpointURL: Tracks SDK performance and session data
+ *    - Method: metricsTrackingWithActionString
+ *    - Status: Active, separate from Rill analytics
+ *    - Data: Encrypted SDK metrics, session info
+ *
+ * 2. RILL ANALYTICS (CURRENT):
+ *    - impressionTrackerURL: Modern analytics system
+ *    - Method: rillTrackingWithActionString
+ *    - Status: Active, primary tracking system
+ *    - Data: Ad events, impressions, clicks, SDK initialization
+ *
+ * 3. REVENUE TRACKING:
+ *    - NURL/LURL: Direct ad network revenue callbacks
+ *    - Methods: trackNUrlWithPrice, trackLUrlWithLUrl
+ *    - Status: Active, fire-and-forget
+ */
+
 #import <CloudXCore/CLXAdReportingNetworkService.h>
 #import <CloudXCore/CLXBaseNetworkService.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
@@ -22,57 +45,6 @@
     return self;
 }
 
-- (void)trackImpressionWithBidID:(NSString *)bidID error:(NSError **)error {
-    // Temporarily disable impression tracking to prevent 404 errors and crashes
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [AdReporting] Impression tracking disabled for bidID: %@", bidID]];
-    
-    // TODO: Re-enable once server endpoint is properly configured
-    /*
-    NSDictionary *urlParameters = @{
-        @"b": bidID,
-        @"t": @"imp"
-    };
-    
-    __block NSError * __autoreleasing *blockError = error;
-    [self.baseNetworkService executeRequestWithEndpoint:@""
-                                         urlParameters:urlParameters
-                                          requestBody:nil
-                                              headers:nil
-                                           maxRetries:3
-                                               delay:1
-                                          completion:^(id _Nullable response, NSError * _Nullable networkError) {
-        if (networkError && blockError) {
-            *blockError = networkError;
-        }
-    }];
-    */
-}
-
-- (void)trackWinWithBidID:(NSString *)bidID error:(NSError **)error {
-    // Temporarily disable win tracking to prevent 404 errors and crashes
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [AdReporting] Win tracking disabled for bidID: %@", bidID]];
-    
-    // TODO: Re-enable once server endpoint is properly configured
-    /*
-    NSDictionary *urlParameters = @{
-        @"t": @"win",
-        @"b": bidID
-    };
-    
-    __block NSError * __autoreleasing *blockError = error;
-    [self.baseNetworkService executeRequestWithEndpoint:@""
-                                         urlParameters:urlParameters
-                                          requestBody:nil
-                                              headers:nil
-                                           maxRetries:3
-                                               delay:1
-                                          completion:^(id _Nullable response, NSError * _Nullable networkError) {
-        if (networkError && blockError) {
-            *blockError = networkError;
-        }
-    }];
-    */
-}
 
 
 - (void)trackNUrlWithPrice:(double)price nUrl:(nullable NSString *)nUrl completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
@@ -162,10 +134,8 @@
     // Use metrics URL from SDK response (stored in user defaults)
     NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey];
     if (!metricsURL) {
-        [self.logger error:@"❌ [CloudXCore] No metrics URL available - metrics tracking disabled"];
-        if (error) {
-            *error = [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"No metrics URL configured"}];
-        }
+        [self.logger debug:@"🔧 [CloudXCore] No metrics URL available - SDK performance metrics tracking disabled"];
+        // Don't treat this as an error since it's handled with fallback in CloudXCoreAPI
         return;
     }
     NSMutableString *urlString = [NSMutableString stringWithString:metricsURL];
@@ -244,23 +214,12 @@
     [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Environment: %@, Action: %@, Campaign: %@, EncodedLength: %lu", [CLXURLProvider environmentName], actionString ?: @"(nil)", campaignId ?: @"(nil)", (unsigned long)(encodedString.length)]];
     
     // Use impression tracker URL from SDK response for Rill tracking
-    NSString *trackingString = nil;
-    
-    // Allow override via user defaults for testing (existing behavior)
-    if ([[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey]) {
-        trackingString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey];
-    } else {
-        // Use impression tracker URL for Rill tracking, fallback to metrics URL
-        trackingString = [[NSUserDefaults standardUserDefaults] stringForKey:@"CLXCore_impressionTrackerUrl"];
-        if (!trackingString) {
-            trackingString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey];
-        }
-    }
+    NSString *trackingString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreImpressionTrackerUrlKey];
     
     if (!trackingString) {
-        [self.logger error:@"❌ [CloudXCore] No tracking URL available - Rill tracking disabled"];
+        [self.logger error:@"⚠️ [CloudXCore] No tracking URL available - Rill analytics disabled"];
         if (error) {
-            *error = [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"No tracking URL configured"}];
+            *error = [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"No Rill tracking URL configured"}];
         }
         return;
     }
@@ -272,7 +231,7 @@
     [urlString appendString:actionString];
     NSURL *url = [NSURL URLWithString:urlString];
     if (!url) {
-        [self.logger error:[NSString stringWithFormat:@"CloudX: can't parse rillTracking to URL: %@", urlString]];
+        [self.logger error:[NSString stringWithFormat:@"❌ [RillTracking] Invalid URL constructed: %@", urlString]];
         [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Invalid URL"}];
         return;
     }

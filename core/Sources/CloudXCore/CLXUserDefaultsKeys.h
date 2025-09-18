@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Metrics and analytics keys
 #define kCLXCoreMetricsDictKey @"CLXCore_metricsDict"
 #define kCLXCoreMetricsUrlKey @"CLXCore_metricsUrl"
+#define kCLXCoreImpressionTrackerUrlKey @"CLXCore_impressionTrackerUrl"
 
 // User data keys
 #define kCLXCoreUserKeyValueKey @"CLXCore_userKeyValue"

@@ -473,8 +473,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
     if (self.lastBidResponse) {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Reporting win for bidID=%@", self.lastBidResponse.bidID]];
-        [self.reportingService winWithBidID:self.lastBidResponse.bidID];
+        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Ad loaded for bidID=%@", self.lastBidResponse.bidID]];
         // Revenue tracking moved to impression callback - don't fire NURL on load
     } else {
         [self.logger debug:@"⚠️ [PublisherBanner] No lastBidResponse to report win"];
@@ -602,7 +601,6 @@ NS_ASSUME_NONNULL_BEGIN
         [self.logger debug:[NSString stringWithFormat:@"[CloudX][Banner] Reporting impression for bidID=%@", self.lastBidResponse.bidID]];
         [self.appSessionService addImpressionWithPlacementID:self.placementID];
         [self.appSessionService addSpendWithPlacementID:self.placementID spend:self.lastBidResponse.price];
-        [self.reportingService impressionWithBidID:self.lastBidResponse.bidID];
         
         // Fire NURL for revenue tracking on impression (industry standard)
         if (self.lastBidResponse.nurl && self.lastBidResponse.nurl.length > 0) {

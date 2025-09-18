@@ -233,11 +233,8 @@ static CloudXCore *_sharedInstance = nil;
         }
         [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsDictKey];
 
-        // Use SDK response URLs exclusively - no fallbacks
-        if (!config.eventTrackingURL) {
-            [self.logger error:@"❌ [CloudXCore] SDK init missing eventTrackingURL - reporting service will not work"];
-        }
-        _reportingService = [[CLXAdEventReporter alloc] initWithEndpoint:config.eventTrackingURL];
+        // Initialize reporting service (no longer uses legacy eventTrackingURL)
+        _reportingService = [[CLXAdEventReporter alloc] initWithEndpoint:nil];
         
         NSMutableDictionary *geoHeaders = [NSMutableDictionary dictionary];
         if (config.geoHeaders) {
@@ -353,10 +350,9 @@ static CloudXCore *_sharedInstance = nil;
     [[NSUserDefaults standardUserDefaults] setValue:config.accountID forKey:kCLXCoreAccountIDKey];
     [[NSUserDefaults standardUserDefaults] setValue:config.metricsEndpointURL forKey:kCLXCoreMetricsUrlKey];
     
-    // Store impression tracker URL for Rill tracking (reuse metrics key for now)
+    // Store impression tracker URL for Rill tracking
     if (config.impressionTrackerURL) {
-        // For Rill tracking, use impression tracker URL if available, otherwise use metrics URL
-        [[NSUserDefaults standardUserDefaults] setValue:config.impressionTrackerURL forKey:@"CLXCore_impressionTrackerUrl"];
+        [[NSUserDefaults standardUserDefaults] setValue:config.impressionTrackerURL forKey:kCLXCoreImpressionTrackerUrlKey];
     }
     
     // Use SDK response URLs exclusively - no fallbacks
@@ -383,7 +379,7 @@ static CloudXCore *_sharedInstance = nil;
     
     // Log missing metrics URL
     if (!config.metricsEndpointURL) {
-        [self.logger error:@"❌ [CloudXCore] SDK init missing metricsEndpointURL - metrics tracking may not work"];
+        [self.logger debug:@"🔧 [CloudXCore] SDK init missing metricsEndpointURL - SDK performance metrics disabled"];
     }
     
     [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Endpoints - Auction: %@, CDP: %@", auctionEndpointUrl, cdpEndpointUrl]];

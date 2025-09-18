@@ -608,7 +608,6 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 - (void)impressionWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
     [self.logger debug:@"🎯 [PublisherFullscreenAd] impressionWithInterstitial called!"];
     self.impressionTime = [NSDate date];
-    [self.reportingService impressionWithBidID:interstitial.bidID];
     [self applyMetrics];
     
     [self.appSessionService addImpressionWithPlacementID:self.placementID];
@@ -764,7 +763,6 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 
 - (void)impressionWithRewarded:(id<CLXAdapterRewarded>)rewarded {
     self.impressionTime = [NSDate date];
-    [self.reportingService impressionWithBidID:rewarded.bidID];
     [self applyMetrics];
     
     [self.appSessionService addImpressionWithPlacementID:self.placementID];

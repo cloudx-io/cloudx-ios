@@ -6,8 +6,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithBaseURL:(NSURL *)baseURL urlSession:(NSURLSession *)urlSession;
 
-- (void)trackImpressionWithBidID:(NSString *)bidID error:(NSError **)error;
-- (void)trackWinWithBidID:(NSString *)bidID error:(NSError **)error;
 - (void)trackNUrlWithPrice:(double)price nUrl:(nullable NSString *)nUrl completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
 - (void)trackLUrlWithLUrl:(nullable NSString *)lUrl;
 - (void)rillTrackingWithActionString:(NSString *)urlString campaignId:(NSString *)campaignId encodedString:(NSString *)encodedString error:(NSError **)error;

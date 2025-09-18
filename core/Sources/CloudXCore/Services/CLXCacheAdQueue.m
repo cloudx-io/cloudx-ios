@@ -141,7 +141,6 @@ NS_ASSUME_NONNULL_BEGIN
         
         // Ad loaded successfully
         NSTimeInterval loadTime = [[NSDate date] timeIntervalSinceDate:startTime];
-        [self.reportingService winWithBidID:bidID];
         [self addQueueItem:[[QueueItem alloc] initWithAd:ad price:price]];
         [self.appSessionService adLoadedWithPlacementID:self.placementID latency:loadTime * 1000];
         
