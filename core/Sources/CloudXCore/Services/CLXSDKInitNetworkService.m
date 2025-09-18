@@ -222,10 +222,8 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     
     // Parse tracking array for Rill analytics
     NSArray *trackingArray = response[@"tracking"];
-    [self.logger info:[NSString stringWithFormat:@"🔍 [TRACKING_DEBUG] Raw tracking from response: %@", trackingArray]];
     if (trackingArray && [trackingArray isKindOfClass:[NSArray class]]) {
         config.tracking = [trackingArray copy];
-        [self.logger info:[NSString stringWithFormat:@"✅ [TRACKING_DEBUG] Parsed %lu tracking fields: %@", (unsigned long)trackingArray.count, trackingArray]];
     } else {
         config.tracking = nil;  // Explicitly set to nil when missing or malformed
         [self.logger error:@"⚠️ [TRACKING_DEBUG] No tracking array found in SDK init response - Rill tracking may not work properly"];
