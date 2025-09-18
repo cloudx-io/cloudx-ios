@@ -26,6 +26,7 @@
 
 // Private method declarations
 - (nullable id)resolveArrayLookup:(NSDictionary *)data segment:(NSString *)segment withFullResponseData:(NSDictionary *)fullData;
+- (nullable id)resolveConditionValue:(NSString *)expression withBidResponseData:(nullable NSDictionary *)bidResponseData auctionId:(nullable NSString *)auctionId;
 
 @end
 
@@ -502,7 +503,7 @@
     }
     
     NSString *path = [field stringByReplacingOccurrencesOfString:@"bidResponse." withString:@""];
-    return [self resolveNestedField:responseData path:path withFullResponseData:responseData];
+    return [self resolveNestedField:responseData path:path withFullResponseData:responseData auctionId:auctionId];
 }
 
 /**
@@ -515,20 +516,19 @@
 }
 
 /**
- * Resolves nested field paths using dot notation with support for array lookups
- * Supports complex array conditions like: participants[rank=${bid.ext.cloudx.rank}]
- * Passes full response data context for resolving dynamic expressions
+ * Resolves nested field paths with auction context
  */
-- (nullable id)resolveNestedField:(id)current path:(NSString *)path withFullResponseData:(nullable NSDictionary *)fullResponseData {
-    NSArray<NSString *> *segments = [path componentsSeparatedByString:@"."];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolving path: %@ with %lu segments", path, (unsigned long)segments.count]];
+- (nullable id)resolveNestedField:(id)current path:(NSString *)path withFullResponseData:(nullable NSDictionary *)fullResponseData auctionId:(nullable NSString *)auctionId {
+    // Smart path splitting that handles array lookup expressions with dots inside
+    NSArray<NSString *> *segments = [self splitPathIntoSegments:path];
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolving path: %@ with %lu segments (auctionId: %@)", path, (unsigned long)segments.count, auctionId ?: @"none"]];
     
     for (NSString *segment in segments) {
         [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Processing segment: %@, current type: %@", segment, [current class]]];
         
         // Check if this segment contains array lookup syntax like: participants[rank=${bid.ext.cloudx.rank}]
         if ([segment containsString:@"["] && [segment containsString:@"]"]) {
-            current = [self resolveArrayLookup:current segment:segment withFullResponseData:fullResponseData];
+            current = [self resolveArrayLookup:current segment:segment withFullResponseData:fullResponseData auctionId:auctionId];
             if (!current) {
                 [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Array lookup failed for segment: %@", segment]];
                 return nil;
@@ -568,6 +568,52 @@
 }
 
 /**
+ * Splits a path into segments while preserving array lookup expressions
+ * Handles cases like: ext.cloudx.auction.participants[rank=${bid.ext.cloudx.rank}].lineItemId
+ */
+- (NSArray<NSString *> *)splitPathIntoSegments:(NSString *)path {
+    NSMutableArray<NSString *> *segments = [NSMutableArray array];
+    NSInteger start = 0;
+    NSInteger bracketDepth = 0;
+    
+    for (NSInteger i = 0; i < path.length; i++) {
+        unichar c = [path characterAtIndex:i];
+        
+        if (c == '[') {
+            bracketDepth++;
+        } else if (c == ']') {
+            bracketDepth--;
+        } else if (c == '.' && bracketDepth == 0) {
+            // Only split on dots that are not inside brackets
+            NSString *segment = [path substringWithRange:NSMakeRange(start, i - start)];
+            if (segment.length > 0) {
+                [segments addObject:segment];
+            }
+            start = i + 1;
+        }
+    }
+    
+    // Add the last segment
+    if (start < path.length) {
+        NSString *segment = [path substringFromIndex:start];
+        if (segment.length > 0) {
+            [segments addObject:segment];
+        }
+    }
+    
+    return [segments copy];
+}
+
+/**
+ * Resolves nested field paths using dot notation with support for array lookups
+ * Supports complex array conditions like: participants[rank=${bid.ext.cloudx.rank}]
+ * Passes full response data context for resolving dynamic expressions
+ */
+- (nullable id)resolveNestedField:(id)current path:(NSString *)path withFullResponseData:(nullable NSDictionary *)fullResponseData {
+    return [self resolveNestedField:current path:path withFullResponseData:fullResponseData auctionId:nil];
+}
+
+/**
  * Resolves array lookup with conditions like: participants[rank=${bid.ext.cloudx.rank}]
  * Extracts the array name, condition field, and condition value, then finds matching element
  */
@@ -576,11 +622,9 @@
 }
 
 /**
- * Resolves array lookup with conditions like: participants[rank=${bid.ext.cloudx.rank}]
- * Extracts the array name, condition field, and condition value, then finds matching element
- * Uses full response data context for resolving dynamic expressions
+ * Resolves array lookup with auction context
  */
-- (nullable id)resolveArrayLookup:(id)current segment:(NSString *)segment withFullResponseData:(nullable NSDictionary *)fullResponseData {
+- (nullable id)resolveArrayLookup:(id)current segment:(NSString *)segment withFullResponseData:(nullable NSDictionary *)fullResponseData auctionId:(nullable NSString *)auctionId {
     // Parse segment like: participants[rank=${bid.ext.cloudx.rank}]
     NSRange bracketStart = [segment rangeOfString:@"["];
     NSRange bracketEnd = [segment rangeOfString:@"]"];
@@ -622,10 +666,10 @@
     // Resolve the condition value (e.g., ${bid.ext.cloudx.rank})
     // Use full response data if available, otherwise fall back to current context
     NSDictionary *contextForResolution = fullResponseData ?: dict;
-    NSLog(@"🔍 [CLXTrackingFieldResolver] Array lookup context - fullResponseData: %@, dict: %@", fullResponseData ? @"present" : @"nil", dict ? @"present" : @"nil");
-    NSLog(@"🔍 [CLXTrackingFieldResolver] Condition expression: %@", conditionValueExpression);
-    id conditionValue = [self resolveConditionValue:conditionValueExpression withBidResponseData:contextForResolution];
-    NSLog(@"🔍 [CLXTrackingFieldResolver] Condition field: %@, resolved value: %@ (type: %@)", conditionField, conditionValue, conditionValue ? NSStringFromClass([conditionValue class]) : @"nil");
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Array lookup context - fullResponseData: %@, dict: %@, auctionId: %@", fullResponseData ? @"present" : @"nil", dict ? @"present" : @"nil", auctionId ?: @"none"]];
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Condition expression: %@", conditionValueExpression]];
+    id conditionValue = [self resolveConditionValue:conditionValueExpression withBidResponseData:contextForResolution auctionId:auctionId];
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Condition field: %@, resolved value: %@ (type: %@)", conditionField, conditionValue, conditionValue ? NSStringFromClass([conditionValue class]) : @"nil"]];
     
     // Find matching element in array
     [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Searching %lu elements for %@=%@", (unsigned long)[array count], conditionField, conditionValue]];
@@ -648,6 +692,15 @@
 }
 
 /**
+ * Resolves array lookup with conditions like: participants[rank=${bid.ext.cloudx.rank}]
+ * Extracts the array name, condition field, and condition value, then finds matching element
+ * Uses full response data context for resolving dynamic expressions
+ */
+- (nullable id)resolveArrayLookup:(id)current segment:(NSString *)segment withFullResponseData:(nullable NSDictionary *)fullResponseData {
+    return [self resolveArrayLookup:current segment:segment withFullResponseData:fullResponseData auctionId:nil];
+}
+
+/**
  * Resolves condition values like ${bid.ext.cloudx.rank}
  */
 - (nullable id)resolveConditionValue:(NSString *)expression {
@@ -655,23 +708,67 @@
 }
 
 /**
- * Resolves condition values like ${bid.ext.cloudx.rank} with context data
+ * Resolves condition values like ${bid.ext.cloudx.rank} with auction context
  */
-- (nullable id)resolveConditionValue:(NSString *)expression withBidResponseData:(nullable NSDictionary *)bidResponseData {
+- (nullable id)resolveConditionValue:(NSString *)expression withBidResponseData:(nullable NSDictionary *)bidResponseData auctionId:(nullable NSString *)auctionId {
     if ([expression hasPrefix:@"${"] && [expression hasSuffix:@"}"]) {
         // Extract the field path from ${...}
         NSString *fieldPath = [expression substringWithRange:NSMakeRange(2, expression.length - 3)];
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolving condition expression: %@", fieldPath]];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolving condition expression: %@ (auctionId: %@)", fieldPath, auctionId ?: @"none"]];
         
         // Handle bid.ext.cloudx.rank by looking it up in the bid response data
         if ([fieldPath isEqualToString:@"bid.ext.cloudx.rank"]) {
-            // In the context of array lookups like participants[rank=${bid.ext.cloudx.rank}],
-            // we need to find the winning bid's rank. The rank is typically 1 for the winning bid.
+            // Try to resolve from the actual bid response data if available
+            if (bidResponseData) {
+                id rankValue = [self resolveNestedField:bidResponseData path:@"ext.cloudx.rank"];
+                if (rankValue) {
+                    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Found rank in bidResponseData: %@", rankValue]];
+                    return rankValue;
+                }
+            }
             
-            // For array lookup scenarios, the winning bid rank is conventionally 1
+            // If we have an auction ID, try to get the actual bid response data
+            if (auctionId) {
+                NSDictionary *responseData = self.responseDataMap[auctionId];
+                if (responseData) {
+                    // Look for the winning bid's rank in the bid response
+                    // In most auction scenarios, the winning bid has rank 1
+                    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Looking up rank from auction %@ response data", auctionId]];
+                    
+                    // Try to find rank in the bid response ext.cloudx.rank
+                    id rankValue = [self resolveNestedField:responseData path:@"ext.cloudx.rank"];
+                    if (rankValue) {
+                        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Found rank in auction response: %@", rankValue]];
+                        return rankValue;
+                    }
+                }
+            }
+            
+            // Fallback: In array lookup scenarios, the winning bid rank is conventionally 1
             // This matches the typical auction behavior where rank 1 = winner
-            NSLog(@"🔍 [CLXTrackingFieldResolver] Resolving bid.ext.cloudx.rank - using rank=1 for winning bid");
+            [self.logger debug:@"🔍 [CLXTrackingFieldResolver] Resolving bid.ext.cloudx.rank - using rank=1 for winning bid"];
             return @1;
+        }
+        
+        // For other field paths, try to resolve them from the bid response data
+        if (bidResponseData) {
+            id result = [self resolveNestedField:bidResponseData path:fieldPath];
+            if (result) {
+                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolved field path %@ from context: %@", fieldPath, result]];
+                return result;
+            }
+        }
+        
+        // Try to resolve from auction-specific response data if available
+        if (auctionId) {
+            NSDictionary *responseData = self.responseDataMap[auctionId];
+            if (responseData) {
+                id result = [self resolveNestedField:responseData path:fieldPath];
+                if (result) {
+                    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolved field path %@ from auction response: %@", fieldPath, result]];
+                    return result;
+                }
+            }
         }
         
         // For other field paths, return nil as we don't have full context resolution yet
@@ -681,6 +778,13 @@
     
     // Direct value (not an expression)
     return expression;
+}
+
+/**
+ * Resolves condition values like ${bid.ext.cloudx.rank} with context data
+ */
+- (nullable id)resolveConditionValue:(NSString *)expression withBidResponseData:(nullable NSDictionary *)bidResponseData {
+    return [self resolveConditionValue:expression withBidResponseData:bidResponseData auctionId:nil];
 }
 
 /**
