@@ -332,7 +332,7 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
                                                    reportingService:[[SpecMockReportingService alloc] init]
                                                             settings:self.testSettings
                                                                tmax:@30
-                                                  environmentConfig:[CLXEnvironmentConfig shared]];
+];
 }
 
 - (void)tearDown {

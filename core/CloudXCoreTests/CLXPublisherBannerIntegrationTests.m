@@ -358,7 +358,7 @@ static const NSTimeInterval kTestTimeout = 0.5;
                                                    reportingService:[[IntegrationMockReportingService alloc] init]
                                                             settings:self.testSettings
                                                                tmax:@30
-                                                  environmentConfig:[CLXEnvironmentConfig shared]];
+];
 }
 
 - (void)tearDown {

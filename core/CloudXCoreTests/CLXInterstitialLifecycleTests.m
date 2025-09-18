@@ -351,8 +351,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
                                                                     bidRequestTimeout:3.0
                                                                      reportingService:self.mockReporter
                                                                              settings:[CLXSettings sharedInstance]
-                                                                               adType:CLXAdTypeInterstitial
-                                                                    environmentConfig:[CLXEnvironmentConfig shared]];
+                                                                               adType:CLXAdTypeInterstitial];
 }
 
 - (void)tearDown {

@@ -23,7 +23,6 @@
 		197993382E772E5000EBA0A3 /* CLXErrorReporterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197993332E772E5000EBA0A3 /* CLXErrorReporterTests.m */; };
 		197993392E772E5000EBA0A3 /* CLXErrorReportingFlowIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197993342E772E5000EBA0A3 /* CLXErrorReportingFlowIntegrationTests.m */; };
 		1979933B2E772E5000EBA0A3 /* CLXProtectedOperationsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197993362E772E5000EBA0A3 /* CLXProtectedOperationsTests.m */; };
-		197994752E7A087B00EBA0A3 /* CLXEnvironmentConfigTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197994742E7A087B00EBA0A3 /* CLXEnvironmentConfigTests.m */; };
 		197994812E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197994802E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m */; };
 		197994822E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1979947F2E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m */; };
 		197994842E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197994832E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m */; };
@@ -266,7 +265,6 @@
 		197993332E772E5000EBA0A3 /* CLXErrorReporterTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXErrorReporterTests.m; sourceTree = "<group>"; };
 		197993342E772E5000EBA0A3 /* CLXErrorReportingFlowIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXErrorReportingFlowIntegrationTests.m; sourceTree = "<group>"; };
 		197993362E772E5000EBA0A3 /* CLXProtectedOperationsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXProtectedOperationsTests.m; sourceTree = "<group>"; };
-		197994742E7A087B00EBA0A3 /* CLXEnvironmentConfigTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXEnvironmentConfigTests.m; sourceTree = "<group>"; };
 		1979947F2E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidNetworkServiceHybridTests.m; sourceTree = "<group>"; };
 		197994802E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXTrackingFieldResolverBidDimensionTests.m; sourceTree = "<group>"; };
 		197994832E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSDKInitNetworkServiceTests.m; sourceTree = "<group>"; };
@@ -549,7 +547,6 @@
 				197994832E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m */,
 				1979947F2E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m */,
 				197994802E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m */,
-				197994742E7A087B00EBA0A3 /* CLXEnvironmentConfigTests.m */,
 				197993322E772E5000EBA0A3 /* CLXBidResponseParsingIntegrationTests.m */,
 				197993332E772E5000EBA0A3 /* CLXErrorReporterTests.m */,
 				197993342E772E5000EBA0A3 /* CLXErrorReportingFlowIntegrationTests.m */,
@@ -1250,7 +1247,6 @@
 				19D929032E6403E000C84DAE /* CLXTrackingFieldResolverPrivacyTests.m in Sources */,
 				19D92D2D2E6F69EB00C84DAE /* CLXMockInitService.m in Sources */,
 				19D92C7D2E6A57DD00C84DAE /* CLXAdapterInitializationIntegrationTests.m in Sources */,
-				197994752E7A087B00EBA0A3 /* CLXEnvironmentConfigTests.m in Sources */,
 				19D92C7E2E6A57DD00C84DAE /* CLXAdapterInitializationUnitTests.m in Sources */,
 				19D92C7F2E6A57DD00C84DAE /* CLXRevenueCallbackArchitectureTests.m in Sources */,
 				19D92B412E690C2A00C84DAE /* CLXAdFormatDelegateCallbackTests.m in Sources */,
