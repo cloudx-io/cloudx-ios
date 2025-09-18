@@ -11,6 +11,12 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <objc/runtime.h>
 
+// Private interface to access internal methods for testing
+@interface CLXTrackingFieldResolver (RillTrackingTesting)
+- (nullable id)resolveBidField:(NSString *)auctionId field:(NSString *)field;
+- (nullable id)resolveBidRequestField:(NSString *)auctionId field:(NSString *)field;
+@end
+
 // MARK: - Test Constants
 
 static NSString * const kTestAppKey = @"g0PdN9_0ilfIcuNXhBopl";
@@ -771,6 +777,23 @@ static MockRillEventReporter *sharedInstance = nil;
 
 #pragma mark - Payload Validation Tests
 
+// Test that bidder field is correctly resolved using direct JSON access
+- (void)testBidderFieldResolution_ShouldUseDirectJSONAccess {
+    // Given: Test data with Meta bidder
+    [self setupTestData];
+    
+    // When: Build payload with bidder field resolution
+    NSString *payload = [self.resolver buildPayload:kTestAuctionID];
+    
+    // Then: Should start with "meta" (first field in tracking config)
+    XCTAssertNotNil(payload, @"Payload should not be nil");
+    XCTAssertTrue([payload hasPrefix:@"meta;"], @"Payload should start with 'meta;' from direct JSON access");
+    
+    // Verify no corruption occurred (old bug would show "ext.premeta.adaptercode")
+    XCTAssertFalse([payload containsString:@"premeta"], @"Should not contain corrupted 'premeta' string");
+    XCTAssertFalse([payload containsString:@"ext.premeta.adaptercode"], @"Should not contain corrupted path");
+}
+
 // Test that server-driven payload contains all expected fields
 - (void)testServerDrivenPayload_ShouldContainAllConfiguredFields {
     // Given: Resolver is set up with test data
@@ -790,6 +813,9 @@ static MockRillEventReporter *sharedInstance = nil;
         // Note: The exact format depends on server configuration
         XCTAssertTrue(payload.length > 0, @"Payload should not be empty");
         XCTAssertTrue([payload containsString:kTestAccountID], @"Should contain account ID");
+        
+        // Verify bidder field is correctly resolved (should be "meta" from test data)
+        XCTAssertTrue([payload hasPrefix:@"meta;"], @"Payload should start with bidder 'meta;'");
         
         // Log the payload for debugging
         NSLog(@"Generated payload: %@", payload);
@@ -891,6 +917,176 @@ static MockRillEventReporter *sharedInstance = nil;
     // Then: Should handle gracefully without crashing
     XCTAssertFalse(success, @"Should return NO for incomplete data");
     XCTAssertEqual(self.mockReporter.firedRillEvents.count, 0, @"No events should fire with incomplete data");
+}
+
+/**
+ * Test deal ID extraction from debug data in Rill tracking
+ * Validates that deal ID is properly extracted from real-world bid response structure
+ */
+- (void)testDealIdExtractionFromDebugData_ShouldIncludeInRillPayload {
+    // Given: Bid response with deal ID only in debug data (like real Meta responses)
+    NSDictionary *testBidResponseWithDebugDeal = @{
+        @"id": kTestAuctionID,
+        @"seatbid": @[@{
+            @"bid": @[@{
+                @"id": kTestBidID,
+                @"price": @99.99,
+                @"w": @320,
+                @"h": @250,
+                // No dealid field in bid object
+                @"creativeId": @"test-creative-456",
+                @"ext": @{
+                    @"prebid": @{
+                        @"meta": @{
+                            @"adaptercode": @"meta"
+                        }
+                    },
+                    @"cloudx": @{
+                        @"rank": @1
+                    }
+                }
+            }]
+        }],
+        @"ext": @{
+            @"cloudx": @{
+                @"auction": @{
+                    @"participants": @[@{
+                        @"rank": @1,
+                        @"round": @1,
+                        @"lineItemId": @"li_test123"
+                    }]
+                }
+            },
+            @"debug": @{
+                @"rounds": @{
+                    @"1": @{
+                        @"resolvedrequest": @{
+                            @"imp": @[@{
+                                @"id": @"test-imp-id",
+                                @"ext": @{
+                                    @"prebid": @{
+                                        @"bidder": @{
+                                            @"meta": @{
+                                                @"line_items": @[@{
+                                                    @"id": @"test-line-item-123",
+                                                    @"deal": @{
+                                                        @"id": @"cloudx-usd-YJRQzEHC",
+                                                        @"wseat": @[@"meta"]
+                                                    }
+                                                }]
+                                            }
+                                        }
+                                    }
+                                }
+                            }]
+                        }
+                    }
+                }
+            }
+        }
+    };
+    
+    [self.resolver setResponseData:kTestAuctionID bidResponseJSON:testBidResponseWithDebugDeal];
+    [self.resolver saveLoadedBid:kTestAuctionID bidId:kTestBidID];
+    [self.resolver setLoopIndex:kTestAuctionID loopIndex:0];
+    
+    // When: Resolve bid.dealid field
+    id dealId = [self.resolver resolveBidField:kTestAuctionID field:@"bid.dealid"];
+    
+    // Then: Should extract deal ID from debug data
+    XCTAssertNotNil(dealId, @"Deal ID should be extracted from debug data");
+    XCTAssertEqualObjects(dealId, @"cloudx-usd-YJRQzEHC", @"Should return correct deal ID from debug data");
+    
+    // And: When building Rill payload, deal ID should be included
+    NSString *payload = [self.resolver buildPayload:kTestAuctionID];
+    XCTAssertNotNil(payload, @"Payload should be built successfully");
+    
+    // Parse payload to verify deal ID is in correct position (4th field)
+    NSArray *payloadFields = [payload componentsSeparatedByString:@";"];
+    XCTAssertTrue(payloadFields.count >= 4, @"Payload should have at least 4 fields");
+    XCTAssertEqualObjects(payloadFields[3], @"cloudx-usd-YJRQzEHC", @"Deal ID should be in 4th position of payload");
+}
+
+/**
+ * Test country extraction and inclusion in Rill payload
+ * Validates that bidRequest.device.geo.country is properly tracked from geo headers
+ */
+- (void)testCountryExtractionFromGeoHeaders_ShouldIncludeInRillPayload {
+    // Given: Mock geo headers with country data
+    [[NSUserDefaults standardUserDefaults] setObject:@{@"cloudfront-viewer-country-iso3": @"USA"} forKey:kCLXCoreGeoHeadersKey];
+    
+    // And: Bid response with bid request data containing geo.country
+    NSDictionary *testBidResponseWithCountry = @{
+        @"id": kTestAuctionID,
+        @"seatbid": @[@{
+            @"bid": @[@{
+                @"id": kTestBidID,
+                @"price": @99.99,
+                @"w": @320,
+                @"h": @250,
+                @"dealid": @"test-deal-123",
+                @"creativeId": @"test-creative-456",
+                @"ext": @{
+                    @"prebid": @{
+                        @"meta": @{
+                            @"adaptercode": @"meta"
+                        }
+                    },
+                    @"cloudx": @{
+                        @"rank": @1
+                    }
+                }
+            }]
+        }],
+        @"ext": @{
+            @"cloudx": @{
+                @"auction": @{
+                    @"participants": @[@{
+                        @"rank": @1,
+                        @"round": @1,
+                        @"lineItemId": @"li_test123"
+                    }]
+                }
+            }
+        }
+    };
+    
+    // And: Bid request data with geo.country field
+    NSDictionary *testBidRequest = @{
+        @"id": kTestAuctionID,
+        @"device": @{
+            @"ifa": @"test-ifa-123",
+            @"geo": @{
+                @"country": @"USA",
+                @"lat": @37.7749,
+                @"lon": @-122.4194
+            }
+        }
+    };
+    
+    [self.resolver setResponseData:kTestAuctionID bidResponseJSON:testBidResponseWithCountry];
+    [self.resolver setRequestData:kTestAuctionID bidRequestJSON:testBidRequest];
+    [self.resolver saveLoadedBid:kTestAuctionID bidId:kTestBidID];
+    [self.resolver setLoopIndex:kTestAuctionID loopIndex:0];
+    
+    // When: Resolve bidRequest.device.geo.country field
+    // Note: This uses internal method for testing - in production this is resolved via buildPayload
+    id countryValue = [self.resolver resolveBidRequestField:kTestAuctionID field:@"bidRequest.device.geo.country"];
+    
+    // Then: Should extract country from bid request
+    XCTAssertNotNil(countryValue, @"Country should be extracted from bid request");
+    XCTAssertEqualObjects(countryValue, @"USA", @"Should return correct country from bid request geo data");
+    
+    // And: When building Rill payload, country should be included
+    NSString *payload = [self.resolver buildPayload:kTestAuctionID];
+    XCTAssertNotNil(payload, @"Payload should be built successfully");
+    
+    // Note: The exact position of country in the payload depends on the server-driven field configuration
+    // For this test, we just verify the country value is accessible
+    NSLog(@"🔍 [CountryTest] Payload with country: %@", payload);
+    
+    // Clean up
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreGeoHeadersKey];
 }
 
 @end

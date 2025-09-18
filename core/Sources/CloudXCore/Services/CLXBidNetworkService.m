@@ -4,6 +4,7 @@
 #import <CloudXCore/CLXGeoLocationService.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBidResponse.h>
+#import <CloudXCore/CLXTrackingFieldResolver.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/URLSession+CLX.h>
 #import <CloudXCore/CLXBiddingConfig.h>
@@ -96,7 +97,7 @@
 
 - (void)startAuctionWithBidRequest:(NSDictionary *)bidRequest
                             appKey:(NSString *)appKey
-                        completion:(void (^)(CLXBidResponse * _Nullable response, NSError * _Nullable error))completion {
+                        completion:(void (^)(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error))completion {
     [self.logger info:[NSString stringWithFormat:@"🚀 [BidNetworkService] startAuctionWithBidRequest called - AppKey: %@", appKey]];
     
     // Log the actual bid request JSON
@@ -138,26 +139,21 @@
     [headers setObject:self.userAgent ?: @"" forKey:@"User-Agent"];
     
     // Convert bidRequest dictionary to NSData
+    // Validate bid request before JSON serialization
+    if (!bidRequest) {
+        NSError *invalidRequestError = [CLXError errorWithCode:CLXErrorCodeInvalidRequest description:@"Bid request cannot be nil"];
+        [self.logger error:@"❌ [BidNetworkService] Bid request is nil"];
+        if (completion) completion(nil, nil, invalidRequestError);
+        return;
+    }
+    
     NSError *jsonError;
     NSData *requestBodyData = [NSJSONSerialization dataWithJSONObject:bidRequest options:0 error:&jsonError];
     if (jsonError) {
         [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] JSON serialization failed - %@ (Domain: %@, Code: %ld)", jsonError.localizedDescription, jsonError.domain, (long)jsonError.code]];
-        if (completion) completion(nil, jsonError);
+        if (completion) completion(nil, nil, jsonError);
         return;
     }
-    
-    // Log request body details
-    NSString *requestBodyString = [[NSString alloc] initWithData:requestBodyData encoding:NSUTF8StringEncoding];
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Request body size: %lu bytes", (unsigned long)requestBodyData.length]];
-    
-    // Validate JSON structure
-    id jsonObject = [NSJSONSerialization JSONObjectWithData:requestBodyData options:0 error:&jsonError];
-    if (jsonError) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] JSON validation failed: %@", jsonError]];
-        if (completion) completion(nil, jsonError);
-        return;
-    }
-    [self.logger info:@"✅ [BidNetworkService] JSON validation successful"];
     
     // Use empty endpoint string like Swift version to avoid double URL
     [self.logger debug:@"🔧 [BidNetworkService] Starting auction request with V1 retry policy (maxRetries:1, delay:1.0s)"];
@@ -173,25 +169,22 @@
         [self.logger debug:@"📥 [BidNetworkService] Network request completion called"];
         
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Network request failed with error: %@", error]];
-            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Error domain: %@", error.domain]];
-            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Error code: %ld", (long)error.code]];
-            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Error user info: %@", error.userInfo]];
-            if (completion) completion(nil, error);
+            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Network request failed - Domain: %@, Code: %ld, Error: %@", error.domain, (long)error.code, error.localizedDescription]];
+            if (completion) completion(nil, nil, error);
             return;
         }
         
         if (!response) {
             NSError *noDataError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse description:@"No response data"];
             [self.logger error:@"❌ [BidNetworkService] No response data received"];
-            if (completion) completion(nil, noDataError);
+            if (completion) completion(nil, nil, noDataError);
             return;
         }
         
         if (isKillSwitchEnabled) {
             NSError *adsDisabledError = [CLXError errorWithCode:CLXErrorCodeAdsDisabled description:@"No response data"];
             [self.logger error:@"❌ [BidNetworkService] kill switch in on received"];
-            if (completion) completion(nil, adsDisabledError);
+            if (completion) completion(nil, nil, adsDisabledError);
             return;
         }
         
@@ -200,7 +193,11 @@
         [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] Response: %@", response]];
         // Parse response dictionary into BidResponse object
         CLXBidResponse *bidResponse = [CLXBidResponse parseBidResponseFromDictionary:response];
-        if (completion) completion(bidResponse, nil);
+        
+        // Pass both parsed object and raw JSON to completion handler
+        if (completion) {
+            completion(bidResponse, [response isKindOfClass:[NSDictionary class]] ? (NSDictionary *)response : nil, nil);
+        }
     }];
 }
 

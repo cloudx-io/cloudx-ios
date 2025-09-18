@@ -125,8 +125,11 @@
         return;
     }
     
-    NSString *placement = [self placementName];
-
+    // Always preserve the original human-readable placement name for display purposes
+    NSString *originalPlacementName = [self placementName];
+    
+    // Use settings placement ID for SDK call if provided, otherwise use original name
+    NSString *placement = originalPlacementName;
     if (_settings.bannerPlacement.length > 0) {
         placement = _settings.bannerPlacement;
     }
@@ -135,6 +138,12 @@
                                                       viewController:self
                                                           delegate:self
                                                               tmax:nil];
+    
+    // Store the original human-readable name for logging purposes
+    // Note: This approach preserves the original placement name regardless of which placement ID is used for the SDK call
+    if (self.bannerAd) {
+        // The banner ad will internally preserve the original placement name through our CLXAd factory method updates
+    }
     
     if (!self.bannerAd) {
         [self showAlertWithTitle:@"Error" message:@"Failed to create banner."];

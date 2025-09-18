@@ -53,6 +53,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 @property (nonatomic, copy, nullable) NSString *userID;
 @property (nonatomic, strong) id<CLXAdEventReporting> reportingService;
 @property (nonatomic, copy) NSString *placementID;
+@property (nonatomic, copy) NSString *placementName;
 @property (nonatomic, copy, nullable) NSString *rewardedCallbackUrl;
 @property (nonatomic, assign) NSInteger adType;
 @property (nonatomic, strong) CLXLogger *logger;
@@ -116,6 +117,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         _adFactories = adFactories;
         _rewardedCallbackUrl = [rewardedCallbackUrl copy];
         _placementID = [placement.id copy];
+        _placementName = [placement.name copy];
         _reportingService = reportingService;
         _userID = [userID copy];
         _adType = adType;
@@ -278,12 +280,12 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
             switch (self.adType) {
                 case 0: // interstitial
                     if ([self.interstitialDelegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-                        [self.interstitialDelegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID] error:error];
+                        [self.interstitialDelegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:error];
                     }
                     break;
                 case 1: // rewarded
                     if ([self.rewardedDelegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-                        [self.rewardedDelegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID] error:error];
+                        [self.rewardedDelegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:error];
                     }
                     break;
             }
@@ -331,7 +333,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if ([self.interstitialDelegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-                        [self.interstitialDelegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID] error:timeoutError];
+                        [self.interstitialDelegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:timeoutError];
                     }
                 });
             }
@@ -355,7 +357,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if ([self.rewardedDelegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-                        [self.rewardedDelegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID] error:timeoutError];
+                        [self.rewardedDelegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:timeoutError];
                     }
                 });
             }
@@ -379,12 +381,12 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
             switch (self.adType) {
                 case 0: // interstitial
                     if ([self.interstitialDelegate respondsToSelector:@selector(failToShowWithAd:error:)]) {
-                        [self.interstitialDelegate failToShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID] error:error];
+                        [self.interstitialDelegate failToShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:error];
                     }
                     break;
                 case 1: // rewarded
                     if ([self.rewardedDelegate respondsToSelector:@selector(failToShowWithAd:error:)]) {
-                        [self.rewardedDelegate failToShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID] error:error];
+                        [self.rewardedDelegate failToShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:error];
                     }
                     break;
             }
@@ -409,12 +411,12 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
                 switch (self.adType) {
                     case 0: // interstitial
                         if ([self.interstitialDelegate respondsToSelector:@selector(didHideWithAd:)]) {
-                            [self.interstitialDelegate didHideWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+                            [self.interstitialDelegate didHideWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
                         }
                         break;
                     case 1: // rewarded
                         if ([self.rewardedDelegate respondsToSelector:@selector(didHideWithAd:)]) {
-                            [self.rewardedDelegate didHideWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+                            [self.rewardedDelegate didHideWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
                         }
                         break;
                 }
@@ -567,7 +569,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.interstitialDelegate respondsToSelector:@selector(didLoadWithAd:)]) {
             [self.logger debug:@"✅ [PublisherFullscreenAd] Calling didLoadWithAd delegate"];
-            [self.interstitialDelegate didLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+            [self.interstitialDelegate didLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
         }
     });
 }
@@ -587,7 +589,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.interstitialDelegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
             [self.logger debug:@"📊 [PublisherFullscreenAd] Calling failToLoadWithAd delegate"];
-            [self.interstitialDelegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID] error:error];
+            [self.interstitialDelegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:error];
         }
     });
 }
@@ -598,7 +600,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.interstitialDelegate respondsToSelector:@selector(didShowWithAd:)]) {
             [self.logger debug:@"📊 [PublisherFullscreenAd] Calling didShowWithAd delegate"];
-            [self.interstitialDelegate didShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+            [self.interstitialDelegate didShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
         }
     });
 }
@@ -636,7 +638,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
             
             if (success) {
                 // Create CLXAd object and trigger revenue callback
-                CLXAd *adObject = [CLXAd adFromBid:strongSelf.lastBidResponse.bid placementId:strongSelf.placementID];
+                CLXAd *adObject = [CLXAd adFromBid:strongSelf.lastBidResponse.bid placementId:strongSelf.placementID placementName:strongSelf.placementName];
                 if (strongSelf.interstitialDelegate && [strongSelf.interstitialDelegate respondsToSelector:@selector(revenuePaid:)]) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [strongSelf.interstitialDelegate revenuePaid:adObject];
@@ -649,7 +651,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     }
     
     if ([self.interstitialDelegate respondsToSelector:@selector(impressionOn:)]) {
-        [self.interstitialDelegate impressionOn:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+        [self.interstitialDelegate impressionOn:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
     }
 }
 
@@ -678,7 +680,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Call delegate
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.interstitialDelegate respondsToSelector:@selector(didHideWithAd:)]) {
-            [self.interstitialDelegate didHideWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+            [self.interstitialDelegate didHideWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
         }
     });
 }
@@ -688,7 +690,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 - (void)didFailToShowWithInterstitial:(id<CLXAdapterInterstitial>)interstitial error:(NSError *)error {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.interstitialDelegate respondsToSelector:@selector(failToShowWithAd:error:)]) {
-            [self.interstitialDelegate failToShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID] error:error];
+            [self.interstitialDelegate failToShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:error];
         }
     });
 }
@@ -704,7 +706,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.interstitialDelegate respondsToSelector:@selector(didClickWithAd:)]) {
-            [self.interstitialDelegate didClickWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+            [self.interstitialDelegate didClickWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
         }
     });
 }
@@ -730,7 +732,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Call success delegate
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.rewardedDelegate respondsToSelector:@selector(didLoadWithAd:)]) {
-            [self.rewardedDelegate didLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+            [self.rewardedDelegate didLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
         }
     });
 }
@@ -747,7 +749,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Call failure delegate
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.rewardedDelegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-            [self.rewardedDelegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID] error:error];
+            [self.rewardedDelegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:error];
         }
     });
 }
@@ -755,7 +757,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 - (void)didShowWithRewarded:(id<CLXAdapterRewarded>)rewarded {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.rewardedDelegate respondsToSelector:@selector(didShowWithAd:)]) {
-            [self.rewardedDelegate didShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+            [self.rewardedDelegate didShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
         }
     });
 }
@@ -782,7 +784,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
             
             if (success) {
                 // Create CLXAd object and trigger revenue callback
-                CLXAd *adObject = [CLXAd adFromBid:strongSelf.lastBidResponse.bid placementId:strongSelf.placementID];
+                CLXAd *adObject = [CLXAd adFromBid:strongSelf.lastBidResponse.bid placementId:strongSelf.placementID placementName:strongSelf.placementName];
                 if (strongSelf.rewardedDelegate && [strongSelf.rewardedDelegate respondsToSelector:@selector(revenuePaid:)]) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [strongSelf.rewardedDelegate revenuePaid:adObject];
@@ -795,7 +797,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     }
     
     if ([self.rewardedDelegate respondsToSelector:@selector(impressionOn:)]) {
-        [self.rewardedDelegate impressionOn:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+        [self.rewardedDelegate impressionOn:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
     }
 }
 
@@ -824,7 +826,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Call delegate
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.rewardedDelegate respondsToSelector:@selector(didHideWithAd:)]) {
-            [self.rewardedDelegate didHideWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+            [self.rewardedDelegate didHideWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
         }
     });
 }
@@ -839,7 +841,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     [self.rillTrackingService sendClickEvent];
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.rewardedDelegate respondsToSelector:@selector(didClickWithAd:)]) {
-            [self.rewardedDelegate didClickWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+            [self.rewardedDelegate didClickWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
         }
     });
 }
@@ -859,7 +861,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 - (void)didFailToShowWithRewarded:(id<CLXAdapterRewarded>)rewarded error:(NSError *)error {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.rewardedDelegate respondsToSelector:@selector(failToShowWithAd:error:)]) {
-            [self.rewardedDelegate failToShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID] error:error];
+            [self.rewardedDelegate failToShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:error];
         }
     });
 }

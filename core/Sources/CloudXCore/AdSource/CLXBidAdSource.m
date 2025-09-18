@@ -217,7 +217,7 @@ NS_ASSUME_NONNULL_BEGIN
             
             [self.logger info:@"✅ [CLXBidAdSource] Bid request created successfully"];
             
-            // Store bid request JSON in tracking field resolver (Android parity)
+            // Store bid request JSON in tracking field resolver
             if ([bidRequest isKindOfClass:[NSDictionary class]]) {
                 NSString *auctionId = bidRequest[@"id"];
                 if (auctionId) {
@@ -238,7 +238,7 @@ NS_ASSUME_NONNULL_BEGIN
             [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXBidAdSource] Starting auction with AppKey: %@", currentAppKey]];
             [strongSelf.bidNetworkService startAuctionWithBidRequest:bidRequest
                                                               appKey:currentAppKey
-                                                          completion:^(CLXBidResponse * _Nullable response, NSError * _Nullable error) {
+                                                          completion:^(CLXBidResponse * _Nullable response, NSDictionary * _Nullable rawJSON, NSError * _Nullable error) {
                 __strong typeof(weakSelf) strongSelf = weakSelf;
                 if (!strongSelf) {
                     [self.logger error:@"❌ [CLXBidAdSource] Self reference lost in auction completion block"];
@@ -261,41 +261,10 @@ NS_ASSUME_NONNULL_BEGIN
                 // Store the bid response for LURL firing
                 strongSelf.currentBidResponse = response;
                 
-                // Store bid response JSON in tracking field resolver (Android parity)
-                if (response.id) {
-                    // Convert CLXBidResponse back to JSON dictionary for field resolution
-                    // Note: In a complete implementation, we'd store the original JSON response
-                    // For now, we'll create a basic representation from the parsed response
-                    NSMutableDictionary *responseDict = [NSMutableDictionary dictionary];
-                    responseDict[@"id"] = response.id;
-                    
-                    if (response.seatbid && response.seatbid.count > 0) {
-                        NSMutableArray *seatbidArray = [NSMutableArray array];
-                        for (CLXBidResponseSeatBid *seatbid in response.seatbid) {
-                            NSMutableDictionary *seatDict = [NSMutableDictionary dictionary];
-                            seatDict[@"seat"] = seatbid.seat ?: @"";
-                            
-                            if (seatbid.bid && seatbid.bid.count > 0) {
-                                NSMutableArray *bidArray = [NSMutableArray array];
-                                for (CLXBidResponseBid *bid in seatbid.bid) {
-                                    NSMutableDictionary *bidDict = [NSMutableDictionary dictionary];
-                                    bidDict[@"id"] = bid.id ?: @"";
-                                    bidDict[@"price"] = @(bid.price);
-                                    bidDict[@"crid"] = bid.crid ?: @"";
-                                    bidDict[@"dealid"] = bid.dealid ?: @"";
-                                    bidDict[@"w"] = @(bid.w);
-                                    bidDict[@"h"] = @(bid.h);
-                                    [bidArray addObject:bidDict];
-                                }
-                                seatDict[@"bid"] = bidArray;
-                            }
-                            [seatbidArray addObject:seatDict];
-                        }
-                        responseDict[@"seatbid"] = seatbidArray;
-                    }
-                    
-                    [[CLXTrackingFieldResolver shared] setResponseData:response.id bidResponseJSON:responseDict];
-                    [strongSelf.logger debug:[NSString stringWithFormat:@"Stored bid response JSON for auction: %@", response.id]];
+                // Store original bid response JSON in tracking field resolver for efficient field resolution
+                if (response.id && rawJSON) {
+                    [[CLXTrackingFieldResolver shared] setResponseData:response.id bidResponseJSON:rawJSON];
+                    [strongSelf.logger debug:[NSString stringWithFormat:@"Stored original bid response JSON for auction: %@", response.id]];
                 }
                 
                 // Implement true waterfall logic 

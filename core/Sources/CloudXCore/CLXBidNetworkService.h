@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)startAuctionWithBidRequest:(id)bidRequest
                             appKey:(NSString *)appKey
-                        completion:(void (^)(CLXBidResponse * _Nullable response, NSError * _Nullable error))completion;
+                        completion:(void (^)(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error))completion;
 
 - (void)startCDPFlowWithBidRequest:(id)bidRequest
                        completion:(void (^)(id _Nullable enrichedBidRequest, NSError * _Nullable error))completion;

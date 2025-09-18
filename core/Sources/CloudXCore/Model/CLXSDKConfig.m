@@ -85,7 +85,7 @@
         _placements = [NSArray array];
         _bidders = [NSArray array];
         _seatbid = [NSArray array];
-        _tracking = [NSArray array];
+        _tracking = nil;  // Leave as nil until explicitly set from server response
     }
     return self;
 }

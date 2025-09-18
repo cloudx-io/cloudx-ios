@@ -51,6 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) CLXBannerTimerService *timerService;
 @property (nonatomic, strong) CLXExponentialBackoffStrategy *waterfallBackoffAlgorithm;
 @property (nonatomic, copy) NSString *placementID;
+@property (nonatomic, copy) NSString *placementName;
 @property (nonatomic, strong) id<CLXAdEventReporting> reportingService;
 @property (nonatomic, strong, nullable) id requestNativeTask;
 @property (nonatomic, strong) CLXLogger *logger;
@@ -93,6 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
         _viewController = viewController;
         _refreshSeconds = (placement.bannerRefreshRateMs ?: 10000) / 1000.0;
         _placementID = [placement.id copy];
+        _placementName = [placement.name copy];
         _reportingService = reportingService;
         _placement = placement;
         _adFactories = adFactories;
@@ -356,7 +358,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.delegate closeWithNative:native];
     }
     if ([self.delegate respondsToSelector:@selector(closedByUserActionWithAd:)]) {
-        [self.delegate closedByUserActionWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+        [self.delegate closedByUserActionWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
     }
 }
 
@@ -390,7 +392,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.delegate didLoadWithNative:native];
     }
             if ([self.delegate respondsToSelector:@selector(didLoadWithAd:)]) {
-            CLXAd *delegateAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID];
+            CLXAd *delegateAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
             [self.delegate didLoadWithAd:delegateAd];
         }
     
@@ -449,7 +451,7 @@ NS_ASSUME_NONNULL_BEGIN
         NSError *cloudXError = [NSError errorWithDomain:@"CLXErrorDomain"
                                                    code:CLXErrorCodeNoFill
                                                userInfo:nil];
-        [self.delegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID] error:cloudXError];
+        [self.delegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:cloudXError];
     }
 }
 
@@ -475,7 +477,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.delegate didShowWithNative:native];
     }
     if ([self.delegate respondsToSelector:@selector(didShowWithAd:)]) {
-        [self.delegate didShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID]];
+        [self.delegate didShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
     }
 }
 
@@ -519,7 +521,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.delegate impressionWithNative:native];
     }
             if ([self.delegate respondsToSelector:@selector(impressionOn:)]) {
-            CLXAd *impressionAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID];
+            CLXAd *impressionAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
             [self.delegate impressionOn:impressionAd];
         }
 }
@@ -538,7 +540,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.delegate clickWithNative:native];
     }
             if ([self.delegate respondsToSelector:@selector(didClickWithAd:)]) {
-            CLXAd *clickAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID];
+            CLXAd *clickAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
             [self.delegate didClickWithAd:clickAd];
         }
 }
