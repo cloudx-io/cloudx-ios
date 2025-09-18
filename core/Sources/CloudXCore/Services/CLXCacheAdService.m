@@ -10,7 +10,7 @@
 #import <CloudXCore/CLXCacheAdService.h>
 #import <CloudXCore/CLXBidAdSource.h>
 #import <CloudXCore/CLXAdEventReporting.h>
-#import <CloudXCore/CLXEnvironmentConfig.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXCacheableAd.h>
 #import <CloudXCore/CLXDestroyable.h>
 #import <CloudXCore/CLXSDKConfigPlacement.h>

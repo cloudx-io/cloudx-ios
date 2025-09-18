@@ -4,7 +4,7 @@
 #import <CloudXCore/URLSession+CLX.h>
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXAdDelegate.h>
-#import <CloudXCore/CLXEnvironmentConfig.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 
 @interface CLXAdEventReporter ()
 @property (nonatomic, strong) CLXAdReportingNetworkService *reportNetworkService;

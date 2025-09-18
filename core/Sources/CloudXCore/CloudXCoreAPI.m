@@ -20,7 +20,6 @@
 #import <CloudXCore/CLXBidderConfig.h>
 #import <CloudXCore/CLXXorEncryption.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
-#import <CloudXCore/CLXEnvironmentConfig.h>
 
 // Adapter Protocols
 #import <CloudXCore/CLXAdapterNative.h>
@@ -552,7 +551,7 @@ static CloudXCore *_sharedInstance = nil;
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
                                                                            tmax:tmax
-                                                              environmentConfig:nil];
+                                                              ];
     
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeW320H50 delegate:delegate];
 }
@@ -590,7 +589,7 @@ static CloudXCore *_sharedInstance = nil;
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
                                                                            tmax:nil
-                                                              environmentConfig:nil];
+                                                              ];
     
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeMREC delegate:delegate];
 }
@@ -625,8 +624,7 @@ static CloudXCore *_sharedInstance = nil;
         bidRequestTimeout:3.0
         reportingService:_reportingService
         settings:[CLXSettings sharedInstance]
-        adType:CLXAdTypeInterstitial
-        environmentConfig:[CLXEnvironmentConfig shared]];
+        adType:CLXAdTypeInterstitial];
     
     return interstitial;
 }
@@ -661,8 +659,7 @@ static CloudXCore *_sharedInstance = nil;
         bidRequestTimeout:3.0
         reportingService:_reportingService
         settings:[CLXSettings sharedInstance]
-        adType:CLXAdTypeRewarded
-        environmentConfig:[CLXEnvironmentConfig shared]];
+        adType:CLXAdTypeRewarded];
     
     return rewarded;
 }
@@ -696,8 +693,7 @@ static CloudXCore *_sharedInstance = nil;
                                                                     adFactories:_adNetworkFactories.native
                                                                 bidTokenSources:_adNetworkFactories.bidTokenSources
                                                               bidRequestTimeout:3.0
-                                                              reportingService:_reportingService
-                                                             environmentConfig:[CLXEnvironmentConfig shared]];
+                                                              reportingService:_reportingService];
     
     if (!native) {
         [self.logger error:@"❌ [CloudXCore] Failed to create native ad"];

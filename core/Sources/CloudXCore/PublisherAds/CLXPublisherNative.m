@@ -27,7 +27,7 @@
 #import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXAdEventReporting.h>
 #import <CloudXCore/CLXRillTrackingService.h>
-#import <CloudXCore/CLXEnvironmentConfig.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -87,8 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
                               adFactories:(NSDictionary<NSString *, id<CLXAdapterNativeFactory>> *)adFactories
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
-                         reportingService:(id<CLXAdEventReporting>)reportingService
-                        environmentConfig:(CLXEnvironmentConfig *)environmentConfig {
+                         reportingService:(id<CLXAdEventReporting>)reportingService {
     self = [super init];
     if (self) {
         _viewController = viewController;
@@ -141,7 +140,6 @@ NS_ASSUME_NONNULL_BEGIN
                                      nativeAdRequirements:[CLXNativeTemplateHelper nativeAdRequirementsForTemplate:nativeType]
                                                       tmax:tmax
                                            reportingService:_reportingService
-                                          environmentConfig:environmentConfig
                                                createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
             __strong typeof(weakSelf) strongSelf = weakSelf;
             if (!strongSelf) return nil;

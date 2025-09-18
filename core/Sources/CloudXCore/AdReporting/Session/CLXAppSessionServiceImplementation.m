@@ -3,7 +3,7 @@
 #import <CloudXCore/CLXAppSession.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXCoreDataManager.h>
-#import <CloudXCore/CLXEnvironmentConfig.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 
 @interface CLXAppSessionServiceImplementation ()
 @property (nonatomic, strong) CLXAppSession *currentSession;

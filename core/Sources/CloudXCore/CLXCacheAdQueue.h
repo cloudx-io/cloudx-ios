@@ -63,7 +63,6 @@ typedef NS_ENUM(NSInteger, CacheAdQueueError) {
  * @param maxCapacity Maximum capacity of the queue
  * @param reportingService Service for reporting events
  * @param placementID Placement identifier
- * @param environmentConfig Environment configuration for URLs
  * @return Initialized cache ad queue
  */
 - (instancetype)initWithMaxCapacity:(NSInteger)maxCapacity
