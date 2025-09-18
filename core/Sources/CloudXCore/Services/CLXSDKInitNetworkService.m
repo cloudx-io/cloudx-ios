@@ -268,8 +268,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         config.geoHeaders = [geos copy];
     }
     
-    // Parse other URLs
-    config.eventTrackingURL = response[@"eventTrackingURL"];
+    // Parse tracking URLs
     config.impressionTrackerURL = response[@"impressionTrackerURL"];
     config.metricsEndpointURL = response[@"metricsEndpointURL"];
     

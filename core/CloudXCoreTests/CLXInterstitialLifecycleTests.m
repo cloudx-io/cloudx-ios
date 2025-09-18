@@ -218,13 +218,6 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     return self;
 }
 
-- (void)impressionWithBidID:(NSString *)bidID {
-    [self.impressionBidIDs addObject:bidID ?: @""];
-}
-
-- (void)winWithBidID:(NSString *)bidID {
-    [self.winBidIDs addObject:bidID ?: @""];
-}
 
 - (void)fireNurlForRevenueWithPrice:(double)price nUrl:(nullable NSString *)nUrl completion:(void(^)(BOOL success, CLXAd * _Nullable ad))completion {
     [self.firedNurls addObject:nUrl ?: @""];

@@ -1,10 +1,8 @@
 #import <CloudXCore/CLXRillImpressionProperties.h>
 
 // MARK: - ConfigProperty
-RillImpressionConfigProperty const RillImpressionConfigPropertyMetricsEndpointURL = @"config.metricsEndpointURL";
 RillImpressionConfigProperty const RillImpressionConfigPropertySessionID = @"config.sessionID";
 RillImpressionConfigProperty const RillImpressionConfigPropertyPreCacheSize = @"config.preCacheSize";
-RillImpressionConfigProperty const RillImpressionConfigPropertyEventTrackingURL = @"config.eventTrackingURL";
 RillImpressionConfigProperty const RillImpressionConfigPropertyCur = @"config.cur";
 RillImpressionConfigProperty const RillImpressionConfigPropertyId = @"config.id";
 RillImpressionConfigProperty const RillImpressionConfigPropertyBidid = @"config.bidid";

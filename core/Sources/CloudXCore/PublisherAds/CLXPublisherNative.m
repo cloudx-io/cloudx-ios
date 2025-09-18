@@ -381,9 +381,6 @@ NS_ASSUME_NONNULL_BEGIN
     self.nativeOnScreen = self.currentLoadingNative;
     self.successWin = YES;
     
-    if (self.lastBidResponse) {
-        [self.reportingService winWithBidID:self.lastBidResponse.bidID];
-    }
     
     // Call both old and new delegate methods for backward compatibility
     if ([self.delegate respondsToSelector:@selector(didLoadWithNative:)]) {
@@ -460,8 +457,7 @@ NS_ASSUME_NONNULL_BEGIN
     if (self.lastBidResponse) {
         [self.logger debug:[NSString stringWithFormat:@"[CloudX][Native] Reporting impression for bidID=%@", self.lastBidResponse.bidID]];
         
-        // Report impression to reporting service
-        [self.reportingService impressionWithBidID:self.lastBidResponse.bidID];
+        // Legacy impression tracking removed - now handled by Rill analytics
         
         // Add spend to app session service
         [self.appSessionService addSpendWithPlacementID:self.placementID spend:self.lastBidResponse.price];
@@ -483,7 +479,6 @@ NS_ASSUME_NONNULL_BEGIN
     [self.logger debug:[NSString stringWithFormat:@"Native impression %@", self.placementID]];
     
     if (self.lastBidResponse) {
-        [self.reportingService impressionWithBidID:self.lastBidResponse.bidID];
         [self.appSessionService addSpendWithPlacementID:self.placementID spend:self.lastBidResponse.price];
         [self.appSessionService addImpressionWithPlacementID:self.placementID];
         

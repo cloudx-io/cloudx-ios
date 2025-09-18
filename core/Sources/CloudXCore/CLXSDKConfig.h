@@ -40,7 +40,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *accountID;
 @property (nonatomic, copy, nullable) NSArray<CLXSDKConfigBidder *> *bidders;
 @property (nonatomic, copy, nullable) NSArray<CLXSDKConfigPlacement *> *placements;
-@property (nonatomic, copy, nullable) NSString *eventTrackingURL;
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointObject *cdpEndpointURL;
 @property (nonatomic, copy, nullable) NSString *organizationID;
@@ -79,7 +78,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointObject *cdpEndpointURL;
 @property (nonatomic, strong, nullable) CLXSDKConfigKeyValueObject *keyValuePaths;
-@property (nonatomic, copy, nullable) NSString *eventTrackingURL;
 @property (nonatomic, copy, nullable) NSString *geoDataEndpointURL;
 @property (nonatomic, strong, nullable) NSArray<CLXSDKConfigPlacement *> *placements;
 @property (nonatomic, strong, nullable) NSArray<CLXSDKConfigBidder *> *bidders;
