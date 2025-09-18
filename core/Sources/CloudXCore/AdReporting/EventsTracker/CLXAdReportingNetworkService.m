@@ -265,6 +265,10 @@
         return;
     }
     NSMutableString *urlString = [NSMutableString stringWithString:trackingString];
+    // Ensure trailing slash for proper path construction (server gives us "/t" but we need "/t/")
+    if (![urlString hasSuffix:@"/"]) {
+        [urlString appendString:@"/"];
+    }
     [urlString appendString:actionString];
     NSURL *url = [NSURL URLWithString:urlString];
     if (!url) {

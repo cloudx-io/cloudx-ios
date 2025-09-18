@@ -246,12 +246,13 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     }
     
     NSDictionary *keyValuePaths = response[@"keyValuePaths"];
-    if (cdpEndpointDict) {
+    if (keyValuePaths) {
         CLXSDKConfigKeyValueObject *keyValuePath = [[CLXSDKConfigKeyValueObject alloc] init];
         keyValuePath.appKeyValues = keyValuePaths[@"appKeyValues"];
         keyValuePath.eids = keyValuePaths[@"eids"];
         keyValuePath.placementLoopIndex = keyValuePaths[@"placementLoopIndex"];
         keyValuePath.userKeyValues = keyValuePaths[@"userKeyValues"];
+        config.keyValuePaths = keyValuePath; // Actually assign the parsed object to config
     }
     
     // Parse geoHeaders
