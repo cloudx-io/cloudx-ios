@@ -13,7 +13,6 @@
         _accountID = nil;
         _bidders = nil;
         _placements = nil;
-        _eventTrackingURL = nil;
         _auctionEndpointURL = nil;
         _cdpEndpointURL = nil;
     }
@@ -29,7 +28,6 @@
         _accountID = nil;
         _bidders = nil;
         _placements = nil;
-        _eventTrackingURL = nil;
         _auctionEndpointURL = nil;
         _cdpEndpointURL = nil;
     }

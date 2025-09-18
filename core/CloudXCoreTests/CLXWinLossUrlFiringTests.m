@@ -95,14 +95,6 @@ static MockCLXAdEventReporter *sharedInstance = nil;
     }
 }
 
-// Other required protocol methods
-- (void)impressionWithBidID:(NSString *)bidID {
-    [self.impressionBidIDs addObject:bidID ?: @""];
-}
-
-- (void)winWithBidID:(NSString *)bidID {
-    [self.winBidIDs addObject:bidID ?: @""];
-}
 
 - (void)metricsTrackingWithActionString:(NSString *)actionString {
     // Not used in tests

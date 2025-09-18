@@ -27,35 +27,6 @@
     return self;
 }
 
-- (void)impressionWithBidID:(NSString *)bidID {
-    __weak typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (!strongSelf) {
-            return;
-        }
-        NSError *error;
-        [strongSelf.reportNetworkService trackImpressionWithBidID:bidID error:&error];
-        if (error) {
-            [strongSelf.logger error:[NSString stringWithFormat:@"Failed to track impression: %@", error.localizedDescription]];
-        }
-    });
-}
-
-- (void)winWithBidID:(NSString *)bidID {
-    __weak typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (!strongSelf) {
-            return;
-        }
-        NSError *error;
-        [strongSelf.reportNetworkService trackWinWithBidID:bidID error:&error];
-        if (error) {
-            [strongSelf.logger error:[NSString stringWithFormat:@"Failed to track win: %@", error.localizedDescription]];
-        }
-    });
-}
 
 
 - (void)fireNurlForRevenueWithPrice:(double)price nUrl:(nullable NSString *)nUrl completion:(void(^)(BOOL success, CLXAd * _Nullable ad))completion {
@@ -150,7 +121,7 @@
         NSError *error;
         [strongSelf.reportNetworkService metricsTrackingWithActionString:actionString error:&error];
         if (error) {
-            [strongSelf.logger error:[NSString stringWithFormat:@"Failed to track rill: %@", error.localizedDescription]];
+            [strongSelf.logger error:[NSString stringWithFormat:@"Failed to track metrics: %@", error.localizedDescription]];
         }
     });
 }

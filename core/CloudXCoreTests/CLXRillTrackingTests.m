@@ -102,8 +102,6 @@ static MockRillEventReporter *sharedInstance = nil;
         completion(YES, nil);
     }
 }
-- (void)impressionWithBidID:(NSString *)bidID {}
-- (void)winWithBidID:(NSString *)bidID {}
 @end
 
 // Mock SDK Config Response with test tracking configuration

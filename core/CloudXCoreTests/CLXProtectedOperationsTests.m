@@ -120,10 +120,12 @@
     NSString *auctionUrl = [CLXURLProvider auctionApiUrl];
     NSString *metricsUrl = [CLXURLProvider metricsApiUrl];
     
-    // All should return valid URLs or handle gracefully
+    // Init URL should be valid (still used for SDK initialization)
     XCTAssertNotNil(initUrl, @"Init API URL should be valid");
-    XCTAssertNotNil(auctionUrl, @"Auction API URL should be valid");
-    XCTAssertNotNil(metricsUrl, @"Metrics API URL should be valid");
+    
+    // Auction and metrics URLs are now deprecated and return nil (URLs come from SDK response)
+    XCTAssertNil(auctionUrl, @"Auction API URL should be nil (deprecated - comes from SDK response)");
+    XCTAssertNil(metricsUrl, @"Metrics API URL should be nil (deprecated - comes from SDK response)");
     
     XCTAssertTrue(YES, @"URL construction should handle all scenarios gracefully");
 }
