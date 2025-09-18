@@ -11,6 +11,7 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXSystemInformation.h>
 #import <CloudXCore/CLXReachabilityService.h>
+#import <CloudXCore/CLXGeoLocationService.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <CloudXCore/CLXSettings.h>
@@ -257,6 +258,7 @@ static void initializeLogger() {
         geo.accuracy = location ? @(location.horizontalAccuracy) : nil;
         geo.type = @1;
         geo.utcoffset = @([[NSTimeZone localTimeZone] secondsFromGMT] / 60);
+        geo.country = [[CLXGeoLocationService shared] countryCode];
         
         CLXBiddingConfigDeviceExt *deviceExt = [[CLXBiddingConfigDeviceExt alloc] init];
         deviceExt.ifv = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
@@ -617,6 +619,9 @@ static void initializeLogger() {
     }
     if (geo.accuracy) {
         json[@"accuracy"] = geo.accuracy;
+    }
+    if (geo.country) {
+        json[@"country"] = geo.country;
     }
     json[@"type"] = geo.type ?: @0;
     json[@"utcoffset"] = geo.utcoffset ?: @0;

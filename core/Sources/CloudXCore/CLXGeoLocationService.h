@@ -42,6 +42,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)isCaliforniaUser;
 
+/**
+ * Gets the user's country code from geo headers
+ * @return The country code (e.g., "USA", "GBR") if available, nil otherwise
+ * @discussion Uses cloudfront-viewer-country-iso3 header for country determination
+ */
+- (nullable NSString *)countryCode;
+
 @end
 
 NS_ASSUME_NONNULL_END 

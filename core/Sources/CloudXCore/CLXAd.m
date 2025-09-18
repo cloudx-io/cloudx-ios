@@ -42,8 +42,12 @@
 }
 
 + (instancetype)adFromBid:(id)bid placementId:(NSString *)placementId {
+    return [self adFromBid:bid placementId:placementId placementName:nil];
+}
+
++ (instancetype)adFromBid:(id)bid placementId:(NSString *)placementId placementName:(NSString *)placementName {
     // Extract data from bid response using available properties
-    NSString *placementName = nil;
+    NSString *resolvedPlacementName = nil;
     NSString *bidder = nil;
     NSString *externalPlacementId = nil;
     NSNumber *revenue = nil;
@@ -62,13 +66,19 @@
             bidder = bidResponse.ext.cloudx.adapterExtras[@"bidder"] ?: bidResponse.ext.cloudx.adapterExtras[@"adapter"];
         }
         
-        // Use placement ID as placement name if no specific name is available
-        placementName = placementId;
+        // Use provided placement name if available, otherwise try adapter extras, then fall back to placement ID
+        if (placementName && placementName.length > 0) {
+            resolvedPlacementName = placementName;
+        } else if (bidResponse.ext && bidResponse.ext.cloudx && bidResponse.ext.cloudx.adapterExtras) {
+            resolvedPlacementName = bidResponse.ext.cloudx.adapterExtras[@"placementName"] ?: placementId;
+        } else {
+            resolvedPlacementName = placementId;
+        }
     }
 
     // Only create CLXAd if we have valid bid data AND required fields
     if ([bid isKindOfClass:[CLXBidResponseBid class]] && bidder && bidder.length > 0 && revenue) {
-        return [[self alloc] initWithPlacementName:placementName
+        return [[self alloc] initWithPlacementName:resolvedPlacementName
                                        placementId:placementId
                                             bidder:bidder
                                externalPlacementId:externalPlacementId
@@ -78,5 +88,6 @@
     // Return nil if we don't have valid bid data or required fields
     return nil;
 }
+
 
 @end

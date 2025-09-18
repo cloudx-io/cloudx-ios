@@ -142,6 +142,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSNumber *accuracy;
 @property (nonatomic, strong) NSNumber *type;
 @property (nonatomic, strong) NSNumber *utcoffset;
+@property (nonatomic, copy, nullable) NSString *country;
 @end
 
 @interface CLXBiddingConfigDeviceExt : NSObject

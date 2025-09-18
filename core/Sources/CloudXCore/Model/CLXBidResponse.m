@@ -99,6 +99,114 @@ static void initializeLogger() {
     return sortedBids;
 }
 
+#pragma mark - Marshaling Methods
+
+- (NSDictionary *)marshalToJSONDictionary {
+    NSMutableDictionary *responseDict = [NSMutableDictionary dictionary];
+    
+    // Basic response fields
+    if (self.id) {
+        responseDict[@"id"] = self.id;
+    }
+    
+    // Marshal seatbid array
+    if (self.seatbid && self.seatbid.count > 0) {
+        NSMutableArray *seatbidArray = [NSMutableArray array];
+        
+        for (CLXBidResponseSeatBid *seatbid in self.seatbid) {
+            NSMutableDictionary *seatDict = [NSMutableDictionary dictionary];
+            seatDict[@"seat"] = seatbid.seat ?: @"";
+            
+            if (seatbid.bid && seatbid.bid.count > 0) {
+                NSMutableArray *bidArray = [NSMutableArray array];
+                for (CLXBidResponseBid *bid in seatbid.bid) {
+                    [bidArray addObject:[CLXBidResponse marshalBidToJSONDictionary:bid]];
+                }
+                seatDict[@"bid"] = bidArray;
+            }
+            
+            [seatbidArray addObject:seatDict];
+        }
+        
+        responseDict[@"seatbid"] = seatbidArray;
+    }
+    
+    return [responseDict copy];
+}
+
++ (NSDictionary *)marshalBidToJSONDictionary:(CLXBidResponseBid *)bid {
+    if (!bid) {
+        return @{};
+    }
+    
+    NSMutableDictionary *bidDict = [NSMutableDictionary dictionary];
+    
+    // Core bid fields
+    [self addStringFieldToDict:bidDict key:@"id" value:bid.id];
+    [self addNumericFieldToDict:bidDict key:@"price" value:@(bid.price)];
+    [self addStringFieldToDict:bidDict key:@"crid" value:bid.crid];
+    [self addStringFieldToDict:bidDict key:@"dealid" value:bid.dealid];
+    [self addNumericFieldToDict:bidDict key:@"w" value:@(bid.w)];
+    [self addNumericFieldToDict:bidDict key:@"h" value:@(bid.h)];
+    [self addStringFieldToDict:bidDict key:@"adm" value:bid.adm];
+    [self addStringFieldToDict:bidDict key:@"nurl" value:bid.nurl];
+    [self addStringFieldToDict:bidDict key:@"lurl" value:bid.lurl];
+    
+    // Marshal extension data
+    if (bid.ext) {
+        bidDict[@"ext"] = [self marshalBidExtToJSONDictionary:bid.ext];
+    }
+    
+    return [bidDict copy];
+}
+
++ (NSDictionary *)marshalBidExtToJSONDictionary:(CLXBidResponseExt *)ext {
+    if (!ext) {
+        return @{};
+    }
+    
+    NSMutableDictionary *extDict = [NSMutableDictionary dictionary];
+    
+    // Original bid pricing
+    [self addNumericFieldToDict:extDict key:@"origbidcpm" value:@(ext.origbidcpm)];
+    [self addStringFieldToDict:extDict key:@"origbidcur" value:ext.origbidcur];
+    
+    // Prebid extensions
+    if (ext.prebid && ext.prebid.meta) {
+        NSMutableDictionary *prebidDict = [NSMutableDictionary dictionary];
+        NSMutableDictionary *metaDict = [NSMutableDictionary dictionary];
+        [self addStringFieldToDict:metaDict key:@"adaptercode" value:ext.prebid.meta.adaptercode];
+        prebidDict[@"meta"] = metaDict;
+        extDict[@"prebid"] = prebidDict;
+    }
+    
+    // CloudX extensions
+    if (ext.cloudx) {
+        NSMutableDictionary *cloudxDict = [NSMutableDictionary dictionary];
+        [self addNumericFieldToDict:cloudxDict key:@"rank" value:@(ext.cloudx.rank)];
+        if (ext.cloudx.adapterExtras) {
+            cloudxDict[@"adapterExtras"] = ext.cloudx.adapterExtras;
+        }
+        extDict[@"cloudx"] = cloudxDict;
+    }
+    
+    return [extDict copy];
+}
+
+#pragma mark - Marshaling Utilities
+
++ (void)addStringFieldToDict:(NSMutableDictionary *)dict key:(NSString *)key value:(nullable NSString *)value {
+    if (value && value.length > 0) {
+        dict[key] = value;
+    }
+}
+
++ (void)addNumericFieldToDict:(NSMutableDictionary *)dict key:(NSString *)key value:(NSNumber *)value {
+    if (value) {
+        dict[key] = value;
+    }
+}
+
 + (CLXBidResponse *)parseBidResponseFromDictionary:(NSDictionary *)dictionary {
     if (!dictionary || ![dictionary isKindOfClass:[NSDictionary class]]) {
         [logger error:@"❌ [BidResponse] Invalid dictionary provided for parsing"];
