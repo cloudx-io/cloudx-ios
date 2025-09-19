@@ -17,6 +17,7 @@
 #import <CloudXCore/CLXSDKConfigPlacement.h>
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXAdNetworkFactories.h>
+#import <CloudXCore/CLXWinLossTracker.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXBidAdSource.h>
@@ -627,26 +628,26 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     
     // Fire NURL for interstitial impression with revenue callback
     CLXBidResponseBid *winningBid = [self.currentBidResponse findBidWithID:interstitial.bidID];
-    if (winningBid && winningBid.nurl) {
-        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Firing NURL for interstitial impression with revenue callback: bidID=%@, price=%.2f", interstitial.bidID, winningBid.price]];
+    if (winningBid && interstitial.bidID && self.currentBidResponse && self.currentBidResponse.id) {
+        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Sending server-side win notification for interstitial impression: bidID=%@, price=%.2f", interstitial.bidID, winningBid.price]];
         
-        __weak typeof(self) weakSelf = self;
-        [self.reportingService fireNurlForRevenueWithPrice:winningBid.price nUrl:winningBid.nurl completion:^(BOOL success, CLXAd * _Nullable ad) {
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            if (!strongSelf) return;
-            
-            if (success) {
-                // Create CLXAd object and trigger revenue callback
-                CLXAd *adObject = [CLXAd adFromBid:strongSelf.lastBidResponse.bid placementId:strongSelf.placementID placementName:strongSelf.placementName];
-                if (strongSelf.interstitialDelegate && [strongSelf.interstitialDelegate respondsToSelector:@selector(revenuePaid:)]) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [strongSelf.interstitialDelegate revenuePaid:adObject];
-                    });
-                }
-            }
-        }];
+        // Mark bid as successfully loaded and send win notification
+        [[CLXWinLossTracker shared] setBidLoadResult:self.currentBidResponse.id 
+                                               bidId:interstitial.bidID 
+                                             success:YES 
+                                          lossReason:nil];
+        [[CLXWinLossTracker shared] sendWin:self.currentBidResponse.id bidId:interstitial.bidID];
+        
+        // Trigger revenue callback immediately (no longer depends on NURL network call)
+        CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        if (self.interstitialDelegate && [self.interstitialDelegate respondsToSelector:@selector(revenuePaid:)]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.interstitialDelegate revenuePaid:adObject];
+            });
+        }
     } else {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] No NURL to fire for interstitial: bidID=%@, winningBid=%@, nurl=%@", interstitial.bidID, winningBid ? @"found" : @"not found", winningBid ? winningBid.nurl : @"N/A"]];
+        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Missing data for interstitial win notification: bidID=%@, winningBid=%@, auctionID=%@", 
+                           interstitial.bidID ?: @"(nil)", winningBid ? @"found" : @"not found", self.currentBidResponse.id ?: @"(nil)"]];
     }
     
     if ([self.interstitialDelegate respondsToSelector:@selector(impressionOn:)]) {
@@ -772,24 +773,23 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     
     // Fire NURL for rewarded impression with revenue callback
     CLXBidResponseBid *winningBid = [self.currentBidResponse findBidWithID:rewarded.bidID];
-    if (winningBid && winningBid.nurl) {
-        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Firing NURL for rewarded impression with revenue callback: bidID=%@, price=%.2f", rewarded.bidID, winningBid.price]];
+    if (winningBid && rewarded.bidID && self.currentBidResponse && self.currentBidResponse.id) {
+        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Sending server-side win notification for rewarded impression: bidID=%@, price=%.2f", rewarded.bidID, winningBid.price]];
         
-        __weak typeof(self) weakSelf = self;
-        [self.reportingService fireNurlForRevenueWithPrice:winningBid.price nUrl:winningBid.nurl completion:^(BOOL success, CLXAd * _Nullable ad) {
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            if (!strongSelf) return;
-            
-            if (success) {
-                // Create CLXAd object and trigger revenue callback
-                CLXAd *adObject = [CLXAd adFromBid:strongSelf.lastBidResponse.bid placementId:strongSelf.placementID placementName:strongSelf.placementName];
-                if (strongSelf.rewardedDelegate && [strongSelf.rewardedDelegate respondsToSelector:@selector(revenuePaid:)]) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [strongSelf.rewardedDelegate revenuePaid:adObject];
-                    });
-                }
-            }
-        }];
+        // Mark bid as successfully loaded and send win notification
+        [[CLXWinLossTracker shared] setBidLoadResult:self.currentBidResponse.id 
+                                               bidId:rewarded.bidID 
+                                             success:YES 
+                                          lossReason:nil];
+        [[CLXWinLossTracker shared] sendWin:self.currentBidResponse.id bidId:rewarded.bidID];
+        
+        // Trigger revenue callback immediately (no longer depends on NURL network call)
+        CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        if (self.rewardedDelegate && [self.rewardedDelegate respondsToSelector:@selector(revenuePaid:)]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.rewardedDelegate revenuePaid:adObject];
+            });
+        }
     } else {
         [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] No NURL to fire for rewarded: bidID=%@, winningBid=%@", rewarded.bidID, winningBid ? @"found" : @"not found"]];
     }

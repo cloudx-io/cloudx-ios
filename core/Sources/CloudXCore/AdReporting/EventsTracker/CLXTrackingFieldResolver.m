@@ -812,4 +812,19 @@
     return [value1 isEqual:value2];
 }
 
+#pragma mark - Win/Loss Field Resolution
+
+- (nullable id)resolveField:(NSString *)fieldPath forAuction:(NSString *)auctionId {
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolving field: %@ for auction: %@", fieldPath, auctionId]];
+    
+    // Handle SDK-level constants
+    if ([fieldPath isEqualToString:@"sdk.loopIndex"]) {
+        NSNumber *loopIndex = self.auctionedLoopIndex[auctionId];
+        return loopIndex ? [loopIndex stringValue] : nil;
+    }
+    
+    // Delegate to existing field resolution logic
+    return [self resolveField:auctionId field:fieldPath];
+}
+
 @end

@@ -10,11 +10,13 @@
 #import <CloudXCore/CloudXCore.h>
 #import <objc/runtime.h>
 #import <objc/objc.h>
+#import "Mocks/MockCLXWinLossTracker.h"
 
 // MARK: - Test Constants
 
 static NSString * const kTestPlacementID = @"test-interstitial-placement";
 static NSString * const kTestBidID = @"test-bid-12345";
+static NSString * const kTestAuctionID = @"test-auction-12345";
 static NSString * const kTestNURL = @"https://test.com/nurl?price=${AUCTION_PRICE}";
 static NSString * const kTestLURL = @"https://test.com/lurl?reason=${AUCTION_LOSS}";
 static const double kTestPrice = 5.99;
@@ -268,6 +270,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 @property (nonatomic, strong) CLXPublisherFullscreenAd *interstitial;
 @property (nonatomic, strong) MockInterstitialDelegate *mockDelegate;
 @property (nonatomic, strong) MockAdEventReporter *mockReporter;
+@property (nonatomic, strong) MockCLXWinLossTracker *mockWinLossTracker;
 @property (nonatomic, strong) MockAdapterInterstitial *mockAdapter;
 @end
 
@@ -311,6 +314,10 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Set up mock reporter
     self.mockReporter = [[MockAdEventReporter alloc] init];
     
+    // Set up mock win/loss tracker for server-side tracking
+    self.mockWinLossTracker = [[MockCLXWinLossTracker alloc] init];
+    [CLXWinLossTracker setSharedInstanceForTesting:self.mockWinLossTracker];
+    
     // Create mock adapter
     self.mockAdapter = [[MockAdapterInterstitial alloc] init];
     
@@ -348,9 +355,13 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 }
 
 - (void)tearDown {
+    // Reset win/loss tracker to default
+    [CLXWinLossTracker resetSharedInstance];
+    
     self.interstitial = nil;
     self.mockDelegate = nil;
     self.mockReporter = nil;
+    self.mockWinLossTracker = nil;
     self.mockAdapter = nil;
     [super tearDown];
 }
@@ -595,18 +606,25 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Create a custom mock bid response that returns our test bid
     MockBidResponse *mockBidResponse = [[MockBidResponse alloc] init];
     mockBidResponse.testBid = mockBid;
+    mockBidResponse.id = kTestAuctionID; // Set auction ID for win/loss tracking
     self.interstitial.currentBidResponse = mockBidResponse;
     
     [self setCurrentState:CLXInterstitialStateSHOWING onInterstitial:self.interstitial];
     self.interstitial.currentInterstitialAdapter = self.mockAdapter;
     
+    // Set up the mock adapter with the test bid ID
+    self.mockAdapter.bidID = kTestBidID;
+    
     // Simulate impression
     [self.interstitial impressionWithInterstitial:self.mockAdapter];
     
-    // Verify NURL was fired
-    XCTAssertEqual(self.mockReporter.firedNurls.count, 1, @"One NURL should be fired");
-    XCTAssertEqualObjects(self.mockReporter.firedNurls.firstObject, kTestNURL, @"Correct NURL should be fired");
-    XCTAssertEqual([self.mockReporter.firedNurlPrices.firstObject doubleValue], kTestPrice, @"Correct price should be used");
+    // Verify win notification was sent (replaces NURL firing)
+    XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 1, @"One win notification should be sent");
+    
+    // Verify the win notification contains correct data
+    NSDictionary *winNotification = self.mockWinLossTracker.winNotifications.firstObject;
+    XCTAssertEqualObjects(winNotification[@"bidId"], kTestBidID, @"Correct bid ID should be used");
+    XCTAssertNotNil(winNotification[@"auctionId"], @"Auction ID should be present");
 }
 
 - (void)testNurlNotFiredWhenNoBidResponse {
@@ -619,8 +637,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Simulate impression
     [self.interstitial impressionWithInterstitial:self.mockAdapter];
     
-    // Verify no NURL was fired
-    XCTAssertEqual(self.mockReporter.firedNurls.count, 0, @"No NURL should be fired when no bid response");
+    // Verify no win notification was sent
+    XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 0, @"No win notification should be sent when no bid response");
 }
 
 - (void)testNurlNotFiredWhenNoNurlInBid {
@@ -641,8 +659,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Simulate impression
     [self.interstitial impressionWithInterstitial:self.mockAdapter];
     
-    // Verify no NURL was fired
-    XCTAssertEqual(self.mockReporter.firedNurls.count, 0, @"No NURL should be fired when bid has no NURL");
+    // Verify no win notification was sent  
+    XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 0, @"No win notification should be sent when bid has no NURL");
 }
 
 // MARK: - Integration Tests
@@ -659,11 +677,15 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     
     MockBidResponse *mockBidResponse = [[MockBidResponse alloc] init];
     mockBidResponse.testBid = mockBid;
+    mockBidResponse.id = kTestAuctionID; // Set auction ID for win/loss tracking
     self.interstitial.currentBidResponse = mockBidResponse;
     
     // Start with loading state and adapter
     [self setCurrentState:CLXInterstitialStateLOADING onInterstitial:self.interstitial];
     self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    
+    // Set up the mock adapter with the test bid ID
+    self.mockAdapter.bidID = kTestBidID;
     
     // Step 1: Load success
     [self.interstitial didLoadWithInterstitial:self.mockAdapter];
@@ -687,9 +709,12 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
             XCTAssertTrue([self.mockDelegate.callbackLog containsObject:callback], @"Callback %@ should be called", callback);
         }
         
-        // Verify NURL was fired on impression
-        XCTAssertEqual(self.mockReporter.firedNurls.count, 1, @"NURL should be fired on impression");
-        XCTAssertEqualObjects(self.mockReporter.firedNurls.firstObject, kTestNURL, @"Correct NURL should be fired");
+        // Verify win notification was sent on impression (replaces NURL firing)
+        XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 1, @"Win notification should be sent on impression");
+        
+        // Verify the win notification contains correct data
+        NSDictionary *winNotification = self.mockWinLossTracker.winNotifications.firstObject;
+        XCTAssertEqualObjects(winNotification[@"bidId"], kTestBidID, @"Correct bid ID should be used");
         
         // Verify final state
         CLXInterstitialState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
@@ -721,8 +746,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         XCTAssertFalse([self.mockDelegate.callbackLog containsObject:@"didLoadWithAd"], @"didLoadWithAd should not be called");
         XCTAssertFalse([self.mockDelegate.callbackLog containsObject:@"didShowWithAd"], @"didShowWithAd should not be called");
         
-        // Verify no NURL fired
-        XCTAssertEqual(self.mockReporter.firedNurls.count, 0, @"No NURL should be fired on load failure");
+        // Verify no win notification sent on load failure
+        XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 0, @"No win notification should be sent on load failure");
         
         // Verify state reset
         CLXInterstitialState currentState = [self getCurrentStateFromInterstitial:self.interstitial];

@@ -271,6 +271,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     // Parse tracking URLs
     config.impressionTrackerURL = response[@"impressionTrackerURL"];
     config.metricsEndpointURL = response[@"metricsEndpointURL"];
+    config.winLossNotificationURL = response[@"winLossNotificationURL"];
     
     // Parse bidders
     NSArray *biddersArray = response[@"bidders"];

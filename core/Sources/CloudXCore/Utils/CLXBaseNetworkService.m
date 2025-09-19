@@ -71,11 +71,14 @@
 }
 
 /**
- * @brief Internal method that executes a network request with per-request retry tracking
+ * @brief Executes HTTP request with retry logic and kill switch detection
  * 
- * Uses per-request retry state instead of shared instance variables to eliminate race conditions.
- * This prevents concurrent requests from corrupting each other's retry counts, ensuring thread-safe
- * operation when multiple network requests are executing simultaneously.
+ * This method handles the complete request lifecycle:
+ * 1. URL construction with parameters
+ * 2. HTTP request execution 
+ * 3. Retry logic for network/server errors
+ * 4. Kill switch detection via X-CloudX-Status header
+ * 5. Response parsing and error handling
  * 
  * @param endpoint The API endpoint to call
  * @param urlParameters Dictionary of URL parameters
@@ -97,28 +100,30 @@
     
     [self.logger debug:[NSString stringWithFormat:@"🔧 [BaseNetworkService] executeRequestWithEndpoint - Endpoint: %@, Retries: %ld", endpoint, (long)maxRetries]];
     
+    // Build complete URL with query parameters
     NSURLComponents *components = [[NSURLComponents alloc] initWithString:[self.baseURL stringByAppendingString:endpoint]];
     
-    // Start with existing query items from the base URL
+    // Preserve existing query items from base URL
     NSMutableArray *queryItems = [NSMutableArray array];
     if (components.queryItems) {
         [queryItems addObjectsFromArray:components.queryItems];
     }
     
-    // Add new URL parameters
+    // Append new URL parameters
     if (urlParameters) {
         [urlParameters enumerateKeysAndObjectsUsingBlock:^(id key, id value, BOOL *stop) {
             [queryItems addObject:[NSURLQueryItem queryItemWithName:key value:[value description]]];
         }];
     }
     
-    // Set the combined query items
+    // Apply all query parameters to URL
     if (queryItems.count > 0) {
         components.queryItems = queryItems;
     }
     
     [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] Final URL: %@", components.URL]];
     
+    // Configure HTTP request with method, body, and headers
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:components.URL];
     request.HTTPMethod = requestBody ? @"POST" : @"GET";
     request.HTTPBody = requestBody;
@@ -129,38 +134,41 @@
     
     [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP %@ request prepared", request.HTTPMethod]];
     
+    // Execute network request with completion handling
     [self.logger debug:@"🔧 [BaseNetworkService] Creating URLSessionDataTask..."];
     NSURLSessionDataTask *task = [self.urlSession dataTaskWithRequest:request
                                                   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         [self.logger debug:[NSString stringWithFormat:@"🔧 [BaseNetworkService] Request completed - Data: %@, Error: %@", data ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
         
+        // Initialize kill switch detection flag
         BOOL isKillSwitchEnabled = NO;
         
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
         
-        // Log HTTP status code
+        // Log response status for debugging
         if (httpResponse) {
             [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP response - Status: %ld", (long)httpResponse.statusCode]];
         } else {
             [self.logger debug:@"📊 [BaseNetworkService] No HTTP response (network/timeout error)"];
         }
         
-        // Check for retryable conditions per V1 spec
+        // Determine if request should be retried based on error type
         BOOL shouldRetry = NO;
         NSTimeInterval retryDelay = delay;
         
-        if (error != nil && (!httpResponse || [self isNetworkTimeoutError:error])) {
-            // Network/timeout errors: retry once after 1s delay
+        // Check for network/timeout errors that warrant retry
+        BOOL isNetworkOrTimeoutError = (error != nil && (!httpResponse || [self isNetworkTimeoutError:error]));
+        if (isNetworkOrTimeoutError) {
             [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Network/timeout error - Error: %@, Attempt: %ld/%ld", error.localizedDescription, (long)(currentAttempt + 1), (long)(maxRetries + 1)]];
             shouldRetry = YES;
             retryDelay = 1.0; // V1 spec: 1-second delay for network errors
         } else if (httpResponse && ((httpResponse.statusCode >= 500 && httpResponse.statusCode < 600) || httpResponse.statusCode == 429)) {
-            // 5xx server errors or 429 rate limiting
+            // Check for server errors (5xx) or rate limiting (429) that warrant retry
             [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Server error %ld - Attempt: %ld/%ld", (long)httpResponse.statusCode, (long)(currentAttempt + 1), (long)(maxRetries + 1)]];
             shouldRetry = YES;
             
             if (httpResponse.statusCode == 429) {
-                // Parse Retry-After header with fallback to 1s
+                // Parse Retry-After header for rate limiting
                 NSString *retryAfterHeader = httpResponse.allHeaderFields[@"Retry-After"];
                 NSTimeInterval parsedDelay = [self parseRetryAfterHeader:retryAfterHeader];
                 retryDelay = parsedDelay > 0 ? parsedDelay : 1.0; // V1 spec: default 1s if missing
@@ -169,6 +177,7 @@
             }
         }
         
+        // Execute retry if conditions are met and attempts remain
         if (shouldRetry && currentAttempt < maxRetries) {
             NSInteger nextAttempt = currentAttempt + 1;
             [self.logger debug:[NSString stringWithFormat:@"🔄 [BaseNetworkService] Retrying request (attempt %ld) after %.1fs delay", (long)(nextAttempt + 1), retryDelay]];
@@ -185,11 +194,12 @@
             return;
         }
         
-        // Max retries reached or non-retryable error
+        // Log when max retries are exhausted
         if (shouldRetry) {
             [self.logger error:@"❌ [BaseNetworkService] Max retries reached, calling completion with error"];
         }
         
+        // Handle request errors by returning early
         if (error) {
             if (completion) {
                 completion(nil, error, isKillSwitchEnabled);
@@ -197,22 +207,37 @@
             return;
         }
         
-        // Log response body
+        // Log response data for debugging
         if (data) {
             NSString *responseBody = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
             [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] Response body length: %lu", (unsigned long)responseBody.length]];
         } else {
             [self.logger debug:@"📊 [BaseNetworkService] No response data received"];
         }
-        
+    
+        // Process successful HTTP responses (2xx status codes)
         if (httpResponse.statusCode >= 200 && httpResponse.statusCode < 300) {
-            if (httpResponse.statusCode == 204) {
-                if ([[httpResponse.allHeaderFields objectForKey:@"X-CloudX-Status"] isEqual:@"ADS_DISABLED"] || [[httpResponse.allHeaderFields objectForKey:@"X-CloudX-Status"] isEqual:@"SDK_DISABLED"]) {
-                    isKillSwitchEnabled = YES;
-                }
-                
+            // KILL SWITCH DETECTION: Check for server-controlled disable commands in HTTP 204 responses
+            // Server sends X-CloudX-Status header with "ADS_DISABLED" or "SDK_DISABLED" to remotely disable functionality
+            BOOL isNoContentResponse = (httpResponse.statusCode == 204);
+            NSString *cloudXStatus = [httpResponse.allHeaderFields objectForKey:@"X-CloudX-Status"];
+            BOOL isKillSwitchActive = ([cloudXStatus isEqual:@"ADS_DISABLED"] || [cloudXStatus isEqual:@"SDK_DISABLED"]);
+            
+
+
+
+
+[self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] Response body length: %@", httpResponse.allHeaderFields]];
+
+
+
+
+            if (isNoContentResponse && isKillSwitchActive) {
+                isKillSwitchEnabled = YES;
             }
+            
             [self.logger info:@"✅ [BaseNetworkService] HTTP status code indicates success"];
+            // Parse JSON response data if present
             if (data) {
                 NSError *jsonError;
                 id jsonResponse = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
@@ -228,12 +253,14 @@
                     }
                 }
             } else {
+                // No data to parse, return success with nil response
                 [self.logger debug:@"📊 [BaseNetworkService] No data to parse, calling completion with nil"];
                 if (completion) {
                     completion(nil, nil, false);
                 }
             }
         } else {
+            // Handle HTTP error status codes (non-2xx)
             [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] HTTP status code indicates error: %ld", (long)httpResponse.statusCode]];
             if (completion) {
                 completion(nil, [CLXError errorWithCode:CLXErrorCodeLoadFailed], false);
@@ -241,6 +268,7 @@
         }
     }];
     
+    // Start the network request
     [self.logger debug:@"🔧 [BaseNetworkService] Starting URLSessionDataTask..."];
     [task resume];
     [self.logger info:@"✅ [BaseNetworkService] URLSessionDataTask started"];

@@ -11,9 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)geoTrackingWithURLString:(NSString *)fullURL
                           extras:(NSDictionary<NSString *, NSString *> *)extras;
 
-// Win/Loss URL firing methods for all ad types
-- (void)fireNurlForRevenueWithPrice:(double)price nUrl:(nullable NSString *)nUrl completion:(void(^)(BOOL success, CLXAd * _Nullable ad))completion;
-- (void)fireLurlWithUrl:(nullable NSString *)lUrl reason:(NSInteger)reason;
+// Legacy win/loss methods removed - use CLXWinLossTracker for server-side tracking
 @end
 
 @interface CLXAdEventReporter : NSObject <CLXAdEventReporting>
