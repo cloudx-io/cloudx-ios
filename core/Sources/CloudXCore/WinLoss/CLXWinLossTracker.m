@@ -295,11 +295,10 @@ static id<CLXWinLossTracking> _testInstance = nil;
                              completion:^(BOOL success, NSError * _Nullable error) {
         
         if (success) {
-            [self.logger debug:@"✅ [WinLossTracker] Win/loss notification sent successfully"];
             // Remove from database cache on success
             [self deleteEventWithId:eventId];
         } else {
-            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Win/loss notification failed: %@", 
+            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Send failed: %@", 
                                error ? error.localizedDescription : @"Unknown error"]];
             // Keep in database for retry
         }

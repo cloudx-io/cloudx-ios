@@ -143,17 +143,14 @@
         
         NSInteger statusCode = httpResponse ? httpResponse.statusCode : 200; // Default to success if no HTTP response
         
-        [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossNetworkService] Win/Loss API Response Status: %ld", (long)statusCode]];
-        
         // Match Android's success condition: code in 200..299
         if (statusCode >= 200 && statusCode < 300) {
-            [self.logger debug:[NSString stringWithFormat:@"✅ [WinLossNetworkService] %@ notification sent successfully", notificationType]];
             
             if (completion) {
                 completion(YES, nil);
             }
         } else {
-            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossNetworkService] Win/loss notification failed with HTTP status: %ld", (long)statusCode]];
+            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossNetworkService] HTTP %ld", (long)statusCode]];
             
             NSError *statusError = [CLXError errorWithCode:CLXErrorCodeServerError 
                                                description:[NSString stringWithFormat:@"HTTP %ld", (long)statusCode]];
