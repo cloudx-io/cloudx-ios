@@ -256,13 +256,10 @@
     
     // Debug logging for country field
     if ([path isEqualToString:@"device.geo.country"]) {
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [CLXTrackingFieldResolver] Resolving bidRequest.device.geo.country - path: %@", path]];
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [CLXTrackingFieldResolver] Request data keys: %@", [requestData allKeys]]];
         NSDictionary *device = requestData[@"device"];
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [CLXTrackingFieldResolver] Device keys: %@", [device allKeys]]];
         NSDictionary *geo = device[@"geo"];
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [CLXTrackingFieldResolver] Geo keys: %@", [geo allKeys]]];
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [CLXTrackingFieldResolver] Country value: '%@'", geo[@"country"]]];
+        [self.logger debug:[NSString stringWithFormat:@"🌍 [CLXTrackingFieldResolver] Resolving device.geo.country: '%@' (device:%@, geo:%@)", 
+                           geo[@"country"], device ? @"✓" : @"✗", geo ? @"✓" : @"✗"]];
     }
     
     return [self resolveNestedField:requestData path:path];
