@@ -256,7 +256,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 @implementation MockBidResponse
 
 - (CLXBidResponseBid *)findBidWithID:(NSString *)bidID {
-    if ([bidID isEqualToString:self.testBid.adid]) {
+    if ([bidID isEqualToString:self.testBid.id]) {
         return self.testBid;
     }
     return nil;
@@ -599,7 +599,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     
     // Set up bid response with NURL
     CLXBidResponseBid *mockBid = [[CLXBidResponseBid alloc] init];
-    mockBid.adid = kTestBidID;
+    mockBid.id = kTestBidID;  // Use .id instead of .adid for win/loss tracking
     mockBid.price = kTestPrice;
     mockBid.nurl = kTestNURL;
     
@@ -608,6 +608,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     mockBidResponse.testBid = mockBid;
     mockBidResponse.id = kTestAuctionID; // Set auction ID for win/loss tracking
     self.interstitial.currentBidResponse = mockBidResponse;
+    
+    // Add bid to mock tracker so it can be found for win notification
+    [self.mockWinLossTracker addBid:kTestAuctionID bid:mockBid];
     
     [self setCurrentState:CLXInterstitialStateSHOWING onInterstitial:self.interstitial];
     self.interstitial.currentInterstitialAdapter = self.mockAdapter;
@@ -625,6 +628,18 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     NSDictionary *winNotification = self.mockWinLossTracker.winNotifications.firstObject;
     XCTAssertEqualObjects(winNotification[@"bidId"], kTestBidID, @"Correct bid ID should be used");
     XCTAssertNotNil(winNotification[@"auctionId"], @"Auction ID should be present");
+    
+    // ENHANCED: Verify actual resolved URL values (not just structure)
+    XCTAssertNotNil(winNotification[@"resolvedURL"], @"Resolved URL should be present");
+    XCTAssertEqualObjects(winNotification[@"originalURL"], kTestNURL, @"Original NURL should match test constant");
+    
+    NSString *resolvedURL = winNotification[@"resolvedURL"];
+    XCTAssertTrue([resolvedURL containsString:@"price=5.99"], @"Resolved URL should contain actual bid price");
+    XCTAssertFalse([resolvedURL containsString:@"${AUCTION_PRICE}"], @"Template should be replaced, not left as-is");
+    
+    // Verify price formatting matches iOS WinLossFieldResolver (%.2f format)
+    NSNumber *bidPrice = winNotification[@"bidPrice"];
+    XCTAssertEqualObjects(bidPrice, @(kTestPrice), @"Bid price should be captured correctly");
 }
 
 - (void)testNurlNotFiredWhenNoBidResponse {
@@ -645,7 +660,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Verifies that no NURL is fired when the winning bid does not contain a notification URL
     
     CLXBidResponseBid *mockBid = [[CLXBidResponseBid alloc] init];
-    mockBid.adid = kTestBidID;
+    mockBid.id = kTestBidID;  // Use .id instead of .adid for win/loss tracking
     mockBid.price = kTestPrice;
     mockBid.nurl = nil; // No NURL
     
@@ -671,7 +686,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     
     // Set up bid response
     CLXBidResponseBid *mockBid = [[CLXBidResponseBid alloc] init];
-    mockBid.adid = kTestBidID;
+    mockBid.id = kTestBidID;  // Use .id instead of .adid for win/loss tracking
     mockBid.price = kTestPrice;
     mockBid.nurl = kTestNURL;
     
@@ -679,6 +694,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     mockBidResponse.testBid = mockBid;
     mockBidResponse.id = kTestAuctionID; // Set auction ID for win/loss tracking
     self.interstitial.currentBidResponse = mockBidResponse;
+    
+    // Add bid to mock tracker so it can be found for win notification
+    [self.mockWinLossTracker addBid:kTestAuctionID bid:mockBid];
     
     // Start with loading state and adapter
     [self setCurrentState:CLXInterstitialStateLOADING onInterstitial:self.interstitial];
@@ -715,6 +733,13 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         // Verify the win notification contains correct data
         NSDictionary *winNotification = self.mockWinLossTracker.winNotifications.firstObject;
         XCTAssertEqualObjects(winNotification[@"bidId"], kTestBidID, @"Correct bid ID should be used");
+        
+        // ENHANCED: Verify URL template replacement in complete lifecycle
+        if (winNotification[@"resolvedURL"]) {
+            NSString *resolvedURL = winNotification[@"resolvedURL"];
+            XCTAssertTrue([resolvedURL containsString:@"price=5.99"], @"Complete lifecycle should resolve AUCTION_PRICE correctly");
+            XCTAssertFalse([resolvedURL containsString:@"${AUCTION_PRICE}"], @"No templates should remain unresolved");
+        }
         
         // Verify final state
         CLXInterstitialState currentState = [self getCurrentStateFromInterstitial:self.interstitial];

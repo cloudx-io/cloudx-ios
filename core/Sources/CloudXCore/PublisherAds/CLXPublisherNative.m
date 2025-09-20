@@ -348,6 +348,20 @@ NS_ASSUME_NONNULL_BEGIN
     });
 }
 
+- (void)fireLosingBidLurls {
+    if (!self.currentBidResponse || !self.lastBidResponse) {
+        return;
+    }
+    
+    NSArray<CLXBidResponseBid *> *allBids = [self.currentBidResponse getAllBidsForWaterfall];
+    NSString *winnerBidId = self.lastBidResponse.bid.id;
+    NSString *auctionId = self.currentBidResponse.id;
+    
+    [[CLXWinLossTracker shared] sendLossNotificationsForLosingBids:auctionId
+                                                     winningBidId:winnerBidId
+                                                          allBids:allBids];
+}
+
 #pragma mark - CLXAdapterNativeDelegate
 
 - (void)closeWithNative:(id<CLXAdapterNative>)native {
@@ -386,15 +400,7 @@ NS_ASSUME_NONNULL_BEGIN
     self.successWin = YES;
     
     // Winner has successfully loaded, now fire loss notifications for all losing bids
-    if (self.currentBidResponse && self.lastBidResponse) {
-        NSArray<CLXBidResponseBid *> *allBids = [self.currentBidResponse getAllBidsForWaterfall];
-        NSString *winnerBidId = self.lastBidResponse.bid.id;
-        NSString *auctionId = self.currentBidResponse.id;
-        
-        [[CLXWinLossTracker shared] sendLossNotificationsForLosingBids:auctionId
-                                                         winningBidId:winnerBidId
-                                                              allBids:allBids];
-    }
+    [self fireLosingBidLurls];
     
     // Call both old and new delegate methods for backward compatibility
     if ([self.delegate respondsToSelector:@selector(didLoadWithNative:)]) {

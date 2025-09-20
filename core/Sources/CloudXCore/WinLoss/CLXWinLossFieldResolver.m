@@ -79,15 +79,24 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
                                                             isWin:isWin
                                                    loadedBidPrice:loadedBidPrice];
         
-        // Only add non-nil values to result (matches Android behavior)
+        // Only add non-nil values to result 
         if (resolvedValue) {
             result[payloadKey] = resolvedValue;
+        } else {
+            // Log missing fields for debugging
+            [self.logger debug:[NSString stringWithFormat:@"⚠️ [WinLossFieldResolver] Field '%@' -> '%@' resolved to nil", payloadKey, fieldPath]];
         }
     }];
     
     [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossFieldResolver] Built payload with %lu fields for %@ event", 
                        (unsigned long)result.count, isWin ? @"WIN" : @"LOSS"]];
     
+    // Always return a payload, even if empty - this ensures events are cached for retry
+    // The server can handle missing fields better than losing the entire event
+    if (result.count == 0) {
+        [self.logger debug:[NSString stringWithFormat:@"⚠️ [WinLossFieldResolver] Empty payload for %@ event - auction: %@, bid: %@", 
+                           isWin ? @"WIN" : @"LOSS", auctionId, bid.id]];
+    }
     return [result copy];
 }
 
@@ -135,6 +144,30 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
                                    loadedBidPrice:loadedBidPrice];
         }
         return nil;
+        
+    } else if ([fieldPath isEqualToString:@"auctionId"]) {
+        // Return the auction ID directly
+        return auctionId;
+        
+    } else if ([fieldPath isEqualToString:@"bidId"]) {
+        // Return the bid ID from the bid
+        return bid.id;
+        
+    } else if ([fieldPath isEqualToString:@"bid.id"]) {
+        // Return the bid ID from the bid (alternative field path format)
+        return bid.id;
+        
+    } else if ([fieldPath isEqualToString:@"bid.price"]) {
+        // Return the bid price from the bid
+        return @(bid.price);
+        
+    } else if ([fieldPath isEqualToString:@"eventType"]) {
+        // Return the event type based on win/loss status
+        return isWin ? @"win" : @"loss";
+        
+    } else if ([fieldPath isEqualToString:@"originalURL"]) {
+        // Return the original URL template before replacement
+        return isWin ? bid.nurl : bid.lurl;
         
     } else if ([fieldPath isEqualToString:@"sdk.loopIndex"]) {
         // Delegate to injected tracking field resolver for loop index

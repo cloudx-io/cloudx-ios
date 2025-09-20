@@ -20,6 +20,8 @@
 		1916B1722E7E061B00E49E3E /* CLXWinLossFieldResolverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B16E2E7E061B00E49E3E /* CLXWinLossFieldResolverTests.m */; };
 		1916B1CD2E7F0F6D00E49E3E /* CLXWinLossRetryBatchingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B1CC2E7F0F6D00E49E3E /* CLXWinLossRetryBatchingTests.m */; };
 		1916B1CE2E7F0F6D00E49E3E /* CLXPublisherWinLossIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B1CB2E7F0F6D00E49E3E /* CLXPublisherWinLossIntegrationTests.m */; };
+		1916B22B2E7F1E8100E49E3E /* CLXPublisherFireLosingBidLurlsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2292E7F1E8100E49E3E /* CLXPublisherFireLosingBidLurlsTests.m */; };
+		1916B22C2E7F1E8100E49E3E /* CLXWinLossURLResolutionIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B22A2E7F1E8100E49E3E /* CLXWinLossURLResolutionIntegrationTests.m */; };
 		1979919A2E74921400EBA0A3 /* CLXGPPProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 197991992E74921400EBA0A3 /* CLXGPPProvider.m */; };
 		1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919B2E74923900EBA0A3 /* CLXGppConsent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -279,6 +281,8 @@
 		1916B16F2E7E061B00E49E3E /* CLXWinLossNetworkServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXWinLossNetworkServiceTests.m; sourceTree = "<group>"; };
 		1916B1CB2E7F0F6D00E49E3E /* CLXPublisherWinLossIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPublisherWinLossIntegrationTests.m; sourceTree = "<group>"; };
 		1916B1CC2E7F0F6D00E49E3E /* CLXWinLossRetryBatchingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXWinLossRetryBatchingTests.m; sourceTree = "<group>"; };
+		1916B2292E7F1E8100E49E3E /* CLXPublisherFireLosingBidLurlsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPublisherFireLosingBidLurlsTests.m; sourceTree = "<group>"; };
+		1916B22A2E7F1E8100E49E3E /* CLXWinLossURLResolutionIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXWinLossURLResolutionIntegrationTests.m; sourceTree = "<group>"; };
 		197991992E74921400EBA0A3 /* CLXGPPProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGPPProvider.m; sourceTree = "<group>"; };
 		1979919B2E74923900EBA0A3 /* CLXGppConsent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGppConsent.h; sourceTree = "<group>"; };
 		1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGPPProvider.h; sourceTree = "<group>"; };
@@ -595,6 +599,8 @@
 		19C7247E2E2390420012CFC7 /* CloudXCoreTests */ = {
 			isa = PBXGroup;
 			children = (
+				1916B2292E7F1E8100E49E3E /* CLXPublisherFireLosingBidLurlsTests.m */,
+				1916B22A2E7F1E8100E49E3E /* CLXWinLossURLResolutionIntegrationTests.m */,
 				1916B1CB2E7F0F6D00E49E3E /* CLXPublisherWinLossIntegrationTests.m */,
 				1916B1CC2E7F0F6D00E49E3E /* CLXWinLossRetryBatchingTests.m */,
 				1916B16D2E7E061B00E49E3E /* CLXSQLiteDatabaseTests.m */,
@@ -1353,6 +1359,8 @@
 				197991A82E74B0D600EBA0A3 /* CLXGppConsentTests.m in Sources */,
 				197991A92E74B0D600EBA0A3 /* CLXGPPIntegrationTests.m in Sources */,
 				197991AA2E74B0D600EBA0A3 /* CLXGPPProviderTests.m in Sources */,
+				1916B22B2E7F1E8100E49E3E /* CLXPublisherFireLosingBidLurlsTests.m in Sources */,
+				1916B22C2E7F1E8100E49E3E /* CLXWinLossURLResolutionIntegrationTests.m in Sources */,
 				197993372E772E5000EBA0A3 /* CLXBidResponseParsingIntegrationTests.m in Sources */,
 				197993382E772E5000EBA0A3 /* CLXErrorReporterTests.m in Sources */,
 				197993392E772E5000EBA0A3 /* CLXErrorReportingFlowIntegrationTests.m in Sources */,

@@ -15,6 +15,7 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
+#import <objc/runtime.h>
 #import "Mocks/MockCLXWinLossTracker.h"
 
 @interface CLXPublisherFireLosingBidLurlsTests : XCTestCase
@@ -123,7 +124,8 @@
                          @"Publisher %@ fireLosingBidLurls method should exist", NSStringFromClass(publisherClass));
         
         // Verify it's a void method with no parameters (consistent signature)
-        char *returnType = method_getReturnType(method);
+        char returnType[256];
+        method_getReturnType(method, returnType, sizeof(returnType));
         XCTAssertEqual(strcmp(returnType, "v"), 0, 
                       @"Publisher %@ fireLosingBidLurls should return void", NSStringFromClass(publisherClass));
         

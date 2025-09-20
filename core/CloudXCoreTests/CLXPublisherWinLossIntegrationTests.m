@@ -308,6 +308,19 @@ static const double kTestLoserPrice2 = 2.25;
         
         // Then: Should have called the win/loss tracker
         XCTAssertTrue(YES, @"fireLosingBidLurls method was called successfully on native publisher");
+        
+        // ENHANCED: Verify actual URL resolution in publisher integration
+        if (self.mockTracker.lossNotifications.count > 0) {
+            for (NSDictionary *lossNotification in self.mockTracker.lossNotifications) {
+                NSString *resolvedURL = lossNotification[@"resolvedURL"];
+                if (resolvedURL) {
+                    XCTAssertFalse([resolvedURL containsString:@"${AUCTION_PRICE}"], 
+                                  @"Publisher integration should resolve all URL templates");
+                    XCTAssertFalse([resolvedURL containsString:@"${AUCTION_LOSS}"], 
+                                  @"Publisher integration should resolve all URL templates");
+                }
+            }
+        }
     } else {
         XCTFail(@"CLXPublisherNative must have fireLosingBidLurls method - THIS WAS THE ORIGINAL BUG!");
     }

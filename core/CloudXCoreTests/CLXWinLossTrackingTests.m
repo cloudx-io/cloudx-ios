@@ -137,7 +137,17 @@ static const NSInteger kTestRank3 = 3;
     XCTAssertEqualObjects(winNotification[@"bidId"], kTestBidID1, @"Bid ID should match");
     XCTAssertEqualObjects(winNotification[@"type"], @"win", @"Notification type should be win");
     XCTAssertNotNil(winNotification[@"timestamp"], @"Timestamp should be present");
+    
+    // BEHAVIORAL TEST: Verify that sendWin was called and tracked
+    // URL resolution logic is tested separately in CLXWinLossURLResolutionIntegrationTests
+    // This test focuses on the interaction/behavior, not the business logic details
 }
+
+// URL template replacement testing moved to CLXWinLossURLResolutionIntegrationTests
+// This maintains proper separation of concerns - behavior vs business logic
+
+// Cross-platform formatting tests moved to CLXWinLossURLResolutionIntegrationTests
+// This maintains proper separation of concerns
 
 /**
  * Test loss notification with proper LURL resolution and loss reason

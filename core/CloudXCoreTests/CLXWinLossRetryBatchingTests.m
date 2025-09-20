@@ -270,21 +270,42 @@ static NSString * const kTestAppKey = @"test-app-key-retry";
     
     for (NSInteger i = 0; i < eventCount; i++) {
         NSString *bidId = [NSString stringWithFormat:@"batch-bid-%ld", (long)i];
+        NSString *auctionId = [NSString stringWithFormat:@"batch-auction-%ld", (long)i]; // Use unique auction ID per bid
         CLXBidResponseBid *bid = [self createTestBidWithId:bidId];
-        [self.realTracker addBid:kTestAuctionID bid:bid];
+        [self.realTracker addBid:auctionId bid:bid];
         
         // Alternate between win and loss notifications
         NSString *eventType = eventTypes[i % 2];
         if ([eventType isEqualToString:@"win"]) {
-            [self.realTracker sendWin:kTestAuctionID bidId:bidId];
+            [self.realTracker sendWin:auctionId bidId:bidId];
         } else {
-            [self.realTracker setBidLoadResult:kTestAuctionID bidId:bidId success:NO lossReason:@(CLXLossReasonTechnicalError)];
-            [self.realTracker sendLoss:kTestAuctionID bidId:bidId];
+            [self.realTracker setBidLoadResult:auctionId bidId:bidId success:NO lossReason:@(CLXLossReasonTechnicalError)];
+            [self.realTracker sendLoss:auctionId bidId:bidId];
+        }
+        
+        // Small delay to prevent overwhelming the async queue
+        if (i % 10 == 9) {
+            [NSThread sleepForTimeInterval:0.1];
         }
     }
     
-    // Give time for all events to be cached
-    [NSThread sleepForTimeInterval:3.0];
+    // Give time for all events to be cached (increased for async processing)
+    // Use a longer wait and check periodically to ensure async operations complete
+    NSInteger maxWaitTime = 10;
+    NSInteger waitInterval = 1;
+    NSInteger currentWaitTime = 0;
+    
+    while (currentWaitTime < maxWaitTime) {
+        [NSThread sleepForTimeInterval:waitInterval];
+        currentWaitTime += waitInterval;
+        
+        NSArray *currentCachedEvents = [self.realTracker getAllCachedEvents];
+        
+        // If we have reached the expected count, break early
+        if (currentCachedEvents.count >= eventCount) {
+            break;
+        }
+    }
     
     // Verify all events are cached
     NSArray *cachedEvents = [self.realTracker getAllCachedEvents];

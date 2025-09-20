@@ -125,35 +125,29 @@ static id<CLXWinLossTracking> _testInstance = nil;
     NSArray<CLXCachedWinLossEvent *> *cachedEvents = [self getAllCachedEvents];
     
     if (cachedEvents.count == 0) {
-        [self.logger debug:@"📊 [WinLossTracker] No pending win/loss events to send"];
         return;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] Found %lu pending events to retry", (unsigned long)cachedEvents.count]];
+    [self.logger debug:[NSString stringWithFormat:@"🔄 [WinLossTracker] Retrying %lu cached events", (unsigned long)cachedEvents.count]];
     [self sendCachedEvents:cachedEvents];
 }
 
 - (void)addBid:(NSString *)auctionId bid:(CLXBidResponseBid *)bid {
     [self.auctionBidManager addBid:auctionId bid:bid];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] Added bid %@ to auction %@", bid.id, auctionId]];
 }
 
-- (void)setBidLoadResult:(NSString *)auctionId
-                   bidId:(NSString *)bidId
-                 success:(BOOL)success
-              lossReason:(nullable NSNumber *)lossReason {
+- (void)setBidLoadResult:(NSString *)auctionId 
+                    bidId:(NSString *)bidId 
+                  success:(BOOL)success 
+               lossReason:(nullable NSNumber *)lossReason {
     [self.auctionBidManager setBidLoadResult:auctionId bidId:bidId success:success lossReason:lossReason];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] Set bid %@ load result - success: %@", 
-                       bidId, success ? @"YES" : @"NO"]];
 }
 
 - (void)setWinner:(NSString *)auctionId winningBidId:(NSString *)winningBidId {
     [self.auctionBidManager setBidWinner:auctionId winningBidId:winningBidId];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] Set winner for auction %@: %@", auctionId, winningBidId]];
 }
 
 - (void)sendLoss:(NSString *)auctionId bidId:(NSString *)bidId {
-    [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] sendLoss - Auction: %@, Bid: %@", auctionId, bidId]];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         CLXBidResponseBid *bid = [self.auctionBidManager getBid:auctionId bidId:bidId];
         NSNumber *lossReason = [self.auctionBidManager getBidLossReason:auctionId bidId:bidId];
@@ -164,6 +158,11 @@ static id<CLXWinLossTracking> _testInstance = nil;
             return;
         }
         
+        // Ensure we always have a loss reason for loss notifications (matches Android behavior)
+        if (!lossReason) {
+            lossReason = @(CLXLossReasonTechnicalError); // Default to technical error
+        }
+        
         // Build payload using field resolver (matches Android's buildWinLossPayload)
         NSDictionary<NSString *, id> *payload = [self.winLossFieldResolver buildWinLossPayloadWithAuctionId:auctionId
                                                                                                          bid:bid
@@ -172,31 +171,16 @@ static id<CLXWinLossTracking> _testInstance = nil;
                                                                                                loadedBidPrice:loadedBidPrice];
         
         if (payload) {
-            // Enhanced logging: specify this is a LOSS notification with reason
-            NSString *lossReasonString = @"Unknown";
-            if (lossReason) {
-                switch (lossReason.integerValue) {
-                    case CLXLossReasonTechnicalError:
-                        lossReasonString = @"TechnicalError";
-                        break;
-                    case CLXLossReasonLostToHigherBid:
-                        lossReasonString = @"LostToHigherBid";
-                        break;
-                    default:
-                        lossReasonString = [NSString stringWithFormat:@"Code_%@", lossReason];
-                        break;
-                }
-            }
-            [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] Sending LOSS notification for auction: %@, bid: %@, reason: %@", auctionId, bidId, lossReasonString]];
+            NSString *reasonStr = (lossReason.integerValue == CLXLossReasonLostToHigherBid) ? @"HigherBid" : @"TechError";
+            [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] LOSS: %@ (%@)", bidId, reasonStr]];
             [self trackWinLoss:payload];
         } else {
-            [self.logger debug:@"📊 [WinLossTracker] No payload mapping configured for loss notification"];
+            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] LOSS payload failed: %@", bidId]];
         }
     });
 }
 
 - (void)sendWin:(NSString *)auctionId bidId:(NSString *)bidId {
-    [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] sendWin - Auction: %@, Bid: %@", auctionId, bidId]];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         CLXBidResponseBid *bid = [self.auctionBidManager getBid:auctionId bidId:bidId];
         
@@ -215,11 +199,10 @@ static id<CLXWinLossTracking> _testInstance = nil;
                                                                                                loadedBidPrice:winnerBidPrice];
         
         if (payload) {
-            // Enhanced logging: specify this is a WIN notification
-            [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] Sending WIN notification for auction: %@, bid: %@, price: %.2f", auctionId, bidId, winnerBidPrice]];
+            [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] WIN: %@ ($%.2f)", bidId, winnerBidPrice]];
             [self trackWinLoss:payload];
         } else {
-            [self.logger debug:@"📊 [WinLossTracker] No payload mapping configured for win notification"];
+            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] WIN payload failed: %@", bidId]];
         }
         
         // Clear auction data after successful win notification (matches Android)
@@ -232,19 +215,16 @@ static id<CLXWinLossTracking> _testInstance = nil;
                                   allBids:(NSArray<CLXBidResponseBid *> *)allBids {
     
     if (!auctionId || !winningBidId || !allBids || allBids.count == 0) {
-        [self.logger debug:@"📊 [WinLossTracker] No bid response available for server-side loss tracking"];
         return;
     }
-    
-    [self.logger debug:[NSString stringWithFormat:@"📤 [WinLossTracker] Sending server-side loss notifications for losing bids (winner: %@)", winningBidId]];
     
     // Set winner in win/loss tracker
     [self setWinner:auctionId winningBidId:winningBidId];
     
+    NSInteger lossCount = 0;
     for (CLXBidResponseBid *bid in allBids) {
         // Skip the winner
         if ([bid.id isEqualToString:winningBidId]) {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] Skipping loss notification for winner bid rank=%ld, id=%@", (long)bid.ext.cloudx.rank, bid.id]];
             continue;
         }
         
@@ -255,18 +235,17 @@ static id<CLXWinLossTracking> _testInstance = nil;
                            success:NO 
                         lossReason:@(CLXLossReasonLostToHigherBid)];
             [self sendLoss:auctionId bidId:bid.id];
-            [self.logger debug:[NSString stringWithFormat:@"📤 [WinLossTracker] Sent server-side loss notification for losing bid rank=%ld, reason=LostToHigherBid", (long)bid.ext.cloudx.rank]];
-        } else {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] No bid ID for loss notification, rank=%ld", (long)bid.ext.cloudx.rank]];
+            lossCount++;
         }
     }
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [WinLossTracker] Completed sending server-side loss notifications for losing bids"]];
+    if (lossCount > 0) {
+        [self.logger debug:[NSString stringWithFormat:@"📤 [WinLossTracker] Sent %ld server-side loss notifications", (long)lossCount]];
+    }
 }
 
 - (void)clearAuction:(NSString *)auctionId {
     [self.auctionBidManager clearAuction:auctionId];
-    [self.logger debug:[NSString stringWithFormat:@"🧹 [WinLossTracker] Cleared auction: %@", auctionId]];
 }
 
 #pragma mark - Database Management
@@ -337,7 +316,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
     NSError *error = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:payload options:0 error:&error];
     if (error || !jsonData) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Failed to serialize payload: %@", error]];
+        [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Failed to serialize payload: %@, payload: %@", error, payload]];
         return eventId;
     }
     
@@ -477,5 +456,6 @@ static id<CLXWinLossTracking> _testInstance = nil;
         [self.logger error:@"Failed to delete all cached events"];
     }
 }
+
 
 @end

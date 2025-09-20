@@ -80,10 +80,6 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 @property (nonatomic, strong) CLXRillTrackingService *rillTrackingService;
 @property (nonatomic, strong) CLXConfigImpressionModel *impModel;
 
-// Private helper methods
-- (void)sendLossNotificationForFailedAd:(CLXAdType)adType;
-- (void)fireLosingBidLurls;
-
 @end
 
 @implementation CLXPublisherFullscreenAd
