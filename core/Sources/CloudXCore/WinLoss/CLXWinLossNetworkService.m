@@ -21,9 +21,14 @@
 @implementation CLXWinLossNetworkService
 
 - (instancetype)initWithBaseURL:(NSString *)baseURL urlSession:(NSURLSession *)urlSession {
+    CLXBaseNetworkService *baseService = [[CLXBaseNetworkService alloc] initWithBaseURL:baseURL urlSession:urlSession];
+    return [self initWithBaseNetworkService:baseService];
+}
+
+- (instancetype)initWithBaseNetworkService:(CLXBaseNetworkService *)baseNetworkService {
     self = [super init];
     if (self) {
-        _baseNetworkService = [[CLXBaseNetworkService alloc] initWithBaseURL:baseURL urlSession:urlSession];
+        _baseNetworkService = baseNetworkService;
         _logger = [[CLXLogger alloc] initWithCategory:@"WinLossNetworkService"];
         _timeoutMillis = 10.0; // 10 second timeout matching Android
     }
@@ -37,11 +42,23 @@
     
     // Convert payload to JSON - matches Android's JSONObject(payload).toString()
     NSError *jsonError;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:payload 
-                                                       options:0 
-                                                         error:&jsonError];
+    NSData *jsonData = nil;
     
-    if (jsonError) {
+    @try {
+        jsonData = [NSJSONSerialization dataWithJSONObject:payload 
+                                                   options:0 
+                                                     error:&jsonError];
+    } @catch (NSException *exception) {
+        // Handle JSON serialization exceptions (e.g., unsupported data types)
+        jsonError = [NSError errorWithDomain:@"CLXWinLossNetworkService" 
+                                        code:1001 
+                                    userInfo:@{
+                                        NSLocalizedDescriptionKey: [NSString stringWithFormat:@"JSON serialization exception: %@", exception.reason],
+                                        @"exception": exception
+                                    }];
+    }
+    
+    if (jsonError || !jsonData) {
         [self.logger error:[NSString stringWithFormat:@"❌ [WinLossNetworkService] JSON serialization failed: %@", jsonError.localizedDescription]];
         if (completion) {
             completion(NO, jsonError);
@@ -51,9 +68,48 @@
     
     NSString *jsonBody = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     
-    // Debug logging matching Android's console output
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [WinLossNetworkService] Sending win/loss notification (%lu chars) to: %@", 
-                       (unsigned long)jsonBody.length, endpointUrl]];
+    // Enhanced debug logging - try to determine if this is a win or loss notification
+    __block NSString *notificationType = @"UNKNOWN";
+    NSError *parseError;
+    id payloadData = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&parseError];
+    if (!parseError && [payloadData isKindOfClass:[NSDictionary class]]) {
+        NSDictionary *payload = (NSDictionary *)payloadData;
+        
+        // Check for loss indicators first
+        if (payload[@"loss_reason"] || payload[@"ortb_loss_code"]) {
+            notificationType = @"LOSS";
+        } else {
+            // For win detection, look for any price-related field with positive value
+            // Since field names are configurable, check common price field patterns
+            NSArray *priceFieldPatterns = @[@"clearing_price", @"price", @"bid_price", @"auction_price", @"settlement_price"];
+            for (NSString *priceField in priceFieldPatterns) {
+                if (payload[priceField] && [payload[priceField] doubleValue] > 0) {
+                    notificationType = @"WIN";
+                    break;
+                }
+            }
+            
+            // If no price field found but no loss reason, likely still a win
+            if ([notificationType isEqualToString:@"UNKNOWN"] && payload.count > 0) {
+                // Check if any field contains a positive numeric value (likely a price)
+                for (id value in payload.allValues) {
+                    if ([value isKindOfClass:[NSNumber class]] && [value doubleValue] > 0) {
+                        notificationType = @"WIN";
+                        break;
+                    } else if ([value isKindOfClass:[NSString class]]) {
+                        double numericValue = [value doubleValue];
+                        if (numericValue > 0) {
+                            notificationType = @"WIN";
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [WinLossNetworkService] Sending %@ notification (%lu chars) to: %@", 
+                       notificationType, (unsigned long)jsonBody.length, endpointUrl]];
     [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossNetworkService] Win/Loss API Request Body: %@", jsonBody]];
     
     // Prepare headers matching Android's implementation
@@ -71,8 +127,7 @@
                                               completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
         
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossNetworkService] Win/loss notification failed with exception: %@", error.localizedDescription]];
-            [self.logger debug:@"📊 [WinLossNetworkService] Win/Loss API call exception"];
+            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossNetworkService] Win/loss notification failed: %@", error.localizedDescription]];
             
             if (completion) {
                 completion(NO, error);
@@ -92,15 +147,13 @@
         
         // Match Android's success condition: code in 200..299
         if (statusCode >= 200 && statusCode < 300) {
-            [self.logger debug:@"📊 [WinLossNetworkService] Win/loss notification sent successfully"];
-            [self.logger debug:@"📊 [WinLossNetworkService] Win/Loss API call successful"];
+            [self.logger debug:[NSString stringWithFormat:@"✅ [WinLossNetworkService] %@ notification sent successfully", notificationType]];
             
             if (completion) {
                 completion(YES, nil);
             }
         } else {
             [self.logger error:[NSString stringWithFormat:@"❌ [WinLossNetworkService] Win/loss notification failed with HTTP status: %ld", (long)statusCode]];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossNetworkService] Win/Loss API call failed with status: %ld", (long)statusCode]];
             
             NSError *statusError = [CLXError errorWithCode:CLXErrorCodeServerError 
                                                description:[NSString stringWithFormat:@"HTTP %ld", (long)statusCode]];

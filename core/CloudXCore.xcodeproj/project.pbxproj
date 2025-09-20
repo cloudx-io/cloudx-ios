@@ -13,6 +13,13 @@
 		1916B09E2E7DE20E00E49E3E /* CLXWinLossFieldResolver.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B0982E7DE20E00E49E3E /* CLXWinLossFieldResolver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1916B0F92E7DECDD00E49E3E /* MockCLXWinLossTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B0F82E7DECDD00E49E3E /* MockCLXWinLossTracker.m */; };
 		1916B0FB2E7DF2EF00E49E3E /* CLXWinLossTrackingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B0FA2E7DF2EF00E49E3E /* CLXWinLossTrackingTests.m */; };
+		1916B1692E7DF8ED00E49E3E /* CLXSQLiteDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B1672E7DF8ED00E49E3E /* CLXSQLiteDatabase.m */; };
+		1916B16C2E7DFD9A00E49E3E /* CLXSQLiteDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B16B2E7DFD9A00E49E3E /* CLXSQLiteDatabase.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1916B1702E7E061B00E49E3E /* CLXWinLossNetworkServiceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B16F2E7E061B00E49E3E /* CLXWinLossNetworkServiceTests.m */; };
+		1916B1712E7E061B00E49E3E /* CLXSQLiteDatabaseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B16D2E7E061B00E49E3E /* CLXSQLiteDatabaseTests.m */; };
+		1916B1722E7E061B00E49E3E /* CLXWinLossFieldResolverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B16E2E7E061B00E49E3E /* CLXWinLossFieldResolverTests.m */; };
+		1916B1CD2E7F0F6D00E49E3E /* CLXWinLossRetryBatchingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B1CC2E7F0F6D00E49E3E /* CLXWinLossRetryBatchingTests.m */; };
+		1916B1CE2E7F0F6D00E49E3E /* CLXPublisherWinLossIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B1CB2E7F0F6D00E49E3E /* CLXPublisherWinLossIntegrationTests.m */; };
 		1979919A2E74921400EBA0A3 /* CLXGPPProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 197991992E74921400EBA0A3 /* CLXGPPProvider.m */; };
 		1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919B2E74923900EBA0A3 /* CLXGppConsent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -265,6 +272,13 @@
 		1916B0F72E7DECDD00E49E3E /* MockCLXWinLossTracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MockCLXWinLossTracker.h; sourceTree = "<group>"; };
 		1916B0F82E7DECDD00E49E3E /* MockCLXWinLossTracker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MockCLXWinLossTracker.m; sourceTree = "<group>"; };
 		1916B0FA2E7DF2EF00E49E3E /* CLXWinLossTrackingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXWinLossTrackingTests.m; sourceTree = "<group>"; };
+		1916B1672E7DF8ED00E49E3E /* CLXSQLiteDatabase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSQLiteDatabase.m; sourceTree = "<group>"; };
+		1916B16B2E7DFD9A00E49E3E /* CLXSQLiteDatabase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSQLiteDatabase.h; sourceTree = "<group>"; };
+		1916B16D2E7E061B00E49E3E /* CLXSQLiteDatabaseTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSQLiteDatabaseTests.m; sourceTree = "<group>"; };
+		1916B16E2E7E061B00E49E3E /* CLXWinLossFieldResolverTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXWinLossFieldResolverTests.m; sourceTree = "<group>"; };
+		1916B16F2E7E061B00E49E3E /* CLXWinLossNetworkServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXWinLossNetworkServiceTests.m; sourceTree = "<group>"; };
+		1916B1CB2E7F0F6D00E49E3E /* CLXPublisherWinLossIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPublisherWinLossIntegrationTests.m; sourceTree = "<group>"; };
+		1916B1CC2E7F0F6D00E49E3E /* CLXWinLossRetryBatchingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXWinLossRetryBatchingTests.m; sourceTree = "<group>"; };
 		197991992E74921400EBA0A3 /* CLXGPPProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGPPProvider.m; sourceTree = "<group>"; };
 		1979919B2E74923900EBA0A3 /* CLXGppConsent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGppConsent.h; sourceTree = "<group>"; };
 		1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGPPProvider.h; sourceTree = "<group>"; };
@@ -532,6 +546,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1916B1682E7DF8ED00E49E3E /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				1916B1672E7DF8ED00E49E3E /* CLXSQLiteDatabase.m */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
 		1979928C2E75E39600EBA0A3 /* ErrorReporting */ = {
 			isa = PBXGroup;
 			children = (
@@ -573,6 +595,11 @@
 		19C7247E2E2390420012CFC7 /* CloudXCoreTests */ = {
 			isa = PBXGroup;
 			children = (
+				1916B1CB2E7F0F6D00E49E3E /* CLXPublisherWinLossIntegrationTests.m */,
+				1916B1CC2E7F0F6D00E49E3E /* CLXWinLossRetryBatchingTests.m */,
+				1916B16D2E7E061B00E49E3E /* CLXSQLiteDatabaseTests.m */,
+				1916B16E2E7E061B00E49E3E /* CLXWinLossFieldResolverTests.m */,
+				1916B16F2E7E061B00E49E3E /* CLXWinLossNetworkServiceTests.m */,
 				1916B0FA2E7DF2EF00E49E3E /* CLXWinLossTrackingTests.m */,
 				197994852E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m */,
 				197994832E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m */,
@@ -808,6 +835,8 @@
 		19C725422E2390810012CFC7 /* CloudXCore */ = {
 			isa = PBXGroup;
 			children = (
+				1916B16B2E7DFD9A00E49E3E /* CLXSQLiteDatabase.h */,
+				1916B1682E7DF8ED00E49E3E /* Database */,
 				1916B0972E7DE20E00E49E3E /* CLXAuctionBidManager.h */,
 				1916B0982E7DE20E00E49E3E /* CLXWinLossFieldResolver.h */,
 				1916B0992E7DE20E00E49E3E /* CLXWinLossNetworkService.h */,
@@ -1077,6 +1106,7 @@
 				1916B09D2E7DE20E00E49E3E /* CLXWinLossTracker.h in Headers */,
 				1916B09E2E7DE20E00E49E3E /* CLXWinLossFieldResolver.h in Headers */,
 				19C725A52E2390810012CFC7 /* CLXSDKInitNetworkService.h in Headers */,
+				1916B16C2E7DFD9A00E49E3E /* CLXSQLiteDatabase.h in Headers */,
 				1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */,
 				1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */,
 				197992952E75E3B700EBA0A3 /* CLXErrorReporter.h in Headers */,
@@ -1255,6 +1285,7 @@
 				19C725DC2E2390810012CFC7 /* CLXSystemInformation.m in Sources */,
 				19C725DD2E2390810012CFC7 /* CLXCachedInterstitial.m in Sources */,
 				19C725DE2E2390810012CFC7 /* CLXPerformanceMetricModel+Update.m in Sources */,
+				1916B1692E7DF8ED00E49E3E /* CLXSQLiteDatabase.m in Sources */,
 				19C725DF2E2390810012CFC7 /* CLXBiddingConfig.m in Sources */,
 				197991A02E74924100EBA0A3 /* CLXGppConsent.m in Sources */,
 				19C725E02E2390810012CFC7 /* CloudXCore.docc in Sources */,
@@ -1283,6 +1314,8 @@
 				19D9283E2E63A99000C84DAE /* CLXInterstitialLifecycleTests.m in Sources */,
 				19D929C22E6644BB00C84DAE /* CLXPublisherBannerSpecComplianceTests.m in Sources */,
 				19D929C32E6644BB00C84DAE /* CLXPublisherBannerIntegrationTests.m in Sources */,
+				1916B1CD2E7F0F6D00E49E3E /* CLXWinLossRetryBatchingTests.m in Sources */,
+				1916B1CE2E7F0F6D00E49E3E /* CLXPublisherWinLossIntegrationTests.m in Sources */,
 				19D929C42E6644BB00C84DAE /* CLXPublisherBannerUnitTests.m in Sources */,
 				19D92C392E6A3B8E00C84DAE /* CLXPublisherBannerBasicTests.m in Sources */,
 				197994842E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m in Sources */,
@@ -1312,6 +1345,9 @@
 				197991A72E74B0D600EBA0A3 /* CLXGeoLocationServiceGPPTests.m in Sources */,
 				197993312E772E4700EBA0A3 /* CLXGeoLocationServiceGPPTests.m in Sources */,
 				197994812E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m in Sources */,
+				1916B1702E7E061B00E49E3E /* CLXWinLossNetworkServiceTests.m in Sources */,
+				1916B1712E7E061B00E49E3E /* CLXSQLiteDatabaseTests.m in Sources */,
+				1916B1722E7E061B00E49E3E /* CLXWinLossFieldResolverTests.m in Sources */,
 				197994862E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m in Sources */,
 				197994822E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m in Sources */,
 				197991A82E74B0D600EBA0A3 /* CLXGppConsentTests.m in Sources */,

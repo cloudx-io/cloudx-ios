@@ -38,6 +38,7 @@
 @interface CLXAuctionBidManager ()
 @property (nonatomic, strong) NSMutableDictionary<NSString *, CLXAuctionState *> *auctionStates;
 @property (nonatomic, strong) CLXLogger *logger;
+@property (nonatomic, strong) dispatch_queue_t syncQueue;
 @end
 
 @implementation CLXAuctionBidManager
@@ -47,6 +48,7 @@
     if (self) {
         _auctionStates = [NSMutableDictionary dictionary];
         _logger = [[CLXLogger alloc] initWithCategory:@"AuctionBidManager"];
+        _syncQueue = dispatch_queue_create("com.cloudx.auctionbidmanager", DISPATCH_QUEUE_SERIAL);
     }
     return self;
 }
@@ -57,10 +59,12 @@
         return;
     }
     
-    CLXAuctionState *state = [self getOrCreateAuctionState:auctionId];
-    state.bids[bid.id] = bid;
-    
-    [self.logger debug:[NSString stringWithFormat:@"📊 [AuctionBidManager] Added bid %@ to auction %@", bid.id, auctionId]];
+    dispatch_sync(self.syncQueue, ^{
+        CLXAuctionState *state = [self getOrCreateAuctionState:auctionId];
+        state.bids[bid.id] = bid;
+        
+        [self.logger debug:[NSString stringWithFormat:@"📊 [AuctionBidManager] Added bid %@ to auction %@", bid.id, auctionId]];
+    });
 }
 
 - (void)setBidLoadResult:(NSString *)auctionId
@@ -73,15 +77,17 @@
         return;
     }
     
-    CLXAuctionState *state = [self getOrCreateAuctionState:auctionId];
-    
-    if (!success && lossReason) {
-        state.bidLossReasons[bidId] = lossReason;
-        [self.logger debug:[NSString stringWithFormat:@"📊 [AuctionBidManager] Set bid %@ loss reason: %@", bidId, lossReason]];
-    }
-    
-    [self.logger debug:[NSString stringWithFormat:@"📊 [AuctionBidManager] Set bid %@ load result - success: %@", 
-                       bidId, success ? @"YES" : @"NO"]];
+    dispatch_sync(self.syncQueue, ^{
+        CLXAuctionState *state = [self getOrCreateAuctionState:auctionId];
+        
+        if (!success && lossReason) {
+            state.bidLossReasons[bidId] = lossReason;
+            [self.logger debug:[NSString stringWithFormat:@"📊 [AuctionBidManager] Set bid %@ loss reason: %@", bidId, lossReason]];
+        }
+        
+        [self.logger debug:[NSString stringWithFormat:@"📊 [AuctionBidManager] Set bid %@ load result - success: %@", 
+                           bidId, success ? @"YES" : @"NO"]];
+    });
 }
 
 - (void)setBidWinner:(NSString *)auctionId winningBidId:(NSString *)winningBidId {
@@ -90,17 +96,19 @@
         return;
     }
     
-    CLXAuctionState *state = [self getOrCreateAuctionState:auctionId];
-    state.winningBidId = winningBidId;
-    
-    // Set winning bid price from the bid object
-    CLXBidResponseBid *winningBid = state.bids[winningBidId];
-    if (winningBid) {
-        state.winningBidPrice = winningBid.price;
-    }
-    
-    [self.logger debug:[NSString stringWithFormat:@"📊 [AuctionBidManager] Set winner for auction %@: %@ (price: %.2f)", 
-                       auctionId, winningBidId, state.winningBidPrice]];
+    dispatch_sync(self.syncQueue, ^{
+        CLXAuctionState *state = [self getOrCreateAuctionState:auctionId];
+        state.winningBidId = winningBidId;
+        
+        // Set winning bid price from the bid object
+        CLXBidResponseBid *winningBid = state.bids[winningBidId];
+        if (winningBid) {
+            state.winningBidPrice = winningBid.price;
+        }
+        
+        [self.logger debug:[NSString stringWithFormat:@"📊 [AuctionBidManager] Set winner for auction %@: %@ (price: %.2f)", 
+                           auctionId, winningBidId, state.winningBidPrice]];
+    });
 }
 
 - (nullable CLXBidResponseBid *)getBid:(NSString *)auctionId bidId:(NSString *)bidId {
@@ -108,8 +116,12 @@
         return nil;
     }
     
-    CLXAuctionState *state = self.auctionStates[auctionId];
-    return state ? state.bids[bidId] : nil;
+    __block CLXBidResponseBid *result = nil;
+    dispatch_sync(self.syncQueue, ^{
+        CLXAuctionState *state = self.auctionStates[auctionId];
+        result = state ? state.bids[bidId] : nil;
+    });
+    return result;
 }
 
 - (nullable NSNumber *)getBidLossReason:(NSString *)auctionId bidId:(NSString *)bidId {
@@ -117,8 +129,12 @@
         return nil;
     }
     
-    CLXAuctionState *state = self.auctionStates[auctionId];
-    return state ? state.bidLossReasons[bidId] : nil;
+    __block NSNumber *result = nil;
+    dispatch_sync(self.syncQueue, ^{
+        CLXAuctionState *state = self.auctionStates[auctionId];
+        result = state ? state.bidLossReasons[bidId] : nil;
+    });
+    return result;
 }
 
 - (double)getLoadedBidPrice:(NSString *)auctionId {
@@ -126,8 +142,12 @@
         return 0.0;
     }
     
-    CLXAuctionState *state = self.auctionStates[auctionId];
-    return state ? state.winningBidPrice : 0.0;
+    __block double result = 0.0;
+    dispatch_sync(self.syncQueue, ^{
+        CLXAuctionState *state = self.auctionStates[auctionId];
+        result = state ? state.winningBidPrice : 0.0;
+    });
+    return result;
 }
 
 - (void)clearAuction:(NSString *)auctionId {
@@ -135,12 +155,18 @@
         return;
     }
     
-    [self.auctionStates removeObjectForKey:auctionId];
-    [self.logger debug:[NSString stringWithFormat:@"🧹 [AuctionBidManager] Cleared auction data for %@", auctionId]];
+    dispatch_sync(self.syncQueue, ^{
+        [self.auctionStates removeObjectForKey:auctionId];
+        [self.logger debug:[NSString stringWithFormat:@"🧹 [AuctionBidManager] Cleared auction data for %@", auctionId]];
+    });
 }
 
 #pragma mark - Private Methods
 
+/**
+ * IMPORTANT: This method must ONLY be called from within the syncQueue dispatch_sync block
+ * It is NOT thread-safe by itself and relies on the caller to provide synchronization
+ */
 - (CLXAuctionState *)getOrCreateAuctionState:(NSString *)auctionId {
     CLXAuctionState *state = self.auctionStates[auctionId];
     if (!state) {

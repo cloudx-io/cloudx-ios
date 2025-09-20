@@ -120,7 +120,7 @@
     for (NSString *field in self.tracking) {
         id resolvedValue = [self resolveField:auctionId field:field];
         NSString *stringValue = resolvedValue ? [resolvedValue description] : @"";
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] %@ = '%@'", field, stringValue]];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] %@ = '%@'", field, stringValue]];
         [values addObject:stringValue];
     }
     
@@ -256,13 +256,13 @@
     
     // Debug logging for country field
     if ([path isEqualToString:@"device.geo.country"]) {
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Resolving bidRequest.device.geo.country - path: %@", path]];
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Request data keys: %@", [requestData allKeys]]];
+        [self.logger debug:[NSString stringWithFormat:@"🌍 [CLXTrackingFieldResolver] Resolving bidRequest.device.geo.country - path: %@", path]];
+        [self.logger debug:[NSString stringWithFormat:@"🌍 [CLXTrackingFieldResolver] Request data keys: %@", [requestData allKeys]]];
         NSDictionary *device = requestData[@"device"];
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Device keys: %@", [device allKeys]]];
+        [self.logger debug:[NSString stringWithFormat:@"🌍 [CLXTrackingFieldResolver] Device keys: %@", [device allKeys]]];
         NSDictionary *geo = device[@"geo"];
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Geo keys: %@", [geo allKeys]]];
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Country value: '%@'", geo[@"country"]]];
+        [self.logger debug:[NSString stringWithFormat:@"🌍 [CLXTrackingFieldResolver] Geo keys: %@", [geo allKeys]]];
+        [self.logger debug:[NSString stringWithFormat:@"🌍 [CLXTrackingFieldResolver] Country value: '%@'", geo[@"country"]]];
     }
     
     return [self resolveNestedField:requestData path:path];
@@ -375,8 +375,8 @@
     
     if ([field isEqualToString:@"bid.dealid"]) {
         id dealid = bidObj[@"dealid"];
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] bid.dealid lookup - bidObj keys: %@", [bidObj allKeys]]];
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] bid.dealid direct value: '%@' (type: %@)", dealid ?: @"(nil)", dealid ? NSStringFromClass([dealid class]) : @"nil"]];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] bid.dealid lookup - bidObj keys: %@", [bidObj allKeys]]];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] bid.dealid direct value: '%@' (type: %@)", dealid ?: @"(nil)", dealid ? NSStringFromClass([dealid class]) : @"nil"]];
         
         // If not found in bid object, look in the resolved request debug data
         if (!dealid) {
@@ -390,13 +390,13 @@
                     if ([lineItems isKindOfClass:[NSArray class]] && [(NSArray *)lineItems count] > 0) {
                         NSDictionary *lineItem = lineItems[0];
                         dealid = lineItem[@"deal"][@"id"];
-                        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] bid.dealid found in resolved request: '%@'", dealid ?: @"(nil)"]];
+                        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] bid.dealid found in resolved request: '%@'", dealid ?: @"(nil)"]];
                     }
                 }
             }
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] bid.dealid final value: '%@'", dealid ?: @"(nil)"]];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] bid.dealid final value: '%@'", dealid ?: @"(nil)"]];
         return dealid;
     }
     

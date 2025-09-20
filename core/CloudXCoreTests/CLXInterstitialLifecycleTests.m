@@ -733,6 +733,39 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     [self setCurrentState:CLXInterstitialStateLOADING onInterstitial:self.interstitial];
     self.interstitial.currentInterstitialAdapter = self.mockAdapter;
     
+    // Set up bid response data required for loss notification
+    CLXBidResponseBid *testBid = [[CLXBidResponseBid alloc] init];
+    testBid.id = kTestBidID;
+    testBid.price = kTestPrice;
+    testBid.lurl = kTestLURL;
+    testBid.nurl = kTestNURL;
+    
+    CLXBidResponse *testBidResponse = [[CLXBidResponse alloc] init];
+    testBidResponse.id = kTestAuctionID;
+    
+    CLXBidAdSourceResponse *testAdSourceResponse = [[CLXBidAdSourceResponse alloc] initWithPrice:testBid.price
+                                                                                     auctionId:kTestAuctionID
+                                                                                        dealId:nil
+                                                                                       latency:0.0
+                                                                                          nurl:testBid.nurl
+                                                                                         bidID:testBid.id
+                                                                                           bid:testBid
+                                                                                    bidRequest:@{}
+                                                                                   networkName:@"test-network"
+                                                                                        clxAd:nil
+                                                                                   createBidAd:^id{ return nil; }];
+    
+    // Set the required properties on the interstitial for loss notification
+    @try {
+        [self.interstitial setValue:testBidResponse forKey:@"currentBidResponse"];
+        [self.interstitial setValue:testAdSourceResponse forKey:@"lastBidResponse"];
+    } @catch (NSException *exception) {
+        NSLog(@"Could not set bid response data via KVC: %@", exception.reason);
+    }
+    
+    // Add bid to mock tracker so loss notification can be sent
+    [self.mockWinLossTracker addBid:kTestAuctionID bid:testBid];
+    
     NSError *testError = [NSError errorWithDomain:@"TestError" code:1001 userInfo:@{NSLocalizedDescriptionKey: @"Load failed"}];
     
     // Simulate load failure
@@ -748,6 +781,15 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         
         // Verify no win notification sent on load failure
         XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 0, @"No win notification should be sent on load failure");
+        
+        // Verify loss notification IS sent on load failure
+        XCTAssertEqual(self.mockWinLossTracker.lossNotifications.count, 1, @"Loss notification should be sent on load failure");
+        
+        // Verify the loss notification contains correct data
+        if (self.mockWinLossTracker.lossNotifications.count > 0) {
+            NSDictionary *lossNotification = self.mockWinLossTracker.lossNotifications.firstObject;
+            XCTAssertEqualObjects(lossNotification[@"lossReason"], @(CLXLossReasonTechnicalError), @"Loss reason should be TechnicalError");
+        }
         
         // Verify state reset
         CLXInterstitialState currentState = [self getCurrentStateFromInterstitial:self.interstitial];

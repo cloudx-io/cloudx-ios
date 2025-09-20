@@ -68,7 +68,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) CLXRillTrackingService *rillTrackingService;
 @property (nonatomic, strong) CLXConfigImpressionModel *impModel;
 
-
 @end
 
 @implementation CLXPublisherNative
@@ -386,6 +385,16 @@ NS_ASSUME_NONNULL_BEGIN
     self.nativeOnScreen = self.currentLoadingNative;
     self.successWin = YES;
     
+    // Winner has successfully loaded, now fire loss notifications for all losing bids
+    if (self.currentBidResponse && self.lastBidResponse) {
+        NSArray<CLXBidResponseBid *> *allBids = [self.currentBidResponse getAllBidsForWaterfall];
+        NSString *winnerBidId = self.lastBidResponse.bid.id;
+        NSString *auctionId = self.currentBidResponse.id;
+        
+        [[CLXWinLossTracker shared] sendLossNotificationsForLosingBids:auctionId
+                                                         winningBidId:winnerBidId
+                                                              allBids:allBids];
+    }
     
     // Call both old and new delegate methods for backward compatibility
     if ([self.delegate respondsToSelector:@selector(didLoadWithNative:)]) {
@@ -409,6 +418,19 @@ NS_ASSUME_NONNULL_BEGIN
     if (native && native.timeout) {
         [native destroy];
         return;
+    }
+    
+    // Send server-side loss notification for technical errors (matching banner implementation)
+    if (self.lastBidResponse && self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
+        [[CLXWinLossTracker shared] setBidLoadResult:self.currentBidResponse.id 
+                                               bidId:self.lastBidResponse.bid.id 
+                                             success:NO 
+                                          lossReason:@(CLXLossReasonTechnicalError)];
+        [[CLXWinLossTracker shared] sendLoss:self.currentBidResponse.id bidId:self.lastBidResponse.bid.id];
+        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherNative] Sent server-side loss notification for failed native ad, reason=TechnicalError"]];
+    } else {
+        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherNative] Missing data for native loss notification: bidID=%@, auctionID=%@", 
+                           self.lastBidResponse.bid.id ?: @"(nil)", self.currentBidResponse.id ?: @"(nil)"]];
     }
     
     [native destroy];

@@ -17,12 +17,29 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class CLXSDKConfigResponse;
 @class CLXBidResponseBid;
+@class CLXTrackingFieldResolver;
 
 /**
  * iOS equivalent of Android's WinLossFieldResolver
  * Builds win/loss notification payloads with dynamic field resolution
  */
 @interface CLXWinLossFieldResolver : NSObject
+
+/**
+ * Initializes the resolver with a specific payload mapping (for testing)
+ * @param payloadMapping The payload mapping dictionary
+ * @return Initialized resolver instance
+ */
+- (instancetype)initWithPayloadMapping:(NSDictionary<NSString *, NSString *> *)payloadMapping;
+
+/**
+ * Initializes the resolver with dependencies (for testing with mocks)
+ * @param payloadMapping The payload mapping dictionary
+ * @param trackingFieldResolver The tracking field resolver dependency
+ * @return Initialized resolver instance
+ */
+- (instancetype)initWithPayloadMapping:(NSDictionary<NSString *, NSString *> *)payloadMapping
+                  trackingFieldResolver:(CLXTrackingFieldResolver *)trackingFieldResolver;
 
 /**
  * Sets the SDK configuration containing server-driven field mappings

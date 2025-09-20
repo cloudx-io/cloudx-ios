@@ -14,11 +14,32 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class CLXBaseNetworkService;
+
+/**
+ * Protocol for win/loss network operations - enables easy testing
+ */
+@protocol CLXWinLossNetworkServiceProtocol <NSObject>
+
+/**
+ * Sends a win/loss notification with dynamic payload
+ * @param appKey The app key for authorization
+ * @param endpointUrl The endpoint URL to send the request to
+ * @param payload Dynamic key-value payload data
+ * @param completion Completion handler with success/error result
+ */
+- (void)sendWithAppKey:(NSString *)appKey
+           endpointUrl:(NSString *)endpointUrl
+               payload:(NSDictionary<NSString *, id> *)payload
+            completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
+
+@end
+
 /**
  * Network service for win/loss notifications
  * Matches Android's WinLossTrackerApiImpl functionality
  */
-@interface CLXWinLossNetworkService : NSObject
+@interface CLXWinLossNetworkService : NSObject <CLXWinLossNetworkServiceProtocol>
 
 /**
  * Initializes the service with base URL and session
@@ -29,18 +50,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithBaseURL:(NSString *)baseURL urlSession:(NSURLSession *)urlSession;
 
 /**
- * Sends a win/loss notification with dynamic payload
- * Matches Android's send method exactly
- * 
- * @param appKey The app key for authorization
- * @param endpointUrl The endpoint URL to send the request to
- * @param payload Dynamic key-value payload data
- * @param completion Completion handler with success/error result
+ * Initializes the service with injectable base network service (for testing)
+ * @param baseNetworkService The base network service to use
+ * @return Initialized service instance
  */
-- (void)sendWithAppKey:(NSString *)appKey
-           endpointUrl:(NSString *)endpointUrl
-               payload:(NSDictionary<NSString *, id> *)payload
-            completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
+- (instancetype)initWithBaseNetworkService:(CLXBaseNetworkService *)baseNetworkService;
 
 @end
 

@@ -80,6 +80,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 @property (nonatomic, strong) CLXRillTrackingService *rillTrackingService;
 @property (nonatomic, strong) CLXConfigImpressionModel *impModel;
 
+// Private helper methods
+- (void)sendLossNotificationForFailedAd:(CLXAdType)adType;
+- (void)fireLosingBidLurls;
 
 @end
 
@@ -491,8 +494,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         }
     }
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherFullscreenAd] Factory found for network: %@", network]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Factory class: %@", NSStringFromClass([factory class])]];
+    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherFullscreenAd] Interstitial factory found for network: %@ (class: %@)", network, NSStringFromClass([factory class])]];
     
     // Create interstitial instance
     id<CLXAdapterInterstitial> interstitial = [factory createWithAdId:adId
@@ -534,8 +536,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         return nil;
     }
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherFullscreenAd] Factory found for network: %@", network]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Factory class: %@", NSStringFromClass([factory class])]];
+    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherFullscreenAd] Rewarded factory found for network: %@ (class: %@)", network, NSStringFromClass([factory class])]];
     
     // Create rewarded instance
     id<CLXAdapterRewarded> rewarded = [factory createWithAdId:adId
@@ -554,6 +555,37 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     return rewarded;
 }
 
+#pragma mark - Private Helper Methods
+
+- (void)sendLossNotificationForFailedAd:(CLXAdType)adType {
+    // Send server-side loss notification for technical errors (matching banner implementation)
+    if (self.lastBidResponse && self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
+        [[CLXWinLossTracker shared] setBidLoadResult:self.currentBidResponse.id 
+                                               bidId:self.lastBidResponse.bid.id 
+                                             success:NO 
+                                          lossReason:@(CLXLossReasonTechnicalError)];
+        [[CLXWinLossTracker shared] sendLoss:self.currentBidResponse.id bidId:self.lastBidResponse.bid.id];
+        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Sent server-side loss notification for failed ad type %ld, reason=TechnicalError", (long)adType]];
+    } else {
+        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Missing data for ad type %ld loss notification: bidID=%@, auctionID=%@", 
+                           (long)adType, self.lastBidResponse.bid.id ?: @"(nil)", self.currentBidResponse.id ?: @"(nil)"]];
+    }
+}
+
+- (void)fireLosingBidLurls {
+    if (!self.currentBidResponse || !self.lastBidResponse) {
+        return;
+    }
+    
+    NSArray<CLXBidResponseBid *> *allBids = [self.currentBidResponse getAllBidsForWaterfall];
+    NSString *winnerBidId = self.lastBidResponse.bid.id;
+    NSString *auctionId = self.currentBidResponse.id;
+    
+    [[CLXWinLossTracker shared] sendLossNotificationsForLosingBids:auctionId
+                                                     winningBidId:winnerBidId
+                                                          allBids:allBids];
+}
+
 #pragma mark - CloudXAdapterInterstitialDelegate
 
 - (void)didLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
@@ -566,18 +598,21 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     self.currentState = CLXInterstitialStateREADY;
     [self.logger debug:@"📊 [PublisherFullscreenAd] State transitioned to READY"];
     
+    // Winner has successfully loaded, now fire loss notifications for all losing bids
+    [self fireLosingBidLurls];
+    
     // Call success delegate
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.interstitialDelegate respondsToSelector:@selector(didLoadWithAd:)]) {
-            [self.logger debug:@"✅ [PublisherFullscreenAd] Calling didLoadWithAd delegate"];
             [self.interstitialDelegate didLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
         }
     });
 }
 
 - (void)didFailToLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial error:(NSError *)error {
-    [self.logger error:[NSString stringWithFormat:@"❌ [PublisherFullscreenAd] didFailToLoadWithInterstitial: %@", error.localizedDescription]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] - Failed interstitial: %@", interstitial]];
+    [self.logger error:[NSString stringWithFormat:@"❌ [PublisherFullscreenAd] didFailToLoadWithInterstitial (%@): %@", interstitial, error.localizedDescription]];
+    
+    [self sendLossNotificationForFailedAd:CLXAdTypeInterstitial];
     
     // Clear cached adapter
     self.currentInterstitialAdapter = nil;
@@ -589,7 +624,6 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Call failure delegate
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.interstitialDelegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-            [self.logger debug:@"📊 [PublisherFullscreenAd] Calling failToLoadWithAd delegate"];
             [self.interstitialDelegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:error];
         }
     });
@@ -729,6 +763,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Transition to ready state
     self.currentState = CLXInterstitialStateREADY;
     
+    // Winner has successfully loaded, now fire loss notifications for all losing bids
+    [self fireLosingBidLurls];
+    
     // Call success delegate
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.rewardedDelegate respondsToSelector:@selector(didLoadWithAd:)]) {
@@ -738,7 +775,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 }
 
 - (void)didFailToLoadWithRewarded:(id<CLXAdapterRewarded>)rewarded error:(NSError *)error {
-    [self.logger error:[NSString stringWithFormat:@"Rewarded adapter failed to load: %@", error.localizedDescription]];
+    [self.logger error:[NSString stringWithFormat:@"❌ [PublisherFullscreenAd] didFailToLoadWithRewarded (%@): %@", rewarded, error.localizedDescription]];
+    
+    [self sendLossNotificationForFailedAd:CLXAdTypeRewarded];
     
     // Clear cached adapter
     self.currentRewardedAdapter = nil;

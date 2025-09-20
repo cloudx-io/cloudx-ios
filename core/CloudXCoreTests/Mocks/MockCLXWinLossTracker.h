@@ -7,6 +7,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class CLXBidResponseBid;
+
 /**
  * Comprehensive mock for CLXWinLossTracker that captures all business-critical tracking events
  * for robust testing of revenue recognition and bid lifecycle management.
@@ -15,10 +17,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Win/Loss Event Tracking
 
-// Detailed win notification tracking
+// Detailed win notification tracking (thread-safe)
 @property (nonatomic, strong) NSMutableArray<NSDictionary *> *winNotifications;
 @property (nonatomic, strong) NSMutableArray<NSDictionary *> *lossNotifications;
 @property (nonatomic, strong) NSMutableArray<NSDictionary *> *bidResults;
+
+// Call count tracking for tests (thread-safe accessors via methods)
+@property (nonatomic, assign) NSInteger sendWinCallCount;
+@property (nonatomic, assign) NSInteger sendLossCallCount;
 
 // Bid data storage (to simulate real tracker behavior)
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableArray<CLXBidResponseBid *> *> *storedBids;
@@ -41,6 +47,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Reset for clean test isolation
 - (void)reset;
+
+#pragma mark - Additional Methods for Testing
+
+// Configuration methods
+- (void)setConfig:(CLXSDKConfigResponse *)config;
+- (void)trySendingPendingWinLossEvents;
+- (void)clearAuction:(NSString *)auctionId;
+
+// New shared method for competitive loss notifications
+- (void)sendLossNotificationsForLosingBids:(NSString *)auctionId
+                             winningBidId:(NSString *)winningBidId
+                                  allBids:(NSArray<CLXBidResponseBid *> *)allBids;
 
 #pragma mark - Singleton Override for Testing
 

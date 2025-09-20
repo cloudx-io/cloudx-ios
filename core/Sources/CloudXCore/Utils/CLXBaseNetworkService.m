@@ -222,23 +222,11 @@
             BOOL isNoContentResponse = (httpResponse.statusCode == 204);
             NSString *cloudXStatus = [httpResponse.allHeaderFields objectForKey:@"X-CloudX-Status"];
             BOOL isKillSwitchActive = ([cloudXStatus isEqual:@"ADS_DISABLED"] || [cloudXStatus isEqual:@"SDK_DISABLED"]);
-            
-
-
-
-
-[self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] Response body length: %@", httpResponse.allHeaderFields]];
-
-
-
-
-            if (isNoContentResponse && isKillSwitchActive) {
-                isKillSwitchEnabled = YES;
-            }
+            isKillSwitchEnabled = isNoContentResponse && isKillSwitchActive;
             
             [self.logger info:@"✅ [BaseNetworkService] HTTP status code indicates success"];
-            // Parse JSON response data if present
-            if (data) {
+            // Parse JSON response data if present and non-empty
+            if (data && data.length > 0) {
                 NSError *jsonError;
                 id jsonResponse = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
                 if (jsonError) {
@@ -253,10 +241,10 @@
                     }
                 }
             } else {
-                // No data to parse, return success with nil response
-                [self.logger debug:@"📊 [BaseNetworkService] No data to parse, calling completion with nil"];
+                // No data or empty data to parse, return success with nil response
+                [self.logger debug:@"📊 [BaseNetworkService] No data or empty data to parse, calling completion with nil"];
                 if (completion) {
-                    completion(nil, nil, false);
+                    completion(nil, nil, isKillSwitchEnabled);
                 }
             }
         } else {

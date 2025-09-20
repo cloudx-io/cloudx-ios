@@ -510,7 +510,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)fireLosingBidLurls {
     if (!self.currentBidResponse || !self.lastBidResponse) {
-        [self.logger debug:@"📊 [PublisherBanner] No bid response available for server-side loss tracking"];
         return;
     }
     
@@ -518,37 +517,9 @@ NS_ASSUME_NONNULL_BEGIN
     NSString *winnerBidId = self.lastBidResponse.bidID;
     NSString *auctionId = self.currentBidResponse.id;
     
-    if (!auctionId) {
-        [self.logger error:@"❌ [PublisherBanner] No auction ID available for loss tracking"];
-        return;
-    }
-    
-    [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherBanner] Sending server-side loss notifications for losing bids (winner: %@)", winnerBidId]];
-    
-    // Set winner in win/loss tracker
-    [[CLXWinLossTracker shared] setWinner:auctionId winningBidId:winnerBidId];
-    
-    for (CLXBidResponseBid *bid in allBids) {
-        // Skip the winner
-        if ([bid.id isEqualToString:winnerBidId]) {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Skipping loss notification for winner bid rank=%ld, id=%@", (long)bid.ext.cloudx.rank, bid.id]];
-            continue;
-        }
-        
-        // Send server-side loss notification for losing bid (replaces client-side LURL firing)
-        if (bid.id) {
-            [[CLXWinLossTracker shared] setBidLoadResult:auctionId 
-                                                   bidId:bid.id 
-                                                 success:NO 
-                                              lossReason:@(CLXLossReasonLostToHigherBid)];
-            [[CLXWinLossTracker shared] sendLoss:auctionId bidId:bid.id];
-            [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherBanner] Sent server-side loss notification for losing bid rank=%ld, reason=LostToHigherBid", (long)bid.ext.cloudx.rank]];
-        } else {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] No bid ID for loss notification, rank=%ld", (long)bid.ext.cloudx.rank]];
-        }
-    }
-    
-    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Completed sending server-side loss notifications for losing bids"]];
+    [[CLXWinLossTracker shared] sendLossNotificationsForLosingBids:auctionId
+                                                     winningBidId:winnerBidId
+                                                          allBids:allBids];
 }
 
 

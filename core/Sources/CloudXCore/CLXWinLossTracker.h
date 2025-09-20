@@ -88,6 +88,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)sendWin:(NSString *)auctionId bidId:(NSString *)bidId;
 
 /**
+ * Sends loss notifications for all losing bids in an auction
+ * @param auctionId The auction identifier
+ * @param winningBidId The winning bid identifier
+ * @param allBids Array of all bids in the auction
+ */
+- (void)sendLossNotificationsForLosingBids:(NSString *)auctionId
+                             winningBidId:(NSString *)winningBidId
+                                  allBids:(NSArray<CLXBidResponseBid *> *)allBids;
+
+/**
  * Clears all data for a specific auction
  * @param auctionId The auction identifier
  */
@@ -119,6 +129,14 @@ NS_ASSUME_NONNULL_BEGIN
  * Reset shared instance to default implementation
  */
 + (void)resetSharedInstance;
+
+/**
+ * Database methods for testing
+ */
+- (void)deleteAllEvents;
+- (void)insertEventWithId:(NSString *)eventId endpointUrl:(NSString *)endpointUrl payload:(NSString *)payload;
+- (void)deleteEventWithId:(NSString *)eventId;
+- (NSArray *)getAllCachedEvents;
 
 @end
 

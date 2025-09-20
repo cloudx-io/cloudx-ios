@@ -34,6 +34,9 @@
 #import <CloudXCore/CLXWinLossNetworkService.h>
 #import <CloudXCore/CLXAuctionBidManager.h>
 
+// Database
+#import <CloudXCore/CLXSQLiteDatabase.h>
+
 // Model
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXBidResponse.h>

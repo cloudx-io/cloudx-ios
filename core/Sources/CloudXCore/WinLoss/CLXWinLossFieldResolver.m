@@ -20,25 +20,39 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
 @interface CLXWinLossFieldResolver ()
 @property (nonatomic, strong, nullable) NSDictionary<NSString *, NSString *> *winLossPayloadMapping;
 @property (nonatomic, strong) CLXLogger *logger;
+@property (nonatomic, strong) CLXTrackingFieldResolver *trackingFieldResolver;
 @end
 
 @implementation CLXWinLossFieldResolver
 
 - (instancetype)init {
+    return [self initWithPayloadMapping:nil];
+}
+
+- (instancetype)initWithPayloadMapping:(NSDictionary<NSString *, NSString *> *)payloadMapping {
+    // Use shared instance for backward compatibility in production
+    return [self initWithPayloadMapping:payloadMapping 
+                   trackingFieldResolver:[CLXTrackingFieldResolver shared]];
+}
+
+- (instancetype)initWithPayloadMapping:(NSDictionary<NSString *, NSString *> *)payloadMapping
+                  trackingFieldResolver:(CLXTrackingFieldResolver *)trackingFieldResolver {
     self = [super init];
     if (self) {
+        _winLossPayloadMapping = [payloadMapping copy];
+        _trackingFieldResolver = trackingFieldResolver;
         _logger = [[CLXLogger alloc] initWithCategory:@"WinLossFieldResolver"];
     }
     return self;
 }
 
 - (void)setConfig:(CLXSDKConfigResponse *)config {
-    // TODO: Extract winLossNotificationPayloadConfig from server config when available
-    // For now, use hardcoded mapping that matches Android's expected behavior
-    self.winLossPayloadMapping = nil; // Will be set by server config later
+    // Extract winLossNotificationPayloadConfig from server config
+    self.winLossPayloadMapping = config.winLossNotificationPayloadConfig;
     
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [WinLossFieldResolver] Config set - mapping available: %@", 
-                       self.winLossPayloadMapping ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [WinLossFieldResolver] Config set - mapping available: %@, fields: %lu", 
+                       self.winLossPayloadMapping ? @"YES" : @"NO",
+                       (unsigned long)self.winLossPayloadMapping.count]];
 }
 
 - (nullable NSDictionary<NSString *, id> *)buildWinLossPayloadWithAuctionId:(NSString *)auctionId
@@ -114,7 +128,7 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
             url = bid.lurl;
         }
         
-        if (url) {
+        if (url && url.length > 0) {
             return [self replaceUrlTemplatesInUrl:url
                                             isWin:isWin
                                        lossReason:lossReason
@@ -123,16 +137,16 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         return nil;
         
     } else if ([fieldPath isEqualToString:@"sdk.loopIndex"]) {
-        // Delegate to existing tracking field resolver for loop index
-        id loopIndex = [[CLXTrackingFieldResolver shared] resolveField:fieldPath forAuction:auctionId];
+        // Delegate to injected tracking field resolver for loop index
+        id loopIndex = [self.trackingFieldResolver resolveField:fieldPath forAuction:auctionId];
         if ([loopIndex isKindOfClass:[NSString class]]) {
             return @([((NSString *)loopIndex) integerValue]);
         }
         return loopIndex;
         
     } else {
-        // Delegate to existing tracking field resolver for other fields
-        return [[CLXTrackingFieldResolver shared] resolveField:fieldPath forAuction:auctionId];
+        // Delegate to injected tracking field resolver for other fields
+        return [self.trackingFieldResolver resolveField:fieldPath forAuction:auctionId];
     }
 }
 
