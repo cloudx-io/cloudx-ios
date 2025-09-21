@@ -16,6 +16,7 @@
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXAdEventReporter.h>
 #import <CloudXCore/CLXAd.h>
+#import <CloudXCore/CLXWinLossTracker.h>
 
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBidNetworkService.h>
@@ -258,14 +259,24 @@ NS_ASSUME_NONNULL_BEGIN
                     return;
                 }
                 
-                // Store the bid response for LURL firing
-                strongSelf.currentBidResponse = response;
-                
-                // Store original bid response JSON in tracking field resolver for efficient field resolution
-                if (response.id && rawJSON) {
-                    [[CLXTrackingFieldResolver shared] setResponseData:response.id bidResponseJSON:rawJSON];
-                    [strongSelf.logger debug:[NSString stringWithFormat:@"Stored original bid response JSON for auction: %@", response.id]];
-                }
+    // Store the bid response for LURL firing
+    strongSelf.currentBidResponse = response;
+    
+    // Store original bid response JSON in tracking field resolver for efficient field resolution
+    if (response.id && rawJSON) {
+        [[CLXTrackingFieldResolver shared] setResponseData:response.id bidResponseJSON:rawJSON];
+        [strongSelf.logger debug:[NSString stringWithFormat:@"Stored original bid response JSON for auction: %@", response.id]];
+    }
+    
+    // Add all bids to win/loss tracking
+    if (response.id) {
+        NSArray<CLXBidResponseBid *> *allBids = [response allBids];
+        for (CLXBidResponseBid *bid in allBids) {
+            [[CLXWinLossTracker shared] addBid:response.id bid:bid];
+        }
+        [strongSelf.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] Added %lu bids to win/loss tracking for auction: %@", 
+                                 (unsigned long)allBids.count, response.id]];
+    }
                 
                 // Implement true waterfall logic 
                 [strongSelf tryWaterfallBidsFromResponse:response 
@@ -388,14 +399,18 @@ NS_ASSUME_NONNULL_BEGIN
     }
     
     // FIRST FILTERING PHASE - This bid is completely discarded because it couldn't create a banner instance
-    // We know it definitely can't show an ad, so fire lurl immediately with TechnicalError
+    // We know it definitely can't show an ad, so send loss notification immediately with TechnicalError
     [self.logger debug:[NSString stringWithFormat:@"❌ [CLXBidAdSource] Bid %ld failed creation: rank=%ld, id=%@", 
                        (long)bidIndex + 1, (long)currentBid.ext.cloudx.rank, currentBid.id]];
     
-    // Fire LURL immediately for adapter creation failures
-    if (currentBid.lurl && currentBid.lurl.length > 0) {
-        [self.logger debug:[NSString stringWithFormat:@"📤 [CLXBidAdSource] Firing lurl for uncreatable bid rank=%ld, reason=TechnicalError", (long)currentBid.ext.cloudx.rank]];
-        [self.reportingService fireLurlWithUrl:currentBid.lurl reason:CLXLossReasonTechnicalError];
+    // Send server-side loss notification for adapter creation failures (replaces client-side LURL firing)
+    if (auctionID && currentBid.id) {
+        [[CLXWinLossTracker shared] setBidLoadResult:auctionID 
+                                               bidId:currentBid.id 
+                                             success:NO 
+                                          lossReason:@(CLXLossReasonTechnicalError)];
+        [[CLXWinLossTracker shared] sendLoss:auctionID bidId:currentBid.id];
+        [self.logger debug:[NSString stringWithFormat:@"📤 [CLXBidAdSource] Sent server-side loss notification for uncreatable bid rank=%ld, reason=TechnicalError", (long)currentBid.ext.cloudx.rank]];
     }
     
     // Try next bid in waterfall

@@ -6,8 +6,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithBaseURL:(NSURL *)baseURL urlSession:(NSURLSession *)urlSession;
 
-- (void)trackNUrlWithPrice:(double)price nUrl:(nullable NSString *)nUrl completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
-- (void)trackLUrlWithLUrl:(nullable NSString *)lUrl;
+// Legacy trackNUrlWithPrice and trackLUrlWithLUrl methods removed
+// Use CLXWinLossNetworkService for server-side win/loss tracking instead
 - (void)rillTrackingWithActionString:(NSString *)urlString campaignId:(NSString *)campaignId encodedString:(NSString *)encodedString error:(NSError **)error;
 - (void)metricsTrackingWithActionString:(NSString *)actionString error:(NSError **)error;
 - (void)geoHeadersWithURLString:(NSString *)fullURL

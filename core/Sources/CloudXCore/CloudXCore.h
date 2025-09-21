@@ -28,6 +28,15 @@
 #import <CloudXCore/CLXAdReportingNetworkService.h>
 #import <CloudXCore/CLXMetricsNetworkService.h>
 
+// Win/Loss Tracking
+#import <CloudXCore/CLXWinLossTracker.h>
+#import <CloudXCore/CLXWinLossFieldResolver.h>
+#import <CloudXCore/CLXWinLossNetworkService.h>
+#import <CloudXCore/CLXAuctionBidManager.h>
+
+// Database
+#import <CloudXCore/CLXSQLiteDatabase.h>
+
 // Model
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXBidResponse.h>

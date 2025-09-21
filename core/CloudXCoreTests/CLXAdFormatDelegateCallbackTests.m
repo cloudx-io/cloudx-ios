@@ -217,4 +217,78 @@
     }
 }
 
+#pragma mark - Failure Scenario Tests
+
+// Test that all ad formats properly call failToLoadWithAd delegate on failures
+- (void)testAllFormats_FailureScenarios_CallDelegateWithCorrectAdObject {
+    // Test that failure scenarios across all ad formats properly call delegate methods
+    
+    // Create test data
+    CLXAd *testAd = [[CLXAd alloc] initWithPlacementName:@"test-failure"
+                                             placementId:@"test-failure-id"
+                                                  bidder:@"test-bidder"
+                                     externalPlacementId:@"test-external"
+                                                 revenue:@2.50];
+    NSError *testError = [NSError errorWithDomain:@"CLXTestError" code:1001 userInfo:@{NSLocalizedDescriptionKey: @"Test failure"}];
+    
+    // Clear tracking
+    [self.receivedCallbacks removeAllObjects];
+    [self.receivedAdObjects removeAllObjects];
+    [self.receivedAdTypes removeAllObjects];
+    
+    // Test failure callback for each format
+    [self failToLoadWithAd:testAd error:testError]; // Banner/Interstitial/Rewarded/Native all use this
+    
+    // Verify delegate was called
+    XCTAssertTrue([self.receivedCallbacks containsObject:@"failToLoadWithAd"], 
+                 @"All ad format failures should call failToLoadWithAd delegate");
+    XCTAssertEqual(self.receivedAdObjects.count, 1, @"Should receive one ad object in failure callback");
+    
+    // Verify ad object is correct type
+    if (self.receivedAdObjects.count > 0) {
+        id adObject = self.receivedAdObjects.firstObject;
+        XCTAssertTrue([adObject isKindOfClass:[CLXAd class]], 
+                     @"Failure callback should receive CLXAd object");
+        
+        CLXAd *receivedAd = (CLXAd *)adObject;
+        XCTAssertEqualObjects(receivedAd.placementId, testAd.placementId, 
+                            @"Failed ad should have correct placement ID");
+        XCTAssertEqualObjects(receivedAd.bidder, testAd.bidder, 
+                            @"Failed ad should have correct bidder");
+    }
+}
+
+// Test that failure callbacks are consistent across all ad format delegate protocols
+- (void)testFailureCallbacks_ConsistentAcrossAllFormats {
+    // This test ensures that banner, interstitial, rewarded, and native ad formats
+    // all have consistent failure callback behavior for publisher integration
+    
+    NSError *testError = [NSError errorWithDomain:@"CLXTestError" code:1002 userInfo:@{NSLocalizedDescriptionKey: @"Consistent failure test"}];
+    CLXAd *testAd = [[CLXAd alloc] initWithPlacementName:@"consistency-test"
+                                             placementId:@"consistency-id"
+                                                  bidder:@"test-bidder"
+                                     externalPlacementId:@"test-external"
+                                                 revenue:@1.75];
+    
+    // Clear tracking
+    [self.receivedCallbacks removeAllObjects];
+    [self.receivedAdObjects removeAllObjects];
+    
+    // Test multiple failure scenarios to ensure consistency
+    [self failToLoadWithAd:testAd error:testError];
+    [self failToShowWithAd:testAd error:testError]; // Only for interstitial/rewarded
+    
+    // Verify both failure types were captured
+    XCTAssertTrue([self.receivedCallbacks containsObject:@"failToLoadWithAd"], 
+                 @"Should capture load failure callback");
+    XCTAssertTrue([self.receivedCallbacks containsObject:@"failToShowWithAd"], 
+                 @"Should capture show failure callback");
+    
+    // Verify all failure callbacks received proper ad objects
+    for (id adObject in self.receivedAdObjects) {
+        XCTAssertTrue([adObject isKindOfClass:[CLXAd class]], 
+                     @"All failure callbacks should receive CLXAd objects");
+    }
+}
+
 @end

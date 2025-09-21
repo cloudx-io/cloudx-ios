@@ -90,6 +90,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *organizationID;
 @property (nonatomic, copy, nullable) NSString *accountID;
 @property (nonatomic, strong, nullable) NSArray<NSString *> *tracking;
+@property (nonatomic, copy, nullable) NSString *winLossNotificationURL;
+@property (nonatomic, strong, nullable) NSDictionary<NSString *, NSString *> *winLossNotificationPayloadConfig;
 
 - (instancetype)init;
 @end

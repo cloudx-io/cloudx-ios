@@ -76,6 +76,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSString *)buildPayload:(NSString *)auctionId;
 
 /**
+ * Resolves a single field value for win/loss tracking
+ * @param fieldPath The field path to resolve
+ * @param auctionId The auction identifier
+ * @return The resolved field value, or nil if not found
+ */
+- (nullable id)resolveField:(NSString *)fieldPath forAuction:(NSString *)auctionId;
+
+/**
  * Gets the account ID for encryption
  * @return The account ID, or nil if not set
  */

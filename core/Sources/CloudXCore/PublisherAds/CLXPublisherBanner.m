@@ -17,6 +17,7 @@
 #import <CloudXCore/CLXConfigImpressionModel.h>
 
 #import <CloudXCore/CLXBidTokenSource.h>
+#import <CloudXCore/CLXWinLossTracker.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXSettings.h>
@@ -509,32 +510,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)fireLosingBidLurls {
     if (!self.currentBidResponse || !self.lastBidResponse) {
-        [self.logger debug:@"📊 [PublisherBanner] No bid response available for lurl firing"];
         return;
     }
     
     NSArray<CLXBidResponseBid *> *allBids = [self.currentBidResponse getAllBidsForWaterfall];
     NSString *winnerBidId = self.lastBidResponse.bidID;
+    NSString *auctionId = self.currentBidResponse.id;
     
-    [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherBanner] Firing lurls for losing bids (winner: %@)", winnerBidId]];
-    
-    for (CLXBidResponseBid *bid in allBids) {
-        // Skip the winner
-        if ([bid.id isEqualToString:winnerBidId]) {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Skipping lurl for winner bid rank=%ld, id=%@", (long)bid.ext.cloudx.rank, bid.id]];
-            continue;
-        }
-        
-        // Fire lurl for losing bid
-        if (bid.lurl && bid.lurl.length > 0) {
-            [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherBanner] Firing lurl for losing bid rank=%ld, reason=LostToHigherBid", (long)bid.ext.cloudx.rank]];
-            [self.reportingService fireLurlWithUrl:bid.lurl reason:CLXLossReasonLostToHigherBid];
-        } else {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] No lurl to fire for losing bid rank=%ld", (long)bid.ext.cloudx.rank]];
-        }
-    }
-    
-    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Completed firing lurls for losing bids"]];
+    [[CLXWinLossTracker shared] sendLossNotificationsForLosingBids:auctionId
+                                                     winningBidId:winnerBidId
+                                                          allBids:allBids];
 }
 
 
@@ -546,10 +531,14 @@ NS_ASSUME_NONNULL_BEGIN
     // Destroy the failed banner
     [banner destroy];
     
-    // Fire LURL for technical errors
-    if (self.lastBidResponse && self.lastBidResponse.bid.lurl && self.lastBidResponse.bid.lurl.length > 0) {
-        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherBanner] Firing lurl for failed winner rank=%ld, reason=TechnicalError", (long)self.lastBidResponse.bid.ext.cloudx.rank]];
-        [self.reportingService fireLurlWithUrl:self.lastBidResponse.bid.lurl reason:CLXLossReasonTechnicalError];
+    // Send server-side loss notification for technical errors (replaces client-side LURL firing)
+    if (self.lastBidResponse && self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
+        [[CLXWinLossTracker shared] setBidLoadResult:self.currentBidResponse.id 
+                                               bidId:self.lastBidResponse.bid.id 
+                                             success:NO 
+                                          lossReason:@(CLXLossReasonTechnicalError)];
+        [[CLXWinLossTracker shared] sendLoss:self.currentBidResponse.id bidId:self.lastBidResponse.bid.id];
+        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherBanner] Sent server-side loss notification for failed winner rank=%ld, reason=TechnicalError", (long)self.lastBidResponse.bid.ext.cloudx.rank]];
     }
     
     // Reset state for next interval
@@ -602,24 +591,29 @@ NS_ASSUME_NONNULL_BEGIN
         [self.appSessionService addImpressionWithPlacementID:self.placementID];
         [self.appSessionService addSpendWithPlacementID:self.placementID spend:self.lastBidResponse.price];
         
-        // Fire NURL for revenue tracking on impression (industry standard)
-        if (self.lastBidResponse.nurl && self.lastBidResponse.nurl.length > 0) {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Firing NURL on impression for bidID=%@", self.lastBidResponse.bidID]];
-            __weak typeof(self) weakSelf = self;
-            [self.reportingService fireNurlForRevenueWithPrice:self.lastBidResponse.price nUrl:self.lastBidResponse.nurl completion:^(BOOL success, CLXAd * _Nullable ad) {
-                __strong typeof(weakSelf) strongSelf = weakSelf;
-                if (!strongSelf) return;
-                if (success) {
-                    CLXAd *adObject = [CLXAd adFromBid:strongSelf.lastBidResponse.bid placementId:strongSelf.placementID];
-                    if (strongSelf.delegate && [strongSelf.delegate respondsToSelector:@selector(revenuePaid:)]) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [strongSelf.delegate revenuePaid:adObject];
-                        });
-                    }
-                }
-            }];
+        // Send server-side win notification on impression (replaces client-side NURL firing)
+        if (self.lastBidResponse.bidID && self.currentBidResponse && self.currentBidResponse.id) {
+            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Sending server-side win notification on impression for bidID=%@", self.lastBidResponse.bidID]];
+            
+            // Mark bid as successfully loaded
+            [[CLXWinLossTracker shared] setBidLoadResult:self.currentBidResponse.id 
+                                                   bidId:self.lastBidResponse.bidID 
+                                                 success:YES 
+                                              lossReason:nil];
+            
+            // Send win notification
+            [[CLXWinLossTracker shared] sendWin:self.currentBidResponse.id bidId:self.lastBidResponse.bidID];
+            
+            // Trigger revenue callback immediately (no longer depends on NURL network call)
+            CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID];
+            if (self.delegate && [self.delegate respondsToSelector:@selector(revenuePaid:)]) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self.delegate revenuePaid:adObject];
+                });
+            }
         } else {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] No NURL to fire on impression for bidID=%@", self.lastBidResponse.bidID]];
+            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Missing auction ID or bid ID for win notification: bidID=%@, auctionID=%@", 
+                               self.lastBidResponse.bidID ?: @"(nil)", self.currentBidResponse.id ?: @"(nil)"]];
         }
         
         // Send Rill tracking impression event
