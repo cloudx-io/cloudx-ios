@@ -224,6 +224,14 @@
             BOOL isKillSwitchActive = ([cloudXStatus isEqual:@"ADS_DISABLED"] || [cloudXStatus isEqual:@"SDK_DISABLED"]);
             isKillSwitchEnabled = isNoContentResponse && isKillSwitchActive;
             
+            
+            
+            
+            
+            [self.logger debug:[NSString stringWithFormat:@"[BaseNetworkService] httpResponse.statusCode: %lu", httpResponse.statusCode]];
+            
+            
+            
             [self.logger info:@"✅ [BaseNetworkService] HTTP status code indicates success"];
             // Parse JSON response data if present and non-empty
             if (data && data.length > 0) {
