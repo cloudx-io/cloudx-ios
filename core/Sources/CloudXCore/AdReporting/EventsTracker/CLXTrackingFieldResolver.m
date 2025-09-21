@@ -120,7 +120,7 @@
     for (NSString *field in self.tracking) {
         id resolvedValue = [self resolveField:auctionId field:field];
         NSString *stringValue = resolvedValue ? [resolvedValue description] : @"";
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] %@ = '%@'", field, stringValue]];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] %@ = '%@'", field, stringValue]];
         [values addObject:stringValue];
     }
     
@@ -256,13 +256,10 @@
     
     // Debug logging for country field
     if ([path isEqualToString:@"device.geo.country"]) {
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Resolving bidRequest.device.geo.country - path: %@", path]];
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Request data keys: %@", [requestData allKeys]]];
         NSDictionary *device = requestData[@"device"];
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Device keys: %@", [device allKeys]]];
         NSDictionary *geo = device[@"geo"];
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Geo keys: %@", [geo allKeys]]];
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [FieldDebug] Country value: '%@'", geo[@"country"]]];
+        [self.logger debug:[NSString stringWithFormat:@"🌍 [CLXTrackingFieldResolver] Resolving device.geo.country: '%@' (device:%@, geo:%@)", 
+                           geo[@"country"], device ? @"✓" : @"✗", geo ? @"✓" : @"✗"]];
     }
     
     return [self resolveNestedField:requestData path:path];
@@ -375,8 +372,8 @@
     
     if ([field isEqualToString:@"bid.dealid"]) {
         id dealid = bidObj[@"dealid"];
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] bid.dealid lookup - bidObj keys: %@", [bidObj allKeys]]];
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] bid.dealid direct value: '%@' (type: %@)", dealid ?: @"(nil)", dealid ? NSStringFromClass([dealid class]) : @"nil"]];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] bid.dealid lookup - bidObj keys: %@", [bidObj allKeys]]];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] bid.dealid direct value: '%@' (type: %@)", dealid ?: @"(nil)", dealid ? NSStringFromClass([dealid class]) : @"nil"]];
         
         // If not found in bid object, look in the resolved request debug data
         if (!dealid) {
@@ -390,13 +387,13 @@
                     if ([lineItems isKindOfClass:[NSArray class]] && [(NSArray *)lineItems count] > 0) {
                         NSDictionary *lineItem = lineItems[0];
                         dealid = lineItem[@"deal"][@"id"];
-                        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] bid.dealid found in resolved request: '%@'", dealid ?: @"(nil)"]];
+                        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] bid.dealid found in resolved request: '%@'", dealid ?: @"(nil)"]];
                     }
                 }
             }
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [FieldDebug] bid.dealid final value: '%@'", dealid ?: @"(nil)"]];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] bid.dealid final value: '%@'", dealid ?: @"(nil)"]];
         return dealid;
     }
     
@@ -810,6 +807,21 @@
     
     // Default object equality
     return [value1 isEqual:value2];
+}
+
+#pragma mark - Win/Loss Field Resolution
+
+- (nullable id)resolveField:(NSString *)fieldPath forAuction:(NSString *)auctionId {
+    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolving field: %@ for auction: %@", fieldPath, auctionId]];
+    
+    // Handle SDK-level constants
+    if ([fieldPath isEqualToString:@"sdk.loopIndex"]) {
+        NSNumber *loopIndex = self.auctionedLoopIndex[auctionId];
+        return loopIndex ? [loopIndex stringValue] : nil;
+    }
+    
+    // Delegate to existing field resolution logic
+    return [self resolveField:auctionId field:fieldPath];
 }
 
 @end

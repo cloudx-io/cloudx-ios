@@ -20,6 +20,7 @@
 #import <CloudXCore/CLXBidderConfig.h>
 #import <CloudXCore/CLXXorEncryption.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
+#import <CloudXCore/CLXWinLossTracker.h>
 
 // Adapter Protocols
 #import <CloudXCore/CLXAdapterNative.h>
@@ -235,6 +236,11 @@ static CloudXCore *_sharedInstance = nil;
 
         // Initialize reporting service (no longer uses legacy eventTrackingURL)
         _reportingService = [[CLXAdEventReporter alloc] initWithEndpoint:nil];
+        
+        // Initialize win/loss tracking with server configuration
+        [[CLXWinLossTracker shared] setAppKey:_appKey];
+        [[CLXWinLossTracker shared] setEndpoint:config.winLossNotificationURL];
+        [[CLXWinLossTracker shared] setConfig:config];
         
         NSMutableDictionary *geoHeaders = [NSMutableDictionary dictionary];
         if (config.geoHeaders) {

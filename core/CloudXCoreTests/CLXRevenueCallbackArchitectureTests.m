@@ -106,16 +106,8 @@
 
 #pragma mark - CLXAdEventReporting Protocol Tests
 
-// Test that CLXAdEventReporting protocol has the new completion-based method
-- (void)testAdEventReportingProtocolHasCompletionMethod {
-    Protocol *protocol = @protocol(CLXAdEventReporting);
-    
-    // Check that the new completion-based method exists in the protocol
-    struct objc_method_description methodDesc = protocol_getMethodDescription(protocol, 
-        @selector(fireNurlForRevenueWithPrice:nUrl:completion:), YES, YES);
-    
-    XCTAssertTrue(methodDesc.name != NULL, @"CLXAdEventReporting protocol should have fireNurlForRevenueWithPrice:nUrl:completion: method");
-}
+// Test removed - old protocol method no longer exists
+// Win/loss tracking now uses CLXWinLossTracker for server-side tracking
 
 #pragma mark - Native Ad View Bridge Tests
 

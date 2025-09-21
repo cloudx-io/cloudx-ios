@@ -15,10 +15,10 @@
  *    - Status: Active, primary tracking system
  *    - Data: Ad events, impressions, clicks, SDK initialization
  *
- * 3. REVENUE TRACKING:
- *    - NURL/LURL: Direct ad network revenue callbacks
- *    - Methods: trackNUrlWithPrice, trackLUrlWithLUrl
- *    - Status: Active, fire-and-forget
+ * 3. WIN/LOSS TRACKING:
+ *    - Server-side win/loss notifications via CLXWinLossTracker
+ *    - Replaces legacy client-side NURL/LURL firing
+ *    - Status: Use CLXWinLossNetworkService for structured payloads
  */
 
 #import <CloudXCore/CLXAdReportingNetworkService.h>
@@ -47,55 +47,8 @@
 
 
 
-- (void)trackNUrlWithPrice:(double)price nUrl:(nullable NSString *)nUrl completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
-    // Network service for NURL tracking with completion callback for revenue reporting
-    if (!nUrl || nUrl.length == 0) {
-        if (completion) {
-            completion(NO, [NSError errorWithDomain:@"CLXAdReportingNetworkService" code:1001 userInfo:@{NSLocalizedDescriptionKey: @"NURL is nil or empty"}]);
-        }
-        return;
-    }
-    
-    NSURL *url = [NSURL URLWithString:nUrl];
-    if (!url) {
-        if (completion) {
-            completion(NO, [NSError errorWithDomain:@"CLXAdReportingNetworkService" code:1002 userInfo:@{NSLocalizedDescriptionKey: @"Invalid NURL format"}]);
-        }
-        return;
-    }
-    
-    NSURLSession *session = [NSURLSession sharedSession];
-    NSURLSessionDataTask *task = [session dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable networkError) {
-        BOOL success = NO;
-        if (!networkError) {
-            if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
-                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-                success = (httpResponse.statusCode >= 200 && httpResponse.statusCode < 300);
-            } else {
-                success = YES; // Non-HTTP response, assume success
-            }
-        }
-        
-        if (completion) {
-            completion(success, networkError);
-        }
-    }];
-    [task resume];
-}
-
-- (void)trackLUrlWithLUrl:(nullable NSString *)lUrl {
-    // Fire and forget implementation matching CloudX Android behavior
-    if (lUrl && lUrl.length > 0) {
-        NSURL *url = [NSURL URLWithString:lUrl];
-        if (url) {
-            NSURLSession *session = [NSURLSession sharedSession];
-            NSURLSessionDataTask *task = [session dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-                // Fire and forget - ignore errors like CloudX Android implementation
-            }];
-            [task resume];
-        }
-    }
-}
+// Legacy trackNUrlWithPrice and trackLUrlWithLUrl methods removed
+// Use CLXWinLossNetworkService for server-side win/loss tracking instead
 
 - (void)geoHeadersWithURLString:(NSString *)fullURL
                           extras:(NSDictionary<NSString *, NSString *> *)extras

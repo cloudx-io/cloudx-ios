@@ -271,6 +271,18 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     // Parse tracking URLs
     config.impressionTrackerURL = response[@"impressionTrackerURL"];
     config.metricsEndpointURL = response[@"metricsEndpointURL"];
+    config.winLossNotificationURL = response[@"winLossNotificationURL"];
+    
+    // Parse win/loss notification payload configuration
+    NSDictionary *winLossPayloadConfig = response[@"winLossNotificationPayloadConfig"];
+    if (winLossPayloadConfig && [winLossPayloadConfig isKindOfClass:[NSDictionary class]]) {
+        config.winLossNotificationPayloadConfig = [winLossPayloadConfig copy];
+        [self.logger debug:[NSString stringWithFormat:@"🔧 [SDK_INIT] Win/loss payload config parsed with %lu fields", 
+                           (unsigned long)config.winLossNotificationPayloadConfig.count]];
+    } else {
+        config.winLossNotificationPayloadConfig = nil;
+        [self.logger debug:@"⚠️ [SDK_INIT] No win/loss payload config found in response"];
+    }
     
     // Parse bidders
     NSArray *biddersArray = response[@"bidders"];

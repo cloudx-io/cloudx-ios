@@ -29,56 +29,8 @@
 
 
 
-- (void)fireNurlForRevenueWithPrice:(double)price nUrl:(nullable NSString *)nUrl completion:(void(^)(BOOL success, CLXAd * _Nullable ad))completion {
-    // Clean separation: reporting service only handles network requests, caller handles callbacks
-    __weak typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (!strongSelf) {
-            if (completion) {
-                completion(NO, nil);
-            }
-            return;
-        }
-        
-        [strongSelf.reportNetworkService trackNUrlWithPrice:price nUrl:nUrl completion:^(BOOL success, NSError * _Nullable error) {
-            if (error) {
-                [strongSelf.logger error:[NSString stringWithFormat:@"Failed to fire NURL: %@", error.localizedDescription]];
-            }
-            
-            if (success) {
-                [strongSelf.logger debug:[NSString stringWithFormat:@"💰 NURL fired successfully, price=%.2f", price]];
-            } else {
-                [strongSelf.logger error:[NSString stringWithFormat:@"❌ Failed to fire NURL for revenue callback: %@", error.localizedDescription ?: @"Unknown error"]];
-            }
-            
-            // Call completion - caller will handle threading for revenue callback
-            if (completion) {
-                completion(success, nil); // Ad will be created by the caller
-            }
-        }];
-    });
-}
-
-- (void)fireLurlWithUrl:(nullable NSString *)lUrl reason:(NSInteger)reason {
-    if (!lUrl || lUrl.length == 0) {
-        return;
-    }
-    
-    __weak typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (!strongSelf) {
-            return;
-        }
-        
-        // Replace macros like ${AUCTION_LOSS} and ${AUCTION_PRICE} (same logic as CLXLossReporter)
-        NSString *resolvedLurl = [lUrl stringByReplacingOccurrencesOfString:@"${AUCTION_LOSS}" withString:[NSString stringWithFormat:@"%ld", (long)reason]];
-        NSString *finalLurl = [resolvedLurl stringByReplacingOccurrencesOfString:@"${AUCTION_PRICE}" withString:@""]; // Price is not typically included in loss URLs
-        
-        [strongSelf.reportNetworkService trackLUrlWithLUrl:finalLurl];
-    });
-}
+// Legacy fireNurlForRevenueWithPrice and fireLurlWithUrl methods removed
+// Use CLXWinLossTracker for server-side win/loss tracking instead
 
 - (void)geoTrackingWithURLString:(NSString *)fullURL
                           extras:(NSDictionary<NSString *, NSString *> *)extras {
