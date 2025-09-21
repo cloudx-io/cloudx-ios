@@ -61,6 +61,12 @@
                                                               fallbackAdId:adId 
                                                                     logger:self.logger];
 
+    // Validate placement ID
+    if (!metaPlacementID || metaPlacementID.length == 0) {
+        [self.logger error:@"Cannot create native adapter - placement ID is nil or empty"];
+        return nil;
+    }
+
     CLXMetaNative *native = [[CLXMetaNative alloc] initWithBidPayload:adm
                                                           placementID:metaPlacementID
                                                                 bidID:bidId
