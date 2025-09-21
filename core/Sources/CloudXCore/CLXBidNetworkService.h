@@ -44,6 +44,11 @@ NS_ASSUME_NONNULL_BEGIN
                            cdpEndpointUrl:(NSString *)cdpEndpointUrl
                             errorReporter:(nullable CLXErrorReporter *)errorReporter;
 
+- (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
+                           cdpEndpointUrl:(NSString *)cdpEndpointUrl
+                            errorReporter:(nullable CLXErrorReporter *)errorReporter
+                               urlSession:(NSURLSession *)urlSession;
+
 @end
 
 NS_ASSUME_NONNULL_END 

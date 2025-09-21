@@ -170,6 +170,9 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
                                                                          withString:[lossReason stringValue]];
                 }
                 lossNotification[@"resolvedURL"] = resolvedURL;
+            } else {
+                // Handle nil LURL gracefully - set empty string
+                lossNotification[@"resolvedURL"] = @"";
             }
             
             // Add bid price

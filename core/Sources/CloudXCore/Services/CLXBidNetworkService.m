@@ -38,6 +38,18 @@
 - (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
                            cdpEndpointUrl:(NSString *)cdpEndpointUrl
                             errorReporter:(nullable CLXErrorReporter *)errorReporter {
+    // Use default URLSession
+    NSURLSession *urlSession = [NSURLSession cloudxSessionWithIdentifier:@"auction"];
+    return [self initWithAuctionEndpointUrl:auctionEndpointUrl 
+                            cdpEndpointUrl:cdpEndpointUrl 
+                             errorReporter:errorReporter 
+                                urlSession:urlSession];
+}
+
+- (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
+                           cdpEndpointUrl:(NSString *)cdpEndpointUrl
+                            errorReporter:(nullable CLXErrorReporter *)errorReporter
+                               urlSession:(NSURLSession *)urlSession {
     self = [super init];
     if (self) {
         _endpoint = [auctionEndpointUrl copy];
@@ -49,8 +61,7 @@
         // Initialize user agent like Swift SDK
         _userAgent = [self generateUserAgent];
         
-        // Initialize base network service with auction endpoint
-        NSURLSession *urlSession = [NSURLSession cloudxSessionWithIdentifier:@"auction"];
+        // Initialize base network service with provided URLSession
         _baseNetworkService = [[CLXBaseNetworkService alloc] initWithBaseURL:auctionEndpointUrl urlSession:urlSession];
         
         [self.logger info:[NSString stringWithFormat:@"✅ [BidNetworkService] Initialized with auction endpoint: %@", _endpoint]];
@@ -174,17 +185,18 @@
             return;
         }
         
+        // Check kill switch BEFORE checking response data (kill switch responses have no data)
+        if (isKillSwitchEnabled) {
+            NSError *adsDisabledError = [CLXError errorWithCode:CLXErrorCodeAdsDisabled];
+            [self.logger error:@"❌ [BidNetworkService] Ads disabled by kill switch"];
+            if (completion) completion(nil, nil, adsDisabledError);
+            return;
+        }
+        
         if (!response) {
             NSError *noDataError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse description:@"No response data"];
             [self.logger error:@"❌ [BidNetworkService] No response data received"];
             if (completion) completion(nil, nil, noDataError);
-            return;
-        }
-        
-        if (isKillSwitchEnabled) {
-            NSError *adsDisabledError = [CLXError errorWithCode:CLXErrorCodeAdsDisabled description:@"No response data"];
-            [self.logger error:@"❌ [BidNetworkService] kill switch in on received"];
-            if (completion) completion(nil, nil, adsDisabledError);
             return;
         }
         

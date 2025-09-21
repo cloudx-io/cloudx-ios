@@ -170,7 +170,7 @@ static const NSInteger kTestRank3 = 3;
     NSDictionary *lossNotification = self.mockTracker.lossNotifications.firstObject;
     XCTAssertEqualObjects(lossNotification[@"auctionId"], kTestAuctionID, @"Auction ID should match");
     XCTAssertEqualObjects(lossNotification[@"bidId"], kTestBidID1, @"Bid ID should match");
-    XCTAssertEqualObjects(lossNotification[@"resolvedURL"], kTestLURL1, @"LURL should be resolved from bid");
+    XCTAssertEqualObjects(lossNotification[@"resolvedURL"], @"https://network1.com/lurl?reason=1", @"LURL should be resolved from bid");
     XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonTechnicalError, @"Loss reason should match");
     XCTAssertEqualObjects(lossNotification[@"type"], @"loss", @"Notification type should be loss");
 }
@@ -210,7 +210,7 @@ static const NSInteger kTestRank3 = 3;
     
     NSDictionary *lossNotification = self.mockTracker.lossNotifications.firstObject;
     XCTAssertEqualObjects(lossNotification[@"bidId"], kTestBidID1, @"Correct bid ID should be used");
-    XCTAssertEqualObjects(lossNotification[@"resolvedURL"], kTestLURL1, @"LURL should be resolved");
+    XCTAssertEqualObjects(lossNotification[@"resolvedURL"], @"https://network1.com/lurl?reason=1", @"LURL should be resolved");
     XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonTechnicalError, @"Loss reason should be TechnicalError");
 }
 
@@ -320,7 +320,7 @@ static const NSInteger kTestRank3 = 3;
     
     NSDictionary *lossNotification = self.mockTracker.lossNotifications.firstObject;
     XCTAssertEqualObjects(lossNotification[@"bidId"], kTestBidID1, @"Correct bid ID should be used");
-    XCTAssertEqualObjects(lossNotification[@"resolvedURL"], kTestLURL1, @"Winner's LURL should be resolved");
+    XCTAssertEqualObjects(lossNotification[@"resolvedURL"], @"https://network1.com/lurl?reason=1", @"Winner's LURL should be resolved");
     XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonTechnicalError, @"Loss reason should be TechnicalError");
 }
 

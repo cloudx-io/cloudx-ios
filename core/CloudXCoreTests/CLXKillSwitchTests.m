@@ -68,12 +68,16 @@
     [super setUp];
     self.mockSession = [[MockURLSession alloc] init];
     
-    // Initialize services - use default initializers for now
-    self.sdkInitService = [[CLXSDKInitNetworkService alloc] init];
+    // Initialize services with mock session
+    self.sdkInitService = [[CLXSDKInitNetworkService alloc] 
+                          initWithBaseURL:@"https://test.cloudx.io/init"
+                          urlSession:self.mockSession];
     
     self.bidService = [[CLXBidNetworkServiceClass alloc] 
                       initWithAuctionEndpointUrl:@"https://test.cloudx.io/auction"
-                      cdpEndpointUrl:@"https://test.cloudx.io/cdp"];
+                      cdpEndpointUrl:@"https://test.cloudx.io/cdp"
+                      errorReporter:nil
+                      urlSession:self.mockSession];
 }
 
 #pragma mark - SDK Initialization Kill Switch Tests
@@ -174,6 +178,12 @@
         @"regs": @{}
     };
     
+    // Configure mock response BEFORE starting the auction
+    self.mockSession.statusCode = 204;
+    self.mockSession.headers = @{@"X-CloudX-Status": @"ADS_DISABLED"};
+    self.mockSession.responseData = nil;
+    self.mockSession.responseError = nil;
+    
     XCTestExpectation *expectation = [self expectationWithDescription:@"Bid request kill switch"];
     
     // When: Start auction with kill switch response
@@ -189,12 +199,6 @@
         
         [expectation fulfill];
     }];
-    
-    // Configure mock response after starting the auction
-    self.mockSession.statusCode = 204;
-    self.mockSession.headers = @{@"X-CloudX-Status": @"ADS_DISABLED"};
-    self.mockSession.responseData = nil;
-    self.mockSession.responseError = nil;
     
     [self waitForExpectationsWithTimeout:5.0 handler:nil];
 }
@@ -213,6 +217,12 @@
         @"regs": @{}
     };
     
+    // Configure mock response BEFORE starting the auction
+    self.mockSession.statusCode = 204;
+    self.mockSession.headers = @{}; // No kill switch header
+    self.mockSession.responseData = nil;
+    self.mockSession.responseError = nil;
+    
     XCTestExpectation *expectation = [self expectationWithDescription:@"Normal no-fill response"];
     
     // When: Start auction with normal 204 response
@@ -227,12 +237,6 @@
         
         [expectation fulfill];
     }];
-    
-    // Configure mock response
-    self.mockSession.statusCode = 204;
-    self.mockSession.headers = @{}; // No kill switch header
-    self.mockSession.responseData = nil;
-    self.mockSession.responseError = nil;
     
     [self waitForExpectationsWithTimeout:5.0 handler:nil];
 }
