@@ -65,6 +65,12 @@
                                                               fallbackAdId:adId 
                                                                     logger:[CLXMetaBannerFactory logger]];
     
+    // Validate placement ID
+    if (!metaPlacementID || metaPlacementID.length == 0) {
+        [[CLXMetaBannerFactory logger] error:@"Cannot create banner adapter - placement ID is nil or empty"];
+        return nil;
+    }
+    
     CLXMetaBanner *banner = [[CLXMetaBanner alloc] initWithBidPayload:adm
                                                            placementID:metaPlacementID
                                                                 bidID:bidId

@@ -59,6 +59,12 @@
                                                               fallbackAdId:adId 
                                                                     logger:self.logger];
     
+    // Validate placement ID
+    if (!metaPlacementID || metaPlacementID.length == 0) {
+        [self.logger error:@"Cannot create rewarded adapter - placement ID is nil or empty"];
+        return nil;
+    }
+    
     CLXMetaRewarded *rewarded = [[CLXMetaRewarded alloc] initWithBidPayload:adm
                                                                  placementID:metaPlacementID
                                                                       bidID:bidId
