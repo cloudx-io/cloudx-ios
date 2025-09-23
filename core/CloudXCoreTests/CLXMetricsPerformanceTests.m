@@ -70,6 +70,10 @@
     self.metricsTracker = nil;
     self.testDatabase = nil;
     self.testDatabasePath = nil;
+    
+    // Reset DI container to ensure clean state for next test
+    [[CLXDIContainer shared] reset];
+    
     [super tearDown];
 }
 
@@ -262,25 +266,9 @@
     NSLog(@"📊 AGGREGATION PERFORMANCE: %ld calls in %.6f seconds (%.2f calls/sec)", 
           (long)updateCount, executionTime, updateCount / executionTime);
     
-    // ROBUST SYNCHRONIZATION: Ensure all async operations complete
-    // Use dispatch_semaphore for precise synchronization
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    
-    // Post a barrier block to the metrics queue to ensure all previous operations complete
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        // Allow sufficient time for all async operations to complete
-        // Since we made 200 calls, give generous time for processing
-        [NSThread sleepForTimeInterval:0.1]; // 100ms should be more than enough
-        dispatch_semaphore_signal(semaphore);
-    });
-    
-    // Wait for completion with timeout
-    dispatch_time_t timeout = dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC); // 5 second timeout
-    long result = dispatch_semaphore_wait(semaphore, timeout);
-    
-    if (result != 0) {
-        XCTFail(@"Timeout waiting for async operations to complete");
-    }
+    // PROPER SYNCHRONIZATION: Use the new flushPendingOperations method
+    // This ensures ALL 200 async trackMethodCall operations complete before proceeding
+    [freshTracker flushPendingOperations];
     
     // EXACT VERIFICATION - NO COMPROMISES
     CLXMetricsEventDao *dao = [[CLXMetricsEventDao alloc] initWithDatabase:isolatedDatabase];

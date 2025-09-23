@@ -261,7 +261,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Initiate bid request for ad content
     [self.bidAdSource requestBidWithAdUnitID:self.placementID
                            storedImpressionId:self.placementID
-                                    impModel:nil
+                                    impModel:self.impModel
                                    successWin:NO
                                    completion:^(CLXBidAdSourceResponse *response, NSError *error) {
         [self handleBidResponse:response error:error];

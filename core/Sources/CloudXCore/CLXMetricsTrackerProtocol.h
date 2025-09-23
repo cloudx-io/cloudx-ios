@@ -70,6 +70,12 @@ NS_ASSUME_NONNULL_BEGIN
  * @return Array of validation issues found (empty if all good)
  */
 - (NSArray<NSString *> *)validateSystem;
+
+/**
+ * Flush all pending async operations (testing only)
+ * This method blocks until all pending trackMethodCall operations complete
+ */
+- (void)flushPendingOperations;
 #endif
 
 @end

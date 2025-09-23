@@ -8,6 +8,8 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXSDKConfig.h>
+#import <CloudXCore/CLXConfigImpressionModel.h>
 #import "CLXUserDefaultsTestHelper.h"
 #import <CoreLocation/CoreLocation.h>
 
@@ -43,6 +45,8 @@
 
 @interface CLXBiddingConfigRequestPrivacyTests : XCTestCase
 @property (nonatomic, strong) CLXPrivacyService *privacyService;
+@property (nonatomic, strong) CLXSDKConfigResponse *mockSDKConfig;
+@property (nonatomic, strong) CLXConfigImpressionModel *mockImpModel;
 @end
 
 @implementation CLXBiddingConfigRequestPrivacyTests
@@ -52,6 +56,17 @@
     
     // Create privacy service using standardUserDefaults to replicate real-world scenarios
     self.privacyService = [[CLXPrivacyService alloc] init];
+    
+    // Create mock SDK config with appID for tests
+    self.mockSDKConfig = [[CLXSDKConfigResponse alloc] init];
+    self.mockSDKConfig.appID = @"test-app-id-from-sdk";
+    self.mockSDKConfig.accountID = @"test-account";
+    self.mockSDKConfig.sessionID = @"test-session";
+    
+    // Create mock impression model
+    self.mockImpModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:self.mockSDKConfig
+                                                                  auctionID:@"test-auction"
+                                                              testGroupName:@"test-group"];
     
     // Don't clear in setUp - let tearDown handle cleanup to avoid race conditions
 }
@@ -95,7 +110,7 @@
            nativeAdRequirements:nil
            skadRequestParameters:@{}
                           tmax:@3.0
-                      impModel:nil
+                      impModel:self.mockImpModel
                       settings:[CLXSettings sharedInstance]
             privacyService:[CLXPrivacyService sharedInstance]];
     
@@ -136,7 +151,7 @@
            nativeAdRequirements:nil
            skadRequestParameters:@{}
                           tmax:@3.0
-                      impModel:nil
+                      impModel:self.mockImpModel
                       settings:[CLXSettings sharedInstance]
                 privacyService:self.privacyService]; // ← SOLID: Dependency injection!
     
@@ -166,7 +181,7 @@
            nativeAdRequirements:nil
            skadRequestParameters:@{}
                           tmax:@3.0
-                      impModel:nil
+                      impModel:self.mockImpModel
                       settings:[CLXSettings sharedInstance]
             privacyService:[CLXPrivacyService sharedInstance]];
     
@@ -211,7 +226,7 @@
            nativeAdRequirements:nil
            skadRequestParameters:@{}
                           tmax:@3.0
-                      impModel:nil
+                      impModel:self.mockImpModel
                       settings:[CLXSettings sharedInstance]
                 privacyService:self.privacyService]; // ← SOLID: Dependency injection!
     

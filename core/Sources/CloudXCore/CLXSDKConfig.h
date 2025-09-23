@@ -91,6 +91,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *impressionTrackerURL;
 @property (nonatomic, copy, nullable) NSString *organizationID;
 @property (nonatomic, copy, nullable) NSString *accountID;
+@property (nonatomic, copy, nullable) NSString *appID;
 @property (nonatomic, strong, nullable) NSArray<NSString *> *tracking;
 @property (nonatomic, copy, nullable) NSString *winLossNotificationURL;
 @property (nonatomic, strong, nullable) NSDictionary<NSString *, NSString *> *winLossNotificationPayloadConfig;

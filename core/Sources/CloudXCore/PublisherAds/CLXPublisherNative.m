@@ -187,7 +187,7 @@ NS_ASSUME_NONNULL_BEGIN
     __weak typeof(self) weakSelf = self;
     [self.bidAdSource requestBidWithAdUnitID:self.placementID
                            storedImpressionId:self.placementID
-                                    impModel:nil
+                                    impModel:self.impModel
                                    successWin:self.successWin
                                    completion:^(CLXBidAdSourceResponse * _Nullable response, NSError * _Nullable error) {
         __strong typeof(weakSelf) strongSelf = weakSelf;

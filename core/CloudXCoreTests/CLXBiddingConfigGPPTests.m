@@ -8,6 +8,8 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXSDKConfig.h>
+#import <CloudXCore/CLXConfigImpressionModel.h>
 #import "CLXUserDefaultsTestHelper.h"
 #import <CoreLocation/CoreLocation.h>
 
@@ -35,6 +37,8 @@
 @interface CLXBiddingConfigGPPTests : XCTestCase
 @property (nonatomic, strong) CLXPrivacyService *privacyService;
 @property (nonatomic, strong) CLXGPPProvider *gppProvider;
+@property (nonatomic, strong) CLXSDKConfigResponse *mockSDKConfig;
+@property (nonatomic, strong) CLXConfigImpressionModel *mockImpModel;
 @end
 
 @implementation CLXBiddingConfigGPPTests
@@ -44,6 +48,17 @@
     self.privacyService = [[CLXPrivacyService alloc] init];
     self.gppProvider = [CLXGPPProvider sharedInstance];
     [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    
+    // Create mock SDK config with appID for tests
+    self.mockSDKConfig = [[CLXSDKConfigResponse alloc] init];
+    self.mockSDKConfig.appID = @"test-app-id-from-sdk";
+    self.mockSDKConfig.accountID = @"test-account";
+    self.mockSDKConfig.sessionID = @"test-session";
+    
+    // Create mock impression model
+    self.mockImpModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:self.mockSDKConfig
+                                                                  auctionID:@"test-auction"
+                                                              testGroupName:@"test-group"];
 }
 
 - (void)tearDown {
@@ -223,7 +238,7 @@
            nativeAdRequirements:nil
            skadRequestParameters:@{}
                           tmax:@3.0
-                      impModel:nil
+                      impModel:self.mockImpModel
                       settings:[CLXSettings sharedInstance]
                 privacyService:self.privacyService];
 }
@@ -244,7 +259,7 @@
            nativeAdRequirements:nil
            skadRequestParameters:@{}
                           tmax:@3.0
-                      impModel:nil
+                      impModel:self.mockImpModel
                       settings:[CLXSettings sharedInstance]
                 privacyService:self.privacyService];
 }
@@ -265,7 +280,7 @@
            nativeAdRequirements:nil
            skadRequestParameters:@{}
                           tmax:@3.0
-                      impModel:nil
+                      impModel:self.mockImpModel
                       settings:[CLXSettings sharedInstance]
                 privacyService:self.privacyService];
 }
