@@ -46,8 +46,14 @@
     
     // Get current session to filter it out - use DIContainer singleton like Swift SDK
     id<CLXAppSessionService> appSessionService = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXAppSessionServiceImplementation class]];
-CLXAppSession *currentSession = (CLXAppSession *)appSessionService.currentSession;
+    CLXAppSession *currentSession = (CLXAppSession *)appSessionService.currentSession;
     NSString *currentSessionID = currentSession.sessionID;
+    
+    // Get the metrics network service from DI container
+    CLXMetricsNetworkService *metricsNetworkService = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsNetworkService class]];
+    
+    NSInteger totalRequests = 0;
+    __block NSInteger completedRequests = 0;
     
     for (CLXAppSessionModel *model in models) {
         // Do not remove current session
@@ -55,31 +61,45 @@ CLXAppSession *currentSession = (CLXAppSession *)appSessionService.currentSessio
             continue;
         }
         
-        NSURL *url = [NSURL URLWithString:model.url];
-        if (url) {
-            NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
-            config.timeoutIntervalForRequest = 30.0;
-            config.timeoutIntervalForResource = 60.0;
-            NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
+        if (model.url && model.url.absoluteString.length > 0) {
+            totalRequests++;
             
-            NSURLSessionDataTask *task = [session dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-                if (error) {
-                    [self.logger error:[NSString stringWithFormat:@"Failed to end session: %@", error.localizedDescription]];
-                } else {
+            [self.logger debug:[NSString stringWithFormat:@"Sending pending metrics for session: %@", model.id]];
+            
+            // Use CLXMetricsNetworkService instead of direct URL calls
+            [metricsNetworkService trackEndSessionWithSession:model completion:^(BOOL success, NSError * _Nullable error) {
+                completedRequests++;
+                
+                if (success) {
+                    [self.logger debug:[NSString stringWithFormat:@"Successfully sent metrics for session: %@", model.id]];
                     [CLXCoreDataManager.shared deleteObject:model];
+                } else {
+                    [self.logger error:[NSString stringWithFormat:@"Failed to send metrics for session %@: %@", model.id, error.localizedDescription ?: @"Unknown error"]];
+                }
+                
+                // Check if all requests are complete
+                if (completedRequests == totalRequests) {
+                    [CLXCoreDataManager.shared saveContext];
+                    
+                    if (completion) {
+                        completion();
+                    }
                 }
             }];
-            
-            [task resume];
         } else {
+            // Invalid URL, just delete the model
+            [self.logger error:[NSString stringWithFormat:@"Invalid metrics URL for session: %@, deleting model", model.id]];
             [CLXCoreDataManager.shared deleteObject:model];
         }
     }
     
-    [CLXCoreDataManager.shared saveContext];
-    
-    if (completion) {
-        completion();
+    // If no requests were made, complete immediately
+    if (totalRequests == 0) {
+        [CLXCoreDataManager.shared saveContext];
+        
+        if (completion) {
+            completion();
+        }
     }
 }
 

@@ -6,6 +6,9 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXMetricsTracker.h>
+#import <CloudXCore/CLXMetricsTrackerImpl.h>
+#import <CloudXCore/CLXMetricsTrackerProtocol.h>
+#import <CloudXCore/CLXMetricsType.h>
 #import <CloudXCore/CLXGPPProvider.h>
 #import <CloudXCore/CLXErrorReporter.h>
 @class CLXAppSessionService;
@@ -107,6 +110,11 @@ static CloudXCore *_sharedInstance = nil;
             [container registerType:[CLXMetricsTracker class] instance:[[CLXMetricsTracker alloc] init]];
         }
         
+        // Register new MetricsTrackerImpl for proper metrics tracking
+        if (![container resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]]) {
+            [container registerType:[CLXMetricsTrackerImpl class] instance:[[CLXMetricsTrackerImpl alloc] init]];
+        }
+        
         if (![container resolveType:ServiceTypeSingleton class:[CLXLiveInitService class]]) {
             [container registerType:[CLXLiveInitService class] instance:[[CLXLiveInitService alloc] init]];
         }
@@ -149,6 +157,10 @@ static CloudXCore *_sharedInstance = nil;
 
 - (void)initSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL, NSError * _Nullable))completion {
     [self.logger info:[NSString stringWithFormat:@"🚀 [CloudXCore] initSDKWithAppKey called with appKey: %@", appKey]];
+    
+    // Track SDK initialization method call
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSdkInit];
     
     // Thread-safe initialization check and setup
     @synchronized(self) {
@@ -361,6 +373,25 @@ static CloudXCore *_sharedInstance = nil;
         [[NSUserDefaults standardUserDefaults] setValue:config.impressionTrackerURL forKey:kCLXCoreImpressionTrackerUrlKey];
     }
     
+    // Initialize and start metrics tracker with proper configuration
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    if (metricsTracker) {
+        // Create SDK config for metrics tracker
+        CLXSDKConfig *sdkConfig = [[CLXSDKConfig alloc] init];
+        sdkConfig.impressionTrackerURL = config.impressionTrackerURL;
+        sdkConfig.metricsEndpointURL = config.metricsEndpointURL;
+        sdkConfig.metricsConfig = config.metricsConfig;
+        
+        [metricsTracker startWithConfig:sdkConfig];
+        [metricsTracker setBasicDataWithSessionId:config.sessionID ?: [[NSUUID UUID] UUIDString]
+                                        accountId:config.accountID ?: @""
+                                      basePayload:@"ios_sdk"];
+        
+        [self.logger info:@"📊 [CloudXCore] Metrics tracker initialized and started"];
+    } else {
+        [self.logger error:@"❌ [CloudXCore] Failed to resolve metrics tracker from DI container"];
+    }
+    
     // Use SDK response URLs exclusively - no fallbacks
     NSString *auctionEndpointUrl = @"";
     NSString *cdpEndpointUrl = @"";
@@ -457,6 +488,9 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (void)provideUserDetailsWithHashedUserID:(NSString *)hashedUserID {
+    // Track hashed user ID method call
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetHashedUserId];
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
     if ([metricsDict.allKeys containsObject:@"method_set_hashed_user_id"]) {
@@ -473,12 +507,18 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (void)useHashedKeyValueWithKey:(NSString *)key value:(NSString *)value {
+    // Track user key-value method call
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetUserKeyValues];
     [[NSUserDefaults standardUserDefaults] setValue:key forKey:kCLXCoreHashedKeyKey];
     [[NSUserDefaults standardUserDefaults] setValue:value forKey:kCLXCoreHashedValueKey];
     [self.logger info:@"✅ [CloudXCore] Hashed key-value pair stored successfully"];
 }
 
 - (void)useKeyValuesWithUserDictionary:(NSDictionary<NSString *,NSString *> *)userDictionary {
+    // Track user key-values method call
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetUserKeyValues];
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
     if ([metricsDict.allKeys containsObject:@"method_set_user_key_values"]) {
@@ -512,6 +552,9 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (void)useBidderKeyValueWithBidder:(NSString *)bidder key:(NSString *)key value:(NSString *)value {
+    // Track app key-values method call (bidder key-values are app-level)
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetAppKeyValues];
     [[NSUserDefaults standardUserDefaults] setValue:bidder forKey:kCLXCoreUserBidderKey];
     [[NSUserDefaults standardUserDefaults] setValue:key forKey:kCLXCoreUserBidderKeyKey];
     [[NSUserDefaults standardUserDefaults] setValue:value forKey:kCLXCoreUserBidderValueKey];
@@ -522,6 +565,9 @@ static CloudXCore *_sharedInstance = nil;
                                     viewController:(UIViewController *)viewController
                                          delegate:(id<CLXBannerDelegate>)delegate
                                              tmax:(NSNumber *)tmax {
+    // Track banner creation method call
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
     [self.logger debug:[NSString stringWithFormat:@"🔧 [CloudXCore] Creating banner for placement: %@", placement]];
     
     // Get placement from config
@@ -561,6 +607,9 @@ static CloudXCore *_sharedInstance = nil;
 - (CLXBannerAdView *)createMRECWithPlacement:(NSString *)placement
                                  viewController:(UIViewController *)viewController
                                       delegate:(id<CLXBannerDelegate>)delegate {
+    // Track MREC creation method call
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateMrec];
     
     // Get placement from config
     CLXSDKConfigPlacement *placementConfig = _adPlacements[placement];
@@ -598,6 +647,9 @@ static CloudXCore *_sharedInstance = nil;
 
 - (id<CLXInterstitial>)createInterstitialWithPlacement:(NSString *)placement
                                                  delegate:(id<CLXInterstitialDelegate>)delegate {
+    // Track interstitial creation method call
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateInterstitial];
     
     // Get placement from config
     CLXSDKConfigPlacement *placementConfig = _adPlacements[placement];
@@ -633,6 +685,9 @@ static CloudXCore *_sharedInstance = nil;
 
 - (id<CLXRewardedInterstitial>)createRewardedWithPlacement:(NSString *)placement
                                                     delegate:(id<CLXRewardedDelegate>)delegate {
+    // Track rewarded creation method call
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateRewarded];
     
     // Get placement from config
     CLXSDKConfigPlacement *placementConfig = _adPlacements[placement];
@@ -667,6 +722,10 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (nullable CLXNativeAdView *)createNativeAdWithPlacement:(NSString *)placement viewController:(UIViewController *)viewController delegate:(id)delegate {
+    // Track native creation method call
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateNative];
+    
     [self.logger debug:[NSString stringWithFormat:@"🔧 [CloudXCore] Creating native ad for placement: %@", placement]];
 
     // Get placement from config

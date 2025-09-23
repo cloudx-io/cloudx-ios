@@ -14,6 +14,11 @@
 #import <CloudXCore/CLXExponentialBackoffStrategy.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
+#import <CloudXCore/CLXDIContainer.h>
+#import <CloudXCore/CLXMetricsTrackerProtocol.h>
+#import <CloudXCore/CLXMetricsTrackerImpl.h>
+#import <CloudXCore/CLXMetricsType.h>
+#import <CloudXCore/CLXMetricsConfig.h>
 
 static NSString *const kAPIRequestKeyAppKey = @"appKey";
 static NSString *const kAPIRequestKeyLat = @"lat";
@@ -125,6 +130,9 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     NSString *requestPayloadString = [[NSString alloc] initWithData:requestBodyData encoding:NSUTF8StringEncoding];
     [self.logger debug:[NSString stringWithFormat:@"📋 [SDKInitNetworkService] Request Payload:\n%@", requestPayloadString]];
     
+    // Track SDK init network call latency
+    NSDate *sdkInitStartTime = [NSDate date];
+    
     [self executeRequestWithEndpoint:self.endpoint
                      urlParameters:nil
                       requestBody:requestBodyData
@@ -132,6 +140,11 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
                        maxRetries:1
                            delay:delay
                           completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
+            // Track SDK init network call latency
+            NSTimeInterval sdkInitLatency = [[NSDate date] timeIntervalSinceDate:sdkInitStartTime] * 1000; // Convert to milliseconds
+            id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+            [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkSdkInit latency:(NSInteger)sdkInitLatency];
+            
             [self.logger debug:@"📥 [SDKInitNetworkService] Network request completion called"];
             
             if (error) {
@@ -272,6 +285,24 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     config.impressionTrackerURL = response[@"impressionTrackerURL"];
     config.metricsEndpointURL = response[@"metricsEndpointURL"];
     config.winLossNotificationURL = response[@"winLossNotificationURL"];
+    
+    // Parse metrics configuration from server response
+    NSDictionary *metricsConfigDict = response[@"metricsConfig"];
+    if (metricsConfigDict && [metricsConfigDict isKindOfClass:[NSDictionary class]]) {
+        config.metricsConfig = [CLXMetricsConfig fromDictionary:metricsConfigDict];
+        [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Parsed metrics config: %@", config.metricsConfig]];
+    } else {
+        [self.logger debug:@"⚠️ [SDKInitNetworkService] No metrics configuration found in server response"];
+        // Create default config to enable metrics with impression URL
+        CLXMetricsConfig *defaultConfig = [[CLXMetricsConfig alloc] init];
+        defaultConfig.sdkApiCallsEnabled = @YES;
+        defaultConfig.networkCallsEnabled = @YES;
+        defaultConfig.networkCallsBidReqEnabled = @YES;
+        defaultConfig.networkCallsInitSdkReqEnabled = @NO; // Keep SDK init disabled by default
+        defaultConfig.networkCallsGeoReqEnabled = @YES;
+        config.metricsConfig = defaultConfig;
+        [self.logger debug:@"📊 [SDKInitNetworkService] Created default metrics config for impression URL usage"];
+    }
     
     // Parse win/loss notification payload configuration
     NSDictionary *winLossPayloadConfig = response[@"winLossNotificationPayloadConfig"];

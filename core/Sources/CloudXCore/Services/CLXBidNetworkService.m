@@ -14,6 +14,10 @@
 #import <CloudXCore/CLXPrivacyService.h>
 #import <CloudXCore/CLXErrorReporter.h>
 #import <WebKit/WebKit.h>
+#import <CloudXCore/CLXDIContainer.h>
+#import <CloudXCore/CLXMetricsTrackerProtocol.h>
+#import <CloudXCore/CLXMetricsTrackerImpl.h>
+#import <CloudXCore/CLXMetricsType.h>
 
 @interface CLXBidNetworkServiceClass ()
 @property (nonatomic, copy) NSString *endpoint;
@@ -170,6 +174,9 @@
     [self.logger debug:@"🔧 [BidNetworkService] Starting auction request with V1 retry policy (maxRetries:1, delay:1.0s)"];
     [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Headers: %@", headers]];
     
+    // Track bid request network call latency
+    NSDate *bidRequestStartTime = [NSDate date];
+    
     [self.baseNetworkService executeRequestWithEndpoint:@""
                                          urlParameters:nil
                                           requestBody:requestBodyData
@@ -177,6 +184,11 @@
                                            maxRetries:1
                                                delay:1.0
                                           completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
+        // Track bid request latency
+        NSTimeInterval bidRequestLatency = [[NSDate date] timeIntervalSinceDate:bidRequestStartTime] * 1000; // Convert to milliseconds
+        id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkBidRequest latency:(NSInteger)bidRequestLatency];
+        
         [self.logger debug:@"📥 [BidNetworkService] Network request completion called"];
         
         if (error) {
