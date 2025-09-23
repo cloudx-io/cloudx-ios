@@ -94,6 +94,11 @@
     [self resetAdState];
 }
 
+- (void)dealloc {
+    // Ensure cleanup even if viewWillDisappear wasn't called
+    [self resetAdState];
+}
+
 - (void)loadMRECAd {
     if (![[CloudXCore shared] isInitialised]) {
         [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
@@ -167,8 +172,12 @@
 }
 
 - (void)resetAdState {
-    [self.mrecAd removeFromSuperview];
-    self.mrecAd = nil;
+    if (self.mrecAd) {
+        // CRITICAL: Properly destroy the MREC to stop auto-refresh timers and background processing
+        [self.mrecAd destroy];
+        [self.mrecAd removeFromSuperview];
+        self.mrecAd = nil;
+    }
     self.isLoading = NO;
 }
 

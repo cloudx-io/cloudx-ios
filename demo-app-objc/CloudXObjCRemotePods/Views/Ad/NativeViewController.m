@@ -75,6 +75,8 @@
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    // Ensure cleanup even if viewWillDisappear wasn't called
+    [self resetAdState];
 }
 
 - (NSString *)placementName {
@@ -158,8 +160,12 @@
 }
 
 - (void)resetAdState {
-    [self.nativeAd removeFromSuperview];
-    self.nativeAd = nil;
+    if (self.nativeAd) {
+        // CRITICAL: Properly destroy the native ad to stop background processing
+        [self.nativeAd destroy];
+        [self.nativeAd removeFromSuperview];
+        self.nativeAd = nil;
+    }
 }
 
 #pragma mark - CLXNativeDelegate
