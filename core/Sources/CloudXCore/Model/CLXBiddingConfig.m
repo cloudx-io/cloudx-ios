@@ -16,6 +16,7 @@
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXPrivacyService.h>
+#import <CloudXCore/CLXSDKConfig.h>
 
 // Internal methods category for accessing privacy methods that are not in public header
 // TEMP: Remove CLXPrivacyService private interface once server supports GDPR/COPPA
@@ -243,13 +244,14 @@ static void initializeLogger() {
         @"appKey3": @"appValue3"};
         
         CLXBiddingConfigApplication *application = [[CLXBiddingConfigApplication alloc] init];
-        application.appID = @"5646234";
+        // Use appID from SDK init response for bid request app.id field
+        application.appID = impModel.sdkConfig.appID;
         application.bundle = bundle;
         application.ver = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
         application.publisher = publisher;
         application.ext.data = value;
         
-        _application = application;
+        self.application = application;
         
         // Create device
         CLXBiddingConfigDeviceGeo *geo = [[CLXBiddingConfigDeviceGeo alloc] init];

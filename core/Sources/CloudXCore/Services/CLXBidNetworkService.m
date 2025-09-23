@@ -150,6 +150,7 @@
     
     NSMutableDictionary *headers = [NSMutableDictionary dictionary];
     [headers setObject:@"application/json" forKey:@"Content-Type"];
+    // Use appKey (init value) as bearer token
     [headers setObject:[NSString stringWithFormat:@"Bearer %@", appKey] forKey:@"Authorization"];
     [headers setObject:self.userAgent ?: @"" forKey:@"User-Agent"];
     
