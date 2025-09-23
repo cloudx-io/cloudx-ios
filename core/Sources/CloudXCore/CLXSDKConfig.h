@@ -8,6 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Forward declarations for classes defined in separate headers
 @class CLXSDKConfigRequest;
+@class CLXMetricsConfig;
 @class CLXSDKConfigBidder;
 @class CLXSDKConfigPlacement;
 
@@ -46,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger preCacheSize;
 @property (nonatomic, copy, nullable) NSString *impressionTrackerURL;
 @property (nonatomic, copy, nullable) NSString *metricsEndpointURL;
+@property (nonatomic, strong, nullable) CLXMetricsConfig *metricsConfig;
 @property (nonatomic, strong, nullable) NSArray<NSString *> *tracking;
 
 - (instancetype)init;
@@ -92,6 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSArray<NSString *> *tracking;
 @property (nonatomic, copy, nullable) NSString *winLossNotificationURL;
 @property (nonatomic, strong, nullable) NSDictionary<NSString *, NSString *> *winLossNotificationPayloadConfig;
+@property (nonatomic, strong, nullable) CLXMetricsConfig *metricsConfig;
 
 - (instancetype)init;
 @end

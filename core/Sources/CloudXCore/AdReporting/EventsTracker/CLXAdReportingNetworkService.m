@@ -26,6 +26,10 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXXorEncryption.h>
+#import <CloudXCore/CLXDIContainer.h>
+#import <CloudXCore/CLXMetricsTrackerProtocol.h>
+#import <CloudXCore/CLXMetricsTrackerImpl.h>
+#import <CloudXCore/CLXMetricsType.h>
 #import <CloudXCore/NSString+CLXSemicolon.h>
 #import <CloudXCore/CLXURLProvider.h>
 
@@ -53,6 +57,9 @@
 - (void)geoHeadersWithURLString:(NSString *)fullURL
                           extras:(NSDictionary<NSString *, NSString *> *)extras
 {
+    // Track geo API network call latency
+    NSDate *geoRequestStartTime = [NSDate date];
+    
     // Convert params to query string
     NSURL *url = [NSURL URLWithString:fullURL];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
@@ -61,6 +68,11 @@
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
                                             completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        // Track geo API network call latency
+        NSTimeInterval geoRequestLatency = [[NSDate date] timeIntervalSinceDate:geoRequestStartTime] * 1000; // Convert to milliseconds
+        id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkGeoApi latency:(NSInteger)geoRequestLatency];
+        
         if (error) {
             [self.logger error:[NSString stringWithFormat:@"CloudX: geoHeaders error: %@", error]];
             //completion(nil, error);

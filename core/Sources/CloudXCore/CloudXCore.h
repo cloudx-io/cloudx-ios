@@ -28,6 +28,17 @@
 #import <CloudXCore/CLXAdReportingNetworkService.h>
 #import <CloudXCore/CLXMetricsNetworkService.h>
 
+// Metrics Tracking
+#import <CloudXCore/CLXMetricsTrackerProtocol.h>
+#import <CloudXCore/CLXMetricsTrackerImpl.h>
+#import <CloudXCore/CLXMetricsType.h>
+#import <CloudXCore/CLXMetricsConfig.h>
+#import <CloudXCore/CLXMetricsEvent.h>
+#import <CloudXCore/CLXMetricsEventDao.h>
+#import <CloudXCore/CLXEventAM.h>
+#import <CloudXCore/CLXEventTrackerBulkApi.h>
+#import <CloudXCore/CLXMetricsDebugger.h>
+
 // Win/Loss Tracking
 #import <CloudXCore/CLXWinLossTracker.h>
 #import <CloudXCore/CLXWinLossFieldResolver.h>

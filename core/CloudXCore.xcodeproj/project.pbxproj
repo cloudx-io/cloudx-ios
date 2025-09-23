@@ -23,6 +23,32 @@
 		1916B22B2E7F1E8100E49E3E /* CLXPublisherFireLosingBidLurlsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2292E7F1E8100E49E3E /* CLXPublisherFireLosingBidLurlsTests.m */; };
 		1916B22C2E7F1E8100E49E3E /* CLXWinLossURLResolutionIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B22A2E7F1E8100E49E3E /* CLXWinLossURLResolutionIntegrationTests.m */; };
 		1916B2342E80AE4F00E49E3E /* CLXKillSwitchTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2332E80AE4F00E49E3E /* CLXKillSwitchTests.m */; };
+		1916B23C2E819D7E00E49E3E /* CLXBidNetworkService.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B23B2E819D7E00E49E3E /* CLXBidNetworkService.h */; };
+		1916B24E2E819DC600E49E3E /* CLXEventTrackerBulkApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2402E819DC600E49E3E /* CLXEventTrackerBulkApi.m */; };
+		1916B24F2E819DC600E49E3E /* CLXMetricsEventDao.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2482E819DC600E49E3E /* CLXMetricsEventDao.m */; };
+		1916B2502E819DC600E49E3E /* CLXMetricsConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2422E819DC600E49E3E /* CLXMetricsConfig.m */; };
+		1916B2512E819DC600E49E3E /* CLXMetricsDebugger.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2442E819DC600E49E3E /* CLXMetricsDebugger.m */; };
+		1916B2522E819DC600E49E3E /* CLXMetricsEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2462E819DC600E49E3E /* CLXMetricsEvent.m */; };
+		1916B2532E819DC600E49E3E /* CLXMetricsType.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B24D2E819DC600E49E3E /* CLXMetricsType.m */; };
+		1916B2542E819DC600E49E3E /* CLXMetricsTrackerImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B24A2E819DC600E49E3E /* CLXMetricsTrackerImpl.m */; };
+		1916B2552E819DC600E49E3E /* CLXEventAM.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B23E2E819DC600E49E3E /* CLXEventAM.m */; };
+		1916B2562E819DC600E49E3E /* CLXEventAM.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B23D2E819DC600E49E3E /* CLXEventAM.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1916B2572E819DC600E49E3E /* CLXMetricsType.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B24C2E819DC600E49E3E /* CLXMetricsType.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1916B2582E819DC600E49E3E /* CLXEventTrackerBulkApi.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B23F2E819DC600E49E3E /* CLXEventTrackerBulkApi.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1916B2592E819DC600E49E3E /* CLXMetricsTrackerImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B2492E819DC600E49E3E /* CLXMetricsTrackerImpl.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1916B25A2E819DC600E49E3E /* CLXMetricsEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B2452E819DC600E49E3E /* CLXMetricsEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1916B25B2E819DC600E49E3E /* CLXMetricsDebugger.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B2432E819DC600E49E3E /* CLXMetricsDebugger.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1916B25C2E819DC600E49E3E /* CLXMetricsEventDao.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B2472E819DC600E49E3E /* CLXMetricsEventDao.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1916B25D2E819DC600E49E3E /* CLXMetricsTrackerProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B24B2E819DC600E49E3E /* CLXMetricsTrackerProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1916B25E2E819DC600E49E3E /* CLXMetricsConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B2412E819DC600E49E3E /* CLXMetricsConfig.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1916B2672E819FD400E49E3E /* CLXMetricsEventDaoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2612E819FD400E49E3E /* CLXMetricsEventDaoTests.m */; };
+		1916B2682E819FD400E49E3E /* CLXMetricsEventTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2622E819FD400E49E3E /* CLXMetricsEventTests.m */; };
+		1916B2692E819FD400E49E3E /* CLXMetricsPerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2642E819FD400E49E3E /* CLXMetricsPerformanceTests.m */; };
+		1916B26A2E819FD400E49E3E /* CLXMetricsTypeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2662E819FD400E49E3E /* CLXMetricsTypeTests.m */; };
+		1916B26B2E819FD400E49E3E /* CLXEventAMTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B25F2E819FD400E49E3E /* CLXEventAMTests.m */; };
+		1916B26C2E819FD400E49E3E /* CLXMetricsTrackerImplTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2652E819FD400E49E3E /* CLXMetricsTrackerImplTests.m */; };
+		1916B26D2E819FD400E49E3E /* CLXMetricsConfigTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2602E819FD400E49E3E /* CLXMetricsConfigTests.m */; };
+		1916B26E2E819FD400E49E3E /* CLXMetricsIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2632E819FD400E49E3E /* CLXMetricsIntegrationTests.m */; };
 		1979919A2E74921400EBA0A3 /* CLXGPPProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 197991992E74921400EBA0A3 /* CLXGPPProvider.m */; };
 		1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919B2E74923900EBA0A3 /* CLXGppConsent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -285,6 +311,32 @@
 		1916B2292E7F1E8100E49E3E /* CLXPublisherFireLosingBidLurlsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPublisherFireLosingBidLurlsTests.m; sourceTree = "<group>"; };
 		1916B22A2E7F1E8100E49E3E /* CLXWinLossURLResolutionIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXWinLossURLResolutionIntegrationTests.m; sourceTree = "<group>"; };
 		1916B2332E80AE4F00E49E3E /* CLXKillSwitchTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXKillSwitchTests.m; sourceTree = "<group>"; };
+		1916B23B2E819D7E00E49E3E /* CLXBidNetworkService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXBidNetworkService.h; sourceTree = "<group>"; };
+		1916B23D2E819DC600E49E3E /* CLXEventAM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXEventAM.h; sourceTree = "<group>"; };
+		1916B23E2E819DC600E49E3E /* CLXEventAM.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXEventAM.m; sourceTree = "<group>"; };
+		1916B23F2E819DC600E49E3E /* CLXEventTrackerBulkApi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXEventTrackerBulkApi.h; sourceTree = "<group>"; };
+		1916B2402E819DC600E49E3E /* CLXEventTrackerBulkApi.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXEventTrackerBulkApi.m; sourceTree = "<group>"; };
+		1916B2412E819DC600E49E3E /* CLXMetricsConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetricsConfig.h; sourceTree = "<group>"; };
+		1916B2422E819DC600E49E3E /* CLXMetricsConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsConfig.m; sourceTree = "<group>"; };
+		1916B2432E819DC600E49E3E /* CLXMetricsDebugger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetricsDebugger.h; sourceTree = "<group>"; };
+		1916B2442E819DC600E49E3E /* CLXMetricsDebugger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsDebugger.m; sourceTree = "<group>"; };
+		1916B2452E819DC600E49E3E /* CLXMetricsEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetricsEvent.h; sourceTree = "<group>"; };
+		1916B2462E819DC600E49E3E /* CLXMetricsEvent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsEvent.m; sourceTree = "<group>"; };
+		1916B2472E819DC600E49E3E /* CLXMetricsEventDao.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetricsEventDao.h; sourceTree = "<group>"; };
+		1916B2482E819DC600E49E3E /* CLXMetricsEventDao.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsEventDao.m; sourceTree = "<group>"; };
+		1916B2492E819DC600E49E3E /* CLXMetricsTrackerImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetricsTrackerImpl.h; sourceTree = "<group>"; };
+		1916B24A2E819DC600E49E3E /* CLXMetricsTrackerImpl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsTrackerImpl.m; sourceTree = "<group>"; };
+		1916B24B2E819DC600E49E3E /* CLXMetricsTrackerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetricsTrackerProtocol.h; sourceTree = "<group>"; };
+		1916B24C2E819DC600E49E3E /* CLXMetricsType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetricsType.h; sourceTree = "<group>"; };
+		1916B24D2E819DC600E49E3E /* CLXMetricsType.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsType.m; sourceTree = "<group>"; };
+		1916B25F2E819FD400E49E3E /* CLXEventAMTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXEventAMTests.m; sourceTree = "<group>"; };
+		1916B2602E819FD400E49E3E /* CLXMetricsConfigTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsConfigTests.m; sourceTree = "<group>"; };
+		1916B2612E819FD400E49E3E /* CLXMetricsEventDaoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsEventDaoTests.m; sourceTree = "<group>"; };
+		1916B2622E819FD400E49E3E /* CLXMetricsEventTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsEventTests.m; sourceTree = "<group>"; };
+		1916B2632E819FD400E49E3E /* CLXMetricsIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsIntegrationTests.m; sourceTree = "<group>"; };
+		1916B2642E819FD400E49E3E /* CLXMetricsPerformanceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsPerformanceTests.m; sourceTree = "<group>"; };
+		1916B2652E819FD400E49E3E /* CLXMetricsTrackerImplTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsTrackerImplTests.m; sourceTree = "<group>"; };
+		1916B2662E819FD400E49E3E /* CLXMetricsTypeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsTypeTests.m; sourceTree = "<group>"; };
 		197991992E74921400EBA0A3 /* CLXGPPProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGPPProvider.m; sourceTree = "<group>"; };
 		1979919B2E74923900EBA0A3 /* CLXGppConsent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGppConsent.h; sourceTree = "<group>"; };
 		1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGPPProvider.h; sourceTree = "<group>"; };
@@ -601,6 +653,14 @@
 		19C7247E2E2390420012CFC7 /* CloudXCoreTests */ = {
 			isa = PBXGroup;
 			children = (
+				1916B25F2E819FD400E49E3E /* CLXEventAMTests.m */,
+				1916B2602E819FD400E49E3E /* CLXMetricsConfigTests.m */,
+				1916B2612E819FD400E49E3E /* CLXMetricsEventDaoTests.m */,
+				1916B2622E819FD400E49E3E /* CLXMetricsEventTests.m */,
+				1916B2632E819FD400E49E3E /* CLXMetricsIntegrationTests.m */,
+				1916B2642E819FD400E49E3E /* CLXMetricsPerformanceTests.m */,
+				1916B2652E819FD400E49E3E /* CLXMetricsTrackerImplTests.m */,
+				1916B2662E819FD400E49E3E /* CLXMetricsTypeTests.m */,
 				1916B2332E80AE4F00E49E3E /* CLXKillSwitchTests.m */,
 				1916B2292E7F1E8100E49E3E /* CLXPublisherFireLosingBidLurlsTests.m */,
 				1916B22A2E7F1E8100E49E3E /* CLXWinLossURLResolutionIntegrationTests.m */,
@@ -697,6 +757,14 @@
 		19C724A12E2390810012CFC7 /* MetricsTracker */ = {
 			isa = PBXGroup;
 			children = (
+				1916B23E2E819DC600E49E3E /* CLXEventAM.m */,
+				1916B2402E819DC600E49E3E /* CLXEventTrackerBulkApi.m */,
+				1916B2422E819DC600E49E3E /* CLXMetricsConfig.m */,
+				1916B2442E819DC600E49E3E /* CLXMetricsDebugger.m */,
+				1916B2462E819DC600E49E3E /* CLXMetricsEvent.m */,
+				1916B2482E819DC600E49E3E /* CLXMetricsEventDao.m */,
+				1916B24A2E819DC600E49E3E /* CLXMetricsTrackerImpl.m */,
+				1916B24D2E819DC600E49E3E /* CLXMetricsType.m */,
 				19C724972E2390810012CFC7 /* CLXInitMetrics.m */,
 				19C724982E2390810012CFC7 /* CLXInitMetricsModel.m */,
 				19C724992E2390810012CFC7 /* CLXInitMetricsModel+Update.m */,
@@ -844,6 +912,16 @@
 		19C725422E2390810012CFC7 /* CloudXCore */ = {
 			isa = PBXGroup;
 			children = (
+				1916B23D2E819DC600E49E3E /* CLXEventAM.h */,
+				1916B23F2E819DC600E49E3E /* CLXEventTrackerBulkApi.h */,
+				1916B2412E819DC600E49E3E /* CLXMetricsConfig.h */,
+				1916B2432E819DC600E49E3E /* CLXMetricsDebugger.h */,
+				1916B2452E819DC600E49E3E /* CLXMetricsEvent.h */,
+				1916B2472E819DC600E49E3E /* CLXMetricsEventDao.h */,
+				1916B2492E819DC600E49E3E /* CLXMetricsTrackerImpl.h */,
+				1916B24B2E819DC600E49E3E /* CLXMetricsTrackerProtocol.h */,
+				1916B24C2E819DC600E49E3E /* CLXMetricsType.h */,
+				1916B23B2E819D7E00E49E3E /* CLXBidNetworkService.h */,
 				1916B16B2E7DFD9A00E49E3E /* CLXSQLiteDatabase.h */,
 				1916B1682E7DF8ED00E49E3E /* Database */,
 				1916B0972E7DE20E00E49E3E /* CLXAuctionBidManager.h */,
@@ -1060,7 +1138,6 @@
 				19C725772E2390810012CFC7 /* CLXSDKConfigPlacement.h in Headers */,
 				19C725782E2390810012CFC7 /* CLXSKAdNetworkService.h in Headers */,
 				19C725792E2390810012CFC7 /* CLXInterstitialDelegate.h in Headers */,
-				19C7257A2E2390810012CFC7 /* CLXBidNetworkService.h in Headers */,
 				19C7257B2E2390810012CFC7 /* CLXSessionMetricModel+Update.h in Headers */,
 				19C7257C2E2390810012CFC7 /* CLXNativeAdView.h in Headers */,
 				19C7257D2E2390810012CFC7 /* CLXBanner.h in Headers */,
@@ -1111,6 +1188,16 @@
 				19D92A4E2E68C6DC00C84DAE /* CLXAdFormat.h in Headers */,
 				19D928C12E63F44B00C84DAE /* CLXPrivacyService.h in Headers */,
 				1916B09B2E7DE20E00E49E3E /* CLXAuctionBidManager.h in Headers */,
+				1916B2562E819DC600E49E3E /* CLXEventAM.h in Headers */,
+				1916B2572E819DC600E49E3E /* CLXMetricsType.h in Headers */,
+				1916B2582E819DC600E49E3E /* CLXEventTrackerBulkApi.h in Headers */,
+				1916B2592E819DC600E49E3E /* CLXMetricsTrackerImpl.h in Headers */,
+				1916B25A2E819DC600E49E3E /* CLXMetricsEvent.h in Headers */,
+				1916B25B2E819DC600E49E3E /* CLXMetricsDebugger.h in Headers */,
+				1916B25C2E819DC600E49E3E /* CLXMetricsEventDao.h in Headers */,
+				1916B25D2E819DC600E49E3E /* CLXMetricsTrackerProtocol.h in Headers */,
+				1916B25E2E819DC600E49E3E /* CLXMetricsConfig.h in Headers */,
+				19C7257A2E2390810012CFC7 /* CLXBidNetworkService.h in Headers */,
 				1916B09C2E7DE20E00E49E3E /* CLXWinLossNetworkService.h in Headers */,
 				1916B09D2E7DE20E00E49E3E /* CLXWinLossTracker.h in Headers */,
 				1916B09E2E7DE20E00E49E3E /* CLXWinLossFieldResolver.h in Headers */,
@@ -1119,6 +1206,7 @@
 				1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */,
 				1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */,
 				197992952E75E3B700EBA0A3 /* CLXErrorReporter.h in Headers */,
+				1916B23C2E819D7E00E49E3E /* CLXBidNetworkService.h in Headers */,
 				19D92CA22E6E099C00C84DAE /* CLXUserDefaultsKeys.h in Headers */,
 				19C725A62E2390810012CFC7 /* CLXSessionMetricModel.h in Headers */,
 				19C725A72E2390810012CFC7 /* CLXLogger.h in Headers */,
@@ -1247,6 +1335,14 @@
 				19C725B62E2390810012CFC7 /* CLXPublisherFullscreenAd.m in Sources */,
 				19C725B72E2390810012CFC7 /* CloudXDataModel.xcdatamodeld in Sources */,
 				19C725B82E2390810012CFC7 /* CLXRillImpressionProperties.m in Sources */,
+				1916B24E2E819DC600E49E3E /* CLXEventTrackerBulkApi.m in Sources */,
+				1916B24F2E819DC600E49E3E /* CLXMetricsEventDao.m in Sources */,
+				1916B2502E819DC600E49E3E /* CLXMetricsConfig.m in Sources */,
+				1916B2512E819DC600E49E3E /* CLXMetricsDebugger.m in Sources */,
+				1916B2522E819DC600E49E3E /* CLXMetricsEvent.m in Sources */,
+				1916B2532E819DC600E49E3E /* CLXMetricsType.m in Sources */,
+				1916B2542E819DC600E49E3E /* CLXMetricsTrackerImpl.m in Sources */,
+				1916B2552E819DC600E49E3E /* CLXEventAM.m in Sources */,
 				19C725B92E2390810012CFC7 /* CLXBidResponse.m in Sources */,
 				19C725BA2E2390810012CFC7 /* CLXAppSessionServiceImplementation.m in Sources */,
 				19D926C52E61103C00C84DAE /* CLXError.m in Sources */,
@@ -1357,6 +1453,14 @@
 				197994812E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m in Sources */,
 				1916B1702E7E061B00E49E3E /* CLXWinLossNetworkServiceTests.m in Sources */,
 				1916B1712E7E061B00E49E3E /* CLXSQLiteDatabaseTests.m in Sources */,
+				1916B2672E819FD400E49E3E /* CLXMetricsEventDaoTests.m in Sources */,
+				1916B2682E819FD400E49E3E /* CLXMetricsEventTests.m in Sources */,
+				1916B2692E819FD400E49E3E /* CLXMetricsPerformanceTests.m in Sources */,
+				1916B26A2E819FD400E49E3E /* CLXMetricsTypeTests.m in Sources */,
+				1916B26B2E819FD400E49E3E /* CLXEventAMTests.m in Sources */,
+				1916B26C2E819FD400E49E3E /* CLXMetricsTrackerImplTests.m in Sources */,
+				1916B26D2E819FD400E49E3E /* CLXMetricsConfigTests.m in Sources */,
+				1916B26E2E819FD400E49E3E /* CLXMetricsIntegrationTests.m in Sources */,
 				1916B1722E7E061B00E49E3E /* CLXWinLossFieldResolverTests.m in Sources */,
 				197994862E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m in Sources */,
 				197994822E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m in Sources */,
