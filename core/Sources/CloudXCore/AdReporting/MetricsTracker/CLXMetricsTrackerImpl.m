@@ -345,6 +345,23 @@
 - (NSArray<NSString *> *)validateSystem {
     return [CLXMetricsDebugger validateMetricsSystem:self];
 }
+
+/**
+ * Flush all pending async operations (testing only)
+ * This method blocks until all pending trackMethodCall operations complete
+ */
+- (void)flushPendingOperations {
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    
+    // Post a barrier block to the metrics queue to ensure all previous operations complete
+    dispatch_async(self.metricsQueue, ^{
+        // All previous async operations on metricsQueue will complete before this block executes
+        dispatch_semaphore_signal(semaphore);
+    });
+    
+    // Wait for the barrier block to execute (indicating all previous operations are done)
+    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+}
 #endif
 
 @end

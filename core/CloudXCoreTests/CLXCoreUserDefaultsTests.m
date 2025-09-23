@@ -49,6 +49,10 @@
 - (void)tearDown {
     // Clear ALL CloudXCore User Defaults keys to ensure test isolation
     [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    
+    // Reset DI container to ensure clean state for next test
+    [[CLXDIContainer shared] reset];
+    
     [super tearDown];
 }
 

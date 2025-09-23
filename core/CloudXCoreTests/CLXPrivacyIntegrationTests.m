@@ -9,6 +9,8 @@
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXPrivacyService.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXSDKConfig.h>
+#import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CoreLocation/CoreLocation.h>
 
 // Testing category to expose internal methods for testing
@@ -23,6 +25,8 @@
 // Note: Using public buildPayload method for robust integration testing instead of private methods
 
 @interface CLXPrivacyIntegrationTests : XCTestCase
+@property (nonatomic, strong) CLXSDKConfigResponse *mockSDKConfig;
+@property (nonatomic, strong) CLXConfigImpressionModel *mockImpModel;
 @end
 
 @implementation CLXPrivacyIntegrationTests
@@ -32,6 +36,17 @@
     // Clear ALL UserDefaults that might interfere with privacy tests
     [self clearAllPotentiallyConflictingSettings];
     [self clearPrivacySettings];
+    
+    // Create mock SDK config with appID for tests
+    self.mockSDKConfig = [[CLXSDKConfigResponse alloc] init];
+    self.mockSDKConfig.appID = @"test-app-id-from-sdk";
+    self.mockSDKConfig.accountID = @"test-account";
+    self.mockSDKConfig.sessionID = @"test-session";
+    
+    // Create mock impression model
+    self.mockImpModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:self.mockSDKConfig
+                                                                  auctionID:@"test-auction"
+                                                              testGroupName:@"test-group"];
 }
 
 - (void)tearDown {
@@ -124,7 +139,7 @@
            nativeAdRequirements:nil
            skadRequestParameters:@{}
                           tmax:@3.0
-                      impModel:nil
+                      impModel:self.mockImpModel
                       settings:[CLXSettings sharedInstance]
             privacyService:privacyService];
     // GDPR should NOT be included in bidding config as server doesn't support it yet
@@ -215,7 +230,7 @@
            nativeAdRequirements:nil
            skadRequestParameters:@{}
                           tmax:@3.0
-                      impModel:nil
+                      impModel:self.mockImpModel
                       settings:[CLXSettings sharedInstance]
             privacyService:privacyService];
     

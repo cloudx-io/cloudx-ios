@@ -9,6 +9,8 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXSDKConfig.h>
+#import <CloudXCore/CLXConfigImpressionModel.h>
 #import <objc/runtime.h>
 
 // Private interface to access internal methods for testing
@@ -188,6 +190,8 @@ static MockRillEventReporter *sharedInstance = nil;
 @property (nonatomic, strong) MockRillEventReporter *mockReporter;
 @property (nonatomic, strong) MockSDKConfigResponse *mockConfig;
 @property (nonatomic, strong) CLXTrackingFieldResolver *resolver;
+@property (nonatomic, strong) CLXSDKConfigResponse *mockSDKConfig;
+@property (nonatomic, strong) CLXConfigImpressionModel *mockImpModel;
 @end
 
 @implementation CLXRillTrackingTests
@@ -198,6 +202,17 @@ static MockRillEventReporter *sharedInstance = nil;
     self.mockReporter = [MockRillEventReporter shared];
     self.mockConfig = [[MockSDKConfigResponse alloc] init];
     self.resolver = [CLXTrackingFieldResolver shared];
+    
+    // Create mock SDK config with appID
+    self.mockSDKConfig = [[CLXSDKConfigResponse alloc] init];
+    self.mockSDKConfig.appID = @"test-app-id";
+    self.mockSDKConfig.accountID = @"test-account";
+    self.mockSDKConfig.sessionID = @"test-session";
+    
+    // Create mock impression model
+    self.mockImpModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:self.mockSDKConfig
+                                                                  auctionID:@"test-auction"
+                                                              testGroupName:@"test-group"];
     
     // Set up resolver with test configuration
     [self.resolver setConfig:self.mockConfig];
@@ -229,6 +244,7 @@ static MockRillEventReporter *sharedInstance = nil;
             @"osv": @"18.5"
         },
         @"app": @{
+            @"id": @"test-app-id",
             @"bundle": @"cloudx.CloudXObjCRemotePods"
         },
         @"imp": @[@{
@@ -900,7 +916,7 @@ static MockRillEventReporter *sharedInstance = nil;
     
     // When: Try to set up tracking with nil data
     BOOL success = [trackingService setupTrackingDataFromBidResponse:nil
-                                                            impModel:nil
+                                                            impModel:self.mockImpModel
                                                          placementID:nil
                                                            loadCount:0];
     

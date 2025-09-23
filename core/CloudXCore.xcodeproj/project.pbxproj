@@ -49,6 +49,8 @@
 		1916B26C2E819FD400E49E3E /* CLXMetricsTrackerImplTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2652E819FD400E49E3E /* CLXMetricsTrackerImplTests.m */; };
 		1916B26D2E819FD400E49E3E /* CLXMetricsConfigTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2602E819FD400E49E3E /* CLXMetricsConfigTests.m */; };
 		1916B26E2E819FD400E49E3E /* CLXMetricsIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2632E819FD400E49E3E /* CLXMetricsIntegrationTests.m */; };
+		1916B32C2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B32B2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m */; };
+		1916B32E2E832C0000E49E3E /* CLXAppIDIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B32D2E832C0000E49E3E /* CLXAppIDIntegrationTests.m */; };
 		1979919A2E74921400EBA0A3 /* CLXGPPProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 197991992E74921400EBA0A3 /* CLXGPPProvider.m */; };
 		1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919B2E74923900EBA0A3 /* CLXGppConsent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -337,6 +339,8 @@
 		1916B2642E819FD400E49E3E /* CLXMetricsPerformanceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsPerformanceTests.m; sourceTree = "<group>"; };
 		1916B2652E819FD400E49E3E /* CLXMetricsTrackerImplTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsTrackerImplTests.m; sourceTree = "<group>"; };
 		1916B2662E819FD400E49E3E /* CLXMetricsTypeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsTypeTests.m; sourceTree = "<group>"; };
+		1916B32B2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAppKeyAppIDDistinctionTests.m; sourceTree = "<group>"; };
+		1916B32D2E832C0000E49E3E /* CLXAppIDIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAppIDIntegrationTests.m; sourceTree = "<group>"; };
 		197991992E74921400EBA0A3 /* CLXGPPProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGPPProvider.m; sourceTree = "<group>"; };
 		1979919B2E74923900EBA0A3 /* CLXGppConsent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGppConsent.h; sourceTree = "<group>"; };
 		1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGPPProvider.h; sourceTree = "<group>"; };
@@ -653,6 +657,8 @@
 		19C7247E2E2390420012CFC7 /* CloudXCoreTests */ = {
 			isa = PBXGroup;
 			children = (
+				1916B32D2E832C0000E49E3E /* CLXAppIDIntegrationTests.m */,
+				1916B32B2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m */,
 				1916B25F2E819FD400E49E3E /* CLXEventAMTests.m */,
 				1916B2602E819FD400E49E3E /* CLXMetricsConfigTests.m */,
 				1916B2612E819FD400E49E3E /* CLXMetricsEventDaoTests.m */,
@@ -1424,6 +1430,7 @@
 				19D929C42E6644BB00C84DAE /* CLXPublisherBannerUnitTests.m in Sources */,
 				19D92C392E6A3B8E00C84DAE /* CLXPublisherBannerBasicTests.m in Sources */,
 				197994842E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m in Sources */,
+				1916B32C2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m in Sources */,
 				19D92C3E2E6A3B8E00C84DAE /* CLXRevenueCallbackEdgeCaseTests.m in Sources */,
 				19D929012E6403E000C84DAE /* CLXPrivacyServiceTests.m in Sources */,
 				19D929022E6403E000C84DAE /* CLXPrivacyIntegrationTests.m in Sources */,
@@ -1465,6 +1472,7 @@
 				197994862E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m in Sources */,
 				197994822E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m in Sources */,
 				197991A82E74B0D600EBA0A3 /* CLXGppConsentTests.m in Sources */,
+				1916B32E2E832C0000E49E3E /* CLXAppIDIntegrationTests.m in Sources */,
 				197991A92E74B0D600EBA0A3 /* CLXGPPIntegrationTests.m in Sources */,
 				197991AA2E74B0D600EBA0A3 /* CLXGPPProviderTests.m in Sources */,
 				1916B22B2E7F1E8100E49E3E /* CLXPublisherFireLosingBidLurlsTests.m in Sources */,

@@ -332,6 +332,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     mockConfig.sessionID = @"test-session-id";
     mockConfig.organizationID = @"test-org-id";
     mockConfig.accountID = @"test-account-id";
+    mockConfig.appID = @"test-interstitial-app-id";
     
     CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] 
         initWithSDKConfig:mockConfig
@@ -363,6 +364,10 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     self.mockReporter = nil;
     self.mockWinLossTracker = nil;
     self.mockAdapter = nil;
+    
+    // Reset DI container to ensure clean state for next test
+    [[CLXDIContainer shared] reset];
+    
     [super tearDown];
 }
 

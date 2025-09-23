@@ -245,7 +245,8 @@ static void initializeLogger() {
         
         CLXBiddingConfigApplication *application = [[CLXBiddingConfigApplication alloc] init];
         // Use appID from SDK init response for bid request app.id field
-        application.appID = impModel.sdkConfig.appID;
+        // Fallback to empty string if impModel or sdkConfig is nil
+        application.appID = impModel.sdkConfig.appID ?: @"";
         application.bundle = bundle;
         application.ver = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
         application.publisher = publisher;
