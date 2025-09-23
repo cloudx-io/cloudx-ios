@@ -709,10 +709,13 @@ NS_ASSUME_NONNULL_BEGIN
         
         if (visible) {
             // Banner became visible - execute any pending refresh
-            if (self.hasPendingRefresh && self.autoRefreshEnabled) {
+            // Fix: Prevent double-loading during initial MREC setup by checking if we're already loading
+            if (self.hasPendingRefresh && self.autoRefreshEnabled && !self.isLoading) {
                 self.hasPendingRefresh = NO;
                 [self.logger debug:@"🔄 [PublisherBanner] Executing pending refresh after becoming visible"];
                 [self load];
+            } else if (self.isLoading) {
+                [self.logger debug:@"⚠️ [PublisherBanner] Skipping pending refresh - already loading"];
             }
             
             // Display any prefetched banner
@@ -749,17 +752,21 @@ NS_ASSUME_NONNULL_BEGIN
     }
     
     // If there's a pending refresh and banner is visible, execute it now
-    if (self.hasPendingRefresh && self.isVisible) {
+    if (self.hasPendingRefresh && self.isVisible && !self.isLoading) {
         self.hasPendingRefresh = NO;
         [self.logger debug:@"🔄 [PublisherBanner] Executing pending refresh after enabling auto-refresh"];
         [self load];
         self.lastManualRefreshTime = now;
+    } else if (self.hasPendingRefresh && self.isLoading) {
+        [self.logger debug:@"⚠️ [PublisherBanner] Skipping pending refresh in startAutoRefresh - already loading"];
     }
     // Industry standard: Immediate refresh when auto-refresh is started (with rate limiting)
-    else if (self.bannerOnScreen && self.isVisible && shouldRefreshImmediately) {
+    else if (self.bannerOnScreen && self.isVisible && shouldRefreshImmediately && !self.isLoading) {
         [self.logger debug:@"🚀 [PublisherBanner] Immediate refresh on auto-refresh start (industry standard)"];
         [self load];
         self.lastManualRefreshTime = now;
+    } else if (self.bannerOnScreen && self.isLoading) {
+        [self.logger debug:@"⚠️ [PublisherBanner] Skipping immediate refresh in startAutoRefresh - already loading"];
     }
     // Start timer for next refresh cycle
     else if (self.bannerOnScreen && self.isVisible) {

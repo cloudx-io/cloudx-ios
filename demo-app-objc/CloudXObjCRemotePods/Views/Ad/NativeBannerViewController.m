@@ -176,8 +176,12 @@
 }
 
 - (void)resetAdState {
-    [self.nativeBannerAd removeFromSuperview];
-    self.nativeBannerAd = nil;
+    if (self.nativeBannerAd) {
+        // CRITICAL: Properly destroy the native banner ad to stop background processing
+        [self.nativeBannerAd destroy];
+        [self.nativeBannerAd removeFromSuperview];
+        self.nativeBannerAd = nil;
+    }
 }
 
 #pragma mark - CLXNativeDelegate
