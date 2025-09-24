@@ -49,13 +49,13 @@ pod install --repo-update
 ### Swift Package Manager
 
 1. In Xcode, go to **File** → **Add Package Dependencies**
-2. Enter the repository URL: `https://github.com/cloudx-xenoss/cloudx-ios`
+2. Enter the repository URL: `https://github.com/cloudx-io/cloudx-ios`
 3. Select the latest version and click **Add Package**
 4. Choose your target and click **Add Package**
 
 ### Manual Installation
 
-1. Download the latest release from [cloudx-ios Releases](https://github.com/cloudx-xenoss/cloudx-ios/releases)
+1. Download the latest release from [cloudx-ios Releases](https://github.com/cloudx-io/cloudx-ios/releases)
 2. Extract the downloaded zip file
 3. Drag the source files into your Xcode project
 4. Ensure "Copy items if needed" is checked and select your target
@@ -1272,8 +1272,8 @@ print("SDK Logs: \(logs)")
 
 ## Support
 
-- **Documentation**: [CloudX iOS Docs](https://github.com/cloudx-xenoss/cloudx-ios)
-- **Issues**: [GitHub Issues](https://github.com/cloudx-xenoss/cloudx-ios/issues)
+- **Documentation**: [CloudX iOS Docs](https://github.com/cloudx-io/cloudx-ios)
+- **Issues**: [GitHub Issues](https://github.com/cloudx-io/cloudx-ios/issues)
 - **Email**: eng@cloudx.io
 
 ## License

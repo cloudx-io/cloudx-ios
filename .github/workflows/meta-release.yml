@@ -82,7 +82,7 @@ jobs:
           sed -i '' "s/s\.version.*=.*/s.version = '$VERSION'/" CloudXMetaAdapter.podspec
           
           # Update Package.swift version and checksum
-          sed -i '' "s|url: \".*\"|url: \"https://github.com/cloudx-xenoss/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip\",|" Package.swift
+          sed -i '' "s|url: \".*\"|url: \"https://github.com/cloudx-io/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip\",|" Package.swift
           sed -i '' "s|checksum: \".*\"|checksum: \"${{ steps.checksum.outputs.checksum }}\"|" Package.swift
 
       - name: 🧪 Validate podspec
@@ -111,7 +111,7 @@ pod 'CloudXMetaAdapter', '~> $VERSION'
 
 ### Swift Package Manager
 \`\`\`
-https://github.com/cloudx-xenoss/cloudx-ios
+https://github.com/cloudx-io/cloudx-ios
 \`\`\`
 
 ### Manual Installation
@@ -125,7 +125,7 @@ Download \`CloudXMetaAdapter-v$VERSION.xcframework.zip\` from this release.
         run: |
           VERSION=${{ steps.version.outputs.version }}
           FULL_VERSION=${{ steps.version.outputs.full_version }}
-          ZIP_URL="https://github.com/cloudx-xenoss/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip"
+          ZIP_URL="https://github.com/cloudx-io/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip"
           echo "Waiting for $ZIP_URL to be fully available..."
 
           for i in {1..60}; do
@@ -147,7 +147,7 @@ Download \`CloudXMetaAdapter-v$VERSION.xcframework.zip\` from this release.
         run: |
           VERSION=${{ steps.version.outputs.version }}
           FULL_VERSION=${{ steps.version.outputs.full_version }}
-          ZIP_URL="https://github.com/cloudx-xenoss/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip"
+          ZIP_URL="https://github.com/cloudx-io/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip"
           echo "Waiting for $ZIP_URL to be downloadable using curl -fL..."
 
           for i in {1..30}; do

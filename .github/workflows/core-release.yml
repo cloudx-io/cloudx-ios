@@ -91,7 +91,7 @@ pod 'CloudXCore', '~> $VERSION'
 
 ### Swift Package Manager
 \`\`\`
-https://github.com/cloudx-xenoss/cloudx-ios
+https://github.com/cloudx-io/cloudx-ios
 \`\`\`
 
 This release provides source-based distribution for easier integration and debugging." \
