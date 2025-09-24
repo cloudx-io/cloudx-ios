@@ -78,23 +78,24 @@ jobs:
           VERSION=${{ steps.version.outputs.version }}
           FULL_VERSION=${{ steps.version.outputs.full_version }}
           
+          # Create release notes file
+          cat > release_notes.md << EOF
+          CloudXCore v$VERSION SDK release (source distribution)
+          
+          ## Installation
+          
+          ### CocoaPods
+          Add to your Podfile: pod 'CloudXCore', '~> $VERSION'
+          
+          ### Swift Package Manager
+          Add repository: https://github.com/cloudx-io/cloudx-ios
+          
+          This release provides source-based distribution for easier integration and debugging.
+          EOF
+          
           gh release create "$FULL_VERSION" \
             --title "CloudXCore v$VERSION" \
-            --notes "CloudXCore v$VERSION SDK release (source distribution)
-
-## Installation
-
-### CocoaPods
-\`\`\`ruby
-pod 'CloudXCore', '~> $VERSION'
-\`\`\`
-
-### Swift Package Manager
-\`\`\`
-https://github.com/cloudx-io/cloudx-ios
-\`\`\`
-
-This release provides source-based distribution for easier integration and debugging." \
+            --notes-file release_notes.md \
             --latest
 
       - name: 📌 Upload logs on failure

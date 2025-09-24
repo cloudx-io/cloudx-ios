@@ -97,28 +97,29 @@ jobs:
           VERSION=${{ steps.version.outputs.version }}
           FULL_VERSION=${{ steps.version.outputs.full_version }}
           
+          # Create release notes file
+          cat > release_notes.md << EOF
+          CloudXMetaAdapter v$VERSION SDK release (static xcframework)
+          
+          ## Installation
+          
+          ### CocoaPods
+          Add to your Podfile: pod 'CloudXMetaAdapter', '~> $VERSION'
+          
+          ### Swift Package Manager
+          Add repository: https://github.com/cloudx-io/cloudx-ios
+          
+          ### Manual Installation
+          Download CloudXMetaAdapter-v$VERSION.xcframework.zip from this release.
+          
+          ## SwiftPM Checksum
+          ${{ steps.checksum.outputs.checksum }}
+          EOF
+          
           gh release create "$FULL_VERSION" \
             adapter-meta/CloudXMetaAdapter-v$VERSION.xcframework.zip \
             --title "CloudXMetaAdapter v$VERSION" \
-            --notes "CloudXMetaAdapter v$VERSION SDK release (static xcframework)
-
-## Installation
-
-### CocoaPods
-\`\`\`ruby
-pod 'CloudXMetaAdapter', '~> $VERSION'
-\`\`\`
-
-### Swift Package Manager
-\`\`\`
-https://github.com/cloudx-io/cloudx-ios
-\`\`\`
-
-### Manual Installation
-Download CloudXMetaAdapter-v$VERSION.xcframework.zip from this release.
-
-## SwiftPM Checksum
-${{ steps.checksum.outputs.checksum }}" \
+            --notes-file release_notes.md \
             --latest
 
       - name: 💤 Wait for .xcframework.zip to be globally available
