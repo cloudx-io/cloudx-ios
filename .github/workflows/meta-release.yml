@@ -115,10 +115,10 @@ https://github.com/cloudx-io/cloudx-ios
 \`\`\`
 
 ### Manual Installation
-Download \`CloudXMetaAdapter-v$VERSION.xcframework.zip\` from this release.
+Download CloudXMetaAdapter-v$VERSION.xcframework.zip from this release.
 
 ## SwiftPM Checksum
-\`${{ steps.checksum.outputs.checksum }}\`" \
+${{ steps.checksum.outputs.checksum }}" \
             --latest
 
       - name: 💤 Wait for .xcframework.zip to be globally available
