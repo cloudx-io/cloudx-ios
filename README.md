@@ -1,11 +1,38 @@
 # CloudX iOS SDK
 
-The CloudX iOS SDK is a comprehensive mobile advertising solution that provides programmatic advertising capabilities for iOS applications. This monorepo contains the complete CloudX iOS SDK ecosystem including the core SDK and various adapter implementations.
+The CloudX iOS SDK is a comprehensive mobile advertising solution that provides programmatic advertising capabilities for iOS applications. This unified repository contains the complete CloudX iOS SDK ecosystem including the core SDK and various adapter implementations.
 
-### Components
+## Quick Start
 
-- **[`core/`](core/README.md)** - The foundational CloudX Core SDK written in Objective-C that provides the base functionality for programmatic advertising
-- **[`adapter-meta/`](adapter-meta/README.md)** - Meta (Facebook Audience Network) adapter for integrating Meta's advertising platform
+### CocoaPods Installation
+
+```ruby
+platform :ios, '14.0'
+
+target 'YourApp' do
+  use_frameworks!
+  
+  # CloudX Core SDK (source-based distribution)
+  pod 'CloudXCore'
+  
+  # Optional: CloudX Adapters (framework-based distribution)
+  pod 'CloudXMetaAdapter'
+  # pod 'CloudXAdManagerAdapter'  # Coming soon
+  # pod 'CloudXPrebidAdapter'     # Coming soon
+end
+```
+
+### Swift Package Manager
+
+Add this repository URL to your Xcode project:
+```
+https://github.com/cloudx-xenoss/cloudx-ios
+```
+
+## Components
+
+- **[`core/`](core/README.md)** - The foundational CloudX Core SDK written in Objective-C that provides the base functionality for programmatic advertising *(source-based distribution)*
+- **[`adapter-meta/`](adapter-meta/README.md)** - Meta (Facebook Audience Network) adapter for integrating Meta's advertising platform *(framework-based distribution)*
 - **[`adapter-cloudx/`](adapter-cloudx/README.md)** - Prebid adapter for header bidding integration with CloudX's programmatic platform
 - **[`demo-app-objc/`](demo-app-objc/)** - Complete Objective-C demo application showcasing CloudX SDK integration and usage patterns
 - **[`demo-app-swift/`](demo-app-swift/)** - Complete Swift demo application demonstrating CloudX SDK implementation in Swift projects
@@ -14,57 +41,45 @@ For detailed installation instructions and usage examples, please refer to the i
 
 ## Release Strategy
 
-This monorepo follows a **unified release strategy** with **separate release assets** to provide both organizational clarity and distribution flexibility.
+This repository uses **component-specific releases** with **tagged distribution** to provide both organizational clarity and distribution flexibility.
 
-### Unified Release Strategy
+### Component-Specific Releases
 
-- **Single Release Per Deployment Cycle**: Each release includes all components that have changed since the last release
-- **Semantic Versioning**: The entire SDK suite follows semantic versioning (e.g., `v1.2.3`)
-- **Coordinated Versioning**: All components are versioned together to ensure compatibility
-- **Clear Release Notes**: Each release clearly documents what changed in each component
+- **Core SDK**: Source-based distribution with tags like `v1.1.40-core`
+- **Meta Adapter**: Framework-based distribution with tags like `v1.1.25-meta`
+- **Individual Versioning**: Each component maintains its own version to allow independent updates
+- **Clear Release Assets**: Each release provides the appropriate distribution format for that component
 
 #### Release Tag Format
 ```
-v1.2.3  # Main SDK suite version
+v1.1.40-core   # Core SDK release (source distribution)
+v1.1.25-meta  # Meta Adapter release (framework distribution)
 ```
 
-#### Release Notes Structure
-```markdown
-## CloudX iOS SDK v1.2.3
+#### Distribution Methods
+- **Core SDK**: Direct source integration via CocoaPods/SPM for easier debugging and customization
+- **Meta Adapter**: Pre-built xcframework for faster build times and simplified integration
+- **Automated Releases**: GitHub Actions automatically build, test, and publish releases when tags are pushed
 
-### Core v1.1.2
-- Fixed memory leak in bid processing
-- Added new configuration options for privacy compliance
-- Improved error handling in network requests
+### Release Assets
 
-### Meta Adapter v1.0.5
-- Updated for Meta SDK 6.15.0 compatibility
-- Improved error handling for failed ad requests
-- Added support for new Meta ad formats
+Each component release provides the appropriate assets for its distribution method:
 
-### CloudX Prebid Adapter v2.1.1
-- Enhanced header bidding timeout handling
-- Fixed issue with bid response parsing
-- Added support for video ad formats
+#### Core SDK Assets (Source Distribution)
+- Direct source file access via CocoaPods/SPM
+- No binary downloads required
+- Full source code availability for debugging
+
+#### Meta Adapter Assets (Framework Distribution) 
 ```
-
-### Separate Release Assets
-
-Each release provides **separate downloadable assets** for each component, allowing developers to download only what they need:
-
-#### Asset Naming Convention
-```
-CloudXCore-v1.1.2.zip           # Core SDK binary
-CloudXMetaAdapter-v1.0.5.zip    # Meta Adapter binary  
-CloudXPrebidAdapter-v2.1.1.zip  # Prebid Adapter binary
-CloudXiOSSDK-Complete-v1.2.3.zip # Optional: All components bundled
+CloudXMetaAdapter-v1.1.25.xcframework.zip  # Static xcframework for integration
 ```
 
 #### Benefits
-- **Selective Downloads**: Developers can download only the components they need
-- **Reduced App Size**: Avoid including unused adapters
-- **Clear Versioning**: Each component's version is clearly indicated in the filename
-- **Backward Compatibility**: Easy to identify compatible versions across components
+- **Optimized Distribution**: Each component uses the most appropriate distribution method
+- **Independent Updates**: Components can be updated independently without affecting others
+- **Developer Choice**: Use source or framework distribution based on your needs
+- **Automated Pipeline**: Releases are automatically built and published via GitHub Actions
 
 ## Documentation
 
