@@ -37,16 +37,7 @@
     loadButton.translatesAutoresizingMaskIntoConstraints = NO;
     [buttonStack addArrangedSubview:loadButton];
     
-    // Show MREC button
-    UIButton *showButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [showButton setTitle:@"Show MREC" forState:UIControlStateNormal];
-    [showButton addTarget:self action:@selector(showMRECAd) forControlEvents:UIControlEventTouchUpInside];
-    showButton.backgroundColor = [UIColor systemBlueColor];
-    [showButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    showButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
-    showButton.layer.cornerRadius = 8;
-    showButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [buttonStack addArrangedSubview:showButton];
+    // Show button removed - MREC is auto-added to view on push
     
     // Auto-refresh toggle button (positioned separately above status label)
     self.autoRefreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -65,8 +56,6 @@
         [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
         [loadButton.widthAnchor constraintEqualToConstant:200],
         [loadButton.heightAnchor constraintEqualToConstant:44],
-        [showButton.widthAnchor constraintEqualToConstant:200],
-        [showButton.heightAnchor constraintEqualToConstant:44],
         
         // Auto-refresh button positioned above status label
         [self.autoRefreshButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
@@ -74,6 +63,9 @@
         [self.autoRefreshButton.widthAnchor constraintEqualToConstant:200],
         [self.autoRefreshButton.heightAnchor constraintEqualToConstant:44]
     ]];
+    
+    // Auto-create and add MREC to view hierarchy immediately
+    [self createAndAddMRECToView];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -110,16 +102,23 @@
         return;
     }
     
-    if (self.mrecAd) {
-        [self showAlertWithTitle:@"Info" message:@"MREC already loaded. Use Show MREC to display it."];
-        return;
+    if (!self.mrecAd) {
+        [self createAndAddMRECToView];
     }
     
-    [self createMRECAd];
+    if (!self.mrecAd) {
+        return; // Failed to create
+    }
+    
+    // Start loading
+    self.isLoading = YES;
+    [self updateStatusUIWithState:AdStateLoading];
+    [self.mrecAd load];
 }
 
-- (void)createMRECAd {
+- (void)createAndAddMRECToView {
     if (self.mrecAd) return;
+    
     NSString *placement = [self placementName];
     if (_settings.mrecPlacement.length > 0) {
         placement = _settings.mrecPlacement;
@@ -131,35 +130,7 @@
         return;
     }
     
-    // Start loading
-    self.isLoading = YES;
-    [self updateStatusUIWithState:AdStateLoading];
-    [self.mrecAd load];
-}
-
-- (void)showMRECAd {
-    if (![[CloudXCore shared] isInitialised]) {
-        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
-        return;
-    }
-    
-    if (!self.mrecAd) {
-        [self showAlertWithTitle:@"Error" message:@"No MREC loaded. Please load an MREC first."];
-        return;
-    }
-    
-    if (self.isLoading) {
-        [self showAlertWithTitle:@"Info" message:@"MREC is still loading. Please wait."];
-        return;
-    }
-    
-    // Check if MREC is already in the view hierarchy
-    if (self.mrecAd.superview) {
-        [self showAlertWithTitle:@"Info" message:@"MREC is already showing."];
-        return;
-    }
-    
-    // Add MREC to view hierarchy
+    // Add MREC to view hierarchy immediately
     self.mrecAd.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.mrecAd];
     
@@ -170,6 +141,13 @@
         [self.mrecAd.heightAnchor constraintEqualToConstant:250]
     ]];
 }
+
+- (void)createMRECAd {
+    // Legacy method - now just calls the new method
+    [self createAndAddMRECToView];
+}
+
+// showMRECAd method removed - MREC is auto-added to view on push
 
 - (void)resetAdState {
     if (self.mrecAd) {

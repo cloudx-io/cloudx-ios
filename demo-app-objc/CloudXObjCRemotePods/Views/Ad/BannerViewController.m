@@ -43,16 +43,7 @@
     loadButton.translatesAutoresizingMaskIntoConstraints = NO;
     [buttonStack addArrangedSubview:loadButton];
     
-    // Show Banner button
-    UIButton *showButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [showButton setTitle:@"Show Banner" forState:UIControlStateNormal];
-    [showButton addTarget:self action:@selector(showBannerAd) forControlEvents:UIControlEventTouchUpInside];
-    showButton.backgroundColor = [UIColor systemBlueColor];
-    [showButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    showButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
-    showButton.layer.cornerRadius = 8;
-    showButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [buttonStack addArrangedSubview:showButton];
+    // Show button removed - Banner is auto-added to view on push
     
     // Auto-refresh toggle button
     self.autoRefreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -72,11 +63,12 @@
         [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
         [loadButton.widthAnchor constraintEqualToConstant:200],
         [loadButton.heightAnchor constraintEqualToConstant:44],
-        [showButton.widthAnchor constraintEqualToConstant:200],
-        [showButton.heightAnchor constraintEqualToConstant:44],
         [self.autoRefreshButton.widthAnchor constraintEqualToConstant:200],
         [self.autoRefreshButton.heightAnchor constraintEqualToConstant:44]
     ]];
+    
+    // Auto-create and add banner to view hierarchy immediately
+    [self createAndAddBannerToView];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -108,22 +100,22 @@
         return;
     }
     
-    if (self.bannerAd) {
-        [self showAlertWithTitle:@"Info" message:@"Banner already loaded. Use Show Banner to display it."];
-        return;
+    if (!self.bannerAd) {
+        [self createAndAddBannerToView];
     }
     
-    [self loadBanner];
+    if (!self.bannerAd) {
+        return; // Failed to create
+    }
+    
+    // Start loading
+    self.isLoading = YES;
+    [self updateStatusUIWithState:AdStateLoading];
+    [self.bannerAd load];
 }
 
-- (void)loadBanner {
-    if (![[CloudXCore shared] isInitialised]) {
-        return;
-    }
-
-    if (self.bannerAd) {
-        return;
-    }
+- (void)createAndAddBannerToView {
+    if (self.bannerAd) return;
     
     // Always preserve the original human-readable placement name for display purposes
     NSString *originalPlacementName = [self placementName];
@@ -139,48 +131,21 @@
                                                           delegate:self
                                                               tmax:nil];
     
-    // Store the original human-readable name for logging purposes
-    // Note: This approach preserves the original placement name regardless of which placement ID is used for the SDK call
-    if (self.bannerAd) {
-        // The banner ad will internally preserve the original placement name through our CLXAd factory method updates
-    }
-    
     if (!self.bannerAd) {
         [self showAlertWithTitle:@"Error" message:@"Failed to create banner."];
         return;
     }
     
-    // Start loading
-    self.isLoading = YES;
-    [self updateStatusUIWithState:AdStateLoading];
-    [self.bannerAd load];
-}
-
-- (void)showBannerAd {
-    if (![[CloudXCore shared] isInitialised]) {
-        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
-        return;
-    }
-    
-    if (!self.bannerAd) {
-        [self showAlertWithTitle:@"Error" message:@"No banner loaded. Please load a banner first."];
-        return;
-    }
-    
-    if (self.isLoading) {
-        [self showAlertWithTitle:@"Info" message:@"Banner is still loading. Please wait."];
-        return;
-    }
-    
-    // Check if banner is already in the view hierarchy
-    if (self.bannerAd.superview) {
-        [self showAlertWithTitle:@"Info" message:@"Banner is already showing."];
-        return;
-    }
-    
-    // Add banner to view hierarchy
+    // Add banner to view hierarchy immediately
     [self addBannerToViewHierarchy];
 }
+
+- (void)loadBanner {
+    // Legacy method - now just calls the new method
+    [self createAndAddBannerToView];
+}
+
+// showBannerAd method removed - Banner is auto-added to view on push
 
 - (void)addBannerToViewHierarchy {
     if (!self.bannerAd || self.bannerAd.superview) {
