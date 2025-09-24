@@ -82,24 +82,28 @@ static void initializeLogger() {
         _skadRequestParameters = skadRequestParameters;
         _tmax = tmax;
         
-        // Calculate screen dimensions based on ad type
+        // Calculate screen dimensions in pixels (not points)
         CGRect screenRect = [[UIScreen mainScreen] bounds];
-        NSInteger screenWidth = (NSInteger)screenRect.size.width;
-        NSInteger screenHeight = (NSInteger)screenRect.size.height;
+        CGFloat scale = [[UIScreen mainScreen] scale];
+        NSInteger screenWidth = (NSInteger)(screenRect.size.width * scale);
+        NSInteger screenHeight = (NSInteger)(screenRect.size.height * scale);
         
-        if (adType == CLXAdTypeMrec) {
-            screenWidth = 300;
-            screenHeight = 250;
-        } else if (adType == CLXAdTypeBanner) {
-            screenWidth = 320;
-            screenHeight = 50;
-        }
-        // For interstitial, rewarded, native: use full screen dimensions
+        // OpenRTB device.w/h should always be full screen pixels, not ad size
+        // Ad format dimensions are handled separately in banner.format array
 
-        // Create banner format
+        // Create banner format with actual ad dimensions
         CLXBiddingConfigImpressionBannerFormat *format = [[CLXBiddingConfigImpressionBannerFormat alloc] init];
-        format.w = @(screenWidth);
-        format.h = @(screenHeight);
+        if (adType == CLXAdTypeMrec) {
+            format.w = @300;
+            format.h = @250;
+        } else if (adType == CLXAdTypeBanner) {
+            format.w = @320;
+            format.h = @50;
+        } else {
+            // For interstitial, rewarded, native: use full screen dimensions
+            format.w = @(screenWidth);
+            format.h = @(screenHeight);
+        }
 
         // Create banner with formats
         CLXBiddingConfigImpressionBanner *banner = [[CLXBiddingConfigImpressionBanner alloc] init];
