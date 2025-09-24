@@ -26,7 +26,7 @@ end
 
 Add this repository URL to your Xcode project:
 ```
-https://github.com/cloudx-xenoss/cloudx-ios
+https://github.com/cloudx-io/cloudx-ios
 ```
 
 ## Components

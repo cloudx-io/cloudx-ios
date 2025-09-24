@@ -3,10 +3,10 @@ Pod::Spec.new do |s|
   s.version          = '1.1.40'
   s.summary          = 'CloudX Core Framework'
   s.description      = 'Core framework for CloudX functionality'
-  s.homepage         = 'https://github.com/cloudx-xenoss/cloudx-ios'
+  s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
   s.license          = { :type => 'Business Source License 1.1', :file => 'core/LICENSE' }
   s.author           = { 'CloudX' => 'support@cloudx.io' }
-  s.source           = { :git => 'https://github.com/cloudx-xenoss/cloudx-ios.git', :tag => "v#{s.version}-core" }
+  s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "v#{s.version}-core" }
   
   s.ios.deployment_target = '14.0'
   

@@ -29,14 +29,14 @@ pod install --repo-update
 
 Import the Swift Package into your XCode project via the following url
 ```bash
-https://github.com/cloudx-xenoss/cloudx-ios
+https://github.com/cloudx-io/cloudx-ios
 ```
 - ⚠️ Meta (FBAudienceNetwork) is **not available via Swift Package Manager**. You must manually download and integrate the **dynamic** (not static) framework.
 - FBAudienceNetwork manual installation instructions are found here [FBAudienceNetwork Installation Instructions](https://developers.facebook.com/docs/audience-network/setting-up/platform-setup/ios/add-sdk) 
 - NOTE: Follow the Project Configuration / Troubleshooting steps in the section below for additional setup setups
 
 ### 📦 Manual  
-1. Navigate to the releases and open the latest release (or whichever release you would like): [Releases](https://github.com/cloudx-xenoss/cloudx-ios/releases)  
+1. Navigate to the releases and open the latest release (or whichever release you would like): [Releases](https://github.com/cloudx-io/cloudx-ios/releases)  
 2. 📥 Download the `CloudXMetaAdapter-v{version}.xcframework.zip` file from the release  
 3. 🗂️ Unzip the download then drag and drop `CloudXMetaAdapter.xcframework` into your XCode project
 4. Follow the Project Configuration / Troubleshooting steps in the section below for additional setup setups
