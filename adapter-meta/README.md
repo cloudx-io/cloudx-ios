@@ -1,83 +1,115 @@
-# ✅ CloudXMetaAdapter
+# CloudX Meta Adapter
+Meta adapter for CloudX Core iOS SDK
 
-CloudXMetaAdapter iOS internal repo. The code is packaged as a framework and then released externally from the following public repo `https://github.com/cloudx-xenoss/CloudXiOSMetaAdapter`
+## Prerequisites
 
-# ✅ CloudXMetaAdapter Release Steps
+- Use Xcode 15.3 or higher  
+- Target iOS 13.0 or higher
+- **iOS 14.5+ Users**: Requires Meta Audience Network SDK 6.2.1+ for proper monetization
+- **Build with Xcode 12+** (iOS SDK 14+) for iOS 14.5+ support
 
-Create the `CloudXMetaAdapter.xcframework.zip` and release it to the public facing repo. Update the podspec and Package.json to support installation via Cocoapods and Swift Package Manager in addition manual download. 
+## 🛠️ Installation
 
-# ✅ Create the framework and zip it up
+### 📦 CocoaPods
 
-Create and zip the framework in this repo from your terminal
+Meta adapter for CloudX SDK is available though [CocoaPods](https://guides.cocoapods.org/using/getting-started.html).
 
-### ✅ 1. Setup
-
-- Navigate to repo `cloudexchange.sdk.ios.metaAdapter`  
-
-If needed, first execute
-```
-chmod +x build_frameworks.sh
-```
-
-Then run the build_frameworks script to create and zip up both a static framework (for pods) and a dynamic framework (for SPM)
-```
-./build_frameworks.sh
+Open your project's `Podfile` and add this line to your app's target
+```ruby
+pod 'CloudXMetaAdapter'
 ```
 
-# ✅ Create the external release
+Install the pod from command line using:
+```bash
+pod install --repo-update
+```
+- Installing via Cocoapods should handle the project configuration, but if you run into any issues building, running, or seeing ads, check the Project Configuration / Troubleshooting steps below
 
-Create a release in the public repo `https://github.com/cloudx-xenoss/CloudXiOSMetaAdapter` by using the framework from the previous steps and then updating the podspec and Package.swift
+### 📦 Swift Package Manager
 
-### ✅ 1. Update `CloudXMetaAdapter.podspec.json`
+Import the Swift Package into your XCode project via the following url
+```bash
+https://github.com/cloudx-xenoss/cloudx-ios
+```
+- ⚠️ Meta (FBAudienceNetwork) is **not available via Swift Package Manager**. You must manually download and integrate the **dynamic** (not static) framework.
+- FBAudienceNetwork manual installation instructions are found here [FBAudienceNetwork Installation Instructions](https://developers.facebook.com/docs/audience-network/setting-up/platform-setup/ios/add-sdk) 
+- NOTE: Follow the Project Configuration / Troubleshooting steps in the section below for additional setup setups
 
-- Set `version`: **1.0.0**  
-- Update `.source.http` to:
+### 📦 Manual  
+1. Navigate to the releases and open the latest release (or whichever release you would like): [Releases](https://github.com/cloudx-xenoss/cloudx-ios/releases)  
+2. 📥 Download the `CloudXMetaAdapter-v{version}.xcframework.zip` file from the release  
+3. 🗂️ Unzip the download then drag and drop `CloudXMetaAdapter.xcframework` into your XCode project
+4. Follow the Project Configuration / Troubleshooting steps in the section below for additional setup setups
 
-```json
-https://github.com/cloudx-xenoss/CloudXiOSMetaAdapter/releases/download/1.0.0/CloudXMetaAdapter.xcframework.zip
+## 📄 Update your Info.plist
+
+### 🚨 Required SKAdNetwork IDs for iOS 14.5+
+
+***Both Meta SKAdNetwork IDs are required for Meta to make bids on iOS 14.5+ devices***
+```xml
+<key>SKAdNetworkItems</key>
+<array>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>v9wttpbfk9.skadnetwork</string>
+    </dict>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>n38lu8286q.skadnetwork</string>
+    </dict>
+</array>
 ```
 
----
+For more information, see [Apple's SKAdNetwork documentation](https://developer.apple.com/documentation/storekit/skadnetwork).
 
-### ✅ 2. Update `Package.swift`
+## ✨ Automatic Features
 
-- Set the URL to:
+The CloudX Meta adapter automatically handles:
 
-```sh
-https://github.com/cloudx-xenoss/CloudXiOSMetaAdapter/releases/download/1.0.0/CloudXMetaAdapter.xcframework.zip
+- ✅ **App Tracking Transparency Integration**: Automatically configures Meta's Advertiser Tracking Enabled (ATE) flag based on your app's ATT permission status
+- ✅ **Bid Token Generation**: Creates Meta bidder tokens for programmatic auction participation  
+- ✅ **Server Reward Validation**: Supports Meta's server-side reward validation for rewarded ads
+- ✅ **iOS 14.5+ Compatibility**: Full support for App Tracking Transparency requirements
+- ✅ **Comprehensive Logging**: Detailed logs for debugging and monitoring ad performance
+
+**No additional configuration required** - the adapter integrates seamlessly with CloudX Core SDK's tracking services.
+
+## 🧰 Project Configuration / Troubleshooting
+
+**1. Linker Flags**  
+Add the following to your project's Other Linker Flags in Build Settings:  
+`-ObjC`
+
+**2. Enable Objective-C Exceptions (Recommended)**
+- Some older versions of Meta SDKs expect Obj-C exceptions to be enabled.
+- Go to Build Settings
+- Set Enable Objective-C Exceptions (GCC_ENABLE_OBJC_EXCEPTIONS) to YES
+
+
+**3. App Transport Security (ATS)**  
+If your app communicates with non-HTTPS servers for ads (less common), update your Info.plist to allow exceptions:  
+```
+<key>NSAppTransportSecurity</key>
+<dict>
+    <key>NSAllowsArbitraryLoads</key>
+    <true/>
+</dict>
+```
+⚠️ *Note: Only do this if absolutely necessary.*
+
+
+**4. NSUserTrackingUsageDescription (iOS 14+)**  
+If your app targets iOS 14+, and you want access to the IDFA, you must add a usage description in your Info.plist:
+```
+<key>NSUserTrackingUsageDescription</key>
+<string>This identifier will be used to deliver personalized ads to you.</string>
 ```
 
-- Compute and update the checksum for Package.swift and SPM:
+**5. Minimum Deployment Target**  
+📱 As of recent versions, Meta SDK requires iOS 11.0+. Set this in your project's deployment target.
 
-```sh
-swift package compute-checksum CloudXMetaAdapter-Dynamic.xcframework.zip
-```
 
-- If CloudXCore version was changed, update it
-```
-.package(url: "https://github.com/cloudx-xenoss/CloudXCoreiOS.git", from: "*.*.*")
-```
+**6. Bitcode (Optional)**  
+🚫 Meta SDK does not support Bitcode. If you're running into issues during archive or validation, disable Bitcode:  
 
----
-
-### ✅ 3. Host in Public GitHub Repo
-
-- Repo: [cloudx-xenoss/CloudXiOSMetaAdapter](https://github.com/cloudx-xenoss/CloudXiOSMetaAdapter)
-- Create a **new Release**
-  - Attach: `CloudXMetaAdapter-Dynamic.xcframework.zip`
-  - Attach: `CloudXMetaAdapter-Static.xcframework.zip`
-  - Check: ✅ *Set as the latest release*
-  - Click **Publish**
-
----
-
-### ✅ 4. Deploy to CocoaPods
-
-```sh
-cd path/to/CloudXiOSMetaAdapter
-pod trunk push
-```
-
-> ⚠️ Make sure that:
-> - `CloudXMetaAdapter.podspec` matches the release version (e.g., **1.0.0**)  
-> - GitHub release **tag** matches `s.version`
+Go to your target → Build Settings → Set **Enable Bitcode** to `NO`.

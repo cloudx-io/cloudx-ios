@@ -1,6 +1,4 @@
 // swift-tools-version: 5.9
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
 import PackageDescription
 
 let package = Package(
@@ -9,27 +7,19 @@ let package = Package(
         .iOS(.v14)
     ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "CloudXMetaAdapter",
-            type: .static,
-            targets: ["CloudXMetaAdapter"]),
+            targets: ["CloudXMetaAdapter"]
+        ),
     ],
     dependencies: [
-        .package(name: "CloudXCore", path: "../cloudexchange.sdk.ios.core"),
+        .package(url: "https://github.com/cloudx-xenoss/cloudx-ios.git", from: "1.1.40")
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        .target(
+        .binaryTarget(
             name: "CloudXMetaAdapter",
-            dependencies: [
-                .product(name: "CloudXCore", package: "CloudXCore")
-            ],
-            path: "Sources/CloudXMetaAdapter",
-            swiftSettings: [
-                .define("SENTRY_STATIC_LIBRARY")
-            ]
+            url: "https://github.com/cloudx-xenoss/cloudx-ios/releases/download/v1.1.25-meta/CloudXMetaAdapter-v1.1.25.xcframework.zip",
+            checksum: "1de4dffd27c735d59de48f2c8205cf209e2accc7ecf0cadcf70f14c9b60c068c"
         )
     ]
 )
