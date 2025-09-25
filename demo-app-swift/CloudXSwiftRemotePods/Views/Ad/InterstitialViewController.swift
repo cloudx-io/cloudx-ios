@@ -3,23 +3,109 @@ import CloudXCore
 
 class InterstitialViewController: BaseAdViewController {
     private var interstitialAd: CLXInterstitial?
-    private var isSDKInitialized = false
+    private var showAdWhenLoaded = false
+    private let settings = UserDefaultsSettings.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupCenteredButton(title: "Show Interstitial", action: #selector(showInterstitialAd))
+        setupUI()
         setupNotifications()
-        
-        // Check if SDK is already initialized
-        isSDKInitialized = cloudX.isInitialised
         updateStatusUI(state: AdState.noAd)
+    }
+    
+    private func setupUI() {
+        // Create a vertical stack for buttons
+        let buttonStack = UIStackView()
+        buttonStack.axis = .vertical
+        buttonStack.spacing = 16
+        buttonStack.alignment = .center
+        buttonStack.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(buttonStack)
+        
+        // Load Interstitial button
+        let loadButton = UIButton(type: .system)
+        loadButton.setTitle("Load Interstitial", for: .normal)
+        loadButton.addTarget(self, action: #selector(loadInterstitialAd), for: .touchUpInside)
+        loadButton.backgroundColor = .systemGreen
+        loadButton.setTitleColor(.white, for: .normal)
+        loadButton.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        loadButton.layer.cornerRadius = 8
+        loadButton.translatesAutoresizingMaskIntoConstraints = false
+        buttonStack.addArrangedSubview(loadButton)
+        
+        // Show Interstitial button
+        let showButton = UIButton(type: .system)
+        showButton.setTitle("Show Interstitial", for: .normal)
+        showButton.addTarget(self, action: #selector(showInterstitialAd), for: .touchUpInside)
+        showButton.backgroundColor = .systemBlue
+        showButton.setTitleColor(.white, for: .normal)
+        showButton.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        showButton.layer.cornerRadius = 8
+        showButton.translatesAutoresizingMaskIntoConstraints = false
+        buttonStack.addArrangedSubview(showButton)
+        
+        // Button constraints
+        NSLayoutConstraint.activate([
+            buttonStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            buttonStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 100),
+            loadButton.widthAnchor.constraint(equalToConstant: 200),
+            loadButton.heightAnchor.constraint(equalToConstant: 44),
+            showButton.widthAnchor.constraint(equalToConstant: 200),
+            showButton.heightAnchor.constraint(equalToConstant: 44)
+        ])
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // Create ad if SDK is already initialized
-        if isSDKInitialized && interstitialAd == nil {
-            createInterstitialAd()
+        // No auto-loading - user must press Load Interstitial button
+    }
+    
+    @objc private func loadInterstitialAd() {
+        if !cloudX.isInitialised {
+            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
+            return
+        }
+        
+        if isLoading {
+            showAlert(title: "Info", message: "Interstitial is already loading.")
+            return
+        }
+        
+        if interstitialAd != nil {
+            showAlert(title: "Info", message: "Interstitial already loaded. Use Show Interstitial to display it.")
+            return
+        }
+        
+        loadInterstitial()
+    }
+    
+    private func loadInterstitial() {
+        if !cloudX.isInitialised {
+            return
+        }
+
+        if isLoading || interstitialAd != nil {
+            return
+        }
+
+        isLoading = true
+        updateStatusUI(state: AdState.loading)
+
+        // Get placement from config manager (with settings override if provided)
+        let originalPlacementName = CLXDemoConfigManager.sharedManager.currentConfig.interstitialPlacement
+        var placement = originalPlacementName
+        if !settings.interstitialPlacement.isEmpty {
+            placement = settings.interstitialPlacement
+        }
+        
+        interstitialAd = cloudX.createInterstitial(withPlacement: placement, delegate: self)
+        
+        if let interstitialAd = interstitialAd {
+            interstitialAd.load()
+        } else {
+            isLoading = false
+            updateStatusUI(state: AdState.noAd)
+            showAlert(title: "Error", message: "Failed to create interstitial.")
         }
     }
     
@@ -72,175 +158,105 @@ class InterstitialViewController: BaseAdViewController {
     }
     
     @objc private func handleSDKInitialized() {
-        isSDKInitialized = true
-        createInterstitialAd()
+        // Don't auto-create - wait for user to press Load Interstitial button
     }
     
-    private func createInterstitialAd() {
-        guard interstitialAd == nil else { return }
-        print("📱 Creating new Interstitial ad instance...")
-        
-        // Ensure SDK is initialized
-        guard cloudX.isInitialised else {
-            print("❌ SDK not initialized yet")
-            showAlert(title: "Error", message: "SDK not initialized yet. Please wait.")
-            return
-        }
-        
-        // Ensure UI operations happen on main thread
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            // Create interstitial ad with verified placement
-            self.interstitialAd = self.cloudX.createInterstitial(withPlacement: "interstitial1", delegate: self)
-            
-            if self.interstitialAd == nil {
-                print("❌ Failed to create Interstitial ad instance")
-                self.showAlert(title: "Error", message: "Failed to create Interstitial ad instance")
-            } else {
-                print("✅ Interstitial ad instance created successfully")
-                // Start polling the ready state
-                self.startPollingReadyState()
-            }
-        }
-    }
-    
-    private func startPollingReadyState() {
-        // Poll every 0.5 seconds to check if the ad is ready
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            guard let self = self,
-                  let ad = self.interstitialAd else { return }
-            
-            if ad.isReady() {
-                print("✅ Ad is now ready from queue")
-                self.updateStatusUI(state: AdState.ready)
-            } else {
-                print("⏳ Ad not ready yet, continuing to poll...")
-                self.updateStatusUI(state: AdState.loading)
-                self.startPollingReadyState()
-            }
-        }
-    }
+    // Remove the old createInterstitialAd and polling methods - they're replaced by loadInterstitial
     
     @objc private func showInterstitialAd() {
-        print("🔄 Starting Interstitial ad load process...")
-        
-        guard isSDKInitialized else {
+        if !cloudX.isInitialised {
             showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
             return
         }
         
-        guard !isLoading else {
-            print("⏳ Already loading an ad, please wait...")
+        guard let interstitialAd = interstitialAd else {
+            showAlert(title: "Error", message: "No interstitial loaded. Please load an interstitial first.")
             return
         }
         
-        // Create a new Interstitial ad instance if needed
-        if interstitialAd == nil {
-            createInterstitialAd()
-        }
-        
-        guard let interstitial = interstitialAd else {
-            showAlert(title: "Error", message: "Failed to create Interstitial ad.")
+        if isLoading {
+            showAlert(title: "Info", message: "Interstitial is still loading. Please wait.")
             return
         }
         
-        // If ad is ready, show it immediately
-        if interstitial.isReady() {
-            print("👀 Ad ready, showing immediately...")
-            interstitial.show(from: self)
-            return
+        if interstitialAd.isReady {
+            interstitialAd.show(from: self)
+        } else {
+            showAlert(title: "Error", message: "Interstitial is not ready. Please try loading again.")
         }
-        
-        isLoading = true
-        updateStatusUI(state: AdState.loading)
-        print("📱 Loading Interstitial ad...")
-        interstitial.load()
     }
     
     private func resetAdState() {
         interstitialAd = nil
         isLoading = false
+        showAdWhenLoaded = false
         updateStatusUI(state: AdState.noAd)
     }
 }
 
 extension InterstitialViewController: CLXInterstitialDelegate {
     func didLoad(with ad: CLXAd) {
-        print("✅ Interstitial ad loaded successfully")
+        DemoAppLogger.sharedInstance.logAdEvent("✅ Interstitial didLoadWithAd", ad: ad)
         isLoading = false
         updateStatusUI(state: AdState.ready)
-        
-        guard let interstitial = ad as? CLXInterstitial else { return }
-        
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            print("👀 Showing Interstitial ad...")
-            interstitial.show(from: self)
-        }
+        // Don't auto-show - wait for user to press Show Interstitial button
     }
     
     func failToLoad(with ad: CLXAd, error: Error) {
-        print("❌ Failed to load Interstitial Ad: \(error)")
+        DemoAppLogger.sharedInstance.logAdEvent("❌ Interstitial failToLoadWithAd", ad: ad)
         isLoading = false
         updateStatusUI(state: AdState.noAd)
         
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            // Check if the error is about no ads being available
             let errorMessage = error.localizedDescription
-            if errorMessage.contains("queue") {
-                self.showAlert(title: "No Ads Available", 
-                             message: "Please wait a moment and try again. New ads are being loaded.")
-            } else {
-                self.showAlert(title: "Ad Load Error", message: errorMessage)
-            }
-            
-            self.interstitialAd = nil
-            // Create new ad instance for next time
-            self.createInterstitialAd()
+            self?.showAlert(title: "Interstitial Ad Error", message: errorMessage)
+            self?.interstitialAd = nil
         }
     }
     
     func didShow(with ad: CLXAd) {
-        print("👀 Interstitial ad did show")
+        DemoAppLogger.sharedInstance.logAdEvent("👀 Interstitial didShowWithAd", ad: ad)
     }
     
     func failToShow(with ad: CLXAd, error: Error) {
-        print("❌ Interstitial ad fail to show: \(error)")
+        DemoAppLogger.sharedInstance.logAdEvent("❌ Interstitial failToShowWithAd", ad: ad)
         updateStatusUI(state: AdState.noAd)
         
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.interstitialAd = nil
-            self.showAlert(title: "Ad Show Error", message: error.localizedDescription)
-            // Create new ad instance for next time
-            self.createInterstitialAd()
+            self?.interstitialAd = nil
+            let errorMessage = error.localizedDescription
+            self?.showAlert(title: "Interstitial Ad Error", message: errorMessage)
         }
     }
     
     func didHide(with ad: CLXAd) {
-        print("🔚 Interstitial ad did hide")
+        DemoAppLogger.sharedInstance.logAdEvent("🔚 Interstitial didHideWithAd", ad: ad)
+        
+        showAdWhenLoaded = false
         interstitialAd = nil
-        // Create new ad instance for next time
-        createInterstitialAd()
+        
+        // Don't auto-load - user must press Load Interstitial button
         updateStatusUI(state: AdState.noAd)
     }
     
     func didClick(with ad: CLXAd) {
-        print("👆 Interstitial ad did click")
+        DemoAppLogger.sharedInstance.logAdEvent("👆 Interstitial didClickWithAd", ad: ad)
     }
     
     func impression(on ad: CLXAd) {
-        print("👁️ Interstitial ad impression recorded")
+        DemoAppLogger.sharedInstance.logAdEvent("👁️ Interstitial impressionOn", ad: ad)
+    }
+    
+    func revenuePaid(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("💰 Interstitial revenuePaid", ad: ad)
     }
     
     func closedByUserAction(with ad: CLXAd) {
-        print("✋ Interstitial ad closed by user action")
+        DemoAppLogger.sharedInstance.logMessage("✋ Interstitial closedByUserActionWithAd - Ad: \(ad)")
+        showAdWhenLoaded = false
         interstitialAd = nil
         // Create new ad instance for next time
-        createInterstitialAd()
+        loadInterstitial()
         updateStatusUI(state: AdState.noAd)
     }
 } 

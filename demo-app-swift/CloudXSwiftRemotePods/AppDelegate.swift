@@ -6,31 +6,42 @@
 //
 
 import UIKit
+import CloudXCore
+import AppTrackingTransparency
+import AdSupport
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        // Check all loaded classes for CloudX prefix
-        let classes = objc_getClassList(nil, 0)
-        let buffer = UnsafeMutablePointer<AnyClass>.allocate(capacity: Int(classes))
-        defer { buffer.deallocate() }
+        // Request App Tracking Transparency permission
+        requestAppTrackingTransparencyPermission()
         
-        let autoreleasingBuffer = AutoreleasingUnsafeMutablePointer<AnyClass>(buffer)
-        let count = Int(objc_getClassList(autoreleasingBuffer, classes))
-        
-        print("\n[DEBUG] All CloudX classes found:")
-        for i in 0..<count {
-            let className = NSStringFromClass(buffer[i])
-            if className.contains("CloudX") {
-                print("[DEBUG] Found class: \(className)")
+        return true
+    }
+    
+    private func requestAppTrackingTransparencyPermission() {
+        // iOS 14+ ATT compliance
+        if #available(iOS 14, *) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                ATTrackingManager.requestTrackingAuthorization { status in
+                    switch status {
+                    case .authorized:
+                        DemoAppLogger.sharedInstance.logMessage("App Tracking authorized")
+                    case .denied:
+                        DemoAppLogger.sharedInstance.logMessage("App Tracking denied")
+                    case .notDetermined:
+                        DemoAppLogger.sharedInstance.logMessage("App Tracking not determined")
+                    case .restricted:
+                        DemoAppLogger.sharedInstance.logMessage("App Tracking restricted")
+                    @unknown default:
+                        break
+                    }
+                }
             }
         }
-        return true
     }
 
     // MARK: UISceneSession Lifecycle

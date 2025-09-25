@@ -6,11 +6,7 @@ extension Notification.Name {
 }
 
 class InitViewController: BaseAdViewController {
-    override var appKey: String? {
-       // return "1c3589a1-rgto-4573-zdae-644c65074537"
-       return "qT9U-tJ0FRb0x4gXb-pF0"
-    //    return "BwWU3Z8kHZrnAx-cBPMHw"
-    }
+    // Uses appKey from BaseAdViewController (CLXDemoConfigManager)
     
     override func viewDidLoad() {
         super.viewDidLoad()

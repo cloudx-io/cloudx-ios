@@ -1,26 +1,59 @@
 import UIKit
 import CloudXCore
 
-class RewardedViewController: BaseAdViewController {
+class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
+    
     private var rewardedAd: CLXRewardedInterstitial?
-    private var isSDKInitialized = false
+    private let settings = UserDefaultsSettings.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupCenteredButton(title: "Show Rewarded", action: #selector(showRewardedAd))
-        setupNotifications()
+        self.title = "Rewarded"
         
-        // Check if SDK is already initialized
-        isSDKInitialized = cloudX.isInitialised
-        updateStatusUI(state: AdState.noAd)
+        // Create a vertical stack for buttons
+        let buttonStack = UIStackView()
+        buttonStack.axis = .vertical
+        buttonStack.spacing = 16
+        buttonStack.alignment = .center
+        buttonStack.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(buttonStack)
+        
+        // Load Rewarded button
+        let loadButton = UIButton(type: .system)
+        loadButton.setTitle("Load Rewarded", for: .normal)
+        loadButton.addTarget(self, action: #selector(loadRewardedAd), for: .touchUpInside)
+        loadButton.backgroundColor = .systemGreen
+        loadButton.setTitleColor(.white, for: .normal)
+        loadButton.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        loadButton.layer.cornerRadius = 8
+        loadButton.translatesAutoresizingMaskIntoConstraints = false
+        buttonStack.addArrangedSubview(loadButton)
+        
+        // Show Rewarded button
+        let showButton = UIButton(type: .system)
+        showButton.setTitle("Show Rewarded", for: .normal)
+        showButton.addTarget(self, action: #selector(showRewardedAd), for: .touchUpInside)
+        showButton.backgroundColor = .systemBlue
+        showButton.setTitleColor(.white, for: .normal)
+        showButton.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        showButton.layer.cornerRadius = 8
+        showButton.translatesAutoresizingMaskIntoConstraints = false
+        buttonStack.addArrangedSubview(showButton)
+        
+        // Button constraints
+        NSLayoutConstraint.activate([
+            buttonStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            buttonStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 100),
+            loadButton.widthAnchor.constraint(equalToConstant: 200),
+            loadButton.heightAnchor.constraint(equalToConstant: 44),
+            showButton.widthAnchor.constraint(equalToConstant: 200),
+            showButton.heightAnchor.constraint(equalToConstant: 44)
+        ])
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // Create ad if SDK is already initialized
-        if isSDKInitialized && rewardedAd == nil {
-            createRewardedAd()
-        }
+        // No auto-loading - user must press Load Rewarded button
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -32,240 +65,230 @@ class RewardedViewController: BaseAdViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    private enum AdState {
-        case noAd
-        case loading
-        case ready
-        
-        var text: String {
-            switch self {
-            case .noAd: return "No Ad Loaded"
-            case .loading: return "Loading Ad..."
-            case .ready: return "Ad Ready"
-            }
+    private var placementName: String {
+        return CLXDemoConfigManager.sharedManager.currentConfig.rewardedPlacement
+    }
+    
+    @objc private func loadRewardedAd() {
+        if !CloudXCore.shared.isInitialised {
+            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
+            return
         }
         
-        var color: UIColor {
-            switch self {
-            case .noAd: return .systemRed
-            case .loading: return .systemYellow
-            case .ready: return .systemGreen
-            }
+        if isLoading {
+            showAlert(title: "Info", message: "Rewarded ad is already loading.")
+            return
+        }
+        
+        if rewardedAd != nil {
+            showAlert(title: "Info", message: "Rewarded ad already loaded. Use Show Rewarded to display it.")
+            return
+        }
+        
+        loadRewarded()
+    }
+    
+    private func loadRewarded() {
+        print("[RewardedViewController] loadRewarded called")
+        if !CloudXCore.shared.isInitialised {
+            print("[RewardedViewController] SDK not initialized")
+            return
+        }
+
+        if isLoading || rewardedAd != nil {
+            print("[RewardedViewController] Rewarded ad process already started")
+            return
+        }
+
+        print("[RewardedViewController] Starting rewarded ad load process...")
+        isLoading = true
+        updateStatusUI(state: .loading)
+
+        var placement = placementName
+        if !settings.rewardedPlacement.isEmpty {
+            placement = settings.rewardedPlacement
+        }
+        print("[RewardedViewController] Using placement: \(placement)")
+        
+        // Log SDK configuration details
+        print("[RewardedViewController] SDK initialization status: \(CloudXCore.shared.isInitialised)")
+        
+        // Create rewarded with comprehensive logging
+        print("[RewardedViewController] Calling createRewardedWithPlacement: \(placement)")
+        rewardedAd = CloudXCore.shared.createRewarded(withPlacement: placement, delegate: self)
+        
+        if let rewardedAd = rewardedAd {
+            print("[RewardedViewController] ✅ Rewarded ad instance created successfully: \(rewardedAd)")
+            print("[RewardedViewController] Loading rewarded ad instance...")
+            rewardedAd.load()
+        } else {
+            print("[RewardedViewController] ❌ Failed to create rewarded with placement: \(placement)")
+            isLoading = false
+            updateStatusUI(state: .noAd)
+            showAlert(title: "Error", message: "Failed to create rewarded ad.")
         }
     }
     
-    private func updateStatusUI(state: AdState) {
-        DispatchQueue.main.async { [weak self] in
-            self?.statusLabel.text = state.text
-            self?.statusLabel.textColor = state.color
-            self?.statusIndicator.backgroundColor = state.color
-        }
-    }
-    
-    private func setupNotifications() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleSDKInitialized),
-            name: .sdkInitialized,
-            object: nil
-        )
-    }
-    
-    @objc private func handleSDKInitialized() {
-        isSDKInitialized = true
-        createRewardedAd()
+    private func resetAdState() {
+        rewardedAd = nil
+        isLoading = false
     }
     
     private func createRewardedAd() {
         guard rewardedAd == nil else { return }
-        print("📱 Creating new Rewarded ad instance...")
-        
-        // Ensure SDK is initialized
-        guard cloudX.isInitialised else {
-            print("❌ SDK not initialized yet")
-            showAlert(title: "Error", message: "SDK not initialized yet. Please wait.")
-            return
-        }
-        
-        // Ensure UI operations happen on main thread
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            // Create rewarded ad with verified placement
-            self.rewardedAd = self.cloudX.createRewarded(withPlacement: "rewarded1", delegate: self)
-            
-            if self.rewardedAd == nil {
-                print("❌ Failed to create Rewarded ad instance")
-                self.showAlert(title: "Error", message: "Failed to create Rewarded ad instance")
-            } else {
-                print("✅ Rewarded ad instance created successfully")
-                // Start polling the ready state
-                self.startPollingReadyState()
-            }
+        let placement = placementName
+        print("[RewardedViewController] Creating new Rewarded ad instance with placement: \(placement)")
+        rewardedAd = CloudXCore.shared.createRewarded(withPlacement: placement, delegate: self)
+        if let rewardedAd = rewardedAd {
+            print("✅ Rewarded ad instance created successfully: \(rewardedAd)")
+            startPollingReadyState()
+        } else {
+            print("❌ Failed to create rewarded ad instance for placement: \(placement)")
         }
     }
     
     private func startPollingReadyState() {
         // Poll every 0.5 seconds to check if the ad is ready
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            guard let self = self,
-                  let ad = self.rewardedAd else { return }
+            guard let self = self else { return }
             
-            if ad.isReady() {
+            guard let rewardedAd = self.rewardedAd else {
+                print("❌ No rewarded ad instance available for polling")
+                return
+            }
+            
+            print("🔍 Checking ad ready state...")
+            if rewardedAd.isReady {
                 print("✅ Ad is now ready from queue")
-                self.updateStatusUI(state: AdState.ready)
+                self.isLoading = false
+                self.updateStatusUI(state: .ready)
+                // Do NOT show the ad here!
+                return
             } else {
                 print("⏳ Ad not ready yet, continuing to poll...")
-                self.updateStatusUI(state: AdState.loading)
+                self.isLoading = true
+                self.updateStatusUI(state: .loading)
                 self.startPollingReadyState()
             }
         }
     }
     
     @objc private func showRewardedAd() {
-        print("🔄 Starting Rewarded ad load process...")
+        print("🔄 [RewardedViewController] showRewardedAd called")
+        print("📊 [RewardedViewController] Current state:")
+        print("📊 [RewardedViewController] - isLoading: \(isLoading)")
+        print("📊 [RewardedViewController] - rewardedAd: \(String(describing: rewardedAd))")
+        print("📊 [RewardedViewController] - rewardedAd.isReady: \(rewardedAd?.isReady ?? false)")
         
-        guard isSDKInitialized else {
-            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
-            return
-        }
-        
-        guard !isLoading else {
-            print("⏳ Already loading an ad, please wait...")
-            return
-        }
-        
-        // Create a new Rewarded ad instance if needed
-        if rewardedAd == nil {
-            createRewardedAd()
-        }
-        
-        guard let rewarded = rewardedAd else {
-            showAlert(title: "Error", message: "Failed to create Rewarded ad.")
+        if isLoading {
+            print("⏳ [RewardedViewController] Already loading an ad, please wait...")
             return
         }
         
         // If ad is ready, show it immediately
-        if rewarded.isReady() {
-            print("👀 Ad ready, showing immediately...")
-            rewarded.show(from: self)
+        if let rewardedAd = rewardedAd, rewardedAd.isReady {
+            print("👀 [RewardedViewController] Ad ready, showing immediately...")
+            print("📊 [RewardedViewController] Calling showFromViewController on: \(rewardedAd)")
+            rewardedAd.show(from: self)
             return
         }
         
-        isLoading = true
-        updateStatusUI(state: AdState.loading)
-        print("📱 Loading Rewarded ad...")
-        rewarded.load()
-    }
-    
-    private func resetAdState() {
-        rewardedAd = nil
-        isLoading = false
-        updateStatusUI(state: AdState.noAd)
-    }
-}
-
-extension RewardedViewController: CLXRewardedDelegate {
-    func didLoad(with ad: CLXAd) {
-        print("✅ Rewarded ad loaded successfully")
-        isLoading = false
-        updateStatusUI(state: AdState.ready)
+        // If no ad instance or not ready, create a new one
+        if rewardedAd == nil {
+            print("📱 [RewardedViewController] No ad instance found, creating new one...")
+            createRewardedAd()
+        }
         
-        guard let rewarded = ad as? CLXRewardedInterstitial else { return }
+        guard let rewardedAd = rewardedAd else {
+            print("❌ [RewardedViewController] Failed to create Rewarded ad instance")
+            showAlert(title: "Error", message: "Failed to create Rewarded ad.")
+            return
+        }
         
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            print("👀 Showing Rewarded ad...")
-            rewarded.show(from: self)
+        // If we have an ad but it's not ready, start loading
+        if !rewardedAd.isReady {
+            print("📱 [RewardedViewController] Ad not ready, starting load...")
+            isLoading = true
+            rewardedAd.load()
         }
     }
     
-    func failToLoad(with ad: CLXAd, error: Error) {
-        print("❌ Failed to load Rewarded Ad: \(error)")
+    // MARK: - CLXRewardedDelegate
+    
+    func didLoad(with ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("✅ Rewarded didLoadWithAd", ad: ad)
         isLoading = false
-        updateStatusUI(state: AdState.noAd)
+        updateStatusUI(state: .ready)
+        // Do NOT show the ad here!
+    }
+    
+    func failToLoad(with ad: CLXAd, error: Error) {
+        DemoAppLogger.sharedInstance.logMessage("❌ Rewarded failToLoadWithAd - Error: \(error.localizedDescription)")
+        isLoading = false
+        updateStatusUI(state: .noAd)
         
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            // Check if the error is about no ads being available
             let errorMessage = error.localizedDescription
-            if errorMessage.contains("queue") {
-                self.showAlert(title: "No Ads Available", 
-                             message: "Please wait a moment and try again. New ads are being loaded.")
-            } else {
-                self.showAlert(title: "Ad Load Error", message: errorMessage)
-            }
-            
-            self.rewardedAd = nil
-            // Create new ad instance for next time
-            self.createRewardedAd()
+            self?.showAlert(title: "Rewarded Ad Error", message: errorMessage)
+            self?.rewardedAd = nil
         }
     }
     
     func didShow(with ad: CLXAd) {
-        print("👀 Rewarded ad did show")
+        DemoAppLogger.sharedInstance.logMessage("👀 Rewarded didShowWithAd - Ad: \(ad)")
     }
     
     func failToShow(with ad: CLXAd, error: Error) {
-        print("❌ Rewarded ad fail to show: \(error)")
-        updateStatusUI(state: AdState.noAd)
+        DemoAppLogger.sharedInstance.logMessage("❌ Rewarded failToShowWithAd - Error: \(error.localizedDescription)")
+        updateStatusUI(state: .noAd)
         
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.rewardedAd = nil
-            self.showAlert(title: "Ad Show Error", message: error.localizedDescription)
-            // Create new ad instance for next time
-            self.createRewardedAd()
+            self?.rewardedAd = nil
+            let errorMessage = error.localizedDescription
+            self?.showAlert(title: "Rewarded Ad Error", message: errorMessage)
         }
     }
     
     func didHide(with ad: CLXAd) {
-        print("🔚 Rewarded ad did hide")
+        DemoAppLogger.sharedInstance.logMessage("🔚 Rewarded didHideWithAd - Ad: \(ad)")
         rewardedAd = nil
         // Create new ad instance for next time
         createRewardedAd()
-        updateStatusUI(state: AdState.noAd)
+        updateStatusUI(state: .noAd)
     }
     
     func didClick(with ad: CLXAd) {
-        print("👆 Rewarded ad did click")
+        DemoAppLogger.sharedInstance.logMessage("👆 Rewarded didClickWithAd - Ad: \(ad)")
     }
     
     func impression(on ad: CLXAd) {
-        print("👁️ Rewarded ad impression recorded")
+        DemoAppLogger.sharedInstance.logMessage("👁️ Rewarded impressionOn - Ad: \(ad)")
+    }
+    
+    func revenuePaid(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("💰 Rewarded revenuePaid", ad: ad)
     }
     
     func closedByUserAction(with ad: CLXAd) {
-        print("✋ Rewarded ad closed by user action")
+        DemoAppLogger.sharedInstance.logMessage("✋ Rewarded closedByUserActionWithAd - Ad: \(ad)")
         rewardedAd = nil
         // Create new ad instance for next time
         createRewardedAd()
-        updateStatusUI(state: AdState.noAd)
+        updateStatusUI(state: .noAd)
     }
     
-    // Rewarded-specific callbacks
     func userRewarded(_ ad: CLXAd) {
-        print("🎁 User earned reward!")
-        // Handle reward here
-        showRewardDialog()
+        DemoAppLogger.sharedInstance.logMessage("🎁 Rewarded userRewarded - Ad: \(ad)")
+        DispatchQueue.main.async { [weak self] in
+            self?.showAlert(title: "Reward", message: "User has earned a reward!")
+        }
     }
     
     func rewardedVideoStarted(_ ad: CLXAd) {
-        print("▶️ Rewarded video started")
+        DemoAppLogger.sharedInstance.logMessage("▶️ Rewarded rewardedVideoStarted - Ad: \(ad)")
     }
     
     func rewardedVideoCompleted(_ ad: CLXAd) {
-        print("✅ Rewarded video completed")
+        DemoAppLogger.sharedInstance.logMessage("✅ Rewarded rewardedVideoCompleted - Ad: \(ad)")
     }
-    
-    private func showRewardDialog() {
-        let alert = UIAlertController(title: "Reward Earned!",
-                                    message: "You earned a reward!",
-                                    preferredStyle: .alert)
-        
-        let okAction = UIAlertAction(title: "OK", style: .default)
-        alert.addAction(okAction)
-        present(alert, animated: true)
-    }
-} 
+}

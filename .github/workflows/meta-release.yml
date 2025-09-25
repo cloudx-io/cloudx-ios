@@ -91,7 +91,7 @@ jobs:
           sed -i '' "s|url: \".*CloudXMetaAdapter.*\",|url: \"https://github.com/cloudx-io/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip\",|" Package.swift
           sed -i '' "s|checksum: \".*\"|checksum: \"${{ steps.checksum.outputs.checksum }}\"|" Package.swift
 
-      - name: 📊 Create GitHub release
+      - name: 📊 Create GitHub release (step 1 - empty release)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -117,11 +117,22 @@ jobs:
           ${{ steps.checksum.outputs.checksum }}
           EOF
           
+          # Create empty release first (two-step process for better CDN propagation)
           gh release create "$FULL_VERSION" \
-            adapter-meta/CloudXMetaAdapter-v$VERSION.xcframework.zip \
             --title "CloudXMetaAdapter v$VERSION" \
             --notes-file release_notes.md \
             --latest
+
+      - name: 📦 Upload xcframework to release (step 2 - file upload)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          # Upload the xcframework file to the existing release
+          gh release upload "$FULL_VERSION" \
+            adapter-meta/CloudXMetaAdapter-v$VERSION.xcframework.zip
 
       - name: 💤 Wait for .xcframework.zip to be globally available
         run: |

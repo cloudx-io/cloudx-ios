@@ -18,13 +18,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
-        DispatchQueue.main.async {
-            let window = UIWindow(windowScene: windowScene)
-            let adDemoTabVC = AdDemoTabViewController()
-            window.rootViewController = adDemoTabVC
-            self.window = window
-            window.makeKeyAndVisible()
-        }
+        self.window = UIWindow(windowScene: windowScene)
+        let rootVC = AdDemoTabViewController()
+        self.window?.rootViewController = rootVC
+        self.window?.makeKeyAndVisible()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

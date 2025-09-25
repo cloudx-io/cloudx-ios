@@ -1,26 +1,68 @@
 import UIKit
 import CloudXCore
 
-class NativeViewController: BaseAdViewController {
+class NativeViewController: BaseAdViewController, CLXNativeDelegate {
+    
     private var nativeAd: CLXNativeAdView?
-    private var isSDKInitialized = false
+    private var adContainerView: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupCenteredButton(title: "Show Native", action: #selector(showNativeAd))
-        setupNotifications()
+        self.title = "Native"
         
-        // Check if SDK is already initialized
-        isSDKInitialized = cloudX.isInitialised
-        updateStatusUI(state: .noAd)
+        // Create a vertical stack container for button and ad
+        let mainStack = UIStackView()
+        mainStack.axis = .vertical
+        mainStack.spacing = 24
+        mainStack.alignment = .center
+        mainStack.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(mainStack)
+        
+        // Load Native button
+        let loadButton = UIButton(type: .system)
+        loadButton.setTitle("Load Native", for: .normal)
+        loadButton.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        loadButton.backgroundColor = .systemGreen
+        loadButton.setTitleColor(.white, for: .normal)
+        loadButton.layer.cornerRadius = 8
+        loadButton.translatesAutoresizingMaskIntoConstraints = false
+        loadButton.addTarget(self, action: #selector(loadNativeAd), for: .touchUpInside)
+        mainStack.addArrangedSubview(loadButton)
+        loadButton.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        loadButton.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        
+        // Show Native button
+        let showButton = UIButton(type: .system)
+        showButton.setTitle("Show Native", for: .normal)
+        showButton.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        showButton.backgroundColor = .systemBlue
+        showButton.setTitleColor(.white, for: .normal)
+        showButton.layer.cornerRadius = 8
+        showButton.translatesAutoresizingMaskIntoConstraints = false
+        showButton.addTarget(self, action: #selector(showNativeAd), for: .touchUpInside)
+        mainStack.addArrangedSubview(showButton)
+        showButton.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        showButton.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        
+        // Create container view for the ad
+        adContainerView = UIView()
+        adContainerView.backgroundColor = .lightGray
+        adContainerView.layer.cornerRadius = 8
+        adContainerView.translatesAutoresizingMaskIntoConstraints = false
+        mainStack.addArrangedSubview(adContainerView)
+        adContainerView.widthAnchor.constraint(equalToConstant: view.frame.size.width - 40).isActive = true
+        adContainerView.heightAnchor.constraint(equalToConstant: 250).isActive = true
+        
+        // Center the stack view vertically in the parent view
+        NSLayoutConstraint.activate([
+            mainStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            mainStack.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // Create ad if SDK is already initialized
-        if isSDKInitialized && nativeAd == nil {
-            createNativeAd()
-        }
+        // No auto-loading - user must press Load Native button
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -30,126 +72,152 @@ class NativeViewController: BaseAdViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+        // Ensure cleanup even if viewWillDisappear wasn't called
+        resetAdState()
     }
     
-    private func setupNotifications() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleSDKInitialized),
-            name: .sdkInitialized,
-            object: nil
-        )
+    private var placementName: String {
+        return CLXDemoConfigManager.sharedManager.currentConfig.nativePlacement
     }
     
-    @objc private func handleSDKInitialized() {
-        isSDKInitialized = true
-        createNativeAd()
-    }
-    
-    private func createNativeAd() {
-        guard nativeAd == nil else { return }
-        print("📱 Creating new Native ad instance...")
-        
-        // Create native ad with verified placement
-        let placementName = "native1"
-        nativeAd = cloudX.createNativeAd(withPlacement: placementName, viewController: self, delegate: self)
-        
-        if nativeAd == nil {
-            print("❌ Failed to create Native ad instance")
-            showAlert(title: "Error", message: "Failed to create Native ad instance")
-        } else {
-            print("✅ Native ad instance created successfully")
-        }
-    }
-    
-    @objc private func showNativeAd() {
-        print("🔄 Starting native ad load process...")
-        
-        guard isSDKInitialized else {
+    @objc private func loadNativeAd() {
+        if !CloudXCore.shared.isInitialised {
             showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
             return
         }
         
-        guard !isLoading else {
-            print("⏳ Already loading an ad, please wait...")
+        if isLoading {
+            showAlert(title: "Info", message: "Native ad is already loading.")
             return
         }
         
-        guard let native = nativeAd else {
-            showAlert(title: "Error", message: "Failed to create native ad.")
+        if nativeAd != nil {
+            showAlert(title: "Info", message: "Native ad already loaded. Use Show Native to display it.")
             return
         }
         
-        // Add to view hierarchy
-        native.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(native)
-        NSLayoutConstraint.activate([
-            native.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            native.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            native.widthAnchor.constraint(equalToConstant: 300),
-            native.heightAnchor.constraint(equalToConstant: 200)
-        ])
-        
+        loadNative()
+    }
+    
+    private func loadNative() {
+        if !CloudXCore.shared.isInitialised {
+            return
+        }
+
+        if isLoading || nativeAd != nil {
+            return
+        }
+
         isLoading = true
         updateStatusUI(state: .loading)
-        print("📱 Loading native ad...")
-        native.load()
+
+        let placement = placementName
+        nativeAd = CloudXCore.shared.createNativeAd(withPlacement: placement,
+                                                   viewController: self,
+                                                   delegate: self)
+        
+        if let nativeAd = nativeAd {
+            nativeAd.load()
+        } else {
+            isLoading = false
+            updateStatusUI(state: .noAd)
+            showAlert(title: "Error", message: "Failed to create native ad.")
+        }
+    }
+    
+    @objc private func showNativeAd() {
+        if !CloudXCore.shared.isInitialised {
+            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
+            return
+        }
+        
+        guard let nativeAd = nativeAd else {
+            showAlert(title: "Error", message: "No native ad loaded. Please load a native ad first.")
+            return
+        }
+        
+        if isLoading {
+            showAlert(title: "Info", message: "Native ad is still loading. Please wait.")
+            return
+        }
+        
+        if !nativeAd.isReady {
+            showAlert(title: "Error", message: "Native ad is not ready. Please try loading again.")
+            return
+        }
+        
+        // Remove any existing ad view
+        adContainerView.subviews.forEach { $0.removeFromSuperview() }
+        
+        // Add the native ad view to the container
+        nativeAd.frame = adContainerView.bounds
+        adContainerView.addSubview(nativeAd)
     }
     
     private func resetAdState() {
-        nativeAd?.removeFromSuperview()
-        nativeAd = nil
-        isLoading = false
-        updateStatusUI(state: .noAd)
+        if let nativeAd = nativeAd {
+            // CRITICAL: Properly destroy the native ad to stop background processing
+            nativeAd.destroy()
+            nativeAd.removeFromSuperview()
+            self.nativeAd = nil
+        }
     }
-}
-
-extension NativeViewController: CLXNativeDelegate {
+    
+    // MARK: - CLXNativeDelegate
+    
     func didLoad(with ad: CLXAd) {
-        print("✅ Native ad loaded successfully")
-        isLoading = false
-        updateStatusUI(state: .ready)
+        DemoAppLogger.sharedInstance.logAdEvent("✅ Native didLoadWithAd", ad: ad)
+        DispatchQueue.main.async { [weak self] in
+            self?.isLoading = false
+            self?.updateStatusUI(state: .ready)
+        }
+        
+        // Don't auto-show - user must press Show Native button
     }
     
     func failToLoad(with ad: CLXAd, error: Error) {
-        print("❌ Failed to load Native Ad: \(error)")
-        isLoading = false
-        updateStatusUI(state: .noAd)
-        nativeAd = nil
+        DemoAppLogger.sharedInstance.logAdEvent("❌ Native failToLoadWithAd", ad: ad)
         
         DispatchQueue.main.async { [weak self] in
-            self?.showAlert(title: "Ad Load Error", message: error.localizedDescription)
+            self?.nativeAd = nil
+            let errorMessage = error.localizedDescription
+            self?.showAlert(title: "Native Ad Error", message: errorMessage)
         }
     }
     
     func didShow(with ad: CLXAd) {
-        print("👀 Native ad did show")
+        DemoAppLogger.sharedInstance.logAdEvent("👀 Native didShowWithAd", ad: ad)
     }
     
     func failToShow(with ad: CLXAd, error: Error) {
-        print("❌ Native ad fail to show: \(error)")
-        nativeAd = nil
+        DemoAppLogger.sharedInstance.logAdEvent("❌ Native failToShowWithAd", ad: ad)
         
         DispatchQueue.main.async { [weak self] in
-            self?.showAlert(title: "Ad Show Error", message: error.localizedDescription)
+            self?.nativeAd = nil
+            let errorMessage = error.localizedDescription
+            self?.showAlert(title: "Native Ad Error", message: errorMessage)
         }
     }
     
     func didHide(with ad: CLXAd) {
-        print("🔚 Native ad did hide")
+        DemoAppLogger.sharedInstance.logAdEvent("🔚 Native didHideWithAd", ad: ad)
         nativeAd = nil
     }
     
     func didClick(with ad: CLXAd) {
-        print("👆 Native ad did click")
+        DemoAppLogger.sharedInstance.logAdEvent("👆 Native didClickWithAd", ad: ad)
     }
     
     func impression(on ad: CLXAd) {
-        print("👁️ Native ad impression recorded")
+        DemoAppLogger.sharedInstance.logAdEvent("👁️ Native impressionOn", ad: ad)
+    }
+    
+    func revenuePaid(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("💰 Native revenuePaid", ad: ad)
     }
     
     func closedByUserAction(with ad: CLXAd) {
-        print("✋ Native ad closed by user action")
+        DemoAppLogger.sharedInstance.logAdEvent("✋ Native closedByUserActionWithAd", ad: ad)
         nativeAd = nil
     }
-} 
+}
