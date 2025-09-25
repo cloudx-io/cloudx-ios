@@ -41,7 +41,9 @@ xcodebuild archive \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
   CODE_SIGNING_ALLOWED=NO \
   MACH_O_TYPE=staticlib \
-  IPHONEOS_DEPLOYMENT_TARGET=13.0 || print_error "Failed to build static framework for device."
+  IPHONEOS_DEPLOYMENT_TARGET=14.0 \
+  HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources' \
+  USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources' 2>&1 | tee xcodebuild-ios.log || print_error "Failed to build static framework for device."
 
 # --- Step 3: Build Static Framework for Simulator ---
 print_status "3. Building Static Framework for Simulator..."
@@ -55,7 +57,9 @@ xcodebuild archive \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
   CODE_SIGNING_ALLOWED=NO \
   MACH_O_TYPE=staticlib \
-  IPHONEOS_DEPLOYMENT_TARGET=13.0 || print_error "Failed to build static framework for simulator."
+  IPHONEOS_DEPLOYMENT_TARGET=14.0 \
+  HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources' \
+  USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources' 2>&1 | tee xcodebuild-sim.log || print_error "Failed to build static framework for simulator."
 
 # --- Step 4: Create .xcframework ---
 print_status "4. Creating .xcframework..."
