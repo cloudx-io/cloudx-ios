@@ -14,9 +14,6 @@ jobs:
       COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
 
     steps:
-      - name: 𝔠 Switch to Xcode 16.1
-        run: sudo xcode-select -s /Applications/Xcode_16.1.app
-
       - name: 🗖 Checkout repo
         uses: actions/checkout@v4
 
@@ -57,7 +54,7 @@ jobs:
       - name: 🧪 Validate podspec
         run: |
           cd core
-          pod spec lint CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests
+          pod spec lint CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests --no-clean
 
       - name: 📤 Push podspec to CocoaPods trunk
         run: |
@@ -66,7 +63,7 @@ jobs:
           cd core
 
           for i in {1..5}; do
-            pod trunk push CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests && break
+            pod trunk push CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests --no-clean && break
             echo "Pod trunk push failed. Retrying in 30 seconds... ($i/5)"
             sleep 30
           done
