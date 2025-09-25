@@ -64,6 +64,7 @@ class BaseAdViewController: UIViewController, AdStateManaging {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupStatusUI()
+        setupShowLogsButton()
         updateStatusUI(state: .noAd)
     }
     
@@ -140,5 +141,31 @@ class BaseAdViewController: UIViewController, AdStateManaging {
             button.widthAnchor.constraint(equalToConstant: 200),
             button.heightAnchor.constraint(equalToConstant: 44)
         ])
+    }
+    
+    func setupShowLogsButton() {
+        let showLogsButton = UIButton(type: .system)
+        showLogsButton.setTitle("Show Logs", for: .normal)
+        showLogsButton.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        showLogsButton.backgroundColor = UIColor.systemOrange
+        showLogsButton.setTitleColor(UIColor.white, for: .normal)
+        showLogsButton.layer.cornerRadius = 6
+        showLogsButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        showLogsButton.addTarget(self, action: #selector(showLogsModal), for: .touchUpInside)
+        
+        view.addSubview(showLogsButton)
+        
+        NSLayoutConstraint.activate([
+            showLogsButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            showLogsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            showLogsButton.widthAnchor.constraint(equalToConstant: 100),
+            showLogsButton.heightAnchor.constraint(equalToConstant: 32)
+        ])
+    }
+    
+    @objc private func showLogsModal() {
+        let logsModal = LogsModalViewController(title: "Demo App Logs")
+        present(logsModal, animated: true)
     }
 } 

@@ -111,7 +111,7 @@ class InterstitialViewController: BaseAdViewController {
             guard let self = self,
                   let ad = self.interstitialAd else { return }
             
-            if ad.isReady() {
+            if ad.isReady {
                 print("✅ Ad is now ready from queue")
                 self.updateStatusUI(state: AdState.ready)
             } else {
@@ -146,7 +146,7 @@ class InterstitialViewController: BaseAdViewController {
         }
         
         // If ad is ready, show it immediately
-        if interstitial.isReady() {
+        if interstitial.isReady {
             print("👀 Ad ready, showing immediately...")
             interstitial.show(from: self)
             return
@@ -234,6 +234,10 @@ extension InterstitialViewController: CLXInterstitialDelegate {
     
     func impression(on ad: CLXAd) {
         print("👁️ Interstitial ad impression recorded")
+    }
+    
+    func revenuePaid(_ ad: CLXAd) {
+        print("💰 Interstitial ad revenue paid")
     }
     
     func closedByUserAction(with ad: CLXAd) {

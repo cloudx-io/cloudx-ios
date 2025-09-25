@@ -154,6 +154,10 @@ extension BannerViewController: CLXBannerDelegate {
         print("👁️ Banner impression recorded")
     }
     
+    func revenuePaid(_ ad: CLXAd) {
+        print("💰 Banner revenue paid")
+    }
+    
     func closedByUserAction(with ad: CLXAd) {
         print("✋ Banner closed by user action")
         bannerAd = nil

@@ -1,88 +1,57 @@
 import UIKit
 
-class AdDemoTabViewController: UIViewController {
-    private var currentViewController: UIViewController?
-    private let segmentedControl: UISegmentedControl
-    private let containerView = UIView()
-    
-    private lazy var viewControllers: [UIViewController] = {
-        return [
-            InitViewController(),
-            BannerViewController(),
-            MRECViewController(),
-            InterstitialViewController(),
-            RewardedViewController(),
-            NativeViewController()
-        ]
-    }()
-    
-    init() {
-        let items = ["Init", "Banner", "MREC", "Interstitial", "Rewarded", "Native"]
-        segmentedControl = UISegmentedControl(items: items)
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+class AdDemoTabViewController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        segmentedControl.selectedSegmentIndex = 0
-        updateSelectedViewController(0)
+        
+        // Create view controllers
+        let initVC = InitViewController()
+        initVC.tabBarItem = UITabBarItem(title: "Init", image: UIImage(systemName: "power"), tag: 0)
+        
+        let initInternalVC = InitInternalViewController()
+        initInternalVC.tabBarItem = UITabBarItem(title: "Init Internal", image: UIImage(systemName: "gear"), tag: 9)
+        
+        let bannerVC = BannerViewController()
+        bannerVC.tabBarItem = UITabBarItem(title: "Banner", image: UIImage(systemName: "rectangle"), tag: 1)
+        
+        let interstitialVC = InterstitialViewController()
+        interstitialVC.tabBarItem = UITabBarItem(title: "Interstitial", image: UIImage(systemName: "square"), tag: 2)
+        
+        let rewardedVC = RewardedViewController()
+        rewardedVC.tabBarItem = UITabBarItem(title: "Rewarded", image: UIImage(systemName: "star"), tag: 3)
+        
+        let mrecVC = MRECViewController()
+        mrecVC.tabBarItem = UITabBarItem(title: "MREC", image: UIImage(systemName: "rectangle.3.group"), tag: 4)
+        
+        let nativeVC = NativeViewController()
+        nativeVC.tabBarItem = UITabBarItem(title: "Native", image: UIImage(systemName: "doc"), tag: 5)
+        
+        let nativeBannerVC = NativeBannerViewController()
+        nativeBannerVC.tabBarItem = UITabBarItem(title: "Native Banner", image: UIImage(systemName: "doc.badge.plus"), tag: 6)
+        
+        let rewardedInterstitialVC = RewardedInterstitialViewController()
+        rewardedInterstitialVC.tabBarItem = UITabBarItem(title: "Reward Inter", image: UIImage(systemName: "star.square"), tag: 7)
+        
+        let privacyVC = PrivacyViewController()
+        privacyVC.tabBarItem = UITabBarItem(title: "Privacy", image: UIImage(systemName: "hand.raised"), tag: 8)
+        
+        let settingsVC = SettingsViewController()
+        settingsVC.tabBarItem = UITabBarItem(title: "Settings", image: UIImage(systemName: "star"), tag: 9)
+        
+        // Set view controllers - InitInternalVC moved to end so it appears in "More" section
+        self.viewControllers = [
+            UINavigationController(rootViewController: initVC),
+            UINavigationController(rootViewController: bannerVC),
+            UINavigationController(rootViewController: interstitialVC),
+            UINavigationController(rootViewController: rewardedVC),
+            UINavigationController(rootViewController: mrecVC),
+            UINavigationController(rootViewController: nativeVC),
+            UINavigationController(rootViewController: nativeBannerVC),
+            UINavigationController(rootViewController: rewardedInterstitialVC),
+            UINavigationController(rootViewController: privacyVC),
+            UINavigationController(rootViewController: initInternalVC),
+            UINavigationController(rootViewController: settingsVC)
+        ]
     }
-    
-    private func setupUI() {
-        view.backgroundColor = .systemBackground
-        
-        // Configure segmented control
-        segmentedControl.translatesAutoresizingMaskIntoConstraints = false
-        segmentedControl.addTarget(self, action: #selector(segmentChanged(_:)), for: .valueChanged)
-        
-        // Configure container view
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(segmentedControl)
-        view.addSubview(containerView)
-        
-        NSLayoutConstraint.activate([
-            segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
-            segmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            segmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            
-            containerView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 8),
-            containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-    }
-    
-    @objc private func segmentChanged(_ sender: UISegmentedControl) {
-        updateSelectedViewController(sender.selectedSegmentIndex)
-    }
-    
-    private func updateSelectedViewController(_ index: Int) {
-        // Remove current view controller
-        currentViewController?.willMove(toParent: nil)
-        currentViewController?.view.removeFromSuperview()
-        currentViewController?.removeFromParent()
-        
-        // Add new view controller
-        let newViewController = viewControllers[index]
-        addChild(newViewController)
-        newViewController.view.frame = containerView.bounds
-        containerView.addSubview(newViewController.view)
-        newViewController.didMove(toParent: self)
-        currentViewController = newViewController
-        
-        // Setup constraints for the new view
-        newViewController.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            newViewController.view.topAnchor.constraint(equalTo: containerView.topAnchor),
-            newViewController.view.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            newViewController.view.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            newViewController.view.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
-        ])
-    }
-} 
+}
