@@ -141,29 +141,38 @@ jobs:
           ZIP_URL="https://github.com/cloudx-io/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip"
           echo "Waiting for $ZIP_URL to be fully available..."
 
-          # Two-step process should be faster, but still wait for CDN propagation
-          for i in {1..40}; do
+          for i in {1..120}; do
             STATUS=$(curl -s -L -w "%{http_code}" -o /dev/null "$ZIP_URL")
             if [ "$STATUS" = "200" ]; then
-              echo "✅ File is now available (HTTP 200) after $i attempts."
-              
-              # Additional verification that file is truly downloadable
-              if curl -fL --retry 3 --connect-timeout 10 --max-time 30 "$ZIP_URL" -o /dev/null; then
-                echo "✅ File is confirmed downloadable."
-                break
-              else
-                echo "⚠️  File returns 200 but not fully downloadable yet, continuing to wait..."
-              fi
+              echo "✅ File is now fully available (HTTP 200)."
+              exit 0
             fi
-            echo "Waiting... ($i/40) — Current HTTP status: $STATUS"
+            echo "Waiting... ($i/120) — Current HTTP status: $STATUS"
             sleep 5
           done
 
-          # Final verification
-          if ! curl -fL --retry 3 --connect-timeout 10 --max-time 30 "$ZIP_URL" -o /dev/null; then
-            echo "❌ .xcframework.zip did not become downloadable after 40 attempts (200 seconds)."
-            exit 1
-          fi
+          echo "❌ .xcframework.zip did not become available after 120 attempts (10 minutes)."
+          exit 1
+
+      - name: 💤 Ensure .xcframework.zip is truly downloadable
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          ZIP_URL="https://github.com/cloudx-io/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip"
+          echo "Waiting for $ZIP_URL to be downloadable using curl -fL..."
+
+          for i in {1..60}; do
+            echo "Attempt $i: trying to fetch the file..."
+            if curl -fL --retry 2 --connect-timeout 10 --max-time 30 "$ZIP_URL" -o /dev/null; then
+              echo "✅ File is now downloadable (curl -fL succeeded)"
+              exit 0
+            fi
+            echo "Still waiting... sleeping 5s"
+            sleep 5
+          done
+          
+          echo "❌ .xcframework.zip could not be downloaded after 60 attempts (5 minutes)."
+          exit 1
 
       - name: 📤 Push podspec to CocoaPods trunk
         run: |
