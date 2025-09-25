@@ -65,7 +65,7 @@ jobs:
           cd core
 
           for i in {1..5}; do
-            pod trunk push CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests --no-clean && break
+            pod trunk push CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests && break
             echo "Pod trunk push failed. Retrying in 30 seconds... ($i/5)"
             sleep 30
           done
