@@ -7,7 +7,9 @@ target 'CloudXMetaAdapter' do
 
   # Pods for CloudXMetaAdapter
   pod 'FBAudienceNetwork', '6.16.0'
-  pod 'CloudXCore'
+  
+  # Use local CloudXCore from the monorepo during build
+  pod 'CloudXCore', :path => '../core'
 
   target 'CloudXMetaAdapterTests' do
     # Pods for testing
