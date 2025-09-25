@@ -42,6 +42,7 @@ Carthage/Checkouts/
 # Archives
 *.ipa
 *.app
+*.xcframework.zip
 
 # Provisioning profiles
 *.mobileprovision
