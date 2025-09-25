@@ -91,7 +91,7 @@ jobs:
           sed -i '' "s|url: \".*CloudXMetaAdapter.*\",|url: \"https://github.com/cloudx-io/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip\",|" Package.swift
           sed -i '' "s|checksum: \".*\"|checksum: \"${{ steps.checksum.outputs.checksum }}\"|" Package.swift
 
-      - name: 📊 Create GitHub release
+      - name: 📊 Create GitHub release (step 1 - empty release)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -117,11 +117,22 @@ jobs:
           ${{ steps.checksum.outputs.checksum }}
           EOF
           
+          # Create empty release first (two-step process for better CDN propagation)
           gh release create "$FULL_VERSION" \
-            adapter-meta/CloudXMetaAdapter-v$VERSION.xcframework.zip \
             --title "CloudXMetaAdapter v$VERSION" \
             --notes-file release_notes.md \
             --latest
+
+      - name: 📦 Upload xcframework to release (step 2 - file upload)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          # Upload the xcframework file to the existing release
+          gh release upload "$FULL_VERSION" \
+            adapter-meta/CloudXMetaAdapter-v$VERSION.xcframework.zip
 
       - name: 💤 Wait for .xcframework.zip to be globally available
         run: |
@@ -130,37 +141,29 @@ jobs:
           ZIP_URL="https://github.com/cloudx-io/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip"
           echo "Waiting for $ZIP_URL to be fully available..."
 
-          for i in {1..60}; do
+          # Two-step process should be faster, but still wait for CDN propagation
+          for i in {1..40}; do
             STATUS=$(curl -s -L -w "%{http_code}" -o /dev/null "$ZIP_URL")
             if [ "$STATUS" = "200" ]; then
-              echo "✅ File is now fully available (HTTP 200)."
-              break
+              echo "✅ File is now available (HTTP 200) after $i attempts."
+              
+              # Additional verification that file is truly downloadable
+              if curl -fL --retry 3 --connect-timeout 10 --max-time 30 "$ZIP_URL" -o /dev/null; then
+                echo "✅ File is confirmed downloadable."
+                break
+              else
+                echo "⚠️  File returns 200 but not fully downloadable yet, continuing to wait..."
+              fi
             fi
-            echo "Waiting... ($i/60) — Current HTTP status: $STATUS"
-            sleep 3
-          done
-
-          if [ "$STATUS" != "200" ]; then
-            echo "❌ .xcframework.zip did not become available after 60 attempts."
-            exit 1
-          fi
-
-      - name: 💤 Ensure .xcframework.zip is truly downloadable
-        run: |
-          VERSION=${{ steps.version.outputs.version }}
-          FULL_VERSION=${{ steps.version.outputs.full_version }}
-          ZIP_URL="https://github.com/cloudx-io/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip"
-          echo "Waiting for $ZIP_URL to be downloadable using curl -fL..."
-
-          for i in {1..30}; do
-            echo "Attempt $i: trying to fetch the file..."
-            if curl -fL --retry 2 --connect-timeout 10 --max-time 20 "$ZIP_URL" -o /dev/null; then
-              echo "✅ File is now downloadable (curl -fL succeeded)"
-              break
-            fi
-            echo "Still waiting... sleeping 5s"
+            echo "Waiting... ($i/40) — Current HTTP status: $STATUS"
             sleep 5
           done
+
+          # Final verification
+          if ! curl -fL --retry 3 --connect-timeout 10 --max-time 30 "$ZIP_URL" -o /dev/null; then
+            echo "❌ .xcframework.zip did not become downloadable after 40 attempts (200 seconds)."
+            exit 1
+          fi
 
       - name: 📤 Push podspec to CocoaPods trunk
         run: |
