@@ -58,8 +58,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
             autoRefreshButton.heightAnchor.constraint(equalToConstant: 44)
         ])
         
-        // Auto-create and add MREC to view hierarchy immediately
-        createAndAddMRECToView()
+        // Don't auto-create MREC - wait for user to load
     }
     
     override func viewWillAppear(_ animated: Bool) {

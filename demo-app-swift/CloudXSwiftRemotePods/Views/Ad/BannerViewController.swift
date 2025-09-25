@@ -4,10 +4,13 @@ import CloudXCore
 class BannerViewController: BaseAdViewController {
     private var bannerAd: CLXBannerAdView?
     private var isSDKInitialized = false
+    private var autoRefreshButton: UIButton!
+    private var autoRefreshEnabled = true
+    private let settings = UserDefaultsSettings.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupCenteredButton(title: "Show Banner", action: #selector(showBannerAd))
+        setupUI()
         setupNotifications()
         
         // Check if SDK is already initialized
@@ -15,12 +18,138 @@ class BannerViewController: BaseAdViewController {
         updateStatusUI(state: .noAd)
     }
     
+    private func setupUI() {
+        // Create a vertical stack for buttons
+        let buttonStack = UIStackView()
+        buttonStack.axis = .vertical
+        buttonStack.spacing = 16
+        buttonStack.alignment = .center
+        buttonStack.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(buttonStack)
+        
+        // Load Banner button
+        let loadButton = UIButton(type: .system)
+        loadButton.setTitle("Load Banner", for: .normal)
+        loadButton.addTarget(self, action: #selector(loadBannerAd), for: .touchUpInside)
+        loadButton.backgroundColor = .systemGreen
+        loadButton.setTitleColor(.white, for: .normal)
+        loadButton.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        loadButton.layer.cornerRadius = 8
+        loadButton.translatesAutoresizingMaskIntoConstraints = false
+        buttonStack.addArrangedSubview(loadButton)
+        
+        // Auto-refresh toggle button
+        autoRefreshButton = UIButton(type: .system)
+        autoRefreshButton.setTitle("Stop Auto-Refresh", for: .normal)
+        autoRefreshButton.addTarget(self, action: #selector(toggleAutoRefresh), for: .touchUpInside)
+        autoRefreshButton.backgroundColor = .systemPurple
+        autoRefreshButton.setTitleColor(.white, for: .normal)
+        autoRefreshButton.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        autoRefreshButton.layer.cornerRadius = 8
+        autoRefreshButton.translatesAutoresizingMaskIntoConstraints = false
+        buttonStack.addArrangedSubview(autoRefreshButton)
+        
+        // Button constraints
+        NSLayoutConstraint.activate([
+            buttonStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            buttonStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 100),
+            loadButton.widthAnchor.constraint(equalToConstant: 200),
+            loadButton.heightAnchor.constraint(equalToConstant: 44),
+            autoRefreshButton.widthAnchor.constraint(equalToConstant: 200),
+            autoRefreshButton.heightAnchor.constraint(equalToConstant: 44)
+        ])
+        
+        // Auto-create and add banner to view hierarchy immediately
+        createAndAddBannerToView()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // Create ad if SDK is already initialized
-        if isSDKInitialized && bannerAd == nil {
-            createBannerAd()
+        // No auto-loading - user must press Load Banner button
+    }
+    
+    @objc private func loadBannerAd() {
+        if !cloudX.isInitialised {
+            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
+            return
         }
+        
+        if isLoading {
+            showAlert(title: "Info", message: "Banner is already loading.")
+            return
+        }
+        
+        if bannerAd == nil {
+            createAndAddBannerToView()
+        }
+        
+        guard let bannerAd = bannerAd else {
+            return // Failed to create
+        }
+        
+        // Start loading
+        isLoading = true
+        updateStatusUI(state: .loading)
+        bannerAd.load()
+    }
+    
+    @objc private func toggleAutoRefresh() {
+        guard let bannerAd = bannerAd else {
+            return
+        }
+        
+        autoRefreshEnabled.toggle()
+        
+        if autoRefreshEnabled {
+            bannerAd.startAutoRefresh()
+            autoRefreshButton.setTitle("Stop Auto-Refresh", for: .normal)
+            autoRefreshButton.backgroundColor = .systemRed
+        } else {
+            bannerAd.stopAutoRefresh()
+            autoRefreshButton.setTitle("Start Auto-Refresh", for: .normal)
+            autoRefreshButton.backgroundColor = .systemGreen
+        }
+    }
+    
+    private func createAndAddBannerToView() {
+        guard bannerAd == nil else { return }
+        
+        print("📱 Creating new banner ad instance...")
+        
+        // Create banner ad with placement from config
+        let placement = CLXDemoConfigManager.sharedManager.currentConfig.bannerPlacement
+        bannerAd = cloudX.createBanner(withPlacement: placement, 
+                                      viewController: self, 
+                                      delegate: self, 
+                                      tmax: nil)
+        
+        if bannerAd == nil {
+            print("❌ Failed to create Banner ad instance")
+            showAlert(title: "Error", message: "Failed to create Banner ad instance")
+        } else {
+            print("✅ Banner ad instance created successfully")
+            // Add banner to view hierarchy immediately
+            addBannerToViewHierarchy()
+        }
+    }
+    
+    private func addBannerToViewHierarchy() {
+        guard let bannerAd = bannerAd, bannerAd.superview == nil else {
+            return
+        }
+        
+        // Add banner to view hierarchy
+        bannerAd.translatesAutoresizingMaskIntoConstraints = false
+        bannerAd.backgroundColor = .red // DEBUG: Make banner container visible
+        
+        view.addSubview(bannerAd)
+        
+        NSLayoutConstraint.activate([
+            bannerAd.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            bannerAd.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            bannerAd.widthAnchor.constraint(equalToConstant: 320),
+            bannerAd.heightAnchor.constraint(equalToConstant: 50)
+        ])
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -50,8 +179,9 @@ class BannerViewController: BaseAdViewController {
         guard bannerAd == nil else { return }
         print("📱 Creating new banner ad instance...")
         
-        // Create banner ad with verified placement
-        bannerAd = cloudX.createBanner(withPlacement: "banner11239747913482", 
+        // Create banner ad with placement from config
+        let placement = CLXDemoConfigManager.sharedManager.currentConfig.bannerPlacement
+        bannerAd = cloudX.createBanner(withPlacement: placement, 
                                       viewController: self, 
                                       delegate: self, 
                                       tmax: nil)

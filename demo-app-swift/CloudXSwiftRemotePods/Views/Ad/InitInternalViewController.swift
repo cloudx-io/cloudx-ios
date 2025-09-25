@@ -205,17 +205,6 @@ class InitInternalViewController: BaseAdViewController {
         UserDefaults.standard.synchronize()
         
         DemoAppLogger.sharedInstance.logMessage("Initializing SDK with \(environmentName) environment")
-        DemoAppLogger.sharedInstance.logMessage("AppId: \(config.appId)")
-        DemoAppLogger.sharedInstance.logMessage("HashedUserId: \(config.hashedUserId)")
-        DemoAppLogger.sharedInstance.logMessage("BaseURL: \(config.baseURL)")
-        DemoAppLogger.sharedInstance.logMessage("Environment set to: \(environmentKey)")
-        
-        // Log the environment and bootstrap URL (other URLs come from SDK response)
-        DemoAppLogger.sharedInstance.logMessage("🔧 Environment Config - \(CLXURLProvider.environmentName()):")
-        DemoAppLogger.sharedInstance.logMessage("  Bootstrap URL: \(CLXURLProvider.initApiUrl())")
-        DemoAppLogger.sharedInstance.logMessage("  Other URLs (tracker, metrics, etc.) will come from SDK init response")
-        
-        DemoAppLogger.sharedInstance.logMessage("Using standard SDK init with \(environmentName) environment")
         
         // Use standard CloudXCore initialization which will now use our environment override
         CloudXCore.shared.initSDK(withAppKey: config.appId, 

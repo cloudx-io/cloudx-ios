@@ -33,7 +33,7 @@ class BaseAdViewController: UIViewController, AdStateManaging {
     var isLoading = false
     
     var appKey: String? {
-        return nil // Force subclasses to override
+        return CLXDemoConfigManager.sharedManager.currentConfig.appId
     }
     
     let statusLabel: UILabel = {
@@ -82,12 +82,11 @@ class BaseAdViewController: UIViewController, AdStateManaging {
             return
         }
 
-        UserDefaults.standard.set("https://pro-dev.cloudx.io/sdk", forKey: "CloudXInitURL")
+        let config = CLXDemoConfigManager.sharedManager.currentConfig
+        UserDefaults.standard.set(config.baseURL, forKey: "CloudXInitURL")
 
         return await withCheckedContinuation { continuation in
-            // Use a test user ID for demo purposes
-            let testUserID = "test-user-123"
-            cloudX.initSDK(withAppKey: appKey, hashedUserID: testUserID) { success, error in
+            cloudX.initSDK(withAppKey: appKey, hashedUserID: config.hashedUserId) { success, error in
                 if success {
                     print("✅ SDK Initialized: \(success)")
                     NotificationCenter.default.post(name: .sdkInitialized, object: nil)
