@@ -8,6 +8,8 @@ on:
 jobs:
   release:
     runs-on: macos-latest
+    permissions:
+      contents: write
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -84,14 +86,15 @@ jobs:
           # Update podspec version
           sed -i '' "s/s\.version.*=.*/s.version = '$VERSION'/" CloudXMetaAdapter.podspec
           
-          # Update Package.swift version and checksum
-          sed -i '' "s|url: \".*\"|url: \"https://github.com/cloudx-io/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip\",|" Package.swift
+          # Update root Package.swift version and checksum for CloudXMetaAdapter binary target
+          cd ..
+          sed -i '' "s|url: \".*CloudXMetaAdapter.*\",|url: \"https://github.com/cloudx-io/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip\",|" Package.swift
           sed -i '' "s|checksum: \".*\"|checksum: \"${{ steps.checksum.outputs.checksum }}\"|" Package.swift
 
       - name: 🧪 Validate podspec
         run: |
           cd adapter-meta
-          pod spec lint CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests
+          pod spec lint CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --no-clean
 
       - name: 📊 Create GitHub release
         env:
