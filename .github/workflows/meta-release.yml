@@ -13,7 +13,7 @@ jobs:
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TOKEN_NEW }}
 
     steps:
       - name: 𝔠 Debug available Xcode versions
@@ -56,7 +56,7 @@ jobs:
           VERSION=${GITHUB_REF_NAME#v}
           VERSION_NO_SUFFIX=${VERSION%-meta}
           echo "version=$VERSION_NO_SUFFIX" >> $GITHUB_OUTPUT
-          echo "full_version=$VERSION" >> $GITHUB_OUTPUT
+          echo "full_version=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
 
       - name: 📀 Build static xcframework
         run: |
@@ -138,7 +138,7 @@ jobs:
       - name: 📤 Push podspec to CocoaPods trunk
         run: |
           mkdir -p ~/.cocoapods/trunk
-          echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TRUNK_TOKEN }}"}}' > ~/.cocoapods/trunk/me.json
+          echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TOKEN_NEW }}"}}' > ~/.cocoapods/trunk/me.json
           cd adapter-meta
 
           for i in {1..5}; do
@@ -146,6 +146,12 @@ jobs:
             echo "Pod trunk push failed. Retrying in 30 seconds... ($i/5)"
             sleep 30
           done
+          
+          # Verify that the pod push actually succeeded
+          pod trunk push CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests || {
+            echo "❌ Pod trunk push failed after all retries"
+            exit 1
+          }
 
       - name: 🧾 Check pod trunk push succeeded
         run: pod trunk info CloudXMetaAdapter
