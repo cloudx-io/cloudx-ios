@@ -311,7 +311,6 @@
 				C03E43D52C7F36DF001AB933 /* Frameworks */,
 				C03E43D62C7F36DF001AB933 /* Resources */,
 				2B17868E76FE3CD86CA28229 /* [CP] Copy Pods Resources */,
-				ACC6A4ABEA44014F7FA1D853 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -432,23 +431,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter/Pods-CloudXMetaAdapter-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		ACC6A4ABEA44014F7FA1D853 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		B10BC1BBDF4911A03C7E5B36 /* [CP] Check Pods Manifest.lock */ = {

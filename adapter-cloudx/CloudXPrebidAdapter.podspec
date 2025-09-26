@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
   s.summary = 'Prebid 3.0 Adapter for CloudX'
   s.description = 'Prebid 3.0 adapter for CloudX iOS SDK'
   s.homepage = 'https://github.com/cloudx-xenoss/CloudXPrebidAdapter'
-  s.license = { :type => 'Copyright', :text => 'Copyright 2024 CloudX, Inc. All rights reserved.' }
+  s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
   s.platform = :ios, '14.0'
   s.module_name = 'CloudXPrebidAdapter'

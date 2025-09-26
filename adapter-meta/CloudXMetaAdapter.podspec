@@ -9,11 +9,7 @@ Pod::Spec.new do |s|
   s.platform = :ios, '14.0'
   s.module_name = 'CloudXMetaAdapter'
   s.static_framework = true
-  s.source = {
-    :http => "https://github.com/cloudx-io/cloudx-ios/releases/download/v1.1.48-meta/CloudXMetaAdapter-v1.1.48.xcframework.zip",
-    :type => "zip",
-    :flatten => false
-  }
+  s.source = { :path => '.' }
   s.vendored_frameworks = 'CloudXMetaAdapter.xcframework'
   s.preserve_paths = 'CloudXMetaAdapter.xcframework'
   s.dependency 'CloudXCore'

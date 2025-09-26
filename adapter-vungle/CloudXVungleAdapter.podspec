@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
   s.summary = 'Vungle Adapter for CloudX iOS SDK'
   s.description = 'Vungle adapter for CloudX iOS SDK supporting all ad formats: Interstitial, Rewarded, Banner/MREC, Native, and App Open ads'
   s.homepage = 'https://github.com/cloudx-xenoss/CloudXVungleAdapter'
-  s.license = { :type => 'Copyright', :text => 'Copyright 2024 CloudX, Inc. All rights reserved.' }
+  s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
   s.platform = :ios, '12.0'
   s.swift_version = '5.9'
