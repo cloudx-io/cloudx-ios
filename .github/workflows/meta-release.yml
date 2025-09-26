@@ -135,21 +135,70 @@ jobs:
             adapter-meta/CloudXMetaAdapter-v$VERSION.xcframework.zip
 
 
-      - name: 📤 Push podspec to CocoaPods trunk
+      - name: 🔍 Debug file structure and authentication
         run: |
+          echo "=== Repository structure ==="
+          ls -la
+          echo "=== Adapter-meta directory ==="
+          ls -la adapter-meta/
+          echo "=== License file check ==="
+          if [ -f "adapter-meta/LICENSE" ]; then
+            echo "✅ LICENSE file found at adapter-meta/LICENSE"
+            wc -l adapter-meta/LICENSE
+          else
+            echo "❌ LICENSE file NOT found at adapter-meta/LICENSE"
+          fi
+          echo "=== CocoaPods authentication setup ==="
           mkdir -p ~/.cocoapods/trunk
           echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TOKEN_NEW }}"}}' > ~/.cocoapods/trunk/me.json
+          echo "Token file created. Testing authentication..."
+          pod trunk me || echo "⚠️ Authentication test failed, but continuing..."
+
+      - name: 🧪 Validate podspec with detailed output
+        run: |
           cd adapter-meta
+          echo "=== Validating CloudXMetaAdapter.podspec ==="
+          echo "Current directory: $(pwd)"
+          echo "Podspec content:"
+          cat CloudXMetaAdapter.podspec
+          echo "=== Running podspec validation ==="
+          pod spec lint CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose || {
+            echo "❌ Podspec validation failed"
+            exit 1
+          }
+
+      - name: 📤 Push podspec to CocoaPods trunk
+        run: |
+          cd adapter-meta
+          echo "=== Starting CocoaPods trunk push ==="
+          echo "Current directory: $(pwd)"
+          echo "Authentication status:"
+          pod trunk me || echo "⚠️ Authentication issue detected"
 
           for i in {1..5}; do
-            pod trunk push CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests && break
-            echo "Pod trunk push failed. Retrying in 30 seconds... ($i/5)"
-            sleep 30
+            echo "=== Attempt $i/5 ==="
+            if pod trunk push CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
+              echo "✅ Pod trunk push succeeded on attempt $i"
+              break
+            else
+              echo "❌ Pod trunk push failed on attempt $i"
+              if [ $i -lt 5 ]; then
+                echo "Retrying in 30 seconds..."
+                sleep 30
+              fi
+            fi
           done
           
-          # Verify that the pod push actually succeeded
+          # Final verification
+          echo "=== Final verification ==="
           pod trunk push CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests || {
             echo "❌ Pod trunk push failed after all retries"
+            echo "=== Debug information ==="
+            echo "Working directory: $(pwd)"
+            echo "Files in current directory:"
+            ls -la
+            echo "CocoaPods trunk config:"
+            cat ~/.cocoapods/trunk/me.json || echo "No trunk config found"
             exit 1
           }
 
