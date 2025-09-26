@@ -1,15 +1,31 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXMetaAdapter'
+<<<<<<< HEAD
   s.version = '1.1.48'
   s.summary = 'Mobile SDK for CloudX iOS Meta Adapter'
   s.description = 'iOS adapter add-on to the CloudX iOS SDK for a Meta bidder'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
   s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
+=======
+  s.version = '1.1.47'
+  s.summary = 'Mobile SDK for CloudX iOS Meta Adapter'
+  s.description = 'iOS adapter add-on to the CloudX iOS SDK for a Meta bidder'
+  s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
+  s.license = { :type => 'Business Source License 1.1', :file => 'adapter-meta/LICENSE' }
+>>>>>>> 7b2d7d3 (Fix CloudXMetaAdapter podspec URL and LICENSE path for v1.1.47)
   s.authors = { 'CloudX' => 'support@cloudx.com' }
   s.platform = :ios, '14.0'
   s.module_name = 'CloudXMetaAdapter'
   s.static_framework = true
+<<<<<<< HEAD
   s.source = { :path => '.' }
+=======
+  s.source = {
+    :http => "https://github.com/cloudx-io/cloudx-ios/releases/download/v1.1.47-meta/CloudXMetaAdapter-v1.1.47.xcframework.zip",
+    :type => "zip",
+    :flatten => false
+  }
+>>>>>>> 7b2d7d3 (Fix CloudXMetaAdapter podspec URL and LICENSE path for v1.1.47)
   s.vendored_frameworks = 'CloudXMetaAdapter.xcframework'
   s.preserve_paths = 'CloudXMetaAdapter.xcframework'
   s.dependency 'CloudXCore'
