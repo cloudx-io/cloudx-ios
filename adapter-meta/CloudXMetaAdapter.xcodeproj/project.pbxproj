@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1916B6942E872D9A00E49E3E /* CLXMetaErrorHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B6922E872D9A00E49E3E /* CLXMetaErrorHandler.m */; };
+		1916B6952E872D9A00E49E3E /* CLXMetaErrorHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B6912E872D9A00E49E3E /* CLXMetaErrorHandler.h */; };
+		1916B6992E872DA200E49E3E /* CLXMetaBaseFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B6972E872DA200E49E3E /* CLXMetaBaseFactory.m */; };
+		1916B69A2E872DA200E49E3E /* CLXMetaBaseFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B6962E872DA200E49E3E /* CLXMetaBaseFactory.h */; };
 		1973D7602E28ED7900DCCF08 /* CLXMetaInitializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7492E28ED7900DCCF08 /* CLXMetaInitializer.h */; };
 		1973D7612E28ED7900DCCF08 /* CLXMetaNative.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7512E28ED7900DCCF08 /* CLXMetaNative.h */; };
 		1973D7622E28ED7900DCCF08 /* CLXMetaBannerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7452E28ED7900DCCF08 /* CLXMetaBannerFactory.h */; };
@@ -43,6 +47,12 @@
 
 /* Begin PBXFileReference section */
 		12652B13D1A6D05E518EB07B /* Pods-CloudXMetaAdapter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXMetaAdapter.debug.xcconfig"; path = "Target Support Files/Pods-CloudXMetaAdapter/Pods-CloudXMetaAdapter.debug.xcconfig"; sourceTree = "<group>"; };
+		1916B68E2E872D6100E49E3E /* CLXMetaBidTokenSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaBidTokenSource.h; sourceTree = "<group>"; };
+		1916B68F2E872D6100E49E3E /* CLXMetaBidTokenSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaBidTokenSource.m; sourceTree = "<group>"; };
+		1916B6912E872D9A00E49E3E /* CLXMetaErrorHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaErrorHandler.h; sourceTree = "<group>"; };
+		1916B6922E872D9A00E49E3E /* CLXMetaErrorHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaErrorHandler.m; sourceTree = "<group>"; };
+		1916B6962E872DA200E49E3E /* CLXMetaBaseFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaBaseFactory.h; sourceTree = "<group>"; };
+		1916B6972E872DA200E49E3E /* CLXMetaBaseFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaBaseFactory.m; sourceTree = "<group>"; };
 		1973D7432E28ED7900DCCF08 /* CLXMetaBanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaBanner.h; sourceTree = "<group>"; };
 		1973D7442E28ED7900DCCF08 /* CLXMetaBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaBanner.m; sourceTree = "<group>"; };
 		1973D7452E28ED7900DCCF08 /* CLXMetaBannerFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaBannerFactory.h; sourceTree = "<group>"; };
@@ -105,6 +115,24 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		1916B6932E872D9A00E49E3E /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				1916B6912E872D9A00E49E3E /* CLXMetaErrorHandler.h */,
+				1916B6922E872D9A00E49E3E /* CLXMetaErrorHandler.m */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		1916B6982E872DA200E49E3E /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				1916B6962E872DA200E49E3E /* CLXMetaBaseFactory.h */,
+				1916B6972E872DA200E49E3E /* CLXMetaBaseFactory.m */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
 		1973D7472E28ED7900DCCF08 /* Banner */ = {
 			isa = PBXGroup;
 			children = (
@@ -114,13 +142,6 @@
 				1973D7462E28ED7900DCCF08 /* CLXMetaBannerFactory.m */,
 			);
 			path = Banner;
-			sourceTree = "<group>";
-		};
-		1973D7482E28ED7900DCCF08 /* include */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = include;
 			sourceTree = "<group>";
 		};
 		1973D74B2E28ED7900DCCF08 /* Initializers */ = {
@@ -168,8 +189,11 @@
 		1973D75E2E28ED7900DCCF08 /* CloudXMetaAdapter */ = {
 			isa = PBXGroup;
 			children = (
+				1916B6982E872DA200E49E3E /* Base */,
+				1916B6932E872D9A00E49E3E /* Utils */,
+				1916B68E2E872D6100E49E3E /* CLXMetaBidTokenSource.h */,
+				1916B68F2E872D6100E49E3E /* CLXMetaBidTokenSource.m */,
 				1973D7472E28ED7900DCCF08 /* Banner */,
-				1973D7482E28ED7900DCCF08 /* include */,
 				1973D74B2E28ED7900DCCF08 /* Initializers */,
 				1973D7502E28ED7900DCCF08 /* Interstitial */,
 				1973D7552E28ED7900DCCF08 /* Native */,
@@ -250,6 +274,8 @@
 				1973D7672E28ED7900DCCF08 /* CLXMetaBanner.h in Headers */,
 				1973D7682E28ED7900DCCF08 /* CLXMetaNativeFactory.h in Headers */,
 				1973D7692E28ED7900DCCF08 /* CloudXMetaAdapter.h in Headers */,
+				1916B6952E872D9A00E49E3E /* CLXMetaErrorHandler.h in Headers */,
+				1916B69A2E872DA200E49E3E /* CLXMetaBaseFactory.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,7 +311,6 @@
 				C03E43D52C7F36DF001AB933 /* Frameworks */,
 				C03E43D62C7F36DF001AB933 /* Resources */,
 				2B17868E76FE3CD86CA28229 /* [CP] Copy Pods Resources */,
-				ACC6A4ABEA44014F7FA1D853 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -339,7 +364,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1973D7732E28ED7900DCCF08 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -409,23 +433,6 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter/Pods-CloudXMetaAdapter-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		ACC6A4ABEA44014F7FA1D853 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		B10BC1BBDF4911A03C7E5B36 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -457,10 +464,12 @@
 			files = (
 				1973D76A2E28ED7900DCCF08 /* CLXMetaInterstitial.m in Sources */,
 				1973D76B2E28ED7900DCCF08 /* CLXMetaBannerFactory.m in Sources */,
+				1916B6942E872D9A00E49E3E /* CLXMetaErrorHandler.m in Sources */,
 				1973D76C2E28ED7900DCCF08 /* CLXMetaNative.m in Sources */,
 				1973D76D2E28ED7900DCCF08 /* CLXMetaNativeFactory.m in Sources */,
 				1973D76E2E28ED7900DCCF08 /* CLXMetaRewarded.m in Sources */,
 				1973D76F2E28ED7900DCCF08 /* CLXMetaInitializer.m in Sources */,
+				1916B6992E872DA200E49E3E /* CLXMetaBaseFactory.m in Sources */,
 				1973D7702E28ED7900DCCF08 /* CLXMetaBanner.m in Sources */,
 				1973D7712E28ED7900DCCF08 /* CLXMetaInterstitialFactory.m in Sources */,
 				1973D7722E28ED7900DCCF08 /* CLXMetaRewardedFactory.m in Sources */,

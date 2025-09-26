@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
   s.summary = 'Mobile SDK for CloudX iOS Meta Adapter'
   s.description = 'iOS adapter add-on to the CloudX iOS SDK for a Meta bidder'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
-  s.license = { :type => 'Proprietary', :text => 'Copyright 2024 CloudX, Inc. All rights reserved.' }
+  s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
   s.platform = :ios, '14.0'
   s.module_name = 'CloudXMetaAdapter'
