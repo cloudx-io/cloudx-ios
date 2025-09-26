@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
   s.summary = 'Mobile SDK for CloudX iOS Meta Adapter'
   s.description = 'iOS adapter add-on to the CloudX iOS SDK for a Meta bidder'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
-  s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
+  s.license = { :type => 'Business Source License 1.1', :file => 'adapter-meta/LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
   s.platform = :ios, '14.0'
   s.module_name = 'CloudXMetaAdapter'
@@ -36,4 +36,7 @@ Pod::Spec.new do |s|
     'OTHER_LDFLAGS' => '-ObjC'
   }
   s.requires_arc = true
+  
+  # Swift version
+  s.swift_versions = ['5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9', '6.0', '6.1', '6.2']
 end 
