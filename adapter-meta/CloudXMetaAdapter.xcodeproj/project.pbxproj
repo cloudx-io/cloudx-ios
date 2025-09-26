@@ -11,6 +11,8 @@
 		1916B6952E872D9A00E49E3E /* CLXMetaErrorHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B6912E872D9A00E49E3E /* CLXMetaErrorHandler.h */; };
 		1916B6992E872DA200E49E3E /* CLXMetaBaseFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B6972E872DA200E49E3E /* CLXMetaBaseFactory.m */; };
 		1916B69A2E872DA200E49E3E /* CLXMetaBaseFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B6962E872DA200E49E3E /* CLXMetaBaseFactory.h */; };
+		1916B6F32E87343F00E49E3E /* CLXMetaBidTokenSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B68F2E872D6100E49E3E /* CLXMetaBidTokenSource.m */; };
+		1916B6F42E87344600E49E3E /* CLXMetaBidTokenSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B68E2E872D6100E49E3E /* CLXMetaBidTokenSource.h */; };
 		1973D7602E28ED7900DCCF08 /* CLXMetaInitializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7492E28ED7900DCCF08 /* CLXMetaInitializer.h */; };
 		1973D7612E28ED7900DCCF08 /* CLXMetaNative.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7512E28ED7900DCCF08 /* CLXMetaNative.h */; };
 		1973D7622E28ED7900DCCF08 /* CLXMetaBannerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7452E28ED7900DCCF08 /* CLXMetaBannerFactory.h */; };
@@ -264,6 +266,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1916B6F42E87344600E49E3E /* CLXMetaBidTokenSource.h in Headers */,
 				1973D7602E28ED7900DCCF08 /* CLXMetaInitializer.h in Headers */,
 				1973D7612E28ED7900DCCF08 /* CLXMetaNative.h in Headers */,
 				1973D7622E28ED7900DCCF08 /* CLXMetaBannerFactory.h in Headers */,
@@ -462,6 +465,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1916B6F32E87343F00E49E3E /* CLXMetaBidTokenSource.m in Sources */,
 				1973D76A2E28ED7900DCCF08 /* CLXMetaInterstitial.m in Sources */,
 				1973D76B2E28ED7900DCCF08 /* CLXMetaBannerFactory.m in Sources */,
 				1916B6942E872D9A00E49E3E /* CLXMetaErrorHandler.m in Sources */,
