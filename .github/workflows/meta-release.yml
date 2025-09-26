@@ -56,7 +56,7 @@ jobs:
           VERSION=${GITHUB_REF_NAME#v}
           VERSION_NO_SUFFIX=${VERSION%-meta}
           echo "version=$VERSION_NO_SUFFIX" >> $GITHUB_OUTPUT
-          echo "full_version=$VERSION" >> $GITHUB_OUTPUT
+          echo "full_version=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
 
       - name: 📀 Build static xcframework
         run: |
