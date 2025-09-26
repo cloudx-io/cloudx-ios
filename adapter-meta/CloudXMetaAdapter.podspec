@@ -1,16 +1,16 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXMetaAdapter'
-  s.version = '1.1.36'
+  s.version = '1.1.47'
   s.summary = 'Mobile SDK for CloudX iOS Meta Adapter'
   s.description = 'iOS adapter add-on to the CloudX iOS SDK for a Meta bidder'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
-  s.license = { :type => 'Proprietary', :text => 'Copyright 2024 CloudX, Inc. All rights reserved.' }
+  s.license = { :type => 'Business Source License 1.1', :file => 'adapter-meta/LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
   s.platform = :ios, '14.0'
   s.module_name = 'CloudXMetaAdapter'
   s.static_framework = true
   s.source = {
-    :http => "https://github.com/cloudx-io/cloudx-ios/releases/download/v#{s.version}-meta/CloudXMetaAdapter-v#{s.version}.xcframework.zip",
+    :http => "https://github.com/cloudx-io/cloudx-ios/releases/download/v1.1.47-meta/CloudXMetaAdapter-v1.1.47.xcframework.zip",
     :type => "zip",
     :flatten => false
   }
