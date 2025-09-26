@@ -135,7 +135,7 @@ jobs:
             adapter-meta/CloudXMetaAdapter-v$VERSION.xcframework.zip
 
 
-      - name: 🔍 Debug file structure and authentication
+      - name: 🔍 Debug file structure
         run: |
           echo "=== Repository structure ==="
           ls -la
@@ -148,11 +148,6 @@ jobs:
           else
             echo "❌ LICENSE file NOT found at adapter-meta/LICENSE"
           fi
-          echo "=== CocoaPods authentication setup ==="
-          mkdir -p ~/.cocoapods/trunk
-          echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TOKEN_NEW }}"}}' > ~/.cocoapods/trunk/me.json
-          echo "Token file created. Testing authentication..."
-          pod trunk me || echo "⚠️ Authentication test failed, but continuing..."
 
       - name: 🧪 Validate podspec with detailed output
         run: |
@@ -167,43 +162,111 @@ jobs:
             exit 1
           }
 
+      - name: 🔐 Setup CocoaPods authentication
+        run: |
+          echo "=== Setting up CocoaPods authentication ==="
+          
+          # Clean any existing authentication
+          rm -rf ~/.cocoapods/trunk
+          
+          # Create fresh authentication directory and config
+          mkdir -p ~/.cocoapods/trunk
+          echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TOKEN_NEW }}"}}' > ~/.cocoapods/trunk/me.json
+          
+          # Verify authentication with retry mechanism
+          echo "=== Verifying authentication ==="
+          for i in {1..3}; do
+            if pod trunk me; then
+              echo "✅ Authentication verified successfully"
+              break
+            else
+              echo "❌ Authentication verification failed (attempt $i/3)"
+              if [ $i -lt 3 ]; then
+                echo "Waiting 15 seconds before retry..."
+                sleep 15
+                # Recreate auth file in case it was corrupted
+                echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TOKEN_NEW }}"}}' > ~/.cocoapods/trunk/me.json
+              else
+                echo "❌ Authentication setup failed after all retries"
+                exit 1
+              fi
+            fi
+          done
+
       - name: 📤 Push podspec to CocoaPods trunk
         run: |
           cd adapter-meta
           echo "=== Starting CocoaPods trunk push ==="
           echo "Current directory: $(pwd)"
-          echo "Authentication status:"
-          pod trunk me || echo "⚠️ Authentication issue detected"
-
-          for i in {1..5}; do
-            echo "=== Attempt $i/5 ==="
+          
+          # Exponential backoff retry mechanism
+          RETRY_COUNT=0
+          MAX_RETRIES=6
+          BASE_DELAY=30
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            DELAY=$((BASE_DELAY * RETRY_COUNT))
+            
+            echo "=== Attempt $RETRY_COUNT/$MAX_RETRIES ==="
+            echo "Current authentication status:"
+            pod trunk me || echo "⚠️ Authentication issue detected"
+            
             if pod trunk push CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
-              echo "✅ Pod trunk push succeeded on attempt $i"
+              echo "✅ Pod trunk push succeeded on attempt $RETRY_COUNT"
               break
             else
-              echo "❌ Pod trunk push failed on attempt $i"
-              if [ $i -lt 5 ]; then
-                echo "Retrying in 30 seconds..."
-                sleep 30
+              echo "❌ Pod trunk push failed on attempt $RETRY_COUNT"
+              
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "Retrying in $DELAY seconds with exponential backoff..."
+                sleep $DELAY
+                
+                # Refresh authentication for next attempt
+                echo "Refreshing authentication..."
+                echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TOKEN_NEW }}"}}' > ~/.cocoapods/trunk/me.json
+              else
+                echo "❌ Pod trunk push failed after all retries"
+                echo "=== Final debug information ==="
+                echo "Working directory: $(pwd)"
+                echo "Files in current directory:"
+                ls -la
+                echo "CocoaPods trunk config:"
+                cat ~/.cocoapods/trunk/me.json || echo "No trunk config found"
+                echo "Pod environment:"
+                pod env
+                exit 1
               fi
             fi
           done
-          
-          # Final verification
-          echo "=== Final verification ==="
-          pod trunk push CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests || {
-            echo "❌ Pod trunk push failed after all retries"
-            echo "=== Debug information ==="
-            echo "Working directory: $(pwd)"
-            echo "Files in current directory:"
-            ls -la
-            echo "CocoaPods trunk config:"
-            cat ~/.cocoapods/trunk/me.json || echo "No trunk config found"
-            exit 1
-          }
 
-      - name: 🧾 Check pod trunk push succeeded
-        run: pod trunk info CloudXMetaAdapter
+      - name: 🧾 Verify successful pod trunk push
+        run: |
+          echo "=== Verifying pod trunk push success ==="
+          
+          # Wait a moment for CocoaPods to process
+          sleep 10
+          
+          # Verify the pod is available
+          if pod trunk info CloudXMetaAdapter; then
+            echo "✅ Pod trunk push verification successful"
+            
+            # Extract and display the latest version
+            LATEST_VERSION=$(pod trunk info CloudXMetaAdapter | grep -E "^\s*-\s*[0-9]" | head -1 | sed 's/^\s*-\s*//')
+            echo "Latest published version: $LATEST_VERSION"
+            
+            # Verify it matches our expected version
+            EXPECTED_VERSION="${{ steps.version.outputs.version }}"
+            if [[ "$LATEST_VERSION" == "$EXPECTED_VERSION" ]]; then
+              echo "✅ Version verification successful: $LATEST_VERSION matches expected $EXPECTED_VERSION"
+            else
+              echo "⚠️ Version mismatch: Latest=$LATEST_VERSION, Expected=$EXPECTED_VERSION"
+              echo "This might be expected if the version was already published"
+            fi
+          else
+            echo "❌ Pod trunk info failed - pod may not be properly published"
+            exit 1
+          fi
 
       - name: 📌 Upload xcodebuild logs on failure
         if: failure()
