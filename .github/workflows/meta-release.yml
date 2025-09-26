@@ -146,6 +146,12 @@ jobs:
             echo "Pod trunk push failed. Retrying in 30 seconds... ($i/5)"
             sleep 30
           done
+          
+          # Verify that the pod push actually succeeded
+          pod trunk push CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests || {
+            echo "❌ Pod trunk push failed after all retries"
+            exit 1
+          }
 
       - name: 🧾 Check pod trunk push succeeded
         run: pod trunk info CloudXMetaAdapter
