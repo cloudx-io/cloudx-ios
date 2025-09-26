@@ -13,7 +13,7 @@ jobs:
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TOKEN_NEW }}
+      COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
 
     steps:
       - name: 𝔠 Debug available Xcode versions
