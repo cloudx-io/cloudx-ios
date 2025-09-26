@@ -30,4 +30,7 @@ Pod::Spec.new do |s|
   s.user_target_xcconfig = {
     'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
   }
+  
+  # Swift version
+  s.swift_versions = ['5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9']
 end 
