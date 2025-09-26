@@ -86,9 +86,15 @@ jobs:
           # Update podspec version
           sed -i '' "s/s\.version.*=.*/s.version = '$VERSION'/" CloudXMetaAdapter.podspec
           
+          # Fix podspec source URL to point to correct version
+          sed -i '' "s|s\.source *=.*|s.source = { :http => \"https://github.com/cloudx-io/cloudx-ios/releases/download/${FULL_VERSION}/CloudXMetaAdapter-v${VERSION}.xcframework.zip\", :type => \"zip\", :flatten => false }|" CloudXMetaAdapter.podspec
+          
+          # Fix license path relative to podspec directory  
+          sed -i '' "s|s\.license *=.*|s.license = { :type => \"Business Source License 1.1\", :file => \"LICENSE\" }|" CloudXMetaAdapter.podspec
+          
           # Update root Package.swift version and checksum for CloudXMetaAdapter binary target
           cd ..
-          sed -i '' "s|url: \".*CloudXMetaAdapter.*\",|url: \"https://github.com/cloudx-io/cloudx-ios/releases/download/v$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip\",|" Package.swift
+          sed -i '' "s|url: \".*CloudXMetaAdapter.*\",|url: \"https://github.com/cloudx-io/cloudx-ios/releases/download/$FULL_VERSION/CloudXMetaAdapter-v$VERSION.xcframework.zip\",|" Package.swift
           sed -i '' "s|checksum: \".*\"|checksum: \"${{ steps.checksum.outputs.checksum }}\"|" Package.swift
 
       - name: 📊 Create GitHub release (step 1 - empty release)
