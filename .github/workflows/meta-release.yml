@@ -13,7 +13,7 @@ jobs:
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+      COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TOKEN_NEW }}
 
     steps:
       - name: 𝔠 Debug available Xcode versions
@@ -162,14 +162,23 @@ jobs:
             exit 1
           }
 
-      - name: 📤 Push podspec to CocoaPods trunk
+      - name: 📋 Verify CocoaPods authentication
         run: |
-          # Setup authentication immediately before push (like Core workflow)
-          mkdir -p ~/.cocoapods/trunk
-          echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TOKEN_NEW }}"}}' > ~/.cocoapods/trunk/me.json
-          cd adapter-meta
+          if [ -z "${COCOAPODS_TRUNK_TOKEN:-}" ]; then
+            echo "❌ COCOAPODS_TRUNK_TOKEN is empty/unset"
+            exit 1
+          else
+            echo "✅ COCOAPODS_TRUNK_TOKEN is set (length: ${#COCOAPODS_TRUNK_TOKEN})"
+          fi
+          echo "=== Checking authentication ==="
+          pod trunk me || true
+          echo "=== Checking pod ownership ==="
+          pod trunk info CloudXMetaAdapter || true
 
-          # Simple retry mechanism matching Core workflow pattern
+      - name: 📤 Push podspec to CocoaPods trunk
+        working-directory: adapter-meta
+        run: |
+          # Use ONLY environment variable - no file conflicts
           for i in {1..5}; do
             echo "=== Attempt $i/5 ==="
             if pod trunk push CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
