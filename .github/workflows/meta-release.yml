@@ -13,7 +13,7 @@ jobs:
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TOKEN_NEW }}
 
     steps:
       - name: 𝔠 Debug available Xcode versions
@@ -138,7 +138,7 @@ jobs:
       - name: 📤 Push podspec to CocoaPods trunk
         run: |
           mkdir -p ~/.cocoapods/trunk
-          echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TRUNK_TOKEN }}"}}' > ~/.cocoapods/trunk/me.json
+          echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TOKEN_NEW }}"}}' > ~/.cocoapods/trunk/me.json
           cd adapter-meta
 
           for i in {1..5}; do
