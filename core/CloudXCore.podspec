@@ -1,8 +1,8 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXCore'
   s.version = '1.1.53'
-  s.summary = 'Mobile SDK for CloudX iOS Core'
-  s.description = 'iOS SDK for CloudX programmatic advertising platform'
+  s.summary = 'Local development only'
+  s.description = 'NOTE: This podspec is for local development only'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
   s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
