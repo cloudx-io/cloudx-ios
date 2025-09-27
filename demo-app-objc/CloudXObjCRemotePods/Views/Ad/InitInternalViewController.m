@@ -209,7 +209,7 @@
         [CLXURLProvider setEnvironment:environmentKey];
     }
     
-    // INTERNAlso set the old key for backward compatibility with demo app config
+    // INTERNAL USE ONLY: Also set the old key for backward compatibility with demo app config
     [[NSUserDefaults standardUserDefaults] setObject:environmentKey forKey:@"CLXDemoEnvironment"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     

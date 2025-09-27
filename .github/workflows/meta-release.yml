@@ -84,13 +84,13 @@ jobs:
           FULL_VERSION=${{ steps.version.outputs.full_version }}
           
           # Update podspec version
-          sed -i '' "s/s\.version.*=.*/s.version = '$VERSION'/" CloudXMetaAdapter.podspec
+          sed -i '' "s/s\.version.*=.*/s.version = '$VERSION'/" CloudXMetaAdapter-remote.podspec
           
           # Fix podspec source URL to point to correct version
-          sed -i '' "s|https://github.com/cloudx-io/cloudx-ios/releases/download/.*CloudXMetaAdapter-v.*\.xcframework\.zip|https://github.com/cloudx-io/cloudx-ios/releases/download/${FULL_VERSION}/CloudXMetaAdapter-v${VERSION}.xcframework.zip|" CloudXMetaAdapter.podspec
+          sed -i '' "s|https://github.com/cloudx-io/cloudx-ios/releases/download/.*CloudXMetaAdapter-v.*\.xcframework\.zip|https://github.com/cloudx-io/cloudx-ios/releases/download/${FULL_VERSION}/CloudXMetaAdapter-v${VERSION}.xcframework.zip|" CloudXMetaAdapter-remote.podspec
           
           # Fix license path relative to podspec directory  
-          sed -i '' "s|'adapter-meta/LICENSE'|'LICENSE'|" CloudXMetaAdapter.podspec
+          sed -i '' "s|'adapter-meta/LICENSE'|'LICENSE'|" CloudXMetaAdapter-remote.podspec
           
           # Update root Package.swift version and checksum for CloudXMetaAdapter binary target
           cd ..
@@ -158,12 +158,12 @@ jobs:
       - name: 🧪 Validate podspec with detailed output
         run: |
           cd adapter-meta
-          echo "=== Validating CloudXMetaAdapter.podspec ==="
+          echo "=== Validating CloudXMetaAdapter-remote.podspec ==="
           echo "Current directory: $(pwd)"
           echo "Podspec content:"
-          cat CloudXMetaAdapter.podspec
+          cat CloudXMetaAdapter-remote.podspec
           echo "=== Running podspec validation ==="
-          pod spec lint CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose || {
+          pod spec lint CloudXMetaAdapter-remote.podspec --allow-warnings --skip-import-validation --skip-tests --verbose || {
             echo "❌ Podspec validation failed"
             exit 1
           }
@@ -185,12 +185,12 @@ jobs:
         run: |
           # Use EXACT same pattern as working Core workflow
           mkdir -p ~/.cocoapods/trunk
-          echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TOKEN_NEW }}"}}' > ~/.cocoapods/trunk/me.json
+          echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TRUNK_TOKEN }}"}}' > ~/.cocoapods/trunk/me.json
           cd adapter-meta
 
           for i in {1..5}; do
             echo "=== Attempt $i/5 ==="
-            if pod trunk push CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
+            if pod trunk push CloudXMetaAdapter-remote.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
               echo "✅ Pod trunk push succeeded on attempt $i"
               break
             else
