@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXCore'
-  s.version = '1.1.53'
+  s.version          = '1.1.54'
   s.summary = 'Local development only'
   s.description = 'NOTE: This podspec is for local development only'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
