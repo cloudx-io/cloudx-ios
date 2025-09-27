@@ -33,7 +33,7 @@ class BaseAdViewController: UIViewController, AdStateManaging {
     var isLoading = false
     
     var appKey: String? {
-        return CLXDemoConfigManager.sharedManager.currentConfig.appId
+        return CLXDemoConfigManager.sharedManager.currentConfig.appKey
     }
     
     let statusLabel: UILabel = {

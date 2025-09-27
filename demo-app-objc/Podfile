@@ -5,11 +5,10 @@ target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
   # Pods for CloudXObjCRemotePods
-  # pod 'CloudXCore', '~> 1.1.53'  # Remote from CocoaPods - just published!
-  # pod 'CloudXMetaAdapter', '~> 1.1.47'  # Remote from CocoaPods - just published!
-  # Test with locally built xcframework that includes missing classes
-  pod 'CloudXCore', '~> 1.1.53'  # Remote from CocoaPods trunk
-  pod 'CloudXMetaAdapter', :path => '../adapter-meta'  # Local xcframework with missing classes
+  # pod 'CloudXCore', '~> 1.1.53'
+  # pod 'CloudXMetaAdapter', '~> 1.1.47'
+  pod 'CloudXCore', :path => '../core'
+  pod 'CloudXMetaAdapter', :path => '../adapter-meta'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths

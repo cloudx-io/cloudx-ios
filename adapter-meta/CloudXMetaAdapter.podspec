@@ -1,21 +1,17 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXMetaAdapter'
-  s.version = '1.1.48'
+  s.version = '1.1.25'
   s.summary = 'Mobile SDK for CloudX iOS Meta Adapter'
   s.description = 'iOS adapter add-on to the CloudX iOS SDK for a Meta bidder'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
-  s.license = { :type => 'Business Source License 1.1', :file => 'adapter-meta/LICENSE' }
+  s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
   s.platform = :ios, '14.0'
   s.module_name = 'CloudXMetaAdapter'
   s.static_framework = true
-  s.source = {
-    :http => "https://github.com/cloudx-io/cloudx-ios/releases/download/v1.1.48-meta/CloudXMetaAdapter-v1.1.48.xcframework.zip",
-    :type => "zip",
-    :flatten => false
-  }
-  s.vendored_frameworks = 'CloudXMetaAdapter.xcframework'
-  s.preserve_paths = 'CloudXMetaAdapter.xcframework'
+  s.source = { :path => '.' }
+  s.source_files = 'Sources/**/*.{h,m}'
+  s.public_header_files = 'Sources/**/*.h'
   s.dependency 'CloudXCore'
   s.dependency 'FBAudienceNetwork', '~> 6.16.0'
   s.frameworks = [
@@ -36,7 +32,4 @@ Pod::Spec.new do |s|
     'OTHER_LDFLAGS' => '-ObjC'
   }
   s.requires_arc = true
-  
-  # Swift version
-  s.swift_versions = ['5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9', '6.0', '6.1', '6.2']
-end 
+end

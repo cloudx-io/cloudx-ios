@@ -10,7 +10,7 @@
 @implementation BaseAdViewController
 
 - (NSString *)appKey {
-    return [[CLXDemoConfigManager sharedManager] currentConfig].appId;
+    return [[CLXDemoConfigManager sharedManager] currentConfig].appKey;
 }
 
 - (void)viewDidLoad {

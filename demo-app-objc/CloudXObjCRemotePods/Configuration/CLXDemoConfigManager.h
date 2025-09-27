@@ -10,7 +10,7 @@ typedef NS_ENUM(NSInteger, CLXDemoEnvironment) {
 
 @interface CLXDemoConfig : NSObject
 
-@property (nonatomic, copy, readonly) NSString *appId;
+@property (nonatomic, copy, readonly) NSString *appKey;
 @property (nonatomic, copy, readonly) NSString *hashedUserId;
 @property (nonatomic, copy, readonly) NSString *baseURL;
 @property (nonatomic, copy, readonly) NSString *bannerPlacement;
@@ -21,7 +21,7 @@ typedef NS_ENUM(NSInteger, CLXDemoEnvironment) {
 @property (nonatomic, copy, readonly) NSString *rewardedPlacement;
 @property (nonatomic, copy, readonly) NSString *rewardedInterstitialPlacement;
 
-- (instancetype)initWithAppId:(NSString *)appId
+- (instancetype)initWithAppKey:(NSString *)appKey
                  hashedUserId:(NSString *)hashedUserId
                       baseURL:(NSString *)baseURL
                bannerPlacement:(NSString *)bannerPlacement

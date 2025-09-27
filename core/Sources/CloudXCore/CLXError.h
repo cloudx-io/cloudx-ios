@@ -123,6 +123,13 @@ extern NSString * const CLXErrorDomain;
 + (instancetype)errorWithCode:(CLXErrorCode)code description:(NSString *)description;
 
 /**
+ * Creates an error with appropriate CloudX error code based on HTTP status code
+ * @param httpStatusCode The HTTP status code from server response
+ * @return A new CLXError instance with appropriate error code and description
+ */
++ (instancetype)errorWithHTTPStatusCode:(NSInteger)httpStatusCode;
+
+/**
  * Creates an error with the specified CloudX error code and user info
  * @param code The CloudX error code
  * @param userInfo Additional user info dictionary
