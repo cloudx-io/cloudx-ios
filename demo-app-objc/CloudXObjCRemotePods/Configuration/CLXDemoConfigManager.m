@@ -2,7 +2,7 @@
 
 @implementation CLXDemoConfig
 
-- (instancetype)initWithAppId:(NSString *)appId
+- (instancetype)initWithAppKey:(NSString *)appKey
                  hashedUserId:(NSString *)hashedUserId
                       baseURL:(NSString *)baseURL
                bannerPlacement:(NSString *)bannerPlacement
@@ -15,7 +15,7 @@
     
     self = [super init];
     if (self) {
-        _appId = [appId copy];
+        _appKey = [appKey copy];
         _hashedUserId = [hashedUserId copy];
         _baseURL = [baseURL copy];
         _bannerPlacement = [bannerPlacement copy];
@@ -58,7 +58,7 @@
 - (void)setupConfigurations {
     // Dev Configuration (current production values)
     CLXDemoConfig *devConfig = [[CLXDemoConfig alloc] 
-        initWithAppId:@"g0PdN9_0ilfIcuNXhBopl"
+        initWithAppKey:@"g0PdN9_0ilfIcuNXhBopl"
         hashedUserId:@"test-user-123"
         baseURL:@"https://pro-dev.cloudx.io/sdk"
         bannerPlacement:@"metaBanner"
@@ -71,7 +71,7 @@
     
     // Staging Configuration
     CLXDemoConfig *stagingConfig = [[CLXDemoConfig alloc] 
-        initWithAppId:@"9o_9omGptuyS2n5wV0QJu"
+        initWithAppKey:@"9o_9omGptuyS2n5wV0QJu"
         hashedUserId:@"test-user-123-staging"
         baseURL:@"https://pro-stage.cloudx.io/sdk"
         bannerPlacement:@"metaBanner"
@@ -84,7 +84,7 @@
     
     // Production Configuration (placeholders)
     CLXDemoConfig *prodConfig = [[CLXDemoConfig alloc] 
-        initWithAppId:@"PROD_APP_ID_PLACEHOLDER"
+        initWithAppKey:@"PROD_APP_KEY_PLACEHOLDER"
         hashedUserId:@"prod-user-placeholder"
         baseURL:@"https://pro.cloudx.io/sdk"
         bannerPlacement:@"prodBanner"

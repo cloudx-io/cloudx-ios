@@ -43,13 +43,13 @@ static NSString *const kEnvironmentKey = @"CLXEnvironment";
     // In DEBUG builds, check user preference
     NSString *environment = [[NSUserDefaults standardUserDefaults] stringForKey:kEnvironmentKey];
     
-    if ([environment isEqualToString:@"staging"]) {
-        return kStagingInitURL;
+    if ([environment isEqualToString:@"dev"]) {
+        return kDevInitURL;
     } else if ([environment isEqualToString:@"production"]) {
         return kProductionInitURL;
     } else {
-        // Default to dev in DEBUG builds
-        return kDevInitURL;
+        // Default to staging in DEBUG builds
+        return kStagingInitURL;
     }
 #else
     // Production builds always use production
@@ -61,12 +61,12 @@ static NSString *const kEnvironmentKey = @"CLXEnvironment";
 #ifdef DEBUG
     NSString *environment = [[NSUserDefaults standardUserDefaults] stringForKey:kEnvironmentKey];
     
-    if ([environment isEqualToString:@"staging"]) {
-        return @"staging";
+    if ([environment isEqualToString:@"dev"]) {
+        return @"development";
     } else if ([environment isEqualToString:@"production"]) {
         return @"production";
     } else {
-        return @"development";
+        return @"staging";
     }
 #else
     return @"production";

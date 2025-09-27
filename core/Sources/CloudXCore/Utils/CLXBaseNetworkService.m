@@ -259,7 +259,7 @@
             // Handle HTTP error status codes (non-2xx)
             [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] HTTP status code indicates error: %ld", (long)httpResponse.statusCode]];
             if (completion) {
-                completion(nil, [CLXError errorWithCode:CLXErrorCodeLoadFailed], false);
+                completion(nil, [CLXError errorWithHTTPStatusCode:httpResponse.statusCode], false);
             }
         }
     }];

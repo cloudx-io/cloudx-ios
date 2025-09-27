@@ -209,25 +209,12 @@
         [CLXURLProvider setEnvironment:environmentKey];
     }
     
-    // Also set the old key for backward compatibility with demo app config
+    // INTERNAlso set the old key for backward compatibility with demo app config
     [[NSUserDefaults standardUserDefaults] setObject:environmentKey forKey:@"CLXDemoEnvironment"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Initializing SDK with %@ environment", environmentName]];
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"AppId: %@", config.appId]];
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"HashedUserId: %@", config.hashedUserId]];
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"BaseURL: %@", config.baseURL]];
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Environment set to: %@", environmentKey]];
-    
-    // Log the environment and bootstrap URL (other URLs come from SDK response)
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔧 Environment Config - %@:", [CLXURLProvider environmentName]]];
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"  Bootstrap URL: %@", [CLXURLProvider initApiUrl]]];
-    [[DemoAppLogger sharedInstance] logMessage:@"  Other URLs (tracker, metrics, etc.) will come from SDK init response"];
-    
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Using standard SDK init with %@ environment", environmentName]];
-    
     // Use standard CloudXCore initialization which will now use our environment override
-    [[CloudXCore shared] initSDKWithAppKey:config.appId 
+    [[CloudXCore shared] initSDKWithAppKey:config.appKey 
                               hashedUserID:config.hashedUserId 
                                 completion:^(BOOL success, NSError * _Nullable error) {
         // Clear old environment override after initialization (success or failure)

@@ -20,6 +20,41 @@ NSString * const CLXErrorDomain = @"CLXErrorDomain";
     return [self errorWithCode:code userInfo:userInfo];
 }
 
++ (instancetype)errorWithHTTPStatusCode:(NSInteger)httpStatusCode {
+    CLXErrorCode errorCode;
+    NSString *description;
+    
+    switch (httpStatusCode) {
+        case 401:
+            errorCode = CLXErrorCodeInvalidAppKey;
+            description = @"Invalid app key. Please verify your app key is correct and active.";
+            break;
+        case 403:
+            errorCode = CLXErrorCodeInvalidAppKey;
+            description = @"App key access denied. Please check your app key permissions.";
+            break;
+        case 404:
+            errorCode = CLXErrorCodeInvalidAppKey;
+            description = @"App key not found. Please verify your app key exists and is properly configured.";
+            break;
+        case 400:
+            errorCode = CLXErrorCodeInvalidRequest;
+            description = [NSString stringWithFormat:@"Bad request (HTTP %ld). Please check your request parameters.", (long)httpStatusCode];
+            break;
+        default:
+            if (httpStatusCode >= 500 && httpStatusCode < 600) {
+                errorCode = CLXErrorCodeServerError;
+                description = [NSString stringWithFormat:@"Server error (HTTP %ld). Please try again later.", (long)httpStatusCode];
+            } else {
+                errorCode = CLXErrorCodeLoadFailed;
+                description = [NSString stringWithFormat:@"HTTP error %ld occurred.", (long)httpStatusCode];
+            }
+            break;
+    }
+    
+    return [self errorWithCode:errorCode description:description];
+}
+
 + (instancetype)errorWithCode:(CLXErrorCode)code userInfo:(nullable NSDictionary *)userInfo {
     NSMutableDictionary *errorUserInfo = [NSMutableDictionary dictionary];
     

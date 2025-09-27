@@ -97,7 +97,8 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         [self.logger error:@"❌ [SDKInitNetworkService] Backoff strategy exhausted"];
         [self.backOffStrategy reset];
         if (completion) {
-            completion(nil, [CLXError errorWithCode:CLXErrorCodeNotInitialized]);
+            completion(nil, [CLXError errorWithCode:CLXErrorCodeInitializationTimeout 
+                                       description:@"SDK initialization timed out after multiple retry attempts. Please check your network connection and try again."]);
         }
         return;
     }
@@ -149,7 +150,9 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
             
             if (error) {
                 [self.logger error:[NSString stringWithFormat:@"❌ [SDKInitNetworkService] Network request failed: %@", error.localizedDescription]];
-                [self tryInitSDKWithAppKey:appKey completion:completion];
+                if (completion) {
+                    completion(nil, error);
+                }
                 return;
             } else if (isKillSwitchEnabled) {
                 NSError *sdkDisabledError = [CLXError errorWithCode:CLXErrorCodeSDKDisabled description:@"No response data"];
@@ -164,7 +167,8 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
                 if (!config) {
                     [self.logger error:@"❌ [SDKInitNetworkService] Failed to parse SDK config from response"];
                     if (completion) {
-                        completion(nil, [CLXError errorWithCode:CLXErrorCodeNotInitialized]);
+                        completion(nil, [CLXError errorWithCode:CLXErrorCodeInvalidResponse 
+                                               description:@"Invalid server response: Unable to parse SDK configuration. Please try again or contact support."]);
                     }
                     return;
                 }

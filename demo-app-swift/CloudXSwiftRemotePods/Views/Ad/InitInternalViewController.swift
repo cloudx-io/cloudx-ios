@@ -207,7 +207,7 @@ class InitInternalViewController: BaseAdViewController {
         DemoAppLogger.sharedInstance.logMessage("Initializing SDK with \(environmentName) environment")
         
         // Use standard CloudXCore initialization which will now use our environment override
-        CloudXCore.shared.initSDK(withAppKey: config.appId, 
+        CloudXCore.shared.initSDK(withAppKey: config.appKey, 
                                  hashedUserID: config.hashedUserId) { [weak self] success, error in
             // Clear old environment override after initialization (success or failure)
             UserDefaults.standard.removeObject(forKey: "CLXDemoEnvironment")

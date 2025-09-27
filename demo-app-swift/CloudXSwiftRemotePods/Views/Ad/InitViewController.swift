@@ -6,46 +6,79 @@ extension Notification.Name {
 }
 
 class InitViewController: BaseAdViewController {
-    // Uses appKey from BaseAdViewController (CLXDemoConfigManager)
+    
+    private var isSDKInitialized: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.title = "Swift Demo"
         setupCenteredButton(title: "Initialize SDK", action: #selector(initializeSDK))
-        updateStatusUI(state: AdState.noAd)
+        
+        // Check if SDK is already initialized
+        isSDKInitialized = CloudXCore.shared.isInitialised
+        updateStatusUI(state: isSDKInitialized ? .ready : .noAd)
     }
     
-    private func updateStatusUI(isInitialized: Bool) {
-        if isInitialized {
-            statusLabel.text = "SDK READY"
-            statusLabel.textColor = .systemGreen
-            statusIndicator.backgroundColor = .systemGreen
-        } else {
-            statusLabel.text = "SDK not initialized"
-            statusLabel.textColor = .systemRed
-            statusIndicator.backgroundColor = .systemRed
+    // Override to prevent show logs button from appearing in InitViewController
+    override func setupShowLogsButton() {
+        // Do nothing - no show logs button for InitViewController
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+        // Update UI if SDK is already initialized
+        if isSDKInitialized {
+            updateStatusUI(state: .ready)
+        }
+    }
+    
+    // Override to provide SDK-specific status messages instead of ad-related ones
+    override func updateStatusUI(state: AdState) {
+        DispatchQueue.main.async {
+            let text: String
+            let color: UIColor
+            
+            switch state {
+            case .noAd:
+                text = "SDK Not Initialized"
+                color = .systemRed
+            case .loading:
+                text = "SDK Initializing..."
+                color = .systemYellow
+            case .ready:
+                text = "SDK Initialized"
+                color = .systemGreen
+            }
+            
+            self.statusLabel.text = text
+            self.statusLabel.textColor = color
+            self.statusIndicator.backgroundColor = color
         }
     }
     
     @objc private func initializeSDK() {
-        guard let key = appKey, !key.isEmpty else {
-            showAlert(title: "Error", message: "API key is missing.")
+        if isSDKInitialized {
+            showAlert(title: "SDK Already Initialized", message: "The SDK is already initialized.")
             return
         }
         
-        UserDefaults.standard.set("https://pro-dev.cloudx.io/sdk", forKey: "CloudXInitURL")
+        updateStatusUI(state: .loading)
         
-        Task {
-            do {
-                await super.initializeSDK()
-                DispatchQueue.main.async {
-                    self.updateStatusUI(isInitialized: true)
-                }
-            } catch {
-                print("❌ SDK Init Failed: \(error)")
-                showAlert(title: "SDK Init Failed", message: error.localizedDescription)
-                DispatchQueue.main.async {
-                    self.updateStatusUI(isInitialized: false)
-                }
+        let config = CLXDemoConfigManager.sharedManager.currentConfig
+        
+        CloudXCore.shared.initSDK(withAppKey: config.appKey, hashedUserID: config.hashedUserId) { [weak self] success, error in
+            guard let self = self else { return }
+            
+            if success {
+                DemoAppLogger.sharedInstance.logMessage("SDK initialized successfully")
+                self.isSDKInitialized = true
+                self.updateStatusUI(state: .ready)
+                NotificationCenter.default.post(name: .sdkInitialized, object: nil)
+            } else {
+                let errorMessage = error?.localizedDescription ?? "Unknown error occurred"
+                self.showAlert(title: "SDK Init Failed", message: errorMessage)
+                self.updateStatusUI(state: .noAd)
             }
         }
     }

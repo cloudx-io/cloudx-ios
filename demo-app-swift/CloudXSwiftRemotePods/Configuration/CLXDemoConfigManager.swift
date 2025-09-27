@@ -7,7 +7,7 @@ enum CLXDemoEnvironment: Int {
 }
 
 class CLXDemoConfig {
-    let appId: String
+    let appKey: String
     let hashedUserId: String
     let baseURL: String
     let bannerPlacement: String
@@ -18,7 +18,7 @@ class CLXDemoConfig {
     let rewardedPlacement: String
     let rewardedInterstitialPlacement: String
     
-    init(appId: String,
+    init(appKey: String,
          hashedUserId: String,
          baseURL: String,
          bannerPlacement: String,
@@ -29,7 +29,7 @@ class CLXDemoConfig {
          rewardedPlacement: String,
          rewardedInterstitialPlacement: String) {
         
-        self.appId = appId
+        self.appKey = appKey
         self.hashedUserId = hashedUserId
         self.baseURL = baseURL
         self.bannerPlacement = bannerPlacement
@@ -55,7 +55,7 @@ class CLXDemoConfigManager {
     private init() {
         // Dev Configuration (current production values)
         let devConfig = CLXDemoConfig(
-            appId: "g0PdN9_0ilfIcuNXhBopl",
+            appKey: "g0PdN9_0ilfIcuNXhBopl",
             hashedUserId: "test-user-123",
             baseURL: "https://pro-dev.cloudx.io/sdk",
             bannerPlacement: "metaBanner",
@@ -69,7 +69,7 @@ class CLXDemoConfigManager {
         
         // Staging Configuration
         let stagingConfig = CLXDemoConfig(
-            appId: "9o_9omGptuyS2n5wV0QJu",
+            appKey: "9o_9omGptuyS2n5wV0QJu",
             hashedUserId: "test-user-123-staging",
             baseURL: "https://pro-stage.cloudx.io/sdk",
             bannerPlacement: "metaBanner",
@@ -83,7 +83,7 @@ class CLXDemoConfigManager {
         
         // Production Configuration (placeholders)
         let prodConfig = CLXDemoConfig(
-            appId: "PROD_APP_ID_PLACEHOLDER",
+            appKey: "PROD_APP_KEY_PLACEHOLDER",
             hashedUserId: "prod-user-placeholder",
             baseURL: "https://pro.cloudx.io/sdk",
             bannerPlacement: "prodBanner",

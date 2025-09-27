@@ -17,8 +17,8 @@
     self.title = @"ObjC Demo";
     [self setupCenteredButtonWithTitle:@"Initialize SDK" action:@selector(initializeSDK)];
     
-    // Set default environment to Development for external InitViewController
-    [[CLXDemoConfigManager sharedManager] setEnvironment:CLXDemoEnvironmentDev];
+    // Set environment to staging for third-party usage
+    [[CLXDemoConfigManager sharedManager] setEnvironment:CLXDemoEnvironmentStaging];
     
     // Check if SDK is already initialized
     self.isSDKInitialized = [[CloudXCore shared] isInitialised];
@@ -77,12 +77,7 @@
     
     CLXDemoConfig *config = [[CLXDemoConfigManager sharedManager] currentConfig];
     
-    NSString *appId = config.appId;
-    
-    if (_settings.bannerPlacement.length > 0) {
-        appId = _settings.appKey;
-    }
-    [[CloudXCore shared] initSDKWithAppKey:appId
+    [[CloudXCore shared] initSDKWithAppKey:config.appKey
                               hashedUserID:config.hashedUserId
                                 completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
@@ -93,6 +88,7 @@
         } else {
             NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
             [self showAlertWithTitle:@"SDK Init Failed" message:errorMessage];
+            [self updateStatusUIWithState:AdStateNoAd];
         }
     }];
 }

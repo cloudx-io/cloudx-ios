@@ -167,7 +167,8 @@ static CloudXCore *_sharedInstance = nil;
         if (!appKey || appKey.length == 0) {
             [self.logger error:@"❌ [CloudXCore] AppKey is nil or empty"];
             if (completion) {
-                completion(NO, [CLXError errorWithCode:CLXErrorCodeNotInitialized]);
+                completion(NO, [CLXError errorWithCode:CLXErrorCodeInvalidAppKey 
+                                          description:@"App key cannot be nil or empty. Please provide a valid app key."]);
             }
             return;
         }
@@ -201,7 +202,8 @@ static CloudXCore *_sharedInstance = nil;
         if (!_initService) {
             [self.logger error:@"❌ [CloudXCore] Still failed to resolve InitService after re-registration"];
             if (completion) {
-                completion(NO, [CLXError errorWithCode:CLXErrorCodeNotInitialized]);
+                completion(NO, [CLXError errorWithCode:CLXErrorCodeNotInitialized 
+                                          description:@"SDK initialization failed: Unable to initialize required services. Please try again or contact support."]);
             }
             return;
         } else {
@@ -217,6 +219,8 @@ static CloudXCore *_sharedInstance = nil;
         
         if (error) {
             [self.logger error:[NSString stringWithFormat:@"❌ [CloudXCore] InitService failed with error: %@", error]];
+            [self.logger error:[NSString stringWithFormat:@"❌ [CloudXCore] Error domain: %@, code: %ld, description: %@", error.domain, (long)error.code, error.localizedDescription]];
+            [self.logger error:[NSString stringWithFormat:@"❌ [CloudXCore] Error class: %@", NSStringFromClass([error class])]];
             if (completion) {
                 completion(NO, error);
             }
@@ -226,7 +230,8 @@ static CloudXCore *_sharedInstance = nil;
         if (!config) {
             [self.logger error:@"❌ [CloudXCore] InitService returned nil config"];
             if (completion) {
-                completion(NO, [CLXError errorWithCode:CLXErrorCodeNotInitialized]);
+                completion(NO, [CLXError errorWithCode:CLXErrorCodeNotInitialized 
+                                          description:@"SDK initialization failed: No configuration received from server. Please check your app key and network connection."]);
             }
             return;
         }
