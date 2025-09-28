@@ -191,9 +191,12 @@ jobs:
           echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TRUNK_TOKEN }}"}}' > ~/.cocoapods/trunk/me.json
           cd adapter-meta
 
+          # Temporarily rename for push (CocoaPods requires filename to match spec name)
+          cp CloudXMetaAdapter-remote.podspec CloudXMetaAdapter.podspec
+          
           for i in {1..5}; do
             echo "=== Attempt $i/5 ==="
-            if pod trunk push CloudXMetaAdapter-remote.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
+            if pod trunk push CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
               echo "✅ Pod trunk push succeeded on attempt $i"
               break
             else
@@ -207,6 +210,8 @@ jobs:
               fi
             fi
           done
+          
+          rm CloudXMetaAdapter.podspec
 
       - name: 🧾 Verify successful pod trunk push
         run: |
