@@ -6,7 +6,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CLXSessionMetricModel.h>
 #import <CloudXCore/CLXSessionMetric.h>
 
 NS_ASSUME_NONNULL_BEGIN

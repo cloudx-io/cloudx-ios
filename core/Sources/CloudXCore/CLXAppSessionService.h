@@ -3,12 +3,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol CLXAppSessionService <CLXAppSessionMetric>
-@property (nonatomic, readonly) NSTimeInterval sessionDuration;
-@property (nonatomic, readonly) id currentSession;
-@end
-
-@interface CLXAppSessionServiceImplementation : NSObject <CLXAppSessionService>
+/**
+ * Service for managing app session lifecycle and metrics
+ */
+@interface CLXAppSessionService : NSObject <CLXAppSessionMetric>
 
 @property (nonatomic, readonly) NSTimeInterval sessionDuration;
 @property (nonatomic, readonly) id currentSession;

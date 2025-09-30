@@ -1,16 +1,14 @@
-#import <CloudXCore/CLXAppSessionServiceImplementation.h>
 #import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXAppSession.h>
 #import <CloudXCore/CLXLogger.h>
-#import <CloudXCore/CLXCoreDataManager.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 
-@interface CLXAppSessionServiceImplementation ()
+@interface CLXAppSessionService ()
 @property (nonatomic, strong) CLXAppSession *currentSession;
 @property (nonatomic, strong) CLXLogger *logger;
 @end
 
-@implementation CLXAppSessionServiceImplementation
+@implementation CLXAppSessionService
 
 - (instancetype)initWithSessionID:(NSString *)sessionID
                            appKey:(NSString *)appKey

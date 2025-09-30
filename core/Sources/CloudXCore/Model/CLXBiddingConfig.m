@@ -145,13 +145,17 @@ static void initializeLogger() {
         
         // Add default bidder to satisfy server validation
         // The server expects at least one bidder in ext.prebid.bidder
+        // Get current loop-index from UserDefaults (updated by banner load logic)
+        NSDictionary<NSString *, NSString *> *bannerUserDict = [[NSUserDefaults standardUserDefaults] objectForKey:kCLXCoreBannerUserKeyValueKey];
+        NSString *loopIndexValue = bannerUserDict[@"loop-index"] ?: @"0";
+        
         NSDictionary *defaultBidder = @{
             @"testbidder": @{
                 @"adservertargeting": @[
                     @{
                         @"key": @"loop-index",
                         @"source": @"bidrequest",
-                        @"value": @"0"
+                        @"value": loopIndexValue
                     }
                 ]
             }
@@ -164,7 +168,8 @@ static void initializeLogger() {
         CLXBiddingConfigImpressionExt *impExt = [[CLXBiddingConfigImpressionExt alloc] init];
         impExt.prebid = storedImpression;
         
-        impExt.data = @{@"loop-index": @"0"};
+        // Use the same loop-index value from UserDefaults
+        impExt.data = @{@"loop-index": loopIndexValue};
         
         // Create native ad if needed
         CLXBiddingConfigImpressionNative *native = nil;
@@ -420,10 +425,7 @@ static void initializeLogger() {
         [logger error:[NSString stringWithFormat:@"❌ [ObjC-BiddingConfig] JSON serialization error: %@", error]];
     } else {
         NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        [logger info:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] Complete Bid Request JSON:"]];
-        [logger info:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] ========================================"]];
-        [logger info:[NSString stringWithFormat:@"%@", jsonString]];
-        [logger info:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] ========================================"]];
+//        [logger info:[NSString stringWithFormat:@"[ObjC-BiddingConfig] %@", jsonString]];
     }
     
     return [json copy];

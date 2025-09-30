@@ -122,7 +122,11 @@
     
     for (NSDictionary *row in results) {
         CLXMetricsEvent *event = [CLXMetricsEvent fromDictionary:row];
-        [events addObject:event];
+        if (event) {
+            [events addObject:event];
+        } else {
+            [self.logger error:[NSString stringWithFormat:@"❌ [MetricsEventDao] Failed to create CLXMetricsEvent from row: %@", row]];
+        }
     }
     
     [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsEventDao] Retrieved %lu metrics events", (unsigned long)events.count]];

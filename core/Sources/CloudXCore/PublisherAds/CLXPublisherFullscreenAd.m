@@ -58,7 +58,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 @property (nonatomic, copy, nullable) NSString *rewardedCallbackUrl;
 @property (nonatomic, assign) NSInteger adType;
 @property (nonatomic, strong) CLXLogger *logger;
-@property (nonatomic, strong) id<CLXAppSessionService> appSessionService;
+@property (nonatomic, strong) CLXAppSessionService * appSessionService;
 @property (nonatomic, strong, nullable) CLXBidAdSource *bidAdSource;
 @property (nonatomic, strong) CLXSettings *settings;
 
@@ -133,7 +133,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
         // Use metrics URL from SDK response (stored in user defaults)
         NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @"";
-        _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
+        _appSessionService = [[CLXAppSessionService alloc] initWithSessionID:sessionID
                                                                                  appKey:appKey
                                                                                     url:metricsURL];
         

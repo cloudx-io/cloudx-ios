@@ -50,6 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Transaction support
  */
 - (void)executeInTransaction:(void (^)(void))block;
+- (BOOL)executeInTransactionWithResult:(BOOL (^)(void))block;
 
 /**
  * Utility methods

@@ -28,15 +28,7 @@ static NSString * const kTestAuctionID = @"test-auction-456";
 static NSString * const kTestBidID = @"test-bid-789";
 static NSString * const kTestPlacementID = @"test-placement-abc";
 
-// Event types matching Android enum
-typedef NS_ENUM(NSInteger, CLXRillEventType) {
-    CLXRillEventTypeSDKInit,        // sdkinitenc
-    CLXRillEventTypeBidRequest,     // bidreqenc
-    CLXRillEventTypeImpression,     // sdkimpenc
-    CLXRillEventTypeClick,          // clickenc
-    CLXRillEventTypeSDKError,       // sdkerrorenc
-    CLXRillEventTypeSDKMetrics      // sdkmetricenc
-};
+// Event types are now defined in CLXRillTrackingServiceV2.h
 
 // Ad types for testing
 typedef NS_ENUM(NSInteger, CLXTestAdType) {

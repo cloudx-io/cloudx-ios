@@ -7,7 +7,7 @@
 
 #import <CloudXCore/CLXMetricsNetworkService.h>
 #import <CloudXCore/CLXSessionMetricType.h>
-#import <CloudXCore/CLXPerformanceMetricModel.h>
+#import <CloudXCore/CLXPerformanceMetric.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXErrorReporter.h>
@@ -92,17 +92,17 @@
     return self;
 }
 
-- (void)trackEndSessionWithSession:(CLXAppSessionModel *)session {
+- (void)trackEndSessionWithSession:(CLXAppSession *)session {
     [self trackEndSessionWithSession:session completion:^(BOOL success, NSError * _Nullable error) {
         // Default completion handler
     }];
 }
 
-- (void)trackEndSessionWithSession:(CLXAppSessionModel *)session
-                       completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
+- (void)trackEndSessionWithSession:(CLXAppSession *)session
+                      completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
     
     // Validate required parameters
-    if (!session.id || !session.appKey) {
+    if (!session.sessionID || !session.appKey) {
         NSError *error = [NSError errorWithDomain:@"MetricsNetworkService"
                                            code:MetricsNetworkErrorInvalidRequest
                                        userInfo:@{NSLocalizedDescriptionKey: @"Invalid request: missing session ID or app key"}];
@@ -116,8 +116,10 @@
     NSMutableArray<CLXMetricsNetworkServiceRequestSessionMetric *> *metrics = [NSMutableArray array];
     
     // Convert regular metrics
+    // TODO: Update to work with SQLite-based metrics - temporarily disabled
+    /*
     if (session.metrics) {
-        for (CLXSessionMetricModel *metricModel in session.metrics.allObjects) {
+        for (CLXSessionMetric *metric in session.metrics) {
             CLXSessionMetricSpend *metricSpend = [[CLXSessionMetricSpend alloc] initWithMetricModel:metricModel];
             if (metricSpend) {
                 CLXMetricsNetworkServiceRequestSessionMetric *metric = [[CLXMetricsNetworkServiceRequestSessionMetric alloc] initWithMetric:metricSpend];
@@ -125,8 +127,11 @@
             }
         }
     }
+    */
     
     // Convert performance metrics
+    // TODO: Update to work with SQLite-based performance metrics - temporarily disabled
+    /*
     if (session.performanceMetrics) {
         NSMutableDictionary<NSString *, NSNumber *> *fillRateMeta = [NSMutableDictionary dictionary];
         NSMutableDictionary<NSString *, NSNumber *> *ctrMeta = [NSMutableDictionary dictionary];
@@ -136,7 +141,7 @@
         NSMutableDictionary<NSString *, NSNumber *> *failToLoadAdCountMeta = [NSMutableDictionary dictionary];
         NSMutableDictionary<NSString *, NSNumber *> *closeLatencyMeta = [NSMutableDictionary dictionary];
         
-        for (CLXPerformanceMetricModel *metric in session.performanceMetrics.allObjects) {
+        for (CLXPerformanceMetric *metric in session.performanceMetrics) {
             NSString *placementID = metric.placementID;
             if (!placementID) continue;
             
@@ -200,10 +205,11 @@
         
         [metrics addObjectsFromArray:@[fillRateMetric, ctrMetric, bidRequestLatencyMetric, adLoadLatencyMetric, clickCountMetric, failToLoadAdCountMetric, closeLatencyMetric]];
     }
+    */
     
     // Create session
-    CLXMetricsNetworkServiceRequestSession *requestSession = [[CLXMetricsNetworkServiceRequestSession alloc] initWithID:session.id
-                                                                                                         duration:(NSInteger)session.duration
+    CLXMetricsNetworkServiceRequestSession *requestSession = [[CLXMetricsNetworkServiceRequestSession alloc] initWithID:session.sessionID
+                                                                                                         duration:(NSInteger)session.sessionDuration
                                                                                                           metrics:metrics];
     
     // Create request

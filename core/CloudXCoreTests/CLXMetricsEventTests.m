@@ -21,11 +21,11 @@
     
     // When
     CLXMetricsEvent *event = [[CLXMetricsEvent alloc] initWithEventId:eventId
-                                                           metricName:metricName
-                                                              counter:counter
-                                                         totalLatency:totalLatency
                                                             sessionId:sessionId
+                                                           metricName:metricName
                                                             auctionId:auctionId];
+    event.counter = counter;
+    event.totalLatency = totalLatency;
     
     // Then
     XCTAssertNotNil(event);
@@ -83,11 +83,11 @@
 - (void)testMetricsEventToDictionary {
     // Given
     CLXMetricsEvent *event = [[CLXMetricsEvent alloc] initWithEventId:@"test-id"
-                                                           metricName:@"method_create_rewarded"
-                                                              counter:2
-                                                         totalLatency:500
                                                             sessionId:@"session-123"
+                                                           metricName:@"method_create_rewarded"
                                                             auctionId:@"auction-456"];
+    event.counter = 2;
+    event.totalLatency = 500;
     
     // When
     NSDictionary *dictionary = [event toDictionary];
@@ -105,11 +105,11 @@
 - (void)testMetricsEventDescription {
     // Given
     CLXMetricsEvent *event = [[CLXMetricsEvent alloc] initWithEventId:@"test-id"
-                                                           metricName:@"method_create_native"
-                                                              counter:1
-                                                         totalLatency:100
                                                             sessionId:@"session-789"
+                                                           metricName:@"method_create_native"
                                                             auctionId:@"auction-101"];
+    event.counter = 1;
+    event.totalLatency = 100;
     
     // When
     NSString *description = [event description];

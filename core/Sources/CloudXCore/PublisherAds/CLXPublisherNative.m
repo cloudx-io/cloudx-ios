@@ -62,7 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger loadNativeTimesCount;
 @property (nonatomic, strong) CLXSDKConfigPlacement *placement;
 @property (nonatomic, strong, nullable) NSDate *adLoadStartTime;
-@property (nonatomic, strong) id<CLXAppSessionService> appSessionService;
+@property (nonatomic, strong) CLXAppSessionService * appSessionService;
 
 // Rill tracking service for analytics events
 @property (nonatomic, strong) CLXRillTrackingService *rillTrackingService;
@@ -120,7 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
         // Initialize app session service (singleton)
         NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey] ?: @"";
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
-        _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
+        _appSessionService = [[CLXAppSessionService alloc] initWithSessionID:sessionID
                                                                                  appKey:appKey
                                                                                     url:[[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @""];
         

@@ -13,10 +13,8 @@
 #import <CloudXCore/CLXInitService.h>
 #import <CloudXCore/CLXMetricsTracker.h>
 #import <CloudXCore/CLXErrorReporter.h>
-#import <CloudXCore/CLXCoreDataManager.h>
 #import <CloudXCore/CLXGeoLocationService.h>
 #import <CloudXCore/CLXAppSessionService.h>
-#import <CloudXCore/CLXAppSessionServiceImplementation.h>
 #import <CloudXCore/CLXBidNetworkService.h>
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <CloudXCore/CLXSettings.h>
@@ -52,12 +50,9 @@
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXBidResponse.h>
 #import <CloudXCore/CLXBidderConfig.h>
-#import <CloudXCore/CLXAppSessionModel.h>
 #import <CloudXCore/CLXAppSession.h>
-#import <CloudXCore/CLXSessionMetricModel.h>
 #import <CloudXCore/CLXSessionMetricSpend.h>
 #import <CloudXCore/CLXSessionMetricPerformance.h>
-#import <CloudXCore/CLXPerformanceMetricModel.h>
 #import <CloudXCore/CLXSessionMetric.h>
 #import <CloudXCore/CLXSessionMetricType.h>
 #import <CloudXCore/CLXBiddingConfig.h>
@@ -136,11 +131,6 @@
 #import <CloudXCore/CLXSDKConfigPlacement.h>
 #import <CloudXCore/CLXSDKConfigEndpointObject.h>
 #import <CloudXCore/CLXInitMetrics.h>
-#import <CloudXCore/CLXInitMetricsModel.h>
-#import <CloudXCore/CLXInitMetricsModel+Update.h>
-#import <CloudXCore/CLXAppSessionModel+Update.h>
-#import <CloudXCore/CLXSessionMetricModel+Update.h>
-#import <CloudXCore/CLXPerformanceMetricModel+Update.h>
 
 // Additional Adapters
 #import <CloudXCore/CLXAdapterFactoryResolver.h>
@@ -154,6 +144,30 @@
 #import <CloudXCore/CLXURLProvider.h>
 #import <CloudXCore/URLSession+CLX.h>
 #import <CloudXCore/UIDevice+CLXIdentifier.h>
+
+// Database Layer
+#import <CloudXCore/CLXDatabaseProtocol.h>
+#import <CloudXCore/CLXDaoProtocols.h>
+#import <CloudXCore/CLXBaseDao.h>
+#import <CloudXCore/CLXCloudXDatabase.h>
+#import <CloudXCore/CLXDatabaseSchema.h>
+#import <CloudXCore/CLXRetryManager.h>
+
+// Database Models
+#import <CloudXCore/CLXBaseEvent.h>
+#import <CloudXCore/CLXMetricsEvent.h>
+#import <CloudXCore/CLXRillEvent.h>
+#import <CloudXCore/CLXSession.h>
+#import <CloudXCore/CLXPerformanceMetric.h>
+
+// Database DAOs
+#import <CloudXCore/CLXMetricsEventDaoImpl.h>
+#import <CloudXCore/CLXRillEventDaoImpl.h>
+#import <CloudXCore/CLXSessionDaoImpl.h>
+#import <CloudXCore/CLXPerformanceDaoImpl.h>
+
+// Database Services
+#import <CloudXCore/CLXRillTrackingServiceV2.h>
 
 // Additional Ad Reporting
 #import <CloudXCore/CLXAdEventReporting.h>

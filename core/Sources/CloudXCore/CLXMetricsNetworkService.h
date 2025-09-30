@@ -7,7 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CloudXCore/CLXBaseNetworkService.h>
-#import <CloudXCore/CLXAppSessionModel.h>
+#import <CloudXCore/CLXAppSession.h>
 #import <CloudXCore/CLXSessionMetricSpend.h>
 
 @class CLXErrorReporter;
@@ -92,8 +92,8 @@ typedef NS_ENUM(NSInteger, MetricsNetworkError) {
  * @param session The AppSessionModel containing the session data to track
  * @param completion Completion block called when the operation finishes
  */
-- (void)trackEndSessionWithSession:(CLXAppSessionModel *)session
-                       completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
+- (void)trackEndSessionWithSession:(CLXAppSession *)session
+                      completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
 
 /**
  * @brief Tracks the end of a session by sending metrics to the server (async version)
@@ -101,9 +101,9 @@ typedef NS_ENUM(NSInteger, MetricsNetworkError) {
  * This method converts the AppSessionModel to the appropriate request format
  * and sends it to the server. It handles both regular metrics and performance metrics.
  * 
- * @param session The CLXAppSessionModel containing the session data to track
+ * @param session The CLXAppSession containing the session data to track
  */
-- (void)trackEndSessionWithSession:(CLXAppSessionModel *)session;
+- (void)trackEndSessionWithSession:(CLXAppSession *)session;
 
 @end
 

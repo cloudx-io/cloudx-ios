@@ -8,7 +8,6 @@
 #import <Foundation/Foundation.h>
 #import <CloudXCore/CLXSessionMetric.h>
 #import <CloudXCore/CLXSessionMetricType.h>
-#import <CloudXCore/CLXSessionMetricModel.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -24,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
                                value:(double)value
                             timestamp:(NSDate *)timestamp;
 
-- (instancetype)initWithMetricModel:(CLXSessionMetricModel *)model;
 
 - (NSString *)typeString;
 

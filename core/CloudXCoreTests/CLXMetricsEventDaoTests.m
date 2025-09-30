@@ -75,11 +75,11 @@
 - (void)testInsertMetricsEvent {
     // Given
     CLXMetricsEvent *event = [[CLXMetricsEvent alloc] initWithEventId:@"test-id"
-                                                           metricName:@"method_create_banner"
-                                                              counter:1
-                                                         totalLatency:250
                                                             sessionId:@"session-123"
+                                                           metricName:@"method_create_banner"
                                                             auctionId:@"auction-456"];
+    event.counter = 1;
+    event.totalLatency = 250;
     
     // When
     BOOL result = [self.dao insert:event];
@@ -111,11 +111,11 @@
     // Given
     self.mockDatabase.shouldFailExecute = YES;
     CLXMetricsEvent *event = [[CLXMetricsEvent alloc] initWithEventId:@"test-id"
-                                                           metricName:@"method_sdk_init"
-                                                              counter:1
-                                                         totalLatency:100
                                                             sessionId:@"session-123"
+                                                           metricName:@"method_sdk_init"
                                                             auctionId:@"auction-456"];
+    event.counter = 1;
+    event.totalLatency = 100;
     
     // When
     BOOL result = [self.dao insert:event];

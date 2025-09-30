@@ -444,7 +444,7 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
     XCTAssertEqual(self.specDelegate.failToLoadCount, 1, @"Should have failed to load");
     XCTAssertEqual(self.specDelegate.noFillErrorCount, 1, @"Should have converted to NO_FILL error per spec");
     XCTAssertEqual(self.specDelegate.lastError.code, CLXErrorCodeNoFill, @"Error code should be NO_FILL per spec");
-    XCTAssertEqualObjects(self.specDelegate.lastError.domain, @"CLXErrorDomain", @"Error domain should be CLXErrorDomain per spec");
+    XCTAssertEqualObjects(self.specDelegate.lastError.domain, CLXErrorDomain, @"Error domain should be CLXErrorDomain per spec");
 }
 
 // Test NO_FILL maintains refresh cadence

@@ -184,19 +184,19 @@
     if (!existingMetric) {
         [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Creating new metric for %@", metricType]];
         updatedMetric = [[CLXMetricsEvent alloc] initWithEventId:[[NSUUID UUID] UUIDString]
-                                                      metricName:metricType
-                                                         counter:1
-                                                    totalLatency:latency
                                                        sessionId:self.sessionId
+                                                      metricName:metricType
                                                        auctionId:[[NSUUID UUID] UUIDString]];
+        updatedMetric.counter = 1;
+        updatedMetric.totalLatency = latency;
     } else {
         [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Updating existing metric for %@", metricType]];
         updatedMetric = [[CLXMetricsEvent alloc] initWithEventId:existingMetric.eventId
-                                                      metricName:existingMetric.metricName
-                                                         counter:existingMetric.counter + 1
-                                                    totalLatency:existingMetric.totalLatency + latency
                                                        sessionId:existingMetric.sessionId
+                                                      metricName:existingMetric.metricName
                                                        auctionId:existingMetric.auctionId];
+        updatedMetric.counter = existingMetric.counter + 1;
+        updatedMetric.totalLatency = existingMetric.totalLatency + latency;
     }
     
     [self.metricsDao insert:updatedMetric];
@@ -242,7 +242,17 @@
     [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Found %lu pending metrics", 
                        (unsigned long)metrics.count]];
     
-    if (metrics.count == 0 || !self.endpoint || self.endpoint.length == 0) {
+    // 🧹 CLEANUP: If no endpoint or too many metrics, clean up old ones
+    if (!self.endpoint || self.endpoint.length == 0 || metrics.count > 1000) {
+        [self _cleanupOldMetrics];
+        if (!self.endpoint || self.endpoint.length == 0) {
+            return;
+        }
+        // Refresh metrics after cleanup
+        metrics = [self.metricsDao getAll];
+    }
+    
+    if (metrics.count == 0) {
         return;
     }
     
@@ -363,5 +373,27 @@
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
 }
 #endif
+
+- (void)_cleanupOldMetrics {
+    NSArray<CLXMetricsEvent *> *allMetrics = [self.metricsDao getAll];
+    NSInteger originalCount = allMetrics.count;
+    
+    if (originalCount > 100) {
+        [self.logger debug:[NSString stringWithFormat:@"🧹 [MetricsTrackerImpl] Cleaning up %ld old metrics (keeping latest 100)", (long)originalCount]];
+        
+        // Sort by creation time and keep only the latest 100
+        NSArray<CLXMetricsEvent *> *sortedMetrics = [allMetrics sortedArrayUsingComparator:^NSComparisonResult(CLXMetricsEvent *obj1, CLXMetricsEvent *obj2) {
+            return [@(obj2.createdAt) compare:@(obj1.createdAt)]; // Descending order (newest first)
+        }];
+        
+        // Delete all but the latest 100
+        for (NSInteger i = 100; i < sortedMetrics.count; i++) {
+            [self.metricsDao deleteById:sortedMetrics[i].eventId];
+        }
+        
+        NSInteger cleanedCount = originalCount - 100;
+        [self.logger debug:[NSString stringWithFormat:@"🗑️ [MetricsTrackerImpl] Cleaned up %ld old metrics", (long)cleanedCount]];
+    }
+}
 
 @end

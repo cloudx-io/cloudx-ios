@@ -2,174 +2,188 @@
 // CLXError.m
 // CloudXCore
 //
-// Industry-standard error handling implementation
+// Industry-standard error codes following AppLovin MAX, Google Mobile Ads, and Unity Ads patterns
 //
 
-#import <CloudXCore/CLXError.h>
+#import "CLXError.h"
 
-NSString * const CLXErrorDomain = @"CLXErrorDomain";
+NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
 
 @implementation CLXError
 
+#pragma mark - Factory Methods
+
 + (instancetype)errorWithCode:(CLXErrorCode)code {
-    return [self errorWithCode:code userInfo:nil];
+    return [self errorWithCode:code description:[self defaultDescriptionForCode:code]];
 }
 
 + (instancetype)errorWithCode:(CLXErrorCode)code description:(NSString *)description {
-    NSDictionary *userInfo = description ? @{NSLocalizedDescriptionKey: description} : nil;
-    return [self errorWithCode:code userInfo:userInfo];
+    return [self errorWithCode:code userInfo:@{NSLocalizedDescriptionKey: description}];
 }
 
 + (instancetype)errorWithHTTPStatusCode:(NSInteger)httpStatusCode {
-    CLXErrorCode errorCode;
+    CLXErrorCode code;
     NSString *description;
     
     switch (httpStatusCode) {
+        case 400:
+            code = CLXErrorCodeInvalidRequest;
+            description = @"Bad Request - Invalid request parameters";
+            break;
         case 401:
-            errorCode = CLXErrorCodeInvalidAppKey;
-            description = @"Invalid app key. Please verify your app key is correct and active.";
+            code = CLXErrorCodeInvalidAppKey;
+            description = @"Unauthorized - Invalid app key";
             break;
         case 403:
-            errorCode = CLXErrorCodeInvalidAppKey;
-            description = @"App key access denied. Please check your app key permissions.";
+            code = CLXErrorCodePermissionDenied;
+            description = @"Forbidden - Permission denied";
             break;
         case 404:
-            errorCode = CLXErrorCodeInvalidAppKey;
-            description = @"App key not found. Please verify your app key exists and is properly configured.";
+            code = CLXErrorCodeNoFill;
+            description = @"Not Found - No ad fill available";
             break;
-        case 400:
-            errorCode = CLXErrorCodeInvalidRequest;
-            description = [NSString stringWithFormat:@"Bad request (HTTP %ld). Please check your request parameters.", (long)httpStatusCode];
+        case 408:
+            code = CLXErrorCodeNetworkTimeout;
+            description = @"Request Timeout";
+            break;
+        case 429:
+            code = CLXErrorCodeTooManyRequests;
+            description = @"Too Many Requests - Rate limited";
+            break;
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+            code = CLXErrorCodeServerError;
+            description = [NSString stringWithFormat:@"Server Error - HTTP %ld", (long)httpStatusCode];
             break;
         default:
-            if (httpStatusCode >= 500 && httpStatusCode < 600) {
-                errorCode = CLXErrorCodeServerError;
-                description = [NSString stringWithFormat:@"Server error (HTTP %ld). Please try again later.", (long)httpStatusCode];
+            if (httpStatusCode >= 400 && httpStatusCode < 500) {
+                code = CLXErrorCodeInvalidRequest;
+                description = [NSString stringWithFormat:@"Client Error - HTTP %ld", (long)httpStatusCode];
+            } else if (httpStatusCode >= 500) {
+                code = CLXErrorCodeServerError;
+                description = [NSString stringWithFormat:@"Server Error - HTTP %ld", (long)httpStatusCode];
             } else {
-                errorCode = CLXErrorCodeLoadFailed;
-                description = [NSString stringWithFormat:@"HTTP error %ld occurred.", (long)httpStatusCode];
+                code = CLXErrorCodeNetworkError;
+                description = [NSString stringWithFormat:@"Network Error - HTTP %ld", (long)httpStatusCode];
             }
             break;
     }
     
-    return [self errorWithCode:errorCode description:description];
+    return [self errorWithCode:code description:description];
 }
 
-+ (instancetype)errorWithCode:(CLXErrorCode)code userInfo:(nullable NSDictionary *)userInfo {
-    NSMutableDictionary *errorUserInfo = [NSMutableDictionary dictionary];
-    
-    // Add localized description based on error code if not provided
-    if (!userInfo[NSLocalizedDescriptionKey]) {
-        NSString *localizedDescription = [CLXError localizedDescriptionForCode:code];
-        if (localizedDescription) {
-            errorUserInfo[NSLocalizedDescriptionKey] = localizedDescription;
-        }
-    }
-    
-    // Add any additional user info
-    if (userInfo) {
-        [errorUserInfo addEntriesFromDictionary:userInfo];
-    }
-    
-    return [[self alloc] initWithDomain:CLXErrorDomain code:code userInfo:errorUserInfo];
++ (instancetype)errorWithCode:(CLXErrorCode)code userInfo:(NSDictionary *)userInfo {
+    return [[self alloc] initWithCode:code userInfo:userInfo];
 }
+
+#pragma mark - Initialization
 
 - (instancetype)initWithCode:(CLXErrorCode)code {
     return [self initWithCode:code userInfo:nil];
 }
 
-- (instancetype)initWithCode:(CLXErrorCode)code userInfo:(nullable NSDictionary *)userInfo {
-    NSMutableDictionary *errorUserInfo = [NSMutableDictionary dictionary];
+- (instancetype)initWithCode:(CLXErrorCode)code userInfo:(NSDictionary *)userInfo {
+    NSMutableDictionary *finalUserInfo = [NSMutableDictionary dictionary];
     
-    // Add localized description based on error code if not provided
+    // Add default description if not provided
     if (!userInfo[NSLocalizedDescriptionKey]) {
-        NSString *localizedDescription = [CLXError localizedDescriptionForCode:code];
-        if (localizedDescription) {
-            errorUserInfo[NSLocalizedDescriptionKey] = localizedDescription;
-        }
+        finalUserInfo[NSLocalizedDescriptionKey] = [self.class defaultDescriptionForCode:code];
     }
     
-    // Add any additional user info
+    // Add provided user info
     if (userInfo) {
-        [errorUserInfo addEntriesFromDictionary:userInfo];
+        [finalUserInfo addEntriesFromDictionary:userInfo];
     }
     
-    return [self initWithDomain:CLXErrorDomain code:code userInfo:errorUserInfo];
+    // Add error code to user info for debugging
+    finalUserInfo[@"CLXErrorCode"] = @(code);
+    
+    return [super initWithDomain:CLXErrorDomain code:code userInfo:[finalUserInfo copy]];
 }
 
-+ (NSString *)localizedDescriptionForCode:(CLXErrorCode)code {
+#pragma mark - Helper Methods
+
++ (NSString *)defaultDescriptionForCode:(CLXErrorCode)code {
     switch (code) {
         // INITIALIZATION ERRORS (100-199)
         case CLXErrorCodeNotInitialized:
-            return @"SDK not initialized. Please initialize the SDK before using it.";
+            return @"SDK not initialized";
         case CLXErrorCodeInitializationInProgress:
-            return @"SDK initialization is already in progress.";
+            return @"SDK initialization already in progress";
         case CLXErrorCodeNoAdaptersFound:
-            return @"No ad network adapters found. Please ensure adapters are properly integrated.";
+            return @"No ad network adapters found";
         case CLXErrorCodeInitializationTimeout:
-            return @"SDK initialization timed out.";
+            return @"SDK initialization timeout";
         case CLXErrorCodeInvalidAppKey:
-            return @"Invalid app key provided. Please check your app key.";
+            return @"Invalid app key provided";
         case CLXErrorCodeSDKDisabled:
-            return @"SDK has been disabled by kill switch.";
+            return @"SDK disabled by kill switch";
             
         // NETWORK ERRORS (200-299)
         case CLXErrorCodeNetworkError:
-            return @"Network error occurred. Please check your internet connection.";
+            return @"Network connectivity error";
         case CLXErrorCodeNetworkTimeout:
-            return @"Network request timed out.";
+            return @"Network request timeout";
         case CLXErrorCodeInvalidResponse:
-            return @"Invalid response received from server.";
+            return @"Invalid server response";
         case CLXErrorCodeServerError:
-            return @"Server error occurred.";
+            return @"Server error occurred";
             
         // AD REQUEST/LOADING ERRORS (300-399)
         case CLXErrorCodeNoFill:
-            return @"No ad available to show.";
+            return @"No ad fill available";
         case CLXErrorCodeInvalidRequest:
-            return @"Invalid ad request parameters.";
+            return @"Invalid ad request parameters";
         case CLXErrorCodeInvalidPlacement:
-            return @"Invalid placement ID. Please check your placement configuration.";
+            return @"Invalid placement ID";
         case CLXErrorCodeLoadTimeout:
-            return @"Ad loading timed out.";
+            return @"Ad loading timeout";
         case CLXErrorCodeLoadFailed:
-            return @"Failed to load ad.";
+            return @"Ad failed to load";
         case CLXErrorCodeInvalidAd:
-            return @"Ad content is invalid or corrupted.";
+            return @"Invalid or corrupted ad content";
         case CLXErrorCodeTooManyRequests:
-            return @"Too many ad requests. Please reduce request frequency.";
+            return @"Too many ad requests - rate limited";
         case CLXErrorCodeRequestCancelled:
-            return @"Ad request was cancelled.";
+            return @"Ad request was cancelled";
         case CLXErrorCodeAdsDisabled:
-            return @"Ads have been disabled by kill switch.";
+            return @"Ads disabled by kill switch";
             
         // AD DISPLAY/SHOW ERRORS (400-499)
         case CLXErrorCodeAdNotReady:
-            return @"Ad is not ready to be displayed.";
+            return @"Ad is not ready to be shown";
         case CLXErrorCodeAdAlreadyShown:
-            return @"Ad has already been shown.";
+            return @"Ad has already been shown";
         case CLXErrorCodeAdExpired:
-            return @"Ad has expired and cannot be shown.";
+            return @"Ad has expired";
         case CLXErrorCodeInvalidViewController:
-            return @"Invalid view controller provided for ad display.";
+            return @"Invalid view controller for ad display";
         case CLXErrorCodeShowFailed:
-            return @"Failed to show ad.";
+            return @"Ad failed to show";
             
         // CONFIGURATION/SETUP ERRORS (500-599)
         case CLXErrorCodeInvalidAdUnit:
-            return @"Invalid ad unit configuration.";
+            return @"Invalid ad unit configuration";
         case CLXErrorCodePermissionDenied:
-            return @"Required permissions not granted.";
+            return @"Required permissions not granted";
         case CLXErrorCodeUnsupportedAdFormat:
-            return @"Ad format not supported.";
+            return @"Ad format not supported";
         case CLXErrorCodeInvalidBannerView:
-            return @"Banner view is nil or invalid.";
+            return @"Invalid banner view";
         case CLXErrorCodeInvalidNativeView:
-            return @"Native view is nil or invalid.";
+            return @"Invalid native view";
             
         default:
-            return @"Unknown error occurred.";
+            return @"Unknown error occurred";
     }
+}
+
+#pragma mark - NSObject
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"CLXError: %ld - %@", (long)self.code, self.localizedDescription];
 }
 
 @end

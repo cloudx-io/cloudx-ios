@@ -521,7 +521,7 @@
     [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolving path: %@ with %lu segments (auctionId: %@)", path, (unsigned long)segments.count, auctionId ?: @"none"]];
     
     for (NSString *segment in segments) {
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Processing segment: %@, current type: %@", segment, [current class]]];
+        // [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Processing segment: %@, current type: %@", segment, [current class]]];
         
         // Check if this segment contains array lookup syntax like: participants[rank=${bid.ext.cloudx.rank}]
         if ([segment containsString:@"["] && [segment containsString:@"]"]) {
@@ -542,9 +542,9 @@
             if ([current isKindOfClass:[NSDictionary class]]) {
                 NSDictionary *dict = (NSDictionary *)current;
                 current = dict[segment];
-                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Dict access [%@] = %@", segment, current ?: @"(nil)"]];
+                // [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Dict access [%@] = %@", segment, current ?: @"(nil)"]];
             } else {
-                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Current is not a dictionary, returning nil"]];
+                // [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Current is not a dictionary, returning nil"]];
                 return nil;
             }
         }

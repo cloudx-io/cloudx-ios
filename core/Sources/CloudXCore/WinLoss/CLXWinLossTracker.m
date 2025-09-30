@@ -275,6 +275,10 @@ static id<CLXWinLossTracking> _testInstance = nil;
 - (void)trackWinLoss:(NSDictionary<NSString *, id> *)payload {
     // Save to database first for retry capability
     NSString *eventId = [self saveToDatabase:payload];
+    if (!eventId) {
+        [self.logger error:@"❌ [WinLossTracker] Failed to save event to database - aborting"];
+        return;
+    }
     
     NSString *endpoint = self.endpointUrl;
     if (!endpoint || endpoint.length == 0) {
@@ -316,10 +320,14 @@ static id<CLXWinLossTracking> _testInstance = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:payload options:0 error:&error];
     if (error || !jsonData) {
         [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Failed to serialize payload: %@, payload: %@", error, payload]];
-        return eventId;
+        return nil; // Return nil to indicate failure
     }
     
     NSString *payloadJson = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    if (!payloadJson) {
+        [self.logger error:@"❌ [WinLossTracker] Failed to create JSON string from data"];
+        return nil; // Return nil to indicate failure
+    }
     
     // Save to database
     [self insertEventWithId:eventId endpointUrl:self.endpointUrl ?: @"" payload:payloadJson];

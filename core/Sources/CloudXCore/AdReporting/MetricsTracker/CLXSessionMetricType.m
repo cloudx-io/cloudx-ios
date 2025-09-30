@@ -6,7 +6,6 @@
 //
 
 #import <CloudXCore/CLXSessionMetricType.h>
-#import <CloudXCore/CLXSessionMetricModel.h>
 
 NSString *CLXSessionMetricTypeRawValue(CLXSessionMetricType type) {
     switch (type) {

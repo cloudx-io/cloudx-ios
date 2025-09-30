@@ -1,5 +1,4 @@
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CLXAppSessionModel.h>
 #import <CloudXCore/CLXSessionMetric.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -28,7 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
                              url:(NSURL *)url 
                            appKey:(NSString *)appKey;
 
-- (instancetype)initWithModel:(CLXAppSessionModel *)model;
 
 @end
 

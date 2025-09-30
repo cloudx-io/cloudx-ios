@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol AdEventReporting;
 @protocol CLXCacheableAd;
-@protocol CLXAppSessionService;
+@class CLXAppSessionService;
 @class CLXEnvironmentConfig;
 
 /**

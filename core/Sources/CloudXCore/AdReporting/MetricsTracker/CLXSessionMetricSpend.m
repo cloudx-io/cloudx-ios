@@ -8,7 +8,6 @@
 #import <CloudXCore/CLXSessionMetricSpend.h>
 #import <CloudXCore/CLXSessionMetric.h>
 #import <CloudXCore/CLXSessionMetricType.h>
-#import <CloudXCore/CLXSessionMetricModel.h>
 
 @implementation CLXSessionMetricSpend
 
@@ -26,38 +25,6 @@
     return self;
 }
 
-- (instancetype)initWithMetricModel:(CLXSessionMetricModel *)model {
-    self = [super init];
-    if (self) {
-        _placementID = [model.placementID copy];
-        _timestamp = [model.timestamp copy];
-        _value = model.value;
-        
-        // Convert string type to enum
-        if ([model.type isEqualToString:@"spend"]) {
-            _type = CLXSessionMetricTypeSpend;
-        } else if ([model.type isEqualToString:@"impression"]) {
-            _type = CLXSessionMetricTypeImpression;
-        } else if ([model.type isEqualToString:@"fill_rate"]) {
-            _type = CLXSessionMetricTypeFillRate;
-        } else if ([model.type isEqualToString:@"bid_request_success_avg_latency"]) {
-            _type = CLXSessionMetricTypeBidRequestLatency;
-        } else if ([model.type isEqualToString:@"ad_load_success_avg_latency"]) {
-            _type = CLXSessionMetricTypeAdLoadLatency;
-        } else if ([model.type isEqualToString:@"ad_load_fail_count"]) {
-            _type = CLXSessionMetricTypeAdLoadFailCount;
-        } else if ([model.type isEqualToString:@"ad_avg_time_to_close"]) {
-            _type = CLXSessionMetricTypeCloseLatency;
-        } else if ([model.type isEqualToString:@"ctr"]) {
-            _type = CLXSessionMetricTypeCTR;
-        } else if ([model.type isEqualToString:@"click_count"]) {
-            _type = CLXSessionMetricTypeClickCount;
-        } else {
-            _type = CLXSessionMetricTypeSpend; // Default fallback
-        }
-    }
-    return self;
-}
 
 - (NSString *)typeString {
     switch (self.type) {

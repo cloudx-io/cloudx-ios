@@ -168,11 +168,11 @@
         for (NSInteger i = 0; i < operationCount; i++) {
             // Create event
             CLXMetricsEvent *event = [[CLXMetricsEvent alloc] initWithEventId:[NSString stringWithFormat:@"perf-test-%ld", (long)i]
-                                                                   metricName:[NSString stringWithFormat:@"%@-%ld", CLXMetricsTypeMethodCreateBanner, (long)i] // Unique metric names
-                                                                      counter:1
-                                                                 totalLatency:0
                                                                     sessionId:@"perf-session"
+                                                                   metricName:[NSString stringWithFormat:@"%@-%ld", CLXMetricsTypeMethodCreateBanner, (long)i] // Unique metric names
                                                                     auctionId:@"perf-auction"];
+            event.counter = 1;
+            event.totalLatency = 0;
             
             // Insert
             [dao insert:event];
@@ -392,11 +392,11 @@
     // Create many events
     for (NSInteger i = 0; i < eventCount; i++) {
         CLXMetricsEvent *event = [[CLXMetricsEvent alloc] initWithEventId:[NSString stringWithFormat:@"cleanup-test-%ld", (long)i]
-                                                               metricName:CLXMetricsTypeMethodCreateBanner
-                                                                  counter:1
-                                                             totalLatency:0
                                                                 sessionId:@"cleanup-session"
+                                                               metricName:CLXMetricsTypeMethodCreateBanner
                                                                 auctionId:@"cleanup-auction"];
+        event.counter = 1;
+        event.totalLatency = 0;
         [dao insert:event];
     }
     

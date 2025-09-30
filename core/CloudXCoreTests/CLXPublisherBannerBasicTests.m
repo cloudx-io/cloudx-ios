@@ -317,7 +317,7 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
     
     XCTAssertEqual(self.mockDelegate.failToLoadCount, 1, @"Delegate should be notified of failure");
     XCTAssertEqual(self.mockDelegate.lastError.code, CLXErrorCodeNoFill, @"Error should be converted to NO_FILL");
-    XCTAssertEqualObjects(self.mockDelegate.lastError.domain, @"CLXErrorDomain", @"Error domain should be CLXErrorDomain");
+    XCTAssertEqualObjects(self.mockDelegate.lastError.domain, CLXErrorDomain, @"Error domain should be CLXErrorDomain");
 }
 
 #pragma mark - State Management Tests

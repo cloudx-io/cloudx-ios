@@ -21,7 +21,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBidNetworkService.h>
 #import <CloudXCore/CLXAppSessionService.h>
-#import <CloudXCore/CLXAppSessionServiceImplementation.h>
+#import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXBiddingConfig.h>
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXBidResponse.h>
@@ -92,7 +92,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSNumber *tmax;
 @property (nonatomic, assign) double latency;
 @property (nonatomic, strong) id<CLXBidNetworkService> bidNetworkService;
-@property (nonatomic, strong) id<CLXAppSessionService> appSessionService;
+@property (nonatomic, strong) CLXAppSessionService * appSessionService;
 @property (nonatomic, strong) id<CLXAdEventReporting> reportingService;
 
 @end
@@ -135,7 +135,7 @@ NS_ASSUME_NONNULL_BEGIN
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
         // Use metrics URL from SDK response (stored in user defaults)
         NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @"";
-        _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
+        _appSessionService = [[CLXAppSessionService alloc] initWithSessionID:sessionID
                                                                                   appKey:appKey
                                                                                      url:metricsURL];
     }

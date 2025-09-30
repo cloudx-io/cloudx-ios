@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSOperationQueue *adLoadOperationQueue;
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, copy) NSString *placementID;
-@property (nonatomic, strong) id<CLXAppSessionService> appSessionService;
+@property (nonatomic, strong) CLXAppSessionService *appSessionService;
 
 @end
 
@@ -89,7 +89,7 @@ NS_ASSUME_NONNULL_BEGIN
         NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
         // Use metrics URL from SDK response (stored in user defaults)
         NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @"";
-        _appSessionService = [[CLXAppSessionServiceImplementation alloc] initWithSessionID:sessionID
+        _appSessionService = [[CLXAppSessionService alloc] initWithSessionID:sessionID
                                                                                  appKey:appKey
                                                                                     url:metricsURL];
     }

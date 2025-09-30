@@ -1,10 +1,11 @@
 #import <CloudXCore/CLXAppSession.h>
-#import <CloudXCore/CLXCoreDataManager.h>
+#import <CloudXCore/CLXCloudXDatabase.h>
+#import <CloudXCore/CLXSession.h>
+#import <CloudXCore/CLXPerformanceMetric.h>
 #import <CloudXCore/CLXSessionMetricSpend.h>
 #import <CloudXCore/CLXSessionMetricPerformance.h>
 #import <CloudXCore/CLXSessionMetricType.h>
-#import <CloudXCore/CLXAppSessionModel.h>
-#import <CloudXCore/CLXPerformanceMetricModel.h>
+#import <CloudXCore/CLXDaoProtocols.h>
 
 @interface CLXAppSession ()
 @property (nonatomic, copy) NSString *sessionID;
@@ -15,6 +16,8 @@
 @property (nonatomic, strong) NSMutableArray<CLXSessionMetricPerformance *> *performanceMetrics;
 @property (nonatomic, assign) double sessionDuration;
 @property (nonatomic, strong) NSTimer *sessionTimer;
+@property (nonatomic, strong) CLXSession *sqliteSession;
+@property (nonatomic, strong) CLXCloudXDatabase *database;
 @end
 
 @implementation CLXAppSession
@@ -35,9 +38,12 @@
         _metrics = [NSMutableArray array];
         _performanceMetrics = [NSMutableArray array];
         _sessionDuration = 0;
+        _database = [CLXCloudXDatabase sharedInstance];
         
-        // Create CoreData session
-        [[CLXCoreDataManager shared] createAppSessionWithSession:self];
+        // Create SQLite session
+        _sqliteSession = [[CLXSession alloc] initWithSessionId:sessionID appKey:appKey url:url.absoluteString];
+        [_sqliteSession startSession];
+        [_database.sessionDao insertSession:_sqliteSession];
         
         // Start session timer
         _sessionTimer = [NSTimer scheduledTimerWithTimeInterval:10.0
@@ -50,27 +56,38 @@
     return self;
 }
 
-- (instancetype)initWithModel:(CLXAppSessionModel *)model {
-    if (!model.id || !model.url || !model.appKey) {
+- (instancetype)initWithSession:(CLXSession *)session {
+    if (!session.sessionId || !session.appKey) {
         return nil;
     }
     
-    self = [self initWithSessionID:model.id
-                              url:[NSURL URLWithString:model.url]
-                            appKey:model.appKey];
-    
+    // Initialize directly without calling initWithSessionID to avoid duplicate session creation
+    self = [super init];
     if (self) {
-        // Convert CoreData metrics to SessionMetricSpend objects
-        if (model.metrics) {
-            for (CLXSessionMetricModel *metricModel in model.metrics.allObjects) {
-                CLXSessionMetricSpend *metricSpend = [[CLXSessionMetricSpend alloc] initWithMetricModel:metricModel];
-                if (metricSpend) {
-                    [self.metrics addObject:metricSpend];
-                }
-            }
-        }
+        NSURL *url = session.url ? [NSURL URLWithString:session.url] : nil;
+        _sessionID = [session.sessionId copy];
+        _startDate = [NSDate dateWithTimeIntervalSince1970:session.startTime];
+        _url = url;
+        _appKey = [session.appKey copy];
+        _metrics = [NSMutableArray array];
+        _performanceMetrics = [NSMutableArray array];
+        _sessionDuration = session.duration;
+        _database = [CLXCloudXDatabase sharedInstance];
         
-        self.sessionDuration = model.duration;
+        // Use existing SQLite session - don't insert again
+        _sqliteSession = session;
+        
+        // Update duration from session
+        [session updateDuration];
+        self.sessionDuration = session.duration;
+        
+        // Start session timer
+        _sessionTimer = [NSTimer scheduledTimerWithTimeInterval:10.0
+                                                         target:self
+                                                       selector:@selector(updateSessionDuration)
+                                                       userInfo:nil
+                                                        repeats:YES];
+        [[NSRunLoop mainRunLoop] addTimer:_sessionTimer forMode:NSRunLoopCommonModes];
     }
     
     return self;
@@ -84,85 +101,73 @@
     
     NSDate *currentDate = [NSDate date];
     self.sessionDuration = [currentDate timeIntervalSinceDate:self.startDate];
-    [[CLXCoreDataManager shared] updateAppSessionWithSession:self];
+    
+    // Update SQLite session
+    [self.sqliteSession updateDuration];
+    [self.database.sessionDao updateSessionDuration:self.sqliteSession.sessionId duration:self.sqliteSession.duration];
 }
 
 - (void)addSpendWithPlacementID:(NSString *)placementID spend:(double)spend {
     CLXSessionMetricSpend *metric = [[CLXSessionMetricSpend alloc] initWithPlacementID:placementID
-                                                                                                                                                           type:CLXSessionMetricTypeSpend
-                                                                             value:spend
-                                                                          timestamp:[NSDate date]];
+                                                                                   type:CLXSessionMetricTypeSpend
+                                                                                  value:spend
+                                                                              timestamp:[NSDate date]];
     [self.metrics addObject:metric];
-    [[CLXCoreDataManager shared] updateAppSessionWithSession:self];
+    
+    // Update SQLite session duration
+    [self.sqliteSession updateDuration];
+    [self.database.sessionDao updateSessionDuration:self.sqliteSession.sessionId duration:self.sqliteSession.duration];
 }
 
 - (void)addClickWithPlacementID:(NSString *)placementID {
-    [[CLXCoreDataManager shared] createOrGetPerformanceMetricForPlacementID:placementID 
-                                                                   session:self 
-                                                               completion:^(CLXPerformanceMetricModel *metric) {
-        if (metric) {
-            metric.clickCount += 1;
-            [[CLXCoreDataManager shared] saveContext];
-        }
-    }];
+    CLXPerformanceMetric *metric = [self.database.performanceDao findOrCreatePerformanceMetricForPlacementId:placementID sessionId:self.sessionID];
+    if (metric) {
+        [metric incrementClicks];
+        [self.database.performanceDao update:metric];
+    }
 }
 
 - (void)addImpressionWithPlacementID:(NSString *)placementID {
-    [[CLXCoreDataManager shared] createOrGetPerformanceMetricForPlacementID:placementID 
-                                                                   session:self 
-                                                               completion:^(CLXPerformanceMetricModel *metric) {
-        if (metric) {
-            metric.impressionCount += 1;
-            [[CLXCoreDataManager shared] saveContext];
-        }
-    }];
+    CLXPerformanceMetric *metric = [self.database.performanceDao findOrCreatePerformanceMetricForPlacementId:placementID sessionId:self.sessionID];
+    if (metric) {
+        [metric incrementImpressions];
+        [self.database.performanceDao update:metric];
+    }
 }
 
 - (void)addCloseWithPlacementID:(NSString *)placementID latency:(double)latency {
-    [[CLXCoreDataManager shared] createOrGetPerformanceMetricForPlacementID:placementID 
-                                                                   session:self 
-                                                               completion:^(CLXPerformanceMetricModel *metric) {
-        if (metric) {
-            metric.closeCount += 1;
-            metric.closeLatency += latency;
-            [[CLXCoreDataManager shared] saveContext];
-        }
-    }];
+    CLXPerformanceMetric *metric = [self.database.performanceDao findOrCreatePerformanceMetricForPlacementId:placementID sessionId:self.sessionID];
+    if (metric) {
+        [metric incrementCloses];
+        [metric addCloseLatency:latency];
+        [self.database.performanceDao update:metric];
+    }
 }
 
 - (void)adFailedToLoadWithPlacementID:(NSString *)placementID {
-    [[CLXCoreDataManager shared] createOrGetPerformanceMetricForPlacementID:placementID 
-                                                                   session:self 
-                                                               completion:^(CLXPerformanceMetricModel *metric) {
-        if (metric) {
-            metric.failToLoadAdCount += 1;
-            [[CLXCoreDataManager shared] saveContext];
-        }
-    }];
+    CLXPerformanceMetric *metric = [self.database.performanceDao findOrCreatePerformanceMetricForPlacementId:placementID sessionId:self.sessionID];
+    if (metric) {
+        [metric incrementFailToLoadAds];
+        [self.database.performanceDao update:metric];
+    }
 }
 
 - (void)bidLoadedWithPlacementID:(NSString *)placementID latency:(double)latency {
-    [[CLXCoreDataManager shared] createOrGetPerformanceMetricForPlacementID:placementID 
-                                                                   session:self 
-                                                               completion:^(CLXPerformanceMetricModel *metric) {
-        if (metric) {
-            metric.bidResponseCount += 1;
-            metric.bidRequestLatency += latency;
-            [[CLXCoreDataManager shared] saveContext];
-        }
-    }];
+    CLXPerformanceMetric *metric = [self.database.performanceDao findOrCreatePerformanceMetricForPlacementId:placementID sessionId:self.sessionID];
+    if (metric) {
+        [metric incrementBidResponses];
+        [metric addBidRequestLatency:latency];
+        [self.database.performanceDao update:metric];
+    }
 }
 
 - (void)adLoadedWithPlacementID:(NSString *)placementID latency:(double)latency {
-    [[CLXCoreDataManager shared] createOrGetPerformanceMetricForPlacementID:placementID 
-                                                                   session:self 
-                                                               completion:^(CLXPerformanceMetricModel *metric) {
-        if (metric) {
-            metric.adLoadCount += 1;
-            metric.adLoadLatency += latency;
-            [[CLXCoreDataManager shared] saveContext];
-        }
-    }];
+    CLXPerformanceMetric *metric = [self.database.performanceDao findOrCreatePerformanceMetricForPlacementId:placementID sessionId:self.sessionID];
+    if (metric) {
+        [metric incrementAdLoads];
+        [metric addAdLoadLatency:latency];
+        [self.database.performanceDao update:metric];
+    }
 }
 
 - (NSString *)description {

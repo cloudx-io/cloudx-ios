@@ -4,42 +4,65 @@
 
 /**
  * @file CLXMetricsEvent.h
- * @brief Metrics event model matching Android's MetricsEvent entity exactly
+ * @brief Metrics event model matching Android MetricsEvent exactly
+ * 
+ * Extends CLXBaseEvent with metrics-specific properties
+ * Maps to metrics_event_table in SQLite database
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXBaseEvent.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Metrics event model for SQLite storage
- * Matches Android's @Entity(tableName = "metrics_event_table") MetricsEvent exactly
+ * Metrics event model matching Android MetricsEvent structure
+ * Fields: id, metricName, counter, totalLatency, sessionId, auctionId
  */
-@interface CLXMetricsEvent : NSObject
+@interface CLXMetricsEvent : CLXBaseEvent
 
-@property (nonatomic, copy) NSString *eventId;        // Primary key - UUID or auctionId
-@property (nonatomic, copy) NSString *metricName;     // e.g., "method_create_banner", "network_call_bid_req"
-@property (nonatomic, assign) NSInteger counter;      // Number of occurrences
-@property (nonatomic, assign) NSInteger totalLatency; // Total latency in milliseconds
-@property (nonatomic, copy) NSString *sessionId;      // Current session ID
-@property (nonatomic, copy) NSString *auctionId;      // Unique auction/event ID
+/**
+ * Metrics-specific properties (matching Android exactly)
+ */
+@property (nonatomic, strong) NSString *metricName;
+@property (nonatomic, assign) NSInteger counter;
+@property (nonatomic, assign) NSInteger totalLatency; // in milliseconds
+@property (nonatomic, strong) NSString *auctionId;
 
+/**
+ * Initialization
+ */
 - (instancetype)initWithEventId:(NSString *)eventId
-                     metricName:(NSString *)metricName
-                        counter:(NSInteger)counter
-                   totalLatency:(NSInteger)totalLatency
                       sessionId:(NSString *)sessionId
+                     metricName:(NSString *)metricName
                       auctionId:(NSString *)auctionId;
 
-/**
- * Create from dictionary (for SQLite result parsing)
- */
-+ (instancetype)fromDictionary:(NSDictionary *)dictionary;
+- (instancetype)initWithSessionId:(NSString *)sessionId
+                       metricName:(NSString *)metricName
+                        auctionId:(NSString *)auctionId;
 
 /**
- * Convert to dictionary (for SQLite parameter binding)
+ * Metrics operations
  */
-- (NSDictionary *)toDictionary;
+- (void)incrementCounter;
+- (void)incrementCounterBy:(NSInteger)amount;
+- (void)addLatency:(NSInteger)latencyMs;
+- (NSTimeInterval)averageLatency;
+
+/**
+ * Factory methods for common metrics
+ */
++ (instancetype)impressionMetricWithSessionId:(NSString *)sessionId auctionId:(NSString *)auctionId;
++ (instancetype)clickMetricWithSessionId:(NSString *)sessionId auctionId:(NSString *)auctionId;
++ (instancetype)loadLatencyMetricWithSessionId:(NSString *)sessionId 
+                                     auctionId:(NSString *)auctionId 
+                                       latency:(NSInteger)latencyMs;
+
+/**
+ * Database column names (matching Android table structure)
+ */
++ (NSArray<NSString *> *)sqlColumnNames;
++ (NSString *)sqlTableName;
 
 @end
 

@@ -6,9 +6,8 @@
 //
 
 #import <CloudXCore/CLXSessionMetricPerformance.h>
-#import <CloudXCore/CLXSessionMetricModel.h>
 #import <CloudXCore/CLXSessionMetric.h>
-#import <CloudXCore/CLXPerformanceMetricModel.h>
+#import <CloudXCore/CLXPerformanceMetric.h>
 
 @implementation CLXSessionMetricPerformance
 
@@ -38,19 +37,19 @@
     return self;
 }
 
-- (instancetype)initWithPerformanceMetricModel:(CLXPerformanceMetricModel *)model {
+- (instancetype)initWithPerformanceMetric:(CLXPerformanceMetric *)metric {
     self = [super init];
     if (self) {
-        _placementID = [model.placementID copy];
-        _adLoadCount = model.adLoadCount;
-        _adLoadLatency = model.adLoadLatency;
-        _bidRequestLatency = model.bidRequestLatency;
-        _bidResponseCount = model.bidResponseCount;
-        _clickCount = model.clickCount;
-        _closeCount = model.closeCount;
-        _closeLatency = model.closeLatency;
-        _failToLoadAdCount = model.failToLoadAdCount;
-        _impressionCount = model.impressionCount;
+        _placementID = [metric.placementId copy];
+        _adLoadCount = metric.adLoadCount;
+        _adLoadLatency = metric.adLoadLatency;
+        _bidRequestLatency = metric.bidRequestLatency;
+        _bidResponseCount = metric.bidResponseCount;
+        _clickCount = metric.clickCount;
+        _closeCount = metric.closeCount;
+        _closeLatency = metric.closeLatency;
+        _failToLoadAdCount = metric.failToLoadAdCount;
+        _impressionCount = metric.impressionCount;
     }
     return self;
 }
