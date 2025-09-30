@@ -3,10 +3,10 @@ platform :ios, '14.0'
 
 target 'CloudXMetaAdapter' do
   # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
+  use_frameworks! :linkage => :static
 
   # Pods for CloudXMetaAdapter
-  pod 'FBAudienceNetwork', '6.16.0'
+  pod 'FBAudienceNetwork', '6.20.1'
   
   # Use local CloudXCore from the monorepo during build
   pod 'CloudXCore', :path => '../core'

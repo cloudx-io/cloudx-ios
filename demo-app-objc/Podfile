@@ -6,7 +6,7 @@ target 'CloudXObjCRemotePods' do
 
   # Pods for CloudXObjCRemotePods
   # pod 'CloudXCore', '~> 1.1.53'
-  # pod 'CloudXMetaAdapter', '~> 1.1.47'
+  # pod 'CloudXMetaAdapter', '~> 1.1.26'
   pod 'CloudXCore', :path => '../core'
   pod 'CloudXMetaAdapter', :path => '../adapter-meta'
 
