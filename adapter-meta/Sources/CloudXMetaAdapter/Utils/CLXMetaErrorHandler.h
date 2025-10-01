@@ -59,6 +59,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (NSDictionary *)userFriendlyAlertInfoForError:(NSError *)error context:(NSString *)context;
 
+/**
+ * Gets a descriptive string for the current ATT authorization status
+ * @return String describing the current ATT status (for debugging/logging)
+ */
++ (NSString *)currentATTStatusDescription;
+
 @end
 
 NS_ASSUME_NONNULL_END

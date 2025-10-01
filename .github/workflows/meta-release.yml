@@ -89,8 +89,7 @@ jobs:
           # Fix podspec source URL to point to correct version
           sed -i '' "s|https://github.com/cloudx-io/cloudx-ios/releases/download/.*CloudXMetaAdapter-v.*\.xcframework\.zip|https://github.com/cloudx-io/cloudx-ios/releases/download/${FULL_VERSION}/CloudXMetaAdapter-v${VERSION}.xcframework.zip|" CloudXMetaAdapter-remote.podspec
           
-          # Fix license path relative to podspec directory  
-          sed -i '' "s|'adapter-meta/LICENSE'|'LICENSE'|" CloudXMetaAdapter-remote.podspec
+          # License file not needed for binary distribution
           
           # Update root Package.swift version and checksum for CloudXMetaAdapter binary target
           cd ..

@@ -7,6 +7,9 @@
 
 #import "CLXMetaErrorHandler.h"
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXAdTrackingService.h>
+#import <AppTrackingTransparency/AppTrackingTransparency.h>
+#import <AdSupport/AdSupport.h>
 
 // Meta FAN SDK Error Codes - Comprehensive List
 typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
@@ -93,11 +96,25 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
     enhancedUserInfo[@"CLXMetaPlacementID"] = placementID ?: @"Unknown";
     enhancedUserInfo[@"CLXMetaIsRetryable"] = @([self isRetryableError:error]);
     
+    // Add ATT status information for all Meta errors (helps with debugging)
+    NSString *attStatusDesc = [self currentATTStatusDescription];
+    enhancedUserInfo[@"CLXMetaATTStatusDescription"] = attStatusDesc;
+    
     // Handle specific error codes with custom logic
     switch (errorCode) {
         case CLXMetaErrorCodeNoFill:
-            [logger info:[NSString stringWithFormat:@"📊 [CLXMetaErrorHandler] %@ No Fill (1001) - No ads available for placement %@ | Recommendation: Do not retry immediately. Consider waterfall to next adapter.", context, placementID]];
-            enhancedUserInfo[@"CLXMetaRecommendation"] = @"No immediate retry - use waterfall";
+            // Check ATT status to provide more informative error messaging
+            BOOL isATTGranted = [CLXAdTrackingService isIDFAAccessAllowed];
+            if (!isATTGranted) {
+                [logger info:[NSString stringWithFormat:@"📊 [CLXMetaErrorHandler] %@ No Fill (1001) - No ads available for placement %@ | ATT Status: NOT GRANTED | This is likely because App Tracking Transparency permission was not granted. Meta requires ATT for personalized ads. | Recommendation: Consider requesting ATT permission or use other ad networks that support non-personalized ads.", context, placementID]];
+                enhancedUserInfo[@"CLXMetaRecommendation"] = @"ATT not granted - Meta requires ATT for ads. Request ATT permission or use other networks.";
+                enhancedUserInfo[@"CLXMetaATTStatus"] = @"denied";
+                enhancedUserInfo[@"CLXMetaATTRequired"] = @YES;
+            } else {
+                [logger info:[NSString stringWithFormat:@"📊 [CLXMetaErrorHandler] %@ No Fill (1001) - No ads available for placement %@ | ATT Status: GRANTED | Recommendation: Do not retry immediately. Consider waterfall to next adapter.", context, placementID]];
+                enhancedUserInfo[@"CLXMetaRecommendation"] = @"No immediate retry - use waterfall";
+                enhancedUserInfo[@"CLXMetaATTStatus"] = @"granted";
+            }
             break;
             
         case CLXMetaErrorCodeAdLoadTooFrequently:
@@ -244,7 +261,7 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
             return @"Network Error - Cannot reach Facebook servers";
             
         case CLXMetaErrorCodeNoFill:
-            return @"No Fill - No ads available to serve";
+            return @"No Fill - No ads available to serve (may be due to ATT permission not granted)";
             
         case CLXMetaErrorCodeAdLoadTooFrequently:
             return @"Ad Load Too Frequently - Rate limited by Facebook SDK";
@@ -346,9 +363,16 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
         title = [NSString stringWithFormat:@"Meta %@ Error", context ?: @"Ad"];
         
         switch (errorCode) {
-            case CLXMetaErrorCodeNoFill:
-                message = @"No ads are currently available from Meta. This is normal and will resolve automatically. Please try again in a moment.";
+            case CLXMetaErrorCodeNoFill: {
+                // Check ATT status to provide more informative user message
+                BOOL isATTGranted = [CLXAdTrackingService isIDFAAccessAllowed];
+                if (!isATTGranted) {
+                    message = @"No ads are currently available from Meta. This is likely because App Tracking Transparency (ATT) permission has not been granted. Meta requires ATT permission to show personalized ads.\n\nTo resolve this:\n• Grant tracking permission when prompted\n• Or use other ad networks that support non-personalized ads\n\nThis is normal behavior and not an error with your app.";
+                } else {
+                    message = @"No ads are currently available from Meta. This is normal and will resolve automatically. Please try again in a moment.";
+                }
                 break;
+            }
                 
             case CLXMetaErrorCodeAdLoadTooFrequently:
                 message = @"Meta has temporarily limited ad requests to prevent spam. Please wait at least 5 seconds before trying again.";
@@ -439,6 +463,31 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
         @"title": title,
         @"message": message
     };
+}
+
++ (NSString *)currentATTStatusDescription {
+    if (@available(iOS 14, *)) {
+        ATTrackingManagerAuthorizationStatus status = ATTrackingManager.trackingAuthorizationStatus;
+        switch (status) {
+            case ATTrackingManagerAuthorizationStatusNotDetermined:
+                return @"ATT Status: Not Determined (user not yet asked)";
+            case ATTrackingManagerAuthorizationStatusRestricted:
+                return @"ATT Status: Restricted (parental controls or device management)";
+            case ATTrackingManagerAuthorizationStatusDenied:
+                return @"ATT Status: Denied (user explicitly denied permission)";
+            case ATTrackingManagerAuthorizationStatusAuthorized:
+                return @"ATT Status: Authorized (tracking permission granted)";
+            default:
+                return @"ATT Status: Unknown";
+        }
+    } else {
+        // For iOS 13 and below, check the deprecated API
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        BOOL trackingEnabled = [ASIdentifierManager sharedManager].isAdvertisingTrackingEnabled;
+        #pragma clang diagnostic pop
+        return trackingEnabled ? @"Pre-iOS 14: Advertising Tracking Enabled" : @"Pre-iOS 14: Advertising Tracking Disabled";
+    }
 }
 
 @end

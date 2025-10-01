@@ -94,7 +94,7 @@ done
 
 # --- Step 6: Zip the xcframework ---
 print_status "6. Zipping the .xcframework..."
-zip -r CloudXMetaAdapter.xcframework.zip CloudXMetaAdapter.xcframework || print_error "Failed to zip .xcframework."
+zip -r CloudXMetaAdapter.xcframework.zip CloudXMetaAdapter.xcframework LICENSE || print_error "Failed to zip .xcframework."
 
 # --- Step 7: Cleanup ---
 print_status "7. Cleaning up build artifacts..."
