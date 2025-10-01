@@ -5,10 +5,10 @@ target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
   # Pods for CloudXObjCRemotePods
-  # pod 'CloudXCore', '~> 1.1.53'
-  # pod 'CloudXMetaAdapter', '~> 1.1.26'
+  # pod 'CloudXCore'
+  pod 'CloudXMetaAdapter'
   pod 'CloudXCore', :path => '../core'
-  pod 'CloudXMetaAdapter', :path => '../adapter-meta'
+  # pod 'CloudXMetaAdapter', :path => '../adapter-meta'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths

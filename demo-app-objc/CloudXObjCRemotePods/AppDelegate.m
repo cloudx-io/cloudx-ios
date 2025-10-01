@@ -17,6 +17,35 @@
 
 @implementation AppDelegate
 
+- (UIWindow *)window {
+    if (!_window) {
+        // Fallback window for Meta SDK compatibility
+        // In scene-based apps, the actual window is managed by SceneDelegate
+        // but some SDKs still expect AppDelegate to have a window property
+        if (@available(iOS 13.0, *)) {
+            // Try to get the key window from active scene
+            for (UIWindowScene *scene in [UIApplication sharedApplication].connectedScenes) {
+                if (scene.activationState == UISceneActivationStateForegroundActive) {
+                    for (UIWindow *window in scene.windows) {
+                        if (window.isKeyWindow) {
+                            return window;
+                        }
+                    }
+                }
+            }
+            // If no key window found, return the first available window
+            for (UIWindowScene *scene in [UIApplication sharedApplication].connectedScenes) {
+                if (scene.windows.count > 0) {
+                    return scene.windows.firstObject;
+                }
+            }
+        }
+        
+        // Final fallback - create a basic window if none exists
+        _window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    }
+    return _window;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.

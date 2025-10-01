@@ -215,7 +215,7 @@
         
         [self.logger info:@"✅ [BidNetworkService] Auction response received successfully"];
         [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] Response type: %@", NSStringFromClass([response class])]];
-//        [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] Response: %@", response]];
+        [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] Response: %@", response]];
         // Parse response dictionary into BidResponse object
         CLXBidResponse *bidResponse = [CLXBidResponse parseBidResponseFromDictionary:response];
         
