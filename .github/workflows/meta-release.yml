@@ -83,13 +83,15 @@ jobs:
           VERSION=${{ steps.version.outputs.version }}
           FULL_VERSION=${{ steps.version.outputs.full_version }}
           
-          # Update podspec version
-          sed -i '' "s/s\.version.*=.*/s.version = '$VERSION'/" CloudXMetaAdapter-remote.podspec
+          # Create release podspec from remote template
+          cp CloudXMetaAdapter-remote.podspec CloudXMetaAdapter-release.podspec
           
-          # Fix podspec source URL to point to correct version
-          sed -i '' "s|https://github.com/cloudx-io/cloudx-ios/releases/download/.*CloudXMetaAdapter-v.*\.xcframework\.zip|https://github.com/cloudx-io/cloudx-ios/releases/download/${FULL_VERSION}/CloudXMetaAdapter-v${VERSION}.xcframework.zip|" CloudXMetaAdapter-remote.podspec
+          # Update version in release podspec
+          sed -i '' "s/s\.version.*=.*/s.version = '$VERSION'/" CloudXMetaAdapter-release.podspec
           
-          # License file not needed for binary distribution
+          # Update source URL with correct version
+          sed -i '' "s|releases/download/v[^/]*/|releases/download/${FULL_VERSION}/|" CloudXMetaAdapter-release.podspec
+          sed -i '' "s|CloudXMetaAdapter-v[0-9.]*\.xcframework\.zip|CloudXMetaAdapter-v${VERSION}.xcframework.zip|" CloudXMetaAdapter-release.podspec
           
           # Update root Package.swift version and checksum for CloudXMetaAdapter binary target
           cd ..
@@ -157,18 +159,18 @@ jobs:
       - name: 🧪 Validate podspec with detailed output
         run: |
           cd adapter-meta
-          echo "=== Validating CloudXMetaAdapter-remote.podspec ==="
+          echo "=== Validating CloudXMetaAdapter-release.podspec ==="
           echo "Current directory: $(pwd)"
           echo "Podspec content:"
-          cat CloudXMetaAdapter-remote.podspec
+          cat CloudXMetaAdapter-release.podspec
           echo "=== Running podspec validation ==="
           # Temporarily rename for validation (CocoaPods requires filename to match spec name)
-          cp CloudXMetaAdapter-remote.podspec CloudXMetaAdapter.podspec
-          pod spec lint CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose || {
+          cp CloudXMetaAdapter-release.podspec CloudXMetaAdapter.podspec.tmp
+          pod spec lint CloudXMetaAdapter.podspec.tmp --allow-warnings --skip-import-validation --skip-tests --verbose || {
             echo "❌ Podspec validation failed"
             exit 1
           }
-          rm CloudXMetaAdapter.podspec
+          rm CloudXMetaAdapter.podspec.tmp
 
       - name: 📋 Verify CocoaPods authentication
         run: |
@@ -189,13 +191,10 @@ jobs:
           mkdir -p ~/.cocoapods/trunk
           echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TRUNK_TOKEN }}"}}' > ~/.cocoapods/trunk/me.json
           cd adapter-meta
-
-          # Temporarily rename for push (CocoaPods requires filename to match spec name)
-          cp CloudXMetaAdapter-remote.podspec CloudXMetaAdapter.podspec
           
           for i in {1..5}; do
             echo "=== Attempt $i/5 ==="
-            if pod trunk push CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
+            if pod trunk push CloudXMetaAdapter-release.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
               echo "✅ Pod trunk push succeeded on attempt $i"
               break
             else
@@ -209,8 +208,6 @@ jobs:
               fi
             fi
           done
-          
-          rm CloudXMetaAdapter.podspec
 
       - name: 🧾 Verify successful pod trunk push
         run: |

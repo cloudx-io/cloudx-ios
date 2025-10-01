@@ -102,7 +102,7 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
     
     // Handle specific error codes with custom logic
     switch (errorCode) {
-        case CLXMetaErrorCodeNoFill:
+        case CLXMetaErrorCodeNoFill: {
             // Check ATT status to provide more informative error messaging
             BOOL isATTGranted = [CLXAdTrackingService isIDFAAccessAllowed];
             if (!isATTGranted) {
@@ -116,6 +116,7 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
                 enhancedUserInfo[@"CLXMetaATTStatus"] = @"granted";
             }
             break;
+        }
             
         case CLXMetaErrorCodeAdLoadTooFrequently:
             [logger error:[NSString stringWithFormat:@"⚠️ [CLXMetaErrorHandler] %@ Rate Limited (1002) - Requests too frequent for placement %@ | Facebook SDK rate limiting | Recommendation: Wait 5+ seconds", context, placementID]];

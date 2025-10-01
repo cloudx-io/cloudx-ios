@@ -96,13 +96,13 @@ echo "checksum=$CHECKSUM"
 
 print_step "📝 Update podspec and Package.swift"
 # Update podspec version
-sed -i '' "s/s\.version.*=.*/s.version = '$VERSION_NO_SUFFIX'/" CloudXMetaAdapter.podspec
+sed -i '' "s/s\.version.*=.*/s.version = '$VERSION_NO_SUFFIX'/" CloudXMetaAdapter-remote.podspec
 
 # Fix podspec source URL to point to correct version
-sed -i '' "s|https://github.com/cloudx-io/cloudx-ios/releases/download/.*CloudXMetaAdapter-v.*\.xcframework\.zip|https://github.com/cloudx-io/cloudx-ios/releases/download/${FULL_VERSION}/CloudXMetaAdapter-v${VERSION_NO_SUFFIX}.xcframework.zip|" CloudXMetaAdapter.podspec
+sed -i '' "s|https://github.com/cloudx-io/cloudx-ios/releases/download/.*CloudXMetaAdapter-v.*\.xcframework\.zip|https://github.com/cloudx-io/cloudx-ios/releases/download/${FULL_VERSION}/CloudXMetaAdapter-v${VERSION_NO_SUFFIX}.xcframework.zip|" CloudXMetaAdapter-remote.podspec
 
 # Fix license path relative to podspec directory  
-sed -i '' "s|'adapter-meta/LICENSE'|'LICENSE'|" CloudXMetaAdapter.podspec
+sed -i '' "s|'adapter-meta/LICENSE'|'LICENSE'|" CloudXMetaAdapter-remote.podspec
 
 # Update root Package.swift version and checksum for CloudXMetaAdapter binary target
 cd ..
@@ -159,12 +159,12 @@ else
 fi
 
 print_step "🧪 Validate podspec with detailed output"
-echo "=== Validating CloudXMetaAdapter.podspec ==="
+echo "=== Validating CloudXMetaAdapter-remote.podspec ==="
 echo "Current directory: $(pwd)"
 echo "Podspec content:"
-cat CloudXMetaAdapter.podspec
+cat CloudXMetaAdapter-remote.podspec
 echo "=== Running podspec validation ==="
-pod spec lint CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose || {
+pod spec lint CloudXMetaAdapter-remote.podspec --allow-warnings --skip-import-validation --skip-tests --verbose || {
     echo "❌ Podspec validation failed"
     exit 1
 }

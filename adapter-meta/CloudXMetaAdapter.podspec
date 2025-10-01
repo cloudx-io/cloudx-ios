@@ -1,35 +1,39 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXMetaAdapter'
-  s.version = '1.1.62'
-  s.summary = 'Mobile SDK for CloudX iOS Meta Adapter'
-  s.description = 'iOS adapter add-on to the CloudX iOS SDK for a Meta bidder'
+  s.version = '1.1.65'
+  s.summary = 'Meta (Facebook) Adapter for CloudX iOS SDK'
+  s.description = 'Meta adapter for CloudX iOS SDK'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
-  s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
+  s.license = { :type => 'Business Source License 1.1' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
   s.platform = :ios, '14.0'
+  s.swift_version = '5.9'
   s.module_name = 'CloudXMetaAdapter'
-  s.static_framework = true
   s.source = { :path => '.' }
-  s.source_files = 'Sources/**/*.{h,m}'
-  s.public_header_files = 'Sources/**/*.h'
+  
+  # Source files
+  s.source_files = 'Sources/CloudXMetaAdapter/**/*.{h,m}'
+  
+  # Public headers
+  s.public_header_files = 'Sources/CloudXMetaAdapter/**/*.h'
+  
   s.dependency 'CloudXCore'
   s.dependency 'FBAudienceNetwork', '~> 6.20.1'
-  s.frameworks = [
-    'AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit'
-  ]
-  s.weak_frameworks = [
-    'Combine', 'CryptoKit', 'SafariServices', 'SwiftUI', 'WebKit', 'FBAudienceNetwork'
-  ]
+  
+  s.framework = 'Foundation'
+  s.framework = 'UIKit'
+  s.framework = 'WebKit'
+  
+  # Enable module support for proper bracket imports
   s.pod_target_xcconfig = {
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
-    'FRAMEWORK_SEARCH_PATHS' => '$(PODS_ROOT)/CloudXMetaAdapter',
-    'OTHER_LDFLAGS' => '-framework CloudXMetaAdapter',
     'DEFINES_MODULE' => 'YES',
-    'CLANG_ENABLE_MODULES' => 'YES',
-    'OTHER_CFLAGS' => '-fmodules'
+    'CLANG_ENABLE_MODULES' => 'YES'
   }
+  
+  # Handle static framework dependencies
   s.user_target_xcconfig = {
     'OTHER_LDFLAGS' => '-ObjC'
   }
+  
   s.requires_arc = true
 end
