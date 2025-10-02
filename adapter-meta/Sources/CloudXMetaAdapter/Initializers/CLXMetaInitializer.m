@@ -110,8 +110,18 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
     [self configureAdvertiserTrackingEnabled];
     
     // Configure test settings (only for development/testing)
+    // Check UserDefaults override first (for TestFlight/special cases)
+    BOOL testModeOverride = [[NSUserDefaults standardUserDefaults] boolForKey:@"CLXMetaTestModeEnabled"];
+    
     #ifdef DEBUG
+    // Always enable in debug builds
     [self configureTestSettings];
+    #else
+    // In release builds, only enable if UserDefaults override is set
+    if (testModeOverride) {
+        [[CLXMetaInitializer logger] debug:@"⚠️ [CLXMetaInitializer] Test mode enabled via UserDefaults override"];
+        [self configureTestSettings];
+    }
     #endif
     
     // Initialize Meta FAN SDK with placement IDs like MAX does
@@ -187,6 +197,18 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
                                       idfaAllowed ? @"YES" : @"NO"]];
 }
 
+/**
+ * Configures Meta test settings for development/testing
+ * 
+ * Test mode can be enabled in two ways:
+ * 1. Automatically in DEBUG builds
+ * 2. Via UserDefaults override: [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"CLXMetaTestModeEnabled"];
+ *
+ * When enabled, registers the current device as a test device to receive test ads.
+ * This only affects the current device - other users will see production ads.
+ *
+ * Note: Remember to disable UserDefaults override before final App Store release!
+ */
 - (void)configureTestSettings {
     // Dynamically get current device's test hash instead of hardcoding
     NSString *deviceHash = [FBAdSettings testDeviceHash];
