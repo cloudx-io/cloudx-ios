@@ -82,14 +82,14 @@
         rewardedPlacement:@"metaRewarded"
         rewardedInterstitialPlacement:@"metaRewarded"];
     
-    // Production Configuration (placeholders)
+    // Production Configuration (Blocky app - io.cloudx.Blocky)
     CLXDemoConfig *prodConfig = [[CLXDemoConfig alloc] 
-        initWithAppKey:@"PROD_APP_KEY_PLACEHOLDER"
-        hashedUserId:@"prod-user-placeholder"
+        initWithAppKey:@"P4Wa4J0La5unuRf7A3pci"
+        hashedUserId:@"prod-user-123"
         baseURL:@"https://pro.cloudx.io/sdk"
-        bannerPlacement:@"prodBanner"
-        mrecPlacement:@"prodMREC"
-        interstitialPlacement:@"prodInterstitial"
+        bannerPlacement:@"blockyBanner1"
+        mrecPlacement:@"blockyMrec1"
+        interstitialPlacement:@"blockyInterstitial1"
         nativePlacement:@"prodNative"
         nativeBannerPlacement:@"prodNative"
         rewardedPlacement:@"prodRewarded"
