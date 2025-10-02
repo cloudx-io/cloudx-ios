@@ -127,11 +127,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSArray<NSNumber *> *)gppSid;
 
 /**
- * @brief Comprehensive privacy check including GPP, COPPA (data clearing only), and ATT
- * @return YES if personal data should be cleared, NO otherwise
- * @discussion Enhanced privacy logic with geographic targeting and GPP consent evaluation
+ * @brief Sets the GPP string for privacy compliance
+ * @param gppString The GPP consent string
+ * @discussion Publisher API to set GPP consent data
  */
-- (BOOL)shouldClearPersonalDataWithGPP;
+- (void)setGppString:(nullable NSString *)gppString;
+
+/**
+ * @brief Sets the GPP section IDs
+ * @param gppSid Array of GPP section IDs
+ * @discussion Publisher API to set GPP section identifiers
+ */
+- (void)setGppSid:(nullable NSArray<NSNumber *> *)gppSid;
 
 @end
 

@@ -3,6 +3,7 @@
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXErrorReporter.h>
+#import <CloudXCore/CLXPrivacyService.h>
 #import <AdSupport/AdSupport.h> // For ASIdentifierManager
 
 static CLXLogger *logger;
@@ -27,30 +28,33 @@ static CLXLogger *logger;
 - (NSString *)getIFA {
     NSString *ifa = nil;
     
-    // 1. IFA from UserDefaults (can be set by app for specific scenarios)
+    // 1. Configured override (for testing scenarios)
     ifa = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreIFAConfigKey];
     if (ifa && ifa.length > 0) {
         [logger info:[NSString stringWithFormat:@"🔧 [CLXSettings] Using configured IFA from UserDefaults: %@", ifa]];
         return ifa;
     }
 
-    // 2. Real device IDFA (primary source)
-    if ([CLXAdTrackingService isIDFAAccessAllowed]) {
-        ifa = [[ASIdentifierManager sharedManager].advertisingIdentifier UUIDString];
-        [logger info:[NSString stringWithFormat:@"📱 [CLXSettings] *** ACTUAL DEVICE IDFA FROM ASIdentifierManager: %@ ***", ifa ?: @"(nil)"]];
-        if (ifa && ifa.length > 0 && ![ifa isEqualToString:@"00000000-0000-0000-0000-000000000000"]) {
-            [logger info:[NSString stringWithFormat:@"✅ [CLXSettings] Using real device IDFA: %@", ifa]];
-            return ifa;
-        }
-    } else {
-        [logger debug:@"📊 [CLXSettings] IDFA access not allowed by ATT status."];
-        // Still log what the IDFA would be even if not allowed
+    // 2. Privacy-aware IDFA retrieval (unified approach)
+    CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
+    if ([privacyService shouldClearPersonalData]) {
+        [logger debug:@"🔒 [CLXSettings] Privacy requires data clearing - returning zero IDFA"];
+        // Still log what the actual IDFA would be for debugging
         NSString *actualIDFA = [[ASIdentifierManager sharedManager].advertisingIdentifier UUIDString];
-        [logger info:[NSString stringWithFormat:@"📱 [CLXSettings] *** ACTUAL DEVICE IDFA (ATT not allowed): %@ ***", actualIDFA ?: @"(nil)"]];
+        [logger info:[NSString stringWithFormat:@"📱 [CLXSettings] *** ACTUAL DEVICE IDFA (privacy blocked): %@ ***", actualIDFA ?: @"(nil)"]];
+        return @"00000000-0000-0000-0000-000000000000";
     }
 
-    // 3. Fallback placeholder if no real IDFA is available
-    [logger error:@"⚠️ [CLXSettings] No real IDFA available or allowed. Using placeholder."];
+    // 3. Real device IDFA (privacy allows and ATT authorized)
+    ifa = [[ASIdentifierManager sharedManager].advertisingIdentifier UUIDString];
+    [logger info:[NSString stringWithFormat:@"📱 [CLXSettings] *** ACTUAL DEVICE IDFA FROM ASIdentifierManager: %@ ***", ifa ?: @"(nil)"]];
+    if (ifa && ifa.length > 0 && ![ifa isEqualToString:@"00000000-0000-0000-0000-000000000000"]) {
+        [logger info:[NSString stringWithFormat:@"✅ [CLXSettings] Using real device IDFA: %@", ifa]];
+        return ifa;
+    }
+
+    // 4. Fallback placeholder if no real IDFA is available
+    [logger error:@"⚠️ [CLXSettings] No real IDFA available. Using placeholder."];
     return @"00000000-0000-0000-0000-000000000000";
 }
 
