@@ -56,11 +56,13 @@ NS_ASSUME_NONNULL_BEGIN
  * @param sdkVersion The SDK version string
  * @param deviceType The device type string
  * @param abTestGroup The A/B test group name
+ * @param appBundle The application bundle identifier
  */
 - (void)setSessionConstData:(NSString *)sessionId
                  sdkVersion:(NSString *)sdkVersion
                  deviceType:(NSString *)deviceType
-                abTestGroup:(NSString *)abTestGroup;
+                abTestGroup:(NSString *)abTestGroup
+                  appBundle:(NSString *)appBundle;
 
 /**
  * Sets the hashed geo IP for privacy-safe tracking

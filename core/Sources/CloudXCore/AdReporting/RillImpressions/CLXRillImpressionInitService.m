@@ -41,10 +41,12 @@
                    auctionId, rillImpressionModel.lastBidResponse.auctionId ? @"bid response" : @"account ID"]];
     
     // Set session data
+    NSString *appBundle = [[NSBundle mainBundle] bundleIdentifier] ?: @"";
     [resolver setSessionConstData:rillImpressionModel.impModel.sessionID ?: @""
                        sdkVersion:@"1.0.0"
                        deviceType:DeviceTypeToString([CLXSystemInformation shared].deviceType)
-                      abTestGroup:rillImpressionModel.impModel.testGroupName ?: @""];
+                      abTestGroup:rillImpressionModel.impModel.testGroupName ?: @""
+                        appBundle:appBundle];
     
     // Set loop index
     [resolver setLoopIndex:auctionId loopIndex:rillImpressionModel.loadBannerTimesCount];

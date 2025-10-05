@@ -88,7 +88,8 @@
     [self.resolver setSessionConstData:@"test-session-67890" 
                             sdkVersion:@"1.0.0-test" 
                             deviceType:@"phone" 
-                           abTestGroup:@"control-group"];
+                           abTestGroup:@"control-group"
+                             appBundle:@"com.cloudx.test"];
 }
 
 // Test privacy allows personal data - comprehensive validation of real IFA return

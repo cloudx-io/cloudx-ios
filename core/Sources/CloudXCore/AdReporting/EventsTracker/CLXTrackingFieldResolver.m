@@ -1,5 +1,6 @@
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 #import <CloudXCore/CLXSDKConfig.h>
+#import <CloudXCore/CLXSDKConfigPlacement.h>
 #import <CloudXCore/CLXSystemInformation.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXPrivacyService.h>
@@ -19,6 +20,7 @@
 @property (nonatomic, copy) NSString *sdkVersion;
 @property (nonatomic, copy) NSString *deviceType;
 @property (nonatomic, copy) NSString *abTestGroup;
+@property (nonatomic, copy) NSString *appBundle;
 @property (nonatomic, copy) NSString *accountId;
 @property (nonatomic, copy) NSString *hashedGeoIp;
 
@@ -59,15 +61,38 @@
     self.tracking = config.tracking;
     
     // Store raw config as dictionary for field resolution
-    // Note: In a real implementation, you'd want to store the original JSON
-    // For now, we'll create a basic representation
     NSMutableDictionary *configDict = [NSMutableDictionary dictionary];
     if (config.accountID) configDict[@"accountID"] = config.accountID;
     if (config.organizationID) configDict[@"organizationID"] = config.organizationID;
     if (config.sessionID) configDict[@"sessionID"] = config.sessionID;
+    
+    // Store placements data as an array to support array lookup syntax like config.placements[id=...]
+    if (config.placements && config.placements.count > 0) {
+        NSMutableArray *placementsArray = [NSMutableArray array];
+        [self.logger debug:[NSString stringWithFormat:@"Processing %lu placements from config", (unsigned long)config.placements.count]];
+        for (id placementObj in config.placements) {
+            // Verify it's a CLXSDKConfigPlacement object
+            if ([placementObj isKindOfClass:[CLXSDKConfigPlacement class]]) {
+                CLXSDKConfigPlacement *placement = (CLXSDKConfigPlacement *)placementObj;
+                NSMutableDictionary *placementData = [NSMutableDictionary dictionary];
+                if (placement.id) placementData[@"id"] = placement.id;
+                if (placement.name) placementData[@"name"] = placement.name;
+                if (placement.dealId) placementData[@"externalId"] = placement.dealId;
+                [placementsArray addObject:placementData];
+                [self.logger debug:[NSString stringWithFormat:@"Stored placement: id=%@, name=%@", placement.id, placement.name]];
+            } else {
+                [self.logger debug:[NSString stringWithFormat:@"Skipping placement - unexpected type: %@", NSStringFromClass([placementObj class])]];
+            }
+        }
+        configDict[@"placements"] = placementsArray;
+        [self.logger debug:[NSString stringWithFormat:@"Total placements stored: %lu", (unsigned long)placementsArray.count]];
+    }
+    
     self.configDataMap = [configDict copy];
     
-    [self.logger debug:[NSString stringWithFormat:@"Config set with %lu tracking fields", (unsigned long)self.tracking.count]];
+    [self.logger debug:[NSString stringWithFormat:@"Config set with %lu tracking fields, %lu placements", 
+                        (unsigned long)self.tracking.count,
+                        (unsigned long)(config.placements ? config.placements.count : 0)]];
 }
 
 - (void)setRequestData:(NSString *)auctionId bidRequestJSON:(NSDictionary *)bidRequestJSON {
@@ -93,13 +118,15 @@
 - (void)setSessionConstData:(NSString *)sessionId
                  sdkVersion:(NSString *)sdkVersion
                  deviceType:(NSString *)deviceType
-                abTestGroup:(NSString *)abTestGroup {
+                abTestGroup:(NSString *)abTestGroup
+                  appBundle:(NSString *)appBundle {
     self.sessionId = sessionId;
     self.sdkVersion = sdkVersion;
     self.deviceType = deviceType;
     self.abTestGroup = abTestGroup;
+    self.appBundle = appBundle;
     
-    [self.logger debug:@"Session constant data set"];
+    [self.logger debug:[NSString stringWithFormat:@"Session constant data set - bundle: %@", appBundle ?: @"(none)"]];
 }
 
 - (void)setHashedGeoIp:(nullable NSString *)hashedGeoIp {
@@ -168,7 +195,7 @@
     
     // Handle config fields
     if ([field hasPrefix:@"config."]) {
-        return [self resolveConfigField:field];
+        return [self resolveConfigField:auctionId field:field];
     }
     
     // Handle bid response fields
@@ -187,6 +214,8 @@
         return self.sdkVersion ?: @"1.0.0";
     } else if ([field isEqualToString:@"sdk.deviceType"]) {
         return self.deviceType;
+    } else if ([field isEqualToString:@"sdk.appBundle"] || [field isEqualToString:@"sdk.app.bundle"]) {
+        return self.appBundle;
     } else if ([field isEqualToString:@"sdk.responseTimeMillis"]) {
         // This should be set dynamically per auction
         NSMutableDictionary *auctionSdkMap = self.sdkMap[auctionId];
@@ -483,14 +512,14 @@
     return nil;
 }
 
-- (nullable id)resolveConfigField:(NSString *)field {
+- (nullable id)resolveConfigField:(NSString *)auctionId field:(NSString *)field {
     if ([field isEqualToString:@"config.testGroupName"]) {
         return self.abTestGroup;
     }
     
-    // General config field resolution
+    // General config field resolution with auction context for dynamic expressions
     NSString *path = [field stringByReplacingOccurrencesOfString:@"config." withString:@""];
-    return [self resolveNestedField:self.configDataMap path:path];
+    return [self resolveNestedField:self.configDataMap path:path withFullResponseData:nil auctionId:auctionId];
 }
 
 - (nullable id)resolveBidResponseField:(NSString *)auctionId field:(NSString *)field {
@@ -747,7 +776,17 @@
             return @1;
         }
         
-        // For other field paths, try to resolve them from the bid response data
+        // For other field paths, try using the full resolveField method if we have auctionId
+        // This handles bidRequest.*, bid.*, config.*, bidResponse.*, and sdk.* fields
+        if (auctionId) {
+            id result = [self resolveField:auctionId field:fieldPath];
+            if (result) {
+                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolved field path %@ via resolveField: %@", fieldPath, result]];
+                return result;
+            }
+        }
+        
+        // Fallback: try to resolve from the bid response data
         if (bidResponseData) {
             id result = [self resolveNestedField:bidResponseData path:fieldPath];
             if (result) {
