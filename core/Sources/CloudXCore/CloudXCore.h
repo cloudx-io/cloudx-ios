@@ -39,6 +39,7 @@
 
 // Win/Loss Tracking
 #import <CloudXCore/CLXWinLossTracker.h>
+#import <CloudXCore/CLXBidLifecycleEvent.h>
 #import <CloudXCore/CLXWinLossFieldResolver.h>
 #import <CloudXCore/CLXWinLossNetworkService.h>
 #import <CloudXCore/CLXAuctionBidManager.h>

@@ -16,28 +16,67 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/URLSession+CLX.h>
 #import <CloudXCore/CLXSQLiteDatabase.h>
+#import <CloudXCore/CLXBidLifecycleEvent.h>
 
 /**
- * Simple model for cached win/loss events
+ * Model for cached win/loss events with state tracking
  */
 @interface CLXCachedWinLossEvent : NSObject
 @property (nonatomic, copy) NSString *eventId;
+@property (nonatomic, copy) NSString *auctionId;
+@property (nonatomic, copy) NSString *bidId;
+@property (nonatomic, copy) NSString *state;
 @property (nonatomic, copy) NSString *endpointUrl;
-@property (nonatomic, copy) NSString *payload;
-- (instancetype)initWithEventId:(NSString *)eventId endpointUrl:(NSString *)endpointUrl payload:(NSString *)payload;
+@property (nonatomic, copy, nullable) NSString *payload;
+@property (nonatomic, copy, nullable) NSString *lossPayload;
+@property (nonatomic, assign) BOOL sent;
+@property (nonatomic, assign) int64_t createdAt;
+@property (nonatomic, assign) int64_t updatedAt;
+- (instancetype)initWithEventId:(NSString *)eventId 
+                     auctionId:(NSString *)auctionId 
+                         bidId:(NSString *)bidId 
+                         state:(NSString *)state 
+                   endpointUrl:(NSString *)endpointUrl 
+                       payload:(nullable NSString *)payload 
+                   lossPayload:(nullable NSString *)lossPayload
+                          sent:(BOOL)sent
+                     createdAt:(int64_t)createdAt
+                     updatedAt:(int64_t)updatedAt;
 @end
 
 @implementation CLXCachedWinLossEvent
-- (instancetype)initWithEventId:(NSString *)eventId endpointUrl:(NSString *)endpointUrl payload:(NSString *)payload {
+- (instancetype)initWithEventId:(NSString *)eventId 
+                     auctionId:(NSString *)auctionId 
+                         bidId:(NSString *)bidId 
+                         state:(NSString *)state 
+                   endpointUrl:(NSString *)endpointUrl 
+                       payload:(nullable NSString *)payload 
+                   lossPayload:(nullable NSString *)lossPayload
+                          sent:(BOOL)sent
+                     createdAt:(int64_t)createdAt
+                     updatedAt:(int64_t)updatedAt {
     self = [super init];
     if (self) {
         _eventId = [eventId copy];
+        _auctionId = [auctionId copy];
+        _bidId = [bidId copy];
+        _state = [state copy];
         _endpointUrl = [endpointUrl copy];
         _payload = [payload copy];
+        _lossPayload = [lossPayload copy];
+        _sent = sent;
+        _createdAt = createdAt;
+        _updatedAt = updatedAt;
     }
     return self;
 }
 @end
+
+// State constants
+static NSString *const kStateNew = @"NEW";
+static NSString *const kStateLoaded = @"LOADED";
+static NSString *const kStateWin = @"WIN";
+static NSString *const kStateLoss = @"LOSS";
 
 @interface CLXWinLossTracker ()
 @property (nonatomic, strong) CLXAuctionBidManager *auctionBidManager;
@@ -122,6 +161,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
 }
 
 - (void)trySendingPendingWinLossEvents {
+    // Get all cached events and retry sending (matching Android)
     NSArray<CLXCachedWinLossEvent *> *cachedEvents = [self getAllCachedEvents];
     
     if (cachedEvents.count == 0) {
@@ -173,7 +213,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
         if (payload) {
             NSString *reasonStr = (lossReason.integerValue == CLXLossReasonLostToHigherBid) ? @"HigherBid" : @"TechError";
             [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] LOSS: %@ (%@)", bidId, reasonStr]];
-            [self trackWinLoss:payload];
+            [self trackWinLoss:payload auctionId:auctionId bidId:bidId];
         } else {
             [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] LOSS payload failed: %@", bidId]];
         }
@@ -200,7 +240,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
         
         if (payload) {
             [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] WIN: %@ ($%.2f)", bidId, winnerBidPrice]];
-            [self trackWinLoss:payload];
+            [self trackWinLoss:payload auctionId:auctionId bidId:bidId];
         } else {
             [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] WIN payload failed: %@", bidId]];
         }
@@ -209,6 +249,51 @@ static id<CLXWinLossTracking> _testInstance = nil;
         [self.auctionBidManager clearAuction:auctionId];
     });
 }
+
+- (void)sendEvent:(NSString *)auctionId
+            bidId:(NSString *)bidId
+            event:(CLXBidLifecycleEvent *)event
+       lossReason:(nullable NSNumber *)lossReason
+   winnerBidPrice:(double)winnerBidPrice {
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        CLXBidResponseBid *bid = [self.auctionBidManager getBid:auctionId bidId:bidId];
+        
+        if (!bid) {
+            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] No bid found for event: %@", bidId]];
+            return;
+        }
+        
+        // Determine loaded bid price based on event type
+        double loadedBidPrice = winnerBidPrice;
+        if (event.type == CLXBidLifecycleEventTypeLoadSuccess || event.type == CLXBidLifecycleEventTypeRenderSuccess) {
+            loadedBidPrice = bid.price;
+        }
+        
+        // Build payload using field resolver with lifecycle event
+        NSDictionary<NSString *, id> *payload = [self.winLossFieldResolver 
+            buildWinLossPayloadWithAuctionId:auctionId
+                                          bid:bid
+                                   lossReason:lossReason
+                                        event:event
+                               loadedBidPrice:loadedBidPrice];
+        
+        if (payload) {
+            NSString *eventName = event.notificationType.length > 0 ? event.notificationType : @"BidReceived";
+            [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] %@: %@ ($%.2f) [%@]", 
+                               eventName, bidId, loadedBidPrice, event.urlType]];
+            
+            // Fire event immediately (no state management)
+            [self trackWinLoss:payload auctionId:auctionId bidId:bidId];
+        } else {
+            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] %@ payload failed: %@", 
+                               event.notificationType, bidId]];
+        }
+    });
+}
+
+// REMOVED: saveBidsAsNew() - Android doesn't pre-cache, events fire immediately
+// REMOVED: convertUnfinishedBidsToLoss() - No state management in simplified implementation
 
 - (void)sendLossNotificationsForLosingBids:(NSString *)auctionId
                              winningBidId:(NSString *)winningBidId
@@ -248,37 +333,122 @@ static id<CLXWinLossTracking> _testInstance = nil;
     [self.auctionBidManager clearAuction:auctionId];
 }
 
+#pragma mark - Helper Methods
+
+// REMOVED: stateForEvent() - No longer needed (state machine removed to match Android)
+
+/**
+ * Converts dictionary to JSON string
+ */
+- (nullable NSString *)jsonStringFromDictionary:(NSDictionary *)dictionary {
+    if (!dictionary) {
+        return nil;
+    }
+    
+    NSError *error = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dictionary options:0 error:&error];
+    if (error || !jsonData) {
+        [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Failed to serialize dictionary: %@", error]];
+        return nil;
+    }
+    
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+}
+
 #pragma mark - Database Management
 
 - (void)createWinLossTableIfNeeded {
     if (![self.database tableExists:@"cached_win_loss_events_table"]) {
+        // Simplified schema matching Android exactly: id, auctionId, bidId, payload, createdAt
         NSString *createTableSQL = @"CREATE TABLE cached_win_loss_events_table ("
-                                   @"id TEXT PRIMARY KEY,"
-                                   @"endpointUrl TEXT NOT NULL,"
-                                   @"payload TEXT NOT NULL"
+                                   @"id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                                   @"auctionId TEXT NOT NULL,"
+                                   @"bidId TEXT NOT NULL,"
+                                   @"payload TEXT NOT NULL,"
+                                   @"createdAt INTEGER NOT NULL"
                                    @");";
         
         BOOL success = [self.database executeSQL:createTableSQL];
         if (success) {
-            [self.logger debug:@"Win/loss events table created successfully"];
+            [self.logger debug:@"✅ Win/loss events table created (simplified schema, matching Android)"];
         } else {
-            [self.logger error:@"Failed to create win/loss events table"];
+            [self.logger error:@"❌ Failed to create win/loss events table"];
         }
+    } else {
+        // Migrate from old complex schema to new simplified schema
+        [self migrateToSimplifiedSchema];
+    }
+}
+
+- (void)migrateToSimplifiedSchema {
+    // Check current schema to determine if migration is needed
+    NSString *pragmaSQL = @"PRAGMA table_info(cached_win_loss_events_table);";
+    NSArray<NSDictionary *> *columns = [self.database executeQuery:pragmaSQL];
+    
+    BOOL hasStateColumn = NO;
+    BOOL hasSimplifiedSchema = NO;
+    
+    for (NSDictionary *column in columns) {
+        NSString *columnName = column[@"name"];
+        if ([columnName isEqualToString:@"state"]) {
+            hasStateColumn = YES;
+        }
+    }
+    
+    // Check if already using simplified schema (no state column)
+    hasSimplifiedSchema = !hasStateColumn && columns.count == 5;
+    
+    if (hasSimplifiedSchema) {
+        [self.logger debug:@"✅ Database already using simplified schema"];
+        return;
+    }
+    
+    [self.logger debug:@"🔄 Migrating to simplified schema (matching Android)..."];
+    
+    // Create new simplified table
+    NSString *createNewTableSQL = @"CREATE TABLE cached_win_loss_events_table_new ("
+                                  @"id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                                  @"auctionId TEXT NOT NULL,"
+                                  @"bidId TEXT NOT NULL,"
+                                  @"payload TEXT NOT NULL,"
+                                  @"createdAt INTEGER NOT NULL"
+                                  @");";
+    
+    if ([self.database executeSQL:createNewTableSQL]) {
+        // Copy existing events (only those with valid payload)
+        // Discard state/lossPayload/sent/updatedAt - no longer needed
+        NSString *copySQL = @"INSERT INTO cached_win_loss_events_table_new "
+                           @"(auctionId, bidId, payload, createdAt) "
+                           @"SELECT "
+                           @"COALESCE(auctionId, ''), "
+                           @"COALESCE(bidId, ''), "
+                           @"COALESCE(payload, '{}'), "
+                           @"COALESCE(createdAt, strftime('%s', 'now') * 1000) "
+                           @"FROM cached_win_loss_events_table "
+                           @"WHERE payload IS NOT NULL AND payload != '';";
+        
+        [self.database executeSQL:copySQL];
+        
+        // Drop old table
+        [self.database executeSQL:@"DROP TABLE cached_win_loss_events_table;"];
+        
+        // Rename new table
+        [self.database executeSQL:@"ALTER TABLE cached_win_loss_events_table_new RENAME TO cached_win_loss_events_table;"];
+        
+        [self.logger debug:@"✅ Database migrated to simplified schema successfully"];
+    } else {
+        [self.logger error:@"❌ Failed to create new simplified table during migration"];
     }
 }
 
 #pragma mark - Private Methods
 
 /**
- * Sends win/loss payload to server with database persistence for retry
+ * Sends win/loss payload to server
  */
-- (void)trackWinLoss:(NSDictionary<NSString *, id> *)payload {
-    // Save to database first for retry capability
-    NSString *eventId = [self saveToDatabase:payload];
-    if (!eventId) {
-        [self.logger error:@"❌ [WinLossTracker] Failed to save event to database - aborting"];
-        return;
-    }
+- (void)trackWinLoss:(NSDictionary<NSString *, id> *)payload
+           auctionId:(NSString *)auctionId
+               bidId:(NSString *)bidId {
     
     NSString *endpoint = self.endpointUrl;
     if (!endpoint || endpoint.length == 0) {
@@ -292,15 +462,27 @@ static id<CLXWinLossTracking> _testInstance = nil;
         return;
     }
     
-    // Send to server (matches Android's trackerApi.send)
+    // Convert payload to JSON string
+    NSString *payloadJson = [self jsonStringFromDictionary:payload];
+    if (!payloadJson) {
+        [self.logger error:@"❌ [WinLossTracker] Failed to serialize payload"];
+        return;
+    }
+    
+    // Save to database first (matching Android)
+    NSNumber *eventId = [self saveEvent:auctionId bidId:bidId payload:payloadJson];
+    
+    // Then try to send
     [self.networkService sendWithAppKey:appKey
                             endpointUrl:endpoint
                                 payload:payload
                              completion:^(BOOL success, NSError * _Nullable error) {
         
         if (success) {
-            // Remove from database cache on success
-            [self deleteEventWithId:eventId];
+            // Delete from database on success (matching Android)
+            if (eventId) {
+                [self deleteEventWithId:[eventId stringValue]];
+            }
         } else {
             [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Send failed: %@", 
                                error ? error.localizedDescription : @"Unknown error"]];
@@ -310,30 +492,40 @@ static id<CLXWinLossTracking> _testInstance = nil;
 }
 
 /**
- * Saves payload to database and returns event ID for tracking
+ * Saves event to database (simplified schema matching Android)
+ * Returns the event ID for later deletion on success
  */
-- (NSString *)saveToDatabase:(NSDictionary<NSString *, id> *)payload {
-    NSString *eventId = [[NSUUID UUID] UUIDString];
-    
-    // Convert payload to JSON string
-    NSError *error = nil;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:payload options:0 error:&error];
-    if (error || !jsonData) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Failed to serialize payload: %@, payload: %@", error, payload]];
-        return nil; // Return nil to indicate failure
+- (nullable NSNumber *)saveEvent:(NSString *)auctionId
+                           bidId:(NSString *)bidId
+                         payload:(NSString *)payloadJson {
+    if (!auctionId || !bidId || !payloadJson) {
+        [self.logger error:@"❌ [WinLossTracker] Cannot save event with nil parameters"];
+        return nil;
     }
     
-    NSString *payloadJson = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    if (!payloadJson) {
-        [self.logger error:@"❌ [WinLossTracker] Failed to create JSON string from data"];
-        return nil; // Return nil to indicate failure
+    int64_t now = (int64_t)([[NSDate date] timeIntervalSince1970] * 1000);
+    
+    NSString *insertSQL = @"INSERT INTO cached_win_loss_events_table "
+                          @"(auctionId, bidId, payload, createdAt) "
+                          @"VALUES (?, ?, ?, ?);";
+    NSArray *parameters = @[auctionId, bidId, payloadJson, @(now)];
+    
+    BOOL success = [self.database executeSQL:insertSQL withParameters:parameters];
+    if (success) {
+        // Get the last inserted row ID
+        NSString *selectSQL = @"SELECT last_insert_rowid();";
+        NSArray *rows = [self.database executeQuery:selectSQL];
+        if (rows.count > 0) {
+            NSDictionary *row = rows[0];
+            NSNumber *eventId = row[@"last_insert_rowid()"];
+            [self.logger debug:[NSString stringWithFormat:@"💾 [WinLossTracker] Saved event ID: %@", eventId]];
+            return eventId;
+        }
+    } else {
+        [self.logger error:@"❌ [WinLossTracker] Failed to save event to database"];
     }
     
-    // Save to database
-    [self insertEventWithId:eventId endpointUrl:self.endpointUrl ?: @"" payload:payloadJson];
-    
-    [self.logger debug:[NSString stringWithFormat:@"💾 [WinLossTracker] Saved event to database with ID: %@", eventId]];
-    return eventId;
+    return nil;
 }
 
 /**
@@ -400,41 +592,44 @@ static id<CLXWinLossTracking> _testInstance = nil;
 #pragma mark - Database Helper Methods
 
 - (NSArray<CLXCachedWinLossEvent *> *)getAllCachedEvents {
-    NSString *selectSQL = @"SELECT id, endpointUrl, payload FROM cached_win_loss_events_table;";
+    // Simplified schema: only id, auctionId, bidId, payload, createdAt
+    NSString *selectSQL = @"SELECT id, auctionId, bidId, payload, createdAt "
+                          @"FROM cached_win_loss_events_table;";
     NSArray<NSDictionary *> *rows = [self.database executeQuery:selectSQL];
     
     NSMutableArray<CLXCachedWinLossEvent *> *events = [NSMutableArray array];
     for (NSDictionary *row in rows) {
-        NSString *eventId = row[@"id"] ?: @"";
-        NSString *endpointUrl = row[@"endpointUrl"] ?: @"";
+        NSString *eventId = [row[@"id"] stringValue];
+        NSString *auctionId = row[@"auctionId"] ?: @"";
+        NSString *bidId = row[@"bidId"] ?: @"";
         NSString *payload = row[@"payload"] ?: @"";
+        int64_t createdAt = [row[@"createdAt"] longLongValue];
         
+        // Use simplified initializer (no state, lossPayload, sent, updatedAt)
         CLXCachedWinLossEvent *event = [[CLXCachedWinLossEvent alloc] initWithEventId:eventId 
-                                                                         endpointUrl:endpointUrl 
-                                                                             payload:payload];
+                                                                         auctionId:auctionId
+                                                                             bidId:bidId
+                                                                             state:@""
+                                                                       endpointUrl:@""
+                                                                           payload:payload
+                                                                       lossPayload:nil
+                                                                              sent:NO
+                                                                         createdAt:createdAt
+                                                                         updatedAt:createdAt];
         [events addObject:event];
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"Retrieved %lu cached events", (unsigned long)events.count]];
+    [self.logger debug:[NSString stringWithFormat:@"Retrieved %lu pending cached events", (unsigned long)events.count]];
     return [events copy];
 }
 
-- (void)insertEventWithId:(NSString *)eventId endpointUrl:(NSString *)endpointUrl payload:(NSString *)payload {
-    if (!eventId) {
-        [self.logger error:@"Cannot insert event with nil ID"];
-        return;
-    }
-    
-    NSString *insertSQL = @"INSERT OR REPLACE INTO cached_win_loss_events_table (id, endpointUrl, payload) VALUES (?, ?, ?);";
-    NSArray *parameters = @[eventId, endpointUrl ?: @"", payload ?: @""];
-    
-    BOOL success = [self.database executeSQL:insertSQL withParameters:parameters];
-    if (success) {
-        [self.logger debug:[NSString stringWithFormat:@"Inserted event with ID: %@", eventId]];
-    } else {
-        [self.logger error:[NSString stringWithFormat:@"Failed to insert event with ID: %@", eventId]];
-    }
-}
+// REMOVED: getUnfinishedBids() - No state tracking in simplified implementation
+
+// REMOVED: insertEventWithAuctionId() - Old state-based insert, replaced with simpler cacheEvent()
+
+// REMOVED: updateBidState() - No state management in simplified implementation
+// REMOVED: markEventAsSent() - No sent flag in simplified schema
+// REMOVED: markEventAsUnsent() - No sent flag in simplified schema
 
 - (void)deleteEventWithId:(NSString *)eventId {
     if (!eventId) {
@@ -466,3 +661,4 @@ static id<CLXWinLossTracking> _testInstance = nil;
 
 
 @end
+

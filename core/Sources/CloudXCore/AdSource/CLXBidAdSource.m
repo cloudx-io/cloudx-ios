@@ -92,8 +92,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSNumber *tmax;
 @property (nonatomic, assign) double latency;
 @property (nonatomic, strong) id<CLXBidNetworkService> bidNetworkService;
-@property (nonatomic, strong) CLXAppSessionService * appSessionService;
+@property (nonatomic, strong) CLXAppSessionService *appSessionService;
 @property (nonatomic, strong) id<CLXAdEventReporting> reportingService;
+@property (nonatomic, strong) id<CLXWinLossTracking> winLossTracker;
 
 @end
 
@@ -129,6 +130,9 @@ NS_ASSUME_NONNULL_BEGIN
         // Get services from dependency injection
         CLXDIContainer *container = [CLXDIContainer shared];
         _bidNetworkService = [container resolveType:ServiceTypeSingleton class:[CLXBidNetworkServiceClass class]];
+        
+        // Initialize win/loss tracker
+        _winLossTracker = [CLXWinLossTracker shared];
         
         // Get app key from UserDefaults (matching Swift SDK behavior)
         NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey] ?: @"";
@@ -268,13 +272,17 @@ NS_ASSUME_NONNULL_BEGIN
         [strongSelf.logger debug:[NSString stringWithFormat:@"Stored original bid response JSON for auction: %@", response.id]];
     }
     
-    // Add all bids to win/loss tracking
+    // Pre-cache all bids with loss payloads for win/loss tracking
     if (response.id) {
         NSArray<CLXBidResponseBid *> *allBids = [response allBids];
+        
+        // Add bids to auction bid manager for tracking
         for (CLXBidResponseBid *bid in allBids) {
-            [[CLXWinLossTracker shared] addBid:response.id bid:bid];
+            [strongSelf.winLossTracker addBid:response.id bid:bid];
         }
-        [strongSelf.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] Added %lu bids to win/loss tracking for auction: %@", 
+        
+        // No pre-caching (matching Android's simplified approach - events fire immediately when they occur)
+        [strongSelf.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] Registered %lu bids for auction: %@", 
                                  (unsigned long)allBids.count, response.id]];
     }
                 
@@ -405,11 +413,11 @@ NS_ASSUME_NONNULL_BEGIN
     
     // Send server-side loss notification for adapter creation failures (replaces client-side LURL firing)
     if (auctionID && currentBid.id) {
-        [[CLXWinLossTracker shared] setBidLoadResult:auctionID 
-                                               bidId:currentBid.id 
-                                             success:NO 
-                                          lossReason:@(CLXLossReasonTechnicalError)];
-        [[CLXWinLossTracker shared] sendLoss:auctionID bidId:currentBid.id];
+        [self.winLossTracker setBidLoadResult:auctionID 
+                                        bidId:currentBid.id 
+                                      success:NO 
+                                   lossReason:@(CLXLossReasonTechnicalError)];
+        [self.winLossTracker sendLoss:auctionID bidId:currentBid.id];
         [self.logger debug:[NSString stringWithFormat:@"📤 [CLXBidAdSource] Sent server-side loss notification for uncreatable bid rank=%ld, reason=TechnicalError", (long)currentBid.ext.cloudx.rank]];
     }
     

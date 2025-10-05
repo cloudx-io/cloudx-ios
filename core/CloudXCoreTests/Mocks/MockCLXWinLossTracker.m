@@ -3,6 +3,7 @@
  */
 
 #import "MockCLXWinLossTracker.h"
+#import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXBidResponse.h>
 #import <CloudXCore/CLXError.h>
 
@@ -12,6 +13,7 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
     dispatch_queue_t _syncQueue;
     NSInteger _sendWinCallCount;
     NSInteger _sendLossCallCount;
+    NSInteger _sendEventCallCount;
 }
 
 #pragma mark - Initialization
@@ -30,11 +32,13 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
         self.winNotifications = [[NSMutableArray alloc] init];
         self.lossNotifications = [[NSMutableArray alloc] init];
         self.bidResults = [[NSMutableArray alloc] init];
+        self.lifecycleEvents = [[NSMutableArray alloc] init];
         self.storedBids = [[NSMutableDictionary alloc] init];
         self.configuredAppKey = nil;
         self.configuredEndpoint = nil;
         _sendWinCallCount = 0;
         _sendLossCallCount = 0;
+        _sendEventCallCount = 0;
     });
 }
 
@@ -65,6 +69,20 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
 - (void)setSendLossCallCount:(NSInteger)sendLossCallCount {
     dispatch_sync(_syncQueue, ^{
         _sendLossCallCount = sendLossCallCount;
+    });
+}
+
+- (NSInteger)sendEventCallCount {
+    __block NSInteger count;
+    dispatch_sync(_syncQueue, ^{
+        count = _sendEventCallCount;
+    });
+    return count;
+}
+
+- (void)setSendEventCallCount:(NSInteger)sendEventCallCount {
+    dispatch_sync(_syncQueue, ^{
+        _sendEventCallCount = sendEventCallCount;
     });
 }
 
@@ -387,5 +405,164 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
     // But we've captured the real resolved payload from CLXWinLossFieldResolver
 }
 
+#pragma mark - New Lifecycle Event Methods
+
+- (void)sendEvent:(NSString *)auctionId
+            bidId:(NSString *)bidId
+            event:(CLXBidLifecycleEvent *)event
+       lossReason:(nullable NSNumber *)lossReason
+   winnerBidPrice:(double)winnerBidPrice {
+    
+    dispatch_sync(_syncQueue, ^{
+        _sendEventCallCount++;
+        
+        NSString *eventTypeString = @"unknown";
+        switch (event.type) {
+            case CLXBidLifecycleEventTypeLoadSuccess:
+                eventTypeString = @"LOAD_SUCCESS";
+                break;
+            case CLXBidLifecycleEventTypeRenderSuccess:
+                eventTypeString = @"RENDER_SUCCESS";
+                break;
+            case CLXBidLifecycleEventTypeLoss:
+                eventTypeString = @"LOSS";
+                break;
+        }
+        
+        // Look up the bid from stored bids to get URL data
+        CLXBidResponseBid *foundBid = nil;
+        NSArray *auctionBids = self.storedBids[auctionId];
+        for (CLXBidResponseBid *bid in auctionBids) {
+            if ([bid.id isEqualToString:bidId]) {
+                foundBid = bid;
+                break;
+            }
+        }
+        
+        NSDictionary *lifecycleEvent = @{
+            @"auctionId": auctionId ?: @"",
+            @"bidId": bidId ?: @"",
+            @"eventType": eventTypeString,
+            @"notificationType": event.notificationType ?: @"",
+            @"urlType": event.urlType ?: @"",
+            @"lossReason": lossReason ?: [NSNull null],
+            @"winnerBidPrice": @(winnerBidPrice),
+            @"timestamp": [NSDate date]
+        };
+        
+        [self.lifecycleEvents addObject:lifecycleEvent];
+        
+        // For backward compatibility with tests, also populate winNotifications/lossNotifications
+        if (event.type == CLXBidLifecycleEventTypeRenderSuccess) {
+            // RENDER_SUCCESS is a win (burl fired on impression)
+            // Extract URL based on event type (prefer burl, fallback to nurl)
+            NSString *originalURL = @"";
+            double bidPrice = winnerBidPrice;
+            
+            if (foundBid) {
+                originalURL = foundBid.burl ?: foundBid.nurl ?: @"";
+                bidPrice = foundBid.price;
+            }
+            
+            NSString *resolvedURL = [self resolveURL:originalURL withPrice:bidPrice];
+            
+            NSDictionary *winNotification = @{
+                @"auctionId": auctionId ?: @"",
+                @"bidId": bidId ?: @"",
+                @"type": @"win",
+                @"timestamp": [NSDate date],
+                @"resolvedURL": resolvedURL,
+                @"originalURL": originalURL,
+                @"bidPrice": @(bidPrice)
+            };
+            [self.winNotifications addObject:winNotification];
+            _sendWinCallCount++;
+        } else if (event.type == CLXBidLifecycleEventTypeLoadSuccess) {
+            // LOAD_SUCCESS fires nurl (notification only, not counted as "win" for revenue)
+            // Don't add to winNotifications - only RENDER_SUCCESS counts as a win
+        } else if (event.type == CLXBidLifecycleEventTypeLoss) {
+            // LOSS event fires lurl
+            NSString *originalURL = @"";
+            
+            if (foundBid) {
+                originalURL = foundBid.lurl ?: @"";
+            }
+            
+            NSString *resolvedURL = [self resolveURL:originalURL withPrice:winnerBidPrice];
+            
+            NSDictionary *lossNotification = @{
+                @"auctionId": auctionId ?: @"",
+                @"bidId": bidId ?: @"",
+                @"type": @"loss",
+                @"lossReason": lossReason ?: @(0),
+                @"timestamp": [NSDate date],
+                @"url": resolvedURL,
+                @"originalURL": originalURL
+            };
+            [self.lossNotifications addObject:lossNotification];
+            _sendLossCallCount++;
+        }
+    });
+}
+
+// Helper to resolve URL templates
+- (NSString *)resolveURL:(NSString *)urlTemplate withPrice:(double)price {
+    if (!urlTemplate || urlTemplate.length == 0) {
+        return @"";
+    }
+    
+    // Replace ${AUCTION_PRICE} with actual price (%.2f format matching iOS)
+    NSString *priceString = [NSString stringWithFormat:@"%.2f", price];
+    NSString *resolved = [urlTemplate stringByReplacingOccurrencesOfString:@"${AUCTION_PRICE}" withString:priceString];
+    
+    return resolved;
+}
+
+// REMOVED: saveBidsAsNew() - No pre-caching in simplified implementation
+// REMOVED: convertUnfinishedBidsToLoss() - No state machine in simplified implementation
+
+#pragma mark - Lifecycle Event Queries
+
+- (NSArray<NSDictionary *> *)lifecycleEventsForAuction:(NSString *)auctionId {
+    __block NSArray<NSDictionary *> *result;
+    dispatch_sync(_syncQueue, ^{
+        result = [self.lifecycleEvents filteredArrayUsingPredicate:
+                [NSPredicate predicateWithFormat:@"auctionId == %@", auctionId]];
+    });
+    return result;
+}
+
+- (NSArray<NSDictionary *> *)lifecycleEventsForBid:(NSString *)bidId {
+    __block NSArray<NSDictionary *> *result;
+    dispatch_sync(_syncQueue, ^{
+        result = [self.lifecycleEvents filteredArrayUsingPredicate:
+                [NSPredicate predicateWithFormat:@"bidId == %@", bidId]];
+    });
+    return result;
+}
+
+- (NSArray<NSDictionary *> *)lifecycleEventsOfType:(NSString *)eventType {
+    __block NSArray<NSDictionary *> *result;
+    dispatch_sync(_syncQueue, ^{
+        result = [self.lifecycleEvents filteredArrayUsingPredicate:
+                [NSPredicate predicateWithFormat:@"eventType == %@", eventType]];
+    });
+    return result;
+}
+
+- (BOOL)hasLifecycleEvent:(NSString *)eventType forAuction:(NSString *)auctionId bidId:(NSString *)bidId {
+    __block BOOL result = NO;
+    dispatch_sync(_syncQueue, ^{
+        for (NSDictionary *event in self.lifecycleEvents) {
+            if ([event[@"eventType"] isEqualToString:eventType] &&
+                [event[@"auctionId"] isEqualToString:auctionId] &&
+                [event[@"bidId"] isEqualToString:bidId]) {
+                result = YES;
+                break;
+            }
+        }
+    });
+    return result;
+}
 
 @end

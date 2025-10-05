@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXSDKConfigResponse;
 @class CLXBidResponseBid;
 @class CLXTrackingFieldResolver;
+@class CLXBidLifecycleEvent;
 
 /**
  * iOS equivalent of Android's WinLossFieldResolver
@@ -62,6 +63,15 @@ NS_ASSUME_NONNULL_BEGIN
                                                                         bid:(nullable CLXBidResponseBid *)bid
                                                                  lossReason:(nullable NSNumber *)lossReason
                                                                       isWin:(BOOL)isWin
+                                                              loadedBidPrice:(double)loadedBidPrice;
+
+/**
+ * Build win/loss payload with lifecycle event (new method for dynamic URL resolution)
+ */
+- (nullable NSDictionary<NSString *, id> *)buildWinLossPayloadWithAuctionId:(NSString *)auctionId
+                                                                        bid:(nullable CLXBidResponseBid *)bid
+                                                                 lossReason:(nullable NSNumber *)lossReason
+                                                                      event:(CLXBidLifecycleEvent *)event
                                                               loadedBidPrice:(double)loadedBidPrice;
 
 @end

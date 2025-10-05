@@ -18,6 +18,7 @@
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXAdNetworkFactories.h>
 #import <CloudXCore/CLXWinLossTracker.h>
+#import <CloudXCore/CLXBidLifecycleEvent.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXBidAdSource.h>
@@ -79,6 +80,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 // Rill tracking service for analytics events
 @property (nonatomic, strong) CLXRillTrackingService *rillTrackingService;
 @property (nonatomic, strong) CLXConfigImpressionModel *impModel;
+@property (nonatomic, strong) id<CLXWinLossTracking> winLossTracker;
 
 @end
 
@@ -127,6 +129,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         
         // Initialize Rill tracking service
         _rillTrackingService = [[CLXRillTrackingService alloc] initWithReportingService:_reportingService];
+        
+        // Initialize win/loss tracker
+        _winLossTracker = [CLXWinLossTracker shared];
         
         // Set up session tracking for metrics collection
         NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey] ?: @"";
@@ -556,11 +561,11 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 - (void)sendLossNotificationForFailedAd:(CLXAdType)adType {
     // Send server-side loss notification for technical errors (matching banner implementation)
     if (self.lastBidResponse && self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
-        [[CLXWinLossTracker shared] setBidLoadResult:self.currentBidResponse.id 
-                                               bidId:self.lastBidResponse.bid.id 
-                                             success:NO 
-                                          lossReason:@(CLXLossReasonTechnicalError)];
-        [[CLXWinLossTracker shared] sendLoss:self.currentBidResponse.id bidId:self.lastBidResponse.bid.id];
+        [self.winLossTracker setBidLoadResult:self.currentBidResponse.id 
+                                        bidId:self.lastBidResponse.bid.id 
+                                      success:NO 
+                                   lossReason:@(CLXLossReasonTechnicalError)];
+        [self.winLossTracker sendLoss:self.currentBidResponse.id bidId:self.lastBidResponse.bid.id];
         [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Sent server-side loss notification for failed ad type %ld, reason=TechnicalError", (long)adType]];
     } else {
         [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Missing data for ad type %ld loss notification: bidID=%@, auctionID=%@", 
@@ -577,9 +582,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     NSString *winnerBidId = self.lastBidResponse.bid.id;
     NSString *auctionId = self.currentBidResponse.id;
     
-    [[CLXWinLossTracker shared] sendLossNotificationsForLosingBids:auctionId
-                                                     winningBidId:winnerBidId
-                                                          allBids:allBids];
+    [self.winLossTracker sendLossNotificationsForLosingBids:auctionId
+                                              winningBidId:winnerBidId
+                                                   allBids:allBids];
 }
 
 #pragma mark - CloudXAdapterInterstitialDelegate
@@ -593,6 +598,22 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Transition to ready state
     self.currentState = CLXInterstitialStateREADY;
     [self.logger debug:@"📊 [PublisherFullscreenAd] State transitioned to READY"];
+    
+    // Fire LOAD_SUCCESS lifecycle event (nurl)
+    if (interstitial.bidID && self.currentBidResponse && self.currentBidResponse.id) {
+        [self.winLossTracker setBidLoadResult:self.currentBidResponse.id
+                                        bidId:interstitial.bidID
+                                      success:YES
+                                   lossReason:nil];
+
+        [self.winLossTracker sendEvent:self.currentBidResponse.id
+                                 bidId:interstitial.bidID
+                                 event:[CLXBidLifecycleEvent loadSuccessEvent]
+                            lossReason:nil
+                        winnerBidPrice:self.lastBidResponse.price];
+        
+        [self.logger debug:[NSString stringWithFormat:@"🚀 [PublisherFullscreenAd] Fired LOAD_SUCCESS event (nurl) for interstitial bidID=%@", interstitial.bidID]];
+    }
     
     // Winner has successfully loaded, now fire loss notifications for all losing bids
     [self fireLosingBidLurls];
@@ -656,17 +677,18 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         [self.logger debug:[NSString stringWithFormat:@"🔍 [PublisherFullscreenAd] Bid ID: %@, NURL: %@, Price: %.2f", bid.id, bid.nurl, bid.price]];
     }
     
-    // Fire NURL for interstitial impression with revenue callback
+    // Fire RENDER_SUCCESS lifecycle event (burl) on impression
     CLXBidResponseBid *winningBid = [self.currentBidResponse findBidWithID:interstitial.bidID];
     if (winningBid && interstitial.bidID && self.currentBidResponse && self.currentBidResponse.id) {
-        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Sending server-side win notification for interstitial impression: bidID=%@, price=%.2f", interstitial.bidID, winningBid.price]];
+        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Firing RENDER_SUCCESS event (burl) for interstitial impression: bidID=%@, price=%.2f", interstitial.bidID, winningBid.price]];
         
-        // Mark bid as successfully loaded and send win notification
-        [[CLXWinLossTracker shared] setBidLoadResult:self.currentBidResponse.id 
-                                               bidId:interstitial.bidID 
-                                             success:YES 
-                                          lossReason:nil];
-        [[CLXWinLossTracker shared] sendWin:self.currentBidResponse.id bidId:interstitial.bidID];
+        [self.winLossTracker sendEvent:self.currentBidResponse.id
+                                 bidId:interstitial.bidID
+                                 event:[CLXBidLifecycleEvent renderSuccessEvent]
+                            lossReason:nil
+                        winnerBidPrice:winningBid.price];
+        
+        [self.logger debug:@"🚀 [PublisherFullscreenAd] RENDER_SUCCESS event (burl) fired for interstitial"];
         
         // Trigger revenue callback immediately (no longer depends on NURL network call)
         CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
@@ -759,6 +781,22 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Transition to ready state
     self.currentState = CLXInterstitialStateREADY;
     
+    // Fire LOAD_SUCCESS lifecycle event (nurl)
+    if (rewarded.bidID && self.currentBidResponse && self.currentBidResponse.id) {
+        [self.winLossTracker setBidLoadResult:self.currentBidResponse.id
+                                        bidId:rewarded.bidID
+                                      success:YES
+                                   lossReason:nil];
+
+        [self.winLossTracker sendEvent:self.currentBidResponse.id
+                                 bidId:rewarded.bidID
+                                 event:[CLXBidLifecycleEvent loadSuccessEvent]
+                            lossReason:nil
+                        winnerBidPrice:self.lastBidResponse.price];
+        
+        [self.logger debug:[NSString stringWithFormat:@"🚀 [PublisherFullscreenAd] Fired LOAD_SUCCESS event (nurl) for rewarded bidID=%@", rewarded.bidID]];
+    }
+    
     // Winner has successfully loaded, now fire loss notifications for all losing bids
     [self fireLosingBidLurls];
     
@@ -806,17 +844,18 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Send Rill tracking impression event
     [self.rillTrackingService sendImpressionEvent];
     
-    // Fire NURL for rewarded impression with revenue callback
+    // Fire RENDER_SUCCESS lifecycle event (burl) on impression
     CLXBidResponseBid *winningBid = [self.currentBidResponse findBidWithID:rewarded.bidID];
     if (winningBid && rewarded.bidID && self.currentBidResponse && self.currentBidResponse.id) {
-        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Sending server-side win notification for rewarded impression: bidID=%@, price=%.2f", rewarded.bidID, winningBid.price]];
+        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Firing RENDER_SUCCESS event (burl) for rewarded impression: bidID=%@, price=%.2f", rewarded.bidID, winningBid.price]];
         
-        // Mark bid as successfully loaded and send win notification
-        [[CLXWinLossTracker shared] setBidLoadResult:self.currentBidResponse.id 
-                                               bidId:rewarded.bidID 
-                                             success:YES 
-                                          lossReason:nil];
-        [[CLXWinLossTracker shared] sendWin:self.currentBidResponse.id bidId:rewarded.bidID];
+        [self.winLossTracker sendEvent:self.currentBidResponse.id
+                                 bidId:rewarded.bidID
+                                 event:[CLXBidLifecycleEvent renderSuccessEvent]
+                            lossReason:nil
+                        winnerBidPrice:winningBid.price];
+        
+        [self.logger debug:@"🚀 [PublisherFullscreenAd] RENDER_SUCCESS event (burl) fired for rewarded"];
         
         // Trigger revenue callback immediately (no longer depends on NURL network call)
         CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];

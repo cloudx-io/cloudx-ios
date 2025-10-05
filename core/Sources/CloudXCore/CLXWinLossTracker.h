@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class CLXSDKConfigResponse;
 @class CLXBidResponseBid;
+@class CLXBidLifecycleEvent;
 
 /**
  * Protocol defining win/loss tracking interface
@@ -88,6 +89,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)sendWin:(NSString *)auctionId bidId:(NSString *)bidId;
 
 /**
+ * Sends a lifecycle event notification (matches Android's sendEvent exactly)
+ * @param auctionId The auction identifier
+ * @param bidId The bid identifier  
+ * @param event The lifecycle event type (LOAD_SUCCESS, RENDER_SUCCESS, or LOSS)
+ * @param lossReason The loss reason (for LOSS events)
+ * @param winnerBidPrice The price of the winning bid
+ */
+- (void)sendEvent:(NSString *)auctionId
+            bidId:(NSString *)bidId
+            event:(CLXBidLifecycleEvent *)event
+       lossReason:(nullable NSNumber *)lossReason
+   winnerBidPrice:(double)winnerBidPrice;
+
+/**
  * Sends loss notifications for all losing bids in an auction
  * @param auctionId The auction identifier
  * @param winningBidId The winning bid identifier
@@ -131,11 +146,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)resetSharedInstance;
 
 /**
- * Database methods for testing
+ * Database methods for testing (simplified to match Android)
  */
 - (void)deleteAllEvents;
-- (void)insertEventWithId:(NSString *)eventId endpointUrl:(NSString *)endpointUrl payload:(NSString *)payload;
-- (void)deleteEventWithId:(NSString *)eventId;
 - (NSArray *)getAllCachedEvents;
 
 @end

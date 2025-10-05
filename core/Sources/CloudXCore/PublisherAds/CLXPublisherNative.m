@@ -18,6 +18,7 @@
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXBidAdSource.h>
 #import <CloudXCore/CLXWinLossTracker.h>
+#import <CloudXCore/CLXBidLifecycleEvent.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXSettings.h>
@@ -62,11 +63,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger loadNativeTimesCount;
 @property (nonatomic, strong) CLXSDKConfigPlacement *placement;
 @property (nonatomic, strong, nullable) NSDate *adLoadStartTime;
-@property (nonatomic, strong) CLXAppSessionService * appSessionService;
+@property (nonatomic, strong) CLXAppSessionService *appSessionService;
 
 // Rill tracking service for analytics events
 @property (nonatomic, strong) CLXRillTrackingService *rillTrackingService;
 @property (nonatomic, strong) CLXConfigImpressionModel *impModel;
+@property (nonatomic, strong) id<CLXWinLossTracking> winLossTracker;
 
 @end
 
@@ -108,6 +110,9 @@ NS_ASSUME_NONNULL_BEGIN
         
         // Initialize Rill tracking service
         _rillTrackingService = [[CLXRillTrackingService alloc] initWithReportingService:reportingService];
+        
+        // Initialize win/loss tracker
+        _winLossTracker = [CLXWinLossTracker shared];
         
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXNative"];
         
@@ -357,9 +362,9 @@ NS_ASSUME_NONNULL_BEGIN
     NSString *winnerBidId = self.lastBidResponse.bid.id;
     NSString *auctionId = self.currentBidResponse.id;
     
-    [[CLXWinLossTracker shared] sendLossNotificationsForLosingBids:auctionId
-                                                     winningBidId:winnerBidId
-                                                          allBids:allBids];
+    [self.winLossTracker sendLossNotificationsForLosingBids:auctionId
+                                              winningBidId:winnerBidId
+                                                   allBids:allBids];
 }
 
 #pragma mark - CLXAdapterNativeDelegate
@@ -399,6 +404,22 @@ NS_ASSUME_NONNULL_BEGIN
     self.nativeOnScreen = self.currentLoadingNative;
     self.successWin = YES;
     
+    // Fire LOAD_SUCCESS lifecycle event (nurl)
+    if (self.lastBidResponse.bidID && self.currentBidResponse && self.currentBidResponse.id) {
+        [self.winLossTracker setBidLoadResult:self.currentBidResponse.id 
+                                        bidId:self.lastBidResponse.bidID 
+                                      success:YES 
+                                   lossReason:nil];
+        
+        [self.winLossTracker sendEvent:self.currentBidResponse.id
+                                 bidId:self.lastBidResponse.bidID
+                                 event:[CLXBidLifecycleEvent loadSuccessEvent]
+                            lossReason:nil
+                        winnerBidPrice:self.lastBidResponse.price];
+        
+        [self.logger debug:[NSString stringWithFormat:@"🚀 [PublisherNative] Fired LOAD_SUCCESS event (nurl) for native bidID=%@", self.lastBidResponse.bidID]];
+    }
+    
     // Winner has successfully loaded, now fire loss notifications for all losing bids
     [self fireLosingBidLurls];
     
@@ -428,11 +449,11 @@ NS_ASSUME_NONNULL_BEGIN
     
     // Send server-side loss notification for technical errors (matching banner implementation)
     if (self.lastBidResponse && self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
-        [[CLXWinLossTracker shared] setBidLoadResult:self.currentBidResponse.id 
-                                               bidId:self.lastBidResponse.bid.id 
-                                             success:NO 
-                                          lossReason:@(CLXLossReasonTechnicalError)];
-        [[CLXWinLossTracker shared] sendLoss:self.currentBidResponse.id bidId:self.lastBidResponse.bid.id];
+        [self.winLossTracker setBidLoadResult:self.currentBidResponse.id 
+                                        bidId:self.lastBidResponse.bid.id 
+                                      success:NO 
+                                   lossReason:@(CLXLossReasonTechnicalError)];
+        [self.winLossTracker sendLoss:self.currentBidResponse.id bidId:self.lastBidResponse.bid.id];
         [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherNative] Sent server-side loss notification for failed native ad, reason=TechnicalError"]];
     } else {
         [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherNative] Missing data for native loss notification: bidID=%@, auctionID=%@", 
@@ -519,16 +540,17 @@ NS_ASSUME_NONNULL_BEGIN
         // Send Rill tracking impression event
         [self.rillTrackingService sendImpressionEvent];
         
-        // Send server-side win notification for native impression (replaces client-side NURL firing)
+        // Fire RENDER_SUCCESS lifecycle event (burl) on impression
         if (self.lastBidResponse.bidID && self.currentBidResponse && self.currentBidResponse.id) {
-            [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherNative] Sending server-side win notification for native impression: bidID=%@, price=%.2f", self.lastBidResponse.bidID, self.lastBidResponse.price]];
+            [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherNative] Firing RENDER_SUCCESS event (burl) for native impression: bidID=%@, price=%.2f", self.lastBidResponse.bidID, self.lastBidResponse.price]];
             
-            // Mark bid as successfully loaded and send win notification
-            [[CLXWinLossTracker shared] setBidLoadResult:self.currentBidResponse.id 
-                                                   bidId:self.lastBidResponse.bidID 
-                                                 success:YES 
-                                              lossReason:nil];
-            [[CLXWinLossTracker shared] sendWin:self.currentBidResponse.id bidId:self.lastBidResponse.bidID];
+            [self.winLossTracker sendEvent:self.currentBidResponse.id
+                                     bidId:self.lastBidResponse.bidID
+                                     event:[CLXBidLifecycleEvent renderSuccessEvent]
+                                lossReason:nil
+                            winnerBidPrice:self.lastBidResponse.price];
+            
+            [self.logger debug:@"🚀 [PublisherNative] RENDER_SUCCESS event (burl) fired"];
             
             // Trigger revenue callback immediately (no longer depends on NURL network call)
             CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID];

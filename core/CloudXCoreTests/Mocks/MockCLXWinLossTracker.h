@@ -22,9 +22,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSMutableArray<NSDictionary *> *lossNotifications;
 @property (nonatomic, strong) NSMutableArray<NSDictionary *> *bidResults;
 
+// Lifecycle event tracking for new event system
+@property (nonatomic, strong) NSMutableArray<NSDictionary *> *lifecycleEvents;
+
 // Call count tracking for tests (thread-safe accessors via methods)
 @property (nonatomic, assign) NSInteger sendWinCallCount;
 @property (nonatomic, assign) NSInteger sendLossCallCount;
+@property (nonatomic, assign) NSInteger sendEventCallCount;
 
 // Bid data storage (to simulate real tracker behavior)
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableArray<CLXBidResponseBid *> *> *storedBids;
@@ -44,6 +48,12 @@ NS_ASSUME_NONNULL_BEGIN
 // Verify business logic
 - (BOOL)hasWinNotificationForAuction:(NSString *)auctionId bidId:(NSString *)bidId;
 - (BOOL)hasLossNotificationForAuction:(NSString *)auctionId bidId:(NSString *)bidId withReason:(CLXLossReason)reason;
+
+// Lifecycle event queries
+- (NSArray<NSDictionary *> *)lifecycleEventsForAuction:(NSString *)auctionId;
+- (NSArray<NSDictionary *> *)lifecycleEventsForBid:(NSString *)bidId;
+- (NSArray<NSDictionary *> *)lifecycleEventsOfType:(NSString *)eventType;
+- (BOOL)hasLifecycleEvent:(NSString *)eventType forAuction:(NSString *)auctionId bidId:(NSString *)bidId;
 
 // Reset for clean test isolation
 - (void)reset;
