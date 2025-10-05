@@ -159,7 +159,7 @@ static const NSInteger kTestRank3 = 3;
     [[CLXWinLossTracker shared] setBidLoadResult:kTestAuctionID 
                                            bidId:kTestBidID1 
                                          success:NO 
-                                      lossReason:@(CLXLossReasonTechnicalError)];
+                                      lossReason:@(CLXLossReasonInternalError)];
     
     // When: Sending loss notification
     [[CLXWinLossTracker shared] sendLoss:kTestAuctionID bidId:kTestBidID1];
@@ -171,7 +171,7 @@ static const NSInteger kTestRank3 = 3;
     XCTAssertEqualObjects(lossNotification[@"auctionId"], kTestAuctionID, @"Auction ID should match");
     XCTAssertEqualObjects(lossNotification[@"bidId"], kTestBidID1, @"Bid ID should match");
     XCTAssertEqualObjects(lossNotification[@"resolvedURL"], @"https://network1.com/lurl?reason=1", @"LURL should be resolved from bid");
-    XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonTechnicalError, @"Loss reason should match");
+    XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonInternalError, @"Loss reason should match");
     XCTAssertEqualObjects(lossNotification[@"type"], @"loss", @"Notification type should be loss");
 }
 
@@ -211,7 +211,7 @@ static const NSInteger kTestRank3 = 3;
     NSDictionary *lossNotification = self.mockTracker.lossNotifications.firstObject;
     XCTAssertEqualObjects(lossNotification[@"bidId"], kTestBidID1, @"Correct bid ID should be used");
     XCTAssertEqualObjects(lossNotification[@"resolvedURL"], @"https://network1.com/lurl?reason=1", @"LURL should be resolved");
-    XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonTechnicalError, @"Loss reason should be TechnicalError");
+    XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonInternalError, @"Loss reason should be InternalError");
 }
 
 /**
@@ -257,7 +257,7 @@ static const NSInteger kTestRank3 = 3;
     
     for (NSDictionary *lossNotification in self.mockTracker.lossNotifications) {
         [actualBidIds addObject:lossNotification[@"bidId"]];
-        XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonTechnicalError, @"All should have TechnicalError reason");
+        XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonInternalError, @"All should have InternalError reason");
         XCTAssertNotNil(lossNotification[@"resolvedURL"], @"All should have resolved LURLs");
     }
     
@@ -308,9 +308,9 @@ static const NSInteger kTestRank3 = 3;
     // Simulate the winner failing to load (this would normally be called by CLXPublisherBanner)
     [[CLXWinLossTracker shared] addBid:kTestAuctionID bid:winnerBid];
     [[CLXWinLossTracker shared] setBidLoadResult:kTestAuctionID 
-                                           bidId:kTestBidID1 
-                                         success:NO 
-                                      lossReason:@(CLXLossReasonTechnicalError)];
+                                          bidId:kTestBidID1 
+                                        success:NO 
+                                     lossReason:@(CLXLossReasonInternalError)];
     
     // When: Winner load fails
     [[CLXWinLossTracker shared] sendLoss:kTestAuctionID bidId:kTestBidID1];
@@ -321,7 +321,7 @@ static const NSInteger kTestRank3 = 3;
     NSDictionary *lossNotification = self.mockTracker.lossNotifications.firstObject;
     XCTAssertEqualObjects(lossNotification[@"bidId"], kTestBidID1, @"Correct bid ID should be used");
     XCTAssertEqualObjects(lossNotification[@"resolvedURL"], @"https://network1.com/lurl?reason=1", @"Winner's LURL should be resolved");
-    XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonTechnicalError, @"Loss reason should be TechnicalError");
+    XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonInternalError, @"Loss reason should be InternalError");
 }
 
 /**
@@ -527,7 +527,7 @@ static const NSInteger kTestRank3 = 3;
         @"auctionId": kTestAuctionID,
         @"bidId": kTestBidID2,
         @"eventType": @"loss",
-        @"lossReason": @(CLXLossReasonTechnicalError)
+        @"lossReason": @(CLXLossReasonInternalError)
     };
     
     NSData *jsonData1 = [NSJSONSerialization dataWithJSONObject:payload1 options:0 error:nil];
@@ -680,7 +680,7 @@ static const NSInteger kTestRank3 = 3;
         @"bidId": kTestBidID1,
         @"eventType": @"win",
         @"price": @(kTestPrice),
-        @"lossReason": @(CLXLossReasonTechnicalError),
+        @"lossReason": @(CLXLossReasonInternalError),
         @"timestamp": @([[NSDate date] timeIntervalSince1970]),
         @"metadata": @{
             @"rank": @(1),
@@ -1042,8 +1042,8 @@ static const NSInteger kTestRank3 = 3;
         // Add bid to tracker
         [formatTracker addBid:auctionId bid:testBid];
         
-        // Simulate load failure with technical error (what all formats should send)
-        [formatTracker setBidLoadResult:auctionId bidId:bidId success:NO lossReason:@(CLXLossReasonTechnicalError)];
+        // Simulate load failure with internal error (what all formats should send)
+        [formatTracker setBidLoadResult:auctionId bidId:bidId success:NO lossReason:@(CLXLossReasonInternalError)];
         [formatTracker sendLoss:auctionId bidId:bidId];
         
         // Verify loss notification was sent
@@ -1059,8 +1059,8 @@ static const NSInteger kTestRank3 = 3;
                                 @"Loss notification should have correct auction ID for %@", formatName);
             XCTAssertEqualObjects(lossNotification[@"bidId"], bidId, 
                                 @"Loss notification should have correct bid ID for %@", formatName);
-            XCTAssertEqualObjects(lossNotification[@"lossReason"], @(CLXLossReasonTechnicalError), 
-                                @"Loss reason should be TechnicalError for load failures in %@", formatName);
+            XCTAssertEqualObjects(lossNotification[@"lossReason"], @(CLXLossReasonInternalError), 
+                                @"Loss reason should be InternalError for load failures in %@", formatName);
             XCTAssertEqualObjects(lossNotification[@"type"], @"loss", 
                                 @"Notification type should be 'loss' for %@", formatName);
         }
@@ -1141,7 +1141,7 @@ static const NSInteger kTestRank3 = 3;
     
     // Test failure scenario for all formats
     for (NSDictionary *scenario in testScenarios) {
-        [consistencyTracker setBidLoadResult:scenario[@"auctionId"] bidId:scenario[@"bidId"] success:NO lossReason:@(CLXLossReasonTechnicalError)];
+        [consistencyTracker setBidLoadResult:scenario[@"auctionId"] bidId:scenario[@"bidId"] success:NO lossReason:@(CLXLossReasonInternalError)];
         [consistencyTracker sendLoss:scenario[@"auctionId"] bidId:scenario[@"bidId"]];
     }
     
@@ -1155,8 +1155,8 @@ static const NSInteger kTestRank3 = 3;
     for (NSDictionary *lossNotification in consistencyTracker.lossNotifications) {
         XCTAssertNotNil(lossNotification[@"auctionId"], @"All loss notifications should have auction ID");
         XCTAssertNotNil(lossNotification[@"bidId"], @"All loss notifications should have bid ID");
-        XCTAssertEqualObjects(lossNotification[@"lossReason"], @(CLXLossReasonTechnicalError), 
-                            @"All formats should use TechnicalError for load failures");
+        XCTAssertEqualObjects(lossNotification[@"lossReason"], @(CLXLossReasonInternalError), 
+                            @"All formats should use InternalError for load failures");
         XCTAssertEqualObjects(lossNotification[@"type"], @"loss", @"All should be loss type");
         XCTAssertNotNil(lossNotification[@"timestamp"], @"All should have timestamps");
     }

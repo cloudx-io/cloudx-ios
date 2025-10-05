@@ -198,9 +198,9 @@ static id<CLXWinLossTracking> _testInstance = nil;
             return;
         }
         
-        // Ensure we always have a loss reason for loss notifications (matches Android behavior)
+        // Ensure we always have a loss reason for loss notifications
         if (!lossReason) {
-            lossReason = @(CLXLossReasonTechnicalError); // Default to technical error
+            lossReason = @(CLXLossReasonInternalError); // Default to internal error
         }
         
         // Build payload using field resolver (matches Android's buildWinLossPayload)
@@ -211,7 +211,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
                                                                                                loadedBidPrice:loadedBidPrice];
         
         if (payload) {
-            NSString *reasonStr = (lossReason.integerValue == CLXLossReasonLostToHigherBid) ? @"HigherBid" : @"TechError";
+            NSString *reasonStr = (lossReason.integerValue == CLXLossReasonLostToHigherBid) ? @"HigherBid" : @"InternalError";
             [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] LOSS: %@ (%@)", bidId, reasonStr]];
             [self trackWinLoss:payload auctionId:auctionId bidId:bidId];
         } else {
@@ -234,7 +234,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
         // Build payload using field resolver (matches Android's buildWinLossPayload)
         NSDictionary<NSString *, id> *payload = [self.winLossFieldResolver buildWinLossPayloadWithAuctionId:auctionId
                                                                                                          bid:bid
-                                                                                                  lossReason:nil
+                                                                                                  lossReason:@(CLXLossReasonBidWon)
                                                                                                        isWin:YES
                                                                                                loadedBidPrice:winnerBidPrice];
         

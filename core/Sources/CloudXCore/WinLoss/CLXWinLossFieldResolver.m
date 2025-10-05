@@ -182,7 +182,20 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         return nil;
         
     } else if ([fieldPath isEqualToString:@"sdk.lossReason"]) {
-        return lossReason;
+        // Return string description matching Android's lossReason.description
+        if (!lossReason) {
+            return nil;
+        }
+        switch (lossReason.integerValue) {
+            case 0:  // CLXLossReasonBidWon
+                return @"Bid Won";
+            case 1:  // CLXLossReasonInternalError
+                return @"Internal Error";
+            case 102:  // CLXLossReasonLostToHigherBid
+                return @"Lost to Higher Bid";
+            default:
+                return @"Internal Error";  // Fallback
+        }
         
     } else if ([fieldPath isEqualToString:@"sdk.sdk"]) {
         return @"sdk";
@@ -232,7 +245,20 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         return !isWin ? @"loss" : nil;
         
     } else if ([fieldPath isEqualToString:@"sdk.lossReason"]) {
-        return lossReason;
+        // Return string description matching Android's lossReason.description
+        if (!lossReason) {
+            return nil;
+        }
+        switch (lossReason.integerValue) {
+            case 0:  // CLXLossReasonBidWon
+                return @"Bid Won";
+            case 1:  // CLXLossReasonInternalError
+                return @"Internal Error";
+            case 102:  // CLXLossReasonLostToHigherBid
+                return @"Lost to Higher Bid";
+            default:
+                return @"Internal Error";  // Fallback
+        }
         
     } else if ([fieldPath isEqualToString:@"sdk.[win|loss]"]) {
         return isWin ? @"win" : @"loss";

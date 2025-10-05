@@ -87,26 +87,26 @@
     // Test WIN scenario
     NSDictionary *winResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                bid:testBid
-                                                                        lossReason:@(2)
+                                                                        lossReason:@(0)  // Bid Won
                                                                              isWin:YES
                                                                     loadedBidPrice:2.50];
     
     XCTAssertEqualObjects(winResult[@"win_field"], @"win", @"sdk.win should return 'win' for win events");
     XCTAssertNil(winResult[@"loss_field"], @"sdk.loss should return nil for win events");
-    XCTAssertEqualObjects(winResult[@"loss_reason_field"], @(2), @"sdk.lossReason should return loss reason even for wins");
+    XCTAssertEqualObjects(winResult[@"loss_reason_field"], @"Bid Won", @"sdk.lossReason should return string description");
     XCTAssertEqualObjects(winResult[@"win_loss_field"], @"win", @"sdk.[win|loss] should return 'win' for wins");
     XCTAssertEqualObjects(winResult[@"sdk_field"], @"sdk", @"sdk.sdk should always return 'sdk'");
     
     // Test LOSS scenario
     NSDictionary *lossResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                 bid:testBid
-                                                                         lossReason:@(3)
+                                                                         lossReason:@(102)  // Lost to Higher Bid
                                                                               isWin:NO
                                                                      loadedBidPrice:2.50];
     
     XCTAssertNil(lossResult[@"win_field"], @"sdk.win should return nil for loss events");
     XCTAssertEqualObjects(lossResult[@"loss_field"], @"loss", @"sdk.loss should return 'loss' for loss events");
-    XCTAssertEqualObjects(lossResult[@"loss_reason_field"], @(3), @"sdk.lossReason should return loss reason for losses");
+    XCTAssertEqualObjects(lossResult[@"loss_reason_field"], @"Lost to Higher Bid", @"sdk.lossReason should return string description");
     XCTAssertEqualObjects(lossResult[@"win_loss_field"], @"loss", @"sdk.[win|loss] should return 'loss' for losses");
     XCTAssertEqualObjects(lossResult[@"sdk_field"], @"sdk", @"sdk.sdk should always return 'sdk'");
 }
@@ -163,23 +163,23 @@
     
     XCTAssertEqual(nilReasonResult.count, 0, @"Should not include field when loss reason is nil");
     
-    // Test with zero loss reason
+    // Test with zero loss reason (Bid Won)
     NSDictionary *zeroReasonResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                       bid:testBid
                                                                                lossReason:@(0)
                                                                                     isWin:NO
                                                                            loadedBidPrice:2.50];
     
-    XCTAssertEqualObjects(zeroReasonResult[@"loss_reason"], @(0), @"Should include zero loss reason");
+    XCTAssertEqualObjects(zeroReasonResult[@"loss_reason"], @"Bid Won", @"Should return string description for zero loss reason");
     
-    // Test with negative loss reason
+    // Test with invalid negative loss reason
     NSDictionary *negativeReasonResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                            bid:testBid
                                                                                     lossReason:@(-1)
                                                                                          isWin:NO
                                                                                 loadedBidPrice:2.50];
     
-    XCTAssertEqualObjects(negativeReasonResult[@"loss_reason"], @(-1), @"Should include negative loss reason");
+    XCTAssertEqualObjects(negativeReasonResult[@"loss_reason"], @"Internal Error", @"Invalid loss reasons should fallback to Internal Error");
 }
 
 #pragma mark - URL Template Processing Tests

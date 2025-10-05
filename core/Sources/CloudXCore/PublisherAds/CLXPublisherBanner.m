@@ -490,7 +490,7 @@ NS_ASSUME_NONNULL_BEGIN
             [self.winLossTracker sendEvent:self.currentBidResponse.id
                                      bidId:self.lastBidResponse.bidID
                                      event:[CLXBidLifecycleEvent loadSuccessEvent]
-                                lossReason:nil
+                                lossReason:@(CLXLossReasonBidWon)
                             winnerBidPrice:self.lastBidResponse.price];
             
             [self.logger debug:[NSString stringWithFormat:@"🚀 [PublisherBanner] Fired LOAD_SUCCESS event (nurl) for bidID=%@", self.lastBidResponse.bidID]];
@@ -553,11 +553,11 @@ NS_ASSUME_NONNULL_BEGIN
     // Send server-side loss notification for technical errors (replaces client-side LURL firing)
     if (self.lastBidResponse && self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
         [self.winLossTracker setBidLoadResult:self.currentBidResponse.id 
-                                        bidId:self.lastBidResponse.bid.id 
-                                      success:NO 
-                                   lossReason:@(CLXLossReasonTechnicalError)];
+                                       bidId:self.lastBidResponse.bid.id 
+                                     success:NO 
+                                  lossReason:@(CLXLossReasonInternalError)];
         [self.winLossTracker sendLoss:self.currentBidResponse.id bidId:self.lastBidResponse.bid.id];
-        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherBanner] Sent server-side loss notification for failed winner rank=%ld, reason=TechnicalError", (long)self.lastBidResponse.bid.ext.cloudx.rank]];
+        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherBanner] Sent server-side loss notification for failed winner rank=%ld, reason=InternalError", (long)self.lastBidResponse.bid.ext.cloudx.rank]];
     }
     
     // Reset state for next interval
@@ -617,7 +617,7 @@ NS_ASSUME_NONNULL_BEGIN
             [self.winLossTracker sendEvent:self.currentBidResponse.id
                                      bidId:self.lastBidResponse.bidID
                                      event:[CLXBidLifecycleEvent renderSuccessEvent]
-                                lossReason:nil
+                                lossReason:@(CLXLossReasonBidWon)
                             winnerBidPrice:self.lastBidResponse.price];
             
             [self.logger debug:@"🚀 [PublisherBanner] RENDER_SUCCESS event (burl) fired"];

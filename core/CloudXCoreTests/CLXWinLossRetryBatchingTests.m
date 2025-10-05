@@ -124,7 +124,7 @@ static NSString * const kTestAppKey = @"test-app-key-retry";
     // Add test bid and set it to failed state
     CLXBidResponseBid *testBid = [self createTestBidWithId:kTestBidID];
     [self.realTracker addBid:kTestAuctionID bid:testBid];
-    [self.realTracker setBidLoadResult:kTestAuctionID bidId:kTestBidID success:NO lossReason:@(CLXLossReasonTechnicalError)];
+    [self.realTracker setBidLoadResult:kTestAuctionID bidId:kTestBidID success:NO lossReason:@(CLXLossReasonInternalError)];
     
     // Verify no cached events initially
     NSArray *initialEvents = [self.realTracker getAllCachedEvents];
@@ -162,9 +162,9 @@ static NSString * const kTestAppKey = @"test-app-key-retry";
     [self.realTracker sendWin:kTestAuctionID bidId:bidIds[1]];
     
     // Set up some bids for loss notifications
-    [self.realTracker setBidLoadResult:kTestAuctionID bidId:bidIds[2] success:NO lossReason:@(CLXLossReasonTechnicalError)];
+    [self.realTracker setBidLoadResult:kTestAuctionID bidId:bidIds[2] success:NO lossReason:@(CLXLossReasonInternalError)];
     [self.realTracker setBidLoadResult:kTestAuctionID bidId:bidIds[3] success:NO lossReason:@(CLXLossReasonLostToHigherBid)];
-    [self.realTracker setBidLoadResult:kTestAuctionID bidId:bidIds[4] success:NO lossReason:@(CLXLossReasonTechnicalError)];
+    [self.realTracker setBidLoadResult:kTestAuctionID bidId:bidIds[4] success:NO lossReason:@(CLXLossReasonInternalError)];
     
     [self.realTracker sendLoss:kTestAuctionID bidId:bidIds[2]];
     [self.realTracker sendLoss:kTestAuctionID bidId:bidIds[3]];
@@ -279,7 +279,7 @@ static NSString * const kTestAppKey = @"test-app-key-retry";
         if ([eventType isEqualToString:@"win"]) {
             [self.realTracker sendWin:auctionId bidId:bidId];
         } else {
-            [self.realTracker setBidLoadResult:auctionId bidId:bidId success:NO lossReason:@(CLXLossReasonTechnicalError)];
+            [self.realTracker setBidLoadResult:auctionId bidId:bidId success:NO lossReason:@(CLXLossReasonInternalError)];
             [self.realTracker sendLoss:auctionId bidId:bidId];
         }
         
@@ -479,7 +479,7 @@ static NSString * const kTestAppKey = @"test-app-key-retry";
     
     CLXBidResponseBid *anotherBid = [self createTestBidWithId:@"another-new-bid"];
     [self.realTracker addBid:kTestAuctionID bid:anotherBid];
-    [self.realTracker setBidLoadResult:kTestAuctionID bidId:@"another-new-bid" success:NO lossReason:@(CLXLossReasonTechnicalError)];
+    [self.realTracker setBidLoadResult:kTestAuctionID bidId:@"another-new-bid" success:NO lossReason:@(CLXLossReasonInternalError)];
     
     XCTAssertNoThrow([self.realTracker sendLoss:kTestAuctionID bidId:@"another-new-bid"], 
                      @"New loss notifications should not be blocked by retry operations");

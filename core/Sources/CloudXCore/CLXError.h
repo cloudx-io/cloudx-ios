@@ -10,11 +10,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Loss reasons for LURL firing - matching Android LossReason enum
+ * Loss reasons following OpenRTB standard - matching Android LossReason enum
+ * See: OpenRTB 2.5+ specification for standard loss reason codes
  */
 typedef NS_ENUM(NSInteger, CLXLossReason) {
-    CLXLossReasonTechnicalError = 1,    // Technical error (adapter creation failed, etc.)
-    CLXLossReasonLostToHigherBid = 4    // Lost to higher bid (not selected in waterfall)
+    CLXLossReasonBidWon = 0,              // Bid Won (OpenRTB: 0)
+    CLXLossReasonInternalError = 1,       // Internal Error (OpenRTB: 1)
+    CLXLossReasonLostToHigherBid = 102    // Lost to Higher Bid (OpenRTB: 102)
 };
 
 /**

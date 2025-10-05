@@ -389,7 +389,7 @@ static const double kTestLoserPrice2 = 2.25;
 
 /**
  * Test that all ad formats distinguish between technical failures and competitive losses
- * Technical failures should use CLXLossReasonTechnicalError
+ * Technical failures should use CLXLossReasonInternalError
  * Competitive losses should use CLXLossReasonLostToHigherBid
  */
 - (void)testAllAdFormats_TechnicalFailures_ShouldUseTechnicalErrorReason {
@@ -410,7 +410,7 @@ static const double kTestLoserPrice2 = 2.25;
         [[CLXWinLossTracker shared] setBidLoadResult:formatAuctionId 
                                                bidId:formatBidId 
                                              success:NO 
-                                          lossReason:@(CLXLossReasonTechnicalError)];
+                                          lossReason:@(CLXLossReasonInternalError)];
         [[CLXWinLossTracker shared] sendLoss:formatAuctionId bidId:formatBidId];
         
         // Then: Should use TechnicalError reason
@@ -419,7 +419,7 @@ static const double kTestLoserPrice2 = 2.25;
         
         if (self.mockTracker.lossNotifications.count > 0) {
             NSDictionary *lossNotification = self.mockTracker.lossNotifications.firstObject;
-            XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonTechnicalError, 
+            XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonInternalError, 
                           @"Format %@ technical failures should use TechnicalError reason", formatName);
             XCTAssertEqualObjects(lossNotification[@"bidId"], formatBidId, 
                                 @"Format %@ should identify correct failing bid", formatName);
@@ -447,7 +447,7 @@ static const double kTestLoserPrice2 = 2.25;
     [[CLXWinLossTracker shared] setBidLoadResult:kTestAuctionID 
                                            bidId:kTestLoserBidID1 
                                          success:NO 
-                                      lossReason:@(CLXLossReasonTechnicalError)];
+                                      lossReason:@(CLXLossReasonInternalError)];
     [[CLXWinLossTracker shared] sendLoss:kTestAuctionID bidId:kTestLoserBidID1];
     
     // 2. Competitive loss for remaining losing bid (when winner loads)
@@ -466,7 +466,7 @@ static const double kTestLoserPrice2 = 2.25;
         NSInteger lossReason = [lossNotification[@"lossReason"] integerValue];
         NSString *bidId = lossNotification[@"bidId"];
         
-        if (lossReason == CLXLossReasonTechnicalError) {
+        if (lossReason == CLXLossReasonInternalError) {
             foundTechnicalFailure = YES;
             XCTAssertEqualObjects(bidId, kTestLoserBidID1, @"Technical failure should be for correct bid");
         } else if (lossReason == CLXLossReasonLostToHigherBid) {

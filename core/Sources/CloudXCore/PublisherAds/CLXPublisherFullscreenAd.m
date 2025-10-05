@@ -562,11 +562,11 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Send server-side loss notification for technical errors (matching banner implementation)
     if (self.lastBidResponse && self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
         [self.winLossTracker setBidLoadResult:self.currentBidResponse.id 
-                                        bidId:self.lastBidResponse.bid.id 
-                                      success:NO 
-                                   lossReason:@(CLXLossReasonTechnicalError)];
+                                       bidId:self.lastBidResponse.bid.id 
+                                     success:NO 
+                                  lossReason:@(CLXLossReasonInternalError)];
         [self.winLossTracker sendLoss:self.currentBidResponse.id bidId:self.lastBidResponse.bid.id];
-        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Sent server-side loss notification for failed ad type %ld, reason=TechnicalError", (long)adType]];
+        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Sent server-side loss notification for failed ad type %ld, reason=InternalError", (long)adType]];
     } else {
         [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Missing data for ad type %ld loss notification: bidID=%@, auctionID=%@", 
                            (long)adType, self.lastBidResponse.bid.id ?: @"(nil)", self.currentBidResponse.id ?: @"(nil)"]];
@@ -609,7 +609,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         [self.winLossTracker sendEvent:self.currentBidResponse.id
                                  bidId:interstitial.bidID
                                  event:[CLXBidLifecycleEvent loadSuccessEvent]
-                            lossReason:nil
+                            lossReason:@(CLXLossReasonBidWon)
                         winnerBidPrice:self.lastBidResponse.price];
         
         [self.logger debug:[NSString stringWithFormat:@"🚀 [PublisherFullscreenAd] Fired LOAD_SUCCESS event (nurl) for interstitial bidID=%@", interstitial.bidID]];
@@ -685,7 +685,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         [self.winLossTracker sendEvent:self.currentBidResponse.id
                                  bidId:interstitial.bidID
                                  event:[CLXBidLifecycleEvent renderSuccessEvent]
-                            lossReason:nil
+                            lossReason:@(CLXLossReasonBidWon)
                         winnerBidPrice:winningBid.price];
         
         [self.logger debug:@"🚀 [PublisherFullscreenAd] RENDER_SUCCESS event (burl) fired for interstitial"];
@@ -791,7 +791,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         [self.winLossTracker sendEvent:self.currentBidResponse.id
                                  bidId:rewarded.bidID
                                  event:[CLXBidLifecycleEvent loadSuccessEvent]
-                            lossReason:nil
+                            lossReason:@(CLXLossReasonBidWon)
                         winnerBidPrice:self.lastBidResponse.price];
         
         [self.logger debug:[NSString stringWithFormat:@"🚀 [PublisherFullscreenAd] Fired LOAD_SUCCESS event (nurl) for rewarded bidID=%@", rewarded.bidID]];
@@ -852,7 +852,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         [self.winLossTracker sendEvent:self.currentBidResponse.id
                                  bidId:rewarded.bidID
                                  event:[CLXBidLifecycleEvent renderSuccessEvent]
-                            lossReason:nil
+                            lossReason:@(CLXLossReasonBidWon)
                         winnerBidPrice:winningBid.price];
         
         [self.logger debug:@"🚀 [PublisherFullscreenAd] RENDER_SUCCESS event (burl) fired for rewarded"];

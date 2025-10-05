@@ -109,7 +109,7 @@
     // When: Build loss payload using REAL field resolver
     NSDictionary *payload = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                              bid:lossBid
-                                                                      lossReason:@(4)  // Lost to higher bid
+                                                                      lossReason:@(102)  // Lost to higher bid (OpenRTB standard)
                                                                            isWin:NO
                                                                   loadedBidPrice:1.25];
     
@@ -118,7 +118,7 @@
     
     NSString *resolvedURL = payload[@"resolvedURL"];
     XCTAssertNotNil(resolvedURL, @"Resolved URL should be present");
-    XCTAssertTrue([resolvedURL containsString:@"reason=4"], @"AUCTION_LOSS should be replaced with loss reason");
+    XCTAssertTrue([resolvedURL containsString:@"reason=102"], @"AUCTION_LOSS should be replaced with OpenRTB loss reason");
     XCTAssertTrue([resolvedURL containsString:@"price=1.25"], @"AUCTION_PRICE should be replaced with bid price");
     XCTAssertFalse([resolvedURL containsString:@"${AUCTION_LOSS}"], @"Loss template should be fully resolved");
     XCTAssertFalse([resolvedURL containsString:@"${AUCTION_PRICE}"], @"Price template should be fully resolved");

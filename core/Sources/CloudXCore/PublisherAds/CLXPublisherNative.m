@@ -414,7 +414,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.winLossTracker sendEvent:self.currentBidResponse.id
                                  bidId:self.lastBidResponse.bidID
                                  event:[CLXBidLifecycleEvent loadSuccessEvent]
-                            lossReason:nil
+                            lossReason:@(CLXLossReasonBidWon)
                         winnerBidPrice:self.lastBidResponse.price];
         
         [self.logger debug:[NSString stringWithFormat:@"🚀 [PublisherNative] Fired LOAD_SUCCESS event (nurl) for native bidID=%@", self.lastBidResponse.bidID]];
@@ -450,11 +450,11 @@ NS_ASSUME_NONNULL_BEGIN
     // Send server-side loss notification for technical errors (matching banner implementation)
     if (self.lastBidResponse && self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
         [self.winLossTracker setBidLoadResult:self.currentBidResponse.id 
-                                        bidId:self.lastBidResponse.bid.id 
-                                      success:NO 
-                                   lossReason:@(CLXLossReasonTechnicalError)];
+                                       bidId:self.lastBidResponse.bid.id 
+                                     success:NO 
+                                  lossReason:@(CLXLossReasonInternalError)];
         [self.winLossTracker sendLoss:self.currentBidResponse.id bidId:self.lastBidResponse.bid.id];
-        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherNative] Sent server-side loss notification for failed native ad, reason=TechnicalError"]];
+        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherNative] Sent server-side loss notification for failed native ad, reason=InternalError"]];
     } else {
         [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherNative] Missing data for native loss notification: bidID=%@, auctionID=%@", 
                            self.lastBidResponse.bid.id ?: @"(nil)", self.currentBidResponse.id ?: @"(nil)"]];
@@ -547,7 +547,7 @@ NS_ASSUME_NONNULL_BEGIN
             [self.winLossTracker sendEvent:self.currentBidResponse.id
                                      bidId:self.lastBidResponse.bidID
                                      event:[CLXBidLifecycleEvent renderSuccessEvent]
-                                lossReason:nil
+                                lossReason:@(CLXLossReasonBidWon)
                             winnerBidPrice:self.lastBidResponse.price];
             
             [self.logger debug:@"🚀 [PublisherNative] RENDER_SUCCESS event (burl) fired"];

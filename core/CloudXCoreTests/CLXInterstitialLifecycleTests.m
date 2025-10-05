@@ -818,7 +818,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         // Verify the loss notification contains correct data
         if (self.mockWinLossTracker.lossNotifications.count > 0) {
             NSDictionary *lossNotification = self.mockWinLossTracker.lossNotifications.firstObject;
-            XCTAssertEqualObjects(lossNotification[@"lossReason"], @(CLXLossReasonTechnicalError), @"Loss reason should be TechnicalError");
+            XCTAssertEqualObjects(lossNotification[@"lossReason"], @(CLXLossReasonInternalError), @"Loss reason should be TechnicalError");
         }
         
         // Verify state reset

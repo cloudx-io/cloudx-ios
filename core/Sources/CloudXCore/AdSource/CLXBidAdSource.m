@@ -414,11 +414,11 @@ NS_ASSUME_NONNULL_BEGIN
     // Send server-side loss notification for adapter creation failures (replaces client-side LURL firing)
     if (auctionID && currentBid.id) {
         [self.winLossTracker setBidLoadResult:auctionID 
-                                        bidId:currentBid.id 
-                                      success:NO 
-                                   lossReason:@(CLXLossReasonTechnicalError)];
+                                       bidId:currentBid.id 
+                                     success:NO 
+                                  lossReason:@(CLXLossReasonInternalError)];
         [self.winLossTracker sendLoss:auctionID bidId:currentBid.id];
-        [self.logger debug:[NSString stringWithFormat:@"📤 [CLXBidAdSource] Sent server-side loss notification for uncreatable bid rank=%ld, reason=TechnicalError", (long)currentBid.ext.cloudx.rank]];
+        [self.logger debug:[NSString stringWithFormat:@"📤 [CLXBidAdSource] Sent server-side loss notification for uncreatable bid rank=%ld, reason=InternalError", (long)currentBid.ext.cloudx.rank]];
     }
     
     // Try next bid in waterfall
