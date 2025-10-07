@@ -1,0 +1,62 @@
+name: CloudXCore Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'core/**'
+      - '.github/workflows/core-tests.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'core/**'
+      - '.github/workflows/core-tests.yml'
+
+jobs:
+  test:
+    name: Run CloudXCore Unit Tests
+    runs-on: macos-14
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer
+      
+      - name: Show Xcode version
+        run: xcodebuild -version
+      
+      - name: List available simulators
+        run: xcrun simctl list devices available
+      
+      - name: Install xcpretty
+        run: gem install xcpretty
+      
+      - name: Run unit tests
+        working-directory: core
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project CloudXCore.xcodeproj \
+            -scheme CloudXCore \
+            -testPlan CloudXCore \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -enableCodeCoverage NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            | xcpretty
+      
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            core/build/Logs/Test/*.xcresult
+          retention-days: 7
+
