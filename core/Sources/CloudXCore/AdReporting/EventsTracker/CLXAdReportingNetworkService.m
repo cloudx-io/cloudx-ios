@@ -79,17 +79,52 @@
         } else {
             [self.logger debug:[NSString stringWithFormat:@"CloudX: geoHeaders: %@", fullURL]];
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-            NSMutableDictionary *finalArray = [NSMutableDictionary dictionary];
-            for (NSString *key in extras) {
-                NSString *dictValue = extras[key];
-                NSString *httpValue = [httpResponse valueForHTTPHeaderField:key];
-                if (httpValue && dictValue) {
-                    finalArray[httpValue] = dictValue;
+            NSMutableDictionary *processedGeoData = [NSMutableDictionary dictionary];
+            NSMutableDictionary *rawGeoHeaders = [NSMutableDictionary dictionary];
+            
+            // Store all raw CloudFront headers for privacy checks
+            NSDictionary *allHeaders = [httpResponse allHeaderFields];
+            for (NSString *headerKey in allHeaders) {
+                if ([headerKey hasPrefix:@"cloudfront-"] || [headerKey hasPrefix:@"CloudFront-"]) {
+                    NSString *lowerKey = [headerKey lowercaseString];
+                    rawGeoHeaders[lowerKey] = allHeaders[headerKey];
                 }
             }
+            
+            // Process geo headers mapping (source -> target) where:
+            // source = CloudFront header name (e.g. "cloudfront-viewer-city")
+            // target = OpenRTB field name (e.g. "city")
+            for (NSString *sourceHeader in extras) {
+                NSString *targetField = extras[sourceHeader];
+                NSString *headerValue = [httpResponse valueForHTTPHeaderField:sourceHeader];
+                if (headerValue && targetField) {
+                    processedGeoData[targetField] = headerValue;
+                }
+            }
+            
+            // Fallback: Extract common CloudFront headers if not provided by server config
+            // This ensures parity with Android which gets all fields
+            if (!processedGeoData[@"region"]) {
+                NSString *region = [httpResponse valueForHTTPHeaderField:@"cloudfront-viewer-country-region"];
+                if (region) processedGeoData[@"region"] = region;
+            }
+            if (!processedGeoData[@"zip"]) {
+                NSString *zip = [httpResponse valueForHTTPHeaderField:@"cloudfront-viewer-postal-code"];
+                if (zip) processedGeoData[@"zip"] = zip;
+            }
+            if (!processedGeoData[@"metro"]) {
+                NSString *metro = [httpResponse valueForHTTPHeaderField:@"cloudfront-viewer-metro-code"];
+                if (metro) processedGeoData[@"metro"] = metro;
+            }
+            
             [self.logger debug:[NSString stringWithFormat:@"CloudX: geoHeaders response status code: %ld", (long)[httpResponse statusCode]]];
-            [self.logger debug:[NSString stringWithFormat:@"CloudX: geoHeaders response: %@", finalArray]];
-            //completion(finalArray, nil);
+            [self.logger debug:[NSString stringWithFormat:@"CloudX: processed geo data (for bid request): %@", processedGeoData]];
+            [self.logger debug:[NSString stringWithFormat:@"CloudX: raw geo headers (for privacy): %@", rawGeoHeaders]];
+            
+            // Store both processed data and raw headers
+            [[NSUserDefaults standardUserDefaults] setObject:processedGeoData forKey:kCLXCoreProcessedGeoDataKey];
+            [[NSUserDefaults standardUserDefaults] setObject:rawGeoHeaders forKey:kCLXCoreRawGeoHeadersKey];
+            [[NSUserDefaults standardUserDefaults] synchronize];
         }
     }];
     [task resume];

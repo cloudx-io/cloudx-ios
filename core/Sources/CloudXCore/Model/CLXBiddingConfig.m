@@ -264,13 +264,31 @@ static void initializeLogger() {
         self.application = application;
         
         // Create device
+        CLXGeoLocationService *geoService = [CLXGeoLocationService shared];
         CLXBiddingConfigDeviceGeo *geo = [[CLXBiddingConfigDeviceGeo alloc] init];
-        geo.lat = location ? @(location.coordinate.latitude) : nil;
-        geo.lon = location ? @(location.coordinate.longitude) : nil;
+        
+        // Extract lat/lon from CloudFront headers (raw geo headers)
+        NSDictionary *rawGeoHeaders = [geoService geoHeaders];
+        if (rawGeoHeaders) {
+            NSString *latString = rawGeoHeaders[@"cloudfront-viewer-latitude"];
+            NSString *lonString = rawGeoHeaders[@"cloudfront-viewer-longitude"];
+            if (latString && [latString isKindOfClass:[NSString class]]) {
+                geo.lat = @([latString doubleValue]);
+            }
+            if (lonString && [lonString isKindOfClass:[NSString class]]) {
+                geo.lon = @([lonString doubleValue]);
+            }
+        }
+        
+        // Note: accuracy not available from CloudFront headers
         geo.accuracy = location ? @(location.horizontalAccuracy) : nil;
         geo.type = @1;
         geo.utcoffset = @([[NSTimeZone localTimeZone] secondsFromGMT] / 60);
-        geo.country = [[CLXGeoLocationService shared] countryCode];
+        geo.country = [geoService countryCode];
+        geo.region = [geoService region];
+        geo.city = [geoService city];
+        geo.zip = [geoService zip];
+        geo.metro = [geoService metro];
         
         CLXBiddingConfigDeviceExt *deviceExt = [[CLXBiddingConfigDeviceExt alloc] init];
         deviceExt.ifv = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
@@ -359,15 +377,14 @@ static void initializeLogger() {
         // Note: IFA is already privacy-aware at source level (CLXSettings.getIFA)
         BOOL shouldClearPersonalData = [privacyService shouldClearPersonalData];
         if (shouldClearPersonalData) {
-            // Clear all personal geo data but preserve timezone information
+            // Clear precise location data but keep general geo fields for contextual targeting
             if (_device.geo) {
                 _device.geo.lat = nil;
                 _device.geo.lon = nil;
                 _device.geo.accuracy = nil;
-                _device.geo.city = nil;
-                _device.geo.zip = nil;
-                _device.geo.metro = nil;
-                // Keep country and region for compliance geo-targeting
+                // Keep country, region, city, zip, and metro for contextual targeting
+                // This matches Android implementation which always includes geo data
+                // regardless of privacy settings (only lat/lon/accuracy are cleared)
                 // Keep utcoffset for timezone-based functionality
             }
         }
@@ -512,7 +529,7 @@ static void initializeLogger() {
         [logger debug:@"⚠️ [BiddingConfig] No prebid found in impression ext"];
     }
     if (ext.data) {
-        json[@"data"] = @{@"loop-index": @"0"};
+        json[@"data"] = ext.data;
     }
     
     return [json copy];

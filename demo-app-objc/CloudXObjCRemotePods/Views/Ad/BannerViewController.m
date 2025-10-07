@@ -3,6 +3,7 @@
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
 #import "UserDefaultsSettings.h"
+#import "GPPScenarioPickerView.h"
 
 @interface BannerViewController ()
 @property (nonatomic, strong) CLXBannerAdView *bannerAd;
@@ -11,13 +12,14 @@
 @property (nonatomic, strong) UIButton *autoRefreshButton;
 @property (nonatomic, assign) BOOL autoRefreshEnabled;
 @property (nonatomic, strong) UserDefaultsSettings *settings;
+@property (nonatomic, strong) GPPScenarioPickerView *gppScenarioPicker;
 @end
 
 @implementation BannerViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.autoRefreshEnabled = YES; // Default to enabled
+    self.autoRefreshEnabled = YES;
     [self setupUI];
     self.settings = [UserDefaultsSettings sharedSettings];
     [self updateStatusUIWithState:AdStateNoAd];
@@ -27,10 +29,37 @@
     // Create a vertical stack for buttons
     UIStackView *buttonStack = [[UIStackView alloc] init];
     buttonStack.axis = UILayoutConstraintAxisVertical;
-    buttonStack.spacing = 16;
+    buttonStack.spacing = 12;
     buttonStack.alignment = UIStackViewAlignmentCenter;
     buttonStack.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:buttonStack];
+    
+    // GPP Scenario Picker - Encapsulated Test Component
+    //
+    // PURPOSE: Provides a self-contained UI for selecting and applying GPP privacy test scenarios.
+    // This component handles ALL GPP test logic internally, keeping BannerViewController clean.
+    //
+    // USAGE:
+    // 1. Simply instantiate and add to view hierarchy (no configuration needed)
+    // 2. Component self-manages: button creation, alert presentation, privacy SDK calls
+    // 3. Zero code footprint in parent - follows DRY principle
+    //
+    // FEATURES:
+    // - 9 privacy test scenarios (COPPA, CCPA, GPP, ATT, regional variations)
+    // - Action sheet picker with full scenario names and descriptions
+    // - Automatic CloudXCore privacy SDK integration
+    // - Console logging for test verification
+    //
+    // TESTING COVERAGE:
+    // - CCPA Consent/Opt-Out
+    // - COPPA (age-restricted users)
+    // - ATT (iOS App Tracking Transparency) - Must be manually enabled/disabled in iOS Settings
+    // - GPP regional (US-CA, US-National, EU)
+    // - Combined scenarios (COPPA + GPP consent precedence)
+    //
+    // self.gppScenarioPicker = [[GPPScenarioPickerView alloc] init];
+    // self.gppScenarioPicker.translatesAutoresizingMaskIntoConstraints = NO;
+    // [buttonStack addArrangedSubview:self.gppScenarioPicker];
     
     // Load Banner button
     UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -42,8 +71,6 @@
     loadButton.layer.cornerRadius = 8;
     loadButton.translatesAutoresizingMaskIntoConstraints = NO;
     [buttonStack addArrangedSubview:loadButton];
-    
-    // Show button removed - Banner is auto-added to view on push
     
     // Auto-refresh toggle button
     self.autoRefreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -60,7 +87,7 @@
     // Button constraints
     [NSLayoutConstraint activateConstraints:@[
         [buttonStack.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
-        [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
+        [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:20],
         [loadButton.widthAnchor constraintEqualToConstant:200],
         [loadButton.heightAnchor constraintEqualToConstant:44],
         [self.autoRefreshButton.widthAnchor constraintEqualToConstant:200],
@@ -293,6 +320,5 @@
     self.adState = state;
     [super updateStatusUIWithState:state];
 }
-
 
 @end 

@@ -65,15 +65,11 @@
 		};
 		1967EE4F2DDFC83700D3E27F /* CloudXObjCRemotePodsTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = CloudXObjCRemotePodsTests;
 			sourceTree = "<group>";
 		};
 		1967EE592DDFC83700D3E27F /* CloudXObjCRemotePodsUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = CloudXObjCRemotePodsUITests;
 			sourceTree = "<group>";
 		};

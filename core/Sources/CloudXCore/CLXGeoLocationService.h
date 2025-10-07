@@ -22,11 +22,18 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)shared;
 
 /**
- * Gets geo headers from UserDefaults for privacy compliance
- * @return Dictionary of geo headers if available, nil otherwise
- * @discussion Used for determining user geography for privacy regulations
+ * Gets raw geo headers from UserDefaults for privacy compliance
+ * @return Dictionary of raw CloudFront headers if available, nil otherwise
+ * @discussion Used for determining user geography for privacy regulations (US/CA checks)
  */
 - (nullable NSDictionary<NSString *, NSString *> *)geoHeaders;
+
+/**
+ * Gets processed geo data mapped to OpenRTB fields for bid requests
+ * @return Dictionary of processed geo fields (city, zip, region, metro) if available, nil otherwise
+ * @discussion Used for populating device.geo in bid requests
+ */
+- (nullable NSDictionary<NSString *, NSString *> *)processedGeoData;
 
 /**
  * Determines if user is located in the United States
@@ -48,6 +55,34 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion Uses cloudfront-viewer-country-iso3 header for country determination
  */
 - (nullable NSString *)countryCode;
+
+/**
+ * Gets the user's region/state code from processed geo data
+ * @return The region code (e.g., "CA", "NY") if available, nil otherwise
+ * @discussion Maps to OpenRTB device.geo.region field
+ */
+- (nullable NSString *)region;
+
+/**
+ * Gets the user's city from processed geo data
+ * @return The city name if available, nil otherwise
+ * @discussion Maps to OpenRTB device.geo.city field
+ */
+- (nullable NSString *)city;
+
+/**
+ * Gets the user's postal/zip code from processed geo data
+ * @return The zip code if available, nil otherwise
+ * @discussion Maps to OpenRTB device.geo.zip field
+ */
+- (nullable NSString *)zip;
+
+/**
+ * Gets the user's DMA (Designated Market Area) code from processed geo data
+ * @return The metro/DMA code if available, nil otherwise
+ * @discussion Maps to OpenRTB device.geo.metro field
+ */
+- (nullable NSString *)metro;
 
 @end
 

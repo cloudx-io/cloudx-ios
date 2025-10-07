@@ -264,23 +264,62 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     }
 }
 
+- (nullable NSData *)decodeBase64Url:(NSString *)encoded {
+    // Manual URL-safe base64 decoder that handles Android's lenient Base64.URL_SAFE behavior
+    // Accepts incomplete padding (even ===) which iOS's standard decoder rejects
+    
+    static const char base64UrlTable[256] = {
+        -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1,
+        -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1,
+        -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,62, -1,62,-1,63,
+        52,53,54,55, 56,57,58,59, 60,61,-1,-1, -1,-1,-1,-1,
+        -1, 0, 1, 2,  3, 4, 5, 6,  7, 8, 9,10, 11,12,13,14,
+        15,16,17,18, 19,20,21,22, 23,24,25,-1, -1,-1,-1,63,
+        -1,26,27,28, 29,30,31,32, 33,34,35,36, 37,38,39,40,
+        41,42,43,44, 45,46,47,48, 49,50,51,-1, -1,-1,-1,-1
+    };
+    
+    NSMutableData *result = [NSMutableData data];
+    const char *input = [encoded UTF8String];
+    NSUInteger length = encoded.length;
+    
+    unsigned int accumulator = 0;
+    int bitsCollected = 0;
+    
+    for (NSUInteger i = 0; i < length; i++) {
+        unsigned char c = input[i];
+        if (c == '=') break; // Stop at padding
+        
+        int value = (c < 256) ? base64UrlTable[c] : -1;
+        if (value == -1) continue; // Skip invalid characters
+        
+        accumulator = (accumulator << 6) | value;
+        bitsCollected += 6;
+        
+        if (bitsCollected >= 8) {
+            bitsCollected -= 8;
+            unsigned char byte = (accumulator >> bitsCollected) & 0xFF;
+            [result appendBytes:&byte length:1];
+        }
+    }
+    
+    return result.length > 0 ? result : nil;
+}
+
 - (nullable NSString *)base64UrlToBits:(NSString *)encoded {
     if (encoded.length == 0) return nil;
     
     @try {
-        // Add padding if needed
-        NSUInteger paddingLength = (4 - (encoded.length % 4)) % 4;
-        NSString *paddedEncoded = [encoded stringByPaddingToLength:encoded.length + paddingLength 
-                                                        withString:@"=" 
-                                                   startingAtIndex:0];
+        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXGPPProvider] Decoding payload: '%@' (length: %lu)", encoded, (unsigned long)encoded.length]];
         
-        // Decode base64url
-        NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:paddedEncoded 
-                                                                  options:NSDataBase64DecodingIgnoreUnknownCharacters];
+        // Use custom lenient decoder that matches Android's Base64.URL_SAFE behavior
+        NSData *decodedData = [self decodeBase64Url:encoded];
         if (!decodedData) {
-            [self.logger error:@"❌ [CLXGPPProvider] Base64URL decoding failed"];
+            [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] Base64URL decoding failed for: '%@'", encoded]];
             return nil;
         }
+        
+        [self.logger debug:[NSString stringWithFormat:@"✅ [CLXGPPProvider] Decoded %lu bytes", (unsigned long)decodedData.length]];
         
         // Convert to bit string
         NSMutableString *bits = [NSMutableString string];
