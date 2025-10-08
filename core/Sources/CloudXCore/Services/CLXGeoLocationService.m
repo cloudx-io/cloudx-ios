@@ -72,7 +72,6 @@
     @try {
         // Return raw CloudFront headers for privacy checks (US/CA detection)
         NSDictionary *rawHeaders = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreRawGeoHeadersKey];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGeoLocationService] Raw geo headers: %@", rawHeaders ?: @"(none)"]];
         return rawHeaders;
     } @catch (NSException *exception) {
         [self.logger error:[NSString stringWithFormat:@"❌ [CLXGeoLocationService] Failed to read raw geo headers: %@", exception.reason]];
@@ -84,7 +83,6 @@
     @try {
         // Return processed geo data for bid request population (city, zip, region, metro)
         NSDictionary *processedData = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreProcessedGeoDataKey];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGeoLocationService] Processed geo data: %@", processedData ?: @"(none)"]];
         return processedData;
     } @catch (NSException *exception) {
         [self.logger error:[NSString stringWithFormat:@"❌ [CLXGeoLocationService] Failed to read processed geo data: %@", exception.reason]];
@@ -154,7 +152,6 @@
     id regionObj = processedData[@"region"];
     NSString *region = [regionObj isKindOfClass:[NSString class]] ? (NSString *)regionObj : nil;
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGeoLocationService] Region: %@", region ?: @"(none)"]];
     return region;
 }
 
@@ -168,7 +165,6 @@
     id cityObj = processedData[@"city"];
     NSString *city = [cityObj isKindOfClass:[NSString class]] ? (NSString *)cityObj : nil;
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGeoLocationService] City: %@", city ?: @"(none)"]];
     return city;
 }
 
@@ -182,7 +178,6 @@
     id zipObj = processedData[@"zip"];
     NSString *zip = [zipObj isKindOfClass:[NSString class]] ? (NSString *)zipObj : nil;
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGeoLocationService] Zip: %@", zip ?: @"(none)"]];
     return zip;
 }
 
@@ -196,7 +191,6 @@
     id metroObj = processedData[@"metro"];
     NSString *metro = [metroObj isKindOfClass:[NSString class]] ? (NSString *)metroObj : nil;
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGeoLocationService] Metro (DMA): %@", metro ?: @"(none)"]];
     return metro;
 }
 

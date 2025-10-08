@@ -405,7 +405,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateBidRequestWithLoopIndex {
     NSDictionary<NSString *, NSString *> *existingUserDict = [[NSUserDefaults standardUserDefaults] objectForKey:kCLXCoreBannerUserKeyValueKey];
     NSMutableDictionary<NSString *, NSString *> *userDict = existingUserDict ? [existingUserDict mutableCopy] : [NSMutableDictionary dictionary];
+    
     userDict[@"loop-index"] = [NSString stringWithFormat:@"%ld", (long)self.loadBannerTimesCount];
+    
     [[NSUserDefaults standardUserDefaults] setObject:userDict forKey:kCLXCoreBannerUserKeyValueKey];
     [self.logger debug:[NSString stringWithFormat:@"updated auction api call with loop-index: %ld", (long)self.loadBannerTimesCount]];
 }

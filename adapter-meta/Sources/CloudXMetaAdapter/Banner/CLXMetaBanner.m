@@ -56,19 +56,23 @@
         _sdkVersion = FB_AD_SDK_VERSION;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMetaBanner"];
         
-        [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXMetaBanner] Init - PlacementID: %@, BidID: %@, Type: %ld, HasBidPayload: %@", 
-                           placementID, bidID, (long)type, bidPayload ? @"YES" : @"NO"]];
+        // Parse template from bid payload to ensure exact size match with Meta's bid
+        NSInteger template = [self parseTemplateFromBidPayload:bidPayload];
+        FBAdSize fbAdSize = [self fbAdSizeForTemplate:template fallbackType:type];
+        
+        [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXMetaBanner] Init - PlacementID: %@, BidID: %@, Type: %ld, Template: %ld, HasBidPayload: %@", 
+                           placementID, bidID, (long)type, (long)template, bidPayload ? @"YES" : @"NO"]];
         
         // Ensure Facebook SDK initialization happens on main thread to prevent crashes
         if ([NSThread isMainThread]) {
             _bannerView = [[FBAdView alloc] initWithPlacementID:placementID
-                                                          adSize:[self fbAdSizeForType:type]
+                                                          adSize:fbAdSize
                                               rootViewController:viewController];
             _bannerView.delegate = self;
         } else {
             dispatch_sync(dispatch_get_main_queue(), ^{
                 self->_bannerView = [[FBAdView alloc] initWithPlacementID:placementID
-                                                                    adSize:[self fbAdSizeForType:type]
+                                                                    adSize:fbAdSize
                                                         rootViewController:viewController];
                 self->_bannerView.delegate = self;
             });
@@ -197,6 +201,85 @@
     if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
         [self.delegate impressionBanner:self];
     }
+}
+
+/**
+ * Parses the Meta template number from the bid payload JSON.
+ * Meta template numbers:
+ * - 3: Rectangle 300x250 (MREC)
+ * - 4: Banner 320x50 (fixed size) - uses deprecated kFBAdSize320x50
+ * - 5: Banner adaptive height 50 (flexible width)
+ * - 6: Banner 728x90 (tablet leaderboard)
+ * - 7: Rectangle 300x250 (MREC alternate)
+ *
+ * Note: Template 4 requires the deprecated kFBAdSize320x50 for fixed sizing.
+ *       kFBAdSizeHeight50Banner is adaptive/flexible and maps to template 5.
+ */
+- (NSInteger)parseTemplateFromBidPayload:(NSString *)bidPayload {
+    if (!bidPayload || bidPayload.length == 0) {
+        return -1;
+    }
+    
+    NSError *error = nil;
+    NSData *jsonData = [bidPayload dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *payload = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
+    
+    if (error || !payload) {
+        [self.logger debug:[NSString stringWithFormat:@"⚠️ [CLXMetaBanner] Failed to parse bid payload JSON: %@", error.localizedDescription]];
+        return -1;
+    }
+    
+    NSNumber *templateNum = payload[@"template"];
+    if (templateNum && [templateNum isKindOfClass:[NSNumber class]]) {
+        NSInteger template = templateNum.integerValue;
+        [self.logger debug:[NSString stringWithFormat:@"📊 [CLXMetaBanner] Parsed template from bid payload: %ld", (long)template]];
+        return template;
+    }
+    
+    [self.logger debug:@"⚠️ [CLXMetaBanner] No template field found in bid payload"];
+    return -1;
+}
+
+/**
+ * Maps Meta template number to the exact FBAdSize required by Meta Audience Network.
+ * This ensures the FBAdView size exactly matches the bid template to prevent
+ * "Bid for type X being used on template Y" errors.
+ */
+- (FBAdSize)fbAdSizeForTemplate:(NSInteger)template fallbackType:(CLXBannerType)fallbackType {
+    FBAdSize fbAdSize;
+    
+    switch (template) {
+        case 3: // MREC 300x250
+        case 7: // MREC 300x250 (alternate template)
+            fbAdSize = kFBAdSizeHeight250Rectangle;
+            [self.logger debug:[NSString stringWithFormat:@"📏 [CLXMetaBanner] Using kFBAdSizeHeight250Rectangle (template %ld - MREC)", (long)template]];
+            break;
+            
+        case 4: // Banner 320x50 (fixed size)
+            #pragma clang diagnostic push
+            #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+            fbAdSize = kFBAdSize320x50;
+            #pragma clang diagnostic pop
+            [self.logger debug:@"📏 [CLXMetaBanner] Using kFBAdSize320x50 (template 4 - fixed 320x50)"];
+            break;
+            
+        case 5: // Adaptive height 50 banner
+            fbAdSize = kFBAdSizeHeight50Banner;
+            [self.logger debug:@"📏 [CLXMetaBanner] Using kFBAdSizeHeight50Banner (template 5 - adaptive 50)"];
+            break;
+            
+        case 6: // Banner 728x90 (tablet leaderboard)
+            fbAdSize = kFBAdSizeHeight90Banner;
+            [self.logger debug:@"📏 [CLXMetaBanner] Using kFBAdSizeHeight90Banner (template 6 - 728x90)"];
+            break;
+            
+        default: // Fallback to CloudX banner type if template not found
+            [self.logger debug:[NSString stringWithFormat:@"⚠️ [CLXMetaBanner] Unknown template %ld, falling back to CloudX type: %ld", (long)template, (long)fallbackType]];
+            fbAdSize = [self fbAdSizeForType:fallbackType];
+            break;
+    }
+    
+    return fbAdSize;
 }
 
 - (FBAdSize)fbAdSizeForType:(CLXBannerType)type {

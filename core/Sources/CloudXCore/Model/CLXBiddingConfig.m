@@ -143,26 +143,9 @@ static void initializeLogger() {
         storedImpression.adservertargeting = [targetingDict copy];
         storedImpression.storedimpression = idObj;
         
-        // Add default bidder to satisfy server validation
-        // The server expects at least one bidder in ext.prebid.bidder
         // Get current loop-index from UserDefaults (updated by banner load logic)
         NSDictionary<NSString *, NSString *> *bannerUserDict = [[NSUserDefaults standardUserDefaults] objectForKey:kCLXCoreBannerUserKeyValueKey];
         NSString *loopIndexValue = bannerUserDict[@"loop-index"] ?: @"0";
-        
-        NSDictionary *defaultBidder = @{
-            @"testbidder": @{
-                @"adservertargeting": @[
-                    @{
-                        @"key": @"loop-index",
-                        @"source": @"bidrequest",
-                        @"value": loopIndexValue
-                    }
-                ]
-            }
-        };
-        storedImpression.bidder = defaultBidder;
-        
-        [logger debug:[NSString stringWithFormat:@"✅ [BiddingConfig] Default bidder configured: %@", defaultBidder]];
         
         // Create impression ext
         CLXBiddingConfigImpressionExt *impExt = [[CLXBiddingConfigImpressionExt alloc] init];
@@ -247,10 +230,10 @@ static void initializeLogger() {
             bundle = [[NSBundle mainBundle] bundleIdentifier];
         }
         
-        NSDictionary *value = @{
-        @"appKey1": @"appValue1",
-        @"appKey2": @"appValue2",
-        @"appKey3": @"appValue3"};
+        // Read app key values from UserDefaults (empty if not set)
+        // Note: iOS doesn't currently have a separate app key values API like Android
+        // This is reserved for future use
+        NSDictionary *appKeyValues = @{};
         
         CLXBiddingConfigApplication *application = [[CLXBiddingConfigApplication alloc] init];
         // Use appID from SDK init response for bid request app.id field
@@ -259,7 +242,7 @@ static void initializeLogger() {
         application.bundle = bundle;
         application.ver = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
         application.publisher = publisher;
-        application.ext.data = value;
+        application.ext.data = appKeyValues;
         
         self.application = application;
         
@@ -323,22 +306,27 @@ static void initializeLogger() {
         NSString *aiPrompt = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAIPromptKey];
         NSString *userKeywords = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserKeywordsKey];
         
-        CLXBiddingConfigUserExtUids * uids = [[CLXBiddingConfigUserExtUids alloc] init];
-        uids.id = @"29060c8606954ec90fbcde825b2783b0b9261585793db9dfcbe6b870a05a9ee3";
-        uids.atype = @"3";
+        // Only create eids if publisher explicitly provided hashed user ID
+        NSArray<CLXBiddingConfigUserExtEids *> *eids = nil;
+        if (hashedUserId && hashedUserId.length > 0) {
+            CLXBiddingConfigUserExtUids * uids = [[CLXBiddingConfigUserExtUids alloc] init];
+            uids.id = hashedUserId;
+            uids.atype = @"3";
+            
+            CLXBiddingConfigUserExtEids *eidItem = [[CLXBiddingConfigUserExtEids alloc] init];
+            eidItem.source = bundle;
+            eidItem.uids = @[uids];
+            
+            eids = @[eidItem];
+        }
         
-        CLXBiddingConfigUserExtEids *eids = [[CLXBiddingConfigUserExtEids alloc] init];
-        eids.source = bundle;
-        eids.uids = uids;
-        
-        NSDictionary *userValue = @{
-            @"userKey1": @"userValue1",
-            @"userKey2": @"userValue2",
-            @"userKey3": @"userValue3"};
+        // Read user key values from UserDefaults (empty if not set)
+        // Publishers can set these via useKeyValuesWithUserDictionary API
+        NSDictionary *userKeyValues = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey] ?: @{};
         
         CLXBiddingConfigUserExt *userExt = [[CLXBiddingConfigUserExt alloc] init];
         //userExt.consent = @"gdpr-consent-string";
-        userExt.data = userValue;
+        userExt.data = userKeyValues;
         userExt.eids = eids;
         
         CLXBiddingConfigUser *user = [[CLXBiddingConfigUser alloc] init];
@@ -580,13 +568,15 @@ static void initializeLogger() {
     json[@"bundle"] = self.application.bundle ?: @"";
     json[@"ver"] = self.application.ver ?: @"";
     json[@"publisher"] = [self convertPublisherToJSON:self.application.publisher];
-    json[@"ext"] = @{
-        @"data": @{
-            @"appKey1": @"appValue1",
-            @"appKey2": @"appValue2",
-            @"appKey3": @"appValue3"
-        }
-    };
+    
+    // Use actual app extension data instead of hardcoded values
+    // Only include if data dictionary is non-empty
+    if (self.application.ext && self.application.ext.data && [self.application.ext.data count] > 0) {
+        json[@"ext"] = @{
+            @"data": self.application.ext.data
+        };
+    }
+    
     return [json copy];
 }
 
@@ -730,27 +720,39 @@ static void initializeLogger() {
         return @{};
     }
     
-    // Return the working hardcoded structure for production
-    NSMutableDictionary *impUsr = @{
-          @"data": @{
-            @"userKey1": @"userValue1",
-            @"userKey2": @"userValue2",
-            @"userKey3": @"userValue3"
-          },
-          @"eids": @[
-            @{
-              @"source": @"io.cloudx.demo.demoapp",
-              @"uids": @[
-                @{
-                  @"id": @"29060c8606954ec90fbcde825b2783b0b9261585793db9dfcbe6b870a05a9ee3",
-                  @"atype": @3
-                }
-              ]
-            }
-          ]
-    };
+    NSMutableDictionary *json = [NSMutableDictionary dictionary];
     
-    return [impUsr copy];
+    // Use actual user data instead of hardcoded values
+    // Only include if data dictionary is non-empty
+    if (ext.data && [ext.data count] > 0) {
+        json[@"data"] = ext.data;
+    }
+    
+    // Use actual eids with proper iOS bundle identifier
+    if (ext.eids && ext.eids.count > 0) {
+        NSMutableArray *eidsArray = [NSMutableArray array];
+        
+        for (CLXBiddingConfigUserExtEids *eidItem in ext.eids) {
+            NSMutableArray *uidsArray = [NSMutableArray array];
+            if (eidItem.uids && eidItem.uids.count > 0) {
+                for (CLXBiddingConfigUserExtUids *uid in eidItem.uids) {
+                    [uidsArray addObject:@{
+                        @"id": uid.id ?: @"",
+                        @"atype": uid.atype ?: @"3"
+                    }];
+                }
+            }
+            
+            [eidsArray addObject:@{
+                @"source": eidItem.source ?: @"",
+                @"uids": [uidsArray copy]
+            }];
+        }
+        
+        json[@"eids"] = [eidsArray copy];
+    }
+    
+    return [json copy];
 }
 
 
