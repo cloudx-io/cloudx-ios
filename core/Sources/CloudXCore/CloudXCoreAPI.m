@@ -23,6 +23,7 @@
 #import <CloudXCore/CLXXorEncryption.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 #import <CloudXCore/CLXWinLossTracker.h>
+#import <CloudXCore/CLXKeyValueState.h>
 
 // Adapter Protocols
 #import <CloudXCore/CLXAdapterNative.h>
@@ -319,6 +320,14 @@ static CloudXCore *_sharedInstance = nil;
     
     _sdkConfig = config;
     
+    // Store key-value paths configuration
+    if (config.keyValuePaths) {
+        [[CLXKeyValueState shared] setKeyValuePaths:config.keyValuePaths];
+        [self.logger info:@"✅ [CloudXCore] Key-value paths configuration stored"];
+    } else {
+        [self.logger debug:@"⚠️ [CloudXCore] No key-value paths configuration found in server response"];
+    }
+    
     // Set the tracking configuration for Rill analytics
     [[CLXTrackingFieldResolver shared] setConfig:config];
     
@@ -516,6 +525,10 @@ static CloudXCore *_sharedInstance = nil;
     }
     [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsDictKey];
     [[NSUserDefaults standardUserDefaults] setValue:hashedUserID forKey:kCLXCoreHashedUserIDKey];
+    
+    // Also store in new state system for declarative injection
+    [[CLXKeyValueState shared] setHashedUserId:hashedUserID];
+    
     [self.logger info:@"✅ [CloudXCore] Hashed user ID stored successfully"];
 }
 
@@ -544,6 +557,12 @@ static CloudXCore *_sharedInstance = nil;
     }
     [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsDictKey];
     [[NSUserDefaults standardUserDefaults] setObject:userDictionary forKey:kCLXCoreUserKeyValueKey];
+    
+    // Also store in new state system for declarative injection
+    for (NSString *key in userDictionary) {
+        [[CLXKeyValueState shared] setUserKeyValue:key value:userDictionary[key]];
+    }
+    
     [self.logger info:@"✅ [CloudXCore] User dictionary stored successfully"];
 }
 
@@ -572,6 +591,37 @@ static CloudXCore *_sharedInstance = nil;
     [[NSUserDefaults standardUserDefaults] setValue:key forKey:kCLXCoreUserBidderKeyKey];
     [[NSUserDefaults standardUserDefaults] setValue:value forKey:kCLXCoreUserBidderValueKey];
     [self.logger info:@"✅ [CloudXCore] Bidder key-value pair stored successfully"];
+}
+
+- (void)setUserKeyValue:(NSString *)key value:(NSString *)value {
+    if (!key || !value) {
+        [self.logger info:@"⚠️ [CloudXCore] Attempted to set user key-value with nil key or value"];
+        return;
+    }
+    
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetUserKeyValues];
+    
+    [[CLXKeyValueState shared] setUserKeyValue:key value:value];
+    [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] User key-value pair set: %@ = %@", key, value]];
+}
+
+- (void)setAppKeyValue:(NSString *)key value:(NSString *)value {
+    if (!key || !value) {
+        [self.logger info:@"⚠️ [CloudXCore] Attempted to set app key-value with nil key or value"];
+        return;
+    }
+    
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetAppKeyValues];
+    
+    [[CLXKeyValueState shared] setAppKeyValue:key value:value];
+    [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] App key-value pair set: %@ = %@", key, value]];
+}
+
+- (void)clearAllKeyValues {
+    [[CLXKeyValueState shared] clearAllKeyValues];
+    [self.logger info:@"✅ [CloudXCore] All key-value pairs cleared"];
 }
 
 - (CLXBannerAdView *)createBannerWithPlacement:(NSString *)placement

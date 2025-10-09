@@ -17,6 +17,8 @@
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXPrivacyService.h>
 #import <CloudXCore/CLXSDKConfig.h>
+#import <CloudXCore/CLXKeyValueState.h>
+#import <CloudXCore/NSDictionary+DynamicPath.h>
 
 // Internal methods category for accessing privacy methods that are not in public header
 // TEMP: Remove CLXPrivacyService private interface once server supports GDPR/COPPA
@@ -424,6 +426,9 @@ static void initializeLogger() {
         json[@"tmax"] = self.tmax;
     }
     
+    // Inject key-value pairs at server-configured paths
+    [self injectKeyValuesIntoRequest:json];
+    
     // Debug logging
     [logger debug:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] Final bid request - Keys: %@, Imp count: %lu", [json allKeys], (unsigned long)[json[@"imp"] count]]];
     
@@ -438,6 +443,46 @@ static void initializeLogger() {
     }
     
     return [json copy];
+}
+
+- (void)injectKeyValuesIntoRequest:(NSMutableDictionary *)json {
+    CLXKeyValueState *state = [CLXKeyValueState shared];
+    CLXSDKConfigKeyValueObject *paths = state.keyValuePaths;
+    
+    if (!paths) {
+        [logger debug:@"⚠️ [ObjC-BiddingConfig] No key-value paths configuration available"];
+        return;
+    }
+    
+    BOOL shouldRemovePII = [self.privacyService shouldClearPersonalData];
+    
+    // Inject user key-values (respect privacy)
+    if (paths.userKeyValues && !shouldRemovePII && state.userKeyValues.count > 0) {
+        NSDictionary *userKV = [state.userKeyValues copy];
+        [logger debug:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] Injecting %lu user key-values at path: %@", (unsigned long)userKV.count, paths.userKeyValues]];
+        [json putAtDynamicPath:paths.userKeyValues value:userKV];
+    }
+    
+    // Inject app key-values (not affected by privacy)
+    if (paths.appKeyValues && state.appKeyValues.count > 0) {
+        NSDictionary *appKV = [state.appKeyValues copy];
+        [logger debug:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] Injecting %lu app key-values at path: %@", (unsigned long)appKV.count, paths.appKeyValues]];
+        [json putAtDynamicPath:paths.appKeyValues value:appKV];
+    }
+    
+    // Inject hashed user ID as eids (respect privacy)
+    if (paths.eids && !shouldRemovePII && state.hashedUserId) {
+        NSString *bundle = [[NSBundle mainBundle] bundleIdentifier] ?: @"";
+        NSDictionary *eid = @{
+            @"source": bundle,
+            @"uids": @[@{
+                @"id": state.hashedUserId,
+                @"atype": @3
+            }]
+        };
+        [logger debug:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] Injecting hashed user ID at path: %@", paths.eids]];
+        [json putAtDynamicPath:paths.eids value:eid];
+    }
 }
 
 - (NSArray *)convertImpressionsToJSON {

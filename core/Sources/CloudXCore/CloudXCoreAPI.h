@@ -91,6 +91,32 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)useBidderKeyValueWithBidder:(NSString *)bidder key:(NSString *)key value:(NSString *)value;
 
 /**
+ * Set a user-level key-value pair for targeting
+ * @param key The targeting key
+ * @param value The targeting value
+ * @discussion User-level key-values are injected into bid requests at server-configured paths.
+ * These values are typically user-specific targeting parameters and will be cleared
+ * if privacy regulations require removing personal data.
+ */
+- (void)setUserKeyValue:(NSString *)key value:(NSString *)value;
+
+/**
+ * Set an app-level key-value pair for targeting
+ * @param key The targeting key
+ * @param value The targeting value
+ * @discussion App-level key-values are injected into bid requests at server-configured paths.
+ * These values are typically app-specific targeting parameters and are not affected
+ * by privacy regulations.
+ */
+- (void)setAppKeyValue:(NSString *)key value:(NSString *)value;
+
+/**
+ * Clear all user and app-level key-value pairs
+ * @discussion Removes all previously set targeting key-value pairs
+ */
+- (void)clearAllKeyValues;
+
+/**
  * Create a banner ad
  * @param placement The placement name. This should match the placement name in the CloudX dashboard
  * @param viewController The view controller in which the ad will be displayed

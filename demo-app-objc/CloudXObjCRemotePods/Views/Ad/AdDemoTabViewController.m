@@ -10,6 +10,7 @@
 #import "RewardedInterstitialViewController.h"
 #import "PrivacyViewController.h"
 #import "SettingsViewController.h"
+#import "KeyValueDemoViewController.h"
 
 @implementation AdDemoTabViewController
 
@@ -47,11 +48,14 @@
     PrivacyViewController *privacyVC = [[PrivacyViewController alloc] init];
     privacyVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Privacy" image:[UIImage systemImageNamed:@"hand.raised"] tag:8];
     
+    KeyValueDemoViewController *keyValueVC = [[KeyValueDemoViewController alloc] init];
+    keyValueVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Key-Values" image:[UIImage systemImageNamed:@"key.fill"] tag:9];
+    
     SettingsViewController *settinsVC = [[SettingsViewController alloc] init];
-    settinsVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:[UIImage systemImageNamed:@"star"] tag:9];
+    settinsVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:[UIImage systemImageNamed:@"gearshape"] tag:10];
 
     
-    // Set view controllers - InitInternalVC moved to end so it appears in "More" section
+    // Set view controllers - Additional VCs appear in "More" section
     self.viewControllers = @[
         [[UINavigationController alloc] initWithRootViewController:initVC],
         [[UINavigationController alloc] initWithRootViewController:bannerVC],
@@ -62,6 +66,7 @@
         [[UINavigationController alloc] initWithRootViewController:nativeBannerVC],
         [[UINavigationController alloc] initWithRootViewController:rewardedInterstitialVC],
         [[UINavigationController alloc] initWithRootViewController:privacyVC],
+        [[UINavigationController alloc] initWithRootViewController:keyValueVC],
         [[UINavigationController alloc] initWithRootViewController:initInternalVC],
         [[UINavigationController alloc] initWithRootViewController:settinsVC]
     ];
