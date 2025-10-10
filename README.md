@@ -17,8 +17,6 @@ target 'YourApp' do
   
   # Optional: CloudX Adapters (framework-based distribution)
   pod 'CloudXMetaAdapter'
-  # pod 'CloudXAdManagerAdapter'  # Coming soon
-  # pod 'CloudXPrebidAdapter'     # Coming soon
 end
 ```
 
