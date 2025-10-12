@@ -84,16 +84,16 @@
     
     // Production Configuration (Blocky app - io.cloudx.Blocky)
     CLXDemoConfig *prodConfig = [[CLXDemoConfig alloc] 
-        initWithAppKey:@"P4Wa4J0La5unuRf7A3pci"
+        initWithAppKey:@"moHXKvQoLMS6neE-t-h_4 "
         hashedUserId:@"prod-user-123"
         baseURL:@"https://pro.cloudx.io/sdk"
-        bannerPlacement:@"blockyBanner1"
-        mrecPlacement:@"blockyMrec1"
-        interstitialPlacement:@"blockyInterstitial1"
-        nativePlacement:@"prodNative"
-        nativeBannerPlacement:@"prodNative"
-        rewardedPlacement:@"prodRewarded"
-        rewardedInterstitialPlacement:@"prodRewarded"];
+        bannerPlacement:@"demoBanner1"
+        mrecPlacement:@"demoMrec1"
+        interstitialPlacement:@"demoInterstitial1"
+        nativePlacement:@"-"
+        nativeBannerPlacement:@"-"
+        rewardedPlacement:@"-"
+        rewardedInterstitialPlacement:@"-"];
     
     _configurations = @{
         @(CLXDemoEnvironmentDev): devConfig,
