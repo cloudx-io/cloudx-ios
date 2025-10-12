@@ -49,6 +49,8 @@ static void initializeLogger() {
 
 @implementation CLXBiddingConfigRequest
 
+@synthesize test = _test;
+
 - (instancetype)initWithAdType:(CLXAdType)adType
                      adUnitID:(NSString *)adUnitID
             storedImpressionId:(NSString *)storedImpressionId
@@ -404,6 +406,11 @@ static void initializeLogger() {
         
         _ext = ext;
         _requestID = [[NSUUID UUID] UUIDString];
+        
+        // Set test flag: 0 for App Store production, 1 for all other environments
+        BOOL isAppStore = [[CLXSystemInformation shared] isAppStoreEnvironment];
+        _test = isAppStore ? @0 : @1;
+        [logger debug:[NSString stringWithFormat:@"🔧 [BiddingConfig] test flag set to: %@ (App Store: %@)", _test, isAppStore ? @"YES" : @"NO"]];
     }
     return self;
 }
@@ -424,6 +431,11 @@ static void initializeLogger() {
     
     if (self.tmax) {
         json[@"tmax"] = self.tmax;
+    }
+    
+    // Add test flag (OpenRTB 2.5 spec: 0 = production, 1 = test)
+    if (self.test) {
+        json[@"test"] = self.test;
     }
     
     // Inject key-value pairs at server-configured paths

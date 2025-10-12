@@ -78,6 +78,12 @@ typedef NS_ENUM(NSInteger, DeviceType) {
 /** The display manager */
 @property (nonatomic, readonly) NSString *displayManager;
 
+/**
+ * Determines if the app is running from the App Store.
+ * Returns NO for debug builds, simulator, TestFlight, and local builds.
+ * Returns YES only for production App Store distribution.
+ */
+@property (nonatomic, readonly) BOOL isAppStoreEnvironment;
 
 @end
 

@@ -87,6 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) CLXBiddingConfigRegulations *regulations;
 @property (nonatomic, strong) CLXBiddingConfigRequestExt *ext;
 @property (nonatomic, copy) NSString *requestID;
+@property (nonatomic, strong, nullable) NSNumber *test;
 
 - (instancetype)initWithAdType:(CLXAdType)adType
                      adUnitID:(NSString *)adUnitID

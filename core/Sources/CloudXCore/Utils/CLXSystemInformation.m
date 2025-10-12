@@ -34,6 +34,7 @@ static CLXSystemInformation *sharedInstance = nil;
 @synthesize systemVersion = _systemVersion;
 @synthesize hardwareVersion = _hardwareVersion;
 @synthesize displayManager = _displayManager;
+@synthesize isAppStoreEnvironment = _isAppStoreEnvironment;
 
 + (CLXSystemInformation *)shared {
     static dispatch_once_t onceToken;
@@ -131,6 +132,42 @@ static CLXSystemInformation *sharedInstance = nil;
     return @"CLOUDX";
 }
 
+- (BOOL)isAppStoreEnvironment {
+    #ifdef DEBUG
+    // All debug builds are non-production
+    return NO;
+    #else
+    // Check if running on simulator
+    #if TARGET_IPHONE_SIMULATOR
+    return NO;
+    #endif
+    
+    // Check for App Store receipt
+    NSURL *receiptURL = [[NSBundle mainBundle] appStoreReceiptURL];
+    NSString *receiptPath = receiptURL.path;
+    
+    // TestFlight apps have receipts in sandboxReceipt, App Store apps in receipt
+    if (receiptPath && [receiptPath containsString:@"sandboxReceipt"]) {
+        return NO;
+    }
+    
+    // Check if receipt exists and is a production receipt
+    if (receiptPath && [[NSFileManager defaultManager] fileExistsAtPath:receiptPath]) {
+        // Check for embedded.mobileprovision (ad-hoc or enterprise distribution)
+        NSString *provisionPath = [[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"];
+        if (provisionPath) {
+            // App Store builds strip this file
+            return NO;
+        }
+        
+        // Receipt exists and no provisioning profile - likely App Store
+        return YES;
+    }
+    
+    // No receipt or unrecognized setup - assume non-production
+    return NO;
+    #endif
+}
 
 @end
 
