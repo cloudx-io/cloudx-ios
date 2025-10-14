@@ -84,10 +84,10 @@
     [buttonStack addArrangedSubview:self.autoRefreshButton];
     
     
-    // Button constraints
+    // Button constraints - positioned below Show Logs button with proper spacing
     [NSLayoutConstraint activateConstraints:@[
         [buttonStack.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
-        [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:20],
+        [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
         [loadButton.widthAnchor constraintEqualToConstant:200],
         [loadButton.heightAnchor constraintEqualToConstant:44],
         [self.autoRefreshButton.widthAnchor constraintEqualToConstant:200],

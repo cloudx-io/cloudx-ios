@@ -71,25 +71,25 @@
     
     // Staging Configuration
     CLXDemoConfig *stagingConfig = [[CLXDemoConfig alloc] 
-        initWithAppKey:@"9o_9omGptuyS2n5wV0QJu"
+        initWithAppKey:@"Ty5bVlbX2tQOSL9YNoZ0D"
         hashedUserId:@"test-user-123-staging"
         baseURL:@"https://pro-stage.cloudx.io/sdk"
-        bannerPlacement:@"metaBanner"
-        mrecPlacement:@"metaMREC"
-        interstitialPlacement:@"metaInterstitial"
-        nativePlacement:@"metaNative"
-        nativeBannerPlacement:@"metaNative"
-        rewardedPlacement:@"metaRewarded"
-        rewardedInterstitialPlacement:@"metaRewarded"];
+        bannerPlacement:@"objcDemo-banner-1"
+        mrecPlacement:@"objcDemo-mrec-1"
+        interstitialPlacement:@"objcDemo-interstitial-1"
+        nativePlacement:@"-"
+        nativeBannerPlacement:@"-"
+        rewardedPlacement:@"-"
+        rewardedInterstitialPlacement:@"-"];
     
     // Production Configuration (Blocky app - io.cloudx.Blocky)
     CLXDemoConfig *prodConfig = [[CLXDemoConfig alloc] 
-        initWithAppKey:@"moHXKvQoLMS6neE-t-h_4 "
+        initWithAppKey:@"ihtOXvp3X9JlMQ5p0_RYL"
         hashedUserId:@"prod-user-123"
         baseURL:@"https://pro.cloudx.io/sdk"
-        bannerPlacement:@"demoBanner1"
-        mrecPlacement:@"demoMrec1"
-        interstitialPlacement:@"demoInterstitial1"
+        bannerPlacement:@"demo-banner-1"
+        mrecPlacement:@"demo-mrec-1"
+        interstitialPlacement:@"demo-interstitial-1"
         nativePlacement:@"-"
         nativeBannerPlacement:@"-"
         rewardedPlacement:@"-"
@@ -123,6 +123,49 @@
         case CLXDemoEnvironmentProduction:
             return @"Production";
     }
+}
+
+- (NSString *)buildSchemeName {
+#ifdef DEBUG
+    return @"Debug";
+#else
+    return @"Release";
+#endif
+}
+
+- (BOOL)isDebugBuild {
+#ifdef DEBUG
+    return YES;
+#else
+    return NO;
+#endif
+}
+
+- (NSString *)enhancedErrorMessageForEnvironment:(CLXDemoEnvironment)environment 
+                                  originalError:(NSString *)originalError {
+    BOOL isDebug = [self isDebugBuild];
+    NSString *buildScheme = [self buildSchemeName];
+    NSString *environmentName = [self environmentName:environment];
+    
+    if ([originalError containsString:@"Unauthorized"] || 
+        [originalError containsString:@"Invalid app key"] ||
+        [originalError containsString:@"malformed App Key"]) {
+        
+        if (environment == CLXDemoEnvironmentProduction && isDebug) {
+            return [NSString stringWithFormat:@"Production init failed: Build scheme is set to '%@' but trying to use Production environment. Please switch to Release build scheme for Production, or use Dev/Staging environments with Debug builds.\n\nOriginal error: %@", 
+                    buildScheme, originalError];
+        }
+        
+        if (environment != CLXDemoEnvironmentProduction && !isDebug) {
+            return [NSString stringWithFormat:@"%@ init failed: Build scheme is set to '%@' but trying to use %@ environment. Debug environments (Dev/Staging) require Debug build scheme, or switch to Production environment with Release builds.\n\nOriginal error: %@", 
+                    environmentName, buildScheme, environmentName, originalError];
+        }
+        
+        return [NSString stringWithFormat:@"%@ init failed with error: %@\n\nCurrent build scheme: %@\nEnvironment: %@", 
+                environmentName, originalError, buildScheme, environmentName];
+    }
+    
+    return originalError;
 }
 
 @end

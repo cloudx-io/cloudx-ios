@@ -230,10 +230,12 @@
             [self updateStatusUIWithState:AdStateReady];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"cloudXSDKInitialized" object:nil];
         } else {
-            NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-            [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ SDK init failed: %@", errorMessage]];
+            NSString *originalError = error ? error.localizedDescription : @"Unknown error occurred";
+            NSString *enhancedError = [configManager enhancedErrorMessageForEnvironment:environment 
+                                                                          originalError:originalError];
+            [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ SDK init failed: %@", enhancedError]];
             [self updateStatusUIWithState:AdStateNoAd];
-            [self showAlertWithTitle:@"SDK Init Failed" message:errorMessage];
+            [self showAlertWithTitle:@"SDK Init Failed" message:enhancedError];
         }
     }];
 }

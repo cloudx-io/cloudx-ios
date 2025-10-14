@@ -23,6 +23,7 @@
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXBannerTimerService.h>
+#import <CloudXCore/CLXPlacementLoopIndexTracker.h>
 
 
 #import <CloudXCore/CLXAppSessionService.h>
@@ -75,7 +76,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readwrite) BOOL isVisible;
 @property (nonatomic, assign) BOOL hasPendingRefresh;
 @property (nonatomic, strong, nullable) id<CLXAdapterBanner> prefetchedBanner;
-@property (nonatomic, assign) NSInteger loadBannerTimesCount;
 @property (nonatomic, copy) NSString *placementSuffix;
 @property (nonatomic, assign) NSInteger impressionIndexStart;
 @property (nonatomic, assign) NSInteger impressionIndexEnd;
@@ -136,7 +136,7 @@ NS_ASSUME_NONNULL_BEGIN
         _forceStop = NO;
         _successWin = NO;
         _autoRefreshEnabled = YES; // Auto-refresh is enabled by default
-        _loadBannerTimesCount = 0;
+        // Note: Loop-index now managed by CLXPlacementLoopIndexTracker (per-placement)
         // Initialize Rill tracking service
         _rillTrackingService = [[CLXRillTrackingService alloc] initWithReportingService:reportingService];
         
@@ -227,7 +227,8 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Private Methods
 
 - (void)requestBannerUpdate {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherBanner] requestBannerUpdate() called for placement: %@ (forceStop:%d, loading:%d, count:%ld, successWin:%d)", self.placementID, self.forceStop, self.isLoading, (long)self.loadBannerTimesCount, self.successWin]];
+    NSInteger currentLoopIndex = [[CLXPlacementLoopIndexTracker shared] getCountForPlacement:self.placementName];
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherBanner] requestBannerUpdate() called for placement: %@ (forceStop:%d, loading:%d, loop-index:%ld, successWin:%d)", self.placementID, self.forceStop, self.isLoading, (long)currentLoopIndex, self.successWin]];
     
     if (self.forceStop) {
         [self.logger debug:@"⚠️ [PublisherBanner] Request stopped due to forceStop flag"];
@@ -295,8 +296,7 @@ NS_ASSUME_NONNULL_BEGIN
         }
         [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreBannerMetricsDictKey];
     
-        // Increment load counter
-        strongSelf.loadBannerTimesCount += 1;
+        // Note: Loop-index is incremented in updateBidRequestWithLoopIndex via CLXPlacementLoopIndexTracker
         
         // Continue banner chain
         [strongSelf continueBannerChain];
@@ -403,13 +403,17 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)updateBidRequestWithLoopIndex {
+    // Use per-placement tracker to match Android behavior
+    NSInteger loopIndex = [[CLXPlacementLoopIndexTracker shared] getAndIncrementForPlacement:self.placementName];
+    
+    // Store in UserDefaults for BiddingConfig to read (temporary bridge until full migration)
     NSDictionary<NSString *, NSString *> *existingUserDict = [[NSUserDefaults standardUserDefaults] objectForKey:kCLXCoreBannerUserKeyValueKey];
     NSMutableDictionary<NSString *, NSString *> *userDict = existingUserDict ? [existingUserDict mutableCopy] : [NSMutableDictionary dictionary];
     
-    userDict[@"loop-index"] = [NSString stringWithFormat:@"%ld", (long)self.loadBannerTimesCount];
+    userDict[@"loop-index"] = [NSString stringWithFormat:@"%ld", (long)loopIndex];
     
     [[NSUserDefaults standardUserDefaults] setObject:userDict forKey:kCLXCoreBannerUserKeyValueKey];
-    [self.logger debug:[NSString stringWithFormat:@"updated auction api call with loop-index: %ld", (long)self.loadBannerTimesCount]];
+    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Updated loop-index=%ld for placement: %@", (long)loopIndex, self.placementName]];
 }
 
 - (void)loadAdItem:(id<CLXAdapterBanner>)item {
@@ -657,7 +661,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)closedByUserActionBanner:(id<CLXAdapterBanner>)banner {
     [self.logger debug:[NSString stringWithFormat:@"[CloudX][Banner] closedByUserAction delegate called for placement: %@", self.placementID]];
     [self.appSessionService addCloseWithPlacementID:self.placementID latency:1.0];
-    self.loadBannerTimesCount = 0;
+    
+    // Reset loop-index for this placement (matches Android behavior)
+    [[CLXPlacementLoopIndexTracker shared] resetForPlacement:self.placementName];
+    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Reset loop-index for placement: %@", self.placementName]];
+    
     if ([self.delegate respondsToSelector:@selector(closedByUserActionWithAd:)]) {
         CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
         [self.delegate closedByUserActionWithAd:adObject];

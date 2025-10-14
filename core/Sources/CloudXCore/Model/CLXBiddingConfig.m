@@ -147,15 +147,28 @@ static void initializeLogger() {
         storedImpression.adservertargeting = [targetingDict copy];
         storedImpression.storedimpression = idObj;
         
-        // Get current loop-index from UserDefaults (updated by banner load logic)
-        NSDictionary<NSString *, NSString *> *bannerUserDict = [[NSUserDefaults standardUserDefaults] objectForKey:kCLXCoreBannerUserKeyValueKey];
-        NSString *loopIndexValue = bannerUserDict[@"loop-index"] ?: @"0";
+        // Loop-index logic: matches Android behavior
+        // - Interstitials and Rewarded ads always use fixed value (1)
+        // - Banner/MREC ads use per-placement counter (NOT incremented here, only retrieved)
+        NSString *loopIndexValue;
+        if (adType == CLXAdTypeInterstitial || adType == CLXAdTypeRewarded) {
+            // Interstitials and Rewarded: always use 1 (fixed value, never increment)
+            loopIndexValue = @"1";
+            [logger debug:[NSString stringWithFormat:@"🔧 [BiddingConfig] Using fixed loop-index=1 for %@ ad", 
+                          adType == CLXAdTypeInterstitial ? @"interstitial" : @"rewarded"]];
+        } else {
+            // Banner/MREC/Native: use per-placement counter from tracker
+            // Note: Counter is incremented separately by the ad load logic, not here
+            NSDictionary<NSString *, NSString *> *bannerUserDict = [[NSUserDefaults standardUserDefaults] objectForKey:kCLXCoreBannerUserKeyValueKey];
+            loopIndexValue = bannerUserDict[@"loop-index"] ?: @"1";
+            [logger debug:[NSString stringWithFormat:@"🔧 [BiddingConfig] Using placement loop-index=%@ for banner/MREC", loopIndexValue]];
+        }
         
         // Create impression ext
         CLXBiddingConfigImpressionExt *impExt = [[CLXBiddingConfigImpressionExt alloc] init];
         impExt.prebid = storedImpression;
         
-        // Use the same loop-index value from UserDefaults
+        // Set loop-index in impression data
         impExt.data = @{@"loop-index": loopIndexValue};
         
         // Create native ad if needed
@@ -407,10 +420,22 @@ static void initializeLogger() {
         _ext = ext;
         _requestID = [[NSUUID UUID] UUIDString];
         
-        // Set test flag: 0 for App Store production, 1 for all other environments
-        BOOL isAppStore = [[CLXSystemInformation shared] isAppStoreEnvironment];
-        _test = isAppStore ? @0 : @1;
-        [logger debug:[NSString stringWithFormat:@"🔧 [BiddingConfig] test flag set to: %@ (App Store: %@)", _test, isAppStore ? @"YES" : @"NO"]];
+        // Set test flag based on simulator detection and build configuration
+        // Simulator (any build) → test=1 (Meta registers simulator as test device)
+        // Real device + DEBUG → test=1 (device registered as test device in Meta adapter)
+        // Real device + RELEASE → test=nil (device not registered, real production ads only)
+        #if TARGET_IPHONE_SIMULATOR
+        _test = @1;
+        [logger debug:@"🔧 [BiddingConfig] Simulator detected - test flag set to: 1"];
+        #else
+        #ifdef DEBUG
+        _test = @1;
+        [logger debug:@"🔧 [BiddingConfig] Real device + DEBUG build - test flag set to: 1"];
+        #else
+        _test = nil;
+        [logger debug:@"🔧 [BiddingConfig] Real device + RELEASE build - test flag excluded"];
+        #endif
+        #endif
     }
     return self;
 }
@@ -434,8 +459,12 @@ static void initializeLogger() {
     }
     
     // Add test flag (OpenRTB 2.5 spec: 0 = production, 1 = test)
-    if (self.test) {
+    // Only include if explicitly set (non-nil) - nil means exclude from request entirely
+    if (self.test != nil) {
         json[@"test"] = self.test;
+        [logger debug:[NSString stringWithFormat:@"🧪 [BiddingConfig] Test flag included in request: %@", self.test]];
+    } else {
+        [logger debug:@"🧪 [BiddingConfig] Test flag excluded from request (nil)"];
     }
     
     // Inject key-value pairs at server-configured paths

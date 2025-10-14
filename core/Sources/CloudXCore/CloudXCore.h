@@ -44,6 +44,9 @@
 #import <CloudXCore/CLXWinLossNetworkService.h>
 #import <CloudXCore/CLXAuctionBidManager.h>
 
+// Placement Loop Index Tracking
+#import <CloudXCore/CLXPlacementLoopIndexTracker.h>
+
 // Database
 #import <CloudXCore/CLXSQLiteDatabase.h>
 

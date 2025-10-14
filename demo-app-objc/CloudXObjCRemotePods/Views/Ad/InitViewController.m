@@ -75,7 +75,9 @@
     
     [self updateStatusUIWithState:AdStateLoading];
     
-    CLXDemoConfig *config = [[CLXDemoConfigManager sharedManager] currentConfig];
+    CLXDemoConfigManager *configManager = [CLXDemoConfigManager sharedManager];
+    CLXDemoConfig *config = [configManager currentConfig];
+    CLXDemoEnvironment currentEnvironment = configManager.currentEnvironment;
     
     [[CloudXCore shared] initSDKWithAppKey:config.appKey
                               hashedUserID:config.hashedUserId
@@ -86,8 +88,11 @@
             [self updateStatusUIWithState:AdStateReady];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"cloudXSDKInitialized" object:nil];
         } else {
-            NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-            [self showAlertWithTitle:@"SDK Init Failed" message:errorMessage];
+            NSString *originalError = error ? error.localizedDescription : @"Unknown error occurred";
+            NSString *enhancedError = [configManager enhancedErrorMessageForEnvironment:currentEnvironment 
+                                                                          originalError:originalError];
+            [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ SDK init failed: %@", enhancedError]];
+            [self showAlertWithTitle:@"SDK Init Failed" message:enhancedError];
             [self updateStatusUIWithState:AdStateNoAd];
         }
     }];

@@ -44,6 +44,10 @@ typedef NS_ENUM(NSInteger, CLXDemoEnvironment) {
 - (void)setEnvironment:(CLXDemoEnvironment)environment;
 - (CLXDemoConfig *)configForEnvironment:(CLXDemoEnvironment)environment;
 - (NSString *)environmentName:(CLXDemoEnvironment)environment;
+- (NSString *)buildSchemeName;
+- (BOOL)isDebugBuild;
+- (NSString *)enhancedErrorMessageForEnvironment:(CLXDemoEnvironment)environment 
+                                  originalError:(NSString *)originalError;
 
 @end
 
