@@ -8,7 +8,6 @@
 #import "NativeViewController.h"
 #import "NativeBannerViewController.h"
 #import "RewardedInterstitialViewController.h"
-#import "PrivacyViewController.h"
 #import "SettingsViewController.h"
 #import "KeyValueDemoViewController.h"
 
@@ -45,9 +44,6 @@
     RewardedInterstitialViewController *rewardedInterstitialVC = [[RewardedInterstitialViewController alloc] init];
     rewardedInterstitialVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Reward Inter" image:[UIImage systemImageNamed:@"star.square"] tag:7];
     
-    PrivacyViewController *privacyVC = [[PrivacyViewController alloc] init];
-    privacyVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Privacy" image:[UIImage systemImageNamed:@"hand.raised"] tag:8];
-    
     KeyValueDemoViewController *keyValueVC = [[KeyValueDemoViewController alloc] init];
     keyValueVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Key-Values" image:[UIImage systemImageNamed:@"key.fill"] tag:9];
     
@@ -65,7 +61,6 @@
         [[UINavigationController alloc] initWithRootViewController:nativeVC],
         [[UINavigationController alloc] initWithRootViewController:nativeBannerVC],
         [[UINavigationController alloc] initWithRootViewController:rewardedInterstitialVC],
-        [[UINavigationController alloc] initWithRootViewController:privacyVC],
         [[UINavigationController alloc] initWithRootViewController:keyValueVC],
         [[UINavigationController alloc] initWithRootViewController:initInternalVC],
         [[UINavigationController alloc] initWithRootViewController:settinsVC]

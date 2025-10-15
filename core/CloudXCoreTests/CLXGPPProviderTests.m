@@ -30,7 +30,7 @@
 
 // Test GPP string storage and retrieval
 - (void)testGPPStringStorageAndRetrieval {
-    NSString *testGppString = @"DBABMA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~1YNN";
+    NSString *testGppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     
     // Test setting GPP string
     [self.gppProvider setGppString:testGppString];
@@ -82,8 +82,8 @@
 
 // Test US-CA (SID=8) consent decoding
 - (void)testUSCAConsentDecoding {
-    // Test GPP string with US-CA section (SID=8) - simplified valid format
-    NSString *gppString = @"DBABMA~BVVqAAEABgAA"; // Header + US-CA payload
+    // Test GPP string with US-CA section (SID=8) - allow all
+    NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     NSArray *gppSid = @[@8]; // US-CA only
     
     [self.gppProvider setGppString:gppString];
@@ -97,7 +97,7 @@
 
 // Test US-National (SID=7) consent decoding
 - (void)testUSNationalConsentDecoding {
-    NSString *gppString = @"DBABMA~BVVqAAEABgAA"; // Header + US-National payload
+    NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     NSArray *gppSid = @[@7]; // US-National only
     
     [self.gppProvider setGppString:gppString];
@@ -111,8 +111,8 @@
 
 // Test auto-selection prioritizes consent requiring PII removal
 - (void)testAutoSelectionPrioritizesPIIRemoval {
-    // Set up GPP with both US-CA and US-National sections
-    NSString *gppString = @"DBABMA~BVVqAAEABgAA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA";
+    // Set up GPP with both US-CA and US-National sections (allow all)
+    NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     NSArray *gppSid = @[@7, @8]; // Both sections
     
     [self.gppProvider setGppString:gppString];
@@ -146,9 +146,9 @@
     NSArray *malformedStrings = @[
         @"", // Empty
         @"invalid", // No sections
-        @"DBABMA", // Header only
-        @"DBABMA~", // Header with empty section
-        @"DBABMA~invalid_base64" // Invalid base64
+        @"DBABrw", // Header only
+        @"DBABrw~", // Header with empty section
+        @"DBABrw~invalid_base64" // Invalid base64
     ];
     
     for (NSString *malformedString in malformedStrings) {
@@ -163,7 +163,7 @@
 
 // Test unsupported SID handling
 - (void)testUnsupportedSIDHandling {
-    NSString *gppString = @"DBABMA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~BVVqAAEABgAA";
+    NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     NSArray *gppSid = @[@99]; // Unsupported SID
     
     [self.gppProvider setGppString:gppString];
@@ -177,7 +177,7 @@
 
 // Test publisher API methods work correctly
 - (void)testPublisherAPIIntegration {
-    NSString *testGppString = @"DBABMA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~1YNN";
+    NSString *testGppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     NSArray *testGppSid = @[@7, @8];
     
     // Test CloudXCore API integration

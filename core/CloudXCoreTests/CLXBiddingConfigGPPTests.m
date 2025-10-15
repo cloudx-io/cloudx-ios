@@ -70,7 +70,7 @@
 
 // Test GPP string is included in bid request regulations
 - (void)testGPPStringIncludedInBidRequest {
-    NSString *testGppString = @"DBABMA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~1YNN";
+    NSString *testGppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     [self.gppProvider setGppString:testGppString];
     
     CLXBiddingConfigRequest *config = [self createTestBiddingConfig];
@@ -94,7 +94,7 @@
 
 // Test both GPP string and SID are included together
 - (void)testGPPStringAndSidIncludedTogether {
-    NSString *testGppString = @"DBABMA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~1YNN";
+    NSString *testGppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     NSArray *testGppSid = @[@7, @8];
     
     [self.gppProvider setGppString:testGppString];
@@ -207,7 +207,7 @@
 // Test legacy CCPA string is still included alongside GPP
 - (void)testLegacyCCPAStringIncludedWithGPP {
     NSString *ccpaString = @"1YNN";
-    NSString *gppString = @"DBABMA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~1YNN";
+    NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     
     [self.privacyService setCCPAPrivacyString:ccpaString];
     [self.gppProvider setGppString:gppString];

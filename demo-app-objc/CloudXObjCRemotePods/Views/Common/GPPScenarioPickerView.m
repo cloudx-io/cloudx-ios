@@ -265,6 +265,24 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
     [self.scenarioButton setTitle:buttonTitle forState:UIControlStateNormal];
 }
 
+- (NSArray<NSNumber *> *)dynamicGPPSid {
+    // Dynamically determine SID based on actual CloudFront geo location
+    CLXGeoLocationService *geoService = [CLXGeoLocationService shared];
+    BOOL isCalifornia = [geoService isCaliforniaUser];
+    BOOL isUS = [geoService isUSUser];
+    
+    if (isCalifornia) {
+        [[DemoAppLogger sharedInstance] logMessage:@"📍 Detected California → Using SID 8 (US-CA)"];
+        return @[@8];  // US-California
+    } else if (isUS) {
+        [[DemoAppLogger sharedInstance] logMessage:@"📍 Detected US (non-CA) → Using SID 7 (US-National)"];
+        return @[@7];  // US-National
+    } else {
+        [[DemoAppLogger sharedInstance] logMessage:@"📍 Detected Non-US → Using empty SID array"];
+        return @[];    // Non-US regions
+    }
+}
+
 - (void)applyScenario:(GPPTestScenario)scenario {
     [self resetGPPSettings];
     
@@ -278,41 +296,41 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
             break;
             
         case GPPTestScenarioGPPCCPAConsent:
-            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: CCPA Consent (real geo data from CloudFront API)"];
-            [CloudXCore setGPPString:@"DBABLA~BVVqAAEABBENA.QA"];
-            [CloudXCore setGPPSid:@[@8]];
+            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: CCPA Consent (Allow All) - AUTO-DETECTING LOCATION"];
+            [CloudXCore setGPPString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
+            [CloudXCore setGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             break;
             
         case GPPTestScenarioGPPCCPAOptOut:
-            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: CCPA Opt-Out (real geo data from CloudFront API)"];
-            [CloudXCore setGPPString:@"DBABLA~BVVqAAEABBENA.YA"];
-            [CloudXCore setGPPSid:@[@8]];
+            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: CCPA Opt-Out (Disallow All) - AUTO-DETECTING LOCATION"];
+            [CloudXCore setGPPString:@"DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA"];
+            [CloudXCore setGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             break;
             
         case GPPTestScenarioGPPNonUS:
-            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: Non-US Germany (real geo data from CloudFront API)"];
-            [CloudXCore setGPPString:@"DBACNYA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~1YYN"];
-            [CloudXCore setGPPSid:@[@8]];
+            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: Non-US (Allow All) - AUTO-DETECTING LOCATION"];
+            [CloudXCore setGPPString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
+            [CloudXCore setGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             break;
             
         case GPPTestScenarioGPPUSNonCalifornia:
-            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: US Non-California (real geo data from CloudFront API)"];
-            [CloudXCore setGPPString:@"DBACNYA~BVWqWBg.YA~1YYN"];
-            [CloudXCore setGPPSid:@[@7]];
+            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: US Non-California - AUTO-DETECTING LOCATION"];
+            [CloudXCore setGPPString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
+            [CloudXCore setGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             break;
             
         case GPPTestScenarioCOPPAFlagged:
-            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: COPPA Flagged (real geo data from CloudFront API)"];
+            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: COPPA Flagged - AUTO-DETECTING LOCATION"];
             [CloudXCore setIsAgeRestrictedUser:YES];
-            [CloudXCore setGPPString:@"DBACNYA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~1YNN"];
-            [CloudXCore setGPPSid:@[@8]];
+            [CloudXCore setGPPString:@"DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA"];
+            [CloudXCore setGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             break;
             
         case GPPTestScenarioCOPPAWithConsent:
-            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: COPPA + GPP Consent (COPPA should win - real geo data from CloudFront API)"];
+            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: COPPA + GPP Consent - AUTO-DETECTING LOCATION"];
             [CloudXCore setIsAgeRestrictedUser:YES];
-            [CloudXCore setGPPString:@"DBABLA~BVVqAAEABBENA.QA"];
-            [CloudXCore setGPPSid:@[@8]];
+            [CloudXCore setGPPString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
+            [CloudXCore setGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             break;
             
         case GPPTestScenarioATTDenied:

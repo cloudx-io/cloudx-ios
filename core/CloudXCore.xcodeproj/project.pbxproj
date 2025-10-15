@@ -50,7 +50,7 @@
 		1916B32C2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B32B2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m */; };
 		1916B32E2E832C0000E49E3E /* CLXAppIDIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B32D2E832C0000E49E3E /* CLXAppIDIntegrationTests.m */; };
 		195755382E9DA1E500C9CC76 /* CLXPlacementLoopIndexTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 195755362E9DA1E500C9CC76 /* CLXPlacementLoopIndexTracker.m */; };
-		195755392E9DA1E500C9CC76 /* CLXPlacementLoopIndexTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 195755352E9DA1E500C9CC76 /* CLXPlacementLoopIndexTracker.h */; };
+		195755392E9DA1E500C9CC76 /* CLXPlacementLoopIndexTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 195755352E9DA1E500C9CC76 /* CLXPlacementLoopIndexTracker.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19656C1C2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 19656C1B2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19656C242E91CF3100BFA06E /* CLXBidLifecycleEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19656C232E91CF3100BFA06E /* CLXBidLifecycleEvent.m */; };
 		1979919A2E74921400EBA0A3 /* CLXGPPProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 197991992E74921400EBA0A3 /* CLXGPPProvider.m */; };
@@ -1252,7 +1252,6 @@
 				1916B2582E819DC600E49E3E /* CLXEventTrackerBulkApi.h in Headers */,
 				1916B2592E819DC600E49E3E /* CLXMetricsTrackerImpl.h in Headers */,
 				1916B25A2E819DC600E49E3E /* CLXMetricsEvent.h in Headers */,
-				195755392E9DA1E500C9CC76 /* CLXPlacementLoopIndexTracker.h in Headers */,
 				19F853452E899BC8002619F1 /* CLXMetricsEventDaoImpl.h in Headers */,
 				19F853462E899BC8002619F1 /* CLXBaseDao.h in Headers */,
 				19F853472E899BC8002619F1 /* CLXRillEvent.h in Headers */,
@@ -1280,6 +1279,7 @@
 				1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */,
 				1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */,
 				19656C1C2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h in Headers */,
+				195755392E9DA1E500C9CC76 /* CLXPlacementLoopIndexTracker.h in Headers */,
 				197992952E75E3B700EBA0A3 /* CLXErrorReporter.h in Headers */,
 				19F592DE2E98365E00C6E11D /* NSDictionary+DynamicPath.h in Headers */,
 				19F592E42E9836CD00C6E11D /* CLXKeyValueState.h in Headers */,

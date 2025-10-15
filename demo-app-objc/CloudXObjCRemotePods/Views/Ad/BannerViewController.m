@@ -57,9 +57,9 @@
     // - GPP regional (US-CA, US-National, EU)
     // - Combined scenarios (COPPA + GPP consent precedence)
     //
-    // self.gppScenarioPicker = [[GPPScenarioPickerView alloc] init];
-    // self.gppScenarioPicker.translatesAutoresizingMaskIntoConstraints = NO;
-    // [buttonStack addArrangedSubview:self.gppScenarioPicker];
+    self.gppScenarioPicker = [[GPPScenarioPickerView alloc] init];
+    self.gppScenarioPicker.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:self.gppScenarioPicker];
     
     // Load Banner button
     UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];

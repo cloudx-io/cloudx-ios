@@ -420,22 +420,30 @@ static void initializeLogger() {
         _ext = ext;
         _requestID = [[NSUUID UUID] UUIDString];
         
-        // Set test flag based on simulator detection and build configuration
-        // Simulator (any build) → test=1 (Meta registers simulator as test device)
-        // Real device + DEBUG → test=1 (device registered as test device in Meta adapter)
-        // Real device + RELEASE → test=nil (device not registered, real production ads only)
-        #if TARGET_IPHONE_SIMULATOR
-        _test = @1;
-        [logger debug:@"🔧 [BiddingConfig] Simulator detected - test flag set to: 1"];
-        #else
-        #ifdef DEBUG
-        _test = @1;
-        [logger debug:@"🔧 [BiddingConfig] Real device + DEBUG build - test flag set to: 1"];
-        #else
-        _test = nil;
-        [logger debug:@"🔧 [BiddingConfig] Real device + RELEASE build - test flag excluded"];
-        #endif
-        #endif
+        // Check if test mode has been forced via internal API (for demo/test apps only)
+        NSNumber *forceTestMode = [[NSUserDefaults standardUserDefaults] objectForKey:@"CLXCore_Internal_ForceTestMode"];
+        
+        if (forceTestMode && [forceTestMode boolValue]) {
+            _test = @1;
+            [logger debug:@"🔧 [BiddingConfig] Force test mode enabled - test flag set to: 1"];
+        } else {
+            // Set test flag based on simulator detection and build configuration
+            // Simulator (any build) → test=1 (Meta registers simulator as test device)
+            // Real device + DEBUG → test=1 (device registered as test device in Meta adapter)
+            // Real device + RELEASE → test=nil (device not registered, real production ads only)
+            #if TARGET_IPHONE_SIMULATOR
+            _test = @1;
+            [logger debug:@"🔧 [BiddingConfig] Simulator detected - test flag set to: 1"];
+            #else
+            #ifdef DEBUG
+            _test = @1;
+            [logger debug:@"🔧 [BiddingConfig] Real device + DEBUG build - test flag set to: 1"];
+            #else
+            _test = nil;
+            [logger debug:@"🔧 [BiddingConfig] Real device + RELEASE build - test flag excluded"];
+            #endif
+            #endif
+        }
     }
     return self;
 }

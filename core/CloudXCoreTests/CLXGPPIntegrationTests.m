@@ -62,9 +62,9 @@
 
 // Test GPP CCPA consent should pass allowed personal data
 - (void)testGPPCCPAConsent_ShouldPassAllowedPersonalData {
-    // Set up GPP string with consent (no opt-out)
-    NSString *gppString = @"DBABMA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~BVVqAAEABgAA";
-    NSArray *gppSid = @[@8]; // US-CA
+    // Set up GPP string with consent (allow all)
+    NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
+    NSArray *gppSid = @[@7, @8]; // US-National and US-CA
     
     [self.gppProvider setGppString:gppString];
     [self.gppProvider setGppSid:gppSid];
@@ -73,9 +73,6 @@
     [self setupCaliforniaUser];
     [self.privacyService setIsAgeRestrictedUser:@NO];
     
-    // Mock consent that allows data (this would be determined by actual GPP parsing)
-    // For this test, we assume the GPP string represents consent
-    
     // Test compliance logic - should allow data with consent
     BOOL shouldClear = [self.privacyService shouldClearPersonalDataForCompliance];
     XCTAssertFalse(shouldClear, @"GPP consent should allow personal data");
@@ -83,9 +80,9 @@
 
 // Test GPP CCPA opt-out should remove personal data
 - (void)testGPPCCPAOptOut_ShouldRemovePersonalData {
-    // Set up GPP string with opt-out flags
-    NSString *gppString = @"DBABMA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~BVVqAAEABgAA";
-    NSArray *gppSid = @[@8]; // US-CA
+    // Set up GPP string with opt-out flags (disallow all)
+    NSString *gppString = @"DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA";
+    NSArray *gppSid = @[@7, @8]; // US-National and US-CA
     
     [self.gppProvider setGppString:gppString];
     [self.gppProvider setGppSid:gppSid];
@@ -102,9 +99,9 @@
 
 // Test GPP Non-US users should have full data with no extra restrictions
 - (void)testGPPNonUS_ShouldHaveFullDataNoRestrictions {
-    // Set up GPP data
-    NSString *gppString = @"DBABMA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~BVVqAAEABgAA";
-    NSArray *gppSid = @[@8];
+    // Set up GPP data (allow all)
+    NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
+    NSArray *gppSid = @[@7, @8];
     
     [self.gppProvider setGppString:gppString];
     [self.gppProvider setGppSid:gppSid];
@@ -119,9 +116,9 @@
 
 // Test GPP US non-California should use US National consent
 - (void)testGPPUSNonCalifornia_ShouldUseUSNationalConsent {
-    // Set up GPP with US-National section
-    NSString *gppString = @"DBABMA~BVVqAAEABgAA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA";
-    NSArray *gppSid = @[@7]; // US-National
+    // Set up GPP with US-National section (allow all)
+    NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
+    NSArray *gppSid = @[@7]; // US-National only
     
     [self.gppProvider setGppString:gppString];
     [self.gppProvider setGppSid:gppSid];
@@ -136,9 +133,9 @@
 
 // Test COPPA flagged app should remove all personal data
 - (void)testCOPPAFlagged_ShouldRemoveAllPersonalData {
-    // Set up GPP data that would normally allow data
-    NSString *gppString = @"DBABMA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~BVVqAAEABgAA";
-    NSArray *gppSid = @[@8];
+    // Set up GPP data that would normally allow data (allow all)
+    NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
+    NSArray *gppSid = @[@7, @8];
     
     [self.gppProvider setGppString:gppString];
     [self.gppProvider setGppSid:gppSid];

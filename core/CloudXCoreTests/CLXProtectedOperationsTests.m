@@ -48,8 +48,8 @@
     // Test the protected readBits method indirectly through GPP decoding
     
     // Set up invalid GPP data that will trigger string manipulation exceptions
-    [self.gppProvider setGppString:@"DBABMA~CPXxRfAPXxRfAAfKABENCCsAP_AAH_AAAqIAAAAA"]; // Valid base64
-    [self.gppProvider setGppSid:@[@7]]; // US-CA section
+    [self.gppProvider setGppString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"]; // Valid format
+    [self.gppProvider setGppSid:@[@7]]; // US-National section
     
     // This should trigger our string manipulation protection when parsing bits - simplified
     CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@7];
@@ -64,10 +64,10 @@
 - (void)testGPPProvider_Base64Decoding_CorruptedData_ExceptionHandling {
     NSArray<NSString *> *corruptedBase64Strings = @[
         @"Invalid!Base64@#$%",           // Invalid characters
-        @"DBABMA~CorruptedData!!!",      // Partially valid
+        @"DBABrw~CorruptedData!!!",      // Partially valid
         @"",                             // Empty string
         @"A",                           // Too short
-        @"DBABMA~" // Truncated
+        @"DBABrw~" // Truncated
     ];
     
     for (NSString *corruptedString in corruptedBase64Strings) {
