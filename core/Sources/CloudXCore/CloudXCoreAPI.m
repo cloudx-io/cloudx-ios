@@ -424,14 +424,17 @@ static CloudXCore *_sharedInstance = nil;
     // Extract CDP endpoint URL from SDK response
     if (config.cdpEndpointURL) {
         cdpEndpointUrl = [self chooseEndpointWithObject:config.cdpEndpointURL value:1.0 - _abTestValue];
+        [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] CDP endpoint configured: %@", cdpEndpointUrl]];
+    } else {
+        [self.logger debug:@"[CloudXCore] No CDP endpoint configured - bid request enrichment disabled"];
     }
     
     // Log missing metrics URL
     if (!config.metricsEndpointURL) {
-        [self.logger debug:@"🔧 [CloudXCore] SDK init missing metricsEndpointURL - SDK performance metrics disabled"];
+        [self.logger debug:@"[CloudXCore] SDK init missing metricsEndpointURL - SDK performance metrics disabled"];
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Endpoints - Auction: %@, CDP: %@", auctionEndpointUrl, cdpEndpointUrl]];
+    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Endpoints - Auction: %@, CDP: %@", auctionEndpointUrl, cdpEndpointUrl ?: @"(none)"]];
     
     // Store endpoint data in logs 
     NSString *endpointData = [NSString stringWithFormat:@"choosenAuctionEndpoint: %@ ||| choosenCDPEndpoint: %@", auctionEndpointUrl, cdpEndpointUrl];

@@ -23,6 +23,7 @@
 @property (nonatomic, copy) NSString *endpoint;
 @property (nonatomic, copy) NSString *cdpEndpoint;
 @property (nonatomic, strong) CLXBaseNetworkService *baseNetworkService;
+@property (nonatomic, strong) CLXBaseNetworkService *cdpNetworkService;
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, copy) NSString *userAgent;
 @property (nonatomic, strong, nullable) CLXErrorReporter *errorReporter;
@@ -67,6 +68,9 @@
         
         // Initialize base network service with provided URLSession
         _baseNetworkService = [[CLXBaseNetworkService alloc] initWithBaseURL:auctionEndpointUrl urlSession:urlSession];
+        
+        // Initialize CDP network service with empty base URL (CDP uses full URLs)
+        _cdpNetworkService = [[CLXBaseNetworkService alloc] initWithBaseURL:@"" urlSession:urlSession];
         
         [self.logger info:[NSString stringWithFormat:@"✅ [BidNetworkService] Initialized with auction endpoint: %@", _endpoint]];
     }
@@ -227,28 +231,39 @@
 }
 
 - (void)startCDPFlowWithBidRequest:(id)bidRequest
+                            appKey:(NSString *)appKey
                        completion:(void (^)(id _Nullable, NSError * _Nullable))completion {
+    
+    [self.logger info:[NSString stringWithFormat:@"🔧 [BidNetworkService] Starting CDP request to: %@", self.cdpEndpoint]];
     
     NSMutableDictionary *headers = [NSMutableDictionary dictionary];
     headers[@"Content-Type"] = @"application/json";
+    headers[@"Authorization"] = [NSString stringWithFormat:@"Bearer %@", appKey];
+    headers[@"User-Agent"] = self.userAgent ?: @"";
     
     NSError *jsonError;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bidRequest options:0 error:&jsonError];
     if (jsonError) {
+        [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] CDP request JSON serialization failed: %@", jsonError.localizedDescription]];
         if (completion) {
             completion(nil, jsonError);
         }
         return;
     }
     
-    [self.logger debug:@"🔧 [BidNetworkService] Starting CDP request with V1 retry policy (maxRetries:1, delay:1.0s)"];
-    [self.baseNetworkService executeRequestWithEndpoint:self.cdpEndpoint
+    [self.cdpNetworkService executeRequestWithEndpoint:self.cdpEndpoint
                                          urlParameters:nil
                                           requestBody:jsonData
                                               headers:headers
                                            maxRetries:1
                                                delay:1.0
                                           completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
+        if (error) {
+            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] CDP request failed: %@", error.localizedDescription]];
+        } else {
+            [self.logger info:@"✅ [BidNetworkService] CDP request succeeded"];
+        }
+        
         if (completion) {
             completion(response, error);
         }

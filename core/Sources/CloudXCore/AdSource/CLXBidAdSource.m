@@ -231,68 +231,196 @@ NS_ASSUME_NONNULL_BEGIN
                 }
             }
             
-            // Start auction
-            NSString *currentAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
-            if (!currentAppKey || currentAppKey.length == 0) {
-                [self.logger error:@"❌ [CLXBidAdSource] No app key found in UserDefaults"];
-                if (completion) {
-                    completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:1 userInfo:@{NSLocalizedDescriptionKey: @"No app key found"}]);
-                }
-                return;
+            // 🧪 Check if CDP endpoint is available for bid request enrichment
+            if (!strongSelf.bidNetworkService.isCDPEndpointEmpty) {
+                [self.logger info:@"🔧 [CLXBidAdSource] CDP endpoint available - enriching bid request before auction"];
+                
+                // Get app key for CDP authentication
+                NSString *currentAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
+                
+                // Enrich bid request via CDP endpoint
+                [strongSelf.bidNetworkService startCDPFlowWithBidRequest:bidRequest
+                                                                  appKey:currentAppKey ?: @""
+                                                              completion:^(id _Nullable enrichedBidRequest, NSError * _Nullable cdpError) {
+                    __strong typeof(weakSelf) strongSelf = weakSelf;
+                    if (!strongSelf) {
+                        [self.logger error:@"❌ [CLXBidAdSource] Self reference lost in CDP completion block"];
+                        if (completion) {
+                            completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Self reference lost"}]);
+                        }
+                        return;
+                    }
+                    
+                    // Handle CDP errors
+                    if (cdpError) {
+                        [self.logger error:[NSString stringWithFormat:@"⚠️ [CLXBidAdSource] CDP enrichment failed: %@ - proceeding with original request", cdpError.localizedDescription]];
+                        [strongSelf startAuctionWithFinalBidRequest:bidRequest
+                                                         completion:completion];
+                        return;
+                    }
+                    
+                    // CDP can operate in two modes:
+                    // 1. ENRICHMENT: CDP enriches bid request with user data/segments and returns enriched request
+                    // 2. PROXY/GATEWAY: CDP acts as proxy to auction server, returns full auction response
+                    //                   (useful for inspection, monitoring, request/response modification)
+                    
+                    if (!enrichedBidRequest || ![enrichedBidRequest isKindOfClass:[NSDictionary class]]) {
+                        [self.logger debug:@"🔧 [CLXBidAdSource] No enriched request from CDP - using original"];
+                        [strongSelf startAuctionWithFinalBidRequest:bidRequest
+                                                         completion:completion];
+                        return;
+                    }
+                    
+                    NSDictionary *cdpResponse = (NSDictionary *)enrichedBidRequest;
+                    
+                    // Detect CDP mode by analyzing response structure
+                    // Proxy mode: has seatbid/nbr (auction response fields) and no imp/device/app (request fields)
+                    // Enrichment mode: has imp/device/app (bid request fields)
+                    BOOL hasAuctionResponseFields = (cdpResponse[@"seatbid"] != nil || cdpResponse[@"nbr"] != nil);
+                    BOOL hasAuctionId = (cdpResponse[@"id"] != nil && [cdpResponse[@"id"] isKindOfClass:[NSString class]] && [(NSString *)cdpResponse[@"id"] length] > 0);
+                    BOOL hasBidRequestFields = (cdpResponse[@"imp"] != nil || cdpResponse[@"device"] != nil || cdpResponse[@"app"] != nil);
+                    BOOL isAuctionResponse = hasAuctionResponseFields && hasAuctionId && !hasBidRequestFields;
+                    
+                    if (isAuctionResponse) {
+                        // MODE 1: CDP returned full auction response (proxy/gateway behavior)
+                        [self.logger info:@"🎯 [CLXBidAdSource] CDP PROXY mode - processing auction response"];
+                        
+                        // Validate auction response structure
+                        if (!hasAuctionId) {
+                            [self.logger error:@"❌ [CLXBidAdSource] CDP proxy response invalid - falling back to direct auction"];
+                            [strongSelf startAuctionWithFinalBidRequest:bidRequest
+                                                             completion:completion];
+                            return;
+                        }
+                        
+                        // Parse as auction response
+                        CLXBidResponse *bidResponse = [CLXBidResponse parseBidResponseFromDictionary:cdpResponse];
+                        
+                        if (!bidResponse) {
+                            [self.logger error:@"❌ [CLXBidAdSource] Failed to parse CDP response - falling back to direct auction"];
+                            [strongSelf startAuctionWithFinalBidRequest:bidRequest
+                                                             completion:completion];
+                            return;
+                        }
+                        
+                        [self.logger info:[NSString stringWithFormat:@"✅ [CLXBidAdSource] CDP proxy returned %lu bids",
+                                          (unsigned long)[bidResponse allBids].count]];
+                        
+                        // Store the bid response for LURL firing
+                        strongSelf.currentBidResponse = bidResponse;
+                        
+                        // Store original bid response JSON for tracking
+                        if (bidResponse.id && cdpResponse) {
+                            [[CLXTrackingFieldResolver shared] setResponseData:bidResponse.id bidResponseJSON:cdpResponse];
+                            [strongSelf.logger debug:[NSString stringWithFormat:@"Stored original bid response JSON for auction: %@", bidResponse.id]];
+                        }
+                        
+                        // Pre-cache all bids for win/loss tracking
+                        if (bidResponse.id) {
+                            NSArray<CLXBidResponseBid *> *allBids = [bidResponse allBids];
+                            for (CLXBidResponseBid *bid in allBids) {
+                                [strongSelf.winLossTracker addBid:bidResponse.id bid:bid];
+                            }
+                            [strongSelf.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] Registered %lu bids for auction: %@",
+                                                     (unsigned long)allBids.count, bidResponse.id]];
+                        }
+                        
+                        // Process the waterfall directly
+                        [strongSelf tryWaterfallBidsFromResponse:bidResponse
+                                                       auctionID:bidResponse.id
+                                                      bidRequest:bidRequest
+                                                      completion:completion];
+                    } else {
+                        // MODE 2: CDP returned enriched bid request (enrichment behavior)
+                        [self.logger info:@"✅ [CLXBidAdSource] CDP ENRICHMENT mode - proceeding to auction"];
+                        
+                        // Validate enriched request has required fields
+                        if (!hasBidRequestFields) {
+                            [self.logger error:@"⚠️ [CLXBidAdSource] CDP enrichment invalid - using original request"];
+                            [strongSelf startAuctionWithFinalBidRequest:bidRequest
+                                                             completion:completion];
+                            return;
+                        }
+                        
+                        // Proceed to auction with enriched request
+                        [strongSelf startAuctionWithFinalBidRequest:cdpResponse
+                                                         completion:completion];
+                    }
+                }];
+            } else {
+                [self.logger debug:@"🔧 [CLXBidAdSource] No CDP endpoint - proceeding directly to auction"];
+                [strongSelf startAuctionWithFinalBidRequest:bidRequest
+                                                 completion:completion];
             }
-            [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXBidAdSource] Starting auction with AppKey: %@", currentAppKey]];
-            [strongSelf.bidNetworkService startAuctionWithBidRequest:bidRequest
-                                                              appKey:currentAppKey
-                                                          completion:^(CLXBidResponse * _Nullable response, NSDictionary * _Nullable rawJSON, NSError * _Nullable error) {
-                __strong typeof(weakSelf) strongSelf = weakSelf;
-                if (!strongSelf) {
-                    [self.logger error:@"❌ [CLXBidAdSource] Self reference lost in auction completion block"];
-                    if (completion) {
-                        completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Self reference lost"}]);
-                    }
-                    return;
-                }
+        }];
+    }];
+}
 
-                [self.logger debug:[NSString stringWithFormat:@"📥 [CLXBidAdSource] Auction completion - Response: %@, Error: %@", response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
-                
-                if (error) {
-                    [self.logger error:[NSString stringWithFormat:@"❌ [CLXBidAdSource] Auction failed with error: %@", error.localizedDescription]];
-                    if (completion) {
-                        completion(nil, error);
-                    }
-                    return;
-                }
-                
-    // Store the bid response for LURL firing
-    strongSelf.currentBidResponse = response;
-    
-    // Store original bid response JSON in tracking field resolver for efficient field resolution
-    if (response.id && rawJSON) {
-        [[CLXTrackingFieldResolver shared] setResponseData:response.id bidResponseJSON:rawJSON];
-        [strongSelf.logger debug:[NSString stringWithFormat:@"Stored original bid response JSON for auction: %@", response.id]];
+// Helper method to start auction (extracted to avoid code duplication)
+- (void)startAuctionWithFinalBidRequest:(id)bidRequest
+                             completion:(void (^)(CLXBidAdSourceResponse * _Nullable response, NSError * _Nullable error))completion {
+    // Start auction
+    NSString *currentAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
+    if (!currentAppKey || currentAppKey.length == 0) {
+        [self.logger error:@"❌ [CLXBidAdSource] No app key found in UserDefaults"];
+        if (completion) {
+            completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:1 userInfo:@{NSLocalizedDescriptionKey: @"No app key found"}]);
+        }
+        return;
     }
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXBidAdSource] Starting auction with AppKey: %@", currentAppKey]];
     
-    // Pre-cache all bids with loss payloads for win/loss tracking
-    if (response.id) {
-        NSArray<CLXBidResponseBid *> *allBids = [response allBids];
+    __weak typeof(self) weakSelf = self;
+    [self.bidNetworkService startAuctionWithBidRequest:bidRequest
+                                                 appKey:currentAppKey
+                                             completion:^(CLXBidResponse * _Nullable response, NSDictionary * _Nullable rawJSON, NSError * _Nullable error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            [self.logger error:@"❌ [CLXBidAdSource] Self reference lost in auction completion block"];
+            if (completion) {
+                completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Self reference lost"}]);
+            }
+            return;
+        }
+
+        [strongSelf.logger debug:[NSString stringWithFormat:@"📥 [CLXBidAdSource] Auction completion - Response: %@, Error: %@", response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
         
-        // Add bids to auction bid manager for tracking
-        for (CLXBidResponseBid *bid in allBids) {
-            [strongSelf.winLossTracker addBid:response.id bid:bid];
+        if (error) {
+            [strongSelf.logger error:[NSString stringWithFormat:@"❌ [CLXBidAdSource] Auction failed with error: %@", error.localizedDescription]];
+            if (completion) {
+                completion(nil, error);
+            }
+            return;
         }
         
-        // No pre-caching (matching Android's simplified approach - events fire immediately when they occur)
-        [strongSelf.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] Registered %lu bids for auction: %@", 
-                                 (unsigned long)allBids.count, response.id]];
-    }
-                
-                // Implement true waterfall logic 
-                [strongSelf tryWaterfallBidsFromResponse:response 
-                                               auctionID:response.id 
-                                              bidRequest:bidRequest 
-                                              completion:completion];
-            }];
-        }];
+        // Store the bid response for LURL firing
+        strongSelf.currentBidResponse = response;
+        
+        // Store original bid response JSON in tracking field resolver for efficient field resolution
+        if (response.id && rawJSON) {
+            [[CLXTrackingFieldResolver shared] setResponseData:response.id bidResponseJSON:rawJSON];
+            [strongSelf.logger debug:[NSString stringWithFormat:@"Stored original bid response JSON for auction: %@", response.id]];
+        }
+        
+        // Pre-cache all bids with loss payloads for win/loss tracking
+        if (response.id) {
+            NSArray<CLXBidResponseBid *> *allBids = [response allBids];
+            
+            // Add bids to auction bid manager for tracking
+            for (CLXBidResponseBid *bid in allBids) {
+                [strongSelf.winLossTracker addBid:response.id bid:bid];
+            }
+            
+            // No pre-caching (matching Android's simplified approach - events fire immediately when they occur)
+            [strongSelf.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] Registered %lu bids for auction: %@", 
+                                     (unsigned long)allBids.count, response.id]];
+        }
+        
+        // Implement true waterfall logic 
+        [strongSelf tryWaterfallBidsFromResponse:response 
+                                       auctionID:response.id 
+                                      bidRequest:bidRequest 
+                                      completion:completion];
     }];
 }
 
