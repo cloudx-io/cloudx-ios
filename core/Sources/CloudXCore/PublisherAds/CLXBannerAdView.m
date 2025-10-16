@@ -187,36 +187,57 @@ static void initializeLogger() {
 
 - (void)failToLoadBanner:(id<CLXAdapterBanner>)banner error:(NSError *)error {
     if ([self.delegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-        CLXAd *adToPass = self.ad ?: (CLXAd *)self.banner;
+        // Use stored ad if available, otherwise create a placeholder
+        // Note: self.ad may be nil if this is the first load attempt
+        CLXAd *adToPass = self.ad;
+        if (!adToPass) {
+            [logger debug:@"⚠️ [CloudXBannerAdView] failToLoadBanner called with no ad object"];
+        }
         [self.delegate failToLoadWithAd:adToPass error:error];
     }
 }
 
 - (void)didShowBanner:(id<CLXAdapterBanner>)banner {
     if ([self.delegate respondsToSelector:@selector(didShowWithAd:)]) {
-        CLXAd *adToPass = self.ad ?: (CLXAd *)self.banner;
-        [self.delegate didShowWithAd:adToPass];
+        // Use stored ad object (should be populated after didLoadWithAd)
+        if (self.ad) {
+            [self.delegate didShowWithAd:self.ad];
+        } else {
+            [logger error:@"❌ [CloudXBannerAdView] didShowBanner called but self.ad is nil"];
+        }
     }
 }
 
 - (void)impressionBanner:(id<CLXAdapterBanner>)banner {
     if ([self.delegate respondsToSelector:@selector(impressionOn:)]) {
-        CLXAd *adToPass = self.ad ?: (CLXAd *)self.banner;
-        [self.delegate impressionOn:adToPass];
+        // Use stored ad object (should be populated after didLoadWithAd)
+        if (self.ad) {
+            [self.delegate impressionOn:self.ad];
+        } else {
+            [logger error:@"❌ [CloudXBannerAdView] impressionBanner called but self.ad is nil"];
+        }
     }
 }
 
 - (void)clickBanner:(id<CLXAdapterBanner>)banner {
     if ([self.delegate respondsToSelector:@selector(didClickWithAd:)]) {
-        CLXAd *adToPass = self.ad ?: (CLXAd *)self.banner;
-        [self.delegate didClickWithAd:adToPass];
+        // Use stored ad object (should be populated after didLoadWithAd)
+        if (self.ad) {
+            [self.delegate didClickWithAd:self.ad];
+        } else {
+            [logger error:@"❌ [CloudXBannerAdView] clickBanner called but self.ad is nil"];
+        }
     }
 }
 
 - (void)closedByUserActionBanner:(id<CLXAdapterBanner>)banner {
     if ([self.delegate respondsToSelector:@selector(closedByUserActionWithAd:)]) {
-        CLXAd *adToPass = self.ad ?: (CLXAd *)self.banner;
-        [self.delegate closedByUserActionWithAd:adToPass];
+        // Use stored ad object (should be populated after didLoadWithAd)
+        if (self.ad) {
+            [self.delegate closedByUserActionWithAd:self.ad];
+        } else {
+            [logger error:@"❌ [CloudXBannerAdView] closedByUserActionBanner called but self.ad is nil"];
+        }
     }
 }
 
@@ -224,6 +245,10 @@ static void initializeLogger() {
 
 - (void)didLoadWithAd:(CLXAd *)ad {
     [logger debug:@"🎯 [CloudXBannerAdView] didLoadWithAd called - displaying banner"];
+    
+    // Store the ad object for use in other delegate methods
+    // This fixes the unsafe cast bug and enables proper ad metadata access
+    _ad = ad;
     
     // Get the banner view from the underlying banner (CLXPublisherBanner)
     if ([self.banner isKindOfClass:[CLXPublisherBanner class]]) {
