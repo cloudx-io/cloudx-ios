@@ -356,7 +356,7 @@ NS_ASSUME_NONNULL_BEGIN
     }];
 }
 
-// Helper method to start auction (extracted to avoid code duplication)
+// Helper method to start auction 
 - (void)startAuctionWithFinalBidRequest:(id)bidRequest
                              completion:(void (^)(CLXBidAdSourceResponse * _Nullable response, NSError * _Nullable error))completion {
     // Start auction

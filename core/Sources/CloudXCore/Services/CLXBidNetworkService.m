@@ -136,11 +136,9 @@
         }
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Bid request: ID=%@, IMPs=%lu, URL=%@%@", 
+    [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Bid request: ID=%@, IMPs=%lu", 
                        bidRequest[@"id"], 
-                       (unsigned long)[bidRequest[@"imp"] count],
-                       self.baseNetworkService.baseURL,
-                       self.endpoint]];
+                       (unsigned long)[bidRequest[@"imp"] count]]];
     
     // Check for missing required fields
     NSMutableArray *missing = [NSMutableArray array];
