@@ -103,7 +103,7 @@
 // Test missing geo headers handling
 - (void)testMissingGeoHeadersHandling {
     // Clear geo headers
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreGeoHeadersKey];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreRawGeoHeadersKey];
     
     // Should default to non-US user when no geo data
     XCTAssertFalse([self.geoService isUSUser], @"Should default to non-US user when no geo headers");
@@ -199,7 +199,14 @@
 #pragma mark - Helper Methods
 
 - (void)setGeoHeaders:(NSDictionary *)headers {
-    [[NSUserDefaults standardUserDefaults] setObject:headers forKey:kCLXCoreGeoHeadersKey];
+    if (headers) {
+        [[NSUserDefaults standardUserDefaults] setObject:headers forKey:kCLXCoreRawGeoHeadersKey];
+    } else {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreRawGeoHeadersKey];
+    }
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    // Force UserDefaults to flush to disk and re-read
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

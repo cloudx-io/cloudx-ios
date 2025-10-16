@@ -80,8 +80,22 @@
 
 #pragma mark - GPP Consent Decoding Tests
 
-// Test US-CA (SID=8) consent decoding
-- (void)testUSCAConsentDecoding {
+// Test US-CA (SID=8) consent decoding with allow-all (no PII removal)
+- (void)testUSCAConsentDecodingAllowAll {
+    // Test GPP string with US-CA section (SID=8) - allow all (no opt-outs)
+    NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
+    NSArray *gppSid = @[@8]; // US-CA only
+    
+    [self.gppProvider setGppString:gppString];
+    [self.gppProvider setGppSid:gppSid];
+    
+    CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@(CLXGppTargetUSCA)];
+    // decodeGppForTarget returns nil when no PII removal required (allow-all scenario)
+    XCTAssertNil(consent, @"Should return nil for allow-all consent (no PII removal required)");
+}
+
+// Test US-CA (SID=8) consent decoding - specific target returns nil regardless
+- (void)testUSCAConsentDecodingWithSpecificTarget {
     // Test GPP string with US-CA section (SID=8) - allow all
     NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     NSArray *gppSid = @[@8]; // US-CA only
@@ -90,13 +104,12 @@
     [self.gppProvider setGppSid:gppSid];
     
     CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@(CLXGppTargetUSCA)];
-    // Note: decodeGppForTarget only returns consent if it requires PII removal
-    // This test verifies the decoding mechanism works (may return nil if no PII removal required)
-    XCTAssertTrue(consent != nil || consent == nil, @"Should handle US-CA consent decoding gracefully");
+    // decodeGppForTarget with specific target returns nil when no PII removal required
+    XCTAssertNil(consent, @"Should return nil when specific target has no opt-outs");
 }
 
-// Test US-National (SID=7) consent decoding
-- (void)testUSNationalConsentDecoding {
+// Test US-National (SID=7) consent decoding with allow-all (no PII removal)
+- (void)testUSNationalConsentDecodingAllowAll {
     NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     NSArray *gppSid = @[@7]; // US-National only
     
@@ -104,14 +117,26 @@
     [self.gppProvider setGppSid:gppSid];
     
     CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@(CLXGppTargetUSNational)];
-    // Note: decodeGppForTarget only returns consent if it requires PII removal
-    // This test verifies the decoding mechanism works (may return nil if no PII removal required)
-    XCTAssertTrue(consent != nil || consent == nil, @"Should handle US-National consent decoding gracefully");
+    // decodeGppForTarget returns nil when no PII removal required
+    XCTAssertNil(consent, @"Should return nil for allow-all consent (no PII removal required)");
 }
 
-// Test auto-selection prioritizes consent requiring PII removal
-- (void)testAutoSelectionPrioritizesPIIRemoval {
-    // Set up GPP with both US-CA and US-National sections (allow all)
+// Test US-National (SID=7) consent decoding - specific target behavior
+- (void)testUSNationalConsentDecodingWithSpecificTarget {
+    NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
+    NSArray *gppSid = @[@7]; // US-National only
+    
+    [self.gppProvider setGppString:gppString];
+    [self.gppProvider setGppSid:gppSid];
+    
+    CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@(CLXGppTargetUSNational)];
+    // decodeGppForTarget with specific target returns nil when no PII removal required
+    XCTAssertNil(consent, @"Should return nil when specific target has no opt-outs");
+}
+
+// Test auto-selection returns first available when no opt-outs present
+- (void)testAutoSelectionWithNoOptOuts {
+    // Set up GPP with both US-CA and US-National sections (allow all - no opt-outs)
     NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     NSArray *gppSid = @[@7, @8]; // Both sections
     
@@ -119,8 +144,30 @@
     [self.gppProvider setGppSid:gppSid];
     
     CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:nil]; // Auto-select
-    // The actual result depends on the GPP string content, but this tests the auto-selection logic
-    XCTAssertTrue(consent != nil || consent == nil, @"Auto-selection should complete without crashing");
+    // When no opt-outs are present, auto-selection returns first available consent
+    XCTAssertNotNil(consent, @"Auto-selection should return first available consent");
+    XCTAssertFalse([consent requiresPiiRemoval], @"Consent should not require PII removal when no opt-outs");
+}
+
+// Test decode behavior is consistent across both SIDs
+- (void)testDecodeConsistencyAcrossSIDs {
+    // Set up GPP with both US-CA and US-National sections
+    NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
+    NSArray *gppSid = @[@7, @8]; // Both sections
+    
+    [self.gppProvider setGppString:gppString];
+    [self.gppProvider setGppSid:gppSid];
+    
+    // Both specific targets should return nil (no PII removal)
+    CLXGppConsent *usCAConsent = [self.gppProvider decodeGppForTarget:@(CLXGppTargetUSCA)];
+    CLXGppConsent *usNationalConsent = [self.gppProvider decodeGppForTarget:@(CLXGppTargetUSNational)];
+    
+    XCTAssertNil(usCAConsent, @"US-CA with no opt-outs should return nil when targeted");
+    XCTAssertNil(usNationalConsent, @"US-National with no opt-outs should return nil when targeted");
+    
+    // Auto-select should return first available
+    CLXGppConsent *autoConsent = [self.gppProvider decodeGppForTarget:nil];
+    XCTAssertNotNil(autoConsent, @"Auto-select should return first available");
 }
 
 #pragma mark - Error Handling Tests

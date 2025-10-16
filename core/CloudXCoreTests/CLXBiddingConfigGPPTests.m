@@ -290,7 +290,7 @@
         @"cloudfront-viewer-country-iso3": @"USA",
         @"cloudfront-viewer-country-region": @"TX"
     };
-    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreGeoHeadersKey];
+    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
 }
 
 - (void)setupNonUSUser {
@@ -298,7 +298,7 @@
         @"cloudfront-viewer-country-iso3": @"CAN",
         @"cloudfront-viewer-country-region": @"ON"
     };
-    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreGeoHeadersKey];
+    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
 }
 
 // Test unified privacy architecture - ATT-first behavior

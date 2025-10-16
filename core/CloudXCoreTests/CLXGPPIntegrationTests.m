@@ -93,8 +93,7 @@
     
     // Test compliance logic - should require data clearing with opt-out
     BOOL shouldClear = [self.privacyService shouldClearPersonalDataForCompliance];
-    // Note: This depends on actual GPP parsing implementation
-    XCTAssertTrue(shouldClear == YES || shouldClear == NO, @"GPP opt-out evaluation should complete");
+    XCTAssertTrue(shouldClear, @"GPP opt-out should require data clearing for California users");
 }
 
 // Test GPP Non-US users should have full data with no extra restrictions
@@ -188,7 +187,7 @@
         @"cloudfront-viewer-country-iso3": @"USA",
         @"cloudfront-viewer-country-region": @"TX"
     };
-    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreGeoHeadersKey];
+    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
 }
 
 - (void)setupCaliforniaUser {
@@ -196,7 +195,7 @@
         @"cloudfront-viewer-country-iso3": @"USA",
         @"cloudfront-viewer-country-region": @"CA"
     };
-    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreGeoHeadersKey];
+    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
 }
 
 - (void)setupUSNonCaliforniaUser {
@@ -204,7 +203,7 @@
         @"cloudfront-viewer-country-iso3": @"USA",
         @"cloudfront-viewer-country-region": @"NY"
     };
-    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreGeoHeadersKey];
+    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
 }
 
 - (void)setupNonUSUser {
@@ -212,7 +211,7 @@
         @"cloudfront-viewer-country-iso3": @"CAN",
         @"cloudfront-viewer-country-region": @"ON"
     };
-    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreGeoHeadersKey];
+    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
 }
 
 @end
