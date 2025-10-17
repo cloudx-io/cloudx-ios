@@ -69,9 +69,9 @@
         rewardedPlacement:@"metaRewarded"
         rewardedInterstitialPlacement:@"metaRewarded"];
     
-    // Staging Configuration
+    // Staging Configuration (MetaTestApp-9-22-25 - bundle: cloudx.CloudXObjCRemotePods)
     CLXDemoConfig *stagingConfig = [[CLXDemoConfig alloc] 
-        initWithAppKey:@"Ty5bVlbX2tQOSL9YNoZ0D"
+        initWithAppKey:@"A7ovaBRCcAL8lapKtoZmm"
         hashedUserId:@"test-user-123-staging"
         baseURL:@"https://pro-stage.cloudx.io/sdk"
         bannerPlacement:@"objcDemo-banner-1"
