@@ -43,8 +43,8 @@
  * @param appKey The application key for SDK initialization
  * @param completion Completion handler called with the SDK configuration or error
  */
-- (void)initSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable, NSError * _Nullable))completion {
-    [self.logger info:[NSString stringWithFormat:@"🚀 [LiveInitService] initSDKWithAppKey called - AppKey: %@", appKey]];
+- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable, NSError * _Nullable))completion {
+    [self.logger info:[NSString stringWithFormat:@"🚀 [LiveInitService] initializeSDKWithAppKey called - AppKey: %@", appKey]];
     
     if (!_networkInitService) {
         [self.logger error:@"❌ [LiveInitService] NetworkInitService is nil"];
@@ -54,7 +54,7 @@
         return;
     }
     
-    [_networkInitService initSDKWithAppKey:appKey completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
+    [_networkInitService initializeSDKWithAppKey:appKey completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
         if (error) {
             [self.logger error:[NSString stringWithFormat:@"❌ [LiveInitService] NetworkInitService failed with error: %@", error]];
         } else {

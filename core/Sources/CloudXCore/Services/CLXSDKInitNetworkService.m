@@ -78,8 +78,8 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
  * @param appKey The application key for SDK initialization
  * @param completion Completion handler called with the SDK configuration or error
  */
-- (void)initSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable, NSError * _Nullable))completion {
-    [self.logger info:[NSString stringWithFormat:@"🚀 [SDKInitNetworkService] initSDKWithAppKey called - AppKey: %@, Endpoint: %@", appKey, _endpoint]];
+- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable, NSError * _Nullable))completion {
+    [self.logger info:[NSString stringWithFormat:@"🚀 [SDKInitNetworkService] initializeSDKWithAppKey called - AppKey: %@, Endpoint: %@", appKey, _endpoint]];
     [self tryInitSDKWithAppKey:appKey completion:completion];
 }
 

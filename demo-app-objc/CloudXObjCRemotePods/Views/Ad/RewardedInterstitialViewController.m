@@ -56,7 +56,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     NSLog(@"[RewardedInterstitialViewController] viewWillAppear");
-    if ([[CloudXCore shared] isInitialised]) {
+    if ([[CloudXCore shared] isInitialized]) {
         [self loadRewardedInterstitial];
     } else {
         NSLog(@"[RewardedInterstitialViewController] SDK not initialized, rewarded interstitial will be loaded once SDK is initialized.");
@@ -78,7 +78,7 @@
 
 - (void)loadRewardedInterstitial {
     NSLog(@"[RewardedInterstitialViewController] loadRewardedInterstitial called");
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         NSLog(@"[RewardedInterstitialViewController] SDK not initialized");
         return;
     }

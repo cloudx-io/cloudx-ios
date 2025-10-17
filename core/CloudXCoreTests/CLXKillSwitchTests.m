@@ -96,7 +96,7 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"SDK init kill switch"];
     
     // When: Initialize SDK
-    [self.sdkInitService initSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
+    [self.sdkInitService initializeSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
         // Then: Should fail with SDK disabled error
         XCTAssertNil(config, @"Config should be nil when SDK is disabled");
         XCTAssertNotNil(error, @"Error should be present");
@@ -123,7 +123,7 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"Normal 204 response"];
     
     // When: Initialize SDK
-    [self.sdkInitService initSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
+    [self.sdkInitService initializeSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
         // Then: Should not trigger kill switch (may fail for other reasons like missing data)
         if (error) {
             XCTAssertNotEqual(error.code, CLXErrorCodeSDKDisabled, @"Should not return SDK disabled error");
@@ -150,7 +150,7 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"HTTP 200 with kill switch header"];
     
     // When: Initialize SDK
-    [self.sdkInitService initSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
+    [self.sdkInitService initializeSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
         // Then: Should not trigger kill switch (kill switch only works with 204)
         if (error) {
             XCTAssertNotEqual(error.code, CLXErrorCodeSDKDisabled, @"Should not return SDK disabled error");
@@ -257,7 +257,7 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"Case sensitive header test"];
     
     // When: Initialize SDK
-    [self.sdkInitService initSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
+    [self.sdkInitService initializeSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
         // Then: Should not trigger kill switch (case mismatch)
         if (error) {
             XCTAssertNotEqual(error.code, CLXErrorCodeSDKDisabled, @"Should not trigger with wrong case");
@@ -283,7 +283,7 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"Unknown header value test"];
     
     // When: Initialize SDK
-    [self.sdkInitService initSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
+    [self.sdkInitService initializeSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
         // Then: Should not trigger kill switch
         if (error) {
             XCTAssertNotEqual(error.code, CLXErrorCodeSDKDisabled, @"Should not trigger with unknown header value");
@@ -309,7 +309,7 @@
     
     XCTestExpectation *sdkExpectation = [self expectationWithDescription:@"SDK_DISABLED test"];
     
-    [self.sdkInitService initSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
+    [self.sdkInitService initializeSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
         XCTAssertEqual(error.code, CLXErrorCodeSDKDisabled, @"Should recognize SDK_DISABLED");
         [sdkExpectation fulfill];
     }];

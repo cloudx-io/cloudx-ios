@@ -92,7 +92,7 @@
 }
 
 - (void)loadMRECAd {
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
         return;
     }
@@ -256,7 +256,7 @@
 }
 
 - (void)loadMREC {
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         return;
     }
 

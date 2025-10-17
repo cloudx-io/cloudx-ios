@@ -15,7 +15,7 @@ class InitViewController: BaseAdViewController {
         setupCenteredButton(title: "Initialize SDK", action: #selector(initializeSDK))
         
         // Check if SDK is already initialized
-        isSDKInitialized = CloudXCore.shared.isInitialised
+        isSDKInitialized = CloudXCore.shared.isInitialized
         updateStatusUI(state: isSDKInitialized ? .ready : .noAd)
     }
     
@@ -67,7 +67,7 @@ class InitViewController: BaseAdViewController {
         
         let config = CLXDemoConfigManager.sharedManager.currentConfig
         
-        CloudXCore.shared.initSDK(withAppKey: config.appKey, hashedUserID: config.hashedUserId) { [weak self] success, error in
+        CloudXCore.shared.initializeSDK(appKey: config.appKey, hashedUserID: config.hashedUserId) { [weak self] success, error in
             guard let self = self else { return }
             
             if success {

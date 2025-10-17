@@ -63,7 +63,7 @@
 @interface CloudXCore ()
 @property (nonatomic, strong) id<CLXInitService> initService;
 @property (nonatomic, strong) CLXSDKConfigResponse *sdkConfig;
-@property (nonatomic, assign) BOOL isInitialised;
+@property (nonatomic, assign) BOOL isInitialized;
 @property (nonatomic, copy) NSString *appKey;
 @property (nonatomic, strong) NSDictionary<NSString *, id> *adNetworkConfigs;
 @property (nonatomic, strong) NSDictionary<NSString *, id> *adPlacements;
@@ -129,12 +129,11 @@ static CloudXCore *_sharedInstance = nil;
         
         _logger = [[CLXLogger alloc] initWithCategory:@"CloudXCoreAPI.m"];
         [self.logger debug:@"🔧 [CloudXCore] Initializing CloudXCore instance"];
-        _isInitialised = NO;
+        _isInitialized = NO;
         _abTestValue = (double)arc4random() / UINT32_MAX;
         _abTestName = @"RandomTest";
         // Default auction URL now comes from SDK response only
         _defaultAuctionURL = @"";
-        _logsData = [NSDictionary dictionary];
         
         [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] Instance initialized - AB Test: %@ (%.3f), Default URL: %@", _abTestName, _abTestValue, _defaultAuctionURL]];
     }
@@ -150,12 +149,12 @@ static CloudXCore *_sharedInstance = nil;
     return [CLXSystemInformation shared].sdkVersion;
 }
 
-- (BOOL)isInitialised {
-    return _isInitialised;
+- (BOOL)isInitialized {
+    return _isInitialized;
 }
 
-- (void)initSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL, NSError * _Nullable))completion {
-    [self.logger info:[NSString stringWithFormat:@"🚀 [CloudXCore] initSDKWithAppKey called with appKey: %@", appKey]];
+- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL, NSError * _Nullable))completion {
+    [self.logger info:[NSString stringWithFormat:@"🚀 [CloudXCore] initializeSDKWithAppKey called with appKey: %@", appKey]];
     
     // Track SDK initialization method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
@@ -172,7 +171,7 @@ static CloudXCore *_sharedInstance = nil;
             return;
         }
         
-        if (_isInitialised) {
+        if (_isInitialized) {
             [self.logger debug:@"⚠️ [CloudXCore] SDK already initialized, returning early"];
             if (completion) {
                 completion(YES, nil);
@@ -212,9 +211,9 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger debug:@"✅ [CloudXCore] InitService resolved successfully"];
     }
     
-    [self.logger info:@"✅ [CloudXCore] InitService resolved, calling initSDKWithAppKey"];
+    [self.logger info:@"✅ [CloudXCore] InitService resolved, calling initializeSDKWithAppKey"];
     
-    [_initService initSDKWithAppKey:appKey completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
+    [_initService initializeSDKWithAppKey:appKey completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
         
         if (error) {
             [self.logger error:[NSString stringWithFormat:@"❌ [CloudXCore] InitService failed with error: %@", error]];
@@ -436,11 +435,7 @@ static CloudXCore *_sharedInstance = nil;
     
     [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Endpoints - Auction: %@, CDP: %@", auctionEndpointUrl, cdpEndpointUrl ?: @"(none)"]];
     
-    // Store endpoint data in logs 
-    NSString *endpointData = [NSString stringWithFormat:@"choosenAuctionEndpoint: %@ ||| choosenCDPEndpoint: %@", auctionEndpointUrl, cdpEndpointUrl];
-    _logsData = @{@"endpointData": endpointData};
-    
-            // Register services in DI container 
+    // Register services in DI container 
         CLXDIContainer *container = [CLXDIContainer shared];
     [container registerType:[CLXAppSessionService class] instance:[[CLXAppSessionService alloc] initWithSessionID:config.sessionID ?: @"" appKey:_appKey url:metricsEndpointURL]];
     [container registerType:[CLXBidNetworkServiceClass class] instance:[[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:auctionEndpointUrl cdpEndpointUrl:cdpEndpointUrl errorReporter:[CLXErrorReporter shared]]];
@@ -462,7 +457,7 @@ static CloudXCore *_sharedInstance = nil;
     }
     
     // Mark as initialized
-    _isInitialised = YES;
+    _isInitialized = YES;
     [self.logger info:@"✅ [CloudXCore] SDK initialization completed successfully"];
     
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
@@ -482,7 +477,7 @@ static CloudXCore *_sharedInstance = nil;
     
     // Mark SDK as successfully initialized
     @synchronized(self) {
-        _isInitialised = YES;
+        _isInitialized = YES;
     }
     [self.logger info:@"✅ [CloudXCore] SDK initialization completed successfully"];
     
@@ -491,14 +486,14 @@ static CloudXCore *_sharedInstance = nil;
     }
 }
 
-- (void)initSDKWithAppKey:(NSString *)appKey hashedUserID:(NSString *)hashedUserID completion:(void (^)(BOOL, NSError * _Nullable))completion {
-    [self.logger info:[NSString stringWithFormat:@"🚀 [CloudXCore] initSDKWithAppKey:hashedUserID called - AppKey: %@", appKey]];
+- (void)initializeSDKWithAppKey:(NSString *)appKey hashedUserID:(NSString *)hashedUserID completion:(void (^)(BOOL, NSError * _Nullable))completion {
+    [self.logger info:[NSString stringWithFormat:@"🚀 [CloudXCore] initializeSDKWithAppKey:hashedUserID called - AppKey: %@", appKey]];
     
     // Store hashed user ID
-    [self provideUserDetailsWithHashedUserID:hashedUserID];
+    [self setHashedUserID:hashedUserID];
     
     // Call the main init method
-    [self initSDKWithAppKey:appKey completion:^(BOOL success, NSError * _Nullable error) {
+    [self initializeSDKWithAppKey:appKey completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             self->_adPlacements = [NSMutableDictionary dictionary];
             for (CLXSDKConfigPlacement *placement in self->_sdkConfig.placements) {
@@ -512,7 +507,7 @@ static CloudXCore *_sharedInstance = nil;
     }];
 }
 
-- (void)provideUserDetailsWithHashedUserID:(NSString *)hashedUserID {
+- (void)setHashedUserID:(NSString *)hashedUserID {
     // Track hashed user ID method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetHashedUserId];
@@ -535,7 +530,7 @@ static CloudXCore *_sharedInstance = nil;
     [self.logger info:@"✅ [CloudXCore] Hashed user ID stored successfully"];
 }
 
-- (void)useHashedKeyValueWithKey:(NSString *)key value:(NSString *)value {
+- (void)setHashedKeyValue:(NSString *)key value:(NSString *)value {
     // Track user key-value method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetUserKeyValues];
@@ -544,7 +539,7 @@ static CloudXCore *_sharedInstance = nil;
     [self.logger info:@"✅ [CloudXCore] Hashed key-value pair stored successfully"];
 }
 
-- (void)useKeyValuesWithUserDictionary:(NSDictionary<NSString *,NSString *> *)userDictionary {
+- (void)setKeyValueDictionary:(NSDictionary<NSString *,NSString *> *)userDictionary {
     // Track user key-values method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetUserKeyValues];
@@ -586,7 +581,7 @@ static CloudXCore *_sharedInstance = nil;
     
 }
 
-- (void)useBidderKeyValueWithBidder:(NSString *)bidder key:(NSString *)key value:(NSString *)value {
+- (void)setBidderKeyValue:(NSString *)bidder key:(NSString *)key value:(NSString *)value {
     // Track app key-values method call (bidder key-values are app-level)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetAppKeyValues];
@@ -1014,6 +1009,30 @@ static CloudXCore *_sharedInstance = nil;
 
 + (nullable NSArray<NSNumber *> *)getGPPSid {
     return [[CLXGPPProvider sharedInstance] gppSid];
+}
+
+#pragma mark - Testing Support
+
+- (void)resetForTesting {
+    // Reset initialization state
+    _isInitialized = NO;
+    _appKey = nil;
+    _sdkConfig = nil;
+    _adNetworkConfigs = nil;
+    _adPlacements = nil;
+    _adFactory = nil;
+    _reportingService = nil;
+    _abTestValue = (double)arc4random() / UINT32_MAX;
+    _abTestName = @"RandomTest";
+    _defaultAuctionURL = @"";
+    _metricsTracker = nil;
+    _geoLocationService = nil;
+    _appSessionService = nil;
+    _bidNetworkService = nil;
+    _adNetworkFactories = nil;
+    
+    // Note: We don't reset the singleton instance itself or the initService
+    // as those are meant to persist across the app lifecycle
 }
 
 @end 

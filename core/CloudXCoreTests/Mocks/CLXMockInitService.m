@@ -50,8 +50,8 @@
 
 #pragma mark - CLXInitService Protocol
 
-- (void)initSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable, NSError * _Nullable))completion {
-    NSLog(@"🧪 [CLXMockInitService] Mock initSDKWithAppKey called - NO NETWORK REQUEST!");
+- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable, NSError * _Nullable))completion {
+    NSLog(@"🧪 [CLXMockInitService] Mock initializeSDKWithAppKey called - NO NETWORK REQUEST!");
     
     // Simulate async behavior but keep it fast for unit tests
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_mockDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{

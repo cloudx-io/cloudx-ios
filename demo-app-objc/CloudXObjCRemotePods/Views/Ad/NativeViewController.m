@@ -84,7 +84,7 @@
 }
 
 - (void)loadNativeAd {
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
         return;
     }
@@ -103,7 +103,7 @@
 }
 
 - (void)loadNative {
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         return;
     }
 
@@ -129,7 +129,7 @@
 }
 
 - (void)showNativeAd {
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
         return;
     }

@@ -21,7 +21,7 @@
     [self setupEnvironmentButtons];
     
     // Check if SDK is already initialized
-    self.isSDKInitialized = [[CloudXCore shared] isInitialised];
+    self.isSDKInitialized = [[CloudXCore shared] isInitialized];
     [self updateStatusUIWithCurrentEnvironment];
 }
 
@@ -214,7 +214,7 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     // Use standard CloudXCore initialization which will now use our environment override
-    [[CloudXCore shared] initSDKWithAppKey:config.appKey 
+    [[CloudXCore shared] initializeSDKWithAppKey:config.appKey 
                               hashedUserID:config.hashedUserId 
                                 completion:^(BOOL success, NSError * _Nullable error) {
         // Clear old environment override after initialization (success or failure)

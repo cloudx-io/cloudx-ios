@@ -8,8 +8,6 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol CLXInterstitialDelegate;
 @protocol CLXRewardedDelegate;
 @protocol CLXNativeDelegate;
-@protocol CLXInterstitial;
-@protocol CLXRewardedInterstitial;
 
 @class CLXBannerAdView;
 @class CLXNativeAdView;
@@ -19,8 +17,19 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The main class of the CloudX SDK.
  * Use this class to initialise the SDK and create ads.
+ * @discussion Thread-safe singleton. All methods should be called from the main thread.
  */
 @interface CloudXCore : NSObject
+
+/**
+ * Use the shared singleton instance instead
+ */
+- (instancetype)init NS_UNAVAILABLE;
+
+/**
+ * Use the shared singleton instance instead
+ */
++ (instancetype)new NS_UNAVAILABLE;
 
 /**
  * The shared instance of CloudXCore
@@ -38,58 +47,59 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *userID;
 
 /**
- * Log data dictionary
- */
-@property (nonatomic, strong) NSDictionary<NSString *, NSString *> *logsData;
-
-/**
  * Whether the SDK is initialized
  */
-@property (nonatomic, readonly) BOOL isInitialised;
+@property (nonatomic, readonly) BOOL isInitialized;
 
 
 
 /**
- * Initialise the SDK to start serving ads
+ * Initialize the SDK to start serving ads
  * @param appKey The app key provided by CloudX
- * @param completion A completion handler that will be called once the SDK is initialised
+ * @param completion A completion handler that will be called once the SDK is initialized
  */
-- (void)initSDKWithAppKey:(NSString *)appKey completion:(nullable void (^)(BOOL success, NSError * _Nullable error))completion;
+- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(nullable void (^)(BOOL success, NSError * _Nullable error))completion
+    NS_SWIFT_NAME(initializeSDK(appKey:completion:));
 
 /**
- * Initialise the SDK to start serving ads with hashed user ID
+ * Initialize the SDK to start serving ads with hashed user ID
  * @param appKey The app key provided by CloudX
  * @param hashedUserID The hashed user ID provided by CloudX
- * @param completion A completion handler that will be called once the SDK is initialised
+ * @param completion A completion handler that will be called once the SDK is initialized
  */
-- (void)initSDKWithAppKey:(NSString *)appKey hashedUserID:(NSString *)hashedUserID completion:(nullable void (^)(BOOL success, NSError * _Nullable error))completion;
+- (void)initializeSDKWithAppKey:(NSString *)appKey hashedUserID:(NSString *)hashedUserID completion:(nullable void (^)(BOOL success, NSError * _Nullable error))completion
+    NS_SWIFT_NAME(initializeSDK(appKey:hashedUserID:completion:));
 
 /**
- * Provide the user details for auction requests
+ * Set the hashed user ID for auction requests
  * @param hashedUserID The hashedUserID provided by CloudX
  */
-- (void)provideUserDetailsWithHashedUserID:(NSString *)hashedUserID;
+- (void)setHashedUserID:(NSString *)hashedUserID
+    NS_SWIFT_NAME(setHashedUserID(_:));
 
 /**
- * Provide the user details for auction requests
+ * Set a hashed key-value pair for auction requests
  * @param key The key provided by CloudX
  * @param value The value provided by CloudX
  */
-- (void)useHashedKeyValueWithKey:(NSString *)key value:(NSString *)value;
+- (void)setHashedKeyValue:(NSString *)key value:(NSString *)value
+    NS_SWIFT_NAME(setHashedKeyValue(key:value:));
 
 /**
- * Provide the user details for auction requests
+ * Set multiple key-value pairs for auction requests
  * @param userDictionary The dictionary of key-value pairs provided by CloudX
  */
-- (void)useKeyValuesWithUserDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary;
+- (void)setKeyValueDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary
+    NS_SWIFT_NAME(setKeyValueDictionary(_:));
 
 /**
- * Provide the user details for auction requests
+ * Set a bidder-specific key-value pair for auction requests
  * @param bidder The bidder name
  * @param key The key provided by CloudX
  * @param value The value provided by CloudX
  */
-- (void)useBidderKeyValueWithBidder:(NSString *)bidder key:(NSString *)key value:(NSString *)value;
+- (void)setBidderKeyValue:(NSString *)bidder key:(NSString *)key value:(NSString *)value
+    NS_SWIFT_NAME(setBidderKeyValue(bidder:key:value:));
 
 /**
  * Set a user-level key-value pair for targeting
@@ -128,7 +138,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable CLXBannerAdView *)createBannerWithPlacement:(NSString *)placement
                                             viewController:(UIViewController *)viewController
                                                   delegate:(nullable id<CLXBannerDelegate>)delegate
-                                                      tmax:(nullable NSNumber *)tmax;
+                                                      tmax:(nullable NSNumber *)tmax
+    NS_SWIFT_NAME(createBanner(placement:viewController:delegate:tmax:));
 
 /**
  * Create a MREC ad
@@ -139,7 +150,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable CLXBannerAdView *)createMRECWithPlacement:(NSString *)placement
                                           viewController:(UIViewController *)viewController
-                                                delegate:(nullable id<CLXBannerDelegate>)delegate;
+                                                delegate:(nullable id<CLXBannerDelegate>)delegate
+    NS_SWIFT_NAME(createMREC(placement:viewController:delegate:));
 
 /**
  * Create an interstitial ad
@@ -170,7 +182,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable CLXNativeAdView *)createNativeAdWithPlacement:(NSString *)placement
                                               viewController:(UIViewController *)viewController
-                                                    delegate:(nullable id<CLXNativeDelegate>)delegate;
+                                                    delegate:(nullable id<CLXNativeDelegate>)delegate
+    NS_SWIFT_NAME(createNativeAd(placement:viewController:delegate:));
 
 /**
  * Track SDK errors for analytics reporting

@@ -14,12 +14,13 @@
 #import "Mocks/CLXMockInitService.h"
 
 @interface CloudXCore (Testing)
-- (instancetype)initSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL success, NSError *error))completion;
-- (void)provideUserDetailsWithHashedUserID:(NSString *)hashedUserID;
-- (void)useHashedKeyValueWithKey:(NSString *)key value:(NSString *)value;
-- (void)useKeyValuesWithUserDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary;
-- (void)useBidderKeyValueWithBidder:(NSString *)bidder key:(NSString *)key value:(NSString *)value;
+- (instancetype)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL success, NSError *error))completion;
+- (void)setHashedUserID:(NSString *)hashedUserID;
+- (void)setHashedKeyValue:(NSString *)key value:(NSString *)value;
+- (void)setKeyValueDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary;
+- (void)setBidderKeyValue:(NSString *)bidder key:(NSString *)key value:(NSString *)value;
 + (void)trackSDKError:(NSString *)error;
+- (void)resetForTesting;
 @end
 
 @interface CLXCoreUserDefaultsTests : XCTestCase
@@ -33,6 +34,9 @@
     
     // Reset DI container to ensure clean state
     [[CLXDIContainer shared] reset];
+    
+    // Reset CloudXCore singleton state for isolated tests
+    [[CloudXCore shared] resetForTesting];
     
     // Set up mock init service for fast, reliable unit tests
     self.mockInitService = [[CLXMockInitService alloc] initWithSuccess:YES];
@@ -64,8 +68,8 @@
     
     NSString *testAppKey = @"test-app-key-123";
     
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:testAppKey completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:testAppKey completion:^(BOOL success, NSError *error) {
         XCTAssertTrue(success, @"Mock SDK initialization should succeed");
         XCTAssertNil(error, @"Mock SDK initialization should not have errors");
         [expectation fulfill];
@@ -83,8 +87,8 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"SDK initialization"];
     __block BOOL completionCalled = NO;
     
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         if (completionCalled) {
             XCTFail(@"Completion block called multiple times - this should not happen");
             return;
@@ -117,8 +121,8 @@
 - (void)testSDKCreatesSessionID {
     XCTestExpectation *expectation = [self expectationWithDescription:@"SDK initialization"];
     
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         XCTAssertTrue(success, @"Mock SDK initialization should succeed");
         [expectation fulfill];
     }];
@@ -149,8 +153,8 @@
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account";
     
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         XCTAssertTrue(success, @"Mock SDK initialization should succeed");
         [expectation fulfill];
     }];
@@ -166,8 +170,8 @@
 - (void)testSDKStoresEncodedString {
     XCTestExpectation *expectation = [self expectationWithDescription:@"SDK initialization"];
     
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         XCTAssertTrue(success, @"Mock SDK initialization should succeed");
         [expectation fulfill];
     }];
@@ -198,15 +202,15 @@
     XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account";
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         [initExpectation fulfill];
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
     
     // Test storing hashed user ID
     NSString *testHashedUserID = @"hashed-user-123";
-    [sdk provideUserDetailsWithHashedUserID:testHashedUserID];
+    [sdk setHashedUserID:testHashedUserID];
     
     // Verify hashed user ID is stored with ACTUAL prefixed key
     NSString *storedHashedUserID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedUserIDKey];
@@ -219,8 +223,8 @@
     XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account";
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         [initExpectation fulfill];
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
@@ -228,7 +232,7 @@
     // Test storing hashed key-value
     NSString *testKey = @"test-key";
     NSString *testValue = @"test-value";
-    [sdk useHashedKeyValueWithKey:testKey value:testValue];
+    [sdk setHashedKeyValue:testKey value:testValue];
     
     // Verify hashed key and value are stored with ACTUAL prefixed keys
     NSString *storedKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedKeyKey];
@@ -243,15 +247,15 @@
     XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account";
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         [initExpectation fulfill];
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
     
     // Test storing user dictionary
     NSDictionary *testUserDict = @{@"age": @"25", @"gender": @"M"};
-    [sdk useKeyValuesWithUserDictionary:testUserDict];
+    [sdk setKeyValueDictionary:testUserDict];
     
     // Verify user dictionary is stored with ACTUAL prefixed key
     NSDictionary *storedUserDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
@@ -266,8 +270,8 @@
     XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account";
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         [initExpectation fulfill];
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
@@ -276,7 +280,7 @@
     NSString *testBidder = @"test-bidder";
     NSString *testKey = @"bid-key";
     NSString *testValue = @"bid-value";
-    [sdk useBidderKeyValueWithBidder:testBidder key:testKey value:testValue];
+    [sdk setBidderKeyValue:testBidder key:testKey value:testValue];
     
     // Verify bidder data is stored with ACTUAL prefixed keys
     NSString *storedBidder = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderKey];

@@ -77,7 +77,7 @@
 }
 
 - (void)loadInterstitialAd {
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
         return;
     }
@@ -96,7 +96,7 @@
 }
 
 - (void)loadInterstitial {
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         return;
     }
 
@@ -132,7 +132,7 @@
 
 
 - (void)showInterstitialAd {
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
         return;
     }

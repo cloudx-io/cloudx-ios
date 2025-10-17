@@ -81,7 +81,7 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
     }
     
     @objc private func loadNativeAd() {
-        if !CloudXCore.shared.isInitialised {
+        if !CloudXCore.shared.isInitialized {
             showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
             return
         }
@@ -100,7 +100,7 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
     }
     
     private func loadNative() {
-        if !CloudXCore.shared.isInitialised {
+        if !CloudXCore.shared.isInitialized {
             return
         }
 
@@ -126,7 +126,7 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
     }
     
     @objc private func showNativeAd() {
-        if !CloudXCore.shared.isInitialised {
+        if !CloudXCore.shared.isInitialized {
             showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
             return
         }

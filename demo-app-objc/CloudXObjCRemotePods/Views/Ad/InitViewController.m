@@ -21,7 +21,7 @@
     [[CLXDemoConfigManager sharedManager] setEnvironment:CLXDemoEnvironmentStaging];
     
     // Check if SDK is already initialized
-    self.isSDKInitialized = [[CloudXCore shared] isInitialised];
+    self.isSDKInitialized = [[CloudXCore shared] isInitialized];
     self.settings = [UserDefaultsSettings sharedSettings];
     [self updateStatusUIWithState:self.isSDKInitialized ? AdStateReady : AdStateNoAd];
 }
@@ -79,7 +79,7 @@
     CLXDemoConfig *config = [configManager currentConfig];
     CLXDemoEnvironment currentEnvironment = configManager.currentEnvironment;
     
-    [[CloudXCore shared] initSDKWithAppKey:config.appKey
+    [[CloudXCore shared] initializeSDKWithAppKey:config.appKey
                               hashedUserID:config.hashedUserId
                                 completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {

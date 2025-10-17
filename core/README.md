@@ -73,7 +73,7 @@ import CloudXCore
 **Objective-C:**
 ```objc
 // Initialize with app key only
-[[CloudXCore shared] initSDKWithAppKey:@"your-app-key-here" 
+[[CloudXCore shared] initializeSDKWithAppKey:@"your-app-key-here" 
                              completion:^(BOOL success, NSError * _Nullable error) {
     if (success) {
         NSLog(@"✅ CloudX SDK initialized successfully");
@@ -83,7 +83,7 @@ import CloudXCore
 }];
 
 // Initialize with app key and hashed user ID
-[[CloudXCore shared] initSDKWithAppKey:@"your-app-key-here" 
+[[CloudXCore shared] initializeSDKWithAppKey:@"your-app-key-here" 
                            hashedUserID:@"user-id-optional" 
                              completion:^(BOOL success, NSError * _Nullable error) {
     if (success) {
@@ -120,13 +120,13 @@ CloudXCore.shared.initSDK(withAppKey: "your-app-key-here",
 
 **Objective-C:**
 ```objc
-BOOL isInitialized = [[CloudXCore shared] isInitialised];
+BOOL isInitialized = [[CloudXCore shared] isInitialized];
 NSString *sdkVersion = [[CloudXCore shared] sdkVersion];
 ```
 
 **Swift:**
 ```swift
-let isInitialized = CloudXCore.shared.isInitialised
+let isInitialized = CloudXCore.shared.isInitialized
 let sdkVersion = CloudXCore.shared.sdkVersion
 ```
 
@@ -928,11 +928,11 @@ The SDK automatically uses privacy information to:
 **Objective-C:**
 ```objc
 // Set hashed user ID for targeting
-[[CloudXCore shared] provideUserDetailsWithHashedUserID:@"hashed-user-id"];
+[[CloudXCore shared] setHashedUserID:@"hashed-user-id"];
 
 // Set key-value pairs for targeting
-[[CloudXCore shared] useHashedKeyValueWithKey:@"age" value:@"25"];
-[[CloudXCore shared] useHashedKeyValueWithKey:@"gender" value:@"male"];
+[[CloudXCore shared] setHashedKeyValue:@"age" value:@"25"];
+[[CloudXCore shared] setHashedKeyValue:@"gender" value:@"male"];
 
 // Set multiple key-value pairs
 NSDictionary *userData = @{
@@ -940,10 +940,10 @@ NSDictionary *userData = @{
     @"gender": @"male",
     @"location": @"US"
 };
-[[CloudXCore shared] useKeyValuesWithUserDictionary:userData];
+[[CloudXCore shared] setKeyValueDictionary:userData];
 
 // Set bidder-specific targeting
-[[CloudXCore shared] useBidderKeyValueWithBidder:@"adnetwork" key:@"custom_key" value:@"custom_value"];
+[[CloudXCore shared] setBidderKeyValue:@"adnetwork" key:@"custom_key" value:@"custom_value"];
 ```
 
 **Swift:**
@@ -1007,7 +1007,7 @@ Here's a complete example showing how to integrate all ad types in a single app:
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Initialize CloudX SDK
-    [[CloudXCore shared] initSDKWithAppKey:@"your-app-key-here" 
+    [[CloudXCore shared] initializeSDKWithAppKey:@"your-app-key-here" 
                               hashedUserID:@"user-id-optional" 
                                 completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
@@ -1154,9 +1154,9 @@ extension MainViewController: CLXBannerDelegate, CLXInterstitialDelegate, CLXRew
 
 | Method | Description |
 |--------|-------------|
-| `initSDKWithAppKey:completion:` | Initialize SDK with app key |
-| `initSDKWithAppKey:hashedUserID:completion:` | Initialize SDK with app key and user ID |
-| `isInitialised` | Check if SDK is initialized |
+| `initializeSDKWithAppKey:completion:` | Initialize SDK with app key |
+| `initializeSDKWithAppKey:hashedUserID:completion:` | Initialize SDK with app key and user ID |
+| `isInitialized` | Check if SDK is initialized |
 | `sdkVersion` | Get SDK version |
 
 ### Ad Creation Methods
@@ -1173,10 +1173,10 @@ extension MainViewController: CLXBannerDelegate, CLXInterstitialDelegate, CLXRew
 
 | Method | Description |
 |--------|-------------|
-| `provideUserDetailsWithHashedUserID:` | Set hashed user ID |
-| `useHashedKeyValueWithKey:value:` | Set key-value pair |
-| `useKeyValuesWithUserDictionary:` | Set multiple key-value pairs |
-| `useBidderKeyValueWithBidder:key:value:` | Set bidder-specific targeting |
+| `setHashedUserID:` | Set hashed user ID |
+| `setHashedKeyValue:value:` | Set key-value pair |
+| `setKeyValueDictionary:` | Set multiple key-value pairs |
+| `setBidderKeyValue:key:value:` | Set bidder-specific targeting |
 
 ### Ad Control Methods
 
@@ -1209,7 +1209,7 @@ All ad types support these common callbacks:
 ### Common Issues
 
 1. **SDK not initialized**
-   - Ensure you call `initSDKWithAppKey:completion:` before creating ads
+   - Ensure you call `initializeSDKWithAppKey:completion:` before creating ads
    - Check that the completion block is called with success
 
 2. **Ads not loading**
@@ -1233,7 +1233,6 @@ Enable debug logging to troubleshoot issues:
 **Objective-C:**
 ```objc
 // Check SDK logs
-NSDictionary *logs = [[CloudXCore shared] logsData];
 NSLog(@"SDK Logs: %@", logs);
 
 // Enable verbose logging via environment variable
@@ -1244,7 +1243,6 @@ NSLog(@"SDK Logs: %@", logs);
 **Swift:**
 ```swift
 // Check SDK logs
-let logs = CloudXCore.shared.logsData
 print("SDK Logs: \(logs)")
 
 // Enable verbose logging via environment variable

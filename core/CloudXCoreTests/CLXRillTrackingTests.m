@@ -178,6 +178,7 @@ static MockRillEventReporter *sharedInstance = nil;
 
 @interface CloudXCore (Testing)
 @property (nonatomic, strong) CLXSDKConfigResponse *sdkConfig;
+- (void)resetForTesting;
 @end
 
 // MARK: - Test Class
@@ -194,6 +195,7 @@ static MockRillEventReporter *sharedInstance = nil;
 
 - (void)setUp {
     [super setUp];
+    [[CloudXCore shared] resetForTesting];
     [MockRillEventReporter reset];
     self.mockReporter = [MockRillEventReporter shared];
     self.mockConfig = [[MockSDKConfigResponse alloc] init];
@@ -391,11 +393,11 @@ static MockRillEventReporter *sharedInstance = nil;
 // Test SDK initialization triggers Rill tracking with correct payload
 - (void)testSDKInit_ShouldFireRillEventWithServerDrivenPayload {
     // Given: SDK is not initialized
-    XCTAssertFalse([CloudXCore shared].isInitialised);
+    XCTAssertFalse([CloudXCore shared].isInitialized);
     
     // When: Initialize SDK
     XCTestExpectation *expectation = [self expectationWithDescription:@"SDK Init"];
-    [[CloudXCore shared] initSDKWithAppKey:kTestAppKey completion:^(BOOL success, NSError *error) {
+    [[CloudXCore shared] initializeSDKWithAppKey:kTestAppKey completion:^(BOOL success, NSError *error) {
         if (success) {
             // Replace the reporting service with our mock after initialization
             [[CloudXCore shared] setValue:self.mockReporter forKey:@"reportingService"];

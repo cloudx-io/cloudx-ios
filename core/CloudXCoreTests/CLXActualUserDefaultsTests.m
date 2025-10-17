@@ -51,7 +51,7 @@
 
 // Test what CloudXCoreAPI.m line 131 actually does
 - (void)testSDKInit_CreatesEmptyMetricsDict {
-    // This is what actually happens in initSDKWithAppKey:completion:
+    // This is what actually happens in initializeSDKWithAppKey:completion:
     NSDictionary *dict = @{};
     [[NSUserDefaults standardUserDefaults] setObject:dict forKey:kCLXCoreMetricsDictKey];
     
@@ -98,7 +98,7 @@
 
 // Test what CloudXCoreAPI.m line 456 actually does
 - (void)testProvideUserDetails_StoresHashedUserID {
-    // This is what actually happens in provideUserDetailsWithHashedUserID:
+    // This is what actually happens in setHashedUserID:
     NSString *hashedUserID = @"test-hashed-user-id";
     [[NSUserDefaults standardUserDefaults] setValue:hashedUserID forKey:kCLXCoreHashedUserIDKey];
     
@@ -108,7 +108,7 @@
 
 // Test what CloudXCoreAPI.m lines 464-465 actually do
 - (void)testUseHashedKeyValue_StoresKeyValuePair {
-    // This is what actually happens in useHashedKeyValueWithKey:value:
+    // This is what actually happens in setHashedKeyValue:value:
     NSString *key = @"test-key";
     NSString *value = @"test-value";
     
@@ -124,7 +124,7 @@
 
 // Test what CloudXCoreAPI.m line 483 actually does
 - (void)testUseKeyValues_StoresUserDictionary {
-    // This is what actually happens in useKeyValuesWithUserDictionary:
+    // This is what actually happens in setKeyValueDictionary:
     NSDictionary *userDict = @{@"key1": @"value1", @"key2": @"value2"};
     [[NSUserDefaults standardUserDefaults] setObject:userDict forKey:kCLXCoreUserKeyValueKey];
     
@@ -134,7 +134,7 @@
 
 // Test what CloudXCoreAPI.m lines 509-511 actually do
 - (void)testUseBidderKeyValue_StoresBidderData {
-    // This is what actually happens in useBidderKeyValueWithBidder:key:value:
+    // This is what actually happens in setBidderKeyValue:key:value:
     NSString *bidder = @"test-bidder";
     NSString *key = @"test-bidder-key";
     NSString *value = @"test-bidder-value";
@@ -168,7 +168,7 @@
     NSDictionary *initialDict = @{};
     [[NSUserDefaults standardUserDefaults] setObject:initialDict forKey:kCLXCoreMetricsDictKey];
     
-    // Update metrics (like provideUserDetailsWithHashedUserID does)
+    // Update metrics (like setHashedUserID does)
     NSDictionary *existingDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     NSMutableDictionary *updatedDict = [existingDict mutableCopy];
     updatedDict[@"method_set_hashed_user_id"] = @"1";

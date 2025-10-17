@@ -20,11 +20,11 @@
 
 @implementation CLXLiveInitService (Internal)
 
-- (void)initSDKWithAppKey:(NSString *)appKey 
+- (void)initializeSDKWithAppKey:(NSString *)appKey 
             customInitURL:(NSString *)customInitURL 
                completion:(void (^)(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error))completion {
     
-    [self.logger info:[NSString stringWithFormat:@"🚀 [LiveInitService+Internal] initSDKWithAppKey called with custom URL - AppKey: %@, URL: %@", appKey, customInitURL]];
+    [self.logger info:[NSString stringWithFormat:@"🚀 [LiveInitService+Internal] initializeSDKWithAppKey called with custom URL - AppKey: %@, URL: %@", appKey, customInitURL]];
     
     // Create a temporary network service with the custom URL
     NSURLSession *cloudxSession = [NSURLSession cloudxSessionWithIdentifier:@"init-internal"];
@@ -42,7 +42,7 @@
         return;
     }
     
-    [customNetworkService initSDKWithAppKey:appKey completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
+    [customNetworkService initializeSDKWithAppKey:appKey completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
         if (error) {
             [self.logger error:[NSString stringWithFormat:@"❌ [LiveInitService+Internal] Custom NetworkInitService failed with error: %@", error]];
         } else {
@@ -62,12 +62,12 @@
  * @param hashedUserId The hashed user ID for SDK initialization
  * @param completion Completion handler called with success status and error
  */
-- (void)initSDKWithAppKey:(NSString *)appKey 
+- (void)initializeSDKWithAppKey:(NSString *)appKey 
             customInitURL:(NSString *)customInitURL 
              hashedUserId:(NSString *)hashedUserId
                completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
     
-    [self initSDKWithAppKey:appKey customInitURL:customInitURL completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
+    [self initializeSDKWithAppKey:appKey customInitURL:customInitURL completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
         // For demo purposes, we'll consider the config fetch as success and let the main SDK handle the rest
         if (completion) {
             completion(config != nil && error == nil, error);

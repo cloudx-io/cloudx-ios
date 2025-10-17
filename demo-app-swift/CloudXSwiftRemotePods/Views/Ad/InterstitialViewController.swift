@@ -61,7 +61,7 @@ class InterstitialViewController: BaseAdViewController {
     }
     
     @objc private func loadInterstitialAd() {
-        if !cloudX.isInitialised {
+        if !cloudX.isInitialized {
             showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
             return
         }
@@ -80,7 +80,7 @@ class InterstitialViewController: BaseAdViewController {
     }
     
     private func loadInterstitial() {
-        if !cloudX.isInitialised {
+        if !cloudX.isInitialized {
             return
         }
 
@@ -164,7 +164,7 @@ class InterstitialViewController: BaseAdViewController {
     // Remove the old createInterstitialAd and polling methods - they're replaced by loadInterstitial
     
     @objc private func showInterstitialAd() {
-        if !cloudX.isInitialised {
+        if !cloudX.isInitialized {
             showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
             return
         }

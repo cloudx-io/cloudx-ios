@@ -53,7 +53,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         print("[RewardedInterstitialViewController] viewWillAppear")
-        if CloudXCore.shared.isInitialised {
+        if CloudXCore.shared.isInitialized {
             loadRewardedInterstitial()
         } else {
             print("[RewardedInterstitialViewController] SDK not initialized, rewarded interstitial will be loaded once SDK is initialized.")
@@ -75,7 +75,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
     
     private func loadRewardedInterstitial() {
         print("[RewardedInterstitialViewController] loadRewardedInterstitial called")
-        if !CloudXCore.shared.isInitialised {
+        if !CloudXCore.shared.isInitialized {
             print("[RewardedInterstitialViewController] SDK not initialized")
             return
         }

@@ -32,17 +32,17 @@ extension CLXLiveInitService {
      *   - completion: Completion handler called with the SDK configuration or error
      * - Note: This method allows overriding the default initialization URL for testing different environments
      */
-    func initSDK(withAppKey appKey: String, 
+    func initializeSDK(withAppKey appKey: String, 
                  customInitURL: String, 
                  completion: @escaping (CLXSDKConfigResponse?, Error?) -> Void) {
         
-        print("🚀 [LiveInitService+Internal] initSDKWithAppKey called with custom URL - AppKey: \(appKey), URL: \(customInitURL)")
+        print("🚀 [LiveInitService+Internal] initializeSDKWithAppKey called with custom URL - AppKey: \(appKey), URL: \(customInitURL)")
         
         // Create a temporary network service with the custom URL
         let cloudxSession = URLSession.cloudxSession(withIdentifier: "init-internal")
         let networkService = CLXSDKInitNetworkService(baseURL: customInitURL, urlSession: cloudxSession)
         
-        networkService.initSDK(withAppKey: appKey) { config, error in
+        networkService.initializeSDK(withAppKey: appKey) { config, error in
             if let error = error {
                 print("❌ [LiveInitService+Internal] Custom NetworkInitService failed with error: \(error)")
             } else {
@@ -62,12 +62,12 @@ extension CLXLiveInitService {
      *   - completion: Completion handler called with success status and error
      * - Note: This method combines custom URL initialization with standard SDK initialization flow
      */
-    func initSDK(withAppKey appKey: String, 
+    func initializeSDK(withAppKey appKey: String, 
                  customInitURL: String, 
                  hashedUserId: String, 
                  completion: @escaping (Bool, Error?) -> Void) {
         
-        initSDK(withAppKey: appKey, customInitURL: customInitURL) { config, error in
+        initializeSDK(withAppKey: appKey, customInitURL: customInitURL) { config, error in
             // For demo purposes, we'll consider the config fetch as success and let the main SDK handle the rest
             let success = config != nil && error == nil
             completion(success, error)

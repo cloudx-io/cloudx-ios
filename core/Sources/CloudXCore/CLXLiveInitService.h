@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param appKey The application key for SDK initialization
  * @param completion Completion handler called with the SDK configuration or error
  */
-- (void)initSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error))completion;
+- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error))completion;
 
 @end
 

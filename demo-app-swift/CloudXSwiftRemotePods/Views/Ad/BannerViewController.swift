@@ -14,7 +14,7 @@ class BannerViewController: BaseAdViewController {
         setupNotifications()
         
         // Check if SDK is already initialized
-        isSDKInitialized = cloudX.isInitialised
+        isSDKInitialized = cloudX.isInitialized
         updateStatusUI(state: .noAd)
     }
     
@@ -69,7 +69,7 @@ class BannerViewController: BaseAdViewController {
     }
     
     @objc private func loadBannerAd() {
-        if !cloudX.isInitialised {
+        if !cloudX.isInitialized {
             showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
             return
         }

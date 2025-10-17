@@ -70,7 +70,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
     }
     
     @objc private func loadRewardedAd() {
-        if !CloudXCore.shared.isInitialised {
+        if !CloudXCore.shared.isInitialized {
             showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
             return
         }
@@ -90,7 +90,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
     
     private func loadRewarded() {
         print("[RewardedViewController] loadRewarded called")
-        if !CloudXCore.shared.isInitialised {
+        if !CloudXCore.shared.isInitialized {
             print("[RewardedViewController] SDK not initialized")
             return
         }
@@ -111,7 +111,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
         print("[RewardedViewController] Using placement: \(placement)")
         
         // Log SDK configuration details
-        print("[RewardedViewController] SDK initialization status: \(CloudXCore.shared.isInitialised)")
+        print("[RewardedViewController] SDK initialization status: \(CloudXCore.shared.isInitialized)")
         
         // Create rewarded with comprehensive logging
         print("[RewardedViewController] Calling createRewardedWithPlacement: \(placement)")

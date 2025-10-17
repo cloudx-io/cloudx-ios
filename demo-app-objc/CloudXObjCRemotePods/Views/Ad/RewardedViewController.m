@@ -75,7 +75,7 @@
 }
 
 - (void)loadRewardedAd {
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
         return;
     }
@@ -95,7 +95,7 @@
 
 - (void)loadRewarded {
     NSLog(@"[RewardedViewController] loadRewarded called");
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         NSLog(@"[RewardedViewController] SDK not initialized");
         return;
     }
@@ -116,7 +116,7 @@
     NSLog(@"[RewardedViewController] Using placement: %@", placement);
     
     // Log SDK configuration details
-    NSLog(@"[RewardedViewController] SDK initialization status: %d", [[CloudXCore shared] isInitialised]);
+    NSLog(@"[RewardedViewController] SDK initialization status: %d", [[CloudXCore shared] isInitialized]);
     
     // Create rewarded with comprehensive logging
     NSLog(@"[RewardedViewController] Calling createRewardedWithPlacement: %@", placement);

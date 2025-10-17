@@ -85,7 +85,7 @@
 }
 
 - (void)loadNativeBannerAd {
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
         return;
     }
@@ -105,7 +105,7 @@
 
 - (void)loadNativeBanner {
     NSLog(@"[NativeBannerViewController] LOG: loadNativeBanner called");
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         NSLog(@"[NativeBannerViewController] LOG: SDK not initialized, returning.");
         return;
     }
@@ -144,7 +144,7 @@
 - (void)showNativeBannerAd {
     NSLog(@"[NativeBannerViewController] LOG: showNativeBannerAd called.");
     
-    if (![[CloudXCore shared] isInitialised]) {
+    if (![[CloudXCore shared] isInitialized]) {
         NSLog(@"[NativeBannerViewController] LOG: SDK not initialized, showing error");
         [self showAlertWithTitle:@"SDK Not Ready" message:@"Please wait for SDK initialization to complete."];
         return;

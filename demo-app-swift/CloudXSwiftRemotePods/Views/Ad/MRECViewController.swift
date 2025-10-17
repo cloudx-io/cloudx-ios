@@ -85,7 +85,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
     }
     
     @objc private func loadMRECAd() {
-        if !CloudXCore.shared.isInitialised {
+        if !CloudXCore.shared.isInitialized {
             showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
             return
         }
@@ -175,7 +175,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
     }
     
     private func loadMREC() {
-        if !CloudXCore.shared.isInitialised {
+        if !CloudXCore.shared.isInitialized {
             return
         }
 

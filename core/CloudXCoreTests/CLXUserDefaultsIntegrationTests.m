@@ -14,10 +14,11 @@
 #import "Mocks/CLXMockInitService.h"
 
 @interface CloudXCore (Testing)
-- (instancetype)initSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL success, NSError *error))completion;
-- (void)provideUserDetailsWithHashedUserID:(NSString *)hashedUserID;
-- (void)useKeyValuesWithUserDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary;
-- (void)useBidderKeyValueWithBidder:(NSString *)bidder key:(NSString *)key value:(NSString *)value;
+- (instancetype)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL success, NSError *error))completion;
+- (void)setHashedUserID:(NSString *)hashedUserID;
+- (void)setKeyValueDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary;
+- (void)setBidderKeyValue:(NSString *)bidder key:(NSString *)key value:(NSString *)value;
+- (void)resetForTesting;
 @end
 
 @interface CLXPublisherBanner (Testing)
@@ -37,6 +38,9 @@
 
 - (void)setUp {
     [super setUp];
+    
+    // Reset CloudXCore singleton state for isolated tests
+    [[CloudXCore shared] resetForTesting];
     
     // Set up mock init service for fast, reliable integration tests
     self.mockInitService = [[CLXMockInitService alloc] initWithSuccess:YES];
@@ -70,8 +74,8 @@
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = testAccountID;
     
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:testAppKey completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:testAppKey completion:^(BOOL success, NSError *error) {
         [expectation fulfill];
     }];
     
@@ -119,16 +123,16 @@
     XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account";
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         [initExpectation fulfill];
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
     
     // Add user data
-    [sdk provideUserDetailsWithHashedUserID:@"integration-hashed-user"];
-    [sdk useKeyValuesWithUserDictionary:@{@"age": @"30", @"location": @"NYC"}];
-    [sdk useBidderKeyValueWithBidder:@"integration-bidder" key:@"bid-key" value:@"bid-value"];
+    [sdk setHashedUserID:@"integration-hashed-user"];
+    [sdk setKeyValueDictionary:@{@"age": @"30", @"location": @"NYC"}];
+    [sdk setBidderKeyValue:@"integration-bidder" key:@"bid-key" value:@"bid-value"];
     
     // Verify all user data is stored with ACTUAL unprefixed keys
     NSString *storedHashedUserID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedUserIDKey];
@@ -151,8 +155,8 @@
     XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account";
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         [initExpectation fulfill];
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
@@ -180,14 +184,14 @@
     XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account";
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         [initExpectation fulfill];
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
     
     // Add user data that publisher ads will use
-    [sdk useKeyValuesWithUserDictionary:@{@"targeting": @"data"}];
+    [sdk setKeyValueDictionary:@{@"targeting": @"data"}];
     
     // Create publisher banner
     CLXPublisherBanner *banner = [[CLXPublisherBanner alloc] init];
@@ -229,14 +233,14 @@
     XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account";
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         [initExpectation fulfill];
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
     
     // Add bidder data
-    [sdk useBidderKeyValueWithBidder:@"test-bidder" key:@"test-key" value:@"test-value"];
+    [sdk setBidderKeyValue:@"test-bidder" key:@"test-key" value:@"test-value"];
     
     // Create bid ad source
     CLXBidAdSource *bidAdSource = [[CLXBidAdSource alloc] init];
@@ -293,15 +297,15 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"SDK initialization"];
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account-123"; // This matches what CLXMockInitService returns
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"cloudx-app-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"cloudx-app-key" completion:^(BOOL success, NSError *error) {
         [expectation fulfill];
     }];
     [self waitForExpectations:@[expectation] timeout:5.0];
     
     // Add CloudXCore data
-    [sdk useKeyValuesWithUserDictionary:@{@"cloudx": @"user"}];
-    [sdk useBidderKeyValueWithBidder:@"cloudx-bidder" key:@"key" value:@"value"];
+    [sdk setKeyValueDictionary:@{@"cloudx": @"user"}];
+    [sdk setBidderKeyValue:@"cloudx-bidder" key:@"key" value:@"value"];
     
     // Check what data survived - demonstrates collision risk
     NSString *finalAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];

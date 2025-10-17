@@ -338,7 +338,7 @@ static void initializeLogger() {
         }
         
         // Read user key values from UserDefaults (empty if not set)
-        // Publishers can set these via useKeyValuesWithUserDictionary API
+        // Publishers can set these via setKeyValueDictionary API
         NSDictionary *userKeyValues = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey] ?: @{};
         
         CLXBiddingConfigUserExt *userExt = [[CLXBiddingConfigUserExt alloc] init];

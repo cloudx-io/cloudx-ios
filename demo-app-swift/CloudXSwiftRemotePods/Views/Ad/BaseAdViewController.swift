@@ -86,7 +86,7 @@ class BaseAdViewController: UIViewController, AdStateManaging {
         UserDefaults.standard.set(config.baseURL, forKey: "CloudXInitURL")
 
         return await withCheckedContinuation { continuation in
-            cloudX.initSDK(withAppKey: appKey, hashedUserID: config.hashedUserId) { success, error in
+            cloudX.initializeSDK(appKey: appKey, hashedUserID: config.hashedUserId) { success, error in
                 if success {
                     print("✅ SDK Initialized: \(success)")
                     NotificationCenter.default.post(name: .sdkInitialized, object: nil)

@@ -14,10 +14,11 @@
 #import "Mocks/CLXMockInitService.h"
 
 @interface CloudXCore (Testing)
-- (instancetype)initSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL success, NSError *error))completion;
-- (void)provideUserDetailsWithHashedUserID:(NSString *)hashedUserID;
-- (void)useKeyValuesWithUserDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary;
-- (void)useBidderKeyValueWithBidder:(NSString *)bidder key:(NSString *)key value:(NSString *)value;
+- (instancetype)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL success, NSError *error))completion;
+- (void)setHashedUserID:(NSString *)hashedUserID;
+- (void)setKeyValueDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary;
+- (void)setBidderKeyValue:(NSString *)bidder key:(NSString *)key value:(NSString *)value;
+- (void)resetForTesting;
 @end
 
 @interface CLXUserDefaultsConcurrencyTests : XCTestCase
@@ -28,6 +29,9 @@
 
 - (void)setUp {
     [super setUp];
+    
+    // Reset CloudXCore singleton state for isolated tests
+    [[CloudXCore shared] resetForTesting];
     
     // Set up mock init service for fast, reliable concurrent tests
     self.mockInitService = [[CLXMockInitService alloc] initWithSuccess:YES];
@@ -70,8 +74,8 @@
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSString *appKey = [NSString stringWithFormat:@"concurrent-app-key-%ld", (long)index];
             
-            CloudXCore *sdk = [[CloudXCore alloc] init];
-            [sdk initSDKWithAppKey:appKey completion:^(BOOL success, NSError *error) {
+            CloudXCore *sdk = [CloudXCore shared];
+            [sdk initializeSDKWithAppKey:appKey completion:^(BOOL success, NSError *error) {
                 NSLog(@"🧪 SDK init %ld completed - success: %@, error: %@", (long)index, success ? @"YES" : @"NO", error);
                 XCTestExpectation *expectation = expectations[index];
                 [expectation fulfill];
@@ -103,8 +107,8 @@
 - (void)testConcurrentUserDataUpdates {
     // Initialize SDK first
     XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         NSLog(@"🧪 SDK initialization completed - success: %@, error: %@", success ? @"YES" : @"NO", error);
         [initExpectation fulfill];
     }];
@@ -123,9 +127,9 @@
             };
             NSString *bidder = [NSString stringWithFormat:@"concurrent-bidder-%ld", (long)i];
             
-            [sdk provideUserDetailsWithHashedUserID:hashedUserID];
-            [sdk useKeyValuesWithUserDictionary:userDict];
-            [sdk useBidderKeyValueWithBidder:bidder key:@"test-key" value:@"test-value"];
+            [sdk setHashedUserID:hashedUserID];
+            [sdk setKeyValueDictionary:userDict];
+            [sdk setBidderKeyValue:bidder key:@"test-key" value:@"test-value"];
             
             [concurrencyExpectation fulfill];
         });
@@ -185,8 +189,8 @@
 - (void)testConcurrentAccessFromDifferentComponents {
     // Initialize SDK first
     XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
-    CloudXCore *sdk = [[CloudXCore alloc] init];
-    [sdk initSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    CloudXCore *sdk = [CloudXCore shared];
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
         NSLog(@"🧪 SDK initialization completed - success: %@, error: %@", success ? @"YES" : @"NO", error);
         [initExpectation fulfill];
     }];
