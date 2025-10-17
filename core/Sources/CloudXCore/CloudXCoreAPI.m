@@ -723,8 +723,8 @@ static CloudXCore *_sharedInstance = nil;
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeMREC delegate:delegate];
 }
 
-- (id<CLXInterstitial>)createInterstitialWithPlacement:(NSString *)placement
-                                                 delegate:(id<CLXInterstitialDelegate>)delegate {
+- (CLXPublisherFullscreenAd *)createInterstitialWithPlacement:(NSString *)placement
+                                                     delegate:(id<CLXInterstitialDelegate>)delegate {
     // Track interstitial creation method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateInterstitial];
@@ -767,8 +767,8 @@ static CloudXCore *_sharedInstance = nil;
     return interstitial;
 }
 
-- (id<CLXRewardedInterstitial>)createRewardedWithPlacement:(NSString *)placement
-                                                    delegate:(id<CLXRewardedDelegate>)delegate {
+- (CLXPublisherFullscreenAd *)createRewardedWithPlacement:(NSString *)placement
+                                                 delegate:(id<CLXRewardedDelegate>)delegate {
     // Track rewarded creation method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateRewarded];

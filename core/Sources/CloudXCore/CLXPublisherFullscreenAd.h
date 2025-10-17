@@ -44,7 +44,20 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, weak, nullable) id<CLXRewardedDelegate> rewardedDelegate;
 
+/**
+ * The placement identifier for this fullscreen ad.
+ */
+@property (nonatomic, copy, readonly) NSString *placementID;
 
+/**
+ * The placement name for this fullscreen ad.
+ */
+@property (nonatomic, copy, readonly) NSString *placementName;
+
+/**
+ * The ad type (interstitial or rewarded).
+ */
+@property (nonatomic, assign, readonly) NSInteger adType;
 
 /**
  * Initializes a new PublisherFullscreenAd with the given parameters.

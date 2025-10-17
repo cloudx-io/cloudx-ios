@@ -152,7 +152,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 // MARK: - Integration Test Class
 
 @interface CLXInterstitialIntegrationTests : XCTestCase
-@property (nonatomic, strong) id<CLXInterstitial> interstitial;
+@property (nonatomic, strong) CLXPublisherFullscreenAd *interstitial;
 @property (nonatomic, strong) IntegrationTestDelegate *testDelegate;
 @end
 
@@ -339,12 +339,12 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 - (void)testNoRetainCyclesWithDelegate {
     // Verifies that there are no retain cycles between the interstitial and its delegate that could cause memory leaks
     
-    __weak id<CLXInterstitial> weakInterstitial;
+    __weak CLXPublisherFullscreenAd *weakInterstitial;
     __weak IntegrationTestDelegate *weakDelegate;
     
     @autoreleasepool {
         IntegrationTestDelegate *delegate = [[IntegrationTestDelegate alloc] init];
-        id<CLXInterstitial> interstitial = [CloudXCore.shared createInterstitialWithPlacement:kTestPlacementID delegate:delegate];
+        CLXPublisherFullscreenAd *interstitial = [CloudXCore.shared createInterstitialWithPlacement:kTestPlacementID delegate:delegate];
         
         weakInterstitial = interstitial;
         weakDelegate = delegate;

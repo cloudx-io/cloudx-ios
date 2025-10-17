@@ -271,7 +271,7 @@ Interstitial ads are full-screen ads that appear between app content.
 
 ```objc
 @interface YourViewController () <CLXInterstitialDelegate>
-@property (nonatomic, strong) id<CLXInterstitial> interstitialAd;
+@property (nonatomic, strong) CLXPublisherFullscreenAd *interstitialAd;
 @end
 
 @implementation YourViewController
@@ -406,7 +406,7 @@ Rewarded ads are full-screen ads that provide rewards to users for watching.
 
 ```objc
 @interface YourViewController () <CLXRewardedDelegate>
-@property (nonatomic, strong) id<CLXRewardedInterstitial> rewardedAd;
+@property (nonatomic, strong) CLXPublisherFullscreenAd *rewardedAd;
 @end
 
 @implementation YourViewController
@@ -1028,8 +1028,8 @@ Here's a complete example showing how to integrate all ad types in a single app:
 
 @interface MainViewController () <CLXBannerDelegate, CLXInterstitialDelegate, CLXRewardedDelegate, CLXNativeDelegate>
 @property (nonatomic, strong) CLXBannerAdView *bannerAd;
-@property (nonatomic, strong) id<CLXInterstitial> interstitialAd;
-@property (nonatomic, strong) id<CLXRewardedInterstitial> rewardedAd;
+@property (nonatomic, strong) CLXPublisherFullscreenAd *interstitialAd;
+@property (nonatomic, strong) CLXPublisherFullscreenAd *rewardedAd;
 @property (nonatomic, strong) CLXNativeAdView *nativeAd;
 @property (nonatomic, strong) CLXBannerAdView *mrecAd;
 @end

@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXBannerAdView;
 @class CLXNativeAdView;
 @class CLXSDKConfigResponse;
+@class CLXPublisherFullscreenAd;
 
 /**
  * The main class of the CloudX SDK.
@@ -144,19 +145,21 @@ NS_ASSUME_NONNULL_BEGIN
  * Create an interstitial ad
  * @param placement The placement name. This should match the placement name in the CloudX dashboard
  * @param delegate The delegate to receive ad events
- * @return A CLXInterstitial object
+ * @return A CLXPublisherFullscreenAd object configured for interstitial ads
  */
-- (nullable id<CLXInterstitial>)createInterstitialWithPlacement:(NSString *)placement
-                                                       delegate:(nullable id<CLXInterstitialDelegate>)delegate;
+- (nullable CLXPublisherFullscreenAd *)createInterstitialWithPlacement:(NSString *)placement
+                                                              delegate:(nullable id<CLXInterstitialDelegate>)delegate
+    NS_SWIFT_NAME(createInterstitial(placement:delegate:));
 
 /**
  * Create a rewarded ad
  * @param placement The placement name. This should match the placement name in the CloudX dashboard
  * @param delegate The delegate to receive ad events
- * @return A CLXRewardedInterstitial object
+ * @return A CLXPublisherFullscreenAd object configured for rewarded ads
  */
-- (nullable id<CLXRewardedInterstitial>)createRewardedWithPlacement:(NSString *)placement
-                                                           delegate:(nullable id<CLXRewardedDelegate>)delegate;
+- (nullable CLXPublisherFullscreenAd *)createRewardedWithPlacement:(NSString *)placement
+                                                          delegate:(nullable id<CLXRewardedDelegate>)delegate
+    NS_SWIFT_NAME(createRewarded(placement:delegate:));
 
 /**
  * Create a native ad
