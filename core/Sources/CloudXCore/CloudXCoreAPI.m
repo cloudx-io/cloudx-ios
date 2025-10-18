@@ -24,6 +24,7 @@
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 #import <CloudXCore/CLXWinLossTracker.h>
 #import <CloudXCore/CLXKeyValueState.h>
+#import <CloudXCore/CLXEndpointResolver.h>
 
 // Adapter Protocols
 #import <CloudXCore/CLXAdapterNative.h>
@@ -403,37 +404,34 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger error:@"❌ [CloudXCore] Failed to resolve metrics tracker from DI container"];
     }
     
-    // Use SDK response URLs exclusively - no fallbacks
-    NSString *auctionEndpointUrl = @"";
-    NSString *cdpEndpointUrl = @"";
+    // Resolve endpoints with A/B testing support
+    CLXEndpointResolver *endpointResolver = [[CLXEndpointResolver alloc] init];
+    [endpointResolver resolveFromConfig:config];
+    
+    NSString *auctionEndpointUrl = endpointResolver.auctionEndpoint;
+    NSString *cdpEndpointUrl = endpointResolver.cdpEndpoint;
     NSString *metricsEndpointURL = config.metricsEndpointURL ?: @"";
     
-    // Extract auction endpoint URL from SDK response
-    if (config.auctionEndpointURL) {
-        id auctionValue = [config.auctionEndpointURL value];
-        if ([auctionValue isKindOfClass:[NSString class]]) {
-            auctionEndpointUrl = (NSString *)auctionValue;
-        } else if ([auctionValue isKindOfClass:[CLXSDKConfigEndpointObject class]]) {
-            auctionEndpointUrl = [self chooseEndpointWithObject:auctionValue value:_abTestValue];
-        }
-    } else {
+    // Validate endpoints
+    if (auctionEndpointUrl.length == 0) {
         [self.logger error:@"❌ [CloudXCore] SDK init missing auctionEndpointURL - auction requests will fail"];
+    } else {
+        [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] Auction endpoint resolved: %@", auctionEndpointUrl]];
     }
     
-    // Extract CDP endpoint URL from SDK response
-    if (config.cdpEndpointURL) {
-        cdpEndpointUrl = [self chooseEndpointWithObject:config.cdpEndpointURL value:1.0 - _abTestValue];
-        [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] CDP endpoint configured: %@", cdpEndpointUrl]];
+    if (cdpEndpointUrl.length > 0) {
+        [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] CDP endpoint resolved: %@", cdpEndpointUrl]];
     } else {
         [self.logger debug:@"[CloudXCore] No CDP endpoint configured - bid request enrichment disabled"];
     }
     
-    // Log missing metrics URL
     if (!config.metricsEndpointURL) {
         [self.logger debug:@"[CloudXCore] SDK init missing metricsEndpointURL - SDK performance metrics disabled"];
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CloudXCore] Endpoints - Auction: %@, CDP: %@", auctionEndpointUrl, cdpEndpointUrl ?: @"(none)"]];
+    if (endpointResolver.testGroupName.length > 0) {
+        [self.logger info:[NSString stringWithFormat:@"🧪 [CloudXCore] A/B Test Group: %@", endpointResolver.testGroupName]];
+    }
     
     // Register services in DI container 
         CLXDIContainer *container = [CLXDIContainer shared];

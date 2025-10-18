@@ -19,6 +19,7 @@
 #import <CloudXCore/CLXMetricsTrackerImpl.h>
 #import <CloudXCore/CLXMetricsType.h>
 #import <CloudXCore/CLXMetricsConfig.h>
+#import <CloudXCore/CLXSDKConfigEndpointObject.h>
 
 static NSString *const kAPIRequestKeyAppKey = @"appKey";
 static NSString *const kAPIRequestKeyLat = @"lat";
@@ -247,19 +248,37 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         [self.logger error:@"⚠️ [TRACKING_DEBUG] No tracking array found in SDK init response - Rill tracking may not work properly"];
     }
     
-    // Parse auction endpoint URL
-    NSDictionary *auctionEndpointDict = response[@"auctionEndpointURL"];
-    if (auctionEndpointDict) {
-        CLXSDKConfigEndpointQuantumValue *endpointValue = [[CLXSDKConfigEndpointQuantumValue alloc] init];
-        endpointValue.endpointString = auctionEndpointDict[@"default"];
-        config.auctionEndpointURL = endpointValue;
+    // Parse auction endpoint URL with A/B test support
+    id auctionEndpointValue = response[@"auctionEndpointURL"];
+    if (auctionEndpointValue) {
+        CLXSDKConfigEndpointQuantumValue *endpointQuantum = [[CLXSDKConfigEndpointQuantumValue alloc] init];
+        
+        if ([auctionEndpointValue isKindOfClass:[NSString class]]) {
+            // Simple string format
+            endpointQuantum.endpointString = (NSString *)auctionEndpointValue;
+        } else if ([auctionEndpointValue isKindOfClass:[NSDictionary class]]) {
+            // Object format with default and test variants
+            NSDictionary *auctionDict = (NSDictionary *)auctionEndpointValue;
+            CLXSDKConfigEndpointObject *endpointObj = [self parseEndpointObject:auctionDict];
+            endpointQuantum.endpointObject = endpointObj;
+        }
+        
+        config.auctionEndpointURL = endpointQuantum;
     }
     
-    // Parse CDP endpoint URL
-    NSDictionary *cdpEndpointDict = response[@"cdpEndpointURL"];
-    if (cdpEndpointDict) {
-        CLXSDKConfigEndpointObject *endpointObject = [[CLXSDKConfigEndpointObject alloc] init];
-        endpointObject.defaultKey = cdpEndpointDict[@"default"];
+    // Parse CDP endpoint URL with A/B test support
+    id cdpEndpointValue = response[@"cdpEndpointURL"];
+    if (cdpEndpointValue) {
+        CLXSDKConfigEndpointObject *endpointObject = nil;
+        
+        if ([cdpEndpointValue isKindOfClass:[NSString class]]) {
+            // Simple string format - wrap in EndpointObject
+            endpointObject = [[CLXSDKConfigEndpointObject alloc] initWithTest:nil defaultKey:(NSString *)cdpEndpointValue];
+        } else if ([cdpEndpointValue isKindOfClass:[NSDictionary class]]) {
+            // Object format with default and test variants
+            endpointObject = [self parseEndpointObject:(NSDictionary *)cdpEndpointValue];
+        }
+        
         config.cdpEndpointURL = endpointObject;
     }
     
@@ -367,6 +386,39 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     [self.logger info:[NSString stringWithFormat:@"✅ [SDKInitNetworkService] SDK config parsed - Account: %@, Session: %@, Bidders: %lu, Placements: %lu", config.accountID, config.sessionID, (unsigned long)config.bidders.count, (unsigned long)config.placements.count]];
     
     return config;
+}
+
+/**
+ * @brief Parses endpoint object with default and test variants for A/B testing
+ * @param endpointDict Dictionary containing 'default' and optionally 'test' array
+ * @return CLXSDKConfigEndpointObject with parsed test variants
+ */
+- (CLXSDKConfigEndpointObject *)parseEndpointObject:(NSDictionary *)endpointDict {
+    NSString *defaultValue = endpointDict[@"default"] ?: @"";
+    NSArray *testArray = endpointDict[@"test"];
+    NSMutableArray<CLXSDKConfigEndpointValue *> *testVariants = [NSMutableArray array];
+    
+    if (testArray && [testArray isKindOfClass:[NSArray class]]) {
+        for (id testItem in testArray) {
+            if ([testItem isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *testDict = (NSDictionary *)testItem;
+                NSString *name = testDict[@"name"];
+                NSString *value = testDict[@"value"];
+                NSNumber *ratioNum = testDict[@"ratio"];
+                double ratio = ratioNum ? [ratioNum doubleValue] : 0.0;
+                
+                if (value && [value isKindOfClass:[NSString class]] && value.length > 0) {
+                    CLXSDKConfigEndpointValue *variant = [[CLXSDKConfigEndpointValue alloc] initWithName:name 
+                                                                                                    value:value 
+                                                                                                    ratio:ratio];
+                    [testVariants addObject:variant];
+                }
+            }
+        }
+    }
+    
+    return [[CLXSDKConfigEndpointObject alloc] initWithTest:testVariants.count > 0 ? testVariants : nil 
+                                                  defaultKey:defaultValue];
 }
 
 @end 

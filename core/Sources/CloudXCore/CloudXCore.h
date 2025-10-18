@@ -150,6 +150,7 @@
 
 // Additional Utils
 #import <CloudXCore/CLXURLProvider.h>
+#import <CloudXCore/CLXEndpointResolver.h>
 #import <CloudXCore/URLSession+CLX.h>
 #import <CloudXCore/UIDevice+CLXIdentifier.h>
 
