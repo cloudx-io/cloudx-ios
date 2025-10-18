@@ -4,7 +4,7 @@
 
 /**
  * @file CLXAuctionBidManager.m
- * @brief Implementation of auction bid state manager matching Android exactly
+ * @brief Implementation of auction bid state manager
  */
 
 #import <CloudXCore/CLXAuctionBidManager.h>

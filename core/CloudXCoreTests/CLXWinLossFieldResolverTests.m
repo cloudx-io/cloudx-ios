@@ -43,7 +43,7 @@
     NSDictionary *result = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                             bid:testBid
                                                                      lossReason:@(1)
-                                                                          isWin:YES
+                                                                          event:[CLXBidLifecycleEvent loadSuccessEvent]
                                                                  loadedBidPrice:2.50];
     
     XCTAssertNil(result, @"Should return nil when no payload mapping is configured");
@@ -61,7 +61,7 @@
     NSDictionary *result = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                             bid:testBid
                                                                      lossReason:@(1)
-                                                                          isWin:YES
+                                                                          event:[CLXBidLifecycleEvent loadSuccessEvent]
                                                                  loadedBidPrice:2.50];
     
     XCTAssertNotNil(result, @"Should return dictionary even with empty mapping");
@@ -88,7 +88,7 @@
     NSDictionary *winResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                bid:testBid
                                                                         lossReason:@(0)  // Bid Won
-                                                                             isWin:YES
+                                                                             event:[CLXBidLifecycleEvent loadSuccessEvent]
                                                                     loadedBidPrice:2.50];
     
     XCTAssertEqualObjects(winResult[@"win_field"], @"win", @"sdk.win should return 'win' for win events");
@@ -101,7 +101,7 @@
     NSDictionary *lossResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                 bid:testBid
                                                                          lossReason:@(102)  // Lost to Higher Bid
-                                                                              isWin:NO
+                                                                              event:[CLXBidLifecycleEvent lossEvent]
                                                                      loadedBidPrice:2.50];
     
     XCTAssertNil(lossResult[@"win_field"], @"sdk.win should return nil for loss events");
@@ -125,7 +125,7 @@
     NSDictionary *result = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                             bid:bidWithoutURLs
                                                                      lossReason:@(1)
-                                                                          isWin:YES
+                                                                          event:[CLXBidLifecycleEvent loadSuccessEvent]
                                                                  loadedBidPrice:2.50];
     
     XCTAssertNotNil(result, @"Should return dictionary when payload mapping is configured");
@@ -139,7 +139,7 @@
     NSDictionary *emptyResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                  bid:bidWithEmptyURLs
                                                                           lossReason:@(1)
-                                                                               isWin:YES
+                                                                               event:[CLXBidLifecycleEvent loadSuccessEvent]
                                                                       loadedBidPrice:2.50];
     
     XCTAssertNotNil(emptyResult, @"Should return dictionary when payload mapping is configured");
@@ -158,7 +158,7 @@
     NSDictionary *nilReasonResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                      bid:testBid
                                                                               lossReason:nil
-                                                                                   isWin:NO
+                                                                                   event:[CLXBidLifecycleEvent lossEvent]
                                                                           loadedBidPrice:2.50];
     
     XCTAssertEqual(nilReasonResult.count, 0, @"Should not include field when loss reason is nil");
@@ -167,7 +167,7 @@
     NSDictionary *zeroReasonResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                       bid:testBid
                                                                                lossReason:@(0)
-                                                                                    isWin:NO
+                                                                                    event:[CLXBidLifecycleEvent lossEvent]
                                                                            loadedBidPrice:2.50];
     
     XCTAssertEqualObjects(zeroReasonResult[@"loss_reason"], @"Bid Won", @"Should return string description for zero loss reason");
@@ -176,70 +176,15 @@
     NSDictionary *negativeReasonResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                            bid:testBid
                                                                                     lossReason:@(-1)
-                                                                                         isWin:NO
+                                                                                         event:[CLXBidLifecycleEvent lossEvent]
                                                                                 loadedBidPrice:2.50];
     
     XCTAssertEqualObjects(negativeReasonResult[@"loss_reason"], @"Internal Error", @"Invalid loss reasons should fallback to Internal Error");
 }
 
-#pragma mark - URL Template Processing Tests
-
-/**
- * Test URL template replacement with edge cases
- */
-- (void)testURLTemplateReplacement_EdgeCases {
-    [self setMockPayloadMapping:@{@"processed_url": @"sdk.[bid.nurl|bid.lurl]"}];
-    
-    // Test with multiple template placeholders
-    CLXBidResponseBid *bid = [[CLXBidResponseBid alloc] init];
-    bid.nurl = @"https://win.com/track?price=${AUCTION_PRICE}&loss=${AUCTION_LOSS}&price2=${AUCTION_PRICE}";
-    bid.lurl = @"https://loss.com/track?price=${AUCTION_PRICE}&loss=${AUCTION_LOSS}&reason=${AUCTION_LOSS}";
-    
-    // Test WIN scenario with multiple price placeholders
-    NSDictionary *winResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
-                                                                               bid:bid
-                                                                        lossReason:@(5)
-                                                                             isWin:YES
-                                                                    loadedBidPrice:3.75];
-    
-    NSString *processedWinURL = winResult[@"processed_url"];
-    XCTAssertTrue([processedWinURL containsString:@"price=3.75"], @"Should replace AUCTION_PRICE in win URL");
-    XCTAssertTrue([processedWinURL containsString:@"price2=3.75"], @"Should replace multiple AUCTION_PRICE occurrences");
-    XCTAssertTrue([processedWinURL containsString:@"loss=${AUCTION_LOSS}"], @"Should not replace AUCTION_LOSS in win URL");
-    
-    // Test LOSS scenario with loss reason replacement
-    NSDictionary *lossResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
-                                                                                bid:bid
-                                                                         lossReason:@(7)
-                                                                              isWin:NO
-                                                                     loadedBidPrice:3.75];
-    
-    NSString *processedLossURL = lossResult[@"processed_url"];
-    XCTAssertTrue([processedLossURL containsString:@"price=3.75"], @"Should replace AUCTION_PRICE in loss URL");
-    XCTAssertTrue([processedLossURL containsString:@"loss=7"], @"Should replace AUCTION_LOSS in loss URL");
-    XCTAssertTrue([processedLossURL containsString:@"reason=7"], @"Should replace multiple AUCTION_LOSS occurrences");
-}
-
-/**
- * Test URL template replacement with special characters
- */
-- (void)testURLTemplateReplacement_SpecialCharacters {
-    [self setMockPayloadMapping:@{@"processed_url": @"sdk.[bid.nurl|bid.lurl]"}];
-    
-    CLXBidResponseBid *bid = [[CLXBidResponseBid alloc] init];
-    bid.lurl = @"https://test.com/track?price=${AUCTION_PRICE}&loss=${AUCTION_LOSS}&encoded=%24%7BAUCTION_PRICE%7D";
-    
-    NSDictionary *result = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
-                                                                            bid:bid
-                                                                     lossReason:@(2)
-                                                                          isWin:NO
-                                                                 loadedBidPrice:1.50];
-    
-    NSString *processedURL = result[@"processed_url"];
-    XCTAssertTrue([processedURL containsString:@"price=1.50"], @"Should replace unencoded template");
-    XCTAssertTrue([processedURL containsString:@"loss=2"], @"Should replace loss reason");
-    XCTAssertTrue([processedURL containsString:@"encoded=%24%7BAUCTION_PRICE%7D"], @"Should not replace URL-encoded templates");
-}
+#pragma mark - URL Template Processing Tests (REMOVED)
+// REMOVED: URL template replacement tests - iOS now does zero client-side URL hydration (matches Android)
+// URLs are sent raw with macros intact (${AUCTION_PRICE}, ${AUCTION_LOSS}) to the server for hydration
 
 #pragma mark - Input Validation Tests
 
@@ -253,7 +198,7 @@
     NSDictionary *nilAuctionResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:nil
                                                                                       bid:[self createTestBid]
                                                                                lossReason:@(1)
-                                                                                    isWin:YES
+                                                                                    event:[CLXBidLifecycleEvent loadSuccessEvent]
                                                                            loadedBidPrice:2.50];
     
     XCTAssertNotNil(nilAuctionResult, @"Should not crash with nil auction ID");
@@ -262,7 +207,7 @@
     NSDictionary *emptyAuctionResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@""
                                                                                         bid:[self createTestBid]
                                                                                  lossReason:@(1)
-                                                                                      isWin:YES
+                                                                                      event:[CLXBidLifecycleEvent loadSuccessEvent]
                                                                              loadedBidPrice:2.50];
     
     XCTAssertNotNil(emptyAuctionResult, @"Should not crash with empty auction ID");
@@ -271,7 +216,7 @@
     NSDictionary *nilBidResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                    bid:nil
                                                                             lossReason:@(1)
-                                                                                 isWin:YES
+                                                                                 event:[CLXBidLifecycleEvent loadSuccessEvent]
                                                                         loadedBidPrice:2.50];
     
     XCTAssertNotNil(nilBidResult, @"Should not crash with nil bid");
@@ -311,7 +256,7 @@
     NSDictionary *result = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction-123"
                                                                             bid:testBid
                                                                      lossReason:nil
-                                                                          isWin:YES
+                                                                          event:[CLXBidLifecycleEvent loadSuccessEvent]
                                                                  loadedBidPrice:1.50];
     
     // Verify server config was applied
@@ -322,7 +267,8 @@
     XCTAssertEqualObjects(result[@"notificationType"], @"win", @"Should resolve sdk.[win|loss] to 'win' for win events");
     XCTAssertEqualObjects(result[@"source"], @"sdk", @"Should resolve sdk.sdk to 'sdk'");
     XCTAssertNil(result[@"lossReason"], @"Should resolve sdk.lossReason to nil for win events (no loss reason)");
-    XCTAssertEqualObjects(result[@"url"], @"https://example.com/win?price=1.50", @"Should process URL template correctly");
+    // ZERO client-side URL hydration - server does all macro replacement
+    XCTAssertEqualObjects(result[@"url"], @"https://example.com/win?price=${AUCTION_PRICE}", @"Should send URL with raw macros intact - server does hydration");
 }
 
 #pragma mark - Helper Methods

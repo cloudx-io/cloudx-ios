@@ -4,7 +4,7 @@
 
 /**
  * @file CLXWinLossTracker.h
- * @brief Win/Loss tracker interface matching Android WinLossTracker exactly
+ * @brief Win/Loss tracker interface
  * 
  * Main coordinator for win/loss tracking functionality. Manages bid states,
  * builds payloads, and sends notifications to the server.
@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Protocol defining win/loss tracking interface
- * Matches Android's WinLossTracker interface exactly
+ * Handles win/loss notification lifecycle and persistence
  */
 @protocol CLXWinLossTracking <NSObject>
 
@@ -75,21 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setWinner:(NSString *)auctionId winningBidId:(NSString *)winningBidId;
 
 /**
- * Sends loss notification for a specific bid
- * @param auctionId The auction identifier
- * @param bidId The bid identifier
- */
-- (void)sendLoss:(NSString *)auctionId bidId:(NSString *)bidId;
-
-/**
- * Sends win notification for a specific bid
- * @param auctionId The auction identifier
- * @param bidId The bid identifier
- */
-- (void)sendWin:(NSString *)auctionId bidId:(NSString *)bidId;
-
-/**
- * Sends a lifecycle event notification (matches Android's sendEvent exactly)
+ * Sends a lifecycle event notification for bid state changes
  * @param auctionId The auction identifier
  * @param bidId The bid identifier  
  * @param event The lifecycle event type (LOAD_SUCCESS, RENDER_SUCCESS, or LOSS)
@@ -122,7 +108,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Main win/loss tracker implementation
- * Matches Android's WinLossTrackerImpl functionality
+ * Implements win/loss tracking with SQLite persistence and retry logic
  */
 @interface CLXWinLossTracker : NSObject <CLXWinLossTracking>
 
@@ -146,7 +132,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)resetSharedInstance;
 
 /**
- * Database methods for testing (simplified to match Android)
+ * Database methods for testing (simplified schema)
  */
 - (void)deleteAllEvents;
 - (NSArray *)getAllCachedEvents;

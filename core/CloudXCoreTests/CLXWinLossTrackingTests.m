@@ -55,6 +55,23 @@ static const NSInteger kTestRank3 = 3;
     [super setUp];
     self.mockTracker = [[MockCLXWinLossTracker alloc] init];
     [CLXWinLossTracker setSharedInstanceForTesting:self.mockTracker];
+    
+    // Configure with payload mapping (simulating server config)
+    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
+    config.winLossNotificationURL = @"https://test.com/winloss";
+    config.winLossNotificationPayloadConfig = @{
+        @"notificationType": @"sdk.[notificationType]",
+        @"url": @"sdk.[bid.nurl|bid.lurl]",
+        @"auctionId": @"auctionId",
+        @"bidId": @"bidId",
+        @"lossReason": @"lossReason",
+        @"price": @"bid.price"
+    };
+    [[CLXWinLossTracker shared] setConfig:config];
+    
+    // Set endpoint and app key - required for trackWinLoss to be called
+    [[CLXWinLossTracker shared] setEndpoint:@"https://test.com/winloss"];
+    [[CLXWinLossTracker shared] setAppKey:@"test-app-key"];
 }
 
 - (void)tearDown {
@@ -126,8 +143,12 @@ static const NSInteger kTestRank3 = 3;
     CLXBidResponseBid *winningBid = [self createBidWithId:kTestBidID1 lurl:nil nurl:kTestNURL1 rank:kTestRank1 price:kTestPrice];
     [[CLXWinLossTracker shared] addBid:kTestAuctionID bid:winningBid];
     
-    // When: Sending win notification
-    [[CLXWinLossTracker shared] sendWin:kTestAuctionID bidId:kTestBidID1];
+    // When: Sending win notification using sendEvent
+    [[CLXWinLossTracker shared] sendEvent:kTestAuctionID
+                                     bidId:kTestBidID1
+                                     event:[CLXBidLifecycleEvent loadSuccessEvent]
+                                lossReason:nil
+                            winnerBidPrice:-1.0];
     
     // Then: Win notification should be captured
     XCTAssertEqual(self.mockTracker.winNotifications.count, 1, @"One win notification should be sent");
@@ -161,8 +182,12 @@ static const NSInteger kTestRank3 = 3;
                                          success:NO 
                                       lossReason:@(CLXLossReasonInternalError)];
     
-    // When: Sending loss notification
-    [[CLXWinLossTracker shared] sendLoss:kTestAuctionID bidId:kTestBidID1];
+    // When: Sending loss notification using sendEvent
+    [[CLXWinLossTracker shared] sendEvent:kTestAuctionID
+                                     bidId:kTestBidID1
+                                     event:[CLXBidLifecycleEvent lossEvent]
+                                lossReason:@(CLXLossReasonInternalError)
+                            winnerBidPrice:-1.0];
     
     // Then: Loss notification should be captured with resolved LURL
     XCTAssertEqual(self.mockTracker.lossNotifications.count, 1, @"One loss notification should be sent");
@@ -170,7 +195,7 @@ static const NSInteger kTestRank3 = 3;
     NSDictionary *lossNotification = self.mockTracker.lossNotifications.firstObject;
     XCTAssertEqualObjects(lossNotification[@"auctionId"], kTestAuctionID, @"Auction ID should match");
     XCTAssertEqualObjects(lossNotification[@"bidId"], kTestBidID1, @"Bid ID should match");
-    XCTAssertEqualObjects(lossNotification[@"resolvedURL"], @"https://network1.com/lurl?reason=1", @"LURL should be resolved from bid");
+    XCTAssertEqualObjects(lossNotification[@"url"], kTestLURL1, @"LURL should be sent with raw macros (zero client-side hydration)");
     XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonInternalError, @"Loss reason should match");
     XCTAssertEqualObjects(lossNotification[@"type"], @"loss", @"Notification type should be loss");
 }
@@ -210,7 +235,7 @@ static const NSInteger kTestRank3 = 3;
     
     NSDictionary *lossNotification = self.mockTracker.lossNotifications.firstObject;
     XCTAssertEqualObjects(lossNotification[@"bidId"], kTestBidID1, @"Correct bid ID should be used");
-    XCTAssertEqualObjects(lossNotification[@"resolvedURL"], @"https://network1.com/lurl?reason=1", @"LURL should be resolved");
+    XCTAssertEqualObjects(lossNotification[@"url"], kTestLURL1, @"LURL should be sent with raw macros (zero client-side hydration)");
     XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonInternalError, @"Loss reason should be InternalError");
 }
 
@@ -258,7 +283,7 @@ static const NSInteger kTestRank3 = 3;
     for (NSDictionary *lossNotification in self.mockTracker.lossNotifications) {
         [actualBidIds addObject:lossNotification[@"bidId"]];
         XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonInternalError, @"All should have InternalError reason");
-        XCTAssertNotNil(lossNotification[@"resolvedURL"], @"All should have resolved LURLs");
+        XCTAssertNotNil(lossNotification[@"url"], @"All should have URLs with raw macros");
     }
     
     XCTAssertEqualObjects(actualBidIds, expectedBidIds, @"All expected bid IDs should have loss notifications");
@@ -313,14 +338,18 @@ static const NSInteger kTestRank3 = 3;
                                      lossReason:@(CLXLossReasonInternalError)];
     
     // When: Winner load fails
-    [[CLXWinLossTracker shared] sendLoss:kTestAuctionID bidId:kTestBidID1];
+    [[CLXWinLossTracker shared] sendEvent:kTestAuctionID
+                                     bidId:kTestBidID1
+                                     event:[CLXBidLifecycleEvent lossEvent]
+                                lossReason:@(CLXLossReasonInternalError)
+                            winnerBidPrice:-1.0];
     
     // Then: Loss notification should be sent
     XCTAssertEqual(self.mockTracker.lossNotifications.count, 1, @"Winner load failure should send loss notification");
     
     NSDictionary *lossNotification = self.mockTracker.lossNotifications.firstObject;
     XCTAssertEqualObjects(lossNotification[@"bidId"], kTestBidID1, @"Correct bid ID should be used");
-    XCTAssertEqualObjects(lossNotification[@"resolvedURL"], @"https://network1.com/lurl?reason=1", @"Winner's LURL should be resolved");
+    XCTAssertEqualObjects(lossNotification[@"url"], kTestLURL1, @"Winner's LURL should be sent with raw macros (zero client-side hydration)");
     XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonInternalError, @"Loss reason should be InternalError");
 }
 
@@ -338,7 +367,11 @@ static const NSInteger kTestRank3 = 3;
                                       lossReason:nil];
     
     // When: Winner loads successfully
-    [[CLXWinLossTracker shared] sendWin:kTestAuctionID bidId:kTestBidID1];
+    [[CLXWinLossTracker shared] sendEvent:kTestAuctionID
+                                     bidId:kTestBidID1
+                                     event:[CLXBidLifecycleEvent loadSuccessEvent]
+                                lossReason:nil
+                            winnerBidPrice:-1.0];
     
     // Then: Win notification should be sent
     XCTAssertEqual(self.mockTracker.winNotifications.count, 1, @"Winner load success should send win notification");
@@ -370,8 +403,8 @@ static const NSInteger kTestRank3 = 3;
     [[CLXWinLossTracker shared] setBidLoadResult:kTestAuctionID bidId:kTestBidID3 success:NO lossReason:@(CLXLossReasonLostToHigherBid)];
     
     // When: Losing bids are notified
-    [[CLXWinLossTracker shared] sendLoss:kTestAuctionID bidId:kTestBidID2];
-    [[CLXWinLossTracker shared] sendLoss:kTestAuctionID bidId:kTestBidID3];
+    [[CLXWinLossTracker shared] sendEvent:kTestAuctionID bidId:kTestBidID2 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonLostToHigherBid) winnerBidPrice:-1.0];
+    [[CLXWinLossTracker shared] sendEvent:kTestAuctionID bidId:kTestBidID3 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonLostToHigherBid) winnerBidPrice:-1.0];
     
     // Then: Both losing bids should send loss notifications
     XCTAssertEqual(self.mockTracker.lossNotifications.count, 2, @"Both losing bids should send loss notifications");
@@ -393,14 +426,18 @@ static const NSInteger kTestRank3 = 3;
     [[CLXWinLossTracker shared] setBidLoadResult:kTestAuctionID bidId:kTestBidID1 success:NO lossReason:@(CLXLossReasonLostToHigherBid)];
     
     // When: Loss notification is sent for bid without LURL
-    [[CLXWinLossTracker shared] sendLoss:kTestAuctionID bidId:kTestBidID1];
+    [[CLXWinLossTracker shared] sendEvent:kTestAuctionID
+                                     bidId:kTestBidID1
+                                     event:[CLXBidLifecycleEvent lossEvent]
+                                lossReason:@(CLXLossReasonLostToHigherBid)
+                            winnerBidPrice:-1.0];
     
     // Then: Should handle gracefully without crash
     XCTAssertEqual(self.mockTracker.lossNotifications.count, 1, @"Loss notification should still be sent");
     
     NSDictionary *lossNotification = self.mockTracker.lossNotifications.firstObject;
-    XCTAssertEqualObjects(lossNotification[@"resolvedURL"], @"", @"Empty LURL should be handled gracefully");
-    XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonLostToHigherBid, @"Loss reason should still be correct");
+    XCTAssertNil(lossNotification[@"url"], @"Empty LURL should not be included in payload (filtered out)");
+    XCTAssertEqual([lossNotification[@"lossReason"] integerValue], CLXLossReasonLostToHigherBid, @"Loss reason should match sendEvent parameter");
 }
 
 #pragma mark - MARK: Configuration Tests
@@ -428,9 +465,16 @@ static const NSInteger kTestRank3 = 3;
  * Test behavior with invalid auction/bid IDs
  */
 - (void)testInvalidIds_ShouldHandleGracefully {
+    // Given: Bids must be added before sending events
+    CLXBidResponseBid *emptyIdBid = [self createBidWithId:@"" lurl:nil nurl:kTestNURL1 rank:1 price:kTestPrice];
+    CLXBidResponseBid *invalidBid = [self createBidWithId:@"invalid-bid" lurl:kTestLURL1 nurl:nil rank:2 price:kTestPrice];
+    
+    [[CLXWinLossTracker shared] addBid:@"" bid:emptyIdBid];
+    [[CLXWinLossTracker shared] addBid:@"invalid-auction" bid:invalidBid];
+    
     // When: Sending notifications with invalid IDs
-    [[CLXWinLossTracker shared] sendWin:@"" bidId:@""];
-    [[CLXWinLossTracker shared] sendLoss:@"invalid-auction" bidId:@"invalid-bid"];
+    [[CLXWinLossTracker shared] sendEvent:@"" bidId:@"" event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0];
+    [[CLXWinLossTracker shared] sendEvent:@"invalid-auction" bidId:@"invalid-bid" event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
     
     // Then: Should handle gracefully without crash
     XCTAssertEqual(self.mockTracker.winNotifications.count, 1, @"Win notification should be sent even with empty IDs");
@@ -456,11 +500,11 @@ static const NSInteger kTestRank3 = 3;
     dispatch_group_t group = dispatch_group_create();
     
     dispatch_group_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [[CLXWinLossTracker shared] sendWin:kTestAuctionID bidId:kTestBidID1];
+        [[CLXWinLossTracker shared] sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0];
     });
     
     dispatch_group_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [[CLXWinLossTracker shared] sendLoss:kTestAuctionID bidId:kTestBidID2];
+        [[CLXWinLossTracker shared] sendEvent:kTestAuctionID bidId:kTestBidID2 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
     });
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Concurrent operations"];
@@ -482,7 +526,7 @@ static const NSInteger kTestRank3 = 3;
     // Given: Some data in the mock
     CLXBidResponseBid *bid = [self createBidWithId:kTestBidID1 lurl:kTestLURL1 nurl:kTestNURL1 rank:kTestRank1 price:kTestPrice];
     [[CLXWinLossTracker shared] addBid:kTestAuctionID bid:bid];
-    [[CLXWinLossTracker shared] sendWin:kTestAuctionID bidId:kTestBidID1];
+    [[CLXWinLossTracker shared] sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0];
     [[CLXWinLossTracker shared] setAppKey:@"test-key"];
     
     XCTAssertEqual(self.mockTracker.winNotifications.count, 1, @"Should have win notification before reset");
@@ -543,8 +587,8 @@ static const NSInteger kTestRank3 = 3;
     [tracker addBid:kTestAuctionID bid:bid2];
     
     // Fire events - they cache automatically and delete on success
-    [tracker sendWin:kTestAuctionID bidId:eventId1];
-    [tracker sendLoss:kTestAuctionID bidId:eventId2];
+    [tracker sendEvent:kTestAuctionID bidId:eventId1 event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0];
+    [tracker sendEvent:kTestAuctionID bidId:eventId2 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
     
     // Allow async operations to complete
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
@@ -580,9 +624,9 @@ static const NSInteger kTestRank3 = 3;
     [tracker addBid:kTestAuctionID bid:bid3];
     
     // Send events to trigger caching
-    [tracker sendLoss:kTestAuctionID bidId:eventId1];
-    [tracker sendLoss:kTestAuctionID bidId:eventId2];
-    [tracker sendLoss:kTestAuctionID bidId:eventId3];
+    [tracker sendEvent:kTestAuctionID bidId:eventId1 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
+    [tracker sendEvent:kTestAuctionID bidId:eventId2 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
+    [tracker sendEvent:kTestAuctionID bidId:eventId3 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
     
     // Allow async operations to complete
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
@@ -616,8 +660,8 @@ static const NSInteger kTestRank3 = 3;
     [tracker addBid:kTestAuctionID bid:bid2];
     
     // Send events - they cache automatically
-    [tracker sendLoss:kTestAuctionID bidId:kTestBidID1];
-    [tracker sendLoss:kTestAuctionID bidId:kTestBidID2];
+    [tracker sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
+    [tracker sendEvent:kTestAuctionID bidId:kTestBidID2 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
     
     // Allow async operations to complete
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
@@ -653,7 +697,7 @@ static const NSInteger kTestRank3 = 3;
     // Test 2: Send event should cache (matching Android)
     CLXBidResponseBid *bid = [self createBidWithId:@"test-bid" lurl:@"https://test.com" nurl:nil rank:1 price:1.0];
     [tracker addBid:kTestAuctionID bid:bid];
-    [tracker sendLoss:kTestAuctionID bidId:@"test-bid"];
+    [tracker sendEvent:kTestAuctionID bidId:@"test-bid" event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
     
     NSArray *result = [tracker getAllCachedEvents];
@@ -702,7 +746,7 @@ static const NSInteger kTestRank3 = 3;
     // Send event (payload generated internally, matching Android)
     CLXBidResponseBid *bid = [self createBidWithId:kTestBidID1 lurl:@"https://test.com" nurl:nil rank:1 price:kTestPrice];
     [tracker addBid:kTestAuctionID bid:bid];
-    [tracker sendWin:kTestAuctionID bidId:kTestBidID1];
+    [tracker sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0];
     
     // Allow async operations to complete
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
@@ -755,11 +799,11 @@ static const NSInteger kTestRank3 = 3;
     // The test will focus on error handling in the network layer instead
     
     // Attempt to send win notification - should not crash
-    XCTAssertNoThrow([realTracker sendWin:kTestAuctionID bidId:kTestBidID1], 
+    XCTAssertNoThrow([realTracker sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0], 
                      @"Should handle database failure gracefully");
     
     // Attempt to send loss notification - should not crash
-    XCTAssertNoThrow([realTracker sendLoss:kTestAuctionID bidId:kTestBidID1], 
+    XCTAssertNoThrow([realTracker sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0], 
                      @"Should handle database failure gracefully");
     
     // Clean up
@@ -794,7 +838,7 @@ static const NSInteger kTestRank3 = 3;
                                                      price:1.0 + (i * 0.01)];
             
             [tracker addBid:auctionId bid:bid];
-            [tracker sendLoss:auctionId bidId:bidId];
+            [tracker sendEvent:auctionId bidId:bidId event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
             
             // Small delay to let async operations complete
             [NSThread sleepForTimeInterval:0.001];
@@ -812,7 +856,7 @@ static const NSInteger kTestRank3 = 3;
     // Verify database is still functional after concurrent operations
     CLXBidResponseBid *finalBid = [self createBidWithId:@"final-test-bid" lurl:@"https://test.com/final" nurl:nil rank:1 price:2.0];
     [tracker addBid:@"final-auction" bid:finalBid];
-    [tracker sendWin:@"final-auction" bidId:@"final-test-bid"];
+    [tracker sendEvent:@"final-auction" bidId:@"final-test-bid" event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0];
     
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
     
@@ -846,8 +890,11 @@ static const NSInteger kTestRank3 = 3;
         
         if (i % 10 == 0) {
             // Trigger some win/loss operations
-            [tracker sendWin:[NSString stringWithFormat:@"auction-%ld", (long)i] 
-                       bidId:[NSString stringWithFormat:@"bid-%ld", (long)i]];
+            [tracker sendEvent:[NSString stringWithFormat:@"auction-%ld", (long)i] 
+                         bidId:[NSString stringWithFormat:@"bid-%ld", (long)i]
+                         event:[CLXBidLifecycleEvent loadSuccessEvent]
+                    lossReason:nil
+                winnerBidPrice:-1.0];
         }
     }
     
@@ -882,7 +929,7 @@ static const NSInteger kTestRank3 = 3;
             CLXBidResponseBid *bid = [self createBidWithId:kTestBidID1 lurl:kTestLURL1 nurl:kTestNURL1 rank:kTestRank1 price:kTestPrice];
             XCTAssertNoThrow([tracker addBid:kTestAuctionID bid:bid], 
                              @"Should not crash adding bid with invalid config");
-            XCTAssertNoThrow([tracker sendWin:kTestAuctionID bidId:kTestBidID1], 
+            XCTAssertNoThrow([tracker sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0], 
                              @"Should not crash sending win with invalid config");
         }
     }
@@ -901,9 +948,9 @@ static const NSInteger kTestRank3 = 3;
     [self.mockTracker addBid:kTestAuctionID bid:incompleteBid];
     
     // Should not crash when trying to use incomplete bid
-    XCTAssertNoThrow([self.mockTracker sendWin:kTestAuctionID bidId:nil], 
+    XCTAssertNoThrow([self.mockTracker sendEvent:kTestAuctionID bidId:nil event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0], 
                      @"Should handle nil bid ID gracefully");
-    XCTAssertNoThrow([self.mockTracker sendLoss:kTestAuctionID bidId:@"nonexistent-bid"], 
+    XCTAssertNoThrow([self.mockTracker sendEvent:kTestAuctionID bidId:@"nonexistent-bid" event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0], 
                      @"Should handle nonexistent bid ID gracefully");
 }
 
@@ -923,8 +970,8 @@ static const NSInteger kTestRank3 = 3;
         [self.mockTracker setWinner:kTestAuctionID winningBidId:bidId];
         
         // Trigger some operations
-        [self.mockTracker sendWin:kTestAuctionID bidId:bidId];
-        [self.mockTracker sendLoss:kTestAuctionID bidId:bidIds[0]]; // Try to send loss for same bid
+        [self.mockTracker sendEvent:kTestAuctionID bidId:bidId event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0];
+        [self.mockTracker sendEvent:kTestAuctionID bidId:bidIds[0] event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0]; // Try to send loss for same bid
     }
     
     // Verify mock received calls (exact behavior depends on implementation)
@@ -947,8 +994,8 @@ static const NSInteger kTestRank3 = 3;
     [tracker addBid:kTestAuctionID bid:bid2];
     
     // Send loss events (cache on send if network fails)
-    [tracker sendLoss:kTestAuctionID bidId:kTestBidID1];
-    [tracker sendLoss:kTestAuctionID bidId:kTestBidID2];
+    [tracker sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
+    [tracker sendEvent:kTestAuctionID bidId:kTestBidID2 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
     
     // Allow async operations to complete
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
@@ -1008,9 +1055,9 @@ static const NSInteger kTestRank3 = 3;
     [realTracker addBid:kTestAuctionID bid:problematicBid];
     
     // Should not crash with problematic URLs
-    XCTAssertNoThrow([realTracker sendWin:kTestAuctionID bidId:@"problematic-bid"], 
+    XCTAssertNoThrow([realTracker sendEvent:kTestAuctionID bidId:@"problematic-bid" event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0], 
                      @"Should handle problematic URL templates gracefully");
-    XCTAssertNoThrow([realTracker sendLoss:kTestAuctionID bidId:@"problematic-bid"], 
+    XCTAssertNoThrow([realTracker sendEvent:kTestAuctionID bidId:@"problematic-bid" event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0], 
                      @"Should handle problematic URL templates gracefully");
     
     [realTracker deleteAllEvents];
@@ -1032,6 +1079,20 @@ static const NSInteger kTestRank3 = 3;
         // Create separate tracker instance for each format test
         MockCLXWinLossTracker *formatTracker = [[MockCLXWinLossTracker alloc] init];
         [formatTracker reset];
+        [formatTracker setEndpoint:@"https://test.com/winloss"];
+        [formatTracker setAppKey:@"test-app-key"];
+        
+        // Configure payload mapping
+        CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
+        config.winLossNotificationPayloadConfig = @{
+            @"notificationType": @"sdk.[notificationType]",
+            @"url": @"sdk.[bid.nurl|bid.lurl]",
+            @"auctionId": @"auctionId",
+            @"bidId": @"bidId",
+            @"lossReason": @"lossReason",
+            @"price": @"bid.price"
+        };
+        [formatTracker setConfig:config];
         
         // Set up test bid data
         NSString *auctionId = [NSString stringWithFormat:@"test-auction-%@", formatName];
@@ -1044,7 +1105,7 @@ static const NSInteger kTestRank3 = 3;
         
         // Simulate load failure with internal error (what all formats should send)
         [formatTracker setBidLoadResult:auctionId bidId:bidId success:NO lossReason:@(CLXLossReasonInternalError)];
-        [formatTracker sendLoss:auctionId bidId:bidId];
+        [formatTracker sendEvent:auctionId bidId:bidId event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
         
         // Verify loss notification was sent
         XCTAssertEqual(formatTracker.lossNotifications.count, 1, 
@@ -1081,6 +1142,20 @@ static const NSInteger kTestRank3 = 3;
         // Create separate tracker instance for each format test
         MockCLXWinLossTracker *formatTracker = [[MockCLXWinLossTracker alloc] init];
         [formatTracker reset];
+        [formatTracker setEndpoint:@"https://test.com/winloss"];
+        [formatTracker setAppKey:@"test-app-key"];
+        
+        // Configure payload mapping
+        CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
+        config.winLossNotificationPayloadConfig = @{
+            @"notificationType": @"sdk.[notificationType]",
+            @"url": @"sdk.[bid.nurl|bid.lurl]",
+            @"auctionId": @"auctionId",
+            @"bidId": @"bidId",
+            @"lossReason": @"lossReason",
+            @"price": @"bid.price"
+        };
+        [formatTracker setConfig:config];
         
         // Set up test bid data
         NSString *auctionId = [NSString stringWithFormat:@"test-auction-%@", formatName];
@@ -1093,7 +1168,7 @@ static const NSInteger kTestRank3 = 3;
         
         // Simulate successful load and impression
         [formatTracker setBidLoadResult:auctionId bidId:bidId success:YES lossReason:nil];
-        [formatTracker sendWin:auctionId bidId:bidId];
+        [formatTracker sendEvent:auctionId bidId:bidId event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0];
         
         // Verify win notification was sent
         XCTAssertEqual(formatTracker.winNotifications.count, 1, 
@@ -1124,6 +1199,20 @@ static const NSInteger kTestRank3 = 3;
     
     MockCLXWinLossTracker *consistencyTracker = [[MockCLXWinLossTracker alloc] init];
     [consistencyTracker reset];
+    [consistencyTracker setEndpoint:@"https://test.com/winloss"];
+    [consistencyTracker setAppKey:@"test-app-key"];
+    
+    // Configure payload mapping
+    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
+    config.winLossNotificationPayloadConfig = @{
+        @"notificationType": @"sdk.[notificationType]",
+        @"url": @"sdk.[bid.nurl|bid.lurl]",
+        @"auctionId": @"auctionId",
+        @"bidId": @"bidId",
+        @"lossReason": @"lossReason",
+        @"price": @"bid.price"
+    };
+    [consistencyTracker setConfig:config];
     
     // Test data for multiple formats
     NSArray *testScenarios = @[
@@ -1142,7 +1231,7 @@ static const NSInteger kTestRank3 = 3;
     // Test failure scenario for all formats
     for (NSDictionary *scenario in testScenarios) {
         [consistencyTracker setBidLoadResult:scenario[@"auctionId"] bidId:scenario[@"bidId"] success:NO lossReason:@(CLXLossReasonInternalError)];
-        [consistencyTracker sendLoss:scenario[@"auctionId"] bidId:scenario[@"bidId"]];
+        [consistencyTracker sendEvent:scenario[@"auctionId"] bidId:scenario[@"bidId"] event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
     }
     
     // Verify all formats sent loss notifications
@@ -1190,8 +1279,9 @@ static const NSInteger kTestRank3 = 3;
     XCTAssertEqualObjects(lifecycleEvent[@"urlType"], @"nurl", @"URL type should be nurl");
     XCTAssertEqualObjects(lifecycleEvent[@"notificationType"], @"loadSuccess", @"Notification type should match");
     
-    // CRITICAL: LOAD_SUCCESS should NOT add to winNotifications (not a billable impression)
-    XCTAssertEqual(self.mockTracker.winNotifications.count, 0, @"LOAD_SUCCESS should NOT count as win for revenue");
+    // LOAD_SUCCESS should be tracked (SDK sends the notification)
+    // Note: Server determines which events count as billable impressions (typically only renderSuccess)
+    XCTAssertEqual(self.mockTracker.winNotifications.count, 1, @"LOAD_SUCCESS event should be sent to server");
     XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should not have loss notifications");
 }
 
@@ -1233,11 +1323,11 @@ static const NSInteger kTestRank3 = 3;
     XCTAssertEqual(self.mockTracker.winNotifications.count, 1, @"RENDER_SUCCESS MUST count as win for revenue");
     XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should not have loss notifications");
     
-    // Verify win notification has resolved URL
+    // Verify win notification has RAW URL with macros intact (zero client-side hydration)
     NSDictionary *winNotification = self.mockTracker.winNotifications.firstObject;
-    NSString *resolvedURL = winNotification[@"resolvedURL"];
-    XCTAssertTrue([resolvedURL containsString:@"price=2.50"], @"burl should have resolved price");
-    XCTAssertFalse([resolvedURL containsString:@"${AUCTION_PRICE}"], @"Template should be replaced");
+    NSString *url = winNotification[@"url"];
+    XCTAssertTrue([url containsString:@"${AUCTION_PRICE}"], @"URL must contain raw macro - server does hydration");
+    XCTAssertFalse([url containsString:@"price=2.50"], @"URL must NOT have client-side hydration");
 }
 
 /**
@@ -1325,11 +1415,8 @@ static const NSInteger kTestRank3 = 3;
     [tracker addBid:kTestAuctionID bid:bid2];
     
     // These events will attempt to send and may or may not cache depending on network
-    [tracker sendLoss:kTestAuctionID bidId:kTestBidID1];
-    [tracker sendLoss:kTestAuctionID bidId:kTestBidID2];
-    
-    // Wait for async operations
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
+    [tracker sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
+    [tracker sendEvent:kTestAuctionID bidId:kTestBidID2 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
     
     // When: Delete all events (this is what happens after successful retry)
     [tracker deleteAllEvents];
@@ -1341,7 +1428,7 @@ static const NSInteger kTestRank3 = 3;
     // Verify we can still use the database after deletion
     CLXBidResponseBid *bid3 = [self createBidWithId:kTestBidID3 lurl:kTestLURL3 nurl:nil rank:3 price:1.0];
     [tracker addBid:@"new-auction" bid:bid3];
-    XCTAssertNoThrow([tracker sendLoss:@"new-auction" bidId:kTestBidID3], 
+    XCTAssertNoThrow([tracker sendEvent:@"new-auction" bidId:kTestBidID3 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0], 
                      @"Database should still be functional after deleteAllEvents");
     
     // Clean up
@@ -1363,7 +1450,7 @@ static const NSInteger kTestRank3 = 3;
     [tracker addBid:kTestAuctionID bid:bid];
     
     // When: Send event (will fail due to invalid endpoint)
-    [tracker sendLoss:kTestAuctionID bidId:kTestBidID1];
+    [tracker sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
     
     // Allow async operation to complete
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
@@ -1388,17 +1475,17 @@ static const NSInteger kTestRank3 = 3;
     [self.mockTracker addBid:kTestAuctionID bid:zeroPriceBid];
     
     // When: Send win notification with zero price
-    [self.mockTracker sendWin:kTestAuctionID bidId:kTestBidID1];
+    [self.mockTracker sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0];
     
     // Then: Should handle gracefully
     XCTAssertEqual(self.mockTracker.winNotifications.count, 1, @"Should send notification even with zero price");
     
     NSDictionary *winNotification = self.mockTracker.winNotifications.firstObject;
-    NSString *resolvedURL = winNotification[@"resolvedURL"];
+    NSString *url = winNotification[@"url"];
     
-    // Verify zero price is formatted correctly (0.00)
-    XCTAssertTrue([resolvedURL containsString:@"0.00"], @"Zero price should format as 0.00");
-    XCTAssertFalse([resolvedURL containsString:@"${AUCTION_PRICE}"], @"Template should be replaced");
+    // Verify URL has raw macro intact (zero client-side hydration)
+    XCTAssertTrue([url containsString:@"${AUCTION_PRICE}"], @"URL must contain raw macro - server does hydration");
+    XCTAssertFalse([url containsString:@"0.00"], @"URL must NOT have client-side hydration");
 }
 
 /**
@@ -1411,7 +1498,7 @@ static const NSInteger kTestRank3 = 3;
     [self.mockTracker addBid:kTestAuctionID bid:negativePriceBid];
     
     // When: Send win notification
-    XCTAssertNoThrow([self.mockTracker sendWin:kTestAuctionID bidId:kTestBidID1], 
+    XCTAssertNoThrow([self.mockTracker sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0], 
                      @"Should not crash with negative price");
     
     // Then: Should handle without crash
@@ -1429,15 +1516,17 @@ static const NSInteger kTestRank3 = 3;
     [self.mockTracker addBid:kTestAuctionID bid:largePriceBid];
     
     // When: Send win notification
-    [self.mockTracker sendWin:kTestAuctionID bidId:kTestBidID1];
+    [self.mockTracker sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0];
     
     // Then: Should format correctly
     XCTAssertEqual(self.mockTracker.winNotifications.count, 1, @"Should send notification");
     
     NSDictionary *winNotification = self.mockTracker.winNotifications.firstObject;
-    NSString *resolvedURL = winNotification[@"resolvedURL"];
+    NSString *url = winNotification[@"url"];
     
-    XCTAssertTrue([resolvedURL containsString:@"9999.99"], @"Large price should format correctly");
+    // URL should contain raw macro (server does hydration), but verify bid price is captured correctly
+    XCTAssertTrue([url containsString:@"${AUCTION_PRICE}"], @"URL must contain raw macro - server does hydration");
+    XCTAssertEqualObjects(winNotification[@"bidPrice"], @(9999.99), @"Large price should be captured correctly in payload");
 }
 
 /**
@@ -1451,17 +1540,18 @@ static const NSInteger kTestRank3 = 3;
     [self.mockTracker addBid:kTestAuctionID bid:precisePriceBid];
     
     // When: Send win notification
-    [self.mockTracker sendWin:kTestAuctionID bidId:kTestBidID1];
+    [self.mockTracker sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0];
     
     // Then: Should round to 2 decimal places
     XCTAssertEqual(self.mockTracker.winNotifications.count, 1, @"Should send notification");
     
     NSDictionary *winNotification = self.mockTracker.winNotifications.firstObject;
-    NSString *resolvedURL = winNotification[@"resolvedURL"];
+    NSString *url = winNotification[@"url"];
     
-    // Should be rounded to 3.14 (2 decimals)
-    XCTAssertTrue([resolvedURL containsString:@"3.14"], @"Should round to 2 decimal places");
-    XCTAssertFalse([resolvedURL containsString:@"3.14159"], @"Should not include extra decimals");
+    // URL should contain raw macro (server does hydration), but verify bid price is captured correctly
+    XCTAssertTrue([url containsString:@"${AUCTION_PRICE}"], @"URL must contain raw macro - server does hydration");
+    // Bid price should be stored as double (not rounded by iOS)
+    XCTAssertEqualObjects(winNotification[@"bidPrice"], @(3.14159), @"Bid price should be stored with full precision");
 }
 
 /**
@@ -1474,13 +1564,14 @@ static const NSInteger kTestRank3 = 3;
     [self.mockTracker addBid:kTestAuctionID bid:simplePriceBid];
     
     // When: Send win notification
-    [self.mockTracker sendWin:kTestAuctionID bidId:kTestBidID1];
+    [self.mockTracker sendEvent:kTestAuctionID bidId:kTestBidID1 event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0];
     
-    // Then: Should always use 2 decimal places (3.50)
+    // Then: URL should contain raw macro (server does hydration)
     NSDictionary *winNotification = self.mockTracker.winNotifications.firstObject;
-    NSString *resolvedURL = winNotification[@"resolvedURL"];
+    NSString *url = winNotification[@"url"];
     
-    XCTAssertTrue([resolvedURL containsString:@"3.50"], @"Should format as 3.50 with trailing zero");
+    XCTAssertTrue([url containsString:@"${AUCTION_PRICE}"], @"URL must contain raw macro - server does hydration");
+    XCTAssertEqualObjects(winNotification[@"bidPrice"], @(3.5), @"Bid price should be stored as double (3.5)");
 }
 
 @end

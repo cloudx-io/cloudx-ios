@@ -17,6 +17,7 @@
 #import <CloudXCore/CLXAdEventReporter.h>
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXWinLossTracker.h>
+#import <CloudXCore/CLXBidLifecycleEvent.h>
 
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBidNetworkService.h>
@@ -411,7 +412,7 @@ NS_ASSUME_NONNULL_BEGIN
                 [strongSelf.winLossTracker addBid:response.id bid:bid];
             }
             
-            // No pre-caching (matching Android's simplified approach - events fire immediately when they occur)
+            // No pre-caching - events fire immediately when they occur
             [strongSelf.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] Registered %lu bids for auction: %@", 
                                      (unsigned long)allBids.count, response.id]];
         }
@@ -539,14 +540,20 @@ NS_ASSUME_NONNULL_BEGIN
     [self.logger debug:[NSString stringWithFormat:@"❌ [CLXBidAdSource] Bid %ld failed creation: rank=%ld, id=%@", 
                        (long)bidIndex + 1, (long)currentBid.ext.cloudx.rank, currentBid.id]];
     
-    // Send server-side loss notification for adapter creation failures (replaces client-side LURL firing)
+    // Send server-side loss notification for adapter creation failures
     if (auctionID && currentBid.id) {
         [self.winLossTracker setBidLoadResult:auctionID 
                                        bidId:currentBid.id 
                                      success:NO 
                                   lossReason:@(CLXLossReasonInternalError)];
-        [self.winLossTracker sendLoss:auctionID bidId:currentBid.id];
-        [self.logger debug:[NSString stringWithFormat:@"📤 [CLXBidAdSource] Sent server-side loss notification for uncreatable bid rank=%ld, reason=InternalError", (long)currentBid.ext.cloudx.rank]];
+        
+        [self.winLossTracker sendEvent:auctionID
+                                  bidId:currentBid.id
+                                  event:[CLXBidLifecycleEvent lossEvent]
+                             lossReason:@(CLXLossReasonInternalError)
+                         winnerBidPrice:-1.0];
+        
+        [self.logger debug:[NSString stringWithFormat:@"📤 [CLXBidAdSource] Sent LOSS event for uncreatable bid rank=%ld, reason=InternalError", (long)currentBid.ext.cloudx.rank]];
     }
     
     // Try next bid in waterfall

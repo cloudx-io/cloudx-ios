@@ -4,7 +4,7 @@
 
 /**
  * @file CLXAuctionBidManager.h
- * @brief Auction bid state manager matching Android AuctionBidManager
+ * @brief Auction bid state manager
  * 
  * Manages bid states throughout the auction lifecycle for win/loss tracking.
  * Tracks which bids succeeded, failed, and their loss reasons.
@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Manages auction bid state tracking
- * Matches Android's AuctionBidManager functionality
+ * Tracks bid states and metadata for auction lifecycle
  */
 @interface CLXAuctionBidManager : NSObject
 

@@ -30,6 +30,22 @@
     [super setUp];
     self.mockTracker = [[MockCLXWinLossTracker alloc] init];
     [CLXWinLossTracker setSharedInstanceForTesting:self.mockTracker];
+    
+    // Configure with payload mapping (simulating server config)
+    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
+    config.winLossNotificationURL = @"https://test.com/winloss";
+    config.winLossNotificationPayloadConfig = @{
+        @"notificationType": @"sdk.[notificationType]",
+        @"url": @"sdk.[bid.nurl|bid.lurl]",
+        @"auctionId": @"auctionId",
+        @"bidId": @"bidId",
+        @"lossReason": @"lossReason"
+    };
+    [[CLXWinLossTracker shared] setConfig:config];
+    
+    // Set endpoint and app key - required for trackWinLoss to be called
+    [[CLXWinLossTracker shared] setEndpoint:@"https://test.com/winloss"];
+    [[CLXWinLossTracker shared] setAppKey:@"test-app-key"];
 }
 
 - (void)tearDown {

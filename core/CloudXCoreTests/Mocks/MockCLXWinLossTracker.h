@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Comprehensive mock for CLXWinLossTracker that captures all business-critical tracking events
  * for robust testing of revenue recognition and bid lifecycle management.
  */
-@interface MockCLXWinLossTracker : NSObject <CLXWinLossTracking>
+@interface MockCLXWinLossTracker : CLXWinLossTracker
 
 #pragma mark - Win/Loss Event Tracking
 
@@ -24,6 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Lifecycle event tracking for new event system
 @property (nonatomic, strong) NSMutableArray<NSDictionary *> *lifecycleEvents;
+
+// All payloads sent via trackWinLoss for debugging
+@property (nonatomic, strong) NSMutableArray<NSDictionary *> *allPayloadsSent;
 
 // Call count tracking for tests (thread-safe accessors via methods)
 @property (nonatomic, assign) NSInteger sendWinCallCount;

@@ -559,14 +559,20 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 #pragma mark - Private Helper Methods
 
 - (void)sendLossNotificationForFailedAd:(CLXAdType)adType {
-    // Send server-side loss notification for technical errors (matching banner implementation)
+    // Send server-side loss notification for technical errors
     if (self.lastBidResponse && self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
         [self.winLossTracker setBidLoadResult:self.currentBidResponse.id 
                                        bidId:self.lastBidResponse.bid.id 
                                      success:NO 
                                   lossReason:@(CLXLossReasonInternalError)];
-        [self.winLossTracker sendLoss:self.currentBidResponse.id bidId:self.lastBidResponse.bid.id];
-        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Sent server-side loss notification for failed ad type %ld, reason=InternalError", (long)adType]];
+        
+        [self.winLossTracker sendEvent:self.currentBidResponse.id
+                                  bidId:self.lastBidResponse.bid.id
+                                  event:[CLXBidLifecycleEvent lossEvent]
+                             lossReason:@(CLXLossReasonInternalError)
+                         winnerBidPrice:-1.0];
+        
+        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Sent LOSS event for failed ad type %ld, reason=InternalError", (long)adType]];
     } else {
         [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Missing data for ad type %ld loss notification: bidID=%@, auctionID=%@", 
                            (long)adType, self.lastBidResponse.bid.id ?: @"(nil)", self.currentBidResponse.id ?: @"(nil)"]];

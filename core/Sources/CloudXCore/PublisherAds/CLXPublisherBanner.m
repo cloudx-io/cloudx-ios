@@ -562,8 +562,14 @@ NS_ASSUME_NONNULL_BEGIN
                                        bidId:self.lastBidResponse.bid.id 
                                      success:NO 
                                   lossReason:@(CLXLossReasonInternalError)];
-        [self.winLossTracker sendLoss:self.currentBidResponse.id bidId:self.lastBidResponse.bid.id];
-        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherBanner] Sent server-side loss notification for failed winner rank=%ld, reason=InternalError", (long)self.lastBidResponse.bid.ext.cloudx.rank]];
+        
+        [self.winLossTracker sendEvent:self.currentBidResponse.id
+                                  bidId:self.lastBidResponse.bid.id
+                                  event:[CLXBidLifecycleEvent lossEvent]
+                             lossReason:@(CLXLossReasonInternalError)
+                         winnerBidPrice:-1.0];
+        
+        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherBanner] Sent LOSS event for failed winner rank=%ld, reason=InternalError", (long)self.lastBidResponse.bid.ext.cloudx.rank]];
     }
     
     // Reset state for next interval

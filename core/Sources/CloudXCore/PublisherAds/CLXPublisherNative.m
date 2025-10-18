@@ -447,14 +447,20 @@ NS_ASSUME_NONNULL_BEGIN
         return;
     }
     
-    // Send server-side loss notification for technical errors (matching banner implementation)
+    // Send server-side loss notification for technical errors
     if (self.lastBidResponse && self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
         [self.winLossTracker setBidLoadResult:self.currentBidResponse.id 
                                        bidId:self.lastBidResponse.bid.id 
                                      success:NO 
                                   lossReason:@(CLXLossReasonInternalError)];
-        [self.winLossTracker sendLoss:self.currentBidResponse.id bidId:self.lastBidResponse.bid.id];
-        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherNative] Sent server-side loss notification for failed native ad, reason=InternalError"]];
+        
+        [self.winLossTracker sendEvent:self.currentBidResponse.id
+                                  bidId:self.lastBidResponse.bid.id
+                                  event:[CLXBidLifecycleEvent lossEvent]
+                             lossReason:@(CLXLossReasonInternalError)
+                         winnerBidPrice:-1.0];
+        
+        [self.logger debug:@"📤 [PublisherNative] Sent LOSS event for failed native ad, reason=InternalError"];
     } else {
         [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherNative] Missing data for native loss notification: bidID=%@, auctionID=%@", 
                            self.lastBidResponse.bid.id ?: @"(nil)", self.currentBidResponse.id ?: @"(nil)"]];

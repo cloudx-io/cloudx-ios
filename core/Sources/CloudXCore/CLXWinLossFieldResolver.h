@@ -4,10 +4,9 @@
 
 /**
  * @file CLXWinLossFieldResolver.h
- * @brief Win/Loss field resolver matching Android WinLossFieldResolver
+ * @brief Win/Loss field resolver for payload construction
  * 
  * Resolves dynamic fields for win/loss notification payloads using server-driven configuration.
- * This matches the Android implementation exactly for consistent cross-platform behavior.
  */
 
 #import <Foundation/Foundation.h>
@@ -21,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXBidLifecycleEvent;
 
 /**
- * iOS equivalent of Android's WinLossFieldResolver
+ * Resolves fields in win/loss notification payloads
  * Builds win/loss notification payloads with dynamic field resolution
  */
 @interface CLXWinLossFieldResolver : NSObject
@@ -50,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Builds a win/loss notification payload with dynamic field resolution
- * Matches Android's buildWinLossPayload method exactly
+ * Builds a complete win/loss notification payload
  * 
  * @param auctionId The auction identifier
  * @param bid The bid object (nullable for some loss scenarios)

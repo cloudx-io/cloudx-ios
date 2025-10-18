@@ -45,6 +45,22 @@ static const double kTestLoserPrice2 = 2.25;
     [super setUp];
     self.mockTracker = [[MockCLXWinLossTracker alloc] init];
     [CLXWinLossTracker setSharedInstanceForTesting:self.mockTracker];
+    
+    // Configure with payload mapping (simulating server config)
+    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
+    config.winLossNotificationURL = @"https://test.com/winloss";
+    config.winLossNotificationPayloadConfig = @{
+        @"notificationType": @"sdk.[notificationType]",
+        @"url": @"sdk.[bid.nurl|bid.lurl]",
+        @"auctionId": @"auctionId",
+        @"bidId": @"bidId",
+        @"lossReason": @"lossReason"
+    };
+    [[CLXWinLossTracker shared] setConfig:config];
+    
+    // Set endpoint and app key - required for trackWinLoss to be called
+    [[CLXWinLossTracker shared] setEndpoint:@"https://test.com/winloss"];
+    [[CLXWinLossTracker shared] setAppKey:@"test-app-key"];
 }
 
 - (void)tearDown {
@@ -137,20 +153,20 @@ static const double kTestLoserPrice2 = 2.25;
     [[CLXWinLossTracker shared] sendLossNotificationsForLosingBids:kTestAuctionID
                                                      winningBidId:kTestWinnerBidID
                                                           allBids:@[]];
-    XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should handle empty bid array");
+XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should handle empty bid array");
     
     // Test 2: Single bid (winner only)
     CLXBidResponseBid *singleBid = [self createBidWithId:kTestWinnerBidID price:kTestWinnerPrice rank:1];
     [[CLXWinLossTracker shared] sendLossNotificationsForLosingBids:kTestAuctionID
                                                      winningBidId:kTestWinnerBidID
                                                           allBids:@[singleBid]];
-    XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should not send loss notifications when only winner exists");
+XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should not send loss notifications when only winner exists");
     
     // Test 3: Nil parameters
     [[CLXWinLossTracker shared] sendLossNotificationsForLosingBids:nil
                                                      winningBidId:nil
                                                           allBids:nil];
-    XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should handle nil parameters gracefully");
+XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should handle nil parameters gracefully");
 }
 
 #pragma mark - MARK: REAL Publisher Integration Tests
@@ -309,15 +325,13 @@ static const double kTestLoserPrice2 = 2.25;
         // Then: Should have called the win/loss tracker
         XCTAssertTrue(YES, @"fireLosingBidLurls method was called successfully on native publisher");
         
-        // ENHANCED: Verify actual URL resolution in publisher integration
+        // ENHANCED: Verify raw URLs with macros intact (zero client-side hydration)
         if (self.mockTracker.lossNotifications.count > 0) {
             for (NSDictionary *lossNotification in self.mockTracker.lossNotifications) {
-                NSString *resolvedURL = lossNotification[@"resolvedURL"];
-                if (resolvedURL) {
-                    XCTAssertFalse([resolvedURL containsString:@"${AUCTION_PRICE}"], 
-                                  @"Publisher integration should resolve all URL templates");
-                    XCTAssertFalse([resolvedURL containsString:@"${AUCTION_LOSS}"], 
-                                  @"Publisher integration should resolve all URL templates");
+                NSString *url = lossNotification[@"url"];
+                if (url) {
+                    XCTAssertTrue([url containsString:@"${AUCTION_PRICE}"] || [url containsString:@"${AUCTION_LOSS}"], 
+                                  @"Publisher integration must send raw URLs with macros intact (zero client-side hydration)");
                 }
             }
         }
@@ -411,7 +425,11 @@ static const double kTestLoserPrice2 = 2.25;
                                                bidId:formatBidId 
                                              success:NO 
                                           lossReason:@(CLXLossReasonInternalError)];
-        [[CLXWinLossTracker shared] sendLoss:formatAuctionId bidId:formatBidId];
+        [[CLXWinLossTracker shared] sendEvent:formatAuctionId
+                                         bidId:formatBidId
+                                         event:[CLXBidLifecycleEvent lossEvent]
+                                    lossReason:@(CLXLossReasonInternalError)
+                                winnerBidPrice:-1.0];
         
         // Then: Should use TechnicalError reason
         XCTAssertEqual(self.mockTracker.lossNotifications.count, 1, 
@@ -448,7 +466,11 @@ static const double kTestLoserPrice2 = 2.25;
                                            bidId:kTestLoserBidID1 
                                          success:NO 
                                       lossReason:@(CLXLossReasonInternalError)];
-    [[CLXWinLossTracker shared] sendLoss:kTestAuctionID bidId:kTestLoserBidID1];
+    [[CLXWinLossTracker shared] sendEvent:kTestAuctionID
+                                     bidId:kTestLoserBidID1
+                                     event:[CLXBidLifecycleEvent lossEvent]
+                                lossReason:@(CLXLossReasonInternalError)
+                            winnerBidPrice:-1.0];
     
     // 2. Competitive loss for remaining losing bid (when winner loads)
     [[CLXWinLossTracker shared] sendLossNotificationsForLosingBids:kTestAuctionID

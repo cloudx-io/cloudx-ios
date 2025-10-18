@@ -4,7 +4,7 @@
 
 /**
  * @file CLXWinLossFieldResolver.m
- * @brief Implementation of Win/Loss field resolver matching Android exactly
+ * @brief Implementation of Win/Loss field resolver
  */
 
 #import <CloudXCore/CLXWinLossFieldResolver.h>
@@ -14,7 +14,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBidLifecycleEvent.h>
 
-// Template placeholders matching Android implementation
+// Template placeholders for dynamic field resolution
 static NSString *const kPlaceholderAuctionPrice = @"${AUCTION_PRICE}";
 static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
 
@@ -56,50 +56,6 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
                        (unsigned long)self.winLossPayloadMapping.count]];
 }
 
-- (nullable NSDictionary<NSString *, id> *)buildWinLossPayloadWithAuctionId:(NSString *)auctionId
-                                                                        bid:(nullable CLXBidResponseBid *)bid
-                                                                 lossReason:(nullable NSNumber *)lossReason
-                                                                      isWin:(BOOL)isWin
-                                                              loadedBidPrice:(double)loadedBidPrice {
-    
-    // Return nil if no payload mapping configured (matches Android behavior)
-    NSDictionary<NSString *, NSString *> *payloadMapping = self.winLossPayloadMapping;
-    if (!payloadMapping) {
-        [self.logger debug:@"📊 [WinLossFieldResolver] No payload mapping configured, returning nil"];
-        return nil;
-    }
-    
-    NSMutableDictionary<NSString *, id> *result = [NSMutableDictionary dictionary];
-    
-    // Resolve each field in the payload mapping (matches Android's forEach logic)
-    [payloadMapping enumerateKeysAndObjectsUsingBlock:^(NSString *payloadKey, NSString *fieldPath, BOOL *stop) {
-        id resolvedValue = [self resolveWinLossFieldWithAuctionId:auctionId
-                                                              bid:bid
-                                                       lossReason:lossReason
-                                                        fieldPath:fieldPath
-                                                            isWin:isWin
-                                                   loadedBidPrice:loadedBidPrice];
-        
-        // Only add non-nil values to result 
-        if (resolvedValue) {
-            result[payloadKey] = resolvedValue;
-        } else {
-            // Log missing fields for debugging
-            [self.logger debug:[NSString stringWithFormat:@"⚠️ [WinLossFieldResolver] Field '%@' -> '%@' resolved to nil", payloadKey, fieldPath]];
-        }
-    }];
-    
-    [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossFieldResolver] Built payload with %lu fields for %@ event", 
-                       (unsigned long)result.count, isWin ? @"WIN" : @"LOSS"]];
-    
-    // Always return a payload, even if empty - this ensures events are cached for retry
-    // The server can handle missing fields better than losing the entire event
-    if (result.count == 0) {
-        [self.logger debug:[NSString stringWithFormat:@"⚠️ [WinLossFieldResolver] Empty payload for %@ event - auction: %@, bid: %@", 
-                           isWin ? @"WIN" : @"LOSS", auctionId, bid.id]];
-    }
-    return [result copy];
-}
 
 - (nullable NSDictionary<NSString *, id> *)buildWinLossPayloadWithAuctionId:(NSString *)auctionId
                                                                         bid:(nullable CLXBidResponseBid *)bid
@@ -125,13 +81,20 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
                                                             event:event
                                                    loadedBidPrice:loadedBidPrice];
         
-        // Only add non-nil values to result 
-        if (resolvedValue) {
-            result[payloadKey] = resolvedValue;
-        } else {
-            // Log missing fields for debugging
+        // Only add non-nil and non-empty values to result 
+        // Filter out nil values
+        if (!resolvedValue) {
             [self.logger debug:[NSString stringWithFormat:@"⚠️ [WinLossFieldResolver] Field '%@' -> '%@' resolved to nil", payloadKey, fieldPath]];
+            return;
         }
+        
+        // Filter out empty strings
+        if ([resolvedValue isKindOfClass:[NSString class]] && [(NSString *)resolvedValue length] == 0) {
+            [self.logger debug:[NSString stringWithFormat:@"⚠️ [WinLossFieldResolver] Field '%@' -> '%@' resolved to empty string", payloadKey, fieldPath]];
+            return;
+        }
+        
+        result[payloadKey] = resolvedValue;
     }];
     
     [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossFieldResolver] Built payload with %lu fields for %@ event (type: %@)", 
@@ -158,8 +121,21 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
     
     // Handle new dynamic fields for lifecycle events
     if ([fieldPath isEqualToString:@"notification"]) {
-        // Return notification type from lifecycle event
+        // Return notification type from lifecycle event (camelCase)
         return event.notificationType.length > 0 ? event.notificationType : nil;
+        
+    } else if ([fieldPath isEqualToString:@"sdk.[notificationType]"]) {
+        // Return notification type in snake_case format for server compatibility
+        // Convert camelCase to snake_case: loadSuccess -> load_success, renderSuccess -> render_success
+        NSString *notificationType = event.notificationType;
+        if ([notificationType isEqualToString:@"loadSuccess"]) {
+            return @"load_success";
+        } else if ([notificationType isEqualToString:@"renderSuccess"]) {
+            return @"render_success";
+        } else if ([notificationType isEqualToString:@"loss"]) {
+            return @"loss";
+        }
+        return notificationType; // Fallback: return as-is
         
     } else if ([fieldPath isEqualToString:@"url"]) {
         // Dynamic URL resolution based on event's urlType
@@ -171,18 +147,58 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         } else if ([urlType isEqualToString:@"lurl"]) {
             url = bid.lurl;
         } else if ([urlType isEqualToString:@"burl"]) {
-            url = bid.burl;  // ✅ BURL now supported!
+            url = bid.burl;
         }
         
-        if (url && url.length > 0) {
-            return [self replaceUrlTemplatesInUrl:url
-                                       lossReason:lossReason
-                                   loadedBidPrice:loadedBidPrice];
+        // Return raw URL with macros INTACT - server will hydrate
+        // Zero client-side URL hydration - macros are resolved server-side
+        return url;
+        
+    } else if ([fieldPath isEqualToString:@"sdk.[bid.nurl|bid.lurl]"]) {
+        // Dynamic URL resolution based on event's urlType (alternative syntax)
+        NSString *urlType = event.urlType;
+        NSString *url = nil;
+        
+        if ([urlType isEqualToString:@"nurl"]) {
+            url = bid.nurl;
+        } else if ([urlType isEqualToString:@"lurl"]) {
+            url = bid.lurl;
+        } else if ([urlType isEqualToString:@"burl"]) {
+            url = bid.burl;
+        }
+        
+        // Return raw URL with macros INTACT - server will hydrate
+        return url;
+        
+    } else if ([fieldPath isEqualToString:@"sdk.win"]) {
+        // Return "win" only for win events (loadSuccess or renderSuccess)
+        if (event.type == CLXBidLifecycleEventTypeLoadSuccess || event.type == CLXBidLifecycleEventTypeRenderSuccess) {
+            return @"win";
         }
         return nil;
         
+    } else if ([fieldPath isEqualToString:@"sdk.loss"]) {
+        // Return "loss" only for loss events
+        if (event.type == CLXBidLifecycleEventTypeLoss) {
+            return @"loss";
+        }
+        return nil;
+        
+    } else if ([fieldPath isEqualToString:@"sdk.[win|loss]"]) {
+        // Return "win" or "loss" based on event type
+        if (event.type == CLXBidLifecycleEventTypeLoadSuccess || event.type == CLXBidLifecycleEventTypeRenderSuccess) {
+            return @"win";
+        } else if (event.type == CLXBidLifecycleEventTypeLoss) {
+            return @"loss";
+        }
+        return nil;
+        
+    } else if ([fieldPath isEqualToString:@"lossReason"]) {
+        // Return numeric loss reason value (for payload)
+        return lossReason;
+        
     } else if ([fieldPath isEqualToString:@"sdk.lossReason"]) {
-        // Return string description matching Android's lossReason.description
+        // Return human-readable loss reason description
         if (!lossReason) {
             return nil;
         }
@@ -227,7 +243,7 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
 }
 
 /**
- * Resolves individual win/loss fields - matches Android's resolveWinLossField method exactly
+ * Resolves individual win/loss fields from bid data and lifecycle events
  * (Legacy method for backwards compatibility)
  */
 - (nullable id)resolveWinLossFieldWithAuctionId:(NSString *)auctionId
@@ -237,7 +253,7 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
                                           isWin:(BOOL)isWin
                                  loadedBidPrice:(double)loadedBidPrice {
     
-    // Match Android's switch statement exactly
+    // Resolve field based on path
     if ([fieldPath isEqualToString:@"sdk.win"]) {
         return isWin ? @"win" : nil;
         
@@ -245,7 +261,7 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         return !isWin ? @"loss" : nil;
         
     } else if ([fieldPath isEqualToString:@"sdk.lossReason"]) {
-        // Return string description matching Android's lossReason.description
+        // Return human-readable loss reason description
         if (!lossReason) {
             return nil;
         }
@@ -267,7 +283,7 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         return @"sdk";
         
     } else if ([fieldPath isEqualToString:@"sdk.[bid.nurl|bid.lurl]"]) {
-        // Extract nurl/lurl from bid based on win/loss status (matches Android exactly)
+        // Extract nurl/lurl from bid based on win/loss status
         NSString *url = nil;
         if (isWin) {
             url = bid.nurl;
@@ -275,13 +291,9 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
             url = bid.lurl;
         }
         
-        if (url && url.length > 0) {
-            return [self replaceUrlTemplatesInUrl:url
-                                            isWin:isWin
-                                       lossReason:lossReason
-                                   loadedBidPrice:loadedBidPrice];
-        }
-        return nil;
+        // Return raw URL with macros INTACT - server will hydrate
+        // Zero client-side URL hydration - macros are resolved server-side
+        return url;
         
     } else if ([fieldPath isEqualToString:@"auctionId"]) {
         // Return the auction ID directly
@@ -299,14 +311,6 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         // Return the bid price from the bid
         return @(bid.price);
         
-    } else if ([fieldPath isEqualToString:@"eventType"]) {
-        // Return the event type based on win/loss status
-        return isWin ? @"win" : @"loss";
-        
-    } else if ([fieldPath isEqualToString:@"originalURL"]) {
-        // Return the original URL template before replacement
-        return isWin ? bid.nurl : bid.lurl;
-        
     } else if ([fieldPath isEqualToString:@"sdk.loopIndex"]) {
         // Delegate to injected tracking field resolver for loop index
         id loopIndex = [self.trackingFieldResolver resolveField:fieldPath forAuction:auctionId];
@@ -322,65 +326,33 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
 }
 
 /**
- * Replaces URL templates with actual values (new method without isWin parameter)
+ * URL macro replacement method (no longer used - kept for reference)
+ * 
+ * URLs are now sent to the server with macros INTACT (${AUCTION_PRICE}, ${AUCTION_LOSS}),
+ * and the server performs macro substitution before firing the URLs.
+ * 
+ * URL template replacement for server-side hydration
+ * but is never called (dead code).
  */
 - (NSString *)replaceUrlTemplatesInUrl:(NSString *)url
                             lossReason:(nullable NSNumber *)lossReason
                         loadedBidPrice:(double)loadedBidPrice {
-    
-    NSString *processedUrl = [url copy];
-    
-    // Replace ${AUCTION_PRICE} template
-    if ([processedUrl containsString:kPlaceholderAuctionPrice]) {
-        NSString *priceString = [NSString stringWithFormat:@"%.2f", loadedBidPrice];
-        processedUrl = [processedUrl stringByReplacingOccurrencesOfString:kPlaceholderAuctionPrice 
-                                                               withString:priceString];
-    }
-    
-    // Replace ${AUCTION_LOSS} template
-    if ([processedUrl containsString:kPlaceholderAuctionLoss]) {
-        NSInteger lossReasonCode = lossReason ? lossReason.integerValue : 1;
-        NSString *lossReasonString = [NSString stringWithFormat:@"%ld", (long)lossReasonCode];
-        processedUrl = [processedUrl stringByReplacingOccurrencesOfString:kPlaceholderAuctionLoss 
-                                                               withString:lossReasonString];
-    }
-    
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [WinLossFieldResolver] URL template replacement - Original: %@, Processed: %@", 
-                       url, processedUrl]];
-    
-    return processedUrl;
+    // No longer performing client-side macro replacement
+    // Server now handles ${AUCTION_PRICE} and ${AUCTION_LOSS} substitution
+    return url;
 }
 
 /**
- * Replaces URL templates with actual values - matches Android's replaceUrlTemplates method exactly
- * (Legacy method with isWin parameter for backwards compatibility)
+ * URL macro replacement method (no longer used - kept for reference)
+ * (Legacy method signature with isWin parameter)
  */
 - (NSString *)replaceUrlTemplatesInUrl:(NSString *)url
                                  isWin:(BOOL)isWin
                             lossReason:(nullable NSNumber *)lossReason
                         loadedBidPrice:(double)loadedBidPrice {
-    
-    NSString *processedUrl = [url copy];
-    
-    // Replace ${AUCTION_PRICE} template (matches Android logic)
-    if ([processedUrl containsString:kPlaceholderAuctionPrice]) {
-        NSString *priceString = [NSString stringWithFormat:@"%.2f", loadedBidPrice];
-        processedUrl = [processedUrl stringByReplacingOccurrencesOfString:kPlaceholderAuctionPrice 
-                                                               withString:priceString];
-    }
-    
-    // Replace ${AUCTION_LOSS} template for loss events only (matches Android logic)
-    if ([processedUrl containsString:kPlaceholderAuctionLoss] && !isWin) {
-        NSInteger lossReasonCode = lossReason ? lossReason.integerValue : 1; // Default to 1 like Android
-        NSString *lossReasonString = [NSString stringWithFormat:@"%ld", (long)lossReasonCode];
-        processedUrl = [processedUrl stringByReplacingOccurrencesOfString:kPlaceholderAuctionLoss 
-                                                               withString:lossReasonString];
-    }
-    
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [WinLossFieldResolver] URL template replacement - Original: %@, Processed: %@", 
-                       url, processedUrl]];
-    
-    return processedUrl;
+    // No longer performing client-side macro replacement
+    // Server now handles ${AUCTION_PRICE} and ${AUCTION_LOSS} substitution
+    return url;
 }
 
 @end

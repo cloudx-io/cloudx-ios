@@ -314,14 +314,34 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Set up mock reporter
     self.mockReporter = [[MockAdEventReporter alloc] init];
     
-    // Set up mock win/loss tracker for server-side tracking
+    // CRITICAL: Set up mock win/loss tracker BEFORE creating interstitial
+    // The interstitial gets [CLXWinLossTracker shared] in its init method
     self.mockWinLossTracker = [[MockCLXWinLossTracker alloc] init];
     [CLXWinLossTracker setSharedInstanceForTesting:self.mockWinLossTracker];
+    
+    // Configure with payload mapping (simulating server config)
+    // Must be done before creating interstitial so it gets the configured instance
+    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
+    config.winLossNotificationURL = @"https://test.com/winloss";
+    config.winLossNotificationPayloadConfig = @{
+        @"notificationType": @"notification",  // camelCase: loadSuccess, renderSuccess, loss
+        @"url": @"url",
+        @"auctionId": @"auctionId",
+        @"bidId": @"bidId",
+        @"lossReason": @"lossReason",
+        @"price": @"bid.price"
+    };
+    [[CLXWinLossTracker shared] setConfig:config];
+    
+    // CRITICAL: Set endpoint and app key - required for trackWinLoss to be called
+    [[CLXWinLossTracker shared] setEndpoint:@"https://test.com/winloss"];
+    [[CLXWinLossTracker shared] setAppKey:@"test-app-key"];
     
     // Create mock adapter
     self.mockAdapter = [[MockAdapterInterstitial alloc] init];
     
     // Create interstitial with proper dependencies for unit testing
+    // This will capture the configured shared instance we set up above
     // We need to create the required dependencies
     CLXSDKConfigPlacement *placement = [[CLXSDKConfigPlacement alloc] init];
     placement.id = kTestPlacementID;
@@ -602,11 +622,12 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 - (void)testNurlFiredOnImpression {
     // Verifies that the NURL (notification URL) is fired with the correct price when an impression is recorded
     
-    // Set up bid response with NURL
+    // Set up bid response with NURL and BURL
     CLXBidResponseBid *mockBid = [[CLXBidResponseBid alloc] init];
     mockBid.id = kTestBidID;  // Use .id instead of .adid for win/loss tracking
     mockBid.price = kTestPrice;
     mockBid.nurl = kTestNURL;
+    mockBid.burl = kTestNURL;  // RENDER_SUCCESS events use burl, not nurl
     
     // Create a custom mock bid response that returns our test bid
     MockBidResponse *mockBidResponse = [[MockBidResponse alloc] init];
@@ -626,6 +647,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Simulate impression
     [self.interstitial impressionWithInterstitial:self.mockAdapter];
     
+    // Wait for impression event to propagate through ad lifecycle
+    [NSThread sleepForTimeInterval:0.2];
+    
     // Verify win notification was sent (replaces NURL firing)
     XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 1, @"One win notification should be sent");
     
@@ -634,13 +658,12 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     XCTAssertEqualObjects(winNotification[@"bidId"], kTestBidID, @"Correct bid ID should be used");
     XCTAssertNotNil(winNotification[@"auctionId"], @"Auction ID should be present");
     
-    // ENHANCED: Verify actual resolved URL values (not just structure)
-    XCTAssertNotNil(winNotification[@"resolvedURL"], @"Resolved URL should be present");
-    XCTAssertEqualObjects(winNotification[@"originalURL"], kTestNURL, @"Original NURL should match test constant");
+    // ENHANCED: Verify URL is sent with raw macros (zero client-side hydration)
+    XCTAssertNotNil(winNotification[@"url"], @"URL should be present");
     
-    NSString *resolvedURL = winNotification[@"resolvedURL"];
-    XCTAssertTrue([resolvedURL containsString:@"price=5.99"], @"Resolved URL should contain actual bid price");
-    XCTAssertFalse([resolvedURL containsString:@"${AUCTION_PRICE}"], @"Template should be replaced, not left as-is");
+    NSString *url = winNotification[@"url"];
+    XCTAssertTrue([url containsString:@"${AUCTION_PRICE}"], @"URL must contain raw macro - server does hydration");
+    XCTAssertFalse([url containsString:@"price=5.99"], @"URL must NOT have client-side price hydration");
     
     // Verify price formatting matches iOS WinLossFieldResolver (%.2f format)
     NSNumber *bidPrice = winNotification[@"bidPrice"];
@@ -694,6 +717,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     mockBid.id = kTestBidID;  // Use .id instead of .adid for win/loss tracking
     mockBid.price = kTestPrice;
     mockBid.nurl = kTestNURL;
+    mockBid.burl = kTestNURL;  // RENDER_SUCCESS events use burl, not nurl
     
     MockBidResponse *mockBidResponse = [[MockBidResponse alloc] init];
     mockBidResponse.testBid = mockBid;
@@ -732,18 +756,24 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
             XCTAssertTrue([self.mockDelegate.callbackLog containsObject:callback], @"Callback %@ should be called", callback);
         }
         
-        // Verify win notification was sent on impression (replaces NURL firing)
-        XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 1, @"Win notification should be sent on impression");
+        // Verify win notifications were sent (loadSuccess on load, renderSuccess on impression)
+        XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 2, @"Two win notifications should be sent: load and render");
         
-        // Verify the win notification contains correct data
-        NSDictionary *winNotification = self.mockWinLossTracker.winNotifications.firstObject;
-        XCTAssertEqualObjects(winNotification[@"bidId"], kTestBidID, @"Correct bid ID should be used");
+        // Verify loadSuccess notification (first)
+        NSDictionary *loadNotification = self.mockWinLossTracker.winNotifications[0];
+        XCTAssertEqualObjects(loadNotification[@"notificationType"], @"loadSuccess", @"First notification should be loadSuccess");
+        XCTAssertEqualObjects(loadNotification[@"bidId"], kTestBidID, @"Correct bid ID should be used");
         
-        // ENHANCED: Verify URL template replacement in complete lifecycle
-        if (winNotification[@"resolvedURL"]) {
-            NSString *resolvedURL = winNotification[@"resolvedURL"];
-            XCTAssertTrue([resolvedURL containsString:@"price=5.99"], @"Complete lifecycle should resolve AUCTION_PRICE correctly");
-            XCTAssertFalse([resolvedURL containsString:@"${AUCTION_PRICE}"], @"No templates should remain unresolved");
+        // Verify renderSuccess notification (second - the impression)
+        NSDictionary *renderNotification = self.mockWinLossTracker.winNotifications[1];
+        XCTAssertEqualObjects(renderNotification[@"notificationType"], @"renderSuccess", @"Second notification should be renderSuccess");
+        XCTAssertEqualObjects(renderNotification[@"bidId"], kTestBidID, @"Correct bid ID should be used");
+        
+        // ENHANCED: Verify raw URL with macros intact (zero client-side hydration)
+        if (renderNotification[@"url"]) {
+            NSString *url = renderNotification[@"url"];
+            XCTAssertTrue([url containsString:@"${AUCTION_PRICE}"], @"URL must contain raw macro - server does hydration");
+            XCTAssertFalse([url containsString:@"price=5.99"], @"URL must NOT have client-side price hydration");
         }
         
         // Verify final state

@@ -6,6 +6,7 @@
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXBidResponse.h>
 #import <CloudXCore/CLXError.h>
+#import <objc/runtime.h>
 
 static MockCLXWinLossTracker *_sharedTestInstance = nil;
 
@@ -33,6 +34,7 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
         self.lossNotifications = [[NSMutableArray alloc] init];
         self.bidResults = [[NSMutableArray alloc] init];
         self.lifecycleEvents = [[NSMutableArray alloc] init];
+        self.allPayloadsSent = [[NSMutableArray alloc] init];
         self.storedBids = [[NSMutableDictionary alloc] init];
         self.configuredAppKey = nil;
         self.configuredEndpoint = nil;
@@ -113,98 +115,24 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
 }
 
 - (void)addBid:(NSString *)auctionId bid:(CLXBidResponseBid *)bid {
+    // Store locally for test inspection
     dispatch_sync(_syncQueue, ^{
         if (!self.storedBids[auctionId]) {
             self.storedBids[auctionId] = [[NSMutableArray alloc] init];
         }
         [self.storedBids[auctionId] addObject:bid];
     });
+    
+    // CRITICAL: Call parent so auctionBidManager has the bid
+    // Without this, parent's sendEvent returns early when getBid returns nil
+    [super addBid:auctionId bid:bid];
 }
 
 - (void)setWinner:(NSString *)auctionId winningBidId:(NSString *)winningBidId {
     // Mock implementation - could track winner settings if needed for tests
 }
 
-- (void)sendWin:(NSString *)auctionId bidId:(NSString *)bidId {
-    dispatch_sync(_syncQueue, ^{
-        _sendWinCallCount++;
-        
-        // Look up the bid to get NURL and price
-        CLXBidResponseBid *bid = [self findBid:bidId inAuction:auctionId];
-        
-        // Create comprehensive win notification with all expected fields
-        NSMutableDictionary *winNotification = [@{
-            @"auctionId": auctionId ?: @"",
-            @"bidId": bidId ?: @"",
-            @"type": @"win",
-            @"timestamp": [NSDate date]
-        } mutableCopy];
-        
-        if (bid) {
-            // Add original URL (template before replacement)
-            if (bid.nurl) {
-                winNotification[@"originalURL"] = bid.nurl;
-                
-                // Simulate URL template replacement (like real CLXWinLossFieldResolver)
-                NSString *resolvedURL = [bid.nurl stringByReplacingOccurrencesOfString:@"${AUCTION_PRICE}" 
-                                                                            withString:[NSString stringWithFormat:@"%.2f", bid.price]];
-                winNotification[@"resolvedURL"] = resolvedURL;
-            }
-            
-            // Add bid price
-            winNotification[@"bidPrice"] = @(bid.price);
-        }
-        
-        [self.winNotifications addObject:[winNotification copy]];
-    });
-}
-
-- (void)sendLoss:(NSString *)auctionId bidId:(NSString *)bidId {
-    dispatch_sync(_syncQueue, ^{
-        _sendLossCallCount++;
-        
-        // Look up the bid to get LURL and loss reason
-        CLXBidResponseBid *bid = [self findBid:bidId inAuction:auctionId];
-        NSNumber *lossReason = [self findLossReasonForBid:bidId inAuction:auctionId];
-        
-        // Create comprehensive loss notification with all expected fields
-        NSMutableDictionary *lossNotification = [@{
-            @"auctionId": auctionId ?: @"",
-            @"bidId": bidId ?: @"",
-            @"type": @"loss",
-            @"timestamp": [NSDate date]
-        } mutableCopy];
-        
-        if (bid) {
-            // Add original URL (template before replacement)
-            if (bid.lurl) {
-                lossNotification[@"originalURL"] = bid.lurl;
-                
-                // Simulate URL template replacement (like real CLXWinLossFieldResolver)
-                NSString *resolvedURL = [bid.lurl stringByReplacingOccurrencesOfString:@"${AUCTION_PRICE}" 
-                                                                             withString:[NSString stringWithFormat:@"%.2f", bid.price]];
-                if (lossReason) {
-                    resolvedURL = [resolvedURL stringByReplacingOccurrencesOfString:@"${AUCTION_LOSS}" 
-                                                                         withString:[lossReason stringValue]];
-                }
-                lossNotification[@"resolvedURL"] = resolvedURL;
-            } else {
-                // Handle nil LURL gracefully - set empty string
-                lossNotification[@"resolvedURL"] = @"";
-            }
-            
-            // Add bid price
-            lossNotification[@"bidPrice"] = @(bid.price);
-        }
-        
-        // Add loss reason
-        if (lossReason) {
-            lossNotification[@"lossReason"] = lossReason;
-        }
-        
-        [self.lossNotifications addObject:[lossNotification copy]];
-    });
-}
+// Legacy sendWin and sendLoss methods removed - tests should use sendEvent() instead
 
 #pragma mark - Private Helper Methods
 
@@ -307,7 +235,9 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
 #pragma mark - Additional Methods for Testing
 
 - (void)setConfig:(CLXSDKConfigResponse *)config {
-    // Mock implementation - could store config if needed for tests
+    // CRITICAL: Must call super to configure parent's winLossFieldResolver
+    // Without this, buildWinLossPayload returns nil and trackWinLoss is never called
+    [super setConfig:config];
 }
 
 - (void)trySendingPendingWinLossEvents {
@@ -340,13 +270,22 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
             continue;
         }
         
-        // Send loss notification for losing bid
+        // Send loss notification for losing bid using sendEvent (matches Android behavior)
         if (bid.id) {
             [self setBidLoadResult:auctionId 
                              bidId:bid.id 
                            success:NO 
                         lossReason:@(CLXLossReasonLostToHigherBid)];
-            [self sendLoss:auctionId bidId:bid.id];
+            
+            // Find winner bid to get winner price
+            CLXBidResponseBid *winnerBid = [self findBid:winningBidId inAuction:auctionId];
+            float winnerBidPrice = winnerBid ? winnerBid.price : -1.0;
+            
+            [self sendEvent:auctionId
+                      bidId:bid.id
+                      event:[CLXBidLifecycleEvent lossEvent]
+                 lossReason:@(CLXLossReasonLostToHigherBid)
+             winnerBidPrice:winnerBidPrice];
         }
     }
 }
@@ -356,32 +295,42 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
 /**
  * CRITICAL: Override trackWinLoss to capture REAL resolved payload from CLXWinLossFieldResolver
  * This ensures integration tests verify actual business logic, not simulated behavior
+ * MUST match parent signature exactly: trackWinLoss:auctionId:bidId:
  */
-- (void)trackWinLoss:(NSDictionary<NSString *, id> *)payload {
+- (void)trackWinLoss:(NSDictionary<NSString *, id> *)payload
+           auctionId:(NSString *)auctionId
+               bidId:(NSString *)bidId {
     dispatch_sync(_syncQueue, ^{
+        // Store ALL payloads for debugging and test inspection
+        [self.allPayloadsSent addObject:payload];
+        
         // Capture the REAL resolved payload from the actual CLXWinLossFieldResolver
-        NSString *type = payload[@"type"] ?: @"unknown";
-        NSString *auctionId = payload[@"auctionId"] ?: @"";
-        NSString *bidId = payload[@"bidId"] ?: @"";
+        NSString *notificationType = payload[@"notificationType"] ?: @"";
+        
+        // Derive type from notificationType
+        NSString *type = @"unknown";
+        if ([notificationType isEqualToString:@"loadSuccess"] || 
+            [notificationType isEqualToString:@"renderSuccess"] ||
+            [notificationType isEqualToString:@"load_success"] || 
+            [notificationType isEqualToString:@"render_success"]) {
+            type = @"win";
+        } else if ([notificationType isEqualToString:@"loss"]) {
+            type = @"loss";
+        }
         
         NSMutableDictionary *notification = [@{
-            @"auctionId": auctionId,
-            @"bidId": bidId,
+            @"auctionId": auctionId,  // Use parameter, not payload (payload might not have it)
+            @"bidId": bidId,          // Use parameter, not payload
             @"timestamp": [NSDate date],
             @"type": type,
+            @"notificationType": notificationType,
             @"fullPayload": payload  // Store the complete resolved payload
         } mutableCopy];
         
         // Extract all relevant fields from the real field resolver output
-        NSString *resolvedURL = payload[@"resolvedURL"];
-        if (resolvedURL) {
-            notification[@"resolvedURL"] = resolvedURL;
-        }
-        
-        // Extract additional fields that integration tests expect
-        NSString *originalURL = payload[@"originalURL"];
-        if (originalURL) {
-            notification[@"originalURL"] = originalURL;
+        NSString *url = payload[@"url"];
+        if (url) {
+            notification[@"url"] = url;
         }
         
         NSNumber *bidPrice = payload[@"price"];
@@ -389,17 +338,46 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
             notification[@"bidPrice"] = bidPrice;
         }
         
-        NSNumber *lossReason = payload[@"lossReason"];
-        if (lossReason) {
-            notification[@"lossReason"] = lossReason;
+        // Extract lossReason - could be a string (from sdk.lossReason) or number
+        id lossReasonValue = payload[@"lossReason"];
+        if (lossReasonValue) {
+            if ([lossReasonValue isKindOfClass:[NSNumber class]]) {
+                notification[@"lossReason"] = lossReasonValue;
+            } else if ([lossReasonValue isKindOfClass:[NSString class]]) {
+                // Convert string back to loss reason code if needed
+                // For now, store the string value
+                notification[@"lossReasonString"] = lossReasonValue;
+                // Map common loss reason strings back to codes for test assertions
+                if ([lossReasonValue isEqualToString:@"Internal Error"]) {
+                    notification[@"lossReason"] = @(CLXLossReasonInternalError);
+                } else if ([lossReasonValue isEqualToString:@"Lost to Higher Bid"]) {
+                    notification[@"lossReason"] = @(CLXLossReasonLostToHigherBid);
+                } else if ([lossReasonValue isEqualToString:@"Bid Won"]) {
+                    notification[@"lossReason"] = @(CLXLossReasonBidWon);
+                }
+            }
         }
         
-        if ([type isEqualToString:@"win"]) {
+        // Categorize by notificationType (support both camelCase and snake_case)
+        // camelCase: loadSuccess, renderSuccess, loss (from event.notificationType)
+        // snake_case: load_success, render_success, loss (from sdk.[notificationType])
+        if ([notificationType isEqualToString:@"loadSuccess"] || 
+            [notificationType isEqualToString:@"renderSuccess"] ||
+            [notificationType isEqualToString:@"load_success"] || 
+            [notificationType isEqualToString:@"render_success"]) {
             [self.winNotifications addObject:[notification copy]];
-        } else if ([type isEqualToString:@"loss"]) {
+            _sendWinCallCount++;
+        } else if ([notificationType isEqualToString:@"loss"]) {
             [self.lossNotifications addObject:[notification copy]];
+            _sendLossCallCount++;
         }
     });
+    
+    // Signal the semaphore to unblock sendEvent if it's waiting
+    dispatch_semaphore_t semaphore = objc_getAssociatedObject(self, @selector(sendEvent:bidId:event:lossReason:winnerBidPrice:));
+    if (semaphore) {
+        dispatch_semaphore_signal(semaphore);
+    }
     
     // DO NOT call super - we don't want actual network requests in tests
     // But we've captured the real resolved payload from CLXWinLossFieldResolver
@@ -413,6 +391,7 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
        lossReason:(nullable NSNumber *)lossReason
    winnerBidPrice:(double)winnerBidPrice {
     
+    // Record the event for test inspection
     dispatch_sync(_syncQueue, ^{
         _sendEventCallCount++;
         
@@ -429,16 +408,6 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
                 break;
         }
         
-        // Look up the bid from stored bids to get URL data
-        CLXBidResponseBid *foundBid = nil;
-        NSArray *auctionBids = self.storedBids[auctionId];
-        for (CLXBidResponseBid *bid in auctionBids) {
-            if ([bid.id isEqualToString:bidId]) {
-                foundBid = bid;
-                break;
-            }
-        }
-        
         NSDictionary *lifecycleEvent = @{
             @"auctionId": auctionId ?: @"",
             @"bidId": bidId ?: @"",
@@ -451,72 +420,26 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
         };
         
         [self.lifecycleEvents addObject:lifecycleEvent];
-        
-        // For backward compatibility with tests, also populate winNotifications/lossNotifications
-        if (event.type == CLXBidLifecycleEventTypeRenderSuccess) {
-            // RENDER_SUCCESS is a win (burl fired on impression)
-            // Extract URL based on event type (prefer burl, fallback to nurl)
-            NSString *originalURL = @"";
-            double bidPrice = winnerBidPrice;
-            
-            if (foundBid) {
-                originalURL = foundBid.burl ?: foundBid.nurl ?: @"";
-                bidPrice = foundBid.price;
-            }
-            
-            NSString *resolvedURL = [self resolveURL:originalURL withPrice:bidPrice];
-            
-            NSDictionary *winNotification = @{
-                @"auctionId": auctionId ?: @"",
-                @"bidId": bidId ?: @"",
-                @"type": @"win",
-                @"timestamp": [NSDate date],
-                @"resolvedURL": resolvedURL,
-                @"originalURL": originalURL,
-                @"bidPrice": @(bidPrice)
-            };
-            [self.winNotifications addObject:winNotification];
-            _sendWinCallCount++;
-        } else if (event.type == CLXBidLifecycleEventTypeLoadSuccess) {
-            // LOAD_SUCCESS fires nurl (notification only, not counted as "win" for revenue)
-            // Don't add to winNotifications - only RENDER_SUCCESS counts as a win
-        } else if (event.type == CLXBidLifecycleEventTypeLoss) {
-            // LOSS event fires lurl
-            NSString *originalURL = @"";
-            
-            if (foundBid) {
-                originalURL = foundBid.lurl ?: @"";
-            }
-            
-            NSString *resolvedURL = [self resolveURL:originalURL withPrice:winnerBidPrice];
-            
-            NSDictionary *lossNotification = @{
-                @"auctionId": auctionId ?: @"",
-                @"bidId": bidId ?: @"",
-                @"type": @"loss",
-                @"lossReason": lossReason ?: @(0),
-                @"timestamp": [NSDate date],
-                @"url": resolvedURL,
-                @"originalURL": originalURL
-            };
-            [self.lossNotifications addObject:lossNotification];
-            _sendLossCallCount++;
-        }
     });
+    
+    // Use a semaphore to properly wait for async work to complete
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    
+    // Store the semaphore in an associated object so trackWinLoss can signal it
+    objc_setAssociatedObject(self, @selector(sendEvent:bidId:event:lossReason:winnerBidPrice:), semaphore, OBJC_ASSOCIATION_RETAIN);
+    
+    // Call parent's sendEvent (which uses dispatch_async on global queue)
+    [super sendEvent:auctionId bidId:bidId event:event lossReason:lossReason winnerBidPrice:winnerBidPrice];
+    
+    // Wait for trackWinLoss to be called (with timeout to prevent hanging tests)
+    dispatch_time_t timeout = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC));
+    dispatch_semaphore_wait(semaphore, timeout);
+    
+    // Clean up associated object
+    objc_setAssociatedObject(self, @selector(sendEvent:bidId:event:lossReason:winnerBidPrice:), nil, OBJC_ASSOCIATION_RETAIN);
 }
 
-// Helper to resolve URL templates
-- (NSString *)resolveURL:(NSString *)urlTemplate withPrice:(double)price {
-    if (!urlTemplate || urlTemplate.length == 0) {
-        return @"";
-    }
-    
-    // Replace ${AUCTION_PRICE} with actual price (%.2f format matching iOS)
-    NSString *priceString = [NSString stringWithFormat:@"%.2f", price];
-    NSString *resolved = [urlTemplate stringByReplacingOccurrencesOfString:@"${AUCTION_PRICE}" withString:priceString];
-    
-    return resolved;
-}
+// REMOVED: URL template resolution - iOS now does zero client-side URL hydration (matches Android)
 
 // REMOVED: saveBidsAsNew() - No pre-caching in simplified implementation
 // REMOVED: convertUnfinishedBidsToLoss() - No state machine in simplified implementation
