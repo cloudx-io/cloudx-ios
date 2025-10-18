@@ -189,30 +189,17 @@
 #pragma mark - Private Methods
 
 - (void)performViewabilityMeasurement {
-    static NSUInteger measurementCount = 0;
-    measurementCount++;
-    
-    // Log every 60th measurement (once per second at 60 FPS) to avoid log spam
-    BOOL shouldLog = (measurementCount % 60 == 0) || measurementCount < 5;
-    
-    if (shouldLog) {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [VIEWABILITY-MEASURE] Performing measurement #%lu", (unsigned long)measurementCount]];
-    }
-    
+    // Check if view is still available
     if (!self.trackedView || !self.trackedView.superview) {
-        if (shouldLog) {
-            [self.logger info:@"⚠️ [VIEWABILITY-MEASURE] View not available or not in superview hierarchy"];
+        // View was removed - stop tracking to avoid log spam
+        if (self.isCurrentlyViewable) {
+            [self.logger info:@"📊 [VIEWABILITY] View removed from hierarchy, stopping tracker"];
         }
-        [self setViewableState:NO];
+        [self stopTracking];
         return;
     }
     
     CLXViewabilityMeasurement *measurement = [self calculateViewabilityMeasurement];
-    
-    if (shouldLog) {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [VIEWABILITY-MEASURE] Calculated exposure: %.1f%% (threshold: %.1f%%), Exposed rect: %@", 
-              measurement.exposedPercentage * 100, self.viewabilityThreshold * 100, NSStringFromCGRect(measurement.exposedRect)]];
-    }
     
     // Update current measurement
     self.currentMeasurement = measurement;
@@ -221,10 +208,12 @@
     BOOL wasViewable = self.isCurrentlyViewable;
     BOOL isNowViewable = measurement.exposedPercentage >= self.viewabilityThreshold;
     
+    // Only log state changes, not every measurement
     if (isNowViewable != wasViewable) {
-        [self.logger debug:[NSString stringWithFormat:@"🔄 [VIEWABILITY-STATE] State change: %@ -> %@", 
+        [self.logger info:[NSString stringWithFormat:@"📊 [VIEWABILITY] State change: %@ -> %@ (exposure: %.0f%%)", 
               wasViewable ? @"VIEWABLE" : @"NOT_VIEWABLE",
-              isNowViewable ? @"VIEWABLE" : @"NOT_VIEWABLE"]];
+              isNowViewable ? @"VIEWABLE" : @"NOT_VIEWABLE",
+              measurement.exposedPercentage * 100]];
         [self setViewableState:isNowViewable];
     }
     
@@ -235,12 +224,10 @@
         NSTimeInterval viewableTime = measurement.viewableTime;
         if (!self.hasMetThreshold && viewableTime >= self.timeThreshold) {
             self.hasMetThreshold = YES;
-            [self.logger info:[NSString stringWithFormat:@"🎯 [VIEWABILITY-THRESHOLD] IAB viewability threshold met! Viewable time: %.2f seconds", viewableTime]];
+            [self.logger info:[NSString stringWithFormat:@"🎯 [VIEWABILITY] IAB threshold met! Viewable time: %.2f seconds", viewableTime]];
             if ([self.delegate respondsToSelector:@selector(viewabilityTracker:didMeetViewabilityThreshold:)]) {
                 [self.delegate viewabilityTracker:self didMeetViewabilityThreshold:measurement];
             }
-        } else if (shouldLog && viewableTime > 0) {
-            [self.logger debug:[NSString stringWithFormat:@"⏱️ [VIEWABILITY-TIME] Current viewable time: %.2f/%.1f seconds", viewableTime, self.timeThreshold]];
         }
     }
     
@@ -248,9 +235,6 @@
     [self.measurementHistory addObject:measurement];
     if (self.measurementHistory.count > 100) {
         [self.measurementHistory removeObjectAtIndex:0];
-        if (shouldLog) {
-            [self.logger debug:[NSString stringWithFormat:@"🗄️ [VIEWABILITY-HISTORY] Pruned old measurement, history size: %lu", (unsigned long)self.measurementHistory.count]];
-        }
     }
     
     // Notify delegate of exposure update (but don't log every time to avoid spam)

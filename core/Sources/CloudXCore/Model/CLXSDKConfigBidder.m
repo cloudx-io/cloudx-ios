@@ -20,7 +20,7 @@
 - (NSString *)networkNameMapped {
     // Map networkName to the correct key used in initializers dictionary
     if ([_networkName isEqualToString:@"testbidder"]) {
-        return @"testbidder";
+        return @"prebidAdapter";  // Map testbidder to prebidAdapter
     } else if ([_networkName isEqualToString:@"googleAdManager"]) {
         return @"googleAdManager";
     } else if ([_networkName isEqualToString:@"meta"]) {

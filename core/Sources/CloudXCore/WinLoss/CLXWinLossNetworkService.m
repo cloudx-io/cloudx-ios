@@ -108,10 +108,6 @@
         }
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [WinLossNetworkService] Sending %@ notification (%lu chars) to: %@", 
-                       notificationType, (unsigned long)jsonBody.length, endpointUrl]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossNetworkService] Win/Loss API Request Body: %@", jsonBody]];
-    
     // Prepare headers matching Android's implementation
     NSMutableDictionary *headers = [[NSMutableDictionary alloc] init];
     headers[@"Authorization"] = [NSString stringWithFormat:@"Bearer %@", appKey];

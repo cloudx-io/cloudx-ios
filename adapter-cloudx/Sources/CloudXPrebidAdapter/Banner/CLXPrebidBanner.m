@@ -193,7 +193,7 @@
             NSString *viewport = [NSString stringWithFormat:@"<meta name='viewport' content='width=%d, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>", (int)bannerSize.width];
             NSString *style = @"<style>"
                               @"html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }"
-                              @"img { display: block; max-width: 100%; height: auto; }"
+                              @"img { display: block; width: 100% !important; height: 100% !important; max-width: none !important; object-fit: fill; }"
                               @"* { box-sizing: border-box; }"
                               @"body > * { max-width: 100%; }"
                               @"</style>";

@@ -403,12 +403,7 @@
 }
 
 - (void)viewabilityTracker:(CLXViewabilityTracker *)tracker didUpdateExposure:(CLXViewabilityMeasurement *)measurement {
-    // Log exposure updates less frequently to avoid spam
-    static NSUInteger updateCount = 0;
-    updateCount++;
-    if (updateCount % 60 == 0) { // Every 60 updates (once per second at 60fps)
-        [self.logger debug:[NSString stringWithFormat:@"📊 [VIEWABILITY] Exposure: %.1f%%", measurement.exposedPercentage * 100]];
-    }
+    // Exposure monitoring - no logging needed here as state changes are logged in the tracker
 }
 
 #pragma mark - UIViewController Support
