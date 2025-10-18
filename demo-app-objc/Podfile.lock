@@ -1,6 +1,6 @@
 PODS:
-  - CloudXCore (1.1.57)
-  - CloudXMetaAdapter (1.1.65):
+  - CloudXCore (1.1.58)
+  - CloudXMetaAdapter (1.1.66):
     - CloudXCore
     - FBAudienceNetwork (~> 6.20.1)
   - FBAudienceNetwork (6.20.1)
@@ -20,8 +20,8 @@ EXTERNAL SOURCES:
     :path: "../adapter-meta"
 
 SPEC CHECKSUMS:
-  CloudXCore: 4dfb4ec9281e977ff8f4f989d6591162240241ba
-  CloudXMetaAdapter: f3fbbfbcfbc3dd6104289149721d454b884d1297
+  CloudXCore: 736fff1f00ec012c2351bb37aa9d8e9bbe493489
+  CloudXMetaAdapter: 3de0152c250cb6a9bc3ca1acebc905b16354cc86
   FBAudienceNetwork: 08e86d63a05b3a5a59414af12e4af8d756943c80
 
 PODFILE CHECKSUM: 9043f85b58a0473aa852a391fc8c5ec1d18c732e

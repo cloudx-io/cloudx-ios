@@ -1232,34 +1232,35 @@ Enable debug logging to troubleshoot issues:
 
 **Objective-C:**
 ```objc
-// Check SDK logs
-NSLog(@"SDK Logs: %@", logs);
+// Enable verbose logging (call early in app lifecycle, before SDK initialization)
+[CloudXCore setLoggingEnabled:YES];
 
-// Enable verbose logging via environment variable
-// Set CLOUDX_VERBOSE_LOG=1 in your scheme's environment variables
-// This enables detailed debug output in release builds
+// Initialize SDK
+[[CloudXCore shared] initializeSDKWithAppKey:@"your-app-key" completion:^(BOOL success, NSError * _Nullable error) {
+    // Handle initialization
+}];
 ```
 
 **Swift:**
 ```swift
-// Check SDK logs
-print("SDK Logs: \(logs)")
+// Enable verbose logging (call early in app lifecycle, before SDK initialization)
+CloudXCore.setLoggingEnabled(true)
 
-// Enable verbose logging via environment variable
-// Set CLOUDX_VERBOSE_LOG=1 in your scheme's environment variables
-// This enables detailed debug output in release builds
+// Initialize SDK
+CloudXCore.shared.initializeSDK(appKey: "your-app-key") { success, error in
+    // Handle initialization
+}
 ```
 
-**Environment Variable Setup:**
-
-1. **In Xcode**: Go to your target's scheme → Edit Scheme → Run → Arguments → Environment Variables
-2. **Add Variable**: Name: `CLOUDX_VERBOSE_LOG`, Value: `1`
-3. **Debug vs Release**: Verbose logging is enabled by default in debug builds. In release builds, it's only enabled when this environment variable is set.
+**When to Enable:**
+- Call `setLoggingEnabled:` as early as possible in your app lifecycle (e.g., in `application:didFinishLaunchingWithOptions:`)
+- Call it **before** SDK initialization to see all logs
+- Logging is disabled by default
 
 **Log Levels:**
-- **Debug**: Fastest performance, messages not persisted (default in debug builds)
-- **Info**: Useful for tracking normal application flow
-- **Error**: Persisted for several days, slowest performance
+- **Debug**: Detailed diagnostic information for troubleshooting
+- **Info**: General informational messages about SDK operations
+- **Error**: Error conditions and failures
 
 ## Support
 

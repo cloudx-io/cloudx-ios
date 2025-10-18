@@ -16,6 +16,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
+        // Enable verbose logging for demo app
+        CloudXCore.setLoggingEnabled(true)
+        
         // Request App Tracking Transparency permission
         requestAppTrackingTransparencyPermission()
         

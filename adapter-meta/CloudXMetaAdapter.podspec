@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXMetaAdapter'
-  s.version = '1.1.65'
+  s.version = '1.1.66'
   s.summary = 'Meta (Facebook) Adapter for CloudX iOS SDK'
   s.description = 'Meta adapter for CloudX iOS SDK'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'

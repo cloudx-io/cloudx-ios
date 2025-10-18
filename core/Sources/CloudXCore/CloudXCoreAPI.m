@@ -1009,6 +1009,12 @@ static CloudXCore *_sharedInstance = nil;
     return [[CLXGPPProvider sharedInstance] gppSid];
 }
 
+#pragma mark - Logging Control
+
++ (void)setLoggingEnabled:(BOOL)enabled {
+    [[CLXLogger shared] setLoggingEnabled:enabled];
+}
+
 #pragma mark - Testing Support
 
 - (void)resetForTesting {

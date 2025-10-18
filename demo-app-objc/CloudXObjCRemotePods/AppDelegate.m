@@ -50,6 +50,9 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
+    // Enable verbose logging for demo app
+    [CloudXCore setLoggingEnabled:YES];
+    
     // DEMO APP ONLY: Force test mode for all bid requests
     // This internal flag ensures test=1 is always set in bid requests for demo app
     // regardless of build configuration (simulator/device, debug/release)

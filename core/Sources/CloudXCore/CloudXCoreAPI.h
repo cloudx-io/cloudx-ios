@@ -250,6 +250,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (nullable NSArray<NSNumber *> *)getGPPSid;
 
+#pragma mark - Logging Control
+
+/**
+ * Enable or disable SDK logging
+ * @param enabled YES to enable logging, NO to disable
+ * @discussion Controls verbose logging output from the SDK. Disabled by default in production.
+ * Call this method early in your app lifecycle, before SDK initialization, to see all logs.
+ */
++ (void)setLoggingEnabled:(BOOL)enabled;
+
 @end
 
 NS_ASSUME_NONNULL_END
