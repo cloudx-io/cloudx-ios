@@ -236,6 +236,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXBiddingConfigImpressionNative *nativeAd;
 @property (nonatomic, strong, nullable) CLXBiddingConfigImpressionExt *ext;
 @property (nonatomic, strong, nullable) CLXBiddingConfigImpressionPMP *pmp;
+@property (nonatomic, strong, nullable) NSArray<NSDictionary *> *metric;  // Session depth metrics
 @end
 
 @interface CLXBiddingConfigImpressionBanner : NSObject

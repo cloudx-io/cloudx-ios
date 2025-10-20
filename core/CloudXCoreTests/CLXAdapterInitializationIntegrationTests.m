@@ -96,7 +96,7 @@
     
     CLXSDKConfigBidder *testBidder = [self createMockTestBidder];
     XCTAssertNotNil(testBidder, @"Test bidder should be created");
-    XCTAssertEqualObjects([testBidder networkNameMapped], @"testbidder", @"Test bidder should map correctly");
+    XCTAssertEqualObjects([testBidder networkNameMapped], @"prebidAdapter", @"Test bidder should map to prebidAdapter");
     
     // Verify the bidder config can be created (this is what gets passed to initializers)
     CLXBidderConfig *bidderConfig = [[CLXBidderConfig alloc] initWithInitializationData:testBidder.bidderInitData 

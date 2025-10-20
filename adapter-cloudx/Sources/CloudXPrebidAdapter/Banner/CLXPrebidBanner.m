@@ -265,10 +265,24 @@
  * @param viewController The view controller from which to present the banner.
  */
 - (void)showFromViewController:(UIViewController *)viewController {
-    [self.logger debug:@"Banner show called"];
     // Banner is already shown when loaded, this method is called for consistency
     if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
         [self.delegate didShowBanner:self];
+    }
+}
+
+/**
+ * Handle impression event when viewability threshold is met.
+ * 
+ * This method is called by the viewability tracker when the banner has met
+ * IAB viewability standards (50% visible for 1 second). It forwards the
+ * impression event to the delegate for session metrics tracking.
+ */
+- (void)impression {
+    [self.logger info:@"🎯 [VIEWABILITY] Banner met viewability threshold - firing impression"];
+    if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
+        [self.logger debug:@"✅ [DELEGATE] Calling impressionBanner on delegate"];
+        [self.delegate impressionBanner:self];
     }
 }
 

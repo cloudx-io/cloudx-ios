@@ -7,6 +7,7 @@
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXMetricsTracker.h>
 #import <CloudXCore/CLXMetricsTrackerImpl.h>
+#import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXMetricsTrackerProtocol.h>
 #import <CloudXCore/CLXMetricsType.h>
 #import <CloudXCore/CLXGPPProvider.h>
@@ -403,6 +404,10 @@ static CloudXCore *_sharedInstance = nil;
     } else {
         [self.logger error:@"❌ [CloudXCore] Failed to resolve metrics tracker from DI container"];
     }
+    
+    // NEW: Reset session metrics on SDK initialization (iOS feature parity with Android)
+    [[CLXSessionMetricsTracker sharedInstance] resetAll];
+    [self.logger info:@"📊 [CloudXCore] Session metrics tracker reset on SDK init"];
     
     // Resolve endpoints with A/B testing support
     CLXEndpointResolver *endpointResolver = [[CLXEndpointResolver alloc] init];

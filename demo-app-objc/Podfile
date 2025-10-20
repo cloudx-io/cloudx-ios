@@ -9,6 +9,7 @@ target 'CloudXObjCRemotePods' do
   # pod 'CloudXMetaAdapter'
   pod 'CloudXCore', :path => '../core'
   pod 'CloudXMetaAdapter', :path => '../adapter-meta'
+  pod 'CloudXPrebidAdapter', :path => '../adapter-cloudx'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths

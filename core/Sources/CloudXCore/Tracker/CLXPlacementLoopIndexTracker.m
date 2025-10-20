@@ -41,11 +41,8 @@
     dispatch_sync(self.queue, ^{
         NSNumber *counter = self.loopIndexMap[placementName];
         if (counter) {
-            // Match Android: return counter - 1 (the current index before next increment)
-            count = [counter integerValue] - 1;
+            count = [counter integerValue];
         } else {
-            // First time for this placement - initialize to 0
-            self.loopIndexMap[placementName] = @0;
             count = 0;
         }
     });

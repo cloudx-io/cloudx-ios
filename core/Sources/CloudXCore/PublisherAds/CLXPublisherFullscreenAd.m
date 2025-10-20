@@ -28,6 +28,8 @@
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXRillTrackingService.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXSessionMetricsTracker.h>
+#import <CloudXCore/CLXAdType.h>
 #import <objc/runtime.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -668,6 +670,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     self.impressionTime = [NSDate date];
     [self applyMetrics];
     
+    // NEW: Record session depth impression (iOS feature parity with Android)
+    [[CLXSessionMetricsTracker sharedInstance] recordImpressionForPlacement:self.placementName adType:CLXAdTypeInterstitial];
+    
     [self.appSessionService addImpressionWithPlacementID:self.placementID];
     
     // Send Rill tracking impression event
@@ -844,6 +849,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 - (void)impressionWithRewarded:(id<CLXAdapterRewarded>)rewarded {
     self.impressionTime = [NSDate date];
     [self applyMetrics];
+    
+    // NEW: Record session depth impression (iOS feature parity with Android)
+    [[CLXSessionMetricsTracker sharedInstance] recordImpressionForPlacement:self.placementName adType:CLXAdTypeRewarded];
     
     [self.appSessionService addImpressionWithPlacementID:self.placementID];
     

@@ -30,6 +30,8 @@
 #import <CloudXCore/CLXAdEventReporting.h>
 #import <CloudXCore/CLXRillTrackingService.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXSessionMetricsTracker.h>
+#import <CloudXCore/CLXAdType.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -513,6 +515,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)didShowWithNative:(id<CLXAdapterNative>)native {
     [self.logger debug:@"[CloudX][Native] Native ad shown"];
+    
+    // NEW: Record session depth impression (iOS feature parity with Android)
+    [[CLXSessionMetricsTracker sharedInstance] recordImpressionForPlacement:self.placementName adType:CLXAdTypeNative];
     
     // Report impression if we have a bid response
     if (self.lastBidResponse) {

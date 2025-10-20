@@ -19,6 +19,8 @@
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXKeyValueState.h>
 #import <CloudXCore/NSDictionary+DynamicPath.h>
+#import <CloudXCore/CLXSessionMetricsTracker.h>
+#import <CloudXCore/CLXSessionMetrics.h>
 
 // Internal methods category for accessing privacy methods that are not in public header
 // TEMP: Remove CLXPrivacyService private interface once server supports GDPR/COPPA
@@ -227,6 +229,13 @@ static void initializeLogger() {
                        impression.banner ? @"YES" : @"NO", 
                        impression.video ? @"YES" : @"NO", 
                        impression.nativeAd ? @"YES" : @"NO"]];
+        
+        // NEW: Add session metrics to impression (iOS feature parity with Android)
+        CLXSessionMetrics *sessionMetrics = [[CLXSessionMetricsTracker sharedInstance] getMetrics];
+        impression.metric = [self sessionMetricsToJSON:sessionMetrics];
+        
+        [logger debug:[NSString stringWithFormat:@"📊 [BiddingConfig] Added %lu session metrics to impression",
+                      (unsigned long)impression.metric.count]];
         
         _impressions = @[impression];
         
@@ -566,9 +575,55 @@ static void initializeLogger() {
     if (impression.pmp) {
         json[@"pmp"] = [self convertPMPToJSON:impression.pmp];
     }
+    if (impression.metric) {
+        json[@"metric"] = impression.metric;
+    }
     
     return [json copy];
 }
+
+#pragma mark - Session Metrics
+
+/**
+ * Converts session metrics to OpenRTB metric array format.
+ * Each metric object contains: type, value, vendor.
+ *
+ * Matches Android implementation in BidRequestProvider.kt:271-290
+ */
+- (NSArray *)sessionMetricsToJSON:(CLXSessionMetrics *)metrics {
+    if (!metrics) {
+        return @[];
+    }
+    
+    NSMutableArray *metricsArray = [NSMutableArray arrayWithCapacity:7];
+    
+    // Helper to add metric object (matching Android format exactly)
+    void (^addMetric)(NSString *, float) = ^(NSString *type, float value) {
+        [metricsArray addObject:@{
+            @"type": type,
+            @"value": @(value),
+            @"vendor": @"EXCHANGE"
+        }];
+    };
+    
+    // Add all session metrics (same order as Android)
+    addMetric(@"session_depth", metrics.depth);
+    addMetric(@"session_depth_banner", metrics.bannerDepth);
+    addMetric(@"session_depth_medium_rectangle", metrics.mediumRectangleDepth);
+    addMetric(@"session_depth_full", metrics.fullDepth);
+    addMetric(@"session_depth_native", metrics.nativeDepth);
+    addMetric(@"session_depth_rewarded", metrics.rewardedDepth);
+    addMetric(@"session_duration", metrics.durationSeconds);
+    
+    [logger debug:[NSString stringWithFormat:
+        @"📊 Session metrics: depth=%.0f, banner=%.0f, mrec=%.0f, full=%.0f, native=%.0f, rewarded=%.0f, duration=%.1fs",
+        metrics.depth, metrics.bannerDepth, metrics.mediumRectangleDepth, 
+        metrics.fullDepth, metrics.nativeDepth, metrics.rewardedDepth, metrics.durationSeconds]];
+    
+    return [metricsArray copy];
+}
+
+#pragma mark - Impression JSON Conversion
 
 - (NSDictionary *)convertBannerToJSON:(CLXBiddingConfigImpressionBanner *)banner {
     NSMutableArray *formatsArray = [NSMutableArray array];

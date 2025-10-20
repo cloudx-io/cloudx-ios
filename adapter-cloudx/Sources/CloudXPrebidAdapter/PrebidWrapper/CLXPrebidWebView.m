@@ -207,6 +207,26 @@
     [self.logger info:@"✅ [SETUP] Viewability tracker configured"];
 }
 
+#pragma mark - View Lifecycle
+
+- (void)didMoveToSuperview {
+    [super didMoveToSuperview];
+    
+    if (self.superview && self.hasFinishedLoading && self.enableViewabilityTracking) {
+        // Restart viewability tracking if needed when added to hierarchy
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (self.enableViewabilityTracking && !self.viewabilityTracker.isCurrentlyViewable) {
+                [self startViewabilityTracking];
+            }
+        });
+    }
+}
+
+- (void)didMoveToWindow {
+    [super didMoveToWindow];
+    // View lifecycle management - no additional logging needed
+}
+
 #pragma mark - Public Methods
 
 - (void)loadOptimizedHTML:(NSString *)html baseURL:(nullable NSURL *)baseURL completion:(nullable void (^)(BOOL success, NSError *error))completion {
@@ -399,7 +419,17 @@
 }
 
 - (void)viewabilityTracker:(CLXViewabilityTracker *)tracker didMeetViewabilityThreshold:(CLXViewabilityMeasurement *)measurement {
-    [self.logger info:[NSString stringWithFormat:@"🎯 [VIEWABILITY] Threshold met! Viewable time: %.2f seconds", measurement.viewableTime]];
+    [self.logger info:[NSString stringWithFormat:@"🎯 [VIEWABILITY] Threshold met (%.2fs) - firing impression", measurement.viewableTime]];
+    
+    // Notify delegate about viewability threshold (for protocol-based callbacks)
+    if ([self.delegate respondsToSelector:@selector(webView:metViewabilityThreshold:)]) {
+        [self.delegate webView:self metViewabilityThreshold:measurement];
+    }
+    
+    // Call impression method directly for banner adapters (matching interstitial/rewarded pattern)
+    if ([self.delegate respondsToSelector:@selector(impression)]) {
+        [(id)self.delegate performSelector:@selector(impression)];
+    }
 }
 
 - (void)viewabilityTracker:(CLXViewabilityTracker *)tracker didUpdateExposure:(CLXViewabilityMeasurement *)measurement {

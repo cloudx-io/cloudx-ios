@@ -282,8 +282,14 @@
                                          viewFrame.size.width - intersection.size.width,
                                          viewFrame.size.height - intersection.size.height);
     measurement.isViewable = measurement.exposedPercentage >= self.viewabilityThreshold;
-    measurement.viewableTime = self.isCurrentlyViewable ? 
-        (measurement.timestamp - self.viewableStartTime) : 0.0;
+    
+    // Calculate total viewable time (accumulated + current session)
+    if (self.isCurrentlyViewable && self.viewableStartTime > 0) {
+        NSTimeInterval currentSessionTime = measurement.timestamp - self.viewableStartTime;
+        measurement.viewableTime = self.totalViewableTime + currentSessionTime;
+    } else {
+        measurement.viewableTime = self.totalViewableTime;
+    }
     
     return measurement;
 }

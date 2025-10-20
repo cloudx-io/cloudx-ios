@@ -547,10 +547,10 @@
 - (nullable id)resolveNestedField:(id)current path:(NSString *)path withFullResponseData:(nullable NSDictionary *)fullResponseData auctionId:(nullable NSString *)auctionId {
     // Smart path splitting that handles array lookup expressions with dots inside
     NSArray<NSString *> *segments = [self splitPathIntoSegments:path];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolving path: %@ with %lu segments (auctionId: %@)", path, (unsigned long)segments.count, auctionId ?: @"none"]];
+
     
     for (NSString *segment in segments) {
-        // [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Processing segment: %@, current type: %@", segment, [current class]]];
+
         
         // Check if this segment contains array lookup syntax like: participants[rank=${bid.ext.cloudx.rank}]
         if ([segment containsString:@"["] && [segment containsString:@"]"]) {
@@ -564,16 +564,13 @@
             if ([current isKindOfClass:[NSArray class]]) {
                 NSArray *array = (NSArray *)current;
                 current = array.count > 0 ? array[0] : nil;
-                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Array access, took first element: %@", current ?: @"(nil)"]];
             }
             
             // Handle dictionary access
             if ([current isKindOfClass:[NSDictionary class]]) {
                 NSDictionary *dict = (NSDictionary *)current;
                 current = dict[segment];
-                // [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Dict access [%@] = %@", segment, current ?: @"(nil)"]];
             } else {
-                // [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Current is not a dictionary, returning nil"]];
                 return nil;
             }
         }
@@ -692,10 +689,7 @@
     // Resolve the condition value (e.g., ${bid.ext.cloudx.rank})
     // Use full response data if available, otherwise fall back to current context
     NSDictionary *contextForResolution = fullResponseData ?: dict;
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Array lookup context - fullResponseData: %@, dict: %@, auctionId: %@", fullResponseData ? @"present" : @"nil", dict ? @"present" : @"nil", auctionId ?: @"none"]];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Condition expression: %@", conditionValueExpression]];
     id conditionValue = [self resolveConditionValue:conditionValueExpression withBidResponseData:contextForResolution auctionId:auctionId];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Condition field: %@, resolved value: %@ (type: %@)", conditionField, conditionValue, conditionValue ? NSStringFromClass([conditionValue class]) : @"nil"]];
     
     // Find matching element in array
     [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Searching %lu elements for %@=%@", (unsigned long)[array count], conditionField, conditionValue]];
@@ -705,7 +699,6 @@
         }
         
         id elementValue = element[conditionField];
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Comparing element[%@]=%@ (type: %@) with condition value %@ (type: %@)", conditionField, elementValue, elementValue ? NSStringFromClass([elementValue class]) : @"nil", conditionValue, conditionValue ? NSStringFromClass([conditionValue class]) : @"nil"]];
         
         if ([self valuesAreEqual:elementValue to:conditionValue]) {
             [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Found matching element: %@", element]];
@@ -748,7 +741,6 @@
             if (bidResponseData) {
                 id rankValue = [self resolveNestedField:bidResponseData path:@"ext.cloudx.rank"];
                 if (rankValue) {
-                    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Found rank in bidResponseData: %@", rankValue]];
                     return rankValue;
                 }
             }
@@ -759,12 +751,8 @@
                 if (responseData) {
                     // Look for the winning bid's rank in the bid response
                     // In most auction scenarios, the winning bid has rank 1
-                    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Looking up rank from auction %@ response data", auctionId]];
-                    
-                    // Try to find rank in the bid response ext.cloudx.rank
                     id rankValue = [self resolveNestedField:responseData path:@"ext.cloudx.rank"];
                     if (rankValue) {
-                        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Found rank in auction response: %@", rankValue]];
                         return rankValue;
                     }
                 }
@@ -781,7 +769,6 @@
         if (auctionId) {
             id result = [self resolveField:auctionId field:fieldPath];
             if (result) {
-                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolved field path %@ via resolveField: %@", fieldPath, result]];
                 return result;
             }
         }
@@ -790,7 +777,6 @@
         if (bidResponseData) {
             id result = [self resolveNestedField:bidResponseData path:fieldPath];
             if (result) {
-                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolved field path %@ from context: %@", fieldPath, result]];
                 return result;
             }
         }
@@ -801,7 +787,6 @@
             if (responseData) {
                 id result = [self resolveNestedField:responseData path:fieldPath];
                 if (result) {
-                    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolved field path %@ from auction response: %@", fieldPath, result]];
                     return result;
                 }
             }

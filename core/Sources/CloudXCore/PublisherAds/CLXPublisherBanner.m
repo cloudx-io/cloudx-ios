@@ -15,6 +15,8 @@
 #import <CloudXCore/CLXBannerType.h>
 #import <CloudXCore/CLXSDKConfigPlacement.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
+#import <CloudXCore/CLXSessionMetricsTracker.h>
+#import <CloudXCore/CLXAdType.h>
 
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXWinLossTracker.h>
@@ -71,6 +73,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL successWin;
 @property (nonatomic, assign) BOOL autoRefreshEnabled;
 @property (nonatomic, strong, nullable) NSDate *lastManualRefreshTime;
+@property (nonatomic, assign) CLXBannerType bannerType;
 
 // Visibility and prefetch properties
 @property (nonatomic, assign, readwrite) BOOL isVisible;
@@ -617,6 +620,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)impressionBanner:(id<CLXAdapterBanner>)banner {
     [self.logger debug:[NSString stringWithFormat:@"[CloudX][Banner] impression delegate called for placement: %@", self.placementID]];
+    
+    // NEW: Record session depth impression (iOS feature parity with Android)
+    NSInteger adType = (self.bannerType == CLXBannerTypeW320H50) ? CLXAdTypeBanner : CLXAdTypeMrec;
+    [[CLXSessionMetricsTracker sharedInstance] recordImpressionForPlacement:self.placementName adType:adType];
+    
     if (self.lastBidResponse) {
         [self.logger debug:[NSString stringWithFormat:@"[CloudX][Banner] Reporting impression for bidID=%@", self.lastBidResponse.bidID]];
         [self.appSessionService addImpressionWithPlacementID:self.placementID];

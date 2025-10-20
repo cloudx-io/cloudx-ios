@@ -308,6 +308,13 @@
 		19F853642E899BD2002619F1 /* CLXRillEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F853532E899BD2002619F1 /* CLXRillEvent.m */; };
 		19F853652E899BD2002619F1 /* CLXRillEventDaoImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F853542E899BD2002619F1 /* CLXRillEventDaoImpl.m */; };
 		19F853662E899BD2002619F1 /* CLXMetricsEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F8534E2E899BD2002619F1 /* CLXMetricsEvent.m */; };
+		19FF30F32EA6E6D50006F05A /* CLXSessionMetrics.h in Headers */ = {isa = PBXBuildFile; fileRef = 19FF30EF2EA6E6D50006F05A /* CLXSessionMetrics.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		19FF30F42EA6E6D50006F05A /* CLXSessionMetricsTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 19FF30F12EA6E6D50006F05A /* CLXSessionMetricsTracker.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		19FF30F52EA6E6D50006F05A /* CLXSessionMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = 19FF30F02EA6E6D50006F05A /* CLXSessionMetrics.m */; };
+		19FF30F62EA6E6D50006F05A /* CLXSessionMetricsTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 19FF30F22EA6E6D50006F05A /* CLXSessionMetricsTracker.m */; };
+		19FF30FA2EA6E81A0006F05A /* CLXSessionDepthIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19FF30F82EA6E81A0006F05A /* CLXSessionDepthIntegrationTests.m */; };
+		19FF30FB2EA6E81A0006F05A /* CLXLoopIndexTrackerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19FF30F72EA6E81A0006F05A /* CLXLoopIndexTrackerTests.m */; };
+		19FF30FC2EA6E81A0006F05A /* CLXSessionDepthUnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19FF30F92EA6E81A0006F05A /* CLXSessionDepthUnitTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -627,6 +634,13 @@
 		19F853552E899BD2002619F1 /* CLXRillTrackingServiceV2.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXRillTrackingServiceV2.m; sourceTree = "<group>"; };
 		19F853562E899BD2002619F1 /* CLXSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSession.m; sourceTree = "<group>"; };
 		19F853572E899BD2002619F1 /* CLXSessionDaoImpl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionDaoImpl.m; sourceTree = "<group>"; };
+		19FF30EF2EA6E6D50006F05A /* CLXSessionMetrics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSessionMetrics.h; sourceTree = "<group>"; };
+		19FF30F02EA6E6D50006F05A /* CLXSessionMetrics.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionMetrics.m; sourceTree = "<group>"; };
+		19FF30F12EA6E6D50006F05A /* CLXSessionMetricsTracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSessionMetricsTracker.h; sourceTree = "<group>"; };
+		19FF30F22EA6E6D50006F05A /* CLXSessionMetricsTracker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionMetricsTracker.m; sourceTree = "<group>"; };
+		19FF30F72EA6E81A0006F05A /* CLXLoopIndexTrackerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXLoopIndexTrackerTests.m; sourceTree = "<group>"; };
+		19FF30F82EA6E81A0006F05A /* CLXSessionDepthIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionDepthIntegrationTests.m; sourceTree = "<group>"; };
+		19FF30F92EA6E81A0006F05A /* CLXSessionDepthUnitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionDepthUnitTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -682,6 +696,8 @@
 		195755372E9DA1E500C9CC76 /* Tracker */ = {
 			isa = PBXGroup;
 			children = (
+				19FF30F02EA6E6D50006F05A /* CLXSessionMetrics.m */,
+				19FF30F22EA6E6D50006F05A /* CLXSessionMetricsTracker.m */,
 				195755362E9DA1E500C9CC76 /* CLXPlacementLoopIndexTracker.m */,
 			);
 			path = Tracker;
@@ -729,6 +745,9 @@
 		19C7247E2E2390420012CFC7 /* CloudXCoreTests */ = {
 			isa = PBXGroup;
 			children = (
+				19FF30F72EA6E81A0006F05A /* CLXLoopIndexTrackerTests.m */,
+				19FF30F82EA6E81A0006F05A /* CLXSessionDepthIntegrationTests.m */,
+				19FF30F92EA6E81A0006F05A /* CLXSessionDepthUnitTests.m */,
 				19F75E7B2EA420CF00E889C0 /* CLXEndpointResolutionIntegrationTests.m */,
 				19F75E7C2EA420CF00E889C0 /* CLXEndpointResolverTests.m */,
 				19F75DD82EA2E68900E889C0 /* CLXWinLossCriticalTests.m */,
@@ -1122,6 +1141,8 @@
 				195755352E9DA1E500C9CC76 /* CLXPlacementLoopIndexTracker.h */,
 				19C725392E2390810012CFC7 /* CLXSessionMetricSpend.h */,
 				19C7253A2E2390810012CFC7 /* CLXSessionMetricType.h */,
+				19FF30EF2EA6E6D50006F05A /* CLXSessionMetrics.h */,
+				19FF30F12EA6E6D50006F05A /* CLXSessionMetricsTracker.h */,
 				19C7253B2E2390810012CFC7 /* CLXSKAdNetworkService.h */,
 				19C7253C2E2390810012CFC7 /* CLXSystemInformation.h */,
 				19C7253D2E2390810012CFC7 /* CLXURLProvider.h */,
@@ -1299,6 +1320,8 @@
 				1916B16C2E7DFD9A00E49E3E /* CLXSQLiteDatabase.h in Headers */,
 				1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */,
 				19F75E482EA41EFB00E889C0 /* CLXEndpointResolver.h in Headers */,
+				19FF30F32EA6E6D50006F05A /* CLXSessionMetrics.h in Headers */,
+				19FF30F42EA6E6D50006F05A /* CLXSessionMetricsTracker.h in Headers */,
 				1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */,
 				19656C1C2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h in Headers */,
 				195755392E9DA1E500C9CC76 /* CLXPlacementLoopIndexTracker.h in Headers */,
@@ -1435,6 +1458,8 @@
 				19C725B62E2390810012CFC7 /* CLXPublisherFullscreenAd.m in Sources */,
 				19C725B82E2390810012CFC7 /* CLXRillImpressionProperties.m in Sources */,
 				1916B24E2E819DC600E49E3E /* CLXEventTrackerBulkApi.m in Sources */,
+				19FF30F52EA6E6D50006F05A /* CLXSessionMetrics.m in Sources */,
+				19FF30F62EA6E6D50006F05A /* CLXSessionMetricsTracker.m in Sources */,
 				1916B24F2E819DC600E49E3E /* CLXMetricsEventDao.m in Sources */,
 				1916B2502E819DC600E49E3E /* CLXMetricsConfig.m in Sources */,
 				1916B2512E819DC600E49E3E /* CLXMetricsDebugger.m in Sources */,
@@ -1565,6 +1590,9 @@
 				1916B1712E7E061B00E49E3E /* CLXSQLiteDatabaseTests.m in Sources */,
 				1916B2672E819FD400E49E3E /* CLXMetricsEventDaoTests.m in Sources */,
 				1916B2682E819FD400E49E3E /* CLXMetricsEventTests.m in Sources */,
+				19FF30FA2EA6E81A0006F05A /* CLXSessionDepthIntegrationTests.m in Sources */,
+				19FF30FB2EA6E81A0006F05A /* CLXLoopIndexTrackerTests.m in Sources */,
+				19FF30FC2EA6E81A0006F05A /* CLXSessionDepthUnitTests.m in Sources */,
 				1916B2692E819FD400E49E3E /* CLXMetricsPerformanceTests.m in Sources */,
 				1916B26A2E819FD400E49E3E /* CLXMetricsTypeTests.m in Sources */,
 				19F75DD92EA2E68900E889C0 /* CLXWinLossCriticalTests.m in Sources */,

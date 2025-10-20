@@ -47,6 +47,10 @@
 // Placement Loop Index Tracking
 #import <CloudXCore/CLXPlacementLoopIndexTracker.h>
 
+// Session Metrics Tracking
+#import <CloudXCore/CLXSessionMetrics.h>
+#import <CloudXCore/CLXSessionMetricsTracker.h>
+
 // Database
 #import <CloudXCore/CLXSQLiteDatabase.h>
 

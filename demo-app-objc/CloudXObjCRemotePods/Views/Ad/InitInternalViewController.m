@@ -18,11 +18,16 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = @"ObjC Demo";
+    
+    // Set environment to staging for third-party usage
+    [[CLXDemoConfigManager sharedManager] setEnvironment:CLXDemoEnvironmentStaging];
+    
     [self setupEnvironmentButtons];
     
     // Check if SDK is already initialized
     self.isSDKInitialized = [[CloudXCore shared] isInitialized];
     [self updateStatusUIWithCurrentEnvironment];
+    [self updateButtonStates];
 }
 
 // Override to prevent show logs button from appearing in InitInternalViewController
@@ -37,6 +42,7 @@
     if (self.isSDKInitialized) {
         [self updateStatusUIWithCurrentEnvironment];
     }
+    [self updateButtonStates];
 }
 
 - (void)setupEnvironmentButtons {
@@ -81,6 +87,9 @@
     [button setTitle:title forState:UIControlStateNormal];
     [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
     
+    // Tag button with environment for identification
+    button.tag = environment;
+    
     // Style the button
     button.backgroundColor = [self colorForEnvironment:environment];
     button.tintColor = [UIColor whiteColor];
@@ -100,6 +109,30 @@
         case CLXDemoEnvironmentProduction:
             // Green - not too bright or light
             return [UIColor colorWithRed:0.2 green:0.7 blue:0.3 alpha:1.0];
+    }
+}
+
+- (void)updateButtonStates {
+    CLXDemoConfigManager *configManager = [CLXDemoConfigManager sharedManager];
+    CLXDemoEnvironment currentEnvironment = configManager.currentEnvironment;
+    
+    NSArray<UIButton *> *buttons = @[self.devButton, self.stagingButton, self.prodButton];
+    
+    for (UIButton *button in buttons) {
+        CLXDemoEnvironment buttonEnvironment = (CLXDemoEnvironment)button.tag;
+        BOOL isCurrentEnvironment = (buttonEnvironment == currentEnvironment);
+        
+        button.enabled = isCurrentEnvironment;
+        
+        if (isCurrentEnvironment) {
+            // Full color for enabled button
+            button.backgroundColor = [self colorForEnvironment:buttonEnvironment];
+            button.alpha = 1.0;
+        } else {
+            // Grayed out for disabled buttons
+            button.backgroundColor = [UIColor systemGrayColor];
+            button.alpha = 0.5;
+        }
     }
 }
 
@@ -180,6 +213,9 @@
     // Set the environment in config manager
     CLXDemoConfigManager *configManager = [CLXDemoConfigManager sharedManager];
     [configManager setEnvironment:environment];
+    
+    // Update button states to reflect the new environment
+    [self updateButtonStates];
     
     CLXDemoConfig *config = [configManager currentConfig];
     NSString *environmentName = [configManager environmentName:environment];

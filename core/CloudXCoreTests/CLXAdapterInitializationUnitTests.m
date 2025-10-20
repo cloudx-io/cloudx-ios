@@ -117,7 +117,7 @@
 - (void)testAllNetworkNameMappings {
     // Test known mappings
     NSArray *testCases = @[
-        @[@"testbidder", @"testbidder"],
+        @[@"testbidder", @"prebidAdapter"],  // testbidder now maps to prebidAdapter
         @[@"googleAdManager", @"googleAdManager"],
         @[@"meta", @"meta"],
         @[@"mintegral", @"mintegral"],
