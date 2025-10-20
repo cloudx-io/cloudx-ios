@@ -1,5 +1,4 @@
 #import "AdDemoTabViewController.h"
-#import "InitViewController.h"
 #import "InitInternalViewController.h"
 #import "BannerViewController.h"
 #import "InterstitialViewController.h"
@@ -17,11 +16,8 @@
     [super viewDidLoad];
     
     // Create view controllers
-    InitViewController *initVC = [[InitViewController alloc] init];
-    initVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Init" image:[UIImage systemImageNamed:@"power"] tag:0];
-    
     InitInternalViewController *initInternalVC = [[InitInternalViewController alloc] init];
-    initInternalVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Init Internal" image:[UIImage systemImageNamed:@"gear"] tag:9];
+    initInternalVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Init" image:[UIImage systemImageNamed:@"power"] tag:0];
     
     BannerViewController *bannerVC = [[BannerViewController alloc] init];
     bannerVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Banner" image:[UIImage systemImageNamed:@"rectangle"] tag:1];
@@ -53,7 +49,7 @@
     
     // Set view controllers - Additional VCs appear in "More" section
     self.viewControllers = @[
-        [[UINavigationController alloc] initWithRootViewController:initVC],
+        [[UINavigationController alloc] initWithRootViewController:initInternalVC],
         [[UINavigationController alloc] initWithRootViewController:bannerVC],
         [[UINavigationController alloc] initWithRootViewController:interstitialVC],
         [[UINavigationController alloc] initWithRootViewController:rewardedVC],
@@ -62,7 +58,6 @@
         [[UINavigationController alloc] initWithRootViewController:nativeBannerVC],
         [[UINavigationController alloc] initWithRootViewController:rewardedInterstitialVC],
         [[UINavigationController alloc] initWithRootViewController:keyValueVC],
-        [[UINavigationController alloc] initWithRootViewController:initInternalVC],
         [[UINavigationController alloc] initWithRootViewController:settinsVC]
     ];
 }

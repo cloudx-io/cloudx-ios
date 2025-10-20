@@ -17,7 +17,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"Internal Init";
+    self.title = @"ObjC Demo";
     [self setupEnvironmentButtons];
     
     // Check if SDK is already initialized
@@ -63,7 +63,7 @@
     
     [self.view addSubview:self.buttonStackView];
     
-    // Add constraints - match InitViewController button dimensions (200px wide, 44px tall)
+    // Add constraints - button dimensions (200px wide, 44px tall)
     [NSLayoutConstraint activateConstraints:@[
         [self.buttonStackView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
         [self.buttonStackView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor],
