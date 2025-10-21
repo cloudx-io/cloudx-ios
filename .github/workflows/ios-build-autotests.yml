@@ -1,0 +1,73 @@
+name: iOS build autotests workflow
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    env:
+        DERIVED_DATA_PATH: "DerivedData"
+    name: build-sdk-ios
+    runs-on: self-hosted
+    permissions: write-all
+    outputs:
+      artifact-url: ${{ steps.upload-artifact.outputs.artifact-url  }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Set Default Scheme
+        working-directory: ./
+        run: |
+          scheme_list=$(xcodebuild -list -json | tr -d "\n")
+          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
+          echo $default | cat >default
+          echo Using default scheme: $default
+
+      - name: Publish test results
+        uses: kishikawakatsumi/xcresulttool@v1
+        if: success() || failure()
+        with:
+          path: ./TestResults.xcresult
+          show-code-coverage: true
+        
+      - name: Build
+        working-directory: ./
+        env:
+          scheme: ${{ 'default' }}
+          platform: ${{ 'iOS Simulator' }}
+        run: |
+          # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
+          device=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//"`
+          if [ $scheme = default ]; then scheme=$(cat default); fi
+          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
+          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
+          set -o pipefail && xcodebuild clean -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "platform=$platform,name=$device" -derivedDataPath $DERIVED_DATA_PATH build-for-testing
+      - name: upload-artifact
+        id: upload-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CloudXDemo
+          path: DerivedData/Build/Products
+      - name: output-artifact-url
+        run:  echo "Artifact URL is ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-artifact.outputs.artifact-id }}"
+  dispatch:
+    name: trigger-autotest
+    runs-on: self-hosted
+    needs: build
+    steps:
+    - uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.PAT_TOKEN }}
+        script: |
+          await github.rest.actions.createWorkflowDispatch({
+            owner: 'cloudx-io',
+            repo: 'cloudexchange.sdk.automated.testing',
+            workflow_id: 'ios.yml',
+            ref: 'main',
+            inputs: {
+              'artifact-url' : '${{ needs.build.outputs.artifact-url }}',
+            },
+          });
