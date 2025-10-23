@@ -1,73 +1,120 @@
 name: iOS build autotests workflow
 
+# This workflow builds an iOS SDK, uploads it as an artifact,
+# and then triggers a separate testing workflow, passing the
+# run ID so the artifact can be downloaded.
+
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      artifact-url:
+        description: 'artifact url'
 
 jobs:
   build:
     env:
-        DERIVED_DATA_PATH: "DerivedData"
+     DERIVED_DATA_PATH: "DerivedData"
     name: build-sdk-ios
-    runs-on: self-hosted
+    runs-on: macos-latest
     permissions: write-all
     outputs:
-      artifact-url: ${{ steps.upload-artifact.outputs.artifact-url  }}
+      artifact-url: ${{ steps.upload-artifact.outputs.artifact-url}}
     steps:
-      - name: checkout
-        uses: actions/checkout@v3
-      - name: Set Default Scheme
-        working-directory: ./
-        run: |
-          scheme_list=$(xcodebuild -list -json | tr -d "\n")
-          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
-          echo $default | cat >default
-          echo Using default scheme: $default
+    - name: 🗖 Checkout repo
+      uses: actions/checkout@v4
 
-      - name: Publish test results
-        uses: kishikawakatsumi/xcresulttool@v1
-        if: success() || failure()
-        with:
-          path: ./TestResults.xcresult
-          show-code-coverage: true
+    - name: 🛠 Install CocoaPods
+      run: |
+        echo "Installing CocoaPods... $(date)"
+        gem list -i cocoapods || sudo gem install cocoapods --no-document
+        echo "Finished installing $(date)"
         
-      - name: Build
-        working-directory: ./
-        env:
-          scheme: ${{ 'default' }}
-          platform: ${{ 'iOS Simulator' }}
-        run: |
-          # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
-          device=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//"`
-          if [ $scheme = default ]; then scheme=$(cat default); fi
-          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
-          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          set -o pipefail && xcodebuild clean -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "platform=$platform,name=$device" -derivedDataPath $DERIVED_DATA_PATH build-for-testing
-      - name: upload-artifact
-        id: upload-artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: CloudXDemo
-          path: DerivedData/Build/Products
-      - name: output-artifact-url
-        run:  echo "Artifact URL is ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-artifact.outputs.artifact-id }}"
+    - name: 📋 Debug Print CocoaPods version and env
+      run: |
+        pod --version
+        pod env
+
+    # NOTE: Corrected indentation for the following steps.
+    # 'working-directory' must be at the same level as 'name' and 'run'.
+    - name: Install CocoaPods dependencies
+      working-directory: ./demo-app-objc/
+      run: |
+        if [ -f "Podfile" ]; then
+          echo "Podfile found — installing pods..."
+          pod repo update
+          pod install --repo-update
+        else
+          echo "No Podfile found — skipping pod install."
+        fi
+
+    - name: Set Default Scheme
+      working-directory: ./demo-app-objc/
+      run: |
+        scheme_list=$(xcodebuild -list -json | tr -d "\n")
+        default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
+        echo $default | cat > default
+        echo "Using default scheme: $default"
+
+    - name: Build
+      working-directory: ./demo-app-objc/
+      env:
+        scheme: ${{ 'default' }}
+        platform: ${{ 'iOS Simulator' }}
+      run: |
+        # Find the first available iPhone simulator
+        device=$(xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//")
+        if [ $scheme = default ]; then scheme=$(cat default); fi
+        
+        # Determine if the project uses a workspace or a project file
+        if [ "$(ls -A | grep -i \\.xcworkspace\$)" ]; then
+          filetype_parameter="workspace"
+          file_to_build="$(ls -A | grep -i \\.xcworkspace\$)"
+        else
+          filetype_parameter="project"
+          file_to_build="$(ls -A | grep -i \\.xcodeproj\$)"
+        fi
+        
+        file_to_build=$(echo $file_to_build | awk '{$1=$1;print}')
+        
+        echo "Building with scheme: $scheme, file: $file_to_build, device: $device"
+        
+        # Run the build command
+        set -o pipefail && xcodebuild clean -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "platform=$platform,name=$device" -derivedDataPath $DERIVED_DATA_PATH build-for-testing
+        
+    - name: Debug list DerivedData contents
+      run: |
+          echo "DerivedData directory structure:"
+          find ./demo-app-objc/DerivedData -maxdepth 3 || true
+
+    - name: Upload build artifact
+      id: upload-artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CloudXObjCRemotePods # The name the artifact will have
+        path: demo-app-objc/DerivedData/Build/Products
+
   dispatch:
     name: trigger-autotest
     runs-on: self-hosted
-    needs: build
+    needs: build # This job will run only after the 'build' job completes successfully
     steps:
-    - uses: actions/github-script@v6
-      with:
-        github-token: ${{ secrets.PAT_TOKEN }}
-        script: |
-          await github.rest.actions.createWorkflowDispatch({
-            owner: 'cloudx-io',
-            repo: 'cloudexchange.sdk.automated.testing',
-            workflow_id: 'ios.yml',
-            ref: 'main',
-            inputs: {
-              'artifact-url' : '${{ needs.build.outputs.artifact-url }}',
-            },
-          });
+      - name: Dispatch testing workflow
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            console.log(`Triggering workflow in another repository with run_id: ${{ needs.build.outputs.run-id }}`);
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'cloudx-io',
+              repo: 'cloudexchange.sdk.automated.testing',
+              workflow_id: 'ios.yml',
+              ref: 'ios-objC-demo-add-branch',
+              inputs: {
+                'artifact-url': '${{ needs.build.outputs.artifact-url }}'
+              },
+            });
+
