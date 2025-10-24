@@ -50,7 +50,7 @@ static const double kTestLoserPrice2 = 2.25;
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.winLossNotificationURL = @"https://test.com/winloss";
     config.winLossNotificationPayloadConfig = @{
-        @"notificationType": @"sdk.[notificationType]",
+        @"notificationType": @"sdk.[loadSuccess|renderSuccess|loss]",
         @"url": @"sdk.[bid.nurl|bid.lurl]",
         @"auctionId": @"auctionId",
         @"bidId": @"bidId",

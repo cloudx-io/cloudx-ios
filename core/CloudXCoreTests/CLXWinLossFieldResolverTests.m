@@ -77,7 +77,7 @@
     [self setMockPayloadMapping:@{
         @"win_field": @"sdk.win",
         @"loss_field": @"sdk.loss",
-        @"loss_reason_field": @"sdk.lossReason",
+        @"loss_reason_code_field": @"sdk.lossReasonCode",
         @"win_loss_field": @"sdk.[win|loss]",
         @"sdk_field": @"sdk.sdk"
     }];
@@ -93,7 +93,7 @@
     
     XCTAssertEqualObjects(winResult[@"win_field"], @"win", @"sdk.win should return 'win' for win events");
     XCTAssertNil(winResult[@"loss_field"], @"sdk.loss should return nil for win events");
-    XCTAssertEqualObjects(winResult[@"loss_reason_field"], @"Bid Won", @"sdk.lossReason should return string description");
+    XCTAssertEqualObjects(winResult[@"loss_reason_code_field"], @(0), @"sdk.lossReasonCode should return numeric code 0 for Bid Won");
     XCTAssertEqualObjects(winResult[@"win_loss_field"], @"win", @"sdk.[win|loss] should return 'win' for wins");
     XCTAssertEqualObjects(winResult[@"sdk_field"], @"sdk", @"sdk.sdk should always return 'sdk'");
     
@@ -106,7 +106,7 @@
     
     XCTAssertNil(lossResult[@"win_field"], @"sdk.win should return nil for loss events");
     XCTAssertEqualObjects(lossResult[@"loss_field"], @"loss", @"sdk.loss should return 'loss' for loss events");
-    XCTAssertEqualObjects(lossResult[@"loss_reason_field"], @"Lost to Higher Bid", @"sdk.lossReason should return string description");
+    XCTAssertEqualObjects(lossResult[@"loss_reason_code_field"], @(102), @"sdk.lossReasonCode should return numeric code 102 for Lost to Higher Bid");
     XCTAssertEqualObjects(lossResult[@"win_loss_field"], @"loss", @"sdk.[win|loss] should return 'loss' for losses");
     XCTAssertEqualObjects(lossResult[@"sdk_field"], @"sdk", @"sdk.sdk should always return 'sdk'");
 }
@@ -150,13 +150,13 @@
  * Test loss reason edge cases
  */
 - (void)testResolveField_LossReason_EdgeCases {
-    [self setMockPayloadMapping:@{@"loss_reason": @"sdk.lossReason"}];
+    [self setMockPayloadMapping:@{@"loss_reason_code": @"sdk.lossReasonCode"}];
     
     CLXBidResponseBid *testBid = [self createTestBid];
     
     // Test with nil loss reason
     NSDictionary *nilReasonResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
-                                                                                     bid:testBid
+                                                                                      bid:testBid
                                                                               lossReason:nil
                                                                                    event:[CLXBidLifecycleEvent lossEvent]
                                                                           loadedBidPrice:2.50];
@@ -170,16 +170,16 @@
                                                                                     event:[CLXBidLifecycleEvent lossEvent]
                                                                            loadedBidPrice:2.50];
     
-    XCTAssertEqualObjects(zeroReasonResult[@"loss_reason"], @"Bid Won", @"Should return string description for zero loss reason");
+    XCTAssertEqualObjects(zeroReasonResult[@"loss_reason_code"], @(0), @"Should return numeric code 0 for Bid Won");
     
-    // Test with invalid negative loss reason
+    // Test with invalid negative loss reason (still passes through as numeric)
     NSDictionary *negativeReasonResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                            bid:testBid
                                                                                     lossReason:@(-1)
                                                                                          event:[CLXBidLifecycleEvent lossEvent]
                                                                                 loadedBidPrice:2.50];
     
-    XCTAssertEqualObjects(negativeReasonResult[@"loss_reason"], @"Internal Error", @"Invalid loss reasons should fallback to Internal Error");
+    XCTAssertEqualObjects(negativeReasonResult[@"loss_reason_code"], @(-1), @"Loss reason code should pass through numeric values as-is");
 }
 
 #pragma mark - URL Template Processing Tests (REMOVED)

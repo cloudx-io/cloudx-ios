@@ -220,6 +220,25 @@ static id<CLXWinLossTracking> _testInstance = nil;
             [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] %@: %@ ($%.2f) [%@]", 
                                eventName, bidId, loadedBidPrice, event.urlType]];
             
+            // Log complete payload structure for testing/debugging
+            NSError *jsonError;
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:payload 
+                                                               options:NSJSONWritingPrettyPrinted 
+                                                                 error:&jsonError];
+            if (jsonData) {
+                NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+                [self.logger debug:[NSString stringWithFormat:@"📦 [WinLossTracker] Complete payload:\n%@", jsonString]];
+                
+                // Log presence of critical fields
+                BOOL hasBid = payload[@"bid"] != nil;
+                BOOL hasLossReasonCode = payload[@"lossReasonCode"] != nil;
+                BOOL hasDeviceTypeCode = payload[@"deviceTypeCode"] != nil;
+                [self.logger debug:[NSString stringWithFormat:@"✅ [WinLossTracker] Critical fields - bid: %@, lossReasonCode: %@, deviceTypeCode: %@", 
+                                   hasBid ? @"YES" : @"NO",
+                                   hasLossReasonCode ? @"YES" : @"NO", 
+                                   hasDeviceTypeCode ? @"YES" : @"NO"]];
+            }
+            
             // Fire event immediately (no state management)
             [self trackWinLoss:payload auctionId:auctionId bidId:bidId];
         } else {

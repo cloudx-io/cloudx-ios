@@ -60,7 +60,7 @@ static const NSInteger kTestRank3 = 3;
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.winLossNotificationURL = @"https://test.com/winloss";
     config.winLossNotificationPayloadConfig = @{
-        @"notificationType": @"sdk.[notificationType]",
+        @"notificationType": @"sdk.[loadSuccess|renderSuccess|loss]",
         @"url": @"sdk.[bid.nurl|bid.lurl]",
         @"auctionId": @"auctionId",
         @"bidId": @"bidId",
@@ -1085,7 +1085,7 @@ static const NSInteger kTestRank3 = 3;
         // Configure payload mapping
         CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
         config.winLossNotificationPayloadConfig = @{
-            @"notificationType": @"sdk.[notificationType]",
+            @"notificationType": @"sdk.[loadSuccess|renderSuccess|loss]",
             @"url": @"sdk.[bid.nurl|bid.lurl]",
             @"auctionId": @"auctionId",
             @"bidId": @"bidId",
@@ -1148,7 +1148,7 @@ static const NSInteger kTestRank3 = 3;
         // Configure payload mapping
         CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
         config.winLossNotificationPayloadConfig = @{
-            @"notificationType": @"sdk.[notificationType]",
+            @"notificationType": @"sdk.[loadSuccess|renderSuccess|loss]",
             @"url": @"sdk.[bid.nurl|bid.lurl]",
             @"auctionId": @"auctionId",
             @"bidId": @"bidId",
@@ -1205,7 +1205,7 @@ static const NSInteger kTestRank3 = 3;
     // Configure payload mapping
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.winLossNotificationPayloadConfig = @{
-        @"notificationType": @"sdk.[notificationType]",
+        @"notificationType": @"sdk.[loadSuccess|renderSuccess|loss]",
         @"url": @"sdk.[bid.nurl|bid.lurl]",
         @"auctionId": @"auctionId",
         @"bidId": @"bidId",
