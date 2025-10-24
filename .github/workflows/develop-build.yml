@@ -54,7 +54,19 @@ jobs:
         id: changes
         run: |
           # Get list of changed files in this push
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} > /tmp/changed_files.txt || git diff --name-only HEAD~1 HEAD > /tmp/changed_files.txt
+          # For first push to branch, before SHA will be all zeros
+          if [[ "${{ github.event.before }}" == "0000000000000000000000000000000000000000" ]] || [[ -z "${{ github.event.before }}" ]]; then
+            # First push - compare with main branch or treat all as changed
+            git diff --name-only origin/main...HEAD > /tmp/changed_files.txt 2>/dev/null || {
+              # If no main branch, mark all components as changed
+              echo "core/" > /tmp/changed_files.txt
+              echo "adapter-meta/" >> /tmp/changed_files.txt
+              echo "adapter-cloudx/" >> /tmp/changed_files.txt
+            }
+          else
+            # Normal push - compare with previous commit
+            git diff --name-only ${{ github.event.before }} ${{ github.sha }} > /tmp/changed_files.txt
+          fi
           
           # Check which components were modified
           CORE_CHANGED="false"
