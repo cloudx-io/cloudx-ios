@@ -58,12 +58,12 @@
 - (void)setupConfigurations {
     // Dev Configuration (current production values)
     CLXDemoConfig *devConfig = [[CLXDemoConfig alloc] 
-        initWithAppKey:@"g0PdN9_0ilfIcuNXhBopl"
+        initWithAppKey:@"Jm_CovdBVkxrHks2xd5V8"
         hashedUserId:@"test-user-123"
         baseURL:@"https://pro-dev.cloudx.io/sdk"
-        bannerPlacement:@"metaBanner"
-        mrecPlacement:@"metaMREC"
-        interstitialPlacement:@"metaInterstitial"
+        bannerPlacement:@"banner111"
+        mrecPlacement:@"mrec111"
+        interstitialPlacement:@"inter111"
         nativePlacement:@"metaNative"
         nativeBannerPlacement:@"metaNative"
         rewardedPlacement:@"metaRewarded"

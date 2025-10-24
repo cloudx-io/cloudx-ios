@@ -13,6 +13,7 @@
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBidLifecycleEvent.h>
+#import <CloudXCore/CLXSystemInformation.h>
 
 // Template placeholders for dynamic field resolution
 static NSString *const kPlaceholderAuctionPrice = @"${AUCTION_PRICE}";
@@ -65,6 +66,7 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
     
     // Return nil if no payload mapping configured
     NSDictionary<NSString *, NSString *> *payloadMapping = self.winLossPayloadMapping;
+    
     if (!payloadMapping) {
         [self.logger debug:@"📊 [WinLossFieldResolver] No payload mapping configured, returning nil"];
         return nil;
@@ -124,35 +126,18 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         // Return notification type from lifecycle event (camelCase)
         return event.notificationType.length > 0 ? event.notificationType : nil;
         
-    } else if ([fieldPath isEqualToString:@"sdk.[notificationType]"]) {
+    } else if ([fieldPath isEqualToString:@"sdk.[loadSuccess|renderSuccess|loss]"]) {
         // Return notification type in snake_case format for server compatibility
         // Convert camelCase to snake_case: loadSuccess -> load_success, renderSuccess -> render_success
         NSString *notificationType = event.notificationType;
         if ([notificationType isEqualToString:@"loadSuccess"]) {
-            return @"load_success";
+            return @"loadSuccess";
         } else if ([notificationType isEqualToString:@"renderSuccess"]) {
-            return @"render_success";
+            return @"renderSuccess";
         } else if ([notificationType isEqualToString:@"loss"]) {
             return @"loss";
         }
         return notificationType; // Fallback: return as-is
-        
-    } else if ([fieldPath isEqualToString:@"url"]) {
-        // Dynamic URL resolution based on event's urlType
-        NSString *urlType = event.urlType;
-        NSString *url = nil;
-        
-        if ([urlType isEqualToString:@"nurl"]) {
-            url = bid.nurl;
-        } else if ([urlType isEqualToString:@"lurl"]) {
-            url = bid.lurl;
-        } else if ([urlType isEqualToString:@"burl"]) {
-            url = bid.burl;
-        }
-        
-        // Return raw URL with macros INTACT - server will hydrate
-        // Zero client-side URL hydration - macros are resolved server-side
-        return url;
         
     } else if ([fieldPath isEqualToString:@"sdk.[bid.nurl|bid.lurl]"]) {
         // Dynamic URL resolution based on event's urlType (alternative syntax)
@@ -168,6 +153,13 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         }
         
         // Return raw URL with macros INTACT - server will hydrate
+        // Zero client-side URL hydration - macros are resolved server-side
+        if (url && url.length > 0) {
+            return [self replaceUrlTemplatesInUrl:url
+                                       lossReason:lossReason
+                                   loadedBidPrice:loadedBidPrice];
+        }
+
         return url;
         
     } else if ([fieldPath isEqualToString:@"sdk.win"]) {
@@ -197,20 +189,23 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         // Return numeric loss reason value (for payload)
         return lossReason;
         
-    } else if ([fieldPath isEqualToString:@"sdk.lossReason"]) {
+    } else if ([fieldPath isEqualToString:@"sdk.deviceTypeCode"]) {
+        // Return numeric loss reason value (for payload)
+        NSInteger deviceTypeAsInt = [CLXSystemInformation shared].deviceType;
+        return @(deviceTypeAsInt);
+        
+    } else if ([fieldPath isEqualToString:@"sdk.lossReasonCode"]) {
         // Return human-readable loss reason description
         if (!lossReason) {
             return nil;
         }
         switch (lossReason.integerValue) {
             case 0:  // CLXLossReasonBidWon
-                return @"Bid Won";
+                return @(lossReason.integerValue);
             case 1:  // CLXLossReasonInternalError
-                return @"Internal Error";
-            case 102:  // CLXLossReasonLostToHigherBid
-                return @"Lost to Higher Bid";
+                return @(lossReason.integerValue);
             default:
-                return @"Internal Error";  // Fallback
+                return @(lossReason.integerValue);
         }
         
     } else if ([fieldPath isEqualToString:@"sdk.sdk"]) {
@@ -221,6 +216,9 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         
     } else if ([fieldPath isEqualToString:@"bidId"]) {
         return bid.id;
+        
+    } else if ([fieldPath isEqualToString:@"seatbid[0].bid[0]"]) {
+        return [bid toDictionary];
         
     } else if ([fieldPath isEqualToString:@"bid.id"]) {
         return bid.id;
@@ -260,20 +258,18 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
     } else if ([fieldPath isEqualToString:@"sdk.loss"]) {
         return !isWin ? @"loss" : nil;
         
-    } else if ([fieldPath isEqualToString:@"sdk.lossReason"]) {
-        // Return human-readable loss reason description
+    } else if ([fieldPath isEqualToString:@"sdk.lossReasonCode"]) {
+        // // Return human-readable loss reason description
         if (!lossReason) {
             return nil;
         }
         switch (lossReason.integerValue) {
             case 0:  // CLXLossReasonBidWon
-                return @"Bid Won";
+                return @(lossReason.integerValue);
             case 1:  // CLXLossReasonInternalError
-                return @"Internal Error";
-            case 102:  // CLXLossReasonLostToHigherBid
-                return @"Lost to Higher Bid";
+                return @(lossReason.integerValue);
             default:
-                return @"Internal Error";  // Fallback
+                return @(lossReason.integerValue);
         }
         
     } else if ([fieldPath isEqualToString:@"sdk.[win|loss]"]) {
@@ -283,7 +279,8 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         return @"sdk";
         
     } else if ([fieldPath isEqualToString:@"sdk.[bid.nurl|bid.lurl]"]) {
-        // Extract nurl/lurl from bid based on win/loss status
+         // Return raw URL with macros INTACT - server will hydrate
+        // Zero client-side URL hydration - macros are resolved server-side
         NSString *url = nil;
         if (isWin) {
             url = bid.nurl;
@@ -291,8 +288,13 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
             url = bid.lurl;
         }
         
-        // Return raw URL with macros INTACT - server will hydrate
-        // Zero client-side URL hydration - macros are resolved server-side
+        if (url && url.length > 0) {
+            return [self replaceUrlTemplatesInUrl:url
+                                            isWin:isWin
+                                       lossReason:lossReason
+                                   loadedBidPrice:loadedBidPrice];
+        }
+        
         return url;
         
     } else if ([fieldPath isEqualToString:@"auctionId"]) {
@@ -310,6 +312,18 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
     } else if ([fieldPath isEqualToString:@"bid.price"]) {
         // Return the bid price from the bid
         return @(bid.price);
+        
+    } else if ([fieldPath isEqualToString:@"eventType"]) {
+        // Return the event type based on win/loss status
+        return isWin ? @"win" : @"loss";
+        
+    } else if ([fieldPath isEqualToString:@"seatbid[0].bid[0]"]) {
+        return [bid toDictionary];
+       
+    } else if ([fieldPath isEqualToString:@"sdk.deviceTypeCode"]) {
+        // Return numeric loss reason value (for payload)
+        NSInteger deviceTypeAsInt = [CLXSystemInformation shared].deviceType;
+        return @(deviceTypeAsInt);
         
     } else if ([fieldPath isEqualToString:@"sdk.loopIndex"]) {
         // Delegate to injected tracking field resolver for loop index

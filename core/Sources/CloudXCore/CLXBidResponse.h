@@ -39,15 +39,38 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *adaptercode;
 @end
 
+// MARK: - CloudX Participants Extension
+@interface CLXBidResponseCloudXParticipants : NSObject
+@property (nonatomic, assign) NSInteger round;
+@property (nonatomic, copy) NSString *bidder;
+@property (nonatomic, copy) NSString *lineItemId;
+@property (nonatomic, assign) NSInteger bidFloor;
+@property (nonatomic, assign) NSString * bid;
+@property (nonatomic, assign) NSInteger responseTimeMillis;
+@property (nonatomic, assign) NSInteger rank;
+
+- (NSDictionary *)toDictionary;
+@end
+
+// MARK: - CloudX Auction Extension
+@interface CLXBidResponseCloudXAuction : NSObject
+@property (nonatomic, strong, nullable) NSArray<CLXBidResponseCloudXParticipants *> *participants;
+
+- (NSArray<NSDictionary *> *)toDictionary;
+@end
+
 // MARK: - CloudX Extension
 @interface CLXBidResponseCloudX : NSObject
 @property (nonatomic, assign) NSInteger rank;
 @property (nonatomic, strong, nullable) NSDictionary<NSString *, NSString *> *adapterExtras;
+
+- (NSDictionary *)toDictionary;
 @end
 
 // MARK: - Prebid Extension
 @interface CLXBidResponsePrebid : NSObject
 @property (nonatomic, strong, nullable) CLXBidResponseCloudXMeta *meta;
+@property (nonatomic, copy, nullable) NSString *type;
 @end
 
 // MARK: - Bid Extension
@@ -81,6 +104,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *dealid;
 @property (nonatomic, assign) NSInteger w;
 @property (nonatomic, assign) NSInteger h;
+
+- (NSDictionary *)toDictionary;
+- (nullable NSString *)toJSON;
 @end
 
 // MARK: - Seat Bid
@@ -89,9 +115,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *seat;
 @end
 
+// MARK: - CloudX Extension
+@interface CLXBidResponseAuction : NSObject
+@property (nonatomic, strong, nullable) CLXBidResponseCloudXAuction *auction;
+@property (nonatomic, copy, nullable) NSString *serverVersion;
+
+- (NSDictionary *)toDictionary;
+@end
+
 // MARK: - Response Extension
 @interface CLXBidResponseResponseExt : NSObject
 // Add any response-level extension fields here
+@property (nonatomic, strong, nullable) CLXBidResponseAuction *cloudx;
+@property (nonatomic, copy, nullable) NSString *lineItemId;
 @end
 
 // MARK: - Main Bid Response
