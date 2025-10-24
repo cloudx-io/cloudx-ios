@@ -8,6 +8,7 @@
  */
 
 #import <CloudXCore/CLXSystemInformation.h>
+#import <CloudXCore/CLXVersion.h>
 #import <UIKit/UIKit.h>
 #import <AdSupport/AdSupport.h>
 #import <AppTrackingTransparency/AppTrackingTransparency.h>
@@ -57,27 +58,7 @@ static CLXSystemInformation *sharedInstance = nil;
 }
 
 - (NSString *)sdkVersion {
-    NSBundle *bundle = [NSBundle bundleWithIdentifier:@"com.cloudx.sdk.core"];
-    NSString *version = [bundle objectForInfoDictionaryKey:@"CloudXMarketingVersion"];
-    if (version) {
-        return version;
-    }
-    
-    NSURL *bundleURL = [[NSBundle mainBundle] URLForResource:@"CloudXSDK" withExtension:@"bundle"];
-    if (bundleURL) {
-        NSBundle *sdkBundle = [NSBundle bundleWithURL:bundleURL];
-        version = [sdkBundle objectForInfoDictionaryKey:@"CloudXMarketingVersion"];
-        if (version) {
-            return version;
-        }
-    }
-    
-    version = [[NSBundle bundleForClass:NSClassFromString(@"CloudXCore")] objectForInfoDictionaryKey:@"CloudXMarketingVersion"];
-    if (version) {
-        return version;
-    }
-    
-    return @"0.0.0";
+    return CLXSDKVersion;
 }
 
 - (NSString *)sdkBundle {

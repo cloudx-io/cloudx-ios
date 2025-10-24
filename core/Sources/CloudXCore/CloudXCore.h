@@ -1,6 +1,9 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+// Version
+#import <CloudXCore/CLXVersion.h>
+
 // Main API
 #import <CloudXCore/CloudXCoreAPI.h>
 

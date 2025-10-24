@@ -1,0 +1,209 @@
+name: Stable Release
+
+# ============================================================================
+# CloudX iOS SDK - Stable Release Automation
+# ============================================================================
+#
+# TRIGGER: Push a version tag (e.g., v1.1.59, v1.1.67-meta, v1.0.0-prebid)
+#
+# WHAT IT DOES:
+#   1. Detects which component from tag suffix (-core, -meta, -prebid)
+#   2. Extracts version from tag (v1.1.59 → 1.1.59)
+#   3. Updates version constant to stable version (no metadata)
+#   4. Validates podspec
+#   5. Builds framework/xcframework
+#   6. Creates GitHub stable release
+#   7. Pushes to CocoaPods Trunk (PUBLIC RELEASE!)
+#
+# HOW TO TRIGGER:
+#   git tag v1.1.59-core && git push origin v1.1.59-core
+#   git tag v1.1.67-meta && git push origin v1.1.67-meta
+#   git tag v1.0.1-prebid && git push origin v1.0.1-prebid
+#
+# REQUIREMENTS:
+#   - Must be on main branch
+#   - COCOAPODS_TRUNK_TOKEN secret must be set
+#   - Tag format: vX.Y.Z-component (e.g., v1.1.59-core)
+#
+# AFTER RELEASE:
+#   Public installation via:
+#     pod 'CloudXCore', '~> 1.1.59'
+#     pod 'CloudXMetaAdapter', '~> 1.1.67'
+#
+# ============================================================================
+
+on:
+  push:
+    tags:
+      - 'v*-core'      # Triggers on v1.1.59-core
+      - 'v*-meta'      # Triggers on v1.1.67-meta
+      - 'v*-prebid'    # Triggers on v1.0.1-prebid
+
+jobs:
+  stable-release:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Parse tag and component
+        id: parse
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          
+          # Extract component (core, meta, or prebid)
+          if [[ "$TAG_NAME" == *-core ]]; then
+            COMPONENT="core"
+            PODSPEC="core/CloudXCore.podspec"
+            VERSION_FILE="core/Sources/CloudXCore/CLXVersion.m"
+            POD_NAME="CloudXCore"
+          elif [[ "$TAG_NAME" == *-meta ]]; then
+            COMPONENT="meta"
+            PODSPEC="adapter-meta/CloudXMetaAdapter.podspec"
+            VERSION_FILE="adapter-meta/Sources/CloudXMetaAdapter/CLXMetaAdapterVersion.m"
+            POD_NAME="CloudXMetaAdapter"
+          elif [[ "$TAG_NAME" == *-prebid ]]; then
+            COMPONENT="prebid"
+            PODSPEC="adapter-cloudx/CloudXPrebidAdapter.podspec"
+            VERSION_FILE="adapter-cloudx/Sources/CloudXPrebidAdapter/CLXPrebidAdapterVersion.m"
+            POD_NAME="CloudXPrebidAdapter"
+          else
+            echo "❌ Unknown component in tag: $TAG_NAME"
+            exit 1
+          fi
+          
+          # Extract version (v1.1.59-core → 1.1.59)
+          VERSION=$(echo "$TAG_NAME" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+)-.*/\1/')
+          
+          echo "component=$COMPONENT" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "podspec=$PODSPEC" >> $GITHUB_OUTPUT
+          echo "version_file=$VERSION_FILE" >> $GITHUB_OUTPUT
+          echo "pod_name=$POD_NAME" >> $GITHUB_OUTPUT
+          
+          echo "📦 Releasing: $POD_NAME v$VERSION"
+      
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+      
+      - name: Install CocoaPods
+        run: |
+          gem install cocoapods --no-document
+          pod --version
+      
+      - name: Update version constant (stable, no metadata)
+        run: |
+          ./scripts/update-version-constant.sh ${{ steps.parse.outputs.component }} "${{ steps.parse.outputs.version }}"
+          echo "✅ Updated version constant to: ${{ steps.parse.outputs.version }}"
+      
+      - name: Build Meta Adapter xcframework
+        if: steps.parse.outputs.component == 'meta'
+        run: |
+          cd adapter-meta
+          ./build_frameworks.sh
+          
+          # Rename to versioned file
+          mv CloudXMetaAdapter.xcframework.zip CloudXMetaAdapter-v${{ steps.parse.outputs.version }}.xcframework.zip
+      
+      - name: Validate podspec
+        run: |
+          cd $(dirname ${{ steps.parse.outputs.podspec }})
+          pod spec lint $(basename ${{ steps.parse.outputs.podspec }}) \
+            --allow-warnings \
+            --skip-import-validation \
+            --skip-tests
+      
+      - name: Push to CocoaPods Trunk
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+        run: |
+          # Configure CocoaPods credentials
+          mkdir -p ~/.cocoapods/trunk
+          echo '{"trunk":{"token":"'$COCOAPODS_TRUNK_TOKEN'"}}' > ~/.cocoapods/trunk/me.json
+          
+          # Push to trunk
+          cd $(dirname ${{ steps.parse.outputs.podspec }})
+          
+          for i in {1..5}; do
+            if pod trunk push $(basename ${{ steps.parse.outputs.podspec }}) \
+              --allow-warnings \
+              --skip-import-validation \
+              --skip-tests; then
+              echo "✅ Successfully pushed to CocoaPods trunk!"
+              break
+            else
+              echo "⚠️ Pod trunk push failed. Retrying in 30 seconds... ($i/5)"
+              sleep 30
+            fi
+          done
+      
+      - name: Verify trunk push
+        run: |
+          pod trunk info ${{ steps.parse.outputs.pod_name }}
+      
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create release notes
+          cat > release_notes.md << EOF
+          ## ${{ steps.parse.outputs.pod_name }} v${{ steps.parse.outputs.version }}
+          
+          **Stable Release** - Production Ready ✅
+          
+          ### 📦 Installation
+          
+          Add to your \`Podfile\`:
+          \`\`\`ruby
+          pod '${{ steps.parse.outputs.pod_name }}', '~> ${{ steps.parse.outputs.version }}'
+          \`\`\`
+          
+          Then run:
+          \`\`\`bash
+          pod install
+          \`\`\`
+          
+          ### 📚 Documentation
+          - **CocoaPods:** https://cocoapods.org/pods/${{ steps.parse.outputs.pod_name }}
+          - **GitHub:** https://github.com/cloudx-io/cloudx-ios
+          
+          ### 🔗 Links
+          - **Commit:** https://github.com/cloudx-io/cloudx-ios/commit/${{ github.sha }}
+          EOF
+          
+          # Create stable release (not pre-release)
+          gh release create "${{ steps.parse.outputs.tag_name }}" \
+            --title "${{ steps.parse.outputs.pod_name }} v${{ steps.parse.outputs.version }}" \
+            --notes-file release_notes.md \
+            --latest
+          
+          # Upload Meta Adapter xcframework if it exists
+          if [ "${{ steps.parse.outputs.component }}" == "meta" ]; then
+            gh release upload "${{ steps.parse.outputs.tag_name }}" \
+              adapter-meta/CloudXMetaAdapter-v${{ steps.parse.outputs.version }}.xcframework.zip
+          fi
+      
+      - name: Summary
+        run: |
+          echo "## 🎉 Stable Release Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Component:** ${{ steps.parse.outputs.pod_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ steps.parse.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** ${{ steps.parse.outputs.tag_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Published To" >> $GITHUB_STEP_SUMMARY
+          echo "- CocoaPods Trunk (public)" >> $GITHUB_STEP_SUMMARY
+          echo "- GitHub Releases" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Developers can now install:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`ruby" >> $GITHUB_STEP_SUMMARY
+          echo "pod '${{ steps.parse.outputs.pod_name }}', '~> ${{ steps.parse.outputs.version }}'" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+

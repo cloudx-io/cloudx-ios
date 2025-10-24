@@ -958,7 +958,10 @@ static void initializeLogger() {
     
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
     if (self.ext.adapterExtras) {
-        json[@"cloudx"] = @{@"adapter_extras": self.ext.adapterExtras};
+        NSMutableDictionary *cloudxExt = [NSMutableDictionary dictionary];
+        cloudxExt[@"adapter_extras"] = self.ext.adapterExtras;
+        cloudxExt[@"sdkReleaseVersion"] = [CLXSystemInformation shared].sdkVersion;
+        json[@"cloudx"] = [cloudxExt copy];
     }
     if (self.ext.prebid) {
         json[@"prebid"] = [self convertPrebidDebugToJSON:self.ext.prebid];

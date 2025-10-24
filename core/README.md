@@ -944,6 +944,17 @@ NSDictionary *userData = @{
 
 // Set bidder-specific targeting
 [[CloudXCore shared] setBidderKeyValue:@"adnetwork" key:@"custom_key" value:@"custom_value"];
+
+// User-level targeting (cleared when privacy regulations require removing personal data)
+[[CloudXCore shared] setUserKeyValue:@"age" value:@"25"];
+[[CloudXCore shared] setUserKeyValue:@"interests" value:@"gaming"];
+
+// App-level targeting (NOT affected by privacy regulations)
+[[CloudXCore shared] setAppKeyValue:@"app_version" value:@"1.2.0"];
+[[CloudXCore shared] setAppKeyValue:@"build_type" value:@"release"];
+
+// Clear all user and app-level key-value pairs
+[[CloudXCore shared] clearAllKeyValues];
 ```
 
 **Swift:**
@@ -965,6 +976,17 @@ CloudXCore.shared.useKeyValues(withUserDictionary: userData)
 
 // Set bidder-specific targeting
 CloudXCore.shared.useBidderKeyValue(withBidder: "adnetwork", key: "custom_key", value: "custom_value")
+
+// User-level targeting (cleared when privacy regulations require removing personal data)
+CloudXCore.shared.setUserKeyValue("age", value: "25")
+CloudXCore.shared.setUserKeyValue("interests", value: "gaming")
+
+// App-level targeting (NOT affected by privacy regulations)
+CloudXCore.shared.setAppKeyValue("app_version", value: "1.2.0")
+CloudXCore.shared.setAppKeyValue("build_type", value: "release")
+
+// Clear all user and app-level key-value pairs
+CloudXCore.shared.clearAllKeyValues()
 ```
 
 ### Ad Lifecycle Management
@@ -1177,6 +1199,9 @@ extension MainViewController: CLXBannerDelegate, CLXInterstitialDelegate, CLXRew
 | `setHashedKeyValue:value:` | Set key-value pair |
 | `setKeyValueDictionary:` | Set multiple key-value pairs |
 | `setBidderKeyValue:key:value:` | Set bidder-specific targeting |
+| `setUserKeyValue:value:` | Set user-level targeting (cleared by privacy regulations) |
+| `setAppKeyValue:value:` | Set app-level targeting (NOT affected by privacy) |
+| `clearAllKeyValues` | Clear all user and app-level key-value pairs |
 
 ### Ad Control Methods
 

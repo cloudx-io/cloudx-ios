@@ -1,0 +1,210 @@
+name: Develop Build & Publish
+
+# ============================================================================
+# CloudX iOS SDK - Automatic Develop Builds
+# ============================================================================
+#
+# TRIGGER: Every push to 'develop' branch
+#
+# WHAT IT DOES:
+#   1. Detects which components changed (Core, Meta, Prebid)
+#   2. Extracts base version from podspecs (e.g., "1.1.58")
+#   3. Generates full version: 1.1.58-dev.156+fe5b6f8
+#      - dev.156 = develop build #156 (from GitHub run number)
+#      - fe5b6f8 = Git commit SHA (exact source code)
+#   4. Updates version constants only for changed components
+#   5. Builds only changed components (saves time)
+#   6. Creates GitHub pre-release with binaries
+#
+# GIT TAGS:
+#   NO git tags are created for develop builds (matches Android behavior).
+#   Only stable releases off main get tagged.
+#
+# USAGE BY DEVELOPERS:
+#   Download xcframeworks from GitHub Pre-Releases or use:
+#     pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'develop'
+#
+# VERSION TRACEABILITY:
+#   Bid requests will show: "sdkReleaseVersion": "1.1.58-dev.156+fe5b6f8"
+#   You can trace to exact code: git show fe5b6f8
+#
+# MATCHES ANDROID:
+#   Android publishes to GitHub Packages, iOS creates GitHub Pre-Releases
+#   Neither creates git tags for develop builds
+#
+# ============================================================================
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for git SHA
+      
+      - name: Detect changed components
+        id: changes
+        run: |
+          # Get list of changed files in this push
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} > /tmp/changed_files.txt || git diff --name-only HEAD~1 HEAD > /tmp/changed_files.txt
+          
+          # Check which components were modified
+          CORE_CHANGED="false"
+          META_CHANGED="false"
+          PREBID_CHANGED="false"
+          
+          if grep -q "^core/" /tmp/changed_files.txt || grep -q "^scripts/" /tmp/changed_files.txt; then
+            CORE_CHANGED="true"
+          fi
+          
+          if grep -q "^adapter-meta/" /tmp/changed_files.txt; then
+            META_CHANGED="true"
+          fi
+          
+          if grep -q "^adapter-cloudx/" /tmp/changed_files.txt; then
+            PREBID_CHANGED="true"
+          fi
+          
+          echo "core_changed=$CORE_CHANGED" >> $GITHUB_OUTPUT
+          echo "meta_changed=$META_CHANGED" >> $GITHUB_OUTPUT
+          echo "prebid_changed=$PREBID_CHANGED" >> $GITHUB_OUTPUT
+          
+          echo "📊 Changed components:"
+          echo "  Core: $CORE_CHANGED"
+          echo "  Meta: $META_CHANGED"
+          echo "  Prebid: $PREBID_CHANGED"
+      
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+      
+      - name: Install CocoaPods
+        run: |
+          gem install cocoapods --no-document
+          pod --version
+      
+      - name: Extract base version from podspec
+        id: version
+        if: steps.changes.outputs.core_changed == 'true'
+        run: |
+          BASE_VERSION=$(grep "s.version" core/CloudXCore.podspec | sed "s/.*'\(.*\)'.*/\1/")
+          echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
+          echo "Base version: $BASE_VERSION"
+      
+      - name: Generate full version with metadata
+        id: fullversion
+        if: steps.changes.outputs.core_changed == 'true'
+        run: |
+          FULL_VERSION=$(./scripts/generate-version.sh ${{ steps.version.outputs.base_version }} dev ${{ github.run_number }})
+          echo "full_version=$FULL_VERSION" >> $GITHUB_OUTPUT
+          echo "Generated version: $FULL_VERSION"
+      
+      - name: Update Core SDK version constant
+        if: steps.changes.outputs.core_changed == 'true'
+        run: |
+          ./scripts/update-version-constant.sh core "${{ steps.fullversion.outputs.full_version }}"
+          echo "Updated CLXVersion.m to: ${{ steps.fullversion.outputs.full_version }}"
+      
+      - name: Update Meta Adapter version constant
+        if: steps.changes.outputs.meta_changed == 'true'
+        run: |
+          META_BASE=$(grep "s.version" adapter-meta/CloudXMetaAdapter.podspec | sed "s/.*'\(.*\)'.*/\1/")
+          META_FULL=$(./scripts/generate-version.sh "$META_BASE" dev ${{ github.run_number }})
+          ./scripts/update-version-constant.sh meta "$META_FULL"
+          echo "Updated CLXMetaAdapterVersion.m to: $META_FULL"
+      
+      - name: Update Prebid Adapter version constant
+        if: steps.changes.outputs.prebid_changed == 'true'
+        run: |
+          PREBID_BASE=$(grep "s.version" adapter-cloudx/CloudXPrebidAdapter.podspec | sed "s/.*'\(.*\)'.*/\1/")
+          PREBID_FULL=$(./scripts/generate-version.sh "$PREBID_BASE" dev ${{ github.run_number }})
+          ./scripts/update-version-constant.sh prebid "$PREBID_FULL"
+          echo "Updated CLXPrebidAdapterVersion.m to: $PREBID_FULL"
+      
+      - name: Build Core framework
+        if: steps.changes.outputs.core_changed == 'true'
+        run: |
+          cd core
+          xcodebuild -project CloudXCore.xcodeproj \
+            -scheme CloudXCore \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            clean build
+      
+      - name: Build Meta Adapter xcframework
+        if: steps.changes.outputs.meta_changed == 'true'
+        run: |
+          cd adapter-meta
+          ./build_frameworks.sh
+      
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASE_TAG="${{ steps.fullversion.outputs.full_version }}"
+          
+          # Create release notes
+          cat > release_notes.md << EOF
+          ## CloudX iOS SDK - Develop Build
+          
+          **Version:** \`${{ steps.fullversion.outputs.full_version }}\`  
+          **Build:** #${{ github.run_number }}  
+          **Commit:** \`${{ github.sha }}\`  
+          **Branch:** \`develop\`
+          
+          ### 🚀 For Internal Testing Only
+          
+          This is an automatic develop build. Use for testing latest SDK features.
+          
+          ### 📦 Installation (Podfile)
+          
+          \`\`\`ruby
+          # Use this specific develop build
+          pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => '$RELEASE_TAG-core'
+          pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => '$RELEASE_TAG-meta'
+          
+          # Or use latest develop branch
+          pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'develop'
+          \`\`\`
+          
+          ### 🔗 Links
+          - **Commit:** https://github.com/cloudx-io/cloudx-ios/commit/${{ github.sha }}
+          - **Workflow:** https://github.com/cloudx-io/cloudx-ios/actions/runs/${{ github.run_id }}
+          EOF
+          
+          # Create release (will create tags automatically)
+          gh release create "$RELEASE_TAG" \
+            --title "iOS SDK Develop Build ${{ github.run_number }}" \
+            --notes-file release_notes.md \
+            --prerelease \
+            --target ${{ github.sha }}
+          
+          # Upload Meta Adapter xcframework
+          if [ -f adapter-meta/CloudXMetaAdapter.xcframework.zip ]; then
+            gh release upload "$RELEASE_TAG" adapter-meta/CloudXMetaAdapter.xcframework.zip
+          fi
+      
+      - name: Summary
+        run: |
+          echo "## 🎉 Develop Build Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** \`${{ steps.fullversion.outputs.full_version }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Build Number:** ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Testing This Build" >> $GITHUB_STEP_SUMMARY
+          echo "Download the xcframework from the GitHub Pre-Release above" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Note:** No git tags are created for develop builds (matches Android behavior)" >> $GITHUB_STEP_SUMMARY
+

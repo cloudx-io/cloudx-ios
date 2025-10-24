@@ -1,7 +1,45 @@
 #!/bin/bash
 
-# CloudX Meta Adapter Local Release Script
-# Usage: ./release-meta.sh 1.1.49
+# ============================================================================
+# CloudX Meta Adapter - Stable Release Script
+# ============================================================================
+#
+# OVERVIEW:
+#   Publishes stable CloudXMetaAdapter releases to CocoaPods Trunk.
+#   Meta Adapter uses BINARY distribution (XCFramework) for IP protection.
+#
+# USAGE:
+#   cd cloudx-ios
+#   ./release-meta.sh 1.1.67
+#
+# WHAT IT DOES:
+#   1. Validates clean main branch
+#   2. Updates CloudXMetaAdapter.podspec version
+#   3. Generates stable version: 1.1.67
+#   4. Updates CLXMetaAdapterVersion.m constant
+#   5. Builds XCFramework for iOS device + simulator
+#   6. Creates versioned zip: CloudXMetaAdapter-v1.1.67.xcframework.zip
+#   7. Creates GitHub release and uploads XCFramework
+#   8. Updates podspec to download from GitHub release
+#   9. Pushes to CocoaPods Trunk
+#
+# REQUIREMENTS:
+#   - Main branch, clean git state
+#   - CocoaPods Trunk access
+#   - GitHub CLI (gh) installed and authenticated
+#
+# WHY BINARY DISTRIBUTION?
+#   - Protects proprietary Meta Audience Network integration code
+#   - Faster pod install (no compilation needed)
+#   - Smaller app size after optimization
+#
+# AFTER RELEASE:
+#   Developers install via:
+#     pod 'CloudXMetaAdapter', '~> 1.1.67'
+#   Podspec downloads XCFramework from:
+#     https://github.com/cloudx-io/cloudx-ios/releases/download/v1.1.67-meta/...
+#
+# ============================================================================
 
 set -e
 
@@ -42,26 +80,34 @@ git checkout -b "$BRANCH_NAME"
 echo "📝 Updating podspec version to ${VERSION}..."
 sed -i '' "s/s\.version.*=.*/s.version = '${VERSION}'/" "$PODSPEC_FILE"
 
-# 5. Build the xcframework
+# 5. Update Meta Adapter version constant with build metadata
+echo "📝 Generating and updating Meta Adapter version constant..."
+FULL_META_VERSION=$(./scripts/generate-version.sh "${VERSION}" stable)
+./scripts/update-version-constant.sh meta "$FULL_META_VERSION"
+VERSION_FILE="adapter-meta/Sources/CloudXMetaAdapter/CLXMetaAdapterVersion.m"
+echo "✅ Meta Adapter version updated to: $FULL_META_VERSION"
+
+# 6. Build the xcframework
 echo "🔨 Building CloudXMetaAdapter.xcframework..."
 cd adapter-meta
 ./build_frameworks.sh
 cd ..
 
-# 6. Rename and move the xcframework zip
+# 7. Rename and move the xcframework zip
 echo "📦 Preparing xcframework zip..."
 mv "adapter-meta/CloudXMetaAdapter.xcframework.zip" "$XCFRAMEWORK_ZIP"
 
-# 7. Update podspec URL to point to the new release
+# 8. Update podspec URL to point to the new release
 echo "🔗 Updating podspec download URL..."
 sed -i '' "s|:http => \".*\"|:http => \"https://github.com/cloudx-io/cloudx-ios/releases/download/v${VERSION}-meta/CloudXMetaAdapter-v${VERSION}.xcframework.zip\"|" "$PODSPEC_FILE"
 
-# 8. Commit changes
+# 9. Commit changes
 echo "💾 Committing changes..."
-git add "$PODSPEC_FILE" "$XCFRAMEWORK_ZIP"
+git add "$PODSPEC_FILE" "$XCFRAMEWORK_ZIP" "$VERSION_FILE"
 git commit -m "Release CloudXMetaAdapter v${VERSION}
 
 - Updated podspec version to ${VERSION}
+- Updated Meta Adapter version constant to ${VERSION}
 - Built xcframework with latest changes
 - Updated download URL for GitHub release"
 

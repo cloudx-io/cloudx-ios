@@ -1,7 +1,48 @@
 #!/bin/bash
 
-# Local Core Release Script - Mirrors GitHub Actions workflow exactly
-# Usage: ./release-core-local.sh 1.1.55
+# ============================================================================
+# CloudX Core SDK - Stable Release Script
+# ============================================================================
+#
+# OVERVIEW:
+#   Publishes stable CloudXCore releases to CocoaPods Trunk for public use.
+#   This is for STABLE releases only (not develop/RC builds).
+#
+# USAGE:
+#   cd cloudx-ios/core
+#   ./release-core.sh 1.1.59
+#
+# WHAT IT DOES:
+#   1. Validates you're on clean main branch
+#   2. Updates CloudXCore.podspec version to 1.1.59
+#   3. Generates stable version: 1.1.59 (no build metadata for stable)
+#   4. Updates CLXVersion.m constant
+#   5. Validates podspec
+#   6. Pushes to CocoaPods Trunk (makes it public!)
+#   7. Creates GitHub release with tag v1.1.59-core
+#
+# REQUIREMENTS:
+#   - Must be on main branch
+#   - Clean git state (no uncommitted changes)
+#   - CocoaPods Trunk access (pod trunk me to check)
+#   - COCOAPODS_TRUNK_TOKEN environment variable
+#
+# AFTER RELEASE:
+#   Developers can install via:
+#     pod 'CloudXCore', '~> 1.1.59'
+#
+# VERSION IN BID REQUESTS:
+#   Will show: "sdkReleaseVersion": "1.1.59"
+#
+# RELEASE WORKFLOW:
+#   1. Develop features on 'develop' branch (auto-builds dev.X+SHA)
+#   2. Create release/1.1.59 branch (auto-builds rc.X+SHA)
+#   3. Test RC thoroughly
+#   4. Merge to main
+#   5. Run this script: ./release-core.sh 1.1.59
+#   6. Public release available on CocoaPods
+#
+# ============================================================================
 
 set -e
 
@@ -77,6 +118,14 @@ echo "full_version=$FULL_VERSION"
 print_step "📝 Update podspec version"
 cd core
 sed -i '' "s/s\.version.*=.*/s.version          = '$VERSION_NO_SUFFIX'/" CloudXCore.podspec
+
+print_step "📝 Generate and update SDK version constant with build metadata"
+cd ..
+# Generate full version with semver metadata (stable releases don't have metadata)
+FULL_SDK_VERSION=$(./scripts/generate-version.sh "$VERSION_NO_SUFFIX" stable)
+./scripts/update-version-constant.sh core "$FULL_SDK_VERSION"
+print_success "SDK version constant updated to: $FULL_SDK_VERSION"
+cd core
 
 print_step "🧪 Validate podspec"
 pod spec lint CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests --no-clean
