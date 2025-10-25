@@ -256,30 +256,21 @@
                 }
             }
         } else {
-            // Handle HTTP error status codes (non-2xx)
-            [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] HTTP status code indicates error: %ld", (long)httpResponse.statusCode]];
+            // Handle HTTP error status codes (non-2xx) - INFO level because error goes to delegate
+            [self.logger info:[NSString stringWithFormat:@"ℹ️ [BaseNetworkService] HTTP status code: %ld", (long)httpResponse.statusCode]];
             
             // Log error response body for debugging
             if (data && data.length > 0) {
                 NSString *errorResponseBody = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
                 if (errorResponseBody) {
-                    [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Error response body: %@", errorResponseBody]];
+                    [self.logger info:[NSString stringWithFormat:@"ℹ️ [BaseNetworkService] Error response body: %@", errorResponseBody]];
                     
-                    // Try to parse as JSON for better formatting
-                    NSError *jsonError;
-                    id jsonResponse = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&jsonError];
-                    if (!jsonError && jsonResponse) {
-                        NSData *prettyJsonData = [NSJSONSerialization dataWithJSONObject:jsonResponse options:NSJSONWritingPrettyPrinted error:nil];
-                        if (prettyJsonData) {
-                            NSString *prettyJsonString = [[NSString alloc] initWithData:prettyJsonData encoding:NSUTF8StringEncoding];
-                            [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Error response (formatted):\n%@", prettyJsonString]];
-                        }
-                    }
+                    // Skip pretty-print JSON to reduce log noise (raw body above is sufficient)
                 } else {
-                    [self.logger error:@"❌ [BaseNetworkService] Error response body could not be decoded as UTF-8"];
+                    [self.logger debug:@"[BaseNetworkService] Error response body could not be decoded as UTF-8"];
                 }
             } else {
-                [self.logger error:@"❌ [BaseNetworkService] No error response body available"];
+                [self.logger debug:@"[BaseNetworkService] No error response body available"];
             }
             
             if (completion) {

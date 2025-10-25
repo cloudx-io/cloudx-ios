@@ -387,7 +387,7 @@ NS_ASSUME_NONNULL_BEGIN
         [strongSelf.logger debug:[NSString stringWithFormat:@"📥 [CLXBidAdSource] Auction completion - Response: %@, Error: %@", response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
         
         if (error) {
-            [strongSelf.logger error:[NSString stringWithFormat:@"❌ [CLXBidAdSource] Auction failed with error: %@", error.localizedDescription]];
+            // Error already logged by network layer - just propagate to delegate
             if (completion) {
                 completion(nil, error);
             }

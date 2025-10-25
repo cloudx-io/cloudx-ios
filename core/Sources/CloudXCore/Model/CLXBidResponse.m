@@ -420,11 +420,8 @@ static void initializeLogger() {
     
     NSDictionary *cloudxDict = dictionary[@"cloudx"];
     
-    [logger debug: [dictionary copy]];
-    
     NSDictionary *auctionDict = cloudxDict[@"auction"];
     
-    [logger debug: [dictionary copy]];
     if ([auctionDict isKindOfClass:[NSDictionary class]]) {
         CLXBidResponseCloudXAuction *auction = [CLXBidResponse parseResponseExtAuctionFromDictionary:auctionDict];
         if (auction) {
@@ -663,7 +660,6 @@ static void initializeLogger() {
         return nil;
     }
     //_logger = [[CLXLogger alloc] initWithCategory:@"WinLossFieldResolver"];
-    [logger debug: [dictionary copy]];
     CLXBidResponseCloudX *cloudx = [[CLXBidResponseCloudX alloc] init];
     // Parse rank with NSNull safety
     id rankValue = dictionary[@"rank"];

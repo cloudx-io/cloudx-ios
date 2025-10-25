@@ -42,15 +42,23 @@ static BOOL _globalLoggingEnabled = NO;
 
 
 - (void)log:(NSString *)message type:(os_log_type_t)type {
+    // Always show errors for debuggability
+    if (type == OS_LOG_TYPE_ERROR) {
+        NSLog(@"%@", message);
+        // Also log to os_log for system Console.app (won't duplicate in Xcode if filtering by subsystem)
+        os_log_with_type(self.osLog, type, "%{public}@", message);
+        return;
+    }
+    
+    // Debug/Info only if verbose logging enabled
     if (!_globalLoggingEnabled) {
         return;
     }
     
-    // Use NSLog for console output (visible in Xcode console and Flutter console)
+    // Use NSLog for Xcode console output (publishers expect console visibility)
     NSLog(@"%@", message);
-    
-    // Use os_log for system logging (visible in Console.app and device logs)
-    os_log_with_type(self.osLog, type, "%{public}@", message);
+    // Note: Skipping os_log for debug/info to avoid duplication in Xcode console
+    // Publishers can enable system logging via Console.app if needed, but most debug in Xcode
 }
 
 - (void)debug:(NSString *)message {

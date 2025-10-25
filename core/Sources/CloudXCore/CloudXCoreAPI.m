@@ -195,19 +195,20 @@ static CloudXCore *_sharedInstance = nil;
     _initService = [container resolveType:ServiceTypeSingleton class:[CLXLiveInitService class]];
     
     if (!_initService) {
-        [self.logger error:@"❌ [CloudXCore] Failed to resolve InitService from DI container"];
+
+        [self.logger debug:@"🔧 [CloudXCore] InitService not found in DI container, using fallback registration"];
         // Try to register it again as a fallback
         [self ensureDIContainerSetup];
         _initService = [container resolveType:ServiceTypeSingleton class:[CLXLiveInitService class]];
         if (!_initService) {
-            [self.logger error:@"❌ [CloudXCore] Still failed to resolve InitService after re-registration"];
+            [self.logger error:@"❌ [CloudXCore] Failed to resolve InitService after fallback registration"];
             if (completion) {
                 completion(NO, [CLXError errorWithCode:CLXErrorCodeNotInitialized 
                                           description:@"SDK initialization failed: Unable to initialize required services. Please try again or contact support."]);
             }
             return;
         } else {
-            [self.logger debug:@"✅ [CloudXCore] InitService resolved after re-registration"];
+            [self.logger debug:@"✅ [CloudXCore] InitService resolved via fallback registration"];
         }
     } else {
         [self.logger debug:@"✅ [CloudXCore] InitService resolved successfully"];
@@ -357,7 +358,7 @@ static CloudXCore *_sharedInstance = nil;
             
             id<CLXAdNetworkInitializer> initializer = adNetworkInitializers[mappedNetworkName];
             if (!initializer) {
-                [self.logger error:[NSString stringWithFormat:@"❌ [CloudXCore] No initializer found for network: %@ (mapped from %@)", mappedNetworkName, adNetworkConfig.networkName]];
+                [self.logger info:[NSString stringWithFormat:@"ℹ️ [CloudXCore] Adapter not configured for network: %@ (mapped from %@)", mappedNetworkName, adNetworkConfig.networkName]];
                 continue;
             }
             

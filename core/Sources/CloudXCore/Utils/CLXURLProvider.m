@@ -9,6 +9,7 @@
 
 #import <CloudXCore/CLXURLProvider.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXLogger.h>
 
 // MARK: - Environment URLs
 static NSString *const kDevInitURL = @"https://pro-dev.cloudx.io/sdk";
@@ -26,13 +27,13 @@ static NSString *const kEnvironmentKey = @"CLXEnvironment";
 
 + (NSString *)auctionApiUrl {
     // Auction URLs now come from SDK response only
-    NSLog(@"⚠️ [CLXURLProvider] auctionApiUrl is deprecated - URLs come from SDK response");
+    [[CLXLogger shared] info:@"⚠️ [CLXURLProvider] auctionApiUrl is deprecated - URLs come from SDK response"];
     return nil;
 }
 
 + (NSString *)metricsApiUrl {
     // Metrics URLs now come from SDK response only
-    NSLog(@"⚠️ [CLXURLProvider] metricsApiUrl is deprecated - URLs come from SDK response");
+    [[CLXLogger shared] info:@"⚠️ [CLXURLProvider] metricsApiUrl is deprecated - URLs come from SDK response"];
     return nil;
 }
 
@@ -78,8 +79,8 @@ static NSString *const kEnvironmentKey = @"CLXEnvironment";
     // Validate environment
     NSArray *validEnvironments = @[@"dev", @"staging", @"production"];
     if (![validEnvironments containsObject:environment]) {
-        NSLog(@"⚠️ [CLXURLProvider] Invalid environment '%@'. Valid options: %@", 
-              environment, validEnvironments);
+        [[CLXLogger shared] error:[NSString stringWithFormat:@"⚠️ [CLXURLProvider] Invalid environment '%@'. Valid options: %@", 
+              environment, validEnvironments]];
         return;
     }
     
@@ -87,10 +88,10 @@ static NSString *const kEnvironmentKey = @"CLXEnvironment";
     [[NSUserDefaults standardUserDefaults] setObject:environment forKey:kEnvironmentKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    NSLog(@"✅ [CLXURLProvider] Environment set to: %@", environment);
+    [[CLXLogger shared] info:[NSString stringWithFormat:@"✅ [CLXURLProvider] Environment set to: %@", environment]];
 #else
     // Ignored in production builds
-    NSLog(@"⚠️ [CLXURLProvider] Environment switching disabled in production builds");
+    [[CLXLogger shared] info:@"⚠️ [CLXURLProvider] Environment switching disabled in production builds"];
 #endif
 }
 

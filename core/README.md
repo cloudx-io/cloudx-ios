@@ -1229,6 +1229,22 @@ All ad types support these common callbacks:
 - `rewardedVideoStarted:` - Video started
 - `rewardedVideoCompleted:` - Video completed
 
+## How Ads Load (Automatic Waterfall)
+
+When you call `load`, the SDK automatically tries multiple ad sources in priority order. **You don't need to do anything** - the SDK handles retries internally.
+
+- **Success**: Your `didLoadWithAd:` callback fires when ANY source succeeds
+- **Failure**: Your `failToLoadWithAd:error:` callback fires ONLY after ALL sources fail
+- **No manual intervention needed** - the waterfall happens automatically and transparently
+
+```objc
+[self.bannerAd load];
+// SDK tries: CloudX auction → Meta → Google → Other adapters
+// You only get ONE callback: success or final failure
+```
+
+**Bottom line:** A single ad source failing doesn't trigger your error callback. The SDK keeps trying until something works or everything fails.
+
 ## Troubleshooting
 
 ### Common Issues
@@ -1253,7 +1269,13 @@ All ad types support these common callbacks:
 
 ### Debug Logging
 
-Enable debug logging to troubleshoot issues:
+The CloudX SDK provides logging to help with integration and troubleshooting.
+
+**Default Behavior:**
+- ✅ **Errors are always visible** - Critical issues are logged even without verbose mode
+- 🔇 **Debug/Info logs are opt-in** - Enable verbose mode to see detailed diagnostic information
+
+**Enable Verbose Logging:**
 
 **Objective-C:**
 ```objc
@@ -1278,14 +1300,16 @@ CloudXCore.shared.initializeSDK(appKey: "your-app-key") { success, error in
 ```
 
 **When to Enable:**
-- Call `setLoggingEnabled:` as early as possible in your app lifecycle (e.g., in `application:didFinishLaunchingWithOptions:`)
-- Call it **before** SDK initialization to see all logs
-- Logging is disabled by default
+- Call `setLoggingEnabled:` as early as possible (e.g., in `application:didFinishLaunchingWithOptions:`)
+- Call it **before** SDK initialization to capture all diagnostic logs
+- Only enable in development builds or when debugging issues
 
 **Log Levels:**
-- **Debug**: Detailed diagnostic information for troubleshooting
-- **Info**: General informational messages about SDK operations
-- **Error**: Error conditions and failures
+- **Error** ❌ (Always visible): Critical failures, initialization errors, network issues
+- **Info** ℹ️ (Verbose mode only): General SDK operations, ad loading, lifecycle events  
+- **Debug** 🔍 (Verbose mode only): Detailed diagnostic information, state changes, internal operations
+
+**Best Practice:** Keep verbose logging disabled in production to reduce console noise, but errors will still be visible for debugging user reports.
 
 ## Support
 

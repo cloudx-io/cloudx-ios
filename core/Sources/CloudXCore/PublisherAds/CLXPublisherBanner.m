@@ -259,9 +259,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.logger debug:[NSString stringWithFormat:@"📥 [PublisherBanner] Bid request completion - Response: %@, Error: %@", response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
 
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] Bid request failed - %@ (Domain: %@, Code: %ld)", error.localizedDescription, error.domain, (long)error.code]];
-            
-            // Continue with waterfall - let continueBannerChain handle the error
+            // Error already logged by lower layers - continue waterfall
             [strongSelf continueBannerChain];
             return;
         }
@@ -333,7 +331,7 @@ NS_ASSUME_NONNULL_BEGIN
             [self failToLoadBanner:nil error:technicalError];
         }
     } else {
-        [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] Waterfall exhausted - lastBidResponse: %@, createBidAd: %@", self.lastBidResponse, self.lastBidResponse.createBidAd]];
+        [self.logger info:[NSString stringWithFormat:@"ℹ️ [PublisherBanner] Waterfall exhausted (no fill) - propagating to delegate"]];
         
         // Waterfall exhausted - create NO_FILL error and handle per spec
         NSError *noFillError = [CLXError errorWithCode:CLXErrorCodeNoFill 
@@ -552,7 +550,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (void)failToLoadBanner:(nullable id<CLXAdapterBanner>)banner error:(nullable NSError *)error {
-    [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] failToLoadBanner for placement: %@ - %@", self.placementID, error.localizedDescription ?: @"Unknown error"]];
+    // Error goes to publisher delegate - log at INFO level
+    [self.logger info:[NSString stringWithFormat:@"ℹ️ [PublisherBanner] failToLoadBanner for placement: %@ - %@", self.placementID, error.localizedDescription ?: @"Unknown error"]];
     
     [self.appSessionService adFailedToLoadWithPlacementID:self.placementID];
 

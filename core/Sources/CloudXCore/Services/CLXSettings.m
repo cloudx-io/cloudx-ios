@@ -53,8 +53,11 @@ static CLXLogger *logger;
         return ifa;
     }
 
-    // 4. Fallback placeholder if no real IDFA is available
-    [logger error:@"⚠️ [CLXSettings] No real IDFA available. Using placeholder."];
+    // 4. Fallback placeholder if no real IDFA is available (log once per session)
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [logger info:@"ℹ️ [CLXSettings] No real IDFA available, using placeholder (ATT not authorized or IDFA unavailable)"];
+    });
     return @"00000000-0000-0000-0000-000000000000";
 }
 

@@ -112,7 +112,7 @@
         return raceCheckMetric;
     }
     
-    [self.logger error:[NSString stringWithFormat:@"Failed to create performance metric for placement %@ session %@", placementId, sessionId]];
+    [self.logger debug:[NSString stringWithFormat:@"Failed to create performance metric for placement %@ session %@ (may be duplicate)", placementId, sessionId]];
     return newMetric; // Return the created instance even if insertion failed
 }
 

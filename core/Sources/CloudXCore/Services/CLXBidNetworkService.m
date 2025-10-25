@@ -195,7 +195,7 @@
         [self.logger debug:@"📥 [BidNetworkService] Network request completion called"];
         
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Network request failed - Domain: %@, Code: %ld, Error: %@", error.domain, (long)error.code, error.localizedDescription]];
+            // Error already logged by BaseNetworkService - just propagate
             if (completion) completion(nil, nil, error);
             return;
         }
@@ -216,10 +216,17 @@
         }
         
         [self.logger info:@"✅ [BidNetworkService] Auction response received successfully"];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] Response type: %@", NSStringFromClass([response class])]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] Response: %@", response]];
+        
         // Parse response dictionary into BidResponse object
         CLXBidResponse *bidResponse = [CLXBidResponse parseBidResponseFromDictionary:response];
+        
+        // Log useful summary instead of massive raw response
+        if (bidResponse) {
+            NSString *currency = bidResponse.cur ?: @"USD";
+            NSInteger seatbidCount = bidResponse.seatbid ? bidResponse.seatbid.count : 0;
+            NSString *bidId = bidResponse.bidid ?: @"unknown";
+            [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] Parsed response - BidID: %@, Currency: %@, SeatBids: %ld", bidId, currency, (long)seatbidCount]];
+        }
         
         // Pass both parsed object and raw JSON to completion handler
         if (completion) {

@@ -68,7 +68,7 @@
 
 - (BOOL)insert:(id)entity {
     if (![self validateEntity:entity error:nil]) {
-        [self.logger error:@"Entity validation failed for insert"];
+        [self.logger debug:@"Entity validation failed for insert (may be expected for duplicates)"];
         return NO;
     }
     
@@ -86,7 +86,8 @@
     if (success) {
         [self.logger debug:[NSString stringWithFormat:@"Successfully inserted entity into %@", self.tableName]];
     } else {
-        [self.logger error:[NSString stringWithFormat:@"Failed to insert entity into %@", self.tableName]];
+        // SQLite layer already logged the specific error (ERROR for real issues, DEBUG for UNIQUE constraints)
+        [self.logger debug:[NSString stringWithFormat:@"Insert failed for %@ (see SQLite log for details)", self.tableName]];
     }
     
     return success;
@@ -100,7 +101,7 @@
     // Validate all entities first
     for (id entity in entities) {
         if (![self validateEntity:entity error:nil]) {
-            [self.logger error:@"Entity validation failed in batch insert"];
+            [self.logger debug:@"Entity validation failed in batch insert (may be expected for duplicates)"];
             return NO;
         }
     }
@@ -113,7 +114,7 @@
         for (id entity in entities) {
             NSArray *values = [self sqlValuesFromEntity:entity];
             if (![self.database executeSQL:sql withParameters:values]) {
-                [self.logger error:@"Failed to insert entity in batch"];
+                [self.logger debug:@"Failed to insert entity in batch (see SQLite log for details)"];
                 success = NO;
                 break;
             }
@@ -160,7 +161,7 @@
 
 - (BOOL)update:(id)entity {
     if (![self validateEntity:entity error:nil]) {
-        [self.logger error:@"Entity validation failed for update"];
+        [self.logger debug:@"Entity validation failed for update"];
         return NO;
     }
     

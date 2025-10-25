@@ -277,7 +277,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 
 - (void)handleBidResponse:(CLXBidAdSourceResponse *)response error:(NSError *)error {
     if (error) {
-        [self.logger error:[NSString stringWithFormat:@"Bid request failed: %@", error.localizedDescription]];
+        // Error already logged by lower layers - just handle state transition
         
         // Transition back to idle
         self.currentState = CLXInterstitialStateIDLE;
@@ -635,7 +635,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 }
 
 - (void)didFailToLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial error:(NSError *)error {
-    [self.logger error:[NSString stringWithFormat:@"❌ [PublisherFullscreenAd] didFailToLoadWithInterstitial (%@): %@", interstitial, error.localizedDescription]];
+    // Error already logged by adapter's error handler - just propagate to delegate
+    [self.logger debug:[NSString stringWithFormat:@"📥 [PublisherFullscreenAd] didFailToLoadWithInterstitial (%@): %@", interstitial, error.localizedDescription]];
     
     [self sendLossNotificationForFailedAd:CLXAdTypeInterstitial];
     
@@ -820,7 +821,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 }
 
 - (void)didFailToLoadWithRewarded:(id<CLXAdapterRewarded>)rewarded error:(NSError *)error {
-    [self.logger error:[NSString stringWithFormat:@"❌ [PublisherFullscreenAd] didFailToLoadWithRewarded (%@): %@", rewarded, error.localizedDescription]];
+    // Error already logged by adapter's error handler - just propagate to delegate
+    [self.logger debug:[NSString stringWithFormat:@"📥 [PublisherFullscreenAd] didFailToLoadWithRewarded (%@): %@", rewarded, error.localizedDescription]];
     
     [self sendLossNotificationForFailedAd:CLXAdTypeRewarded];
     

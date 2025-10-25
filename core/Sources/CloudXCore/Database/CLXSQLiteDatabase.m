@@ -113,7 +113,15 @@
     if (result == SQLITE_DONE || result == SQLITE_ROW) {
         return YES;
     } else {
-        [self.logger error:[NSString stringWithFormat:@"Failed to execute statement: %s", sqlite3_errmsg(self->_database)]];
+        const char *errMsg = sqlite3_errmsg(self->_database);
+        NSString *errorMessage = [NSString stringWithUTF8String:errMsg];
+        
+        // UNIQUE constraint violations are expected for upsert patterns (debug only)
+        if (result == SQLITE_CONSTRAINT && [errorMessage containsString:@"UNIQUE constraint"]) {
+            [self.logger debug:[NSString stringWithFormat:@"🔧 [SQLite] UNIQUE constraint: %@", errorMessage]];
+        } else {
+            [self.logger error:[NSString stringWithFormat:@"Failed to execute statement: %s", errMsg]];
+        }
         return NO;
     }
 }

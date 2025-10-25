@@ -74,18 +74,33 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
         return error;
     }
     
+    // De-duplicate: Meta SDK sometimes calls error delegate twice from different internal layers
+    static NSMutableDictionary *recentErrors = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        recentErrors = [NSMutableDictionary dictionary];
+    });
+    
+    NSString *errorKey = [NSString stringWithFormat:@"%@_%@_%ld_%@", 
+                          context, placementID ?: @"unknown", (long)error.code, error.domain];
+    NSNumber *lastLogTime = recentErrors[errorKey];
+    NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+    
+    // If same error logged within 1 second, skip (Meta SDK duplicate)
+    if (lastLogTime && (now - [lastLogTime doubleValue]) < 1.0) {
+        return error; // Skip logging, just return enhanced error
+    }
+    recentErrors[errorKey] = @(now);
+    
     NSInteger errorCode = error.code;
     NSString *errorDescription = [self descriptionForErrorCode:errorCode];
     NSString *originalMessage = error.localizedDescription ?: @"Unknown error";
     
-    // Log comprehensive error details in a single line
-    [logger error:[NSString stringWithFormat:@"❌ [CLXMetaErrorHandler] %@ Error - Code: %ld | %@ | Original: %@ | Placement: %@ | Domain: %@", 
-                   context, (long)errorCode, errorDescription, originalMessage, placementID ?: @"Unknown", error.domain ?: @"Unknown"]];
-    
-    // Log user info if available
-    if (error.userInfo && error.userInfo.count > 0) {
-        [logger error:[NSString stringWithFormat:@"❌ [CLXMetaErrorHandler] User Info: %@", error.userInfo]];
-    }
+    // Log comprehensive error details in a single line (includes user info inline if present)
+    NSString *userInfoStr = (error.userInfo && error.userInfo.count > 0) ? 
+                            [NSString stringWithFormat:@" | UserInfo: %@", error.userInfo] : @"";
+    [logger error:[NSString stringWithFormat:@"❌ [CLXMetaErrorHandler] %@ Error - Code: %ld | %@ | Original: %@ | Placement: %@%@", 
+                   context, (long)errorCode, errorDescription, originalMessage, placementID ?: @"Unknown", userInfoStr]];
     
     // Create enhanced error with additional metadata
     NSMutableDictionary *enhancedUserInfo = [error.userInfo mutableCopy] ?: [NSMutableDictionary dictionary];
@@ -119,81 +134,62 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
         }
             
         case CLXMetaErrorCodeAdLoadTooFrequently:
-            [logger error:[NSString stringWithFormat:@"⚠️ [CLXMetaErrorHandler] %@ Rate Limited (1002) - Requests too frequent for placement %@ | Facebook SDK rate limiting | Recommendation: Wait 5+ seconds", context, placementID]];
-            
             enhancedUserInfo[@"FacebookRateLimited"] = @YES;
             enhancedUserInfo[@"SuggestedMinimumDelay"] = @([self suggestedDelayForError:error]);
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"Wait 5+ seconds before retry";
             break;
             
         case CLXMetaErrorCodeNetworkError:
-            [logger error:[NSString stringWithFormat:@"🌐 [CLXMetaErrorHandler] %@ Network Error (1000) - Cannot reach Facebook servers | Recommendation: Check network and retry", context]];
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"Check network and retry";
             break;
             
         case CLXMetaErrorCodeDisplayFormatMismatch:
-            [logger error:[NSString stringWithFormat:@"📐 [CLXMetaErrorHandler] %@ Format Mismatch (1011) - Display format doesn't match placement | Recommendation: Verify placement configuration", context]];
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"Check placement format configuration";
             break;
             
         case CLXMetaErrorCodeUnsupportedSDKVersion:
-            [logger error:[NSString stringWithFormat:@"📱 [CLXMetaErrorHandler] %@ Unsupported SDK (1012) - SDK version no longer supported | Recommendation: Update Meta SDK", context]];
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"Update Meta SDK version";
             break;
             
         case CLXMetaErrorCodeNotAppAdminDeveloperOrTester:
-            [logger error:[NSString stringWithFormat:@"👤 [CLXMetaErrorHandler] %@ Auth Error (1203) - User not admin/developer/tester | Recommendation: Add user as tester in Facebook App", context]];
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"Add user as tester in Facebook App";
             break;
             
         case CLXMetaErrorCodeServerError:
-            [logger error:[NSString stringWithFormat:@"🖥️ [CLXMetaErrorHandler] %@ Server Error (2000) - Facebook server issue | Recommendation: Retry after delay", context]];
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"Retry after delay";
             break;
             
         case CLXMetaErrorCodeInternalError:
-            [logger error:[NSString stringWithFormat:@"⚙️ [CLXMetaErrorHandler] %@ Internal Error (2001) - SDK internal issue | Recommendation: File bug report if persistent", context]];
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"File bug report if persistent";
             break;
             
         case CLXMetaErrorCodeInvalidPlacement:
-            [logger error:[NSString stringWithFormat:@"🎯 [CLXMetaErrorHandler] %@ Invalid Placement (1004) - Placement ID not found | Recommendation: Verify placement ID in Facebook App", context]];
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"Verify placement ID configuration";
             break;
             
         case CLXMetaErrorCodeBidTokenNotFound:
         case CLXMetaErrorCodeInvalidBidToken:
-            [logger error:[NSString stringWithFormat:@"🎫 [CLXMetaErrorHandler] %@ Bid Token Error (%ld) - Invalid or missing bid token | Recommendation: Regenerate bid token", context, (long)errorCode]];
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"Regenerate bid token";
             break;
             
         case CLXMetaErrorCodeAdExpired:
-            [logger error:[NSString stringWithFormat:@"⏰ [CLXMetaErrorHandler] %@ Ad Expired (1010) - Ad content expired | Recommendation: Load new ad", context]];
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"Load new ad";
             break;
             
         case CLXMetaErrorCodeATTNotDetermined:
         case CLXMetaErrorCodeATTRestricted:
         case CLXMetaErrorCodeATTDenied:
-            [logger error:[NSString stringWithFormat:@"🔒 [CLXMetaErrorHandler] %@ ATT Error (%ld) - App Tracking Transparency issue | Recommendation: Handle ATT permission appropriately", context, (long)errorCode]];
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"Handle ATT permission";
             break;
             
         default:
-            [logger error:[NSString stringWithFormat:@"❓ [CLXMetaErrorHandler] %@ Unknown Error (%ld) - Unrecognized error code | Recommendation: Check Meta documentation", context, (long)errorCode]];
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"Check Meta documentation";
             break;
     }
     
-    // Log retry and delay recommendations
+    // Add retry and delay metadata (no separate log needed - already in main error log)
     BOOL isRetryable = [self isRetryableError:error];
     NSTimeInterval suggestedDelay = [self suggestedDelayForError:error];
-    
-    if (suggestedDelay > 0) {
-        [logger info:[NSString stringWithFormat:@"🔄 [CLXMetaErrorHandler] Is Retryable: %@ | Suggested Delay: %.1f seconds", isRetryable ? @"YES" : @"NO", suggestedDelay]];
-    } else {
-        [logger info:[NSString stringWithFormat:@"🔄 [CLXMetaErrorHandler] Is Retryable: %@", isRetryable ? @"YES" : @"NO"]];
-    }
     
     // Get user-friendly message for the error
     NSDictionary *alertInfo = [self userFriendlyAlertInfoForError:error context:context];
