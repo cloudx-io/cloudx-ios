@@ -57,6 +57,79 @@
 - (void)geoHeadersWithURLString:(NSString *)fullURL
                           extras:(NSDictionary<NSString *, NSString *> *)extras
 {
+    // ==================================================================================
+    // SIMULATOR-ONLY GEO FALLBACK
+    // ==================================================================================
+    // Purpose: Provide geo data when running on iOS Simulator for testing.
+    //
+    // Why: The CloudFront geo endpoint (geoip.cloudx.io) returns 403 Forbidden when
+    //      accessed from iOS Simulator because CloudFront blocks simulator IPs.
+    //      Without geo data, SDK cannot determine user country for ad targeting.
+    //
+    // Solution: Use device's actual locale/region settings to detect country.
+    //           This matches the real location of the developer running the simulator.
+    //
+    // Safety: This code is ONLY compiled for simulator builds via TARGET_IPHONE_SIMULATOR.
+    //         Real iOS devices will ALWAYS use actual CloudFront geo data from headers.
+    //         This code is completely stripped from production builds at compile time.
+    // ==================================================================================
+    #if TARGET_IPHONE_SIMULATOR
+    [self.logger info:@"🧪 [Simulator] CloudFront blocks simulator IPs - using device locale for geo data"];
+    
+    // Get actual country from device's locale settings
+    NSLocale *currentLocale = [NSLocale currentLocale];
+    NSString *countryCode = [currentLocale objectForKey:NSLocaleCountryCode]; // e.g., "CH", "US", "GB"
+    
+    // Convert ISO2 (CH) to ISO3 (CHE) format for CloudFront compatibility
+    NSLocale *enUSLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
+    NSString *countryISO3 = [enUSLocale displayNameForKey:NSLocaleCountryCode value:countryCode];
+    
+    // Map common ISO2 codes to ISO3 (fallback if displayName doesn't work)
+    NSDictionary *iso2ToISO3 = @{
+        @"US": @"USA", @"GB": @"GBR", @"DE": @"DEU", @"FR": @"FRA", @"IT": @"ITA",
+        @"ES": @"ESP", @"CH": @"CHE", @"AT": @"AUT", @"BE": @"BEL", @"NL": @"NLD",
+        @"SE": @"SWE", @"NO": @"NOR", @"DK": @"DNK", @"FI": @"FIN", @"PL": @"POL",
+        @"PT": @"PRT", @"GR": @"GRC", @"IE": @"IRL", @"CZ": @"CZE", @"HU": @"HUN",
+        @"RO": @"ROU", @"BG": @"BGR", @"HR": @"HRV", @"SK": @"SVK", @"SI": @"SVN",
+        @"LT": @"LTU", @"LV": @"LVA", @"EE": @"EST", @"CY": @"CYP", @"MT": @"MLT",
+        @"LU": @"LUX", @"IS": @"ISL", @"LI": @"LIE", @"MC": @"MCO", @"AD": @"AND",
+        @"SM": @"SMR", @"VA": @"VAT", @"UA": @"UKR", @"BY": @"BLR", @"MD": @"MDA",
+        @"RU": @"RUS", @"RS": @"SRB", @"ME": @"MNE", @"MK": @"MKD", @"BA": @"BIH",
+        @"AL": @"ALB", @"XK": @"XKX"
+    };
+    
+    NSString *finalCountryISO3 = iso2ToISO3[countryCode] ?: @"USA"; // Default to USA if unknown
+    
+    // Get region/state from locale (may be nil)
+    NSString *regionCode = [[NSTimeZone localTimeZone] abbreviation] ?: @"";
+    
+    [self.logger info:[NSString stringWithFormat:@"🧪 [Simulator] Detected country from device locale: %@ (%@)", countryCode, finalCountryISO3]];
+    
+    // Mock CloudFront headers using detected country
+    NSDictionary *mockRawHeaders = @{
+        @"cloudfront-viewer-country-iso3": finalCountryISO3,
+        @"cloudfront-viewer-country-region": regionCode
+    };
+    
+    // Mock processed geo data for bid requests (OpenRTB format)
+    NSDictionary *mockProcessedData = @{
+        @"region": regionCode
+    };
+    
+    // Store mock data in UserDefaults (same as production flow)
+    [[NSUserDefaults standardUserDefaults] setObject:mockRawHeaders forKey:kCLXCoreRawGeoHeadersKey];
+    [[NSUserDefaults standardUserDefaults] setObject:mockProcessedData forKey:kCLXCoreProcessedGeoDataKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    [self.logger info:[NSString stringWithFormat:@"🧪 [Simulator] Geo data set from locale: %@ - Region: %@", finalCountryISO3, regionCode]];
+    
+    // Skip network call for simulator
+    return;
+    #endif
+    // ==================================================================================
+    // END SIMULATOR-ONLY CODE
+    // ==================================================================================
+    
     // Track geo API network call latency
     NSDate *geoRequestStartTime = [NSDate date];
     
