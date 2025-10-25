@@ -243,7 +243,7 @@
     }
     
     // Wait for all threads to complete
-    dispatch_group_wait(group, dispatch_time(DISPATCH_TIME_NOW, 30 * NSEC_PER_SEC));
+    dispatch_group_wait(group, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC));
     
     // Verify data integrity
     NSArray *results = [self.database executeQuery:@"SELECT COUNT(*) as count FROM concurrent_test;"];

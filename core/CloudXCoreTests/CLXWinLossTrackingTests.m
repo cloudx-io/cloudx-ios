@@ -848,7 +848,7 @@ static const NSInteger kTestRank3 = 3;
     }
     
     // Wait for all operations to complete
-    dispatch_group_wait(group, dispatch_time(DISPATCH_TIME_NOW, 30 * NSEC_PER_SEC));
+    dispatch_group_wait(group, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC));
     
     // Allow final async operations to complete
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];

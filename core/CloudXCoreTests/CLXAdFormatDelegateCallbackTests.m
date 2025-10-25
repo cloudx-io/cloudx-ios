@@ -8,7 +8,7 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
 
-@interface CLXAdFormatDelegateCallbackTests : XCTestCase <CLXBannerDelegate, CLXInterstitialDelegate, CLXRewardedDelegate, CLXNativeDelegate>
+@interface CLXAdFormatDelegateCallbackTests : XCTestCase <CLXAdDelegate, CLXBannerDelegate, CLXInterstitialDelegate, CLXRewardedDelegate, CLXNativeDelegate>
 
 // Properties to capture delegate callbacks
 @property (nonatomic, strong) NSMutableArray<NSString *> *receivedCallbacks;

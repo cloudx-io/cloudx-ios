@@ -244,7 +244,7 @@
     }
     
     // Wait for all concurrent operations
-    dispatch_group_wait(group, dispatch_time(DISPATCH_TIME_NOW, 30 * NSEC_PER_SEC));
+    dispatch_group_wait(group, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC));
     [self waitForAsyncOperations];
     
     // Verify all events were tracked

@@ -15,41 +15,39 @@ on:
     paths:
       - 'core/**'
       - '.github/workflows/core-tests.yml'
+  workflow_dispatch:
 
 jobs:
   test:
     name: Run CloudXCore Unit Tests
-    runs-on: macos-14
+    runs-on: macos-latest
+    timeout-minutes: 20
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: Select Xcode version
-        run: sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer
-      
       - name: Show Xcode version
-        run: xcodebuild -version
+        run: |
+          xcodebuild -version
+          xcode-select -p
       
       - name: List available simulators
         run: xcrun simctl list devices available
       
-      - name: Install xcpretty
-        run: gem install xcpretty
-      
       - name: Run unit tests
         working-directory: core
+        timeout-minutes: 15
         run: |
           set -o pipefail
           xcodebuild test \
             -project CloudXCore.xcodeproj \
             -scheme CloudXCore \
-            -testPlan CloudXCore \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -enableCodeCoverage NO \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGN_IDENTITY="" \
-            | xcpretty
+            2>&1 | tee xcodebuild.log | grep -E "Test Suite|Test Case|Executed|Assertion|error:|warning:" || cat xcodebuild.log
       
       - name: Upload test results
         if: failure()

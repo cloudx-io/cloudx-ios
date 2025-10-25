@@ -152,7 +152,7 @@
             });
         }
         
-        dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+        dispatch_group_wait(group, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC));
     }];
     
     // Performance expectation: < 500ms for 1000 concurrent calls
