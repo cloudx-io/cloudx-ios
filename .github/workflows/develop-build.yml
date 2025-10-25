@@ -73,6 +73,14 @@ jobs:
           META_CHANGED="false"
           PREBID_CHANGED="false"
           
+          # Workflow changes trigger all builds to test new workflow logic
+          if grep -q "^\.github/workflows/" /tmp/changed_files.txt; then
+            CORE_CHANGED="true"
+            META_CHANGED="true"
+            PREBID_CHANGED="true"
+            echo "⚙️ Workflow changed - rebuilding all components"
+          fi
+          
           if grep -q "^core/" /tmp/changed_files.txt || grep -q "^scripts/" /tmp/changed_files.txt; then
             CORE_CHANGED="true"
           fi
