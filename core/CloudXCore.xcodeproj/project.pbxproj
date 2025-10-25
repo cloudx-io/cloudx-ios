@@ -266,6 +266,8 @@
 		19D92CA22E6E099C00C84DAE /* CLXUserDefaultsKeys.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D92C9F2E6E099C00C84DAE /* CLXUserDefaultsKeys.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19D92CA72E6E235500C84DAE /* CLXActualUserDefaultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D92CA32E6E235500C84DAE /* CLXActualUserDefaultsTests.m */; };
 		19D92D2D2E6F69EB00C84DAE /* CLXMockInitService.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D92D2C2E6F69EB00C84DAE /* CLXMockInitService.m */; };
+		19EC25492EACB45F005C8EF6 /* CLXVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 19EC25472EACB45F005C8EF6 /* CLXVersion.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		19EC254A2EACB45F005C8EF6 /* CLXVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 19EC25482EACB45F005C8EF6 /* CLXVersion.m */; };
 		19F592DE2E98365E00C6E11D /* NSDictionary+DynamicPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F592DC2E98365E00C6E11D /* NSDictionary+DynamicPath.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19F592DF2E98365E00C6E11D /* NSDictionary+DynamicPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F592DD2E98365E00C6E11D /* NSDictionary+DynamicPath.m */; };
 		19F592E42E9836CD00C6E11D /* CLXKeyValueState.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F592E12E9836CD00C6E11D /* CLXKeyValueState.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -592,6 +594,8 @@
 		19D92CA32E6E235500C84DAE /* CLXActualUserDefaultsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXActualUserDefaultsTests.m; sourceTree = "<group>"; };
 		19D92D2B2E6F69EB00C84DAE /* CLXMockInitService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMockInitService.h; sourceTree = "<group>"; };
 		19D92D2C2E6F69EB00C84DAE /* CLXMockInitService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMockInitService.m; sourceTree = "<group>"; };
+		19EC25472EACB45F005C8EF6 /* CLXVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVersion.h; sourceTree = "<group>"; };
+		19EC25482EACB45F005C8EF6 /* CLXVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVersion.m; sourceTree = "<group>"; };
 		19F592DC2E98365E00C6E11D /* NSDictionary+DynamicPath.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+DynamicPath.h"; sourceTree = "<group>"; };
 		19F592DD2E98365E00C6E11D /* NSDictionary+DynamicPath.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+DynamicPath.m"; sourceTree = "<group>"; };
 		19F592E12E9836CD00C6E11D /* CLXKeyValueState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXKeyValueState.h; sourceTree = "<group>"; };
@@ -999,6 +1003,8 @@
 		19C725422E2390810012CFC7 /* CloudXCore */ = {
 			isa = PBXGroup;
 			children = (
+				19EC25472EACB45F005C8EF6 /* CLXVersion.h */,
+				19EC25482EACB45F005C8EF6 /* CLXVersion.m */,
 				19F592E32E9836CD00C6E11D /* State */,
 				19656C1B2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h */,
 				19F853412E899BC8002619F1 /* CLXBaseDao.h */,
@@ -1323,6 +1329,7 @@
 				19FF30F32EA6E6D50006F05A /* CLXSessionMetrics.h in Headers */,
 				19FF30F42EA6E6D50006F05A /* CLXSessionMetricsTracker.h in Headers */,
 				1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */,
+				19EC25492EACB45F005C8EF6 /* CLXVersion.h in Headers */,
 				19656C1C2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h in Headers */,
 				195755392E9DA1E500C9CC76 /* CLXPlacementLoopIndexTracker.h in Headers */,
 				197992952E75E3B700EBA0A3 /* CLXErrorReporter.h in Headers */,
@@ -1491,6 +1498,7 @@
 				19C725C92E2390810012CFC7 /* CLXAdapterFactoryResolver.m in Sources */,
 				19C725CA2E2390810012CFC7 /* CLXSDKInitNetworkService.m in Sources */,
 				19C725CB2E2390810012CFC7 /* CLXRillImpressionDefaultModel.m in Sources */,
+				19EC254A2EACB45F005C8EF6 /* CLXVersion.m in Sources */,
 				19C725CC2E2390810012CFC7 /* CLXNativeAdView.m in Sources */,
 				19C725CD2E2390810012CFC7 /* CLXSDKConfigPlacement.m in Sources */,
 				19C725CF2E2390810012CFC7 /* CLXSessionMetricType.m in Sources */,

@@ -43,6 +43,8 @@ on:
 jobs:
   build-and-publish:
     runs-on: macos-latest
+    permissions:
+      contents: write  # Required to create releases and tags
     
     steps:
       - name: Checkout code
@@ -160,6 +162,8 @@ jobs:
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -derivedDataPath build \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
             clean build
       
       - name: Build Meta Adapter xcframework
