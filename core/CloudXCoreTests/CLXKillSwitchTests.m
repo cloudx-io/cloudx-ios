@@ -188,7 +188,8 @@
     
     // When: Start auction with kill switch response
     [self.bidService startAuctionWithBidRequest:mockBidRequest 
-                                         appKey:@"test-app-key" 
+                                         appKey:@"test-app-key"
+                                  correlationId:[[NSUUID UUID] UUIDString]
                                      completion:^(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error) {
         // Then: Should fail with ads disabled error
         XCTAssertNil(parsedResponse, @"Parsed response should be nil when ads are disabled");
@@ -227,7 +228,8 @@
     
     // When: Start auction with normal 204 response
     [self.bidService startAuctionWithBidRequest:mockBidRequest 
-                                         appKey:@"test-app-key" 
+                                         appKey:@"test-app-key"
+                                  correlationId:[[NSUUID UUID] UUIDString]
                                      completion:^(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error) {
         // Then: Should not trigger kill switch
         if (error) {

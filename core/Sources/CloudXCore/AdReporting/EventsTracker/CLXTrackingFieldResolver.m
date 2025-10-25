@@ -142,17 +142,14 @@
     
     NSMutableArray<NSString *> *values = [NSMutableArray array];
     
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [PAYLOAD DEBUG] Building payload for auction: %@ with %lu fields", auctionId, (unsigned long)self.tracking.count]];
-    
     for (NSString *field in self.tracking) {
         id resolvedValue = [self resolveField:auctionId field:field];
         NSString *stringValue = resolvedValue ? [resolvedValue description] : @"";
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] %@ = '%@'", field, stringValue]];
         [values addObject:stringValue];
     }
     
     NSString *payload = [values componentsJoinedByString:@";"];
-    [self.logger debug:[NSString stringWithFormat:@"Built payload with %lu fields for auction: %@ - Payload: %@", (unsigned long)values.count, auctionId, payload]];
+    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXTrackingFieldResolver] Built payload with %lu fields for auction: %@", (unsigned long)values.count, auctionId]];
     
     return payload;
 }
@@ -324,7 +321,6 @@
             if ([bid[@"id"] isEqualToString:bidId]) {
                 bidObj = bid;
                 impid = bid[@"impid"];  // 🔗 Get the impression ID
-                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Found bid object for bidId: %@", bidId]];
                 break;
             }
         }
@@ -340,7 +336,6 @@
     if ([field isEqualToString:@"bid.ext.prebid.meta.adaptercode"]) {
         // Direct access to the bidder field
         id result = bidObj[@"ext"][@"prebid"][@"meta"][@"adaptercode"];
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Direct access to bidder: %@", result ?: @"(nil)"]];
         return result;
     }
     
@@ -401,8 +396,6 @@
     
     if ([field isEqualToString:@"bid.dealid"]) {
         id dealid = bidObj[@"dealid"];
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] bid.dealid lookup - bidObj keys: %@", [bidObj allKeys]]];
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] bid.dealid direct value: '%@' (type: %@)", dealid ?: @"(nil)", dealid ? NSStringFromClass([dealid class]) : @"nil"]];
         
         // If not found in bid object, look in the resolved request debug data
         if (!dealid) {
@@ -416,13 +409,11 @@
                     if ([lineItems isKindOfClass:[NSArray class]] && [(NSArray *)lineItems count] > 0) {
                         NSDictionary *lineItem = lineItems[0];
                         dealid = lineItem[@"deal"][@"id"];
-                        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] bid.dealid found in resolved request: '%@'", dealid ?: @"(nil)"]];
                     }
                 }
             }
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] bid.dealid final value: '%@'", dealid ?: @"(nil)"]];
         return dealid;
     }
     
@@ -434,10 +425,7 @@
         path = field;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Fallback path resolution for '%@' -> '%@'", field, path]];
-    id result = [self resolveNestedField:bidObj path:path];
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Result for %@: %@", field, result ?: @"(nil)"]];
-    return result;
+    return [self resolveNestedField:bidObj path:path];
 }
 
 /**
@@ -556,7 +544,6 @@
         if ([segment containsString:@"["] && [segment containsString:@"]"]) {
             current = [self resolveArrayLookup:current segment:segment withFullResponseData:fullResponseData auctionId:auctionId];
             if (!current) {
-                [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Array lookup failed for segment: %@", segment]];
                 return nil;
             }
         } else {
@@ -576,7 +563,6 @@
         }
         
         if (!current) {
-            [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Current is nil after segment %@, returning nil", segment]];
             return nil;
         }
     }
@@ -661,8 +647,6 @@
     NSString *condition = [segment substringWithRange:NSMakeRange(bracketStart.location + 1, 
                                                                   bracketEnd.location - bracketStart.location - 1)];
     
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Array lookup - name: %@, condition: %@", arrayName, condition]];
-    
     // Get the array from current object
     if (![current isKindOfClass:[NSDictionary class]]) {
         [self.logger debug:@"🔍 [CLXTrackingFieldResolver] Current is not a dictionary for array lookup"];
@@ -692,7 +676,6 @@
     id conditionValue = [self resolveConditionValue:conditionValueExpression withBidResponseData:contextForResolution auctionId:auctionId];
     
     // Find matching element in array
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Searching %lu elements for %@=%@", (unsigned long)[array count], conditionField, conditionValue]];
     for (NSDictionary *element in array) {
         if (![element isKindOfClass:[NSDictionary class]]) {
             continue;
@@ -701,7 +684,6 @@
         id elementValue = element[conditionField];
         
         if ([self valuesAreEqual:elementValue to:conditionValue]) {
-            [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Found matching element: %@", element]];
             return element;
         }
     }
@@ -733,7 +715,6 @@
     if ([expression hasPrefix:@"${"] && [expression hasSuffix:@"}"]) {
         // Extract the field path from ${...}
         NSString *fieldPath = [expression substringWithRange:NSMakeRange(2, expression.length - 3)];
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolving condition expression: %@ (auctionId: %@)", fieldPath, auctionId ?: @"none"]];
         
         // Handle bid.ext.cloudx.rank by looking it up in the bid response data
         if ([fieldPath isEqualToString:@"bid.ext.cloudx.rank"]) {
@@ -760,7 +741,6 @@
             
             // Fallback: In array lookup scenarios, the winning bid rank is conventionally 1
             // This matches the typical auction behavior where rank 1 = winner
-            [self.logger debug:@"🔍 [CLXTrackingFieldResolver] Resolving bid.ext.cloudx.rank - using rank=1 for winning bid"];
             return @1;
         }
         
@@ -836,8 +816,6 @@
 #pragma mark - Win/Loss Field Resolution
 
 - (nullable id)resolveField:(NSString *)fieldPath forAuction:(NSString *)auctionId {
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Resolving field: %@ for auction: %@", fieldPath, auctionId]];
-    
     // Handle SDK-level constants
     if ([fieldPath isEqualToString:@"sdk.loopIndex"]) {
         NSNumber *loopIndex = self.auctionedLoopIndex[auctionId];

@@ -52,6 +52,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 
 // CLXAdFormat properties are computed from currentState - no redeclaration needed
 
+// Correlation ID for request tracing
+@property (nonatomic, copy, nullable) NSString *currentCorrelationId;
+
 // Core properties
 @property (nonatomic, strong, nullable) CLXAdNetworkFactories *adFactories;
 @property (nonatomic, copy, nullable) NSString *userID;
@@ -241,35 +244,39 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 #pragma mark - CloudXInterstitial Protocol
 
 - (void)load {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherFullscreenAd] load called - Placement: %@, Type: %ld, State: %ld", _placementID, (long)_adType, (long)self.currentState]];
+    // Generate correlation ID for this ad load request
+    self.currentCorrelationId = [[NSUUID UUID] UUIDString];
+    
+    [self.logger info:[NSString stringWithFormat:@"[%@] 🎬 [PublisherFullscreenAd] Ad load started - Placement: %@, Type: %ld", self.currentCorrelationId, _placementID, (long)_adType]];
     
     // Check current state to determine if loading is allowed
     switch (self.currentState) {
         case CLXInterstitialStateIDLE:
             break;
         case CLXInterstitialStateLOADING:
-            [self.logger debug:@"⚠️ [PublisherFullscreenAd] Already loading, ignoring load request"];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] ⚠️ [PublisherFullscreenAd] Already loading, ignoring load request", self.currentCorrelationId]];
             return;
         case CLXInterstitialStateREADY:
-            [self.logger debug:@"⚠️ [PublisherFullscreenAd] Already loaded, ignoring load request"];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] ⚠️ [PublisherFullscreenAd] Already loaded, ignoring load request", self.currentCorrelationId]];
             return;
         case CLXInterstitialStateSHOWING:
-            [self.logger debug:@"⚠️ [PublisherFullscreenAd] Currently showing, ignoring load request"];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] ⚠️ [PublisherFullscreenAd] Currently showing, ignoring load request", self.currentCorrelationId]];
             return;
         case CLXInterstitialStateDESTROYED:
-            [self.logger error:@"❌ [PublisherFullscreenAd] Ad destroyed, cannot load"];
+            [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherFullscreenAd] Ad destroyed, cannot load", self.currentCorrelationId]];
             return;
     }
     
     // Transition to loading state
     self.currentState = CLXInterstitialStateLOADING;
-    [self.logger debug:@"State transitioned to LOADING"];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] State transitioned to LOADING", self.currentCorrelationId]];
     
     // Initiate bid request for ad content
     [self.bidAdSource requestBidWithAdUnitID:self.placementID
                            storedImpressionId:self.placementID
                                     impModel:self.impModel
                                    successWin:NO
+                                correlationId:self.currentCorrelationId
                                    completion:^(CLXBidAdSourceResponse *response, NSError *error) {
         [self handleBidResponse:response error:error];
     }];
@@ -277,7 +284,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 
 - (void)handleBidResponse:(CLXBidAdSourceResponse *)response error:(NSError *)error {
     if (error) {
-        // Error already logged by lower layers - just handle state transition
+        [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherFullscreenAd] Bid request failed: %@", self.currentCorrelationId, error.localizedDescription]];
         
         // Transition back to idle
         self.currentState = CLXInterstitialStateIDLE;
@@ -635,8 +642,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 }
 
 - (void)didFailToLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial error:(NSError *)error {
-    // Error already logged by adapter's error handler - just propagate to delegate
-    [self.logger debug:[NSString stringWithFormat:@"📥 [PublisherFullscreenAd] didFailToLoadWithInterstitial (%@): %@", interstitial, error.localizedDescription]];
+    [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherFullscreenAd] didFailToLoadWithInterstitial (%@): %@", self.currentCorrelationId, interstitial, error.localizedDescription]];
     
     [self sendLossNotificationForFailedAd:CLXAdTypeInterstitial];
     
@@ -821,8 +827,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 }
 
 - (void)didFailToLoadWithRewarded:(id<CLXAdapterRewarded>)rewarded error:(NSError *)error {
-    // Error already logged by adapter's error handler - just propagate to delegate
-    [self.logger debug:[NSString stringWithFormat:@"📥 [PublisherFullscreenAd] didFailToLoadWithRewarded (%@): %@", rewarded, error.localizedDescription]];
+    [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherFullscreenAd] didFailToLoadWithRewarded (%@): %@", self.currentCorrelationId, rewarded, error.localizedDescription]];
     
     [self sendLossNotificationForFailedAd:CLXAdTypeRewarded];
     

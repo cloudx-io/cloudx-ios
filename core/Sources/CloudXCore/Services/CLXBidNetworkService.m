@@ -78,19 +78,20 @@
 }
 
 - (void)createBidRequestWithAdUnitID:(NSString *)adUnitID
-                   storedImpressionId:(NSString *)storedImpressionId
-                               adType:(CLXAdType)adType
-                               dealID:(nullable NSString *)dealID
-                             bidFloor:(float)bidFloor
-                          publisherID:(NSString *)publisherID
-                               userID:(NSString *)userID
-                          adapterInfo:(NSDictionary *)adapterInfo
-                nativeAdRequirements:(nullable id)nativeAdRequirements
-                                 tmax:(nullable NSNumber *)tmax
-                            impModel:(nullable CLXConfigImpressionModel *)impModel
-                           completion:(void (^)(id _Nullable, NSError * _Nullable))completion {
+                  storedImpressionId:(NSString *)storedImpressionId
+                              adType:(CLXAdType)adType
+                              dealID:(nullable NSString *)dealID
+                            bidFloor:(float)bidFloor
+                         publisherID:(NSString *)publisherID
+                              userID:(NSString *)userID
+                         adapterInfo:(NSDictionary *)adapterInfo
+               nativeAdRequirements:(nullable id)nativeAdRequirements
+                                tmax:(nullable NSNumber *)tmax
+                           impModel:(nullable CLXConfigImpressionModel *)impModel
+                       correlationId:(NSString *)correlationId
+                          completion:(void (^)(id _Nullable, NSError * _Nullable))completion {
     
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Creating bid request - AdUnit: %@, Type: %d", adUnitID, (int)adType]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [BidNetworkService] Creating bid request - AdUnit: %@, Type: %d", correlationId, adUnitID, (int)adType]];
     
     CLXBiddingConfigRequest *bidRequest = [[CLXBiddingConfigRequest alloc] initWithAdType:adType
                                                                              adUnitID:adUnitID
@@ -116,8 +117,9 @@
 
 - (void)startAuctionWithBidRequest:(NSDictionary *)bidRequest
                             appKey:(NSString *)appKey
+                      correlationId:(NSString *)correlationId
                         completion:(void (^)(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error))completion {
-    [self.logger info:[NSString stringWithFormat:@"🚀 [BidNetworkService] startAuctionWithBidRequest called - AppKey: %@", appKey]];
+    [self.logger info:[NSString stringWithFormat:@"[%@] 📡 [BidNetworkService] Starting auction request - AppKey: %@", correlationId, appKey]];
     
     // Log the actual bid request JSON
     if (bidRequest) {
@@ -126,17 +128,18 @@
             NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bidRequest options:NSJSONWritingPrettyPrinted error:&jsonError];
             if (jsonData && !jsonError) {
                 NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-                [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] BidRequest JSON (%lu chars)", (unsigned long)jsonString.length]];
+                [self.logger debug:[NSString stringWithFormat:@"[%@] 📊 [BidNetworkService] BidRequest JSON (%lu chars)", correlationId, (unsigned long)jsonString.length]];
             }
         } @catch (NSException *exception) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Exception in bid_request_json_logging: %@ - %@", 
-                               exception.name ?: @"unknown", exception.reason ?: @"no reason"]];
-            [self reportException:exception context:@{@"operation": @"bid_request_json_logging"}];
+            [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [BidNetworkService] Exception in bid_request_json_logging: %@ - %@", 
+                               correlationId, exception.name ?: @"unknown", exception.reason ?: @"no reason"]];
+            [self reportException:exception context:@{@"operation": @"bid_request_json_logging", @"correlationId": correlationId}];
             // Continue execution - debug logging failure should not affect bid request
         }
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Bid request: ID=%@, IMPs=%lu", 
+    [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [BidNetworkService] Bid request: ID=%@, IMPs=%lu", 
+                       correlationId,
                        bidRequest[@"id"], 
                        (unsigned long)[bidRequest[@"imp"] count]]];
     
@@ -147,7 +150,7 @@
     if (!bidRequest[@"device"]) [missing addObject:@"device"];
     if (!bidRequest[@"regs"]) [missing addObject:@"regs"];
     if (missing.count > 0) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] Missing required fields: %@", [missing componentsJoinedByString:@", "]]];
+        [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [BidNetworkService] Missing required fields: %@", correlationId, [missing componentsJoinedByString:@", "]]];
     }
     
     NSMutableDictionary *headers = [NSMutableDictionary dictionary];
@@ -155,12 +158,18 @@
     // Use appKey (init value) as bearer token
     [headers setObject:[NSString stringWithFormat:@"Bearer %@", appKey] forKey:@"Authorization"];
     [headers setObject:self.userAgent ?: @"" forKey:@"User-Agent"];
+    // Add correlation ID for end-to-end request tracing
+    [headers setObject:correlationId forKey:@"X-CloudX-Correlation-ID"];
     
     // Convert bidRequest dictionary to NSData
     // Validate bid request before JSON serialization
     if (!bidRequest) {
-        NSError *invalidRequestError = [CLXError errorWithCode:CLXErrorCodeInvalidRequest description:@"Bid request cannot be nil"];
-        [self.logger error:@"❌ [BidNetworkService] Bid request is nil"];
+        NSError *invalidRequestError = [CLXError errorWithCode:CLXErrorCodeInvalidRequest 
+                                                       userInfo:@{
+                                                           NSLocalizedDescriptionKey: @"Bid request cannot be nil",
+                                                           @"CLXCorrelationID": correlationId
+                                                       }];
+        [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [BidNetworkService] Bid request is nil", correlationId]];
         if (completion) completion(nil, nil, invalidRequestError);
         return;
     }
@@ -168,14 +177,18 @@
     NSError *jsonError;
     NSData *requestBodyData = [NSJSONSerialization dataWithJSONObject:bidRequest options:0 error:&jsonError];
     if (jsonError) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] JSON serialization failed - %@ (Domain: %@, Code: %ld)", jsonError.localizedDescription, jsonError.domain, (long)jsonError.code]];
-        if (completion) completion(nil, nil, jsonError);
+        [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [BidNetworkService] JSON serialization failed - %@ (Domain: %@, Code: %ld)", correlationId, jsonError.localizedDescription, jsonError.domain, (long)jsonError.code]];
+        // Add correlation ID to error
+        NSMutableDictionary *errorUserInfo = [jsonError.userInfo mutableCopy] ?: [NSMutableDictionary dictionary];
+        errorUserInfo[@"CLXCorrelationID"] = correlationId;
+        NSError *enrichedError = [NSError errorWithDomain:jsonError.domain code:jsonError.code userInfo:errorUserInfo];
+        if (completion) completion(nil, nil, enrichedError);
         return;
     }
     
     // Use empty endpoint string like Swift version to avoid double URL
-    [self.logger debug:@"🔧 [BidNetworkService] Starting auction request with V1 retry policy (maxRetries:1, delay:1.0s)"];
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [BidNetworkService] Headers: %@", headers]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [BidNetworkService] Starting auction request with V1 retry policy (maxRetries:1, delay:1.0s)", correlationId]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [BidNetworkService] Headers: %@", correlationId, headers]];
     
     // Track bid request network call latency
     NSDate *bidRequestStartTime = [NSDate date];
@@ -192,30 +205,41 @@
         id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
         [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkBidRequest latency:(NSInteger)bidRequestLatency];
         
-        [self.logger debug:@"📥 [BidNetworkService] Network request completion called"];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] 📥 [BidNetworkService] Network request completion called (%.0fms)", correlationId, bidRequestLatency]];
         
         if (error) {
-            // Error already logged by BaseNetworkService - just propagate
-            if (completion) completion(nil, nil, error);
+            // Error already logged by BaseNetworkService - add correlation ID and propagate
+            NSMutableDictionary *errorUserInfo = [error.userInfo mutableCopy] ?: [NSMutableDictionary dictionary];
+            errorUserInfo[@"CLXCorrelationID"] = correlationId;
+            NSError *enrichedError = [NSError errorWithDomain:error.domain code:error.code userInfo:errorUserInfo];
+            if (completion) completion(nil, nil, enrichedError);
             return;
         }
         
         // Check kill switch BEFORE checking response data (kill switch responses have no data)
         if (isKillSwitchEnabled) {
-            NSError *adsDisabledError = [CLXError errorWithCode:CLXErrorCodeAdsDisabled];
-            [self.logger error:@"❌ [BidNetworkService] Ads disabled by kill switch"];
+            NSError *adsDisabledError = [CLXError errorWithCode:CLXErrorCodeAdsDisabled
+                                                       userInfo:@{
+                                                           NSLocalizedDescriptionKey: @"Ads disabled by kill switch",
+                                                           @"CLXCorrelationID": correlationId
+                                                       }];
+            [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [BidNetworkService] Ads disabled by kill switch", correlationId]];
             if (completion) completion(nil, nil, adsDisabledError);
             return;
         }
         
         if (!response) {
-            NSError *noDataError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse description:@"No response data"];
-            [self.logger error:@"❌ [BidNetworkService] No response data received"];
+            NSError *noDataError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse 
+                                                   userInfo:@{
+                                                       NSLocalizedDescriptionKey: @"No response data",
+                                                       @"CLXCorrelationID": correlationId
+                                                   }];
+            [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [BidNetworkService] No response data received", correlationId]];
             if (completion) completion(nil, nil, noDataError);
             return;
         }
         
-        [self.logger info:@"✅ [BidNetworkService] Auction response received successfully"];
+        [self.logger info:[NSString stringWithFormat:@"[%@] ✅ [BidNetworkService] Auction response received successfully", correlationId]];
         
         // Parse response dictionary into BidResponse object
         CLXBidResponse *bidResponse = [CLXBidResponse parseBidResponseFromDictionary:response];
@@ -225,7 +249,7 @@
             NSString *currency = bidResponse.cur ?: @"USD";
             NSInteger seatbidCount = bidResponse.seatbid ? bidResponse.seatbid.count : 0;
             NSString *bidId = bidResponse.bidid ?: @"unknown";
-            [self.logger debug:[NSString stringWithFormat:@"📊 [BidNetworkService] Parsed response - BidID: %@, Currency: %@, SeatBids: %ld", bidId, currency, (long)seatbidCount]];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] 📊 [BidNetworkService] Parsed response - BidID: %@, Currency: %@, SeatBids: %ld", correlationId, bidId, currency, (long)seatbidCount]];
         }
         
         // Pass both parsed object and raw JSON to completion handler

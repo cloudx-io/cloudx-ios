@@ -40,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL isSuspended;
 @property (nonatomic, strong) CLXSettings *settings;
 @property (nonatomic, assign) NSInteger adType;
+@property (nonatomic, copy, nullable) NSString *currentCorrelationId;
 
 @end
 
@@ -154,32 +155,38 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)loadQueueItem {
+    // Generate correlation ID for this cache ad load request
+    self.currentCorrelationId = [[NSUUID UUID] UUIDString];
+    
     // Implement actual queue item loading with async/await pattern
     if (!self.bidAdSource || self.isSuspended) {
-        [self.logger debug:self.isSuspended ? @"Queue loading is suspended" : @"No bid ad source available"];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] Queue loading %@", self.currentCorrelationId, self.isSuspended ? @"suspended" : @"no bid source"]];
         return;
     }
+    
+    [self.logger info:[NSString stringWithFormat:@"[%@] 🎬 [CacheAdService] Starting cache ad load for placement: %@", self.currentCorrelationId, self.placement.id]];
     
     __weak typeof(self) weakSelf = self;
     [self.bidAdSource requestBidWithAdUnitID:self.placement.id
                            storedImpressionId:self.placement.id
                                     impModel:nil
                                    successWin:self.winSuccess
+                                correlationId:self.currentCorrelationId
                                    completion:^(CLXBidAdSourceResponse * _Nullable response, NSError * _Nullable error) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         if (!strongSelf) return;
         
         if (error) {
-            [strongSelf.logger error:[NSString stringWithFormat:@"❌ [CacheAdService] Bid failed: %@ (domain:%@, code:%ld)", error.localizedDescription, error.domain, (long)error.code]];
+            [strongSelf.logger error:[NSString stringWithFormat:@"[%@] ❌ [CacheAdService] Bid failed: %@ (domain:%@, code:%ld)", strongSelf.currentCorrelationId, error.localizedDescription, error.domain, (long)error.code]];
             
             // Check if retries are enabled for this ad type
             if (![strongSelf shouldEnableRetries]) {
-                [strongSelf.logger info:@"🚫 [CacheAdService] Retries disabled for this ad type - failing immediately"];
+                [strongSelf.logger info:[NSString stringWithFormat:@"[%@] 🚫 [CacheAdService] Retries disabled for this ad type - failing immediately", strongSelf.currentCorrelationId]];
                 return; // Exit without retrying
             }
             
             // Log retry attempt
-            [strongSelf.logger debug:@"🔄 [CacheAdService] Retries enabled - will retry after backoff delay"];
+            [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] 🔄 [CacheAdService] Retries enabled - will retry after backoff delay", strongSelf.currentCorrelationId]];
             
             // Implement waterfall backoff delay logic
             NSError *backoffError;
@@ -188,7 +195,7 @@ NS_ASSUME_NONNULL_BEGIN
                 delay = 1.0; // Default delay if backoff fails
             }
             
-            [strongSelf.logger debug:[NSString stringWithFormat:@"Sleep for %f seconds", delay]];
+            [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] Sleep for %.1f seconds", strongSelf.currentCorrelationId, delay]];
             
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 if (strongSelf.cachedQueue.isEnoughSpace && !strongSelf.isSuspended) {
@@ -201,9 +208,11 @@ NS_ASSUME_NONNULL_BEGIN
             // Reset waterfall backoff algorithm
             NSTimeInterval delay = [strongSelf.waterfallBackoffAlgorithm reset];
             
+            [strongSelf.logger info:[NSString stringWithFormat:@"[%@] ✅ [CacheAdService] Bid response received - Network: %@, BidID: %@", strongSelf.currentCorrelationId, response.networkName, response.bidID]];
+            
             // Create cacheable ad from response
             if (strongSelf.createCacheableAd && response) {
-                [strongSelf.logger debug:[NSString stringWithFormat:@"🔧 [CacheAdService] Creating cacheable ad - Network: %@, BidID: %@", response.networkName, response.bidID]];
+                [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [CacheAdService] Creating cacheable ad - Network: %@, BidID: %@", strongSelf.currentCorrelationId, response.networkName, response.bidID]];
                 
                 // Call createBidAd block without parameters (it captures parameters internally)
                 id destroyable = response.createBidAd();

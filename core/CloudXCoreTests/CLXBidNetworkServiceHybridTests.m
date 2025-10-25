@@ -53,6 +53,7 @@
     @try {
         [self.networkService startAuctionWithBidRequest:testBidRequest
                                                  appKey:@"test-app-key"
+                                          correlationId:[[NSUUID UUID] UUIDString]
                                              completion:completionHandler];
         // If we reach here, the interface is compatible
         XCTAssertTrue(YES, @"Method signature is compatible");
@@ -94,7 +95,8 @@
     
     // This should compile without warnings
     [self.networkService startAuctionWithBidRequest:testRequest
-                                             appKey:@"test-key" 
+                                             appKey:@"test-key"
+                                      correlationId:[[NSUUID UUID] UUIDString]
                                          completion:completionBlock];
 }
 

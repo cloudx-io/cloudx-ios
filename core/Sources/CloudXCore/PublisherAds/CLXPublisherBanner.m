@@ -52,6 +52,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readwrite) CLXSettings *settings;
 
+// Correlation ID for request tracing
+@property (nonatomic, copy, nullable) NSString *currentCorrelationId;
+
 // Private properties
 @property (nonatomic, strong, nullable) id<CLXBidAdSourceProtocol> bidAdSource;
 @property (nonatomic, strong) NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *adFactories;
@@ -201,27 +204,30 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - CloudXBanner Protocol
 
 - (void)load {
-    [self.logger info:[NSString stringWithFormat:@"🚀 [PublisherBanner] load() called for placement: %@ (loading:%d, stopped:%d, onScreen:%@, bidSource:%d)", self.placementID, self.isLoading, self.forceStop, self.bannerOnScreen ? @"YES" : @"NO", self.bidAdSource != nil]];
+    // Generate correlation ID for this ad load request
+    self.currentCorrelationId = [[NSUUID UUID] UUIDString];
+    
+    [self.logger info:[NSString stringWithFormat:@"[%@] 🎬 [PublisherBanner] Ad load started for placement: %@", self.currentCorrelationId, self.placementID]];
     
     if (self.isLoading) {
-        [self.logger debug:[NSString stringWithFormat:@"⚠️ [PublisherBanner] Banner load already in progress for placement: %@", self.placementID]];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] ⚠️ [PublisherBanner] Banner load already in progress for placement: %@", self.currentCorrelationId, self.placementID]];
         return;
     }
     
     if (self.forceStop) {
-        [self.logger debug:[NSString stringWithFormat:@"⚠️ [PublisherBanner] Banner load stopped due to forceStop flag for placement: %@", self.placementID]];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] ⚠️ [PublisherBanner] Banner load stopped due to forceStop flag for placement: %@", self.currentCorrelationId, self.placementID]];
         return;
     }
     
     if (!self.bidAdSource) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [PublisherBanner] No CLXBidAdSource available for placement: %@", self.placementID]];
+        [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherBanner] No CLXBidAdSource available for placement: %@", self.currentCorrelationId, self.placementID]];
         return;
     }
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Starting banner load process for placement: %@", self.placementID]];
+    [self.logger info:[NSString stringWithFormat:@"[%@] ✅ [PublisherBanner] Starting banner load process for placement: %@", self.currentCorrelationId, self.placementID]];
     self.isLoading = YES;
     self.adLoadStartTime = [NSDate date];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Ad load start time set: %@", self.adLoadStartTime]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] 📊 [PublisherBanner] Ad load start time set: %@", self.currentCorrelationId, self.adLoadStartTime]];
     
     // Implement async banner update request
     [self requestBannerUpdate];
@@ -231,10 +237,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)requestBannerUpdate {
     NSInteger currentLoopIndex = [[CLXPlacementLoopIndexTracker shared] getCountForPlacement:self.placementName];
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherBanner] requestBannerUpdate() called for placement: %@ (forceStop:%d, loading:%d, loop-index:%ld, successWin:%d)", self.placementID, self.forceStop, self.isLoading, (long)currentLoopIndex, self.successWin]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [PublisherBanner] requestBannerUpdate() called for placement: %@", self.currentCorrelationId, self.placementID]];
     
     if (self.forceStop) {
-        [self.logger debug:@"⚠️ [PublisherBanner] Request stopped due to forceStop flag"];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] ⚠️ [PublisherBanner] Request stopped due to forceStop flag", self.currentCorrelationId]];
         return;
     }
     
@@ -249,6 +255,7 @@ NS_ASSUME_NONNULL_BEGIN
                            storedImpressionId:storedImpressionId
                                     impModel:self.impModel
                                    successWin:self.successWin
+                                correlationId:self.currentCorrelationId
                                    completion:^(CLXBidAdSourceResponse * _Nullable response, NSError * _Nullable error) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         if (!strongSelf) {
@@ -256,23 +263,25 @@ NS_ASSUME_NONNULL_BEGIN
             return;
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"📥 [PublisherBanner] Bid request completion - Response: %@, Error: %@", response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] 📥 [PublisherBanner] Bid request completion - Response: %@, Error: %@", strongSelf.currentCorrelationId, response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
 
         if (error) {
-            // Error already logged by lower layers - continue waterfall
+            [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherBanner] Bid request failed - %@ (Domain: %@, Code: %ld)", strongSelf.currentCorrelationId, error.localizedDescription, error.domain, (long)error.code]];
+            
+            // Continue with waterfall - let continueBannerChain handle the error
             [strongSelf continueBannerChain];
             return;
         }
         
         if (!response) {
-            [self.logger error:@"❌ [PublisherBanner] Bid request returned nil response"];
+            [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherBanner] Bid request returned nil response", strongSelf.currentCorrelationId]];
             
             // Continue with waterfall - let continueBannerChain handle the nil response
             [strongSelf continueBannerChain];
             return;
         }
         
-        [self.logger info:[NSString stringWithFormat:@"✅ [PublisherBanner] Bid response received - Network: %@, BidID: %@, Price: %.2f, CreateBidAd: %d", response.networkName, response.bidID, response.price, response.createBidAd != nil]];
+        [self.logger info:[NSString stringWithFormat:@"[%@] ✅ [PublisherBanner] Bid response received - Network: %@, BidID: %@, Price: %.2f, CreateBidAd: %d", strongSelf.currentCorrelationId, response.networkName, response.bidID, response.price, response.createBidAd != nil]];
         
         strongSelf.lastBidResponse = response;
         
@@ -331,7 +340,7 @@ NS_ASSUME_NONNULL_BEGIN
             [self failToLoadBanner:nil error:technicalError];
         }
     } else {
-        [self.logger info:[NSString stringWithFormat:@"ℹ️ [PublisherBanner] Waterfall exhausted (no fill) - propagating to delegate"]];
+        [self.logger info:[NSString stringWithFormat:@"[%@] ℹ️ [PublisherBanner] Waterfall exhausted (no fill) - propagating to delegate", self.currentCorrelationId]];
         
         // Waterfall exhausted - create NO_FILL error and handle per spec
         NSError *noFillError = [CLXError errorWithCode:CLXErrorCodeNoFill 
@@ -550,8 +559,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (void)failToLoadBanner:(nullable id<CLXAdapterBanner>)banner error:(nullable NSError *)error {
-    // Error goes to publisher delegate - log at INFO level
-    [self.logger info:[NSString stringWithFormat:@"ℹ️ [PublisherBanner] failToLoadBanner for placement: %@ - %@", self.placementID, error.localizedDescription ?: @"Unknown error"]];
+    [self.logger info:[NSString stringWithFormat:@"[%@] ℹ️ [PublisherBanner] failToLoadBanner for placement: %@ - %@", self.currentCorrelationId, self.placementID, error.localizedDescription ?: @"Unknown error"]];
     
     [self.appSessionService adFailedToLoadWithPlacementID:self.placementID];
 

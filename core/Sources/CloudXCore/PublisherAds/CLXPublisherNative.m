@@ -43,6 +43,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readwrite) BOOL isLoading;
 @property (nonatomic, assign, readwrite) BOOL isDestroyed;
 
+// Correlation ID for request tracing
+@property (nonatomic, copy, nullable) NSString *currentCorrelationId;
+
 // Private properties
 @property (nonatomic, strong, nullable) CLXBidAdSource *bidAdSource;
 @property (nonatomic, strong) NSDictionary<NSString *, id<CLXAdapterNativeFactory>> *adFactories;
@@ -167,12 +170,15 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - CloudXNative Protocol
 
 - (void)load {
+    // Generate correlation ID for this ad load request
+    self.currentCorrelationId = [[NSUUID UUID] UUIDString];
+    
     if (self.isLoading) {
-        [self.logger debug:@"Native load already in progress"];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] Native load already in progress", self.currentCorrelationId]];
         return;
     }
     
-    [self.logger debug:@"Starting native load process"];
+    [self.logger info:[NSString stringWithFormat:@"[%@] 🎬 [PublisherNative] Ad load started for placement: %@", self.currentCorrelationId, self.placementID]];
     self.isLoading = YES;
     
     // Implement async native update request
@@ -188,7 +194,7 @@ NS_ASSUME_NONNULL_BEGIN
         return;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"Requesting native update - loop-index: %ld", (long)self.loadNativeTimesCount]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [PublisherNative] Requesting native update - loop-index: %ld", self.currentCorrelationId, (long)self.loadNativeTimesCount]];
     
     // Request bid from bid ad source
     __weak typeof(self) weakSelf = self;
@@ -196,12 +202,13 @@ NS_ASSUME_NONNULL_BEGIN
                            storedImpressionId:self.placementID
                                     impModel:self.impModel
                                    successWin:self.successWin
+                                correlationId:self.currentCorrelationId
                                    completion:^(CLXBidAdSourceResponse * _Nullable response, NSError * _Nullable error) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         if (!strongSelf) return;
         
         if (error) {
-            [strongSelf.logger debug:[NSString stringWithFormat:@"Failed to receive bid: %@", error.localizedDescription]];
+            [strongSelf.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherNative] Bid request failed: %@", strongSelf.currentCorrelationId, error.localizedDescription]];
             
             // Implement waterfall backoff delay logic
             NSError *backoffError;
