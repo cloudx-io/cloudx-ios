@@ -19,8 +19,12 @@
     [super viewDidLoad];
     self.title = @"ObjC Demo";
     
-    // Set environment to staging for third-party usage
-    [[CLXDemoConfigManager sharedManager] setEnvironment:CLXDemoEnvironmentStaging];
+    CLXDemoConfigManager *configManager = [CLXDemoConfigManager sharedManager];
+    if ([configManager isDebugBuild]) {
+        [configManager setEnvironment:CLXDemoEnvironmentStaging];
+    } else {
+        [configManager setEnvironment:CLXDemoEnvironmentProduction];
+    }
     
     [self setupEnvironmentButtons];
     
@@ -114,22 +118,27 @@
 
 - (void)updateButtonStates {
     CLXDemoConfigManager *configManager = [CLXDemoConfigManager sharedManager];
-    CLXDemoEnvironment currentEnvironment = configManager.currentEnvironment;
+    BOOL isDebugBuild = [configManager isDebugBuild];
     
     NSArray<UIButton *> *buttons = @[self.devButton, self.stagingButton, self.prodButton];
     
     for (UIButton *button in buttons) {
         CLXDemoEnvironment buttonEnvironment = (CLXDemoEnvironment)button.tag;
-        BOOL isCurrentEnvironment = (buttonEnvironment == currentEnvironment);
+        BOOL shouldEnable = NO;
         
-        button.enabled = isCurrentEnvironment;
+        if (isDebugBuild) {
+            shouldEnable = (buttonEnvironment == CLXDemoEnvironmentDev || 
+                           buttonEnvironment == CLXDemoEnvironmentStaging);
+        } else {
+            shouldEnable = (buttonEnvironment == CLXDemoEnvironmentProduction);
+        }
         
-        if (isCurrentEnvironment) {
-            // Full color for enabled button
+        button.enabled = shouldEnable;
+        
+        if (shouldEnable) {
             button.backgroundColor = [self colorForEnvironment:buttonEnvironment];
             button.alpha = 1.0;
         } else {
-            // Grayed out for disabled buttons
             button.backgroundColor = [UIColor systemGrayColor];
             button.alpha = 0.5;
         }
