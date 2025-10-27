@@ -4,7 +4,7 @@
 #import "CLXDemoConfigManager.h"
 
 @interface RewardedInterstitialViewController ()
-@property (nonatomic, strong) CLXPublisherFullscreenAd *rewardedInterstitialAd;
+@property (nonatomic, strong) CLXRewarded *rewardedInterstitialAd;
 @end
 
 @implementation RewardedInterstitialViewController

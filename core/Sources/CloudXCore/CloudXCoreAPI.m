@@ -47,9 +47,8 @@
 #import <CloudXCore/CLXBannerType.h>
 #import <CloudXCore/CLXInterstitial.h>
 #import <CloudXCore/CLXInterstitialDelegate.h>
-#import <CloudXCore/CLXRewardedInterstitial.h>
+#import <CloudXCore/CLXRewarded.h>
 #import <CloudXCore/CLXRewardedDelegate.h>
-#import <CloudXCore/CLXFullscreenAd.h>
 #import <CloudXCore/CLXNative.h>
 #import <CloudXCore/CLXNativeAdView.h>
 #import <CloudXCore/CLXNativeTemplate.h>
@@ -60,7 +59,7 @@
 #import <CloudXCore/CLXSDKConfigPlacement.h>
 #import <CloudXCore/CLXPublisherBanner.h>
 #import <CloudXCore/CLXPublisherNative.h>
-#import <CloudXCore/CLXPublisherFullscreenAd.h>
+#import <CloudXCore/CLXPublisherFullscreenAdBase.h>
 
 @interface CloudXCore ()
 @property (nonatomic, strong) id<CLXInitService> initService;
@@ -722,8 +721,8 @@ static CloudXCore *_sharedInstance = nil;
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeMREC delegate:delegate];
 }
 
-- (CLXPublisherFullscreenAd *)createInterstitialWithPlacement:(NSString *)placement
-                                                     delegate:(id<CLXInterstitialDelegate>)delegate {
+- (CLXInterstitial *)createInterstitialWithPlacement:(NSString *)placement
+                                            delegate:(id<CLXInterstitialDelegate>)delegate {
     // Track interstitial creation method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateInterstitial];
@@ -747,27 +746,25 @@ static CloudXCore *_sharedInstance = nil;
                                                                                   auctionID:auctionID
                                                                               testGroupName:_abTestName];
     
-    // Create interstitial with simplified state-based management
-    CLXPublisherFullscreenAd *interstitial = [[CLXPublisherFullscreenAd alloc] initWithInterstitialDelegate:delegate
-        rewardedDelegate:nil
-        placement:placementConfig
-        publisherID:@""
-        userID:@""
-        rewardedCallbackUrl:nil
-        impModel:impModel
-        adFactories:_adNetworkFactories
-        waterfallMaxBackOffTime:@10.0
-        bidTokenSources:_adNetworkFactories.bidTokenSources
-        bidRequestTimeout:3.0
-        reportingService:_reportingService
-        settings:[CLXSettings sharedInstance]
-        adType:CLXAdTypeInterstitial];
+    // Create interstitial ad
+    CLXInterstitial *interstitial = [[CLXInterstitial alloc] initWithPlacement:placementConfig
+                                                                    publisherID:@""
+                                                                         userID:@""
+                                                            rewardedCallbackUrl:nil
+                                                                       impModel:impModel
+                                                                    adFactories:_adNetworkFactories
+                                                       waterfallMaxBackOffTime:@10.0
+                                                                bidTokenSources:_adNetworkFactories.bidTokenSources
+                                                             bidRequestTimeout:3.0
+                                                              reportingService:_reportingService
+                                                                      settings:[CLXSettings sharedInstance]];
+    interstitial.delegate = delegate;
     
     return interstitial;
 }
 
-- (CLXPublisherFullscreenAd *)createRewardedWithPlacement:(NSString *)placement
-                                                 delegate:(id<CLXRewardedDelegate>)delegate {
+- (CLXRewarded *)createRewardedWithPlacement:(NSString *)placement
+                                    delegate:(id<CLXRewardedDelegate>)delegate {
     // Track rewarded creation method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateRewarded];
@@ -791,21 +788,19 @@ static CloudXCore *_sharedInstance = nil;
                                                                                   auctionID:auctionID
                                                                               testGroupName:_abTestName];
     
-    // Create rewarded with simplified state-based management
-    CLXPublisherFullscreenAd *rewarded = [[CLXPublisherFullscreenAd alloc] initWithInterstitialDelegate:nil
-        rewardedDelegate:delegate
-        placement:placementConfig
-        publisherID:@""
-        userID:@""
-        rewardedCallbackUrl:nil
-        impModel:impModel
-        adFactories:_adNetworkFactories
-        waterfallMaxBackOffTime:@5.0
-        bidTokenSources:_adNetworkFactories.bidTokenSources
-        bidRequestTimeout:3.0
-        reportingService:_reportingService
-        settings:[CLXSettings sharedInstance]
-        adType:CLXAdTypeRewarded];
+    // Create rewarded ad
+    CLXRewarded *rewarded = [[CLXRewarded alloc] initWithPlacement:placementConfig
+                                                        publisherID:@""
+                                                             userID:@""
+                                                rewardedCallbackUrl:nil
+                                                           impModel:impModel
+                                                        adFactories:_adNetworkFactories
+                                           waterfallMaxBackOffTime:@5.0
+                                                    bidTokenSources:_adNetworkFactories.bidTokenSources
+                                                 bidRequestTimeout:3.0
+                                                  reportingService:_reportingService
+                                                          settings:[CLXSettings sharedInstance]];
+    rewarded.delegate = delegate;
     
     return rewarded;
 }

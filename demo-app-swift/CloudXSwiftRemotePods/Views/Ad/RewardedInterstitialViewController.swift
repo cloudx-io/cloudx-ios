@@ -3,7 +3,7 @@ import CloudXCore
 
 class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDelegate {
     
-    private var rewardedInterstitialAd: CLXRewardedInterstitial?
+    private var rewardedInterstitialAd: CLXRewarded?
     
     override func viewDidLoad() {
         super.viewDidLoad()
