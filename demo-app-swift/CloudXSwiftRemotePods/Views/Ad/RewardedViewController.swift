@@ -3,7 +3,7 @@ import CloudXCore
 
 class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
     
-    private var rewardedAd: CLXRewarded?
+    private var rewardedAd: CLXRewardedInterstitial?
     private let settings = UserDefaultsSettings.shared
     
     override func viewDidLoad() {

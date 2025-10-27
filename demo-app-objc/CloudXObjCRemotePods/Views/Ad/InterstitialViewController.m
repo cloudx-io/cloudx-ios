@@ -5,7 +5,7 @@
 #import "UserDefaultsSettings.h"
 
 @interface InterstitialViewController ()
-@property (nonatomic, strong) CLXInterstitial *interstitialAd;
+@property (nonatomic, strong) CLXPublisherFullscreenAd *interstitialAd;
 @property (nonatomic, assign) BOOL showAdWhenLoaded;
 @property (nonatomic, strong) UserDefaultsSettings *settings;
 @end

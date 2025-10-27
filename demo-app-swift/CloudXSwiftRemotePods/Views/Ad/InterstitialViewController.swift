@@ -2,7 +2,7 @@ import UIKit
 import CloudXCore
 
 class InterstitialViewController: BaseAdViewController {
-    private var interstitialAd: CLXPublisherFullscreenAd?
+    private var interstitialAd: CLXInterstitial?
     private var showAdWhenLoaded = false
     private let settings = UserDefaultsSettings.shared
     

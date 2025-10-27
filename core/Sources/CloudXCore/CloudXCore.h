@@ -96,26 +96,19 @@
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXAdDelegate.h>
 
-// Banner Ads
 #import <CloudXCore/CLXBanner.h>
 #import <CloudXCore/CLXBannerDelegate.h>
 #import <CloudXCore/CLXBannerAdView.h>
 #import <CloudXCore/CLXBannerType.h>
-#import <CloudXCore/CLXPublisherBanner.h>
-
-// Interstitial & Rewarded Ads (concrete classes)
-#import <CloudXCore/CLXPublisherFullscreenAdBase.h>
 #import <CloudXCore/CLXInterstitial.h>
 #import <CloudXCore/CLXInterstitialDelegate.h>
-#import <CloudXCore/CLXRewarded.h>
+#import <CloudXCore/CLXRewardedInterstitial.h>
 #import <CloudXCore/CLXRewardedDelegate.h>
-
-// Native Ads
 #import <CloudXCore/CLXNative.h>
 #import <CloudXCore/CLXNativeDelegate.h>
 #import <CloudXCore/CLXNativeAdView.h>
 #import <CloudXCore/CLXNativeTemplate.h>
-#import <CloudXCore/CLXPublisherNative.h>
+#import <CloudXCore/CLXFullscreenAd.h>
 
 // Ad Cache
 #import <CloudXCore/CLXCachedInterstitial.h>
@@ -156,6 +149,11 @@
 
 // Additional Adapters
 #import <CloudXCore/CLXAdapterFactoryResolver.h>
+
+// Additional Publisher Components
+#import <CloudXCore/CLXPublisherBanner.h>
+#import <CloudXCore/CLXPublisherFullscreenAd.h>
+#import <CloudXCore/CLXPublisherNative.h>
 
 // Additional Utils
 #import <CloudXCore/CLXURLProvider.h>
