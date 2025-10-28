@@ -99,7 +99,7 @@ jobs:
 
   dispatch:
     name: trigger-autotest
-    runs-on: self-hosted
+    runs-on: macos-latest
     needs: build # This job will run only after the 'build' job completes successfully
     steps:
       - name: Dispatch testing workflow
