@@ -18,18 +18,18 @@ static const NSTimeInterval kTestTimeout = 5.0;
 // MARK: - Import private enum definition
 
 // Copy the enum definition from the implementation file for testing
-typedef NS_ENUM(NSInteger, CLXInterstitialState) {
-    CLXInterstitialStateIDLE,      // No ad loaded, ready to start loading
-    CLXInterstitialStateLOADING,   // Ad request in progress
-    CLXInterstitialStateREADY,     // Ad loaded and ready to display
-    CLXInterstitialStateSHOWING,   // Ad currently visible to user
-    CLXInterstitialStateDESTROYED  // Ad destroyed, no further operations allowed
+typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
+    CLXFullscreenAdStateIDLE,      // No ad loaded, ready to start loading
+    CLXFullscreenAdStateLOADING,   // Ad request in progress
+    CLXFullscreenAdStateREADY,     // Ad loaded and ready to display
+    CLXFullscreenAdStateSHOWING,   // Ad currently visible to user
+    CLXFullscreenAdStateDESTROYED  // Ad destroyed, no further operations allowed
 };
 
 // MARK: - Categories to expose private methods
 
-@interface CLXPublisherFullscreenAd (IntegrationTesting)
-@property (nonatomic, assign) CLXInterstitialState currentState;
+@interface CLXInterstitial (IntegrationTesting)
+@property (nonatomic, assign) CLXFullscreenAdState currentState;
 @end
 
 // MARK: - Mock Delegate for Integration Tests
@@ -152,7 +152,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 // MARK: - Integration Test Class
 
 @interface CLXInterstitialIntegrationTests : XCTestCase
-@property (nonatomic, strong) CLXPublisherFullscreenAd *interstitial;
+@property (nonatomic, strong) CLXInterstitial *interstitial;
 @property (nonatomic, strong) IntegrationTestDelegate *testDelegate;
 @end
 
@@ -320,7 +320,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     threadCheckDelegate.expectation = expectation;
     
     // Set up the delegate
-    self.interstitial.interstitialDelegate = threadCheckDelegate;
+    self.interstitial.delegate = threadCheckDelegate;
     
     // Try to trigger a load (which will likely fail for our test placement, but may still trigger callbacks)
     [self.interstitial load];
@@ -339,12 +339,12 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 - (void)testNoRetainCyclesWithDelegate {
     // Verifies that there are no retain cycles between the interstitial and its delegate that could cause memory leaks
     
-    __weak CLXPublisherFullscreenAd *weakInterstitial;
+    __weak CLXInterstitial *weakInterstitial;
     __weak IntegrationTestDelegate *weakDelegate;
     
     @autoreleasepool {
         IntegrationTestDelegate *delegate = [[IntegrationTestDelegate alloc] init];
-        CLXPublisherFullscreenAd *interstitial = [CloudXCore.shared createInterstitialWithPlacement:kTestPlacementID delegate:delegate];
+        CLXInterstitial *interstitial = [CloudXCore.shared createInterstitialWithPlacement:kTestPlacementID delegate:delegate];
         
         weakInterstitial = interstitial;
         weakDelegate = delegate;
@@ -376,9 +376,9 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 }
 
 - (void)testAdTypeProperty {
-    // Verifies that the created object conforms to the CLXInterstitial protocol (indicating correct ad type)
+    // Verifies that the created object is an instance of CLXInterstitial class (indicating correct ad type)
     if (self.interstitial) {
-        XCTAssertTrue([self.interstitial conformsToProtocol:@protocol(CLXInterstitial)], @"Created object should conform to CLXInterstitial protocol");
+        XCTAssertTrue([self.interstitial isKindOfClass:[CLXInterstitial class]], @"Created object should be an instance of CLXInterstitial class");
     } else {
         XCTAssertNil(self.interstitial, @"Cannot test ad type on nil interstitial");
     }
@@ -387,11 +387,11 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 - (void)testDelegateProperty {
     // Verifies that the delegate property can be set and retrieved correctly, including setting to nil
     if (self.interstitial) {
-        XCTAssertEqual(self.interstitial.interstitialDelegate, self.testDelegate, @"Delegate should be set correctly");
+        XCTAssertEqual(self.interstitial.delegate, self.testDelegate, @"Delegate should be set correctly");
         
         // Test setting to nil
-        self.interstitial.interstitialDelegate = nil;
-        XCTAssertNil(self.interstitial.interstitialDelegate, @"Delegate should be nil after setting to nil");
+        self.interstitial.delegate = nil;
+        XCTAssertNil(self.interstitial.delegate, @"Delegate should be nil after setting to nil");
     } else {
         XCTAssertNil(self.interstitial, @"Cannot test delegate property on nil interstitial");
     }

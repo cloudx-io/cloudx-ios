@@ -5,7 +5,7 @@
 #import "UserDefaultsSettings.h"
 
 @interface RewardedViewController ()
-@property (nonatomic, strong) CLXPublisherFullscreenAd *rewardedAd;
+@property (nonatomic, strong) CLXRewarded *rewardedAd;
 @property (nonatomic, strong) UserDefaultsSettings *settings;
 @end
 

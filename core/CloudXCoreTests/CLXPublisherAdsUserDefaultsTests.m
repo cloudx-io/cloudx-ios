@@ -17,7 +17,7 @@
 @interface CLXPublisherNative (Testing)
 @end
 
-@interface CLXPublisherFullscreenAd (Testing)
+@interface CLXPublisherFullscreenAdBase (Testing)
 @end
 
 @interface CLXPublisherAdsUserDefaultsTests : XCTestCase
@@ -135,37 +135,37 @@
     XCTAssertEqualObjects(storedUserKeyValue, userKeyValue, @"CLXPublisherNative should read user key value with unprefixed key");
 }
 
-#pragma mark - CLXPublisherFullscreenAd User Defaults Tests
+#pragma mark - CLXPublisherFullscreenAdBase User Defaults Tests
 
-// Test that CLXPublisherFullscreenAd reads metrics dictionary using ACTUAL key
+// Test that fullscreen ads read metrics dictionary using ACTUAL key
 - (void)testPublisherFullscreenReadsMetricsDict {
     // Set up initial metrics dictionary with ACTUAL unprefixed key
     NSDictionary *initialMetrics = @{@"fullscreen_metric": @"fullscreen_value"};
     [[NSUserDefaults standardUserDefaults] setObject:initialMetrics forKey:kCLXCoreMetricsDictKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    // Create CLXPublisherFullscreenAd instance
-    CLXPublisherFullscreenAd *fullscreen = [[CLXPublisherFullscreenAd alloc] init];
-    XCTAssertNotNil(fullscreen, @"CLXPublisherFullscreenAd should be created");
+    // Create CLXInterstitial instance (concrete fullscreen ad class)
+    CLXInterstitial *fullscreen = [[CLXInterstitial alloc] init];
+    XCTAssertNotNil(fullscreen, @"CLXInterstitial should be created");
     
     // Verify it can read the metrics dictionary with ACTUAL unprefixed key
     NSDictionary *storedMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
-    XCTAssertEqualObjects(storedMetrics, initialMetrics, @"CLXPublisherFullscreenAd should read metrics with unprefixed key");
+    XCTAssertEqualObjects(storedMetrics, initialMetrics, @"Fullscreen ads should read metrics with unprefixed key");
 }
 
-// Test that CLXPublisherFullscreenAd reads user key value data using ACTUAL key
+// Test that fullscreen ads read user key value data using ACTUAL key
 - (void)testPublisherFullscreenReadsUserKeyValue {
     // Set up user key value data with ACTUAL unprefixed key
     NSDictionary *userKeyValue = @{@"fullscreen_user_data": @"fullscreen_value"};
     [[NSUserDefaults standardUserDefaults] setObject:userKeyValue forKey:kCLXCoreUserKeyValueKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    // Create CLXPublisherFullscreenAd instance
-    CLXPublisherFullscreenAd *fullscreen = [[CLXPublisherFullscreenAd alloc] init];
+    // Create CLXInterstitial instance (concrete fullscreen ad class)
+    CLXInterstitial *fullscreen = [[CLXInterstitial alloc] init];
     
     // Verify it can read the user key value data with ACTUAL unprefixed key
     NSDictionary *storedUserKeyValue = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
-    XCTAssertEqualObjects(storedUserKeyValue, userKeyValue, @"CLXPublisherFullscreenAd should read user key value with unprefixed key");
+    XCTAssertEqualObjects(storedUserKeyValue, userKeyValue, @"Fullscreen ads should read user key value with unprefixed key");
 }
 
 #pragma mark - Collision Risk Tests

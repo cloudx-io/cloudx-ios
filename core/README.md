@@ -271,7 +271,7 @@ Interstitial ads are full-screen ads that appear between app content.
 
 ```objc
 @interface YourViewController () <CLXInterstitialDelegate>
-@property (nonatomic, strong) CLXPublisherFullscreenAd *interstitialAd;
+@property (nonatomic, strong) CLXInterstitial *interstitialAd;
 @end
 
 @implementation YourViewController
@@ -406,7 +406,7 @@ Rewarded ads are full-screen ads that provide rewards to users for watching.
 
 ```objc
 @interface YourViewController () <CLXRewardedDelegate>
-@property (nonatomic, strong) CLXPublisherFullscreenAd *rewardedAd;
+@property (nonatomic, strong) CLXRewarded *rewardedAd;
 @end
 
 @implementation YourViewController

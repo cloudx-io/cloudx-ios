@@ -24,19 +24,19 @@ static const double kTestPrice = 5.99;
 // MARK: - Import private enum definition for testing
 
 // Copy the enum definition from the implementation file for testing
-typedef NS_ENUM(NSInteger, CLXInterstitialState) {
-    CLXInterstitialStateIDLE,      // No ad loaded, ready to start loading
-    CLXInterstitialStateLOADING,   // Ad request in progress
-    CLXInterstitialStateREADY,     // Ad loaded and ready to display
-    CLXInterstitialStateSHOWING,   // Ad currently visible to user
-    CLXInterstitialStateDESTROYED  // Ad destroyed, no further operations allowed
+typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
+    CLXFullscreenAdStateIDLE,      // No ad loaded, ready to start loading
+    CLXFullscreenAdStateLOADING,   // Ad request in progress
+    CLXFullscreenAdStateREADY,     // Ad loaded and ready to display
+    CLXFullscreenAdStateSHOWING,   // Ad currently visible to user
+    CLXFullscreenAdStateDESTROYED  // Ad destroyed, no further operations allowed
 };
 
 // MARK: - Categories to expose private methods and properties
 
-@interface CLXPublisherFullscreenAd (Testing) <CLXAdapterInterstitialDelegate, CLXAdapterRewardedDelegate>
-@property (nonatomic, assign) CLXInterstitialState currentState;
-@property (nonatomic, strong) id<CLXAdapterInterstitial> currentInterstitialAdapter;
+@interface CLXInterstitial (Testing) <CLXAdapterInterstitialDelegate, CLXAdapterRewardedDelegate>
+@property (nonatomic, assign) CLXFullscreenAdState currentState;
+@property (nonatomic, strong) id<CLXAdapterInterstitial> currentAdapter;
 @property (nonatomic, strong) CLXBidResponse *currentBidResponse;
 @property (nonatomic, strong) id<CLXAdEventReporting> reportingService;
 - (void)handleBidResponse:(CLXBidAdSourceResponse *)response;
@@ -267,7 +267,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 // MARK: - Test Class
 
 @interface CLXInterstitialLifecycleTests : XCTestCase
-@property (nonatomic, strong) CLXPublisherFullscreenAd *interstitial;
+@property (nonatomic, strong) CLXInterstitial *interstitial;
 @property (nonatomic, strong) MockInterstitialDelegate *mockDelegate;
 @property (nonatomic, strong) MockAdEventReporter *mockReporter;
 @property (nonatomic, strong) MockCLXWinLossTracker *mockWinLossTracker;
@@ -278,7 +278,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 
 // MARK: - Helper Methods for Runtime Property Access
 
-- (void)setCurrentState:(CLXInterstitialState)state onInterstitial:(CLXPublisherFullscreenAd *)interstitial {
+- (void)setCurrentState:(CLXFullscreenAdState)state onInterstitial:(CLXInterstitial *)interstitial {
     // Use KVC (Key-Value Coding) to set the private property safely
     @try {
         [interstitial setValue:@(state) forKey:@"currentState"];
@@ -289,12 +289,12 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     }
 }
 
-- (CLXInterstitialState)getCurrentStateFromInterstitial:(CLXPublisherFullscreenAd *)interstitial {
+- (CLXFullscreenAdState)getCurrentStateFromInterstitial:(CLXInterstitial *)interstitial {
     // Try to get the actual private property using KVC first
     @try {
         NSNumber *stateNumber = [interstitial valueForKey:@"currentState"];
         if (stateNumber) {
-            return (CLXInterstitialState)[stateNumber integerValue];
+            return (CLXFullscreenAdState)[stateNumber integerValue];
         }
     } @catch (NSException *exception) {
         NSLog(@"Could not get currentState via KVC, using associated object: %@", exception.reason);
@@ -302,7 +302,7 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     
     // Fallback to associated object
     NSNumber *stateNumber = objc_getAssociatedObject(interstitial, @selector(currentState));
-    return stateNumber ? (CLXInterstitialState)[stateNumber integerValue] : CLXInterstitialStateIDLE;
+    return stateNumber ? (CLXFullscreenAdState)[stateNumber integerValue] : CLXFullscreenAdStateIDLE;
 }
 
 - (void)setUp {
@@ -359,20 +359,18 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
                 auctionID:@"test-auction-id"
             testGroupName:@"test-group"];
     
-    self.interstitial = [[CLXPublisherFullscreenAd alloc] initWithInterstitialDelegate:self.mockDelegate
-                                                                      rewardedDelegate:nil
-                                                                             placement:placement
-                                                                           publisherID:@"test-publisher"
-                                                                                userID:@"test-user"
-                                                                   rewardedCallbackUrl:nil
-                                                                              impModel:impModel
-                                                                           adFactories:nil
-                                                              waterfallMaxBackOffTime:@10.0
-                                                                       bidTokenSources:@{}
-                                                                    bidRequestTimeout:3.0
-                                                                     reportingService:self.mockReporter
-                                                                             settings:[CLXSettings sharedInstance]
-                                                                               adType:CLXAdTypeInterstitial];
+    self.interstitial = [[CLXInterstitial alloc] initWithPlacement:placement
+                                                                     publisherID:@"test-publisher"
+                                                                          userID:@"test-user"
+                                                             rewardedCallbackUrl:nil
+                                                                        impModel:impModel
+                                                                     adFactories:nil
+                                                        waterfallMaxBackOffTime:@10.0
+                                                                bidTokenSources:@{}
+                                                               bidRequestTimeout:3.0
+                                                                reportingService:self.mockReporter
+                                                                        settings:[CLXSettings sharedInstance]];
+    self.interstitial.delegate = self.mockDelegate;
 }
 
 - (void)tearDown {
@@ -395,8 +393,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 
 - (void)testInitialState {
     // Verifies that a newly created interstitial ad starts in the IDLE state and is not ready to show
-    CLXInterstitialState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
-    XCTAssertEqual(currentState, CLXInterstitialStateIDLE, @"Interstitial should start in IDLE state");
+    CLXFullscreenAdState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
+    XCTAssertEqual(currentState, CLXFullscreenAdStateIDLE, @"Interstitial should start in IDLE state");
     XCTAssertFalse([self.interstitial isReady], @"Interstitial should not be ready initially");
 }
 
@@ -405,15 +403,15 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Note: This would require mocking the bid source, so we'll test the state directly
     
     // Simulate starting a load
-    [self setCurrentState:CLXInterstitialStateLOADING onInterstitial:self.interstitial];
-    CLXInterstitialState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
-    XCTAssertEqual(currentState, CLXInterstitialStateLOADING, @"State should transition to LOADING");
+    [self setCurrentState:CLXFullscreenAdStateLOADING onInterstitial:self.interstitial];
+    CLXFullscreenAdState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
+    XCTAssertEqual(currentState, CLXFullscreenAdStateLOADING, @"State should transition to LOADING");
 }
 
 - (void)testStateTransitionFromLoadingToReady {
     // Verifies that the interstitial transitions from LOADING to READY state when an ad successfully loads
-    [self setCurrentState:CLXInterstitialStateLOADING onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateLOADING onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     // Create mock bid response
     CLXBidResponseBid *mockBid = [[CLXBidResponseBid alloc] init];
@@ -428,23 +426,23 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Simulate adapter load success
     [self.interstitial didLoadWithInterstitial:self.mockAdapter];
     
-    CLXInterstitialState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
-    XCTAssertEqual(currentState, CLXInterstitialStateREADY, @"State should transition to READY after successful load");
+    CLXFullscreenAdState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
+    XCTAssertEqual(currentState, CLXFullscreenAdStateREADY, @"State should transition to READY after successful load");
     XCTAssertTrue([self.interstitial isReady], @"Interstitial should be ready after successful load");
 }
 
 - (void)testStateTransitionFromLoadingToIdleOnFailure {
     // Verifies that the interstitial transitions from LOADING back to IDLE state when ad loading fails
-    [self setCurrentState:CLXInterstitialStateLOADING onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateLOADING onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     NSError *testError = [NSError errorWithDomain:@"TestError" code:1001 userInfo:@{NSLocalizedDescriptionKey: @"Load failed"}];
     
     // Simulate adapter load failure
     [self.interstitial didFailToLoadWithInterstitial:self.mockAdapter error:testError];
     
-    CLXInterstitialState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
-    XCTAssertEqual(currentState, CLXInterstitialStateIDLE, @"State should transition back to IDLE after load failure");
+    CLXFullscreenAdState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
+    XCTAssertEqual(currentState, CLXFullscreenAdStateIDLE, @"State should transition back to IDLE after load failure");
     XCTAssertFalse([self.interstitial isReady], @"Interstitial should not be ready after load failure");
 }
 
@@ -452,8 +450,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Verifies that the interstitial can be shown when in READY state and calls the adapter correctly
     
     // Set up the interstitial with a mock adapter and ready state
-    [self setCurrentState:CLXInterstitialStateREADY onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateREADY onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     // Simulate show by calling showFromViewController
     UIViewController *testViewController = [[UIViewController alloc] init];
@@ -469,8 +467,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
 
 - (void)testStateTransitionFromShowingToIdleOnClose {
     // Verifies that the interstitial handles close events correctly and becomes ready for new loads
-    [self setCurrentState:CLXInterstitialStateSHOWING onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateSHOWING onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     // Set up expectation for delegate callback
     XCTestExpectation *expectation = [self expectationWithDescription:@"didHideWithAd callback"];
@@ -499,8 +497,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     XCTestExpectation *expectation = [self expectationWithDescription:@"didLoadWithAd callback"];
     
     // Set up the interstitial in loading state
-    [self setCurrentState:CLXInterstitialStateLOADING onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateLOADING onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     // Simulate successful load
     [self.interstitial didLoadWithInterstitial:self.mockAdapter];
@@ -520,8 +518,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Verifies that the failToLoadWithAd delegate callback is triggered when an interstitial fails to load
     XCTestExpectation *expectation = [self expectationWithDescription:@"failToLoadWithAd callback"];
     
-    [self setCurrentState:CLXInterstitialStateLOADING onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateLOADING onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     NSError *testError = [NSError errorWithDomain:@"TestError" code:1001 userInfo:@{NSLocalizedDescriptionKey: @"Load failed"}];
     
@@ -541,8 +539,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Verifies that the didShowWithAd delegate callback is triggered when an interstitial is displayed to the user
     XCTestExpectation *expectation = [self expectationWithDescription:@"didShowWithAd callback"];
     
-    [self setCurrentState:CLXInterstitialStateREADY onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateREADY onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     // Simulate show
     [self.interstitial didShowWithInterstitial:self.mockAdapter];
@@ -561,8 +559,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Verifies that the impressionOn delegate callback is triggered when an interstitial impression is recorded
     XCTestExpectation *expectation = [self expectationWithDescription:@"impressionOn callback"];
     
-    [self setCurrentState:CLXInterstitialStateSHOWING onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateSHOWING onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     // Simulate impression
     [self.interstitial impressionWithInterstitial:self.mockAdapter];
@@ -581,8 +579,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Verifies that the didClickWithAd delegate callback is triggered when a user clicks on the interstitial
     XCTestExpectation *expectation = [self expectationWithDescription:@"didClickWithAd callback"];
     
-    [self setCurrentState:CLXInterstitialStateSHOWING onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateSHOWING onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     // Simulate click
     [self.interstitial clickWithInterstitial:self.mockAdapter];
@@ -601,8 +599,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Verifies that the didHideWithAd delegate callback is triggered when an interstitial is closed or hidden
     XCTestExpectation *expectation = [self expectationWithDescription:@"didHideWithAd callback"];
     
-    [self setCurrentState:CLXInterstitialStateSHOWING onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateSHOWING onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     // Simulate close
     [self.interstitial didCloseWithInterstitial:self.mockAdapter];
@@ -638,8 +636,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Add bid to mock tracker so it can be found for win notification
     [self.mockWinLossTracker addBid:kTestAuctionID bid:mockBid];
     
-    [self setCurrentState:CLXInterstitialStateSHOWING onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateSHOWING onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     // Set up the mock adapter with the test bid ID
     self.mockAdapter.bidID = kTestBidID;
@@ -674,8 +672,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Verifies that no NURL is fired when there is no bid response available for the interstitial
     
     self.interstitial.currentBidResponse = nil;
-    [self setCurrentState:CLXInterstitialStateSHOWING onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateSHOWING onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     // Simulate impression
     [self.interstitial impressionWithInterstitial:self.mockAdapter];
@@ -696,8 +694,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     mockBidResponse.testBid = mockBid;
     self.interstitial.currentBidResponse = mockBidResponse;
     
-    [self setCurrentState:CLXInterstitialStateSHOWING onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateSHOWING onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     // Simulate impression
     [self.interstitial impressionWithInterstitial:self.mockAdapter];
@@ -728,8 +726,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     [self.mockWinLossTracker addBid:kTestAuctionID bid:mockBid];
     
     // Start with loading state and adapter
-    [self setCurrentState:CLXInterstitialStateLOADING onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateLOADING onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     // Set up the mock adapter with the test bid ID
     self.mockAdapter.bidID = kTestBidID;
@@ -777,8 +775,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         }
         
         // Verify final state
-        CLXInterstitialState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
-        XCTAssertEqual(currentState, CLXInterstitialStateIDLE, @"Should return to IDLE after close");
+        CLXFullscreenAdState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
+        XCTAssertEqual(currentState, CLXFullscreenAdStateIDLE, @"Should return to IDLE after close");
         
         [expectation fulfill];
     });
@@ -790,8 +788,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
     // Tests the interstitial lifecycle when loading fails, verifying proper error handling and state transitions
     XCTestExpectation *expectation = [self expectationWithDescription:@"Load failure lifecycle"];
     
-    [self setCurrentState:CLXInterstitialStateLOADING onInterstitial:self.interstitial];
-    self.interstitial.currentInterstitialAdapter = self.mockAdapter;
+    [self setCurrentState:CLXFullscreenAdStateLOADING onInterstitial:self.interstitial];
+    self.interstitial.currentAdapter = self.mockAdapter;
     
     // Set up bid response data required for loss notification
     CLXBidResponseBid *testBid = [[CLXBidResponseBid alloc] init];
@@ -852,8 +850,8 @@ typedef NS_ENUM(NSInteger, CLXInterstitialState) {
         }
         
         // Verify state reset
-        CLXInterstitialState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
-        XCTAssertEqual(currentState, CLXInterstitialStateIDLE, @"Should return to IDLE after load failure");
+        CLXFullscreenAdState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
+        XCTAssertEqual(currentState, CLXFullscreenAdStateIDLE, @"Should return to IDLE after load failure");
         
         [expectation fulfill];
     });

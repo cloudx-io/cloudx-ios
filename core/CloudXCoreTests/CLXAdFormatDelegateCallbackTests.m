@@ -17,8 +17,8 @@
 
 // Ad format instances for testing
 @property (nonatomic, strong) CLXPublisherBanner *bannerPublisher;
-@property (nonatomic, strong) CLXPublisherFullscreenAd *interstitialPublisher;
-@property (nonatomic, strong) CLXPublisherFullscreenAd *rewardedPublisher;
+@property (nonatomic, strong) CLXInterstitial *interstitialPublisher;
+@property (nonatomic, strong) CLXRewarded *rewardedPublisher;
 @property (nonatomic, strong) CLXNativeAdView *nativeAdView;
 @property (nonatomic, strong) CLXBannerAdView *bannerAdView;
 

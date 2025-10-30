@@ -73,8 +73,8 @@
  * This test ensures the method exists and is callable
  */
 - (void)testFullscreenPublisher_HasFireLosingBidLurlsMethod {
-    // Given: CLXPublisherFullscreenAd class
-    Class fullscreenClass = [CLXPublisherFullscreenAd class];
+    // Given: CLXPublisherFullscreenAdBase class (base for interstitial and rewarded)
+    Class fullscreenClass = [CLXPublisherFullscreenAdBase class];
     
     // Then: Should have fireLosingBidLurls method
     XCTAssertTrue([fullscreenClass instancesRespondToSelector:@selector(fireLosingBidLurls)], 
@@ -123,7 +123,7 @@
 - (void)testAllPublishers_HaveIdenticalFireLosingBidLurlsSignature {
     NSArray *publisherClasses = @[
         [CLXPublisherBanner class],
-        [CLXPublisherFullscreenAd class],
+        [CLXPublisherFullscreenAdBase class],
         [CLXPublisherNative class]
     ];
     

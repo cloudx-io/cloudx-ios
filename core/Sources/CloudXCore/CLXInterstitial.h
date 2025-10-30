@@ -3,28 +3,27 @@
  */
 
 /**
- * @file CloudXInterstitial.h
- * @brief Interstitial ad protocol
+ * @file CLXInterstitial.h
+ * @brief Interstitial ad class
  */
 
 #import <UIKit/UIKit.h>
-#import <CloudXCore/CLXAd.h>
-#import <CloudXCore/CLXFullscreenAd.h>
+#import <CloudXCore/CLXPublisherFullscreenAdBase.h>
+#import <CloudXCore/CLXInterstitialDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * CloudXInterstitial is an interface of interstitial ad in the CloudX SDK. 
- * It inherits from the CloudXAd protocol.
+ * CLXInterstitial represents an interstitial ad in the CloudX SDK.
+ * Interstitial ads are full-screen ads that appear at natural transition points in an app.
  */
-@protocol CLXInterstitial <CLXFullscreenAd>
+@interface CLXInterstitial : CLXPublisherFullscreenAdBase
 
 /**
- * An optional delegate that conforms to the CLXInterstitialDelegate protocol. 
- * This delegate will receive events related to the interstitial ad.
+ * Delegate that receives events related to the interstitial ad.
  */
-@property (nonatomic, weak, nullable) id<CLXInterstitialDelegate> interstitialDelegate;
+@property (nonatomic, weak, nullable) id<CLXInterstitialDelegate> delegate;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

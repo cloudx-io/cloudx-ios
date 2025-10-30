@@ -14,7 +14,6 @@
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXPrivacyService.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
-#import <CloudXCore/CLXPublisherFullscreenAd.h>
 #import <CloudXCore/CLXPublisherBanner.h>
 #import <CloudXCore/CLXPublisherNative.h>
 

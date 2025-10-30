@@ -230,8 +230,8 @@ XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should handle nil 
  * This would have caught the original bug where fullscreen ads were missing this method!
  */
 - (void)testFullscreenPublisher_HasFireLosingBidLurlsMethod {
-    // Given: CLXPublisherFullscreenAd class
-    Class fullscreenClass = [CLXPublisherFullscreenAd class];
+    // Given: CLXPublisherFullscreenAdBase class
+    Class fullscreenClass = [CLXPublisherFullscreenAdBase class];
     
     // Then: Should respond to fireLosingBidLurls selector
     XCTAssertTrue([fullscreenClass instancesRespondToSelector:@selector(fireLosingBidLurls)], 
@@ -243,8 +243,8 @@ XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should handle nil 
  * This is the REAL integration test that would have caught the original bug
  */
 - (void)testFullscreenPublisher_FireLosingBidLurls_CallsWinLossTracker {
-    // Given: Create a REAL CLXPublisherFullscreenAd instance
-    CLXPublisherFullscreenAd *fullscreenPublisher = [[CLXPublisherFullscreenAd alloc] init];
+    // Given: Create a REAL CLXInterstitial instance (concrete fullscreen ad class)
+    CLXInterstitial *fullscreenPublisher = [[CLXInterstitial alloc] init];
     
     // Set up the fullscreen's bid response data
     CLXBidResponse *bidResponse = [self createMultiBidResponse];
@@ -274,7 +274,7 @@ XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should handle nil 
  */
 - (void)testFullscreenPublisher_DidLoadWithRewarded_CallsFireLosingBidLurls {
     // Same logic as interstitial - verify the method exists and integration works
-    Class fullscreenClass = [CLXPublisherFullscreenAd class];
+    Class fullscreenClass = [CLXPublisherFullscreenAdBase class];
     
     XCTAssertTrue([fullscreenClass instancesRespondToSelector:@selector(fireLosingBidLurls)], 
                   @"didLoadWithRewarded must be able to call fireLosingBidLurls");
@@ -350,7 +350,7 @@ XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should handle nil 
     // These are the ACTUAL publisher classes that need the fireLosingBidLurls method
     NSArray *publisherClassesAndNames = @[
         @{@"class": [CLXPublisherBanner class], @"name": @"CLXPublisherBanner"},
-        @{@"class": [CLXPublisherFullscreenAd class], @"name": @"CLXPublisherFullscreenAd"}, 
+        @{@"class": [CLXPublisherFullscreenAdBase class], @"name": @"CLXPublisherFullscreenAdBase"}, 
         @{@"class": [CLXPublisherNative class], @"name": @"CLXPublisherNative"}
     ];
     
@@ -371,7 +371,7 @@ XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should handle nil 
 - (void)testAllPublisherClasses_HaveConsistentFireLosingBidLurlsSignature {
     NSArray *publisherClasses = @[
         [CLXPublisherBanner class],
-        [CLXPublisherFullscreenAd class],
+        [CLXPublisherFullscreenAdBase class],
         [CLXPublisherNative class]
     ];
     
