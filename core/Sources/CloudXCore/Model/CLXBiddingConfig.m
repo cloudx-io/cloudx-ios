@@ -439,7 +439,7 @@ static void initializeLogger() {
             // Set test flag based on simulator detection and build configuration
             // Simulator (any build) → test=1 (Meta registers simulator as test device)
             // Real device + DEBUG → test=1 (device registered as test device in Meta adapter)
-            // Real device + RELEASE → test=nil (device not registered, real production ads only)
+            // Real device + RELEASE → test=0 (production mode)
             #if TARGET_IPHONE_SIMULATOR
             _test = @1;
             [logger debug:@"🔧 [BiddingConfig] Simulator detected - test flag set to: 1"];
@@ -448,8 +448,8 @@ static void initializeLogger() {
             _test = @1;
             [logger debug:@"🔧 [BiddingConfig] Real device + DEBUG build - test flag set to: 1"];
             #else
-            _test = nil;
-            [logger debug:@"🔧 [BiddingConfig] Real device + RELEASE build - test flag excluded"];
+            _test = @0;
+            [logger debug:@"🔧 [BiddingConfig] Real device + RELEASE build - test flag set to: 0"];
             #endif
             #endif
         }
