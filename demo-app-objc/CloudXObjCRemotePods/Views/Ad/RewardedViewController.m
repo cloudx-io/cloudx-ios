@@ -75,10 +75,6 @@
 }
 
 - (void)loadRewardedAd {
-    if (![[CloudXCore shared] isInitialized]) {
-        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
-        return;
-    }
     
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"Rewarded ad is already loading."];
@@ -95,10 +91,6 @@
 
 - (void)loadRewarded {
     NSLog(@"[RewardedViewController] loadRewarded called");
-    if (![[CloudXCore shared] isInitialized]) {
-        NSLog(@"[RewardedViewController] SDK not initialized");
-        return;
-    }
 
     if (self.isLoading || self.rewardedAd) {
         NSLog(@"[RewardedViewController] Rewarded ad process already started");
@@ -114,9 +106,6 @@
         placement = _settings.rewardedPlacement;
     }
     NSLog(@"[RewardedViewController] Using placement: %@", placement);
-    
-    // Log SDK configuration details
-    NSLog(@"[RewardedViewController] SDK initialization status: %d", [[CloudXCore shared] isInitialized]);
     
     // Create rewarded with comprehensive logging
     NSLog(@"[RewardedViewController] Calling createRewardedWithPlacement: %@", placement);
@@ -275,27 +264,11 @@
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Rewarded revenuePaid" ad:ad];
 }
 
-- (void)closedByUserActionWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ Rewarded closedByUserActionWithAd - Ad: %@", ad]];
-    self.rewardedAd = nil;
-    // Create new ad instance for next time
-    [self createRewardedAd];
-    [self updateStatusUIWithState:AdStateNoAd];
-}
-
 - (void)userRewarded:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🎁 Rewarded userRewarded - Ad: %@", ad]];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showAlertWithTitle:@"Reward" message:@"User has earned a reward!"];
     });
-}
-
-- (void)rewardedVideoStarted:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"▶️ Rewarded rewardedVideoStarted - Ad: %@", ad]];
-}
-
-- (void)rewardedVideoCompleted:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ Rewarded rewardedVideoCompleted - Ad: %@", ad]];
 }
 
 @end 

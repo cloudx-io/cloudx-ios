@@ -77,10 +77,6 @@
 }
 
 - (void)loadInterstitialAd {
-    if (![[CloudXCore shared] isInitialized]) {
-        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
-        return;
-    }
     
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"Interstitial is already loading."];
@@ -96,9 +92,6 @@
 }
 
 - (void)loadInterstitial {
-    if (![[CloudXCore shared] isInitialized]) {
-        return;
-    }
 
     if (self.isLoading || self.interstitialAd) {
         return;
@@ -132,10 +125,6 @@
 
 
 - (void)showInterstitialAd {
-    if (![[CloudXCore shared] isInitialized]) {
-        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
-        return;
-    }
     
     if (!self.interstitialAd) {
         [self showAlertWithTitle:@"Error" message:@"No interstitial loaded. Please load an interstitial first."];
@@ -216,15 +205,6 @@
 
 - (void)revenuePaid:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Interstitial revenuePaid" ad:ad];
-}
-
-- (void)closedByUserActionWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ Interstitial closedByUserActionWithAd - Ad: %@", ad]];
-    self.showAdWhenLoaded = NO;
-    self.interstitialAd = nil;
-    // Create new ad instance for next time
-    [self loadInterstitial];
-    [self updateStatusUIWithState:AdStateNoAd];
 }
 
 @end 

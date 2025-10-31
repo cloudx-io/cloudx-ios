@@ -222,27 +222,12 @@
 
 #pragma mark - Publisher API Tests
 
-// Test publisher API methods work correctly
-- (void)testPublisherAPIIntegration {
-    NSString *testGppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
-    NSArray *testGppSid = @[@7, @8];
-    
-    // Test CloudXCore API integration
-    [CloudXCore setGPPString:testGppString];
-    [CloudXCore setGPPSid:testGppSid];
-    
-    NSString *retrievedString = [CloudXCore getGPPString];
-    NSArray *retrievedSid = [CloudXCore getGPPSid];
-    
-    XCTAssertEqualObjects(retrievedString, testGppString, @"CloudXCore GPP string API should work");
-    XCTAssertEqualObjects(retrievedSid, testGppSid, @"CloudXCore GPP SID API should work");
-    
-    // Test clearing
-    [CloudXCore setGPPString:nil];
-    [CloudXCore setGPPSid:nil];
-    
-    XCTAssertNil([CloudXCore getGPPString], @"Should clear GPP string");
-    XCTAssertNil([CloudXCore getGPPSid], @"Should clear GPP SID");
-}
+// NOTE: Public GPP API methods (setGPPString, getGPPString, setGPPSid, getGPPSid) 
+// were intentionally removed to align with Android's approach.
+// iOS now reads GPP data from IAB standard UserDefaults keys, just like Android reads
+// from IAB standard SharedPreferences.
+//
+// GPP functionality is tested via CLXGPPProvider directly (see tests above).
+// Publishers should set GPP data via IAB-standard mechanisms, not CloudX SDK.
 
 @end

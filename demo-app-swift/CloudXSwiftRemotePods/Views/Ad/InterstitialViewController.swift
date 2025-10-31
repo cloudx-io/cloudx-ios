@@ -61,10 +61,6 @@ class InterstitialViewController: BaseAdViewController {
     }
     
     @objc private func loadInterstitialAd() {
-        if !cloudX.isInitialized {
-            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
-            return
-        }
         
         if isLoading {
             showAlert(title: "Info", message: "Interstitial is already loading.")
@@ -80,9 +76,6 @@ class InterstitialViewController: BaseAdViewController {
     }
     
     private func loadInterstitial() {
-        if !cloudX.isInitialized {
-            return
-        }
 
         if isLoading || interstitialAd != nil {
             return
@@ -98,7 +91,7 @@ class InterstitialViewController: BaseAdViewController {
             placement = settings.interstitialPlacement
         }
         
-        interstitialAd = cloudX.createInterstitial(withPlacement: placement, delegate: self)
+        interstitialAd = cloudX.createInterstitial(placement: placement, delegate: self)
         
         if let interstitialAd = interstitialAd {
             interstitialAd.load()
@@ -164,10 +157,6 @@ class InterstitialViewController: BaseAdViewController {
     // Remove the old createInterstitialAd and polling methods - they're replaced by loadInterstitial
     
     @objc private func showInterstitialAd() {
-        if !cloudX.isInitialized {
-            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
-            return
-        }
         
         guard let interstitialAd = interstitialAd else {
             showAlert(title: "Error", message: "No interstitial loaded. Please load an interstitial first.")
@@ -249,14 +238,5 @@ extension InterstitialViewController: CLXInterstitialDelegate {
     
     func revenuePaid(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("💰 Interstitial revenuePaid", ad: ad)
-    }
-    
-    func closedByUserAction(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logMessage("✋ Interstitial closedByUserActionWithAd - Ad: \(ad)")
-        showAdWhenLoaded = false
-        interstitialAd = nil
-        // Create new ad instance for next time
-        loadInterstitial()
-        updateStatusUI(state: AdState.noAd)
     }
 } 

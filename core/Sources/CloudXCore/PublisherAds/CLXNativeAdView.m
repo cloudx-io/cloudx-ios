@@ -185,11 +185,6 @@ static void initializeLogger() {
 
 - (void)closeWithNative:(id<CLXAdapterNative>)native {
     [logger debug:@"[CloudXNativeAdView] closeWithNative called"];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(closedByUserActionWithAd:)]) {
-            [self.delegate closedByUserActionWithAd:[CLXAd adFromBid:((CLXPublisherNative *)self.native).lastBidResponse.bid placementId:((CLXPublisherNative *)self.native).placementID placementName:((CLXPublisherNative *)self.native).placementName]];
-        }
-    });
 }
 
 

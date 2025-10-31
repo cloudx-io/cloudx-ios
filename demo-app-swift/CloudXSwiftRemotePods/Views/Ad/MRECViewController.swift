@@ -85,10 +85,6 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
     }
     
     @objc private func loadMRECAd() {
-        if !CloudXCore.shared.isInitialized {
-            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
-            return
-        }
         
         if isLoading {
             showAlert(title: "Info", message: "MREC is already loading.")
@@ -116,7 +112,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         if !settings.mrecPlacement.isEmpty {
             placement = settings.mrecPlacement
         }
-        mrecAd = CloudXCore.shared.createMREC(withPlacement: placement, viewController: self, delegate: self)
+        mrecAd = CloudXCore.shared.createMREC(placement: placement, viewController: self, delegate: self)
         
         guard let mrecAd = mrecAd else {
             showAlert(title: "Error", message: "Failed to create MREC.")
@@ -175,9 +171,6 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
     }
     
     private func loadMREC() {
-        if !CloudXCore.shared.isInitialized {
-            return
-        }
 
         if isLoading || mrecAd != nil {
             return
@@ -187,7 +180,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         updateStatusUI(state: .loading)
 
         let placement = placementName
-        mrecAd = CloudXCore.shared.createMREC(withPlacement: placement,
+        mrecAd = CloudXCore.shared.createMREC(placement: placement,
                                             viewController: self,
                                             delegate: self)
         
@@ -248,11 +241,6 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
     
     func revenuePaid(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("💰 MREC revenuePaid", ad: ad)
-    }
-    
-    func closedByUserAction(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("✋ MREC closedByUserActionWithAd", ad: ad)
-        mrecAd = nil
     }
     
     // Banner-specific delegate methods (MREC is a banner type)

@@ -70,10 +70,6 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
     }
     
     @objc private func loadRewardedAd() {
-        if !CloudXCore.shared.isInitialized {
-            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
-            return
-        }
         
         if isLoading {
             showAlert(title: "Info", message: "Rewarded ad is already loading.")
@@ -90,10 +86,6 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
     
     private func loadRewarded() {
         print("[RewardedViewController] loadRewarded called")
-        if !CloudXCore.shared.isInitialized {
-            print("[RewardedViewController] SDK not initialized")
-            return
-        }
 
         if isLoading || rewardedAd != nil {
             print("[RewardedViewController] Rewarded ad process already started")
@@ -110,12 +102,9 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
         }
         print("[RewardedViewController] Using placement: \(placement)")
         
-        // Log SDK configuration details
-        print("[RewardedViewController] SDK initialization status: \(CloudXCore.shared.isInitialized)")
-        
         // Create rewarded with comprehensive logging
         print("[RewardedViewController] Calling createRewardedWithPlacement: \(placement)")
-        rewardedAd = CloudXCore.shared.createRewarded(withPlacement: placement, delegate: self)
+        rewardedAd = CloudXCore.shared.createRewarded(placement: placement, delegate: self)
         
         if let rewardedAd = rewardedAd {
             print("[RewardedViewController] ✅ Rewarded ad instance created successfully: \(rewardedAd)")
@@ -138,7 +127,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
         guard rewardedAd == nil else { return }
         let placement = placementName
         print("[RewardedViewController] Creating new Rewarded ad instance with placement: \(placement)")
-        rewardedAd = CloudXCore.shared.createRewarded(withPlacement: placement, delegate: self)
+        rewardedAd = CloudXCore.shared.createRewarded(placement: placement, delegate: self)
         if let rewardedAd = rewardedAd {
             print("✅ Rewarded ad instance created successfully: \(rewardedAd)")
             startPollingReadyState()
@@ -269,26 +258,10 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
         DemoAppLogger.sharedInstance.logAdEvent("💰 Rewarded revenuePaid", ad: ad)
     }
     
-    func closedByUserAction(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logMessage("✋ Rewarded closedByUserActionWithAd - Ad: \(ad)")
-        rewardedAd = nil
-        // Create new ad instance for next time
-        createRewardedAd()
-        updateStatusUI(state: .noAd)
-    }
-    
     func userRewarded(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logMessage("🎁 Rewarded userRewarded - Ad: \(ad)")
         DispatchQueue.main.async { [weak self] in
             self?.showAlert(title: "Reward", message: "User has earned a reward!")
         }
-    }
-    
-    func rewardedVideoStarted(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logMessage("▶️ Rewarded rewardedVideoStarted - Ad: \(ad)")
-    }
-    
-    func rewardedVideoCompleted(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logMessage("✅ Rewarded rewardedVideoCompleted - Ad: \(ad)")
     }
 }

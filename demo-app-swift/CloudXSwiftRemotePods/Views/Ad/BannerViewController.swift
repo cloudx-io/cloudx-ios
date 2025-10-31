@@ -13,8 +13,8 @@ class BannerViewController: BaseAdViewController {
         setupUI()
         setupNotifications()
         
-        // Check if SDK is already initialized
-        isSDKInitialized = cloudX.isInitialized
+        // SDK initialization state tracked internally
+        isSDKInitialized = false // Will be set to true after successful initialization
         updateStatusUI(state: .noAd)
     }
     
@@ -69,10 +69,6 @@ class BannerViewController: BaseAdViewController {
     }
     
     @objc private func loadBannerAd() {
-        if !cloudX.isInitialized {
-            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
-            return
-        }
         
         if isLoading {
             showAlert(title: "Info", message: "Banner is already loading.")
@@ -118,7 +114,7 @@ class BannerViewController: BaseAdViewController {
         
         // Create banner ad with placement from config
         let placement = CLXDemoConfigManager.sharedManager.currentConfig.bannerPlacement
-        bannerAd = cloudX.createBanner(withPlacement: placement, 
+        bannerAd = cloudX.createBanner(placement: placement, 
                                       viewController: self, 
                                       delegate: self, 
                                       tmax: nil)
@@ -181,7 +177,7 @@ class BannerViewController: BaseAdViewController {
         
         // Create banner ad with placement from config
         let placement = CLXDemoConfigManager.sharedManager.currentConfig.bannerPlacement
-        bannerAd = cloudX.createBanner(withPlacement: placement, 
+        bannerAd = cloudX.createBanner(placement: placement, 
                                       viewController: self, 
                                       delegate: self, 
                                       tmax: nil)
@@ -286,10 +282,5 @@ extension BannerViewController: CLXBannerDelegate {
     
     func revenuePaid(_ ad: CLXAd) {
         print("💰 Banner revenue paid")
-    }
-    
-    func closedByUserAction(with ad: CLXAd) {
-        print("✋ Banner closed by user action")
-        bannerAd = nil
     }
 } 

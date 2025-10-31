@@ -230,17 +230,6 @@ static void initializeLogger() {
     }
 }
 
-- (void)closedByUserActionBanner:(id<CLXAdapterBanner>)banner {
-    if ([self.delegate respondsToSelector:@selector(closedByUserActionWithAd:)]) {
-        // Use stored ad object (should be populated after didLoadWithAd)
-        if (self.ad) {
-            [self.delegate closedByUserActionWithAd:self.ad];
-        } else {
-            [logger error:@"❌ [CloudXBannerAdView] closedByUserActionBanner called but self.ad is nil"];
-        }
-    }
-}
-
 #pragma mark - BaseAdDelegate
 
 - (void)didLoadWithAd:(CLXAd *)ad {
@@ -321,12 +310,6 @@ static void initializeLogger() {
 - (void)impressionOn:(CLXAd *)ad {
     if ([self.delegate respondsToSelector:@selector(impressionOn:)]) {
         [self.delegate impressionOn:ad];
-    }
-}
-
-- (void)closedByUserActionWithAd:(CLXAd *)ad {
-    if ([self.delegate respondsToSelector:@selector(closedByUserActionWithAd:)]) {
-        [self.delegate closedByUserActionWithAd:ad];
     }
 }
 

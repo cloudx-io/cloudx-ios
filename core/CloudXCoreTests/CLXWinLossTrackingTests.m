@@ -40,6 +40,7 @@ static const NSInteger kTestRank3 = 3;
                      bidIndex:(NSInteger)bidIndex 
                     auctionID:(nullable NSString *)auctionID 
                    bidRequest:(NSDictionary *)bidRequest 
+                correlationId:(NSString *)correlationId
                    completion:(void (^)(CLXBidAdSourceResponse * _Nullable, NSError * _Nullable))completion;
 @end
 
@@ -221,6 +222,7 @@ static const NSInteger kTestRank3 = 3;
                               bidIndex:0 
                              auctionID:kTestAuctionID 
                             bidRequest:@{@"test": @"data"} 
+                         correlationId:@"test-correlation-id"
                             completion:^(CLXBidAdSourceResponse *response, NSError *error) {
         XCTAssertNil(response, @"Response should be nil for failed bid");
         XCTAssertNotNil(error, @"Error should be present for failed bid");
@@ -264,6 +266,7 @@ static const NSInteger kTestRank3 = 3;
                               bidIndex:0 
                              auctionID:kTestAuctionID 
                             bidRequest:@{@"test": @"data"} 
+                         correlationId:@"test-correlation-id"
                             completion:^(CLXBidAdSourceResponse *response, NSError *error) {
         XCTAssertNil(response, @"Response should be nil when all bids fail");
         XCTAssertNotNil(error, @"Error should be present when all bids fail");
@@ -307,6 +310,7 @@ static const NSInteger kTestRank3 = 3;
                               bidIndex:0 
                              auctionID:kTestAuctionID 
                             bidRequest:@{@"test": @"data"} 
+                         correlationId:@"test-correlation-id"
                             completion:^(CLXBidAdSourceResponse *response, NSError *error) {
         XCTAssertNotNil(response, @"Response should be present for successful bid");
         XCTAssertNil(error, @"Error should be nil for successful bid");

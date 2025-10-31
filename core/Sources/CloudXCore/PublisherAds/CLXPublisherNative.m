@@ -383,12 +383,8 @@ NS_ASSUME_NONNULL_BEGIN
     [native destroy];
     self.loadNativeTimesCount = 0;
     
-    // Call both old and new delegate methods for backward compatibility
     if ([self.delegate respondsToSelector:@selector(closeWithNative:)]) {
         [self.delegate closeWithNative:native];
-    }
-    if ([self.delegate respondsToSelector:@selector(closedByUserActionWithAd:)]) {
-        [self.delegate closedByUserActionWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
     }
 }
 

@@ -70,12 +70,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)revenuePaid:(CLXAd *)ad;
 
-/**
- * Called when ad is closed by user action.
- * @param ad The ad that was closed
- */
-- (void)closedByUserActionWithAd:(CLXAd *)ad;
-
 @end
 
 NS_ASSUME_NONNULL_END

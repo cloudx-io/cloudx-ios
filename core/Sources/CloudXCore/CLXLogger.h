@@ -2,6 +2,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, CLXLogLevel) {
+    CLXLogLevelVerbose = 0,
+    CLXLogLevelDebug = 1,
+    CLXLogLevelInfo = 2,
+    CLXLogLevelWarn = 3,
+    CLXLogLevelError = 4
+};
+
 @interface CLXLogger : NSObject
 
 + (instancetype)shared;
@@ -16,6 +24,12 @@ NS_ASSUME_NONNULL_BEGIN
  * @param enabled YES to enable logging, NO to disable
  */
 - (void)setLoggingEnabled:(BOOL)enabled;
+
+/**
+ * Set the minimum log level. Messages below this level will be suppressed.
+ * @param minLogLevel The minimum log level (CLXLogLevel)
+ */
+- (void)setMinLogLevel:(CLXLogLevel)minLogLevel;
 
 @end
 

@@ -81,10 +81,6 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
     }
     
     @objc private func loadNativeAd() {
-        if !CloudXCore.shared.isInitialized {
-            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
-            return
-        }
         
         if isLoading {
             showAlert(title: "Info", message: "Native ad is already loading.")
@@ -100,9 +96,6 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
     }
     
     private func loadNative() {
-        if !CloudXCore.shared.isInitialized {
-            return
-        }
 
         if isLoading || nativeAd != nil {
             return
@@ -112,7 +105,7 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
         updateStatusUI(state: .loading)
 
         let placement = placementName
-        nativeAd = CloudXCore.shared.createNativeAd(withPlacement: placement,
+        nativeAd = CloudXCore.shared.createNativeAd(placement: placement,
                                                    viewController: self,
                                                    delegate: self)
         
@@ -126,10 +119,6 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
     }
     
     @objc private func showNativeAd() {
-        if !CloudXCore.shared.isInitialized {
-            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
-            return
-        }
         
         guard let nativeAd = nativeAd else {
             showAlert(title: "Error", message: "No native ad loaded. Please load a native ad first.")
@@ -214,10 +203,5 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
     
     func revenuePaid(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("💰 Native revenuePaid", ad: ad)
-    }
-    
-    func closedByUserAction(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("✋ Native closedByUserActionWithAd", ad: ad)
-        nativeAd = nil
     }
 }

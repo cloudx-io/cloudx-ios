@@ -109,15 +109,6 @@
     XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"impressionOn should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
-- (void)closedByUserActionWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"closedByUserActionWithAd"];
-    [self.receivedAdObjects addObject:ad ?: [NSNull null]];
-    [self.receivedAdTypes addObject:NSStringFromClass([ad class])];
-    
-    XCTAssertNotNil(ad, @"closedByUserActionWithAd should receive non-nil CLXAd object");
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"closedByUserActionWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
-}
-
 // Rewarded-specific delegate method
 - (void)userDidEarnRewardWithAd:(CLXAd *)ad {
     [self.receivedCallbacks addObject:@"userDidEarnRewardWithAd"];
@@ -189,7 +180,6 @@
     [self didHideWithAd:testAd];
     [self didClickWithAd:testAd];
     [self impressionOn:testAd];
-    [self closedByUserActionWithAd:testAd];
     
     // Test rewarded delegate methods (includes reward callback)
     [self userDidEarnRewardWithAd:testAd];
@@ -200,7 +190,6 @@
     [self didShowWithAd:testAd];
     [self didClickWithAd:testAd];
     [self impressionOn:testAd];
-    [self closedByUserActionWithAd:testAd];
     
     // Verify all callbacks received CLXAd objects
     XCTAssertGreaterThan(self.receivedCallbacks.count, 0, @"Should have received delegate callbacks");

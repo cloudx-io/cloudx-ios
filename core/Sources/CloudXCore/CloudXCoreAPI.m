@@ -489,27 +489,6 @@ static CloudXCore *_sharedInstance = nil;
     }
 }
 
-- (void)initializeSDKWithAppKey:(NSString *)appKey hashedUserID:(NSString *)hashedUserID completion:(void (^)(BOOL, NSError * _Nullable))completion {
-    [self.logger info:[NSString stringWithFormat:@"🚀 [CloudXCore] initializeSDKWithAppKey:hashedUserID called - AppKey: %@", appKey]];
-    
-    // Store hashed user ID
-    [self setHashedUserID:hashedUserID];
-    
-    // Call the main init method
-    [self initializeSDKWithAppKey:appKey completion:^(BOOL success, NSError * _Nullable error) {
-        if (success) {
-            self->_adPlacements = [NSMutableDictionary dictionary];
-            for (CLXSDKConfigPlacement *placement in self->_sdkConfig.placements) {
-                [(NSMutableDictionary *)self->_adPlacements setObject:placement forKey:placement.name];
-            }
-            [self.logger info:[NSString stringWithFormat:@"✅ [CloudXCore] Successfully loaded %lu ad placements", (unsigned long)self->_adPlacements.count]];
-            completion(YES, nil);
-        } else {
-            completion(NO, error);
-        }
-    }];
-}
-
 - (void)setHashedUserID:(NSString *)hashedUserID {
     // Track hashed user ID method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
@@ -992,28 +971,39 @@ static CloudXCore *_sharedInstance = nil;
     [[CLXPrivacyService sharedInstance] setDoNotSell:@(isDoNotSell)];
 }
 
-#pragma mark - GPP (Global Privacy Platform) Settings
-
-+ (void)setGPPString:(nullable NSString *)gppString {
-    [[CLXGPPProvider sharedInstance] setGppString:gppString];
-}
-
-+ (nullable NSString *)getGPPString {
-    return [[CLXGPPProvider sharedInstance] gppString];
-}
-
-+ (void)setGPPSid:(nullable NSArray<NSNumber *> *)gppSid {
-    [[CLXGPPProvider sharedInstance] setGppSid:gppSid];
-}
-
-+ (nullable NSArray<NSNumber *> *)getGPPSid {
-    return [[CLXGPPProvider sharedInstance] gppSid];
-}
-
 #pragma mark - Logging Control
 
 + (void)setLoggingEnabled:(BOOL)enabled {
     [[CLXLogger shared] setLoggingEnabled:enabled];
+}
+
++ (void)setMinLogLevel:(NSInteger)minLogLevel {
+    [[CLXLogger shared] setMinLogLevel:(CLXLogLevel)minLogLevel];
+}
+
+#pragma mark - SDK Lifecycle
+
+- (void)deinitialize {
+    [self.logger info:@"🔄 [CloudXCore] Deinitializing SDK"];
+    
+    // Reset initialization state
+    _isInitialized = NO;
+    _appKey = nil;
+    _sdkConfig = nil;
+    _adNetworkConfigs = nil;
+    _adPlacements = nil;
+    _adFactory = nil;
+    _reportingService = nil;
+    _abTestValue = 0.0;
+    _abTestName = nil;
+    _defaultAuctionURL = nil;
+    _metricsTracker = nil;
+    _geoLocationService = nil;
+    _appSessionService = nil;
+    _bidNetworkService = nil;
+    _adNetworkFactories = nil;
+    
+    [self.logger info:@"✅ [CloudXCore] SDK deinitialized successfully"];
 }
 
 #pragma mark - Testing Support

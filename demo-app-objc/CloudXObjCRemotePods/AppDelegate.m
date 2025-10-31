@@ -78,11 +78,13 @@
     // Clear all CloudXCore privacy test settings to ensure clean state
     // This prevents COPPA, GPP, and other privacy scenarios from persisting across app launches
     [CloudXCore setIsAgeRestrictedUser:NO];
-    [CloudXCore setGPPString:nil];
-    [CloudXCore setGPPSid:nil];
     [CloudXCore setIsUserConsent:YES];
     [CloudXCore setIsDoNotSell:NO];
     [CloudXCore setCCPAPrivacyString:nil];
+    
+    // Clear IAB GPP UserDefaults (CloudX reads from these internally)
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_HDR_GppString"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_GppSID"];
     
     // Also clear any environment overrides
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CLXDemoEnvironment"];

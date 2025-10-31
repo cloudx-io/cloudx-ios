@@ -85,10 +85,6 @@
 }
 
 - (void)loadNativeBannerAd {
-    if (![[CloudXCore shared] isInitialized]) {
-        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
-        return;
-    }
     
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"Native banner is already loading."];
@@ -105,10 +101,6 @@
 
 - (void)loadNativeBanner {
     NSLog(@"[NativeBannerViewController] LOG: loadNativeBanner called");
-    if (![[CloudXCore shared] isInitialized]) {
-        NSLog(@"[NativeBannerViewController] LOG: SDK not initialized, returning.");
-        return;
-    }
 
     if (self.isLoading || self.nativeBannerAd) {
         NSLog(@"[NativeBannerViewController] LOG: Ad process already started, returning.");
@@ -143,12 +135,6 @@
 
 - (void)showNativeBannerAd {
     NSLog(@"[NativeBannerViewController] LOG: showNativeBannerAd called.");
-    
-    if (![[CloudXCore shared] isInitialized]) {
-        NSLog(@"[NativeBannerViewController] LOG: SDK not initialized, showing error");
-        [self showAlertWithTitle:@"SDK Not Ready" message:@"Please wait for SDK initialization to complete."];
-        return;
-    }
     
     if (!self.nativeBannerAd) {
         NSLog(@"[NativeBannerViewController] LOG: No native banner ad instance, loading now...");
@@ -232,11 +218,6 @@
 
 - (void)revenuePaid:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 NativeBanner revenuePaid" ad:ad];
-}
-
-- (void)closedByUserActionWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ NativeBanner closedByUserActionWithAd - Ad: %@", ad]];
-    self.nativeBannerAd = nil;
 }
 
 @end

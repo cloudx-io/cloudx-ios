@@ -84,10 +84,6 @@
 }
 
 - (void)loadNativeAd {
-    if (![[CloudXCore shared] isInitialized]) {
-        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
-        return;
-    }
     
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"Native ad is already loading."];
@@ -103,9 +99,6 @@
 }
 
 - (void)loadNative {
-    if (![[CloudXCore shared] isInitialized]) {
-        return;
-    }
 
     if (self.isLoading || self.nativeAd) {
         return;
@@ -129,10 +122,6 @@
 }
 
 - (void)showNativeAd {
-    if (![[CloudXCore shared] isInitialized]) {
-        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
-        return;
-    }
     
     if (!self.nativeAd) {
         [self showAlertWithTitle:@"Error" message:@"No native ad loaded. Please load a native ad first."];
@@ -219,11 +208,6 @@
 
 - (void)revenuePaid:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Native revenuePaid" ad:ad];
-}
-
-- (void)closedByUserActionWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"✋ Native closedByUserActionWithAd" ad:ad];
-    self.nativeAd = nil;
 }
 
 @end 

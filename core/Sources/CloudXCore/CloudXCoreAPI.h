@@ -42,15 +42,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) NSString *sdkVersion;
 
-/**
- * User ID for tracking
- */
-@property (nonatomic, copy, nullable) NSString *userID;
-
-/**
- * Whether the SDK is initialized
- */
-@property (nonatomic, readonly) BOOL isInitialized;
 
 
 
@@ -61,15 +52,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)initializeSDKWithAppKey:(NSString *)appKey completion:(nullable void (^)(BOOL success, NSError * _Nullable error))completion
     NS_SWIFT_NAME(initializeSDK(appKey:completion:));
-
-/**
- * Initialize the SDK to start serving ads with hashed user ID
- * @param appKey The app key provided by CloudX
- * @param hashedUserID The hashed user ID provided by CloudX
- * @param completion A completion handler that will be called once the SDK is initialized
- */
-- (void)initializeSDKWithAppKey:(NSString *)appKey hashedUserID:(NSString *)hashedUserID completion:(nullable void (^)(BOOL success, NSError * _Nullable error))completion
-    NS_SWIFT_NAME(initializeSDK(appKey:hashedUserID:completion:));
 
 /**
  * Set the hashed user ID for auction requests
@@ -186,13 +168,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                     delegate:(nullable id<CLXNativeDelegate>)delegate
     NS_SWIFT_NAME(createNativeAd(placement:viewController:delegate:));
 
-/**
- * Track SDK errors for analytics reporting
- * @param error The error to track
- */
-+ (void)trackSDKError:(NSError *)error;
-
-#pragma mark - Privacy Settings (Matching Android API)
+#pragma mark - Privacy Settings
 
 /**
  * Set CCPA privacy string
@@ -221,36 +197,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)setIsDoNotSell:(BOOL)isDoNotSell;
 
-#pragma mark - GPP (Global Privacy Platform) Settings
-
-/**
- * Set GPP consent string
- * @param gppString The GPP consent string from IAB framework
- * @discussion GPP (Global Privacy Platform) compliance string for comprehensive privacy management
- */
-+ (void)setGPPString:(nullable NSString *)gppString;
-
-/**
- * Get GPP consent string
- * @return The current GPP consent string, or nil if not set
- * @discussion Retrieves the stored GPP consent string
- */
-+ (nullable NSString *)getGPPString;
-
-/**
- * Set GPP section IDs
- * @param gppSid Array of GPP section IDs indicating applicable privacy frameworks
- * @discussion GPP section identifiers (e.g., @[@7, @8] for US-National and US-CA)
- */
-+ (void)setGPPSid:(nullable NSArray<NSNumber *> *)gppSid;
-
-/**
- * Get GPP section IDs
- * @return Array of GPP section IDs, or nil if not set
- * @discussion Retrieves the stored GPP section identifiers
- */
-+ (nullable NSArray<NSNumber *> *)getGPPSid;
-
 #pragma mark - Logging Control
 
 /**
@@ -260,6 +206,23 @@ NS_ASSUME_NONNULL_BEGIN
  * Call this method early in your app lifecycle, before SDK initialization, to see all logs.
  */
 + (void)setLoggingEnabled:(BOOL)enabled;
+
+/**
+ * Set minimum log level for SDK logging
+ * @param minLogLevel The minimum log level (0=Verbose, 1=Debug, 2=Info, 3=Warning, 4=Error)
+ * @discussion Controls which log messages are displayed. Only logs at or above this level will be shown.
+ * Call this method early in your app lifecycle, before SDK initialization.
+ */
++ (void)setMinLogLevel:(NSInteger)minLogLevel;
+
+#pragma mark - SDK Lifecycle
+
+/**
+ * Deinitialize the SDK and clean up resources
+ * @discussion Tears down the SDK, releases resources, and resets the initialization state.
+ * After calling this, you can reinitialize the SDK if needed.
+ */
+- (void)deinitialize;
 
 @end
 

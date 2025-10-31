@@ -69,14 +69,20 @@
 //     - CloudXCore SDK automatically applies privacy rules
 //     - Bid requests reflect privacy settings (lat/lon removal, etc.)
 //
-//  INTEGRATION WITH CLOUDXCORE SDK:
-//  ----------------------------------
-//  Automatically calls CloudXCore APIs:
-//  - setGPPString: - Sets GPP consent string
-//  - setGPPSid: - Sets GPP Section ID (7=US-National, 8=US-CA/EU)
+//  INTEGRATION WITH IAB STANDARD STORAGE:
+//  ----------------------------------------
+//  Writes directly to IAB standard UserDefaults keys (CloudX reads these internally):
+//  - IABGPP_HDR_GppString - IAB GPP consent string
+//  - IABGPP_GppSID - IAB GPP Section ID (7=US-National, 8=US-CA/EU)
+//  
+//  Also calls CloudXCore public APIs for other privacy settings:
 //  - setIsAgeRestrictedUser: - Enables COPPA compliance
 //  - setIsUserConsent: - Sets user consent flag
 //  - setIsDoNotSell: - Sets CCPA do-not-sell flag
+//  
+//  NOTE: GPP public methods were removed from CloudX SDK to align with Android.
+//  Both platforms now read GPP from IAB standard storage. Publishers should use
+//  IAB CMP SDKs; this component writes to IAB keys for demo/testing purposes only.
 //
 //  TESTING WORKFLOW:
 //  -----------------
@@ -119,14 +125,20 @@
 //      │   - UI (label + button)         │
 //      │   - Action sheet picker         │
 //      │   - Scenario application        │
-//      │   - CloudXCore SDK integration  │
+//      │   - IAB UserDefaults writes     │
 //      └────────────┬────────────────────┘
-//                   │ calls
+//                   │ writes to
 //                   ▼
 //      ┌─────────────────────────────────┐
+//      │   IAB UserDefaults              │
+//      │   - IABGPP_HDR_GppString        │
+//      │   - IABGPP_GppSID               │
+//      └─────────────┬───────────────────┘
+//                    │ read by
+//                    ▼
+//      ┌─────────────────────────────────┐
 //      │   CloudXCore SDK                │
-//      │   - setGPPString:               │
-//      │   - setGPPSid:                  │
+//      │   - Reads GPP internally        │
 //      │   - setIsAgeRestrictedUser:     │
 //      └─────────────────────────────────┘
 

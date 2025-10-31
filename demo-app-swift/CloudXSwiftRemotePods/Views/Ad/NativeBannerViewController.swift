@@ -80,10 +80,6 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
     }
     
     @objc private func loadNativeBannerAd() {
-        if !CloudXCore.shared.isInitialized {
-            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
-            return
-        }
         
         if isLoading {
             showAlert(title: "Info", message: "Native banner is already loading.")
@@ -100,10 +96,6 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
     
     private func loadNativeBanner() {
         print("[NativeBannerViewController] LOG: loadNativeBanner called")
-        if !CloudXCore.shared.isInitialized {
-            print("[NativeBannerViewController] LOG: SDK not initialized, returning.")
-            return
-        }
 
         if isLoading || nativeBannerAd != nil {
             print("[NativeBannerViewController] LOG: Ad process already started, returning.")
@@ -120,7 +112,7 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
         }
         print("[NativeBannerViewController] LOG: Using placement: '\(placement)'")
         
-        nativeBannerAd = CloudXCore.shared.createNativeAd(withPlacement: placement,
+        nativeBannerAd = CloudXCore.shared.createNativeAd(placement: placement,
                                                          viewController: self,
                                                          delegate: self)
         
@@ -138,12 +130,6 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
     
     @objc private func showNativeBannerAd() {
         print("[NativeBannerViewController] LOG: showNativeBannerAd called.")
-        
-        if !CloudXCore.shared.isInitialized {
-            print("[NativeBannerViewController] LOG: SDK not initialized, showing error")
-            showAlert(title: "SDK Not Ready", message: "Please wait for SDK initialization to complete.")
-            return
-        }
         
         guard let nativeBannerAd = nativeBannerAd else {
             print("[NativeBannerViewController] LOG: No native banner ad instance, loading now...")
@@ -225,10 +211,5 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
     
     func revenuePaid(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("💰 NativeBanner revenuePaid", ad: ad)
-    }
-    
-    func closedByUserAction(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logMessage("✋ NativeBanner closedByUserActionWithAd - Ad: \(ad)")
-        nativeBannerAd = nil
     }
 }

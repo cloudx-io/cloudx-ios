@@ -71,8 +71,14 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         CLXDemoConfig *config = [[CLXDemoConfigManager sharedManager] currentConfig];
         NSString *hashedUserId = config.hashedUserId;
+        
+        // Set hashed user ID before initialization if provided
+        if (hashedUserId.length > 0) {
+            [[CloudXCore shared] setHashedUserID:hashedUserId];
+        }
+        
         [self updateStatusUIWithState:AdStateLoading];
-        [[CloudXCore shared] initializeSDKWithAppKey:appKey hashedUserID:hashedUserId completion:^(BOOL success, NSError * _Nullable error) {
+        [[CloudXCore shared] initializeSDKWithAppKey:appKey completion:^(BOOL success, NSError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (success) {
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"cloudXSDKInitialized" object:nil];

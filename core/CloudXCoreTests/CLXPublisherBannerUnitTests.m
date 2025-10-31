@@ -440,7 +440,6 @@ static const NSTimeInterval kTestTimeout = 2.0;
     // Reset delegate
     self.mockDelegate.impressionCalled = NO;
     self.mockDelegate.clickCalled = NO;
-    self.mockDelegate.closedByUserActionCalled = NO;
     
     // Test impressionBanner
     [self.banner impressionBanner:mockAdapter];
@@ -450,9 +449,8 @@ static const NSTimeInterval kTestTimeout = 2.0;
     [self.banner clickBanner:mockAdapter];
     XCTAssertTrue(self.mockDelegate.clickCalled, @"click should be forwarded to delegate");
     
-    // Test closedByUserActionBanner
-    [self.banner closedByUserActionBanner:mockAdapter];
-    XCTAssertTrue(self.mockDelegate.closedByUserActionCalled, @"closedByUserAction should be forwarded to delegate");
+    // NOTE: closedByUserAction callback was intentionally removed from the public API
+    // to align with industry standards (AdMob, MAX, Unity, LevelPlay don't have this callback)
 }
 
 #pragma mark - Destroy and Cleanup Tests

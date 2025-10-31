@@ -53,11 +53,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         print("[RewardedInterstitialViewController] viewWillAppear")
-        if CloudXCore.shared.isInitialized {
-            loadRewardedInterstitial()
-        } else {
-            print("[RewardedInterstitialViewController] SDK not initialized, rewarded interstitial will be loaded once SDK is initialized.")
-        }
+        loadRewardedInterstitial()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -75,10 +71,6 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
     
     private func loadRewardedInterstitial() {
         print("[RewardedInterstitialViewController] loadRewardedInterstitial called")
-        if !CloudXCore.shared.isInitialized {
-            print("[RewardedInterstitialViewController] SDK not initialized")
-            return
-        }
 
         if isLoading || rewardedInterstitialAd != nil {
             print("[RewardedInterstitialViewController] Rewarded interstitial ad process already started")
@@ -94,7 +86,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         
         // Create rewarded interstitial with comprehensive logging
         print("[RewardedInterstitialViewController] Calling createRewardedWithPlacement: \(placement)")
-        rewardedInterstitialAd = CloudXCore.shared.createRewarded(withPlacement: placement, delegate: self)
+        rewardedInterstitialAd = CloudXCore.shared.createRewarded(placement: placement, delegate: self)
         
         if let rewardedInterstitialAd = rewardedInterstitialAd {
             print("[RewardedInterstitialViewController] ✅ Rewarded interstitial ad instance created successfully: \(rewardedInterstitialAd)")
@@ -195,25 +187,10 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         DemoAppLogger.sharedInstance.logMessage("💰 RewardedInterstitial revenuePaid - Ad: \(ad)")
     }
     
-    func closedByUserAction(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logMessage("✋ RewardedInterstitial closedByUserActionWithAd - Ad: \(ad)")
-        rewardedInterstitialAd = nil
-        loadRewardedInterstitial()
-        updateStatusUI(state: .noAd)
-    }
-    
     func userRewarded(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logMessage("🎁 RewardedInterstitial userRewarded - Ad: \(ad)")
         DispatchQueue.main.async { [weak self] in
             self?.showAlert(title: "Reward", message: "User has earned a reward from interstitial!")
         }
-    }
-    
-    func rewardedVideoStarted(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logMessage("▶️ RewardedInterstitial rewardedVideoStarted - Ad: \(ad)")
-    }
-    
-    func rewardedVideoCompleted(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logMessage("✅ RewardedInterstitial rewardedVideoCompleted - Ad: \(ad)")
     }
 }

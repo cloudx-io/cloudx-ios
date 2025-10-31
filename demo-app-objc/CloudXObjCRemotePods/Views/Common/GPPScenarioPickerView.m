@@ -70,15 +70,20 @@
 //     - Requires iOS Settings: Tracking disabled
 //     - Expected: Personal data removed by iOS system
 //
-//  CLOUDXCORE SDK INTEGRATION:
-//  ----------------------------
-//  The component directly calls CloudXCore SDK APIs:
+//  IAB USERDEFAULTS INTEGRATION:
+//  -----------------------------
+//  The component writes directly to IAB standard UserDefaults keys:
 //
-//  - [CloudXCore setGPPString:] - Sets GPP consent string
-//  - [CloudXCore setGPPSid:] - Sets GPP Section ID array
-//  - [CloudXCore setIsAgeRestrictedUser:] - Enables COPPA mode
-//  - [CloudXCore setIsUserConsent:] - Sets user consent flag
-//  - [CloudXCore setIsDoNotSell:] - Sets CCPA do-not-sell flag
+//  - IABGPP_HDR_GppString - IAB GPP consent string (CloudX reads this internally)
+//  - IABGPP_GppSID - IAB GPP Section ID string (CloudX reads this internally)
+//  - [CloudXCore setIsAgeRestrictedUser:] - Enables COPPA mode (CloudX API)
+//  - [CloudXCore setIsUserConsent:] - Sets user consent flag (CloudX API)
+//  - [CloudXCore setIsDoNotSell:] - Sets CCPA do-not-sell flag (CloudX API)
+//
+//  NOTE: GPP methods (setGPPString/setGPPSid) were removed from CloudX public API
+//  to align with Android's approach. Both platforms now read GPP from IAB standard
+//  storage. Publishers should use IAB CMP SDKs; this demo component writes directly
+//  to IAB keys for testing purposes only.
 //
 //  TESTING WORKFLOW:
 //  -----------------
@@ -297,40 +302,40 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
             
         case GPPTestScenarioGPPCCPAConsent:
             [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: CCPA Consent (Allow All) - AUTO-DETECTING LOCATION"];
-            [CloudXCore setGPPString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
-            [CloudXCore setGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
+            [self setIABGPPString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
+            [self setIABGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             break;
             
         case GPPTestScenarioGPPCCPAOptOut:
             [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: CCPA Opt-Out (Disallow All) - AUTO-DETECTING LOCATION"];
-            [CloudXCore setGPPString:@"DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA"];
-            [CloudXCore setGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
+            [self setIABGPPString:@"DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA"];
+            [self setIABGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             break;
             
         case GPPTestScenarioGPPNonUS:
             [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: Non-US (Allow All) - AUTO-DETECTING LOCATION"];
-            [CloudXCore setGPPString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
-            [CloudXCore setGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
+            [self setIABGPPString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
+            [self setIABGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             break;
             
         case GPPTestScenarioGPPUSNonCalifornia:
             [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: US Non-California - AUTO-DETECTING LOCATION"];
-            [CloudXCore setGPPString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
-            [CloudXCore setGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
+            [self setIABGPPString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
+            [self setIABGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             break;
             
         case GPPTestScenarioCOPPAFlagged:
             [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: COPPA Flagged - AUTO-DETECTING LOCATION"];
             [CloudXCore setIsAgeRestrictedUser:YES];
-            [CloudXCore setGPPString:@"DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA"];
-            [CloudXCore setGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
+            [self setIABGPPString:@"DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA"];
+            [self setIABGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             break;
             
         case GPPTestScenarioCOPPAWithConsent:
             [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: COPPA + GPP Consent - AUTO-DETECTING LOCATION"];
             [CloudXCore setIsAgeRestrictedUser:YES];
-            [CloudXCore setGPPString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
-            [CloudXCore setGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
+            [self setIABGPPString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
+            [self setIABGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             break;
             
         case GPPTestScenarioATTDenied:
@@ -341,9 +346,37 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
     }
 }
 
+- (void)setIABGPPString:(nullable NSString *)gppString {
+    if (gppString) {
+        [[NSUserDefaults standardUserDefaults] setObject:gppString forKey:@"IABGPP_HDR_GppString"];
+    } else {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_HDR_GppString"];
+    }
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)setIABGPPSid:(nullable NSArray<NSNumber *> *)gppSid {
+    if (gppSid && gppSid.count > 0) {
+        // Convert array to underscore-delimited string (IAB standard format)
+        NSMutableArray<NSString *> *sidStrings = [NSMutableArray array];
+        for (NSNumber *sid in gppSid) {
+            [sidStrings addObject:[sid stringValue]];
+        }
+        NSString *sidString = [sidStrings componentsJoinedByString:@"_"];
+        [[NSUserDefaults standardUserDefaults] setObject:sidString forKey:@"IABGPP_GppSID"];
+    } else {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_GppSID"];
+    }
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 - (void)resetGPPSettings {
-    [CloudXCore setGPPString:nil];
-    [CloudXCore setGPPSid:nil];
+    // Clear IAB UserDefaults directly (CloudX reads from these)
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_HDR_GppString"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_GppSID"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    // Clear CloudX privacy settings (public APIs that still exist)
     [CloudXCore setIsAgeRestrictedUser:NO];
     [CloudXCore setIsUserConsent:YES];
     [CloudXCore setIsDoNotSell:NO];

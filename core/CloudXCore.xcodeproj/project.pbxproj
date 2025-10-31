@@ -82,7 +82,7 @@
 		198303D12EB1F8CA0080DDAF /* CLXPublisherFullscreenAdBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 198303CE2EB1F8CA0080DDAF /* CLXPublisherFullscreenAdBase.m */; };
 		198303D22EB1F8CA0080DDAF /* CLXRewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = 198303CF2EB1F8CA0080DDAF /* CLXRewarded.m */; };
 		198303D52EB1FA040080DDAF /* CLXPublisherFullscreenAdBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 198303D32EB1FA040080DDAF /* CLXPublisherFullscreenAdBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		198303D62EB1FA040080DDAF /* CLXRewarded.h in Headers */ = {isa = PBXBuildFile; fileRef = 198303D42EB1FA040080DDAF /* CLXRewarded.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1983054C2EB3D0FE0080DDAF /* CloudXCoreInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 1983054B2EB3D0FE0080DDAF /* CloudXCoreInternal.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		19C7247B2E2390420012CFC7 /* CloudXCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C724702E2390420012CFC7 /* CloudXCore.framework */; };
 		19C725472E2390810012CFC7 /* CLXURLProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C7253D2E2390810012CFC7 /* CLXURLProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C725482E2390810012CFC7 /* CLXSessionMetricSpend.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C725392E2390810012CFC7 /* CLXSessionMetricSpend.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -319,7 +319,7 @@
 		19FF30FB2EA6E81A0006F05A /* CLXLoopIndexTrackerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19FF30F72EA6E81A0006F05A /* CLXLoopIndexTrackerTests.m */; };
 		19FF30FC2EA6E81A0006F05A /* CLXSessionDepthUnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19FF30F92EA6E81A0006F05A /* CLXSessionDepthUnitTests.m */; };
 		4CB082B6B56BF7F6E2326FA3 /* CLXPublisherFullscreenAdBase.m in Sources */ = {isa = PBXBuildFile; fileRef = FE130BCA63E61DEDE9759912 /* CLXPublisherFullscreenAdBase.m */; };
-		6956E7B6FB9B6E60A7B2AE46 /* CLXRewarded.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9B871D0C8F2CC740FA93C5 /* CLXRewarded.h */; };
+		6956E7B6FB9B6E60A7B2AE46 /* CLXRewarded.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9B871D0C8F2CC740FA93C5 /* CLXRewarded.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		76C392589B9EB51D6C79360A /* CLXInterstitial.m in Sources */ = {isa = PBXBuildFile; fileRef = 168C26A6C1BC9AE04A765A03 /* CLXInterstitial.m */; };
 		7F95952F0A16C19482E1C8AD /* CLXPublisherFullscreenAdBase.h in Headers */ = {isa = PBXBuildFile; fileRef = D3BD626817D65D02E7871508 /* CLXPublisherFullscreenAdBase.h */; };
 		EA6E5C231326BAA0E6B44342 /* CLXRewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C0B287DB7F3EE0A2635EB97 /* CLXRewarded.m */; };
@@ -416,6 +416,7 @@
 		198303D32EB1FA040080DDAF /* CLXPublisherFullscreenAdBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPublisherFullscreenAdBase.h; sourceTree = "<group>"; };
 		198303D42EB1FA040080DDAF /* CLXRewarded.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXRewarded.h; sourceTree = "<group>"; };
 		198303D72EB269D20080DDAF /* CLXPublisherFullscreenAdBaseInternal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPublisherFullscreenAdBaseInternal.h; sourceTree = "<group>"; };
+		1983054B2EB3D0FE0080DDAF /* CloudXCoreInternal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CloudXCoreInternal.h; sourceTree = "<group>"; };
 		19C724702E2390420012CFC7 /* CloudXCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		19C7247A2E2390420012CFC7 /* CloudXCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		19C7248B2E2390810012CFC7 /* CLXAdapterFactoryResolver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterFactoryResolver.m; sourceTree = "<group>"; };
@@ -663,8 +664,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		19D92D2A2E6E3F0600C84DAE /* Helper */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = Helper;
 			sourceTree = "<group>";
 		};
@@ -1023,6 +1022,7 @@
 		19C725422E2390810012CFC7 /* CloudXCore */ = {
 			isa = PBXGroup;
 			children = (
+				1983054B2EB3D0FE0080DDAF /* CloudXCoreInternal.h */,
 				198303D72EB269D20080DDAF /* CLXPublisherFullscreenAdBaseInternal.h */,
 				198303D32EB1FA040080DDAF /* CLXPublisherFullscreenAdBase.h */,
 				198303D42EB1FA040080DDAF /* CLXRewarded.h */,
@@ -1351,16 +1351,16 @@
 				19EC25492EACB45F005C8EF6 /* CLXVersion.h in Headers */,
 				19656C1C2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h in Headers */,
 				195755392E9DA1E500C9CC76 /* CLXPlacementLoopIndexTracker.h in Headers */,
-				198303D52EB1FA040080DDAF /* CLXPublisherFullscreenAdBase.h in Headers */,
-				198303D62EB1FA040080DDAF /* CLXRewarded.h in Headers */,
 				197992952E75E3B700EBA0A3 /* CLXErrorReporter.h in Headers */,
 				19F592DE2E98365E00C6E11D /* NSDictionary+DynamicPath.h in Headers */,
 				19F592E42E9836CD00C6E11D /* CLXKeyValueState.h in Headers */,
+				198303D52EB1FA040080DDAF /* CLXPublisherFullscreenAdBase.h in Headers */,
+				6956E7B6FB9B6E60A7B2AE46 /* CLXRewarded.h in Headers */,
 				19C7257A2E2390810012CFC7 /* CLXBidNetworkService.h in Headers */,
 				19D92CA22E6E099C00C84DAE /* CLXUserDefaultsKeys.h in Headers */,
 				19C725A72E2390810012CFC7 /* CLXLogger.h in Headers */,
+				1983054C2EB3D0FE0080DDAF /* CloudXCoreInternal.h in Headers */,
 				7F95952F0A16C19482E1C8AD /* CLXPublisherFullscreenAdBase.h in Headers */,
-				6956E7B6FB9B6E60A7B2AE46 /* CLXRewarded.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

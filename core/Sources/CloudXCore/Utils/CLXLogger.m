@@ -8,6 +8,7 @@
 
 // Class-level logging flag that affects all logger instances
 static BOOL _globalLoggingEnabled = NO;
+static CLXLogLevel _globalMinLogLevel = CLXLogLevelVerbose;
 
 @interface CLXLogger ()
 @property (nonatomic, copy) NSString *category;
@@ -38,6 +39,25 @@ static BOOL _globalLoggingEnabled = NO;
     _globalLoggingEnabled = enabled;
 }
 
+- (void)setMinLogLevel:(CLXLogLevel)minLogLevel {
+    _globalMinLogLevel = minLogLevel;
+}
+
+- (CLXLogLevel)logLevelFromOSLogType:(os_log_type_t)type {
+    switch (type) {
+        case OS_LOG_TYPE_DEBUG:
+            return CLXLogLevelDebug;
+        case OS_LOG_TYPE_INFO:
+            return CLXLogLevelInfo;
+        case OS_LOG_TYPE_ERROR:
+            return CLXLogLevelError;
+        case OS_LOG_TYPE_FAULT:
+            return CLXLogLevelError;
+        default:
+            return CLXLogLevelDebug;
+    }
+}
+
 - (NSString *)timestampedMessage:(NSString *)message {
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"HH:mm:ss.SSS"];
@@ -46,11 +66,19 @@ static BOOL _globalLoggingEnabled = NO;
 }
 
 - (void)log:(NSString *)message type:(os_log_type_t)type {
+    CLXLogLevel messageLevel = [self logLevelFromOSLogType:type];
+    
+    // Check if message meets minimum log level threshold
+    if (messageLevel < _globalMinLogLevel) {
+        return;
+    }
+    
     NSString *msgWithTimestamp = [self timestampedMessage:message];
 
     // Always show errors for debuggability
     if (type == OS_LOG_TYPE_ERROR) {
         NSLog(@"%@", msgWithTimestamp);
+        // Also log to os_log for system Console.app (won't duplicate in Xcode if filtering by subsystem)
         os_log_with_type(self.osLog, type, "%{public}@", msgWithTimestamp);
         return;
     }
@@ -61,10 +89,9 @@ static BOOL _globalLoggingEnabled = NO;
     }
     
     // Use NSLog for Xcode console output (publishers expect console visibility)
+    NSLog(@"%@", msgWithTimestamp);
     // Note: Skipping os_log for debug/info to avoid duplication in Xcode console
     // Publishers can enable system logging via Console.app if needed, but most debug in Xcode
-
-    NSLog(@"%@", msgWithTimestamp);
 }
 
 - (void)debug:(NSString *)message {

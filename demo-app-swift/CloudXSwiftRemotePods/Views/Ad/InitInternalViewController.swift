@@ -14,8 +14,8 @@ class InitInternalViewController: BaseAdViewController {
         self.title = "Internal Init"
         setupEnvironmentButtons()
         
-        // Check if SDK is already initialized
-        isSDKInitialized = CloudXCore.shared.isInitialized
+        // SDK initialization state tracked internally
+        isSDKInitialized = false // Will be set to true after successful initialization
         updateStatusUIWithCurrentEnvironment()
     }
     
@@ -206,9 +206,13 @@ class InitInternalViewController: BaseAdViewController {
         
         DemoAppLogger.sharedInstance.logMessage("Initializing SDK with \(environmentName) environment")
         
+        // Set hashed user ID before initialization if provided
+        if !config.hashedUserId.isEmpty {
+            CloudXCore.shared.setHashedUserID(config.hashedUserId)
+        }
+        
         // Use standard CloudXCore initialization which will now use our environment override
-        CloudXCore.shared.initializeSDK(appKey: config.appKey, 
-                                 hashedUserID: config.hashedUserId) { [weak self] success, error in
+        CloudXCore.shared.initializeSDK(appKey: config.appKey) { [weak self] success, error in
             // Clear old environment override after initialization (success or failure)
             UserDefaults.standard.removeObject(forKey: "CLXDemoEnvironment")
             UserDefaults.standard.synchronize()

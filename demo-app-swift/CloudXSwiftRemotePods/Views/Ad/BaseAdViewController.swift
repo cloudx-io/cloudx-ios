@@ -84,9 +84,14 @@ class BaseAdViewController: UIViewController, AdStateManaging {
 
         let config = CLXDemoConfigManager.sharedManager.currentConfig
         UserDefaults.standard.set(config.baseURL, forKey: "CloudXInitURL")
+        
+        // Set hashed user ID before initialization if provided
+        if !config.hashedUserId.isEmpty {
+            cloudX.setHashedUserID(config.hashedUserId)
+        }
 
         return await withCheckedContinuation { continuation in
-            cloudX.initializeSDK(appKey: appKey, hashedUserID: config.hashedUserId) { success, error in
+            cloudX.initializeSDK(appKey: appKey) { success, error in
                 if success {
                     print("✅ SDK Initialized: \(success)")
                     NotificationCenter.default.post(name: .sdkInitialized, object: nil)

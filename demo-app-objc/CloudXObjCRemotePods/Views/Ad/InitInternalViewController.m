@@ -28,8 +28,8 @@
     
     [self setupEnvironmentButtons];
     
-    // Check if SDK is already initialized
-    self.isSDKInitialized = [[CloudXCore shared] isInitialized];
+    // SDK initialization state tracked internally
+    self.isSDKInitialized = NO; // Will be set to YES after successful initialization
     [self updateStatusUIWithCurrentEnvironment];
     [self updateButtonStates];
 }
@@ -258,9 +258,13 @@
     [[NSUserDefaults standardUserDefaults] setObject:environmentKey forKey:@"CLXDemoEnvironment"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
+    // Set hashed user ID before initialization if provided
+    if (config.hashedUserId.length > 0) {
+        [[CloudXCore shared] setHashedUserID:config.hashedUserId];
+    }
+    
     // Use standard CloudXCore initialization which will now use our environment override
     [[CloudXCore shared] initializeSDKWithAppKey:config.appKey 
-                              hashedUserID:config.hashedUserId 
                                 completion:^(BOOL success, NSError * _Nullable error) {
         // Clear old environment override after initialization (success or failure)
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CLXDemoEnvironment"];

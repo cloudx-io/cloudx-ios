@@ -92,10 +92,6 @@
 }
 
 - (void)loadMRECAd {
-    if (![[CloudXCore shared] isInitialized]) {
-        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
-        return;
-    }
     
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"MREC is already loading."];
@@ -227,11 +223,6 @@
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 MREC revenuePaid" ad:ad];
 }
 
-- (void)closedByUserActionWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"✋ MREC closedByUserActionWithAd" ad:ad];
-    self.mrecAd = nil;
-}
-
 // Banner-specific delegate methods (MREC is a banner type)
 - (void)didExpandAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"🔍 MREC didExpandAd" ad:ad];
@@ -256,10 +247,7 @@
 }
 
 - (void)loadMREC {
-    if (![[CloudXCore shared] isInitialized]) {
-        return;
-    }
-
+    
     if (self.isLoading || self.mrecAd) {
         return;
     }

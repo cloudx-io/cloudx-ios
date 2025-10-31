@@ -25,7 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL didShowCalled;
 @property (nonatomic, assign) BOOL impressionCalled;
 @property (nonatomic, assign) BOOL clickCalled;
-@property (nonatomic, assign) BOOL closedByUserActionCalled;
 @property (nonatomic, strong, nullable) NSError *lastError;
 @property (nonatomic, strong, nullable) CLXAd *lastAd;
 @property (nonatomic, strong, nullable) id<CLXAdapterBanner> lastBanner;
@@ -90,11 +89,6 @@ NS_ASSUME_NONNULL_END
 
 - (void)didClickWithAd:(CLXAd *)ad {
     self.clickCalled = YES;
-    self.lastAd = ad;
-}
-
-- (void)closedByUserActionWithAd:(CLXAd *)ad {
-    self.closedByUserActionCalled = YES;
     self.lastAd = ad;
 }
 

@@ -56,11 +56,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     NSLog(@"[RewardedInterstitialViewController] viewWillAppear");
-    if ([[CloudXCore shared] isInitialized]) {
-        [self loadRewardedInterstitial];
-    } else {
-        NSLog(@"[RewardedInterstitialViewController] SDK not initialized, rewarded interstitial will be loaded once SDK is initialized.");
-    }
+    [self loadRewardedInterstitial];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -78,10 +74,6 @@
 
 - (void)loadRewardedInterstitial {
     NSLog(@"[RewardedInterstitialViewController] loadRewardedInterstitial called");
-    if (![[CloudXCore shared] isInitialized]) {
-        NSLog(@"[RewardedInterstitialViewController] SDK not initialized");
-        return;
-    }
 
     if (self.isLoading || self.rewardedInterstitialAd) {
         NSLog(@"[RewardedInterstitialViewController] Rewarded interstitial ad process already started");
@@ -195,26 +187,11 @@
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 RewardedInterstitial revenuePaid - Ad: %@", ad]];
 }
 
-- (void)closedByUserActionWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✋ RewardedInterstitial closedByUserActionWithAd - Ad: %@", ad]];
-    self.rewardedInterstitialAd = nil;
-    [self loadRewardedInterstitial];
-    [self updateStatusUIWithState:AdStateNoAd];
-}
-
 - (void)userRewarded:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🎁 RewardedInterstitial userRewarded - Ad: %@", ad]];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showAlertWithTitle:@"Reward" message:@"User has earned a reward from interstitial!"];
     });
-}
-
-- (void)rewardedVideoStarted:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"▶️ RewardedInterstitial rewardedVideoStarted - Ad: %@", ad]];
-}
-
-- (void)rewardedVideoCompleted:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ RewardedInterstitial rewardedVideoCompleted - Ad: %@", ad]];
 }
 
 @end

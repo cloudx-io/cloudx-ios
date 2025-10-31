@@ -15,6 +15,7 @@
 #import <CloudXCore/CLXMetricsNetworkService.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CloudXCore.h>
+#import "../Sources/CloudXCore/CloudXCoreInternal.h"
 #import "Helper/CLXUserDefaultsTestHelper.h"
 
 /**

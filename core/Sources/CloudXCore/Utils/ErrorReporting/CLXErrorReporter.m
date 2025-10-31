@@ -10,6 +10,7 @@
 #import <CloudXCore/CLXErrorReporter.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CloudXCoreInternal.h>
 
 @interface CLXErrorReporter ()
 @property (nonatomic, strong) CLXLogger *logger;

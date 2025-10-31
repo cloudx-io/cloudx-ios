@@ -117,11 +117,6 @@
 }
 
 - (void)loadBannerAd {
-    if (![[CloudXCore shared] isInitialized]) {
-        [self showAlertWithTitle:@"Error" message:@"SDK not initialized. Please initialize SDK first."];
-        return;
-    }
-    
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"Banner is already loading."];
         return;
@@ -290,11 +285,6 @@
 
 - (void)revenuePaid:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Banner revenuePaid" ad:ad];
-}
-
-- (void)closedByUserActionWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"✋ Banner closedByUserActionWithAd" ad:ad];
-    self.bannerAd = nil;
 }
 
 // NEW MAX SDK Compatibility Delegate Methods

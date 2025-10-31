@@ -683,14 +683,9 @@ NS_ASSUME_NONNULL_BEGIN
     [self.logger debug:[NSString stringWithFormat:@"[CloudX][Banner] closedByUserAction delegate called for placement: %@", self.placementID]];
     [self.appSessionService addCloseWithPlacementID:self.placementID latency:1.0];
     
-    // Reset loop-index for this placement (matches Android behavior)
+    // Reset loop-index for this placement
     [[CLXPlacementLoopIndexTracker shared] resetForPlacement:self.placementName];
     [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherBanner] Reset loop-index for placement: %@", self.placementName]];
-    
-    if ([self.delegate respondsToSelector:@selector(closedByUserActionWithAd:)]) {
-        CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-        [self.delegate closedByUserActionWithAd:adObject];
-    }
 }
 
 - (void)didExpandBanner:(id<CLXAdapterBanner>)banner {

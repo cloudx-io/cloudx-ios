@@ -14,9 +14,9 @@ class InitViewController: BaseAdViewController {
         self.title = "Swift Demo"
         setupCenteredButton(title: "Initialize SDK", action: #selector(initializeSDK))
         
-        // Check if SDK is already initialized
-        isSDKInitialized = CloudXCore.shared.isInitialized
-        updateStatusUI(state: isSDKInitialized ? .ready : .noAd)
+        // SDK initialization state tracked internally
+        isSDKInitialized = false // Will be set to true after successful initialization
+        updateStatusUI(state: .noAd)
     }
     
     // Override to prevent show logs button from appearing in InitViewController
@@ -67,7 +67,12 @@ class InitViewController: BaseAdViewController {
         
         let config = CLXDemoConfigManager.sharedManager.currentConfig
         
-        CloudXCore.shared.initializeSDK(appKey: config.appKey, hashedUserID: config.hashedUserId) { [weak self] success, error in
+        // Set hashed user ID before initialization if provided
+        if !config.hashedUserId.isEmpty {
+            CloudXCore.shared.setHashedUserID(config.hashedUserId)
+        }
+        
+        CloudXCore.shared.initializeSDK(appKey: config.appKey) { [weak self] success, error in
             guard let self = self else { return }
             
             if success {

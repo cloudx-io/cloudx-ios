@@ -10,6 +10,7 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXLiveInitService.h>
+#import "../Sources/CloudXCore/CloudXCoreInternal.h"
 #import "CLXUserDefaultsTestHelper.h"
 #import "Mocks/CLXMockInitService.h"
 

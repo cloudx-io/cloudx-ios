@@ -28,18 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)userRewarded:(CLXAd *)ad;
 
-/**
- * Called when rewarded video started.
- * @param ad ad that was started
- */
-- (void)rewardedVideoStarted:(CLXAd *)ad;
-
-/**
- * Called when rewarded video completed.
- * @param ad ad that was completed
- */
-- (void)rewardedVideoCompleted:(CLXAd *)ad;
-
 @end
 
 NS_ASSUME_NONNULL_END 
