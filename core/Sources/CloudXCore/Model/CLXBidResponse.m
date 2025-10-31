@@ -161,6 +161,7 @@ static void initializeLogger() {
         if (self.ext.cloudx) {
             NSMutableDictionary *cloudDict = [NSMutableDictionary dictionary];
             cloudDict[@"rank"] = @(self.ext.cloudx.rank);
+            cloudDict[@"test"] = @(self.ext.cloudx.test);
             if (self.ext.cloudx.adapterExtras) cloudDict[@"adapterExtras"] = self.ext.cloudx.adapterExtras;
             extDict[@"cloudx"] = cloudDict;
         }
@@ -665,6 +666,10 @@ static void initializeLogger() {
     id rankValue = dictionary[@"rank"];
     if (rankValue && ![rankValue isKindOfClass:[NSNull class]]) {
         cloudx.rank = [rankValue integerValue];
+    }
+    id testValue = dictionary[@"test"];
+    if (testValue && ![testValue isKindOfClass:[NSNull class]]) {
+        cloudx.test = [testValue integerValue];
     }
     // Parse adapterExtras
     NSDictionary *adapterExtrasDict = dictionary[@"adapter_extras"];

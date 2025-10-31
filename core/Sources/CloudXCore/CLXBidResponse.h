@@ -63,6 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXBidResponseCloudX : NSObject
 @property (nonatomic, assign) NSInteger rank;
 @property (nonatomic, strong, nullable) NSDictionary<NSString *, NSString *> *adapterExtras;
+@property (nonatomic, assign) NSInteger test;
 
 - (NSDictionary *)toDictionary;
 @end

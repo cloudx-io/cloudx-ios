@@ -96,7 +96,7 @@ static CLXLogger *_debugLogger = nil;
     [_debugLogger info:[NSString stringWithFormat:@"📱 SDK API Calls Enabled: %@", [self boolToString:[config isSdkApiCallsEnabled]]]];
     [_debugLogger info:[NSString stringWithFormat:@"🌐 Network Calls Enabled: %@", [self boolToString:[config isNetworkCallsEnabled]]]];
     [_debugLogger info:[NSString stringWithFormat:@"  📊 Bid Request Calls: %@", [self boolToString:[config isBidRequestNetworkCallsEnabled]]]];
-    [_debugLogger info:[NSString stringWithFormat:@"  🚀 Init SDK Calls: %@", [self boolToString:[config isInitSdkNetworkCallsEnabled]]]];
+    [_debugLogger info:[NSString stringWithFormat:@"  🚀 Init SDK Calls: %@", [self boolToString:[config isSdkInitNetworkCallsEnabled]]]];
     [_debugLogger info:[NSString stringWithFormat:@"  🌍 Geo Calls: %@", [self boolToString:[config isGeoNetworkCallsEnabled]]]];
 }
 

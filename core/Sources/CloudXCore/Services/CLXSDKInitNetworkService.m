@@ -311,19 +311,20 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     config.winLossNotificationURL = response[@"winLossNotificationURL"];
     
     // Parse metrics configuration from server response
-    NSDictionary *metricsConfigDict = response[@"metricsConfig"];
-    if (metricsConfigDict && [metricsConfigDict isKindOfClass:[NSDictionary class]]) {
-        config.metricsConfig = [CLXMetricsConfig fromDictionary:metricsConfigDict];
+    NSArray<NSDictionary *> *metricsConfigArr = response[@"metrics"];
+    if (metricsConfigArr.count > 0) {
+        NSDictionary *metricsConfigDict = metricsConfigArr[0];
+        config.metricsConfig = [CLXMetricsConfig fromDictionary: metricsConfigDict];
         [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Parsed metrics config: %@", config.metricsConfig]];
     } else {
         [self.logger debug:@"⚠️ [SDKInitNetworkService] No metrics configuration found in server response"];
         // Create default config to enable metrics with impression URL
         CLXMetricsConfig *defaultConfig = [[CLXMetricsConfig alloc] init];
-        defaultConfig.sdkApiCallsEnabled = @YES;
-        defaultConfig.networkCallsEnabled = @YES;
-        defaultConfig.networkCallsBidReqEnabled = @YES;
-        defaultConfig.networkCallsInitSdkReqEnabled = @NO; // Keep SDK init disabled by default
-        defaultConfig.networkCallsGeoReqEnabled = @YES;
+        defaultConfig.sdkAPICalls.enabled = @YES;
+        defaultConfig.networkCalls.enabled = @YES;
+        defaultConfig.networkCalls.bidReq.enabled = @YES;
+        defaultConfig.networkCalls.sdkInitRequest.enabled = @NO; // Keep SDK init disabled by default
+        defaultConfig.networkCalls.geoReq.enabled = @YES;
         config.metricsConfig = defaultConfig;
         [self.logger debug:@"📊 [SDKInitNetworkService] Created default metrics config for impression URL usage"];
     }

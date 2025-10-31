@@ -11,49 +11,49 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**
- * Metrics configuration class
- * Matches Android's data class MetricsConfig exactly
- */
+@interface CLXMetricsConfigNetworkSubConfig : NSObject
+
+@property (nonatomic, strong) NSNumber *enabled;
+
+- (instancetype)initWithDictionary:(NSDictionary *)dictionary;
+
+@end
+
+@interface CLXMetricsConfigNetworkCalls : NSObject
+
+@property (nonatomic, strong) NSNumber *enabled;
+@property (nonatomic, strong) CLXMetricsConfigNetworkSubConfig *bidReq;
+@property (nonatomic, strong) CLXMetricsConfigNetworkSubConfig *sdkInitRequest; // renamed from initSdkReq
+@property (nonatomic, strong) CLXMetricsConfigNetworkSubConfig *geoReq;
+
+- (instancetype)initWithDictionary:(NSDictionary *)dictionary;
+
+@end
+
+@interface CLXMetricsConfigSDKAPICalls : NSObject
+
+@property (nonatomic, strong) NSNumber *enabled;
+
+- (instancetype)initWithDictionary:(NSDictionary *)dictionary;
+
+@end
+
 @interface CLXMetricsConfig : NSObject
 
-@property (nonatomic, assign) NSInteger sendIntervalSeconds;                    // Default: 60
-@property (nonatomic, strong, nullable) NSNumber *sdkApiCallsEnabled;          // Global SDK API calls flag
-@property (nonatomic, strong, nullable) NSNumber *networkCallsEnabled;         // Global network calls flag
-@property (nonatomic, strong, nullable) NSNumber *networkCallsBidReqEnabled;   // Bid request specific flag
-@property (nonatomic, strong, nullable) NSNumber *networkCallsInitSdkReqEnabled; // SDK init specific flag
-@property (nonatomic, strong, nullable) NSNumber *networkCallsGeoReqEnabled;   // Geo API specific flag
+@property (nonatomic, assign) NSInteger sendIntervalSeconds;
+@property (nonatomic, strong) CLXMetricsConfigSDKAPICalls *sdkAPICalls;
+@property (nonatomic, strong) CLXMetricsConfigNetworkCalls *networkCalls;
 
-- (instancetype)init;
-
-/**
- * Create from dictionary (for JSON parsing)
- */
+- (instancetype)initWithDictionary:(NSDictionary *)dictionary;
 + (instancetype)fromDictionary:(NSDictionary *)dictionary;
 
 /**
- * Check if SDK API calls are enabled
+ * Convenience methods
  */
 - (BOOL)isSdkApiCallsEnabled;
-
-/**
- * Check if network calls are globally enabled
- */
 - (BOOL)isNetworkCallsEnabled;
-
-/**
- * Check if bid request network calls are enabled
- */
 - (BOOL)isBidRequestNetworkCallsEnabled;
-
-/**
- * Check if SDK init network calls are enabled
- */
-- (BOOL)isInitSdkNetworkCallsEnabled;
-
-/**
- * Check if geo API network calls are enabled
- */
+- (BOOL)isSdkInitNetworkCallsEnabled;
 - (BOOL)isGeoNetworkCallsEnabled;
 
 @end

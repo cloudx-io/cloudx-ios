@@ -132,7 +132,7 @@
         BOOL isCallMetricsEnabled = NO;
         
         if ([networkType isEqualToString:CLXMetricsTypeNetworkSdkInit]) {
-            isCallMetricsEnabled = [self.metricsConfig isInitSdkNetworkCallsEnabled];
+            isCallMetricsEnabled = [self.metricsConfig isSdkInitNetworkCallsEnabled];
         } else if ([networkType isEqualToString:CLXMetricsTypeNetworkGeoApi]) {
             isCallMetricsEnabled = [self.metricsConfig isGeoNetworkCallsEnabled];
         } else if ([networkType isEqualToString:CLXMetricsTypeNetworkBidRequest]) {
