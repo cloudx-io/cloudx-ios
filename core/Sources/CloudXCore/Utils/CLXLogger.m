@@ -29,8 +29,6 @@ static BOOL _globalLoggingEnabled = NO;
     self = [super init];
     if (self) {
         _category = [category copy];
-        
-        // Create os_log for system logging
         _osLog = os_log_create("io.cloudx.sdk", category.UTF8String);
     }
     return self;
@@ -40,13 +38,20 @@ static BOOL _globalLoggingEnabled = NO;
     _globalLoggingEnabled = enabled;
 }
 
+- (NSString *)timestampedMessage:(NSString *)message {
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"HH:mm:ss.SSS"];
+    NSString *timestamp = [formatter stringFromDate:[NSDate date]];
+    return [NSString stringWithFormat:@"[%@] %@", timestamp, message];
+}
 
 - (void)log:(NSString *)message type:(os_log_type_t)type {
+    NSString *msgWithTimestamp = [self timestampedMessage:message];
+
     // Always show errors for debuggability
     if (type == OS_LOG_TYPE_ERROR) {
-        NSLog(@"%@", message);
-        // Also log to os_log for system Console.app (won't duplicate in Xcode if filtering by subsystem)
-        os_log_with_type(self.osLog, type, "%{public}@", message);
+        NSLog(@"%@", msgWithTimestamp);
+        os_log_with_type(self.osLog, type, "%{public}@", msgWithTimestamp);
         return;
     }
     
@@ -56,9 +61,10 @@ static BOOL _globalLoggingEnabled = NO;
     }
     
     // Use NSLog for Xcode console output (publishers expect console visibility)
-    NSLog(@"%@", message);
     // Note: Skipping os_log for debug/info to avoid duplication in Xcode console
     // Publishers can enable system logging via Console.app if needed, but most debug in Xcode
+
+    NSLog(@"%@", msgWithTimestamp);
 }
 
 - (void)debug:(NSString *)message {
@@ -73,4 +79,4 @@ static BOOL _globalLoggingEnabled = NO;
     [self log:message type:OS_LOG_TYPE_ERROR];
 }
 
-@end 
+@end
