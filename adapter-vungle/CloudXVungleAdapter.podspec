@@ -17,6 +17,11 @@ Pod::Spec.new do |s|
   # Public headers
   s.public_header_files = 'Sources/CloudXVungleAdapter/**/*.h'
   
+  # Privacy Manifest for App Store compliance (iOS 17+)
+  s.resource_bundles = {
+    'CloudXVungleAdapter' => ['Sources/CloudXVungleAdapter/PrivacyInfo.xcprivacy']
+  }
+  
   s.dependency 'CloudXCore'
   s.dependency 'VungleAdsSDK', '~> 7.4.0'
   

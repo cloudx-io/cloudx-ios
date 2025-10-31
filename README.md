@@ -17,6 +17,7 @@ target 'YourApp' do
   
   # Optional: CloudX Adapters (framework-based distribution)
   pod 'CloudXMetaAdapter'
+  pod 'CloudXVungleAdapter'
 end
 ```
 
@@ -31,6 +32,7 @@ https://github.com/cloudx-io/cloudx-ios
 
 - **[`core/`](core/README.md)** - The foundational CloudX Core SDK written in Objective-C that provides the base functionality for programmatic advertising *(source-based distribution)*
 - **[`adapter-meta/`](adapter-meta/README.md)** - Meta (Facebook Audience Network) adapter for integrating Meta's advertising platform *(framework-based distribution)*
+- **[`adapter-vungle/`](adapter-vungle/README.md)** - Vungle (Liftoff) adapter for integrating Vungle/Liftoff advertising with header bidding support *(source-based distribution)*
 - **[`adapter-cloudx/`](adapter-cloudx/README.md)** - Prebid adapter for header bidding integration with CloudX's programmatic platform
 - **[`demo-app-objc/`](demo-app-objc/)** - Complete Objective-C demo application showcasing CloudX SDK integration and usage patterns
 - **[`demo-app-swift/`](demo-app-swift/)** - Complete Swift demo application demonstrating CloudX SDK implementation in Swift projects
@@ -45,18 +47,21 @@ This repository uses **component-specific releases** with **tagged distribution*
 
 - **Core SDK**: Source-based distribution with tags like `v1.1.40-core`
 - **Meta Adapter**: Framework-based distribution with tags like `v1.1.25-meta`
+- **Vungle Adapter**: Source-based distribution with tags like `v1.0.0-vungle`
 - **Individual Versioning**: Each component maintains its own version to allow independent updates
 - **Clear Release Assets**: Each release provides the appropriate distribution format for that component
 
 #### Release Tag Format
 ```
-v1.1.40-core   # Core SDK release (source distribution)
-v1.1.25-meta  # Meta Adapter release (framework distribution)
+v1.1.40-core    # Core SDK release (source distribution)
+v1.1.25-meta    # Meta Adapter release (framework distribution)
+v1.0.0-vungle   # Vungle Adapter release (source distribution)
 ```
 
 #### Distribution Methods
 - **Core SDK**: Direct source integration via CocoaPods/SPM for easier debugging and customization
 - **Meta Adapter**: Pre-built xcframework for faster build times and simplified integration
+- **Vungle Adapter**: Direct source integration via CocoaPods/SPM for easier debugging and full transparency
 - **Automated Releases**: GitHub Actions automatically build, test, and publish releases when tags are pushed
 
 ### Release Assets
@@ -84,7 +89,8 @@ CloudXMetaAdapter-v1.1.25.xcframework.zip  # Static xcframework for integration
 For detailed documentation, installation instructions, and usage examples, please refer to the individual component READMEs:
 
 - **[Core SDK](core/README.md)** - Detailed core SDK documentation and installation
-- **[Meta Adapter](adapter-meta/README.md)** - Meta integration guide and setup
+- **[Meta Adapter](adapter-meta/README.md)** - Meta (Facebook Audience Network) integration guide and setup
+- **[Vungle Adapter](adapter-vungle/README.md)** - Vungle (Liftoff) integration guide with header bidding support
 - **[Prebid Adapter](adapter-cloudx/README.md)** - Prebid integration guide and configuration
 - **Demo Apps** - Explore the demo application directories for complete integration examples
 
