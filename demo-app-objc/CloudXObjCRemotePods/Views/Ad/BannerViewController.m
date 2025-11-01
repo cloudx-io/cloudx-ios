@@ -4,6 +4,7 @@
 #import "CLXDemoConfigManager.h"
 #import "UserDefaultsSettings.h"
 #import "GPPScenarioPickerView.h"
+#import "NSError+DemoDescription.h"
 
 @interface BannerViewController ()
 @property (nonatomic, strong) CLXBannerAdView *bannerAd;
@@ -23,6 +24,39 @@
     [self setupUI];
     self.settings = [UserDefaultsSettings sharedSettings];
     [self updateStatusUIWithState:AdStateNoAd];
+}
+
+// Override to position status label above banner area
+- (void)setupStatusUI {
+    // Setup status indicator stack
+    self.statusStack = [[UIStackView alloc] init];
+    self.statusStack.axis = UILayoutConstraintAxisHorizontal;
+    self.statusStack.spacing = 8;
+    self.statusStack.alignment = UIStackViewAlignmentCenter;
+    self.statusStack.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    self.statusIndicator = [[UIView alloc] init];
+    self.statusIndicator.translatesAutoresizingMaskIntoConstraints = NO;
+    self.statusIndicator.layer.cornerRadius = 6;
+    self.statusIndicator.clipsToBounds = YES;
+    
+    self.statusLabel = [[UILabel alloc] init];
+    self.statusLabel.textAlignment = NSTextAlignmentCenter;
+    self.statusLabel.font = [UIFont systemFontOfSize:16 weight:UIFontWeightMedium];
+    self.statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [self.statusStack addArrangedSubview:self.statusIndicator];
+    [self.statusStack addArrangedSubview:self.statusLabel];
+    
+    [self.view addSubview:self.statusStack];
+    
+    // Position status label above banner area (banner is 50px high + 30px spacing)
+    [NSLayoutConstraint activateConstraints:@[
+        [self.statusStack.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [self.statusStack.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-80],
+        [self.statusIndicator.widthAnchor constraintEqualToConstant:12],
+        [self.statusIndicator.heightAnchor constraintEqualToConstant:12]
+    ]];
 }
 
 - (void)setupUI {
@@ -250,8 +284,8 @@
     self.bannerAd = nil;
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-        [self showAlertWithTitle:@"Banner Ad Error" message:errorMessage];
+        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
+        [self showAlertWithTitle:@"Banner Ad Load Failed" message:errorMessage];
     });
 }
 
@@ -265,8 +299,8 @@
     self.bannerAd = nil;
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-        [self showAlertWithTitle:@"Banner Ad Error" message:errorMessage];
+        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
+        [self showAlertWithTitle:@"Banner Ad Show Failed" message:errorMessage];
     });
 }
 

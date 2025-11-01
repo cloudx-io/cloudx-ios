@@ -3,6 +3,7 @@
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
 #import "UserDefaultsSettings.h"
+#import "NSError+DemoDescription.h"
 
 @interface RewardedViewController ()
 @property (nonatomic, strong) CLXRewarded *rewardedAd;
@@ -222,8 +223,8 @@
     [self updateStatusUIWithState:AdStateNoAd];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-        [self showAlertWithTitle:@"Rewarded Ad Error" message:errorMessage];
+        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
+        [self showAlertWithTitle:@"Rewarded Ad Load Failed" message:errorMessage];
         
         self.rewardedAd = nil;
     });
@@ -239,8 +240,8 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.rewardedAd = nil;
-        NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-        [self showAlertWithTitle:@"Rewarded Ad Error" message:errorMessage];
+        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
+        [self showAlertWithTitle:@"Rewarded Ad Show Failed" message:errorMessage];
     });
 }
 

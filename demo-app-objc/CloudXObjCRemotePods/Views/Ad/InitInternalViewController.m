@@ -4,6 +4,7 @@
 #import <CloudXCore/CLXURLProvider.h>
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
+#import "NSError+DemoDescription.h"
 
 @interface InitInternalViewController ()
 @property (nonatomic, assign) BOOL isSDKInitialized;
@@ -63,7 +64,7 @@
                                             action:@selector(initializeWithProductionEnvironment)
                                        environment:CLXDemoEnvironmentProduction];
     
-    // Create stack view for buttons - Staging at top, Dev in middle, Production at bottom
+    // Create stack view for buttons - Staging at top, Dev, Production at bottom
     self.buttonStackView = [[UIStackView alloc] initWithArrangedSubviews:@[self.stagingButton, self.devButton, self.prodButton]];
     self.buttonStackView.axis = UILayoutConstraintAxisVertical;
     self.buttonStackView.spacing = 16;
@@ -279,12 +280,15 @@
             [self updateStatusUIWithState:AdStateReady];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"cloudXSDKInitialized" object:nil];
         } else {
-            NSString *originalError = error ? error.localizedDescription : @"Unknown error occurred";
-            NSString *enhancedError = [configManager enhancedErrorMessageForEnvironment:environment 
-                                                                          originalError:originalError];
-            [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ SDK init failed: %@", enhancedError]];
+            // Get detailed error description
+            NSString *detailedError = error ? [error detailedDemoDescription] : @"Unknown error occurred";
+            
+            // Add environment-specific context
+            NSString *enhancedError = [NSString stringWithFormat:@"Environment: %@\n\n%@", environmentName, detailedError];
+            
+            [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ SDK init failed: %@", detailedError]];
             [self updateStatusUIWithState:AdStateNoAd];
-            [self showAlertWithTitle:@"SDK Init Failed" message:enhancedError];
+            [self showAlertWithTitle:@"SDK Initialization Failed" message:enhancedError];
         }
     }];
 }

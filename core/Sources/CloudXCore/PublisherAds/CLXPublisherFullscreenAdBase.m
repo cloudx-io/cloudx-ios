@@ -239,13 +239,17 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     [self.logger debug:[NSString stringWithFormat:@"[%@] State transitioned to LOADING", self.currentCorrelationId]];
     
     // Initiate bid request for ad content
+    __weak typeof(self) weakSelf = self;
     [self.bidAdSource requestBidWithAdUnitID:self.placementID
                            storedImpressionId:self.placementID
                                     impModel:self.impModel
                                    successWin:NO
                                 correlationId:self.currentCorrelationId
                                    completion:^(CLXBidAdSourceResponse *response, NSError *error) {
-        [self handleBidResponse:response error:error];
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        [strongSelf handleBidResponse:response error:error];
     }];
 }
 
@@ -348,7 +352,12 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 - (void)handleBidResponse:(CLXBidAdSourceResponse *)response error:(NSError *)error {
     if (error) {
-        [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherFullscreenAd] Bid request failed: %@", self.currentCorrelationId, error.localizedDescription]];
+        [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherFullscreenAd] Bid request failed: %@ (Code: %ld)", self.currentCorrelationId, error.localizedDescription, (long)error.code]];
+        
+        // Kill switch errors should fail immediately with the actual error
+        if (error.code == CLXErrorCodeSDKDisabled || error.code == CLXErrorCodeAdsDisabled) {
+            [self.logger error:[NSString stringWithFormat:@"[%@] 🚫 [PublisherFullscreenAd] Kill switch active - failing immediately", self.currentCorrelationId]];
+        }
         
         // Transition back to idle
         self.currentState = CLXFullscreenAdStateIDLE;

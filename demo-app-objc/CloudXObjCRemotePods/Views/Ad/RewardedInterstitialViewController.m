@@ -2,6 +2,7 @@
 #import <CloudXCore/CloudXCore.h>
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
+#import "NSError+DemoDescription.h"
 
 @interface RewardedInterstitialViewController ()
 @property (nonatomic, strong) CLXRewarded *rewardedInterstitialAd;
@@ -144,11 +145,10 @@
     [self updateStatusUIWithState:AdStateNoAd];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-        [self showAlertWithTitle:@"Rewarded Interstitial Error" message:errorMessage];
+        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
+        [self showAlertWithTitle:@"Rewarded Interstitial Load Failed" message:errorMessage];
         self.rewardedInterstitialAd = nil;
         // Don't automatically retry - let user manually retry if needed
-        // This prevents the race condition where error shows but ad loads anyway
     });
 }
 
@@ -162,8 +162,8 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.rewardedInterstitialAd = nil;
-        NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-        [self showAlertWithTitle:@"Rewarded Interstitial Error" message:errorMessage];
+        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
+        [self showAlertWithTitle:@"Rewarded Interstitial Show Failed" message:errorMessage];
         // Don't automatically retry - let user manually retry if needed
     });
 }

@@ -3,6 +3,7 @@
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
 #import "UserDefaultsSettings.h"
+#import "NSError+DemoDescription.h"
 
 @interface MRECViewController ()
 @property (nonatomic, strong) CLXBannerAdView *mrecAd;
@@ -188,8 +189,8 @@
     self.isLoading = NO;
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-        [self showAlertWithTitle:@"MREC Error" message:errorMessage];
+        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
+        [self showAlertWithTitle:@"MREC Ad Load Failed" message:errorMessage];
     });
 }
 
@@ -201,8 +202,8 @@
     [[DemoAppLogger sharedInstance] logAdEvent:@"❌ MREC failToShowWithAd" ad:ad];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-        [self showAlertWithTitle:@"MREC Error" message:errorMessage];
+        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
+        [self showAlertWithTitle:@"MREC Ad Show Failed" message:errorMessage];
     });
 }
 

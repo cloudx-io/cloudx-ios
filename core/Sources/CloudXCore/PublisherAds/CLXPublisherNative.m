@@ -208,6 +208,14 @@ NS_ASSUME_NONNULL_BEGIN
         if (!strongSelf) return;
         
         if (error) {
+            // Check if this is a kill switch error - should fail immediately, not retry
+            if (error.code == CLXErrorCodeSDKDisabled || error.code == CLXErrorCodeAdsDisabled) {
+                [strongSelf.logger error:[NSString stringWithFormat:@"[%@] 🚫 [PublisherNative] Kill switch active - failing immediately with code %ld", strongSelf.currentCorrelationId, (long)error.code]];
+                strongSelf.isLoading = NO;
+                [strongSelf failToLoadWithNative:nil error:error];
+                return;
+            }
+            
             [strongSelf.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherNative] Bid request failed: %@", strongSelf.currentCorrelationId, error.localizedDescription]];
             
             // Implement waterfall backoff delay logic
@@ -502,17 +510,16 @@ NS_ASSUME_NONNULL_BEGIN
     }
     
     // Call both old and new delegate methods for backward compatibility
+    // Use the actual error passed in, or default to NoFill if no error provided
+    NSError *delegateError = error ?: [NSError errorWithDomain:@"CLXErrorDomain"
+                                                           code:CLXErrorCodeNoFill
+                                                       userInfo:nil];
+    
     if ([self.delegate respondsToSelector:@selector(failToLoadWithNative:error:)]) {
-        NSError *cloudXError = [NSError errorWithDomain:@"CLXErrorDomain"
-                                                   code:CLXErrorCodeNoFill
-                                               userInfo:nil];
-        [self.delegate failToLoadWithNative:native error:cloudXError];
+        [self.delegate failToLoadWithNative:native error:delegateError];
     }
     if ([self.delegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-        NSError *cloudXError = [NSError errorWithDomain:@"CLXErrorDomain"
-                                                   code:CLXErrorCodeNoFill
-                                               userInfo:nil];
-        [self.delegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:cloudXError];
+        [self.delegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:delegateError];
     }
 }
 

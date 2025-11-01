@@ -3,6 +3,7 @@
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
 #import "UserDefaultsSettings.h"
+#import "NSError+DemoDescription.h"
 
 @interface InterstitialViewController ()
 @property (nonatomic, strong) CLXInterstitial *interstitialAd;
@@ -164,8 +165,8 @@
     [self updateStatusUIWithState:AdStateNoAd];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-        [self showAlertWithTitle:@"Interstitial Ad Error" message:errorMessage];
+        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
+        [self showAlertWithTitle:@"Interstitial Ad Load Failed" message:errorMessage];
         self.interstitialAd = nil;
     });
 }
@@ -180,8 +181,8 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.interstitialAd = nil;
-        NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-        [self showAlertWithTitle:@"Interstitial Ad Error" message:errorMessage];
+        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
+        [self showAlertWithTitle:@"Interstitial Ad Show Failed" message:errorMessage];
     });
 }
 

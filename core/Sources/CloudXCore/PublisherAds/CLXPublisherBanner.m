@@ -259,13 +259,19 @@ NS_ASSUME_NONNULL_BEGIN
                                    completion:^(CLXBidAdSourceResponse * _Nullable response, NSError * _Nullable error) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         if (!strongSelf) {
-            [self.logger error:@"❌ [PublisherBanner] Self reference lost in bid completion block"];
             return;
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"[%@] 📥 [PublisherBanner] Bid request completion - Response: %@, Error: %@", strongSelf.currentCorrelationId, response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
+        [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] 📥 [PublisherBanner] Bid request completion - Response: %@, Error: %@", strongSelf.currentCorrelationId, response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
 
         if (error) {
+            // Check if this is a kill switch error - should fail immediately, not continue waterfall
+            if (error.code == CLXErrorCodeSDKDisabled || error.code == CLXErrorCodeAdsDisabled) {
+                [self.logger error:[NSString stringWithFormat:@"[%@] 🚫 [PublisherBanner] Kill switch active - failing immediately with code %ld", strongSelf.currentCorrelationId, (long)error.code]];
+                [strongSelf failToLoadBanner:nil error:error];
+                return;
+            }
+            
             [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherBanner] Bid request failed - %@ (Domain: %@, Code: %ld)", strongSelf.currentCorrelationId, error.localizedDescription, error.domain, (long)error.code]];
             
             // Continue with waterfall - let continueBannerChain handle the error

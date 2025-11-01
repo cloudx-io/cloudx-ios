@@ -78,8 +78,8 @@ static CLXLogLevel _globalMinLogLevel = CLXLogLevelVerbose;
     // Always show errors for debuggability
     if (type == OS_LOG_TYPE_ERROR) {
         NSLog(@"%@", msgWithTimestamp);
-        // Also log to os_log for system Console.app (won't duplicate in Xcode if filtering by subsystem)
-        os_log_with_type(self.osLog, type, "%{public}@", msgWithTimestamp);
+        // Note: Only using NSLog to avoid duplicate logs in Xcode console
+        // os_log would cause duplication if console shows both stdout and unified logging
         return;
     }
     

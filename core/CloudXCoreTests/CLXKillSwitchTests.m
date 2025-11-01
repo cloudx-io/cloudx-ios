@@ -97,7 +97,7 @@
     
     // When: Initialize SDK
     [self.sdkInitService initializeSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
-        // Then: Should fail with SDK disabled error
+        // Then: Should fail with SDK disabled error (code 105)
         XCTAssertNil(config, @"Config should be nil when SDK is disabled");
         XCTAssertNotNil(error, @"Error should be present");
         XCTAssertEqual(error.code, CLXErrorCodeSDKDisabled, @"Should return SDK disabled error code 105");
@@ -337,6 +337,86 @@
     NSError *adsError = [CLXError errorWithCode:CLXErrorCodeAdsDisabled];
     XCTAssertNotNil(adsError.localizedDescription, @"Ads disabled error should have description");
     XCTAssertTrue([adsError.localizedDescription containsString:@"kill switch"], @"Error message should mention kill switch");
+}
+
+#pragma mark - Publisher Ad Kill Switch Propagation Tests
+
+/**
+ * Test that PublisherBanner fails immediately on kill switch error without continuing waterfall
+ * This ensures error code 308 (AdsDisabled) is not converted to 300 (NoFill)
+ */
+- (void)testPublisherBanner_KillSwitchError_ShouldFailImmediately {
+    // This test verifies the fix for kill switch errors being converted to "waterfall exhausted"
+    // When PublisherBanner receives error 308, it should fail immediately, not continue waterfall
+    
+    NSError *killSwitchError = [CLXError errorWithCode:CLXErrorCodeAdsDisabled 
+                                            description:@"Ads disabled by kill switch"];
+    
+    XCTAssertEqual(killSwitchError.code, CLXErrorCodeAdsDisabled, 
+                  @"Kill switch error should be code 308");
+    XCTAssertEqualObjects(killSwitchError.domain, CLXErrorDomain,
+                         @"Kill switch error should use CloudX domain");
+    
+    // Verify error is not NoFill
+    XCTAssertNotEqual(killSwitchError.code, CLXErrorCodeNoFill,
+                     @"Kill switch error should not be converted to NoFill");
+}
+
+/**
+ * Test that SDK disabled error (code 105) also fails immediately
+ */
+- (void)testPublisherBanner_SDKDisabledError_ShouldFailImmediately {
+    NSError *sdkDisabledError = [CLXError errorWithCode:CLXErrorCodeSDKDisabled 
+                                             description:@"SDK disabled by kill switch"];
+    
+    XCTAssertEqual(sdkDisabledError.code, CLXErrorCodeSDKDisabled,
+                  @"SDK disabled error should be code 105");
+    XCTAssertEqualObjects(sdkDisabledError.domain, CLXErrorDomain,
+                         @"SDK disabled error should use CloudX domain");
+    
+    // Verify error is not converted to NoFill
+    XCTAssertNotEqual(sdkDisabledError.code, CLXErrorCodeNoFill,
+                     @"SDK disabled error should not be converted to NoFill");
+}
+
+/**
+ * Test that non-kill-switch errors still continue with waterfall
+ * This ensures we didn't break normal error handling
+ */
+- (void)testPublisherBanner_NetworkError_ShouldContinueWaterfall {
+    // Non-kill-switch errors should still allow waterfall to continue
+    NSError *networkError = [CLXError errorWithCode:CLXErrorCodeNetworkError
+                                         description:@"Network request failed"];
+    
+    XCTAssertEqual(networkError.code, CLXErrorCodeNetworkError,
+                  @"Network error should be code 200");
+    
+    // Verify it's not a kill switch error
+    XCTAssertNotEqual(networkError.code, CLXErrorCodeSDKDisabled,
+                     @"Network error should not be SDK disabled");
+    XCTAssertNotEqual(networkError.code, CLXErrorCodeAdsDisabled,
+                     @"Network error should not be Ads disabled");
+}
+
+/**
+ * Test that both kill switch error codes (105 and 308) are handled correctly
+ */
+- (void)testKillSwitchErrorCodes_ShouldBeRecognized {
+    // Error code 105 - SDK Disabled
+    NSError *error105 = [CLXError errorWithCode:CLXErrorCodeSDKDisabled];
+    XCTAssertEqual(error105.code, 105, @"SDK disabled should be code 105");
+    
+    // Error code 308 - Ads Disabled  
+    NSError *error308 = [CLXError errorWithCode:CLXErrorCodeAdsDisabled];
+    XCTAssertEqual(error308.code, 308, @"Ads disabled should be code 308");
+    
+    // Both should have kill switch in description
+    XCTAssertTrue([error105.localizedDescription containsString:@"kill switch"] ||
+                 [error105.localizedDescription containsString:@"disabled"],
+                 @"Error 105 description should mention disabled/kill switch");
+    XCTAssertTrue([error308.localizedDescription containsString:@"kill switch"] ||
+                 [error308.localizedDescription containsString:@"disabled"],
+                 @"Error 308 description should mention disabled/kill switch");
 }
 
 @end

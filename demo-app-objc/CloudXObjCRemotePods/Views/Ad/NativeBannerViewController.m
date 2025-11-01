@@ -3,6 +3,7 @@
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
 #import "UserDefaultsSettings.h"
+#import "NSError+DemoDescription.h"
 
 @interface NativeBannerViewController ()
 @property (nonatomic, strong) CLXNativeAdView *nativeBannerAd;
@@ -184,8 +185,8 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeBannerAd = nil;
-        NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-        [self showAlertWithTitle:@"Native Banner Error" message:errorMessage];
+        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
+        [self showAlertWithTitle:@"Native Banner Load Failed" message:errorMessage];
     });
 }
 
@@ -198,8 +199,8 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeBannerAd = nil;
-        NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
-        [self showAlertWithTitle:@"Native Banner Error" message:errorMessage];
+        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
+        [self showAlertWithTitle:@"Native Banner Show Failed" message:errorMessage];
     });
 }
 
