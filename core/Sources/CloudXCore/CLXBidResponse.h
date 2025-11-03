@@ -128,7 +128,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXBidResponseResponseExt : NSObject
 // Add any response-level extension fields here
 @property (nonatomic, strong, nullable) CLXBidResponseAuction *cloudx;
-@property (nonatomic, copy, nullable) NSString *lineItemId;
 @end
 
 // MARK: - Main Bid Response

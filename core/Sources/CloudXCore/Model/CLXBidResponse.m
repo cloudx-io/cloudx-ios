@@ -428,11 +428,9 @@ static void initializeLogger() {
         if (auction) {
             CLXBidResponseAuction *cloudx = [[CLXBidResponseAuction alloc] init];
             NSString *serverVersion = cloudxDict[@"serverVersion"] ?: @"";
-            NSString *lineItemId = dictionary[@"lineItemId"] ?: @"";
             cloudx.serverVersion = serverVersion;
             cloudx.auction = auction;
             ext.cloudx = cloudx;
-            ext.lineItemId = lineItemId;
         }
     }
     
