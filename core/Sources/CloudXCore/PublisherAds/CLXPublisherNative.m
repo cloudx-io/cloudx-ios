@@ -236,11 +236,14 @@ NS_ASSUME_NONNULL_BEGIN
             // Store the full bid response for LURL firing by getting it from bidAdSource
             strongSelf.currentBidResponse = [strongSelf.bidAdSource getCurrentBidResponse];
             
+            // Get current loop index for Rill tracking
+            NSInteger currentLoopIndex = [[CLXPlacementLoopIndexTracker shared] getCountForPlacement:strongSelf.placementName];
+            
             // Set up Rill tracking data
             [strongSelf.rillTrackingService setupTrackingDataFromBidResponse:response
                                                                     impModel:strongSelf.impModel
                                                                  placementID:strongSelf.placementID
-                                                                   loadCount:strongSelf.loadNativeTimesCount];
+                                                                   loadCount:currentLoopIndex];
             
             // Reset waterfall backoff algorithm
             [strongSelf.waterfallBackoffAlgorithm reset];

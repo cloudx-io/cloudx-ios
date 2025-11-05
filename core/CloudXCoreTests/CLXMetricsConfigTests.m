@@ -17,11 +17,8 @@
     // Then
     XCTAssertNotNil(config);
     XCTAssertEqual(config.sendIntervalSeconds, 60); // Default like Android
-    XCTAssertNil(config.sdkApiCallsEnabled);
-    XCTAssertNil(config.networkCallsEnabled);
-    XCTAssertNil(config.networkCallsBidReqEnabled);
-    XCTAssertNil(config.networkCallsInitSdkReqEnabled);
-    XCTAssertNil(config.networkCallsGeoReqEnabled);
+    XCTAssertNil(config.sdkAPICalls);
+    XCTAssertNil(config.networkCalls);
 }
 
 - (void)testFromDictionaryWithAllValues {
@@ -41,11 +38,11 @@
     // Then
     XCTAssertNotNil(config);
     XCTAssertEqual(config.sendIntervalSeconds, 120);
-    XCTAssertEqualObjects(config.sdkApiCallsEnabled, @YES);
-    XCTAssertEqualObjects(config.networkCallsEnabled, @YES);
-    XCTAssertEqualObjects(config.networkCallsBidReqEnabled, @YES);
-    XCTAssertEqualObjects(config.networkCallsInitSdkReqEnabled, @NO);
-    XCTAssertEqualObjects(config.networkCallsGeoReqEnabled, @YES);
+    XCTAssertEqualObjects(config.sdkAPICalls.enabled, @YES);
+    XCTAssertEqualObjects(config.networkCalls.enabled, @YES);
+    XCTAssertEqualObjects(config.networkCalls.bidReq.enabled, @YES);
+    XCTAssertEqualObjects(config.networkCalls.sdkInitRequest.enabled, @NO);
+    XCTAssertEqualObjects(config.networkCalls.geoReq.enabled, @YES);
 }
 
 - (void)testFromDictionaryWithPartialValues {
@@ -61,11 +58,8 @@
     // Then
     XCTAssertNotNil(config);
     XCTAssertEqual(config.sendIntervalSeconds, 30);
-    XCTAssertEqualObjects(config.sdkApiCallsEnabled, @NO);
-    XCTAssertNil(config.networkCallsEnabled);
-    XCTAssertNil(config.networkCallsBidReqEnabled);
-    XCTAssertNil(config.networkCallsInitSdkReqEnabled);
-    XCTAssertNil(config.networkCallsGeoReqEnabled);
+    XCTAssertEqualObjects(config.sdkAPICalls.enabled, @NO);
+    XCTAssertNil(config.networkCalls);
 }
 
 - (void)testFromDictionaryWithEmptyDictionary {
@@ -78,98 +72,113 @@
     // Then
     XCTAssertNotNil(config);
     XCTAssertEqual(config.sendIntervalSeconds, 60); // Default value
-    XCTAssertNil(config.sdkApiCallsEnabled);
-    XCTAssertNil(config.networkCallsEnabled);
-    XCTAssertNil(config.networkCallsBidReqEnabled);
-    XCTAssertNil(config.networkCallsInitSdkReqEnabled);
-    XCTAssertNil(config.networkCallsGeoReqEnabled);
+    XCTAssertNil(config.sdkAPICalls);
+    XCTAssertNil(config.networkCalls);
 }
 
 - (void)testIsSdkApiCallsEnabled {
     // Test enabled
     CLXMetricsConfig *config1 = [[CLXMetricsConfig alloc] init];
-    config1.sdkApiCallsEnabled = @YES;
+    config1.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    config1.sdkAPICalls.enabled = @YES;
     XCTAssertTrue([config1 isSdkApiCallsEnabled]);
     
     // Test disabled
     CLXMetricsConfig *config2 = [[CLXMetricsConfig alloc] init];
-    config2.sdkApiCallsEnabled = @NO;
+    config2.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    config2.sdkAPICalls.enabled = @NO;
     XCTAssertFalse([config2 isSdkApiCallsEnabled]);
     
     // Test nil (default disabled)
     CLXMetricsConfig *config3 = [[CLXMetricsConfig alloc] init];
-    config3.sdkApiCallsEnabled = nil;
     XCTAssertFalse([config3 isSdkApiCallsEnabled]);
 }
 
 - (void)testIsNetworkCallsEnabled {
     // Test enabled
     CLXMetricsConfig *config1 = [[CLXMetricsConfig alloc] init];
-    config1.networkCallsEnabled = @YES;
+    config1.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config1.networkCalls.enabled = @YES;
     XCTAssertTrue([config1 isNetworkCallsEnabled]);
     
     // Test disabled
     CLXMetricsConfig *config2 = [[CLXMetricsConfig alloc] init];
-    config2.networkCallsEnabled = @NO;
+    config2.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config2.networkCalls.enabled = @NO;
     XCTAssertFalse([config2 isNetworkCallsEnabled]);
     
     // Test nil (default disabled)
     CLXMetricsConfig *config3 = [[CLXMetricsConfig alloc] init];
-    config3.networkCallsEnabled = nil;
     XCTAssertFalse([config3 isNetworkCallsEnabled]);
 }
 
 - (void)testIsBidRequestNetworkCallsEnabled {
     // Test both global and specific enabled
     CLXMetricsConfig *config1 = [[CLXMetricsConfig alloc] init];
-    config1.networkCallsEnabled = @YES;
-    config1.networkCallsBidReqEnabled = @YES;
+    config1.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config1.networkCalls.enabled = @YES;
+    config1.networkCalls.bidReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config1.networkCalls.bidReq.enabled = @YES;
     XCTAssertTrue([config1 isBidRequestNetworkCallsEnabled]);
     
     // Test global enabled but specific disabled
     CLXMetricsConfig *config2 = [[CLXMetricsConfig alloc] init];
-    config2.networkCallsEnabled = @YES;
-    config2.networkCallsBidReqEnabled = @NO;
+    config2.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config2.networkCalls.enabled = @YES;
+    config2.networkCalls.bidReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config2.networkCalls.bidReq.enabled = @NO;
     XCTAssertFalse([config2 isBidRequestNetworkCallsEnabled]);
     
     // Test global disabled but specific enabled
     CLXMetricsConfig *config3 = [[CLXMetricsConfig alloc] init];
-    config3.networkCallsEnabled = @NO;
-    config3.networkCallsBidReqEnabled = @YES;
+    config3.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config3.networkCalls.enabled = @NO;
+    config3.networkCalls.bidReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config3.networkCalls.bidReq.enabled = @YES;
     XCTAssertFalse([config3 isBidRequestNetworkCallsEnabled]);
     
     // Test both disabled
     CLXMetricsConfig *config4 = [[CLXMetricsConfig alloc] init];
-    config4.networkCallsEnabled = @NO;
-    config4.networkCallsBidReqEnabled = @NO;
+    config4.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config4.networkCalls.enabled = @NO;
+    config4.networkCalls.bidReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config4.networkCalls.bidReq.enabled = @NO;
     XCTAssertFalse([config4 isBidRequestNetworkCallsEnabled]);
 }
 
-- (void)testIsInitSdkNetworkCallsEnabled {
+- (void)testIsSdkInitNetworkCallsEnabled {
     // Test both global and specific enabled
     CLXMetricsConfig *config1 = [[CLXMetricsConfig alloc] init];
-    config1.networkCallsEnabled = @YES;
-    config1.networkCallsInitSdkReqEnabled = @YES;
-    XCTAssertTrue([config1 isInitSdkNetworkCallsEnabled]);
+    config1.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config1.networkCalls.enabled = @YES;
+    config1.networkCalls.sdkInitRequest = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config1.networkCalls.sdkInitRequest.enabled = @YES;
+    XCTAssertTrue([config1 isSdkInitNetworkCallsEnabled]);
     
     // Test global enabled but specific disabled
     CLXMetricsConfig *config2 = [[CLXMetricsConfig alloc] init];
-    config2.networkCallsEnabled = @YES;
-    config2.networkCallsInitSdkReqEnabled = @NO;
-    XCTAssertFalse([config2 isInitSdkNetworkCallsEnabled]);
+    config2.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config2.networkCalls.enabled = @YES;
+    config2.networkCalls.sdkInitRequest = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config2.networkCalls.sdkInitRequest.enabled = @NO;
+    XCTAssertFalse([config2 isSdkInitNetworkCallsEnabled]);
 }
 
 - (void)testIsGeoNetworkCallsEnabled {
     // Test both global and specific enabled
     CLXMetricsConfig *config1 = [[CLXMetricsConfig alloc] init];
-    config1.networkCallsEnabled = @YES;
-    config1.networkCallsGeoReqEnabled = @YES;
+    config1.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config1.networkCalls.enabled = @YES;
+    config1.networkCalls.geoReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config1.networkCalls.geoReq.enabled = @YES;
     XCTAssertTrue([config1 isGeoNetworkCallsEnabled]);
     
     // Test global enabled but specific disabled
     CLXMetricsConfig *config2 = [[CLXMetricsConfig alloc] init];
-    config2.networkCallsEnabled = @YES;
-    config2.networkCallsGeoReqEnabled = @NO;
+    config2.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config2.networkCalls.enabled = @YES;
+    config2.networkCalls.geoReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config2.networkCalls.geoReq.enabled = @NO;
     XCTAssertFalse([config2 isGeoNetworkCallsEnabled]);
 }
 
@@ -177,8 +186,10 @@
     // Given
     CLXMetricsConfig *config = [[CLXMetricsConfig alloc] init];
     config.sendIntervalSeconds = 90;
-    config.sdkApiCallsEnabled = @YES;
-    config.networkCallsEnabled = @NO;
+    config.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    config.sdkAPICalls.enabled = @YES;
+    config.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config.networkCalls.enabled = @NO;
     
     // When
     NSString *description = [config description];
@@ -186,8 +197,6 @@
     // Then
     XCTAssertNotNil(description);
     XCTAssertTrue([description containsString:@"90"]);
-    XCTAssertTrue([description containsString:@"1"]); // YES as number
-    XCTAssertTrue([description containsString:@"0"]); // NO as number
 }
 
 @end

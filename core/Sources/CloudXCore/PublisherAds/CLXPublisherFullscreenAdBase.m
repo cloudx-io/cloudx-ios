@@ -385,11 +385,14 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     self.currentBidResponse = [self.bidAdSource getCurrentBidResponse];
     self.lastBidResponse = response;
     
+    // Fullscreen ads always use loop index 1
+    NSInteger loopIndexForFullscreen = 1;
+    
     // Set up Rill tracking data
     [self.rillTrackingService setupTrackingDataFromBidResponse:response
                                                       impModel:self.impModel
                                                    placementID:self.placementID
-                                                     loadCount:0];
+                                                     loadCount:loopIndexForFullscreen];
     
     // Configure adapter delegate and initiate loading with timeout protection
     [self setupAdapterAndLoad:adapter];

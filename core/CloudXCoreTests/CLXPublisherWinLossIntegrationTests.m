@@ -588,4 +588,186 @@ XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should handle nil 
     // Each concurrent operation should result in loss notifications for losing bids
 }
 
+#pragma mark - MARK: Loop Index Regression Tests (CX-1903)
+
+/**
+ * REGRESSION TEST for CX-1903: Loop index in win/loss notifications was always 0
+ * 
+ * This test verifies that loop index correctly flows through the entire system:
+ * 1. Stored in CLXTrackingFieldResolver when bid request is created
+ * 2. Not overwritten by Rill tracking service 
+ * 3. Correctly included in win/loss notification payloads
+ * 
+ * This test would have caught the bug where:
+ * - setupTrackingDataFromBidResponse was hardcoded with loadCount:0
+ * - Loop index was overwritten to 0 even though bid request had correct value
+ */
+- (void)testLoopIndex_InWinLossNotifications_ShouldReflectCorrectValue {
+    // Given: Configure payload mapping with loopIndex field
+    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
+    config.winLossNotificationURL = @"https://test.com/winloss";
+    config.winLossNotificationPayloadConfig = @{
+        @"notificationType": @"sdk.[loadSuccess|renderSuccess|loss]",
+        @"loopIndex": @"sdk.loopIndex",  // Key field to test
+        @"url": @"sdk.[bid.nurl|bid.lurl]",
+        @"auctionId": @"auctionId",
+        @"bidId": @"bidId"
+    };
+    [[CLXWinLossTracker shared] setConfig:config];
+    
+    // Simulate banner's 6th refresh with loop index = 6
+    NSInteger expectedLoopIndex = 6;
+    NSString *testAuctionId = @"loop-index-test-auction";
+    NSString *testBidId = @"loop-index-test-bid";
+    
+    // Store loop index in tracking resolver (as CLXBiddingConfig does)
+    [[CLXTrackingFieldResolver shared] setLoopIndex:testAuctionId loopIndex:expectedLoopIndex];
+    
+    // Create bid with nurl
+    CLXBidResponseBid *bid = [[CLXBidResponseBid alloc] init];
+    bid.id = testBidId;
+    bid.price = 2.50;
+    bid.nurl = [NSString stringWithFormat:@"https://test.com/nurl?bid=%@", testBidId];
+    bid.lurl = [NSString stringWithFormat:@"https://test.com/lurl?bid=%@", testBidId];
+    
+    // Add bid to tracker
+    [[CLXWinLossTracker shared] addBid:testAuctionId bid:bid];
+    
+    // When: Send loadSuccess event (simulates ad load success)
+    [[CLXWinLossTracker shared] sendEvent:testAuctionId
+                                    bidId:testBidId
+                                    event:[CLXBidLifecycleEvent loadSuccessEvent]
+                               lossReason:@(CLXLossReasonBidWon)
+                           winnerBidPrice:bid.price];
+    
+    // Then: Verify win notification was sent with correct loop index
+    XCTAssertEqual(self.mockTracker.winNotifications.count, 1, 
+                  @"Should send one win notification for loadSuccess");
+    
+    if (self.mockTracker.winNotifications.count > 0) {
+        NSDictionary *winNotification = self.mockTracker.winNotifications[0];
+        NSDictionary *fullPayload = winNotification[@"fullPayload"];
+        
+        XCTAssertNotNil(fullPayload, @"Should have full payload");
+        
+        // CRITICAL: Loop index should be 6, not 0
+        NSNumber *actualLoopIndex = fullPayload[@"loopIndex"];
+        XCTAssertNotNil(actualLoopIndex, @"Loop index should be present in payload");
+        XCTAssertEqual([actualLoopIndex integerValue], expectedLoopIndex, 
+                      @"Loop index should be %ld (not 0) - this is the CX-1903 regression test", 
+                      (long)expectedLoopIndex);
+        
+        // Verify other expected fields
+        XCTAssertEqualObjects(winNotification[@"bidId"], testBidId, @"Should have correct bid ID");
+        XCTAssertEqualObjects(fullPayload[@"notificationType"], @"loadSuccess", 
+                            @"Should have correct notification type");
+    }
+}
+
+/**
+ * REGRESSION TEST for CX-1903: Verify loop index persists across multiple events
+ * 
+ * Tests that loop index remains correct for both loadSuccess (nurl) and 
+ * renderSuccess (burl) events in the same auction.
+ */
+- (void)testLoopIndex_AcrossMultipleEvents_ShouldRemainConsistent {
+    // Given: Configure with loop index field
+    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
+    config.winLossNotificationURL = @"https://test.com/winloss";
+    config.winLossNotificationPayloadConfig = @{
+        @"notificationType": @"sdk.[loadSuccess|renderSuccess|loss]",
+        @"loopIndex": @"sdk.loopIndex",
+        @"url": @"sdk.[bid.nurl|bid.lurl]"
+    };
+    [[CLXWinLossTracker shared] setConfig:config];
+    
+    NSInteger expectedLoopIndex = 3;
+    NSString *testAuctionId = @"multi-event-auction";
+    NSString *testBidId = @"multi-event-bid";
+    
+    // Store loop index
+    [[CLXTrackingFieldResolver shared] setLoopIndex:testAuctionId loopIndex:expectedLoopIndex];
+    
+    // Create bid
+    CLXBidResponseBid *bid = [[CLXBidResponseBid alloc] init];
+    bid.id = testBidId;
+    bid.price = 1.75;
+    bid.nurl = @"https://test.com/nurl";
+    bid.burl = @"https://test.com/burl";
+    [[CLXWinLossTracker shared] addBid:testAuctionId bid:bid];
+    
+    // When: Send both loadSuccess and renderSuccess events
+    [[CLXWinLossTracker shared] sendEvent:testAuctionId
+                                    bidId:testBidId
+                                    event:[CLXBidLifecycleEvent loadSuccessEvent]
+                               lossReason:@(CLXLossReasonBidWon)
+                           winnerBidPrice:bid.price];
+    
+    [[CLXWinLossTracker shared] sendEvent:testAuctionId
+                                    bidId:testBidId
+                                    event:[CLXBidLifecycleEvent renderSuccessEvent]
+                               lossReason:@(CLXLossReasonBidWon)
+                           winnerBidPrice:bid.price];
+    
+    // Then: Both events should have same loop index
+    XCTAssertEqual(self.mockTracker.winNotifications.count, 2, 
+                  @"Should send two win notifications");
+    
+    for (NSDictionary *notification in self.mockTracker.winNotifications) {
+        NSDictionary *payload = notification[@"fullPayload"];
+        NSNumber *loopIndex = payload[@"loopIndex"];
+        XCTAssertEqual([loopIndex integerValue], expectedLoopIndex, 
+                      @"Loop index should be consistent across all events for same auction");
+    }
+}
+
+/**
+ * REGRESSION TEST for CX-1903: Verify fullscreen ads use loop index 1
+ * 
+ * Fullscreen ads (interstitials, rewarded) should always use loop index 1,
+ * not an incremental counter.
+ */
+- (void)testLoopIndex_ForFullscreenAds_ShouldAlwaysBeOne {
+    // Given: Configure with loop index field
+    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
+    config.winLossNotificationURL = @"https://test.com/winloss";
+    config.winLossNotificationPayloadConfig = @{
+        @"notificationType": @"sdk.[loadSuccess|renderSuccess|loss]",
+        @"loopIndex": @"sdk.loopIndex",
+        @"url": @"sdk.[bid.nurl|bid.lurl]"
+    };
+    [[CLXWinLossTracker shared] setConfig:config];
+    
+    NSInteger expectedLoopIndex = 1;  // Fullscreen ads always use 1
+    NSString *testAuctionId = @"fullscreen-auction";
+    NSString *testBidId = @"fullscreen-bid";
+    
+    // Store loop index as 1 (as fullscreen ads do)
+    [[CLXTrackingFieldResolver shared] setLoopIndex:testAuctionId loopIndex:expectedLoopIndex];
+    
+    // Create bid
+    CLXBidResponseBid *bid = [[CLXBidResponseBid alloc] init];
+    bid.id = testBidId;
+    bid.price = 5.00;
+    bid.nurl = @"https://test.com/nurl";
+    [[CLXWinLossTracker shared] addBid:testAuctionId bid:bid];
+    
+    // When: Send loadSuccess event
+    [[CLXWinLossTracker shared] sendEvent:testAuctionId
+                                    bidId:testBidId
+                                    event:[CLXBidLifecycleEvent loadSuccessEvent]
+                               lossReason:@(CLXLossReasonBidWon)
+                           winnerBidPrice:bid.price];
+    
+    // Then: Verify loop index is 1
+    XCTAssertEqual(self.mockTracker.winNotifications.count, 1, @"Should send win notification");
+    
+    if (self.mockTracker.winNotifications.count > 0) {
+        NSDictionary *payload = self.mockTracker.winNotifications[0][@"fullPayload"];
+        NSNumber *loopIndex = payload[@"loopIndex"];
+        XCTAssertEqual([loopIndex integerValue], 1, 
+                      @"Fullscreen ads should always have loop index of 1");
+    }
+}
+
 @end

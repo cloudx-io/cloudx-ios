@@ -44,12 +44,20 @@
     // Start with all metrics enabled and impression URL
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkApiCallsEnabled = @YES;
-    metricsConfig.networkCallsEnabled = @YES;
-    metricsConfig.networkCallsBidReqEnabled = @YES;
+    
+    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig.sdkAPICalls.enabled = @YES;
+    
+    metricsConfig.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    metricsConfig.networkCalls.enabled = @YES;
+    metricsConfig.networkCalls.bidReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    metricsConfig.networkCalls.bidReq.enabled = @YES;
+    metricsConfig.networkCalls.geoReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    metricsConfig.networkCalls.geoReq.enabled = @YES;
+    metricsConfig.networkCalls.sdkInitRequest = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    metricsConfig.networkCalls.sdkInitRequest.enabled = @YES;
+    
     config.impressionTrackerURL = @"https://perf-test.example.com/track"; // Test impression URL for performance
-    metricsConfig.networkCallsGeoReqEnabled = @YES;
-    metricsConfig.networkCallsInitSdkReqEnabled = @YES;
     config.metricsConfig = metricsConfig;
     
     [self.metricsTracker startWithConfig:config];
@@ -247,7 +255,8 @@
     // Set up metrics tracker with proper configuration
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkApiCallsEnabled = @YES;
+    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig.sdkAPICalls.enabled = @YES;
     config.metricsConfig = metricsConfig;
     [freshTracker startWithConfig:config];
     [freshTracker setBasicDataWithSessionId:@"perf-session" accountId:@"perf-account" basePayload:@"perf-payload"];

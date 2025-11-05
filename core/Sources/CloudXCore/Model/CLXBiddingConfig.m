@@ -21,6 +21,7 @@
 #import <CloudXCore/NSDictionary+DynamicPath.h>
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXSessionMetrics.h>
+#import <CloudXCore/CLXTrackingFieldResolver.h>
 
 // Internal methods category for accessing privacy methods that are not in public header
 // TEMP: Remove CLXPrivacyService private interface once server supports GDPR/COPPA
@@ -428,6 +429,11 @@ static void initializeLogger() {
         
         _ext = ext;
         _requestID = [[NSUUID UUID] UUIDString];
+        
+        // Store loop index for win/loss tracking
+        NSInteger loopIndexInt = [loopIndexValue integerValue];
+        [[CLXTrackingFieldResolver shared] setLoopIndex:_requestID loopIndex:loopIndexInt];
+        [logger debug:[NSString stringWithFormat:@"📊 [BiddingConfig] Stored loop-index=%ld for auction: %@", (long)loopIndexInt, _requestID]];
         
         // Check if test mode has been forced via internal API (for demo/test apps only)
         NSNumber *forceTestMode = [[NSUserDefaults standardUserDefaults] objectForKey:@"CLXCore_Internal_ForceTestMode"];

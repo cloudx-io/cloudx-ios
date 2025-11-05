@@ -82,7 +82,8 @@
     // Given - start the metrics tracker with impression URL
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkApiCallsEnabled = @YES;
+    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig.sdkAPICalls.enabled = @YES;
     config.metricsConfig = metricsConfig;
     config.impressionTrackerURL = @"https://test-impression.example.com/t"; // Test impression URL usage
     
@@ -114,9 +115,12 @@
     // Given - start the metrics tracker with impression URL for network calls
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.networkCallsEnabled = @YES;
-    metricsConfig.networkCallsBidReqEnabled = @YES;
-    metricsConfig.networkCallsInitSdkReqEnabled = @YES; // Also enable SDK init network calls
+    metricsConfig.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    metricsConfig.networkCalls.enabled = @YES;
+    metricsConfig.networkCalls.bidReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    metricsConfig.networkCalls.bidReq.enabled = @YES;
+    metricsConfig.networkCalls.sdkInitRequest = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    metricsConfig.networkCalls.sdkInitRequest.enabled = @YES; // Also enable SDK init network calls
     config.metricsConfig = metricsConfig;
     config.impressionTrackerURL = @"https://test-network.example.com/track"; // Test impression URL for network metrics
     
@@ -148,11 +152,16 @@
     // Given - start the metrics tracker with all metrics enabled
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkApiCallsEnabled = @YES;
-    metricsConfig.networkCallsEnabled = @YES;
-    metricsConfig.networkCallsBidReqEnabled = @YES;
-    metricsConfig.networkCallsInitSdkReqEnabled = @YES;
-    metricsConfig.networkCallsGeoReqEnabled = @YES;
+    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig.sdkAPICalls.enabled = @YES;
+    metricsConfig.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    metricsConfig.networkCalls.enabled = @YES;
+    metricsConfig.networkCalls.bidReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    metricsConfig.networkCalls.bidReq.enabled = @YES;
+    metricsConfig.networkCalls.sdkInitRequest = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    metricsConfig.networkCalls.sdkInitRequest.enabled = @YES;
+    metricsConfig.networkCalls.geoReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    metricsConfig.networkCalls.geoReq.enabled = @YES;
     config.metricsConfig = metricsConfig;
     
     [self.metricsTracker startWithConfig:config];
@@ -193,8 +202,10 @@
     // Given - start with only method calls enabled
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkApiCallsEnabled = @YES;
-    metricsConfig.networkCallsEnabled = @NO; // Disabled
+    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig.sdkAPICalls.enabled = @YES;
+    metricsConfig.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    metricsConfig.networkCalls.enabled = @NO; // Disabled
     config.metricsConfig = metricsConfig;
     
     [self.metricsTracker startWithConfig:config];
@@ -218,9 +229,12 @@
     // Given - enable network calls but disable specific types
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.networkCallsEnabled = @YES;
-    metricsConfig.networkCallsBidReqEnabled = @YES;
-    metricsConfig.networkCallsGeoReqEnabled = @NO; // Disabled
+    metricsConfig.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    metricsConfig.networkCalls.enabled = @YES;
+    metricsConfig.networkCalls.bidReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    metricsConfig.networkCalls.bidReq.enabled = @YES;
+    metricsConfig.networkCalls.geoReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    metricsConfig.networkCalls.geoReq.enabled = @NO; // Disabled
     config.metricsConfig = metricsConfig;
     
     [self.metricsTracker startWithConfig:config];
@@ -248,7 +262,8 @@
     
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkApiCallsEnabled = @YES;
+    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig.sdkAPICalls.enabled = @YES;
     config.metricsConfig = metricsConfig;
     
     [self.metricsTracker startWithConfig:config];
@@ -270,11 +285,16 @@
     // Given
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkApiCallsEnabled = @YES;
-    metricsConfig.networkCallsEnabled = @YES;
-    metricsConfig.networkCallsBidReqEnabled = @YES;
-    metricsConfig.networkCallsInitSdkReqEnabled = @YES;
-    metricsConfig.networkCallsGeoReqEnabled = @YES;
+    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig.sdkAPICalls.enabled = @YES;
+    metricsConfig.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    metricsConfig.networkCalls.enabled = @YES;
+    metricsConfig.networkCalls.bidReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    metricsConfig.networkCalls.bidReq.enabled = @YES;
+    metricsConfig.networkCalls.sdkInitRequest = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    metricsConfig.networkCalls.sdkInitRequest.enabled = @YES;
+    metricsConfig.networkCalls.geoReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    metricsConfig.networkCalls.geoReq.enabled = @YES;
     config.metricsConfig = metricsConfig;
     
     [self.metricsTracker startWithConfig:config];
@@ -321,7 +341,8 @@
     // Given
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkApiCallsEnabled = @YES;
+    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig.sdkAPICalls.enabled = @YES;
     config.metricsConfig = metricsConfig;
     config.impressionTrackerURL = @"https://lifecycle-test.example.com/t";
     
@@ -355,7 +376,8 @@
     // Given - Test fallback from impressionTrackerURL to metricsEndpointURL
     CLXSDKConfig *configWithImpression = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig1 = [[CLXMetricsConfig alloc] init];
-    metricsConfig1.sdkApiCallsEnabled = @YES;
+    metricsConfig1.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig1.sdkAPICalls.enabled = @YES;
     configWithImpression.metricsConfig = metricsConfig1;
     configWithImpression.impressionTrackerURL = @"https://impression.example.com/track";
     configWithImpression.metricsEndpointURL = @"https://metrics.example.com/api";
@@ -376,7 +398,8 @@
     [self.metricsTracker stop];
     CLXSDKConfig *configWithMetrics = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig2 = [[CLXMetricsConfig alloc] init];
-    metricsConfig2.sdkApiCallsEnabled = @YES;
+    metricsConfig2.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig2.sdkAPICalls.enabled = @YES;
     configWithMetrics.metricsConfig = metricsConfig2;
     configWithMetrics.impressionTrackerURL = nil; // No impression URL
     configWithMetrics.metricsEndpointURL = @"https://fallback-metrics.example.com/api";

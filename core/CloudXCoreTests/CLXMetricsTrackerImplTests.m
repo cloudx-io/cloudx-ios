@@ -91,8 +91,10 @@
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
     metricsConfig.sendIntervalSeconds = 120;
-    metricsConfig.sdkApiCallsEnabled = @YES;
-    metricsConfig.networkCallsEnabled = @YES;
+    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig.sdkAPICalls.enabled = @YES;
+    metricsConfig.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    metricsConfig.networkCalls.enabled = @YES;
     config.metricsConfig = metricsConfig;
     config.impressionTrackerURL = @"https://test.example.com/t";
     
@@ -107,7 +109,8 @@
     // Given - Test that impressionTrackerURL is used for metrics endpoint
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkApiCallsEnabled = @YES;
+    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig.sdkAPICalls.enabled = @YES;
     config.metricsConfig = metricsConfig;
     config.impressionTrackerURL = @"https://impression.example.com/track";
     
@@ -122,7 +125,8 @@
     // Given - Test fallback to metricsEndpointURL when impressionTrackerURL is nil
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkApiCallsEnabled = @YES;
+    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig.sdkAPICalls.enabled = @YES;
     config.metricsConfig = metricsConfig;
     config.metricsEndpointURL = @"https://metrics.example.com/api";
     // impressionTrackerURL is nil, should fallback to metricsEndpointURL
@@ -138,7 +142,8 @@
     // Given - Test behavior when both URLs are nil
     CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
     CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkApiCallsEnabled = @YES;
+    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    metricsConfig.sdkAPICalls.enabled = @YES;
     config.metricsConfig = metricsConfig;
     // Both impressionTrackerURL and metricsEndpointURL are nil
     
