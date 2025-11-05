@@ -240,7 +240,7 @@ NS_ASSUME_NONNULL_BEGIN
             [strongSelf.rillTrackingService setupTrackingDataFromBidResponse:response
                                                                     impModel:strongSelf.impModel
                                                                  placementID:strongSelf.placementID
-                                                                   loadCount:0];
+                                                                   loadCount:strongSelf.loadNativeTimesCount];
             
             // Reset waterfall backoff algorithm
             [strongSelf.waterfallBackoffAlgorithm reset];

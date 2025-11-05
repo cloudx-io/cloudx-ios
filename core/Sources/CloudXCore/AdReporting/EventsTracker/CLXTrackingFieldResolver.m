@@ -217,6 +217,8 @@
         // This should be set dynamically per auction
         NSMutableDictionary *auctionSdkMap = self.sdkMap[auctionId];
         return auctionSdkMap[field];
+    } else if ([field isEqualToString:@"sdk.loopIndex"]) {
+        return self.auctionedLoopIndex[auctionId];
     } else {
         // Check auction-specific SDK parameters
         NSMutableDictionary *auctionSdkMap = self.sdkMap[auctionId];
@@ -226,10 +228,6 @@
 
 - (nullable id)resolveBidRequestField:(NSString *)auctionId field:(NSString *)field {
     // Handle special cases first
-    if ([field isEqualToString:@"bidRequest.loopIndex"]) {
-        return self.auctionedLoopIndex[auctionId];
-    }
-    
     if ([field isEqualToString:@"bidRequest.device.ifa"]) {
         // Privacy logic implementation matching Android behavior
         CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];

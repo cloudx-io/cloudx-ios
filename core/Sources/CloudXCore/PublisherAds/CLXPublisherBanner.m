@@ -298,7 +298,7 @@ NS_ASSUME_NONNULL_BEGIN
         [strongSelf.rillTrackingService setupTrackingDataFromBidResponse:response
                                                                 impModel:strongSelf.impModel
                                                              placementID:storedImpressionId
-                                                               loadCount:0];
+                                                               loadCount:currentLoopIndex];
         
         NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreBannerMetricsDictKey];
         NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
