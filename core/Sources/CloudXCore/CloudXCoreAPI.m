@@ -259,6 +259,9 @@ static CloudXCore *_sharedInstance = nil;
         [[CLXWinLossTracker shared] setEndpoint:config.winLossNotificationURL];
         [[CLXWinLossTracker shared] setConfig:config];
         
+        // Retry any cached win/loss events from previous sessions
+        [[CLXWinLossTracker shared] trySendingPendingWinLossEvents];
+        
         NSMutableDictionary *geoHeaders = [NSMutableDictionary dictionary];
         if (config.geoHeaders) {
             for (CLXSDKConfigGeoBid *geoBid in config.geoHeaders) {

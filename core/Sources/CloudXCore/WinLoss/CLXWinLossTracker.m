@@ -615,9 +615,9 @@ static id<CLXWinLossTracking> _testInstance = nil;
     
     BOOL success = [self.database executeSQL:deleteSQL withParameters:parameters];
     if (success) {
-        [self.logger debug:[NSString stringWithFormat:@"Deleted event with ID: %@", eventId]];
+        [self.logger debug:[NSString stringWithFormat:@"🗑️ [WinLossTracker] Deleted event with ID: %@", eventId]];
     } else {
-        [self.logger error:[NSString stringWithFormat:@"Failed to delete event with ID: %@", eventId]];
+        [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Failed to delete event with ID: %@", eventId]];
     }
 }
 
