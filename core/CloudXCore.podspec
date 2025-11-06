@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXCore'
-  s.version          = '1.1.59'
+  s.version          = '1.1.60'
   s.summary          = 'CloudX Core Framework'
   s.description      = 'Core framework for CloudX functionality'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
