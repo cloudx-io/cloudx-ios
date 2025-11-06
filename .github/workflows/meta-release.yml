@@ -185,6 +185,49 @@ jobs:
           echo "=== Checking pod ownership ==="
           pod trunk info CloudXMetaAdapter || true
 
+      - name: ⏳ Wait for CloudXCore dependency to be available
+        run: |
+          echo "🔍 Checking for CloudXCore dependency availability..."
+          # CloudXMetaAdapter depends on CloudXCore, so we need to ensure Core is available before pushing
+          # This prevents race conditions when both Core and Meta are released simultaneously
+          
+          # Try to find the required Core version from the podspec
+          REQUIRED_CORE_VERSION=$(grep "s.dependency 'CloudXCore'" adapter-meta/CloudXMetaAdapter-release.podspec | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "")
+          
+          if [ -z "$REQUIRED_CORE_VERSION" ]; then
+            echo "⚠️  No specific CloudXCore version requirement found, checking for latest..."
+            # If no version specified, just check that CloudXCore exists
+            if pod trunk info CloudXCore > /dev/null 2>&1; then
+              echo "✅ CloudXCore is available on CocoaPods"
+            else
+              echo "❌ CloudXCore not found on CocoaPods"
+              exit 1
+            fi
+          else
+            echo "📦 Required CloudXCore version: $REQUIRED_CORE_VERSION"
+            MAX_ATTEMPTS=60
+            WAIT_SECONDS=10
+            
+            for i in $(seq 1 $MAX_ATTEMPTS); do
+              echo "🔄 Attempt $i/$MAX_ATTEMPTS: Checking if CloudXCore $REQUIRED_CORE_VERSION is available..."
+              
+              if pod trunk info CloudXCore 2>/dev/null | grep -q "$REQUIRED_CORE_VERSION"; then
+                echo "✅ CloudXCore $REQUIRED_CORE_VERSION is available on CocoaPods!"
+                echo "✅ Proceeding with CloudXMetaAdapter release..."
+                exit 0
+              fi
+              
+              if [ $i -lt $MAX_ATTEMPTS ]; then
+                echo "⏳ CloudXCore $REQUIRED_CORE_VERSION not yet available, waiting ${WAIT_SECONDS}s..."
+                sleep $WAIT_SECONDS
+              else
+                echo "❌ Timeout: CloudXCore $REQUIRED_CORE_VERSION not available after $((MAX_ATTEMPTS * WAIT_SECONDS))s"
+                echo "💡 This usually means CloudXCore release is still in progress or failed"
+                exit 1
+              fi
+            done
+          fi
+
       - name: 📤 Push podspec to CocoaPods trunk
         run: |
           # Use EXACT same pattern as working Core workflow
