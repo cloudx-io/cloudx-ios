@@ -6,8 +6,8 @@ target 'CloudXPrebidAdapter' do
   use_frameworks!
 
   # Pods for CloudXPrebidAdapter
-  # LOCAL development
-  pod 'CloudXCore', :path => '../cloudexchange.sdk.ios.coreObjC'
+  # LOCAL development (monorepo)
+  pod 'CloudXCore', :path => '../core'
 
   # REMOTE development
   # pod 'CloudXCore', :podspec => 'https://raw.githubusercontent.com/cloudx-xenoss/CloudXCoreiOS/main/CloudXCore.podspec.json'

@@ -5,8 +5,8 @@ target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
   # Pods for CloudXObjCRemotePods
-  # pod 'CloudXCore'
-  # pod 'CloudXMetaAdapter'
+  # For REMOTE: pod 'CloudXCore'
+  # For LOCAL development: just use :path, CocoaPods will find -local.podspec
   pod 'CloudXCore', :path => '../core'
   pod 'CloudXMetaAdapter', :path => '../adapter-meta'
   pod 'CloudXPrebidAdapter', :path => '../adapter-cloudx'

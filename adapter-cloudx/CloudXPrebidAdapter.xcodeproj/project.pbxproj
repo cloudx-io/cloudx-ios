@@ -114,6 +114,8 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		19D063AB2E30F0B000B3B99C /* CloudXPrebidAdapterTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = CloudXPrebidAdapterTests;
 			sourceTree = "<group>";
 		};
@@ -358,7 +360,6 @@
 				19D063A32E30F0B000B3B99C /* Sources */,
 				19D063A42E30F0B000B3B99C /* Frameworks */,
 				19D063A52E30F0B000B3B99C /* Resources */,
-				4195E9F691CDCB93AB55AD7A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -428,23 +429,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		4195E9F691CDCB93AB55AD7A /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests/Pods-CloudXPrebidAdapter-CloudXPrebidAdapterTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		669B8F355B22EFBCCD1A0432 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
