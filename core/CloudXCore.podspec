@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '14.0'
   
   # Source files for distribution
-  s.source_files = 'Sources/CloudXCore/**/*.{h,m}'
+  s.source_files = 'core/Sources/CloudXCore/**/*.{h,m}'
   
   s.framework = 'Foundation'
   s.frameworks = 'SafariServices'

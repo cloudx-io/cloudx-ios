@@ -165,12 +165,12 @@ jobs:
           cat CloudXMetaAdapter-release.podspec
           echo "=== Running podspec validation ==="
           # Temporarily rename for validation (CocoaPods requires filename to match spec name)
-          cp CloudXMetaAdapter-release.podspec CloudXMetaAdapter.podspec.tmp
-          pod spec lint CloudXMetaAdapter.podspec.tmp --allow-warnings --skip-import-validation --skip-tests --verbose || {
+          cp CloudXMetaAdapter-release.podspec CloudXMetaAdapter.podspec
+          pod spec lint CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose || {
             echo "❌ Podspec validation failed"
             exit 1
           }
-          rm CloudXMetaAdapter.podspec.tmp
+          rm CloudXMetaAdapter.podspec
 
       - name: 📋 Verify CocoaPods authentication
         run: |
