@@ -41,13 +41,13 @@
         _placementID = [placementID copy];
         _bidID = [bidID copy];
         _delegate = delegate;
-        _logger = [CLXLogger loggerWithTag:@"VungleAppOpen"];
+        _logger = [[CLXLogger alloc] initWithCategory:@"VungleAppOpen"];
         _timeoutInterval = 30.0; // Default 30 second timeout
         _isLoaded = NO;
         _isShowing = NO;
         _isDestroyed = NO;
         
-        [_logger logDebug:[NSString stringWithFormat:@"Initialized Vungle App Open - Placement: %@, BidID: %@, HasBidPayload: %@", 
+        [_logger debug:[NSString stringWithFormat:@"Initialized Vungle App Open - Placement: %@, BidID: %@, HasBidPayload: %@", 
                           placementID, bidID, bidPayload ? @"YES" : @"NO"]];
     }
     return self;
@@ -71,12 +71,12 @@
 
 - (void)load {
     if (self.isDestroyed) {
-        [self.logger logError:@"Cannot load - adapter is destroyed"];
+        [self.logger error:@"Cannot load - adapter is destroyed"];
         return;
     }
     
     if (self.isLoaded) {
-        [self.logger logWarning:@"Ad already loaded, ignoring duplicate load request"];
+        [self.logger error:@"Ad already loaded, ignoring duplicate load request"];
         return;
     }
     
@@ -84,12 +84,12 @@
     if (![VungleAds isInitialized]) {
         NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
                                              code:CLXVungleAdapterErrorCodeNotInitialized
-                                         userInfo:@{NSLocalizedDescriptionKey: @"Vungle SDK not initialized"}];
+                                          userInfo:nil];
         [self handleLoadFailure:error];
         return;
     }
     
-    [self.logger logInfo:[NSString stringWithFormat:@"Loading App Open ad for placement: %@", self.placementID]];
+    [self.logger info:[NSString stringWithFormat:@"Loading App Open ad for placement: %@", self.placementID]];
     
     // Create Vungle interstitial (used for App Open ads)
     self.interstitial = [[VungleInterstitial alloc] initWithPlacementId:self.placementID];
@@ -99,43 +99,38 @@
     [self startTimeoutTimer];
     
     // Load the ad
-    if (self.bidPayload) {
-        [self.logger logDebug:@"Loading App Open with bid payload"];
-        [self.interstitial load:self.bidPayload];
-    } else {
-        [self.logger logDebug:@"Loading waterfall App Open ad"];
-        [self.interstitial load];
-    }
+    [self.logger debug:[NSString stringWithFormat:@"Loading %@ App Open ad", self.bidPayload ? @"bidding" : @"waterfall"]];
+    [self.interstitial load:self.bidPayload];
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
     if (self.isDestroyed) {
-        [self.logger logError:@"Cannot show - adapter is destroyed"];
+        [self.logger error:@"Cannot show - adapter is destroyed"];
         return;
     }
     
     if (!self.isLoaded) {
         NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
                                              code:CLXVungleAdapterErrorCodeShowFailed
-                                         userInfo:@{NSLocalizedDescriptionKey: @"App Open ad not loaded"}];
+                                          userInfo:nil];
         [self handleShowFailure:error];
         return;
     }
     
     if (self.isShowing) {
-        [self.logger logWarning:@"App Open ad is already showing, ignoring duplicate show request"];
+        [self.logger error:@"App Open ad is already showing, ignoring duplicate show request"];
         return;
     }
     
     if (!viewController) {
         NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
                                              code:CLXVungleAdapterErrorCodeShowFailed
-                                         userInfo:@{NSLocalizedDescriptionKey: @"View controller is nil"}];
+                                          userInfo:nil];
         [self handleShowFailure:error];
         return;
     }
     
-    [self.logger logInfo:@"Showing App Open ad"];
+    [self.logger info:@"Showing App Open ad"];
     self.isShowing = YES;
     
     // Present the ad
@@ -147,7 +142,7 @@
         return;
     }
     
-    [self.logger logDebug:@"Destroying App Open adapter"];
+    [self.logger debug:@"Destroying App Open adapter"];
     self.isDestroyed = YES;
     
     // Cancel timeout timer
@@ -170,11 +165,11 @@
     [self cancelTimeoutTimer];
     
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring load callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring load callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"App Open ad loaded successfully"];
+    [self.logger info:@"App Open ad loaded successfully"];
     self.isLoaded = YES;
     
     if ([self.delegate respondsToSelector:@selector(didLoadWithInterstitial:)]) {
@@ -186,7 +181,7 @@
     [self cancelTimeoutTimer];
     
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring load failure callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring load failure callback - adapter destroyed"];
         return;
     }
     
@@ -195,20 +190,20 @@
 
 - (void)interstitialAdWillPresent:(VungleInterstitial *)interstitial {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring will present callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring will present callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logDebug:@"App Open ad will present"];
+    [self.logger debug:@"App Open ad will present"];
 }
 
 - (void)interstitialAdDidPresent:(VungleInterstitial *)interstitial {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring did present callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring did present callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"App Open ad presented successfully"];
+    [self.logger info:@"App Open ad presented successfully"];
     
     if ([self.delegate respondsToSelector:@selector(didShowWithInterstitial:)]) {
         [self.delegate didShowWithInterstitial:self];
@@ -217,7 +212,7 @@
 
 - (void)interstitialAdDidFailToPresent:(VungleInterstitial *)interstitial withError:(NSError *)error {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring present failure callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring present failure callback - adapter destroyed"];
         return;
     }
     
@@ -226,11 +221,11 @@
 
 - (void)interstitialAdDidTrackImpression:(VungleInterstitial *)interstitial {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring impression callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring impression callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"App Open ad impression tracked"];
+    [self.logger info:@"App Open ad impression tracked"];
     
     if ([self.delegate respondsToSelector:@selector(impressionWithInterstitial:)]) {
         [self.delegate impressionWithInterstitial:self];
@@ -239,11 +234,11 @@
 
 - (void)interstitialAdDidClick:(VungleInterstitial *)interstitial {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring click callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring click callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"App Open ad clicked"];
+    [self.logger info:@"App Open ad clicked"];
     
     if ([self.delegate respondsToSelector:@selector(clickWithInterstitial:)]) {
         [self.delegate clickWithInterstitial:self];
@@ -252,29 +247,29 @@
 
 - (void)interstitialAdWillLeaveApplication:(VungleInterstitial *)interstitial {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring will leave app callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring will leave app callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logDebug:@"App Open ad will leave application"];
+    [self.logger debug:@"App Open ad will leave application"];
 }
 
 - (void)interstitialAdWillClose:(VungleInterstitial *)interstitial {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring will close callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring will close callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logDebug:@"App Open ad will close"];
+    [self.logger debug:@"App Open ad will close"];
 }
 
 - (void)interstitialAdDidClose:(VungleInterstitial *)interstitial {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring did close callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring did close callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"App Open ad closed"];
+    [self.logger info:@"App Open ad closed"];
     self.isShowing = NO;
     self.isLoaded = NO; // Ad is consumed after showing
     
@@ -309,11 +304,11 @@
         return;
     }
     
-    [self.logger logWarning:[NSString stringWithFormat:@"App Open ad load timed out after %.1f seconds", self.timeoutInterval]];
+    [self.logger error:[NSString stringWithFormat:@"App Open ad load timed out after %.1f seconds", self.timeoutInterval]];
     
     NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
                                          code:CLXVungleAdapterErrorCodeTimeout
-                                     userInfo:@{NSLocalizedDescriptionKey: @"App Open ad load timed out"}];
+                                      userInfo:nil];
     [self handleLoadFailure:error];
 }
 

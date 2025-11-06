@@ -24,7 +24,7 @@
     static CLXLogger *logger = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        logger = [CLXLogger loggerWithTag:@"VungleBannerFactory"];
+        logger = [[CLXLogger alloc] initWithCategory:@"VungleBannerFactory"];
     });
     return logger;
 }
@@ -48,28 +48,28 @@
     
     // Validate required parameters
     if (!viewController) {
-        [logger logError:@"Cannot create banner adapter - viewController is nil"];
+        [logger error:@"Cannot create banner adapter - viewController is nil"];
         return nil;
     }
     
     if (!adId || adId.length == 0) {
-        [logger logError:@"Cannot create banner adapter - adId is nil or empty"];
+        [logger error:@"Cannot create banner adapter - adId is nil or empty"];
         return nil;
     }
     
     if (!bidId || bidId.length == 0) {
-        [logger logError:@"Cannot create banner adapter - bidId is nil or empty"];
+        [logger error:@"Cannot create banner adapter - bidId is nil or empty"];
         return nil;
     }
     
     if (!delegate) {
-        [logger logError:@"Cannot create banner adapter - delegate is nil"];
+        [logger error:@"Cannot create banner adapter - delegate is nil"];
         return nil;
     }
     
     // Validate banner type support
     if (![self isBannerTypeSupported:type]) {
-        [logger logError:[NSString stringWithFormat:@"Unsupported banner type: %ld", (long)type]];
+        [logger error:[NSString stringWithFormat:@"Unsupported banner type: %ld", (long)type]];
         return nil;
     }
     
@@ -92,13 +92,13 @@
                                                               placementId:placementId
                                                                    extras:extras];
     
-    [logger logInfo:[NSString stringWithFormat:@"Creating Vungle banner adapter - Placement: %@, BidID: %@, Type: %ld, HasBidPayload: %@",
+    [logger info:[NSString stringWithFormat:@"Creating Vungle banner adapter - Placement: %@, BidID: %@, Type: %ld, HasBidPayload: %@",
                     placementId, bidId, (long)type, bidPayload ? @"YES" : @"NO"]
-           userInfo:userInfo];
+           ];
     
     // Log close button parameter (note: Vungle banners don't typically support close buttons)
     if (hasClosedButton) {
-        [logger logDebug:@"Close button requested - Vungle banners handle this automatically" userInfo:userInfo];
+        [logger debug:@"Close button requested - Vungle banners handle this automatically" ];
     }
     
     // Create and return the adapter
@@ -110,11 +110,11 @@
                                                                   delegate:delegate];
     
     if (!adapter) {
-        [logger logError:@"Failed to create Vungle banner adapter" userInfo:userInfo];
+        [logger error:@"Failed to create Vungle banner adapter" ];
         return nil;
     }
     
-    [logger logDebug:@"Successfully created Vungle banner adapter" userInfo:userInfo];
+    [logger debug:@"Successfully created Vungle banner adapter" ];
     return adapter;
 }
 
@@ -122,9 +122,8 @@
 
 - (BOOL)isBannerTypeSupported:(CLXBannerType)type {
     switch (type) {
-        case CLXBannerTypeBanner:           // 320x50
-        case CLXBannerTypeMediumRectangle:  // 300x250 (MREC)
-        case CLXBannerTypeLeaderboard:      // 728x90
+        case CLXBannerTypeW320H50:  // 320x50 (or 728x90 on iPad)
+        case CLXBannerTypeMREC:     // 300x250
             return YES;
             
         default:

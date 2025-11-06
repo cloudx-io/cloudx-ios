@@ -85,6 +85,7 @@ Thumbs.db
 **/demo-app-*/build.log
 **/demo-app-*/last_build.log
 **/demo-app-*/all_logs_combined.txt
+**/demo-app-*/demo-config-*.yaml
 
 # Documentation artifacts
 *.pdf

@@ -179,11 +179,11 @@ NS_ASSUME_NONNULL_BEGIN
                                                     dealID:_dealID
                                              hasCloseButton:hasCloseButton
                                                publisherID:publisherID
-                                                    adType:adType
-                                            bidTokenSources:bidTokenSources
-                                     nativeAdRequirements:nil
-                                                      tmax:tmax
-                                           reportingService:_reportingService
+                                                   adType:adType
+                                           bidTokenSources:bidTokenSources
+                                    nativeAdRequirements:nil
+                                                     tmax:_tmax
+                                          reportingService:_reportingService
                                                createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
             __strong typeof(weakSelf) strongSelf = weakSelf;
             if (!strongSelf) return nil;
@@ -262,16 +262,9 @@ NS_ASSUME_NONNULL_BEGIN
             return;
         }
         
-        [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] 📥 [PublisherBanner] Bid request completion - Response: %@, Error: %@", strongSelf.currentCorrelationId, response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] 📥 [PublisherBanner] Bid request completion - Response: %@, Error: %@", strongSelf.currentCorrelationId, response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
 
         if (error) {
-            // Check if this is a kill switch error - should fail immediately, not continue waterfall
-            if (error.code == CLXErrorCodeSDKDisabled || error.code == CLXErrorCodeAdsDisabled) {
-                [self.logger error:[NSString stringWithFormat:@"[%@] 🚫 [PublisherBanner] Kill switch active - failing immediately with code %ld", strongSelf.currentCorrelationId, (long)error.code]];
-                [strongSelf failToLoadBanner:nil error:error];
-                return;
-            }
-            
             [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherBanner] Bid request failed - %@ (Domain: %@, Code: %ld)", strongSelf.currentCorrelationId, error.localizedDescription, error.domain, (long)error.code]];
             
             // Continue with waterfall - let continueBannerChain handle the error

@@ -110,16 +110,28 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
     [self configureAdvertiserTrackingEnabled];
     
     // Configure test settings (only for development/testing)
-    // Check UserDefaults override first (for TestFlight/special cases)
+    // Check if running on simulator
+    BOOL isSimulator = NO;
+    #if TARGET_OS_SIMULATOR
+        isSimulator = YES;
+    #endif
+    
+    // Check UserDefaults override (for TestFlight/special cases)
     BOOL testModeOverride = [[NSUserDefaults standardUserDefaults] boolForKey:@"CLXMetaTestModeEnabled"];
     
+    // Enable test mode if: Debug build, Simulator, or UserDefaults override
+    if (isSimulator) {
+        [[CLXMetaInitializer logger] info:@"📱 [CLXMetaInitializer] Running on simulator - enabling test mode"];
+        [self configureTestSettings];
+    }
     #ifdef DEBUG
-    // Always enable in debug builds
-    [self configureTestSettings];
+    else {
+        [[CLXMetaInitializer logger] info:@"🐛 [CLXMetaInitializer] Debug build - enabling test mode"];
+        [self configureTestSettings];
+    }
     #else
-    // In release builds, only enable if UserDefaults override is set
-    if (testModeOverride) {
-        [[CLXMetaInitializer logger] debug:@"⚠️ [CLXMetaInitializer] Test mode enabled via UserDefaults override"];
+    else if (testModeOverride) {
+        [[CLXMetaInitializer logger] info:@"⚠️ [CLXMetaInitializer] Test mode enabled via UserDefaults override"];
         [self configureTestSettings];
     }
     #endif

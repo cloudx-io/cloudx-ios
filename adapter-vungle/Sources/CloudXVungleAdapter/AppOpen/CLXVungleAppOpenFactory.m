@@ -24,7 +24,7 @@
     static CLXLogger *logger = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        logger = [CLXLogger loggerWithTag:@"VungleAppOpenFactory"];
+        logger = [[CLXLogger alloc] initWithCategory:@"VungleAppOpenFactory"];
     });
     return logger;
 }
@@ -45,17 +45,17 @@
     
     // Validate required parameters
     if (!adId || adId.length == 0) {
-        [logger logError:@"Cannot create App Open adapter - adId is nil or empty"];
+        [logger error:@"Cannot create App Open adapter - adId is nil or empty"];
         return nil;
     }
     
     if (!bidId || bidId.length == 0) {
-        [logger logError:@"Cannot create App Open adapter - bidId is nil or empty"];
+        [logger error:@"Cannot create App Open adapter - bidId is nil or empty"];
         return nil;
     }
     
     if (!delegate) {
-        [logger logError:@"Cannot create App Open adapter - delegate is nil"];
+        [logger error:@"Cannot create App Open adapter - delegate is nil"];
         return nil;
     }
     
@@ -76,9 +76,8 @@
                                                               placementId:placementId
                                                                    extras:extras];
     
-    [logger logInfo:[NSString stringWithFormat:@"Creating Vungle App Open adapter - Placement: %@, BidID: %@, HasBidPayload: %@",
-                    placementId, bidId, bidPayload ? @"YES" : @"NO"]
-           userInfo:userInfo];
+    [logger info:[NSString stringWithFormat:@"Creating Vungle App Open adapter - Placement: %@, BidID: %@, HasBidPayload: %@",
+                    placementId, bidId, bidPayload ? @"YES" : @"NO"]];
     
     // Create and return the adapter
     CLXVungleAppOpen *adapter = [[CLXVungleAppOpen alloc] initWithBidPayload:bidPayload
@@ -87,11 +86,11 @@
                                                                     delegate:delegate];
     
     if (!adapter) {
-        [logger logError:@"Failed to create Vungle App Open adapter" userInfo:userInfo];
+        [logger error:@"Failed to create Vungle App Open adapter"];
         return nil;
     }
     
-    [logger logDebug:@"Successfully created Vungle App Open adapter" userInfo:userInfo];
+    [logger debug:@"Successfully created Vungle App Open adapter"];
     return adapter;
 }
 
@@ -110,19 +109,19 @@
     
     NSString *placementId = extras[@"vungle_appopen_placement_id"];
     if (placementId && placementId.length > 0) {
-        [logger logDebug:[NSString stringWithFormat:@"Using Vungle App Open placement ID from extras: %@", placementId]];
+        [logger debug:[NSString stringWithFormat:@"Using Vungle App Open placement ID from extras: %@", placementId]];
         return placementId;
     }
     
     placementId = extras[@"appopen_placement_id"];
     if (placementId && placementId.length > 0) {
-        [logger logDebug:[NSString stringWithFormat:@"Using App Open placement ID from extras: %@", placementId]];
+        [logger debug:[NSString stringWithFormat:@"Using App Open placement ID from extras: %@", placementId]];
         return placementId;
     }
     
     // Fall back to standard Vungle placement resolution
     placementId = [CLXVungleBaseFactory resolveVunglePlacementID:extras fallbackAdId:adId logger:logger];
-    [logger logDebug:[NSString stringWithFormat:@"Using standard placement ID for App Open: %@", placementId]];
+    [logger debug:[NSString stringWithFormat:@"Using standard placement ID for App Open: %@", placementId]];
     
     return placementId;
 }

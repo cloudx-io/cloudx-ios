@@ -26,7 +26,7 @@
     [self.logger info:@"Starting factory resolution for adapters"];
     
     // Get all known adapter names (this would be equivalent to SDKConfig.KnownAdapterName.allCases in Swift)
-    NSArray *knownAdapterNames = @[@"testbidder", @"googleAdManager", @"meta", @"mintegral", @"cloudx", @"prebidAdapter", @"prebidMobile"];
+    NSArray *knownAdapterNames = @[@"testbidder", @"googleAdManager", @"meta", @"mintegral", @"cloudx", @"prebidAdapter", @"prebidMobile", @"vungle"];
     
     for (NSString *adapterName in knownAdapterNames) {
         NSString *className = [self classNameForAdapterName:adapterName];
@@ -149,7 +149,7 @@
 
 - (NSString *)classNameForAdapterName:(NSString *)adapterName {
     if ([adapterName isEqualToString:@"testbidder"]) {
-        return @"TestVastNetwork";
+        return @"Prebid";  // Testbidder is implemented by the Prebid adapter
     } else if ([adapterName isEqualToString:@"googleAdManager"]) {
         return @"AdManager";
     } else if ([adapterName isEqualToString:@"meta"]) {
@@ -162,8 +162,10 @@
         return @"Prebid";
     } else if ([adapterName isEqualToString:@"prebidMobile"]) {
         return @"Prebid";
+    } else if ([adapterName isEqualToString:@"vungle"]) {
+        return @"Vungle";
     } else {
-        return @"TestVastNetwork"; // default
+        return @"Prebid"; // default to Prebid (testbidder)
     }
 }
 

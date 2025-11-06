@@ -30,7 +30,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _logger = [CLXLogger loggerWithTag:@"VungleInitializer"];
+        _logger = [[CLXLogger alloc] initWithCategory:@"VungleInitializer"];
         _isInitializing = NO;
         _pendingCompletions = [NSMutableArray array];
     }
@@ -67,7 +67,7 @@
     
     // Check if already initialized
     if ([VungleAds isInitialized]) {
-        [self.logger logInfo:@"Vungle SDK already initialized"];
+        [self.logger info:@"Vungle SDK already initialized"];
         dispatch_async(dispatch_get_main_queue(), ^{
             safeCompletion(YES, nil);
         });
@@ -76,7 +76,7 @@
     
     // Check if initialization is in progress
     if (self.isInitializing) {
-        [self.logger logInfo:@"Vungle SDK initialization already in progress, queuing completion"];
+        [self.logger info:@"Vungle SDK initialization already in progress, queuing completion"];
         @synchronized(self.pendingCompletions) {
             [self.pendingCompletions addObject:[safeCompletion copy]];
         }
@@ -93,7 +93,7 @@
                                              NSLocalizedFailureReasonErrorKey: @"No app_id found in configuration"
                                          }];
         
-        [self.logger logError:[NSString stringWithFormat:@"Initialization failed: %@", error.localizedDescription]];
+        [self.logger error:[NSString stringWithFormat:@"Initialization failed: %@", error.localizedDescription]];
         dispatch_async(dispatch_get_main_queue(), ^{
             safeCompletion(NO, error);
         });
@@ -106,7 +106,7 @@
         [self.pendingCompletions addObject:[safeCompletion copy]];
     }
     
-    [self.logger logInfo:[NSString stringWithFormat:@"Initializing Vungle SDK with App ID: %@", appId]];
+    [self.logger info:[NSString stringWithFormat:@"Initializing Vungle SDK with App ID: %@", appId]];
     
     // Initialize Vungle SDK
     [VungleAds initWithAppId:appId completion:^(NSError * _Nullable error) {
@@ -120,22 +120,23 @@
 
 - (nullable NSString *)extractAppIdFromConfig:(nullable CLXBidderConfig *)config {
     if (!config) {
-        [self.logger logWarning:@"No configuration provided"];
+        [self.logger error:@"No configuration provided"];
         return nil;
     }
     
     // Try different possible keys for app ID
-    NSArray *possibleKeys = @[@"app_id", @"vungle_app_id", @"appId", @"application_id"];
+    NSArray *possibleKeys = @[@"appID", @"app_id", @"vungle_app_id", @"appId", @"application_id"];
     
     for (NSString *key in possibleKeys) {
-        NSString *appId = config.extras[key];
+        NSString *appId = config.initializationData[key];
         if (appId && appId.length > 0) {
-            [self.logger logDebug:[NSString stringWithFormat:@"Found App ID using key '%@': %@", key, appId]];
+            [self.logger debug:[NSString stringWithFormat:@"Found App ID using key '%@': %@", key, appId]];
             return appId;
         }
     }
     
-    [self.logger logError:@"No App ID found in configuration extras. Expected keys: app_id, vungle_app_id, appId, or application_id"];
+    // No App ID found in configuration
+    [self.logger error:@"Vungle App ID not found in initialization data"];
     return nil;
 }
 
@@ -146,10 +147,10 @@
     NSError *finalError = error;
     
     if (success) {
-        [self.logger logInfo:@"Vungle SDK initialization completed successfully"];
+        [self.logger info:@"Vungle SDK initialization completed successfully"];
     } else {
         finalError = [CLXVungleErrorHandler mapVungleError:error context:@"Initialization"];
-        [self.logger logError:[NSString stringWithFormat:@"Vungle SDK initialization failed: %@", finalError.localizedDescription]];
+        [self.logger error:[NSString stringWithFormat:@"Vungle SDK initialization failed: %@", finalError.localizedDescription]];
     }
     
     // Call all pending completions

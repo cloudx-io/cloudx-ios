@@ -48,13 +48,13 @@
         _bannerType = type;
         _viewController = viewController;
         _delegate = delegate;
-        _logger = [CLXLogger loggerWithTag:@"VungleBanner"];
+        _logger = [[CLXLogger alloc] initWithCategory:@"VungleBanner"];
         _timeoutInterval = 30.0; // Default 30 second timeout
         _isLoaded = NO;
         _isShowing = NO;
         _isDestroyed = NO;
         
-        [_logger logDebug:[NSString stringWithFormat:@"Initialized Vungle banner - Placement: %@, BidID: %@, Type: %ld, HasBidPayload: %@", 
+        [_logger debug:[NSString stringWithFormat:@"Initialized Vungle banner - Placement: %@, BidID: %@, Type: %ld, HasBidPayload: %@", 
                           placementID, bidID, (long)type, bidPayload ? @"YES" : @"NO"]];
     }
     return self;
@@ -78,12 +78,12 @@
 
 - (void)load {
     if (self.isDestroyed) {
-        [self.logger logError:@"Cannot load - adapter is destroyed"];
+        [self.logger error:@"Cannot load - adapter is destroyed"];
         return;
     }
     
     if (self.isLoaded) {
-        [self.logger logWarning:@"Ad already loaded, ignoring duplicate load request"];
+        [self.logger error:@"Ad already loaded, ignoring duplicate load request"];
         return;
     }
     
@@ -91,19 +91,19 @@
     if (![VungleAds isInitialized]) {
         NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
                                              code:CLXVungleAdapterErrorCodeNotInitialized
-                                         userInfo:@{NSLocalizedDescriptionKey: @"Vungle SDK not initialized"}];
+                                          userInfo:nil];
         [self handleLoadFailure:error];
         return;
     }
     
-    [self.logger logInfo:[NSString stringWithFormat:@"Loading banner ad for placement: %@", self.placementID]];
+    [self.logger info:[NSString stringWithFormat:@"Loading banner ad for placement: %@", self.placementID]];
     
     // Convert CloudX banner type to Vungle ad size
     VungleAdSize *vungleAdSize = [self vungleAdSizeFromBannerType:self.bannerType];
     if (!vungleAdSize) {
         NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
                                              code:CLXVungleAdapterErrorCodeInvalidConfiguration
-                                         userInfo:@{NSLocalizedDescriptionKey: @"Unsupported banner size"}];
+                                          userInfo:nil];
         [self handleLoadFailure:error];
         return;
     }
@@ -118,31 +118,31 @@
     
     // Load the ad
     if (self.bidPayload) {
-        [self.logger logDebug:@"Loading banner with bid payload"];
+        [self.logger debug:@"Loading banner with bid payload"];
         [self.vungleBannerView load:self.bidPayload];
     } else {
-        [self.logger logDebug:@"Loading waterfall banner ad"];
+        [self.logger debug:@"Loading waterfall banner ad"];
         [self.vungleBannerView load:nil];
     }
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
     if (self.isDestroyed) {
-        [self.logger logError:@"Cannot show - adapter is destroyed"];
+        [self.logger error:@"Cannot show - adapter is destroyed"];
         return;
     }
     
     if (!self.isLoaded) {
-        [self.logger logWarning:@"Banner not loaded, cannot show"];
+        [self.logger error:@"Banner not loaded, cannot show"];
         return;
     }
     
     if (self.isShowing) {
-        [self.logger logWarning:@"Banner is already showing"];
+        [self.logger error:@"Banner is already showing"];
         return;
     }
     
-    [self.logger logInfo:@"Showing banner ad"];
+    [self.logger info:@"Showing banner ad"];
     self.isShowing = YES;
     
     // Notify delegate that banner is shown
@@ -156,7 +156,7 @@
         return;
     }
     
-    [self.logger logDebug:@"Destroying banner adapter"];
+    [self.logger debug:@"Destroying banner adapter"];
     self.isDestroyed = YES;
     
     // Cancel timeout timer
@@ -181,11 +181,11 @@
     [self cancelTimeoutTimer];
     
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring load callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring load callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"Banner ad loaded successfully"];
+    [self.logger info:@"Banner ad loaded successfully"];
     self.isLoaded = YES;
     
     if ([self.delegate respondsToSelector:@selector(didLoadBanner:)]) {
@@ -197,7 +197,7 @@
     [self cancelTimeoutTimer];
     
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring load failure callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring load failure callback - adapter destroyed"];
         return;
     }
     
@@ -206,29 +206,29 @@
 
 - (void)bannerAdWillPresent:(VungleBannerView *)bannerView {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring will present callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring will present callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logDebug:@"Banner ad will present"];
+    [self.logger debug:@"Banner ad will present"];
 }
 
 - (void)bannerAdDidPresent:(VungleBannerView *)bannerView {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring did present callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring did present callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logDebug:@"Banner ad did present"];
+    [self.logger debug:@"Banner ad did present"];
 }
 
 - (void)bannerAdDidTrackImpression:(VungleBannerView *)bannerView {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring impression callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring impression callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"Banner ad impression tracked"];
+    [self.logger info:@"Banner ad impression tracked"];
     
     if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
         [self.delegate impressionBanner:self];
@@ -237,11 +237,11 @@
 
 - (void)bannerAdDidClick:(VungleBannerView *)bannerView {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring click callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring click callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"Banner ad clicked"];
+    [self.logger info:@"Banner ad clicked"];
     
     if ([self.delegate respondsToSelector:@selector(clickBanner:)]) {
         [self.delegate clickBanner:self];
@@ -250,29 +250,29 @@
 
 - (void)bannerAdWillLeaveApplication:(VungleBannerView *)bannerView {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring will leave app callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring will leave app callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logDebug:@"Banner ad will leave application"];
+    [self.logger debug:@"Banner ad will leave application"];
 }
 
 - (void)bannerAdWillClose:(VungleBannerView *)bannerView {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring will close callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring will close callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logDebug:@"Banner ad will close"];
+    [self.logger debug:@"Banner ad will close"];
 }
 
 - (void)bannerAdDidClose:(VungleBannerView *)bannerView {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring did close callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring did close callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"Banner ad closed"];
+    [self.logger info:@"Banner ad closed"];
     self.isShowing = NO;
     
     if ([self.delegate respondsToSelector:@selector(closedByUserActionBanner:)]) {
@@ -284,17 +284,19 @@
 
 - (nullable VungleAdSize *)vungleAdSizeFromBannerType:(CLXBannerType)bannerType {
     switch (bannerType) {
-        case CLXBannerTypeBanner:
-            return [VungleAdSize VungleAdSizeBannerRegular]; // 320x50
+        case CLXBannerTypeW320H50:
+            // W320H50 maps to regular banner (320x50) or leaderboard (728x90) on iPad
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+                return [VungleAdSize VungleAdSizeLeaderboard]; // 728x90 on iPad
+            } else {
+                return [VungleAdSize VungleAdSizeBannerRegular]; // 320x50 on iPhone
+            }
             
-        case CLXBannerTypeMediumRectangle:
+        case CLXBannerTypeMREC:
             return [VungleAdSize VungleAdSizeMREC]; // 300x250
             
-        case CLXBannerTypeLeaderboard:
-            return [VungleAdSize VungleAdSizeLeaderboard]; // 728x90
-            
         default:
-            [self.logger logError:[NSString stringWithFormat:@"Unsupported banner type: %ld", (long)bannerType]];
+            [self.logger error:[NSString stringWithFormat:@"Unsupported banner type: %ld", (long)bannerType]];
             return nil;
     }
 }
@@ -323,12 +325,12 @@
         return;
     }
     
-    [self.logger logWarning:[NSString stringWithFormat:@"Banner ad load timed out after %.1f seconds", self.timeoutInterval]];
+    [self.logger error:[NSString stringWithFormat:@"Banner ad load timed out after %.1f seconds", self.timeoutInterval]];
     self.timeout = YES;
     
     NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
                                          code:CLXVungleAdapterErrorCodeTimeout
-                                     userInfo:@{NSLocalizedDescriptionKey: @"Banner ad load timed out"}];
+                                      userInfo:nil];
     [self handleLoadFailure:error];
 }
 

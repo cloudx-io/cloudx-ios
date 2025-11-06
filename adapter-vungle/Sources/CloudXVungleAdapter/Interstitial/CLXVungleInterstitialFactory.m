@@ -24,7 +24,7 @@
     static CLXLogger *logger = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        logger = [CLXLogger loggerWithTag:@"VungleInterstitialFactory"];
+        logger = [[CLXLogger alloc] initWithCategory:@"VungleInterstitialFactory"];
     });
     return logger;
 }
@@ -45,17 +45,17 @@
     
     // Validate required parameters
     if (!adId || adId.length == 0) {
-        [logger logError:@"Cannot create interstitial adapter - adId is nil or empty"];
+        [logger error:@"Cannot create interstitial adapter - adId is nil or empty"];
         return nil;
     }
     
     if (!bidId || bidId.length == 0) {
-        [logger logError:@"Cannot create interstitial adapter - bidId is nil or empty"];
+        [logger error:@"Cannot create interstitial adapter - bidId is nil or empty"];
         return nil;
     }
     
     if (!delegate) {
-        [logger logError:@"Cannot create interstitial adapter - delegate is nil"];
+        [logger error:@"Cannot create interstitial adapter - delegate is nil"];
         return nil;
     }
     
@@ -78,9 +78,9 @@
                                                               placementId:placementId
                                                                    extras:extras];
     
-    [logger logInfo:[NSString stringWithFormat:@"Creating Vungle interstitial adapter - Placement: %@, BidID: %@, HasBidPayload: %@",
+    [logger info:[NSString stringWithFormat:@"Creating Vungle interstitial adapter - Placement: %@, BidID: %@, HasBidPayload: %@",
                     placementId, bidId, bidPayload ? @"YES" : @"NO"]
-           userInfo:userInfo];
+           ];
     
     // Create and return the adapter
     CLXVungleInterstitial *adapter = [[CLXVungleInterstitial alloc] initWithBidPayload:bidPayload
@@ -89,11 +89,11 @@
                                                                               delegate:delegate];
     
     if (!adapter) {
-        [logger logError:@"Failed to create Vungle interstitial adapter" userInfo:userInfo];
+        [logger error:@"Failed to create Vungle interstitial adapter" ];
         return nil;
     }
     
-    [logger logDebug:@"Successfully created Vungle interstitial adapter" userInfo:userInfo];
+    [logger debug:@"Successfully created Vungle interstitial adapter" ];
     return adapter;
 }
 

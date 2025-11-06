@@ -420,7 +420,10 @@ static void initializeLogger() {
         }
         
         CLXBiddingConfigRequestExtPrebidDebug *prebid = [[CLXBiddingConfigRequestExtPrebidDebug alloc] init];
-        prebid.debug = @YES;
+        // Debug flag controls verbose logging in server bid responses
+        // NO = production (concise responses), YES = verbose debug information
+        // Set to NO to match Android SDK behavior and keep responses lightweight
+        prebid.debug = @NO;
         prebid.adservertargeting = [prebidArray copy];
         
         CLXBiddingConfigRequestExt *ext = [[CLXBiddingConfigRequestExt alloc] init];

@@ -43,7 +43,7 @@
         _placementID = [placementID copy];
         _bidID = [bidID copy];
         _delegate = delegate;
-        _logger = [CLXLogger loggerWithTag:@"VungleRewarded"];
+        _logger = [[CLXLogger alloc] initWithCategory:@"VungleRewarded"];
         _timeoutInterval = 30.0; // Default 30 second timeout
         _isReady = NO;
         _isLoaded = NO;
@@ -51,7 +51,7 @@
         _isDestroyed = NO;
         _hasRewarded = NO;
         
-        [_logger logDebug:[NSString stringWithFormat:@"Initialized Vungle rewarded - Placement: %@, BidID: %@, HasBidPayload: %@", 
+        [_logger debug:[NSString stringWithFormat:@"Initialized Vungle rewarded - Placement: %@, BidID: %@, HasBidPayload: %@", 
                           placementID, bidID, bidPayload ? @"YES" : @"NO"]];
     }
     return self;
@@ -75,12 +75,12 @@
 
 - (void)load {
     if (self.isDestroyed) {
-        [self.logger logError:@"Cannot load - adapter is destroyed"];
+        [self.logger error:@"Cannot load - adapter is destroyed"];
         return;
     }
     
     if (self.isLoaded) {
-        [self.logger logWarning:@"Ad already loaded, ignoring duplicate load request"];
+        [self.logger error:@"Ad already loaded, ignoring duplicate load request"];
         return;
     }
     
@@ -88,12 +88,12 @@
     if (![VungleAds isInitialized]) {
         NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
                                              code:CLXVungleAdapterErrorCodeNotInitialized
-                                         userInfo:@{NSLocalizedDescriptionKey: @"Vungle SDK not initialized"}];
+                                          userInfo:nil];
         [self handleLoadFailure:error];
         return;
     }
     
-    [self.logger logInfo:[NSString stringWithFormat:@"Loading rewarded ad for placement: %@", self.placementID]];
+    [self.logger info:[NSString stringWithFormat:@"Loading rewarded ad for placement: %@", self.placementID]];
     
     // Create Vungle rewarded
     self.rewarded = [[VungleRewarded alloc] initWithPlacementId:self.placementID];
@@ -103,43 +103,38 @@
     [self startTimeoutTimer];
     
     // Load the ad
-    if (self.bidPayload) {
-        [self.logger logDebug:@"Loading with bid payload"];
-        [self.rewarded load:self.bidPayload];
-    } else {
-        [self.logger logDebug:@"Loading waterfall ad"];
-        [self.rewarded load];
-    }
+    [self.logger debug:[NSString stringWithFormat:@"Loading %@ ad", self.bidPayload ? @"bidding" : @"waterfall"]];
+    [self.rewarded load:self.bidPayload];
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
     if (self.isDestroyed) {
-        [self.logger logError:@"Cannot show - adapter is destroyed"];
+        [self.logger error:@"Cannot show - adapter is destroyed"];
         return;
     }
     
     if (!self.isReady) {
         NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
                                              code:CLXVungleAdapterErrorCodeShowFailed
-                                         userInfo:@{NSLocalizedDescriptionKey: @"Ad not ready to show"}];
+                                          userInfo:nil];
         [self handleShowFailure:error];
         return;
     }
     
     if (self.isShowing) {
-        [self.logger logWarning:@"Ad is already showing, ignoring duplicate show request"];
+        [self.logger error:@"Ad is already showing, ignoring duplicate show request"];
         return;
     }
     
     if (!viewController) {
         NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
                                              code:CLXVungleAdapterErrorCodeShowFailed
-                                         userInfo:@{NSLocalizedDescriptionKey: @"View controller is nil"}];
+                                          userInfo:nil];
         [self handleShowFailure:error];
         return;
     }
     
-    [self.logger logInfo:@"Showing rewarded ad"];
+    [self.logger info:@"Showing rewarded ad"];
     self.isShowing = YES;
     self.hasRewarded = NO;
     
@@ -152,7 +147,7 @@
         return;
     }
     
-    [self.logger logDebug:@"Destroying rewarded adapter"];
+    [self.logger debug:@"Destroying rewarded adapter"];
     self.isDestroyed = YES;
     
     // Cancel timeout timer
@@ -177,11 +172,11 @@
     [self cancelTimeoutTimer];
     
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring load callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring load callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"Rewarded ad loaded successfully"];
+    [self.logger info:@"Rewarded ad loaded successfully"];
     self.isLoaded = YES;
     self.isReady = YES;
     
@@ -194,7 +189,7 @@
     [self cancelTimeoutTimer];
     
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring load failure callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring load failure callback - adapter destroyed"];
         return;
     }
     
@@ -203,20 +198,20 @@
 
 - (void)rewardedAdWillPresent:(VungleRewarded *)rewarded {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring will present callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring will present callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logDebug:@"Rewarded ad will present"];
+    [self.logger debug:@"Rewarded ad will present"];
 }
 
 - (void)rewardedAdDidPresent:(VungleRewarded *)rewarded {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring did present callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring did present callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"Rewarded ad presented successfully"];
+    [self.logger info:@"Rewarded ad presented successfully"];
     
     if ([self.delegate respondsToSelector:@selector(didShowWithRewarded:)]) {
         [self.delegate didShowWithRewarded:self];
@@ -225,7 +220,7 @@
 
 - (void)rewardedAdDidFailToPresent:(VungleRewarded *)rewarded withError:(NSError *)error {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring present failure callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring present failure callback - adapter destroyed"];
         return;
     }
     
@@ -234,11 +229,11 @@
 
 - (void)rewardedAdDidTrackImpression:(VungleRewarded *)rewarded {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring impression callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring impression callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"Rewarded ad impression tracked"];
+    [self.logger info:@"Rewarded ad impression tracked"];
     
     if ([self.delegate respondsToSelector:@selector(impressionWithRewarded:)]) {
         [self.delegate impressionWithRewarded:self];
@@ -247,11 +242,11 @@
 
 - (void)rewardedAdDidClick:(VungleRewarded *)rewarded {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring click callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring click callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"Rewarded ad clicked"];
+    [self.logger info:@"Rewarded ad clicked"];
     
     if ([self.delegate respondsToSelector:@selector(clickWithRewarded:)]) {
         [self.delegate clickWithRewarded:self];
@@ -260,20 +255,20 @@
 
 - (void)rewardedAdWillLeaveApplication:(VungleRewarded *)rewarded {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring will leave app callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring will leave app callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logDebug:@"Rewarded ad will leave application"];
+    [self.logger debug:@"Rewarded ad will leave application"];
 }
 
 - (void)rewardedAdDidRewardUser:(VungleRewarded *)rewarded {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring reward callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring reward callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:@"User earned reward from rewarded ad"];
+    [self.logger info:@"User earned reward from rewarded ad"];
     self.hasRewarded = YES;
     
     if ([self.delegate respondsToSelector:@selector(userRewardWithRewarded:)]) {
@@ -283,20 +278,20 @@
 
 - (void)rewardedAdWillClose:(VungleRewarded *)rewarded {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring will close callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring will close callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logDebug:@"Rewarded ad will close"];
+    [self.logger debug:@"Rewarded ad will close"];
 }
 
 - (void)rewardedAdDidClose:(VungleRewarded *)rewarded {
     if (self.isDestroyed) {
-        [self.logger logDebug:@"Ignoring did close callback - adapter destroyed"];
+        [self.logger debug:@"Ignoring did close callback - adapter destroyed"];
         return;
     }
     
-    [self.logger logInfo:[NSString stringWithFormat:@"Rewarded ad closed - User rewarded: %@", self.hasRewarded ? @"YES" : @"NO"]];
+    [self.logger info:[NSString stringWithFormat:@"Rewarded ad closed - User rewarded: %@", self.hasRewarded ? @"YES" : @"NO"]];
     self.isShowing = NO;
     self.isReady = NO; // Ad is consumed after showing
     self.isLoaded = NO;
@@ -332,11 +327,11 @@
         return;
     }
     
-    [self.logger logWarning:[NSString stringWithFormat:@"Rewarded ad load timed out after %.1f seconds", self.timeoutInterval]];
+    [self.logger error:[NSString stringWithFormat:@"Rewarded ad load timed out after %.1f seconds", self.timeoutInterval]];
     
     NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
                                          code:CLXVungleAdapterErrorCodeTimeout
-                                     userInfo:@{NSLocalizedDescriptionKey: @"Ad load timed out"}];
+                                      userInfo:nil];
     [self handleLoadFailure:error];
 }
 

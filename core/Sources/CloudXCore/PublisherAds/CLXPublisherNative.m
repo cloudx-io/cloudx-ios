@@ -139,7 +139,7 @@ NS_ASSUME_NONNULL_BEGIN
         
         // Calculate TMAX from placement configuration (convert milliseconds to seconds)
         // Use nil to match Swift version behavior (no timeout)
-        NSNumber *tmax = nil; // nil means omit tmax from JSON
+        NSNumber *tmax = nil;
         
         _bidAdSource = [[CLXBidAdSource alloc] initWithUserID:userID
                                                placementID:_placementID
@@ -208,14 +208,6 @@ NS_ASSUME_NONNULL_BEGIN
         if (!strongSelf) return;
         
         if (error) {
-            // Check if this is a kill switch error - should fail immediately, not retry
-            if (error.code == CLXErrorCodeSDKDisabled || error.code == CLXErrorCodeAdsDisabled) {
-                [strongSelf.logger error:[NSString stringWithFormat:@"[%@] 🚫 [PublisherNative] Kill switch active - failing immediately with code %ld", strongSelf.currentCorrelationId, (long)error.code]];
-                strongSelf.isLoading = NO;
-                [strongSelf failToLoadWithNative:nil error:error];
-                return;
-            }
-            
             [strongSelf.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherNative] Bid request failed: %@", strongSelf.currentCorrelationId, error.localizedDescription]];
             
             // Implement waterfall backoff delay logic

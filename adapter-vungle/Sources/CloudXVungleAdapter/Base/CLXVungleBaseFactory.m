@@ -29,40 +29,44 @@
     
     NSString *placementId = extras[@"vungle_placement_id"];
     if (placementId && placementId.length > 0) {
-        [logger logDebug:[NSString stringWithFormat:@"Using Vungle placement ID from extras: %@", placementId]];
+        [logger debug:[NSString stringWithFormat:@"Using Vungle placement ID from extras: %@", placementId]];
         return placementId;
     }
     
     placementId = extras[@"placement_id"];
     if (placementId && placementId.length > 0) {
-        [logger logDebug:[NSString stringWithFormat:@"Using placement ID from extras: %@", placementId]];
+        [logger debug:[NSString stringWithFormat:@"Using placement ID from extras: %@", placementId]];
         return placementId;
     }
     
-    [logger logDebug:[NSString stringWithFormat:@"Using adId as placement ID fallback: %@", adId]];
+    [logger debug:[NSString stringWithFormat:@"Using adId as placement ID fallback: %@", adId]];
     return adId;
 }
 
 + (BOOL)validateVungleInitialization:(CLXLogger *)logger {
     if (![VungleAds isInitialized]) {
-        [logger logError:@"Vungle SDK is not initialized. Call VungleAds.initWithAppId before creating adapters."];
+        [logger error:@"Vungle SDK is not initialized. Call VungleAds.initWithAppId before creating adapters."];
         return NO;
     }
     
-    [logger logDebug:@"Vungle SDK initialization validated successfully"];
+    [logger debug:@"Vungle SDK initialization validated successfully"];
     return YES;
 }
 
 + (nullable NSString *)extractBidPayloadFromADM:(NSString *)adm logger:(CLXLogger *)logger {
     if (!adm || adm.length == 0) {
-        [logger logDebug:@"No ADM provided, using waterfall request"];
+        [logger debug:@"No ADM provided, using waterfall request"];
         return nil;
     }
     
-    // Try to parse ADM as JSON to extract bid payload
+    // Vungle SDK expects the ENTIRE ADM JSON string, not just the extracted adunit value
+    // The ADM should be a JSON object like: {"version":2,"adunit":"..."}
+    // Vungle SDK will parse this internally
+    
+    // Verify it's valid JSON before passing to Vungle
     NSData *admData = [adm dataUsingEncoding:NSUTF8StringEncoding];
     if (!admData) {
-        [logger logWarning:@"Unable to convert ADM to data, treating as waterfall"];
+        [logger error:@"Unable to convert ADM to data"];
         return nil;
     }
     
@@ -70,20 +74,14 @@
     id jsonObject = [NSJSONSerialization JSONObjectWithData:admData options:0 error:&jsonError];
     
     if (jsonError || ![jsonObject isKindOfClass:[NSDictionary class]]) {
-        [logger logDebug:@"ADM is not valid JSON, treating as waterfall request"];
-        return nil;
+        // If ADM is not JSON, return as-is (might be raw payload for waterfall)
+        [logger debug:@"ADM is not JSON, returning as-is"];
+        return adm;
     }
     
-    NSDictionary *admDict = (NSDictionary *)jsonObject;
-    NSString *bidPayload = admDict[@"bid_payload"] ?: admDict[@"bidPayload"];
-    
-    if (bidPayload && bidPayload.length > 0) {
-        [logger logDebug:[NSString stringWithFormat:@"Extracted bid payload from ADM (length: %lu)", (unsigned long)bidPayload.length]];
-        return bidPayload;
-    }
-    
-    [logger logDebug:@"No bid payload found in ADM, using waterfall request"];
-    return nil;
+    // ADM is valid JSON - return the entire JSON string to Vungle SDK
+    [logger debug:[NSString stringWithFormat:@"Passing entire ADM JSON to Vungle SDK (length: %lu)", (unsigned long)adm.length]];
+    return adm;
 }
 
 + (NSDictionary *)createAdapterUserInfo:(NSString *)adId

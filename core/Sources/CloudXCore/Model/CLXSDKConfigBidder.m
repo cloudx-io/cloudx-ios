@@ -33,6 +33,8 @@
         return @"prebidAdapter";
     } else if ([_networkName isEqualToString:@"prebidMobile"]) {
         return @"prebidAdapter";
+    } else if ([_networkName isEqualToString:@"vungle"]) {
+        return @"vungle";
     }
     return _networkName;
 }

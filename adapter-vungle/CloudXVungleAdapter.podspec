@@ -23,7 +23,7 @@ Pod::Spec.new do |s|
   }
   
   s.dependency 'CloudXCore'
-  s.dependency 'VungleAdsSDK', '~> 7.4.0'
+  s.dependency 'VungleAds', '~> 7.4.0'
   
   s.framework = 'Foundation'
   s.framework = 'UIKit'

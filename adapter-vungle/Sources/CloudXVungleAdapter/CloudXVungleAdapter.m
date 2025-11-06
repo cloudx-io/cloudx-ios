@@ -27,54 +27,34 @@
 double CloudXVungleAdapterVersionNumber = 1.0;
 const unsigned char CloudXVungleAdapterVersionString[] = "1.0.0";
 
-/**
- * Registration function for CloudX Vungle Adapter
- * This function is called by the CloudX SDK to register all adapter components
- */
-void CloudXVungleAdapterRegister(void) {
+// Ensure classes are loaded for static frameworks
+__attribute__((visibility("default"))) void CloudXVungleAdapterRegister(void) {
+    // Create a local logger for registration
+    static CLXLogger *registrationLogger = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        // Create logger for registration process
-        CLXLogger *logger = [CLXLogger loggerWithTag:@"VungleAdapterRegistration"];
-        
-        [logger logInfo:@"Registering CloudX Vungle Adapter v1.0.0"];
-        
-        // Register the network initializer
-        [CLXAdNetworkRegistry registerInitializer:[CLXVungleInitializer class]
-                                       forNetwork:@"Vungle"];
-        
-        // Register bid token source
-        [CLXBidTokenRegistry registerBidTokenSource:[CLXVungleBidTokenSource class]
-                                         forNetwork:@"Vungle"];
-        
-        // Register adapter factories
-        [CLXAdapterFactoryRegistry registerInterstitialFactory:[CLXVungleInterstitialFactory class]
-                                                    forNetwork:@"Vungle"];
-        
-        [CLXAdapterFactoryRegistry registerRewardedFactory:[CLXVungleRewardedFactory class]
-                                                forNetwork:@"Vungle"];
-        
-        [CLXAdapterFactoryRegistry registerBannerFactory:[CLXVungleBannerFactory class]
-                                              forNetwork:@"Vungle"];
-        
-        [CLXAdapterFactoryRegistry registerNativeFactory:[CLXVungleNativeFactory class]
-                                              forNetwork:@"Vungle"];
-        
-        // Register App Open factory (uses interstitial factory protocol)
-        [CLXAdapterFactoryRegistry registerInterstitialFactory:[CLXVungleAppOpenFactory class]
-                                                    forNetwork:@"VungleAppOpen"];
-        
-        [logger logInfo:@"CloudX Vungle Adapter registration completed successfully"];
-        [logger logInfo:@"Supported ad formats: Interstitial, Rewarded, Banner/MREC, Native, App Open"];
-        [logger logInfo:@"Features: Header Bidding, Waterfall, Error Handling, Privacy Compliance"];
+        registrationLogger = [[CLXLogger alloc] initWithCategory:@"VungleAdapterRegistration"];
     });
+    
+    [registrationLogger debug:@"Loading Vungle adapter classes"];
+    
+    // Force load all classes by referencing them
+    [CLXVungleInitializer class];
+    [CLXVungleBidTokenSource class];
+    [CLXVungleInterstitialFactory class];
+    [CLXVungleRewardedFactory class];
+    [CLXVungleBannerFactory class];
+    [CLXVungleNativeFactory class];
+    [CLXVungleAppOpenFactory class];
+    
+    [registrationLogger debug:@"Vungle adapter classes loaded successfully"];
 }
 
-/**
- * Automatic registration using constructor attribute
- * This ensures the adapter is registered when the framework is loaded
- */
-__attribute__((constructor))
-static void CloudXVungleAdapterAutoRegister(void) {
+@implementation CloudXVungleAdapter
+
+// Call registration during class load
++ (void)load {
     CloudXVungleAdapterRegister();
 }
+
+@end

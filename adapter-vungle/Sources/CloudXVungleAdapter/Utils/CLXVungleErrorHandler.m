@@ -33,7 +33,7 @@ NSString * const CLXVungleAdapterErrorDomain = @"com.cloudx.adapter.vungle";
     NSString *logMessage = [NSString stringWithFormat:@"Vungle %@ Error - Placement: %@, Code: %ld, Description: %@, Original: %@",
                            context, placementID, (long)error.code, errorDescription, error.localizedDescription];
     
-    [logger logError:logMessage];
+    [logger error:logMessage];
     
     // Map to CloudX error and add metadata
     NSError *mappedError = [self mapVungleError:error context:context];
@@ -49,7 +49,7 @@ NSString * const CLXVungleAdapterErrorDomain = @"com.cloudx.adapter.vungle";
     
     return [NSError errorWithDomain:mappedError.domain
                                code:mappedError.code
-                           userInfo:[userInfo copy]];
+                           userInfo:userInfo];
 }
 
 + (NSError *)mapVungleError:(NSError *)vungleError context:(NSString *)context {

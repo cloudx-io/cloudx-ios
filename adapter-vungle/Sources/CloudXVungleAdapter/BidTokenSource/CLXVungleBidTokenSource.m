@@ -14,6 +14,9 @@
 @import CloudXCore;
 #endif
 
+#import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXError.h>
+#import <CloudXCore/CLXSettings.h>
 #import <VungleAdsSDK/VungleAdsSDK.h>
 
 @interface CLXVungleBidTokenSource ()
@@ -42,7 +45,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _logger = [CLXLogger loggerWithTag:@"VungleBidTokenSource"];
+        _logger = [[CLXLogger alloc] initWithCategory:@"VungleBidTokenSource"];
     }
     return self;
 }
@@ -53,92 +56,81 @@
     return @"Vungle";
 }
 
-- (void)getBidTokenWithCompletion:(void (^)(NSString * _Nullable bidToken, NSError * _Nullable error))completion {
-    // Ensure we have a completion block
-    void (^safeCompletion)(NSString *, NSError *) = completion ?: ^(NSString *token, NSError *error) {};
+- (void)getTokenWithCompletion:(void (^)(NSDictionary<NSString *, NSString *> * _Nullable token, NSError * _Nullable error))completion {
+    [self.logger debug:@"🔧 [CLXVungleBidTokenSource] Getting Vungle bidding token"];
     
-    // Check if Vungle SDK is initialized
-    if (![VungleAds isInitialized]) {
-        NSError *error = [NSError errorWithDomain:@"com.cloudx.adapter.vungle.bidtoken"
-                                             code:1001
-                                         userInfo:@{
-                                             NSLocalizedDescriptionKey: @"Vungle SDK not initialized",
-                                             NSLocalizedFailureReasonErrorKey: @"Cannot generate bid token before SDK initialization"
-                                         }];
-        
-        [self.logger logError:@"Cannot generate bid token - Vungle SDK not initialized"];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            safeCompletion(nil, error);
-        });
-        return;
-    }
-    
-    [self.logger logDebug:@"Requesting bid token from Vungle SDK"];
-    
-    // Generate bid token using Vungle SDK
-    // Note: The exact method name may vary depending on Vungle SDK version
-    // This implementation assumes the standard bid token generation API
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    // Ensure we're on main thread for Vungle SDK calls
+    dispatch_async(dispatch_get_main_queue(), ^{
         @try {
-            // Attempt to get bid token from Vungle SDK
-            NSString *bidToken = [VungleAds getBidToken];
+            // Check if Vungle SDK is initialized
+            if (![VungleAds isInitialized]) {
+                NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
+                                             description:@"Vungle SDK not initialized"];
+                
+                [self.logger error:@"Cannot generate bid token - Vungle SDK not initialized"];
+                if (completion) {
+                    completion(nil, error);
+                }
+                return;
+            }
+            
+            // Get Vungle bidding token
+            NSString *bidToken = [VungleAds getBiddingToken];
+            NSString *idfa = [[CLXSettings sharedInstance] getIFA];
+            [self.logger debug:[NSString stringWithFormat:@"📊 [CLXVungleBidTokenSource] Vungle bidding token: %@ | IDFA from CLXSettings: %@", 
+                               bidToken ? @"[RECEIVED]" : @"[NIL]", idfa ? @"[AVAILABLE]" : @"[NIL]"]];
+            
+            // Create token dictionary with Vungle-specific data
+            NSMutableDictionary<NSString *, NSString *> *tokenDict = [NSMutableDictionary dictionary];
             
             if (bidToken && bidToken.length > 0) {
-                [self.logger logDebug:[NSString stringWithFormat:@"Successfully generated bid token (length: %lu)", (unsigned long)bidToken.length]];
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    safeCompletion(bidToken, nil);
-                });
-            } else {
-                NSError *error = [NSError errorWithDomain:@"com.cloudx.adapter.vungle.bidtoken"
-                                                     code:1002
-                                                 userInfo:@{
-                                                     NSLocalizedDescriptionKey: @"Empty bid token received",
-                                                     NSLocalizedFailureReasonErrorKey: @"Vungle SDK returned empty or nil bid token"
-                                                 }];
-                
-                [self.logger logWarning:@"Received empty bid token from Vungle SDK"];
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    safeCompletion(nil, error);
-                });
+                tokenDict[@"bid_token"] = bidToken;
             }
+            
+            if (idfa && idfa.length > 0) {
+                tokenDict[@"device_ifa"] = idfa;
+                [self.logger info:[NSString stringWithFormat:@"🔧 [CLXVungleBidTokenSource] Using centralized IFA in device_ifa: %@", idfa]];
+            }
+            
+            // Add network identifier
+            tokenDict[@"network"] = @"vungle";
+            
+            [self.logger info:[NSString stringWithFormat:@"✅ [CLXVungleBidTokenSource] Token created with %lu keys", (unsigned long)tokenDict.count]];
+            
+            if (completion) {
+                completion([tokenDict copy], nil);
+            }
+            
         } @catch (NSException *exception) {
-            NSError *error = [NSError errorWithDomain:@"com.cloudx.adapter.vungle.bidtoken"
-                                                 code:1003
-                                             userInfo:@{
-                                                 NSLocalizedDescriptionKey: @"Exception during bid token generation",
-                                                 NSLocalizedFailureReasonErrorKey: exception.reason ?: @"Unknown exception"
-                                             }];
+            NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
+                                         description:exception.reason ?: @"Unknown exception occurred while getting bid token"];
             
-            [self.logger logError:[NSString stringWithFormat:@"Exception during bid token generation: %@", exception.reason]];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                safeCompletion(nil, error);
-            });
+            if (completion) {
+                completion(nil, error);
+            }
         }
     });
 }
 
-- (nullable NSString *)getBidTokenSync {
+- (nullable NSString *)getBiddingTokenSync {
     // Check if Vungle SDK is initialized
     if (![VungleAds isInitialized]) {
-        [self.logger logError:@"Cannot generate bid token - Vungle SDK not initialized"];
+        [self.logger error:@"Cannot generate bid token - Vungle SDK not initialized"];
         return nil;
     }
     
     @try {
-        NSString *bidToken = [VungleAds getBidToken];
+        NSString *bidToken = [VungleAds getBiddingToken];
         
         if (bidToken && bidToken.length > 0) {
-            [self.logger logDebug:[NSString stringWithFormat:@"Successfully generated sync bid token (length: %lu)", (unsigned long)bidToken.length]];
+            [self.logger debug:[NSString stringWithFormat:@"Successfully generated sync bid token (length: %lu)", (unsigned long)bidToken.length]];
             return bidToken;
         } else {
-            [self.logger logWarning:@"Received empty bid token from Vungle SDK (sync)"];
+            [self.logger error:@"Received empty bid token from Vungle SDK (sync)"];
             return nil;
         }
     } @catch (NSException *exception) {
-        [self.logger logError:[NSString stringWithFormat:@"Exception during sync bid token generation: %@", exception.reason]];
+        [self.logger error:[NSString stringWithFormat:@"Exception during sync bid token generation: %@", exception.reason]];
         return nil;
     }
 }

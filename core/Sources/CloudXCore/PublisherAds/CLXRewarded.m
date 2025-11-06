@@ -209,6 +209,9 @@ NS_ASSUME_NONNULL_BEGIN
     [logger debug:@"User rewarded"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(rewardedVideoCompleted:)]) {
+            [self.delegate rewardedVideoCompleted:self];
+        }
         if ([self.delegate respondsToSelector:@selector(userRewarded:)]) {
             [self.delegate userRewarded:self];
         }

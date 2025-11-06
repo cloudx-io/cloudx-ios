@@ -57,26 +57,26 @@
 
 - (void)setupConfigurations {
     // Dev Configuration (current production values)
-    CLXDemoConfig *devConfig = [[CLXDemoConfig alloc] 
-        initWithAppKey:@"Jm_CovdBVkxrHks2xd5V8"
+    CLXDemoConfig *stagingConfig = [[CLXDemoConfig alloc]
+        initWithAppKey:@"A7ovaBRCcAL8lapKtoZmm"
         hashedUserId:@"test-user-123"
         baseURL:@"https://pro-dev.cloudx.io/sdk"
-        bannerPlacement:@"banner111"
-        mrecPlacement:@"mrec111"
-        interstitialPlacement:@"inter111"
+        bannerPlacement:@"objcDemo-banner-1"
+        mrecPlacement:@"objcDemo-mrec-1"
+        interstitialPlacement:@"objcDemo-interstitial-1"
         nativePlacement:@"metaNative"
         nativeBannerPlacement:@"metaNative"
         rewardedPlacement:@"metaRewarded"
         rewardedInterstitialPlacement:@"metaRewarded"];
     
-    // Staging Configuration (MetaTestApp-9-22-25 - bundle: cloudx.CloudXObjCRemotePods)
-    CLXDemoConfig *stagingConfig = [[CLXDemoConfig alloc] 
-        initWithAppKey:@"A7ovaBRCcAL8lapKtoZmm"
+    // Staging Configuration (objc-demo-app with Vungle - bundle: cloudx.CloudXObjCRemotePods)
+    CLXDemoConfig *devConfig = [[CLXDemoConfig alloc]
+        initWithAppKey:@"NddUgEiyx_bbYax2BQGI2"
         hashedUserId:@"test-user-123-staging"
         baseURL:@"https://pro-stage.cloudx.io/sdk"
-        bannerPlacement:@"objcDemo-banner-1"
-        mrecPlacement:@"objcDemo-mrec-1"
-        interstitialPlacement:@"objcDemo-interstitial-1"
+        bannerPlacement:@"objc-demo-banner"
+        mrecPlacement:@"objc-demo-mrec"
+        interstitialPlacement:@"objc-demo-interstitial"
         nativePlacement:@"-"
         nativeBannerPlacement:@"-"
         rewardedPlacement:@"-"
@@ -96,8 +96,8 @@
         rewardedInterstitialPlacement:@"-"];
     
     _configurations = @{
-        @(CLXDemoEnvironmentDev): devConfig,
         @(CLXDemoEnvironmentStaging): stagingConfig,
+        @(CLXDemoEnvironmentDev): devConfig,
         @(CLXDemoEnvironmentProduction): prodConfig
     };
 }

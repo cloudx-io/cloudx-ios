@@ -24,7 +24,7 @@
     static CLXLogger *logger = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        logger = [CLXLogger loggerWithTag:@"VungleRewardedFactory"];
+        logger = [[CLXLogger alloc] initWithCategory:@"VungleRewardedFactory"];
     });
     return logger;
 }
@@ -45,17 +45,17 @@
     
     // Validate required parameters
     if (!adId || adId.length == 0) {
-        [logger logError:@"Cannot create rewarded adapter - adId is nil or empty"];
+        [logger error:@"Cannot create rewarded adapter - adId is nil or empty"];
         return nil;
     }
     
     if (!bidId || bidId.length == 0) {
-        [logger logError:@"Cannot create rewarded adapter - bidId is nil or empty"];
+        [logger error:@"Cannot create rewarded adapter - bidId is nil or empty"];
         return nil;
     }
     
     if (!delegate) {
-        [logger logError:@"Cannot create rewarded adapter - delegate is nil"];
+        [logger error:@"Cannot create rewarded adapter - delegate is nil"];
         return nil;
     }
     
@@ -78,9 +78,9 @@
                                                               placementId:placementId
                                                                    extras:extras];
     
-    [logger logInfo:[NSString stringWithFormat:@"Creating Vungle rewarded adapter - Placement: %@, BidID: %@, HasBidPayload: %@",
+    [logger info:[NSString stringWithFormat:@"Creating Vungle rewarded adapter - Placement: %@, BidID: %@, HasBidPayload: %@",
                     placementId, bidId, bidPayload ? @"YES" : @"NO"]
-           userInfo:userInfo];
+           ];
     
     // Create and return the adapter
     CLXVungleRewarded *adapter = [[CLXVungleRewarded alloc] initWithBidPayload:bidPayload
@@ -89,11 +89,11 @@
                                                                       delegate:delegate];
     
     if (!adapter) {
-        [logger logError:@"Failed to create Vungle rewarded adapter" userInfo:userInfo];
+        [logger error:@"Failed to create Vungle rewarded adapter" ];
         return nil;
     }
     
-    [logger logDebug:@"Successfully created Vungle rewarded adapter" userInfo:userInfo];
+    [logger debug:@"Successfully created Vungle rewarded adapter" ];
     return adapter;
 }
 

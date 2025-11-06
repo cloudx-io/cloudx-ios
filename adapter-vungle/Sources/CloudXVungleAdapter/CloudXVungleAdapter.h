@@ -16,6 +16,10 @@ FOUNDATION_EXPORT const unsigned char CloudXVungleAdapterVersionString[];
 // Registration function for static frameworks
 __attribute__((visibility("default"))) void CloudXVungleAdapterRegister(void);
 
+// Adapter registration class
+@interface CloudXVungleAdapter : NSObject
+@end
+
 // Public headers - Base Infrastructure
 #import "CLXVungleBaseFactory.h"
 #import "CLXVungleErrorHandler.h"

@@ -1,0 +1,248 @@
+name: Release CloudXVungleAdapter
+
+on:
+  push:
+    tags:
+      - 'v*-vungle'
+
+jobs:
+  release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+
+    steps:
+      - name: 𝔠 Debug available Xcode versions
+        run: ls -la /Applications/ | grep -i xcode
+
+      - name: 𝔠 Switch to Xcode 16.1
+        run: sudo xcode-select -s /Applications/Xcode_16.1.app
+
+      - name: 🗖 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🤠 Clean build artifacts
+        run: |
+          rm -rf build
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+
+      - name: 🛠 Install CocoaPods
+        run: |
+          sudo gem install cocoapods --no-document
+
+      - name: 📋 Debug Print CocoaPods version and env
+        run: |
+          pod --version
+          pod env
+
+      - name: 📋 Debug Show trunk config file
+        run: |
+          if [ -f ~/.cocoapods/trunk/me.json ]; then
+            cat ~/.cocoapods/trunk/me.json
+          else
+            echo "No trunk config file found."
+          fi
+
+      - name: 📋 Debug pod trunk me
+        run: pod trunk me || true
+
+      - name: 🔢 Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          VERSION_NO_SUFFIX=${VERSION%-vungle}
+          echo "version=$VERSION_NO_SUFFIX" >> $GITHUB_OUTPUT
+          echo "full_version=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+
+      - name: 📀 Build xcframework
+        run: |
+          cd adapter-vungle
+          bash build_frameworks.sh
+
+      - name: 📦 Rename framework with version
+        run: |
+          cd adapter-vungle
+          VERSION=${{ steps.version.outputs.version }}
+          mv CloudXVungleAdapter.xcframework.zip CloudXVungleAdapter-v$VERSION.xcframework.zip
+
+      - name: 🔢 Compute SwiftPM checksum
+        id: checksum
+        run: |
+          cd adapter-vungle
+          VERSION=${{ steps.version.outputs.version }}
+          CHECKSUM=$(swift package compute-checksum CloudXVungleAdapter-v$VERSION.xcframework.zip)
+          echo "checksum=$CHECKSUM" >> $GITHUB_OUTPUT
+
+      - name: 📝 Update podspec and Package.swift
+        run: |
+          cd adapter-vungle
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          # Create release podspec from remote template
+          cp CloudXVungleAdapter-remote.podspec CloudXVungleAdapter-release.podspec
+          
+          # Update version in release podspec
+          sed -i '' "s/s\.version.*=.*/s.version = '$VERSION'/" CloudXVungleAdapter-release.podspec
+          
+          # Update source URL with correct version
+          sed -i '' "s|releases/download/v[^/]*/|releases/download/${FULL_VERSION}/|" CloudXVungleAdapter-release.podspec
+          sed -i '' "s|CloudXVungleAdapter-v[0-9.]*\.xcframework\.zip|CloudXVungleAdapter-v${VERSION}.xcframework.zip|" CloudXVungleAdapter-release.podspec
+          
+          # Update root Package.swift version and checksum for CloudXVungleAdapter binary target
+          cd ..
+          sed -i '' "s|url: \".*CloudXVungleAdapter.*\",|url: \"https://github.com/cloudx-io/cloudx-ios/releases/download/$FULL_VERSION/CloudXVungleAdapter-v$VERSION.xcframework.zip\",|" Package.swift
+          sed -i '' "s|checksum: \".*\"|checksum: \"${{ steps.checksum.outputs.checksum }}\"|" Package.swift
+
+      - name: 📊 Create GitHub release (step 1 - empty release)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          # Create release notes file
+          cat > release_notes.md << EOF
+          CloudXVungleAdapter v$VERSION SDK release (xcframework)
+          
+          ## Installation
+          
+          ### CocoaPods
+          Add to your Podfile: pod 'CloudXVungleAdapter', '~> $VERSION'
+          
+          ### Swift Package Manager
+          Add repository: https://github.com/cloudx-io/cloudx-ios
+          
+          ### Manual Installation
+          Download CloudXVungleAdapter-v$VERSION.xcframework.zip from this release.
+          
+          ## SwiftPM Checksum
+          ${{ steps.checksum.outputs.checksum }}
+          EOF
+          
+          # Create empty release first (two-step process for better CDN propagation)
+          gh release create "$FULL_VERSION" \
+            --title "CloudXVungleAdapter v$VERSION" \
+            --notes-file release_notes.md \
+            --latest
+
+      - name: 📦 Upload xcframework to release (step 2 - file upload)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          # Upload the xcframework file to the existing release
+          gh release upload "$FULL_VERSION" \
+            adapter-vungle/CloudXVungleAdapter-v$VERSION.xcframework.zip
+
+
+      - name: 🔍 Debug file structure
+        run: |
+          echo "=== Repository structure ==="
+          ls -la
+          echo "=== Adapter-vungle directory ==="
+          ls -la adapter-vungle/
+          echo "=== License file check ==="
+          if [ -f "adapter-vungle/LICENSE" ]; then
+            echo "✅ LICENSE file found at adapter-vungle/LICENSE"
+            wc -l adapter-vungle/LICENSE
+          else
+            echo "❌ LICENSE file NOT found at adapter-vungle/LICENSE"
+          fi
+
+      - name: 🧪 Validate podspec with detailed output
+        run: |
+          cd adapter-vungle
+          echo "=== Validating CloudXVungleAdapter-release.podspec ==="
+          echo "Current directory: $(pwd)"
+          echo "Podspec content:"
+          cat CloudXVungleAdapter-release.podspec
+          echo "=== Running podspec validation ==="
+          # Temporarily rename for validation (CocoaPods requires filename to match spec name)
+          cp CloudXVungleAdapter-release.podspec CloudXVungleAdapter.podspec.tmp
+          pod spec lint CloudXVungleAdapter.podspec.tmp --allow-warnings --skip-import-validation --skip-tests --verbose || {
+            echo "❌ Podspec validation failed"
+            exit 1
+          }
+          rm CloudXVungleAdapter.podspec.tmp
+
+      - name: 📋 Verify CocoaPods authentication
+        run: |
+          if [ -z "${COCOAPODS_TRUNK_TOKEN:-}" ]; then
+            echo "❌ COCOAPODS_TRUNK_TOKEN is empty/unset"
+            exit 1
+          else
+            echo "✅ COCOAPODS_TRUNK_TOKEN is set (length: ${#COCOAPODS_TRUNK_TOKEN})"
+          fi
+          echo "=== Checking authentication ==="
+          pod trunk me || true
+          echo "=== Checking pod ownership ==="
+          pod trunk info CloudXVungleAdapter || true
+
+      - name: 📤 Push podspec to CocoaPods trunk
+        run: |
+          # Use EXACT same pattern as working Core workflow
+          mkdir -p ~/.cocoapods/trunk
+          echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TRUNK_TOKEN }}"}}' > ~/.cocoapods/trunk/me.json
+          cd adapter-vungle
+          
+          for i in {1..5}; do
+            echo "=== Attempt $i/5 ==="
+            if pod trunk push CloudXVungleAdapter-release.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
+              echo "✅ Pod trunk push succeeded on attempt $i"
+              break
+            else
+              echo "❌ Pod trunk push failed on attempt $i"
+              if [ $i -lt 5 ]; then
+                echo "Retrying in 30 seconds..."
+                sleep 30
+              else
+                echo "❌ Pod trunk push failed after all retries"
+                exit 1
+              fi
+            fi
+          done
+
+      - name: 🧾 Verify successful pod trunk push
+        run: |
+          echo "=== Verifying pod trunk push success ==="
+          
+          # Wait a moment for CocoaPods to process
+          sleep 10
+          
+          # Verify the pod is available
+          if pod trunk info CloudXVungleAdapter; then
+            echo "✅ Pod trunk push verification successful"
+            
+            # Extract and display the latest version
+            LATEST_VERSION=$(pod trunk info CloudXVungleAdapter | grep -E "^\s*-\s*[0-9]" | head -1 | sed 's/^\s*-\s*//')
+            echo "Latest published version: $LATEST_VERSION"
+            
+            # Verify it matches our expected version
+            EXPECTED_VERSION="${{ steps.version.outputs.version }}"
+            if [[ "$LATEST_VERSION" == "$EXPECTED_VERSION" ]]; then
+              echo "✅ Version verification successful: $LATEST_VERSION matches expected $EXPECTED_VERSION"
+            else
+              echo "⚠️ Version mismatch: Latest=$LATEST_VERSION, Expected=$EXPECTED_VERSION"
+              echo "This might be expected if the version was already published"
+            fi
+          else
+            echo "❌ Pod trunk info failed - pod may not be properly published"
+            exit 1
+          fi
+
+      - name: 📌 Upload xcodebuild logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-logs
+          path: |
+            adapter-vungle/xcodebuild-ios.log
+            adapter-vungle/xcodebuild-sim.log
+
