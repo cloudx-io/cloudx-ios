@@ -58,7 +58,7 @@ jobs:
           echo "version=$VERSION_NO_SUFFIX" >> $GITHUB_OUTPUT
           echo "full_version=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
 
-      - name: 📀 Build xcframework
+      - name: 📀 Build static xcframework
         run: |
           cd adapter-vungle
           bash build_frameworks.sh
@@ -107,7 +107,7 @@ jobs:
           
           # Create release notes file
           cat > release_notes.md << EOF
-          CloudXVungleAdapter v$VERSION SDK release (xcframework)
+          CloudXVungleAdapter v$VERSION SDK release (static xcframework)
           
           ## Installation
           
@@ -165,12 +165,12 @@ jobs:
           cat CloudXVungleAdapter-release.podspec
           echo "=== Running podspec validation ==="
           # Temporarily rename for validation (CocoaPods requires filename to match spec name)
-          cp CloudXVungleAdapter-release.podspec CloudXVungleAdapter.podspec.tmp
-          pod spec lint CloudXVungleAdapter.podspec.tmp --allow-warnings --skip-import-validation --skip-tests --verbose || {
+          cp CloudXVungleAdapter-release.podspec CloudXVungleAdapter.podspec
+          pod spec lint CloudXVungleAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose || {
             echo "❌ Podspec validation failed"
             exit 1
           }
-          rm CloudXVungleAdapter.podspec.tmp
+          rm CloudXVungleAdapter.podspec
 
       - name: 📋 Verify CocoaPods authentication
         run: |
@@ -185,6 +185,49 @@ jobs:
           echo "=== Checking pod ownership ==="
           pod trunk info CloudXVungleAdapter || true
 
+      - name: ⏳ Wait for CloudXCore dependency to be available
+        run: |
+          echo "🔍 Checking for CloudXCore dependency availability..."
+          # CloudXVungleAdapter depends on CloudXCore, so we need to ensure Core is available before pushing
+          # This prevents race conditions when both Core and Vungle are released simultaneously
+          
+          # Try to find the required Core version from the podspec
+          REQUIRED_CORE_VERSION=$(grep "s.dependency 'CloudXCore'" adapter-vungle/CloudXVungleAdapter-release.podspec | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "")
+          
+          if [ -z "$REQUIRED_CORE_VERSION" ]; then
+            echo "⚠️  No specific CloudXCore version requirement found, checking for latest..."
+            # If no version specified, just check that CloudXCore exists
+            if pod trunk info CloudXCore > /dev/null 2>&1; then
+              echo "✅ CloudXCore is available on CocoaPods"
+            else
+              echo "❌ CloudXCore not found on CocoaPods"
+              exit 1
+            fi
+          else
+            echo "📦 Required CloudXCore version: $REQUIRED_CORE_VERSION"
+            MAX_ATTEMPTS=60
+            WAIT_SECONDS=10
+            
+            for i in $(seq 1 $MAX_ATTEMPTS); do
+              echo "🔄 Attempt $i/$MAX_ATTEMPTS: Checking if CloudXCore $REQUIRED_CORE_VERSION is available..."
+              
+              if pod trunk info CloudXCore 2>/dev/null | grep -q "$REQUIRED_CORE_VERSION"; then
+                echo "✅ CloudXCore $REQUIRED_CORE_VERSION is available on CocoaPods!"
+                echo "✅ Proceeding with CloudXVungleAdapter release..."
+                exit 0
+              fi
+              
+              if [ $i -lt $MAX_ATTEMPTS ]; then
+                echo "⏳ CloudXCore $REQUIRED_CORE_VERSION not yet available, waiting ${WAIT_SECONDS}s..."
+                sleep $WAIT_SECONDS
+              else
+                echo "❌ Timeout: CloudXCore $REQUIRED_CORE_VERSION not available after $((MAX_ATTEMPTS * WAIT_SECONDS))s"
+                echo "💡 This usually means CloudXCore release is still in progress or failed"
+                exit 1
+              fi
+            done
+          fi
+
       - name: 📤 Push podspec to CocoaPods trunk
         run: |
           # Use EXACT same pattern as working Core workflow
@@ -192,9 +235,13 @@ jobs:
           echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TRUNK_TOKEN }}"}}' > ~/.cocoapods/trunk/me.json
           cd adapter-vungle
           
+          # CocoaPods requires filename to match spec name
+          echo "=== Copying podspec with correct name ==="
+          cp CloudXVungleAdapter-release.podspec CloudXVungleAdapter.podspec
+          
           for i in {1..5}; do
             echo "=== Attempt $i/5 ==="
-            if pod trunk push CloudXVungleAdapter-release.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
+            if pod trunk push CloudXVungleAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
               echo "✅ Pod trunk push succeeded on attempt $i"
               break
             else
@@ -245,4 +292,3 @@ jobs:
           path: |
             adapter-vungle/xcodebuild-ios.log
             adapter-vungle/xcodebuild-sim.log
-

@@ -44,11 +44,6 @@
     CLXLogger *logger = [[self class] logger];
     
     // Validate required parameters
-    if (!adId || adId.length == 0) {
-        [logger error:@"Cannot create App Open adapter - adId is nil or empty"];
-        return nil;
-    }
-    
     if (!bidId || bidId.length == 0) {
         [logger error:@"Cannot create App Open adapter - bidId is nil or empty"];
         return nil;
@@ -64,8 +59,14 @@
         return nil;
     }
     
-    // Resolve placement ID - for App Open, prefer specific App Open placement IDs
+    // Resolve placement ID from extras or fallback to adId
     NSString *placementId = [self resolveAppOpenPlacementID:extras fallbackAdId:adId logger:logger];
+    
+    // Validate the resolved placement ID
+    if (!placementId || placementId.length == 0) {
+        [logger error:@"Cannot create App Open adapter - no valid placement ID (checked extras and adId)"];
+        return nil;
+    }
     
     // Extract bid payload from ADM if present
     NSString *bidPayload = [CLXVungleBaseFactory extractBidPayloadFromADM:adm logger:logger];

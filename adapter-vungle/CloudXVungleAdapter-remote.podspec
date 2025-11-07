@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
     :flatten => false
   }
   
-  s.ios.deployment_target = '12.0'
+  s.ios.deployment_target = '14.0'
   
   # Remote distribution uses vendored frameworks (binary)
   s.vendored_frameworks = 'CloudXVungleAdapter.xcframework'

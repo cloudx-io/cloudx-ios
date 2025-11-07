@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.homepage = 'https://github.com/cloudx-xenoss/CloudXVungleAdapter'
   s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
-  s.platform = :ios, '12.0'
+  s.platform = :ios, '14.0'
   s.swift_version = '5.9'
   s.module_name = 'CloudXVungleAdapter'
   s.source = { :path => '.' }

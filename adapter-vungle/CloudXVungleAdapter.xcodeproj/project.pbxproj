@@ -36,9 +36,12 @@
 		A1000034294A8A0000000001 /* CLXVungleAppOpen.m in Sources */ = {isa = PBXBuildFile; fileRef = A1000035294A8A0000000001 /* CLXVungleAppOpen.m */; };
 		A1000036294A8A0000000001 /* CLXVungleAppOpenFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A1000037294A8A0000000001 /* CLXVungleAppOpenFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A1000038294A8A0000000001 /* CLXVungleAppOpenFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A1000039294A8A0000000001 /* CLXVungleAppOpenFactory.m */; };
+		CDED9BAF15240D48AF5B8545 /* Pods_CloudXVungleAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 031B74F43B93524A95385711 /* Pods_CloudXVungleAdapter.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		031B74F43B93524A95385711 /* Pods_CloudXVungleAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXVungleAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7AFE62617AD212851C2832E7 /* Pods-CloudXVungleAdapter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXVungleAdapter.debug.xcconfig"; path = "Target Support Files/Pods-CloudXVungleAdapter/Pods-CloudXVungleAdapter.debug.xcconfig"; sourceTree = "<group>"; };
 		A1000000294A8A0000000001 /* CloudXVungleAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CloudXVungleAdapter.h; sourceTree = "<group>"; };
 		A1000003294A8A0000000001 /* CLXVungleBaseFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVungleBaseFactory.h; sourceTree = "<group>"; };
 		A1000005294A8A0000000001 /* CLXVungleBaseFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVungleBaseFactory.m; sourceTree = "<group>"; };
@@ -70,6 +73,7 @@
 		A1000039294A8A0000000001 /* CLXVungleAppOpenFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVungleAppOpenFactory.m; sourceTree = "<group>"; };
 		A100003A294A8A0000000001 /* CloudXVungleAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXVungleAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A100003B294A8A0000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FBA9F5E098CDAE8D5BE7BD3D /* Pods-CloudXVungleAdapter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXVungleAdapter.release.xcconfig"; path = "Target Support Files/Pods-CloudXVungleAdapter/Pods-CloudXVungleAdapter.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,17 +81,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CDED9BAF15240D48AF5B8545 /* Pods_CloudXVungleAdapter.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		968876E3891A0011EBBD6C88 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				031B74F43B93524A95385711 /* Pods_CloudXVungleAdapter.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		A100003D294A8A0000000001 = {
 			isa = PBXGroup;
 			children = (
 				A100003E294A8A0000000001 /* Sources */,
 				A100003F294A8A0000000001 /* Products */,
+				B8F2ACC845DE1B52A06FD429 /* Pods */,
+				968876E3891A0011EBBD6C88 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -216,6 +231,16 @@
 			path = AppOpen;
 			sourceTree = "<group>";
 		};
+		B8F2ACC845DE1B52A06FD429 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				7AFE62617AD212851C2832E7 /* Pods-CloudXVungleAdapter.debug.xcconfig */,
+				FBA9F5E098CDAE8D5BE7BD3D /* Pods-CloudXVungleAdapter.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -248,10 +273,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A100004C294A8A0000000001 /* Build configuration list for PBXNativeTarget "CloudXVungleAdapter" */;
 			buildPhases = (
+				C65321FAE5B736A38E928F22 /* [CP] Check Pods Manifest.lock */,
 				A100004A294A8A0000000001 /* Headers */,
 				A100004D294A8A0000000001 /* Sources */,
 				A100003C294A8A0000000001 /* Frameworks */,
 				A100004E294A8A0000000001 /* Resources */,
+				D4426EB66F7F5120F519ACFC /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -303,6 +330,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C65321FAE5B736A38E928F22 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXVungleAdapter-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D4426EB66F7F5120F519ACFC /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXVungleAdapter/Pods-CloudXVungleAdapter-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXVungleAdapter/Pods-CloudXVungleAdapter-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXVungleAdapter/Pods-CloudXVungleAdapter-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A100004D294A8A0000000001 /* Sources */ = {
@@ -453,6 +522,7 @@
 		};
 		A1000053294A8A0000000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7AFE62617AD212851C2832E7 /* Pods-CloudXVungleAdapter.debug.xcconfig */;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -474,9 +544,9 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
+				MODULEMAP_FILE = Sources/CloudXVungleAdapter/module.modulemap;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				MODULEMAP_FILE = Sources/CloudXVungleAdapter/module.modulemap;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cloudx.adapter.vungle;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -490,6 +560,7 @@
 		};
 		A1000054294A8A0000000001 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FBA9F5E098CDAE8D5BE7BD3D /* Pods-CloudXVungleAdapter.release.xcconfig */;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -511,9 +582,9 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
+				MODULEMAP_FILE = Sources/CloudXVungleAdapter/module.modulemap;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				MODULEMAP_FILE = Sources/CloudXVungleAdapter/module.modulemap;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cloudx.adapter.vungle;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

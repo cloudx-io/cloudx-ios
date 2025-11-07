@@ -55,9 +55,19 @@
     if ([bid isKindOfClass:[CLXBidResponseBid class]]) {
         CLXBidResponseBid *bidResponse = (CLXBidResponseBid *)bid;
         
-        // Use available bid response data
-        externalPlacementId = bidResponse.adid; // Use adid as external placement ID
         revenue = @(bidResponse.price); // Use price as revenue
+        
+        // Extract external placement ID with fallback chain
+        // Priority: adid (OpenRTB standard) > adapter_extras placement_id > crid > bid ID
+        externalPlacementId = bidResponse.adid;
+        if (!externalPlacementId || externalPlacementId.length == 0) {
+            if (bidResponse.ext && bidResponse.ext.cloudx && bidResponse.ext.cloudx.adapterExtras) {
+                externalPlacementId = bidResponse.ext.cloudx.adapterExtras[@"placement_id"];
+            }
+        }
+        if (!externalPlacementId || externalPlacementId.length == 0) {
+            externalPlacementId = bidResponse.crid ?: bidResponse.id;
+        }
         
         // Try to get bidder from prebid meta (primary source) or adapter extras (fallback)
         if (bidResponse.ext && bidResponse.ext.prebid && bidResponse.ext.prebid.meta && bidResponse.ext.prebid.meta.adaptercode) {
