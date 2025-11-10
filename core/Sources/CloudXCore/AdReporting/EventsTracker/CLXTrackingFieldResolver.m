@@ -209,8 +209,9 @@
         return self.sessionId;
     } else if ([field isEqualToString:@"sdk.releaseVersion"]) {
         return self.sdkVersion ?: @"1.0.0";
-    } else if ([field isEqualToString:@"sdk.deviceType"]) {
-        return self.deviceType;
+    } else if ([field isEqualToString:@"sdk.deviceTypeName"]) {
+        NSInteger deviceTypeAsInt = [CLXSystemInformation shared].deviceType;
+        return @(deviceTypeAsInt);
     } else if ([field isEqualToString:@"sdk.appBundle"] || [field isEqualToString:@"sdk.app.bundle"]) {
         return self.appBundle;
     } else if ([field isEqualToString:@"sdk.responseTimeMillis"]) {
@@ -219,16 +220,7 @@
         return auctionSdkMap[field];
     } else if ([field isEqualToString:@"sdk.loopIndex"]) {
         return self.auctionedLoopIndex[auctionId];
-    } else {
-        // Check auction-specific SDK parameters
-        NSMutableDictionary *auctionSdkMap = self.sdkMap[auctionId];
-        return auctionSdkMap[field];
-    }
-}
-
-- (nullable id)resolveBidRequestField:(NSString *)auctionId field:(NSString *)field {
-    // Handle special cases first
-    if ([field isEqualToString:@"bidRequest.device.ifa"]) {
+    } else if ([field isEqualToString:@"sdk.ifa"]) {
         // Privacy logic implementation matching Android behavior
         CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
         
@@ -268,8 +260,14 @@
         NSString *ifa = [self resolveNestedField:requestData path:@"device.ifa"];
         [self.logger debug:[NSString stringWithFormat:@"✅ [CLXTrackingFieldResolver] Using device IFA: %@", ifa ? @"(present)" : @"(none)"]];
         return ifa;
+    } else {
+        // Check auction-specific SDK parameters
+        NSMutableDictionary *auctionSdkMap = self.sdkMap[auctionId];
+        return auctionSdkMap[field];
     }
-    
+}
+
+- (nullable id)resolveBidRequestField:(NSString *)auctionId field:(NSString *)field {
     // General case: resolve using dot notation
     NSDictionary *requestData = self.requestDataMap[auctionId];
     if (!requestData) {
