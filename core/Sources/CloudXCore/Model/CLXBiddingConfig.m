@@ -306,6 +306,9 @@ static void initializeLogger() {
         // This handles all configuration scenarios with proper debug/production safety
         NSString *ifa = [settings getIFA];
         
+        // Get DNT (Do Not Track) status from ATT/LAT settings
+        BOOL dnt = [CLXAdTrackingService dnt];
+        
         CLXBiddingConfigDevice *device = [[CLXBiddingConfigDevice alloc] init];
         device.ua = userAgent ?: @"ua";
         device.make = @"Apple";
@@ -315,7 +318,7 @@ static void initializeLogger() {
         device.hwv = [[UIDevice currentDevice] systemVersion];
         device.language = [[NSLocale currentLocale] languageCode];
         device.ifa = ifa;
-        device.dnt = @0;
+        device.dnt = @(dnt ? 1 : 0);
         device.devicetype = @([CLXSystemInformation shared].deviceType); // Use robust device type detection
         device.h = @(screenHeight);
         device.w = @(screenWidth);
@@ -379,12 +382,14 @@ static void initializeLogger() {
 
         CLXBiddingConfigRegulations *regulations = [[CLXBiddingConfigRegulations alloc] init];
         regulations.ext = regExt;
+        
+        // COPPA is now supported by server - include in bid requests
+        regulations.coppa = [privacyService coppaApplies];
 
-        // TODO: Re-enable GDPR and COPPA once server support is implemented
+        // TODO: Re-enable GDPR once server support is implemented
         // iab.gdprApplies = [privacyService gdprApplies];
         // iab.tcString = [privacyService gdprConsentString];
         // regExt.gdpr = [privacyService gdprApplies];
-        // regulations.coppa = [privacyService coppaApplies];
 
         _regulations = regulations;
         
@@ -836,11 +841,16 @@ static void initializeLogger() {
     NSString *gppString = [privacyService gppString];
     if (gppString) {
         regExt.gpp = gppString;
-    }
-    
-    NSArray<NSNumber *> *gppSid = [privacyService gppSid];
-    if (gppSid && gppSid.count > 0) {
-        regExt.gppSid = gppSid;
+        
+        // Per IAB spec, gpp_sid MUST be present when gpp string exists
+        NSArray<NSNumber *> *gppSid = [privacyService gppSid];
+        if (gppSid) {
+            regExt.gppSid = gppSid;
+        } else {
+            // If no SID provided, use empty array (valid per IAB spec)
+            [logger debug:@"⚠️ [BiddingConfig] GPP string present but no SID - using empty array"];
+            regExt.gppSid = @[];
+        }
     }
 }
 
@@ -939,9 +949,10 @@ static void initializeLogger() {
     // Include GPP compliance data in bid request regulations
     if (ext.gpp) {
         json[@"gpp"] = ext.gpp;
-    }
-    if (ext.gppSid && ext.gppSid.count > 0) {
-        json[@"gpp_sid"] = ext.gppSid;
+        // Per IAB spec, gpp_sid MUST be present when gpp exists (even if empty array)
+        if (ext.gppSid) {
+            json[@"gpp_sid"] = ext.gppSid;
+        }
     }
     return [json copy];
 }

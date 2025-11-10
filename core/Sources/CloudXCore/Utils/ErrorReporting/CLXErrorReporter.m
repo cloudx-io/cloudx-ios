@@ -10,7 +10,12 @@
 #import <CloudXCore/CLXErrorReporter.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CloudXCore.h>
-#import <CloudXCore/CloudXCoreInternal.h>
+
+// Forward declaration of internal CloudXCore method
+// Declared in CloudXCoreInternal.h but not importing to avoid module issues
+@interface CloudXCore (ErrorReporting)
++ (void)trackSDKError:(NSError *)error;
+@end
 
 @interface CLXErrorReporter ()
 @property (nonatomic, strong) CLXLogger *logger;

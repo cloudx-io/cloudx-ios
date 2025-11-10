@@ -108,26 +108,34 @@
     XCTAssertEqualObjects(regsExt[@"gpp_sid"], testGppSid, @"GPP SID should be included");
 }
 
-// Test COPPA flag is included in bid request when enabled
-- (void)testCOPPAFlagIncludedWhenEnabled {
+// DEPRECATED: Test replaced by testCOPPAIncludedInBidRequest_Enabled (CX-1912)
+// Old behavior: COPPA was disabled (nil) until server support
+// New behavior: COPPA is now supported by server and included in bid requests
+- (void)testCOPPAFlagIncludedWhenEnabled_Legacy {
     [self.privacyService setIsAgeRestrictedUser:@YES];
     
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
     NSDictionary *json = [config json];
     
     NSNumber *coppaFlag = json[@"regs"][@"coppa"];
-    XCTAssertNil(coppaFlag, @"COPPA flag should be disabled until server is ready");
+    // CX-1912: COPPA is now included in bid requests (server support added)
+    XCTAssertNotNil(coppaFlag, @"COPPA flag is now supported by server");
+    XCTAssertTrue([coppaFlag boolValue], @"COPPA should be true when age-restricted");
 }
 
-// Test COPPA flag is not included when disabled
-- (void)testCOPPAFlagNotIncludedWhenDisabled {
+// DEPRECATED: Test replaced by testCOPPAIncludedInBidRequest_Disabled (CX-1912)
+// Old behavior: COPPA was not included when disabled
+// New behavior: COPPA field is always present (true/false based on setting)
+- (void)testCOPPAFlagNotIncludedWhenDisabled_Legacy {
     [self.privacyService setIsAgeRestrictedUser:@NO];
     
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
     NSDictionary *json = [config json];
     
     NSNumber *coppaFlag = json[@"regs"][@"coppa"];
-    XCTAssertNil(coppaFlag, @"COPPA flag should not be included when disabled");
+    // CX-1912: COPPA field is now always present with true/false value
+    XCTAssertNotNil(coppaFlag, @"COPPA field should be present");
+    XCTAssertFalse([coppaFlag boolValue], @"COPPA should be false when not age-restricted");
 }
 
 #pragma mark - Personal Data Clearing in Bid Requests
@@ -323,6 +331,132 @@
     
     NSLog(@"🔍 Unified Privacy Test - shouldClear: %@, IFA: %@", 
           shouldClear ? @"YES" : @"NO", ifa);
+}
+
+#pragma mark - QA Fix Tests (CX-1911, CX-1912, CX-1904)
+
+// CX-1911: GPP SID must be present when GPP string exists (even if empty array)
+// Per IAB spec, gpp_sid MUST accompany gpp string, even if empty
+- (void)testGPPSidPresentWhenGPPStringExists_EmptyArray {
+    NSString *testGppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
+    
+    // Set GPP string but no SID (simulates CMP providing string without SID)
+    [self.gppProvider setGppString:testGppString];
+    [self.gppProvider setGppSid:nil];
+    
+    CLXBiddingConfigRequest *config = [self createTestBiddingConfig];
+    NSDictionary *json = [config json];
+    
+    NSDictionary *regsExt = json[@"regs"][@"ext"];
+    
+    // Verify GPP string is present
+    XCTAssertEqualObjects(regsExt[@"gpp"], testGppString, @"GPP string should be present");
+    
+    // CX-1911 FIX: gpp_sid MUST be present when gpp exists (even if empty)
+    XCTAssertNotNil(regsExt[@"gpp_sid"], @"gpp_sid MUST be present when gpp string exists (IAB spec)");
+    XCTAssertTrue([regsExt[@"gpp_sid"] isKindOfClass:[NSArray class]], @"gpp_sid must be an array");
+    XCTAssertEqual([regsExt[@"gpp_sid"] count], 0, @"gpp_sid should be empty array when no SID provided");
+}
+
+// CX-1911: GPP SID included with non-empty array
+- (void)testGPPSidPresentWhenGPPStringExists_NonEmptyArray {
+    NSString *testGppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
+    NSArray *testGppSid = @[@7]; // US National
+    
+    [self.gppProvider setGppString:testGppString];
+    [self.gppProvider setGppSid:testGppSid];
+    
+    CLXBiddingConfigRequest *config = [self createTestBiddingConfig];
+    NSDictionary *json = [config json];
+    
+    NSDictionary *regsExt = json[@"regs"][@"ext"];
+    
+    // CX-1911 FIX: gpp_sid present with correct values
+    XCTAssertEqualObjects(regsExt[@"gpp_sid"], testGppSid, @"gpp_sid should contain provided SID array");
+}
+
+// CX-1911: GPP SID not present when GPP string absent
+- (void)testGPPSidAbsentWhenGPPStringAbsent {
+    // No GPP string set
+    [self.gppProvider setGppString:nil];
+    [self.gppProvider setGppSid:nil];
+    
+    CLXBiddingConfigRequest *config = [self createTestBiddingConfig];
+    NSDictionary *json = [config json];
+    
+    NSDictionary *regsExt = json[@"regs"][@"ext"];
+    
+    // When no GPP string, gpp_sid should not be present
+    XCTAssertNil(regsExt[@"gpp"], @"GPP string should be absent");
+    XCTAssertNil(regsExt[@"gpp_sid"], @"gpp_sid should be absent when no GPP string");
+}
+
+// CX-1912: COPPA field included in bid request when enabled
+- (void)testCOPPAIncludedInBidRequest_Enabled {
+    [self setupUSUser];
+    [self.privacyService setIsAgeRestrictedUser:@YES];
+    
+    CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
+    NSDictionary *json = [config json];
+    
+    // CX-1912 FIX: COPPA must be present in bid request
+    NSNumber *coppaValue = json[@"regs"][@"coppa"];
+    XCTAssertNotNil(coppaValue, @"COPPA field must be present in bid request");
+    XCTAssertTrue([coppaValue boolValue], @"COPPA value should be true when age-restricted user");
+}
+
+// CX-1912: COPPA field included with false value when disabled
+- (void)testCOPPAIncludedInBidRequest_Disabled {
+    [self setupUSUser];
+    [self.privacyService setIsAgeRestrictedUser:@NO];
+    
+    CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
+    NSDictionary *json = [config json];
+    
+    // CX-1912: COPPA should be present with false value
+    NSNumber *coppaValue = json[@"regs"][@"coppa"];
+    XCTAssertNotNil(coppaValue, @"COPPA field should be present even when disabled");
+    XCTAssertFalse([coppaValue boolValue], @"COPPA value should be false when not age-restricted");
+}
+
+// CX-1904: DNT field set correctly in device (not hardcoded to 0)
+// Note: This test verifies DNT field exists and is a number (0 or 1)
+// Actual value depends on ATT authorization status which varies in test environment
+- (void)testDNTFieldDynamicallySet {
+    CLXBiddingConfigRequest *config = [self createTestBiddingConfig];
+    NSDictionary *json = [config json];
+    
+    // CX-1904 FIX: DNT should be dynamically set from CLXAdTrackingService
+    NSNumber *dntValue = json[@"device"][@"dnt"];
+    XCTAssertNotNil(dntValue, @"DNT field must be present in device");
+    XCTAssertTrue([dntValue isKindOfClass:[NSNumber class]], @"DNT must be a number");
+    
+    // DNT should be 0 or 1 (0 = tracking allowed, 1 = do not track)
+    XCTAssertTrue([dntValue intValue] == 0 || [dntValue intValue] == 1, 
+                  @"DNT value must be 0 (tracking allowed) or 1 (do not track)");
+    
+    NSLog(@"🔍 DNT Test - Value: %@", dntValue);
+}
+
+// CX-1904: Verify DNT correlates with IFA privacy behavior
+// When DNT=1, IFA should be zeros; when DNT=0, IFA may be real
+- (void)testDNTCorrelatesWithIFAPrivacy {
+    CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
+    NSDictionary *json = [config json];
+    
+    NSNumber *dntValue = json[@"device"][@"dnt"];
+    NSString *ifaValue = json[@"device"][@"ifa"];
+    
+    XCTAssertNotNil(dntValue, @"DNT must be present");
+    XCTAssertNotNil(ifaValue, @"IFA must be present");
+    
+    // CX-1904: When DNT=1 (do not track), IFA should be zeros
+    if ([dntValue intValue] == 1) {
+        XCTAssertEqualObjects(ifaValue, @"00000000-0000-0000-0000-000000000000",
+                             @"When DNT=1, IFA must be zero IDFA for privacy");
+    }
+    
+    NSLog(@"🔍 DNT/IFA Correlation Test - DNT: %@, IFA: %@", dntValue, ifaValue);
 }
 
 @end

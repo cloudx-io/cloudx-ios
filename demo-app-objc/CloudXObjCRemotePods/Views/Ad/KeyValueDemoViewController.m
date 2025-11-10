@@ -7,6 +7,7 @@
 
 #import "KeyValueDemoViewController.h"
 #import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXKeyValueState.h>
 #import "DemoAppLogger.h"
 
 @interface KeyValueDemoViewController () <UITableViewDelegate, UITableViewDataSource>
@@ -211,11 +212,27 @@
     self.infoLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.infoSection addSubview:self.infoLabel];
     
+    // Add sample data button
+    UIButton *sampleButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [sampleButton setTitle:@"Load Sample Key-Values (for testing)" forState:UIControlStateNormal];
+    sampleButton.backgroundColor = [UIColor systemGreenColor];
+    [sampleButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    sampleButton.layer.cornerRadius = 8;
+    sampleButton.titleLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightMedium];
+    [sampleButton addTarget:self action:@selector(loadSampleKeyValues:) forControlEvents:UIControlEventTouchUpInside];
+    sampleButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.infoSection addSubview:sampleButton];
+    
     [NSLayoutConstraint activateConstraints:@[
         [self.infoLabel.topAnchor constraintEqualToAnchor:self.infoSection.topAnchor constant:50],
         [self.infoLabel.leadingAnchor constraintEqualToAnchor:self.infoSection.leadingAnchor constant:16],
         [self.infoLabel.trailingAnchor constraintEqualToAnchor:self.infoSection.trailingAnchor constant:-16],
-        [self.infoLabel.bottomAnchor constraintEqualToAnchor:self.infoSection.bottomAnchor constant:-16]
+        
+        [sampleButton.topAnchor constraintEqualToAnchor:self.infoLabel.bottomAnchor constant:16],
+        [sampleButton.leadingAnchor constraintEqualToAnchor:self.infoSection.leadingAnchor constant:16],
+        [sampleButton.trailingAnchor constraintEqualToAnchor:self.infoSection.trailingAnchor constant:-16],
+        [sampleButton.heightAnchor constraintEqualToConstant:44],
+        [sampleButton.bottomAnchor constraintEqualToAnchor:self.infoSection.bottomAnchor constant:-16]
     ]];
     
     [self.mainStackView addArrangedSubview:self.infoSection];
@@ -300,6 +317,42 @@
     self.displayedUserKVs = [state.userKeyValues mutableCopy];
     self.displayedAppKVs = [state.appKeyValues mutableCopy];
     [self.kvTableView reloadData];
+}
+
+- (void)loadSampleKeyValues:(UIButton *)sender {
+    [[DemoAppLogger sharedInstance] logMessage:@"🧪 Loading sample key-values for privacy testing..."];
+    
+    // User-level key-values (should be cleared when privacy requires it)
+    [[CloudXCore shared] setUserKeyValue:@"age" value:@"28"];
+    [[CloudXCore shared] setUserKeyValue:@"gender" value:@"male"];
+    [[CloudXCore shared] setUserKeyValue:@"interest" value:@"gaming"];
+    [[CloudXCore shared] setUserKeyValue:@"membership" value:@"premium"];
+    
+    // App-level key-values (never cleared)
+    [[CloudXCore shared] setAppKeyValue:@"app_version" value:@"1.2.3"];
+    [[CloudXCore shared] setAppKeyValue:@"build_type" value:@"debug"];
+    [[CloudXCore shared] setAppKeyValue:@"platform" value:@"ios"];
+    [[CloudXCore shared] setAppKeyValue:@"app_category" value:@"entertainment"];
+    
+    [[DemoAppLogger sharedInstance] logMessage:@"✅ Sample key-values loaded:"];
+    [[DemoAppLogger sharedInstance] logMessage:@"   User-Level: age, gender, interest, membership"];
+    [[DemoAppLogger sharedInstance] logMessage:@"   App-Level: app_version, build_type, platform, app_category"];
+    [[DemoAppLogger sharedInstance] logMessage:@""];
+    [[DemoAppLogger sharedInstance] logMessage:@"🧪 PRIVACY TEST INSTRUCTIONS:"];
+    [[DemoAppLogger sharedInstance] logMessage:@"1. Load a banner ad and check bid request JSON"];
+    [[DemoAppLogger sharedInstance] logMessage:@"2. Verify user KVs at path: user.ext.data"];
+    [[DemoAppLogger sharedInstance] logMessage:@"3. Verify app KVs at path: app.ext.data"];
+    [[DemoAppLogger sharedInstance] logMessage:@"4. Go to Settings → Deny ATT / Set CCPA opt-out"];
+    [[DemoAppLogger sharedInstance] logMessage:@"5. Load banner again - user KVs should be GONE"];
+    [[DemoAppLogger sharedInstance] logMessage:@"6. App KVs should STILL be present"];
+    
+    [self refreshDisplayedData];
+    
+    [self showAlert:@"Sample Data Loaded" 
+            message:@"8 sample key-values loaded:\n\n"
+                    @"User-Level (4): age, gender, interest, membership\n\n"
+                    @"App-Level (4): app_version, build_type, platform, app_category\n\n"
+                    @"Load a banner ad to see them in the bid request!"];
 }
 
 #pragma mark - UITableViewDataSource

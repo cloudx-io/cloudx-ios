@@ -7,6 +7,9 @@
 // Main API
 #import <CloudXCore/CloudXCoreAPI.h>
 
+// Internal (for testing)
+#import <CloudXCore/CloudXCoreInternal.h>
+
 // Common
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXAdType.h>

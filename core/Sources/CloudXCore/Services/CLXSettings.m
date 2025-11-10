@@ -37,6 +37,11 @@ static CLXLogger *logger;
 
     // 2. Privacy-aware IDFA retrieval (unified approach)
     CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
+    if (!privacyService) {
+        [logger error:@"❌ [CLXSettings] Privacy service not available - returning zero IDFA for safety"];
+        return @"00000000-0000-0000-0000-000000000000";
+    }
+    
     if ([privacyService shouldClearPersonalData]) {
         [logger debug:@"🔒 [CLXSettings] Privacy requires data clearing - returning zero IDFA"];
         // Still log what the actual IDFA would be for debugging
