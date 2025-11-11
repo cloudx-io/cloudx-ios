@@ -18,5 +18,16 @@
     return sharedInstance;
 }
 
+#pragma mark - Hashed User ID
+
+- (NSString *)hashedUserId {
+    return [[NSUserDefaults standardUserDefaults] stringForKey:@"DemoApp.HashedUserId"];
+}
+
+- (void)setHashedUserId:(NSString *)hashedUserId {
+    [[NSUserDefaults standardUserDefaults] setObject:hashedUserId forKey:@"DemoApp.HashedUserId"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 @end
 

@@ -19,6 +19,7 @@
 @property (nonatomic, copy) NSString *nativeMediumPlacement;
 @property (nonatomic, copy) NSString *consentString;
 @property (nonatomic, copy) NSString *usPrivacyString;
+@property (nonatomic, copy) NSString *hashedUserId;
 @property (nonatomic, assign) BOOL userTargeting;
 
 + (instancetype)sharedSettings;

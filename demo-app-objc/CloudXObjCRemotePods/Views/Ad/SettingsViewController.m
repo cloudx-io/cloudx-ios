@@ -7,6 +7,7 @@
 
 #import "SettingsViewController.h"
 #import "UserDefaultsSettings.h"
+#import <CloudXCore/CloudXCore.h>
 
 @interface CLXTextField : UITextField
 @end
@@ -56,14 +57,15 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 3; // SDK, Placement, Privacy
+    return 4; // SDK, Placement, Privacy, Logging
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
         case 0: return 2; // SDK Settings
         case 1: return 6; // Placement Settings
-        case 2: return 3; // Privacy
+        case 2: return 4; // Privacy: Consent, US Privacy, Hashed User ID, User Targeting
+        case 3: return 3; // Logging: Enable, Emojis, Level
         default: return 0;
     }
 }
@@ -73,8 +75,16 @@
         case 0: return @"SDK Settings";
         case 1: return @"Placement Settings";
         case 2: return @"Privacy";
+        case 3: return @"Logging Controls 🪵";
         default: return nil;
     }
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+    if (section == 3) {
+        return @"V=Verbose (all logs), D=Debug (dev logs), I=Info (key events), W=Warn (issues), E=Error (failures only). Toggle emojis to test plain text mode for log aggregation systems.";
+    }
+    return nil;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -110,7 +120,8 @@
             switch (indexPath.row) {
                 case 0: cell.textLabel.text = @"Consent String"; textField.text = self.settings.consentString; break;
                 case 1: cell.textLabel.text = @"US Privacy String"; textField.text = self.settings.usPrivacyString; break;
-                case 2: {
+                case 2: cell.textLabel.text = @"Hashed User ID"; textField.text = self.settings.hashedUserId; textField.placeholder = @"sha256 hash"; break;
+                case 3: {
                     cell.textLabel.text = @"User Targeting";
                     UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectZero];
                     toggle.on = self.settings.userTargeting;
@@ -121,12 +132,71 @@
                 }
             }
             break;
+        case 3: // Logging
+            [textField removeFromSuperview]; // We'll use switches for all logging controls
+            switch (indexPath.row) {
+                case 0: {
+                    cell.textLabel.text = @"Logging Enabled";
+                    UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectZero];
+                    // Read from UserDefaults, default is YES (enabled)
+                    toggle.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"LoggingDisabled"];
+                    toggle.tag = 300;
+                    [toggle addTarget:self action:@selector(loggingToggleChanged:) forControlEvents:UIControlEventValueChanged];
+                    cell.accessoryView = toggle;
+                    break;
+                }
+                case 1: {
+                    cell.textLabel.text = @"Emojis Enabled";
+                    UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectZero];
+                    // Default is YES, store override in UserDefaults
+                    toggle.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"LoggingEmojisDisabled"];
+                    toggle.tag = 301;
+                    [toggle addTarget:self action:@selector(loggingToggleChanged:) forControlEvents:UIControlEventValueChanged];
+                    cell.accessoryView = toggle;
+                    break;
+                }
+                case 2: {
+                    cell.textLabel.text = @"Log Level";
+                    UISegmentedControl *levelControl = [[UISegmentedControl alloc] initWithItems:@[@"V", @"D", @"I", @"W", @"E"]];
+                    NSInteger currentLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"LoggingLevel"];
+                    levelControl.selectedSegmentIndex = currentLevel > 0 ? currentLevel : 2; // Default to Info
+                    levelControl.frame = CGRectMake(0, 0, 200, 30);
+                    [levelControl addTarget:self action:@selector(logLevelChanged:) forControlEvents:UIControlEventValueChanged];
+                    cell.accessoryView = levelControl;
+                    break;
+                }
+            }
+            break;
     }
     return cell;
 }
 
 - (void)userTargetingSwitchChanged:(UISwitch *)sender {
     self.settings.userTargeting = sender.isOn;
+}
+
+- (void)loggingToggleChanged:(UISwitch *)sender {
+    if (sender.tag == 300) {
+        // Logging Enabled/Disabled
+        [CloudXCore setLoggingEnabled:sender.isOn];
+        [[NSUserDefaults standardUserDefaults] setBool:!sender.isOn forKey:@"LoggingDisabled"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        NSLog(@"🪵 Logging %@", sender.isOn ? @"ENABLED" : @"DISABLED");
+    } else if (sender.tag == 301) {
+        // Emojis Enabled/Disabled
+        [CloudXCore setLoggingEmojisEnabled:sender.isOn];
+        [[NSUserDefaults standardUserDefaults] setBool:!sender.isOn forKey:@"LoggingEmojisDisabled"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        NSLog(@"🪵 Emojis %@", sender.isOn ? @"ENABLED" : @"DISABLED");
+    }
+}
+
+- (void)logLevelChanged:(UISegmentedControl *)sender {
+    // 0=Verbose, 1=Debug, 2=Info, 3=Warn, 4=Error
+    [CloudXCore setMinLogLevel:sender.selectedSegmentIndex];
+    [[NSUserDefaults standardUserDefaults] setInteger:sender.selectedSegmentIndex forKey:@"LoggingLevel"];
+    NSArray *levelNames = @[@"VERBOSE", @"DEBUG", @"INFO", @"WARN", @"ERROR"];
+    NSLog(@"🪵 Log level set to: %@", levelNames[sender.selectedSegmentIndex]);
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
@@ -141,6 +211,17 @@
     else if (tag == 15) self.settings.nativeMediumPlacement = textField.text;
     else if (tag == 20) self.settings.consentString = textField.text;
     else if (tag == 21) self.settings.usPrivacyString = textField.text;
+    else if (tag == 22) {
+        self.settings.hashedUserId = textField.text;
+        // Set the hashed user ID in CloudXCore privacy service
+        if (textField.text.length > 0) {
+            [[CloudXCore shared] setHashedUserID:textField.text];
+            NSLog(@"🔒 Hashed User ID set: %@", textField.text);
+        } else {
+            [[CloudXCore shared] setHashedUserID:nil];
+            NSLog(@"🔒 Hashed User ID cleared");
+        }
+    }
 }
 
 @end
