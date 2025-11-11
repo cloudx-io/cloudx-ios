@@ -6,17 +6,14 @@ Pod::Spec.new do |s|
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
   s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
-  s.source = {
-    :http => "https://github.com/cloudx-io/cloudx-ios/releases/download/v1.1.67-meta/CloudXMetaAdapter-v#{s.version}.xcframework.zip",
-    :type => "zip",
-    :flatten => false
-  }
+  # For local development with :path in Podfile
+  s.source = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "v#{s.version}-meta" }
   
   s.ios.deployment_target = '14.0'
   
-  # Remote distribution uses vendored frameworks (binary)
-  s.vendored_frameworks = 'CloudXMetaAdapter.xcframework'
-  s.preserve_paths = 'CloudXMetaAdapter.xcframework'
+  # LOCAL DEVELOPMENT: Build from source files
+  s.source_files = 'Sources/CloudXMetaAdapter/**/*.{h,m}'
+  s.public_header_files = 'Sources/CloudXMetaAdapter/**/*.h'
   
   s.dependency 'CloudXCore'
   s.dependency 'FBAudienceNetwork', '~> 6.20.1'
@@ -27,12 +24,7 @@ Pod::Spec.new do |s|
     'Combine', 'CryptoKit', 'SafariServices', 'SwiftUI', 'WebKit', 'FBAudienceNetwork'
   ]
   s.pod_target_xcconfig = {
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
-    'FRAMEWORK_SEARCH_PATHS' => '$(PODS_ROOT)/CloudXMetaAdapter',
-    'OTHER_LDFLAGS' => '-framework CloudXMetaAdapter',
-    'DEFINES_MODULE' => 'YES',
     'CLANG_ENABLE_MODULES' => 'YES',
-    'OTHER_CFLAGS' => '-fmodules',
     'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
   }
   s.user_target_xcconfig = {

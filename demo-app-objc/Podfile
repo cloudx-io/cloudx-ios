@@ -8,7 +8,7 @@ target 'CloudXObjCRemotePods' do
 
   # Pods for CloudXObjCRemotePods
   # For REMOTE: pod 'CloudXCore'
-  # For LOCAL development: just use :path, CocoaPods will find -local.podspec
+  # For LOCAL development: just use :path, CocoaPods will find the podspec
   pod 'CloudXCore', :path => '../core'
   pod 'CloudXMetaAdapter', :path => '../adapter-meta'
   pod 'CloudXPrebidAdapter', :path => '../adapter-cloudx'
