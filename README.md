@@ -16,9 +16,9 @@ target 'YourApp' do
   pod 'CloudXSDK', '~> 0.1.0'
   
   # Optional: CloudX Mediation Adapters
-  pod 'CloudXMediationMetaAdapter', '~> 0.1.0'         # Meta (framework-based)
-  pod 'CloudXMediationVungleAdapter', '~> 0.1.0'       # Vungle (source-based)
-  pod 'CloudXMediationPrebidAdapter', '~> 0.1.0'       # Prebid (source-based)
+  pod 'CloudXMediationMetaAdapter', '~> 0.1.0'         
+  pod 'CloudXMediationVungleAdapter', '~> 0.1.0'       
+  pod 'CloudXMediationPrebidAdapter', '~> 0.1.0'       
 end
 ```
 
