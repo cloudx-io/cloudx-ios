@@ -15,6 +15,10 @@ let package = Package(
             name: "CloudXMetaAdapter", 
             targets: ["CloudXMetaAdapter"]
         ),
+        .library(
+            name: "CloudXMediationInMobiAdapter",
+            targets: ["CloudXMediationInMobiAdapter"]
+        ),
     ],
     targets: [
         // CloudXCore - Source-based target
@@ -37,6 +41,12 @@ let package = Package(
             name: "CloudXMetaAdapter",
             url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v1.1.25-meta/CloudXMetaAdapter-v1.1.25.xcframework.zip",
             checksum: "e38d93be3f3cd570c03a4df4a835ce13efa112761764532208fa7bad216416ef"
+        ),
+        // CloudXMediationInMobiAdapter - Binary framework target
+        .binaryTarget(
+            name: "CloudXMediationInMobiAdapter",
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v1.0.0-inmobi/CloudXMediationInMobiAdapter-v1.0.0.xcframework.zip",
+            checksum: "0000000000000000000000000000000000000000000000000000000000000000"
         )
     ]
 )

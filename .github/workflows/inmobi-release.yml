@@ -1,0 +1,295 @@
+name: Release CloudXMediationInMobiAdapter
+
+on:
+  push:
+    tags:
+      - 'v*-inmobi'
+
+jobs:
+  release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+
+    steps:
+      - name: 𝔠 Debug available Xcode versions
+        run: ls -la /Applications/ | grep -i xcode
+
+      - name: 𝔠 Switch to Xcode 16.1
+        run: sudo xcode-select -s /Applications/Xcode_16.1.app
+
+      - name: 🗖 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🤠 Clean build artifacts
+        run: |
+          rm -rf build
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+
+      - name: 🛠 Install CocoaPods
+        run: |
+          sudo gem install cocoapods --no-document
+
+      - name: 📋 Debug Print CocoaPods version and env
+        run: |
+          pod --version
+          pod env
+
+      - name: 📋 Debug Show trunk config file
+        run: |
+          if [ -f ~/.cocoapods/trunk/me.json ]; then
+            cat ~/.cocoapods/trunk/me.json
+          else
+            echo "No trunk config file found."
+          fi
+
+      - name: 📋 Debug pod trunk me
+        run: pod trunk me || true
+
+      - name: 🔢 Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          VERSION_NO_SUFFIX=${VERSION%-inmobi}
+          echo "version=$VERSION_NO_SUFFIX" >> $GITHUB_OUTPUT
+          echo "full_version=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+
+      - name: 📀 Build static xcframework
+        run: |
+          cd adapter-inmobi
+          bash build_frameworks.sh
+
+      - name: 📦 Rename framework with version
+        run: |
+          cd adapter-inmobi
+          VERSION=${{ steps.version.outputs.version }}
+          mv CloudXMediationInMobiAdapter.xcframework.zip CloudXMediationInMobiAdapter-v$VERSION.xcframework.zip
+
+      - name: 🔢 Compute SwiftPM checksum
+        id: checksum
+        run: |
+          cd adapter-inmobi
+          VERSION=${{ steps.version.outputs.version }}
+          CHECKSUM=$(swift package compute-checksum CloudXMediationInMobiAdapter-v$VERSION.xcframework.zip)
+          echo "checksum=$CHECKSUM" >> $GITHUB_OUTPUT
+
+      - name: 📝 Update podspec and Package.swift
+        run: |
+          cd adapter-inmobi
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          # Create release podspec from remote template
+          cp CloudXMediationInMobiAdapter-remote.podspec CloudXMediationInMobiAdapter-release.podspec
+          
+          # Update version in release podspec
+          sed -i '' "s/s\.version.*=.*/s.version = '$VERSION'/" CloudXMediationInMobiAdapter-release.podspec
+          
+          # Update source URL with correct version
+          sed -i '' "s|releases/download/v[^/]*/|releases/download/${FULL_VERSION}/|" CloudXMediationInMobiAdapter-release.podspec
+          sed -i '' "s|CloudXMediationInMobiAdapter-v[0-9.]*\.xcframework\.zip|CloudXMediationInMobiAdapter-v${VERSION}.xcframework.zip|" CloudXMediationInMobiAdapter-release.podspec
+          
+          # Update root Package.swift version and checksum for CloudXMediationInMobiAdapter binary target
+          cd ..
+          sed -i '' "s|url: \".*CloudXMediationInMobiAdapter.*\",|url: \"https://github.com/cloudx-io/cloudx-ios/releases/download/$FULL_VERSION/CloudXMediationInMobiAdapter-v$VERSION.xcframework.zip\",|" Package.swift
+          sed -i '' "s|checksum: \".*\"|checksum: \"${{ steps.checksum.outputs.checksum }}\"|" Package.swift
+
+      - name: 📊 Create GitHub release (step 1 - empty release)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          # Create release notes file
+          cat > release_notes.md << EOF
+          CloudXMediationInMobiAdapter v$VERSION SDK release (static xcframework)
+          
+          ## Installation
+          
+          ### CocoaPods
+          Add to your Podfile: pod 'CloudXMediationInMobiAdapter', '~> $VERSION'
+          
+          ### Swift Package Manager
+          Add repository: https://github.com/cloudx-io/cloudx-ios
+          
+          ### Manual Installation
+          Download CloudXMediationInMobiAdapter-v$VERSION.xcframework.zip from this release.
+          
+          ## SwiftPM Checksum
+          ${{ steps.checksum.outputs.checksum }}
+          EOF
+          
+          # Create empty release first (two-step process for better CDN propagation)
+          gh release create "$FULL_VERSION" \
+            --title "CloudXMediationInMobiAdapter v$VERSION" \
+            --notes-file release_notes.md \
+            --latest
+
+      - name: 📦 Upload xcframework to release (step 2 - file upload)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          # Upload the xcframework file to the existing release
+          gh release upload "$FULL_VERSION" \
+            adapter-inmobi/CloudXMediationInMobiAdapter-v$VERSION.xcframework.zip
+
+
+      - name: 🔍 Debug file structure
+        run: |
+          echo "=== Repository structure ==="
+          ls -la
+          echo "=== Adapter-inmobi directory ==="
+          ls -la adapter-inmobi/
+          echo "=== License file check ==="
+          if [ -f "adapter-inmobi/LICENSE" ]; then
+            echo "✅ LICENSE file found at adapter-inmobi/LICENSE"
+            wc -l adapter-inmobi/LICENSE
+          else
+            echo "❌ LICENSE file NOT found at adapter-inmobi/LICENSE"
+          fi
+
+      - name: 🧪 Validate podspec with detailed output
+        run: |
+          cd adapter-inmobi
+          echo "=== Validating CloudXMediationInMobiAdapter-release.podspec ==="
+          echo "Current directory: $(pwd)"
+          echo "Podspec content:"
+          cat CloudXMediationInMobiAdapter-release.podspec
+          echo "=== Running podspec validation ==="
+          # Temporarily rename for validation (CocoaPods requires filename to match spec name)
+          cp CloudXMediationInMobiAdapter-release.podspec CloudXMediationInMobiAdapter.podspec
+          pod spec lint CloudXMediationInMobiAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose || {
+            echo "❌ Podspec validation failed"
+            exit 1
+          }
+          rm CloudXMediationInMobiAdapter.podspec
+
+      - name: 📋 Verify CocoaPods authentication
+        run: |
+          if [ -z "${COCOAPODS_TRUNK_TOKEN:-}" ]; then
+            echo "❌ COCOAPODS_TRUNK_TOKEN is empty/unset"
+            exit 1
+          else
+            echo "✅ COCOAPODS_TRUNK_TOKEN is set (length: ${#COCOAPODS_TRUNK_TOKEN})"
+          fi
+          echo "=== Checking authentication ==="
+          pod trunk me || true
+          echo "=== Checking pod ownership ==="
+          pod trunk info CloudXMediationInMobiAdapter || true
+
+      - name: ⏳ Wait for CloudXCore dependency to be available
+        run: |
+          echo "🔍 Checking for CloudXCore dependency availability..."
+          # CloudXMediationInMobiAdapter depends on CloudXCore, so we need to ensure Core is available before pushing
+          # This prevents race conditions when both Core and InMobi are released simultaneously
+          
+          # Try to find the required Core version from the podspec
+          REQUIRED_CORE_VERSION=$(grep "s.dependency 'CloudXCore'" adapter-inmobi/CloudXMediationInMobiAdapter-release.podspec | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "")
+          
+          if [ -z "$REQUIRED_CORE_VERSION" ]; then
+            echo "⚠️  No specific CloudXCore version requirement found, checking for latest..."
+            # If no version specified, just check that CloudXCore exists
+            if pod trunk info CloudXCore > /dev/null 2>&1; then
+              echo "✅ CloudXCore is available on CocoaPods"
+            else
+              echo "❌ CloudXCore not found on CocoaPods"
+              exit 1
+            fi
+          else
+            echo "📦 Required CloudXCore version: $REQUIRED_CORE_VERSION"
+            MAX_ATTEMPTS=60
+            WAIT_SECONDS=10
+            
+            for i in $(seq 1 $MAX_ATTEMPTS); do
+              echo "🔄 Attempt $i/$MAX_ATTEMPTS: Checking if CloudXCore $REQUIRED_CORE_VERSION is available..."
+              
+              if pod trunk info CloudXCore 2>/dev/null | grep -q "$REQUIRED_CORE_VERSION"; then
+                echo "✅ CloudXCore $REQUIRED_CORE_VERSION is available on CocoaPods!"
+                echo "✅ Proceeding with CloudXMediationInMobiAdapter release..."
+                exit 0
+              fi
+              
+              if [ $i -lt $MAX_ATTEMPTS ]; then
+                echo "⏳ CloudXCore $REQUIRED_CORE_VERSION not yet available, waiting ${WAIT_SECONDS}s..."
+                sleep $WAIT_SECONDS
+              else
+                echo "❌ Timeout: CloudXCore $REQUIRED_CORE_VERSION not available after $((MAX_ATTEMPTS * WAIT_SECONDS))s"
+                echo "💡 This usually means CloudXCore release is still in progress or failed"
+                exit 1
+              fi
+            done
+          fi
+
+      - name: 📤 Push podspec to CocoaPods trunk
+        run: |
+          # Use EXACT same pattern as working Core workflow
+          mkdir -p ~/.cocoapods/trunk
+          echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TRUNK_TOKEN }}"}}' > ~/.cocoapods/trunk/me.json
+          cd adapter-inmobi
+          
+          # CocoaPods requires filename to match spec name
+          echo "=== Copying podspec with correct name ==="
+          cp CloudXMediationInMobiAdapter-release.podspec CloudXMediationInMobiAdapter.podspec
+          
+          for i in {1..5}; do
+            echo "=== Attempt $i/5 ==="
+            if pod trunk push CloudXMediationInMobiAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
+              echo "✅ Pod trunk push succeeded on attempt $i"
+              break
+            else
+              echo "❌ Pod trunk push failed on attempt $i"
+              if [ $i -lt 5 ]; then
+                echo "Retrying in 30 seconds..."
+                sleep 30
+              else
+                echo "❌ Pod trunk push failed after all retries"
+                exit 1
+              fi
+            fi
+          done
+
+      - name: 🧾 Verify successful pod trunk push
+        run: |
+          echo "=== Verifying pod trunk push success ==="
+          
+          # Wait a moment for CocoaPods to process
+          sleep 10
+          
+          # Verify the pod is available
+          if pod trunk info CloudXMediationInMobiAdapter; then
+            echo "✅ Pod trunk push verification successful"
+            
+            # Extract and display the latest version
+            LATEST_VERSION=$(pod trunk info CloudXMediationInMobiAdapter | grep -E "^\s*-\s*[0-9]" | head -1 | sed 's/^\s*-\s*//')
+            echo "Latest published version: $LATEST_VERSION"
+            
+            # Verify it matches our expected version
+            EXPECTED_VERSION="${{ steps.version.outputs.version }}"
+            if [[ "$LATEST_VERSION" == "$EXPECTED_VERSION" ]]; then
+              echo "✅ Version verification successful: $LATEST_VERSION matches expected $EXPECTED_VERSION"
+            else
+              echo "⚠️ Version mismatch: Latest=$LATEST_VERSION, Expected=$EXPECTED_VERSION"
+              echo "This might be expected if the version was already published"
+            fi
+          else
+            echo "❌ Pod trunk info failed - pod may not be properly published"
+            exit 1
+          fi
+
+      - name: 📌 Upload xcodebuild logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-logs
+          path: |
+            adapter-inmobi/xcodebuild-ios.log
+            adapter-inmobi/xcodebuild-sim.log
+
