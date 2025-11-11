@@ -383,10 +383,8 @@ static void initializeLogger() {
         CLXBiddingConfigRegulations *regulations = [[CLXBiddingConfigRegulations alloc] init];
         regulations.ext = regExt;
         
-        // COPPA is now supported by server - include in bid requests
-        regulations.coppa = [privacyService coppaApplies];
-
-        // TODO: Re-enable GDPR once server support is implemented
+        // TODO: Re-enable COPPA and GDPR once server support is implemented
+        // regulations.coppa = [privacyService coppaApplies];
         // iab.gdprApplies = [privacyService gdprApplies];
         // iab.tcString = [privacyService gdprConsentString];
         // regExt.gdpr = [privacyService gdprApplies];
