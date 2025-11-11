@@ -383,8 +383,10 @@ static void initializeLogger() {
         CLXBiddingConfigRegulations *regulations = [[CLXBiddingConfigRegulations alloc] init];
         regulations.ext = regExt;
         
-        // TODO: Re-enable COPPA and GDPR once server support is implemented
-        // regulations.coppa = [privacyService coppaApplies];
+        // COPPA is now enabled per OpenRTB spec (0 = no, 1 = yes)
+        regulations.coppa = [privacyService coppaApplies];
+        
+        // TODO: Re-enable GDPR once server support is implemented
         // iab.gdprApplies = [privacyService gdprApplies];
         // iab.tcString = [privacyService gdprConsentString];
         // regExt.gdpr = [privacyService gdprApplies];

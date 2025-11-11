@@ -14,11 +14,11 @@
 #import <CoreLocation/CoreLocation.h>
 
 // Test category to expose internal methods for testing
-// GDPR methods are internal because server support is not yet implemented. COPPA is fully supported.
+// GDPR methods are internal because server support is not yet implemented. COPPA is now supported per OpenRTB spec.
 @interface CLXPrivacyService (Testing)
 - (nullable NSString *)gdprConsentString; // Internal - server not supported
 - (nullable NSNumber *)gdprApplies; // Internal - server not supported
-- (nullable NSNumber *)coppaApplies; // Internal method for testing
+- (nullable NSNumber *)coppaApplies; // Returns integer 0 or 1 per OpenRTB spec
 // Note: No longer supports UserDefaults injection to ensure real-world collision testing
 @end
 
@@ -185,8 +185,9 @@
                       settings:[CLXSettings sharedInstance]
             privacyService:[CLXPrivacyService sharedInstance]];
     
-    // COPPA is temporarily disabled until server is ready
-    XCTAssertNil(config.regulations.coppa, @"COPPA should be disabled until server is ready");
+    // COPPA is now enabled per OpenRTB spec (integer 0 or 1)
+    XCTAssertNotNil(config.regulations.coppa, @"COPPA should be present when enabled");
+    XCTAssertEqual([config.regulations.coppa intValue], 1, @"COPPA should be 1 when age-restricted user (OpenRTB integer format)");
 }
 
 // Test that CCPA and COPPA privacy settings are included in bidding config
@@ -237,8 +238,9 @@
     // CCPA should be included (server supported)
     XCTAssertEqualObjects(config.regulations.ext.iab.usPrivacyString, testCCPAString, @"US privacy string should match CCPA string");
     
-    // COPPA is temporarily disabled until server is ready
-    XCTAssertNil(config.regulations.coppa, @"COPPA should be disabled until server is ready");
+    // COPPA is now enabled per OpenRTB spec (returns integer 0 or 1)
+    XCTAssertNotNil(config.regulations.coppa, @"COPPA should be present when set");
+    XCTAssertEqual([config.regulations.coppa intValue], 1, @"COPPA should be 1 when age-restricted user (OpenRTB integer format)");
     
     // GDPR should NOT be included (server not supported yet)
     XCTAssertNil(config.regulations.ext.iab.gdprApplies, @"GDPR applies should not be included (server not supported)");

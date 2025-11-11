@@ -4,10 +4,10 @@
 
 /**
  * @file CLXPrivacyService.h
- * @brief Privacy service for handling CCPA and personal data protection
- * @details This service provides privacy compliance functionality for CCPA.
+ * @brief Privacy service for handling CCPA, COPPA, and personal data protection
+ * @details This service provides privacy compliance functionality for CCPA and COPPA.
  *          GDPR support is temporarily internal as server-side support is not yet implemented.
- *          COPPA data clearing is implemented but not included in bid requests (server limitation).
+ *          COPPA is now enabled and sent to server per OpenRTB spec.
  */
 
 #import <Foundation/Foundation.h>
@@ -17,9 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @class CLXPrivacyService
  * @brief Service for handling privacy compliance and personal data protection
- * @discussion This service manages privacy settings for CCPA compliance and
+ * @discussion This service manages privacy settings for CCPA and COPPA compliance and
  * determines when personal data should be cleared. GDPR support is temporarily internal
- * until server-side implementation is complete. COPPA data clearing is implemented but not sent to server.
+ * until server-side implementation is complete. COPPA is now enabled and sent to server per OpenRTB spec.
  */
 @interface CLXPrivacyService : NSObject
 

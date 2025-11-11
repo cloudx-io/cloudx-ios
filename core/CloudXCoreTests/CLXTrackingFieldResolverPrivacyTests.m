@@ -71,6 +71,7 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCOPPAAppliesKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreHashedUserIDKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreRawGeoHeadersKey];
     
     // Clear resolver data
     [self.resolver clear];
@@ -78,10 +79,20 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+- (void)setupUSUser {
+    NSDictionary *geoHeaders = @{
+        @"cloudfront-viewer-country-iso3": @"USA",
+        @"cloudfront-viewer-country-region": @"TX"
+    };
+    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 - (void)setupBaseTestConfiguration {
     // Set up consistent test configuration
+    // Use sdk.ifa which has privacy fallback logic (hashed user ID, hashed geo IP, session ID)
     CLXSDKConfigResponse *testConfig = [[CLXSDKConfigResponse alloc] init];
-    testConfig.tracking = @[@"bidRequest.device.ifa", @"sdk.sessionId"];
+    testConfig.tracking = @[@"sdk.ifa", @"sdk.sessionId"];
     [self.resolver setConfig:testConfig];
     
     // Set up session data with known values
@@ -155,6 +166,9 @@
     NSString *originalIFA = @"AEBE52E7-03EE-455A-B3C4-E57283966239";
     NSString *expectedSessionId = @"test-session-67890";
     
+    // Set up US user (COPPA only applies to US users)
+    [self setupUSUser];
+    
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyCOPPAAppliesKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey]; // Ensure no GDPR override
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey]; // Ensure no CCPA override
@@ -227,8 +241,8 @@
     
     [self.resolver setRequestData:self.testAuctionId bidRequestJSON:testBidRequest];
     
-    // Test the IFA resolution directly to understand the behavior
-    id resolvedIFA = [self.resolver resolveBidRequestField:self.testAuctionId field:@"bidRequest.device.ifa"];
+    // Test the IFA resolution directly (sdk.ifa has privacy fallback logic)
+    id resolvedIFA = [self.resolver resolveField:self.testAuctionId field:@"sdk.ifa"];
     
     // THEN: Should NOT return the original IFA when DNT is enabled
     XCTAssertNotNil(resolvedIFA, @"IFA resolution should return a value");

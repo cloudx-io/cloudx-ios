@@ -221,7 +221,7 @@
     } else if ([field isEqualToString:@"sdk.loopIndex"]) {
         return self.auctionedLoopIndex[auctionId];
     } else if ([field isEqualToString:@"sdk.ifa"]) {
-        // Privacy logic implementation matching Android behavior
+        // Privacy logic implementation
         CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
         
         // Check if personal data should be cleared due to privacy settings
@@ -230,10 +230,10 @@
             return self.sessionId ?: @"";
         }
         
-        // Check DNT (Do Not Track) flag from bid request
+        // Check DNT (Do Not Track) flag from bid request (OpenRTB field names)
         NSDictionary *requestData = self.requestDataMap[auctionId];
-        NSDictionary *device = [requestData objectForKey:kCLXCoreDeviceKey];
-        NSNumber *dntValue = [device objectForKey:kCLXCoreDntKey];
+        NSDictionary *device = [requestData objectForKey:@"device"];
+        NSNumber *dntValue = [device objectForKey:@"dnt"];
         BOOL isLimitedAdTrackingEnabled = [dntValue intValue] == 1;
         
         if (isLimitedAdTrackingEnabled) {

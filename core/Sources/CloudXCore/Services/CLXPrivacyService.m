@@ -4,8 +4,8 @@
 
 /**
  * @file CLXPrivacyService.m
- * @brief Implementation of privacy service for CCPA and personal data protection
- * @discussion GDPR methods are temporarily internal until server support is added. COPPA data clearing is implemented but not sent to server.
+ * @brief Implementation of privacy service for CCPA, COPPA, and personal data protection
+ * @discussion GDPR methods are temporarily internal until server support is added. COPPA is now enabled and sent to server per OpenRTB spec.
  */
 
 #import <CloudXCore/CLXPrivacyService.h>
@@ -16,14 +16,14 @@
 #import <CloudXCore/CLXGeoLocationService.h>
 
 // Private category for internal methods (not exposed in public header)
-// These methods are temporarily private because server-side support for GDPR/CCPA is not implemented
+// GDPR methods are temporarily private because server-side support for GDPR is not implemented
 @interface CLXPrivacyService ()
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, strong) NSUserDefaults *userDefaults;
 @end
 
 // Internal methods category - these are NOT in the public header
-// ⚠️ Server does not support GDPR or COPPA in bid requests yet - COPPA data clearing is implemented
+// ⚠️ Server does not support GDPR in bid requests yet
 @interface CLXPrivacyService (Internal)
 - (nullable NSString *)gdprConsentString;
 - (nullable NSNumber *)gdprApplies;
@@ -180,15 +180,15 @@
 }
 
 - (nullable NSNumber *)coppaApplies {
-    // ⚠️ INTERNAL ONLY: COPPA support not yet implemented on server
-    // Including COPPA data in bid requests will cause 502 errors
     NSUserDefaults *defaults = self.userDefaults;
     if ([defaults objectForKey:kCLXPrivacyCOPPAAppliesKey]) {
-        NSNumber *applies = @([defaults boolForKey:kCLXPrivacyCOPPAAppliesKey]);
-        [self.logger verbose:[NSString stringWithFormat:@"COPPA applies (INTERNAL): %@", applies]];
+        // OpenRTB spec requires integer: 0 = no, 1 = yes (not boolean)
+        BOOL coppaEnabled = [defaults boolForKey:kCLXPrivacyCOPPAAppliesKey];
+        NSNumber *applies = @(coppaEnabled ? 1 : 0);
+        [self.logger verbose:[NSString stringWithFormat:@"COPPA applies: %@", applies]];
         return applies;
     }
-    [self.logger verbose:@"COPPA applies (INTERNAL): (unknown)"];
+    [self.logger verbose:@"COPPA applies: (unknown)"];
     return nil;
 }
 

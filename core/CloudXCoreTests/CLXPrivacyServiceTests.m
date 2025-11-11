@@ -202,10 +202,10 @@
     BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
     XCTAssertTrue(shouldClear, @"COPPA applicable should clear personal data");
     
-    // Verify getter returns correct value
+    // Verify getter returns correct value (OpenRTB spec: integer 0 or 1)
     NSNumber *coppaApplies = [self.privacyService coppaApplies];
     XCTAssertNotNil(coppaApplies, @"COPPA applies should be retrievable");
-    XCTAssertTrue([coppaApplies boolValue], @"COPPA applies should be true");
+    XCTAssertEqual([coppaApplies intValue], 1, @"COPPA applies should be 1 (OpenRTB integer format)");
     
     // Test COPPA not applicable
     [self clearPrivacySettings];
@@ -324,8 +324,9 @@
     [self.privacyService setIsAgeRestrictedUser:@YES];
     
     // Verify it was stored (using internal method since this is for testing)
+    // OpenRTB spec requires integer: 0 = no, 1 = yes
     NSNumber *coppaApplies = [self.privacyService coppaApplies];
-    XCTAssertEqualObjects(coppaApplies, @YES, @"COPPA flag should be stored correctly");
+    XCTAssertEqual([coppaApplies intValue], 1, @"COPPA flag should be 1 (OpenRTB integer format)");
     
     // Test clearing COPPA flag
     [self.privacyService setIsAgeRestrictedUser:nil];
@@ -370,7 +371,7 @@
     
     [CloudXCore setIsAgeRestrictedUserWithService:YES privacyService:self.privacyService];
     NSNumber *coppaApplies = [self.privacyService coppaApplies];
-    XCTAssertEqualObjects(coppaApplies, @YES, @"CloudXCore setIsAgeRestrictedUser should delegate to CLXPrivacyService");
+    XCTAssertEqual([coppaApplies intValue], 1, @"CloudXCore setIsAgeRestrictedUser should delegate to CLXPrivacyService (OpenRTB integer format)");
     
     [CloudXCore setIsDoNotSellWithService:NO privacyService:self.privacyService];
     ccpaString = [self.privacyService ccpaPrivacyString];
