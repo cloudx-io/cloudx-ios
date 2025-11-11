@@ -12,12 +12,13 @@ platform :ios, '14.0'
 target 'YourApp' do
   use_frameworks!
   
-  # CloudX Core SDK (source-based distribution)
-  pod 'CloudXCore'
+  # CloudX SDK (source-based distribution)
+  pod 'CloudXSDK', '~> 0.1.0'
   
-  # Optional: CloudX Adapters (framework-based distribution)
-  pod 'CloudXMetaAdapter'
-  pod 'CloudXVungleAdapter'
+  # Optional: CloudX Mediation Adapters
+  pod 'CloudXMediationMetaAdapter', '~> 0.1.0'         # Meta (framework-based)
+  pod 'CloudXMediationVungleAdapter', '~> 0.1.0'       # Vungle (source-based)
+  pod 'CloudXMediationPrebidAdapter', '~> 0.1.0'       # Prebid (source-based)
 end
 ```
 
@@ -30,10 +31,10 @@ https://github.com/cloudx-io/cloudx-ios
 
 ## Components
 
-- **[`core/`](core/README.md)** - The foundational CloudX Core SDK written in Objective-C that provides the base functionality for programmatic advertising *(source-based distribution)*
-- **[`adapter-meta/`](adapter-meta/README.md)** - Meta (Facebook Audience Network) adapter for integrating Meta's advertising platform *(framework-based distribution)*
-- **[`adapter-vungle/`](adapter-vungle/README.md)** - Vungle (Liftoff) adapter for integrating Vungle/Liftoff advertising with header bidding support *(source-based distribution)*
-- **[`adapter-cloudx/`](adapter-cloudx/README.md)** - Prebid adapter for header bidding integration with CloudX's programmatic platform
+- **[`core/`](core/README.md)** - The foundational CloudXSDK written in Objective-C that provides the base functionality for programmatic advertising *(source-based distribution)*
+- **[`adapter-meta/`](adapter-meta/README.md)** - CloudXMediationMetaAdapter for Meta Audience Network integration *(framework-based distribution)*
+- **[`adapter-vungle/`](adapter-vungle/README.md)** - CloudXMediationVungleAdapter for Vungle/Liftoff advertising with header bidding support *(source-based distribution)*
+- **[`adapter-cloudx/`](adapter-cloudx/README.md)** - CloudXMediationPrebidAdapter for header bidding integration with CloudX's programmatic platform *(source-based distribution)*
 - **[`demo-app-objc/`](demo-app-objc/)** - Complete Objective-C demo application showcasing CloudX SDK integration and usage patterns
 - **[`demo-app-swift/`](demo-app-swift/)** - Complete Swift demo application demonstrating CloudX SDK implementation in Swift projects
 
@@ -45,17 +46,19 @@ This repository uses **component-specific releases** with **tagged distribution*
 
 ### Component-Specific Releases
 
-- **Core SDK**: Source-based distribution with tags like `v1.1.40-core`
-- **Meta Adapter**: Framework-based distribution with tags like `v1.1.25-meta`
-- **Vungle Adapter**: Source-based distribution with tags like `v1.0.0-vungle`
+- **CloudXSDK**: Source-based distribution with tags like `v0.1.0-sdk`
+- **CloudXMediationMetaAdapter**: Framework-based distribution with tags like `v0.1.0-meta`
+- **CloudXMediationVungleAdapter**: Source-based distribution with tags like `v0.1.0-vungle`
+- **CloudXMediationPrebidAdapter**: Source-based distribution with tags like `v0.1.0-prebid`
 - **Individual Versioning**: Each component maintains its own version to allow independent updates
 - **Clear Release Assets**: Each release provides the appropriate distribution format for that component
 
 #### Release Tag Format
 ```
-v1.1.40-core    # Core SDK release (source distribution)
-v1.1.25-meta    # Meta Adapter release (framework distribution)
-v1.0.0-vungle   # Vungle Adapter release (source distribution)
+v0.1.0-sdk      # SDK release (source distribution)
+v0.1.0-meta     # Meta Adapter release (framework distribution)
+v0.1.0-vungle   # Vungle Adapter release (source distribution)
+v0.1.0-prebid   # Prebid Adapter release (source distribution)
 ```
 
 #### Distribution Methods
@@ -75,7 +78,7 @@ Each component release provides the appropriate assets for its distribution meth
 
 #### Meta Adapter Assets (Framework Distribution) 
 ```
-CloudXMetaAdapter-v1.1.25.xcframework.zip  # Static xcframework for integration
+CloudXMediationMetaAdapter-v0.1.0.xcframework.zip  # Static xcframework for integration
 ```
 
 #### Benefits
