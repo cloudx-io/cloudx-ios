@@ -74,7 +74,7 @@
         NSDictionary *rawHeaders = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreRawGeoHeadersKey];
         return rawHeaders;
     } @catch (NSException *exception) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [CLXGeoLocationService] Failed to read raw geo headers: %@", exception.reason]];
+        [self.logger error:[NSString stringWithFormat:@"Failed to read raw geo headers: %@", exception.reason]];
         return nil;
     }
 }
@@ -85,7 +85,7 @@
         NSDictionary *processedData = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreProcessedGeoDataKey];
         return processedData;
     } @catch (NSException *exception) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [CLXGeoLocationService] Failed to read processed geo data: %@", exception.reason]];
+        [self.logger error:[NSString stringWithFormat:@"Failed to read processed geo data: %@", exception.reason]];
         return nil;
     }
 }
@@ -93,7 +93,7 @@
 - (BOOL)isUSUser {
     NSDictionary *geoHeaders = [self geoHeaders];
     if (!geoHeaders) {
-        [self.logger debug:@"📊 [CLXGeoLocationService] No geo headers - assuming non-US user"];
+        [self.logger debug:@"No geo headers - assuming non-US user"];
         return NO;
     }
     
@@ -102,13 +102,13 @@
     NSString *countryCode = [countryCodeObj isKindOfClass:[NSString class]] ? (NSString *)countryCodeObj : nil;
     BOOL isUS = [countryCode.lowercaseString isEqualToString:@"usa"];
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGeoLocationService] Country: %@, isUS: %@", countryCode ?: @"(none)", @(isUS)]];
+    [self.logger verbose:[NSString stringWithFormat:@"Country: %@, isUS: %@", countryCode ?: @"(none)", @(isUS)]];
     return isUS;
 }
 
 - (BOOL)isCaliforniaUser {
     if (![self isUSUser]) {
-        [self.logger debug:@"📊 [CLXGeoLocationService] Not US user - not California"];
+        [self.logger debug:@"Not US user - not California"];
         return NO;
     }
     
@@ -117,14 +117,14 @@
     NSString *region = [regionObj isKindOfClass:[NSString class]] ? (NSString *)regionObj : nil;
     BOOL isCalifornia = [region.lowercaseString isEqualToString:@"ca"];
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGeoLocationService] Region: %@, isCalifornia: %@", region ?: @"(none)", @(isCalifornia)]];
+    [self.logger verbose:[NSString stringWithFormat:@"Region: %@, isCalifornia: %@", region ?: @"(none)", @(isCalifornia)]];
     return isCalifornia;
 }
 
 - (nullable NSString *)countryCode {
     NSDictionary *geoHeaders = [self geoHeaders];
     if (!geoHeaders) {
-        [self.logger debug:@"📊 [CLXGeoLocationService] No geo headers - no country code available"];
+        [self.logger debug:@"No geo headers - no country code available"];
         return nil;
     }
     
@@ -134,11 +134,11 @@
     
     // Handle placeholder values from simulator/development environment
     if ([countryCode isEqualToString:@"country"] || [countryCode isEqualToString:@"COUNTRY"]) {
-        [self.logger debug:@"📊 [CLXGeoLocationService] Detected placeholder country value, defaulting to USA"];
+        [self.logger debug:@"Detected placeholder country value, defaulting to USA"];
         countryCode = @"USA";
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGeoLocationService] Country code: %@", countryCode ?: @"(none)"]];
+    [self.logger debug:[NSString stringWithFormat:@"Country code: %@", countryCode ?: @"(none)"]];
     return countryCode;
 }
 

@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
                                 burl:(nullable NSString *)burl
                              network:(NSString *)network {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Rewarded"];
-    [logger debug:[NSString stringWithFormat:@"🔧 Creating rewarded: AdID=%@, BidID=%@, Network=%@", adId, bidId, network]];
+    [logger debug:[NSString stringWithFormat:@"Creating rewarded: AdID=%@, BidID=%@, Network=%@", adId, bidId, network]];
     
     CLXAdNetworkFactories *factories = [self valueForKey:@"adFactories"];
     if (!factories) {
@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
     
-    [logger debug:[NSString stringWithFormat:@"📊 adFactories.rewardedInterstitials: %@", factories.rewardedInterstitials]];
+    [logger debug:[NSString stringWithFormat:@"adFactories.rewardedInterstitials: %@", factories.rewardedInterstitials]];
     
     id<CLXAdapterRewardedFactory> factory = factories.rewardedInterstitials[network];
     if (!factory) {
@@ -56,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
     
-    [logger info:[NSString stringWithFormat:@"✅ Rewarded factory found for network: %@ (class: %@)", network, NSStringFromClass([factory class])]];
+    [logger info:[NSString stringWithFormat:@"Rewarded factory found for network: %@ (class: %@)", network, NSStringFromClass([factory class])]];
     
     id<CLXAdapterRewarded> rewarded = [factory createWithAdId:adId
                                                          bidId:bidId
@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
     
-    [logger info:[NSString stringWithFormat:@"✅ Rewarded created - Network: %@, BidID: %@", rewarded.network, rewarded.bidID]];
+    [logger info:[NSString stringWithFormat:@"Rewarded created - Network: %@, BidID: %@", rewarded.network, rewarded.bidID]];
     
     return rewarded;
 }

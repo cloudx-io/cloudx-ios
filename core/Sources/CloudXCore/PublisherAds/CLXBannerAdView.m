@@ -163,11 +163,11 @@ static void initializeLogger() {
 #pragma mark - CLXAdapterBannerDelegate
 
 - (void)didLoadBanner:(id<CLXAdapterBanner>)banner {
-    [logger debug:@"🎯 [CloudXBannerAdView] didLoadBanner called"];
+    [logger debug:@"[CloudXBannerAdView] didLoadBanner called"];
     
     UIView *bannerView = banner.bannerView;
     if (bannerView) {
-        [logger debug:@"🎯 [CloudXBannerAdView] Adding banner view to view hierarchy"];
+        [logger debug:@"[CloudXBannerAdView] Adding banner view to view hierarchy"];
         
         bannerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         bannerView.userInteractionEnabled = YES;
@@ -178,7 +178,7 @@ static void initializeLogger() {
         [self setNeedsLayout];
         [self layoutIfNeeded];
     } else {
-        [logger error:@"❌ [CloudXBannerAdView] Banner view is nil, cannot add to hierarchy"];
+        [logger error:@"Banner view is nil, cannot add to hierarchy"];
     }
     
     // Note: didLoadWithAd: is called directly by CLXPublisherBanner, not here
@@ -191,7 +191,7 @@ static void initializeLogger() {
         // Note: self.ad may be nil if this is the first load attempt
         CLXAd *adToPass = self.ad;
         if (!adToPass) {
-            [logger debug:@"⚠️ [CloudXBannerAdView] failToLoadBanner called with no ad object"];
+            [logger warn:@"[CloudXBannerAdView] failToLoadBanner called with no ad object"];
         }
         [self.delegate failToLoadWithAd:adToPass error:error];
     }
@@ -203,7 +203,7 @@ static void initializeLogger() {
         if (self.ad) {
             [self.delegate didShowWithAd:self.ad];
         } else {
-            [logger error:@"❌ [CloudXBannerAdView] didShowBanner called but self.ad is nil"];
+            [logger error:@"didShowBanner called but self.ad is nil"];
         }
     }
 }
@@ -214,7 +214,7 @@ static void initializeLogger() {
         if (self.ad) {
             [self.delegate impressionOn:self.ad];
         } else {
-            [logger error:@"❌ [CloudXBannerAdView] impressionBanner called but self.ad is nil"];
+            [logger error:@"impressionBanner called but self.ad is nil"];
         }
     }
 }
@@ -225,7 +225,7 @@ static void initializeLogger() {
         if (self.ad) {
             [self.delegate didClickWithAd:self.ad];
         } else {
-            [logger error:@"❌ [CloudXBannerAdView] clickBanner called but self.ad is nil"];
+            [logger error:@"clickBanner called but self.ad is nil"];
         }
     }
 }
@@ -233,7 +233,7 @@ static void initializeLogger() {
 #pragma mark - BaseAdDelegate
 
 - (void)didLoadWithAd:(CLXAd *)ad {
-    [logger debug:@"🎯 [CloudXBannerAdView] didLoadWithAd called - displaying banner"];
+    [logger debug:@"[CloudXBannerAdView] didLoadWithAd called - displaying banner"];
     
     // Store the ad object for use in other delegate methods
     // This fixes the unsafe cast bug and enables proper ad metadata access
@@ -250,7 +250,7 @@ static void initializeLogger() {
         }
         
         if (currentBanner && currentBanner.bannerView) {
-            [logger debug:@"🎯 [CloudXBannerAdView] Found banner view, adding to hierarchy"];
+            [logger debug:@"[CloudXBannerAdView] Found banner view, adding to hierarchy"];
             
             // Remove any existing banner views to prevent duplicates
             for (UIView *subview in [self.subviews copy]) {
@@ -267,7 +267,7 @@ static void initializeLogger() {
             [self setNeedsLayout];
             [self layoutIfNeeded];
         } else {
-            [logger error:@"❌ [CloudXBannerAdView] No banner view available to display"];
+            [logger error:@"No banner view available to display"];
         }
     }
     

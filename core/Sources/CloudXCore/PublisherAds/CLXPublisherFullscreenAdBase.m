@@ -77,7 +77,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 @property (nonatomic, strong, nullable) CLXBidResponse *currentBidResponse;
 @property (nonatomic, strong, nullable) CLXBidAdSourceResponse *lastBidResponse;
 
-// Rill tracking service for analytics events
+// Analytics tracking service for analytics events
 @property (nonatomic, strong) CLXRillTrackingService *rillTrackingService;
 @property (nonatomic, strong) CLXConfigImpressionModel *impModel;
 @property (nonatomic, strong) id<CLXWinLossTracking> winLossTracker;
@@ -121,7 +121,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         _forceCloseEventDelay = 30.0;
         _closeEventReceived = NO;
         
-        // Initialize Rill tracking service
+        // Initialize Analytics tracking service
         _rillTrackingService = [[CLXRillTrackingService alloc] initWithReportingService:_reportingService];
         
         // Initialize win/loss tracker
@@ -221,13 +221,13 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         case CLXFullscreenAdStateIDLE:
             break;
         case CLXFullscreenAdStateLOADING:
-            [self.logger debug:[NSString stringWithFormat:@"[%@] ⚠️ [PublisherFullscreenAd] Already loading, ignoring load request", self.currentCorrelationId]];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherFullscreenAd] Already loading, ignoring load request", self.currentCorrelationId]];
             return;
         case CLXFullscreenAdStateREADY:
-            [self.logger debug:[NSString stringWithFormat:@"[%@] ⚠️ [PublisherFullscreenAd] Already loaded, ignoring load request", self.currentCorrelationId]];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherFullscreenAd] Already loaded, ignoring load request", self.currentCorrelationId]];
             return;
         case CLXFullscreenAdStateSHOWING:
-            [self.logger debug:[NSString stringWithFormat:@"[%@] ⚠️ [PublisherFullscreenAd] Currently showing, ignoring load request", self.currentCorrelationId]];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherFullscreenAd] Currently showing, ignoring load request", self.currentCorrelationId]];
             return;
         case CLXFullscreenAdStateDESTROYED:
             [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherFullscreenAd] Ad destroyed, cannot load", self.currentCorrelationId]];
@@ -250,11 +250,11 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherFullscreenAd] showFromViewController called - Ready: %d, State: %ld", self.isReady, (long)self.currentState]];
+    [self.logger debug:[NSString stringWithFormat:@"showFromViewController called - Ready: %d, State: %ld", self.isReady, (long)self.currentState]];
     
     // Verify ad is ready before attempting to show
     if (self.currentState != CLXFullscreenAdStateREADY) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [PublisherFullscreenAd] Cannot show ad - invalid state: %ld", (long)self.currentState]];
+        [self.logger error:[NSString stringWithFormat:@"Cannot show ad - invalid state: %ld", (long)self.currentState]];
         NSError *error = [NSError errorWithDomain:@"CLXErrorDomain" 
                                              code:CLXErrorCodeNoFill 
                                          userInfo:@{NSLocalizedDescriptionKey: @"Ad not ready"}];
@@ -361,7 +361,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     }
     
     // Create adapter instance from bid response
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [PublisherFullscreenAd] createBidAd - AdID: %@, BidID: %@, Network: %@", response.bid.adid, response.bidID, response.networkName]];
+    [self.logger debug:[NSString stringWithFormat:@"createBidAd - AdID: %@, BidID: %@, Network: %@", response.bid.adid, response.bidID, response.networkName]];
     
     id adapter = response.createBidAd();
     if (!adapter) {
@@ -379,7 +379,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Fullscreen ads always use loop index 1
     NSInteger loopIndexForFullscreen = 1;
     
-    // Set up Rill tracking data
+    // Set up Analytics tracking data
     [self.rillTrackingService setupTrackingDataFromBidResponse:response
                                                       impModel:self.impModel
                                                    placementID:self.placementID
@@ -410,9 +410,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                              lossReason:@(CLXLossReasonInternalError)
                          winnerBidPrice:-1.0];
         
-        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Sent LOSS event for failed ad type %ld, reason=InternalError", (long)[self adType]]];
+        [self.logger debug:[NSString stringWithFormat:@"Sent LOSS event for failed ad type %ld, reason=InternalError", (long)[self adType]]];
     } else {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] Missing data for ad type %ld loss notification: bidID=%@, auctionID=%@", 
+        [self.logger debug:[NSString stringWithFormat:@"Missing data for ad type %ld loss notification: bidID=%@, auctionID=%@", 
                            (long)[self adType], self.lastBidResponse.bid.id ?: @"(nil)", self.currentBidResponse.id ?: @"(nil)"]];
     }
 }
@@ -433,12 +433,12 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 - (void)transitionToReadyState {
     self.currentState = CLXFullscreenAdStateREADY;
-    [self.logger debug:@"📊 [PublisherFullscreenAd] State transitioned to READY"];
+    [self.logger debug:@"State transitioned to READY"];
 }
 
 - (void)transitionToIdleState {
     self.currentState = CLXFullscreenAdStateIDLE;
-    [self.logger debug:@"📊 [PublisherFullscreenAd] State transitioned to IDLE"];
+    [self.logger debug:@"State transitioned to IDLE"];
 }
 
 - (void)handleAdClose {
@@ -475,7 +475,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                             lossReason:@(CLXLossReasonBidWon)
                         winnerBidPrice:price];
         
-        [self.logger debug:[NSString stringWithFormat:@"🚀 [PublisherFullscreenAd] Fired LOAD_SUCCESS event (nurl) for bidID=%@", bidID]];
+        [self.logger debug:[NSString stringWithFormat:@"[PublisherFullscreenAd] Fired LOAD_SUCCESS event (nurl) for bidID=%@", bidID]];
     }
 }
 
@@ -489,7 +489,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     
     CLXBidResponseBid *winningBid = [self.currentBidResponse findBidWithID:bidID];
     if (winningBid && bidID && self.currentBidResponse && self.currentBidResponse.id) {
-        [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherFullscreenAd] Firing RENDER_SUCCESS event (burl) for impression: bidID=%@, price=%.2f", bidID, winningBid.price]];
+        [self.logger debug:[NSString stringWithFormat:@"Firing RENDER_SUCCESS event (burl) for impression: bidID=%@, price=%.2f", bidID, winningBid.price]];
         
         [self.winLossTracker sendEvent:self.currentBidResponse.id
                                  bidId:bidID
@@ -497,9 +497,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                             lossReason:@(CLXLossReasonBidWon)
                         winnerBidPrice:winningBid.price];
         
-        [self.logger debug:@"🚀 [PublisherFullscreenAd] RENDER_SUCCESS event (burl) fired"];
+        [self.logger debug:@"[PublisherFullscreenAd] RENDER_SUCCESS event (burl) fired"];
     } else {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherFullscreenAd] No NURL to fire: bidID=%@, winningBid=%@", bidID, winningBid ? @"found" : @"not found"]];
+        [self.logger debug:[NSString stringWithFormat:@"No NURL to fire: bidID=%@, winningBid=%@", bidID, winningBid ? @"found" : @"not found"]];
     }
 }
 

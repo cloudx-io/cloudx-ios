@@ -118,9 +118,9 @@
     NSDictionary *json = [config json];
     
     NSNumber *coppaFlag = json[@"regs"][@"coppa"];
-    // CX-1912: COPPA is now included in bid requests (server support added)
+    // CX-1912: COPPA is now included in bid requests per OpenRTB spec (integer 0 or 1)
     XCTAssertNotNil(coppaFlag, @"COPPA flag is now supported by server");
-    XCTAssertTrue([coppaFlag boolValue], @"COPPA should be true when age-restricted");
+    XCTAssertEqual([coppaFlag intValue], 1, @"COPPA should be 1 when age-restricted (OpenRTB integer format)");
 }
 
 // DEPRECATED: Test replaced by testCOPPAIncludedInBidRequest_Disabled (CX-1912)
@@ -133,9 +133,9 @@
     NSDictionary *json = [config json];
     
     NSNumber *coppaFlag = json[@"regs"][@"coppa"];
-    // CX-1912: COPPA field is now always present with true/false value
+    // CX-1912: COPPA field is present with integer value per OpenRTB spec
     XCTAssertNotNil(coppaFlag, @"COPPA field should be present");
-    XCTAssertFalse([coppaFlag boolValue], @"COPPA should be false when not age-restricted");
+    XCTAssertEqual([coppaFlag intValue], 0, @"COPPA should be 0 when not age-restricted (OpenRTB integer format)");
 }
 
 #pragma mark - Personal Data Clearing in Bid Requests
@@ -399,10 +399,10 @@
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
     NSDictionary *json = [config json];
     
-    // CX-1912 FIX: COPPA must be present in bid request
+    // CX-1912 FIX: COPPA must be present in bid request per OpenRTB spec (integer 0 or 1)
     NSNumber *coppaValue = json[@"regs"][@"coppa"];
     XCTAssertNotNil(coppaValue, @"COPPA field must be present in bid request");
-    XCTAssertTrue([coppaValue boolValue], @"COPPA value should be true when age-restricted user");
+    XCTAssertEqual([coppaValue intValue], 1, @"COPPA value should be 1 when age-restricted user (OpenRTB integer format)");
 }
 
 // CX-1912: COPPA field included with false value when disabled
@@ -413,10 +413,10 @@
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
     NSDictionary *json = [config json];
     
-    // CX-1912: COPPA should be present with false value
+    // CX-1912: COPPA should be present with integer 0 per OpenRTB spec
     NSNumber *coppaValue = json[@"regs"][@"coppa"];
     XCTAssertNotNil(coppaValue, @"COPPA field should be present even when disabled");
-    XCTAssertFalse([coppaValue boolValue], @"COPPA value should be false when not age-restricted");
+    XCTAssertEqual([coppaValue intValue], 0, @"COPPA value should be 0 when not age-restricted (OpenRTB integer format)");
 }
 
 // CX-1904: DNT field set correctly in device (not hardcoded to 0)

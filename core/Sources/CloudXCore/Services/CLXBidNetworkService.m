@@ -72,7 +72,7 @@
         // Initialize CDP network service with empty base URL (CDP uses full URLs)
         _cdpNetworkService = [[CLXBaseNetworkService alloc] initWithBaseURL:@"" urlSession:urlSession];
         
-        [self.logger info:[NSString stringWithFormat:@"✅ [BidNetworkService] Initialized with auction endpoint: %@", _endpoint]];
+        [self.logger info:[NSString stringWithFormat:@"Initialized with auction endpoint: %@", _endpoint]];
     }
     return self;
 }
@@ -91,7 +91,7 @@
                        correlationId:(NSString *)correlationId
                           completion:(void (^)(id _Nullable, NSError * _Nullable))completion {
     
-    [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [BidNetworkService] Creating bid request - AdUnit: %@, Type: %d", correlationId, adUnitID, (int)adType]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] [BidNetworkService] Creating bid request - AdUnit: %@, Type: %d", correlationId, adUnitID, (int)adType]];
     
     CLXBiddingConfigRequest *bidRequest = [[CLXBiddingConfigRequest alloc] initWithAdType:adType
                                                                              adUnitID:adUnitID
@@ -119,7 +119,7 @@
                             appKey:(NSString *)appKey
                       correlationId:(NSString *)correlationId
                         completion:(void (^)(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error))completion {
-    [self.logger info:[NSString stringWithFormat:@"[%@] 📡 [BidNetworkService] Starting auction request - AppKey: %@", correlationId, appKey]];
+    [self.logger info:[NSString stringWithFormat:@"[%@] [BidNetworkService] Starting auction request - AppKey: %@", correlationId, appKey]];
     
     // Log the actual bid request JSON
     if (bidRequest) {
@@ -128,7 +128,7 @@
             NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bidRequest options:NSJSONWritingPrettyPrinted error:&jsonError];
             if (jsonData && !jsonError) {
                 NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-                [self.logger debug:[NSString stringWithFormat:@"[%@] 📊 [BidNetworkService] BidRequest JSON (%lu chars)", correlationId, (unsigned long)jsonString.length]];
+                [self.logger debug:[NSString stringWithFormat:@"[%@] [BidNetworkService] BidRequest JSON (%lu chars)", correlationId, (unsigned long)jsonString.length]];
             }
         } @catch (NSException *exception) {
             [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [BidNetworkService] Exception in bid_request_json_logging: %@ - %@", 
@@ -138,7 +138,7 @@
         }
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [BidNetworkService] Bid request: ID=%@, IMPs=%lu", 
+    [self.logger debug:[NSString stringWithFormat:@"[%@] [BidNetworkService] Bid request: ID=%@, IMPs=%lu", 
                        correlationId,
                        bidRequest[@"id"], 
                        (unsigned long)[bidRequest[@"imp"] count]]];
@@ -187,8 +187,8 @@
     }
     
     // Use empty endpoint string like Swift version to avoid double URL
-    [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [BidNetworkService] Starting auction request with V1 retry policy (maxRetries:1, delay:1.0s)", correlationId]];
-    [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [BidNetworkService] Headers: %@", correlationId, headers]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] Starting auction request with V1 retry policy (maxRetries:1, delay:1.0s)", correlationId]];
+    [self.logger verbose:[NSString stringWithFormat:@"[%@] Headers: %@", correlationId, headers]];
     
     // Track bid request network call latency
     NSDate *bidRequestStartTime = [NSDate date];
@@ -205,7 +205,7 @@
         id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
         [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkBidRequest latency:(NSInteger)bidRequestLatency];
         
-        [self.logger debug:[NSString stringWithFormat:@"[%@] 📥 [BidNetworkService] Network request completion called (%.0fms)", correlationId, bidRequestLatency]];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] [BidNetworkService] Network request completion called (%.0fms)", correlationId, bidRequestLatency]];
         
         if (error) {
             // Error already logged by BaseNetworkService - add correlation ID and propagate
@@ -239,7 +239,7 @@
             return;
         }
         
-        [self.logger info:[NSString stringWithFormat:@"[%@] ✅ [BidNetworkService] Auction response received successfully", correlationId]];
+        [self.logger info:[NSString stringWithFormat:@"[%@] [BidNetworkService] Auction response received successfully", correlationId]];
         
         // Parse response dictionary into BidResponse object
         CLXBidResponse *bidResponse = [CLXBidResponse parseBidResponseFromDictionary:response];
@@ -249,7 +249,7 @@
             NSString *currency = bidResponse.cur ?: @"USD";
             NSInteger seatbidCount = bidResponse.seatbid ? bidResponse.seatbid.count : 0;
             NSString *bidId = bidResponse.bidid ?: @"unknown";
-            [self.logger debug:[NSString stringWithFormat:@"[%@] 📊 [BidNetworkService] Parsed response - BidID: %@, Currency: %@, SeatBids: %ld", correlationId, bidId, currency, (long)seatbidCount]];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] [BidNetworkService] Parsed response - BidID: %@, Currency: %@, SeatBids: %ld", correlationId, bidId, currency, (long)seatbidCount]];
         }
         
         // Pass both parsed object and raw JSON to completion handler
@@ -263,7 +263,7 @@
                             appKey:(NSString *)appKey
                        completion:(void (^)(id _Nullable, NSError * _Nullable))completion {
     
-    [self.logger info:[NSString stringWithFormat:@"🔧 [BidNetworkService] Starting CDP request to: %@", self.cdpEndpoint]];
+    [self.logger info:[NSString stringWithFormat:@"Starting CDP request to: %@", self.cdpEndpoint]];
     
     NSMutableDictionary *headers = [NSMutableDictionary dictionary];
     headers[@"Content-Type"] = @"application/json";
@@ -273,7 +273,7 @@
     NSError *jsonError;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bidRequest options:0 error:&jsonError];
     if (jsonError) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] CDP request JSON serialization failed: %@", jsonError.localizedDescription]];
+        [self.logger error:[NSString stringWithFormat:@"CDP request JSON serialization failed: %@", jsonError.localizedDescription]];
         if (completion) {
             completion(nil, jsonError);
         }
@@ -288,9 +288,9 @@
                                                delay:1.0
                                           completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [BidNetworkService] CDP request failed: %@", error.localizedDescription]];
+            [self.logger error:[NSString stringWithFormat:@"CDP request failed: %@", error.localizedDescription]];
         } else {
-            [self.logger info:@"✅ [BidNetworkService] CDP request succeeded"];
+            [self.logger info:@"CDP request succeeded"];
         }
         
         if (completion) {

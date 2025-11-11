@@ -98,7 +98,7 @@
                     currentAttempt:(NSInteger)currentAttempt
                      completion:(void (^)(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled))completion {
     
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [BaseNetworkService] executeRequestWithEndpoint - Endpoint: %@, Retries: %ld", endpoint, (long)maxRetries]];
+    [self.logger verbose:[NSString stringWithFormat:@"Request endpoint: %@, maxRetries: %ld", endpoint, (long)maxRetries]];
     
     // Build complete URL with query parameters
     NSURLComponents *components = [[NSURLComponents alloc] initWithString:[self.baseURL stringByAppendingString:endpoint]];
@@ -121,7 +121,7 @@
         components.queryItems = queryItems;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] Final URL: %@", components.URL]];
+    [self.logger verbose:[NSString stringWithFormat:@"Final URL: %@", components.URL]];
     
     // Configure HTTP request with method, body, and headers
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:components.URL];
@@ -132,13 +132,13 @@
     [requestHeaders addEntriesFromDictionary:headers ?: @{}];
     request.allHTTPHeaderFields = requestHeaders;
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP %@ request prepared", request.HTTPMethod]];
+    [self.logger verbose:[NSString stringWithFormat:@"HTTP %@ request prepared", request.HTTPMethod]];
     
     // Execute network request with completion handling
-    [self.logger debug:@"🔧 [BaseNetworkService] Creating URLSessionDataTask..."];
+    [self.logger verbose:@"Starting network request"];
     NSURLSessionDataTask *task = [self.urlSession dataTaskWithRequest:request
                                                   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        [self.logger debug:[NSString stringWithFormat:@"🔧 [BaseNetworkService] Request completed - Data: %@, Error: %@", data ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
+        [self.logger verbose:[NSString stringWithFormat:@"Request completed - hasData: %@, hasError: %@", data ? @"YES" : @"NO", error ? @"YES" : @"NO"]];
         
         // Initialize kill switch detection flag
         BOOL isKillSwitchEnabled = NO;
@@ -147,9 +147,9 @@
         
         // Log response status for debugging
         if (httpResponse) {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] HTTP response - Status: %ld", (long)httpResponse.statusCode]];
+            [self.logger verbose:[NSString stringWithFormat:@"HTTP response status: %ld", (long)httpResponse.statusCode]];
         } else {
-            [self.logger debug:@"📊 [BaseNetworkService] No HTTP response (network/timeout error)"];
+            [self.logger verbose:@"No HTTP response (network/timeout error)"];
         }
         
         // Determine if request should be retried based on error type
@@ -159,12 +159,12 @@
         // Check for network/timeout errors that warrant retry
         BOOL isNetworkOrTimeoutError = (error != nil && (!httpResponse || [self isNetworkTimeoutError:error]));
         if (isNetworkOrTimeoutError) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Network/timeout error - Error: %@, Attempt: %ld/%ld", error.localizedDescription, (long)(currentAttempt + 1), (long)(maxRetries + 1)]];
+            [self.logger error:[NSString stringWithFormat:@"Network/timeout error - Error: %@, Attempt: %ld/%ld", error.localizedDescription, (long)(currentAttempt + 1), (long)(maxRetries + 1)]];
             shouldRetry = YES;
             retryDelay = 1.0; // V1 spec: 1-second delay for network errors
         } else if (httpResponse && ((httpResponse.statusCode >= 500 && httpResponse.statusCode < 600) || httpResponse.statusCode == 429)) {
             // Check for server errors (5xx) or rate limiting (429) that warrant retry
-            [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] Server error %ld - Attempt: %ld/%ld", (long)httpResponse.statusCode, (long)(currentAttempt + 1), (long)(maxRetries + 1)]];
+            [self.logger error:[NSString stringWithFormat:@"Server error %ld - Attempt: %ld/%ld", (long)httpResponse.statusCode, (long)(currentAttempt + 1), (long)(maxRetries + 1)]];
             shouldRetry = YES;
             
             if (httpResponse.statusCode == 429) {
@@ -180,7 +180,7 @@
         // Execute retry if conditions are met and attempts remain
         if (shouldRetry && currentAttempt < maxRetries) {
             NSInteger nextAttempt = currentAttempt + 1;
-            [self.logger debug:[NSString stringWithFormat:@"🔄 [BaseNetworkService] Retrying request (attempt %ld) after %.1fs delay", (long)(nextAttempt + 1), retryDelay]];
+            [self.logger verbose:[NSString stringWithFormat:@"Retrying request (attempt %ld) after %.1fs delay", (long)(nextAttempt + 1), retryDelay]];
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(retryDelay * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
                 [self executeRequestWithEndpoint:endpoint
                                    urlParameters:urlParameters
@@ -196,7 +196,7 @@
         
         // Log when max retries are exhausted
         if (shouldRetry) {
-            [self.logger error:@"❌ [BaseNetworkService] Max retries reached, calling completion with error"];
+            [self.logger error:@"Max retries reached, calling completion with error"];
         }
         
         // Handle request errors by returning early
@@ -210,9 +210,9 @@
         // Log response data for debugging
         if (data) {
             NSString *responseBody = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [BaseNetworkService] Response body length: %lu", (unsigned long)responseBody.length]];
+            [self.logger verbose:[NSString stringWithFormat:@"Response body length: %lu", (unsigned long)responseBody.length]];
         } else {
-            [self.logger debug:@"📊 [BaseNetworkService] No response data received"];
+            [self.logger verbose:@"No response data received"];
         }
     
         // Process successful HTTP responses (2xx status codes)
@@ -224,53 +224,44 @@
             BOOL isKillSwitchActive = ([cloudXStatus isEqual:@"ADS_DISABLED"] || [cloudXStatus isEqual:@"SDK_DISABLED"]);
             isKillSwitchEnabled = isNoContentResponse && isKillSwitchActive;
             
+            [self.logger verbose:[NSString stringWithFormat:@"HTTP status code: %lu", httpResponse.statusCode]];
             
-            
-            
-            
-            [self.logger debug:[NSString stringWithFormat:@"[BaseNetworkService] httpResponse.statusCode: %lu", httpResponse.statusCode]];
-            
-            
-            
-            [self.logger info:@"✅ [BaseNetworkService] HTTP status code indicates success"];
             // Parse JSON response data if present and non-empty
             if (data && data.length > 0) {
                 NSError *jsonError;
                 id jsonResponse = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
                 if (jsonError) {
-                    [self.logger error:[NSString stringWithFormat:@"❌ [BaseNetworkService] JSON parsing failed: %@", jsonError]];
+                    [self.logger error:[NSString stringWithFormat:@"JSON parsing failed: %@", jsonError]];
                     if (completion) {
                         completion(nil, jsonError, isKillSwitchEnabled);
                     }
                 } else {
-                    [self.logger info:@"✅ [BaseNetworkService] JSON parsing successful, calling completion with response"];
+                    [self.logger verbose:@"JSON parsing successful"];
                     if (completion) {
                         completion(jsonResponse, nil, isKillSwitchEnabled);
                     }
                 }
             } else {
                 // No data or empty data to parse, return success with nil response
-                [self.logger debug:@"📊 [BaseNetworkService] No data or empty data to parse, calling completion with nil"];
+                [self.logger verbose:@"No data or empty data to parse"];
                 if (completion) {
                     completion(nil, nil, isKillSwitchEnabled);
                 }
             }
         } else {
-            // Handle HTTP error status codes (non-2xx) - INFO level because error goes to delegate
-            [self.logger info:[NSString stringWithFormat:@"ℹ️ [BaseNetworkService] HTTP status code: %ld", (long)httpResponse.statusCode]];
+            // Handle HTTP error status codes (non-2xx)
+            [self.logger verbose:[NSString stringWithFormat:@"HTTP error status code: %ld", (long)httpResponse.statusCode]];
             
             // Log error response body for debugging
             if (data && data.length > 0) {
                 NSString *errorResponseBody = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
                 if (errorResponseBody) {
-                    [self.logger info:[NSString stringWithFormat:@"ℹ️ [BaseNetworkService] Error response body: %@", errorResponseBody]];
-                    
-                    // Skip pretty-print JSON to reduce log noise (raw body above is sufficient)
+                    [self.logger verbose:[NSString stringWithFormat:@"Error response body: %@", errorResponseBody]];
                 } else {
-                    [self.logger debug:@"[BaseNetworkService] Error response body could not be decoded as UTF-8"];
+                    [self.logger verbose:@"Error response body could not be decoded as UTF-8"];
                 }
             } else {
-                [self.logger debug:@"[BaseNetworkService] No error response body available"];
+                [self.logger verbose:@"No error response body available"];
             }
             
             if (completion) {
@@ -280,9 +271,7 @@
     }];
     
     // Start the network request
-    [self.logger debug:@"🔧 [BaseNetworkService] Starting URLSessionDataTask..."];
     [task resume];
-    [self.logger info:@"✅ [BaseNetworkService] URLSessionDataTask started"];
 }
 
 #pragma mark - Private Helper Methods

@@ -65,11 +65,11 @@
  */
 - (instancetype)initWithWebView:(WKWebView *)webView placementType:(CLXMRAIDPlacementType)placementType {
     self.logger = [[CLXLogger alloc] initWithCategory:@"CLXMRAIDManager"];
-    [self.logger info:[NSString stringWithFormat:@"🚀 [MRAID-INIT] CLXMRAIDManager initialization started - WebView: %p, Placement type: %ld", webView, (long)placementType]];
+    [self.logger debug:[NSString stringWithFormat:@"MRAID-INIT: CLXMRAIDManager initialization started - WebView: %p, Placement type: %ld", webView, (long)placementType]];
     
     self = [super init];
     if (self) {
-        [self.logger info:@"✅ [MRAID-INIT] Super init successful"];
+        [self.logger verbose:@"Super init successful"];
         
         // Initialize core properties
         _webView = webView;
@@ -85,7 +85,7 @@
         _pendingJavaScriptQueue = [NSMutableArray array];
         _webViewReady = NO;
         
-        [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID-INIT] Initial state: Loading, Supports inline video: %@, Initial viewable: NO", _supportsInlineVideo ? @"YES" : @"NO"]];
+        [self.logger debug:[NSString stringWithFormat:@"Initial state: Loading, Supports inline video: %@, Initial viewable: NO", _supportsInlineVideo ? @"YES" : @"NO"]];
         
         // Configure screen properties for device capabilities
         [self setupScreenProperties];
@@ -106,9 +106,9 @@
             [self checkWebViewReadiness];
         });
         
-        [self.logger info:@"✅ [MRAID-INIT] CLXMRAIDManager initialization completed"];
+        [self.logger debug:@"CLXMRAIDManager initialization completed"];
     } else {
-        [self.logger error:@"❌ [MRAID-INIT] Super init failed"];
+        [self.logger error:@"Super init failed"];
     }
     return self;
 }
@@ -129,12 +129,12 @@
  * notification observers to prevent memory leaks.
  */
 - (void)cleanup {
-    [self.logger info:@"🗑️ [MRAID] Cleaning up MRAID manager resources"];
+    [self.logger info:@"Cleaning up MRAID manager resources"];
     
     // Remove script message handler to prevent crashes on reuse
     if (self.webView && self.webView.configuration.userContentController) {
         [self.webView.configuration.userContentController removeScriptMessageHandlerForName:@"mraid"];
-        [self.logger debug:@"✅ [MRAID] Script message handler 'mraid' removed"];
+        [self.logger debug:@"Script message handler 'mraid' removed"];
     }
     
     // Stop viewability tracking
@@ -152,7 +152,7 @@
     self.currentState = CLXMRAIDStateHidden;
     self.isViewable = NO;
     
-    [self.logger info:@"✅ [MRAID] MRAID manager cleanup completed"];
+    [self.logger info:@"MRAID manager cleanup completed"];
 }
 
 #pragma mark - Setup
@@ -227,16 +227,16 @@
         @"storePicture", @"createCalendarEvent", @"playVideo", @"unload"
     ];
     
-    [self.logger info:[NSString stringWithFormat:@"📱 [MRAID] JavaScript API functions injected: %lu functions", (unsigned long)mraidFunctions.count]];
-    [self.logger info:@"🔧 [MRAID] expand() implementation: YES"];
-    [self.logger info:@"🔧 [MRAID] resize() implementation: YES"];
-    [self.logger info:@"📱 [MRAID] getVersion() returns: 3.0"];
+    [self.logger debug:[NSString stringWithFormat:@"JavaScript API functions injected: %lu functions", (unsigned long)mraidFunctions.count]];
+    [self.logger debug:@"expand() implementation: YES"];
+    [self.logger debug:@"resize() implementation: YES"];
+    [self.logger debug:@"getVersion() returns: 3.0"];
     
     // Log device capabilities
     NSString *deviceCapabilities = [NSString stringWithFormat:@"SMS:%@, Tel:%@, Calendar:%@, StorePicture:%@, InlineVideo:%@",
                                    @"YES", @"YES", @"YES", @"YES", _supportsInlineVideo ? @"YES" : @"NO"];
-    [self.logger info:[NSString stringWithFormat:@"📊 [MRAID] Device capabilities: %@", deviceCapabilities]];
-    [self.logger info:@"✅ [MRAID] All 20+ MRAID functions implemented"];
+    [self.logger debug:[NSString stringWithFormat:@"Device capabilities: %@", deviceCapabilities]];
+    [self.logger debug:@"All 20+ MRAID functions implemented"];
     
     // Remove existing script message handler to prevent crashes
     [self.webView.configuration.userContentController removeScriptMessageHandlerForName:@"mraid"];
@@ -416,35 +416,35 @@
 
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
     [self.logger debug:@"📨 [MRAID-MSG] Received script message from webview"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID-MSG] Message name: %@", message.name]];
+    [self.logger debug:[NSString stringWithFormat:@"Message name: %@", message.name]];
     
     if (![message.name isEqualToString:@"mraid"]) {
-        [self.logger info:[NSString stringWithFormat:@"⚠️ [MRAID-MSG] Ignoring non-MRAID message: %@", message.name]];
+        [self.logger warn:[NSString stringWithFormat:@"[MRAID-MSG] Ignoring non-MRAID message: %@", message.name]];
         return;
     }
     
     NSDictionary *body = message.body;
     NSString *action = body[@"action"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID-MSG] MRAID action received: %@", action]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID-MSG] Message body: %@", body]];
+    [self.logger debug:[NSString stringWithFormat:@"MRAID action received: %@", action]];
+    [self.logger debug:[NSString stringWithFormat:@"Message body: %@", body]];
     
     if ([action isEqualToString:@"open"]) {
         [self.logger debug:@"🔗 [MRAID-ACTION] Handling open URL action"];
         [self handleOpenURL:body[@"url"]];
     } else if ([action isEqualToString:@"close"]) {
-        [self.logger debug:@"❌ [MRAID-ACTION] Handling close action"];
+        [self.logger debug:@"Handling close action"];
         [self handleClose];
     } else if ([action isEqualToString:@"expand"]) {
-        [self.logger debug:@"📱 [MRAID-ACTION] Handling expand action"];
+        [self.logger debug:@"[MRAID-ACTION] Handling expand action"];
         [self handleExpand:body[@"url"]];
     } else if ([action isEqualToString:@"resize"]) {
-        [self.logger debug:@"🔄 [MRAID-ACTION] Handling resize action"];
+        [self.logger debug:@"Handling resize action"];
         [self handleResize:body[@"properties"]];
     } else if ([action isEqualToString:@"playVideo"]) {
         [self.logger debug:@"📹 [MRAID-ACTION] Handling play video action"];
         [self handlePlayVideo:body[@"url"]];
     } else if ([action isEqualToString:@"storePicture"]) {
-        [self.logger debug:@"🖼️ [MRAID-ACTION] Handling store picture action"];
+        [self.logger debug:@"[MRAID-ACTION] Handling store picture action"];
         [self handleStorePicture:body[@"url"]];
     } else if ([action isEqualToString:@"createCalendarEvent"]) {
         [self.logger debug:@"📅 [MRAID-ACTION] Handling create calendar event action"];
@@ -456,7 +456,7 @@
         [self.logger debug:@"🔊 [MRAID-ACTION] Handling get audio volume action"];
         [self handleGetAudioVolume];
     } else {
-        [self.logger info:[NSString stringWithFormat:@"⚠️ [MRAID-ACTION] Unknown MRAID action: %@", action]];
+        [self.logger warn:[NSString stringWithFormat:@"[MRAID-ACTION] Unknown MRAID action: %@", action]];
     }
 }
 
@@ -539,12 +539,11 @@
         NSString *stateString = [self stringFromState:state];
         NSString *oldStateString = [self stringFromState:oldState];
         
-        [self.logger info:[NSString stringWithFormat:@"📱 [MRAID] State changed: %@ → %@", oldStateString, stateString]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID] State transition: %@ → %@", oldStateString, stateString]];
+        [self.logger debug:[NSString stringWithFormat:@"State changed: %@ → %@", oldStateString, stateString]];
         
         // Execute JavaScript state change with detailed logging
         NSString *script = [NSString stringWithFormat:@"mraid._setState('%@');", stateString];
-        [self.logger debug:[NSString stringWithFormat:@"🔧 [MRAID-STATE] Executing state change script: %@", script]];
+        [self.logger debug:[NSString stringWithFormat:@"Executing state change script: %@", script]];
         [self executeJavaScript:script];
         [self executeJavaScript:script];
         
@@ -559,12 +558,11 @@
         BOOL oldViewable = _isViewable;
         _isViewable = viewable;
         
-        [self.logger info:[NSString stringWithFormat:@"👁️ [MRAID] Viewability changed: %@ → %@", oldViewable ? @"YES" : @"NO", viewable ? @"YES" : @"NO"]];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID] Viewability transition: %@ → %@", oldViewable ? @"YES" : @"NO", viewable ? @"YES" : @"NO"]];
+        [self.logger debug:[NSString stringWithFormat:@"Viewability changed: %@ → %@", oldViewable ? @"YES" : @"NO", viewable ? @"YES" : @"NO"]];
         
         // Execute JavaScript viewability change with detailed logging
         NSString *script = [NSString stringWithFormat:@"mraid._setViewable(%@);", viewable ? @"true" : @"false"];
-        [self.logger debug:[NSString stringWithFormat:@"🔧 [MRAID-VIEWABILITY] Executing viewability script: %@", script]];
+        [self.logger debug:[NSString stringWithFormat:@"Executing viewability script: %@", script]];
         [self executeJavaScript:script];
         
         if ([self.delegate respondsToSelector:@selector(mraidManager:didChangeViewable:)]) {
@@ -672,11 +670,11 @@
 #pragma mark - Utilities
 
 - (void)executeJavaScript:(NSString *)script {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [MRAID-JS] Executing JavaScript: %@", script]];
+    [self.logger debug:[NSString stringWithFormat:@"Executing JavaScript: %@", script]];
     
     // Check WebView readiness before executing JavaScript
     if (!self.webView || self.webView.loading) {
-        [self.logger info:[NSString stringWithFormat:@"⚠️ [MRAID-JS] WebView not ready - Loading: %@, URL: %@",
+        [self.logger warn:[NSString stringWithFormat:@"[MRAID-JS] WebView not ready - Loading: %@, URL: %@",
             self.webView.loading ? @"YES" : @"NO",
             self.webView.URL ? self.webView.URL.absoluteString : @"nil"]];
         return;
@@ -684,46 +682,46 @@
     
     // Check if WebView has loaded actual content (not about:blank)
     if ([self.webView.URL.absoluteString isEqualToString:@"about:blank"]) {
-        [self.logger info:@"⚠️ [MRAID-JS] WebView has not loaded HTML content yet (about:blank), deferring JavaScript execution"];
+        [self.logger debug:@"MRAID-JS: WebView has not loaded HTML content yet (about:blank), deferring JavaScript execution"];
         [self.pendingJavaScriptQueue addObject:script];
         return;
     }
     
     // Check if WebView is ready for JavaScript execution
     if (!self.webViewReady) {
-        [self.logger info:@"⚠️ [MRAID-JS] WebView not ready for JavaScript execution, queuing script"];
+        [self.logger debug:@"MRAID-JS: WebView not ready for JavaScript execution, queuing script"];
         [self.pendingJavaScriptQueue addObject:script];
         return;
     }
     
     [self.webView evaluateJavaScript:script completionHandler:^(id result, NSError *error) {
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [MRAID-JS] JavaScript execution error: %@", error.localizedDescription]];
-            [self.logger debug:[NSString stringWithFormat:@"🔍 [MRAID-JS] Error details - Code: %ld, Domain: %@", (long)error.code, error.domain]];
-            [self.logger debug:[NSString stringWithFormat:@"🔍 [MRAID-JS] Error userInfo: %@", error.userInfo]];
-            [self.logger debug:[NSString stringWithFormat:@"🔍 [MRAID-JS] WebView state - Loading: %@, Ready: %@", 
+            [self.logger error:[NSString stringWithFormat:@"JavaScript execution error: %@", error.localizedDescription]];
+            [self.logger debug:[NSString stringWithFormat:@"Error details - Code: %ld, Domain: %@", (long)error.code, error.domain]];
+            [self.logger debug:[NSString stringWithFormat:@"Error userInfo: %@", error.userInfo]];
+            [self.logger debug:[NSString stringWithFormat:@"WebView state - Loading: %@, Ready: %@", 
                 self.webView.loading ? @"YES" : @"NO",
                 self.webView.URL ? @"YES" : @"NO"]];
         } else {
-            [self.logger debug:[NSString stringWithFormat:@"✅ [MRAID-JS] JavaScript executed successfully - Result: %@", result]];
+            [self.logger debug:[NSString stringWithFormat:@"JavaScript executed successfully - Result: %@", result]];
         }
     }];
 }
 
 - (void)diagnoseJavaScriptContext {
-    [self.logger info:@"🔍 [MRAID-DIAGNOSTIC] Starting JavaScript context diagnosis"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID-DIAGNOSTIC] WebView: %p", self.webView]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID-DIAGNOSTIC] WebView loading: %@", self.webView.loading ? @"YES" : @"NO"]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID-DIAGNOSTIC] WebView URL: %@", self.webView.URL ? self.webView.URL.absoluteString : @"nil"]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID-DIAGNOSTIC] Current state: %@", [self stringFromState:self.currentState]]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MRAID-DIAGNOSTIC] Is viewable: %@", self.isViewable ? @"YES" : @"NO"]];
+    [self.logger debug:@"Starting JavaScript context diagnosis"];
+    [self.logger debug:[NSString stringWithFormat:@"WebView: %p", self.webView]];
+    [self.logger debug:[NSString stringWithFormat:@"WebView loading: %@", self.webView.loading ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"WebView URL: %@", self.webView.URL ? self.webView.URL.absoluteString : @"nil"]];
+    [self.logger debug:[NSString stringWithFormat:@"Current state: %@", [self stringFromState:self.currentState]]];
+    [self.logger debug:[NSString stringWithFormat:@"Is viewable: %@", self.isViewable ? @"YES" : @"NO"]];
     
     // Test basic JavaScript execution
     [self.webView evaluateJavaScript:@"typeof mraid" completionHandler:^(id result, NSError *error) {
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [MRAID-DIAGNOSTIC] mraid object not available: %@", error.localizedDescription]];
+            [self.logger error:[NSString stringWithFormat:@"mraid object not available: %@", error.localizedDescription]];
         } else {
-            [self.logger info:[NSString stringWithFormat:@"✅ [MRAID-DIAGNOSTIC] mraid object type: %@", result]];
+            [self.logger debug:[NSString stringWithFormat:@"mraid object type: %@", result]];
             if ([result isEqualToString:@"object"]) {
                 [self markWebViewReady];
             }
@@ -732,7 +730,7 @@
 }
 
 - (void)markWebViewReady {
-    [self.logger info:@"✅ [MRAID-READY] WebView is ready for JavaScript execution"];
+    [self.logger debug:@"WebView is ready for JavaScript execution"];
     self.webViewReady = YES;
     [self processPendingJavaScriptQueue];
     
@@ -747,7 +745,7 @@
         return;
     }
     
-    [self.logger info:[NSString stringWithFormat:@"🔄 [MRAID-QUEUE] Processing %lu pending JavaScript commands", (unsigned long)self.pendingJavaScriptQueue.count]];
+    [self.logger debug:[NSString stringWithFormat:@"Processing %lu pending JavaScript commands", (unsigned long)self.pendingJavaScriptQueue.count]];
     
     NSArray *pendingScripts = [self.pendingJavaScriptQueue copy];
     [self.pendingJavaScriptQueue removeAllObjects];
@@ -764,10 +762,10 @@
     
     // Check if WebView has loaded content (not about:blank)
     if (self.webView.URL && ![self.webView.URL.absoluteString isEqualToString:@"about:blank"]) {
-        [self.logger info:@"✅ [MRAID-READY] WebView has loaded content, checking MRAID availability"];
+        [self.logger debug:@"WebView has loaded content, checking MRAID availability"];
         [self diagnoseJavaScriptContext];
     } else {
-        [self.logger debug:@"⏳ [MRAID-READY] WebView still loading content, will check again later"];
+        [self.logger debug:@"MRAID-READY: WebView still loading content, will check again later"];
     }
 }
 
@@ -782,7 +780,7 @@
 }
 
 - (void)testMRAIDAPI {
-    [self.logger info:@"🧪 [MRAID-TEST] Starting MRAID API validation test"];
+    [self.logger debug:@"[MRAID-TEST] Starting MRAID API validation test"];
     
     // Test basic MRAID functions
     NSArray *testScripts = @[
@@ -801,9 +799,9 @@
     for (NSString *script in testScripts) {
         [self.webView evaluateJavaScript:script completionHandler:^(id result, NSError *error) {
             if (error) {
-                [self.logger error:[NSString stringWithFormat:@"❌ [MRAID-TEST] Failed: %@ - Error: %@", script, error.localizedDescription]];
+                [self.logger error:[NSString stringWithFormat:@"Failed: %@ - Error: %@", script, error.localizedDescription]];
             } else {
-                [self.logger info:[NSString stringWithFormat:@"✅ [MRAID-TEST] Passed: %@ = %@", script, result]];
+                [self.logger debug:[NSString stringWithFormat:@"Passed: %@ = %@", script, result]];
             }
         }];
     }
@@ -812,9 +810,9 @@
     NSString *eventTestScript = @"mraid.addEventListener('ready', function() { console.log('MRAID ready event fired'); });";
     [self.webView evaluateJavaScript:eventTestScript completionHandler:^(id result, NSError *error) {
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [MRAID-TEST] Event listener failed: %@", error.localizedDescription]];
+            [self.logger error:[NSString stringWithFormat:@"Event listener failed: %@", error.localizedDescription]];
         } else {
-            [self.logger info:@"✅ [MRAID-TEST] Event listener registered successfully"];
+            [self.logger debug:@"Event listener registered successfully"];
         }
     }];
 }

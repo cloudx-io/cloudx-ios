@@ -70,7 +70,7 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
                  placementID:(NSString *)placementID {
     
     if (!error) {
-        [logger error:[NSString stringWithFormat:@"❌ [CLXMetaErrorHandler] Null error passed to handler for %@", context]];
+        [logger error:[NSString stringWithFormat:@"Null error passed to handler for %@", context]];
         return error;
     }
     
@@ -99,7 +99,7 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
     // Log comprehensive error details in a single line (includes user info inline if present)
     NSString *userInfoStr = (error.userInfo && error.userInfo.count > 0) ? 
                             [NSString stringWithFormat:@" | UserInfo: %@", error.userInfo] : @"";
-    [logger error:[NSString stringWithFormat:@"❌ [CLXMetaErrorHandler] %@ Error - Code: %ld | %@ | Original: %@ | Placement: %@%@", 
+    [logger error:[NSString stringWithFormat:@"%@ Error - Code: %ld | %@ | Original: %@ | Placement: %@%@", 
                    context, (long)errorCode, errorDescription, originalMessage, placementID ?: @"Unknown", userInfoStr]];
     
     // Create enhanced error with additional metadata
@@ -121,12 +121,12 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
             // Check ATT status to provide more informative error messaging
             BOOL isATTGranted = [CLXAdTrackingService isIDFAAccessAllowed];
             if (!isATTGranted) {
-                [logger info:[NSString stringWithFormat:@"📊 [CLXMetaErrorHandler] %@ No Fill (1001) - No ads available for placement %@ | ATT Status: NOT GRANTED | This is likely because App Tracking Transparency permission was not granted. Meta requires ATT for personalized ads. | Recommendation: Consider requesting ATT permission or use other ad networks that support non-personalized ads.", context, placementID]];
+                [logger info:[NSString stringWithFormat:@"%@ No Fill (1001) - No ads available for placement %@ | ATT Status: NOT GRANTED | This is likely because App Tracking Transparency permission was not granted. Meta requires ATT for personalized ads. | Recommendation: Consider requesting ATT permission or use other ad networks that support non-personalized ads.", context, placementID]];
                 enhancedUserInfo[@"CLXMetaRecommendation"] = @"ATT not granted - Meta requires ATT for ads. Request ATT permission or use other networks.";
                 enhancedUserInfo[@"CLXMetaATTStatus"] = @"denied";
                 enhancedUserInfo[@"CLXMetaATTRequired"] = @YES;
             } else {
-                [logger info:[NSString stringWithFormat:@"📊 [CLXMetaErrorHandler] %@ No Fill (1001) - No ads available for placement %@ | ATT Status: GRANTED | Recommendation: Do not retry immediately. Consider waterfall to next adapter.", context, placementID]];
+                [logger info:[NSString stringWithFormat:@"%@ No Fill (1001) - No ads available for placement %@ | ATT Status: GRANTED | Recommendation: Do not retry immediately. Consider waterfall to next adapter.", context, placementID]];
                 enhancedUserInfo[@"CLXMetaRecommendation"] = @"No immediate retry - use waterfall";
                 enhancedUserInfo[@"CLXMetaATTStatus"] = @"granted";
             }

@@ -25,7 +25,7 @@
     NSString *prebidId = [[NSUUID UUID] UUIDString];
     NSDictionary *token = @{@"prebid_id": prebidId};
     
-    [logger debug:[NSString stringWithFormat:@"Generated Prebid token: %@", token]];
+    [logger verbose:[NSString stringWithFormat:@"Generated Prebid token: %@", token]];
     completion(token, nil);
 }
 

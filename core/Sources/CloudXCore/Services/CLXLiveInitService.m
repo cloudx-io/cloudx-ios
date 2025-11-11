@@ -33,7 +33,7 @@
         _networkInitService = [[CLXSDKInitNetworkService alloc] initWithBaseURL:initApiURL.absoluteString
                                                                  urlSession:cloudxSession];
         
-        [self.logger info:@"✅ [LiveInitService] LiveInitService initialized successfully"];
+        [self.logger info:@"LiveInitService initialized successfully"];
     }
     return self;
 }
@@ -44,10 +44,10 @@
  * @param completion Completion handler called with the SDK configuration or error
  */
 - (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable, NSError * _Nullable))completion {
-    [self.logger info:[NSString stringWithFormat:@"🚀 [LiveInitService] initializeSDKWithAppKey called - AppKey: %@", appKey]];
+    [self.logger info:[NSString stringWithFormat:@"[LiveInitService] initializeSDKWithAppKey called - AppKey: %@", appKey]];
     
     if (!_networkInitService) {
-        [self.logger error:@"❌ [LiveInitService] NetworkInitService is nil"];
+        [self.logger error:@"NetworkInitService is nil"];
         if (completion) {
             completion(nil, [NSError errorWithDomain:@"LiveInitService" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"NetworkInitService not initialized"}]);
         }
@@ -56,9 +56,9 @@
     
     [_networkInitService initializeSDKWithAppKey:appKey completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [LiveInitService] NetworkInitService failed with error: %@", error]];
+            [self.logger error:[NSString stringWithFormat:@"NetworkInitService failed with error: %@", error]];
         } else {
-            [self.logger info:@"✅ [LiveInitService] NetworkInitService succeeded"];
+            [self.logger info:@"NetworkInitService succeeded"];
         }
         
         if (completion) {

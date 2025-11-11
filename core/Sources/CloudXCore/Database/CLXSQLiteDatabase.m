@@ -118,7 +118,7 @@
         
         // UNIQUE constraint violations are expected for upsert patterns (debug only)
         if (result == SQLITE_CONSTRAINT && [errorMessage containsString:@"UNIQUE constraint"]) {
-            [self.logger debug:[NSString stringWithFormat:@"🔧 [SQLite] UNIQUE constraint: %@", errorMessage]];
+            [self.logger debug:[NSString stringWithFormat:@"UNIQUE constraint: %@", errorMessage]];
         } else {
             [self.logger error:[NSString stringWithFormat:@"Failed to execute statement: %s", errMsg]];
         }

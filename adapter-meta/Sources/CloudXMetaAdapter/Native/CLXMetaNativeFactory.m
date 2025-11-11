@@ -54,7 +54,7 @@
                                                       extras:(NSDictionary<NSString *, NSString *> *)extras
                                                     delegate:(id<CLXAdapterNativeDelegate>)delegate {
     
-    [self.logger debug:[NSString stringWithFormat:@"✅ [CLXMetaNativeFactory] Creating native for placement: %@ | bidPayload: %@", adId, adm ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating native for placement: %@ | bidPayload: %@", adId, adm ? @"YES" : @"NO"]];
 
     // Use shared base factory method to resolve Meta placement ID
     NSString *metaPlacementID = [CLXMetaBaseFactory resolveMetaPlacementID:extras 

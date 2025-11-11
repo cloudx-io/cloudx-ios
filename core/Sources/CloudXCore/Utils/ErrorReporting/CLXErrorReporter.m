@@ -56,14 +56,14 @@
     
     @try {
         if (!exception) {
-            [self.logger debug:@"📊 [ErrorReporter] Attempted to report nil exception"];
+            [self.logger debug:@"Attempted to report nil exception"];
             return;
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"📊 [ErrorReporter] Reporting exception: %@ (placement: %@)", 
+        [self.logger debug:[NSString stringWithFormat:@"Reporting exception: %@ (placement: %@)", 
                           exception.name ?: @"unknown", placementID ?: @"global"]];
         
-        // Create NSError from NSException for Rill tracking
+        // Create NSError from NSException for Analytics tracking
         NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
         userInfo[NSLocalizedDescriptionKey] = exception.reason ?: @"Unknown exception";
         userInfo[@"exception_name"] = exception.name ?: @"UnknownException";
@@ -82,7 +82,7 @@
                                                         code:1001 
                                                     userInfo:[userInfo copy]];
         
-        // Send via Rill SDK Error tracking
+        // Send via Analytics SDK Error tracking
         [CloudXCore trackSDKError:errorForTracking];
         
     } @catch (NSException *reportingException) {
@@ -97,14 +97,14 @@
     
     @try {
         if (!error) {
-            [self.logger debug:@"📊 [ErrorReporter] Attempted to report nil error"];
+            [self.logger debug:@"Attempted to report nil error"];
             return;
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"📊 [ErrorReporter] Reporting error: %@ (placement: %@)", 
+        [self.logger debug:[NSString stringWithFormat:@"Reporting error: %@ (placement: %@)", 
                           error.localizedDescription ?: @"unknown", placementID ?: @"global"]];
         
-        // Enhance error with placement and context info for Rill tracking
+        // Enhance error with placement and context info for Analytics tracking
         NSMutableDictionary *enhancedUserInfo = [NSMutableDictionary dictionaryWithDictionary:error.userInfo ?: @{}];
         
         // Add placement and context info
@@ -121,7 +121,7 @@
                                                      code:error.code 
                                                  userInfo:[enhancedUserInfo copy]];
         
-        // Send via Rill SDK Error tracking
+        // Send via Analytics SDK Error tracking
         [CloudXCore trackSDKError:enhancedError];
         
     } @catch (NSException *reportingException) {
@@ -132,7 +132,7 @@
 
 #if DEBUG
 - (void)testErrorReporting {
-    [self.logger info:@"🧪 [ErrorReporter] Testing error reporting infrastructure"];
+    [self.logger debug:@"[ErrorReporter] Testing error reporting infrastructure"];
     
     // Create a test exception
     NSException *testException = [NSException exceptionWithName:@"CLXTestException" 
@@ -150,7 +150,7 @@
     // Report it with test context
     [self reportError:testError context:@{@"operation": @"infrastructure_test", @"test_mode": @"debug"}];
     
-    [self.logger info:@"✅ [ErrorReporter] Error reporting test completed"];
+    [self.logger info:@"Error reporting test completed"];
 }
 #endif
 

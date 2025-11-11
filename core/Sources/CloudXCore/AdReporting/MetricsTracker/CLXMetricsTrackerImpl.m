@@ -66,7 +66,7 @@
     dispatch_async(self.metricsQueue, ^{
         self.metricsConfig = config.metricsConfig;
         if (!self.metricsConfig) {
-            [self.logger info:@"⚠️ [MetricsTrackerImpl] Metrics configuration is nil, skipping metrics tracking"];
+            [self.logger info:@"Metrics configuration is nil, skipping metrics tracking"];
             return;
         }
         
@@ -74,16 +74,11 @@
         NSString *metricsURL = config.impressionTrackerURL ?: config.metricsEndpointURL;
         if (metricsURL && metricsURL.length > 0) {
             self.endpoint = [NSString stringWithFormat:@"%@/bulk?debug=true", metricsURL];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Using endpoint: %@ (from %@)", 
-                               self.endpoint, config.impressionTrackerURL ? @"impressionTrackerURL" : @"metricsEndpointURL"]];
         } else {
             self.endpoint = nil;
-            [self.logger info:@"⚠️ [MetricsTrackerImpl] No impression tracker or metrics endpoint URL provided, metrics sending disabled"];
+            [self.logger info:@"No impression tracker or metrics endpoint URL provided, metrics sending disabled"];
         }
         self.sendIntervalSeconds = self.metricsConfig.sendIntervalSeconds ?: 60;
-        
-        [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Starting metrics tracker with cycle duration: %ld seconds", 
-                           (long)self.sendIntervalSeconds]];
         
         [self _startPeriodicSending];
     });
@@ -96,15 +91,12 @@
         self.sessionId = [sessionId copy] ?: @"";
         self.accountId = [accountId copy] ?: @"";
         self.basePayload = [basePayload copy] ?: @"";
-        
-        [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Basic data set - sessionId: %@, accountId: %@", 
-                           sessionId ? @"YES" : @"NO", accountId ? @"YES" : @"NO"]];
     });
 }
 
 - (void)trackMethodCall:(NSString *)methodType {
     if (![CLXMetricsType isMethodCallType:methodType]) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [MetricsTrackerImpl] Invalid method type: %@", methodType]];
+        [self.logger error:[NSString stringWithFormat:@"Invalid method type: %@", methodType]];
         return;
     }
     
@@ -112,18 +104,16 @@
         // Check if SDK API calls are enabled
         BOOL isMethodCallMetricsEnabled = [self.metricsConfig isSdkApiCallsEnabled];
         if (!isMethodCallMetricsEnabled) {
-            [self.logger info:[NSString stringWithFormat:@"⚠️ [MetricsTrackerImpl] SDK API call metrics tracking is disabled for %@", methodType]];
             return;
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Tracking SDK API call: %@", methodType]];
         [self _trackMetric:methodType latency:0];
     });
 }
 
 - (void)trackNetworkCall:(NSString *)networkType latency:(NSInteger)latencyMs {
     if (![CLXMetricsType isNetworkCallType:networkType]) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [MetricsTrackerImpl] Invalid network type: %@", networkType]];
+        [self.logger error:[NSString stringWithFormat:@"Invalid network type: %@", networkType]];
         return;
     }
     
@@ -140,18 +130,13 @@
         }
         
         if (isNetworkCallMetricsEnabled && isCallMetricsEnabled) {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Tracking network request: %@ with latency: %ld ms", 
-                               networkType, (long)latencyMs]];
             [self _trackMetric:networkType latency:latencyMs];
-        } else {
-            [self.logger info:[NSString stringWithFormat:@"⚠️ [MetricsTrackerImpl] Network call metrics tracking is disabled for %@", networkType]];
         }
     });
 }
 
 - (void)trySendingPendingMetrics {
     dispatch_async(self.metricsQueue, ^{
-        [self.logger debug:@"📊 [MetricsTrackerImpl] Attempting to send pending metrics"];
         [self _sendPendingMetrics];
     });
 }
@@ -160,29 +145,21 @@
     if (self.metricsQueue) {
         dispatch_async(self.metricsQueue, ^{
             [self _stopPeriodicSending];
-            [self.logger debug:@"📊 [MetricsTrackerImpl] Metrics tracker stopped"];
         });
     } else {
         // Fallback for cases where queue is not available
         [self _stopPeriodicSending];
-        [self.logger debug:@"📊 [MetricsTrackerImpl] Metrics tracker stopped (synchronous fallback)"];
     }
 }
 
 #pragma mark - Private Methods
 
 - (void)_trackMetric:(NSString *)metricType latency:(NSInteger)latency {
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Tracking metric: %@ with latency: %ld ms", 
-                       metricType, (long)latency]];
-    
     // Get existing metric for aggregation (matching Android logic)
     CLXMetricsEvent *existingMetric = [self.metricsDao getAllByMetric:metricType];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Existing metric for %@: %@", 
-                       metricType, existingMetric ? @"YES" : @"NO"]];
     
     CLXMetricsEvent *updatedMetric;
     if (!existingMetric) {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Creating new metric for %@", metricType]];
         updatedMetric = [[CLXMetricsEvent alloc] initWithEventId:[[NSUUID UUID] UUIDString]
                                                        sessionId:self.sessionId
                                                       metricName:metricType
@@ -190,7 +167,6 @@
         updatedMetric.counter = 1;
         updatedMetric.totalLatency = latency;
     } else {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Updating existing metric for %@", metricType]];
         updatedMetric = [[CLXMetricsEvent alloc] initWithEventId:existingMetric.eventId
                                                        sessionId:existingMetric.sessionId
                                                       metricName:existingMetric.metricName
@@ -206,7 +182,7 @@
     [self _stopPeriodicSending]; // Stop any existing timer
     
     if (self.sendIntervalSeconds <= 0) {
-        [self.logger info:@"⚠️ [MetricsTrackerImpl] Invalid send interval, periodic sending disabled"];
+        [self.logger info:@"Invalid send interval, periodic sending disabled"];
         return;
     }
     
@@ -222,9 +198,6 @@
             [timer invalidate];
         }
     }];
-    
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Started periodic sending every %ld seconds", 
-                       (long)self.sendIntervalSeconds]];
 }
 
 - (void)_stopPeriodicSending {
@@ -233,16 +206,13 @@
             [self.sendTimer invalidate];
         }
         self.sendTimer = nil;
-        [self.logger debug:@"📊 [MetricsTrackerImpl] Stopped periodic sending"];
     }
 }
 
 - (void)_sendPendingMetrics {
     NSArray<CLXMetricsEvent *> *metrics = [self.metricsDao getAll];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Found %lu pending metrics", 
-                       (unsigned long)metrics.count]];
     
-    // 🧹 CLEANUP: If no endpoint or too many metrics, clean up old ones
+    // If no endpoint or too many metrics, clean up old ones
     if (!self.endpoint || self.endpoint.length == 0 || metrics.count > 1000) {
         [self _cleanupOldMetrics];
         if (!self.endpoint || self.endpoint.length == 0) {
@@ -266,36 +236,32 @@
     }
     
     if (events.count == 0) {
-        [self.logger debug:@"📊 [MetricsTrackerImpl] No valid events to send"];
         return;
     }
     
     // Send via bulk API
     [self.bulkApi sendToEndpoint:self.endpoint items:events completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
-            [self.logger debug:[NSString stringWithFormat:@"✅ [MetricsTrackerImpl] Successfully sent %lu metrics", (unsigned long)events.count]];
-            
             // Delete successfully sent metrics
             dispatch_async(self.metricsQueue, ^{
                 for (CLXMetricsEvent *metric in metrics) {
                     [self.metricsDao deleteById:metric.eventId];
                 }
-                [self.logger debug:[NSString stringWithFormat:@"🗑️ [MetricsTrackerImpl] Cleaned up %lu sent metrics", (unsigned long)metrics.count]];
             });
         } else {
-            [self.logger error:[NSString stringWithFormat:@"❌ [MetricsTrackerImpl] Failed to send metrics: %@", error.localizedDescription ?: @"Unknown error"]];
+            [self.logger warn:[NSString stringWithFormat:@"Failed to send metrics: %@", error.localizedDescription ?: @"Unknown error"]];
         }
     }];
 }
 
 - (nullable CLXEventAM *)_buildEventFromMetric:(CLXMetricsEvent *)metric {
     if (!metric) {
-        [self.logger error:@"❌ [MetricsTrackerImpl] Cannot build event - metric is nil"];
+        [self.logger error:@"Cannot build event - metric is nil"];
         return nil;
     }
     
     if (!self.accountId || self.accountId.length == 0) {
-        [self.logger error:@"❌ [MetricsTrackerImpl] Cannot build event - accountId is nil or empty"];
+        [self.logger error:@"Cannot build event - accountId is nil or empty"];
         return nil;
     }
     
@@ -309,9 +275,6 @@
     // Replace {eventId} placeholder with actual event ID (handle nil auctionId)
     NSString *auctionId = metric.auctionId ?: @"unknown";
     payload = [payload stringByReplacingOccurrencesOfString:@"{eventId}" withString:auctionId];
-    
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsTrackerImpl] Building event for metric: %@ with payload: %@", 
-                       metric.metricName ?: @"unknown", payload]];
     
     // Generate XOR encryption data matching Android exactly
     NSData *secret = [CLXXorEncryption generateXorSecret:self.accountId];
@@ -336,9 +299,9 @@
     // Additional debug info specific to this tracker instance
     [self.logger info:@"🔍 TRACKER INSTANCE DEBUG"];
     [self.logger info:@"========================="];
-    [self.logger info:[NSString stringWithFormat:@"📱 Session ID: %@", self.sessionId ?: @"(nil)"]];
+    [self.logger info:[NSString stringWithFormat:@"Session ID: %@", self.sessionId ?: @"(nil)"]];
     [self.logger info:[NSString stringWithFormat:@"👤 Account ID: %@", self.accountId ?: @"(nil)"]];
-    [self.logger info:[NSString stringWithFormat:@"📦 Base Payload Length: %lu chars", (unsigned long)(self.basePayload ? self.basePayload.length : 0)]];
+    [self.logger info:[NSString stringWithFormat:@"Base Payload Length: %lu chars", (unsigned long)(self.basePayload ? self.basePayload.length : 0)]];
     [self.logger info:[NSString stringWithFormat:@"⏰ Send Timer: %@", self.sendTimer ? @"Active" : @"Inactive"]];
     
     // Performance report
@@ -379,8 +342,6 @@
     NSInteger originalCount = allMetrics.count;
     
     if (originalCount > 100) {
-        [self.logger debug:[NSString stringWithFormat:@"🧹 [MetricsTrackerImpl] Cleaning up %ld old metrics (keeping latest 100)", (long)originalCount]];
-        
         // Sort by creation time and keep only the latest 100
         NSArray<CLXMetricsEvent *> *sortedMetrics = [allMetrics sortedArrayUsingComparator:^NSComparisonResult(CLXMetricsEvent *obj1, CLXMetricsEvent *obj2) {
             return [@(obj2.createdAt) compare:@(obj1.createdAt)]; // Descending order (newest first)
@@ -390,9 +351,6 @@
         for (NSInteger i = 100; i < sortedMetrics.count; i++) {
             [self.metricsDao deleteById:sortedMetrics[i].eventId];
         }
-        
-        NSInteger cleanedCount = originalCount - 100;
-        [self.logger debug:[NSString stringWithFormat:@"🗑️ [MetricsTrackerImpl] Cleaned up %ld old metrics", (long)cleanedCount]];
     }
 }
 

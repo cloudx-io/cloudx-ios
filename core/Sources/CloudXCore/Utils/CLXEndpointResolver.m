@@ -40,7 +40,7 @@
 
 - (void)resolveFromConfig:(CLXSDKConfigResponse *)config randomValue:(double)randomValue {
     if (!config) {
-        [self.logger error:@"❌ [EndpointResolver] Config is nil, cannot resolve endpoints"];
+        [self.logger error:@"Config is nil, cannot resolve endpoints"];
         return;
     }
     

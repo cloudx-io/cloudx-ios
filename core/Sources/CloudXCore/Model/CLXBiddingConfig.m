@@ -157,14 +157,14 @@ static void initializeLogger() {
         if (adType == CLXAdTypeInterstitial || adType == CLXAdTypeRewarded) {
             // Interstitials and Rewarded: always use 1 (fixed value, never increment)
             loopIndexValue = @"1";
-            [logger debug:[NSString stringWithFormat:@"🔧 [BiddingConfig] Using fixed loop-index=1 for %@ ad", 
+            [logger debug:[NSString stringWithFormat:@"Using fixed loop-index=1 for %@ ad", 
                           adType == CLXAdTypeInterstitial ? @"interstitial" : @"rewarded"]];
         } else {
             // Banner/MREC/Native: use per-placement counter from tracker
             // Note: Counter is incremented separately by the ad load logic, not here
             NSDictionary<NSString *, NSString *> *bannerUserDict = [[NSUserDefaults standardUserDefaults] objectForKey:kCLXCoreBannerUserKeyValueKey];
             loopIndexValue = bannerUserDict[@"loop-index"] ?: @"1";
-            [logger debug:[NSString stringWithFormat:@"🔧 [BiddingConfig] Using placement loop-index=%@ for banner/MREC", loopIndexValue]];
+            [logger debug:[NSString stringWithFormat:@"Using placement loop-index=%@ for banner/MREC", loopIndexValue]];
         }
         
         // Create impression ext
@@ -177,16 +177,16 @@ static void initializeLogger() {
         // Create native ad if needed
         CLXBiddingConfigImpressionNative *native = nil;
         if (adType == CLXAdTypeNative && nativeAdRequirements) {
-            [logger debug:[NSString stringWithFormat:@"🔧 [BiddingConfig] Creating native ad with requirements: %@", nativeAdRequirements]];
+            [logger debug:[NSString stringWithFormat:@"Creating native ad with requirements: %@", nativeAdRequirements]];
             
             // Encode nativeAdRequirements to JSON string like Swift version
             NSError *jsonError;
             NSData *jsonData = [NSJSONSerialization dataWithJSONObject:nativeAdRequirements options:0 error:&jsonError];
             if (jsonError) {
-                [logger error:[NSString stringWithFormat:@"❌ [BiddingConfig] Failed to encode native ad requirements: %@", jsonError]];
+                [logger error:[NSString stringWithFormat:@"Failed to encode native ad requirements: %@", jsonError]];
             } else {
                 NSString *requestString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-                [logger info:[NSString stringWithFormat:@"✅ [BiddingConfig] Native ad requirements encoded: %@", requestString]];
+                [logger info:[NSString stringWithFormat:@"Native ad requirements encoded: %@", requestString]];
                 
                 native = [[CLXBiddingConfigImpressionNative alloc] init];
                 native.ver = @"1.2";
@@ -200,7 +200,7 @@ static void initializeLogger() {
         impression.impressionID = [[NSUUID UUID] UUIDString];
         impression.tagid = storedImpressionId;
         
-        [logger debug:[NSString stringWithFormat:@"🔧 [BiddingConfig] Creating impression - AdType: %ld, Dimensions: %ldx%ld", (long)adType, (long)screenWidth, (long)screenHeight]];
+        [logger debug:[NSString stringWithFormat:@"Creating impression - AdType: %ld, Dimensions: %ldx%ld", (long)adType, (long)screenWidth, (long)screenHeight]];
         
         impression.instl = (adType == CLXAdTypeInterstitial || adType == CLXAdTypeRewarded) ? @1 : @0;
         
@@ -225,7 +225,7 @@ static void initializeLogger() {
         impression.ext = impExt;
         impression.pmp = nil;
         
-        [logger debug:[NSString stringWithFormat:@"✅ [BiddingConfig] Impression created - instl:%@, banner:%@, video:%@, native:%@", 
+        [logger debug:[NSString stringWithFormat:@"Impression created - instl:%@, banner:%@, video:%@, native:%@", 
                        impression.instl, 
                        impression.banner ? @"YES" : @"NO", 
                        impression.video ? @"YES" : @"NO", 
@@ -235,7 +235,7 @@ static void initializeLogger() {
         CLXSessionMetrics *sessionMetrics = [[CLXSessionMetricsTracker sharedInstance] getMetrics];
         impression.metric = [self sessionMetricsToJSON:sessionMetrics];
         
-        [logger debug:[NSString stringWithFormat:@"📊 [BiddingConfig] Added %lu session metrics to impression",
+        [logger debug:[NSString stringWithFormat:@"Added %lu session metrics to impression",
                       (unsigned long)impression.metric.count]];
         
         _impressions = @[impression];
@@ -369,7 +369,7 @@ static void initializeLogger() {
         _privacyService = privacyService;
         
         // Create regulations - only CCPA is supported by server currently
-        // ⚠️ GDPR and COPPA are temporarily disabled as server support is not yet implemented
+        // GDPR and COPPA are temporarily disabled as server support is not yet implemented
         // Including GDPR/COPPA data causes 502 bid request errors
         CLXBiddingConfigRegulationsExtIAB *iab = [[CLXBiddingConfigRegulationsExtIAB alloc] init];
         iab.usPrivacyString = [privacyService ccpaPrivacyString]; // CCPA is server-supported
@@ -439,14 +439,14 @@ static void initializeLogger() {
         // Store loop index for win/loss tracking
         NSInteger loopIndexInt = [loopIndexValue integerValue];
         [[CLXTrackingFieldResolver shared] setLoopIndex:_requestID loopIndex:loopIndexInt];
-        [logger debug:[NSString stringWithFormat:@"📊 [BiddingConfig] Stored loop-index=%ld for auction: %@", (long)loopIndexInt, _requestID]];
+        [logger debug:[NSString stringWithFormat:@"Stored loop-index=%ld for auction: %@", (long)loopIndexInt, _requestID]];
         
         // Check if test mode has been forced via internal API (for demo/test apps only)
         NSNumber *forceTestMode = [[NSUserDefaults standardUserDefaults] objectForKey:@"CLXCore_Internal_ForceTestMode"];
         
         if (forceTestMode && [forceTestMode boolValue]) {
             _test = @1;
-            [logger debug:@"🔧 [BiddingConfig] Force test mode enabled - test flag set to: 1"];
+            [logger debug:@"Force test mode enabled - test flag set to: 1"];
         } else {
             // Set test flag based on simulator detection and build configuration
             // Simulator (any build) → test=1 (Meta registers simulator as test device)
@@ -454,14 +454,14 @@ static void initializeLogger() {
             // Real device + RELEASE → test=0 (production mode)
             #if TARGET_IPHONE_SIMULATOR
             _test = @1;
-            [logger debug:@"🔧 [BiddingConfig] Simulator detected - test flag set to: 1"];
+            [logger debug:@"Simulator detected - test flag set to: 1"];
             #else
             #ifdef DEBUG
             _test = @1;
-            [logger debug:@"🔧 [BiddingConfig] Real device + DEBUG build - test flag set to: 1"];
+            [logger debug:@"Real device + DEBUG build - test flag set to: 1"];
             #else
             _test = @0;
-            [logger debug:@"🔧 [BiddingConfig] Real device + RELEASE build - test flag set to: 0"];
+            [logger debug:@"Real device + RELEASE build - test flag set to: 0"];
             #endif
             #endif
         }
@@ -491,22 +491,22 @@ static void initializeLogger() {
     // Only include if explicitly set (non-nil) - nil means exclude from request entirely
     if (self.test != nil) {
         json[@"test"] = self.test;
-        [logger debug:[NSString stringWithFormat:@"🧪 [BiddingConfig] Test flag included in request: %@", self.test]];
+        [logger debug:[NSString stringWithFormat:@"[BiddingConfig] Test flag included in request: %@", self.test]];
     } else {
-        [logger debug:@"🧪 [BiddingConfig] Test flag excluded from request (nil)"];
+        [logger debug:@"[BiddingConfig] Test flag excluded from request (nil)"];
     }
     
     // Inject key-value pairs at server-configured paths
     [self injectKeyValuesIntoRequest:json];
     
     // Debug logging
-    [logger debug:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] Final bid request - Keys: %@, Imp count: %lu", [json allKeys], (unsigned long)[json[@"imp"] count]]];
+    [logger debug:[NSString stringWithFormat:@"Final bid request - Keys: %@, Imp count: %lu", [json allKeys], (unsigned long)[json[@"imp"] count]]];
     
     // Log the complete JSON structure
     NSError *error;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:&error];
     if (error) {
-        [logger error:[NSString stringWithFormat:@"❌ [ObjC-BiddingConfig] JSON serialization error: %@", error]];
+        [logger error:[NSString stringWithFormat:@"JSON serialization error: %@", error]];
     } else {
         NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 //        [logger info:[NSString stringWithFormat:@"[ObjC-BiddingConfig] %@", jsonString]];
@@ -520,7 +520,7 @@ static void initializeLogger() {
     CLXSDKConfigKeyValueObject *paths = state.keyValuePaths;
     
     if (!paths) {
-        [logger debug:@"⚠️ [ObjC-BiddingConfig] No key-value paths configuration available"];
+        [logger warn:@"[ObjC-BiddingConfig] No key-value paths configuration available"];
         return;
     }
     
@@ -529,14 +529,14 @@ static void initializeLogger() {
     // Inject user key-values (respect privacy)
     if (paths.userKeyValues && !shouldRemovePII && state.userKeyValues.count > 0) {
         NSDictionary *userKV = [state.userKeyValues copy];
-        [logger debug:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] Injecting %lu user key-values at path: %@", (unsigned long)userKV.count, paths.userKeyValues]];
+        [logger debug:[NSString stringWithFormat:@"Injecting %lu user key-values at path: %@", (unsigned long)userKV.count, paths.userKeyValues]];
         [json putAtDynamicPath:paths.userKeyValues value:userKV];
     }
     
     // Inject app key-values (not affected by privacy)
     if (paths.appKeyValues && state.appKeyValues.count > 0) {
         NSDictionary *appKV = [state.appKeyValues copy];
-        [logger debug:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] Injecting %lu app key-values at path: %@", (unsigned long)appKV.count, paths.appKeyValues]];
+        [logger debug:[NSString stringWithFormat:@"Injecting %lu app key-values at path: %@", (unsigned long)appKV.count, paths.appKeyValues]];
         [json putAtDynamicPath:paths.appKeyValues value:appKV];
     }
     
@@ -550,7 +550,7 @@ static void initializeLogger() {
                 @"atype": @3
             }]
         };
-        [logger debug:[NSString stringWithFormat:@"🔧 [ObjC-BiddingConfig] Injecting hashed user ID at path: %@", paths.eids]];
+        [logger debug:[NSString stringWithFormat:@"Injecting hashed user ID at path: %@", paths.eids]];
         [json putAtDynamicPath:paths.eids value:eid];
     }
 }
@@ -627,8 +627,8 @@ static void initializeLogger() {
     addMetric(@"session_depth_rewarded", metrics.rewardedDepth);
     addMetric(@"session_duration", metrics.durationSeconds);
     
-    [logger debug:[NSString stringWithFormat:
-        @"📊 Session metrics: depth=%.0f, banner=%.0f, mrec=%.0f, full=%.0f, native=%.0f, rewarded=%.0f, duration=%.1fs",
+    [logger verbose:[NSString stringWithFormat:
+        @"Session metrics: depth=%.0f, banner=%.0f, mrec=%.0f, full=%.0f, native=%.0f, rewarded=%.0f, duration=%.1fs",
         metrics.depth, metrics.bannerDepth, metrics.mediumRectangleDepth, 
         metrics.fullDepth, metrics.nativeDepth, metrics.rewardedDepth, metrics.durationSeconds]];
     
@@ -673,9 +673,9 @@ static void initializeLogger() {
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
     if (ext.prebid) {
         json[@"prebid"] = [self convertStoredImpressionToJSON:ext.prebid];
-        [logger debug:[NSString stringWithFormat:@"🔧 [BiddingConfig] Impression ext prebid JSON: %@", json[@"prebid"]]];
+        [logger verbose:[NSString stringWithFormat:@"Impression ext prebid JSON: %@", json[@"prebid"]]];
     } else {
-        [logger debug:@"⚠️ [BiddingConfig] No prebid found in impression ext"];
+        [logger warn:@"[BiddingConfig] No prebid found in impression ext"];
     }
     if (ext.data) {
         json[@"data"] = ext.data;
@@ -703,12 +703,12 @@ static void initializeLogger() {
     // Add bidder configuration if present
     if (storedImpression.bidder) {
         json[@"bidder"] = storedImpression.bidder;
-        [logger debug:[NSString stringWithFormat:@"🔧 [BiddingConfig] Including bidder in JSON: %@", storedImpression.bidder]];
+        [logger debug:[NSString stringWithFormat:@"Including bidder in JSON: %@", storedImpression.bidder]];
     } else {
-        [logger debug:@"⚠️ [BiddingConfig] No bidder configuration found in storedImpression"];
+        [logger warn:@"[BiddingConfig] No bidder configuration found in storedImpression"];
     }
     
-    [logger debug:[NSString stringWithFormat:@"🔧 [BiddingConfig] Final storedImpression JSON: %@", json]];
+    [logger verbose:[NSString stringWithFormat:@"Final storedImpression JSON: %@", json]];
     
     return [json copy];
 }
@@ -846,7 +846,7 @@ static void initializeLogger() {
             regExt.gppSid = gppSid;
         } else {
             // If no SID provided, use empty array (valid per IAB spec)
-            [logger debug:@"⚠️ [BiddingConfig] GPP string present but no SID - using empty array"];
+            [logger warn:@"[BiddingConfig] GPP string present but no SID - using empty array"];
             regExt.gppSid = @[];
         }
     }

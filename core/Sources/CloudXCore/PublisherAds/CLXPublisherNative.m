@@ -70,7 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSDate *adLoadStartTime;
 @property (nonatomic, strong) CLXAppSessionService *appSessionService;
 
-// Rill tracking service for analytics events
+// Analytics tracking service for analytics events
 @property (nonatomic, strong) CLXRillTrackingService *rillTrackingService;
 @property (nonatomic, strong) CLXConfigImpressionModel *impModel;
 @property (nonatomic, strong) id<CLXWinLossTracking> winLossTracker;
@@ -113,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
         _successWin = NO;
         _loadNativeTimesCount = 0;
         
-        // Initialize Rill tracking service
+        // Initialize Analytics tracking service
         _rillTrackingService = [[CLXRillTrackingService alloc] initWithReportingService:reportingService];
         
         // Initialize win/loss tracker
@@ -194,7 +194,7 @@ NS_ASSUME_NONNULL_BEGIN
         return;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [PublisherNative] Requesting native update - loop-index: %ld", self.currentCorrelationId, (long)self.loadNativeTimesCount]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherNative] Requesting native update - loop-index: %ld", self.currentCorrelationId, (long)self.loadNativeTimesCount]];
     
     // Request bid from bid ad source
     __weak typeof(self) weakSelf = self;
@@ -208,7 +208,7 @@ NS_ASSUME_NONNULL_BEGIN
         if (!strongSelf) return;
         
         if (error) {
-            [strongSelf.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherNative] Bid request failed: %@", strongSelf.currentCorrelationId, error.localizedDescription]];
+            [strongSelf.logger error:[NSString stringWithFormat:@"[%@] Bid request failed: %@", strongSelf.currentCorrelationId, error.localizedDescription]];
             
             // Implement waterfall backoff delay logic
             NSError *backoffError;
@@ -228,10 +228,10 @@ NS_ASSUME_NONNULL_BEGIN
             // Store the full bid response for LURL firing by getting it from bidAdSource
             strongSelf.currentBidResponse = [strongSelf.bidAdSource getCurrentBidResponse];
             
-            // Get current loop index for Rill tracking
+            // Get current loop index for Analytics tracking
             NSInteger currentLoopIndex = [[CLXPlacementLoopIndexTracker shared] getCountForPlacement:strongSelf.placementName];
             
-            // Set up Rill tracking data
+            // Set up Analytics tracking data
             [strongSelf.rillTrackingService setupTrackingDataFromBidResponse:response
                                                                     impModel:strongSelf.impModel
                                                                  placementID:strongSelf.placementID
@@ -270,7 +270,7 @@ NS_ASSUME_NONNULL_BEGIN
             [self.logger debug:@"No valid native created from bid for placement"];
             // Early returns for cleaner code flow
             if (!self.isLoading) {
-                [self.logger debug:@"⚠️ [PublisherNative] Not retrying - isLoading=false"];
+                [self.logger debug:@"[PublisherNative] Not retrying - isLoading=false"];
                 return;
             }
             
@@ -291,7 +291,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.logger debug:@"No valid native created from bid for placement"];
         // Early returns for cleaner code flow
         if (!self.isLoading) {
-            [self.logger debug:@"⚠️ [PublisherNative] Not retrying - isLoading=false"];
+            [self.logger debug:@"[PublisherNative] Not retrying - isLoading=false"];
             return;
         }
         
@@ -354,10 +354,10 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)loadAdItem:(id<CLXAdapterNative>)item {
-    [self.logger debug:[NSString stringWithFormat:@"[CloudX][Native] Instantiating AdapterNative: %@", NSStringFromClass([item class])]];
+    [self.logger debug:[NSString stringWithFormat:@"Instantiating AdapterNative: %@", NSStringFromClass([item class])]];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self.logger debug:[NSString stringWithFormat:@"[CloudX][Native] Calling load() on AdapterNative: %@", NSStringFromClass([item class])]];
+        [self.logger debug:[NSString stringWithFormat:@"Calling load() on AdapterNative: %@", NSStringFromClass([item class])]];
         item.timeout = NO;
         self.currentLoadingNative = item;
         self.adLoadStartTime = [NSDate date];
@@ -425,7 +425,7 @@ NS_ASSUME_NONNULL_BEGIN
                             lossReason:@(CLXLossReasonBidWon)
                         winnerBidPrice:self.lastBidResponse.price];
         
-        [self.logger debug:[NSString stringWithFormat:@"🚀 [PublisherNative] Fired LOAD_SUCCESS event (nurl) for native bidID=%@", self.lastBidResponse.bidID]];
+        [self.logger debug:[NSString stringWithFormat:@"[PublisherNative] Fired LOAD_SUCCESS event (nurl) for native bidID=%@", self.lastBidResponse.bidID]];
     }
     
     // Winner has successfully loaded, now fire loss notifications for all losing bids
@@ -468,9 +468,9 @@ NS_ASSUME_NONNULL_BEGIN
                              lossReason:@(CLXLossReasonInternalError)
                          winnerBidPrice:-1.0];
         
-        [self.logger debug:@"📤 [PublisherNative] Sent LOSS event for failed native ad, reason=InternalError"];
+        [self.logger debug:@"Sent LOSS event for failed native ad, reason=InternalError"];
     } else {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherNative] Missing data for native loss notification: bidID=%@, auctionID=%@", 
+        [self.logger debug:[NSString stringWithFormat:@"Missing data for native loss notification: bidID=%@, auctionID=%@", 
                            self.lastBidResponse.bid.id ?: @"(nil)", self.currentBidResponse.id ?: @"(nil)"]];
     }
     
@@ -519,16 +519,16 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)didShowWithNative:(id<CLXAdapterNative>)native {
-    [self.logger debug:@"[CloudX][Native] Native ad shown"];
+    [self.logger debug:@"Native ad shown"];
     
     // NEW: Record session depth impression (iOS feature parity with Android)
     [[CLXSessionMetricsTracker sharedInstance] recordImpressionForPlacement:self.placementName adType:CLXAdTypeNative];
     
     // Report impression if we have a bid response
     if (self.lastBidResponse) {
-        [self.logger debug:[NSString stringWithFormat:@"[CloudX][Native] Reporting impression for bidID=%@", self.lastBidResponse.bidID]];
+        [self.logger debug:[NSString stringWithFormat:@"Reporting impression for bidID=%@", self.lastBidResponse.bidID]];
         
-        // Legacy impression tracking removed - now handled by Rill analytics
+        // Legacy impression tracking removed - now handled by Analytics
         
         // Add spend to app session service
         [self.appSessionService addSpendWithPlacementID:self.placementID spend:self.lastBidResponse.price];
@@ -553,12 +553,12 @@ NS_ASSUME_NONNULL_BEGIN
         [self.appSessionService addSpendWithPlacementID:self.placementID spend:self.lastBidResponse.price];
         [self.appSessionService addImpressionWithPlacementID:self.placementID];
         
-        // Send Rill tracking impression event
+        // Send Analytics tracking impression event
         [self.rillTrackingService sendImpressionEvent];
         
         // Fire RENDER_SUCCESS lifecycle event (burl) on impression
         if (self.lastBidResponse.bidID && self.currentBidResponse && self.currentBidResponse.id) {
-            [self.logger debug:[NSString stringWithFormat:@"📤 [PublisherNative] Firing RENDER_SUCCESS event (burl) for native impression: bidID=%@, price=%.2f", self.lastBidResponse.bidID, self.lastBidResponse.price]];
+            [self.logger debug:[NSString stringWithFormat:@"Firing RENDER_SUCCESS event (burl) for native impression: bidID=%@, price=%.2f", self.lastBidResponse.bidID, self.lastBidResponse.price]];
             
             [self.winLossTracker sendEvent:self.currentBidResponse.id
                                      bidId:self.lastBidResponse.bidID
@@ -566,7 +566,7 @@ NS_ASSUME_NONNULL_BEGIN
                                 lossReason:@(CLXLossReasonBidWon)
                             winnerBidPrice:self.lastBidResponse.price];
             
-            [self.logger debug:@"🚀 [PublisherNative] RENDER_SUCCESS event (burl) fired"];
+            [self.logger debug:@"[PublisherNative] RENDER_SUCCESS event (burl) fired"];
             
             // Trigger revenue callback immediately (no longer depends on NURL network call)
             CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID];
@@ -576,7 +576,7 @@ NS_ASSUME_NONNULL_BEGIN
                 });
             }
         } else {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [PublisherNative] Missing auction ID or bid ID for win notification: bidID=%@, auctionID=%@", 
+            [self.logger debug:[NSString stringWithFormat:@"Missing auction ID or bid ID for win notification: bidID=%@, auctionID=%@", 
                                self.lastBidResponse.bidID ?: @"(nil)", self.currentBidResponse.id ?: @"(nil)"]];
         }
     }
@@ -597,7 +597,7 @@ NS_ASSUME_NONNULL_BEGIN
     // Call appSessionService.addClick
     [self.appSessionService addClickWithPlacementID:self.placementID];
     
-    // Send Rill tracking click event
+    // Send Analytics tracking click event
     [self.rillTrackingService sendClickEvent];
     
     // Call both old and new delegate methods for backward compatibility

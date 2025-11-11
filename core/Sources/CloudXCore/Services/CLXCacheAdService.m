@@ -73,7 +73,7 @@ NS_ASSUME_NONNULL_BEGIN
             break;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CacheAdService] %@ retries: %@", adTypeName, enabled ? @"enabled" : @"disabled"]];
+    [self.logger debug:[NSString stringWithFormat:@"%@ retries: %@", adTypeName, enabled ? @"enabled" : @"disabled"]];
     return enabled;
 }
 
@@ -138,7 +138,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)hasAds {
     BOOL hasItems = self.cachedQueue.hasItems;
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CacheAdService] hasAds called - cachedQueue: %@, hasItems: %d", self.cachedQueue, hasItems]];
+    [self.logger debug:[NSString stringWithFormat:@"hasAds called - cachedQueue: %@, hasItems: %d", self.cachedQueue, hasItems]];
     return hasItems;
 }
 
@@ -186,7 +186,7 @@ NS_ASSUME_NONNULL_BEGIN
             }
             
             // Log retry attempt
-            [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] 🔄 [CacheAdService] Retries enabled - will retry after backoff delay", strongSelf.currentCorrelationId]];
+            [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] [CacheAdService] Retries enabled - will retry after backoff delay", strongSelf.currentCorrelationId]];
             
             // Implement waterfall backoff delay logic
             NSError *backoffError;
@@ -208,24 +208,24 @@ NS_ASSUME_NONNULL_BEGIN
             // Reset waterfall backoff algorithm
             NSTimeInterval delay = [strongSelf.waterfallBackoffAlgorithm reset];
             
-            [strongSelf.logger info:[NSString stringWithFormat:@"[%@] ✅ [CacheAdService] Bid response received - Network: %@, BidID: %@", strongSelf.currentCorrelationId, response.networkName, response.bidID]];
+            [strongSelf.logger info:[NSString stringWithFormat:@"[%@] [CacheAdService] Bid response received - Network: %@, BidID: %@", strongSelf.currentCorrelationId, response.networkName, response.bidID]];
             
             // Create cacheable ad from response
             if (strongSelf.createCacheableAd && response) {
-                [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [CacheAdService] Creating cacheable ad - Network: %@, BidID: %@", strongSelf.currentCorrelationId, response.networkName, response.bidID]];
+                [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] [CacheAdService] Creating cacheable ad - Network: %@, BidID: %@", strongSelf.currentCorrelationId, response.networkName, response.bidID]];
                 
                 // Call createBidAd block without parameters (it captures parameters internally)
                 id destroyable = response.createBidAd();
                 
                 if (destroyable) {
                     id<CLXCacheableAd> cacheableAd = strongSelf.createCacheableAd(destroyable);
-                    [strongSelf.logger debug:[NSString stringWithFormat:@"📊 [CacheAdService] Cacheable ad created: %@", cacheableAd]];
+                    [strongSelf.logger debug:[NSString stringWithFormat:@"Cacheable ad created: %@", cacheableAd]];
                     
                     if (cacheableAd) {
                         // Set the bid response on the cacheable ad for NURL firing
                         CLXBidResponse *bidResponse = [strongSelf.bidAdSource getCurrentBidResponse];
                         cacheableAd.bidResponse = bidResponse;
-                        [strongSelf.logger debug:@"🔧 [CacheAdService] Set bidResponse on cacheable ad and enqueueing"];
+                        [strongSelf.logger debug:@"Set bidResponse on cacheable ad and enqueueing"];
                         [strongSelf.cachedQueue enqueueAdWithPrice:response.price
                                                        loadTimeout:strongSelf.bidLoadTimeout
                                                              bidID:response.bidID
@@ -234,17 +234,17 @@ NS_ASSUME_NONNULL_BEGIN
                             if (error) {
                                 [strongSelf.logger error:[NSString stringWithFormat:@"Failed to enqueue ad: %@", error.localizedDescription]];
                             } else {
-                                [strongSelf.logger info:[NSString stringWithFormat:@"✅ [CacheAdService] Ad successfully enqueued to service: %@", strongSelf]];
+                                [strongSelf.logger info:[NSString stringWithFormat:@"Ad successfully enqueued to service: %@", strongSelf]];
                             }
                         }];
                     } else {
-                        [strongSelf.logger error:@"❌ [CacheAdService] Failed to create cacheable ad from destroyable"];
+                        [strongSelf.logger error:@"Failed to create cacheable ad from destroyable"];
                     }
                 } else {
-                    [strongSelf.logger error:@"❌ [CacheAdService] Failed to create destroyable from bid response"];
+                    [strongSelf.logger error:@"Failed to create destroyable from bid response"];
                 }
             } else {
-                [strongSelf.logger error:[NSString stringWithFormat:@"❌ [CacheAdService] Missing createCacheableAd block (%d) or response (%d)", strongSelf.createCacheableAd != nil, response != nil]];
+                [strongSelf.logger error:[NSString stringWithFormat:@"Missing createCacheableAd block (%d) or response (%d)", strongSelf.createCacheableAd != nil, response != nil]];
             }
             
             // Schedule next load

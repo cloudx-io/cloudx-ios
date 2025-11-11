@@ -316,7 +316,7 @@
 - (void)reportException:(NSException *)exception context:(NSDictionary<NSString *, NSString *> *)context {
     // Always log the exception for visibility
     NSString *operation = context[@"operation"] ?: @"unknown_operation";
-    [self.logger error:[NSString stringWithFormat:@"❌ [MetricsNetworkService] Exception in %@: %@ - %@", 
+    [self.logger error:[NSString stringWithFormat:@"Exception in %@: %@ - %@", 
                        operation, exception.name ?: @"unknown", exception.reason ?: @"no reason"]];
     
     // Also report via metrics if error reporter was injected

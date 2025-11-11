@@ -55,7 +55,7 @@
 
 - (void)addBid:(NSString *)auctionId bid:(CLXBidResponseBid *)bid {
     if (!auctionId || !bid || !bid.id) {
-        [self.logger error:@"❌ [AuctionBidManager] Invalid parameters for addBid"];
+        [self.logger error:@"Invalid parameters for addBid"];
         return;
     }
     
@@ -63,7 +63,7 @@
         CLXAuctionState *state = [self getOrCreateAuctionState:auctionId];
         state.bids[bid.id] = bid;
         
-        [self.logger debug:[NSString stringWithFormat:@"📊 [AuctionBidManager] Added bid %@ to auction %@", bid.id, auctionId]];
+        [self.logger debug:[NSString stringWithFormat:@"Added bid %@ to auction %@", bid.id, auctionId]];
     });
 }
 
@@ -73,7 +73,7 @@
               lossReason:(nullable NSNumber *)lossReason {
     
     if (!auctionId || !bidId) {
-        [self.logger error:@"❌ [AuctionBidManager] Invalid parameters for setBidLoadResult"];
+        [self.logger error:@"Invalid parameters for setBidLoadResult"];
         return;
     }
     
@@ -82,17 +82,17 @@
         
         if (!success && lossReason) {
             state.bidLossReasons[bidId] = lossReason;
-            [self.logger debug:[NSString stringWithFormat:@"📊 [AuctionBidManager] Set bid %@ loss reason: %@", bidId, lossReason]];
+            [self.logger debug:[NSString stringWithFormat:@"Set bid %@ loss reason: %@", bidId, lossReason]];
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"📊 [AuctionBidManager] Set bid %@ load result - success: %@", 
+        [self.logger debug:[NSString stringWithFormat:@"Set bid %@ load result - success: %@", 
                            bidId, success ? @"YES" : @"NO"]];
     });
 }
 
 - (void)setBidWinner:(NSString *)auctionId winningBidId:(NSString *)winningBidId {
     if (!auctionId || !winningBidId) {
-        [self.logger error:@"❌ [AuctionBidManager] Invalid parameters for setBidWinner"];
+        [self.logger error:@"Invalid parameters for setBidWinner"];
         return;
     }
     
@@ -106,7 +106,7 @@
             state.winningBidPrice = winningBid.price;
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"📊 [AuctionBidManager] Set winner for auction %@: %@ (price: %.2f)", 
+        [self.logger debug:[NSString stringWithFormat:@"Set winner for auction %@: %@ (price: %.2f)", 
                            auctionId, winningBidId, state.winningBidPrice]];
     });
 }
@@ -157,7 +157,7 @@
     
     dispatch_sync(self.syncQueue, ^{
         [self.auctionStates removeObjectForKey:auctionId];
-        [self.logger debug:[NSString stringWithFormat:@"🧹 [AuctionBidManager] Cleared auction data for %@", auctionId]];
+        [self.logger debug:[NSString stringWithFormat:@"Cleared auction data for %@", auctionId]];
     });
 }
 
@@ -172,7 +172,7 @@
     if (!state) {
         state = [[CLXAuctionState alloc] init];
         self.auctionStates[auctionId] = state;
-        [self.logger debug:[NSString stringWithFormat:@"🔧 [AuctionBidManager] Created new auction state for %@", auctionId]];
+        [self.logger debug:[NSString stringWithFormat:@"Created new auction state for %@", auctionId]];
     }
     return state;
 }

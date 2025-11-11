@@ -52,7 +52,7 @@ static BOOL isInitialized = NO;
  */
 + (instancetype)createInstance {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXPrebidInitializer"];
-    [logger info:@"🏭 [FACTORY] CloudXPrebidInitializer createInstance called"];
+    [logger info:@"[ CloudXPrebidInitializer createInstance called"];
     
     CLXPrebidInitializer *instance = [[CLXPrebidInitializer alloc] init];
     return instance;
@@ -69,10 +69,10 @@ static BOOL isInitialized = NO;
  */
 - (BOOL)initializeWithConfig:(CLXBidderConfig *)config {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXPrebidInitializer"];
-    [logger info:@"🚀 [INIT-SYNC] CloudXPrebidInitializer synchronous initialization started"];
+    [logger debug:@"[INIT-SYNC] CloudXPrebidInitializer synchronous initialization started"];
     
     // Prebid adapter is rendering-only, no special initialization needed
-    [logger info:@"✅ [INIT-SYNC] Synchronous initialization completed successfully"];
+    [logger info:@"Synchronous initialization completed successfully"];
     
     return YES;
 }
@@ -89,7 +89,7 @@ static BOOL isInitialized = NO;
  */
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXPrebidInitializer"];
-    [logger info:@"🚀 [INIT-ASYNC] CloudXPrebidInitializer async initialization started"];
+    [logger debug:@"[INIT-ASYNC] CloudXPrebidInitializer async initialization started"];
     
     // Prebid adapter is rendering-only, no special initialization needed
     // Set initialization state to true
@@ -100,7 +100,7 @@ static BOOL isInitialized = NO;
         completion(YES, nil);
     }
     
-    [logger info:@"✅ [INIT-ASYNC] Async initialization completed successfully"];
+    [logger info:@"Async initialization completed successfully"];
 }
 
 @end 

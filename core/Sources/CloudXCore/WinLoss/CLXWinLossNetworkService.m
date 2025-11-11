@@ -59,7 +59,7 @@
     }
     
     if (jsonError || !jsonData) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [WinLossNetworkService] JSON serialization failed: %@", jsonError.localizedDescription]];
+        [self.logger error:[NSString stringWithFormat:@"JSON serialization failed: %@", jsonError.localizedDescription]];
         if (completion) {
             completion(NO, jsonError);
         }
@@ -123,7 +123,7 @@
                                               completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
         
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossNetworkService] Win/loss notification failed: %@", error.localizedDescription]];
+            [self.logger error:[NSString stringWithFormat:@"Win/loss notification failed: %@", error.localizedDescription]];
             
             if (completion) {
                 completion(NO, error);
@@ -146,7 +146,7 @@
                 completion(YES, nil);
             }
         } else {
-            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossNetworkService] HTTP %ld", (long)statusCode]];
+            [self.logger error:[NSString stringWithFormat:@"HTTP %ld", (long)statusCode]];
             
             NSError *statusError = [CLXError errorWithCode:CLXErrorCodeServerError 
                                                description:[NSString stringWithFormat:@"HTTP %ld", (long)statusCode]];

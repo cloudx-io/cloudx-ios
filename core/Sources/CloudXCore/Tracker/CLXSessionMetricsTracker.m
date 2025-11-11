@@ -122,7 +122,7 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
         self.placementCounts[placementName] = @(currentPlacementCount + 1);
         
         [self.logger debug:[NSString stringWithFormat:
-            @"📊 Recorded impression - placement:'%@' format:%ld globalCount:%ld",
+            @"Recorded impression - placement:'%@' format:%ld globalCount:%ld",
             placementName, (long)format, (long)self.globalCount]];
     });
 }
@@ -149,7 +149,7 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
                                              rewardedDepth:[self.formatCounts[CLXSessionAdFormatRewarded] floatValue]
                                            durationSeconds:durationSeconds];
         
-        [self.logger debug:[NSString stringWithFormat:@"📊 getMetrics: %@", metrics]];
+        [self.logger debug:[NSString stringWithFormat:@"getMetrics: %@", metrics]];
     });
     
     return metrics;
@@ -174,14 +174,14 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
     
     dispatch_sync(self.queue, ^{
         [self.placementCounts removeObjectForKey:placementName];
-        [self.logger debug:[NSString stringWithFormat:@"🔄 Reset placement: %@", placementName]];
+        [self.logger info:[NSString stringWithFormat:@"Reset placement: %@", placementName]];
     });
 }
 
 - (void)resetAll {
     dispatch_sync(self.queue, ^{
         [self resetState];
-        [self.logger info:@"🔄 Reset all session metrics"];
+        [self.logger info:@"Reset all session metrics"];
     });
 }
 
@@ -190,7 +190,7 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
 - (void)setClockProviderForTesting:(NSTimeInterval (^)(void))clockProvider {
     dispatch_sync(self.queue, ^{
         self.clockProvider = clockProvider;
-        [self.logger debug:@"🧪 Clock provider set for testing"];
+        [self.logger debug:@"Clock provider set for testing"];
     });
 }
 
@@ -199,7 +199,7 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
         self.clockProvider = ^NSTimeInterval {
             return [NSProcessInfo processInfo].systemUptime;
         };
-        [self.logger debug:@"🧪 Clock provider reset to default"];
+        [self.logger debug:@"Clock provider reset to default"];
     });
 }
 
@@ -219,7 +219,7 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
     NSTimeInterval timeSinceLastActivity = now - self.lastActivityTime;
     if (timeSinceLastActivity >= kSessionTimeoutSeconds) {
         [self.logger info:[NSString stringWithFormat:
-            @"⏱️ Session timeout (%.1f minutes) - resetting metrics",
+            @"Session timeout (%.1f minutes) - resetting metrics",
             timeSinceLastActivity / 60.0]];
         [self resetState];
     }

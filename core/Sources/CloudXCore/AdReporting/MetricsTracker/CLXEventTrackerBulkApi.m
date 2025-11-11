@@ -28,7 +28,7 @@
             completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
     
     if (!endpointUrl || endpointUrl.length == 0) {
-        [self.logger error:@"❌ [EventTrackerBulkApi] Endpoint URL is nil or empty"];
+        [self.logger error:@"Endpoint URL is nil or empty"];
         if (completion) {
             completion(NO, [CLXError errorWithCode:CLXErrorCodeInvalidRequest description:@"Endpoint URL is required"]);
         }
@@ -36,14 +36,14 @@
     }
     
     if (!items || items.count == 0) {
-        [self.logger debug:@"📊 [EventTrackerBulkApi] No items to send"];
+        [self.logger debug:@"No items to send"];
         if (completion) {
             completion(YES, nil);
         }
         return;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [EventTrackerBulkApi] Sending %lu metrics events to %@", 
+    [self.logger debug:[NSString stringWithFormat:@"Sending %lu metrics events to %@", 
                        (unsigned long)items.count, endpointUrl]];
     
     // Convert items to JSON array
@@ -55,7 +55,7 @@
     NSError *jsonError;
     NSData *requestBody = [NSJSONSerialization dataWithJSONObject:jsonArray options:0 error:&jsonError];
     if (jsonError) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [EventTrackerBulkApi] JSON serialization failed: %@", jsonError.localizedDescription]];
+        [self.logger error:[NSString stringWithFormat:@"JSON serialization failed: %@", jsonError.localizedDescription]];
         if (completion) {
             completion(NO, jsonError);
         }
@@ -71,14 +71,14 @@
     request.timeoutInterval = self.timeoutMillis / 1000.0; // Convert to seconds
     
     // Log request details
-    [self.logger debug:[NSString stringWithFormat:@"📊 [EventTrackerBulkApi] Request body size: %lu bytes", (unsigned long)requestBody.length]];
+    [self.logger debug:[NSString stringWithFormat:@"Request body size: %lu bytes", (unsigned long)requestBody.length]];
     
     // Execute request
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
                                             completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [EventTrackerBulkApi] Network request failed: %@", error.localizedDescription]];
+            [self.logger error:[NSString stringWithFormat:@"Network request failed: %@", error.localizedDescription]];
             if (completion) {
                 completion(NO, error);
             }
@@ -89,14 +89,14 @@
         NSInteger statusCode = httpResponse.statusCode;
         
         if (statusCode >= 200 && statusCode < 300) {
-            [self.logger debug:[NSString stringWithFormat:@"✅ [EventTrackerBulkApi] Successfully sent %lu metrics events (status: %ld)", 
+            [self.logger debug:[NSString stringWithFormat:@"Successfully sent %lu metrics events (status: %ld)", 
                                (unsigned long)items.count, (long)statusCode]];
             if (completion) {
                 completion(YES, nil);
             }
         } else {
             NSString *errorMessage = [NSString stringWithFormat:@"HTTP %ld", (long)statusCode];
-            [self.logger error:[NSString stringWithFormat:@"❌ [EventTrackerBulkApi] HTTP error: %@", errorMessage]];
+            [self.logger error:[NSString stringWithFormat:@"HTTP error: %@", errorMessage]];
             
             NSError *httpError = [CLXError errorWithCode:CLXErrorCodeNetworkError description:errorMessage];
             if (completion) {

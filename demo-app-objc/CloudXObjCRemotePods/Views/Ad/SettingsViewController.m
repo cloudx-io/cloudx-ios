@@ -64,7 +64,7 @@
     switch (section) {
         case 0: return 2; // SDK Settings
         case 1: return 6; // Placement Settings
-        case 2: return 4; // Privacy: Consent, US Privacy, Hashed User ID, User Targeting
+        case 2: return 3; // Privacy: Consent, US Privacy, User Targeting
         case 3: return 3; // Logging: Enable, Emojis, Level
         default: return 0;
     }
@@ -120,8 +120,7 @@
             switch (indexPath.row) {
                 case 0: cell.textLabel.text = @"Consent String"; textField.text = self.settings.consentString; break;
                 case 1: cell.textLabel.text = @"US Privacy String"; textField.text = self.settings.usPrivacyString; break;
-                case 2: cell.textLabel.text = @"Hashed User ID"; textField.text = self.settings.hashedUserId; textField.placeholder = @"sha256 hash"; break;
-                case 3: {
+                case 2: {
                     cell.textLabel.text = @"User Targeting";
                     UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectZero];
                     toggle.on = self.settings.userTargeting;
@@ -211,17 +210,6 @@
     else if (tag == 15) self.settings.nativeMediumPlacement = textField.text;
     else if (tag == 20) self.settings.consentString = textField.text;
     else if (tag == 21) self.settings.usPrivacyString = textField.text;
-    else if (tag == 22) {
-        self.settings.hashedUserId = textField.text;
-        // Set the hashed user ID in CloudXCore privacy service
-        if (textField.text.length > 0) {
-            [[CloudXCore shared] setHashedUserID:textField.text];
-            NSLog(@"🔒 Hashed User ID set: %@", textField.text);
-        } else {
-            [[CloudXCore shared] setHashedUserID:nil];
-            NSLog(@"🔒 Hashed User ID cleared");
-        }
-    }
 }
 
 @end

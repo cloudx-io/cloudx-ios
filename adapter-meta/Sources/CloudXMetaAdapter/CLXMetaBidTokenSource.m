@@ -49,7 +49,7 @@
 #pragma mark - CLXBidTokenSource
 
 - (void)getTokenWithCompletion:(void (^)(NSDictionary<NSString *, NSString *> * _Nullable token, NSError * _Nullable error))completion {
-    [self.logger debug:@"🔧 [CLXMetaBidTokenSource] Getting Meta bidder token"];
+    [self.logger debug:@"Getting Meta bidder token"];
     
     // Ensure we're on main thread for Meta SDK calls
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -57,7 +57,7 @@
             // Get Meta bidder token - this is required for every bid request
             NSString *bidderToken = [FBAdSettings bidderToken];
             NSString *idfa = [[CLXSettings sharedInstance] getIFA];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [CLXMetaBidTokenSource] Meta bidder token: %@ | IDFA from CLXSettings: %@", 
+            [self.logger debug:[NSString stringWithFormat:@"Meta bidder token: %@ | IDFA from CLXSettings: %@", 
                                bidderToken ? @"[RECEIVED]" : @"[NIL]", idfa ? @"[AVAILABLE]" : @"[NIL]"]];
             
             // Create token dictionary with Meta-specific data
@@ -69,20 +69,20 @@
             
             if (idfa && idfa.length > 0) {
                 tokenDict[@"device_ifa"] = idfa;
-                [self.logger info:[NSString stringWithFormat:@"🔧 [CLXMetaBidTokenSource] Using centralized IFA in device_ifa: %@", idfa]];
+                [self.logger debug:[NSString stringWithFormat:@"Using centralized IFA in device_ifa: %@", idfa]];
             }
             
             // Add network identifier
             tokenDict[@"network"] = @"audienceNetwork";
             
-            [self.logger info:[NSString stringWithFormat:@"✅ [CLXMetaBidTokenSource] Token created with %lu keys", (unsigned long)tokenDict.count]];
+            [self.logger debug:[NSString stringWithFormat:@"Token created with %lu keys", (unsigned long)tokenDict.count]];
             
             if (completion) {
                 completion([tokenDict copy], nil);
             }
             
         } @catch (NSException *exception) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [CLXMetaBidTokenSource] Exception getting token: %@", exception.reason]];
+            [self.logger error:[NSString stringWithFormat:@"Exception getting token: %@", exception.reason]];
             
             NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
                                          description:exception.reason ?: @"Unknown exception occurred while getting bid token"];

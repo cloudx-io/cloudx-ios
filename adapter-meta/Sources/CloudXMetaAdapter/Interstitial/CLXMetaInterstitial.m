@@ -53,7 +53,7 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
         _sdkVersion = FB_AD_SDK_VERSION;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMetaInterstitial"];
         
-        [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXMetaInterstitial] Init - PlacementID: %@, BidID: %@, HasBidPayload: %@", 
+        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %@, BidID: %@, HasBidPayload: %@", 
                            placementID, bidID, bidPayload ? @"YES" : @"NO"]];
         
         _interstitial = [[FBInterstitialAd alloc] initWithPlacementID:placementID];
@@ -63,7 +63,7 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
 }
 
 - (NSString *)bidID {
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXMetaInterstitial] bidID getter called - returning: %@", _bidID]];
+    [self.logger debug:[NSString stringWithFormat:@"bidID getter called - returning: %@", _bidID]];
     return _bidID;
 }
 
@@ -73,7 +73,7 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
 
 - (BOOL)isReady {
     BOOL ready = _interstitial && _interstitial.isAdValid;
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXMetaInterstitial] isReady: %@", ready ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"isReady: %@", ready ? @"YES" : @"NO"]];
     return ready;
 }
 
@@ -85,7 +85,7 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
     }
     
     _isLoading = YES;
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXMetaInterstitial] Loading ad - Placement: %@, HasBidPayload: %@", 
+    [self.logger debug:[NSString stringWithFormat:@"Loading ad - Placement: %@, HasBidPayload: %@", 
                        _placementID, self.bidPayload ? @"YES" : @"NO"]];
     
     // Ensure Meta SDK calls happen on main thread
@@ -108,7 +108,7 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
     BOOL ready = [self isReady];
     
     if (ready) {
-        [self.logger info:@"🔧 [CLXMetaInterstitial] Showing interstitial ad"];
+        [self.logger info:@"Showing interstitial ad"];
         
         // Call didShowWithAd before showing the ad
         if ([self.delegate respondsToSelector:@selector(didShowWithInterstitial:)]) {
@@ -117,7 +117,7 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
         
         [_interstitial showAdFromRootViewController:viewController];
     } else {
-        [self.logger error:@"❌ [CLXMetaInterstitial] Cannot show ad - not ready"];
+        [self.logger error:@"Cannot show ad - not ready"];
         
         // Create an error for show failure and call failure delegate
         NSError *showError = [CLXError errorWithCode:CLXErrorCodeAdNotReady 
@@ -129,7 +129,7 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
 }
 
 - (void)destroy {
-    [self.logger debug:@"🧹 [CLXMetaInterstitial] Destroying interstitial"];
+    [self.logger debug:@"Destroying interstitial"];
     
     if (self.interstitial) {
         // Properly clean up Meta SDK state
@@ -141,17 +141,17 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
     self.delegate = nil;
     _isLoading = NO;
     
-    [self.logger debug:@"✅ [CLXMetaInterstitial] Destruction complete"];
+    [self.logger debug:@"Destruction complete"];
 }
 
 #pragma mark - FBInterstitialAdDelegate
 
 - (void)interstitialAdDidLoad:(FBInterstitialAd *)interstitialAd {
-    [self.logger info:[NSString stringWithFormat:@"🎉 [CLXMetaInterstitial] Loaded successfully - Valid: %@", interstitialAd.isAdValid ? @"YES" : @"NO"]];
+    [self.logger info:[NSString stringWithFormat:@"Loaded successfully - Valid: %@", interstitialAd.isAdValid ? @"YES" : @"NO"]];
     
     // Check if ad is valid before proceeding (per Meta official guidelines)
     if (!interstitialAd.isAdValid) {
-        [self.logger error:@"❌ [CLXMetaInterstitial] Ad loaded but invalid"];
+        [self.logger error:@"Ad loaded but invalid"];
         _isLoading = NO;
         
         // Create an error for invalid ad and call failure delegate
@@ -188,7 +188,7 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
 }
 
 - (void)interstitialAdDidClose:(FBInterstitialAd *)interstitialAd {
-    [self.logger info:@"✅ [CLXMetaInterstitial] Ad closed"];
+    [self.logger info:@"Ad closed"];
     
     if ([self.delegate respondsToSelector:@selector(didCloseWithInterstitial:)]) {
         [self.delegate didCloseWithInterstitial:self];
@@ -196,12 +196,12 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
 }
 
 - (void)interstitialAdWillClose:(FBInterstitialAd *)interstitialAd {
-    [self.logger info:@"🔧 [CLXMetaInterstitial] Ad will close"];
+    [self.logger info:@"Ad will close"];
     // Consider to add code here to resume your app's flow
 }
 
 - (void)interstitialAdWillLogImpression:(FBInterstitialAd *)interstitialAd {
-    [self.logger info:[NSString stringWithFormat:@"📊 [CLXMetaInterstitial] Impression tracked - bidID: %@, self: %p | Forwarding to delegate: %@", 
+    [self.logger info:[NSString stringWithFormat:@"Impression tracked - bidID: %@, self: %p | Forwarding to delegate: %@", 
                        self.bidID, self, [self.delegate respondsToSelector:@selector(impressionWithInterstitial:)] ? @"YES" : @"NO"]];
     
     // Forward to CloudX delegate if it supports impression tracking

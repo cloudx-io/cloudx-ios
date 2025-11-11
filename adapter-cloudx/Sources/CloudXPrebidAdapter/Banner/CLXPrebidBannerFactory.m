@@ -35,9 +35,9 @@
  */
 + (instancetype)createInstance {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"PrebidBannerFactory"];
-    [logger debug:@"🔧 [PrebidBannerFactory] createInstance called"];
+    [logger debug:@"createInstance called"];
     CLXPrebidBannerFactory *instance = [[CLXPrebidBannerFactory alloc] init];
-    [logger info:[NSString stringWithFormat:@"✅ [PrebidBannerFactory] Instance created: %@", instance]];
+    [logger info:[NSString stringWithFormat:@"Instance created: %@", instance]];
     return instance;
 }
 
@@ -66,28 +66,28 @@
                                                      extras:(NSDictionary<NSString *, NSString *> *)extras
                                                    delegate:(id<CLXAdapterBannerDelegate>)delegate {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXPrebidBannerFactory"];
-    [logger info:[NSString stringWithFormat:@"🏭 [FACTORY] Creating banner - Type: %ld, Markup: %lu chars, CloseBtn: %@", (long)type, (unsigned long)(adm ? adm.length : 0), hasClosedButton ? @"YES" : @"NO"]];
+    [logger debug:[NSString stringWithFormat:@"Creating banner - Type: %ld, Markup: %lu chars, CloseBtn: %@", (long)type, (unsigned long)(adm ? adm.length : 0), hasClosedButton ? @"YES" : @"NO"]];
     
     // Validate required parameters
     if (!viewController) {
-        [logger error:@"❌ [FACTORY] Cannot create banner - viewController is nil"];
+        [logger error:@"Cannot create banner - viewController is nil"];
         return nil;
     }
     
     if (!adm || adm.length == 0) {
-        [logger error:@"❌ [FACTORY] Cannot create banner - ad markup is empty or nil"];
+        [logger error:@"Cannot create banner - ad markup is empty or nil"];
         return nil;
     }
     
     if (!delegate) {
-        [logger info:@"⚠️ [FACTORY] Creating banner without delegate"];
+        [logger warn:@"Creating banner without delegate"];
     }
     
-    [logger info:@"✅ [FACTORY] Validation passed, creating CloudXPrebidBanner instance..."];
+    [logger debug:@"Validation passed, creating CloudXPrebidBanner instance..."];
     
     // Log ad markup preview for debugging
     if (adm.length > 0) {
-        [logger debug:[NSString stringWithFormat:@"📊 [FACTORY] Ad markup preview: %@...", 
+        [logger debug:[NSString stringWithFormat:@"Ad markup preview: %@...", 
                       [adm substringToIndex:MIN(150, adm.length)]]];
     }
     
@@ -99,10 +99,10 @@
                                                                                delegate:delegate];
     
     if (banner) {
-        [logger info:[NSString stringWithFormat:@"✅ [FACTORY] CloudXPrebidBanner created successfully: %p", banner]];
+        [logger debug:[NSString stringWithFormat:@"CloudXPrebidBanner created successfully: %p", banner]];
         return banner;
     } else {
-        [logger error:@"❌ [FACTORY] Failed to create CloudXPrebidBanner instance"];
+        [logger error:@"Failed to create CloudXPrebidBanner instance"];
         return nil;
     }
 }

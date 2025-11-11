@@ -36,16 +36,16 @@
     
     BOOL success = [self.database executeSQL:createTableSQL];
     if (success) {
-        [self.logger debug:@"📊 [MetricsEventDao] Metrics table created successfully"];
+        [self.logger debug:@"Metrics table created successfully"];
     } else {
-        [self.logger error:@"❌ [MetricsEventDao] Failed to create metrics table"];
+        [self.logger error:@"Failed to create metrics table"];
     }
     return success;
 }
 
 - (BOOL)insert:(CLXMetricsEvent *)event {
     if (!event) {
-        [self.logger error:@"❌ [MetricsEventDao] Cannot insert nil event"];
+        [self.logger error:@"Cannot insert nil event"];
         return NO;
     }
     
@@ -64,10 +64,10 @@
     
     BOOL success = [self.database executeSQL:insertSQL withParameters:parameters];
     if (success) {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsEventDao] Inserted metric: %@ (counter: %ld, latency: %ld)", 
+        [self.logger debug:[NSString stringWithFormat:@"Inserted metric: %@ (counter: %ld, latency: %ld)", 
                            event.metricName, (long)event.counter, (long)event.totalLatency]];
     } else {
-        [self.logger error:[NSString stringWithFormat:@"❌ [MetricsEventDao] Failed to insert metric: %@", event.metricName]];
+        [self.logger error:[NSString stringWithFormat:@"Failed to insert metric: %@", event.metricName]];
     }
     
     return success;
@@ -75,7 +75,7 @@
 
 - (nullable CLXMetricsEvent *)getAllByMetric:(NSString *)metricName {
     if (!metricName || metricName.length == 0) {
-        [self.logger error:@"❌ [MetricsEventDao] Cannot query with nil/empty metric name"];
+        [self.logger error:@"Cannot query with nil/empty metric name"];
         return nil;
     }
     
@@ -86,18 +86,18 @@
     
     if (results.count > 0) {
         CLXMetricsEvent *event = [CLXMetricsEvent fromDictionary:results.firstObject];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsEventDao] Found existing metric: %@ (counter: %ld)", 
+        [self.logger debug:[NSString stringWithFormat:@"Found existing metric: %@ (counter: %ld)", 
                            metricName, (long)event.counter]];
         return event;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsEventDao] No existing metric found for: %@", metricName]];
+    [self.logger debug:[NSString stringWithFormat:@"No existing metric found for: %@", metricName]];
     return nil;
 }
 
 - (BOOL)deleteById:(NSString *)eventId {
     if (!eventId || eventId.length == 0) {
-        [self.logger error:@"❌ [MetricsEventDao] Cannot delete with nil/empty event ID"];
+        [self.logger error:@"Cannot delete with nil/empty event ID"];
         return NO;
     }
     
@@ -106,9 +106,9 @@
     
     BOOL success = [self.database executeSQL:deleteSQL withParameters:parameters];
     if (success) {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsEventDao] Deleted metric with ID: %@", eventId]];
+        [self.logger debug:[NSString stringWithFormat:@"Deleted metric with ID: %@", eventId]];
     } else {
-        [self.logger error:[NSString stringWithFormat:@"❌ [MetricsEventDao] Failed to delete metric with ID: %@", eventId]];
+        [self.logger error:[NSString stringWithFormat:@"Failed to delete metric with ID: %@", eventId]];
     }
     
     return success;
@@ -125,11 +125,11 @@
         if (event) {
             [events addObject:event];
         } else {
-            [self.logger error:[NSString stringWithFormat:@"❌ [MetricsEventDao] Failed to create CLXMetricsEvent from row: %@", row]];
+            [self.logger error:[NSString stringWithFormat:@"Failed to create CLXMetricsEvent from row: %@", row]];
         }
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [MetricsEventDao] Retrieved %lu metrics events", (unsigned long)events.count]];
+    [self.logger debug:[NSString stringWithFormat:@"Retrieved %lu metrics events", (unsigned long)events.count]];
     return [events copy];
 }
 

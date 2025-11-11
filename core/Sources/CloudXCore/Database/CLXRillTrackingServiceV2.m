@@ -63,7 +63,7 @@
                      campaignId:campaignId
                      eventValue:eventValue
                       eventType:eventType];
-    NSLog(@"✅ trackEventWithEncoded completed");
+    NSLog(@"trackEventWithEncoded completed");
 }
 
 - (void)trackEventWithEncoded:(NSString *)encoded

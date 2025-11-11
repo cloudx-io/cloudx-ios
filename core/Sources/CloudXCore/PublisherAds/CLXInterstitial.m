@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
                                 burl:(nullable NSString *)burl
                              network:(NSString *)network {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Interstitial"];
-    [logger debug:[NSString stringWithFormat:@"🔧 Creating interstitial: AdID=%@, BidID=%@, Network=%@, ADM=%lu chars", adId, bidId, network, (unsigned long)adm.length]];
+    [logger debug:[NSString stringWithFormat:@"Creating interstitial: AdID=%@, BidID=%@, Network=%@, ADM=%lu chars", adId, bidId, network, (unsigned long)adm.length]];
     
     CLXAdNetworkFactories *factories = [self valueForKey:@"adFactories"];
     if (!factories) {
@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
     
-    [logger info:[NSString stringWithFormat:@"✅ Interstitial factory found for network: %@ (class: %@)", network, NSStringFromClass([factory class])]];
+    [logger info:[NSString stringWithFormat:@"Interstitial factory found for network: %@ (class: %@)", network, NSStringFromClass([factory class])]];
     
     id<CLXAdapterInterstitial> interstitial = [factory createWithAdId:adId
                                                                  bidId:bidId
@@ -67,7 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
     
-    [logger info:[NSString stringWithFormat:@"✅ Interstitial created - Network: %@, BidID: %@", interstitial.network, interstitial.bidID]];
+    [logger info:[NSString stringWithFormat:@"Interstitial created - Network: %@, BidID: %@", interstitial.network, interstitial.bidID]];
     
     return interstitial;
 }
@@ -132,7 +132,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)didLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Interstitial"];
-    [logger debug:[NSString stringWithFormat:@"🔧 didLoadWithInterstitial - Class: %@", NSStringFromClass([(NSObject *)interstitial class])]];
+    [logger debug:[NSString stringWithFormat:@"didLoadWithInterstitial - Class: %@", NSStringFromClass([(NSObject *)interstitial class])]];
     
     self.currentAdapter = interstitial;
     [self transitionToReadyState];

@@ -54,7 +54,7 @@
 - (BOOL)shouldClearPersonalData {
     // iOS ATT is the primary privacy control - platform-first approach
     if (![CLXAdTrackingService isIDFAAccessAllowed]) {
-        [self.logger debug:@"🔒 [CLXPrivacyService] iOS ATT not authorized - clearing personal data"];
+        [self.logger debug:@"iOS ATT not authorized - clearing personal data"];
         return YES;
     }
     
@@ -67,13 +67,13 @@
     
     // Non-US users: no additional restrictions (matching Android)
     if (![geoService isUSUser]) {
-        [self.logger debug:@"✅ [CLXPrivacyService] Non-US user - no additional restrictions"];
+        [self.logger debug:@"Non-US user - no additional restrictions"];
         return NO;
     }
     
     // US users: COPPA always takes precedence (matching Android)
     if ([self isCoppaEnabled]) {
-        [self.logger debug:@"🔒 [CLXPrivacyService] COPPA enabled for US user - clearing personal data"];
+        [self.logger debug:@"COPPA enabled for US user - clearing personal data"];
         return YES;
     }
     
@@ -83,23 +83,23 @@
     
     CLXGppConsent *gppConsent = [gppProvider decodeGppForTarget:targetSid];
     if (gppConsent && [gppConsent requiresPiiRemoval]) {
-        [self.logger debug:[NSString stringWithFormat:@"🔒 [CLXPrivacyService] GPP consent (SID %@) requires PII removal - clearing personal data", targetSid]];
+        [self.logger debug:[NSString stringWithFormat:@"GPP consent (SID %@) requires PII removal - clearing personal data", targetSid]];
         return YES;
     }
     
     // Legacy CCPA string check for backward compatibility
     NSString *ccpaString = [self ccpaPrivacyString];
     if (ccpaString && [ccpaString containsString:@"Y"]) {
-        [self.logger debug:@"🔒 [CLXPrivacyService] Legacy CCPA opt-out detected - clearing personal data"];
+        [self.logger debug:@"Legacy CCPA opt-out detected - clearing personal data"];
         return YES;
     }
     
-    [self.logger debug:@"✅ [CLXPrivacyService] Personal data can be used (all compliance checks passed)"];
+    [self.logger verbose:@"Personal data can be used (all compliance checks passed)"];
     return NO;
 }
 
 - (BOOL)shouldClearPersonalDataIgnoringATT {
-    // ⚠️ INTERNAL METHOD: This method includes GDPR/COPPA checks that are not yet supported by server in bid requests
+    // INTERNAL METHOD: This method includes GDPR/COPPA checks that are not yet supported by server in bid requests
     // Internal method includes comprehensive privacy checks - should not be exposed to publishers
     
     // Check GDPR consent (INTERNAL - server not supported yet)
@@ -108,13 +108,13 @@
     
     if (gdprApplies && [gdprApplies boolValue]) {
         if (!gdprConsent || gdprConsent.length == 0) {
-            [self.logger debug:@"🔒 [CLXPrivacyService] GDPR applies but no consent string - clearing personal data"];
+            [self.logger debug:@"GDPR applies but no consent string - clearing personal data"];
             return YES;
         }
         
         // Basic GDPR consent validation - in a real implementation, you'd parse the TC string
         if ([gdprConsent hasPrefix:@"0"] || [gdprConsent containsString:@"reject"]) {
-            [self.logger debug:@"🔒 [CLXPrivacyService] GDPR consent indicates rejection - clearing personal data"];
+            [self.logger debug:@"GDPR consent indicates rejection - clearing personal data"];
             return YES;
         }
     }
@@ -122,18 +122,18 @@
     // Check CCPA opt-out (PUBLIC - server supported)
     NSString *ccpaString = [self ccpaPrivacyString];
     if (ccpaString && [ccpaString containsString:@"Y"]) {
-        [self.logger debug:@"🔒 [CLXPrivacyService] CCPA opt-out detected - clearing personal data"];
+        [self.logger debug:@"CCPA opt-out detected - clearing personal data"];
         return YES;
     }
     
     // Check COPPA (INTERNAL - server not supported yet)
     NSNumber *coppaApplies = [self coppaApplies];
     if (coppaApplies && [coppaApplies boolValue]) {
-        [self.logger debug:@"🔒 [CLXPrivacyService] COPPA applies - clearing personal data"];
+        [self.logger verbose:@"COPPA applies - clearing personal data"];
         return YES;
     }
     
-    [self.logger debug:@"✅ [CLXPrivacyService] Personal data can be used (ignoring ATT)"];
+    [self.logger verbose:@"Personal data can be used (ignoring ATT)"];
     return NO;
 }
 
@@ -141,7 +141,7 @@
 
 - (nullable NSString *)ccpaPrivacyString {
     NSString *ccpa = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXPrivacyCCPAPrivacyKey];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXPrivacyService] CCPA privacy: %@", ccpa ?: @"(none)"]];
+    [self.logger verbose:[NSString stringWithFormat:@"CCPA privacy: %@", ccpa ?: @"(none)"]];
     return ccpa;
 }
 
@@ -149,33 +149,33 @@
     // Check if CCPA privacy string indicates opt-out
     NSString *ccpaString = [self ccpaPrivacyString];
     if (ccpaString && [ccpaString containsString:@"Y"]) {
-        [self.logger debug:@"📊 [CLXPrivacyService] CCPA applies: YES (opt-out detected)"];
+        [self.logger debug:@"CCPA applies: YES (opt-out detected)"];
         return @YES;
     }
-    [self.logger debug:@"📊 [CLXPrivacyService] CCPA applies: NO"];
+    [self.logger debug:@"CCPA applies: NO"];
     return @NO;
 }
 
 #pragma mark - Internal Privacy Methods (GDPR/COPPA - Server Not Supported)
 
 - (nullable NSString *)gdprConsentString {
-    // ⚠️ INTERNAL ONLY: GDPR support not yet implemented on server
+    // INTERNAL ONLY: GDPR support not yet implemented on server
     // Including GDPR data in bid requests will cause 502 errors
     NSString *consent = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXPrivacyGDPRConsentKey];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXPrivacyService] GDPR consent (INTERNAL): %@", consent ?: @"(none)"]];
+    [self.logger debug:[NSString stringWithFormat:@"GDPR consent (INTERNAL): %@", consent ?: @"(none)"]];
     return consent;
 }
 
 - (nullable NSNumber *)gdprApplies {
-    // ⚠️ INTERNAL ONLY: GDPR support not yet implemented on server
+    // INTERNAL ONLY: GDPR support not yet implemented on server
     // Including GDPR data in bid requests will cause 502 errors
     NSUserDefaults *defaults = self.userDefaults;
     if ([defaults objectForKey:kCLXPrivacyGDPRAppliesKey]) {
         NSNumber *applies = @([defaults boolForKey:kCLXPrivacyGDPRAppliesKey]);
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CLXPrivacyService] GDPR applies (INTERNAL): %@", applies]];
+        [self.logger debug:[NSString stringWithFormat:@"GDPR applies (INTERNAL): %@", applies]];
         return applies;
     }
-    [self.logger debug:@"📊 [CLXPrivacyService] GDPR applies (INTERNAL): (unknown)"];
+    [self.logger debug:@"GDPR applies (INTERNAL): (unknown)"];
     return nil;
 }
 
@@ -185,21 +185,21 @@
     NSUserDefaults *defaults = self.userDefaults;
     if ([defaults objectForKey:kCLXPrivacyCOPPAAppliesKey]) {
         NSNumber *applies = @([defaults boolForKey:kCLXPrivacyCOPPAAppliesKey]);
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CLXPrivacyService] COPPA applies (INTERNAL): %@", applies]];
+        [self.logger verbose:[NSString stringWithFormat:@"COPPA applies (INTERNAL): %@", applies]];
         return applies;
     }
-    [self.logger debug:@"📊 [CLXPrivacyService] COPPA applies (INTERNAL): (unknown)"];
+    [self.logger verbose:@"COPPA applies (INTERNAL): (unknown)"];
     return nil;
 }
 
 - (nullable NSString *)hashedUserId {
     NSString *hashedId = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXPrivacyHashedUserIdKey];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXPrivacyService] Hashed user ID: %@", hashedId ? @"(present)" : @"(none)"]];
+    [self.logger debug:[NSString stringWithFormat:@"Hashed user ID: %@", hashedId ? @"(present)" : @"(none)"]];
     return hashedId;
 }
 
 - (void)setHashedUserId:(nullable NSString *)hashedUserId {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXPrivacyService] Setting hashed user ID: %@", hashedUserId ? @"(present)" : @"(none)"]];
+    [self.logger debug:[NSString stringWithFormat:@"Setting hashed user ID: %@", hashedUserId ? @"(present)" : @"(none)"]];
     if (hashedUserId) {
         [[NSUserDefaults standardUserDefaults] setObject:hashedUserId forKey:kCLXPrivacyHashedUserIdKey];
     } else {
@@ -210,12 +210,12 @@
 
 - (nullable NSString *)hashedGeoIp {
     NSString *hashedGeoIp = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXPrivacyHashedGeoIpKey];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXPrivacyService] Hashed geo IP: %@", hashedGeoIp ? @"(present)" : @"(none)"]];
+    [self.logger debug:[NSString stringWithFormat:@"Hashed geo IP: %@", hashedGeoIp ? @"(present)" : @"(none)"]];
     return hashedGeoIp;
 }
 
 - (void)setHashedGeoIp:(nullable NSString *)hashedGeoIp {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXPrivacyService] Setting hashed geo IP: %@", hashedGeoIp ? @"(present)" : @"(none)"]];
+    [self.logger debug:[NSString stringWithFormat:@"Setting hashed geo IP: %@", hashedGeoIp ? @"(present)" : @"(none)"]];
     if (hashedGeoIp) {
         [[NSUserDefaults standardUserDefaults] setObject:hashedGeoIp forKey:kCLXPrivacyHashedGeoIpKey];
     } else {
@@ -227,7 +227,7 @@
 #pragma mark - Public Privacy Setters
 
 - (void)setCCPAPrivacyString:(nullable NSString *)ccpaPrivacyString {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXPrivacyService] Setting CCPA privacy string: %@", ccpaPrivacyString ?: @"(cleared)"]];
+    [self.logger debug:[NSString stringWithFormat:@"Setting CCPA privacy string: %@", ccpaPrivacyString ?: @"(cleared)"]];
     if (ccpaPrivacyString) {
         [[NSUserDefaults standardUserDefaults] setObject:ccpaPrivacyString forKey:kCLXPrivacyCCPAPrivacyKey];
     } else {
@@ -237,7 +237,7 @@
 }
 
 - (void)setHasUserConsent:(nullable NSNumber *)hasUserConsent {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXPrivacyService] Setting GDPR consent: %@", hasUserConsent ? (hasUserConsent.boolValue ? @"YES" : @"NO") : @"(cleared)"]];
+    [self.logger debug:[NSString stringWithFormat:@"Setting GDPR consent: %@", hasUserConsent ? (hasUserConsent.boolValue ? @"YES" : @"NO") : @"(cleared)"]];
     if (hasUserConsent) {
         [[NSUserDefaults standardUserDefaults] setBool:[hasUserConsent boolValue] forKey:kCLXPrivacyGDPRAppliesKey];
     } else {
@@ -247,7 +247,7 @@
 }
 
 - (void)setIsAgeRestrictedUser:(nullable NSNumber *)isAgeRestrictedUser {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXPrivacyService] Setting COPPA flag: %@", isAgeRestrictedUser ? (isAgeRestrictedUser.boolValue ? @"YES" : @"NO") : @"(cleared)"]];
+    [self.logger debug:[NSString stringWithFormat:@"Setting COPPA flag: %@", isAgeRestrictedUser ? (isAgeRestrictedUser.boolValue ? @"YES" : @"NO") : @"(cleared)"]];
     if (isAgeRestrictedUser) {
         [[NSUserDefaults standardUserDefaults] setBool:[isAgeRestrictedUser boolValue] forKey:kCLXPrivacyCOPPAAppliesKey];
     } else {
@@ -263,7 +263,7 @@
         // CCPA string format: "1YNN" = opt-out, "1NNN" = no opt-out
         ccpaString = doNotSell.boolValue ? @"1YNN" : @"1NNN";
     }
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXPrivacyService] Setting do not sell: %@ (CCPA: %@)", doNotSell ? (doNotSell.boolValue ? @"YES" : @"NO") : @"(cleared)", ccpaString ?: @"(cleared)"]];
+    [self.logger debug:[NSString stringWithFormat:@"Setting do not sell: %@ (CCPA: %@)", doNotSell ? (doNotSell.boolValue ? @"YES" : @"NO") : @"(cleared)", ccpaString ?: @"(cleared)"]];
     [self setCCPAPrivacyString:ccpaString];
 }
 
@@ -271,13 +271,13 @@
 
 - (nullable NSString *)gppString {
     NSString *gppString = [[CLXGPPProvider sharedInstance] gppString];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXPrivacyService] GPP string: %@", gppString ?: @"(none)"]];
+    [self.logger verbose:[NSString stringWithFormat:@"GPP string: %@", gppString ?: @"(none)"]];
     return gppString;
 }
 
 - (nullable NSArray<NSNumber *> *)gppSid {
     NSArray<NSNumber *> *gppSid = [[CLXGPPProvider sharedInstance] gppSid];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXPrivacyService] GPP SID: %@", gppSid ?: @"(none)"]];
+    [self.logger debug:[NSString stringWithFormat:@"GPP SID: %@", gppSid ?: @"(none)"]];
     return gppSid;
 }
 
@@ -286,18 +286,18 @@
 - (void)setGppString:(NSString *)gppString {
     [[CLXGPPProvider sharedInstance] setGppString:gppString];
     if (gppString) {
-        [self.logger info:[NSString stringWithFormat:@"🔧 [CLXPrivacyService] GPP string set: %@", gppString]];
+        [self.logger info:[NSString stringWithFormat:@"GPP string set: %@", gppString]];
     } else {
-        [self.logger info:@"🔧 [CLXPrivacyService] GPP string cleared"];
+        [self.logger info:@"GPP string cleared"];
     }
 }
 
 - (void)setGppSid:(NSArray<NSNumber *> *)gppSid {
     [[CLXGPPProvider sharedInstance] setGppSid:gppSid];
     if (gppSid && gppSid.count > 0) {
-        [self.logger info:[NSString stringWithFormat:@"🔧 [CLXPrivacyService] GPP SID set: %@", gppSid]];
+        [self.logger info:[NSString stringWithFormat:@"GPP SID set: %@", gppSid]];
     } else {
-        [self.logger info:@"🔧 [CLXPrivacyService] GPP SID cleared"];
+        [self.logger info:@"GPP SID cleared"];
     }
 }
 

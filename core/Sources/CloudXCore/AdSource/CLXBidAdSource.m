@@ -158,7 +158,7 @@ NS_ASSUME_NONNULL_BEGIN
     // Store correlation ID for this request
     self.currentCorrelationId = correlationId;
     
-    [self.logger info:[NSString stringWithFormat:@"[%@] 📊 [CLXBidAdSource] Auction started - AdUnit: %@, Placement: %@, AdType: %ld", correlationId, adUnitID, self.placementID, (long)self.adType]];
+    [self.logger info:[NSString stringWithFormat:@"[%@] Auction started - AdUnit: %@, Placement: %@, AdType: %ld", correlationId, adUnitID, self.placementID, (long)self.adType]];
     
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
@@ -174,10 +174,10 @@ NS_ASSUME_NONNULL_BEGIN
     
     // Create network name token dictionary from bidTokenSources
     [self makeNetworkNameTokenDictWithCompletion:^(NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *networkNameTokenDict) {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] Network name token dict: %@", networkNameTokenDict]];
+        [self.logger verbose:[NSString stringWithFormat:@"Network name token dict: %@", networkNameTokenDict]];
         
         // Create bid request
-        [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [CLXBidAdSource] Creating bid request...", correlationId]];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] Creating bid request...", correlationId]];
         __weak typeof(self) weakSelf = self;
         [self.bidNetworkService createBidRequestWithAdUnitID:adUnitID
                                           storedImpressionId:storedImpressionId
@@ -194,14 +194,14 @@ NS_ASSUME_NONNULL_BEGIN
                                                   completion:^(id _Nullable bidRequest, NSError * _Nullable error) {
             __strong typeof(weakSelf) strongSelf = weakSelf;
             if (!strongSelf) {
-                [self.logger error:@"❌ [CLXBidAdSource] Self reference lost in bid request creation block"];
+                [self.logger error:@"Self reference lost in bid request creation block"];
                 if (completion) {
                     completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Self reference lost"}]);
                 }
                 return;
             }
             
-            [self.logger debug:[NSString stringWithFormat:@"[%@] 📥 [CLXBidAdSource] Bid request creation completion called", correlationId]];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] [CLXBidAdSource] Bid request creation completion called", correlationId]];
             
             // Log the actual bid request JSON
             if (bidRequest) {
@@ -209,38 +209,38 @@ NS_ASSUME_NONNULL_BEGIN
                 NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bidRequest options:NSJSONWritingPrettyPrinted error:&jsonError];
                 if (jsonData && !jsonError) {
                     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-                    [self.logger debug:[NSString stringWithFormat:@"[%@] 📊 [CLXBidAdSource] BidRequest JSON:\n%@", correlationId, jsonString]];
+                    [self.logger verbose:[NSString stringWithFormat:@"[%@] BidRequest JSON:\n%@", correlationId, jsonString]];
                 } else {
-                    [self.logger debug:[NSString stringWithFormat:@"[%@] 📊 [CLXBidAdSource] BidRequest: %@", correlationId, bidRequest]];
+                    [self.logger verbose:[NSString stringWithFormat:@"[%@] BidRequest: %@", correlationId, bidRequest]];
                 }
             } else {
-                [self.logger debug:[NSString stringWithFormat:@"[%@] 📊 [CLXBidAdSource] BidRequest: (null)", correlationId]];
+                [self.logger debug:[NSString stringWithFormat:@"[%@] BidRequest: (null)", correlationId]];
             }
             
-            [self.logger debug:[NSString stringWithFormat:@"[%@] 📊 [CLXBidAdSource] Error: %@", correlationId, error]];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] Error: %@", correlationId, error]];
             
             if (error) {
-                [self.logger error:[NSString stringWithFormat:@"❌ [CLXBidAdSource] Bid request creation failed with error: %@", error.localizedDescription]];
+                [self.logger error:[NSString stringWithFormat:@"Bid request creation failed with error: %@", error.localizedDescription]];
                 if (completion) {
                     completion(nil, error);
                 }
                 return;
             }
             
-            [self.logger info:[NSString stringWithFormat:@"[%@] ✅ [CLXBidAdSource] Bid request created successfully", correlationId]];
+            [self.logger info:[NSString stringWithFormat:@"[%@] Bid request created successfully", correlationId]];
             
             // Store bid request JSON in tracking field resolver
             if ([bidRequest isKindOfClass:[NSDictionary class]]) {
                 NSString *auctionId = bidRequest[@"id"];
                 if (auctionId) {
                     [[CLXTrackingFieldResolver shared] setRequestData:auctionId bidRequestJSON:(NSDictionary *)bidRequest];
-                    [self.logger debug:[NSString stringWithFormat:@"[%@] 📊 [CLXBidAdSource] Stored bid request JSON for auction: %@", correlationId, auctionId]];
+                    [self.logger debug:[NSString stringWithFormat:@"[%@] Stored bid request JSON for auction: %@", correlationId, auctionId]];
                 }
             }
             
             // 🧪 Check if CDP endpoint is available for bid request enrichment
             if (!strongSelf.bidNetworkService.isCDPEndpointEmpty) {
-                [self.logger info:@"🔧 [CLXBidAdSource] CDP endpoint available - enriching bid request before auction"];
+                [self.logger info:@"CDP endpoint available - enriching bid request before auction"];
                 
                 // Get app key for CDP authentication
                 NSString *currentAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
@@ -251,7 +251,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               completion:^(id _Nullable enrichedBidRequest, NSError * _Nullable cdpError) {
                     __strong typeof(weakSelf) strongSelf = weakSelf;
                     if (!strongSelf) {
-                        [self.logger error:@"❌ [CLXBidAdSource] Self reference lost in CDP completion block"];
+                        [self.logger error:@"Self reference lost in CDP completion block"];
                         if (completion) {
                             completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Self reference lost"}]);
                         }
@@ -260,7 +260,7 @@ NS_ASSUME_NONNULL_BEGIN
                     
                     // Handle CDP errors
                     if (cdpError) {
-                        [self.logger error:[NSString stringWithFormat:@"[%@] ⚠️ [CLXBidAdSource] CDP enrichment failed: %@ - proceeding with original request", correlationId, cdpError.localizedDescription]];
+                        [self.logger error:[NSString stringWithFormat:@"[%@] [CLXBidAdSource] CDP enrichment failed: %@ - proceeding with original request", correlationId, cdpError.localizedDescription]];
                         [strongSelf startAuctionWithFinalBidRequest:bidRequest
                                                       correlationId:correlationId
                                                          completion:completion];
@@ -273,7 +273,7 @@ NS_ASSUME_NONNULL_BEGIN
                     //                   (useful for inspection, monitoring, request/response modification)
                     
                     if (!enrichedBidRequest || ![enrichedBidRequest isKindOfClass:[NSDictionary class]]) {
-                        [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [CLXBidAdSource] No enriched request from CDP - using original", correlationId]];
+                        [self.logger debug:[NSString stringWithFormat:@"[%@] No enriched request from CDP - using original", correlationId]];
                         [strongSelf startAuctionWithFinalBidRequest:bidRequest
                                                       correlationId:correlationId
                                                          completion:completion];
@@ -292,11 +292,11 @@ NS_ASSUME_NONNULL_BEGIN
                     
                     if (isAuctionResponse) {
                         // MODE 1: CDP returned full auction response (proxy/gateway behavior)
-                        [self.logger info:@"🎯 [CLXBidAdSource] CDP PROXY mode - processing auction response"];
+                        [self.logger debug:@"[CLXBidAdSource] CDP PROXY mode - processing auction response"];
                         
                         // Validate auction response structure
                         if (!hasAuctionId) {
-                            [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [CLXBidAdSource] CDP proxy response invalid - falling back to direct auction", correlationId]];
+                            [self.logger error:[NSString stringWithFormat:@"[%@] CDP proxy response invalid - falling back to direct auction", correlationId]];
                             [strongSelf startAuctionWithFinalBidRequest:bidRequest
                                                           correlationId:correlationId
                                                              completion:completion];
@@ -307,14 +307,14 @@ NS_ASSUME_NONNULL_BEGIN
                         CLXBidResponse *bidResponse = [CLXBidResponse parseBidResponseFromDictionary:cdpResponse];
                         
                         if (!bidResponse) {
-                            [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [CLXBidAdSource] Failed to parse CDP response - falling back to direct auction", correlationId]];
+                            [self.logger error:[NSString stringWithFormat:@"[%@] Failed to parse CDP response - falling back to direct auction", correlationId]];
                             [strongSelf startAuctionWithFinalBidRequest:bidRequest
                                                           correlationId:correlationId
                                                              completion:completion];
                             return;
                         }
                         
-                        [self.logger info:[NSString stringWithFormat:@"✅ [CLXBidAdSource] CDP proxy returned %lu bids",
+                        [self.logger info:[NSString stringWithFormat:@"CDP proxy returned %lu bids",
                                           (unsigned long)[bidResponse allBids].count]];
                         
                         // Store the bid response for LURL firing
@@ -323,7 +323,7 @@ NS_ASSUME_NONNULL_BEGIN
                         // Store original bid response JSON for tracking
                         if (bidResponse.id && cdpResponse) {
                             [[CLXTrackingFieldResolver shared] setResponseData:bidResponse.id bidResponseJSON:cdpResponse];
-                            [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] 📊 [CLXBidAdSource] Stored original bid response JSON for auction: %@", correlationId, bidResponse.id]];
+                            [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] Stored original bid response JSON for auction: %@", correlationId, bidResponse.id]];
                         }
                         
                         // Pre-cache all bids for win/loss tracking
@@ -332,7 +332,7 @@ NS_ASSUME_NONNULL_BEGIN
                             for (CLXBidResponseBid *bid in allBids) {
                                 [strongSelf.winLossTracker addBid:bidResponse.id bid:bid];
                             }
-                            [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] 📊 [CLXBidAdSource] Registered %lu bids for auction: %@",
+                            [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] Registered %lu bids for auction: %@",
                                                      correlationId, (unsigned long)allBids.count, bidResponse.id]];
                         }
                         
@@ -344,11 +344,11 @@ NS_ASSUME_NONNULL_BEGIN
                                                       completion:completion];
                     } else {
                         // MODE 2: CDP returned enriched bid request (enrichment behavior)
-                        [self.logger info:@"✅ [CLXBidAdSource] CDP ENRICHMENT mode - proceeding to auction"];
+                        [self.logger info:@"CDP ENRICHMENT mode - proceeding to auction"];
                         
                         // Validate enriched request has required fields
                         if (!hasBidRequestFields) {
-                            [self.logger error:[NSString stringWithFormat:@"[%@] ⚠️ [CLXBidAdSource] CDP enrichment invalid - using original request", correlationId]];
+                            [self.logger error:[NSString stringWithFormat:@"[%@] [CLXBidAdSource] CDP enrichment invalid - using original request", correlationId]];
                             [strongSelf startAuctionWithFinalBidRequest:bidRequest
                                                           correlationId:correlationId
                                                              completion:completion];
@@ -362,7 +362,7 @@ NS_ASSUME_NONNULL_BEGIN
                     }
                 }];
             } else {
-                [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [CLXBidAdSource] No CDP endpoint - proceeding directly to auction", correlationId]];
+                [self.logger debug:[NSString stringWithFormat:@"[%@] No CDP endpoint - proceeding directly to auction", correlationId]];
                 [strongSelf startAuctionWithFinalBidRequest:bidRequest
                                               correlationId:correlationId
                                                  completion:completion];
@@ -378,13 +378,13 @@ NS_ASSUME_NONNULL_BEGIN
     // Start auction
     NSString *currentAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
     if (!currentAppKey || currentAppKey.length == 0) {
-        [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [CLXBidAdSource] No app key found in UserDefaults", correlationId]];
+        [self.logger error:[NSString stringWithFormat:@"[%@] No app key found in UserDefaults", correlationId]];
         if (completion) {
             completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:1 userInfo:@{NSLocalizedDescriptionKey: @"No app key found"}]);
         }
         return;
     }
-    [self.logger debug:[NSString stringWithFormat:@"[%@] 📡 [CLXBidAdSource] Starting auction with AppKey: %@", correlationId, currentAppKey]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] [CLXBidAdSource] Starting auction with AppKey: %@", correlationId, currentAppKey]];
     
     __weak typeof(self) weakSelf = self;
     [self.bidNetworkService startAuctionWithBidRequest:bidRequest
@@ -393,14 +393,14 @@ NS_ASSUME_NONNULL_BEGIN
                                              completion:^(CLXBidResponse * _Nullable response, NSDictionary * _Nullable rawJSON, NSError * _Nullable error) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         if (!strongSelf) {
-            [self.logger error:@"❌ [CLXBidAdSource] Self reference lost in auction completion block"];
+            [self.logger error:@"Self reference lost in auction completion block"];
             if (completion) {
                 completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Self reference lost"}]);
             }
             return;
         }
 
-        [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] 📥 [CLXBidAdSource] Auction completion - Response: %@, Error: %@", correlationId, response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
+        [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] [CLXBidAdSource] Auction completion - Response: %@, Error: %@", correlationId, response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
         
         if (error) {
             // Error already logged by network layer - just propagate to delegate
@@ -416,7 +416,7 @@ NS_ASSUME_NONNULL_BEGIN
         // Store original bid response JSON in tracking field resolver for efficient field resolution
         if (response.id && rawJSON) {
             [[CLXTrackingFieldResolver shared] setResponseData:response.id bidResponseJSON:rawJSON];
-            [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] 📊 [CLXBidAdSource] Stored original bid response JSON for auction: %@", correlationId, response.id]];
+            [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] Stored original bid response JSON for auction: %@", correlationId, response.id]];
         }
         
         // Pre-cache all bids with loss payloads for win/loss tracking
@@ -429,7 +429,7 @@ NS_ASSUME_NONNULL_BEGIN
             }
             
             // No pre-caching - events fire immediately when they occur
-            [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] 📊 [CLXBidAdSource] Registered %lu bids for auction: %@", 
+            [strongSelf.logger debug:[NSString stringWithFormat:@"[%@] Registered %lu bids for auction: %@", 
                                      correlationId, (unsigned long)allBids.count, response.id]];
         }
         
@@ -446,7 +446,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *networkNameTokenDict = [NSMutableDictionary dictionary];
     
     if (self.bidTokenSources.count == 0) {
-        [self.logger debug:@"⚠️ [CLXBidAdSource] No bid token sources available"];
+        [self.logger debug:@"[CLXBidAdSource] No bid token sources available"];
         if (completion) {
             completion([networkNameTokenDict copy]);
         }
@@ -462,19 +462,19 @@ NS_ASSUME_NONNULL_BEGIN
         dispatch_group_enter(group);
         [tokenSource getTokenWithCompletion:^(NSDictionary<NSString *,NSString *> * _Nullable token, NSError * _Nullable error) {
             if (error) {
-                [self.logger error:[NSString stringWithFormat:@"❌ [CLXBidAdSource] Failed to get token for adapter %@: %@", adapterName, error.localizedDescription]];
+                [self.logger error:[NSString stringWithFormat:@"Failed to get token for adapter %@: %@", adapterName, error.localizedDescription]];
             } else if (token) {
-                [self.logger debug:[NSString stringWithFormat:@"✅ [CLXBidAdSource] Got token for adapter %@: %@", adapterName, token]];
+                [self.logger verbose:[NSString stringWithFormat:@"Got token for adapter %@: %@", adapterName, token]];
                 networkNameTokenDict[adapterName] = token;
             } else {
-                [self.logger debug:[NSString stringWithFormat:@"⚠️ [CLXBidAdSource] No token returned for adapter %@", adapterName]];
+                [self.logger debug:[NSString stringWithFormat:@"[CLXBidAdSource] No token returned for adapter %@", adapterName]];
             }
             dispatch_group_leave(group);
         }];
     }
     
     dispatch_group_notify(group, queue, ^{
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CLXBidAdSource] Network name token dict created: %@", networkNameTokenDict]];
+        [self.logger verbose:[NSString stringWithFormat:@"Network name token dict created: %@", networkNameTokenDict]];
         if (completion) {
             completion([networkNameTokenDict copy]);
         }
@@ -490,14 +490,14 @@ NS_ASSUME_NONNULL_BEGIN
     NSArray<CLXBidResponseBid *> *sortedBids = [response getAllBidsForWaterfall];
     
     if (sortedBids.count == 0) {
-        [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [CLXBidAdSource] No bids found in response", correlationId]];
+        [self.logger error:[NSString stringWithFormat:@"[%@] No bids found in response", correlationId]];
         if (completion) {
             completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:CLXBidAdSourceErrorNoBid userInfo:@{NSLocalizedDescriptionKey: @"No bids in auction response."}]);
         }
         return;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"[%@] 🔄 [CLXBidAdSource] Starting waterfall with %lu bids", correlationId, (unsigned long)sortedBids.count]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] [CLXBidAdSource] Starting waterfall with %lu bids", correlationId, (unsigned long)sortedBids.count]];
     
     // Try bids in waterfall order 
     [self tryNextBidInWaterfall:sortedBids 
@@ -516,7 +516,7 @@ NS_ASSUME_NONNULL_BEGIN
                    completion:(void (^)(CLXBidAdSourceResponse * _Nullable, NSError * _Nullable))completion {
     
     if (bidIndex >= sortedBids.count) {
-        [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [CLXBidAdSource] All bids failed in waterfall", correlationId]];
+        [self.logger error:[NSString stringWithFormat:@"[%@] All bids failed in waterfall", correlationId]];
         if (completion) {
             completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:CLXBidAdSourceErrorNoBid userInfo:@{NSLocalizedDescriptionKey: @"All bids failed in waterfall."}]);
         }
@@ -524,7 +524,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
     
     CLXBidResponseBid *currentBid = sortedBids[bidIndex];
-    [self.logger debug:[NSString stringWithFormat:@"[%@] 🔄 [CLXBidAdSource] Trying bid %ld/%lu: rank=%ld, id=%@", 
+    [self.logger debug:[NSString stringWithFormat:@"[%@] [CLXBidAdSource] Trying bid %ld/%lu: rank=%ld, id=%@", 
                        correlationId, (long)bidIndex + 1, (unsigned long)sortedBids.count, 
                        (long)currentBid.ext.cloudx.rank, currentBid.id]];
     
@@ -539,14 +539,14 @@ NS_ASSUME_NONNULL_BEGIN
         
         if (testAd != nil) {
             // SUCCESS - This bid can be created (but not yet confirmed as loaded)
-            [self.logger info:[NSString stringWithFormat:@"[%@] ✅ [CLXBidAdSource] Waterfall success with bid %ld: rank=%ld, id=%@", 
+            [self.logger info:[NSString stringWithFormat:@"[%@] Waterfall success with bid %ld: rank=%ld, id=%@", 
                               correlationId, (long)bidIndex + 1, (long)currentBid.ext.cloudx.rank, currentBid.id]];
             
             [self.appSessionService bidLoadedWithPlacementID:currentBid.id latency:self.latency];
             
             // NOTE: Don't fire lurls here - wait until winner actually loads successfully
             // This prevents premature lurl firing for bids that might still be needed as fallbacks
-            [self.logger debug:[NSString stringWithFormat:@"[%@] 📊 [CLXBidAdSource] Deferring lurl firing until winner loads successfully", correlationId]];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] Deferring lurl firing until winner loads successfully", correlationId]];
             
             if (completion) {
                 completion(bidAdSourceResponse, nil);
@@ -557,7 +557,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     // FIRST FILTERING PHASE - This bid is completely discarded because it couldn't create a banner instance
     // We know it definitely can't show an ad, so send loss notification immediately with TechnicalError
-    [self.logger debug:[NSString stringWithFormat:@"[%@] ❌ [CLXBidAdSource] Bid %ld failed creation: rank=%ld, id=%@", 
+    [self.logger debug:[NSString stringWithFormat:@"[%@] Bid %ld failed creation: rank=%ld, id=%@", 
                        correlationId, (long)bidIndex + 1, (long)currentBid.ext.cloudx.rank, currentBid.id]];
     
     // Send server-side loss notification for adapter creation failures
@@ -613,14 +613,14 @@ NS_ASSUME_NONNULL_BEGIN
                                                clxAd:clxAd
                                           createBidAd:^id{
         NSString *correlationId = self.currentCorrelationId ?: @"unknown";
-        [self.logger debug:[NSString stringWithFormat:@"[%@] 🔧 [CLXBidAdSource] createBidAd block called", correlationId]];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] createBidAd block called", correlationId]];
         if (self.createBidAd) {
-            [self.logger debug:[NSString stringWithFormat:@"[%@] ✅ [CLXBidAdSource] Calling original createBidAd function...", correlationId]];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] Calling original createBidAd function...", correlationId]];
             id result = self.createBidAd(bid.adid ?: @"", bid.id ?: @"", bid.adm ?: @"", bid.ext.cloudx.adapterExtras ?: @{}, bid.burl, self.hasCloseButton, networkName);
-            [self.logger debug:[NSString stringWithFormat:@"[%@] 📊 [CLXBidAdSource] createBidAd result: %@", correlationId, result]];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] createBidAd result: %@", correlationId, result]];
             return result;
         } else {
-            [self.logger debug:[NSString stringWithFormat:@"[%@] ❌ [CLXBidAdSource] createBidAd function is nil", correlationId]];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] createBidAd function is nil", correlationId]];
             return nil;
         }
     }];

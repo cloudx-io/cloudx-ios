@@ -140,7 +140,6 @@ static id<CLXWinLossTracking> _testInstance = nil;
 
 - (void)setAppKey:(NSString *)appKey {
     _appKey = [appKey copy];
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [WinLossTracker] App key set: %@", appKey ? @"YES" : @"NO"]];
 }
 
 - (void)setEndpoint:(nullable NSString *)endpointUrl {
@@ -151,13 +150,10 @@ static id<CLXWinLossTracking> _testInstance = nil;
         NSURLSession *urlSession = [NSURLSession cloudxSessionWithIdentifier:@"winloss"];
         self.networkService = [[CLXWinLossNetworkService alloc] initWithBaseURL:endpointUrl urlSession:urlSession];
     }
-    
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [WinLossTracker] Endpoint set: %@", endpointUrl ?: @"(nil)"]];
 }
 
 - (void)setConfig:(CLXSDKConfigResponse *)config {
     [self.winLossFieldResolver setConfig:config];
-    [self.logger debug:@"🔧 [WinLossTracker] Config set for field resolver"];
 }
 
 - (void)trySendingPendingWinLossEvents {
@@ -168,7 +164,6 @@ static id<CLXWinLossTracking> _testInstance = nil;
         return;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"🔄 [WinLossTracker] Retrying %lu cached events", (unsigned long)cachedEvents.count]];
     [self sendCachedEvents:cachedEvents];
 }
 
@@ -197,7 +192,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
         CLXBidResponseBid *bid = [self.auctionBidManager getBid:auctionId bidId:bidId];
         
         if (!bid) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] No bid found for event: %@", bidId]];
+            [self.logger error:[NSString stringWithFormat:@"No bid found for event: %@", bidId]];
             return;
         }
         
@@ -217,7 +212,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
         
         if (payload) {
             NSString *eventName = event.notificationType.length > 0 ? event.notificationType : @"BidReceived";
-            [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossTracker] %@: %@ ($%.2f) [%@]", 
+            [self.logger verbose:[NSString stringWithFormat:@"%@: %@ ($%.2f) [%@]", 
                                eventName, bidId, loadedBidPrice, event.urlType]];
             
             // Log complete payload structure for testing/debugging
@@ -227,13 +222,13 @@ static id<CLXWinLossTracking> _testInstance = nil;
                                                                  error:&jsonError];
             if (jsonData) {
                 NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-                [self.logger debug:[NSString stringWithFormat:@"📦 [WinLossTracker] Complete payload:\n%@", jsonString]];
+                [self.logger verbose:[NSString stringWithFormat:@"Complete payload:\n%@", jsonString]];
                 
                 // Log presence of critical fields
                 BOOL hasBid = payload[@"bid"] != nil;
                 BOOL hasLossReasonCode = payload[@"lossReasonCode"] != nil;
                 BOOL hasDeviceTypeCode = payload[@"deviceTypeCode"] != nil;
-                [self.logger debug:[NSString stringWithFormat:@"✅ [WinLossTracker] Critical fields - bid: %@, lossReasonCode: %@, deviceTypeCode: %@", 
+                [self.logger verbose:[NSString stringWithFormat:@"Critical fields - bid: %@, lossReasonCode: %@, deviceTypeCode: %@", 
                                    hasBid ? @"YES" : @"NO",
                                    hasLossReasonCode ? @"YES" : @"NO", 
                                    hasDeviceTypeCode ? @"YES" : @"NO"]];
@@ -242,7 +237,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
             // Fire event immediately (no state management)
             [self trackWinLoss:payload auctionId:auctionId bidId:bidId];
         } else {
-            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] %@ payload failed: %@", 
+            [self.logger error:[NSString stringWithFormat:@"%@ payload failed: %@", 
                                event.notificationType, bidId]];
         }
     });
@@ -296,10 +291,6 @@ static id<CLXWinLossTracking> _testInstance = nil;
             lossCount++;
         }
     }
-    
-    if (lossCount > 0) {
-        [self.logger debug:[NSString stringWithFormat:@"📤 [WinLossTracker] Sent %ld LOSS events (LOST_TO_HIGHER_BID)", (long)lossCount]];
-    }
 }
 
 - (void)clearAuction:(NSString *)auctionId {
@@ -321,7 +312,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
     NSError *error = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dictionary options:0 error:&error];
     if (error || !jsonData) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Failed to serialize dictionary: %@", error]];
+        [self.logger error:[NSString stringWithFormat:@"Failed to serialize dictionary: %@", error]];
         return nil;
     }
     
@@ -342,10 +333,8 @@ static id<CLXWinLossTracking> _testInstance = nil;
                                    @");";
         
         BOOL success = [self.database executeSQL:createTableSQL];
-        if (success) {
-            [self.logger debug:@"✅ Win/loss events table created (simplified schema)"];
-        } else {
-            [self.logger error:@"❌ Failed to create win/loss events table"];
+        if (!success) {
+            [self.logger error:@"Failed to create win/loss events table"];
         }
     } else {
         // Migrate from old complex schema to new simplified schema
@@ -372,11 +361,8 @@ static id<CLXWinLossTracking> _testInstance = nil;
     hasSimplifiedSchema = !hasStateColumn && columns.count == 5;
     
     if (hasSimplifiedSchema) {
-        [self.logger debug:@"✅ Database already using simplified schema"];
         return;
     }
-    
-    [self.logger debug:@"🔄 Migrating to simplified schema..."];
     
     // Create new simplified table
     NSString *createNewTableSQL = @"CREATE TABLE cached_win_loss_events_table_new ("
@@ -407,10 +393,8 @@ static id<CLXWinLossTracking> _testInstance = nil;
         
         // Rename new table
         [self.database executeSQL:@"ALTER TABLE cached_win_loss_events_table_new RENAME TO cached_win_loss_events_table;"];
-        
-        [self.logger debug:@"✅ Database migrated to simplified schema successfully"];
     } else {
-        [self.logger error:@"❌ Failed to create new simplified table during migration"];
+        [self.logger error:@"Failed to create new simplified table during migration"];
     }
 }
 
@@ -425,20 +409,20 @@ static id<CLXWinLossTracking> _testInstance = nil;
     
     NSString *endpoint = self.endpointUrl;
     if (!endpoint || endpoint.length == 0) {
-        [self.logger error:@"❌ [WinLossTracker] No endpoint configured for win/loss notification"];
+        [self.logger error:@"No endpoint configured for win/loss notification"];
         return;
     }
     
     NSString *appKey = self.appKey;
     if (!appKey || appKey.length == 0) {
-        [self.logger error:@"❌ [WinLossTracker] No app key configured for win/loss notification"];
+        [self.logger error:@"No app key configured for win/loss notification"];
         return;
     }
     
     // Convert payload to JSON string
     NSString *payloadJson = [self jsonStringFromDictionary:payload];
     if (!payloadJson) {
-        [self.logger error:@"❌ [WinLossTracker] Failed to serialize payload"];
+        [self.logger error:@"Failed to serialize payload"];
         return;
     }
     
@@ -457,7 +441,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
                 [self deleteEventWithId:[eventId stringValue]];
             }
         } else {
-            [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Send failed: %@", 
+            [self.logger error:[NSString stringWithFormat:@"Send failed: %@", 
                                error ? error.localizedDescription : @"Unknown error"]];
             // Keep in database for retry
         }
@@ -472,7 +456,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
                            bidId:(NSString *)bidId
                          payload:(NSString *)payloadJson {
     if (!auctionId || !bidId || !payloadJson) {
-        [self.logger error:@"❌ [WinLossTracker] Cannot save event with nil parameters"];
+        [self.logger error:@"Cannot save event with nil parameters"];
         return nil;
     }
     
@@ -491,11 +475,10 @@ static id<CLXWinLossTracking> _testInstance = nil;
         if (rows.count > 0) {
             NSDictionary *row = rows[0];
             NSNumber *eventId = row[@"last_insert_rowid()"];
-            [self.logger debug:[NSString stringWithFormat:@"💾 [WinLossTracker] Saved event ID: %@", eventId]];
             return eventId;
         }
     } else {
-        [self.logger error:@"❌ [WinLossTracker] Failed to save event to database"];
+        [self.logger error:@"Failed to save event to database"];
     }
     
     return nil;
@@ -509,12 +492,12 @@ static id<CLXWinLossTracking> _testInstance = nil;
     NSString *appKey = self.appKey;
     
     if (!endpoint || endpoint.length == 0) {
-        [self.logger error:@"❌ [WinLossTracker] No endpoint configured for cached events"];
+        [self.logger error:@"No endpoint configured for cached events"];
         return;
     }
     
     if (!appKey || appKey.length == 0) {
-        [self.logger error:@"❌ [WinLossTracker] No app key configured for cached events"];
+        [self.logger error:@"No app key configured for cached events"];
         return;
     }
     
@@ -529,10 +512,9 @@ static id<CLXWinLossTracking> _testInstance = nil;
                                         payload:payload
                                      completion:^(BOOL success, NSError * _Nullable error) {
                 if (success) {
-                    [self.logger debug:[NSString stringWithFormat:@"✅ [WinLossTracker] Cached event sent successfully: %@", cachedEvent.eventId]];
                     [self deleteEventWithId:cachedEvent.eventId];
                 } else {
-                    [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Cached event failed: %@", cachedEvent.eventId]];
+                    [self.logger error:[NSString stringWithFormat:@"Cached event failed: %@", cachedEvent.eventId]];
                 }
             }];
         }
@@ -555,7 +537,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
     NSError *error = nil;
     NSDictionary *payload = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
     if (error) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Failed to parse cached payload: %@", error]];
+        [self.logger error:[NSString stringWithFormat:@"Failed to parse cached payload: %@", error]];
         return nil;
     }
     
@@ -592,7 +574,6 @@ static id<CLXWinLossTracking> _testInstance = nil;
         [events addObject:event];
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"Retrieved %lu pending cached events", (unsigned long)events.count]];
     return [events copy];
 }
 
@@ -614,10 +595,8 @@ static id<CLXWinLossTracking> _testInstance = nil;
     NSArray *parameters = @[eventId];
     
     BOOL success = [self.database executeSQL:deleteSQL withParameters:parameters];
-    if (success) {
-        [self.logger debug:[NSString stringWithFormat:@"🗑️ [WinLossTracker] Deleted event with ID: %@", eventId]];
-    } else {
-        [self.logger error:[NSString stringWithFormat:@"❌ [WinLossTracker] Failed to delete event with ID: %@", eventId]];
+    if (!success) {
+        [self.logger error:[NSString stringWithFormat:@"Failed to delete event with ID: %@", eventId]];
     }
 }
 
@@ -625,9 +604,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
     NSString *deleteAllSQL = @"DELETE FROM cached_win_loss_events_table;";
     
     BOOL success = [self.database executeSQL:deleteAllSQL];
-    if (success) {
-        [self.logger debug:@"Deleted all cached events"];
-    } else {
+    if (!success) {
         [self.logger error:@"Failed to delete all cached events"];
     }
 }

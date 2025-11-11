@@ -52,6 +52,8 @@
     
     // Enable verbose logging for demo app
     [CloudXCore setLoggingEnabled:YES];
+    [CloudXCore setMinLogLevel:CLXLogLevelVerbose];
+    [CloudXCore setLoggingEmojisEnabled:YES];
     
     // DEMO APP ONLY: Force test mode for all bid requests
     // This internal flag ensures test=1 is always set in bid requests for demo app

@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -209,11 +210,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Set minimum log level for SDK logging
- * @param minLogLevel The minimum log level (0=Verbose, 1=Debug, 2=Info, 3=Warning, 4=Error)
+ * @param minLogLevel The minimum log level (CLXLogLevelVerbose, CLXLogLevelDebug, CLXLogLevelInfo, CLXLogLevelWarn, CLXLogLevelError)
  * @discussion Controls which log messages are displayed. Only logs at or above this level will be shown.
  * Call this method early in your app lifecycle, before SDK initialization.
  */
-+ (void)setMinLogLevel:(NSInteger)minLogLevel;
++ (void)setMinLogLevel:(CLXLogLevel)minLogLevel;
+
+/**
+ * Enable or disable emojis in logs
+ * @param enabled YES to show emojis (default), NO for plain text
+ * @discussion Disable emojis when exporting logs to systems that don't support them (Datadog, Splunk, etc)
+ */
++ (void)setLoggingEmojisEnabled:(BOOL)enabled;
 
 #pragma mark - SDK Lifecycle
 

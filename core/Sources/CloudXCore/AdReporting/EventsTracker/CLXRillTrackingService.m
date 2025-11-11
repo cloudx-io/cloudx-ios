@@ -46,17 +46,17 @@
                              placementID:(NSString *)placementID
                                loadCount:(NSInteger)loadCount {
     if (!bidResponse || !impModel) {
-        [self.logger debug:@"Missing bid response or impression model for Rill tracking"];
+        [self.logger debug:@"Missing bid response or impression model for Analytics tracking"];
         return NO;
     }
     
     NSString *accountId = impModel.accountID;
     if (!accountId || accountId.length == 0) {
-        [self.logger debug:@"No account ID available for Rill tracking"];
+        [self.logger debug:@"No account ID available for Analytics tracking"];
         return NO;
     }
     
-    // Create Rill impression model using banner approach
+    // Create Analytics impression model using banner approach
     CLXRillImpressionModel *model = [[CLXRillImpressionModel alloc] initWithLastBidResponse:bidResponse 
                                                                                    impModel:impModel 
                                                                                 adapterName:bidResponse.networkName 
@@ -66,7 +66,7 @@
     // Build tracking payload string
     NSString *payloadString = [CLXRillImpressionInitService createDataStringWithRillImpressionModel:model];
     if (!payloadString || payloadString.length == 0) {
-        [self.logger debug:@"No payload string available for Rill tracking"];
+        [self.logger debug:@"No payload string available for Analytics tracking"];
         return NO;
     }
     
@@ -79,7 +79,7 @@
     _encodedString = [encrypted urlQueryEncodedString];
     _campaignId = [campaignId urlQueryEncodedString];
     
-    [self.logger debug:[NSString stringWithFormat:@"Rill tracking data configured successfully - Campaign ID: %@", _campaignId]];
+    [self.logger debug:[NSString stringWithFormat:@"Analytics tracking data configured successfully - Campaign ID: %@", _campaignId]];
     
     // Send bid request tracking event
     [self sendBidRequestEvent];
@@ -96,7 +96,7 @@
     [self.reportingService rillTrackingWithActionString:@"bidreqenc" 
                                              campaignId:self.campaignId 
                                           encodedString:self.encodedString];
-    [self.logger debug:@"Sent bid request Rill tracking event"];
+    [self.logger debug:@"Sent bid request Analytics tracking event"];
 }
 
 - (void)sendImpressionEvent {
@@ -108,7 +108,7 @@
     [self.reportingService rillTrackingWithActionString:@"sdkimpenc" 
                                              campaignId:self.campaignId 
                                           encodedString:self.encodedString];
-    [self.logger debug:@"Sent impression Rill tracking event"];
+    [self.logger debug:@"Sent impression Analytics tracking event"];
 }
 
 - (void)sendClickEvent {
@@ -120,7 +120,7 @@
     [self.reportingService rillTrackingWithActionString:@"clickenc" 
                                              campaignId:self.campaignId 
                                           encodedString:self.encodedString];
-    [self.logger debug:@"Sent click Rill tracking event"];
+    [self.logger debug:@"Sent click Analytics tracking event"];
 }
 
 - (BOOL)isReadyForTracking {

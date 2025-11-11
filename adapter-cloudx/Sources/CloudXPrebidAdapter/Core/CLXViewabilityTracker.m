@@ -63,11 +63,11 @@
  */
 - (instancetype)initWithView:(UIView *)view {
     self.logger = [[CLXLogger alloc] initWithCategory:@"CLXViewabilityTracker"];
-    [self.logger info:[NSString stringWithFormat:@"🚀 [VIEWABILITY-INIT] CLXViewabilityTracker initialization started - Tracked view: %p (%@)", view, NSStringFromClass([view class])]];
+    [self.logger debug:[NSString stringWithFormat:@"VIEWABILITY-INIT: CLXViewabilityTracker initialization started - Tracked view: %p (%@)", view, NSStringFromClass([view class])]];
     
     self = [super init];
     if (self) {
-        [self.logger info:@"✅ [VIEWABILITY-INIT] Super init successful"];
+        [self.logger verbose:@"Super init successful"];
         
         // Initialize core tracking properties
         _trackedView = view;
@@ -78,13 +78,13 @@
         _currentMeasurement = [[CLXViewabilityMeasurement alloc] init];
         _hasMetThreshold = NO;
         
-        [self.logger debug:[NSString stringWithFormat:@"📊 [VIEWABILITY-INIT] Standard: IAB (50%% for 1 second), Viewability threshold: %.1f%%, Time threshold: %.1f seconds, Measurement history initialized", _viewabilityThreshold * 100, _timeThreshold]];
+        [self.logger debug:[NSString stringWithFormat:@"Standard: IAB (50%% for 1 second), Viewability threshold: %.1f%%, Time threshold: %.1f seconds, Measurement history initialized", _viewabilityThreshold * 100, _timeThreshold]];
         
         // Register for app lifecycle notifications
         [self setupNotifications];
-        [self.logger info:@"🎯 [VIEWABILITY-INIT] CLXViewabilityTracker initialization completed successfully - Notifications configured"];
+        [self.logger debug:@"CLXViewabilityTracker initialization completed"];
     } else {
-        [self.logger error:@"❌ [VIEWABILITY-INIT] Super init failed"];
+        [self.logger error:@"Super init failed"];
     }
     return self;
 }
@@ -138,7 +138,7 @@
     // Perform initial measurement
     [self performViewabilityMeasurement];
     
-    [self.logger info:@"👁️ [VIEWABILITY] Started tracking with 60 FPS measurement"];
+    [self.logger debug:@"Started tracking with 60 FPS measurement"];
 }
 
 /**
@@ -157,7 +157,7 @@
         [self setViewableState:NO];
     }
     
-    [self.logger info:@"⏹️ [VIEWABILITY] Stopped tracking"];
+    [self.logger debug:@"Stopped tracking"];
 }
 
 - (void)checkViewability {
@@ -193,7 +193,7 @@
     if (!self.trackedView || !self.trackedView.superview) {
         // View was removed - stop tracking to avoid log spam
         if (self.isCurrentlyViewable) {
-            [self.logger info:@"📊 [VIEWABILITY] View removed from hierarchy, stopping tracker"];
+            [self.logger debug:@"View removed from hierarchy, stopping tracker"];
         }
         [self stopTracking];
         return;
@@ -210,7 +210,7 @@
     
     // Only log state changes, not every measurement
     if (isNowViewable != wasViewable) {
-        [self.logger info:[NSString stringWithFormat:@"📊 [VIEWABILITY] State change: %@ -> %@ (exposure: %.0f%%)", 
+        [self.logger debug:[NSString stringWithFormat:@"State change: %@ -> %@ (exposure: %.0f%%)", 
               wasViewable ? @"VIEWABLE" : @"NOT_VIEWABLE",
               isNowViewable ? @"VIEWABLE" : @"NOT_VIEWABLE",
               measurement.exposedPercentage * 100]];
@@ -224,7 +224,7 @@
         NSTimeInterval viewableTime = measurement.viewableTime;
         if (!self.hasMetThreshold && viewableTime >= self.timeThreshold) {
             self.hasMetThreshold = YES;
-            [self.logger info:[NSString stringWithFormat:@"🎯 [VIEWABILITY] IAB threshold met! Viewable time: %.2f seconds", viewableTime]];
+            [self.logger debug:[NSString stringWithFormat:@"[VIEWABILITY] IAB threshold met! Viewable time: %.2f seconds", viewableTime]];
             if ([self.delegate respondsToSelector:@selector(viewabilityTracker:didMeetViewabilityThreshold:)]) {
                 [self.delegate viewabilityTracker:self didMeetViewabilityThreshold:measurement];
             }

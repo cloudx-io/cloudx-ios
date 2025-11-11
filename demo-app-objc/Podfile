@@ -12,7 +12,8 @@ target 'CloudXObjCRemotePods' do
   pod 'CloudXCore', :path => '../core'
   pod 'CloudXMetaAdapter', :path => '../adapter-meta'
   pod 'CloudXPrebidAdapter', :path => '../adapter-cloudx'
-  pod 'CloudXVungleAdapter', :path => '../adapter-vungle'
+  # Vungle adapter temporarily removed - not configured server-side for this app
+  # pod 'CloudXVungleAdapter', :path => '../adapter-vungle'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths

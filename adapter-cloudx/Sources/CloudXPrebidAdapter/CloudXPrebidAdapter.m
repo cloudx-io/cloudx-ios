@@ -13,14 +13,14 @@
 + (NSString *)version {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXPrebidAdapter"];
     NSString *version = @"3.0.1";
-    [logger debug:[NSString stringWithFormat:@"📊 [VERSION] CloudXPrebidAdapter version requested: %@", version]];
+    [logger debug:[NSString stringWithFormat:@"CloudXPrebidAdapter version requested: %@", version]];
     return version;
 }
 
 + (NSString *)networkName {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXPrebidAdapter"];
     NSString *networkName = @"prebid";
-    [logger debug:[NSString stringWithFormat:@"📊 [NETWORK] CloudXPrebidAdapter network name requested: %@", networkName]];
+    [logger debug:[NSString stringWithFormat:@"CloudXPrebidAdapter network name requested: %@", networkName]];
     return networkName;
 }
 

@@ -439,7 +439,7 @@ static void initializeLogger() {
 
 + (CLXBidResponse *)parseBidResponseFromDictionary:(NSDictionary *)dictionary {
     if (!dictionary || ![dictionary isKindOfClass:[NSDictionary class]]) {
-        [logger error:@"❌ [BidResponse] Invalid dictionary provided for parsing"];
+        [logger error:@"Invalid dictionary provided for parsing"];
         return nil;
     }
     
@@ -471,7 +471,7 @@ static void initializeLogger() {
         response.seatbid = [seatbids copy];
     }
     
-    [logger info:[NSString stringWithFormat:@"✅ [BidResponse] Successfully parsed bid response with %lu seatbids", (unsigned long)response.seatbid.count]];
+    [logger info:[NSString stringWithFormat:@"Successfully parsed bid response with %lu seatbids", (unsigned long)response.seatbid.count]];
     return response;
 }
 

@@ -10,14 +10,37 @@ typedef NS_ENUM(NSInteger, CLXLogLevel) {
     CLXLogLevelError = 4
 };
 
+typedef NS_ENUM(NSInteger, CLXLogEmoji) {
+    CLXLogEmojiError,     // ❌
+    CLXLogEmojiWarn,      // ⚠️
+    CLXLogEmojiInfo,      // ℹ️
+    CLXLogEmojiDebug,     // 🐛
+    CLXLogEmojiVerbose,   // 🔍
+    CLXLogEmojiSuccess,   // ✅
+    CLXLogEmojiEvent      // 🎉
+};
+
 @interface CLXLogger : NSObject
 
 + (instancetype)shared;
 
 - (instancetype)initWithCategory:(NSString *)category;
+
+// Log at specific level with automatic emoji mapping
+- (void)verbose:(NSString *)message;
 - (void)debug:(NSString *)message;
 - (void)info:(NSString *)message;
+- (void)warn:(NSString *)message;
 - (void)error:(NSString *)message;
+
+// Log at specific level with custom emoji type
+- (void)logAtLevel:(CLXLogLevel)level 
+         emojiType:(CLXLogEmoji)emojiType 
+           message:(NSString *)message;
+
+// Convenience methods (INFO level + custom emoji)
+- (void)success:(NSString *)message;
+- (void)event:(NSString *)message;
 
 /**
  * Enable or disable logging dynamically
@@ -30,6 +53,13 @@ typedef NS_ENUM(NSInteger, CLXLogLevel) {
  * @param minLogLevel The minimum log level (CLXLogLevel)
  */
 - (void)setMinLogLevel:(CLXLogLevel)minLogLevel;
+
+/**
+ * Enable or disable emojis in logs
+ * @param enabled YES to show emojis (default), NO for plain text
+ * @discussion Disable emojis when exporting logs to systems that don't support them
+ */
+- (void)setEmojisEnabled:(BOOL)enabled;
 
 @end
 

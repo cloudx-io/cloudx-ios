@@ -48,7 +48,7 @@ static void initializeLogger() {
 }
 
 - (void)dealloc {
-    [logger debug:@"🔧 [CachedRewarded] dealloc called"];
+    [logger debug:@"dealloc called"];
     [self destroy];
 }
 
@@ -60,7 +60,7 @@ static void initializeLogger() {
 
 - (void)loadWithTimeout:(NSTimeInterval)timeout
              completion:(void (^)(NSError * _Nullable error))completion {
-    [logger debug:[NSString stringWithFormat:@"🔧 [CachedRewarded] loadWithTimeout: %f called", timeout]];
+    [logger debug:[NSString stringWithFormat:@"loadWithTimeout: %f called", timeout]];
     
     self.loadCompletion = completion;
     
@@ -68,7 +68,7 @@ static void initializeLogger() {
     self.loadingTimer = [NSTimer scheduledTimerWithTimeInterval:timeout
                                                          repeats:NO
                                                            block:^(NSTimer * _Nonnull timer) {
-        [logger debug:@"🔧 [CachedRewarded] Loading timer fired"];
+        [logger debug:@"Loading timer fired"];
         if (self.loadCompletion) {
             NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadTimeout 
                                                  description:@"Loading timeout"];
@@ -84,14 +84,14 @@ static void initializeLogger() {
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
-    [logger debug:[NSString stringWithFormat:@"🔧 [CachedRewarded] showFromViewController called - Ready: %d", self.rewarded.isReady]];
+    [logger debug:[NSString stringWithFormat:@"showFromViewController called - Ready: %d", self.rewarded.isReady]];
     
     [self.rewarded showFromViewController:viewController];
-    [logger info:@"✅ [CachedRewarded] showFromViewController call completed"];
+    [logger info:@"showFromViewController call completed"];
 }
 
 - (void)destroy {
-    [logger debug:@"🔧 [CachedRewarded] destroy called"];
+    [logger debug:@"destroy called"];
     
     // Invalidate timer
     [self.loadingTimer invalidate];
@@ -109,7 +109,7 @@ static void initializeLogger() {
 #pragma mark - CloudXAdapterRewardedDelegate
 
 - (void)didLoadWithRewarded:(id<CLXAdapterRewarded>)rewarded {
-    [logger debug:@"🔧 [CachedRewarded] didLoadWithRewarded called"];
+    [logger debug:@"didLoadWithRewarded called"];
     
     // Invalidate timer
     [self.loadingTimer invalidate];
@@ -128,7 +128,7 @@ static void initializeLogger() {
 }
 
 - (void)didFailToLoadWithRewarded:(id<CLXAdapterRewarded>)rewarded error:(NSError *)error {
-    [logger error:[NSString stringWithFormat:@"🔧 [CachedRewarded] didFailToLoadWithRewarded called with error: %@", error]];
+    [logger error:[NSString stringWithFormat:@"didFailToLoadWithRewarded called with error: %@", error]];
     
     // Invalidate timer
     [self.loadingTimer invalidate];
@@ -147,7 +147,7 @@ static void initializeLogger() {
 }
 
 - (void)didShowWithRewarded:(id<CLXAdapterRewarded>)rewarded {
-    [logger debug:@"🔧 [CachedRewarded] didShowWithRewarded called"];
+    [logger debug:@"didShowWithRewarded called"];
     
     // Forward to delegate
     if ([self.delegate respondsToSelector:@selector(didShowWithRewarded:)]) {
@@ -156,7 +156,7 @@ static void initializeLogger() {
 }
 
 - (void)impressionWithRewarded:(id<CLXAdapterRewarded>)rewarded {
-    [logger debug:@"🔧 [CachedRewarded] impressionWithRewarded called"];
+    [logger debug:@"impressionWithRewarded called"];
     
     // Forward to delegate
     if ([self.delegate respondsToSelector:@selector(impressionWithRewarded:)]) {
@@ -165,7 +165,7 @@ static void initializeLogger() {
 }
 
 - (void)didCloseWithRewarded:(id<CLXAdapterRewarded>)rewarded {
-    [logger debug:@"🔧 [CachedRewarded] didCloseWithRewarded called"];
+    [logger debug:@"didCloseWithRewarded called"];
     
     // Forward to delegate
     if ([self.delegate respondsToSelector:@selector(didCloseWithRewarded:)]) {
@@ -174,7 +174,7 @@ static void initializeLogger() {
 }
 
 - (void)clickWithRewarded:(id<CLXAdapterRewarded>)rewarded {
-    [logger debug:@"🔧 [CachedRewarded] clickWithRewarded called"];
+    [logger debug:@"clickWithRewarded called"];
     
     // Forward to delegate
     if ([self.delegate respondsToSelector:@selector(clickWithRewarded:)]) {
@@ -183,7 +183,7 @@ static void initializeLogger() {
 }
 
 - (void)userRewardWithRewarded:(id<CLXAdapterRewarded>)rewarded {
-    [logger debug:@"🔧 [CachedRewarded] userRewardWithRewarded called"];
+    [logger debug:@"userRewardWithRewarded called"];
     
     // Forward to delegate
     if ([self.delegate respondsToSelector:@selector(userRewardWithRewarded:)]) {
@@ -192,7 +192,7 @@ static void initializeLogger() {
 }
 
 - (void)didFailToShowWithRewarded:(id<CLXAdapterRewarded>)rewarded error:(NSError *)error {
-    [logger error:[NSString stringWithFormat:@"🔧 [CachedRewarded] didFailToShowWithRewarded called with error: %@", error]];
+    [logger error:[NSString stringWithFormat:@"didFailToShowWithRewarded called with error: %@", error]];
     
     // Forward to delegate
     if ([self.delegate respondsToSelector:@selector(didFailToShowWithRewarded:error:)]) {
@@ -201,7 +201,7 @@ static void initializeLogger() {
 }
 
 - (void)expiredWithRewarded:(id<CLXAdapterRewarded>)rewarded {
-    [logger debug:@"🔧 [CachedRewarded] expiredWithRewarded called"];
+    [logger debug:@"expiredWithRewarded called"];
     
     // Forward to delegate
     if ([self.delegate respondsToSelector:@selector(expiredWithRewarded:)]) {

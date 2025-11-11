@@ -52,7 +52,7 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
     // Extract winLossNotificationPayloadConfig from server config
     self.winLossPayloadMapping = config.winLossNotificationPayloadConfig;
     
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [WinLossFieldResolver] Config set - mapping available: %@, fields: %lu", 
+    [self.logger debug:[NSString stringWithFormat:@"Config set - mapping available: %@, fields: %lu", 
                        self.winLossPayloadMapping ? @"YES" : @"NO",
                        (unsigned long)self.winLossPayloadMapping.count]];
 }
@@ -68,7 +68,7 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
     NSDictionary<NSString *, NSString *> *payloadMapping = self.winLossPayloadMapping;
     
     if (!payloadMapping) {
-        [self.logger debug:@"📊 [WinLossFieldResolver] No payload mapping configured, returning nil"];
+        [self.logger debug:@"No payload mapping configured, returning nil"];
         return nil;
     }
     
@@ -86,24 +86,24 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         // Only add non-nil and non-empty values to result 
         // Filter out nil values
         if (!resolvedValue) {
-            [self.logger debug:[NSString stringWithFormat:@"⚠️ [WinLossFieldResolver] Field '%@' -> '%@' resolved to nil", payloadKey, fieldPath]];
+            [self.logger debug:[NSString stringWithFormat:@"[WinLossFieldResolver] Field '%@' -> '%@' resolved to nil", payloadKey, fieldPath]];
             return;
         }
         
         // Filter out empty strings
         if ([resolvedValue isKindOfClass:[NSString class]] && [(NSString *)resolvedValue length] == 0) {
-            [self.logger debug:[NSString stringWithFormat:@"⚠️ [WinLossFieldResolver] Field '%@' -> '%@' resolved to empty string", payloadKey, fieldPath]];
+            [self.logger debug:[NSString stringWithFormat:@"[WinLossFieldResolver] Field '%@' -> '%@' resolved to empty string", payloadKey, fieldPath]];
             return;
         }
         
         result[payloadKey] = resolvedValue;
     }];
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [WinLossFieldResolver] Built payload with %lu fields for %@ event (type: %@)", 
+    [self.logger debug:[NSString stringWithFormat:@"Built payload with %lu fields for %@ event (type: %@)", 
                        (unsigned long)result.count, event.notificationType.length > 0 ? event.notificationType : @"BidReceived", event.urlType]];
     
     if (result.count == 0) {
-        [self.logger debug:[NSString stringWithFormat:@"⚠️ [WinLossFieldResolver] Empty payload for %@ event - auction: %@, bid: %@", 
+        [self.logger debug:[NSString stringWithFormat:@"[WinLossFieldResolver] Empty payload for %@ event - auction: %@, bid: %@", 
                            event.notificationType, auctionId, bid.id]];
     }
     return [result copy];

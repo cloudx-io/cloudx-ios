@@ -95,7 +95,7 @@ static CLXLogger *_debugLogger = nil;
     [_debugLogger info:[NSString stringWithFormat:@"⏱️ Send Interval: %ld seconds", (long)config.sendIntervalSeconds]];
     [_debugLogger info:[NSString stringWithFormat:@"📱 SDK API Calls Enabled: %@", [self boolToString:[config isSdkApiCallsEnabled]]]];
     [_debugLogger info:[NSString stringWithFormat:@"🌐 Network Calls Enabled: %@", [self boolToString:[config isNetworkCallsEnabled]]]];
-    [_debugLogger info:[NSString stringWithFormat:@"  📊 Bid Request Calls: %@", [self boolToString:[config isBidRequestNetworkCallsEnabled]]]];
+    [_debugLogger info:[NSString stringWithFormat:@"  Bid Request Calls: %@", [self boolToString:[config isBidRequestNetworkCallsEnabled]]]];
     [_debugLogger info:[NSString stringWithFormat:@"  🚀 Init SDK Calls: %@", [self boolToString:[config isSdkInitNetworkCallsEnabled]]]];
     [_debugLogger info:[NSString stringWithFormat:@"  🌍 Geo Calls: %@", [self boolToString:[config isGeoNetworkCallsEnabled]]]];
 }
@@ -131,7 +131,7 @@ static CLXLogger *_debugLogger = nil;
     if (!metricsTracker) {
         [issues addObject:@"Metrics tracker is nil"];
     } else {
-        [_debugLogger info:@"✅ Metrics tracker instance is valid"];
+        [_debugLogger info:@"Metrics tracker instance is valid"];
     }
     
     // Check metric type constants
@@ -167,7 +167,7 @@ static CLXLogger *_debugLogger = nil;
     }
     
     if (issues.count == 0) {
-        [_debugLogger info:@"✅ All validation checks passed!"];
+        [_debugLogger info:@"All validation checks passed!"];
     } else {
         [_debugLogger error:[NSString stringWithFormat:@"⚠️ Found %lu validation issues:", (unsigned long)issues.count]];
         for (NSString *issue in issues) {
@@ -212,9 +212,9 @@ static CLXLogger *_debugLogger = nil;
         }
         
         if (aggregationRatio < 0.1) {
-            [report appendString:@"✅ Excellent aggregation efficiency.\n"];
+            [report appendString:@"Excellent aggregation efficiency.\n"];
         } else if (aggregationRatio < 0.5) {
-            [report appendString:@"✅ Good aggregation efficiency.\n"];
+            [report appendString:@"Good aggregation efficiency.\n"];
         } else {
             [report appendString:@"⚠️ Low aggregation efficiency. Events may not be aggregating properly.\n"];
         }
@@ -264,12 +264,12 @@ static CLXLogger *_debugLogger = nil;
         // Test multiple encryptions for consistency
         NSString *encrypted2 = [CLXXorEncryption encrypt:testPayload secret:secret];
         if ([encrypted isEqualToString:encrypted2]) {
-            [result appendString:@"✅ Encryption is deterministic\n"];
+            [result appendString:@"Encryption is deterministic\n"];
         } else {
             [result appendString:@"⚠️ Encryption is not deterministic!\n"];
         }
         
-        [result appendString:@"✅ All encryption tests passed\n"];
+        [result appendString:@"All encryption tests passed\n"];
         
     } @catch (NSException *exception) {
         [result appendFormat:@"❌ Encryption test failed: %@\n", exception.reason];
@@ -295,7 +295,7 @@ static CLXLogger *_debugLogger = nil;
 #pragma mark - Private Helpers
 
 + (NSString *)boolToString:(BOOL)value {
-    return value ? @"✅ Enabled" : @"❌ Disabled";
+    return value ? @"Enabled" : @"❌ Disabled";
 }
 
 @end

@@ -48,7 +48,7 @@ static void initializeLogger() {
 }
 
 - (void)dealloc {
-    [logger debug:@"🔧 [CachedInterstitial] dealloc called"];
+    [logger debug:@"dealloc called"];
     [self destroy];
 }
 
@@ -60,7 +60,7 @@ static void initializeLogger() {
 
 - (void)loadWithTimeout:(NSTimeInterval)timeout
              completion:(void (^)(NSError * _Nullable error))completion {
-    [logger debug:[NSString stringWithFormat:@"🔧 [CachedInterstitial] loadWithTimeout: %f called", timeout]];
+    [logger debug:[NSString stringWithFormat:@"loadWithTimeout: %f called", timeout]];
     
     self.loadCompletion = completion;
     
@@ -68,7 +68,7 @@ static void initializeLogger() {
     self.loadingTimer = [NSTimer scheduledTimerWithTimeInterval:timeout
                                                          repeats:NO
                                                            block:^(NSTimer * _Nonnull timer) {
-        [logger debug:@"🔧 [CachedInterstitial] Loading timer fired"];
+        [logger debug:@"Loading timer fired"];
         if (self.loadCompletion) {
             NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadTimeout 
                                                  description:@"Loading timeout"];
@@ -84,12 +84,12 @@ static void initializeLogger() {
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
-    [logger debug:@"🔧 [CachedInterstitial] showFromViewController called"];
+    [logger debug:@"showFromViewController called"];
     [self.interstitial showFromViewController:viewController];
 }
 
 - (void)destroy {
-    [logger debug:@"🔧 [CachedInterstitial] destroy called"];
+    [logger debug:@"destroy called"];
     
     // Invalidate timer
     [self.loadingTimer invalidate];
@@ -107,7 +107,7 @@ static void initializeLogger() {
 #pragma mark - CloudXAdapterInterstitialDelegate
 
 - (void)didLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
-    [logger debug:@"🔧 [CachedInterstitial] didLoadWithInterstitial called"];
+    [logger debug:@"didLoadWithInterstitial called"];
     
     // Invalidate timer
     [self.loadingTimer invalidate];
@@ -126,7 +126,7 @@ static void initializeLogger() {
 }
 
 - (void)didFailToLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial error:(NSError *)error {
-    [logger error:[NSString stringWithFormat:@"🔧 [CachedInterstitial] didFailToLoadWithInterstitial called with error: %@", error]];
+    [logger error:[NSString stringWithFormat:@"didFailToLoadWithInterstitial called with error: %@", error]];
     
     // Invalidate timer
     [self.loadingTimer invalidate];
@@ -145,7 +145,7 @@ static void initializeLogger() {
 }
 
 - (void)didShowWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
-    [logger debug:@"🔧 [CachedInterstitial] didShowWithInterstitial called"];
+    [logger debug:@"didShowWithInterstitial called"];
     
     // Forward to delegate
     if ([self.delegate respondsToSelector:@selector(didShowWithInterstitial:)]) {
@@ -154,7 +154,7 @@ static void initializeLogger() {
 }
 
 - (void)impressionWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
-    [logger debug:@"🔧 [CachedInterstitial] impressionWithInterstitial called"];
+    [logger debug:@"impressionWithInterstitial called"];
     
     // Forward to delegate
     if ([self.delegate respondsToSelector:@selector(impressionWithInterstitial:)]) {
@@ -163,7 +163,7 @@ static void initializeLogger() {
 }
 
 - (void)didCloseWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
-    [logger debug:@"🔧 [CachedInterstitial] didCloseWithInterstitial called"];
+    [logger debug:@"didCloseWithInterstitial called"];
     
     // Forward to delegate
     if ([self.delegate respondsToSelector:@selector(didCloseWithInterstitial:)]) {
@@ -172,7 +172,7 @@ static void initializeLogger() {
 }
 
 - (void)clickWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
-    [logger debug:@"🔧 [CachedInterstitial] clickWithInterstitial called"];
+    [logger debug:@"clickWithInterstitial called"];
     
     // Forward to delegate
     if ([self.delegate respondsToSelector:@selector(clickWithInterstitial:)]) {
@@ -181,7 +181,7 @@ static void initializeLogger() {
 }
 
 - (void)didFailToShowWithInterstitial:(id<CLXAdapterInterstitial>)interstitial error:(NSError *)error {
-    [logger error:[NSString stringWithFormat:@"🔧 [CachedInterstitial] didFailToShowWithInterstitial called with error: %@", error]];
+    [logger error:[NSString stringWithFormat:@"didFailToShowWithInterstitial called with error: %@", error]];
     
     // Forward to delegate
     if ([self.delegate respondsToSelector:@selector(didFailToShowWithInterstitial:error:)]) {
@@ -190,7 +190,7 @@ static void initializeLogger() {
 }
 
 - (void)expiredWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
-    [logger debug:@"🔧 [CachedInterstitial] expiredWithInterstitial called"];
+    [logger debug:@"expiredWithInterstitial called"];
     
     // Forward to delegate
     if ([self.delegate respondsToSelector:@selector(expiredWithInterstitial:)]) {

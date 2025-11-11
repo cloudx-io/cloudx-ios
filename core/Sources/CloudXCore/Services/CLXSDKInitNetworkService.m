@@ -38,7 +38,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
  * @return An initialized instance of SDKInitNetworkService
  */
 - (instancetype)initWithBaseURL:(NSString *)baseURL urlSession:(NSURLSession *)urlSession {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [SDKInitNetworkService] Initializing with baseURL: %@", baseURL]];
+    [self.logger debug:[NSString stringWithFormat:@"Initializing with baseURL: %@", baseURL]];
     
     // Extract the base URL and endpoint from the full URL
     NSURL *url = [NSURL URLWithString:baseURL];
@@ -50,7 +50,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         endpointPath = @"/";
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [SDKInitNetworkService] URL parsing - Original: %@, Base: %@, Path: '%@'", baseURL, actualBaseURL, endpointPath]];
+    [self.logger debug:[NSString stringWithFormat:@"URL parsing - Original: %@, Base: %@, Path: '%@'", baseURL, actualBaseURL, endpointPath]];
     
     
     // Call parent's initWithBaseURL method with the actual base URL
@@ -59,7 +59,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         _endpoint = endpointPath;
         _logger = [[CLXLogger alloc] initWithCategory:@"SDKInitNetworkService"];
         _backOffStrategy = [[CLXExponentialBackoffStrategy alloc] initWithInitialDelay:1 maxDelay:60 maxAttempts:5];
-        [self.logger info:[NSString stringWithFormat:@"✅ [SDKInitNetworkService] Initialized - endpoint: %@, baseURL: %@", _endpoint, self.baseURL]];
+        [self.logger info:[NSString stringWithFormat:@"Initialized - endpoint: %@, baseURL: %@", _endpoint, self.baseURL]];
     }
     return self;
 }
@@ -80,7 +80,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
  * @param completion Completion handler called with the SDK configuration or error
  */
 - (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable, NSError * _Nullable))completion {
-    [self.logger info:[NSString stringWithFormat:@"🚀 [SDKInitNetworkService] initializeSDKWithAppKey called - AppKey: %@, Endpoint: %@", appKey, _endpoint]];
+    [self.logger info:[NSString stringWithFormat:@"[SDKInitNetworkService] initializeSDKWithAppKey called - AppKey: %@, Endpoint: %@", appKey, _endpoint]];
     [self tryInitSDKWithAppKey:appKey completion:completion];
 }
 
@@ -90,12 +90,12 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
  * @param completion Completion handler called with the SDK configuration or error
  */
 - (void)tryInitSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable, NSError * _Nullable))completion {
-    [self.logger debug:@"🔧 [SDKInitNetworkService] tryInitSDKWithAppKey called"];
+    [self.logger debug:@"tryInitSDKWithAppKey called"];
     
     NSError *backoffError;
     NSTimeInterval delay = [self.backOffStrategy nextDelayWithError:&backoffError];
     if (backoffError) {
-        [self.logger error:@"❌ [SDKInitNetworkService] Backoff strategy exhausted"];
+        [self.logger error:@"Backoff strategy exhausted"];
         [self.backOffStrategy reset];
         if (completion) {
             completion(nil, [CLXError errorWithCode:CLXErrorCodeInitializationTimeout 
@@ -104,24 +104,24 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         return;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Attempt to init SDK with delay: %f", delay]];
+    [self.logger debug:[NSString stringWithFormat:@"Attempt to init SDK with delay: %f", delay]];
     
-    [self.logger debug:@"🔧 [SDKInitNetworkService] Creating request"];
+    [self.logger debug:@"Creating request"];
     CLXSDKConfigRequest *request = [self createRequest];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Request created: %@", request]];
+    [self.logger debug:[NSString stringWithFormat:@"Request created: %@", request]];
     
-    [self.logger debug:@"🔧 [SDKInitNetworkService] Preparing headers"];
+    [self.logger debug:@"Preparing headers"];
     NSMutableDictionary *headers = [[self headers] mutableCopy];
     headers[@"Authorization"] = [NSString stringWithFormat:@"Bearer %@", appKey];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Headers: %@", headers]];
+    [self.logger debug:[NSString stringWithFormat:@"Headers: %@", headers]];
     
-    [self.logger debug:[NSString stringWithFormat:@"🌐 [SDKInitNetworkService] Executing network request - Endpoint: %@", self.endpoint]];
+    [self.logger debug:[NSString stringWithFormat:@"[SDKInitNetworkService] Executing network request - Endpoint: %@", self.endpoint]];
     
     // Serialize the JSON dictionary to NSData
     NSError *jsonError;
     NSData *requestBodyData = [NSJSONSerialization dataWithJSONObject:request.json options:NSJSONWritingPrettyPrinted error:&jsonError];
     if (jsonError) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [SDKInitNetworkService] JSON serialization failed: %@", jsonError]];
+        [self.logger error:[NSString stringWithFormat:@"JSON serialization failed: %@", jsonError]];
         if (completion) {
             completion(nil, jsonError);
         }
@@ -130,7 +130,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     
     // Debug: Print the request payload
     NSString *requestPayloadString = [[NSString alloc] initWithData:requestBodyData encoding:NSUTF8StringEncoding];
-    [self.logger debug:[NSString stringWithFormat:@"📋 [SDKInitNetworkService] Request Payload:\n%@", requestPayloadString]];
+    [self.logger debug:[NSString stringWithFormat:@"[SDKInitNetworkService] Request Payload:\n%@", requestPayloadString]];
     
     // Track SDK init network call latency
     NSDate *sdkInitStartTime = [NSDate date];
@@ -147,26 +147,26 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
             id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
             [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkSdkInit latency:(NSInteger)sdkInitLatency];
             
-            [self.logger debug:@"📥 [SDKInitNetworkService] Network request completion called"];
+            [self.logger debug:@"[SDKInitNetworkService] Network request completion called"];
             
             if (error) {
-                [self.logger error:[NSString stringWithFormat:@"❌ [SDKInitNetworkService] Network request failed: %@", error.localizedDescription]];
+                [self.logger error:[NSString stringWithFormat:@"Network request failed: %@", error.localizedDescription]];
                 if (completion) {
                     completion(nil, error);
                 }
                 return;
             } else if (isKillSwitchEnabled) {
                 NSError *sdkDisabledError = [CLXError errorWithCode:CLXErrorCodeSDKDisabled description:@"No response data"];
-                [self.logger error:@"❌ [BidNetworkService] kill switch in on received"];
+                [self.logger error:@"kill switch in on received"];
                 if (completion) completion(nil, sdkDisabledError);
                 return;
             } else {
-                [self.logger info:@"✅ [SDKInitNetworkService] Network request succeeded"];
+                [self.logger info:@"Network request succeeded"];
                 
                 // Parse the response into SDKConfig object
                 CLXSDKConfigResponse *config = [self parseSDKConfigFromResponse:response];
                 if (!config) {
-                    [self.logger error:@"❌ [SDKInitNetworkService] Failed to parse SDK config from response"];
+                    [self.logger error:@"Failed to parse SDK config from response"];
                     if (completion) {
                         completion(nil, [CLXError errorWithCode:CLXErrorCodeInvalidResponse 
                                                description:@"Invalid server response: Unable to parse SDK configuration. Please try again or contact support."]);
@@ -186,13 +186,13 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
  * @return SDKConfigRequest object containing system information
  */
 - (CLXSDKConfigRequest *)createRequest {
-    [self.logger debug:@"🔧 [SDKInitNetworkService] Creating SDK config request"];
+    [self.logger debug:@"Creating SDK config request"];
     
     // Use IDFV as rid for rollout
     NSString *idfa = [CLXSystemInformation shared].idfa ?: @"00000-00000-00000-000000";
     NSString *idfv = [CLXSystemInformation shared].idfv ?: @"00000-00000-00000-000000";
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Device info - IDFA: %@, Bundle: %@, OS: %@", idfa, [CLXSystemInformation shared].appBundleIdentifier, [CLXSystemInformation shared].osVersion]];
+    [self.logger debug:[NSString stringWithFormat:@"Device info - IDFA: %@, Bundle: %@, OS: %@", idfa, [CLXSystemInformation shared].appBundleIdentifier, [CLXSystemInformation shared].osVersion]];
     
     CLXSDKConfigRequest *request = [[CLXSDKConfigRequest alloc] init];
     request.bundle = [CLXSystemInformation shared].appBundleIdentifier;
@@ -208,7 +208,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     request.id = [[NSUUID UUID] UUIDString];
     request.urlParams = @{}; // Empty dictionary as in Swift
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [SDKInitNetworkService] Request created successfully - ID: %@", request.id]];
+    [self.logger info:[NSString stringWithFormat:@"Request created successfully - ID: %@", request.id]];
     
     return request;
 }
@@ -220,14 +220,14 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
  */
 - (CLXSDKConfigResponse *)parseSDKConfigFromResponse:(NSDictionary *)response {
     if (!response || ![response isKindOfClass:[NSDictionary class]]) {
-        [self.logger error:@"❌ [SDKInitNetworkService] Invalid response format"];
+        [self.logger error:@"Invalid response format"];
         return nil;
     }
     
-    [self.logger debug:@"🔧 [SDKInitNetworkService] Parsing SDK config from response"];
+    [self.logger debug:@"Parsing SDK config from response"];
     
     // 🔍 DEBUG: Print the full SDK init response to examine tracking configuration
-    [self.logger info:[NSString stringWithFormat:@"📋 [SDK_INIT_RESPONSE] Full response: %@", response]];
+    [self.logger info:[NSString stringWithFormat:@"[SDK_INIT_RESPONSE] Full response: %@", response]];
     
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     
@@ -239,13 +239,13 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     config.preCacheSize = [response[@"preCacheSize"] integerValue];
     config.geoDataEndpointURL = response[@"geoDataEndpointURL"];
     
-    // Parse tracking array for Rill analytics
+    // Parse tracking array for Analytics
     NSArray *trackingArray = response[@"tracking"];
     if (trackingArray && [trackingArray isKindOfClass:[NSArray class]]) {
         config.tracking = [trackingArray copy];
     } else {
         config.tracking = nil;  // Explicitly set to nil when missing or malformed
-        [self.logger error:@"⚠️ [TRACKING_DEBUG] No tracking array found in SDK init response - Rill tracking may not work properly"];
+        [self.logger error:@"No tracking array found in SDK init response - Analytics tracking may not work properly"];
     }
     
     // Parse auction endpoint URL with A/B test support
@@ -315,9 +315,9 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     if (metricsConfigArr.count > 0) {
         NSDictionary *metricsConfigDict = metricsConfigArr[0];
         config.metricsConfig = [CLXMetricsConfig fromDictionary: metricsConfigDict];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [SDKInitNetworkService] Parsed metrics config: %@", config.metricsConfig]];
+        [self.logger debug:[NSString stringWithFormat:@"Parsed metrics config: %@", config.metricsConfig]];
     } else {
-        [self.logger debug:@"⚠️ [SDKInitNetworkService] No metrics configuration found in server response"];
+        [self.logger debug:@"[SDKInitNetworkService] No metrics configuration found in server response"];
         // Create default config to enable metrics with impression URL
         CLXMetricsConfig *defaultConfig = [[CLXMetricsConfig alloc] init];
         defaultConfig.sdkAPICalls.enabled = @YES;
@@ -326,18 +326,18 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         defaultConfig.networkCalls.sdkInitRequest.enabled = @NO; // Keep SDK init disabled by default
         defaultConfig.networkCalls.geoReq.enabled = @YES;
         config.metricsConfig = defaultConfig;
-        [self.logger debug:@"📊 [SDKInitNetworkService] Created default metrics config for impression URL usage"];
+        [self.logger debug:@"Created default metrics config for impression URL usage"];
     }
     
     // Parse win/loss notification payload configuration
     NSDictionary *winLossPayloadConfig = response[@"winLossNotificationPayloadConfig"];
     if (winLossPayloadConfig && [winLossPayloadConfig isKindOfClass:[NSDictionary class]]) {
         config.winLossNotificationPayloadConfig = [winLossPayloadConfig copy];
-        [self.logger debug:[NSString stringWithFormat:@"🔧 [SDK_INIT] Win/loss payload config parsed with %lu fields", 
+        [self.logger debug:[NSString stringWithFormat:@"Win/loss payload config parsed with %lu fields", 
                            (unsigned long)config.winLossNotificationPayloadConfig.count]];
     } else {
         config.winLossNotificationPayloadConfig = nil;
-        [self.logger debug:@"⚠️ [SDK_INIT] No win/loss payload config found in response"];
+        [self.logger debug:@"[SDK_INIT] No win/loss payload config found in response"];
     }
     
     // Parse bidders
@@ -384,7 +384,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         config.placements = [placements copy];
     }
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [SDKInitNetworkService] SDK config parsed - Account: %@, Session: %@, Bidders: %lu, Placements: %lu", config.accountID, config.sessionID, (unsigned long)config.bidders.count, (unsigned long)config.placements.count]];
+    [self.logger info:[NSString stringWithFormat:@"SDK config parsed - Account: %@, Session: %@, Bidders: %lu, Placements: %lu", config.accountID, config.sessionID, (unsigned long)config.bidders.count, (unsigned long)config.placements.count]];
     
     return config;
 }

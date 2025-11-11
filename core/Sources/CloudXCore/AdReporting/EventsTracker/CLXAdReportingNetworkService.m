@@ -74,7 +74,7 @@
     //         This code is completely stripped from production builds at compile time.
     // ==================================================================================
     #if TARGET_IPHONE_SIMULATOR
-    [self.logger info:@"🧪 [Simulator] CloudFront blocks simulator IPs - using device locale for geo data"];
+    [self.logger debug:@"[Simulator] CloudFront blocks simulator IPs - using device locale for geo data"];
     
     // Get actual country from device's locale settings
     NSLocale *currentLocale = [NSLocale currentLocale];
@@ -103,7 +103,7 @@
     // Get region/state from locale (may be nil)
     NSString *regionCode = [[NSTimeZone localTimeZone] abbreviation] ?: @"";
     
-    [self.logger info:[NSString stringWithFormat:@"🧪 [Simulator] Detected country from device locale: %@ (%@)", countryCode, finalCountryISO3]];
+    [self.logger debug:[NSString stringWithFormat:@"[Simulator] Detected country from device locale: %@ (%@)", countryCode, finalCountryISO3]];
     
     // Mock CloudFront headers using detected country
     NSDictionary *mockRawHeaders = @{
@@ -121,7 +121,7 @@
     [[NSUserDefaults standardUserDefaults] setObject:mockProcessedData forKey:kCLXCoreProcessedGeoDataKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    [self.logger info:[NSString stringWithFormat:@"🧪 [Simulator] Geo data set from locale: %@ - Region: %@", finalCountryISO3, regionCode]];
+    [self.logger debug:[NSString stringWithFormat:@"[Simulator] Geo data set from locale: %@ - Region: %@", finalCountryISO3, regionCode]];
     
     // Skip network call for simulator
     return;
@@ -207,7 +207,7 @@
     // Use metrics URL from SDK response (stored in user defaults)
     NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey];
     if (!metricsURL) {
-        [self.logger debug:@"🔧 [CloudXCore] No metrics URL available - SDK performance metrics tracking disabled"];
+        [self.logger debug:@"No metrics URL available - SDK performance metrics tracking disabled"];
         // Don't treat this as an error since it's handled with fallback in CloudXCoreAPI
         return;
     }
@@ -284,13 +284,13 @@
                             error:(NSError **)error
 {
     // Debug logging for Rill tracking parameters  
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Environment: %@, Action: %@, Campaign: %@, EncodedLength: %lu", [CLXURLProvider environmentName], actionString ?: @"(nil)", campaignId ?: @"(nil)", (unsigned long)(encodedString.length)]];
+    [self.logger debug:[NSString stringWithFormat:@"Environment: %@, Action: %@, Campaign: %@, EncodedLength: %lu", [CLXURLProvider environmentName], actionString ?: @"(nil)", campaignId ?: @"(nil)", (unsigned long)(encodedString.length)]];
     
     // Use impression tracker URL from SDK response for Rill tracking
     NSString *trackingString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreImpressionTrackerUrlKey];
     
     if (!trackingString) {
-        [self.logger error:@"⚠️ [CloudXCore] No tracking URL available - Rill analytics disabled"];
+        [self.logger warn:@"[CloudXCore] No tracking URL available - Rill analytics disabled"];
         if (error) {
             *error = [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"No Rill tracking URL configured"}];
         }
@@ -304,7 +304,7 @@
     [urlString appendString:actionString];
     NSURL *url = [NSURL URLWithString:urlString];
     if (!url) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [RillTracking] Invalid URL constructed: %@", urlString]];
+        [self.logger error:[NSString stringWithFormat:@"Invalid URL constructed: %@", urlString]];
         [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Invalid URL"}];
         return;
     }
@@ -336,7 +336,7 @@
         @"url": fullURLString,
         @"parameters": params
     };
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Request JSON: %@", requestJSON]];
+    [self.logger debug:[NSString stringWithFormat:@"Request JSON: %@", requestJSON]];
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:fullURL];
     request.HTTPMethod = @"GET";
@@ -350,7 +350,7 @@
         
         if (error) {
             responseJSON[@"error"] = error.localizedDescription;
-            [self.logger error:[NSString stringWithFormat:@"🔍 [RillTracking] ERROR: %@", error]];
+            [self.logger error:[NSString stringWithFormat:@"ERROR: %@", error]];
         } else {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
             responseJSON[@"statusCode"] = @(httpResponse.statusCode);
@@ -364,7 +364,7 @@
             }
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [RillTracking] Response JSON: %@", responseJSON]];
+        [self.logger debug:[NSString stringWithFormat:@"Response JSON: %@", responseJSON]];
         
         if (error && blockError) {
             *blockError = error;

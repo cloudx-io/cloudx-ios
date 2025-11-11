@@ -104,7 +104,7 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
 
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config 
                   completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
-    [[CLXMetaInitializer logger] debug:@"🔧 [CLXMetaInitializer] Initializing Meta Audience Network adapter"];
+    [[CLXMetaInitializer logger] debug:@"Initializing Meta Audience Network adapter"];
     
     // Configure production settings (always needed)
     [self configureAdvertiserTrackingEnabled];
@@ -126,7 +126,7 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
     }
     #ifdef DEBUG
     else {
-        [[CLXMetaInitializer logger] info:@"🐛 [CLXMetaInitializer] Debug build - enabling test mode"];
+        [[CLXMetaInitializer logger] info:@"Debug build - enabling test mode"];
         [self configureTestSettings];
     }
     #else
@@ -141,7 +141,7 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
     
     isInitialized = YES;
     
-    [[CLXMetaInitializer logger] info:@"✅ [CLXMetaInitializer] Meta adapter initialization completed"];
+    [[CLXMetaInitializer logger] info:@"Meta adapter initialization completed"];
     
     if (completion) {
         completion(YES, nil);
@@ -158,16 +158,16 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
         NSArray *configPlacementIDs = config.initializationData[@"placementIds"];
         if ([configPlacementIDs isKindOfClass:[NSArray class]] && configPlacementIDs.count > 0) {
             [placementIDs addObjectsFromArray:configPlacementIDs];
-            [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"🔍 [CLXMetaInitializer] Found bidder init data: %@ | Added %lu placement IDs", 
+            [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Found bidder init data: %@ | Added %lu placement IDs", 
                                                config.initializationData, (unsigned long)placementIDs.count]];
         } else {
-            [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"🔍 [CLXMetaInitializer] Found bidder init data: %@ | No valid placement IDs array", config.initializationData]];
+            [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Found bidder init data: %@ | No valid placement IDs array", config.initializationData]];
         }
     }
     
     // Initialize Meta FAN SDK with placement IDs like MAX does
     if (placementIDs.count > 0) {
-        [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"✅ [CLXMetaInitializer] Initializing Meta FAN SDK with %lu placement IDs: %@", (unsigned long)placementIDs.count, [placementIDs componentsJoinedByString:@", "]]];
+        [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"Initializing Meta FAN SDK with %lu placement IDs: %@", (unsigned long)placementIDs.count, [placementIDs componentsJoinedByString:@", "]]];
         
         void (^facebookCompletionHandler)(FBAdInitResults *results) = ^(FBAdInitResults *initResult) {
             [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"%@ [CLXMetaInitializer] Meta FAN SDK initialization %@: %@", 
@@ -181,7 +181,7 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
         FBAdInitSettings *initSettings = [[FBAdInitSettings alloc] initWithPlacementIDs:placementIDs mediationService:mediationIdentifier];
         [FBAudienceNetworkAds initializeWithSettings:initSettings completionHandler:facebookCompletionHandler];
     } else {
-        [[CLXMetaInitializer logger] debug:@"🔧 [CLXMetaInitializer] No placement IDs available - using default Meta FAN SDK initialization"];
+        [[CLXMetaInitializer logger] debug:@"No placement IDs available - using default Meta FAN SDK initialization"];
         
         // Still need to initialize Meta FAN SDK even without placement IDs
         void (^facebookCompletionHandler)(FBAdInitResults *results) = ^(FBAdInitResults *initResult) {
@@ -205,7 +205,7 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
     // Set Meta's ATE flag based on CloudX tracking service result
     [FBAdSettings setAdvertiserTrackingEnabled:idfaAllowed];
     
-    [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"📊 [CLXMetaInitializer] ATE flag set to %@ - Based on CloudX tracking service", 
+    [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"ATE flag set to %@ - Based on CloudX tracking service", 
                                       idfaAllowed ? @"YES" : @"NO"]];
 }
 

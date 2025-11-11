@@ -62,7 +62,7 @@
         _sdkVersion = FB_AD_SDK_VERSION;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMetaNative"];
         
-        [self.logger debug:[NSString stringWithFormat:@"✅ [CLXMetaNative] Initialized for placement: %@ | bidPayload: %@", placementID, bidPayload ? @"YES" : @"NO"]];
+        [self.logger debug:[NSString stringWithFormat:@"Initialized for placement: %@ | bidPayload: %@", placementID, bidPayload ? @"YES" : @"NO"]];
         
         _nativeAd = [[FBNativeAd alloc] initWithPlacementID:placementID];
         _nativeAd.delegate = self;
@@ -95,7 +95,7 @@
     }
     
     _isLoading = YES;
-    [self.logger debug:[NSString stringWithFormat:@"🔄 [CLXMetaNative] Loading ad for placement: %@ | bidPayload: %@", _placementID, self.bidPayload ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"Loading ad for placement: %@ | bidPayload: %@", _placementID, self.bidPayload ? @"YES" : @"NO"]];
     
     // Ensure Meta SDK calls happen on main thread
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -187,7 +187,7 @@
                           viewController:self.viewController
                           clickableViews:clickableViews];
     
-    [self.logger debug:[NSString stringWithFormat:@"✅ [CLXMetaNative] Native view created with frame: %@", NSStringFromCGRect(__nativeView.frame)]];
+    [self.logger debug:[NSString stringWithFormat:@"Native view created with frame: %@", NSStringFromCGRect(__nativeView.frame)]];
 }
 
 - (void)destroy {
@@ -200,7 +200,7 @@
 #pragma mark - FBNativeAdDelegate
 
 - (void)nativeAdDidLoad:(FBNativeAd *)nativeAd {
-    [self.logger info:@"✅ [CLXMetaNative] Native ad loaded successfully"];
+    [self.logger info:@"Native ad loaded successfully"];
     
     // If there is an existing valid native ad, unregister the view (per Meta guidelines)
     if (self.nativeAd && self.nativeAd.isAdValid) {
@@ -245,11 +245,11 @@
 }
 
 - (void)nativeAdDidFinishHandlingClick:(FBNativeAd *)nativeAd {
-    [self.logger info:@"✅ [CLXMetaNative] Native ad finished handling click"];
+    [self.logger info:@"Native ad finished handling click"];
 }
 
 - (void)nativeAdWillLogImpression:(FBNativeAd *)nativeAd {
-    [self.logger info:@"📊 [CLXMetaNative] Native ad impression logged"];
+    [self.logger info:@"Native ad impression logged"];
     
     // Forward to CloudX delegate if it supports impression tracking
     if ([self.delegate respondsToSelector:@selector(impressionWithNative:)]) {

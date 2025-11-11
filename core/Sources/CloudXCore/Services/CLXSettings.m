@@ -31,37 +31,37 @@ static CLXLogger *logger;
     // 1. Configured override (for testing scenarios)
     ifa = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreIFAConfigKey];
     if (ifa && ifa.length > 0) {
-        [logger info:[NSString stringWithFormat:@"🔧 [CLXSettings] Using configured IFA from UserDefaults: %@", ifa]];
+        [logger info:[NSString stringWithFormat:@"Using configured IFA from UserDefaults: %@", ifa]];
         return ifa;
     }
 
     // 2. Privacy-aware IDFA retrieval (unified approach)
     CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
     if (!privacyService) {
-        [logger error:@"❌ [CLXSettings] Privacy service not available - returning zero IDFA for safety"];
+        [logger error:@"Privacy service not available - returning zero IDFA for safety"];
         return @"00000000-0000-0000-0000-000000000000";
     }
     
     if ([privacyService shouldClearPersonalData]) {
-        [logger debug:@"🔒 [CLXSettings] Privacy requires data clearing - returning zero IDFA"];
+        [logger debug:@"Privacy requires data clearing - returning zero IDFA"];
         // Still log what the actual IDFA would be for debugging
         NSString *actualIDFA = [[ASIdentifierManager sharedManager].advertisingIdentifier UUIDString];
-        [logger info:[NSString stringWithFormat:@"📱 [CLXSettings] *** ACTUAL DEVICE IDFA (privacy blocked): %@ ***", actualIDFA ?: @"(nil)"]];
+        [logger info:[NSString stringWithFormat:@"*** ACTUAL DEVICE IDFA (privacy blocked): %@ ***", actualIDFA ?: @"(nil)"]];
         return @"00000000-0000-0000-0000-000000000000";
     }
 
     // 3. Real device IDFA (privacy allows and ATT authorized)
     ifa = [[ASIdentifierManager sharedManager].advertisingIdentifier UUIDString];
-    [logger info:[NSString stringWithFormat:@"📱 [CLXSettings] *** ACTUAL DEVICE IDFA FROM ASIdentifierManager: %@ ***", ifa ?: @"(nil)"]];
+    [logger debug:[NSString stringWithFormat:@"*** ACTUAL DEVICE IDFA FROM ASIdentifierManager: %@ ***", ifa ?: @"(nil)"]];
     if (ifa && ifa.length > 0 && ![ifa isEqualToString:@"00000000-0000-0000-0000-000000000000"]) {
-        [logger info:[NSString stringWithFormat:@"✅ [CLXSettings] Using real device IDFA: %@", ifa]];
+        [logger debug:[NSString stringWithFormat:@"Using real device IDFA: %@", ifa]];
         return ifa;
     }
 
     // 4. Fallback placeholder if no real IDFA is available (log once per session)
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        [logger info:@"ℹ️ [CLXSettings] No real IDFA available, using placeholder (ATT not authorized or IDFA unavailable)"];
+        [logger info:@"No real IDFA available, using placeholder (ATT not authorized or IDFA unavailable)"];
     });
     return @"00000000-0000-0000-0000-000000000000";
 }
@@ -83,7 +83,7 @@ static CLXLogger *logger;
         }
         return enabled;
     } @catch (NSException *exception) {
-        [logger error:[NSString stringWithFormat:@"❌ [CLXSettings] Exception in banner_retries_userdefaults_read: %@ - %@", 
+        [logger error:[NSString stringWithFormat:@"Exception in banner_retries_userdefaults_read: %@ - %@", 
                        exception.name ?: @"unknown", exception.reason ?: @"no reason"]];
         // Note: CLXSettings is a static class, so we use shared instance for error reporting
         // This is acceptable since Settings is a utility class without dependency injection

@@ -60,7 +60,7 @@
         NSInteger template = [self parseTemplateFromBidPayload:bidPayload];
         FBAdSize fbAdSize = [self fbAdSizeForTemplate:template fallbackType:type];
         
-        [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXMetaBanner] Init - PlacementID: %@, BidID: %@, Type: %ld, Template: %ld, HasBidPayload: %@", 
+        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %@, BidID: %@, Type: %ld, Template: %ld, HasBidPayload: %@", 
                            placementID, bidID, (long)type, (long)template, bidPayload ? @"YES" : @"NO"]];
         
         // Ensure Facebook SDK initialization happens on main thread to prevent crashes
@@ -87,13 +87,13 @@
 
 - (BOOL)isReady {
     BOOL ready = self.bannerView != nil && self.bannerView.isAdValid;
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXMetaBanner] isReady: %@ (view: %@, valid: %@)", 
+    [self.logger debug:[NSString stringWithFormat:@"isReady: %@ (view: %@, valid: %@)", 
                        ready ? @"YES" : @"NO", self.bannerView ? @"YES" : @"NO", self.bannerView.isAdValid ? @"YES" : @"NO"]];
     return ready;
 }
 
 - (void)load {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXMetaBanner] Loading ad - Placement: %@, HasBidPayload: %@", 
+    [self.logger debug:[NSString stringWithFormat:@"Loading ad - Placement: %@, HasBidPayload: %@", 
                        _placementID, self.bidPayload ? @"YES" : @"NO"]];
     
     // Ensure Meta SDK calls happen on main thread
@@ -117,13 +117,13 @@
 - (void)showFromViewController:(UIViewController *)viewController {
     UIViewController *vc = viewController ?: self.viewController;
     if (!vc || !self.bannerView) {
-        [self.logger error:@"❌ [CLXMetaBanner] Cannot show ad - missing view controller or banner view"];
+        [self.logger error:@"Cannot show ad - missing view controller or banner view"];
         return;
     }
     
     // Check if ad is valid before showing (per Meta official guidelines)
     if (!self.bannerView.isAdValid) {
-        [self.logger error:@"❌ [CLXMetaBanner] Cannot show ad - not valid"];
+        [self.logger error:@"Cannot show ad - not valid"];
         return;
     }
     
@@ -133,7 +133,7 @@
     CGFloat bannerHeight = (_type == CLXBannerTypeMREC) ? 250 : 50;
     self.bannerView.frame = CGRectMake(0, vc.view.bounds.size.height - bannerHeight, vc.view.bounds.size.width, bannerHeight);
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [CLXMetaBanner] Banner displayed with frame: %@", NSStringFromCGRect(self.bannerView.frame)]];
+    [self.logger info:[NSString stringWithFormat:@"Banner displayed with frame: %@", NSStringFromCGRect(self.bannerView.frame)]];
 }
 
 - (void)destroy {
@@ -148,7 +148,7 @@
 - (void)adViewDidLoad:(FBAdView *)adView {
     // Check if ad is valid before proceeding (per Meta official guidelines)
     if (!adView.isAdValid) {
-        [self.logger error:@"❌ [CLXMetaBanner] Ad loaded but invalid"];
+        [self.logger error:@"Ad loaded but invalid"];
         
         // Create an error for invalid ad and call failure delegate
         NSError *invalidAdError = [CLXError errorWithCode:CLXErrorCodeInvalidAd 
@@ -160,13 +160,13 @@
         return;
     }
     
-    [self.logger info:[NSString stringWithFormat:@"✅ [CLXMetaBanner] Ad loaded successfully and is valid | Delegate responds to didLoadBanner: %@", 
+    [self.logger info:[NSString stringWithFormat:@"Ad loaded successfully and is valid | Delegate responds to didLoadBanner: %@", 
                        [self.delegate respondsToSelector:@selector(didLoadBanner:)] ? @"YES" : @"NO"]];
     
     if ([self.delegate respondsToSelector:@selector(didLoadBanner:)]) {
         [self.delegate didLoadBanner:self];
     } else {
-        [self.logger error:@"❌ [CLXMetaBanner] Delegate does not respond to didLoadBanner"];
+        [self.logger error:@"Delegate does not respond to didLoadBanner"];
     }
 }
 
@@ -195,7 +195,7 @@
 }
 
 - (void)adViewWillLogImpression:(FBAdView *)adView {
-    [self.logger info:@"📊 [CLXMetaBanner] Ad impression logged"];
+    [self.logger info:@"Ad impression logged"];
     
     // Forward to CloudX delegate if it supports impression tracking
     if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
@@ -232,7 +232,7 @@
     NSNumber *templateNum = payload[@"template"];
     if (templateNum && [templateNum isKindOfClass:[NSNumber class]]) {
         NSInteger template = templateNum.integerValue;
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CLXMetaBanner] Parsed template from bid payload: %ld", (long)template]];
+        [self.logger debug:[NSString stringWithFormat:@"Parsed template from bid payload: %ld", (long)template]];
         return template;
     }
     

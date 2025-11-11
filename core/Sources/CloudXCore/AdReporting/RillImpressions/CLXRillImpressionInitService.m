@@ -60,14 +60,14 @@
     if (rillImpressionModel.impModel.sdkConfig) {
         [resolver setConfig:rillImpressionModel.impModel.sdkConfig];
     } else {
-        [logger debug:@"⚠️ [SDK_CONFIG_DEBUG] No SDK config available in impression model"];
+        [logger warn:@"[SDK_CONFIG_DEBUG] No SDK config available in impression model"];
     }
     
     // Build payload using server-driven fields
     NSString *serverDrivenPayload = [resolver buildPayload:auctionId];
     if (serverDrivenPayload && serverDrivenPayload.length > 0) {
         [logger debug:@"Using server-driven tracking payload"];
-        [logger debug:[NSString stringWithFormat:@"🔍 [PAYLOAD DEBUG] Raw payload before encryption: %@", serverDrivenPayload]];
+        [logger debug:[NSString stringWithFormat:@"Raw payload before encryption: %@", serverDrivenPayload]];
         return serverDrivenPayload;
     }
     

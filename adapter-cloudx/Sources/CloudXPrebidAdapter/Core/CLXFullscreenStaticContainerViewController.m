@@ -68,11 +68,11 @@
 - (instancetype)initWithDelegate:(id<CLXFullscreenStaticContainerViewControllerDelegate>)delegate
                             adm:(NSString *)adm {
     self.logger = [[CLXLogger alloc] initWithCategory:@"CLXFullscreenStaticContainerViewController"];
-    [self.logger info:[NSString stringWithFormat:@"🚀 [INIT] CLXFullscreenStaticContainerViewController initialization started - Delegate: %@, Ad markup: %lu chars", delegate ? @"Present" : @"nil", (unsigned long)(adm ? adm.length : 0)]];
+    [self.logger info:[NSString stringWithFormat:@"[ CLXFullscreenStaticContainerViewController initialization started - Delegate: %@, Ad markup: %lu chars", delegate ? @"Present" : @"nil", (unsigned long)(adm ? adm.length : 0)]];
     
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
-        [self.logger info:@"✅ [INIT] Super init successful"];
+        [self.logger info:@"Super init successful"];
         
         // Configure core properties
         self.delegate = delegate;
@@ -82,7 +82,7 @@
         
         // Initialize performance manager
         self.performanceManager = [CLXPerformanceManager sharedManager];
-        [self.logger info:@"✅ [INIT] Performance manager initialized"];
+        [self.logger info:@"Performance manager initialized"];
         
         // Viewability tracker will be initialized in viewDidLoad when self.view is available
         
@@ -96,9 +96,9 @@
         self.modalPresentationStyle = UIModalPresentationFullScreen;
         
         [self setupUI];
-        [self.logger info:@"🎯 [INIT] CLXFullscreenStaticContainerViewController initialization completed successfully - UI setup completed"];
+        [self.logger debug:@"[INIT] CLXFullscreenStaticContainerViewController initialization completed successfully - UI setup completed"];
     } else {
-        [self.logger error:@"❌ [INIT] Super init failed"];
+        [self.logger error:@"Super init failed"];
     }
     return self;
 }
@@ -109,12 +109,12 @@
  */
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self.logger debug:@"📱 [LIFECYCLE] viewDidLoad called"];
+    [self.logger debug:@"[LIFECYCLE] viewDidLoad called"];
     
     // Initialize viewability tracker now that self.view is available
     self.viewabilityTracker = [[CLXViewabilityTracker alloc] initWithView:self.view];
     self.viewabilityTracker.delegate = self;
-    [self.logger info:@"✅ [INIT] Viewability tracker initialized"];
+    [self.logger info:@"Viewability tracker initialized"];
 }
 
 /**
@@ -124,7 +124,7 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    [self.logger debug:@"📱 [LIFECYCLE] viewDidAppear called"];
+    [self.logger debug:@"[LIFECYCLE] viewDidAppear called"];
     
     // Start viewability tracking with IAB standard configuration
     [self startViewabilityTracking];
@@ -144,7 +144,7 @@
  */
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    [self.logger debug:@"📱 [LIFECYCLE] viewDidDisappear called"];
+    [self.logger debug:@"[LIFECYCLE] viewDidDisappear called"];
     
     // Stop viewability tracking
     [self stopViewabilityTracking];
@@ -160,7 +160,7 @@
  * Also cleans up MRAID manager and viewability tracker.
  */
 - (void)destroy {
-    [self.logger info:@"🗑️ [DESTROY] Destroying fullscreen container"];
+    [self.logger info:@"[DESTROY] Destroying fullscreen container"];
     dispatch_async(dispatch_get_main_queue(), ^{
         // Stop viewability tracking
         [self stopViewabilityTracking];
@@ -174,7 +174,7 @@
         self.webView.navigationDelegate = nil;
         self.webView.UIDelegate = nil;
         
-        [self.logger info:@"✅ [DESTROY] Fullscreen container destroyed successfully"];
+        [self.logger info:@"Fullscreen container destroyed successfully"];
     });
 }
 
@@ -187,7 +187,7 @@
  * Starts performance monitoring for load time measurement.
  */
 - (void)loadHTML {
-    [self.logger info:@"🌐 [LOAD] Loading HTML content"];
+    [self.logger info:@"[LOAD] Loading HTML content"];
     
     // Start performance monitoring
     self.loadTimerKey = [NSString stringWithFormat:@"interstitial_load_%p", self];
@@ -201,13 +201,13 @@
             
             if (optimizedHTML) {
                 [self.webView loadHTMLString:optimizedHTML baseURL:nil];
-                [self.logger info:@"✅ [LOAD] Optimized HTML content loaded successfully"];
+                [self.logger info:@"Optimized HTML content loaded successfully"];
             } else {
                 [self.webView loadHTMLString:self.adm baseURL:nil];
-                [self.logger info:@"✅ [LOAD] Original HTML content loaded successfully"];
+                [self.logger info:@"Original HTML content loaded successfully"];
             }
         } else {
-            [self.logger info:@"⚠️ [LOAD] Cannot load - adm is nil or empty"];
+            [self.logger warn:@"[LOAD] Cannot load - adm is nil or empty"];
         }
     });
 }
@@ -222,7 +222,7 @@
  * responsive layout across different device sizes.
  */
 - (void)setupUI {
-    [self.logger debug:@"🔧 [SETUP] Setting up UI components"];
+    [self.logger debug:@"Setting up UI components"];
     
     // Create close button with system styling
     self.closeButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -253,7 +253,7 @@
         [self.closeButton.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor constant:-self.trailingConstant]
     ]];
     
-    [self.logger info:@"✅ [SETUP] UI components configured successfully"];
+    [self.logger info:@"UI components configured successfully"];
 }
 
 /**
@@ -263,13 +263,13 @@
  * and sets up delegate for handling MRAID events.
  */
 - (void)initializeMRAIDManager {
-    [self.logger info:@"🔧 [MRAID] Initializing MRAID 3.0 manager"];
+    [self.logger info:@"Initializing MRAID 3.0 manager"];
     
     self.mraidManager = [[CLXMRAIDManager alloc] initWithWebView:self.webView 
                                                    placementType:CLXMRAIDPlacementTypeInterstitial];
     self.mraidManager.delegate = self;
     
-    [self.logger info:@"✅ [MRAID] MRAID 3.0 manager initialized successfully"];
+    [self.logger info:@"MRAID 3.0 manager initialized successfully"];
 }
 
 /**
@@ -279,7 +279,7 @@
  * and starts 60 FPS measurement tracking.
  */
 - (void)startViewabilityTracking {
-    [self.logger info:@"👁️ [VIEWABILITY] Starting viewability tracking"];
+    [self.logger info:@"VIEWABILITY [ Starting viewability tracking"];
     
     // Configure IAB standard (50% visible for 1 second)
     [self.viewabilityTracker configureCustomStandard:0.5 timeRequirement:1.0];
@@ -287,7 +287,7 @@
     // Start tracking
     [self.viewabilityTracker startTracking];
     
-    [self.logger info:@"✅ [VIEWABILITY] Viewability tracking started successfully"];
+    [self.logger info:@"Viewability tracking started successfully"];
 }
 
 /**
@@ -297,10 +297,10 @@
  */
 - (void)stopViewabilityTracking {
     if (self.viewabilityTracker) {
-        [self.logger info:@"⏹️ [VIEWABILITY] Stopping viewability tracking"];
+        [self.logger info:@"VIEWABILITY [ Stopping viewability tracking"];
         [self.viewabilityTracker stopTracking];
         self.viewabilityTracker = nil;
-        [self.logger info:@"✅ [VIEWABILITY] Viewability tracking stopped"];
+        [self.logger info:@"Viewability tracking stopped"];
     }
 }
 
@@ -311,13 +311,13 @@
  * of the close action. Ensures proper cleanup of resources.
  */
 - (void)clickClose {
-    [self.logger info:@"❌ [CLOSE] Close button tapped"];
+    [self.logger info:@"Close button tapped"];
     [self dismissViewControllerAnimated:YES completion:^{
         if ([self.delegate respondsToSelector:@selector(closeFullScreenAd)]) {
             [self.logger debug:@"📞 [DELEGATE] Calling closeFullScreenAd on delegate"];
             [self.delegate closeFullScreenAd];
         } else {
-            [self.logger info:@"⚠️ [DELEGATE] Delegate does not respond to closeFullScreenAd"];
+            [self.logger warn:@"[DELEGATE] Delegate does not respond to closeFullScreenAd"];
         }
     }];
 }
@@ -342,17 +342,17 @@
  * @param navigation The WKNavigation object
  */
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    [self.logger info:@"✅ [NAVIGATION] WebView navigation completed successfully"];
+    [self.logger info:@"WebView navigation completed successfully"];
     
     // Now that WebView has loaded HTML content, inject MRAID JavaScript
     if (self.mraidManager) {
-        [self.logger debug:@"🔧 [MRAID] Injecting JavaScript after WebView load completion"];
+        [self.logger debug:@"Injecting JavaScript after WebView load completion"];
         NSString *mraidJavaScript = [self.mraidManager getMRAIDJavaScript];
         [webView evaluateJavaScript:mraidJavaScript completionHandler:^(id _Nullable result, NSError * _Nullable error) {
             if (error) {
-                [self.logger error:[NSString stringWithFormat:@"❌ [MRAID] JavaScript injection failed: %@", error]];
+                [self.logger error:[NSString stringWithFormat:@"JavaScript injection failed: %@", error]];
             } else {
-                [self.logger info:@"✅ [MRAID] JavaScript injected successfully"];
+                [self.logger info:@"JavaScript injected successfully"];
             }
         }];
     }
@@ -360,7 +360,7 @@
     // End performance monitoring
     if (self.loadTimerKey) {
         [self.performanceManager endLoadTimerForKey:self.loadTimerKey];
-        [self.logger info:@"📊 [PERFORMANCE] Load time measurement completed"];
+        [self.logger info:@"Load time measurement completed"];
     }
     
     // Start render timer
@@ -370,14 +370,14 @@
     // End render timer after a short delay to measure render time
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.performanceManager endRenderTimerForKey:renderTimerKey];
-        [self.logger info:@"📊 [PERFORMANCE] Render time measurement completed"];
+        [self.logger info:@"Render time measurement completed"];
     });
     
     if ([self.delegate respondsToSelector:@selector(didLoad)]) {
         [self.logger debug:@"📞 [DELEGATE] Calling didLoad on delegate"];
         [self.delegate didLoad];
     } else {
-        [self.logger info:@"⚠️ [DELEGATE] Delegate does not respond to didLoad"];
+        [self.logger warn:@"[DELEGATE] Delegate does not respond to didLoad"];
     }
 }
 
@@ -393,7 +393,7 @@
  * @param error The NSError describing the failure
  */
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
-    [self.logger error:[NSString stringWithFormat:@"❌ [NAVIGATION] WebView navigation failed: %@", error.localizedDescription]];
+    [self.logger error:[NSString stringWithFormat:@"WebView navigation failed: %@", error.localizedDescription]];
     
     // End performance monitoring on failure
     if (self.loadTimerKey) {
@@ -404,7 +404,7 @@
         [self.logger debug:@"📞 [DELEGATE] Calling didFailToShowWithError on delegate"];
         [self.delegate didFailToShowWithError:error];
     } else {
-        [self.logger info:@"⚠️ [DELEGATE] Delegate does not respond to didFailToShowWithError"];
+        [self.logger warn:@"[DELEGATE] Delegate does not respond to didFailToShowWithError"];
     }
 }
 
@@ -435,13 +435,13 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             NSURL *url = navigationAction.request.URL;
             if (url) {
-                [self.logger debug:[NSString stringWithFormat:@"📊 [CLICK] URL: %@", url]];
+                [self.logger debug:[NSString stringWithFormat:@"URL: %@", url]];
                 
                 if ([self.delegate respondsToSelector:@selector(didClickFullAdd)]) {
                     [self.logger debug:@"📞 [DELEGATE] Calling didClickFullAdd on delegate"];
                     [self.delegate didClickFullAdd];
                 } else {
-                    [self.logger info:@"⚠️ [DELEGATE] Delegate does not respond to didClickFullAdd"];
+                    [self.logger warn:@"[DELEGATE] Delegate does not respond to didClickFullAdd"];
                 }
                 
                 // Open URL in SafariViewController for better user experience
@@ -450,10 +450,10 @@
                 
                 SFSafariViewController *safariVC = [[SFSafariViewController alloc] initWithURL:url configuration:config];
                 [self presentViewController:safariVC animated:YES completion:^{
-                    [self.logger info:@"✅ [CLICK] SafariViewController presented successfully"];
+                    [self.logger info:@"SafariViewController presented successfully"];
                 }];
             } else {
-                [self.logger info:@"⚠️ [CLICK] URL is nil, cannot open SafariViewController"];
+                [self.logger warn:@"[CLICK] URL is nil, cannot open SafariViewController"];
             }
         });
     }
@@ -470,15 +470,15 @@
 @implementation CLXFullscreenStaticContainerViewController (CLXMRAIDManagerDelegate)
 
 - (void)mraidManager:(CLXMRAIDManager *)manager didChangeState:(CLXMRAIDState)state {
-    [self.logger info:[NSString stringWithFormat:@"📱 [MRAID] State changed to: %ld", (long)state]];
+    [self.logger info:[NSString stringWithFormat:@"[MRAID] State changed to: %ld", (long)state]];
 }
 
 - (void)mraidManager:(CLXMRAIDManager *)manager didChangeViewable:(BOOL)viewable {
-    [self.logger info:[NSString stringWithFormat:@"👁️ [MRAID] Viewability changed to: %@", viewable ? @"YES" : @"NO"]];
+    [self.logger info:[NSString stringWithFormat:@"[MRAID] Viewability changed to: %@", viewable ? @"YES" : @"NO"]];
 }
 
 - (void)mraidManager:(CLXMRAIDManager *)manager didReceiveCloseRequest:(NSDictionary *)parameters {
-    [self.logger info:@"❌ [MRAID] Close request received from MRAID"];
+    [self.logger info:@"Close request received from MRAID"];
     [self clickClose];
 }
 
@@ -506,7 +506,7 @@
 @implementation CLXFullscreenStaticContainerViewController (CLXViewabilityTrackerDelegate)
 
 - (void)viewabilityTracker:(CLXViewabilityTracker *)tracker didChangeViewability:(BOOL)viewable measurement:(CLXViewabilityMeasurement *)measurement {
-    [self.logger info:[NSString stringWithFormat:@"👁️ [VIEWABILITY] Viewability changed to: %@ (%.1f%% exposed)", 
+    [self.logger info:[NSString stringWithFormat:@"[VIEWABILITY] Viewability changed to: %@ (%.1f%% exposed)", 
                        viewable ? @"YES" : @"NO", measurement.exposedPercentage * 100]];
     
     // Update MRAID viewability state
@@ -520,8 +520,8 @@
 }
 
 - (void)viewabilityTracker:(CLXViewabilityTracker *)tracker didMeetViewabilityThreshold:(CLXViewabilityMeasurement *)measurement {
-    [self.logger info:@"🎯 [VIEWABILITY] IAB viewability threshold met!"];
-    [self.logger info:[NSString stringWithFormat:@"📊 [VIEWABILITY] Viewable time: %.2f seconds", measurement.viewableTime]];
+    [self.logger info:@"VIEWABILITY [ IAB viewability threshold met!"];
+    [self.logger info:[NSString stringWithFormat:@"Viewable time: %.2f seconds", measurement.viewableTime]];
     
     // Trigger impression when viewability threshold is met
     if ([self.delegate respondsToSelector:@selector(impression)]) {

@@ -58,7 +58,7 @@
                                                        extras:(NSDictionary<NSString *, NSString *> *)extras
                                                      delegate:(id<CLXAdapterBannerDelegate>)delegate {
     
-    [[CLXMetaBannerFactory logger] debug:[NSString stringWithFormat:@"✅ [CLXMetaBannerFactory] Creating banner for placement: %@ | bidPayload: %@", adId, adm ? @"YES" : @"NO"]];
+    [[CLXMetaBannerFactory logger] debug:[NSString stringWithFormat:@"Creating banner for placement: %@ | bidPayload: %@", adId, adm ? @"YES" : @"NO"]];
     
     // Use shared base factory method to resolve Meta placement ID
     NSString *metaPlacementID = [CLXMetaBaseFactory resolveMetaPlacementID:extras 

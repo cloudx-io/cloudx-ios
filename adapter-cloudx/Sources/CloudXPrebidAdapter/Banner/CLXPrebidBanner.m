@@ -70,7 +70,7 @@
                viewController:(UIViewController *)viewController
                      delegate:(id<CLXAdapterBannerDelegate>)delegate {
     self.logger = [[CLXLogger alloc] initWithCategory:@"CloudXPrebidBanner"];
-    [self.logger info:[NSString stringWithFormat:@"🚀 [INIT] CloudXPrebidBanner initialization - Markup: %lu chars, Type: %ld, CloseBtn: %@", (unsigned long)adm.length, (long)type, hasClosedButton ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"CloudXPrebidBanner initialization - Markup: %lu chars, Type: %ld, CloseBtn: %@", (unsigned long)adm.length, (long)type, hasClosedButton ? @"YES" : @"NO"]];
     
     // Start performance tracking for initialization
     [[CLXPerformanceManager sharedManager] startLoadTimerForKey:[NSString stringWithFormat:@"banner_%p", self]];
@@ -86,7 +86,7 @@
         
         // Validate ad markup content
         if (!self.adm || self.adm.length == 0) {
-            [self.logger error:@"❌ [INIT] Invalid ad markup - empty or nil"];
+            [self.logger error:@"Invalid ad markup - empty or nil"];
         }
         
         // Create close button on main thread for UI safety
@@ -95,9 +95,9 @@
             self.closeButton.translatesAutoresizingMaskIntoConstraints = NO;
         });
         
-        [self.logger info:[NSString stringWithFormat:@"✅ [INIT] CloudXPrebidBanner initialization completed - Instance: %p", self]];
+        [self.logger debug:[NSString stringWithFormat:@"CloudXPrebidBanner initialization completed - Instance: %p", self]];
     } else {
-        [self.logger error:@"❌ [INIT] Super init failed"];
+        [self.logger error:@"Super init failed"];
         [[CLXPerformanceManager sharedManager] endLoadTimerForKey:[NSString stringWithFormat:@"banner_%p", self]];
         return nil;
     }
@@ -137,11 +137,11 @@
  * It is typically called after initialization.
  */
 - (void)load {
-    [self.logger info:@"🚀 [LOAD] Banner load() method called"];
+    [self.logger info:@"[ Banner load() method called"];
     
     // Pre-load validation
     if (!self.adm || self.adm.length == 0) {
-        [self.logger error:@"❌ [LOAD] Cannot load - ad markup is empty or nil"];
+        [self.logger error:@"Cannot load - ad markup is empty or nil"];
         if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
             NSError *error = [NSError errorWithDomain:@"CloudXPrebidBanner" code:400 userInfo:@{NSLocalizedDescriptionKey: @"Ad markup is empty or nil"}];
             [self.delegate failToLoadBanner:self error:error];
@@ -150,7 +150,7 @@
     }
     
     if (!self.viewController) {
-        [self.logger error:@"❌ [LOAD] Cannot load - view controller is nil"];
+        [self.logger error:@"Cannot load - view controller is nil"];
         if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
             NSError *error = [NSError errorWithDomain:@"CloudXPrebidBanner" code:401 userInfo:@{NSLocalizedDescriptionKey: @"View controller is nil"}];
             [self.delegate failToLoadBanner:self error:error];
@@ -163,10 +163,10 @@
         [[CLXPerformanceManager sharedManager] startRenderTimerForKey:[NSString stringWithFormat:@"banner_%p", self]];
         
         CGSize bannerSize = [self getBannerSizeForType:self.type];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [LOAD] Calculated banner size: %@", NSStringFromCGSize(bannerSize)]];
+        [self.logger debug:[NSString stringWithFormat:@"Calculated banner size: %@", NSStringFromCGSize(bannerSize)]];
         
         if (bannerSize.width <= 0 || bannerSize.height <= 0) {
-            [self.logger error:@"❌ [LOAD] Invalid banner size calculated"];
+            [self.logger error:@"Invalid banner size calculated"];
             if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
                 NSError *error = [NSError errorWithDomain:@"CloudXPrebidBanner" code:402 userInfo:@{NSLocalizedDescriptionKey: @"Invalid banner size"}];
                 [self.delegate failToLoadBanner:self error:error];
@@ -178,7 +178,7 @@
         self.webView = [[CLXPrebidWebView alloc] initWithFrame:frame placementType:CLXMRAIDPlacementTypeInline];
         
         if (self.webView) {
-            [self.logger info:[NSString stringWithFormat:@"✅ [LOAD] CLXPrebidWebView created successfully: %p", self.webView]];
+            [self.logger debug:[NSString stringWithFormat:@"CLXPrebidWebView created successfully: %p", self.webView]];
             self.webView.delegate = self;
             self.webView.scrollView.scrollEnabled = NO;
             self.webView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -209,7 +209,7 @@
             
             NSString *htmlString = [NSString stringWithFormat:@"<!DOCTYPE html><html><head>%@%@</head><body>%@</body></html>", viewport, style, optimizedAdm];
             
-            [self.logger info:[NSString stringWithFormat:@"✅ [LOAD] HTML generated - %lu chars", (unsigned long)htmlString.length]];
+            [self.logger debug:[NSString stringWithFormat:@"HTML generated - %lu chars", (unsigned long)htmlString.length]];
             
             // Check for video content
             BOOL hasVideo = [self.adm containsString:@"<video"] || [self.adm containsString:@"<VAST"] || [self.adm containsString:@".mp4"] || [self.adm containsString:@".webm"];
@@ -222,16 +222,16 @@
             // Check for MRAID content
             BOOL hasMRAID = [self.adm containsString:@"mraid"] || [self.adm containsString:@"expand"] || [self.adm containsString:@"resize"];
             if (hasMRAID) {
-                [self.logger info:@"📱 [LOAD] MRAID content detected"];
+                [self.logger info:@"[LOAD] MRAID content detected"];
             }
             
-            [self.logger info:@"🚀 [LOAD] Loading HTML into CLXPrebidWebView with advanced features enabled"];
+            [self.logger debug:@"Loading HTML into CLXPrebidWebView with advanced features enabled"];
             // Use CLXPrebidWebView's loadOptimizedHTML method for best performance
             [self.webView loadOptimizedHTML:htmlString baseURL:nil completion:^(BOOL success, NSError *error) {
                 if (success) {
-                    [self.logger info:@"✅ [LOAD] HTML loaded successfully into webview"];
+                    [self.logger debug:@"HTML loaded successfully into webview"];
                 } else {
-                    [self.logger error:[NSString stringWithFormat:@"❌ [LOAD] Failed to load HTML: %@", error.localizedDescription]];
+                    [self.logger error:[NSString stringWithFormat:@"Failed to load HTML: %@", error.localizedDescription]];
                 }
             }];
             
@@ -247,11 +247,11 @@
                     [self.webView.trailingAnchor constraintEqualToAnchor:self.closeButton.trailingAnchor],
                     [self.webView.topAnchor constraintEqualToAnchor:self.closeButton.topAnchor]
                 ]];
-                [self.logger info:@"✅ [TestVastNetworkBanner] Close button added"];
+                [self.logger info:@"Close button added"];
             }
             
         } else {
-            [self.logger error:@"❌ [TestVastNetworkBanner] Failed to create WKWebView"];
+            [self.logger error:@"Failed to create WKWebView"];
         }
     });
 }
@@ -279,9 +279,9 @@
  * impression event to the delegate for session metrics tracking.
  */
 - (void)impression {
-    [self.logger info:@"🎯 [VIEWABILITY] Banner met viewability threshold - firing impression"];
+    [self.logger info:@"VIEWABILITY [ Banner met viewability threshold - firing impression"];
     if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
-        [self.logger debug:@"✅ [DELEGATE] Calling impressionBanner on delegate"];
+        [self.logger debug:@"Calling impressionBanner on delegate"];
         [self.delegate impressionBanner:self];
     }
 }
@@ -344,7 +344,7 @@
  * @return UIViewController for presenting modals.
  */
 - (UIViewController *)viewControllerForPresentingModals {
-    [self.logger debug:@"🔧 [TestVastNetworkBanner] viewControllerForPresentingModals called"];
+    [self.logger debug:@"viewControllerForPresentingModals called"];
     return self.viewController;
 }
 
@@ -357,10 +357,10 @@
  * @param webView The CLXPrebidWebView that is ready.
  */
 - (void)webViewReadyToDisplay:(CLXPrebidWebView *)webView {
-    [self.logger info:@"🎉 [SUCCESS] webViewReadyToDisplay called - banner is ready!"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SUCCESS] CLXPrebidWebView: %p", webView]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SUCCESS] Banner instance: %p", self]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [SUCCESS] Delegate available: %@", self.delegate ? @"YES" : @"NO"]];
+    [self.logger debug:@"webViewReadyToDisplay called - banner is ready!"];
+    [self.logger debug:[NSString stringWithFormat:@"CLXPrebidWebView: %p", webView]];
+    [self.logger debug:[NSString stringWithFormat:@"Banner instance: %p", self]];
+    [self.logger debug:[NSString stringWithFormat:@"Delegate available: %@", self.delegate ? @"YES" : @"NO"]];
     
     // End performance timers
     NSString *timerKey = [NSString stringWithFormat:@"banner_%p", self];
@@ -369,19 +369,19 @@
     
     // Log performance metrics
     CLXPerformanceMetrics *metrics = [[CLXPerformanceManager sharedManager] metrics];
-    [self.logger info:[NSString stringWithFormat:@"⏱️ [PERFORMANCE] Load time: %.3f seconds", metrics.loadTime]];
-    [self.logger info:[NSString stringWithFormat:@"⏱️ [PERFORMANCE] Render time: %.3f seconds", metrics.renderTime]];
+    [self.logger debug:[NSString stringWithFormat:@"[PERFORMANCE] Load time: %.3f seconds", metrics.loadTime]];
+    [self.logger debug:[NSString stringWithFormat:@"[PERFORMANCE] Render time: %.3f seconds", metrics.renderTime]];
     
-    [self.logger debug:@"🔧 [SUCCESS] Notifying delegate: didLoadBanner..."];
+    [self.logger debug:@"Notifying delegate: didLoadBanner..."];
     if ([self.delegate respondsToSelector:@selector(didLoadBanner:)]) {
-        [self.logger info:@"✅ [DELEGATE] Calling didLoadBanner on delegate"];
+        [self.logger debug:@"Calling didLoadBanner on delegate"];
         [self.delegate didLoadBanner:self];
-        [self.logger debug:@"✅ [DELEGATE] didLoadBanner call completed"];
+        [self.logger debug:@"didLoadBanner call completed"];
     } else {
-        [self.logger info:@"⚠️ [DELEGATE] Delegate does not respond to didLoadBanner"];
+        [self.logger warn:@"[DELEGATE] Delegate does not respond to didLoadBanner"];
     }
     
-    [self.logger info:@"🎯 [SUCCESS] Banner load sequence completed successfully"];
+    [self.logger info:@"SUCCESS [ Banner load sequence completed successfully"];
 }
 
 /**
@@ -394,14 +394,14 @@
  * @param error The NSError describing the failure.
  */
 - (void)webView:(CLXPrebidWebView *)webView failedToLoadWithError:(NSError *)error {
-    [self.logger error:@"❌ [ERROR] Banner failed to load - webView error occurred"];
-    [self.logger error:[NSString stringWithFormat:@"📊 [ERROR] WebView: %p", webView]];
-    [self.logger error:[NSString stringWithFormat:@"📊 [ERROR] Banner instance: %p", self]];
-    [self.logger error:[NSString stringWithFormat:@"📊 [ERROR] Error domain: %@", error.domain]];
-    [self.logger error:[NSString stringWithFormat:@"📊 [ERROR] Error code: %ld", (long)error.code]];
-    [self.logger error:[NSString stringWithFormat:@"📊 [ERROR] Error description: %@", error.localizedDescription]];
-    [self.logger error:[NSString stringWithFormat:@"📊 [ERROR] Error failure reason: %@", error.localizedFailureReason ?: @"None"]];
-    [self.logger error:[NSString stringWithFormat:@"📊 [ERROR] Error user info: %@", error.userInfo]];
+    [self.logger error:@"Banner failed to load - webView error occurred"];
+    [self.logger error:[NSString stringWithFormat:@"WebView: %p", webView]];
+    [self.logger error:[NSString stringWithFormat:@"Banner instance: %p", self]];
+    [self.logger error:[NSString stringWithFormat:@"Error domain: %@", error.domain]];
+    [self.logger error:[NSString stringWithFormat:@"Error code: %ld", (long)error.code]];
+    [self.logger error:[NSString stringWithFormat:@"Error description: %@", error.localizedDescription]];
+    [self.logger error:[NSString stringWithFormat:@"Error failure reason: %@", error.localizedFailureReason ?: @"None"]];
+    [self.logger error:[NSString stringWithFormat:@"Error user info: %@", error.userInfo]];
     
     // End performance timers on failure
     NSString *timerKey = [NSString stringWithFormat:@"banner_%p", self];
@@ -410,19 +410,19 @@
     
     // Log attempted ad markup for debugging
     if (self.adm && self.adm.length > 0) {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [ERROR] Ad markup that failed to load: %@", 
+        [self.logger debug:[NSString stringWithFormat:@"Ad markup that failed to load: %@", 
                       [self.adm substringToIndex:MIN(300, self.adm.length)]]];
     } else {
-        [self.logger error:@"📊 [ERROR] Ad markup was empty or nil"];
+        [self.logger error:@"Ad markup was empty or nil"];
     }
     
-    [self.logger debug:@"🔧 [ERROR] Notifying delegate of failure..."];
+    [self.logger debug:@"Notifying delegate of failure..."];
     if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
         [self.logger error:@"📞 [DELEGATE] Calling failToLoadBanner:error: on delegate"];
         [self.delegate failToLoadBanner:self error:error];
-        [self.logger debug:@"✅ [DELEGATE] failToLoadBanner:error: call completed"];
+        [self.logger debug:@"failToLoadBanner:error: call completed"];
     } else {
-        [self.logger error:@"⚠️ [DELEGATE] Delegate does not respond to failToLoadBanner:error: - no error callback available"];
+        [self.logger warn:@"[DELEGATE] Delegate does not respond to failToLoadBanner:error: - no error callback available"];
     }
     
     [self.logger error:@"🔚 [ERROR] Banner error handling completed"];
@@ -438,11 +438,11 @@
  * @param url The NSURL of the click-through link.
  */
 - (void)webView:(CLXPrebidWebView *)webView receivedClickthroughLink:(NSURL *)url {
-    [self.logger info:@"✅ [TestVastNetworkBanner] webView:receivedClickthroughLink called"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [TestVastNetworkBanner] URL: %@", url]];
+    [self.logger info:@"webView:receivedClickthroughLink called"];
+    [self.logger debug:[NSString stringWithFormat:@"URL: %@", url]];
     
     if ([self.delegate respondsToSelector:@selector(clickBanner:)]) {
-        [self.logger info:@"✅ [TestVastNetworkBanner] Calling delegate clickBanner"];
+        [self.logger info:@"Calling delegate clickBanner"];
         [self.delegate clickBanner:self];
     }
     

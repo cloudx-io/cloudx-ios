@@ -127,11 +127,11 @@
  */
 - (instancetype)init {
     self.logger = [[CLXLogger alloc] initWithCategory:@"CLXPerformanceManager"];
-    [self.logger info:@"🚀 [PERFORMANCE-INIT] CLXPerformanceManager initialization started"];
+    [self.logger debug:@"[PERFORMANCE-INIT] CLXPerformanceManager initialization started"];
     
     self = [super init];
     if (self) {
-        [self.logger info:@"✅ [PERFORMANCE-INIT] Super init successful"];
+        [self.logger info:@"Super init successful"];
         
         // Initialize performance tracking components
         _metrics = [[CLXPerformanceMetrics alloc] init];
@@ -146,7 +146,7 @@
         _maxConcurrentPreloads = 3; // Limit concurrent preloads to prevent resource exhaustion
         _currentCacheSize = 0;
         
-        [self.logger debug:@"📊 [PERFORMANCE-INIT] Configuration:"];
+        [self.logger debug:@"Configuration:"];
         [self.logger debug:[NSString stringWithFormat:@"  📍 Max cache size: %lu MB", (unsigned long)(_maxCacheSize / 1024 / 1024)]];
         [self.logger debug:[NSString stringWithFormat:@"  📍 Cache expiration: %ld seconds", (long)_cacheExpirationTime]];
         [self.logger debug:[NSString stringWithFormat:@"  📍 Background processing: %@", _backgroundProcessingEnabled ? @"Enabled" : @"Disabled"]];
@@ -155,25 +155,25 @@
         // Create GCD queues for concurrent operations
         _backgroundQueue = dispatch_queue_create("com.cloudx.prebid.background", DISPATCH_QUEUE_CONCURRENT);
         _cacheQueue = dispatch_queue_create("com.cloudx.prebid.cache", DISPATCH_QUEUE_SERIAL);
-        [self.logger info:@"✅ [PERFORMANCE-INIT] GCD queues created"];
+        [self.logger info:@"GCD queues created"];
         
         // Configure operation queue for background preloading
         _preloadQueue = [[NSOperationQueue alloc] init];
         _preloadQueue.maxConcurrentOperationCount = _maxConcurrentPreloads;
         _preloadQueue.name = @"PreloadQueue";
-        [self.logger info:@"✅ [PERFORMANCE-INIT] Preload queue configured"];
+        [self.logger info:@"Preload queue configured"];
         
         // Register for system notifications
         [self setupNotifications];
-        [self.logger info:@"✅ [PERFORMANCE-INIT] Notifications registered"];
+        [self.logger info:@"Notifications registered"];
         
         // Start maintenance timer for periodic cleanup
         [self startMaintenanceTimer];
-        [self.logger info:@"✅ [PERFORMANCE-INIT] Maintenance timer started (5 minutes interval)"];
+        [self.logger info:@"Maintenance timer started (5 minutes interval)"];
         
-        [self.logger info:@"🎯 [PERFORMANCE-INIT] CLXPerformanceManager initialization completed successfully"];
+        [self.logger debug:@"[PERFORMANCE-INIT] CLXPerformanceManager initialization completed successfully"];
     } else {
-        [self.logger error:@"❌ [PERFORMANCE-INIT] Super init failed"];
+        [self.logger error:@"Super init failed"];
     }
     return self;
 }
@@ -355,7 +355,7 @@
         self.cache[key] = entry;
         self.currentCacheSize += entry.size;
         
-        [self.logger debug:[NSString stringWithFormat:@"📦 [CACHE] Cached content for key: %@, size: %lu bytes", key, (unsigned long)entry.size]];
+        [self.logger debug:[NSString stringWithFormat:@"[CACHE] Cached content for key: %@, size: %lu bytes", key, (unsigned long)entry.size]];
     });
 }
 
@@ -380,9 +380,9 @@
             entry.accessCount++;
             result = entry.data;
             
-            [self.logger debug:[NSString stringWithFormat:@"📦 [CACHE] Cache hit for key: %@", key]];
+            [self.logger debug:[NSString stringWithFormat:@"[CACHE] Cache hit for key: %@", key]];
         } else {
-            [self.logger debug:[NSString stringWithFormat:@"📦 [CACHE] Cache miss for key: %@", key]];
+            [self.logger debug:[NSString stringWithFormat:@"[CACHE] Cache miss for key: %@", key]];
         }
     });
     return result;
@@ -403,7 +403,7 @@
         if (entry) {
             self.currentCacheSize -= entry.size;
             [self.cache removeObjectForKey:key];
-            [self.logger debug:[NSString stringWithFormat:@"🗑️ [CACHE] Removed cached content for key: %@", key]];
+            [self.logger debug:[NSString stringWithFormat:@"[CACHE] Removed cached content for key: %@", key]];
         }
     });
 }
@@ -436,7 +436,7 @@
  */
 - (void)preloadAdContent:(CLXPreloadRequest *)request {
     if (!self.backgroundProcessingEnabled || !request || !request.adMarkup) {
-        [self.logger debug:[NSString stringWithFormat:@"⚠️ [PRELOAD] Skipping preload - background processing: %@, request: %@, adMarkup: %@", 
+        [self.logger warn:[NSString stringWithFormat:@"[PRELOAD] Skipping preload - background processing: %@, request: %@, adMarkup: %@", 
               self.backgroundProcessingEnabled ? @"YES" : @"NO",
               request ? @"Present" : @"nil",
               request.adMarkup ? @"Present" : @"nil"]];
@@ -505,7 +505,7 @@
     
     dispatch_async(self.cacheQueue, ^{
         self.loadTimers[key] = @([NSDate timeIntervalSinceReferenceDate]);
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PERFORMANCE] Started load timer for key: %@", key]];
+        [self.logger debug:[NSString stringWithFormat:@"Started load timer for key: %@", key]];
     });
 }
 
@@ -527,7 +527,7 @@
             self.metrics.loadTime = loadTime;
             [self.loadTimers removeObjectForKey:key];
             
-            [self.logger info:[NSString stringWithFormat:@"📊 [PERFORMANCE] Load time for %@: %.3f seconds", key, loadTime]];
+            [self.logger debug:[NSString stringWithFormat:@"Load time for %@: %.3f seconds", key, loadTime]];
             
             // Update last optimization time
             self.metrics.lastOptimizationTime = [NSDate timeIntervalSinceReferenceDate];
@@ -548,7 +548,7 @@
     
     dispatch_async(self.cacheQueue, ^{
         self.renderTimers[key] = @([NSDate timeIntervalSinceReferenceDate]);
-        [self.logger debug:[NSString stringWithFormat:@"📊 [PERFORMANCE] Started render timer for key: %@", key]];
+        [self.logger debug:[NSString stringWithFormat:@"Started render timer for key: %@", key]];
     });
 }
 
@@ -570,7 +570,7 @@
             self.metrics.renderTime = renderTime;
             [self.renderTimers removeObjectForKey:key];
             
-            [self.logger info:[NSString stringWithFormat:@"📊 [PERFORMANCE] Render time for %@: %.3f seconds", key, renderTime]];
+            [self.logger debug:[NSString stringWithFormat:@"Render time for %@: %.3f seconds", key, renderTime]];
             
             // Update last optimization time
             self.metrics.lastOptimizationTime = [NSDate timeIntervalSinceReferenceDate];
@@ -590,8 +590,8 @@
     NSUInteger totalRequests = self.metrics.cacheHits + self.metrics.cacheMisses;
     CGFloat hitRate = totalRequests > 0 ? (CGFloat)self.metrics.cacheHits / totalRequests * 100.0 : 0.0;
     
-    [self.logger info:[NSString stringWithFormat:@"💾 [PERFORMANCE] Cache hit rate: %.1f%% (%lu hits, %lu misses)", hitRate, self.metrics.cacheHits, self.metrics.cacheMisses]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PERFORMANCE] Cache hit recorded - Total requests: %lu", totalRequests]];
+    [self.logger info:[NSString stringWithFormat:@"Cache hit rate: %.1f%% (%lu hits, %lu misses)", hitRate, self.metrics.cacheHits, self.metrics.cacheMisses]];
+    [self.logger debug:[NSString stringWithFormat:@"Cache hit recorded - Total requests: %lu", totalRequests]];
 }
 
 /**
@@ -606,8 +606,8 @@
     NSUInteger totalRequests = self.metrics.cacheHits + self.metrics.cacheMisses;
     CGFloat hitRate = totalRequests > 0 ? (CGFloat)self.metrics.cacheHits / totalRequests * 100.0 : 0.0;
     
-    [self.logger info:[NSString stringWithFormat:@"💾 [PERFORMANCE] Cache hit rate: %.1f%% (%lu hits, %lu misses)", hitRate, self.metrics.cacheHits, self.metrics.cacheMisses]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PERFORMANCE] Cache miss recorded - Total requests: %lu", totalRequests]];
+    [self.logger info:[NSString stringWithFormat:@"Cache hit rate: %.1f%% (%lu hits, %lu misses)", hitRate, self.metrics.cacheHits, self.metrics.cacheMisses]];
+    [self.logger debug:[NSString stringWithFormat:@"Cache miss recorded - Total requests: %lu", totalRequests]];
 }
 
 #pragma mark - Resource Optimization
@@ -630,8 +630,8 @@
         return nil;
     }
     
-    [self.logger debug:@"🔧 [PERFORMANCE] Optimizing HTML content"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PERFORMANCE] Original size: %lu characters", (unsigned long)html.length]];
+    [self.logger verbose:@"Optimizing HTML content"];
+    [self.logger verbose:[NSString stringWithFormat:@"Original size: %lu characters", (unsigned long)html.length]];
     
     NSMutableString *optimizedHTML = [html mutableCopy];
     
@@ -647,8 +647,8 @@
     // Trim leading/trailing whitespace
     [optimizedHTML setString:[optimizedHTML stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
     
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PERFORMANCE] Optimized size: %lu characters", (unsigned long)optimizedHTML.length]];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [PERFORMANCE] Compression ratio: %.1f%%", (1.0 - (double)optimizedHTML.length / html.length) * 100]];
+    [self.logger verbose:[NSString stringWithFormat:@"Optimized size: %lu characters", (unsigned long)optimizedHTML.length]];
+    [self.logger verbose:[NSString stringWithFormat:@"Compression ratio: %.1f%%", (1.0 - (double)optimizedHTML.length / html.length) * 100]];
     
     return optimizedHTML;
 }
@@ -686,7 +686,7 @@
         
         // Check if HTML is valid
         if (!html || html.length == 0) {
-            [self.logger debug:@"⚠️ [PRELOAD] HTML content is nil or empty, skipping preload"];
+            [self.logger warn:@"[PRELOAD] HTML content is nil or empty, skipping preload"];
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) {
                     completion([preloadedKeys copy]);
@@ -695,11 +695,11 @@
             return;
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"🔄 [PRELOAD] Starting image preload for HTML length: %lu", (unsigned long)html.length]];
+        [self.logger debug:[NSString stringWithFormat:@"Starting image preload for HTML length: %lu", (unsigned long)html.length]];
         
         // Log active preload count
         NSUInteger activePreloads = self.preloadQueue.operationCount;
-        [self.logger info:[NSString stringWithFormat:@"🔄 [PERFORMANCE] Background preloads: %lu active", activePreloads]];
+        [self.logger verbose:[NSString stringWithFormat:@"Background preloads: %lu active", activePreloads]];
         
         // Extract image URLs from HTML using regex pattern
         NSRegularExpression *imgRegex = [NSRegularExpression regularExpressionWithPattern:@"<img[^>]+src=['\"]([^'\"]+)['\"]"
@@ -743,7 +743,7 @@
         
         // Notify completion when all downloads finish
         dispatch_group_notify(group, dispatch_get_main_queue(), ^{
-            [self.logger debug:[NSString stringWithFormat:@"✅ [PRELOAD] Image preload completed - %lu images preloaded", (unsigned long)preloadedKeys.count]];
+            [self.logger verbose:[NSString stringWithFormat:@"Image preload completed - %lu images preloaded", (unsigned long)preloadedKeys.count]];
             if (completion) {
                 completion([preloadedKeys copy]);
             }

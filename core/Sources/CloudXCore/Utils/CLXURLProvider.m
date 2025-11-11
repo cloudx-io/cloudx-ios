@@ -27,13 +27,13 @@ static NSString *const kEnvironmentKey = @"CLXEnvironment";
 
 + (NSString *)auctionApiUrl {
     // Auction URLs now come from SDK response only
-    [[CLXLogger shared] info:@"⚠️ [CLXURLProvider] auctionApiUrl is deprecated - URLs come from SDK response"];
+    [[CLXLogger shared] info:@"[CLXURLProvider] auctionApiUrl is deprecated - URLs come from SDK response"];
     return nil;
 }
 
 + (NSString *)metricsApiUrl {
     // Metrics URLs now come from SDK response only
-    [[CLXLogger shared] info:@"⚠️ [CLXURLProvider] metricsApiUrl is deprecated - URLs come from SDK response"];
+    [[CLXLogger shared] info:@"[CLXURLProvider] metricsApiUrl is deprecated - URLs come from SDK response"];
     return nil;
 }
 
@@ -79,7 +79,7 @@ static NSString *const kEnvironmentKey = @"CLXEnvironment";
     // Validate environment
     NSArray *validEnvironments = @[@"dev", @"staging", @"production"];
     if (![validEnvironments containsObject:environment]) {
-        [[CLXLogger shared] error:[NSString stringWithFormat:@"⚠️ [CLXURLProvider] Invalid environment '%@'. Valid options: %@", 
+        [[CLXLogger shared] error:[NSString stringWithFormat:@"[CLXURLProvider] Invalid environment '%@'. Valid options: %@", 
               environment, validEnvironments]];
         return;
     }
@@ -88,10 +88,10 @@ static NSString *const kEnvironmentKey = @"CLXEnvironment";
     [[NSUserDefaults standardUserDefaults] setObject:environment forKey:kEnvironmentKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    [[CLXLogger shared] info:[NSString stringWithFormat:@"✅ [CLXURLProvider] Environment set to: %@", environment]];
+    [[CLXLogger shared] info:[NSString stringWithFormat:@"[CLXURLProvider] Environment set to: %@", environment]];
 #else
     // Ignored in production builds
-    [[CLXLogger shared] info:@"⚠️ [CLXURLProvider] Environment switching disabled in production builds"];
+    [[CLXLogger shared] info:@"[CLXURLProvider] Environment switching disabled in production builds"];
 #endif
 }
 

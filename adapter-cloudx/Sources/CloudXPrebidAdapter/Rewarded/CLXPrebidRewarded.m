@@ -25,7 +25,7 @@
                       bidID:(NSString *)bidID
                    delegate:(id<CLXAdapterRewardedDelegate>)delegate {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidRewarded"];
-    [logger info:[NSString stringWithFormat:@"🚀 [INIT] CLXPrebidRewarded initialization - Markup: %lu chars, BidID: %@", (unsigned long)adm.length, bidID ?: @"nil"]];
+    [logger debug:[NSString stringWithFormat:@"[INIT] CLXPrebidRewarded initialization - Markup: %lu chars, BidID: %@", (unsigned long)adm.length, bidID ?: @"nil"]];
     
     self = [super init];
     if (self) {
@@ -33,9 +33,9 @@
         self.bidID = bidID;
         self.delegate = delegate;
         
-        [logger info:@"✅ [INIT] CLXPrebidRewarded initialization completed successfully"];
+        [logger info:@"CLXPrebidRewarded initialization completed successfully"];
     } else {
-        [logger error:@"❌ [INIT] Super init failed"];
+        [logger error:@"Super init failed"];
     }
     return self;
 }
@@ -61,18 +61,18 @@
 
 - (void)load {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidRewarded"];
-    [logger info:@"🚀 [LOAD] CLXPrebidRewarded load called"];
+    [logger debug:@"[LOAD] CLXPrebidRewarded load called"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.containerViewController = [[CLXFullscreenStaticContainerViewController alloc] initWithDelegate:self adm:self.adm];
         [self.containerViewController loadHTML];
-        [logger info:@"✅ [LOAD] Container created and HTML load initiated"];
+        [logger info:@"Container created and HTML load initiated"];
     });
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidRewarded"];
-    [logger info:@"🚀 [SHOW] CLXPrebidRewarded showFromViewController called"];
+    [logger debug:@"[SHOW] CLXPrebidRewarded showFromViewController called"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.containerViewController) {
@@ -82,9 +82,9 @@
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [self impression];
             });
-            [logger info:@"✅ [SHOW] Ad presentation initiated successfully"];
+            [logger info:@"Ad presentation initiated successfully"];
         } else {
-            [logger error:@"❌ [SHOW] ContainerViewController is nil!"];
+            [logger error:@"ContainerViewController is nil!"];
             NSError *error = [NSError errorWithDomain:@"CloudXTestVastNetworkAdapter" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Ad failed to show: containerViewController was nil."}];
             [self didFailToShowWithError:error];
         }

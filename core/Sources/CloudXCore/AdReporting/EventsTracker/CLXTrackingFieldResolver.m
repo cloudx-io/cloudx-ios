@@ -149,7 +149,7 @@
     }
     
     NSString *payload = [values componentsJoinedByString:@";"];
-    [self.logger debug:[NSString stringWithFormat:@"📊 [CLXTrackingFieldResolver] Built payload with %lu fields for auction: %@", (unsigned long)values.count, auctionId]];
+    [self.logger debug:[NSString stringWithFormat:@"Built payload with %lu fields for auction: %@", (unsigned long)values.count, auctionId]];
     
     return payload;
 }
@@ -226,7 +226,7 @@
         
         // Check if personal data should be cleared due to privacy settings
         if ([privacyService shouldClearPersonalData]) {
-            [self.logger debug:@"🔒 [CLXTrackingFieldResolver] Privacy settings require clearing personal data - using session ID"];
+            [self.logger debug:@"[CLXTrackingFieldResolver] Privacy settings require clearing personal data - using session ID"];
             return self.sessionId ?: @"";
         }
         
@@ -237,28 +237,28 @@
         BOOL isLimitedAdTrackingEnabled = [dntValue intValue] == 1;
         
         if (isLimitedAdTrackingEnabled) {
-            [self.logger debug:@"🔒 [CLXTrackingFieldResolver] DNT flag is set - using privacy-safe identifier"];
+            [self.logger debug:@"[CLXTrackingFieldResolver] DNT flag is set - using privacy-safe identifier"];
             
             // Use hashed user ID if available
             NSString *hashedUserId = [privacyService hashedUserId];
             if (hashedUserId && hashedUserId.length > 0) {
-                [self.logger debug:@"🔒 [CLXTrackingFieldResolver] Using hashed user ID"];
+                [self.logger debug:@"[CLXTrackingFieldResolver] Using hashed user ID"];
                 return hashedUserId;
             }
             
             // Fallback to hashed geo IP
             if (self.hashedGeoIp && self.hashedGeoIp.length > 0) {
-                [self.logger debug:@"🔒 [CLXTrackingFieldResolver] Using hashed geo IP"];
+                [self.logger debug:@"[CLXTrackingFieldResolver] Using hashed geo IP"];
                 return self.hashedGeoIp;
             }
             
-            [self.logger debug:@"🔒 [CLXTrackingFieldResolver] No privacy-safe identifiers available - returning empty string"];
+            [self.logger debug:@"[CLXTrackingFieldResolver] No privacy-safe identifiers available - returning empty string"];
             return @"";
         }
         
         // Normal case: return the actual IFA
         NSString *ifa = [self resolveNestedField:requestData path:@"device.ifa"];
-        [self.logger debug:[NSString stringWithFormat:@"✅ [CLXTrackingFieldResolver] Using device IFA: %@", ifa ? @"(present)" : @"(none)"]];
+        [self.logger debug:[NSString stringWithFormat:@"Using device IFA: %@", ifa ? @"(present)" : @"(none)"]];
         return ifa;
     } else {
         // Check auction-specific SDK parameters
@@ -280,7 +280,7 @@
     if ([path isEqualToString:@"device.geo.country"]) {
         NSDictionary *device = requestData[@"device"];
         NSDictionary *geo = device[@"geo"];
-        [self.logger debug:[NSString stringWithFormat:@"🌍 [CLXTrackingFieldResolver] Resolving device.geo.country: '%@' (device:%@, geo:%@)", 
+        [self.logger debug:[NSString stringWithFormat:@"[CLXTrackingFieldResolver] Resolving device.geo.country: '%@' (device:%@, geo:%@)", 
                            geo[@"country"], device ? @"✓" : @"✗", geo ? @"✓" : @"✗"]];
     }
     
@@ -290,20 +290,20 @@
 - (nullable id)resolveBidField:(NSString *)auctionId field:(NSString *)field {
     NSString *bidId = self.loadedBidMap[auctionId];
     if (!bidId) {
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] No bidId found for auction: %@", auctionId]];
+        [self.logger debug:[NSString stringWithFormat:@"No bidId found for auction: %@", auctionId]];
         return nil;
     }
     
     NSDictionary *responseData = self.responseDataMap[auctionId];
     if (!responseData) {
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] No response data for auction: %@", auctionId]];
+        [self.logger debug:[NSString stringWithFormat:@"No response data for auction: %@", auctionId]];
         return nil;
     }
     
     // Find the winning bid object in seatbid array
     NSArray *seatbids = responseData[@"seatbid"];
     if (![seatbids isKindOfClass:[NSArray class]]) {
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] No seatbid array found in response"]];
+        [self.logger debug:[NSString stringWithFormat:@"No seatbid array found in response"]];
         return nil;
     }
     
@@ -324,7 +324,7 @@
     }
     
     if (!bidObj) {
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] No bid object found for bidId: %@", bidId]];
+        [self.logger debug:[NSString stringWithFormat:@"No bid object found for bidId: %@", bidId]];
         return nil;
     }
     
@@ -635,7 +635,7 @@
     NSRange bracketEnd = [segment rangeOfString:@"]"];
     
     if (bracketStart.location == NSNotFound || bracketEnd.location == NSNotFound) {
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Invalid array lookup syntax: %@", segment]];
+        [self.logger debug:[NSString stringWithFormat:@"Invalid array lookup syntax: %@", segment]];
         return nil;
     }
     
@@ -645,21 +645,21 @@
     
     // Get the array from current object
     if (![current isKindOfClass:[NSDictionary class]]) {
-        [self.logger debug:@"🔍 [CLXTrackingFieldResolver] Current is not a dictionary for array lookup"];
+        [self.logger debug:@"Current is not a dictionary for array lookup"];
         return nil;
     }
     
     NSDictionary *dict = (NSDictionary *)current;
     NSArray *array = dict[arrayName];
     if (![array isKindOfClass:[NSArray class]]) {
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] No array found for key: %@", arrayName]];
+        [self.logger debug:[NSString stringWithFormat:@"No array found for key: %@", arrayName]];
         return nil;
     }
     
     // Parse condition like: rank=${bid.ext.cloudx.rank}
     NSArray *conditionParts = [condition componentsSeparatedByString:@"="];
     if (conditionParts.count != 2) {
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Invalid condition syntax: %@", condition]];
+        [self.logger debug:[NSString stringWithFormat:@"Invalid condition syntax: %@", condition]];
         return nil;
     }
     
@@ -684,7 +684,7 @@
         }
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] No matching element found for condition %@=%@", conditionField, conditionValue]];
+    [self.logger debug:[NSString stringWithFormat:@"No matching element found for condition %@=%@", conditionField, conditionValue]];
     return nil;
 }
 
@@ -769,7 +769,7 @@
         }
         
         // For other field paths, return nil as we don't have full context resolution yet
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXTrackingFieldResolver] Unsupported field path in condition: %@", fieldPath]];
+        [self.logger debug:[NSString stringWithFormat:@"Unsupported field path in condition: %@", fieldPath]];
         return nil;
     }
     

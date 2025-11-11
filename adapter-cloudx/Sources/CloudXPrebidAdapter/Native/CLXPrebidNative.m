@@ -29,7 +29,7 @@
               viewController:(UIViewController *)viewController
                                        delegate:(id<CLXAdapterNativeDelegate>)delegate {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidNative"];
-    [logger info:[NSString stringWithFormat:@"🚀 [INIT] CLXPrebidNative initialization - Markup: %lu chars, Type: %ld", (unsigned long)adm.length, (long)type]];
+    [logger debug:[NSString stringWithFormat:@"[INIT] CLXPrebidNative initialization - Markup: %lu chars, Type: %ld", (unsigned long)adm.length, (long)type]];
     
     self = [super init];
     if (self) {
@@ -40,14 +40,14 @@
         self.timeout = NO;
         
         if (self.nativeAdData) {
-            [logger info:@"✅ [INIT] Native ad data parsed successfully"];
+            [logger info:@"Native ad data parsed successfully"];
         } else {
-            [logger error:@"❌ [INIT] Failed to parse native ad data from adm"];
+            [logger error:@"Failed to parse native ad data from adm"];
         }
         
-        [logger info:@"✅ [INIT] CLXPrebidNative initialization completed"];
+        [logger info:@"CLXPrebidNative initialization completed"];
     } else {
-        [logger error:@"❌ [INIT] Super init failed"];
+        [logger error:@"Super init failed"];
     }
     return self;
 }
@@ -67,12 +67,12 @@
 
 - (void)load {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXPrebidNative"];
-    [logger info:@"🚀 [LOAD] CLXPrebidNative load() method called"];
+    [logger debug:@"[LOAD] CLXPrebidNative load() method called"];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         if (!self.nativeAdData) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [logger error:@"❌ [LOAD] Load failed: nativeAdData is nil"];
+                [logger error:@"Load failed: nativeAdData is nil"];
                 if ([self.delegate respondsToSelector:@selector(failToLoadWithNative:error:)]) {
                     [self.delegate failToLoadWithNative:self error:[CLXDemoAdapterError invalidAdmError]];
                 }

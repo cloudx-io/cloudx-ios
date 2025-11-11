@@ -55,13 +55,13 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     @try {
         NSString *gppString = [self.userDefaults stringForKey:kIABGPP_GppString];
         if (gppString.length > 0) {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGPPProvider] GPP string: %@", gppString]];
+            [self.logger verbose:[NSString stringWithFormat:@"GPP string: %@", gppString]];
             return gppString;
         }
-        [self.logger debug:@"📊 [CLXGPPProvider] GPP string: (none)"];
+        [self.logger verbose:@"GPP string: (none)"];
         return nil;
     } @catch (NSException *exception) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] Failed to read GPP string: %@", exception.reason]];
+        [self.logger error:[NSString stringWithFormat:@"Failed to read GPP string: %@", exception.reason]];
         return nil;
     }
 }
@@ -70,7 +70,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     @try {
         NSString *rawSid = [self.userDefaults stringForKey:kIABGPP_GppSID];
         if (rawSid.length == 0) {
-            [self.logger debug:@"📊 [CLXGPPProvider] GPP SID: (none)"];
+            [self.logger verbose:@"GPP SID: (none)"];
             return nil;
         }
         
@@ -93,14 +93,14 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
             // Remove duplicates and sort - matching Android behavior
             NSOrderedSet *uniqueSids = [NSOrderedSet orderedSetWithArray:parsedSids];
             NSArray<NSNumber *> *sortedSids = [[uniqueSids array] sortedArrayUsingSelector:@selector(compare:)];
-            [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGPPProvider] GPP SID: %@", sortedSids]];
+            [self.logger verbose:[NSString stringWithFormat:@"GPP SID: %@", sortedSids]];
             return sortedSids;
         }
         
-        [self.logger debug:@"📊 [CLXGPPProvider] GPP SID: (none - no valid values)"];
+        [self.logger verbose:@"GPP SID: (none - no valid values)"];
         return nil;
     } @catch (NSException *exception) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] Failed to parse GPP SID: %@", exception.reason]];
+        [self.logger error:[NSString stringWithFormat:@"Failed to parse GPP SID: %@", exception.reason]];
         return nil;
     }
 }
@@ -110,7 +110,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     NSArray<NSNumber *> *sids = [self gppSid];
     
     if (!gpp || !sids || sids.count == 0) {
-        [self.logger debug:@"📊 [CLXGPPProvider] No GPP data available for decoding"];
+        [self.logger debug:@"No GPP data available for decoding"];
         return nil;
     }
     
@@ -118,10 +118,10 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
         // Decode specific target
         CLXGppConsent *consent = [self decodeGppSection:gpp sids:sids targetSid:[target integerValue]];
         if (consent && [consent requiresPiiRemoval]) {
-            [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGPPProvider] Decoded target %@ with PII removal required", target]];
+            [self.logger debug:[NSString stringWithFormat:@"Decoded target %@ with PII removal required", target]];
             return consent;
         }
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGPPProvider] Target %@ does not require PII removal", target]];
+        [self.logger debug:[NSString stringWithFormat:@"Target %@ does not require PII removal", target]];
         return nil;
     } else {
         // Auto-select: prioritize consent requiring PII removal, then first available
@@ -138,32 +138,32 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
         // Find first consent requiring PII removal
         for (CLXGppConsent *consent in decodedConsents) {
             if ([consent requiresPiiRemoval]) {
-                [self.logger debug:@"📊 [CLXGPPProvider] Auto-selected consent requiring PII removal"];
+                [self.logger debug:@"Auto-selected consent requiring PII removal"];
                 return consent;
             }
         }
         
         // Return first available if none require PII removal
         if (decodedConsents.count > 0) {
-            [self.logger debug:@"📊 [CLXGPPProvider] Auto-selected first available consent"];
+            [self.logger debug:@"Auto-selected first available consent"];
             return decodedConsents.firstObject;
         }
         
-        [self.logger debug:@"📊 [CLXGPPProvider] No decodable consent found"];
+        [self.logger debug:@"No decodable consent found"];
         return nil;
     }
 }
 
 - (nullable CLXGppConsent *)decodeGppSection:(NSString *)gpp sids:(NSArray<NSNumber *> *)sids targetSid:(NSInteger)targetSid {
     if (![sids containsObject:@(targetSid)]) {
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGPPProvider] SID %ld not present in GPP", (long)targetSid]];
+        [self.logger debug:[NSString stringWithFormat:@"SID %ld not present in GPP", (long)targetSid]];
         return nil;
     }
     
     @try {
         NSString *payload = [self selectSectionPayload:gpp sids:sids targetSid:targetSid];
         if (!payload) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] Failed to extract payload for SID %ld", (long)targetSid]];
+            [self.logger error:[NSString stringWithFormat:@"Failed to extract payload for SID %ld", (long)targetSid]];
             return nil;
         }
         
@@ -172,11 +172,11 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
         } else if (targetSid == CLXGppTargetUSNational) {
             return [self decodeUsNational:payload];
         } else {
-            [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] Unsupported SID %ld", (long)targetSid]];
+            [self.logger error:[NSString stringWithFormat:@"Unsupported SID %ld", (long)targetSid]];
             return nil;
         }
     } @catch (NSException *exception) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] Failed to decode SID %ld: %@", (long)targetSid, exception.reason]];
+        [self.logger error:[NSString stringWithFormat:@"Failed to decode SID %ld: %@", (long)targetSid, exception.reason]];
         return nil;
     }
 }
@@ -194,14 +194,14 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     }
     
     if (payloads.count == 0) {
-        [self.logger error:@"❌ [CLXGPPProvider] GPP string has no payload sections"];
+        [self.logger error:@"GPP string has no payload sections"];
         return nil;
     }
     
     // Find index of target SID in sorted SID array
     NSUInteger sidIndex = [sids indexOfObject:@(targetSid)];
     if (sidIndex == NSNotFound || sidIndex >= payloads.count) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] SID %ld index %lu out of range for %lu payloads", (long)targetSid, (unsigned long)sidIndex, (unsigned long)payloads.count]];
+        [self.logger error:[NSString stringWithFormat:@"SID %ld index %lu out of range for %lu payloads", (long)targetSid, (unsigned long)sidIndex, (unsigned long)payloads.count]];
         return nil;
     }
     
@@ -219,7 +219,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     @try {
         NSString *bits = [self base64UrlToBits:payload];
         if (!bits) {
-            [self.logger error:@"❌ [CLXGPPProvider] Failed to decode US-CA payload to bits"];
+            [self.logger error:@"Failed to decode US-CA payload to bits"];
             return nil;
         }
         
@@ -228,10 +228,10 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
         NSNumber *sharingOptOut = [self readBits:bits start:14 length:2];
         
         CLXGppConsent *consent = [[CLXGppConsent alloc] initWithSaleOptOut:saleOptOut sharingOptOut:sharingOptOut];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGPPProvider] US-CA decoded: %@", consent]];
+        [self.logger debug:[NSString stringWithFormat:@"US-CA decoded: %@", consent]];
         return consent;
     } @catch (NSException *exception) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] US-CA decode failed: %@", exception.reason]];
+        [self.logger error:[NSString stringWithFormat:@"US-CA decode failed: %@", exception.reason]];
         return nil;
     }
 }
@@ -240,7 +240,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     @try {
         NSString *bits = [self base64UrlToBits:payload];
         if (!bits) {
-            [self.logger error:@"❌ [CLXGPPProvider] Failed to decode US-National payload to bits"];
+            [self.logger error:@"Failed to decode US-National payload to bits"];
             return nil;
         }
         
@@ -256,10 +256,10 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
         NSNumber *effectiveSaleOptOut = saleOptOut ?: @0;
         
         CLXGppConsent *consent = [[CLXGppConsent alloc] initWithSaleOptOut:effectiveSaleOptOut sharingOptOut:effectiveSharingOptOut];
-        [self.logger debug:[NSString stringWithFormat:@"📊 [CLXGPPProvider] US-National decoded: %@", consent]];
+        [self.logger debug:[NSString stringWithFormat:@"US-National decoded: %@", consent]];
         return consent;
     } @catch (NSException *exception) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] US-National decode failed: %@", exception.reason]];
+        [self.logger error:[NSString stringWithFormat:@"US-National decode failed: %@", exception.reason]];
         return nil;
     }
 }
@@ -310,16 +310,16 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     if (encoded.length == 0) return nil;
     
     @try {
-        [self.logger debug:[NSString stringWithFormat:@"🔍 [CLXGPPProvider] Decoding payload: '%@' (length: %lu)", encoded, (unsigned long)encoded.length]];
+        [self.logger debug:[NSString stringWithFormat:@"Decoding payload: '%@' (length: %lu)", encoded, (unsigned long)encoded.length]];
         
         // Use custom lenient decoder that matches Android's Base64.URL_SAFE behavior
         NSData *decodedData = [self decodeBase64Url:encoded];
         if (!decodedData) {
-            [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] Base64URL decoding failed for: '%@'", encoded]];
+            [self.logger error:[NSString stringWithFormat:@"Base64URL decoding failed for: '%@'", encoded]];
             return nil;
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"✅ [CLXGPPProvider] Decoded %lu bytes", (unsigned long)decodedData.length]];
+        [self.logger debug:[NSString stringWithFormat:@"Decoded %lu bytes", (unsigned long)decodedData.length]];
         
         // Convert to bit string
         NSMutableString *bits = [NSMutableString string];
@@ -332,14 +332,14 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
         
         return [bits copy];
     } @catch (NSException *exception) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] Base64URL to bits conversion failed: %@", exception.reason]];
+        [self.logger error:[NSString stringWithFormat:@"Base64URL to bits conversion failed: %@", exception.reason]];
         return nil;
     }
 }
 
 - (nullable NSNumber *)readBits:(NSString *)bits start:(NSUInteger)start length:(NSUInteger)length {
     if (start + length > bits.length) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] Bit range %lu-%lu exceeds string length %lu", 
+        [self.logger error:[NSString stringWithFormat:@"Bit range %lu-%lu exceeds string length %lu", 
                            (unsigned long)start, (unsigned long)(start + length), (unsigned long)bits.length]];
         return nil;
     }
@@ -356,7 +356,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
         }
         return @(value);
     } @catch (NSException *exception) {
-        [self.logger error:[NSString stringWithFormat:@"❌ [CLXGPPProvider] Exception in bit_string_parsing: %@ - %@", 
+        [self.logger error:[NSString stringWithFormat:@"Exception in bit_string_parsing: %@ - %@", 
                            exception.name ?: @"unknown", exception.reason ?: @"no reason"]];
         [self reportException:exception context:@{@"operation": @"bit_string_parsing", @"start": [@(start) stringValue], @"length": [@(length) stringValue]}];
         return nil;
@@ -366,7 +366,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
 #pragma mark - Publisher API Methods
 
 - (void)setGppString:(nullable NSString *)gppString {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXGPPProvider] Setting GPP string: %@", gppString ?: @"(cleared)"]];
+    [self.logger debug:[NSString stringWithFormat:@"Setting GPP string: %@", gppString ?: @"(cleared)"]];
     if (gppString) {
         [self.userDefaults setObject:gppString forKey:kIABGPP_GppString];
     } else {
@@ -376,7 +376,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
 }
 
 - (void)setGppSid:(nullable NSArray<NSNumber *> *)gppSid {
-    [self.logger debug:[NSString stringWithFormat:@"🔧 [CLXGPPProvider] Setting GPP SID: %@", gppSid ?: @"(cleared)"]];
+    [self.logger debug:[NSString stringWithFormat:@"Setting GPP SID: %@", gppSid ?: @"(cleared)"]];
     if (gppSid && gppSid.count > 0) {
         // Convert to underscore-delimited string (matching Android format)
         NSMutableArray<NSString *> *sidStrings = [NSMutableArray array];
