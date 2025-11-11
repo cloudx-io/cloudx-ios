@@ -12,10 +12,10 @@ platform :ios, '14.0'
 target 'YourApp' do
   use_frameworks!
   
-  # CloudX SDK (source-based distribution)
+  # CloudX SDK 
   pod 'CloudXSDK', '~> 0.1.0'
   
-  # Optional: CloudX Mediation Adapters
+  # Optional: CloudX Mediation Adapters (at least one is needed to show ads)
   pod 'CloudXMediationMetaAdapter', '~> 0.1.0'         
   pod 'CloudXMediationVungleAdapter', '~> 0.1.0'       
   pod 'CloudXMediationPrebidAdapter', '~> 0.1.0'       
