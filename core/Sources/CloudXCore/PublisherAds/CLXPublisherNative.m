@@ -505,10 +505,14 @@ NS_ASSUME_NONNULL_BEGIN
     }
     
     // Call both old and new delegate methods for backward compatibility
-    // Use the actual error passed in, or default to NoFill if no error provided
-    NSError *delegateError = error ?: [NSError errorWithDomain:@"CLXErrorDomain"
-                                                           code:CLXErrorCodeNoFill
-                                                       userInfo:nil];
+    // Preserve the original error to maintain detailed server messages
+    NSError *delegateError = error;
+    if (!delegateError) {
+        // Only create a default error if none was provided
+        delegateError = [NSError errorWithDomain:@"CLXErrorDomain"
+                                            code:CLXErrorCodeNoFill
+                                        userInfo:nil];
+    }
     
     if ([self.delegate respondsToSelector:@selector(failToLoadWithNative:error:)]) {
         [self.delegate failToLoadWithNative:native error:delegateError];
