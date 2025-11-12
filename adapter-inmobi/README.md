@@ -384,7 +384,7 @@ This adapter is licensed under the Business Source License 1.1. See the LICENSE 
 
 This adapter follows industry-standard naming conventions:
 
-- **Pod Name**: `CloudXMediationInMobiAdapter` (matches AppLovin MAX pattern: `AppLovinMediation[Network]Adapter`)
+- **Pod Name**: `CloudXMediationInMobiAdapter` 
 - **Class Prefix**: `CLXInMobi*` (e.g., `CLXInMobiInterstitial`, `CLXInMobiBanner`)
 - **Framework Name**: `CloudXMediationInMobiAdapter`
 
