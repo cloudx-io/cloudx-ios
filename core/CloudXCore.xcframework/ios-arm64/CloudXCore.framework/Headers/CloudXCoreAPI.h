@@ -1,0 +1,244 @@
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import <CloudXCore/CLXLogger.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+// Forward declarations for public interfaces
+@protocol CLXBannerDelegate;
+@protocol CLXInterstitialDelegate;
+@protocol CLXRewardedDelegate;
+@protocol CLXNativeDelegate;
+
+@class CLXBannerAdView;
+@class CLXNativeAdView;
+@class CLXSDKConfigResponse;
+@class CLXInterstitial;
+@class CLXRewarded;
+
+/**
+ * The main class of the CloudX SDK.
+ * Use this class to initialise the SDK and create ads.
+ * @discussion Thread-safe singleton. All methods should be called from the main thread.
+ */
+@interface CloudXCore : NSObject
+
+/**
+ * Use the shared singleton instance instead
+ */
+- (instancetype)init NS_UNAVAILABLE;
+
+/**
+ * Use the shared singleton instance instead
+ */
++ (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * The shared instance of CloudXCore
+ */
+@property (class, nonatomic, readonly) CloudXCore *shared;
+
+/**
+ * The version of the CloudX SDK
+ */
+@property (nonatomic, readonly) NSString *sdkVersion;
+
+
+
+
+/**
+ * Initialize the SDK to start serving ads
+ * @param appKey The app key provided by CloudX
+ * @param completion A completion handler that will be called once the SDK is initialized
+ */
+- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(nullable void (^)(BOOL success, NSError * _Nullable error))completion
+    NS_SWIFT_NAME(initializeSDK(appKey:completion:));
+
+/**
+ * Set the hashed user ID for auction requests
+ * @param hashedUserID The hashedUserID provided by CloudX
+ */
+- (void)setHashedUserID:(NSString *)hashedUserID
+    NS_SWIFT_NAME(setHashedUserID(_:));
+
+/**
+ * Set a hashed key-value pair for auction requests
+ * @param key The key provided by CloudX
+ * @param value The value provided by CloudX
+ */
+- (void)setHashedKeyValue:(NSString *)key value:(NSString *)value
+    NS_SWIFT_NAME(setHashedKeyValue(key:value:));
+
+/**
+ * Set multiple key-value pairs for auction requests
+ * @param userDictionary The dictionary of key-value pairs provided by CloudX
+ */
+- (void)setKeyValueDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary
+    NS_SWIFT_NAME(setKeyValueDictionary(_:));
+
+/**
+ * Set a bidder-specific key-value pair for auction requests
+ * @param bidder The bidder name
+ * @param key The key provided by CloudX
+ * @param value The value provided by CloudX
+ */
+- (void)setBidderKeyValue:(NSString *)bidder key:(NSString *)key value:(NSString *)value
+    NS_SWIFT_NAME(setBidderKeyValue(bidder:key:value:));
+
+/**
+ * Set a user-level key-value pair for targeting
+ * @param key The targeting key
+ * @param value The targeting value
+ * @discussion User-level key-values are injected into bid requests at server-configured paths.
+ * These values are typically user-specific targeting parameters and will be cleared
+ * if privacy regulations require removing personal data.
+ */
+- (void)setUserKeyValue:(NSString *)key value:(NSString *)value;
+
+/**
+ * Set an app-level key-value pair for targeting
+ * @param key The targeting key
+ * @param value The targeting value
+ * @discussion App-level key-values are injected into bid requests at server-configured paths.
+ * These values are typically app-specific targeting parameters and are not affected
+ * by privacy regulations.
+ */
+- (void)setAppKeyValue:(NSString *)key value:(NSString *)value;
+
+/**
+ * Clear all user and app-level key-value pairs
+ * @discussion Removes all previously set targeting key-value pairs
+ */
+- (void)clearAllKeyValues;
+
+/**
+ * Create a banner ad
+ * @param placement The placement name. This should match the placement name in the CloudX dashboard
+ * @param viewController The view controller in which the ad will be displayed
+ * @param delegate The delegate to receive ad events
+ * @param tmax Optional timeout value for bid requests
+ * @return A CLXBannerAdView object
+ */
+- (nullable CLXBannerAdView *)createBannerWithPlacement:(NSString *)placement
+                                            viewController:(UIViewController *)viewController
+                                                  delegate:(nullable id<CLXBannerDelegate>)delegate
+                                                      tmax:(nullable NSNumber *)tmax
+    NS_SWIFT_NAME(createBanner(placement:viewController:delegate:tmax:));
+
+/**
+ * Create a MREC ad
+ * @param placement The placement name. This should match the placement name in the CloudX dashboard
+ * @param viewController The view controller in which the ad will be displayed
+ * @param delegate The delegate to receive ad events
+ * @return A CLXBannerAdView object
+ */
+- (nullable CLXBannerAdView *)createMRECWithPlacement:(NSString *)placement
+                                          viewController:(UIViewController *)viewController
+                                                delegate:(nullable id<CLXBannerDelegate>)delegate
+    NS_SWIFT_NAME(createMREC(placement:viewController:delegate:));
+
+/**
+ * Create an interstitial ad
+ * @param placement The placement name. This should match the placement name in the CloudX dashboard
+ * @param delegate The delegate to receive ad events
+ * @return A CLXInterstitial object
+ */
+- (nullable CLXInterstitial *)createInterstitialWithPlacement:(NSString *)placement
+                                                     delegate:(nullable id<CLXInterstitialDelegate>)delegate
+    NS_SWIFT_NAME(createInterstitial(placement:delegate:));
+
+/**
+ * Create a rewarded ad
+ * @param placement The placement name. This should match the placement name in the CloudX dashboard
+ * @param delegate The delegate to receive ad events
+ * @return A CLXRewarded object
+ */
+- (nullable CLXRewarded *)createRewardedWithPlacement:(NSString *)placement
+                                             delegate:(nullable id<CLXRewardedDelegate>)delegate
+    NS_SWIFT_NAME(createRewarded(placement:delegate:));
+
+/**
+ * Create a native ad
+ * @param placement The placement name. This should match the placement name in the CloudX dashboard
+ * @param viewController The view controller in which the ad will be displayed
+ * @param delegate The delegate to receive ad events
+ * @return A CLXNativeAdView object
+ */
+- (nullable CLXNativeAdView *)createNativeAdWithPlacement:(NSString *)placement
+                                              viewController:(UIViewController *)viewController
+                                                    delegate:(nullable id<CLXNativeDelegate>)delegate
+    NS_SWIFT_NAME(createNativeAd(placement:viewController:delegate:));
+
+#pragma mark - Privacy Settings
+
+/**
+ * Set CCPA privacy string
+ * @param ccpaPrivacyString The CCPA privacy string (e.g., "1YNN")
+ */
++ (void)setCCPAPrivacyString:(nullable NSString *)ccpaPrivacyString;
+
+/**
+ * Set whether user has given consent (GDPR)
+ * @param isUserConsent YES if user has given consent, NO otherwise
+ * @discussion ⚠️ GDPR is not yet supported by CloudX servers. Please contact CloudX if you need GDPR support. CCPA is fully supported.
+ */
++ (void)setIsUserConsent:(BOOL)isUserConsent;
+
+/**
+ * Set whether user is age-restricted (COPPA)
+ * @param isAgeRestrictedUser YES if user is age-restricted, NO otherwise
+ * @discussion COPPA data clearing is implemented but not included in bid requests (server limitation). Android parity for data clearing behavior.
+ */
++ (void)setIsAgeRestrictedUser:(BOOL)isAgeRestrictedUser;
+
+/**
+ * Set "do not sell" preference (CCPA)
+ * @param isDoNotSell YES to opt-out of data selling, NO otherwise
+ * @discussion CCPA "do not sell my personal information" flag - converts to CCPA privacy string format
+ */
++ (void)setIsDoNotSell:(BOOL)isDoNotSell;
+
+#pragma mark - Logging Control
+
+/**
+ * Enable or disable SDK logging
+ * @param enabled YES to enable logging, NO to disable
+ * @discussion Controls verbose logging output from the SDK. Disabled by default in production.
+ * Call this method early in your app lifecycle, before SDK initialization, to see all logs.
+ */
++ (void)setLoggingEnabled:(BOOL)enabled;
+
+/**
+ * Set minimum log level for SDK logging
+ * @param minLogLevel The minimum log level (CLXLogLevelVerbose, CLXLogLevelDebug, CLXLogLevelInfo, CLXLogLevelWarn, CLXLogLevelError)
+ * @discussion Controls which log messages are displayed. Only logs at or above this level will be shown.
+ * Call this method early in your app lifecycle, before SDK initialization.
+ */
++ (void)setMinLogLevel:(CLXLogLevel)minLogLevel;
+
+/**
+ * Enable or disable emojis in logs
+ * @param enabled YES to show emojis (default), NO for plain text
+ * @discussion Disable emojis when exporting logs to systems that don't support them (Datadog, Splunk, etc)
+ */
++ (void)setLoggingEmojisEnabled:(BOOL)enabled;
+
+/**
+ * Enable or disable timestamps in logs
+ * @param enabled YES to show timestamps, NO to hide (default)
+ * @discussion Timestamps are formatted as HH:mm:ss.SSS and appear after [CloudX]. Useful for debugging timing issues.
+ */
++ (void)setLoggingTimestampsEnabled:(BOOL)enabled;
+
+#pragma mark - SDK Lifecycle
+
+/**
+ * Deinitialize the SDK and clean up resources
+ * @discussion Tears down the SDK, releases resources, and resets the initialization state.
+ * After calling this, you can reinitialize the SDK if needed.
+ */
+- (void)deinitialize;
+
+@end
+
+NS_ASSUME_NONNULL_END

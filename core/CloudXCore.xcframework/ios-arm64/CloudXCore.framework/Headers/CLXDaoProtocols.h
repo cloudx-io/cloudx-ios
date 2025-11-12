@@ -1,0 +1,156 @@
+/*
+ * Copyright (c) 2024 CloudX. All rights reserved.
+ */
+
+/**
+ * @file CLXDaoProtocols.h
+ * @brief DAO protocol hierarchy following Interface Segregation Principle
+ * 
+ * Separate protocols for different data access concerns:
+ * - CLXBaseDao: Common CRUD operations
+ * - CLXMetricsEventDao: Metrics-specific operations
+ * - CLXRillEventDao: Rill event-specific operations
+ * - CLXSessionDao: Session management operations
+ * - CLXPerformanceDao: Performance metrics operations
+ */
+
+#import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@class CLXMetricsEvent;
+@class CLXRillEvent;
+@class CLXSession;
+@class CLXPerformanceMetric;
+
+/**
+ * Base DAO protocol with common CRUD operations
+ * Generic type T represents the model type
+ */
+@protocol CLXBaseDao <NSObject>
+
+- (BOOL)insert:(id)entity;
+- (BOOL)insertBatch:(NSArray *)entities;
+- (nullable id)findById:(NSString *)entityId;
+- (NSArray *)findAll;
+- (BOOL)update:(id)entity;
+- (BOOL)deleteById:(NSString *)entityId;
+- (BOOL)deleteAll;
+- (NSInteger)count;
+
+@end
+
+/**
+ * Metrics Event DAO protocol
+ * Handles metrics_event_table operations matching Android MetricsEventDao
+ */
+@protocol CLXMetricsEventDao <CLXBaseDao>
+
+- (BOOL)insertMetricsEvent:(CLXMetricsEvent *)event;
+- (BOOL)insertMetricsEventBatch:(NSArray<CLXMetricsEvent *> *)events;
+- (nullable CLXMetricsEvent *)findMetricsEventById:(NSString *)eventId;
+- (NSArray<CLXMetricsEvent *> *)findMetricsEventsBySessionId:(NSString *)sessionId;
+- (NSArray<CLXMetricsEvent *> *)findMetricsEventsByAuctionId:(NSString *)auctionId;
+- (NSArray<CLXMetricsEvent *> *)findMetricsEventsByMetricName:(NSString *)metricName;
+- (NSArray<CLXMetricsEvent *> *)findMetricsEventsCreatedAfter:(NSTimeInterval)timestamp;
+
+// Aggregation operations
+- (NSInteger)getTotalCounterForMetric:(NSString *)metricName sessionId:(NSString *)sessionId;
+- (NSInteger)getTotalLatencyForMetric:(NSString *)metricName sessionId:(NSString *)sessionId;
+- (NSDictionary<NSString *, NSNumber *> *)getMetricsSummaryForSession:(NSString *)sessionId;
+
+// Cleanup operations
+- (BOOL)deleteMetricsEventsOlderThan:(NSTimeInterval)timestamp;
+- (BOOL)deleteMetricsEventsBySessionId:(NSString *)sessionId;
+
+@end
+
+/**
+ * Rill Event DAO protocol
+ * Handles cached_tracking_events_table operations matching Android CachedTrackingEventDao
+ */
+@protocol CLXRillEventDao <CLXBaseDao>
+
+- (BOOL)insertRillEvent:(CLXRillEvent *)event;
+- (BOOL)insertRillEventBatch:(NSArray<CLXRillEvent *> *)events;
+- (nullable CLXRillEvent *)findRillEventById:(NSString *)eventId;
+- (NSArray<CLXRillEvent *> *)findRillEventsByCampaignId:(NSString *)campaignId;
+- (NSArray<CLXRillEvent *> *)findRillEventsByEventName:(NSString *)eventName;
+- (NSArray<CLXRillEvent *> *)findRillEventsByType:(NSString *)type;
+- (NSArray<CLXRillEvent *> *)findRillEventsByStatus:(NSString *)status;
+
+// Retry management
+- (NSArray<CLXRillEvent *> *)findPendingRillEvents;
+- (NSArray<CLXRillEvent *> *)findFailedRillEventsForRetry;
+- (BOOL)updateRillEventStatus:(NSString *)eventId status:(NSString *)status;
+- (BOOL)incrementRetryCount:(NSString *)eventId;
+
+// Batch processing
+- (NSArray<CLXRillEvent *> *)findRillEventsForBatch:(NSInteger)batchSize;
+- (BOOL)markRillEventsAsProcessed:(NSArray<NSString *> *)eventIds;
+
+// Cleanup operations
+- (BOOL)deleteRillEventsOlderThan:(NSTimeInterval)timestamp;
+- (BOOL)deleteProcessedRillEvents;
+
+@end
+
+/**
+ * Session DAO protocol
+ * Handles session_table operations replacing Core Data CLXAppSessionModel
+ */
+@protocol CLXSessionDao <CLXBaseDao>
+
+- (BOOL)insertSession:(CLXSession *)session;
+- (nullable CLXSession *)findSessionById:(NSString *)sessionId;
+- (nullable CLXSession *)findCurrentSession;
+- (NSArray<CLXSession *> *)findSessionsByAppKey:(NSString *)appKey;
+- (NSArray<CLXSession *> *)findSessionsInTimeRange:(NSTimeInterval)startTime endTime:(NSTimeInterval)endTime;
+
+// Session lifecycle
+- (BOOL)updateSessionEndTime:(NSString *)sessionId endTime:(NSTimeInterval)endTime;
+- (BOOL)updateSessionDuration:(NSString *)sessionId duration:(NSTimeInterval)duration;
+- (BOOL)updateSessionUrl:(NSString *)sessionId url:(NSString *)url;
+
+// Analytics
+- (NSInteger)getSessionCountForAppKey:(NSString *)appKey;
+- (NSTimeInterval)getAverageSessionDuration;
+- (NSArray<CLXSession *> *)findActiveSessions;
+
+// Cleanup operations
+- (BOOL)deleteSessionsOlderThan:(NSTimeInterval)timestamp;
+
+@end
+
+/**
+ * Performance DAO protocol
+ * Handles performance_metrics_table operations replacing Core Data CLXPerformanceMetricModel
+ */
+@protocol CLXPerformanceDao <CLXBaseDao>
+
+- (BOOL)insertPerformanceMetric:(CLXPerformanceMetric *)metric;
+- (BOOL)insertPerformanceMetricBatch:(NSArray<CLXPerformanceMetric *> *)metrics;
+- (NSArray<CLXPerformanceMetric *> *)findPerformanceMetricsByPlacementId:(NSString *)placementId;
+- (NSArray<CLXPerformanceMetric *> *)findPerformanceMetricsBySessionId:(NSString *)sessionId;
+- (nullable CLXPerformanceMetric *)findPerformanceMetricByPlacementId:(NSString *)placementId sessionId:(NSString *)sessionId;
+- (CLXPerformanceMetric *)findOrCreatePerformanceMetricForPlacementId:(NSString *)placementId sessionId:(NSString *)sessionId;
+
+// Aggregation operations
+- (NSInteger)getTotalClicksForPlacement:(NSString *)placementId;
+- (NSInteger)getTotalImpressionsForPlacement:(NSString *)placementId;
+- (NSInteger)getTotalClosesForPlacement:(NSString *)placementId;
+- (NSTimeInterval)getAverageLoadLatencyForPlacement:(NSString *)placementId;
+- (NSInteger)getTotalBidResponsesForPlacement:(NSString *)placementId;
+
+// Performance analytics
+- (NSDictionary<NSString *, NSNumber *> *)getPerformanceSummaryForPlacement:(NSString *)placementId;
+- (NSDictionary<NSString *, NSNumber *> *)getPerformanceSummaryForSession:(NSString *)sessionId;
+- (NSArray<CLXPerformanceMetric *> *)findTopPerformingPlacements:(NSInteger)limit;
+
+// Cleanup operations
+- (BOOL)deletePerformanceMetricsOlderThan:(NSTimeInterval)timestamp;
+- (BOOL)deletePerformanceMetricsBySessionId:(NSString *)sessionId;
+
+@end
+
+NS_ASSUME_NONNULL_END
