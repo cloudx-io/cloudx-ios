@@ -12,6 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'core/CloudXCore.xcframework'
   
   s.frameworks = ['Foundation', 'SafariServices', 'UIKit', 'CoreLocation', 'WebKit', 'CoreData']
+  s.requires_arc = true
   
   s.pod_target_xcconfig = {
     'CLANG_ENABLE_MODULES' => 'YES',
