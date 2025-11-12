@@ -13,11 +13,13 @@ Pod::Spec.new do |s|
   
   s.frameworks = ['Foundation', 'SafariServices', 'UIKit', 'CoreLocation', 'WebKit', 'CoreData']
   s.requires_arc = true
+  s.static_framework = false
   
   s.pod_target_xcconfig = {
     'CLANG_ENABLE_MODULES' => 'YES',
     'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO',
-    'DEFINES_MODULE' => 'YES'
+    'DEFINES_MODULE' => 'YES',
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386'
   }
   s.user_target_xcconfig = {
     'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
