@@ -120,4 +120,20 @@ class CLXDemoConfigManager {
             return "Production"
         }
     }
+    
+    var buildSchemeName: String {
+        #if DEBUG
+        return "Debug"
+        #else
+        return "Release"
+        #endif
+    }
+    
+    var isDebugBuild: Bool {
+        #if DEBUG
+        return true
+        #else
+        return false
+        #endif
+    }
 }

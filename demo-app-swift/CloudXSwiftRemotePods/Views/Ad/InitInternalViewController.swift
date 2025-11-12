@@ -11,12 +11,22 @@ class InitInternalViewController: BaseAdViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "Internal Init"
+        self.title = "Swift Demo"
+        
+        // Auto-select environment based on build type
+        let configManager = CLXDemoConfigManager.sharedManager
+        if configManager.isDebugBuild {
+            configManager.setEnvironment(.staging)
+        } else {
+            configManager.setEnvironment(.production)
+        }
+        
         setupEnvironmentButtons()
         
         // SDK initialization state tracked internally
         isSDKInitialized = false // Will be set to true after successful initialization
         updateStatusUIWithCurrentEnvironment()
+        updateButtonStates()
     }
     
     // Override to prevent show logs button from appearing in InitInternalViewController
@@ -31,6 +41,7 @@ class InitInternalViewController: BaseAdViewController {
         if isSDKInitialized {
             updateStatusUIWithCurrentEnvironment()
         }
+        updateButtonStates()
     }
     
     private func setupEnvironmentButtons() {
@@ -75,6 +86,9 @@ class InitInternalViewController: BaseAdViewController {
         button.setTitle(title, for: .normal)
         button.addTarget(self, action: action, for: .touchUpInside)
         
+        // Tag button with environment for identification
+        button.tag = environment.rawValue
+        
         // Style the button
         button.backgroundColor = color(for: environment)
         button.tintColor = .white
@@ -94,6 +108,35 @@ class InitInternalViewController: BaseAdViewController {
         case .production:
             // Green - not too bright or light
             return UIColor(red: 0.2, green: 0.7, blue: 0.3, alpha: 1.0)
+        }
+    }
+    
+    private func updateButtonStates() {
+        let configManager = CLXDemoConfigManager.sharedManager
+        let isDebugBuild = configManager.isDebugBuild
+        
+        let buttons = [devButton, stagingButton, prodButton]
+        
+        for button in buttons {
+            guard let button = button else { continue }
+            let buttonEnvironment = CLXDemoEnvironment(rawValue: button.tag) ?? .dev
+            let shouldEnable: Bool
+            
+            if isDebugBuild {
+                shouldEnable = (buttonEnvironment == .dev || buttonEnvironment == .staging)
+            } else {
+                shouldEnable = (buttonEnvironment == .production)
+            }
+            
+            button.isEnabled = shouldEnable
+            
+            if shouldEnable {
+                button.backgroundColor = color(for: buttonEnvironment)
+                button.alpha = 1.0
+            } else {
+                button.backgroundColor = .systemGray
+                button.alpha = 0.5
+            }
         }
     }
     

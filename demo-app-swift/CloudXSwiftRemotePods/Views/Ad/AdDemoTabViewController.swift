@@ -5,12 +5,9 @@ class AdDemoTabViewController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Create view controllers
-        let initVC = InitViewController()
-        initVC.tabBarItem = UITabBarItem(title: "Init", image: UIImage(systemName: "power"), tag: 0)
-        
+        // Create view controllers 
         let initInternalVC = InitInternalViewController()
-        initInternalVC.tabBarItem = UITabBarItem(title: "Init Internal", image: UIImage(systemName: "gear"), tag: 9)
+        initInternalVC.tabBarItem = UITabBarItem(title: "Init", image: UIImage(systemName: "power"), tag: 0)
         
         let bannerVC = BannerViewController()
         bannerVC.tabBarItem = UITabBarItem(title: "Banner", image: UIImage(systemName: "rectangle"), tag: 1)
@@ -33,15 +30,15 @@ class AdDemoTabViewController: UITabBarController {
         let rewardedInterstitialVC = RewardedInterstitialViewController()
         rewardedInterstitialVC.tabBarItem = UITabBarItem(title: "Reward Inter", image: UIImage(systemName: "star.square"), tag: 7)
         
-        let privacyVC = PrivacyViewController()
-        privacyVC.tabBarItem = UITabBarItem(title: "Privacy", image: UIImage(systemName: "hand.raised"), tag: 8)
+        let keyValueVC = KeyValueDemoViewController()
+        keyValueVC.tabBarItem = UITabBarItem(title: "Key-Values", image: UIImage(systemName: "key.fill"), tag: 9)
         
         let settingsVC = SettingsViewController()
-        settingsVC.tabBarItem = UITabBarItem(title: "Settings", image: UIImage(systemName: "star"), tag: 9)
+        settingsVC.tabBarItem = UITabBarItem(title: "Settings", image: UIImage(systemName: "gearshape"), tag: 10)
         
-        // Set view controllers - InitInternalVC moved to end so it appears in "More" section
+        // Set view controllers - Additional VCs appear in "More" section
         self.viewControllers = [
-            UINavigationController(rootViewController: initVC),
+            UINavigationController(rootViewController: initInternalVC),
             UINavigationController(rootViewController: bannerVC),
             UINavigationController(rootViewController: interstitialVC),
             UINavigationController(rootViewController: rewardedVC),
@@ -49,8 +46,7 @@ class AdDemoTabViewController: UITabBarController {
             UINavigationController(rootViewController: nativeVC),
             UINavigationController(rootViewController: nativeBannerVC),
             UINavigationController(rootViewController: rewardedInterstitialVC),
-            UINavigationController(rootViewController: privacyVC),
-            UINavigationController(rootViewController: initInternalVC),
+            UINavigationController(rootViewController: keyValueVC),
             UINavigationController(rootViewController: settingsVC)
         ]
     }

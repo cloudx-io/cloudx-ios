@@ -3,18 +3,14 @@ import CloudXCore
 
 class BannerViewController: BaseAdViewController {
     private var bannerAd: CLXBannerAdView?
-    private var isSDKInitialized = false
     private var autoRefreshButton: UIButton!
     private var autoRefreshEnabled = true
     private let settings = UserDefaultsSettings.shared
+    private var gppScenarioPicker: GPPScenarioPickerView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setupNotifications()
-        
-        // SDK initialization state tracked internally
-        isSDKInitialized = false // Will be set to true after successful initialization
         updateStatusUI(state: .noAd)
     }
     
@@ -22,10 +18,37 @@ class BannerViewController: BaseAdViewController {
         // Create a vertical stack for buttons
         let buttonStack = UIStackView()
         buttonStack.axis = .vertical
-        buttonStack.spacing = 16
+        buttonStack.spacing = 12
         buttonStack.alignment = .center
         buttonStack.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(buttonStack)
+        
+        // GPP Scenario Picker - Encapsulated Test Component
+        //
+        // PURPOSE: Provides a self-contained UI for selecting and applying GPP privacy test scenarios.
+        // This component handles ALL GPP test logic internally, keeping BannerViewController clean.
+        //
+        // USAGE:
+        // 1. Simply instantiate and add to view hierarchy (no configuration needed)
+        // 2. Component self-manages: button creation, alert presentation, privacy SDK calls
+        // 3. Zero code footprint in parent - follows DRY principle
+        //
+        // FEATURES:
+        // - 9 privacy test scenarios (COPPA, CCPA, GPP, ATT, regional variations)
+        // - Action sheet picker with full scenario names and descriptions
+        // - Automatic CloudXCore privacy SDK integration
+        // - Console logging for test verification
+        //
+        // TESTING COVERAGE:
+        // - CCPA Consent/Opt-Out
+        // - COPPA (age-restricted users)
+        // - ATT (iOS App Tracking Transparency) - Must be manually enabled/disabled in iOS Settings
+        // - GPP regional (US-CA, US-National, EU)
+        // - Combined scenarios (COPPA + GPP consent precedence)
+        //
+        gppScenarioPicker = GPPScenarioPickerView()
+        gppScenarioPicker.translatesAutoresizingMaskIntoConstraints = false
+        buttonStack.addArrangedSubview(gppScenarioPicker)
         
         // Load Banner button
         let loadButton = UIButton(type: .system)
@@ -69,7 +92,6 @@ class BannerViewController: BaseAdViewController {
     }
     
     @objc private func loadBannerAd() {
-        
         if isLoading {
             showAlert(title: "Info", message: "Banner is already loading.")
             return
@@ -110,7 +132,7 @@ class BannerViewController: BaseAdViewController {
     private func createAndAddBannerToView() {
         guard bannerAd == nil else { return }
         
-        print("📱 Creating new banner ad instance...")
+        DemoAppLogger.sharedInstance.logMessage("📱 Creating new banner ad instance...")
         
         // Create banner ad with placement from config
         let placement = CLXDemoConfigManager.sharedManager.currentConfig.bannerPlacement
@@ -120,10 +142,10 @@ class BannerViewController: BaseAdViewController {
                                       tmax: nil)
         
         if bannerAd == nil {
-            print("❌ Failed to create Banner ad instance")
+            DemoAppLogger.sharedInstance.logMessage("❌ Failed to create Banner ad instance")
             showAlert(title: "Error", message: "Failed to create Banner ad instance")
         } else {
-            print("✅ Banner ad instance created successfully")
+            DemoAppLogger.sharedInstance.logMessage("✅ Banner ad instance created successfully")
             // Add banner to view hierarchy immediately
             addBannerToViewHierarchy()
         }
@@ -157,79 +179,9 @@ class BannerViewController: BaseAdViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    private func setupNotifications() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleSDKInitialized),
-            name: .sdkInitialized,
-            object: nil
-        )
-    }
-    
-    @objc private func handleSDKInitialized() {
-        isSDKInitialized = true
-        createBannerAd()
-    }
-    
-    private func createBannerAd() {
-        guard bannerAd == nil else { return }
-        print("📱 Creating new banner ad instance...")
-        
-        // Create banner ad with placement from config
-        let placement = CLXDemoConfigManager.sharedManager.currentConfig.bannerPlacement
-        bannerAd = cloudX.createBanner(placement: placement, 
-                                      viewController: self, 
-                                      delegate: self, 
-                                      tmax: nil)
-        
-        if bannerAd == nil {
-            print("❌ Failed to create Banner ad instance")
-            showAlert(title: "Error", message: "Failed to create Banner ad instance")
-        } else {
-            print("✅ Banner ad instance created successfully")
-        }
-    }
-    
-    @objc private func showBannerAd() {
-        print("🔄 Starting banner ad load process...")
-        
-        guard isSDKInitialized else {
-            showAlert(title: "Error", message: "SDK not initialized. Please initialize SDK first.")
-            return
-        }
-        
-        guard !isLoading else {
-            print("⏳ Already loading an ad, please wait...")
-            return
-        }
-        
-        // Create a new banner ad instance if needed
-        if bannerAd == nil {
-            createBannerAd()
-        }
-        
-        guard let banner = bannerAd else {
-            showAlert(title: "Error", message: "Failed to create banner.")
-            return
-        }
-        
-        banner.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(banner)
-        NSLayoutConstraint.activate([
-            banner.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            banner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            banner.widthAnchor.constraint(equalToConstant: 320),
-            banner.heightAnchor.constraint(equalToConstant: 50)
-        ])
-        
-        isLoading = true
-        updateStatusUI(state: .loading)
-        print("📱 Loading banner ad...")
-        banner.load()
-    }
-    
     private func resetAdState() {
         bannerAd?.removeFromSuperview()
+        bannerAd?.destroy()
         bannerAd = nil
         isLoading = false
         updateStatusUI(state: .noAd)
@@ -238,49 +190,70 @@ class BannerViewController: BaseAdViewController {
 
 extension BannerViewController: CLXBannerDelegate {
     func didLoad(with ad: CLXAd) {
-        print("✅ Banner loaded successfully")
+        DemoAppLogger.sharedInstance.logAdEvent("✅ Banner didLoadWithAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .ready)
     }
     
     func failToLoad(with ad: CLXAd, error: Error) {
-        print("❌ Failed to load Banner Ad: \(error)")
+        DemoAppLogger.sharedInstance.logAdEvent("❌ Banner failToLoadWithAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .noAd)
         bannerAd = nil
         
         DispatchQueue.main.async { [weak self] in
-            self?.showAlert(title: "Ad Load Error", message: error.localizedDescription)
+            let errorMessage = (error as NSError).detailedDemoDescription
+            self?.showAlert(title: "Banner Ad Load Failed", message: errorMessage)
         }
     }
     
     func didShow(with ad: CLXAd) {
-        print("👀 Banner did show")
+        DemoAppLogger.sharedInstance.logAdEvent("👀 Banner didShowWithAd", ad: ad)
     }
     
     func failToShow(with ad: CLXAd, error: Error) {
-        print("❌ Banner fail to show: \(error)")
+        DemoAppLogger.sharedInstance.logAdEvent("❌ Banner failToShowWithAd", ad: ad)
         bannerAd = nil
         
         DispatchQueue.main.async { [weak self] in
-            self?.showAlert(title: "Ad Show Error", message: error.localizedDescription)
+            let errorMessage = (error as NSError).detailedDemoDescription
+            self?.showAlert(title: "Banner Ad Show Failed", message: errorMessage)
         }
     }
     
     func didHide(with ad: CLXAd) {
-        print("🔚 Banner did hide")
+        DemoAppLogger.sharedInstance.logAdEvent("🔚 Banner didHideWithAd", ad: ad)
         bannerAd = nil
     }
     
     func didClick(with ad: CLXAd) {
-        print("👆 Banner did click")
+        DemoAppLogger.sharedInstance.logAdEvent("👆 Banner didClickWithAd", ad: ad)
     }
     
     func impression(on ad: CLXAd) {
-        print("👁️ Banner impression recorded")
+        DemoAppLogger.sharedInstance.logAdEvent("👁️ Banner impressionOn", ad: ad)
     }
     
     func revenuePaid(_ ad: CLXAd) {
-        print("💰 Banner revenue paid")
+        DemoAppLogger.sharedInstance.logAdEvent("💰 Banner revenuePaid", ad: ad)
     }
-} 
+    
+    // NEW MAX SDK Compatibility Delegate Methods
+    func didExpand(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("🔍 Banner didExpandAd", ad: ad)
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.showAlert(title: "Banner Expanded!", 
+                           message: "Banner ad expanded to full screen. This is a new MAX SDK compatibility feature.")
+        }
+    }
+    
+    func didCollapse(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("🔍 Banner didCollapseAd", ad: ad)
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.showAlert(title: "Banner Collapsed!", 
+                           message: "Banner ad collapsed from full screen. This is a new MAX SDK compatibility feature.")
+        }
+    }
+}

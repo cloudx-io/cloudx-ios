@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CloudXCore
 
 class CLXTextField: UITextField {
     
@@ -46,7 +47,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 3 // SDK, Placement, Privacy
+        return 4 // SDK, Placement, Privacy, Logging
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -54,6 +55,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         case 0: return 2 // SDK Settings
         case 1: return 6 // Placement Settings
         case 2: return 3 // Privacy
+        case 3: return 3 // Logging: Enable, Emojis, Level
         default: return 0
         }
     }
@@ -63,8 +65,16 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         case 0: return "SDK Settings"
         case 1: return "Placement Settings"
         case 2: return "Privacy"
+        case 3: return "Logging Controls 🪵"
         default: return nil
         }
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        if section == 3 {
+            return "V=Verbose (all logs), D=Debug (dev logs), I=Info (key events), W=Warn (issues), E=Error (failures only). Toggle emojis to test plain text mode for log aggregation systems."
+        }
+        return nil
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -124,9 +134,62 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
                 textField.removeFromSuperview()
             default: break
             }
+        case 3: // Logging
+            textField.removeFromSuperview() // We'll use switches for all logging controls
+            switch indexPath.row {
+            case 0:
+                cell.textLabel?.text = "Logging Enabled"
+                let toggle = UISwitch()
+                // Read from UserDefaults, default is YES (enabled)
+                toggle.isOn = !UserDefaults.standard.bool(forKey: "LoggingDisabled")
+                toggle.tag = 300
+                toggle.addTarget(self, action: #selector(loggingToggleChanged(_:)), for: .valueChanged)
+                cell.accessoryView = toggle
+            case 1:
+                cell.textLabel?.text = "Emojis Enabled"
+                let toggle = UISwitch()
+                // Default is YES, store override in UserDefaults
+                toggle.isOn = !UserDefaults.standard.bool(forKey: "LoggingEmojisDisabled")
+                toggle.tag = 301
+                toggle.addTarget(self, action: #selector(loggingToggleChanged(_:)), for: .valueChanged)
+                cell.accessoryView = toggle
+            case 2:
+                cell.textLabel?.text = "Log Level"
+                let levelControl = UISegmentedControl(items: ["V", "D", "I", "W", "E"])
+                let currentLevel = UserDefaults.standard.integer(forKey: "LoggingLevel")
+                levelControl.selectedSegmentIndex = currentLevel > 0 ? currentLevel : 2 // Default to Info
+                levelControl.frame = CGRect(x: 0, y: 0, width: 200, height: 30)
+                levelControl.addTarget(self, action: #selector(logLevelChanged(_:)), for: .valueChanged)
+                cell.accessoryView = levelControl
+            default: break
+            }
         default: break
         }
         return cell
+    }
+    
+    @objc private func loggingToggleChanged(_ sender: UISwitch) {
+        if sender.tag == 300 {
+            // Logging Enabled/Disabled
+            CloudXCore.setLoggingEnabled(sender.isOn)
+            UserDefaults.standard.set(!sender.isOn, forKey: "LoggingDisabled")
+            UserDefaults.standard.synchronize()
+            print("🪵 Logging \(sender.isOn ? "ENABLED" : "DISABLED")")
+        } else if sender.tag == 301 {
+            // Emojis Enabled/Disabled
+            CloudXCore.setLoggingEmojisEnabled(sender.isOn)
+            UserDefaults.standard.set(!sender.isOn, forKey: "LoggingEmojisDisabled")
+            UserDefaults.standard.synchronize()
+            print("🪵 Emojis \(sender.isOn ? "ENABLED" : "DISABLED")")
+        }
+    }
+    
+    @objc private func logLevelChanged(_ sender: UISegmentedControl) {
+        // 0=Verbose, 1=Debug, 2=Info, 3=Warn, 4=Error
+        CloudXCore.setMinLogLevel(CLXLogLevel(rawValue: sender.selectedSegmentIndex) ?? .info)
+        UserDefaults.standard.set(sender.selectedSegmentIndex, forKey: "LoggingLevel")
+        let levelNames = ["VERBOSE", "DEBUG", "INFO", "WARN", "ERROR"]
+        print("🪵 Log level set to: \(levelNames[sender.selectedSegmentIndex])")
     }
     
     @objc private func userTargetingSwitchChanged(_ sender: UISwitch) {
