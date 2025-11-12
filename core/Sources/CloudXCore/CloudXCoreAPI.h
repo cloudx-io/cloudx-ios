@@ -223,6 +223,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)setLoggingEmojisEnabled:(BOOL)enabled;
 
+/**
+ * Enable or disable timestamps in logs
+ * @param enabled YES to show timestamps, NO to hide (default)
+ * @discussion Timestamps are formatted as HH:mm:ss.SSS and appear after [CloudX]. Useful for debugging timing issues.
+ */
++ (void)setLoggingTimestampsEnabled:(BOOL)enabled;
+
 #pragma mark - SDK Lifecycle
 
 /**

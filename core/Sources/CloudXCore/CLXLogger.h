@@ -61,6 +61,13 @@ typedef NS_ENUM(NSInteger, CLXLogEmoji) {
  */
 - (void)setEmojisEnabled:(BOOL)enabled;
 
+/**
+ * Enable or disable timestamps in logs
+ * @param enabled YES to show timestamps, NO to hide (default)
+ * @discussion Timestamps are formatted as HH:mm:ss.SSS and appear after [CloudX]
+ */
+- (void)setTimestampsEnabled:(BOOL)enabled;
+
 @end
 
 NS_ASSUME_NONNULL_END 

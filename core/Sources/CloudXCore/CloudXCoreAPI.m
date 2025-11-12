@@ -990,6 +990,10 @@ static CloudXCore *_sharedInstance = nil;
     [[CLXLogger shared] setEmojisEnabled:enabled];
 }
 
++ (void)setLoggingTimestampsEnabled:(BOOL)enabled {
+    [[CLXLogger shared] setTimestampsEnabled:enabled];
+}
+
 #pragma mark - SDK Lifecycle
 
 - (void)deinitialize {

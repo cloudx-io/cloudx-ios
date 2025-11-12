@@ -10,6 +10,7 @@
 static BOOL _globalLoggingEnabled = YES;
 static CLXLogLevel _globalMinLogLevel = CLXLogLevelError;
 static BOOL _globalEmojisEnabled = YES;
+static BOOL _globalTimestampsEnabled = NO;
 
 @interface CLXLogger ()
 @property (nonatomic, copy) NSString *category;
@@ -46,6 +47,10 @@ static BOOL _globalEmojisEnabled = YES;
 
 - (void)setEmojisEnabled:(BOOL)enabled {
     _globalEmojisEnabled = enabled;
+}
+
+- (void)setTimestampsEnabled:(BOOL)enabled {
+    _globalTimestampsEnabled = enabled;
 }
 
 #pragma mark - Emoji and Level Name Mapping
@@ -118,24 +123,36 @@ static BOOL _globalEmojisEnabled = YES;
         return;
     }
     
-    // Format: [CloudX] <emoji> <LEVEL>  | ClassName - message
+    // Format: [CloudX] <timestamp?> <emoji> <LEVEL>  | ClassName - message
     NSString *emoji = [self emojiForType:emojiType];
     NSString *typePrefix = [self emojiTypeNameForType:emojiType];
     NSString *levelName = [self levelNameForLevel:level];
     
+    // Generate timestamp if enabled
+    NSString *timestamp = @"";
+    if (_globalTimestampsEnabled) {
+        static NSDateFormatter *timestampFormatter = nil;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            timestampFormatter = [[NSDateFormatter alloc] init];
+            [timestampFormatter setDateFormat:@"HH:mm:ss.SSS"];
+        });
+        timestamp = [NSString stringWithFormat:@"[%@] ", [timestampFormatter stringFromDate:[NSDate date]]];
+    }
+    
     NSString *formattedMessage;
     if (emoji.length > 0) {
-        // With emojis: [CloudX] <emoji> <LEVEL>  | ClassName - message
-        formattedMessage = [NSString stringWithFormat:@"[CloudX] %@ %@ | %@ - %@", 
-                           emoji, levelName, self.category, message];
+        // With emojis: [CloudX] [timestamp?] <emoji> <LEVEL>  | ClassName - message
+        formattedMessage = [NSString stringWithFormat:@"[CloudX] %@%@ %@ | %@ - %@", 
+                           timestamp, emoji, levelName, self.category, message];
     } else if (typePrefix.length > 0) {
-        // Without emojis, with type prefix: [CloudX] <TYPE> <LEVEL>  | ClassName - message
-        formattedMessage = [NSString stringWithFormat:@"[CloudX] %@%@ | %@ - %@", 
-                           typePrefix, levelName, self.category, message];
+        // Without emojis, with type prefix: [CloudX] [timestamp?] <TYPE> <LEVEL>  | ClassName - message
+        formattedMessage = [NSString stringWithFormat:@"[CloudX] %@%@%@ | %@ - %@", 
+                           timestamp, typePrefix, levelName, self.category, message];
     } else {
-        // Without emojis, no type: [CloudX] <LEVEL>  | ClassName - message
-        formattedMessage = [NSString stringWithFormat:@"[CloudX] %@ | %@ - %@", 
-                           levelName, self.category, message];
+        // Without emojis, no type: [CloudX] [timestamp?] <LEVEL>  | ClassName - message
+        formattedMessage = [NSString stringWithFormat:@"[CloudX] %@%@ | %@ - %@", 
+                           timestamp, levelName, self.category, message];
     }
     
     // Log using os_log (Xcode console shows these automatically)

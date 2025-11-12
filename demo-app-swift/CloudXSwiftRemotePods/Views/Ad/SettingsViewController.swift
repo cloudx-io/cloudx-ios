@@ -55,7 +55,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         case 0: return 2 // SDK Settings
         case 1: return 6 // Placement Settings
         case 2: return 3 // Privacy
-        case 3: return 3 // Logging: Enable, Emojis, Level
+        case 3: return 4 // Logging: Enable, Emojis, Timestamps, Level
         default: return 0
         }
     }
@@ -154,6 +154,14 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
                 toggle.addTarget(self, action: #selector(loggingToggleChanged(_:)), for: .valueChanged)
                 cell.accessoryView = toggle
             case 2:
+                cell.textLabel?.text = "Timestamps Enabled"
+                let toggle = UISwitch()
+                // Default is NO, store override in UserDefaults
+                toggle.isOn = UserDefaults.standard.bool(forKey: "LoggingTimestampsEnabled")
+                toggle.tag = 302
+                toggle.addTarget(self, action: #selector(loggingToggleChanged(_:)), for: .valueChanged)
+                cell.accessoryView = toggle
+            case 3:
                 cell.textLabel?.text = "Log Level"
                 let levelControl = UISegmentedControl(items: ["V", "D", "I", "W", "E"])
                 let currentLevel = UserDefaults.standard.integer(forKey: "LoggingLevel")
@@ -181,6 +189,12 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
             UserDefaults.standard.set(!sender.isOn, forKey: "LoggingEmojisDisabled")
             UserDefaults.standard.synchronize()
             print("🪵 Emojis \(sender.isOn ? "ENABLED" : "DISABLED")")
+        } else if sender.tag == 302 {
+            // Timestamps Enabled/Disabled
+            CloudXCore.setLoggingTimestampsEnabled(sender.isOn)
+            UserDefaults.standard.set(sender.isOn, forKey: "LoggingTimestampsEnabled")
+            UserDefaults.standard.synchronize()
+            print("🪵 Timestamps \(sender.isOn ? "ENABLED" : "DISABLED")")
         }
     }
     

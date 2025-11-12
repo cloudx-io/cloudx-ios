@@ -65,7 +65,7 @@
         case 0: return 2; // SDK Settings
         case 1: return 6; // Placement Settings
         case 2: return 3; // Privacy: Consent, US Privacy, User Targeting
-        case 3: return 3; // Logging: Enable, Emojis, Level
+        case 3: return 4; // Logging: Enable, Emojis, Timestamps, Level
         default: return 0;
     }
 }
@@ -155,6 +155,16 @@
                     break;
                 }
                 case 2: {
+                    cell.textLabel.text = @"Timestamps Enabled";
+                    UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectZero];
+                    // Default is NO, store override in UserDefaults
+                    toggle.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"LoggingTimestampsEnabled"];
+                    toggle.tag = 302;
+                    [toggle addTarget:self action:@selector(loggingToggleChanged:) forControlEvents:UIControlEventValueChanged];
+                    cell.accessoryView = toggle;
+                    break;
+                }
+                case 3: {
                     cell.textLabel.text = @"Log Level";
                     UISegmentedControl *levelControl = [[UISegmentedControl alloc] initWithItems:@[@"V", @"D", @"I", @"W", @"E"]];
                     NSInteger currentLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"LoggingLevel"];
@@ -187,6 +197,12 @@
         [[NSUserDefaults standardUserDefaults] setBool:!sender.isOn forKey:@"LoggingEmojisDisabled"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         NSLog(@"🪵 Emojis %@", sender.isOn ? @"ENABLED" : @"DISABLED");
+    } else if (sender.tag == 302) {
+        // Timestamps Enabled/Disabled
+        [CloudXCore setLoggingTimestampsEnabled:sender.isOn];
+        [[NSUserDefaults standardUserDefaults] setBool:sender.isOn forKey:@"LoggingTimestampsEnabled"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        NSLog(@"🪵 Timestamps %@", sender.isOn ? @"ENABLED" : @"DISABLED");
     }
 }
 
