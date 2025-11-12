@@ -252,9 +252,10 @@
             // Handle HTTP error status codes (non-2xx)
             [self.logger verbose:[NSString stringWithFormat:@"HTTP error status code: %ld", (long)httpResponse.statusCode]];
             
-            // Log error response body for debugging
+            // Extract error response body for debugging and user-facing error messages
+            NSString *errorResponseBody = nil;
             if (data && data.length > 0) {
-                NSString *errorResponseBody = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                errorResponseBody = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
                 if (errorResponseBody) {
                     [self.logger verbose:[NSString stringWithFormat:@"Error response body: %@", errorResponseBody]];
                 } else {
@@ -265,7 +266,8 @@
             }
             
             if (completion) {
-                completion(nil, [CLXError errorWithHTTPStatusCode:httpResponse.statusCode], false);
+                // Pass server error message to CLXError for detailed error reporting in demo apps
+                completion(nil, [CLXError errorWithHTTPStatusCode:httpResponse.statusCode serverMessage:errorResponseBody], false);
             }
         }
     }];

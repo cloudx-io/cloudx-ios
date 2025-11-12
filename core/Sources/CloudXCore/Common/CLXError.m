@@ -22,6 +22,10 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
 }
 
 + (instancetype)errorWithHTTPStatusCode:(NSInteger)httpStatusCode {
+    return [self errorWithHTTPStatusCode:httpStatusCode serverMessage:nil];
+}
+
++ (instancetype)errorWithHTTPStatusCode:(NSInteger)httpStatusCode serverMessage:(NSString *)serverMessage {
     CLXErrorCode code;
     NSString *description;
     
@@ -71,7 +75,16 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
             break;
     }
     
-    return [self errorWithCode:code description:description];
+    // Build userInfo dictionary with server message if available
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    userInfo[NSLocalizedDescriptionKey] = description;
+    
+    // Add server message as failure reason for detailed error reporting
+    if (serverMessage && serverMessage.length > 0) {
+        userInfo[NSLocalizedFailureReasonErrorKey] = serverMessage;
+    }
+    
+    return [self errorWithCode:code userInfo:userInfo];
 }
 
 + (instancetype)errorWithCode:(CLXErrorCode)code userInfo:(NSDictionary *)userInfo {
