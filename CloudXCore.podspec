@@ -16,15 +16,7 @@ Pod::Spec.new do |s|
   s.static_framework = false
   
   s.pod_target_xcconfig = {
-    'CLANG_ENABLE_MODULES' => 'YES',
-    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO',
-    'DEFINES_MODULE' => 'YES',
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386'
-  }
-  s.user_target_xcconfig = {
-    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO',
-    'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/CloudXCore" "${PODS_XCFRAMEWORKS_BUILD_DIR}/CloudXCore"',
-    'HEADER_SEARCH_PATHS' => '$(inherited) "${PODS_XCFRAMEWORKS_BUILD_DIR}/CloudXCore/CloudXCore.framework/Headers"'
   }
   
   s.swift_versions = ['5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9', '6.0', '6.1', '6.2']
