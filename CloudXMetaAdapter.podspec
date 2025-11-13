@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXMetaAdapter'
   s.version          = '1.2.0'
-  s.summary          = 'CloudX Meta Adapter - Static Framework'
+  s.summary          = 'CloudX Meta Adapter Framework'
   s.description      = 'Meta (Facebook Audience Network) adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
   s.license          = { :type => 'Business Source License 1.1' }
@@ -19,7 +19,6 @@ Pod::Spec.new do |s|
   s.weak_frameworks = ['Combine', 'CryptoKit', 'SafariServices', 'SwiftUI', 'WebKit']
   
   s.requires_arc = true
-  s.static_framework = true
   
   s.pod_target_xcconfig = {
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386'
