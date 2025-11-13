@@ -592,8 +592,10 @@ NS_ASSUME_NONNULL_BEGIN
     NSString *networkName = bid.ext.prebid.meta.adaptercode ?: @"TestVastNetwork";
     
     // Map server-side network names to client-side adapter names
+    // TODO - resolve the name mismatch by either updating the prebidAdapter
+    // naming or changing the server network name
     if ([networkName isEqualToString:@"testbidder"]) {
-        networkName = @"cloudXRenderer";
+        networkName = @"prebidAdapter";
     }
     
     // Create CLXAd from bid response data

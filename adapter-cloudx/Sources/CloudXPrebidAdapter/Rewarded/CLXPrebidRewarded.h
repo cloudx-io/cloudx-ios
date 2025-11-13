@@ -1,8 +1,8 @@
 //
-//  CLXRendererRewarded.h
-//  CloudXRenderer
+//  CLXPrebidRewarded.h
+//  CloudXPrebidAdapter
 //
-//  CloudX rewarded ad renderer implementation
+//  Prebid 3.0 rewarded ad implementation
 //
 
 #import <Foundation/Foundation.h>
@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXRendererRewarded : NSObject <CLXAdapterRewarded>
+@interface CLXPrebidRewarded : NSObject <CLXAdapterRewarded>
 
 @property (nonatomic, assign, readonly) BOOL isReady;
 

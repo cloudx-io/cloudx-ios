@@ -1,8 +1,8 @@
 //
-//  CLXRendererBidTokenSource.h
-//  CloudXRenderer
+//  CLXPrebidBidTokenSource.h
+//  CloudXPrebidAdapter
 //
-//  CloudX renderer bid token source implementation
+//  Prebid 3.0 bid token source implementation
 //
 
 #import <Foundation/Foundation.h>
@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXRendererBidTokenSource : NSObject <CLXBidTokenSource>
+@interface CLXPrebidBidTokenSource : NSObject <CLXBidTokenSource>
 
 + (instancetype)createInstance;
 

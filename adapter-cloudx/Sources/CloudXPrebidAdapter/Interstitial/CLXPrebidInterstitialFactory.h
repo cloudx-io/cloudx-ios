@@ -1,6 +1,6 @@
 //
-//  CLXRendererInterstitialFactory.h
-//  CloudXRenderer
+//  CloudXTestVastNetworkInterstitialFactory.h
+//  CloudXTestVastNetworkAdapter
 //
 //
 
@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXRendererInterstitialFactory : NSObject <CLXAdapterInterstitialFactory>
+@interface CLXPrebidInterstitialFactory : NSObject <CLXAdapterInterstitialFactory>
 
 + (instancetype)createInstance;
 

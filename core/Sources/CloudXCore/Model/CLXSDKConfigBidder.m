@@ -20,7 +20,7 @@
 - (NSString *)networkNameMapped {
     // Map networkName to the correct key used in initializers dictionary
     if ([_networkName isEqualToString:@"testbidder"]) {
-        return @"cloudXRenderer";  // Map testbidder to CloudXRenderer
+        return @"prebidAdapter";  // Map testbidder to prebidAdapter
     } else if ([_networkName isEqualToString:@"googleAdManager"]) {
         return @"googleAdManager";
     } else if ([_networkName isEqualToString:@"meta"]) {
@@ -29,8 +29,10 @@
         return @"mintegral";
     } else if ([_networkName isEqualToString:@"cloudx"]) {
         return @"cloudx";
-    } else if ([_networkName isEqualToString:@"cloudXRenderer"]) {
-        return @"cloudXRenderer";
+    } else if ([_networkName isEqualToString:@"prebidAdapter"]) {
+        return @"prebidAdapter";
+    } else if ([_networkName isEqualToString:@"prebidMobile"]) {
+        return @"prebidAdapter";
     } else if ([_networkName isEqualToString:@"vungle"]) {
         return @"vungle";
     }

@@ -117,12 +117,13 @@
 - (void)testAllNetworkNameMappings {
     // Test known mappings
     NSArray *testCases = @[
-        @[@"testbidder", @"cloudXRenderer"],  // testbidder maps to cloudXRenderer
+        @[@"testbidder", @"prebidAdapter"],  // testbidder now maps to prebidAdapter
         @[@"googleAdManager", @"googleAdManager"],
         @[@"meta", @"meta"],
         @[@"mintegral", @"mintegral"],
         @[@"cloudx", @"cloudx"],
-        @[@"cloudXRenderer", @"cloudXRenderer"],
+        @[@"prebidAdapter", @"prebidAdapter"],
+        @[@"prebidMobile", @"prebidAdapter"],  // Should map to prebidAdapter
         @[@"unknown", @"unknown"]  // Unknown should return as-is
     ];
     

@@ -23,8 +23,13 @@ Pod::Spec.new do |s|
   s.weak_frameworks = [
     'Combine', 'CryptoKit', 'SafariServices', 'SwiftUI', 'WebKit', 'FBAudienceNetwork'
   ]
+  s.pod_target_xcconfig = {
+    'CLANG_ENABLE_MODULES' => 'YES',
+    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
+  }
   s.user_target_xcconfig = {
-    'OTHER_LDFLAGS' => '-ObjC'
+    'OTHER_LDFLAGS' => '-ObjC',
+    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
   }
   s.requires_arc = true
   

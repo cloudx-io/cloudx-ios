@@ -1,11 +1,11 @@
 # Uncomment the next line to define a global platform for your project
 platform :ios, '14.0'
 
-target 'CloudXRenderer' do
+target 'CloudXPrebidAdapter' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-  # Pods for CloudXRenderer
+  # Pods for CloudXPrebidAdapter
   # LOCAL development (monorepo)
   pod 'CloudXCore', :path => '../core'
 
@@ -13,7 +13,7 @@ target 'CloudXRenderer' do
   # pod 'CloudXCore', :podspec => 'https://raw.githubusercontent.com/cloudx-xenoss/CloudXCoreiOS/main/CloudXCore.podspec.json'
   # pod 'CloudXCore'
 
-  target 'CloudXRendererTests' do
+  target 'CloudXPrebidAdapterTests' do
     # Pods for testing
   end
 

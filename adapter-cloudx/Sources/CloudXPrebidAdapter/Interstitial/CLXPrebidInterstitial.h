@@ -1,8 +1,8 @@
 //
-//  CLXRendererInterstitial.h
-//  CloudXRenderer
+//  CLXPrebidInterstitial.h
+//  CloudXPrebidAdapter
 //
-//  CloudX interstitial ad renderer implementation
+//  Prebid 3.0 interstitial ad implementation
 //
 
 #import <Foundation/Foundation.h>
@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXRendererInterstitial : NSObject <CLXAdapterInterstitial>
+@interface CLXPrebidInterstitial : NSObject <CLXAdapterInterstitial>
 
 - (instancetype)initWithAdm:(NSString *)adm
                       bidID:(NSString *)bidID

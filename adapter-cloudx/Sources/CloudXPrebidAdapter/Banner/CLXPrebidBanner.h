@@ -1,8 +1,8 @@
 //
-//  CLXRendererBanner.h
-//  CloudXRenderer
+//  CloudXPrebidBanner.h
+//  CloudXPrebidAdapter
 //
-//  CloudX banner ad renderer implementation
+//  Prebid 3.0 compliant banner ad implementation
 //
 
 #import <Foundation/Foundation.h>
@@ -11,16 +11,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXRendererBanner : NSObject <CLXAdapterBanner>
+@interface CLXPrebidBanner : NSObject <CLXAdapterBanner>
 
 @property (nonatomic, weak) id<CLXAdapterBannerDelegate> delegate;
 
 /**
- * Initialize with ad markup from core SDK
+ * Initialize with bid markup from core SDK
  * This is the primary initialization method - core SDK provides the ad markup
  * after handling the auction and bid selection process
  *
- * @param adMarkup HTML/VAST markup from winning bid response
+ * @param adMarkup HTML/VAST markup from winning prebid bid response
  * @param hasCloseButton Whether banner should show close button
  * @param type Banner type (standard, interscroller, etc.)
  * @param viewController Parent view controller for presentation

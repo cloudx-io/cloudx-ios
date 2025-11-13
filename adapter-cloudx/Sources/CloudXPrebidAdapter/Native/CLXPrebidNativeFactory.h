@@ -1,8 +1,8 @@
 //
-//  CLXRendererNativeFactory.h
-//  CloudXRenderer
+//  CLXPrebidNativeFactory.h
+//  CloudXPrebidAdapter
 //
-//  CloudX native factory implementation
+//  Prebid 3.0 native factory implementation
 //
 
 #import <Foundation/Foundation.h>
@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXRendererNativeFactory : NSObject <CLXAdapterNativeFactory>
+@interface CLXPrebidNativeFactory : NSObject <CLXAdapterNativeFactory>
 
 + (instancetype)createInstance;
 

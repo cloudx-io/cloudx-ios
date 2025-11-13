@@ -4,6 +4,8 @@
 <dict>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This identifier will be used to deliver personalized ads to you.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -207,6 +209,7 @@
 			<key>SKAdNetworkIdentifier</key>
 			<string>3qcr597p9d.skadnetwork</string>
 		</dict>
+		<!-- Meta Audience Network SKAdNetwork IDs -->
 		<dict>
 			<key>SKAdNetworkIdentifier</key>
 			<string>v79kvwwj4g.skadnetwork</string>

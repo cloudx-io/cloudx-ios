@@ -7,10 +7,13 @@ target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
   # Pods for CloudXObjCRemotePods
-  # CloudXCore from remote public repo as binary xcframework (dynamic)
-  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-core'
-  # CloudXMetaAdapter from remote public repo as binary xcframework (static)
-  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-meta'
+  # For REMOTE: pod 'CloudXCore'
+  # For LOCAL development: just use :path, CocoaPods will find the podspec
+  pod 'CloudXCore', :path => '../core'
+  pod 'CloudXMetaAdapter', :path => '../adapter-meta'
+  pod 'CloudXPrebidAdapter', :path => '../adapter-cloudx'
+  # Vungle adapter temporarily removed - not configured server-side for this app
+  # pod 'CloudXVungleAdapter', :path => '../adapter-vungle'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths

@@ -1,8 +1,8 @@
 //
-//  CLXRendererBannerFactory.h
-//  CloudXRenderer
+//  CloudXPrebidBannerFactory.h
+//  CloudXPrebidAdapter
 //
-//  CloudX banner factory implementation
+//  Prebid 3.0 banner factory implementation
 //
 
 #import <Foundation/Foundation.h>
@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXRendererBannerFactory : NSObject <CLXAdapterBannerFactory>
+@interface CLXPrebidBannerFactory : NSObject <CLXAdapterBannerFactory>
 
 @end
 
