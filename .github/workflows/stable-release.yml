@@ -114,8 +114,7 @@ jobs:
       
       - name: Validate podspec
         run: |
-          cd $(dirname ${{ steps.parse.outputs.podspec }})
-          pod spec lint $(basename ${{ steps.parse.outputs.podspec }}) \
+          pod spec lint ${{ steps.parse.outputs.podspec }} \
             --allow-warnings \
             --skip-import-validation \
             --skip-tests
@@ -128,11 +127,9 @@ jobs:
           mkdir -p ~/.cocoapods/trunk
           echo '{"trunk":{"token":"'$COCOAPODS_TRUNK_TOKEN'"}}' > ~/.cocoapods/trunk/me.json
           
-          # Push to trunk
-          cd $(dirname ${{ steps.parse.outputs.podspec }})
-          
+          # Push to trunk from repo root
           for i in {1..5}; do
-            if pod trunk push $(basename ${{ steps.parse.outputs.podspec }}) \
+            if pod trunk push ${{ steps.parse.outputs.podspec }} \
               --allow-warnings \
               --skip-import-validation \
               --skip-tests; then

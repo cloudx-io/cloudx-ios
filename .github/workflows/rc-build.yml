@@ -95,10 +95,8 @@ jobs:
       
       - name: Validate podspecs
         run: |
-          cd core
-          pod spec lint CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests
-          cd ../renderer-cloudx
-          pod spec lint CloudXRenderer.podspec --allow-warnings --skip-import-validation --skip-tests
+          pod spec lint core/CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests
+          pod spec lint renderer-cloudx/CloudXRenderer.podspec --allow-warnings --skip-import-validation --skip-tests
       
       - name: Build Core framework
         run: |
