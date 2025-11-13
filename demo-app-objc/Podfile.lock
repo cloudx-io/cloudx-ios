@@ -3,14 +3,14 @@ PODS:
   - CloudXMetaAdapter (1.1.68):
     - CloudXCore
     - FBAudienceNetwork (~> 6.20.1)
-  - CloudXPrebidAdapter (1.0.0):
+  - CloudXRenderer (1.0.0):
     - CloudXCore
   - FBAudienceNetwork (6.20.1)
 
 DEPENDENCIES:
   - CloudXCore (from `../core`)
   - CloudXMetaAdapter (from `../adapter-meta`)
-  - CloudXPrebidAdapter (from `../adapter-cloudx`)
+  - CloudXRenderer (from `../renderer-cloudx`)
 
 SPEC REPOS:
   trunk:
@@ -21,15 +21,15 @@ EXTERNAL SOURCES:
     :path: "../core"
   CloudXMetaAdapter:
     :path: "../adapter-meta"
-  CloudXPrebidAdapter:
-    :path: "../adapter-cloudx"
+  CloudXRenderer:
+    :path: "../renderer-cloudx"
 
 SPEC CHECKSUMS:
   CloudXCore: c6ca3ee7bf1235f92208730b7bedf3170e20913a
-  CloudXMetaAdapter: 3adbce33a87dc32ae3a5f3285929b3fc74b4bcb7
-  CloudXPrebidAdapter: 2db71d871116409ffd9492288df956a7e9a8e9c1
+  CloudXMetaAdapter: 44e3c2a4c82ed2ea6a68fa37d59db7cd7c9048b5
+  CloudXRenderer: 737995f31ca522d832f071ca18ebb7529a7707be
   FBAudienceNetwork: 08e86d63a05b3a5a59414af12e4af8d756943c80
 
-PODFILE CHECKSUM: b8c5127fd12a7503d58cbe0cea428e481525f0be
+PODFILE CHECKSUM: 825999119e44c21a771464c841b587dd16d4b86c
 
 COCOAPODS: 1.16.2

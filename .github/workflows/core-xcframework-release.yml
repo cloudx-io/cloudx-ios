@@ -1,0 +1,354 @@
+name: Release CloudXCore XCFramework
+
+on:
+  push:
+    tags:
+      - 'v*-core'
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    env:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      CLOUDX_PUBLIC_REPO_TOKEN: ${{ secrets.CLOUDX_PUBLIC_REPO_TOKEN }}
+      COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+
+    steps:
+      - name: 🔧 Switch to Xcode 15.3
+        run: sudo xcode-select -s /Applications/Xcode_15.3.app
+
+      - name: 🗂️ Checkout private SDK repo
+        uses: actions/checkout@v4
+
+      - name: 🧹 Clean build artifacts
+        run: |
+          rm -rf build
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
+
+      - name: 🕵️ Install sentry-cli
+        run: curl -sL https://sentry.io/get-cli/ | bash
+
+      - name: 🔢 Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          VERSION_NO_SUFFIX=${VERSION%-core}
+          echo "version=$VERSION_NO_SUFFIX" >> $GITHUB_OUTPUT
+          echo "full_version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v${VERSION_NO_SUFFIX}-core" >> $GITHUB_OUTPUT
+
+      - name: 📱 Build iOS Device Archive
+        working-directory: core
+        run: |
+          set -o pipefail
+          IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
+            -project CloudXCore.xcodeproj \
+            -scheme CloudXCore \
+            -destination "generic/platform=iOS" \
+            -archivePath build/ios_devices.xcarchive \
+            -configuration Release \
+            SKIP_INSTALL=NO \
+            BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+            CODE_SIGNING_ALLOWED=NO | tee xcodebuild-ios.log
+
+      - name: 🖥️ Build iOS Simulator Archive
+        working-directory: core
+        run: |
+          set -o pipefail
+          IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
+            -project CloudXCore.xcodeproj \
+            -scheme CloudXCore \
+            -destination "generic/platform=iOS Simulator" \
+            -archivePath build/ios_simulator.xcarchive \
+            -configuration Release \
+            SKIP_INSTALL=NO \
+            BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+            CODE_SIGNING_ALLOWED=NO | tee xcodebuild-sim.log
+
+      - name: 🧱 Create XCFramework
+        working-directory: core
+        run: |
+          xcodebuild -create-xcframework \
+            -framework build/ios_devices.xcarchive/Products/Library/Frameworks/CloudXCore.framework \
+            -framework build/ios_simulator.xcarchive/Products/Library/Frameworks/CloudXCore.framework \
+            -output CloudXCore.xcframework
+
+      - name: 🕵️ Upload dSYMs to Sentry
+        working-directory: core
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          RELEASE_NAME="CloudXCore@$VERSION"
+          sentry-cli releases new "$RELEASE_NAME" || true
+          sentry-cli debug-files upload build/ios_devices.xcarchive/dSYMs || true
+          sentry-cli debug-files upload build/ios_simulator.xcarchive/dSYMs || true
+          sentry-cli releases finalize "$RELEASE_NAME" || true
+
+      - name: 🔪 Strip debug symbols from XCFramework
+        working-directory: core
+        run: |
+          find CloudXCore.xcframework -name "*.framework" | while read FRAMEWORK; do
+            BINARY_NAME=$(basename "$FRAMEWORK" .framework)
+            BINARY_PATH="$FRAMEWORK/$BINARY_NAME"
+            if [ -f "$BINARY_PATH" ]; then
+              echo "Stripping debug symbols from $BINARY_PATH"
+              strip -x "$BINARY_PATH"
+            fi
+          done
+
+      - name: 📦 Zip XCFramework
+        working-directory: core
+        run: zip -r CloudXCore.xcframework.zip CloudXCore.xcframework
+
+      - name: 🧮 Compute SwiftPM Checksum
+        id: checksum
+        working-directory: core
+        run: |
+          CHECKSUM=$(swift package compute-checksum CloudXCore.xcframework.zip)
+          echo "checksum=$CHECKSUM" >> $GITHUB_OUTPUT
+          echo "SwiftPM Checksum: $CHECKSUM"
+
+      - name: 🗂️ Clone public repo and prepare release
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          TAG=${{ steps.version.outputs.tag }}
+          CHECKSUM=${{ steps.checksum.outputs.checksum }}
+          
+          # Clone public repo
+          git clone https://x-access-token:${{ secrets.CLOUDX_PUBLIC_REPO_TOKEN }}@github.com/cloudx-io/cloudx-ios.git cloudx-ios-public
+          
+          # Move xcframework zip to public repo
+          mv core/CloudXCore.xcframework.zip cloudx-ios-public/core/
+          cd cloudx-ios-public/core
+          
+          # Unzip for reference
+          unzip -o CloudXCore.xcframework.zip
+          
+          # Update Package.swift
+          cat > Package.swift << 'EOF'
+          // swift-tools-version: 5.9
+
+          import PackageDescription
+
+          let package = Package(
+              name: "CloudXCore",
+              platforms: [
+                  .iOS(.v14)
+              ],
+              products: [
+                  .library(
+                      name: "CloudXCore",
+                      targets: ["CloudXCore"]
+                  )
+              ],
+              targets: [
+                  .binaryTarget(
+                      name: "CloudXCore",
+                      url: "https://github.com/cloudx-io/cloudx-ios/releases/download/TAG_PLACEHOLDER/CloudXCore.xcframework.zip",
+                      checksum: "CHECKSUM_PLACEHOLDER"
+                  )
+              ]
+          )
+          EOF
+          
+          sed -i '' "s|TAG_PLACEHOLDER|$TAG|" Package.swift
+          sed -i '' "s|CHECKSUM_PLACEHOLDER|$CHECKSUM|" Package.swift
+          
+          # Update podspec
+          cat > CloudXCore.podspec << 'EOF'
+          Pod::Spec.new do |s|
+            s.name             = 'CloudXCore'
+            s.version          = 'VERSION_PLACEHOLDER'
+            s.summary          = 'CloudX Core Framework'
+            s.description      = 'Core framework for CloudX functionality - binary distribution'
+            s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
+            s.license          = { :type => 'Business Source License 1.1' }
+            s.author           = { 'CloudX' => 'support@cloudx.io' }
+            s.source           = {
+              :http => 'https://github.com/cloudx-io/cloudx-ios/releases/download/TAG_PLACEHOLDER/CloudXCore.xcframework.zip'
+            }
+            
+            s.ios.deployment_target = '14.0'
+            s.vendored_frameworks = 'CloudXCore.xcframework'
+            
+            s.framework = 'Foundation'
+            s.frameworks = 'SafariServices'
+            
+            s.pod_target_xcconfig = {
+              'CLANG_ENABLE_MODULES' => 'YES',
+              'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
+            }
+            s.user_target_xcconfig = {
+              'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
+            }
+            
+            s.swift_versions = ['5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9', '6.0', '6.1', '6.2']
+          end
+          EOF
+          
+          sed -i '' "s|VERSION_PLACEHOLDER|$VERSION|" CloudXCore.podspec
+          sed -i '' "s|TAG_PLACEHOLDER|$TAG|" CloudXCore.podspec
+          
+          # Commit and push changes
+          git config user.name "cloudx-release-bot"
+          git config user.email "cloudx@users.noreply.github.com"
+          git add Package.swift CloudXCore.podspec
+          git commit -m "Update CloudXCore to v$VERSION (binary distribution)"
+          git push origin main
+
+      - name: 🔗 Create GitHub Release on Public Repo
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          TAG=${{ steps.version.outputs.tag }}
+          CHECKSUM=${{ steps.checksum.outputs.checksum }}
+          
+          # Create release notes
+          cat > release_notes.md << EOF
+          CloudXCore v$VERSION SDK release (binary distribution)
+          
+          ## Installation
+          
+          ### CocoaPods
+          Add to your Podfile:
+          \`\`\`ruby
+          pod 'CloudXCore', '~> $VERSION'
+          \`\`\`
+          
+          ### Swift Package Manager
+          Add to your Package.swift:
+          \`\`\`swift
+          .package(url: "https://github.com/cloudx-io/cloudx-ios", from: "$VERSION")
+          \`\`\`
+          
+          Or add via Xcode:
+          1. File → Add Package Dependencies
+          2. Enter: https://github.com/cloudx-io/cloudx-ios
+          3. Select version: $VERSION
+          
+          ## Distribution Format
+          
+          This release provides **binary distribution** as a dynamic xcframework for:
+          - Faster build times
+          - Intellectual property protection
+          - Reduced integration complexity
+          
+          ## Artifacts
+          
+          - **CloudXCore.xcframework.zip** - Binary framework for iOS device + simulator
+          - **SwiftPM Checksum**: \`$CHECKSUM\`
+          
+          ## Requirements
+          
+          - iOS 14.0+
+          - Xcode 15.3+
+          - Swift 5.9+
+          EOF
+          
+          # Create release using GitHub CLI
+          cd cloudx-ios-public
+          GITHUB_TOKEN=${{ secrets.CLOUDX_PUBLIC_REPO_TOKEN }} gh release create "$TAG" \
+            --title "CloudXCore v$VERSION" \
+            --notes-file ../release_notes.md \
+            --latest
+
+      - name: 📤 Upload XCFramework to GitHub Release
+        run: |
+          TAG=${{ steps.version.outputs.tag }}
+          cd cloudx-ios-public
+          GITHUB_TOKEN=${{ secrets.CLOUDX_PUBLIC_REPO_TOKEN }} gh release upload "$TAG" \
+            core/CloudXCore.xcframework.zip \
+            --repo cloudx-io/cloudx-ios \
+            --clobber
+
+      - name: ⏳ Wait for XCFramework to be globally available
+        run: |
+          TAG=${{ steps.version.outputs.tag }}
+          ZIP_URL="https://github.com/cloudx-io/cloudx-ios/releases/download/$TAG/CloudXCore.xcframework.zip"
+          echo "Waiting for $ZIP_URL to be fully available..."
+          
+          for i in {1..60}; do
+            STATUS=$(curl -s -L -w "%{http_code}" -o /dev/null "$ZIP_URL")
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ File is now fully available (HTTP 200)."
+              break
+            fi
+            echo "Waiting... ($i/60) — Current HTTP status: $STATUS"
+            sleep 3
+          done
+
+      - name: ✅ Verify XCFramework is downloadable
+        run: |
+          TAG=${{ steps.version.outputs.tag }}
+          ZIP_URL="https://github.com/cloudx-io/cloudx-ios/releases/download/$TAG/CloudXCore.xcframework.zip"
+          echo "Verifying $ZIP_URL is downloadable..."
+          
+          for i in {1..30}; do
+            echo "Attempt $i: trying to fetch the file..."
+            if curl -fL --retry 2 --connect-timeout 10 --max-time 20 "$ZIP_URL" -o /dev/null; then
+              echo "✅ File is now downloadable (curl -fL succeeded)"
+              break
+            fi
+            echo "Still waiting... sleeping 5s"
+            sleep 5
+          done
+
+      - name: 📤 Push Podspec to CocoaPods Trunk
+        run: |
+          mkdir -p ~/.cocoapods/trunk
+          echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TRUNK_TOKEN }}"}}' > ~/.cocoapods/trunk/me.json
+          cd cloudx-ios-public/core
+          
+          for i in {1..5}; do
+            pod trunk push CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests && break
+            echo "Pod trunk push failed. Retrying in 30 seconds... ($i/5)"
+            sleep 30
+          done
+
+      - name: ✅ Verify CocoaPods Release
+        run: |
+          pod trunk info CloudXCore
+          echo ""
+          echo "✅ CloudXCore successfully published to CocoaPods!"
+
+      - name: 📊 Release Summary
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          TAG=${{ steps.version.outputs.tag }}
+          CHECKSUM=${{ steps.checksum.outputs.checksum }}
+          
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ CloudXCore v$VERSION Released Successfully!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "📦 Distribution: Binary XCFramework"
+          echo "🏷️  Version: $VERSION"
+          echo "🔖 Tag: $TAG"
+          echo "🧮 Checksum: $CHECKSUM"
+          echo ""
+          echo "🔗 Release URL:"
+          echo "   https://github.com/cloudx-io/cloudx-ios/releases/tag/$TAG"
+          echo ""
+          echo "📚 CocoaPods:"
+          echo "   pod 'CloudXCore', '~> $VERSION'"
+          echo ""
+          echo "📦 Swift Package Manager:"
+          echo "   https://github.com/cloudx-io/cloudx-ios"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+      - name: 📌 Upload Build Logs on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-logs
+          path: |
+            core/xcodebuild-ios.log
+            core/xcodebuild-sim.log
+
+
+

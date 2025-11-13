@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXMediationInMobiAdapter'
-  s.version = '1.0.0'
+  s.version = '1.2.0'
   s.summary = 'InMobi adapter for CloudX iOS SDK - Industry standard mediation naming'
   s.description = 'iOS adapter for the CloudX SDK providing header bidding and waterfall support for InMobi advertising network'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
