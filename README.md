@@ -22,13 +22,6 @@ target 'YourApp' do
 end
 ```
 
-### Swift Package Manager
-
-Add this repository URL to your Xcode project:
-```
-https://github.com/cloudx-io/cloudx-ios
-```
-
 ### ⚠️ Important: Xcode 15+ Configuration
 
 **If using CocoaPods with Xcode 15 or later**, you must disable User Script Sandboxing in your Xcode project:
@@ -76,60 +69,5 @@ v0.1.0-prebid   # Prebid Adapter release (source distribution)
 #### Distribution Methods
 - **Core SDK**: Direct source integration via CocoaPods/SPM for easier debugging and customization
 - **Meta Adapter**: Pre-built xcframework for faster build times and simplified integration
-- **Vungle Adapter**: Direct source integration via CocoaPods/SPM for easier debugging and full transparency
 - **Automated Releases**: GitHub Actions automatically build, test, and publish releases when tags are pushed
 
-### Release Assets
-
-Each component release provides the appropriate assets for its distribution method:
-
-#### Core SDK Assets (Source Distribution)
-- Direct source file access via CocoaPods/SPM
-- No binary downloads required
-- Full source code availability for debugging
-
-#### Meta Adapter Assets (Framework Distribution) 
-```
-CloudXMediationMetaAdapter-v0.1.0.xcframework.zip  # Static xcframework for integration
-```
-
-#### Benefits
-- **Optimized Distribution**: Each component uses the most appropriate distribution method
-- **Independent Updates**: Components can be updated independently without affecting others
-- **Developer Choice**: Use source or framework distribution based on your needs
-- **Automated Pipeline**: Releases are automatically built and published via GitHub Actions
-
-## Documentation
-
-For detailed documentation, installation instructions, and usage examples, please refer to the individual component READMEs:
-
-- **[Core SDK](core/README.md)** - Detailed core SDK documentation and installation
-- **[Meta Adapter](adapter-meta/README.md)** - Meta (Facebook Audience Network) integration guide and setup
-- **[Vungle Adapter](adapter-vungle/README.md)** - Vungle (Liftoff) integration guide with header bidding support
-- **[Prebid Adapter](adapter-cloudx/README.md)** - Prebid integration guide and configuration
-- **Demo Apps** - Explore the demo application directories for complete integration examples
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes in the appropriate component directory
-4. Add tests for your changes
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the individual LICENSE files in each component directory for details.
-
-## Support
-
-For technical support and questions:
-- Create an issue in this repository
-- Contact the CloudX team at [support email]
-- Check the documentation in each component's README
-
-## Changelog
-
-See [RELEASES](https://github.com/cloudx-xenoss/cloudexchange.ios.sdk/releases) for detailed changelog and version history.
