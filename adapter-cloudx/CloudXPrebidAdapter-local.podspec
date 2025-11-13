@@ -9,27 +9,28 @@ Pod::Spec.new do |s|
   s.platform = :ios, '14.0'
   s.module_name = 'CloudXRenderer'
   
-  # Source configuration
-  s.source = {
-    :git => 'https://github.com/cloudx-xenoss/CloudXRenderer.git',
-    :tag => s.version.to_s
-  }
+  # Source configuration  
+  s.source = { :path => '.' }
   
   # Source files
   s.source_files = 'Sources/CloudXRenderer/**/*.{h,m}'
   s.public_header_files = 'Sources/CloudXRenderer/**/*.h'
   
   # Dependencies
-  s.dependency 'CloudXCore'
+  # s.dependency "CloudXCore" # Manually linked as xcframework
   
   # Build settings
   s.pod_target_xcconfig = {
     'VALID_ARCHS[sdk=iphoneos*]' => 'arm64 armv7',
-    'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64 arm64'
+    'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64 arm64',
+    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO',
+    'DEFINES_MODULE' => 'YES',
+    'CLANG_ENABLE_MODULES' => 'YES'
   }
   
   s.user_target_xcconfig = {
-    'OTHER_LDFLAGS' => '-ObjC'
+    'OTHER_LDFLAGS' => '-ObjC',
+    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
   }
   
   s.requires_arc = true

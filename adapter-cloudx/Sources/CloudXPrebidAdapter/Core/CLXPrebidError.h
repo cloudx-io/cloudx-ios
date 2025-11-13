@@ -1,74 +1,73 @@
 //
-//  CLXPrebidError.h
-//  CloudXPrebidAdapter
+//  CLXRendererError.h
+//  CloudXRenderer
 //
-//  Prebid 3.0 error handling and constants
+//  CloudX renderer error handling and constants
 //
 
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString *const CLXPrebidErrorDomain;
+extern NSString *const CLXRendererErrorDomain;
 
 /**
- * Prebid adapter error codes
- * Aligned with Prebid 3.0 error specifications
+ * Renderer error codes
  */
-typedef NS_ENUM(NSInteger, CLXPrebidErrorCode) {
-    CLXPrebidErrorCodeUnknown = 0,
+typedef NS_ENUM(NSInteger, CLXRendererErrorCode) {
+    CLXRendererErrorCodeUnknown = 0,
     
     // Configuration Errors (1xx)
-    CLXPrebidErrorCodeNotInitialized = 100,
-    CLXPrebidErrorCodeInvalidConfiguration = 101,
-    CLXPrebidErrorCodeInvalidPrebidServerURL = 102,
+    CLXRendererErrorCodeNotInitialized = 100,
+    CLXRendererErrorCodeInvalidConfiguration = 101,
+    CLXRendererErrorCodeInvalidServerURL = 102,
     
     // Network Errors (2xx)
-    CLXPrebidErrorCodeNetworkFailure = 200,
-    CLXPrebidErrorCodeRequestTimeout = 201,
-    CLXPrebidErrorCodeInvalidResponse = 202,
-    CLXPrebidErrorCodeServerError = 203,
+    CLXRendererErrorCodeNetworkFailure = 200,
+    CLXRendererErrorCodeRequestTimeout = 201,
+    CLXRendererErrorCodeInvalidResponse = 202,
+    CLXRendererErrorCodeServerError = 203,
     
     // Bid Errors (3xx)
-    CLXPrebidErrorCodeNoBidResponse = 300,
-    CLXPrebidErrorCodeInvalidBidResponse = 301,
-    CLXPrebidErrorCodeBidExpired = 302,
-    CLXPrebidErrorCodeInsufficientInventory = 303,
+    CLXRendererErrorCodeNoBidResponse = 300,
+    CLXRendererErrorCodeInvalidBidResponse = 301,
+    CLXRendererErrorCodeBidExpired = 302,
+    CLXRendererErrorCodeInsufficientInventory = 303,
     
     // Rendering Errors (4xx)
-    CLXPrebidErrorCodeRenderingFailure = 400,
-    CLXPrebidErrorCodeInvalidAdMarkup = 401,
-    CLXPrebidErrorCodeWebViewError = 402,
-    CLXPrebidErrorCodeViewControllerNotAvailable = 403,
+    CLXRendererErrorCodeRenderingFailure = 400,
+    CLXRendererErrorCodeInvalidAdMarkup = 401,
+    CLXRendererErrorCodeWebViewError = 402,
+    CLXRendererErrorCodeViewControllerNotAvailable = 403,
     
     // Ad Format Errors (5xx)
-    CLXPrebidErrorCodeUnsupportedAdFormat = 500,
-    CLXPrebidErrorCodeInvalidAdSize = 501,
-    CLXPrebidErrorCodeVideoPlaybackError = 502,
-    CLXPrebidErrorCodeNativeAdError = 503
+    CLXRendererErrorCodeUnsupportedAdFormat = 500,
+    CLXRendererErrorCodeInvalidAdSize = 501,
+    CLXRendererErrorCodeVideoPlaybackError = 502,
+    CLXRendererErrorCodeNativeAdError = 503
 };
 
 /**
- * Utility class for creating and managing Prebid-specific errors
+ * Utility class for creating and managing renderer-specific errors
  */
-@interface CLXPrebidError : NSObject
+@interface CLXRendererError : NSObject
 
 /**
  * Create error with code and description
- * @param code Error code from CLXPrebidErrorCode
+ * @param code Error code from CLXRendererErrorCode
  * @param description User-readable error description
- * @return NSError instance with Prebid domain
+ * @return NSError instance with renderer domain
  */
-+ (NSError *)errorWithCode:(CLXPrebidErrorCode)code description:(NSString *)description;
++ (NSError *)errorWithCode:(CLXRendererErrorCode)code description:(NSString *)description;
 
 /**
  * Create error with code, description and underlying error
- * @param code Error code from CLXPrebidErrorCode
+ * @param code Error code from CLXRendererErrorCode
  * @param description User-readable error description
  * @param underlyingError Original error that caused this error
- * @return NSError instance with Prebid domain and underlying error
+ * @return NSError instance with renderer domain and underlying error
  */
-+ (NSError *)errorWithCode:(CLXPrebidErrorCode)code 
++ (NSError *)errorWithCode:(CLXRendererErrorCode)code 
                description:(NSString *)description 
            underlyingError:(nullable NSError *)underlyingError;
 
@@ -77,7 +76,7 @@ typedef NS_ENUM(NSInteger, CLXPrebidErrorCode) {
  * @param code Error code
  * @return Description string
  */
-+ (NSString *)descriptionForCode:(CLXPrebidErrorCode)code;
++ (NSString *)descriptionForCode:(CLXRendererErrorCode)code;
 
 /**
  * Check if error is a network-related error

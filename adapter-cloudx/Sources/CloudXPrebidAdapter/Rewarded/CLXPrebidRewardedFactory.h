@@ -1,8 +1,8 @@
 //
-//  CLXPrebidRewardedFactory.h
-//  CloudXPrebidAdapter
+//  CLXRendererRewardedFactory.h
+//  CloudXRenderer
 //
-//  Prebid 3.0 rewarded factory implementation
+//  CloudX rewarded factory implementation
 //
 
 #import <Foundation/Foundation.h>
@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXPrebidRewardedFactory : NSObject <CLXAdapterRewardedFactory>
+@interface CLXRendererRewardedFactory : NSObject <CLXAdapterRewardedFactory>
 
 + (instancetype)createInstance;
 

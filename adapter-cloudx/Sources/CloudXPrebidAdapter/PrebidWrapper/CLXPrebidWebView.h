@@ -1,6 +1,6 @@
 //
-//  CLXPrebidWebView.h
-//  CloudXPrebidAdapter
+//  CLXRendererWebView.h
+//  CloudXRenderer
 //
 //  Advanced MRAID 3.0 compliant web view with performance optimization
 //
@@ -14,48 +14,48 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class CLXPrebidWebView;
+@class CLXRendererWebView;
 
 /**
  * Enhanced delegate protocol for comprehensive ad events
  */
-@protocol CLXPrebidWebViewDelegate <NSObject>
+@protocol CLXRendererWebViewDelegate <NSObject>
 
 @required
 - (nullable UIViewController *)viewControllerForPresentingModals;
 
 @optional
-- (void)webViewReadyToDisplay:(CLXPrebidWebView *)webView;
-- (void)webView:(CLXPrebidWebView *)webView failedToLoadWithError:(NSError *)error;
-- (void)webView:(CLXPrebidWebView *)webView receivedClickthroughLink:(NSURL *)url;
+- (void)webViewReadyToDisplay:(CLXRendererWebView *)webView;
+- (void)webView:(CLXRendererWebView *)webView failedToLoadWithError:(NSError *)error;
+- (void)webView:(CLXRendererWebView *)webView receivedClickthroughLink:(NSURL *)url;
 
 // MRAID events
-- (void)webView:(CLXPrebidWebView *)webView mraidStateChanged:(CLXMRAIDState)state;
-- (void)webView:(CLXPrebidWebView *)webView mraidViewabilityChanged:(BOOL)viewable;
-- (void)webView:(CLXPrebidWebView *)webView didRequestResize:(CGSize)size;
-- (void)webView:(CLXPrebidWebView *)webView didRequestExpand:(nullable NSURL *)url;
+- (void)webView:(CLXRendererWebView *)webView mraidStateChanged:(CLXMRAIDState)state;
+- (void)webView:(CLXRendererWebView *)webView mraidViewabilityChanged:(BOOL)viewable;
+- (void)webView:(CLXRendererWebView *)webView didRequestResize:(CGSize)size;
+- (void)webView:(CLXRendererWebView *)webView didRequestExpand:(nullable NSURL *)url;
 
 // Viewability events
-- (void)webView:(CLXPrebidWebView *)webView viewabilityChanged:(BOOL)viewable measurement:(CLXViewabilityMeasurement *)measurement;
-- (void)webView:(CLXPrebidWebView *)webView metViewabilityThreshold:(CLXViewabilityMeasurement *)measurement;
+- (void)webView:(CLXRendererWebView *)webView viewabilityChanged:(BOOL)viewable measurement:(CLXViewabilityMeasurement *)measurement;
+- (void)webView:(CLXRendererWebView *)webView metViewabilityThreshold:(CLXViewabilityMeasurement *)measurement;
 
 // Video events
-- (void)webView:(CLXPrebidWebView *)webView didRequestPlayVideo:(NSURL *)videoURL;
-- (void)webView:(CLXPrebidWebView *)webView videoDidComplete:(BOOL)completed;
+- (void)webView:(CLXRendererWebView *)webView didRequestPlayVideo:(NSURL *)videoURL;
+- (void)webView:(CLXRendererWebView *)webView videoDidComplete:(BOOL)completed;
 
 // Interactive events  
-- (void)webView:(CLXPrebidWebView *)webView didRequestStorePicture:(NSURL *)imageURL;
-- (void)webView:(CLXPrebidWebView *)webView didRequestCreateCalendarEvent:(NSDictionary *)eventData;
+- (void)webView:(CLXRendererWebView *)webView didRequestStorePicture:(NSURL *)imageURL;
+- (void)webView:(CLXRendererWebView *)webView didRequestCreateCalendarEvent:(NSDictionary *)eventData;
 
 @end
 
 /**
  * Advanced MRAID 3.0 compliant web view with comprehensive feature support
  */
-@interface CLXPrebidWebView : UIView <CLXMRAIDManagerDelegate, CLXViewabilityTrackerDelegate>
+@interface CLXRendererWebView : UIView <CLXMRAIDManagerDelegate, CLXViewabilityTrackerDelegate>
 
 // Core properties
-@property (nonatomic, weak, nullable) id<CLXPrebidWebViewDelegate> delegate;
+@property (nonatomic, weak, nullable) id<CLXRendererWebViewDelegate> delegate;
 @property (nonatomic, readonly) UIScrollView *scrollView;
 @property (nonatomic, readonly) WKWebView *internalWebView;
 @property (nonatomic, assign) BOOL inspectable API_AVAILABLE(ios(16.4));

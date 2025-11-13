@@ -1,17 +1,17 @@
 //
-//  CloudXPrebidAdapterTests.m
-//  CloudXPrebidAdapterTests
+//  CloudXRendererTests.m
+//  CloudXRendererTests
 //
 //  Created by Bryan Boyko on 7/23/25.
 //
 
 #import <XCTest/XCTest.h>
 
-@interface CloudXPrebidAdapterTests : XCTestCase
+@interface CloudXRendererTests : XCTestCase
 
 @end
 
-@implementation CloudXPrebidAdapterTests
+@implementation CloudXRendererTests
 
 - (void)setUp {
     // Put setup code here. This method is called before the invocation of each test method in the class.

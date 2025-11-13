@@ -1,8 +1,8 @@
 //
-//  CloudXPrebidAdapter.h
-//  CloudXPrebidAdapter
+//  CloudXRenderer.h
+//  CloudXRenderer
 //
-//  Prebid 3.0 compliant rendering adapter for CloudX mediation
+//  CloudX Renderer for in-house and third-party demand sources
 //  Focuses purely on ad rendering - all bid logic handled by CloudX Core SDK
 //
 
@@ -10,15 +10,15 @@
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CloudXCore.h>
 
-//! Project version number for CloudXPrebidAdapter.
-FOUNDATION_EXPORT double CloudXPrebidAdapterVersionNumber;
+//! Project version number for CloudXRenderer.
+FOUNDATION_EXPORT double CloudXRendererVersionNumber;
 
-//! Project version string for CloudXPrebidAdapter.
-FOUNDATION_EXPORT const unsigned char CloudXPrebidAdapterVersionString[];
+//! Project version string for CloudXRenderer.
+FOUNDATION_EXPORT const unsigned char CloudXRendererVersionString[];
 
 // Core Rendering Engine  
-#import "CLXPrebidWebView.h"
-#import "CLXPrebidError.h"
+#import "CLXRendererWebView.h"
+#import "CLXRendererError.h"
 
 // Advanced MRAID and Performance
 #import "CLXMRAIDManager.h"
@@ -27,22 +27,22 @@ FOUNDATION_EXPORT const unsigned char CloudXPrebidAdapterVersionString[];
 #import "CLXVASTParser.h"
 
 // Ad Unit Factories
-#import "CLXPrebidBannerFactory.h"
-#import "CLXPrebidInterstitialFactory.h"
-#import "CLXPrebidNativeFactory.h"
-#import "CLXPrebidRewardedFactory.h"
+#import "CLXRendererBannerFactory.h"
+#import "CLXRendererInterstitialFactory.h"
+#import "CLXRendererNativeFactory.h"
+#import "CLXRendererRewardedFactory.h"
 
 // Initializer
-#import "CLXPrebidInitializer.h"
+#import "CLXRendererInitializer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * CloudX Prebid 3.0 Rendering Adapter
+ * CloudX Renderer
  * 
- * This adapter focuses purely on rendering prebid ad markup received from the 
- * CloudX Core SDK. All bid requests, auction logic, and server communication
- * are handled by the core SDK's CLXBidNetworkService.
+ * This renderer focuses purely on rendering ad markup received from the 
+ * CloudX Core SDK or third-party demand sources. All bid requests, auction logic, 
+ * and server communication are handled by the core SDK's CLXBidNetworkService.
  *
  * Key Features:
  * - Complete MRAID 3.0 implementation with resize/expand/collapse
@@ -52,18 +52,18 @@ NS_ASSUME_NONNULL_BEGIN
  * - Background resource preloading and optimization
  * - Native impression tracking with view hierarchy analysis
  * - Support for banner, interstitial, native, and rewarded formats
- * - Transparent rendering without additional mediation fees
+ * - Transparent rendering without additional fees
  */
-@interface CloudXPrebidAdapter : NSObject
+@interface CloudXRenderer : NSObject
 
 /**
- * Get current adapter version (Prebid 3.0 compliant)
- * @return Version string in format "3.0.x"
+ * Get current renderer version
+ * @return Version string in format "1.x.x"
  */
 + (NSString *)version;
 
 /**
- * Get adapter network name for core SDK registration
+ * Get renderer network name for core SDK registration
  * @return Network identifier used by core SDK
  */
 + (NSString *)networkName;

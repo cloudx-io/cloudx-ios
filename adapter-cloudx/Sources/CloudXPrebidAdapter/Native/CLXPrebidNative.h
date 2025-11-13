@@ -1,8 +1,8 @@
 //
-//  CLXPrebidNative.h
-//  CloudXPrebidAdapter
+//  CLXRendererNative.h
+//  CloudXRenderer
 //
-//  Prebid 3.0 native ad implementation
+//  CloudX native ad renderer implementation
 //
 
 #import <Foundation/Foundation.h>
@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXPrebidNative : NSObject <CLXAdapterNative>
+@interface CLXRendererNative : NSObject <CLXAdapterNative>
 
 @property (nonatomic, weak) id<CLXAdapterNativeDelegate> delegate;
 

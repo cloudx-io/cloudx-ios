@@ -1,8 +1,8 @@
 //
-//  CLXPrebidInitializer.h
-//  CloudXPrebidAdapter
+//  CLXRendererInitializer.h
+//  CloudXRenderer
 //
-//  Prebid 3.0 adapter initializer
+//  CloudX renderer initializer
 //
 
 #import <Foundation/Foundation.h>
@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXPrebidInitializer : NSObject <CLXAdNetworkInitializer>
+@interface CLXRendererInitializer : NSObject <CLXAdNetworkInitializer>
 
 + (instancetype)createInstance;
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
