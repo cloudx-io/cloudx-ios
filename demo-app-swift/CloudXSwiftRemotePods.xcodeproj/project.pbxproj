@@ -65,11 +65,15 @@
 		};
 		195FD5AF2DE3C8000026F997 /* CloudXSwiftRemotePodsTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = CloudXSwiftRemotePodsTests;
 			sourceTree = "<group>";
 		};
 		195FD5B92DE3C8000026F997 /* CloudXSwiftRemotePodsUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = CloudXSwiftRemotePodsUITests;
 			sourceTree = "<group>";
 		};
@@ -160,6 +164,7 @@
 				195FD5932DE3C7FF0026F997 /* Frameworks */,
 				195FD5942DE3C7FF0026F997 /* Resources */,
 				FB16E2065D3FEF9739C80C6E /* [CP] Copy Pods Resources */,
+				02D549B7DCFABE1205EB1DAD /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -204,6 +209,7 @@
 				195FD5B32DE3C8000026F997 /* Frameworks */,
 				195FD5B42DE3C8000026F997 /* Resources */,
 				4A45775B4D2988EA825A2578 /* [CP] Copy Pods Resources */,
+				31C29EEB26957C617376A2C3 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -287,6 +293,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		02D549B7DCFABE1205EB1DAD /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		297A8366BAE951DB838CB4B8 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -307,6 +330,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		31C29EEB26957C617376A2C3 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		35917AB919BB5C01AD695857 /* [CP] Check Pods Manifest.lock */ = {
