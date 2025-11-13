@@ -42,6 +42,8 @@ on:
 jobs:
   build-and-publish:
     runs-on: macos-latest
+    permissions:
+      contents: write  # Required to create releases
     
     steps:
       - name: Checkout code
