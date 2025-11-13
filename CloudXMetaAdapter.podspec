@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "v#{s.version}-meta" }
   
   s.ios.deployment_target = '14.0'
-  s.vendored_frameworks = 'adapter-meta/CloudXMetaAdapter.xcframework'
+  s.vendored_libraries = 'adapter-meta/CloudXMetaAdapter.xcframework/**/*.a'
   
   # Dependencies
   s.dependency 'CloudXCore', '~> 1.2'
@@ -19,18 +19,13 @@ Pod::Spec.new do |s|
   s.weak_frameworks = ['Combine', 'CryptoKit', 'SafariServices', 'SwiftUI', 'WebKit']
   
   s.requires_arc = true
-  
-  # Static framework - FBAudienceNetwork remains as external runtime dependency
-  s.static_framework = true
 
   s.pod_target_xcconfig = {
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
-    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386'
   }
 
   s.user_target_xcconfig = {
-    'OTHER_LDFLAGS' => '-ObjC',
-    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
+    'OTHER_LDFLAGS' => '-ObjC'
   }
 
   s.swift_versions = ['5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9', '6.0', '6.1', '6.2']
