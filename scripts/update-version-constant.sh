@@ -22,9 +22,9 @@
 #   renderer = CloudXRenderer
 #
 # EXAMPLES:
-#   ./update-version-constant.sh core "1.1.58-dev.156+abc1234"
-#   ./update-version-constant.sh meta "1.1.66-local+def5678"
-#   ./update-version-constant.sh renderer "1.0.0-rc.1+abc1234"
+#   ./update-version-constant.sh core "X.Y.Z-dev.156+abc1234"
+#   ./update-version-constant.sh meta "X.Y.Z-local+def5678"
+#   ./update-version-constant.sh renderer "X.Y.Z-rc.1+abc1234"
 #
 # AUTOMATED USAGE:
 #   - Called by GitHub Actions workflows on every push (develop/release)
@@ -36,7 +36,7 @@
 #   {
 #     "ext": {
 #       "cloudx": {
-#         "sdkReleaseVersion": "1.1.58-dev.156+abc1234"  ← Updated here
+#         "sdkReleaseVersion": "X.Y.Z-dev.156+abc1234"  ← Updated here
 #       }
 #     }
 #   }

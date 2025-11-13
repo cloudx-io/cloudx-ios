@@ -4,10 +4,10 @@ name: Stable Release
 # CloudX iOS SDK - Stable Release Automation
 # ============================================================================
 #
-# TRIGGER: Push a version tag (e.g., v1.1.59, v1.1.67-meta, v1.0.0-prebid)
+# TRIGGER: Push a version tag (e.g., v1.1.59, v1.1.67-meta, v1.0.0-renderer)
 #
 # WHAT IT DOES:
-#   1. Detects which component from tag suffix (-core, -meta, -prebid)
+#   1. Detects which component from tag suffix (-core, -meta, -renderer)
 #   2. Extracts version from tag (v1.1.59 → 1.1.59)
 #   3. Updates version constant to stable version (no metadata)
 #   4. Validates podspec
@@ -18,7 +18,7 @@ name: Stable Release
 # HOW TO TRIGGER:
 #   git tag v1.1.59-core && git push origin v1.1.59-core
 #   git tag v1.1.67-meta && git push origin v1.1.67-meta
-#   git tag v1.0.1-prebid && git push origin v1.0.1-prebid
+#   git tag v1.0.1-renderer && git push origin v1.0.1-renderer
 #
 # REQUIREMENTS:
 #   - Must be on main branch
@@ -37,7 +37,7 @@ on:
     tags:
       - 'v*-core'      # Triggers on v1.1.59-core
       - 'v*-meta'      # Triggers on v1.1.67-meta
-      - 'v*-prebid'    # Triggers on v1.0.1-prebid
+      - 'v*-renderer'  # Triggers on v1.0.1-renderer
 
 jobs:
   stable-release:
@@ -55,7 +55,7 @@ jobs:
           TAG_NAME=${GITHUB_REF#refs/tags/}
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
           
-          # Extract component (core, meta, or prebid)
+          # Extract component (core, meta, or renderer)
           if [[ "$TAG_NAME" == *-core ]]; then
             COMPONENT="core"
             PODSPEC="core/CloudXCore.podspec"
@@ -66,11 +66,11 @@ jobs:
             PODSPEC="adapter-meta/CloudXMetaAdapter.podspec"
             VERSION_FILE="adapter-meta/Sources/CloudXMetaAdapter/CLXMetaAdapterVersion.m"
             POD_NAME="CloudXMetaAdapter"
-          elif [[ "$TAG_NAME" == *-prebid ]]; then
-            COMPONENT="prebid"
-            PODSPEC="adapter-cloudx/CloudXPrebidAdapter.podspec"
-            VERSION_FILE="adapter-cloudx/Sources/CloudXPrebidAdapter/CLXPrebidAdapterVersion.m"
-            POD_NAME="CloudXPrebidAdapter"
+          elif [[ "$TAG_NAME" == *-renderer ]]; then
+            COMPONENT="renderer"
+            PODSPEC="renderer-cloudx/CloudXRenderer.podspec"
+            VERSION_FILE="renderer-cloudx/Sources/CloudXRenderer/CLXRendererVersion.m"
+            POD_NAME="CloudXRenderer"
           else
             echo "❌ Unknown component in tag: $TAG_NAME"
             exit 1
@@ -114,8 +114,7 @@ jobs:
       
       - name: Validate podspec
         run: |
-          cd $(dirname ${{ steps.parse.outputs.podspec }})
-          pod spec lint $(basename ${{ steps.parse.outputs.podspec }}) \
+          pod spec lint ${{ steps.parse.outputs.podspec }} \
             --allow-warnings \
             --skip-import-validation \
             --skip-tests
@@ -128,11 +127,9 @@ jobs:
           mkdir -p ~/.cocoapods/trunk
           echo '{"trunk":{"token":"'$COCOAPODS_TRUNK_TOKEN'"}}' > ~/.cocoapods/trunk/me.json
           
-          # Push to trunk
-          cd $(dirname ${{ steps.parse.outputs.podspec }})
-          
+          # Push to trunk from repo root
           for i in {1..5}; do
-            if pod trunk push $(basename ${{ steps.parse.outputs.podspec }}) \
+            if pod trunk push ${{ steps.parse.outputs.podspec }} \
               --allow-warnings \
               --skip-import-validation \
               --skip-tests; then

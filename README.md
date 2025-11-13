@@ -33,7 +33,7 @@ https://github.com/cloudx-io/cloudx-ios
 - **[`core/`](core/README.md)** - The foundational CloudX Core SDK written in Objective-C that provides the base functionality for programmatic advertising *(source-based distribution)*
 - **[`adapter-meta/`](adapter-meta/README.md)** - Meta (Facebook Audience Network) adapter for integrating Meta's advertising platform *(framework-based distribution)*
 - **[`adapter-vungle/`](adapter-vungle/README.md)** - Vungle (Liftoff) adapter for integrating Vungle/Liftoff advertising with header bidding support *(source-based distribution)*
-- **[`adapter-cloudx/`](adapter-cloudx/README.md)** - Prebid adapter for header bidding integration with CloudX's programmatic platform
+- **[`renderer-cloudx/`](renderer-cloudx/README.md)** - CloudX Renderer for header bidding integration with CloudX's programmatic platform
 - **[`demo-app-objc/`](demo-app-objc/)** - Complete Objective-C demo application showcasing CloudX SDK integration and usage patterns
 - **[`demo-app-swift/`](demo-app-swift/)** - Complete Swift demo application demonstrating CloudX SDK implementation in Swift projects
 
@@ -45,17 +45,17 @@ This repository uses **component-specific releases** with **tagged distribution*
 
 ### Component-Specific Releases
 
-- **Core SDK**: Source-based distribution with tags like `v1.1.40-core`
-- **Meta Adapter**: Framework-based distribution with tags like `v1.1.25-meta`
-- **Vungle Adapter**: Source-based distribution with tags like `v1.0.0-vungle`
+- **Core SDK**: Source-based distribution with tags like `vX.Y.Z-core`
+- **Meta Adapter**: Framework-based distribution with tags like `vX.Y.Z-meta`
+- **Vungle Adapter**: Source-based distribution with tags like `vX.Y.Z-vungle`
 - **Individual Versioning**: Each component maintains its own version to allow independent updates
 - **Clear Release Assets**: Each release provides the appropriate distribution format for that component
 
 #### Release Tag Format
 ```
-v1.1.40-core    # Core SDK release (source distribution)
-v1.1.25-meta    # Meta Adapter release (framework distribution)
-v1.0.0-vungle   # Vungle Adapter release (source distribution)
+vX.Y.Z-core    # Core SDK release (source distribution)
+vX.Y.Z-meta    # Meta Adapter release (framework distribution)
+vX.Y.Z-vungle   # Vungle Adapter release (source distribution)
 ```
 
 #### Distribution Methods
@@ -75,7 +75,7 @@ Each component release provides the appropriate assets for its distribution meth
 
 #### Meta Adapter Assets (Framework Distribution) 
 ```
-CloudXMetaAdapter-v1.1.25.xcframework.zip  # Static xcframework for integration
+CloudXMetaAdapter-vX.Y.Z.xcframework.zip  # Static xcframework for integration
 ```
 
 #### Benefits
@@ -91,7 +91,7 @@ For detailed documentation, installation instructions, and usage examples, pleas
 - **[Core SDK](core/README.md)** - Detailed core SDK documentation and installation
 - **[Meta Adapter](adapter-meta/README.md)** - Meta (Facebook Audience Network) integration guide and setup
 - **[Vungle Adapter](adapter-vungle/README.md)** - Vungle (Liftoff) integration guide with header bidding support
-- **[Prebid Adapter](adapter-cloudx/README.md)** - Prebid integration guide and configuration
+- **[CloudX Renderer](renderer-cloudx/README.md)** - CloudX Renderer integration guide and configuration
 - **Demo Apps** - Explore the demo application directories for complete integration examples
 
 ## Contributing

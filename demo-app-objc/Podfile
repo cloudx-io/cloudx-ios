@@ -1,19 +1,13 @@
-source 'https://cdn.cocoapods.org/'
-
 # Uncomment the next line to define a global platform for your project
 platform :ios, '14.0'
 
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
-  # Pods for CloudXObjCRemotePods
-  # For REMOTE: pod 'CloudXCore'
-  # For LOCAL development: just use :path, CocoaPods will find the podspec
+  # Pods for CloudXObjCRemotePods - LOCAL development with source files
   pod 'CloudXCore', :path => '../core'
+  pod 'CloudXRenderer', :path => '../../cloudx-ios/renderer-cloudx'  # Binary framework from public repo
   pod 'CloudXMetaAdapter', :path => '../adapter-meta'
-  pod 'CloudXPrebidAdapter', :path => '../adapter-cloudx'
-  # Vungle adapter temporarily removed - not configured server-side for this app
-  # pod 'CloudXVungleAdapter', :path => '../adapter-vungle'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths

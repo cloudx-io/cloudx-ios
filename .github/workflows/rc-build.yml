@@ -13,7 +13,7 @@ name: Release Candidate Build & Publish
 #      - a1b2c3d = Git commit SHA
 #   3. Updates all version constants
 #   4. Validates podspecs (ensures they're ready for CocoaPods)
-#   5. Builds all components (Core, Meta, Prebid)
+#   5. Builds all components (Core, Meta, Renderer)
 #   6. Creates GitHub pre-release with testing checklist
 #
 # GIT TAGS:
@@ -42,6 +42,8 @@ on:
 jobs:
   build-and-publish:
     runs-on: macos-latest
+    permissions:
+      contents: write  # Required to create releases
     
     steps:
       - name: Checkout code
@@ -63,7 +65,7 @@ jobs:
       - name: Extract base version from podspec
         id: version
         run: |
-          BASE_VERSION=$(grep "s.version" core/CloudXCore.podspec | sed "s/.*'\(.*\)'.*/\1/")
+          BASE_VERSION=$(grep "s.version.*=" core/CloudXCore.podspec | head -1 | sed "s/.*['\"]\\([^'\"]*\\)['\"].*/\\1/")
           echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
           echo "Base version: $BASE_VERSION"
       
@@ -81,24 +83,22 @@ jobs:
       
       - name: Update Meta Adapter version constant
         run: |
-          META_BASE=$(grep "s.version" adapter-meta/CloudXMetaAdapter.podspec | sed "s/.*'\(.*\)'.*/\1/")
+          META_BASE=$(grep "s.version.*=" adapter-meta/CloudXMetaAdapter.podspec | head -1 | sed "s/.*['\"]\\([^'\"]*\\)['\"].*/\\1/")
           META_FULL=$(./scripts/generate-version.sh "$META_BASE" rc ${{ github.run_number }})
           ./scripts/update-version-constant.sh meta "$META_FULL"
           echo "Updated CLXMetaAdapterVersion.m to: $META_FULL"
       
-      - name: Update Prebid Adapter version constant
+      - name: Update Renderer version constant
         run: |
-          PREBID_BASE=$(grep "s.version" adapter-cloudx/CloudXPrebidAdapter.podspec | sed "s/.*'\(.*\)'.*/\1/")
-          PREBID_FULL=$(./scripts/generate-version.sh "$PREBID_BASE" rc ${{ github.run_number }})
-          ./scripts/update-version-constant.sh prebid "$PREBID_FULL"
-          echo "Updated CLXPrebidAdapterVersion.m to: $PREBID_FULL"
+          RENDERER_BASE=$(grep "s.version.*=" renderer-cloudx/CloudXRenderer.podspec | head -1 | sed "s/.*['\"]\\([^'\"]*\\)['\"].*/\\1/")
+          RENDERER_FULL=$(./scripts/generate-version.sh "$RENDERER_BASE" rc ${{ github.run_number }})
+          ./scripts/update-version-constant.sh renderer "$RENDERER_FULL"
+          echo "Updated CLXRendererVersion.m to: $RENDERER_FULL"
       
       - name: Validate podspecs
         run: |
-          cd core
-          pod spec lint CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests
-          cd ../adapter-cloudx
-          pod spec lint CloudXPrebidAdapter.podspec --allow-warnings --skip-import-validation --skip-tests
+          pod lib lint core/CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests
+          pod lib lint renderer-cloudx/CloudXRenderer.podspec --allow-warnings --skip-import-validation --skip-tests --include-podspecs='core/CloudXCore.podspec'
       
       - name: Build Core framework
         run: |
@@ -108,6 +108,8 @@ jobs:
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -derivedDataPath build \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
             clean build
       
       - name: Build Meta Adapter xcframework

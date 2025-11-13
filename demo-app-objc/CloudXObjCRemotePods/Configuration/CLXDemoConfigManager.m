@@ -56,31 +56,31 @@
 }
 
 - (void)setupConfigurations {
-    // Dev Configuration (current production values)
+    // Staging Configuration (MetaTestApp-9-22-25 - bundle: cloudx.CloudXObjCRemotePods)
     CLXDemoConfig *stagingConfig = [[CLXDemoConfig alloc]
         initWithAppKey:@"A7ovaBRCcAL8lapKtoZmm"
         hashedUserId:@"test-user-123"
-        baseURL:@"https://pro-dev.cloudx.io/sdk"
+        baseURL:@"https://pro-stage.cloudx.io/sdk"
         bannerPlacement:@"objcDemo-banner-1"
         mrecPlacement:@"objcDemo-mrec-1"
         interstitialPlacement:@"objcDemo-interstitial-1"
-        nativePlacement:@"metaNative"
-        nativeBannerPlacement:@"metaNative"
-        rewardedPlacement:@"metaRewarded"
-        rewardedInterstitialPlacement:@"metaRewarded"];
-    
-    // Staging Configuration (objc-demo-app with Vungle - bundle: cloudx.CloudXObjCRemotePods)
-    CLXDemoConfig *devConfig = [[CLXDemoConfig alloc]
-        initWithAppKey:@"NddUgEiyx_bbYax2BQGI2"
-        hashedUserId:@"test-user-123-staging"
-        baseURL:@"https://pro-stage.cloudx.io/sdk"
-        bannerPlacement:@"objc-demo-banner"
-        mrecPlacement:@"objc-demo-mrec"
-        interstitialPlacement:@"objc-demo-interstitial"
         nativePlacement:@"-"
         nativeBannerPlacement:@"-"
         rewardedPlacement:@"-"
         rewardedInterstitialPlacement:@"-"];
+    
+    // Dev Configuration (MetaTestiOS - bundle: cloudx.CloudXObjCRemotePods)
+    CLXDemoConfig *devConfig = [[CLXDemoConfig alloc]
+        initWithAppKey:@"9o_9omGptuyS2n5wV0QJu"
+        hashedUserId:@"test-user-123"
+        baseURL:@"https://pro-dev.cloudx.io/sdk"
+        bannerPlacement:@"metaBanner"
+        mrecPlacement:@"metaMREC"
+        interstitialPlacement:@"metaInterstitial"
+        nativePlacement:@"metaNative"
+        nativeBannerPlacement:@"metaNative"
+        rewardedPlacement:@"metaRewarded"
+        rewardedInterstitialPlacement:@"metaRewarded"];
     
     // Production Configuration (Blocky app - io.cloudx.Blocky)
     CLXDemoConfig *prodConfig = [[CLXDemoConfig alloc] 

@@ -1,13 +1,14 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXMetaAdapter'
-  s.version = '1.1.68'
+  s.version = '1.2.0'
   s.summary = 'Mobile SDK for CloudX iOS Meta Adapter'
   s.description = 'iOS adapter add-on to the CloudX iOS SDK for a Meta bidder'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
   s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
   # For local development with :path in Podfile
-  s.source = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "v#{s.version}-meta" }
+  # Local development - no git source needed
+  s.source = { :path => '.' }
   
   s.ios.deployment_target = '14.0'
   

@@ -29,7 +29,7 @@ enum AdState {
 }
 
 class BaseAdViewController: UIViewController, AdStateManaging {
-    let cloudX = CloudXCore.shared
+    var cloudX: CloudXCore { CloudXCore.shared }
     var isLoading = false
     
     var appKey: String? {

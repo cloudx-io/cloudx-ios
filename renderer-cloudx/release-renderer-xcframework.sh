@@ -1,20 +1,20 @@
 #!/bin/bash
 
 # ============================================================================
-# CloudX Core SDK - XCFramework Release Script
+# CloudX Renderer - Dynamic XCFramework Release Script
 # ============================================================================
 #
 # OVERVIEW:
-#   Builds CloudXCore as a dynamic xcframework and prepares for binary distribution.
+#   Builds CloudXRenderer as a DYNAMIC xcframework and prepares for binary distribution.
 #   This is used by CI/CD but can also be run locally for testing.
 #
 # USAGE:
-#   cd cloudx-ios-private/core
-#   ./release-core-xcframework.sh 1.2.0
+#   cd cloudx-ios-private/renderer-cloudx
+#   ./release-renderer-xcframework.sh 1.2.0
 #
 # WHAT IT DOES:
 #   1. Validates version format and prerequisites
-#   2. Builds xcframework for iOS device + simulator
+#   2. Builds DYNAMIC xcframework for iOS device + simulator
 #   3. Uploads dSYMs to Sentry for symbolication
 #   4. Strips debug symbols from framework binary
 #   5. Creates distributable .zip file
@@ -27,14 +27,14 @@
 #   - sentry-cli installed (curl -sL https://sentry.io/get-cli/ | bash)
 #
 # OUTPUT ARTIFACTS:
-#   - CloudXCore.xcframework/          (unzipped framework)
-#   - CloudXCore.xcframework.zip       (distributable binary)
-#   - release_metadata.txt             (version, checksum, URLs)
+#   - CloudXRenderer.xcframework/          (unzipped framework)
+#   - CloudXRenderer.xcframework.zip       (distributable binary)
+#   - release_metadata.txt                 (version, checksum, URLs)
 #
 # DISTRIBUTION:
 #   The generated xcframework.zip should be:
 #   1. Uploaded to GitHub Release on cloudx-io/cloudx-ios
-#   2. Referenced in CloudXCore.podspec with version and download URL
+#   2. Referenced in CloudXRenderer.podspec with version and download URL
 #   3. Referenced in Package.swift with checksum
 #
 # ============================================================================
@@ -73,14 +73,14 @@ if [ $# -eq 0 ]; then
 fi
 
 VERSION=$1
-MODULE_NAME="CloudXCore"
-RELEASE_NAME="CloudXCore@$VERSION"
+MODULE_NAME="CloudXRenderer"
+RELEASE_NAME="CloudXRenderer@$VERSION"
 ARCHIVE_DIR="./build"
 OUTPUT_XCFRAMEWORK="${MODULE_NAME}.xcframework"
 ZIP_OUTPUT="${MODULE_NAME}.xcframework.zip"
 
 echo ""
-echo "🚀 Building ${MODULE_NAME} v${VERSION} as XCFramework"
+echo "🚀 Building ${MODULE_NAME} v${VERSION} as XCFramework (DYNAMIC)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
@@ -116,8 +116,8 @@ print_success "Build directory cleaned"
 print_step "📱 Building for iOS device..."
 set -o pipefail
 IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
-  -project CloudXCore.xcodeproj \
-  -scheme CloudXCore \
+  -workspace CloudXRenderer.xcworkspace \
+  -scheme CloudXRenderer \
   -destination "generic/platform=iOS" \
   -archivePath "$ARCHIVE_DIR/ios_devices.xcarchive" \
   -configuration Release \
@@ -129,8 +129,8 @@ print_success "iOS device build completed"
 # Build for iOS Simulator
 print_step "🖥️  Building for iOS simulator..."
 IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
-  -project CloudXCore.xcodeproj \
-  -scheme CloudXCore \
+  -workspace CloudXRenderer.xcworkspace \
+  -scheme CloudXRenderer \
   -destination "generic/platform=iOS Simulator" \
   -archivePath "$ARCHIVE_DIR/ios_simulator.xcarchive" \
   -configuration Release \
@@ -140,7 +140,7 @@ IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
 print_success "iOS simulator build completed"
 
 # Create XCFramework
-print_step "🧱 Creating .xcframework..."
+print_step "🧱 Creating .xcframework (DYNAMIC)..."
 xcodebuild -create-xcframework \
   -framework "$ARCHIVE_DIR/ios_devices.xcarchive/Products/Library/Frameworks/${MODULE_NAME}.framework" \
   -framework "$ARCHIVE_DIR/ios_simulator.xcarchive/Products/Library/Frameworks/${MODULE_NAME}.framework" \
@@ -185,11 +185,12 @@ print_success "Checksum: $CHECKSUM"
 # Generate release metadata
 print_step "📝 Generating release metadata..."
 cat > release_metadata.txt << EOF
-CloudXCore v$VERSION - XCFramework Release
+CloudXRenderer v$VERSION - XCFramework Release (DYNAMIC)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 VERSION:    $VERSION
-TAG:        v${VERSION}-core
+TAG:        v${VERSION}-renderer
+TYPE:       DYNAMIC FRAMEWORK
 SIZE:       $ZIP_SIZE
 CHECKSUM:   $CHECKSUM
 
@@ -198,22 +199,26 @@ NEXT STEPS:
 
 1. Upload to GitHub Release:
    - Repository: cloudx-io/cloudx-ios
-   - Tag: v${VERSION}-core
+   - Tag: v${VERSION}-renderer
    - Attach: $ZIP_OUTPUT
 
-2. Update cloudx-ios/core/CloudXCore.podspec:
+2. Update cloudx-ios/renderer-cloudx/CloudXRenderer.podspec:
    s.version = '$VERSION'
    s.source = {
-     :http => 'https://github.com/cloudx-io/cloudx-ios/releases/download/v${VERSION}-core/CloudXCore.xcframework.zip'
+     :http => 'https://github.com/cloudx-io/cloudx-ios/releases/download/v${VERSION}-renderer/CloudXRenderer.xcframework.zip'
    }
+   s.vendored_frameworks = 'renderer-cloudx/CloudXRenderer.xcframework'
 
-3. Update cloudx-ios/core/Package.swift:
-   url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v${VERSION}-core/CloudXCore.xcframework.zip",
+3. Update cloudx-ios/Package.swift:
+   url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v${VERSION}-renderer/CloudXRenderer.xcframework.zip",
    checksum: "$CHECKSUM"
 
-4. Push to CocoaPods:
-   cd cloudx-ios/core
-   pod trunk push CloudXCore.podspec --allow-warnings
+4. Copy framework to public repo:
+   cp -r CloudXRenderer.xcframework ../cloudx-ios/renderer-cloudx/
+
+5. Push to CocoaPods:
+   cd cloudx-ios/renderer-cloudx
+   pod trunk push CloudXRenderer.podspec --allow-warnings
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EOF
@@ -231,14 +236,15 @@ echo "   • $OUTPUT_XCFRAMEWORK"
 echo "   • $ZIP_OUTPUT ($ZIP_SIZE)"
 echo "   • release_metadata.txt"
 echo ""
+echo "🏗️  Framework Type: DYNAMIC (like CloudXCore)"
+echo "   Users must set: ENABLE_USER_SCRIPT_SANDBOXING = NO"
+echo ""
 echo "📄 View release metadata:"
 echo "   cat release_metadata.txt"
 echo ""
 echo "🔗 GitHub Release URL:"
-echo "   https://github.com/cloudx-io/cloudx-ios/releases/tag/v${VERSION}-core"
+echo "   https://github.com/cloudx-io/cloudx-ios/releases/tag/v${VERSION}-renderer"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-
-
 

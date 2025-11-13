@@ -7,7 +7,7 @@ target 'CloudXSwiftRemotePods' do
   # Pods for CloudXSwiftRemotePods
   # CloudXCore from local source (for development/debugging)
   pod 'CloudXCore', :path => '../core'
-  pod 'CloudXRenderer', :path => '../renderer-cloudx'
+  pod 'CloudXRenderer', :path => '../../cloudx-ios/renderer-cloudx'  # Binary framework from public repo
   pod 'CloudXMetaAdapter', :path => '../adapter-meta'
 
   target 'CloudXSwiftRemotePodsTests' do

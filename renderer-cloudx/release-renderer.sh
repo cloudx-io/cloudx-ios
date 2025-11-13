@@ -10,19 +10,19 @@
 #
 # USAGE:
 #   cd cloudx-ios/renderer-cloudx
-#   ./release-renderer.sh 1.1.59
+#   ./release-renderer.sh X.Y.Z
 #
 # WHAT IT DOES:
 #   1. Validates clean main branch
 #   2. Updates CloudXRenderer.podspec version
-#   3. Generates stable version: 1.1.59
+#   3. Generates stable version: X.Y.Z
 #   4. Updates CLXRendererVersion.m constant
 #   5. Validates podspec
 #   6. Pushes to CocoaPods Trunk (public release)
 #
 # AFTER RELEASE:
 #   Developers install via:
-#     pod 'CloudXRenderer', '~> 1.1.59'
+#     pod 'CloudXRenderer', '~> X.Y.Z'
 #
 # ============================================================================
 
@@ -30,7 +30,7 @@ set -e
 
 if [ $# -eq 0 ]; then
     echo "Usage: $0 <version>"
-    echo "Example: $0 1.1.59"
+    echo "Example: $0 X.Y.Z"
     exit 1
 fi
 

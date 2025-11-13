@@ -81,18 +81,18 @@ class CLXDemoConfigManager {
             rewardedInterstitialPlacement: "metaRewarded"
         )
         
-        // Production Configuration (placeholders)
+        // Production Configuration
         let prodConfig = CLXDemoConfig(
-            appKey: "PROD_APP_KEY_PLACEHOLDER",
-            hashedUserId: "prod-user-placeholder",
+            appKey: "xcQftcBSUmqzuv1LfET2o",
+            hashedUserId: "test-user-123",
             baseURL: "https://pro.cloudx.io/sdk",
-            bannerPlacement: "prodBanner",
-            mrecPlacement: "prodMREC",
-            interstitialPlacement: "prodInterstitial",
-            nativePlacement: "prodNative",
-            nativeBannerPlacement: "prodNative",
-            rewardedPlacement: "prodRewarded",
-            rewardedInterstitialPlacement: "prodRewarded"
+            bannerPlacement: "swift-demo-banner-1",
+            mrecPlacement: "swift-demo-mrec-1",
+            interstitialPlacement: "swift-demo-interstitial-1",
+            nativePlacement: "-",
+            nativeBannerPlacement: "-",
+            rewardedPlacement: "-",
+            rewardedInterstitialPlacement: "-"
         )
         
         self.configurations = [
