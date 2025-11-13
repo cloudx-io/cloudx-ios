@@ -13,7 +13,7 @@ name: Release Candidate Build & Publish
 #      - a1b2c3d = Git commit SHA
 #   3. Updates all version constants
 #   4. Validates podspecs (ensures they're ready for CocoaPods)
-#   5. Builds all components (Core, Meta, Prebid)
+#   5. Builds all components (Core, Meta, Renderer)
 #   6. Creates GitHub pre-release with testing checklist
 #
 # GIT TAGS:
@@ -86,19 +86,19 @@ jobs:
           ./scripts/update-version-constant.sh meta "$META_FULL"
           echo "Updated CLXMetaAdapterVersion.m to: $META_FULL"
       
-      - name: Update Prebid Adapter version constant
+      - name: Update Renderer version constant
         run: |
-          PREBID_BASE=$(grep "s.version.*=" adapter-cloudx/CloudXPrebidAdapter.podspec | head -1 | sed "s/.*['\"]\\([^'\"]*\\)['\"].*/\\1/")
-          PREBID_FULL=$(./scripts/generate-version.sh "$PREBID_BASE" rc ${{ github.run_number }})
-          ./scripts/update-version-constant.sh prebid "$PREBID_FULL"
-          echo "Updated CLXPrebidAdapterVersion.m to: $PREBID_FULL"
+          RENDERER_BASE=$(grep "s.version.*=" renderer-cloudx/CloudXRenderer.podspec | head -1 | sed "s/.*['\"]\\([^'\"]*\\)['\"].*/\\1/")
+          RENDERER_FULL=$(./scripts/generate-version.sh "$RENDERER_BASE" rc ${{ github.run_number }})
+          ./scripts/update-version-constant.sh renderer "$RENDERER_FULL"
+          echo "Updated CLXRendererVersion.m to: $RENDERER_FULL"
       
       - name: Validate podspecs
         run: |
           cd core
           pod spec lint CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests
-          cd ../adapter-cloudx
-          pod spec lint CloudXPrebidAdapter.podspec --allow-warnings --skip-import-validation --skip-tests
+          cd ../renderer-cloudx
+          pod spec lint CloudXRenderer.podspec --allow-warnings --skip-import-validation --skip-tests
       
       - name: Build Core framework
         run: |

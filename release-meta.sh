@@ -10,15 +10,15 @@
 #
 # USAGE:
 #   cd cloudx-ios
-#   ./release-meta.sh 1.1.67
+#   ./release-meta.sh X.Y.Z
 #
 # WHAT IT DOES:
 #   1. Validates clean main branch
 #   2. Updates CloudXMetaAdapter.podspec version
-#   3. Generates stable version: 1.1.67
+#   3. Generates stable version: X.Y.Z
 #   4. Updates CLXMetaAdapterVersion.m constant
 #   5. Builds XCFramework for iOS device + simulator
-#   6. Creates versioned zip: CloudXMetaAdapter-v1.1.67.xcframework.zip
+#   6. Creates versioned zip: CloudXMetaAdapter-vX.Y.Z.xcframework.zip
 #   7. Creates GitHub release and uploads XCFramework
 #   8. Updates podspec to download from GitHub release
 #   9. Pushes to CocoaPods Trunk
@@ -35,9 +35,9 @@
 #
 # AFTER RELEASE:
 #   Developers install via:
-#     pod 'CloudXMetaAdapter', '~> 1.1.67'
+#     pod 'CloudXMetaAdapter', '~> X.Y.Z'
 #   Podspec downloads XCFramework from:
-#     https://github.com/cloudx-io/cloudx-ios/releases/download/v1.1.67-meta/...
+#     https://github.com/cloudx-io/cloudx-ios/releases/download/vX.Y.Z-meta/...
 #
 # ============================================================================
 
@@ -45,7 +45,7 @@ set -e
 
 if [ $# -eq 0 ]; then
     echo "Usage: $0 <version>"
-    echo "Example: $0 1.1.49"
+    echo "Example: $0 X.Y.Z"
     exit 1
 fi
 
