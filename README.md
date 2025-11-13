@@ -29,6 +29,18 @@ Add this repository URL to your Xcode project:
 https://github.com/cloudx-io/cloudx-ios
 ```
 
+### ⚠️ Important: Xcode 15+ Configuration
+
+**If using CocoaPods with Xcode 15 or later**, you must disable User Script Sandboxing in your Xcode project:
+
+1. Select your project in Xcode
+2. Select your app target  
+3. Go to **Build Settings**
+4. Search for "User Script Sandboxing"
+5. Set **ENABLE_USER_SCRIPT_SANDBOXING** to **No**
+
+This is required for CocoaPods to properly embed dynamic frameworks. This is a standard requirement for all iOS SDKs that use dynamic frameworks (including AppLovin SDK, Firebase, Google Mobile Ads, etc.).
+
 ## Components
 
 - **[`core/`](core/README.md)** - The foundational CloudXSDK written in Objective-C that provides the base functionality for programmatic advertising *(source-based distribution)*
