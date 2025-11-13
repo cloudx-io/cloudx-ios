@@ -5,8 +5,9 @@ target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static
 
   # Pods for CloudXSwiftRemotePods
+  # CloudXCore from local source (for development/debugging)
   pod 'CloudXCore', :path => '../core'
-  pod 'CloudXPrebidAdapter', :path => '../adapter-cloudx'
+  pod 'CloudXRenderer', :path => '../renderer-cloudx'
   pod 'CloudXMetaAdapter', :path => '../adapter-meta'
 
   target 'CloudXSwiftRemotePodsTests' do
