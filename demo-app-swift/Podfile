@@ -9,6 +9,7 @@ target 'CloudXSwiftRemotePods' do
   # Pods for CloudXSwiftRemotePods - Remote installation from public repo
   # This demonstrates how external developers would install CloudX from GitHub
   pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-core'
+  pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-renderer'
   pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-meta'
 
   target 'CloudXSwiftRemotePodsTests' do

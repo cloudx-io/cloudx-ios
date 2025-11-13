@@ -1,0 +1,39 @@
+PODS:
+  - CloudXCore (1.2.0)
+  - CloudXMetaAdapter (1.2.0):
+    - CloudXCore (~> 1.2)
+    - FBAudienceNetwork (= 6.20.1)
+  - FBAudienceNetwork (6.20.1)
+
+DEPENDENCIES:
+  - CloudXCore (from `https://github.com/cloudx-io/cloudx-ios.git`, tag `v1.2.0-core`)
+  - CloudXMetaAdapter (from `https://github.com/cloudx-io/cloudx-ios.git`, tag `v1.2.0-meta`)
+
+SPEC REPOS:
+  trunk:
+    - FBAudienceNetwork
+
+EXTERNAL SOURCES:
+  CloudXCore:
+    :git: https://github.com/cloudx-io/cloudx-ios.git
+    :tag: v1.2.0-core
+  CloudXMetaAdapter:
+    :git: https://github.com/cloudx-io/cloudx-ios.git
+    :tag: v1.2.0-meta
+
+CHECKOUT OPTIONS:
+  CloudXCore:
+    :git: https://github.com/cloudx-io/cloudx-ios.git
+    :tag: v1.2.0-core
+  CloudXMetaAdapter:
+    :git: https://github.com/cloudx-io/cloudx-ios.git
+    :tag: v1.2.0-meta
+
+SPEC CHECKSUMS:
+  CloudXCore: e7e19ff17b8a805502632f25e298a41e42666e64
+  CloudXMetaAdapter: 6cd43e6918ab69beca72a567768dacd67fbc07a4
+  FBAudienceNetwork: 08e86d63a05b3a5a59414af12e4af8d756943c80
+
+PODFILE CHECKSUM: 7a82098e65c11a832e440f4bfe1c94bbabedb48e
+
+COCOAPODS: 1.16.2

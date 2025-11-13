@@ -115,3 +115,4 @@ If your app targets iOS 14+, and you want access to the IDFA, you must add a usa
 Go to your target → Build Settings → Set **Enable Bitcode** to `NO`.
 
 
+
