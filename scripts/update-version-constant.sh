@@ -11,20 +11,20 @@
 # VERSION CONSTANTS:
 #   Core SDK:        core/Sources/CloudXCore/CLXVersion.m (CLXSDKVersion)
 #   Meta Adapter:    adapter-meta/.../CLXMetaAdapterVersion.m (CLXMetaAdapterVersion)
-#   Prebid Adapter:  adapter-cloudx/.../CLXPrebidAdapterVersion.m (CLXPrebidAdapterVersion)
+#   Renderer:        renderer-cloudx/.../CLXRendererVersion.m (CLXRendererVersion)
 #
 # USAGE:
 #   ./update-version-constant.sh <component> <full_version>
 #
 # COMPONENTS:
-#   core    = CloudXCore SDK
-#   meta    = CloudXMetaAdapter
-#   prebid  = CloudXPrebidAdapter
+#   core     = CloudXCore SDK
+#   meta     = CloudXMetaAdapter
+#   renderer = CloudXRenderer
 #
 # EXAMPLES:
 #   ./update-version-constant.sh core "1.1.58-dev.156+abc1234"
 #   ./update-version-constant.sh meta "1.1.66-local+def5678"
-#   ./update-version-constant.sh prebid "1.1.58-rc.2+abc1234"
+#   ./update-version-constant.sh renderer "1.0.0-rc.1+abc1234"
 #
 # AUTOMATED USAGE:
 #   - Called by GitHub Actions workflows on every push (develop/release)
@@ -50,7 +50,7 @@ FULL_VERSION=$2
 
 if [ -z "$COMPONENT" ] || [ -z "$FULL_VERSION" ]; then
     echo "Usage: $0 <component> <full_version>"
-    echo "Components: core, meta, prebid"
+    echo "Components: core, meta, renderer"
     exit 1
 fi
 
@@ -64,13 +64,13 @@ case $COMPONENT in
         VERSION_FILE="adapter-meta/Sources/CloudXMetaAdapter/CLXMetaAdapterVersion.m"
         CONSTANT_NAME="CLXMetaAdapterVersion"
         ;;
-    prebid)
-        VERSION_FILE="adapter-cloudx/Sources/CloudXPrebidAdapter/CLXPrebidAdapterVersion.m"
-        CONSTANT_NAME="CLXPrebidAdapterVersion"
+    renderer)
+        VERSION_FILE="renderer-cloudx/Sources/CloudXRenderer/CLXRendererVersion.m"
+        CONSTANT_NAME="CLXRendererVersion"
         ;;
     *)
         echo "Error: Unknown component '$COMPONENT'" >&2
-        echo "Valid components: core, meta, prebid" >&2
+        echo "Valid components: core, meta, renderer" >&2
         exit 1
         ;;
 esac
