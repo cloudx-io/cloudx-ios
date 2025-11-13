@@ -24,7 +24,8 @@ Pod::Spec.new do |s|
   s.static_framework = true
 
   s.pod_target_xcconfig = {
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386'
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
+    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
   }
 
   s.user_target_xcconfig = {
