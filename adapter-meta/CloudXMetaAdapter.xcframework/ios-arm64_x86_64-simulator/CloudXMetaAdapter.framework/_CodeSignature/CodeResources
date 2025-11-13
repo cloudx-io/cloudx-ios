@@ -21,6 +21,10 @@
 	<dict>
 		<key>FBAudienceNetwork.bundle/Info.plist</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			e/cOssJXjiY/PdCW5MwpJ922ZGo=
+			</data>
 			<key>hash2</key>
 			<data>
 			ADM1j45SrxINJUSIrF6ayOYE4O/NK7Aw6nSsak2ssxY=
@@ -28,6 +32,10 @@
 		</dict>
 		<key>FBAudienceNetwork.bundle/PrivacyInfo.xcprivacy</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			iJf6SpfSfy71MDcGI+K9k1a78DU=
+			</data>
 			<key>hash2</key>
 			<data>
 			cSw93xWtIPxdaMlNpIyJu23eaMe/V5QkksYayESwhlc=
