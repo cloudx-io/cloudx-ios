@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
   # For local development with :path in Podfile
-  s.source = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "v#{s.version}-meta" }
+  s.source = { :path => '.' }
   
   s.ios.deployment_target = '14.0'
   
@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.source_files = 'Sources/CloudXMetaAdapter/**/*.{h,m}'
   s.public_header_files = 'Sources/CloudXMetaAdapter/**/*.h'
   
-  s.dependency 'CloudXCore'
+  # s.dependency "CloudXCore" # Manually linked as xcframework
   s.dependency 'FBAudienceNetwork', '~> 6.20.1'
   s.frameworks = [
     'AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit'
@@ -23,8 +23,13 @@ Pod::Spec.new do |s|
   s.weak_frameworks = [
     'Combine', 'CryptoKit', 'SafariServices', 'SwiftUI', 'WebKit', 'FBAudienceNetwork'
   ]
+  s.pod_target_xcconfig = {
+    'CLANG_ENABLE_MODULES' => 'YES',
+    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
+  }
   s.user_target_xcconfig = {
-    'OTHER_LDFLAGS' => '-ObjC'
+    'OTHER_LDFLAGS' => '-ObjC',
+    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
   }
   s.requires_arc = true
   
