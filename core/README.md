@@ -58,6 +58,18 @@ targets: [
 - Xcode 15.3+
 - Swift 5.9+ (if using Swift)
 
+### ⚠️ Important: Xcode 15+ Configuration
+
+If using CocoaPods with Xcode 15 or later, you must disable User Script Sandboxing in your Xcode project:
+
+1. Select your project in Xcode
+2. Select your app target
+3. Go to **Build Settings**
+4. Search for "User Script Sandboxing"
+5. Set **ENABLE_USER_SCRIPT_SANDBOXING** to **No**
+
+This is required for CocoaPods to embed dynamic frameworks properly. This is a standard requirement for all SDKs that use dynamic frameworks (including AppLovin SDK, Firebase, etc.).
+
 ## 🏗️ Architecture
 
 CloudXCore is distributed as a **dynamic xcframework** containing:
