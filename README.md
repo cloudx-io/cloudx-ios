@@ -16,8 +16,7 @@ target 'YourApp' do
   pod 'CloudXSDK', '~> 0.1.0'
   
   # Optional: CloudX Mediation Adapters (at least one is needed to show ads)
-  pod 'CloudXMediationMetaAdapter', '~> 0.1.0'         
-  pod 'CloudXMediationVungleAdapter', '~> 0.1.0'       
+  pod 'CloudXMediationMetaAdapter', '~> 0.1.0'          
   pod 'CloudXMediationPrebidAdapter', '~> 0.1.0'       
 end
 ```
