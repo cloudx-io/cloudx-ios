@@ -63,7 +63,7 @@ jobs:
       - name: Extract base version from podspec
         id: version
         run: |
-          BASE_VERSION=$(grep "s.version" core/CloudXCore.podspec | sed "s/.*'\(.*\)'.*/\1/")
+          BASE_VERSION=$(grep "s.version.*=" core/CloudXCore.podspec | head -1 | sed "s/.*['\"]\\([^'\"]*\\)['\"].*/\\1/")
           echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
           echo "Base version: $BASE_VERSION"
       
@@ -81,14 +81,14 @@ jobs:
       
       - name: Update Meta Adapter version constant
         run: |
-          META_BASE=$(grep "s.version" adapter-meta/CloudXMetaAdapter.podspec | sed "s/.*'\(.*\)'.*/\1/")
+          META_BASE=$(grep "s.version.*=" adapter-meta/CloudXMetaAdapter.podspec | head -1 | sed "s/.*['\"]\\([^'\"]*\\)['\"].*/\\1/")
           META_FULL=$(./scripts/generate-version.sh "$META_BASE" rc ${{ github.run_number }})
           ./scripts/update-version-constant.sh meta "$META_FULL"
           echo "Updated CLXMetaAdapterVersion.m to: $META_FULL"
       
       - name: Update Prebid Adapter version constant
         run: |
-          PREBID_BASE=$(grep "s.version" adapter-cloudx/CloudXPrebidAdapter.podspec | sed "s/.*'\(.*\)'.*/\1/")
+          PREBID_BASE=$(grep "s.version.*=" adapter-cloudx/CloudXPrebidAdapter.podspec | head -1 | sed "s/.*['\"]\\([^'\"]*\\)['\"].*/\\1/")
           PREBID_FULL=$(./scripts/generate-version.sh "$PREBID_BASE" rc ${{ github.run_number }})
           ./scripts/update-version-constant.sh prebid "$PREBID_FULL"
           echo "Updated CLXPrebidAdapterVersion.m to: $PREBID_FULL"
