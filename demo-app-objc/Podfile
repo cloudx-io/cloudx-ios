@@ -4,8 +4,6 @@ source 'https://cdn.cocoapods.org/'
 platform :ios, '14.0'
 
 target 'CloudXObjCRemotePods' do
-  use_frameworks! :linkage => :static
-
   # Pods for CloudXObjCRemotePods - Remote installation from public repo
   # This demonstrates how external developers would install CloudX from GitHub
   pod 'CloudXCore', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v1.2.0-core/core/CloudXCore.podspec'
