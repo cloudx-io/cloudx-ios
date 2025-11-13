@@ -1,0 +1,23 @@
+source 'https://cdn.cocoapods.org/'
+
+# Uncomment the next line to define a global platform for your project
+platform :ios, '14.0'
+
+target 'CloudXSwiftRemotePods' do
+  use_frameworks! :linkage => :static
+
+  # Pods for CloudXSwiftRemotePods - Remote installation from public repo
+  # This demonstrates how external developers would install CloudX from GitHub
+  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-core'
+  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-meta'
+
+  target 'CloudXSwiftRemotePodsTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'CloudXSwiftRemotePodsUITests' do
+    # Pods for testing
+  end
+
+end
