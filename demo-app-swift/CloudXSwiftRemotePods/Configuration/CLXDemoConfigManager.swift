@@ -53,6 +53,20 @@ class CLXDemoConfigManager {
     }
     
     private init() {
+        // Staging Configuration
+        let stagingConfig = CLXDemoConfig(
+            appKey: "YG7zqD4RoWwMcGnp3XvNK",
+            hashedUserId: "test-user-123-staging",
+            baseURL: "https://pro-stage.cloudx.io/sdk",
+            bannerPlacement: "swift-demo-banner-1",
+            mrecPlacement: "swift-demo-mrec-1",
+            interstitialPlacement: "swift-demo-interstitial-1",
+            nativePlacement: "-",
+            nativeBannerPlacement: "-",
+            rewardedPlacement: "-",
+            rewardedInterstitialPlacement: "-"
+        )
+        
         // Dev Configuration (current production values)
         let devConfig = CLXDemoConfig(
             appKey: "g0PdN9_0ilfIcuNXhBopl",
@@ -65,20 +79,6 @@ class CLXDemoConfigManager {
             nativeBannerPlacement: "metaNative",
             rewardedPlacement: "metaRewarded",
             rewardedInterstitialPlacement: "metaRewarded"
-        )
-        
-        // Staging Configuration
-        let stagingConfig = CLXDemoConfig(
-            appKey: "A7ovaBRCcAL8lapKtoZmm",
-            hashedUserId: "test-user-123-staging",
-            baseURL: "https://pro-stage.cloudx.io/sdk",
-            bannerPlacement: "objcDemo-banner-1",
-            mrecPlacement: "objcDemo-mrec-1",
-            interstitialPlacement: "objcDemo-interstitial-1",
-            nativePlacement: "-",
-            nativeBannerPlacement: "-",
-            rewardedPlacement: "-",
-            rewardedInterstitialPlacement: "-"
         )
         
         // Production Configuration (placeholders)
