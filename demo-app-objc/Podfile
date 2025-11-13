@@ -8,9 +8,9 @@ target 'CloudXObjCRemotePods' do
 
   # Pods for CloudXObjCRemotePods - Remote installation from public repo
   # This demonstrates how external developers would install CloudX from GitHub
-  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-core'
-  pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-renderer'
-  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-meta'
+  pod 'CloudXCore', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v1.2.0-core/core/CloudXCore.podspec'
+  pod 'CloudXRenderer', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v1.2.0-renderer/renderer-cloudx/CloudXRenderer.podspec'
+  pod 'CloudXMetaAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v1.2.0-meta/adapter-meta/CloudXMetaAdapter.podspec'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths
