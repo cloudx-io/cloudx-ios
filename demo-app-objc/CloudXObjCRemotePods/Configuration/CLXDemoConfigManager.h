@@ -2,17 +2,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, CLXDemoEnvironment) {
-    CLXDemoEnvironmentDev,
-    CLXDemoEnvironmentStaging,
-    CLXDemoEnvironmentProduction
-};
-
 @interface CLXDemoConfig : NSObject
 
 @property (nonatomic, copy, readonly) NSString *appKey;
 @property (nonatomic, copy, readonly) NSString *hashedUserId;
-@property (nonatomic, copy, readonly) NSString *baseURL;
 @property (nonatomic, copy, readonly) NSString *bannerPlacement;
 @property (nonatomic, copy, readonly) NSString *mrecPlacement;
 @property (nonatomic, copy, readonly) NSString *interstitialPlacement;
@@ -23,7 +16,6 @@ typedef NS_ENUM(NSInteger, CLXDemoEnvironment) {
 
 - (instancetype)initWithAppKey:(NSString *)appKey
                  hashedUserId:(NSString *)hashedUserId
-                      baseURL:(NSString *)baseURL
                bannerPlacement:(NSString *)bannerPlacement
                  mrecPlacement:(NSString *)mrecPlacement
          interstitialPlacement:(NSString *)interstitialPlacement
@@ -38,16 +30,9 @@ typedef NS_ENUM(NSInteger, CLXDemoEnvironment) {
 
 + (instancetype)sharedManager;
 
-@property (nonatomic, assign) CLXDemoEnvironment currentEnvironment;
+// Production-only configuration for remote pods demo
+// Environment switching requires local source compilation with DEBUG flag
 @property (nonatomic, strong, readonly) CLXDemoConfig *currentConfig;
-
-- (void)setEnvironment:(CLXDemoEnvironment)environment;
-- (CLXDemoConfig *)configForEnvironment:(CLXDemoEnvironment)environment;
-- (NSString *)environmentName:(CLXDemoEnvironment)environment;
-- (NSString *)buildSchemeName;
-- (BOOL)isDebugBuild;
-- (NSString *)enhancedErrorMessageForEnvironment:(CLXDemoEnvironment)environment 
-                                  originalError:(NSString *)originalError;
 
 @end
 

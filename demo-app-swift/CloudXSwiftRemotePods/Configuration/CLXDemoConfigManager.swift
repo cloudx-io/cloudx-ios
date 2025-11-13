@@ -1,15 +1,8 @@
 import Foundation
 
-enum CLXDemoEnvironment: Int {
-    case dev = 0
-    case staging = 1
-    case production = 2
-}
-
 class CLXDemoConfig {
     let appKey: String
     let hashedUserId: String
-    let baseURL: String
     let bannerPlacement: String
     let mrecPlacement: String
     let interstitialPlacement: String
@@ -20,7 +13,6 @@ class CLXDemoConfig {
     
     init(appKey: String,
          hashedUserId: String,
-         baseURL: String,
          bannerPlacement: String,
          mrecPlacement: String,
          interstitialPlacement: String,
@@ -31,7 +23,6 @@ class CLXDemoConfig {
         
         self.appKey = appKey
         self.hashedUserId = hashedUserId
-        self.baseURL = baseURL
         self.bannerPlacement = bannerPlacement
         self.mrecPlacement = mrecPlacement
         self.interstitialPlacement = interstitialPlacement
@@ -45,19 +36,15 @@ class CLXDemoConfig {
 class CLXDemoConfigManager {
     static let sharedManager = CLXDemoConfigManager()
     
-    var currentEnvironment: CLXDemoEnvironment = .dev
-    private let configurations: [CLXDemoEnvironment: CLXDemoConfig]
-    
-    var currentConfig: CLXDemoConfig {
-        return configForEnvironment(currentEnvironment)
-    }
+    // Production-only configuration for remote pods demo
+    // Environment switching requires local source compilation with DEBUG flag
+    let currentConfig: CLXDemoConfig
     
     private init() {
-        // Staging Configuration
-        let stagingConfig = CLXDemoConfig(
-            appKey: "YG7zqD4RoWwMcGnp3XvNK",
-            hashedUserId: "test-user-123-staging",
-            baseURL: "https://pro-stage.cloudx.io/sdk",
+        // Production Configuration
+        self.currentConfig = CLXDemoConfig(
+            appKey: "xcQftcBSUmqzuv1LfET2o",
+            hashedUserId: "test-user-123",
             bannerPlacement: "swift-demo-banner-1",
             mrecPlacement: "swift-demo-mrec-1",
             interstitialPlacement: "swift-demo-interstitial-1",
@@ -66,74 +53,5 @@ class CLXDemoConfigManager {
             rewardedPlacement: "-",
             rewardedInterstitialPlacement: "-"
         )
-        
-        // Dev Configuration (current production values)
-        let devConfig = CLXDemoConfig(
-            appKey: "g0PdN9_0ilfIcuNXhBopl",
-            hashedUserId: "test-user-123",
-            baseURL: "https://pro-dev.cloudx.io/sdk",
-            bannerPlacement: "metaBanner",
-            mrecPlacement: "metaMREC",
-            interstitialPlacement: "metaInterstitial",
-            nativePlacement: "metaNative",
-            nativeBannerPlacement: "metaNative",
-            rewardedPlacement: "metaRewarded",
-            rewardedInterstitialPlacement: "metaRewarded"
-        )
-        
-        // Production Configuration (placeholders)
-        let prodConfig = CLXDemoConfig(
-            appKey: "PROD_APP_KEY_PLACEHOLDER",
-            hashedUserId: "prod-user-placeholder",
-            baseURL: "https://pro.cloudx.io/sdk",
-            bannerPlacement: "prodBanner",
-            mrecPlacement: "prodMREC",
-            interstitialPlacement: "prodInterstitial",
-            nativePlacement: "prodNative",
-            nativeBannerPlacement: "prodNative",
-            rewardedPlacement: "prodRewarded",
-            rewardedInterstitialPlacement: "prodRewarded"
-        )
-        
-        self.configurations = [
-            .dev: devConfig,
-            .staging: stagingConfig,
-            .production: prodConfig
-        ]
-    }
-    
-    func setEnvironment(_ environment: CLXDemoEnvironment) {
-        currentEnvironment = environment
-    }
-    
-    func configForEnvironment(_ environment: CLXDemoEnvironment) -> CLXDemoConfig {
-        return configurations[environment]!
-    }
-    
-    func environmentName(_ environment: CLXDemoEnvironment) -> String {
-        switch environment {
-        case .dev:
-            return "Development"
-        case .staging:
-            return "Staging"
-        case .production:
-            return "Production"
-        }
-    }
-    
-    var buildSchemeName: String {
-        #if DEBUG
-        return "Debug"
-        #else
-        return "Release"
-        #endif
-    }
-    
-    var isDebugBuild: Bool {
-        #if DEBUG
-        return true
-        #else
-        return false
-        #endif
     }
 }

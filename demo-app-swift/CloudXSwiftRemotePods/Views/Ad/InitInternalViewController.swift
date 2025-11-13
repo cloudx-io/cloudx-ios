@@ -4,29 +4,17 @@ import CloudXCore
 class InitInternalViewController: BaseAdViewController {
     
     private var isSDKInitialized: Bool = false
-    private var buttonStackView: UIStackView!
-    private var devButton: UIButton!
-    private var stagingButton: UIButton!
-    private var prodButton: UIButton!
+    private var initButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Swift Demo"
         
-        // Auto-select environment based on build type
-        let configManager = CLXDemoConfigManager.sharedManager
-        if configManager.isDebugBuild {
-            configManager.setEnvironment(.staging)
-        } else {
-            configManager.setEnvironment(.production)
-        }
-        
-        setupEnvironmentButtons()
+        setupInitButton()
         
         // SDK initialization state tracked internally
-        isSDKInitialized = false // Will be set to true after successful initialization
-        updateStatusUIWithCurrentEnvironment()
-        updateButtonStates()
+        isSDKInitialized = false
+        updateStatusUI(state: .noAd)
     }
     
     // Override to prevent show logs button from appearing in InitInternalViewController
@@ -37,242 +25,67 @@ class InitInternalViewController: BaseAdViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
-        // Update UI if SDK is already initialized
-        if isSDKInitialized {
-            updateStatusUIWithCurrentEnvironment()
-        }
-        updateButtonStates()
     }
     
-    private func setupEnvironmentButtons() {
-        // Create buttons
-        devButton = createButton(withTitle: "Init Dev", 
-                                action: #selector(initializeWithDevEnvironment),
-                                environment: .dev)
+    private func setupInitButton() {
+        // Create init button
+        initButton = UIButton(type: .system)
+        initButton.setTitle("Init SDK", for: .normal)
+        initButton.addTarget(self, action: #selector(initializeSDK), for: .touchUpInside)
         
-        stagingButton = createButton(withTitle: "Init Staging", 
-                                   action: #selector(initializeWithStagingEnvironment),
-                                   environment: .staging)
+        // Style the button
+        initButton.backgroundColor = .systemBlue
+        initButton.tintColor = .white
+        initButton.layer.cornerRadius = 8
+        initButton.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        initButton.translatesAutoresizingMaskIntoConstraints = false
         
-        prodButton = createButton(withTitle: "Init Production", 
-                                action: #selector(initializeWithProductionEnvironment),
-                                environment: .production)
+        view.addSubview(initButton)
         
-        // Create stack view for buttons - Staging at top, Dev in middle, Production at bottom
-        buttonStackView = UIStackView(arrangedSubviews: [stagingButton, devButton, prodButton])
-        buttonStackView.axis = .vertical
-        buttonStackView.spacing = 16
-        buttonStackView.alignment = .fill
-        buttonStackView.distribution = .fillEqually
-        buttonStackView.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(buttonStackView)
-        
-        // Add constraints - match InitViewController button dimensions (200px wide, 44px tall)
+        // Add constraints
         NSLayoutConstraint.activate([
-            buttonStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            buttonStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            stagingButton.widthAnchor.constraint(equalToConstant: 200),
-            stagingButton.heightAnchor.constraint(equalToConstant: 44),
-            devButton.widthAnchor.constraint(equalToConstant: 200),
-            devButton.heightAnchor.constraint(equalToConstant: 44),
-            prodButton.widthAnchor.constraint(equalToConstant: 200),
-            prodButton.heightAnchor.constraint(equalToConstant: 44)
+            initButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            initButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            initButton.widthAnchor.constraint(equalToConstant: 200),
+            initButton.heightAnchor.constraint(equalToConstant: 44)
         ])
     }
     
-    private func createButton(withTitle title: String, action: Selector, environment: CLXDemoEnvironment) -> UIButton {
-        let button = UIButton(type: .system)
-        button.setTitle(title, for: .normal)
-        button.addTarget(self, action: action, for: .touchUpInside)
-        
-        // Tag button with environment for identification
-        button.tag = environment.rawValue
-        
-        // Style the button
-        button.backgroundColor = color(for: environment)
-        button.tintColor = .white
-        button.layer.cornerRadius = 8
-        button.titleLabel?.font = .boldSystemFont(ofSize: 16)
-        
-        return button
-    }
-    
-    private func color(for environment: CLXDemoEnvironment) -> UIColor {
-        switch environment {
-        case .dev:
-            return .systemBlue
-        case .staging:
-            // Light blue - not too bright or light
-            return UIColor(red: 0.4, green: 0.7, blue: 0.9, alpha: 1.0)
-        case .production:
-            // Green - not too bright or light
-            return UIColor(red: 0.2, green: 0.7, blue: 0.3, alpha: 1.0)
-        }
-    }
-    
-    private func updateButtonStates() {
-        let configManager = CLXDemoConfigManager.sharedManager
-        let isDebugBuild = configManager.isDebugBuild
-        
-        let buttons = [devButton, stagingButton, prodButton]
-        
-        for button in buttons {
-            guard let button = button else { continue }
-            let buttonEnvironment = CLXDemoEnvironment(rawValue: button.tag) ?? .dev
-            let shouldEnable: Bool
-            
-            if isDebugBuild {
-                shouldEnable = (buttonEnvironment == .dev || buttonEnvironment == .staging)
-            } else {
-                shouldEnable = (buttonEnvironment == .production)
-            }
-            
-            button.isEnabled = shouldEnable
-            
-            if shouldEnable {
-                button.backgroundColor = color(for: buttonEnvironment)
-                button.alpha = 1.0
-            } else {
-                button.backgroundColor = .systemGray
-                button.alpha = 0.5
-            }
-        }
-    }
-    
-    // Override to provide environment-specific status messages
-    private func updateStatusUIWithCurrentEnvironment() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            let configManager = CLXDemoConfigManager.sharedManager
-            let environmentName = configManager.environmentName(configManager.currentEnvironment)
-            
-            let text: String
-            let color: UIColor
-            
-            if self.isSDKInitialized {
-                text = "SDK Initialized (\(environmentName))"
-                color = .systemGreen
-            } else {
-                text = "SDK Not Initialized (\(environmentName))"
-                color = .systemRed
-            }
-            
-            self.statusLabel.text = text
-            self.statusLabel.textColor = color
-            self.statusIndicator.backgroundColor = color
-        }
-    }
-    
-    override func updateStatusUI(state: AdState) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            let configManager = CLXDemoConfigManager.sharedManager
-            let environmentName = configManager.environmentName(configManager.currentEnvironment)
-            
-            let text: String
-            let color: UIColor
-            
-            switch state {
-            case .noAd:
-                text = "SDK Not Initialized (\(environmentName))"
-                color = .systemRed
-            case .loading:
-                text = "SDK Initializing (\(environmentName))..."
-                color = .systemYellow
-            case .ready:
-                text = "SDK Initialized (\(environmentName))"
-                color = .systemGreen
-            }
-            
-            self.statusLabel.text = text
-            self.statusLabel.textColor = color
-            self.statusIndicator.backgroundColor = color
-        }
-    }
-    
-    @objc private func initializeWithDevEnvironment() {
-        initializeWithEnvironment(.dev)
-    }
-    
-    @objc private func initializeWithStagingEnvironment() {
-        initializeWithEnvironment(.staging)
-    }
-    
-    @objc private func initializeWithProductionEnvironment() {
-        initializeWithEnvironment(.production)
-    }
-    
-    private func initializeWithEnvironment(_ environment: CLXDemoEnvironment) {
+    @objc private func initializeSDK() {
         if isSDKInitialized {
-            let configManager = CLXDemoConfigManager.sharedManager
-            let environmentName = configManager.environmentName(environment)
-            showAlert(title: "SDK Already Initialized", 
-                     message: "The SDK is already initialized. Current environment: \(configManager.environmentName(configManager.currentEnvironment))")
+            showAlert(title: "SDK Already Initialized", message: "The SDK is already initialized.")
             return
         }
         
-        // Set the environment in config manager
-        let configManager = CLXDemoConfigManager.sharedManager
-        configManager.setEnvironment(environment)
-        
-        let config = configManager.currentConfig
-        let environmentName = configManager.environmentName(environment)
-        
         updateStatusUI(state: .loading)
+        initButton.isEnabled = false
         
-        // Clear DI container to force fresh services with new environment
-        CLXDIContainer.shared().reset()
+        let config = CLXDemoConfigManager.sharedManager.currentConfig
         
-        // Set environment in our centralized config FIRST (before any SDK calls)
-        let environmentKey: String
-        switch environment {
-        case .dev:
-            environmentKey = "dev"
-        case .staging:
-            environmentKey = "staging"
-        case .production:
-            // Production doesn't need environment override - it's the default for non-DEBUG
-            environmentKey = "production"
-        }
-        
-        // Set the debug environment in our centralized config
-        if environment != .production {
-            CLXURLProvider.setEnvironment(environmentKey)
-        }
-        
-        // Also set the old key for backward compatibility with demo app config
-        UserDefaults.standard.set(environmentKey, forKey: "CLXDemoEnvironment")
-        UserDefaults.standard.synchronize()
-        
-        DemoAppLogger.sharedInstance.logMessage("Initializing SDK with \(environmentName) environment")
+        DemoAppLogger.sharedInstance.logMessage("Initializing SDK")
         
         // Set hashed user ID before initialization if provided
         if !config.hashedUserId.isEmpty {
             CloudXCore.shared.setHashedUserID(config.hashedUserId)
         }
         
-        // Use standard CloudXCore initialization which will now use our environment override
+        // Use standard CloudXCore initialization
         CloudXCore.shared.initializeSDK(appKey: config.appKey) { [weak self] success, error in
-            // Clear old environment override after initialization (success or failure)
-            UserDefaults.standard.removeObject(forKey: "CLXDemoEnvironment")
-            UserDefaults.standard.synchronize()
+            guard let self = self else { return }
             
-            // Note: We keep the CLXDebugEnvironment setting in our centralized config
-            // so it persists for subsequent SDK operations
-            
-            if success {
-                DemoAppLogger.sharedInstance.logMessage("✅ SDK initialized successfully with \(environmentName) environment")
-                self?.isSDKInitialized = true
-                self?.updateStatusUI(state: .ready)
-                NotificationCenter.default.post(name: NSNotification.Name("cloudXSDKInitialized"), object: nil)
-            } else {
-                let errorMessage = error?.localizedDescription ?? "Unknown error occurred"
-                DemoAppLogger.sharedInstance.logMessage("❌ SDK init failed: \(errorMessage)")
-                self?.updateStatusUI(state: .noAd)
-                self?.showAlert(title: "SDK Init Failed", message: errorMessage)
+            DispatchQueue.main.async {
+                if success {
+                    DemoAppLogger.sharedInstance.logMessage("✅ SDK initialized successfully")
+                    self.isSDKInitialized = true
+                    self.updateStatusUI(state: .ready)
+                    NotificationCenter.default.post(name: .sdkInitialized, object: nil)
+                } else {
+                    let errorMessage = error?.localizedDescription ?? "Unknown error occurred"
+                    self.showAlert(title: "SDK Init Failed", message: errorMessage)
+                    self.updateStatusUI(state: .noAd)
+                    self.initButton.isEnabled = true
+                    DemoAppLogger.sharedInstance.logMessage("❌ SDK init failed: \(errorMessage)")
+                }
             }
         }
     }

@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D42DA69D84CE35A42829D25 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B9D9200F10B80C4CB3A996A /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */; };
-		1DC6EB2774F1AE0F00381291 /* Pods_CloudXSwiftRemotePods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E5B3D8C01B197B7E22CDD24F /* Pods_CloudXSwiftRemotePods.framework */; };
-		EE32CC7E02BFEF47B534BDF6 /* Pods_CloudXSwiftRemotePodsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F07E2DD597B4B49ACD8C363 /* Pods_CloudXSwiftRemotePodsTests.framework */; };
+		31CBFF09B8CEFD26EE6051AB /* libPods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 04B4E2C02754357548CABBAC /* libPods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.a */; };
+		6D19975090E81C75AAF6BD65 /* libPods-CloudXSwiftRemotePodsTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2986ABA79D5D69EFAF77FEAE /* libPods-CloudXSwiftRemotePodsTests.a */; };
+		85C8B0F7094E6019FFDB4944 /* libPods-CloudXSwiftRemotePods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F1D15B345C20AE061BB68AE /* libPods-CloudXSwiftRemotePods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,18 +30,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0B9D9200F10B80C4CB3A996A /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		04B4E2C02754357548CABBAC /* libPods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F40A848F2925EB524BADAC1 /* Pods-CloudXSwiftRemotePodsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePodsTests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePodsTests/Pods-CloudXSwiftRemotePodsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		1917BCDE38ECEECE4237054E /* Pods-CloudXSwiftRemotePodsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePodsTests.release.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePodsTests/Pods-CloudXSwiftRemotePodsTests.release.xcconfig"; sourceTree = "<group>"; };
 		195FD5962DE3C7FF0026F997 /* CloudXSwiftRemotePods.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CloudXSwiftRemotePods.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		195FD5AC2DE3C8000026F997 /* CloudXSwiftRemotePodsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXSwiftRemotePodsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		195FD5B62DE3C8000026F997 /* CloudXSwiftRemotePodsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXSwiftRemotePodsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F1D15B345C20AE061BB68AE /* libPods-CloudXSwiftRemotePods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CloudXSwiftRemotePods.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		248B5C5EFA2B9863D2EB05AD /* Pods-CloudXSwiftRemotePods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods.release.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods.release.xcconfig"; sourceTree = "<group>"; };
 		277FC88C6CF1AD307FFEBBF4 /* Pods-CloudXSwiftRemotePods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods.debug.xcconfig"; sourceTree = "<group>"; };
+		2986ABA79D5D69EFAF77FEAE /* libPods-CloudXSwiftRemotePodsTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CloudXSwiftRemotePodsTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3976EB4F4BF62B6D5539BE6A /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig"; sourceTree = "<group>"; };
-		7F07E2DD597B4B49ACD8C363 /* Pods_CloudXSwiftRemotePodsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePodsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B86BF64856422458B376B338 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig"; sourceTree = "<group>"; };
-		E5B3D8C01B197B7E22CDD24F /* Pods_CloudXSwiftRemotePods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -84,7 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1DC6EB2774F1AE0F00381291 /* Pods_CloudXSwiftRemotePods.framework in Frameworks */,
+				85C8B0F7094E6019FFDB4944 /* libPods-CloudXSwiftRemotePods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,7 +92,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EE32CC7E02BFEF47B534BDF6 /* Pods_CloudXSwiftRemotePodsTests.framework in Frameworks */,
+				6D19975090E81C75AAF6BD65 /* libPods-CloudXSwiftRemotePodsTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,7 +100,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1D42DA69D84CE35A42829D25 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework in Frameworks */,
+				31CBFF09B8CEFD26EE6051AB /* libPods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,9 +132,9 @@
 		8EDD72DBEC76DD27B7AE44DD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				E5B3D8C01B197B7E22CDD24F /* Pods_CloudXSwiftRemotePods.framework */,
-				0B9D9200F10B80C4CB3A996A /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */,
-				7F07E2DD597B4B49ACD8C363 /* Pods_CloudXSwiftRemotePodsTests.framework */,
+				1F1D15B345C20AE061BB68AE /* libPods-CloudXSwiftRemotePods.a */,
+				04B4E2C02754357548CABBAC /* libPods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.a */,
+				2986ABA79D5D69EFAF77FEAE /* libPods-CloudXSwiftRemotePodsTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

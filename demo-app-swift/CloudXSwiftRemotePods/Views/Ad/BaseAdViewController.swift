@@ -29,7 +29,7 @@ enum AdState {
 }
 
 class BaseAdViewController: UIViewController, AdStateManaging {
-    let cloudX = CloudXCore.shared
+    var cloudX: CloudXCore { CloudXCore.shared }
     var isLoading = false
     
     var appKey: String? {
@@ -83,7 +83,6 @@ class BaseAdViewController: UIViewController, AdStateManaging {
         }
 
         let config = CLXDemoConfigManager.sharedManager.currentConfig
-        UserDefaults.standard.set(config.baseURL, forKey: "CloudXInitURL")
         
         // Set hashed user ID before initialization if provided
         if !config.hashedUserId.isEmpty {
