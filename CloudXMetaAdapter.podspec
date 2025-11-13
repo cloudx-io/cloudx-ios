@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   
   # Dependencies
   s.dependency 'CloudXCore', '~> 1.2'
-  s.dependency 'FBAudienceNetwork', '6.20.1'
+  s.dependency 'FBAudienceNetwork', '= 6.20.1'
   
   s.frameworks = ['AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit']
   s.weak_frameworks = ['Combine', 'CryptoKit', 'SafariServices', 'SwiftUI', 'WebKit']
