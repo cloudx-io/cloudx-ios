@@ -15,9 +15,9 @@ target 'YourApp' do
   # CloudX SDK 
   pod 'CloudXSDK', '~> 0.1.0'
   
-  # Optional: CloudX Mediation Adapters (at least one is needed to show ads)
-  pod 'CloudXMediationMetaAdapter', '~> 0.1.0'          
-  pod 'CloudXMediationPrebidAdapter', '~> 0.1.0'       
+  # Optional: CloudX Adapters (at least one is needed to show ads)
+  pod 'CloudXMetaAdapter', '~> 1.2.0'
+  pod 'CloudXRenderer', '~> 1.2.0'       
 end
 ```
 
@@ -35,10 +35,9 @@ This is required for CocoaPods to properly embed dynamic frameworks. This is a s
 
 ## Components
 
-- **[`core/`](core/README.md)** - The foundational CloudXSDK written in Objective-C that provides the base functionality for programmatic advertising *(source-based distribution)*
-- **[`adapter-meta/`](adapter-meta/README.md)** - CloudXMediationMetaAdapter for Meta Audience Network integration *(framework-based distribution)*
-- **[`adapter-vungle/`](adapter-vungle/README.md)** - CloudXMediationVungleAdapter for Vungle/Liftoff advertising with header bidding support *(source-based distribution)*
-- **[`adapter-cloudx/`](adapter-cloudx/README.md)** - CloudXMediationPrebidAdapter for header bidding integration with CloudX's programmatic platform *(source-based distribution)*
+- **[`core/`](core/README.md)** - CloudXCore framework providing the foundational SDK functionality for programmatic advertising *(binary xcframework distribution)*
+- **[`adapter-meta/`](adapter-meta/README.md)** - CloudXMetaAdapter for Meta Audience Network integration *(binary xcframework distribution)*
+- **[`renderer-cloudx/`](renderer-cloudx/README.md)** - CloudXRenderer for rendering creative content with MRAID support *(binary xcframework distribution)*
 - **[`demo-app-objc/`](demo-app-objc/)** - Complete Objective-C demo application showcasing CloudX SDK integration and usage patterns
 - **[`demo-app-swift/`](demo-app-swift/)** - Complete Swift demo application demonstrating CloudX SDK implementation in Swift projects
 
@@ -50,23 +49,22 @@ This repository uses **component-specific releases** with **tagged distribution*
 
 ### Component-Specific Releases
 
-- **CloudXSDK**: Source-based distribution with tags like `v0.1.0-sdk`
-- **CloudXMediationMetaAdapter**: Framework-based distribution with tags like `v0.1.0-meta`
-- **CloudXMediationVungleAdapter**: Source-based distribution with tags like `v0.1.0-vungle`
-- **CloudXMediationPrebidAdapter**: Source-based distribution with tags like `v0.1.0-prebid`
+- **CloudXCore**: Binary xcframework distribution with tags like `v1.2.0-core`
+- **CloudXMetaAdapter**: Binary xcframework distribution with tags like `v1.2.0-meta`
+- **CloudXRenderer**: Binary xcframework distribution with tags like `v1.2.0-renderer`
 - **Individual Versioning**: Each component maintains its own version to allow independent updates
-- **Clear Release Assets**: Each release provides the appropriate distribution format for that component
+- **Clear Release Assets**: Each release provides the appropriate xcframework binary for that component
 
 #### Release Tag Format
 ```
-v0.1.0-sdk      # SDK release (source distribution)
-v0.1.0-meta     # Meta Adapter release (framework distribution)
-v0.1.0-vungle   # Vungle Adapter release (source distribution)
-v0.1.0-prebid   # Prebid Adapter release (source distribution)
+v1.2.0-core      # Core SDK release (binary xcframework)
+v1.2.0-meta      # Meta Adapter release (binary xcframework)
+v1.2.0-renderer  # Renderer release (binary xcframework)
 ```
 
 #### Distribution Methods
-- **Core SDK**: Direct source integration via CocoaPods/SPM for easier debugging and customization
-- **Meta Adapter**: Pre-built xcframework for faster build times and simplified integration
-- **Automated Releases**: GitHub Actions automatically build, test, and publish releases when tags are pushed
+- **CloudXCore**: Pre-built xcframework for core SDK functionality
+- **CloudXMetaAdapter**: Pre-built xcframework for Meta Audience Network integration
+- **CloudXRenderer**: Pre-built xcframework for creative rendering with MRAID support
+- **CocoaPods Installation**: All components distributed via CocoaPods with git+tag references
 
