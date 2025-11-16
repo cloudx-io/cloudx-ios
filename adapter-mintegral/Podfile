@@ -1,0 +1,24 @@
+platform :ios, '14.0'
+use_frameworks! :linkage => :static
+
+target 'CloudXMintegralAdapter' do
+  pod 'CloudXCore', :path => '../core'
+  # Mintegral SDK - Update version as needed
+  # pod 'MintegralAdSDK', '~> 7.6'
+  # Or individual Mintegral subspecs:
+  # pod 'MintegralAdSDK/BannerAd'
+  # pod 'MintegralAdSDK/InterstitialVideoAd'
+  # pod 'MintegralAdSDK/RewardVideoAd'
+  # pod 'MintegralAdSDK/BidRewardVideoAd'
+  # pod 'MintegralAdSDK/BidInterstitialVideoAd'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+    end
+  end
+end
+
