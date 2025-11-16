@@ -1,0 +1,7 @@
+framework module CloudXMolocoAdapter {
+  umbrella header "CloudXMolocoAdapter.h"
+  
+  export *
+  module * { export * }
+}
+

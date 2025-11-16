@@ -1,0 +1,7 @@
+framework module CloudXMediationMolocoAdapter {
+  umbrella header "CloudXMediationMolocoAdapter.h"
+  
+  export *
+  module * { export * }
+}
+
