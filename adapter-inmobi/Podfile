@@ -1,9 +1,9 @@
-# Podfile for CloudXMediationInMobiAdapter development
+# Podfile for CloudXInMobiAdapter development
 
 platform :ios, '14.0'
 use_frameworks! :linkage => :static
 
-target 'CloudXMediationInMobiAdapter' do
+target 'CloudXInMobiAdapter' do
   pod 'CloudXCore', :path => '../core'
   pod 'InMobiSDK', '~> 10.8'
 end

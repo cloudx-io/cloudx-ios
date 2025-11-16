@@ -38,7 +38,7 @@ fi
 VERSION=$1
 FULL_VERSION="v${VERSION}-inmobi"
 
-echo "🚀 Starting CloudXMediationInMobiAdapter v${VERSION} local release (mirroring GitHub Actions)..."
+echo "🚀 Starting CloudXInMobiAdapter v${VERSION} local release (mirroring GitHub Actions)..."
 
 # Check authentication
 if [ -z "$COCOAPODS_TRUNK_TOKEN" ]; then
@@ -88,25 +88,25 @@ print_step "📀 Build static xcframework"
 bash build_frameworks.sh
 
 print_step "📦 Rename framework with version"
-mv CloudXMediationInMobiAdapter.xcframework.zip CloudXMediationInMobiAdapter-v$VERSION_NO_SUFFIX.xcframework.zip
+mv CloudXInMobiAdapter.xcframework.zip CloudXInMobiAdapter-v$VERSION_NO_SUFFIX.xcframework.zip
 
 print_step "🔢 Compute SwiftPM checksum"
-CHECKSUM=$(swift package compute-checksum CloudXMediationInMobiAdapter-v$VERSION_NO_SUFFIX.xcframework.zip)
+CHECKSUM=$(swift package compute-checksum CloudXInMobiAdapter-v$VERSION_NO_SUFFIX.xcframework.zip)
 echo "checksum=$CHECKSUM"
 
 print_step "📝 Update podspec and Package.swift"
 # Update podspec version
-sed -i '' "s/s\.version.*=.*/s.version = '$VERSION_NO_SUFFIX'/" CloudXMediationInMobiAdapter-remote.podspec
+sed -i '' "s/s\.version.*=.*/s.version = '$VERSION_NO_SUFFIX'/" CloudXInMobiAdapter-remote.podspec
 
 # Fix podspec source URL to point to correct version
-sed -i '' "s|https://github.com/cloudx-io/cloudx-ios/releases/download/.*CloudXMediationInMobiAdapter-v.*\.xcframework\.zip|https://github.com/cloudx-io/cloudx-ios/releases/download/${FULL_VERSION}/CloudXMediationInMobiAdapter-v${VERSION_NO_SUFFIX}.xcframework.zip|" CloudXMediationInMobiAdapter-remote.podspec
+sed -i '' "s|https://github.com/cloudx-io/cloudx-ios/releases/download/.*CloudXInMobiAdapter-v.*\.xcframework\.zip|https://github.com/cloudx-io/cloudx-ios/releases/download/${FULL_VERSION}/CloudXInMobiAdapter-v${VERSION_NO_SUFFIX}.xcframework.zip|" CloudXInMobiAdapter-remote.podspec
 
 # Fix license path relative to podspec directory  
-sed -i '' "s|'adapter-inmobi/LICENSE'|'LICENSE'|" CloudXMediationInMobiAdapter-remote.podspec
+sed -i '' "s|'adapter-inmobi/LICENSE'|'LICENSE'|" CloudXInMobiAdapter-remote.podspec
 
-# Update root Package.swift version and checksum for CloudXMediationInMobiAdapter binary target
+# Update root Package.swift version and checksum for CloudXInMobiAdapter binary target
 cd ..
-sed -i '' "s|url: \".*CloudXMediationInMobiAdapter.*\",|url: \"https://github.com/cloudx-io/cloudx-ios/releases/download/$FULL_VERSION/CloudXMediationInMobiAdapter-v$VERSION_NO_SUFFIX.xcframework.zip\",|" Package.swift
+sed -i '' "s|url: \".*CloudXInMobiAdapter.*\",|url: \"https://github.com/cloudx-io/cloudx-ios/releases/download/$FULL_VERSION/CloudXInMobiAdapter-v$VERSION_NO_SUFFIX.xcframework.zip\",|" Package.swift
 sed -i '' "s|checksum: \".*\"|checksum: \"$CHECKSUM\"|" Package.swift
 cd adapter-inmobi
 
@@ -115,18 +115,18 @@ cd ..
 
 # Create release notes file
 cat > release_notes.md << EOF
-CloudXMediationInMobiAdapter v$VERSION_NO_SUFFIX SDK release (static xcframework)
+CloudXInMobiAdapter v$VERSION_NO_SUFFIX SDK release (static xcframework)
 
 ## Installation
 
 ### CocoaPods
-Add to your Podfile: pod 'CloudXMediationInMobiAdapter', '~> $VERSION_NO_SUFFIX'
+Add to your Podfile: pod 'CloudXInMobiAdapter', '~> $VERSION_NO_SUFFIX'
 
 ### Swift Package Manager
 Add repository: https://github.com/cloudx-io/cloudx-ios
 
 ### Manual Installation
-Download CloudXMediationInMobiAdapter-v$VERSION_NO_SUFFIX.xcframework.zip from this release.
+Download CloudXInMobiAdapter-v$VERSION_NO_SUFFIX.xcframework.zip from this release.
 
 ## SwiftPM Checksum
 $CHECKSUM
@@ -134,14 +134,14 @@ EOF
 
 # Create empty release first (two-step process for better CDN propagation)
 gh release create "$FULL_VERSION" \
-  --title "CloudXMediationInMobiAdapter v$VERSION_NO_SUFFIX" \
+  --title "CloudXInMobiAdapter v$VERSION_NO_SUFFIX" \
   --notes-file release_notes.md \
   --latest
 
 print_step "📦 Upload xcframework to release (step 2 - file upload)"
 # Upload the xcframework file to the existing release
 gh release upload "$FULL_VERSION" \
-  adapter-inmobi/CloudXMediationInMobiAdapter-v$VERSION_NO_SUFFIX.xcframework.zip
+  adapter-inmobi/CloudXInMobiAdapter-v$VERSION_NO_SUFFIX.xcframework.zip
 
 cd adapter-inmobi
 
@@ -159,12 +159,12 @@ else
 fi
 
 print_step "🧪 Validate podspec with detailed output"
-echo "=== Validating CloudXMediationInMobiAdapter-remote.podspec ==="
+echo "=== Validating CloudXInMobiAdapter-remote.podspec ==="
 echo "Current directory: $(pwd)"
 echo "Podspec content:"
-cat CloudXMediationInMobiAdapter-remote.podspec
+cat CloudXInMobiAdapter-remote.podspec
 echo "=== Running podspec validation ==="
-pod spec lint CloudXMediationInMobiAdapter-remote.podspec --allow-warnings --skip-import-validation --skip-tests --verbose || {
+pod spec lint CloudXInMobiAdapter-remote.podspec --allow-warnings --skip-import-validation --skip-tests --verbose || {
     echo "❌ Podspec validation failed"
     exit 1
 }
@@ -179,7 +179,7 @@ fi
 echo "=== Checking authentication ==="
 pod trunk me || true
 echo "=== Checking pod ownership ==="
-pod trunk info CloudXMediationInMobiAdapter || true
+pod trunk info CloudXInMobiAdapter || true
 
 print_step "📤 Push podspec to CocoaPods trunk"
 # Use EXACT same pattern as working Core workflow
@@ -188,7 +188,7 @@ echo '{"trunk":{"token":"'$COCOAPODS_TRUNK_TOKEN'"}}' > ~/.cocoapods/trunk/me.js
 
 for i in {1..5}; do
     echo "=== Attempt $i/5 ==="
-    if pod trunk push CloudXMediationInMobiAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
+    if pod trunk push CloudXInMobiAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
         echo "✅ Pod trunk push succeeded on attempt $i"
         break
     else
@@ -210,11 +210,11 @@ echo "=== Verifying pod trunk push success ==="
 sleep 10
 
 # Verify the pod is available
-if pod trunk info CloudXMediationInMobiAdapter; then
+if pod trunk info CloudXInMobiAdapter; then
     echo "✅ Pod trunk push verification successful"
     
     # Extract and display the latest version
-    LATEST_VERSION=$(pod trunk info CloudXMediationInMobiAdapter | grep -E "^\s*-\s*[0-9]" | head -1 | sed 's/^\s*-\s*//')
+    LATEST_VERSION=$(pod trunk info CloudXInMobiAdapter | grep -E "^\s*-\s*[0-9]" | head -1 | sed 's/^\s*-\s*//')
     echo "Latest published version: $LATEST_VERSION"
     
     # Verify it matches our expected version
@@ -230,9 +230,9 @@ else
 fi
 
 cd ..
-print_success "CloudXMediationInMobiAdapter v$VERSION_NO_SUFFIX release completed successfully!"
+print_success "CloudXInMobiAdapter v$VERSION_NO_SUFFIX release completed successfully!"
 echo "🔗 GitHub Release: https://github.com/cloudx-io/cloudx-ios/releases/tag/$FULL_VERSION"
-echo "📦 CocoaPods: https://cocoapods.org/pods/CloudXMediationInMobiAdapter"
+echo "📦 CocoaPods: https://cocoapods.org/pods/CloudXInMobiAdapter"
 
 # Clean up
 rm -f release_notes.md

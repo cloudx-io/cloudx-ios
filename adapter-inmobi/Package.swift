@@ -2,14 +2,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "CloudXMediationInMobiAdapter",
+    name: "CloudXInMobiAdapter",
     platforms: [
         .iOS(.v14)
     ],
     products: [
         .library(
-            name: "CloudXMediationInMobiAdapter",
-            targets: ["CloudXMediationInMobiAdapter"]
+            name: "CloudXInMobiAdapter",
+            targets: ["CloudXInMobiAdapter"]
         ),
     ],
     dependencies: [
@@ -17,9 +17,9 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "CloudXMediationInMobiAdapter",
+            name: "CloudXInMobiAdapter",
             dependencies: [],
-            path: "Sources/CloudXMediationInMobiAdapter",
+            path: "Sources/CloudXInMobiAdapter",
             publicHeadersPath: ".",
             cSettings: [
                 .define("DEFINES_MODULE", to: "YES"),

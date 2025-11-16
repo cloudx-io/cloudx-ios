@@ -5,7 +5,7 @@
 # ============================================================================
 #
 # OVERVIEW:
-#   Builds CloudXMediationInMobiAdapter as a STATIC xcframework and prepares for binary distribution.
+#   Builds CloudXInMobiAdapter as a STATIC xcframework and prepares for binary distribution.
 #   This is used by CI/CD but can also be run locally for testing.
 #
 # USAGE:
@@ -27,14 +27,14 @@
 #   - sentry-cli installed (curl -sL https://sentry.io/get-cli/ | bash)
 #
 # OUTPUT ARTIFACTS:
-#   - CloudXMediationInMobiAdapter.xcframework/          (unzipped framework)
-#   - CloudXMediationInMobiAdapter.xcframework.zip       (distributable binary)
+#   - CloudXInMobiAdapter.xcframework/          (unzipped framework)
+#   - CloudXInMobiAdapter.xcframework.zip       (distributable binary)
 #   - release_metadata.txt                               (version, checksum, URLs)
 #
 # DISTRIBUTION:
 #   The generated xcframework.zip should be:
 #   1. Uploaded to GitHub Release on cloudx-io/cloudx-ios
-#   2. Referenced in CloudXMediationInMobiAdapter.podspec with version and download URL
+#   2. Referenced in CloudXInMobiAdapter.podspec with version and download URL
 #   3. Referenced in Package.swift with checksum
 #
 # ============================================================================
@@ -59,9 +59,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Configuration
 # ============================================================================
 
-FRAMEWORK_NAME="CloudXMediationInMobiAdapter"
-SCHEME_NAME="CloudXMediationInMobiAdapter"
-WORKSPACE_FILE="CloudXMediationInMobiAdapter.xcworkspace"
+FRAMEWORK_NAME="CloudXInMobiAdapter"
+SCHEME_NAME="CloudXInMobiAdapter"
+WORKSPACE_FILE="CloudXInMobiAdapter.xcworkspace"
 
 ARCHIVE_DIR="${SCRIPT_DIR}/build/archives"
 OUTPUT_DIR="${SCRIPT_DIR}/build/output"
@@ -343,7 +343,7 @@ https://github.com/cloudx-io/cloudx-ios/releases/download/v${version}-inmobi/${F
 
 CocoaPods Podspec
 -----------------
-Update CloudXMediationInMobiAdapter.podspec:
+Update CloudXInMobiAdapter.podspec:
 
   s.version = '${version}'
   s.source = {
@@ -365,9 +365,9 @@ Update Package.swift:
 Next Steps
 ----------
 1. Upload ${FRAMEWORK_NAME}.xcframework.zip to GitHub Release v${version}-inmobi
-2. Update podspec in cloudx-ios/adapter-inmobi/CloudXMediationInMobiAdapter.podspec
+2. Update podspec in cloudx-ios/adapter-inmobi/CloudXInMobiAdapter.podspec
 3. Update Package.swift in cloudx-ios/adapter-inmobi/
-4. Push podspec to CocoaPods trunk: pod trunk push CloudXMediationInMobiAdapter.podspec
+4. Push podspec to CocoaPods trunk: pod trunk push CloudXInMobiAdapter.podspec
 5. Test integration in demo apps
 
 EOF

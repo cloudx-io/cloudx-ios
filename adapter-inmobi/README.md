@@ -18,7 +18,7 @@ InMobi adapter for CloudX SDK is available through [CocoaPods](https://guides.co
 
 Open your project's `Podfile` and add this line to your app's target:
 ```ruby
-pod 'CloudXMediationInMobiAdapter'
+pod 'CloudXInMobiAdapter'
 ```
 
 Install the pod from command line using:
@@ -35,13 +35,13 @@ Import the Swift Package into your Xcode project via the following URL:
 https://github.com/cloudx-io/cloudx-ios
 ```
 
-Select the `CloudXMediationInMobiAdapter` product when adding the package to your target.
+Select the `CloudXInMobiAdapter` product when adding the package to your target.
 
 ### 📦 Manual  
 
 1. Navigate to the releases and open the latest release: [Releases](https://github.com/cloudx-io/cloudx-ios/releases)  
-2. 📥 Download the `CloudXMediationInMobiAdapter-v{version}.xcframework.zip` file from the release
-3. 🗂️ Unzip the download then drag and drop `CloudXMediationInMobiAdapter.xcframework` into your Xcode project
+2. 📥 Download the `CloudXInMobiAdapter-v{version}.xcframework.zip` file from the release
+3. 🗂️ Unzip the download then drag and drop `CloudXInMobiAdapter.xcframework` into your Xcode project
 4. Manually add InMobi SDK 10.8+ (available via CocoaPods)
 5. Follow the Project Configuration / Troubleshooting steps below
 
@@ -384,9 +384,9 @@ This adapter is licensed under the Business Source License 1.1. See the LICENSE 
 
 This adapter follows industry-standard naming conventions:
 
-- **Pod Name**: `CloudXMediationInMobiAdapter` 
+- **Pod Name**: `CloudXInMobiAdapter` 
 - **Class Prefix**: `CLXInMobi*` (e.g., `CLXInMobiInterstitial`, `CLXInMobiBanner`)
-- **Framework Name**: `CloudXMediationInMobiAdapter`
+- **Framework Name**: `CloudXInMobiAdapter`
 
 The adapter implements CloudX's protocol-based architecture for seamless integration with CloudX Core SDK.
 

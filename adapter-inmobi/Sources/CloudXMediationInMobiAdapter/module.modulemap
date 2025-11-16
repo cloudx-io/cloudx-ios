@@ -1,7 +1,0 @@
-framework module CloudXMediationInMobiAdapter {
-    umbrella header "CloudXMediationInMobiAdapter.h"
-    
-    export *
-    module * { export * }
-}
-
