@@ -45,6 +45,7 @@
 
 @interface SettingsViewController () <UITextFieldDelegate>
 @property (nonatomic, strong) UserDefaultsSettings *settings;
+@property (nonatomic, weak) UITextField *hashedUserIdTextField;
 @end
 
 @implementation SettingsViewController
@@ -118,9 +119,27 @@
             break;
         case 2: // Privacy
             switch (indexPath.row) {
-                case 0: cell.textLabel.text = @"Consent String"; textField.text = self.settings.consentString; break;
-                case 1: cell.textLabel.text = @"US Privacy String"; textField.text = self.settings.usPrivacyString; break;
-                case 2: {
+                case 0: {
+                    cell.textLabel.text = @"Hashed User ID";
+                    textField.text = self.settings.hashedUserId;
+                    
+                    // Store reference to this text field
+                    self.hashedUserIdTextField = textField;
+                    
+                    // Add a small "Apply" button to the right of the text field
+                    UIButton *applyButton = [UIButton buttonWithType:UIButtonTypeSystem];
+                    [applyButton setTitle:@"Apply" forState:UIControlStateNormal];
+                    applyButton.frame = CGRectMake(0, 0, 55, 30);
+                    [applyButton addTarget:self action:@selector(applyHashedUserId:) forControlEvents:UIControlEventTouchUpInside];
+                    cell.accessoryView = applyButton;
+                    
+                    // Adjust text field frame to make room for the button
+                    textField.frame = CGRectMake(150, 7, cell.contentView.bounds.size.width - 220, 30);
+                    break;
+                }
+                case 1: cell.textLabel.text = @"Consent String"; textField.text = self.settings.consentString; break;
+                case 2: cell.textLabel.text = @"US Privacy String"; textField.text = self.settings.usPrivacyString; break;
+                case 3: {
                     cell.textLabel.text = @"User Targeting";
                     UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectZero];
                     toggle.on = self.settings.userTargeting;
@@ -178,6 +197,32 @@
             break;
     }
     return cell;
+}
+
+- (void)applyHashedUserId:(UIButton *)sender {
+    // Get the current text from the stored text field reference
+    NSString *hashedUserId = self.hashedUserIdTextField.text;
+    
+    // Save it to settings and apply to SDK (allow empty/nil to clear)
+    self.settings.hashedUserId = hashedUserId;
+    [[CloudXCore shared] setHashedUserID:hashedUserId];
+    
+    // Dismiss keyboard if it's showing
+    [self.hashedUserIdTextField resignFirstResponder];
+    
+    // Show confirmation alert
+    NSString *message;
+    if (hashedUserId && hashedUserId.length > 0) {
+        message = [NSString stringWithFormat:@"Hashed User ID updated to:\n%@", hashedUserId];
+    } else {
+        message = @"Hashed User ID cleared";
+    }
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Applied"
+                                                                   message:message
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)userTargetingSwitchChanged:(UISwitch *)sender {
