@@ -350,13 +350,9 @@ NS_ASSUME_NONNULL_BEGIN
     } else {
         [self.logger info:[NSString stringWithFormat:@"[%@] Waterfall exhausted (no fill) - propagating to delegate", self.currentCorrelationId]];
         
-        // Use the original bid error if available (preserves detailed server messages)
-        // Otherwise, create a generic NO_FILL error
-        NSError *errorToReport = self.lastBidError;
-        if (!errorToReport) {
-            errorToReport = [CLXError errorWithCode:CLXErrorCodeNoFill 
-                                         description:@"No ad available - waterfall exhausted"];
-        }
+        // Convert internal BidAdSource errors to public CLXError domain
+        NSString *message = self.lastBidError.localizedDescription ?: @"No ad available - waterfall exhausted";
+        NSError *errorToReport = [CLXError errorWithCode:CLXErrorCodeNoFill description:message];
         
         [self failToLoadBanner:nil error:errorToReport];
     }
@@ -602,9 +598,13 @@ NS_ASSUME_NONNULL_BEGIN
     self.isReady = NO;
     self.isLoading = NO;
     
-    // Use the error as-is to preserve detailed server messages
-    // No longer wrap bid source errors in generic error messages
+    // Convert internal BidAdSource errors to public CLXError domain
     NSError *delegateError = error;
+    if (error && [error.domain isEqualToString:@"CLXBidAdSource"]) {
+        // Preserve detailed message but use public error domain
+        NSString *message = error.localizedDescription ?: @"Ad failed to load";
+        delegateError = [CLXError errorWithCode:CLXErrorCodeNoFill description:message];
+    }
     
     // Start timer for next refresh interval (no banner-level retry)
     [self.logger debug:@"Starting timer for next refresh interval..."];

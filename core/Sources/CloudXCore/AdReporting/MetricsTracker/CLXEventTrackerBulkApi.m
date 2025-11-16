@@ -46,14 +46,27 @@
     [self.logger debug:[NSString stringWithFormat:@"Sending %lu metrics events to %@", 
                        (unsigned long)items.count, endpointUrl]];
     
-    // Convert items to JSON array
+    // Convert items to JSON array with URL encoding
     NSMutableArray *jsonArray = [NSMutableArray arrayWithCapacity:items.count];
     for (CLXEventAM *item in items) {
-        [jsonArray addObject:[item toDictionary]];
+        NSDictionary *itemDict = [item toDictionary];
+        
+        // URL-encode campaignId and impression
+        NSString *encodedCampaignId = [self _urlEncode:itemDict[@"campaignId"]];
+        NSString *encodedImpression = [self _urlEncode:itemDict[@"impression"]];
+        
+        NSMutableDictionary *encodedDict = [itemDict mutableCopy];
+        encodedDict[@"campaignId"] = encodedCampaignId ?: itemDict[@"campaignId"];
+        encodedDict[@"impression"] = encodedImpression ?: itemDict[@"impression"];
+        
+        [jsonArray addObject:encodedDict];
     }
     
+    // Wrap in "items" object
+    NSDictionary *requestPayload = @{@"items": jsonArray};
+    
     NSError *jsonError;
-    NSData *requestBody = [NSJSONSerialization dataWithJSONObject:jsonArray options:0 error:&jsonError];
+    NSData *requestBody = [NSJSONSerialization dataWithJSONObject:requestPayload options:NSJSONWritingPrettyPrinted error:&jsonError];
     if (jsonError) {
         [self.logger error:[NSString stringWithFormat:@"JSON serialization failed: %@", jsonError.localizedDescription]];
         if (completion) {
@@ -61,6 +74,10 @@
         }
         return;
     }
+    
+    // Log payload for debugging
+    NSString *payloadString = [[NSString alloc] initWithData:requestBody encoding:NSUTF8StringEncoding];
+    [self.logger debug:[NSString stringWithFormat:@"Metrics payload JSON: %@", payloadString]];
     
     // Create request
     NSURL *url = [NSURL URLWithString:endpointUrl];
@@ -98,6 +115,12 @@
             NSString *errorMessage = [NSString stringWithFormat:@"HTTP %ld", (long)statusCode];
             [self.logger error:[NSString stringWithFormat:@"HTTP error: %@", errorMessage]];
             
+            // Log response body for debugging
+            if (data) {
+                NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                [self.logger error:[NSString stringWithFormat:@"Server response: %@", responseString]];
+            }
+            
             NSError *httpError = [CLXError errorWithCode:CLXErrorCodeNetworkError description:errorMessage];
             if (completion) {
                 completion(NO, httpError);
@@ -106,6 +129,21 @@
     }];
     
     [task resume];
+}
+
+- (NSString *)_urlEncode:(NSString *)string {
+    if (!string) {
+        return nil;
+    }
+    
+    // Create character set that matches RFC 1738 (application/x-www-form-urlencoded)
+    NSMutableCharacterSet *allowedCharacters = [[NSCharacterSet alphanumericCharacterSet] mutableCopy];
+    [allowedCharacters addCharactersInString:@"-_.*"];
+    
+    // Percent encode everything else (including = which becomes %3D)
+    NSString *encoded = [string stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacters];
+    
+    return encoded;
 }
 
 @end

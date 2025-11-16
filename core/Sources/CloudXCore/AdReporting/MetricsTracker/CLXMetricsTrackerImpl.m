@@ -56,8 +56,16 @@
 }
 
 - (void)dealloc {
-    // Synchronously stop without using dispatch queue to avoid crashes
-    [self _stopPeriodicSending];
+    // Capture timer reference and invalidate asynchronously on main thread
+    // This is safe because NSTimer is thread-safe for invalidation
+    NSTimer *timer = _sendTimer;
+    _sendTimer = nil;
+    
+    if (timer) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [timer invalidate];
+        });
+    }
 }
 
 #pragma mark - CLXMetricsTrackerProtocol
@@ -70,10 +78,10 @@
             return;
         }
         
-        // Use impressionTrackerURL for metrics like Android uses trackingEndpointUrl
+        // Use impressionTrackerURL for metrics
         NSString *metricsURL = config.impressionTrackerURL ?: config.metricsEndpointURL;
         if (metricsURL && metricsURL.length > 0) {
-            self.endpoint = [NSString stringWithFormat:@"%@/bulk?debug=true", metricsURL];
+            self.endpoint = [NSString stringWithFormat:@"%@/bulk", metricsURL];
         } else {
             self.endpoint = nil;
             [self.logger info:@"No impression tracker or metrics endpoint URL provided, metrics sending disabled"];
@@ -142,14 +150,10 @@
 }
 
 - (void)stop {
-    if (self.metricsQueue) {
-        dispatch_async(self.metricsQueue, ^{
-            [self _stopPeriodicSending];
-        });
-    } else {
-        // Fallback for cases where queue is not available
+    // Stop timer on main thread since that's where it was created
+    dispatch_async(dispatch_get_main_queue(), ^{
         [self _stopPeriodicSending];
-    }
+    });
 }
 
 #pragma mark - Private Methods
@@ -186,18 +190,27 @@
         return;
     }
     
-    // Use weak reference to avoid retain cycle
-    __weak typeof(self) weakSelf = self;
-    self.sendTimer = [NSTimer scheduledTimerWithTimeInterval:self.sendIntervalSeconds
-                                                     repeats:YES
-                                                       block:^(NSTimer * _Nonnull timer) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (strongSelf) {
-            [strongSelf _sendPendingMetrics];
-        } else {
-            [timer invalidate];
-        }
-    }];
+    // Create timer on the main thread's run loop
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __weak typeof(self) weakSelf = self;
+        self.sendTimer = [NSTimer scheduledTimerWithTimeInterval:self.sendIntervalSeconds
+                                                         repeats:YES
+                                                           block:^(NSTimer * _Nonnull timer) {
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (!strongSelf) {
+                [timer invalidate];
+                return;
+            }
+            // Dispatch back to the metrics queue for thread-safe metric sending
+            dispatch_async(strongSelf.metricsQueue, ^{
+                __strong typeof(weakSelf) innerStrongSelf = weakSelf;
+                if (innerStrongSelf) {
+                    [innerStrongSelf _sendPendingMetrics];
+                }
+            });
+        }];
+        [self.logger debug:[NSString stringWithFormat:@"Metrics timer started - will fire every %ld seconds", (long)self.sendIntervalSeconds]];
+    });
 }
 
 - (void)_stopPeriodicSending {
