@@ -13,10 +13,9 @@ Pod::Spec.new do |s|
   
   # Dependencies
   s.dependency 'CloudXCore', '1.2.0-rc.1'
-  s.dependency 'VungleAds', '~> 7.4.0'
+  s.dependency 'VungleAds', '~> 7.2'
   
   s.frameworks = ['AVFoundation', 'AudioToolbox', 'CFNetwork', 'CoreGraphics', 'CoreMedia', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']
-  s.libraries = 'swiftCompatibilityConcurrency'
   
   s.requires_arc = true
   s.static_framework = true
@@ -26,7 +25,7 @@ Pod::Spec.new do |s|
   }
   
   s.user_target_xcconfig = {
-    'OTHER_LDFLAGS' => '-ObjC -lswiftCompatibilityConcurrency'
+    'OTHER_LDFLAGS' => '-ObjC'
   }
   
   s.swift_versions = ['5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9', '6.0', '6.1', '6.2']
