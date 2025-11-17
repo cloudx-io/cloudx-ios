@@ -6,7 +6,7 @@
 
 @interface InitInternalViewController ()
 @property (nonatomic, assign) BOOL isSDKInitialized;
-@property (nonatomic, strong) UIButton *initButton;
+@property (nonatomic, strong) UIButton *initializationButton;
 @end
 
 @implementation InitInternalViewController
@@ -15,7 +15,7 @@
     [super viewDidLoad];
     self.title = @"ObjC Demo";
     
-    [self setupInitButton];
+    [self setupInitializationButton];
     
     self.isSDKInitialized = NO;
     [self updateStatusUIWithState:AdStateNoAd];
@@ -30,27 +30,27 @@
     [self.navigationController setNavigationBarHidden:NO animated:animated];
 }
 
-- (void)setupInitButton {
-    // Create init button
-    self.initButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [self.initButton setTitle:@"Init SDK" forState:UIControlStateNormal];
-    [self.initButton addTarget:self action:@selector(initializeSDK) forControlEvents:UIControlEventTouchUpInside];
+- (void)setupInitializationButton {
+    // Create initialization button
+    self.initializationButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [self.initializationButton setTitle:@"Initialize SDK" forState:UIControlStateNormal];
+    [self.initializationButton addTarget:self action:@selector(initializeSDK) forControlEvents:UIControlEventTouchUpInside];
     
     // Style the button
-    self.initButton.backgroundColor = [UIColor systemBlueColor];
-    [self.initButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    self.initButton.layer.cornerRadius = 8;
-    self.initButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
-    self.initButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.initializationButton.backgroundColor = [UIColor systemBlueColor];
+    [self.initializationButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    self.initializationButton.layer.cornerRadius = 8;
+    self.initializationButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    self.initializationButton.translatesAutoresizingMaskIntoConstraints = NO;
     
-    [self.view addSubview:self.initButton];
+    [self.view addSubview:self.initializationButton];
     
     // Add constraints
     [NSLayoutConstraint activateConstraints:@[
-        [self.initButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
-        [self.initButton.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor],
-        [self.initButton.widthAnchor constraintEqualToConstant:200],
-        [self.initButton.heightAnchor constraintEqualToConstant:44]
+        [self.initializationButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [self.initializationButton.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor],
+        [self.initializationButton.widthAnchor constraintEqualToConstant:200],
+        [self.initializationButton.heightAnchor constraintEqualToConstant:44]
     ]];
 }
 
@@ -61,7 +61,7 @@
     }
     
     [self updateStatusUIWithState:AdStateLoading];
-    self.initButton.enabled = NO;
+    self.initializationButton.enabled = NO;
     
     CLXDemoConfig *config = [[CLXDemoConfigManager sharedManager] currentConfig];
     
@@ -85,7 +85,7 @@
                 NSString *errorMessage = error ? error.localizedDescription : @"Unknown error occurred";
                 [self showAlertWithTitle:@"SDK Init Failed" message:errorMessage];
                 [self updateStatusUIWithState:AdStateNoAd];
-                self.initButton.enabled = YES;
+                self.initializationButton.enabled = YES;
                 [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ SDK init failed: %@", errorMessage]];
             }
         });
