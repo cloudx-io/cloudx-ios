@@ -1,49 +1,63 @@
 PODS:
-  - CloudXCore (1.2.0)
-  - CloudXMetaAdapter (1.2.0):
-    - CloudXCore (~> 1.2)
-    - FBAudienceNetwork (~> 6.20)
-  - CloudXRenderer (1.2.0):
-    - CloudXCore (~> 1.2)
-  - FBAudienceNetwork (6.21.0)
+  - CloudXCore (1.2.0-rc.1)
+  - CloudXMetaAdapter (1.2.0-rc.1):
+    - CloudXCore (= 1.2.0-rc.1)
+    - FBAudienceNetwork (~> 6.20.1)
+  - CloudXRenderer (1.2.0-rc.1):
+    - CloudXCore (= 1.2.0-rc.1)
+  - CloudXVungleAdapter (1.2.0-rc.1):
+    - CloudXCore (= 1.2.0-rc.1)
+    - VungleAds (~> 7.4.0)
+  - FBAudienceNetwork (6.20.1)
+  - VungleAds (7.4.5)
 
 DEPENDENCIES:
-  - CloudXCore (from `https://github.com/cloudx-io/cloudx-ios.git`, tag `v1.2.0-core`)
-  - CloudXMetaAdapter (from `https://github.com/cloudx-io/cloudx-ios.git`, tag `v1.2.0-meta`)
-  - CloudXRenderer (from `https://github.com/cloudx-io/cloudx-ios.git`, tag `v1.2.0-renderer`)
+  - CloudXCore (from `https://github.com/cloudx-io/cloudx-ios.git`, tag `v1.2.0-rc.1-core`)
+  - CloudXMetaAdapter (from `https://github.com/cloudx-io/cloudx-ios.git`, tag `v1.2.0-rc.1-meta`)
+  - CloudXRenderer (from `https://github.com/cloudx-io/cloudx-ios.git`, tag `v1.2.0-rc.1-renderer`)
+  - CloudXVungleAdapter (from `https://github.com/cloudx-io/cloudx-ios.git`, tag `v1.2.0-rc.1-vungle`)
 
 SPEC REPOS:
   trunk:
     - FBAudienceNetwork
+    - VungleAds
 
 EXTERNAL SOURCES:
   CloudXCore:
     :git: https://github.com/cloudx-io/cloudx-ios.git
-    :tag: v1.2.0-core
+    :tag: v1.2.0-rc.1-core
   CloudXMetaAdapter:
     :git: https://github.com/cloudx-io/cloudx-ios.git
-    :tag: v1.2.0-meta
+    :tag: v1.2.0-rc.1-meta
   CloudXRenderer:
     :git: https://github.com/cloudx-io/cloudx-ios.git
-    :tag: v1.2.0-renderer
+    :tag: v1.2.0-rc.1-renderer
+  CloudXVungleAdapter:
+    :git: https://github.com/cloudx-io/cloudx-ios.git
+    :tag: v1.2.0-rc.1-vungle
 
 CHECKOUT OPTIONS:
   CloudXCore:
     :git: https://github.com/cloudx-io/cloudx-ios.git
-    :tag: v1.2.0-core
+    :tag: v1.2.0-rc.1-core
   CloudXMetaAdapter:
     :git: https://github.com/cloudx-io/cloudx-ios.git
-    :tag: v1.2.0-meta
+    :tag: v1.2.0-rc.1-meta
   CloudXRenderer:
     :git: https://github.com/cloudx-io/cloudx-ios.git
-    :tag: v1.2.0-renderer
+    :tag: v1.2.0-rc.1-renderer
+  CloudXVungleAdapter:
+    :git: https://github.com/cloudx-io/cloudx-ios.git
+    :tag: v1.2.0-rc.1-vungle
 
 SPEC CHECKSUMS:
-  CloudXCore: 4af74deb889c2d2cf72d5eba674cecfea2047441
-  CloudXMetaAdapter: 85bc21c99d319581f7d7060d55691759e054e442
-  CloudXRenderer: 5b0c8d06722b717046eb84c1807700064bde14f7
-  FBAudienceNetwork: f4ab9e073ab98c884dbdb5ffe7c861272b380bc2
+  CloudXCore: af071f8163abb71fade55a423d8f4172ddac7d44
+  CloudXMetaAdapter: 0796916ac478de8e4bb22b210a59d51f8f849449
+  CloudXRenderer: 00e80217cce9bdf106b8dc1f12a882d40334cc3e
+  CloudXVungleAdapter: fc946e94c9def56403d0d10301984b41de894604
+  FBAudienceNetwork: 08e86d63a05b3a5a59414af12e4af8d756943c80
+  VungleAds: 1da221690dd1a8710d0b6a4c7aeac14cb12d31ab
 
-PODFILE CHECKSUM: efa93063f85d23dbd3ee7e444bdaae2027f1675a
+PODFILE CHECKSUM: b08a63b9cf6c74633e400157bef8dcfc8dcc3ab5
 
 COCOAPODS: 1.16.2
