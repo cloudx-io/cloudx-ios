@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-meta/CloudXMetaAdapter.xcframework'
   
   # Dependencies
-  s.dependency 'CloudXCore', '~> 1.2'
+  s.dependency 'CloudXCore', '1.2.0-rc.1'
   s.dependency 'FBAudienceNetwork', '~> 6.20'
   
   s.frameworks = ['AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit']

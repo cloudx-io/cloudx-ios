@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'renderer-cloudx/CloudXRenderer.xcframework'
   
   # Dependencies
-  s.dependency 'CloudXCore', '~> 1.2'
+  s.dependency 'CloudXCore', '1.2.0-rc.1'
   
   s.frameworks = ['Foundation', 'UIKit', 'WebKit', 'AVFoundation', 'AVKit']
   s.weak_frameworks = ['SafariServices']
