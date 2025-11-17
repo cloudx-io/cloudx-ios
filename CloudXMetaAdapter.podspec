@@ -17,6 +17,7 @@ Pod::Spec.new do |s|
   
   s.frameworks = ['AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit']
   s.weak_frameworks = ['Combine', 'CryptoKit', 'SafariServices', 'SwiftUI', 'WebKit']
+  s.libraries = 'swiftCompatibilityConcurrency'
   
   s.requires_arc = true
   s.static_framework = true

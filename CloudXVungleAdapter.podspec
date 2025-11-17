@@ -16,6 +16,7 @@ Pod::Spec.new do |s|
   s.dependency 'VungleAds', '~> 7.4.0'
   
   s.frameworks = ['AVFoundation', 'AudioToolbox', 'CFNetwork', 'CoreGraphics', 'CoreMedia', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']
+  s.libraries = 'swiftCompatibilityConcurrency'
   
   s.requires_arc = true
   s.static_framework = true
