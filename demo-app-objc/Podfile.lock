@@ -2,14 +2,14 @@ PODS:
   - CloudXCore (1.2.0-rc.1)
   - CloudXMetaAdapter (1.2.0-rc.1):
     - CloudXCore (= 1.2.0-rc.1)
-    - FBAudienceNetwork (~> 6.20)
+    - FBAudienceNetwork (~> 6.20.1)
   - CloudXRenderer (1.2.0-rc.1):
     - CloudXCore (= 1.2.0-rc.1)
   - CloudXVungleAdapter (1.2.0-rc.1):
     - CloudXCore (= 1.2.0-rc.1)
-    - VungleAds (~> 7.4.0)
-  - FBAudienceNetwork (6.21.0)
-  - VungleAds (7.4.5)
+    - VungleAds (~> 7.2.1)
+  - FBAudienceNetwork (6.20.1)
+  - VungleAds (7.2.2)
 
 DEPENDENCIES:
   - CloudXCore (from `https://github.com/cloudx-io/cloudx-ios.git`, tag `v1.2.0-rc.1-core`)
@@ -51,12 +51,12 @@ CHECKOUT OPTIONS:
     :tag: v1.2.0-rc.1-vungle
 
 SPEC CHECKSUMS:
-  CloudXCore: 3f09adecf445914c3ea36df06091834de6702bae
-  CloudXMetaAdapter: 7dfde1327d6eb17a20e25b154d0839975aaf4fe0
-  CloudXRenderer: 02d0b2002185d2b6f5be01a4a6d390daedce3ca5
-  CloudXVungleAdapter: 467ffa84276d3c2b53aba413546e1bf5021b609d
-  FBAudienceNetwork: f4ab9e073ab98c884dbdb5ffe7c861272b380bc2
-  VungleAds: 1da221690dd1a8710d0b6a4c7aeac14cb12d31ab
+  CloudXCore: af071f8163abb71fade55a423d8f4172ddac7d44
+  CloudXMetaAdapter: 0796916ac478de8e4bb22b210a59d51f8f849449
+  CloudXRenderer: 00e80217cce9bdf106b8dc1f12a882d40334cc3e
+  CloudXVungleAdapter: bfaf92c08d3944aff1cddde517fb71ae814b6bb5
+  FBAudienceNetwork: 08e86d63a05b3a5a59414af12e4af8d756943c80
+  VungleAds: 1982548185a43a60f07066f28ddb5f12d67a90d7
 
 PODFILE CHECKSUM: 2c2bcbcd8d4e22f2ef82a6fe9a83184281cd34b8
 
