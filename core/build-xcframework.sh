@@ -123,7 +123,12 @@ IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   -configuration Release \
   SKIP_INSTALL=NO \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-  CODE_SIGNING_ALLOWED=NO | tee xcodebuild-ios.log
+  CODE_SIGNING_ALLOWED=NO \
+  DEBUG_INFORMATION_FORMAT=dwarf \
+  DEPLOYMENT_POSTPROCESSING=YES \
+  STRIP_INSTALLED_PRODUCT=YES \
+  STRIP_STYLE=non-global \
+  COPY_PHASE_STRIP=YES | tee xcodebuild-ios.log
 print_success "iOS device build completed"
 
 # Build for iOS Simulator
@@ -136,7 +141,12 @@ IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   -configuration Release \
   SKIP_INSTALL=NO \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-  CODE_SIGNING_ALLOWED=NO | tee xcodebuild-sim.log
+  CODE_SIGNING_ALLOWED=NO \
+  DEBUG_INFORMATION_FORMAT=dwarf \
+  DEPLOYMENT_POSTPROCESSING=YES \
+  STRIP_INSTALLED_PRODUCT=YES \
+  STRIP_STYLE=non-global \
+  COPY_PHASE_STRIP=YES | tee xcodebuild-sim.log
 print_success "iOS simulator build completed"
 
 # Create XCFramework
@@ -147,29 +157,9 @@ xcodebuild -create-xcframework \
   -output "$OUTPUT_XCFRAMEWORK"
 print_success "XCFramework created: $OUTPUT_XCFRAMEWORK"
 
-# Upload dSYMs to Sentry
-if [ "$SKIP_SENTRY" = false ]; then
-    print_step "🕵️  Uploading dSYMs to Sentry..."
-    sentry-cli releases new "$RELEASE_NAME" || true
-    sentry-cli debug-files upload "$ARCHIVE_DIR/ios_devices.xcarchive/dSYMs" || print_warning "Device dSYM upload failed"
-    sentry-cli debug-files upload "$ARCHIVE_DIR/ios_simulator.xcarchive/dSYMs" || print_warning "Simulator dSYM upload failed"
-    sentry-cli releases finalize "$RELEASE_NAME" || true
-    print_success "dSYMs uploaded to Sentry"
-else
-    print_warning "Skipping Sentry dSYM upload"
-fi
-
-# Strip debug symbols from xcframework
-print_step "🔪 Stripping debug symbols from .xcframework..."
-find "$OUTPUT_XCFRAMEWORK" -name "*.framework" | while read FRAMEWORK; do
-    BINARY_NAME=$(basename "$FRAMEWORK" .framework)
-    BINARY_PATH="$FRAMEWORK/$BINARY_NAME"
-    if [ -f "$BINARY_PATH" ]; then
-        echo "  Stripping: $BINARY_PATH"
-        strip -x "$BINARY_PATH"
-    fi
-done
-print_success "Debug symbols stripped"
+# Note: dSYM generation disabled - no debug symbols to upload or strip
+print_step "ℹ️  Debug symbols disabled (no dSYMs generated)"
+print_success "Framework built without debug symbols"
 
 # Zip the xcframework
 print_step "📦 Zipping .xcframework..."

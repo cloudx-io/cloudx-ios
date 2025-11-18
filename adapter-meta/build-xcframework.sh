@@ -46,6 +46,11 @@ xcodebuild archive \
   CODE_SIGNING_ALLOWED=NO \
   MACH_O_TYPE=staticlib \
   IPHONEOS_DEPLOYMENT_TARGET=14.0 \
+  DEBUG_INFORMATION_FORMAT=dwarf \
+  DEPLOYMENT_POSTPROCESSING=YES \
+  STRIP_INSTALLED_PRODUCT=YES \
+  STRIP_STYLE=non-global \
+  COPY_PHASE_STRIP=YES \
   HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMetaAdapter $(SRCROOT)/Sources/CloudXMetaAdapter/Base $(SRCROOT)/Sources/CloudXMetaAdapter/Banner $(SRCROOT)/Sources/CloudXMetaAdapter/Initializers $(SRCROOT)/Sources/CloudXMetaAdapter/Interstitial $(SRCROOT)/Sources/CloudXMetaAdapter/Native $(SRCROOT)/Sources/CloudXMetaAdapter/Rewarded $(SRCROOT)/Sources/CloudXMetaAdapter/Utils' \
   USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMetaAdapter $(SRCROOT)/Sources/CloudXMetaAdapter/Base $(SRCROOT)/Sources/CloudXMetaAdapter/Banner $(SRCROOT)/Sources/CloudXMetaAdapter/Initializers $(SRCROOT)/Sources/CloudXMetaAdapter/Interstitial $(SRCROOT)/Sources/CloudXMetaAdapter/Native $(SRCROOT)/Sources/CloudXMetaAdapter/Rewarded $(SRCROOT)/Sources/CloudXMetaAdapter/Utils' 2>&1 | tee xcodebuild-ios.log || print_error "Failed to build static framework for device."
 
@@ -62,6 +67,11 @@ xcodebuild archive \
   CODE_SIGNING_ALLOWED=NO \
   MACH_O_TYPE=staticlib \
   IPHONEOS_DEPLOYMENT_TARGET=14.0 \
+  DEBUG_INFORMATION_FORMAT=dwarf \
+  DEPLOYMENT_POSTPROCESSING=YES \
+  STRIP_INSTALLED_PRODUCT=YES \
+  STRIP_STYLE=non-global \
+  COPY_PHASE_STRIP=YES \
   HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMetaAdapter $(SRCROOT)/Sources/CloudXMetaAdapter/Base $(SRCROOT)/Sources/CloudXMetaAdapter/Banner $(SRCROOT)/Sources/CloudXMetaAdapter/Initializers $(SRCROOT)/Sources/CloudXMetaAdapter/Interstitial $(SRCROOT)/Sources/CloudXMetaAdapter/Native $(SRCROOT)/Sources/CloudXMetaAdapter/Rewarded $(SRCROOT)/Sources/CloudXMetaAdapter/Utils' \
   USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMetaAdapter $(SRCROOT)/Sources/CloudXMetaAdapter/Base $(SRCROOT)/Sources/CloudXMetaAdapter/Banner $(SRCROOT)/Sources/CloudXMetaAdapter/Initializers $(SRCROOT)/Sources/CloudXMetaAdapter/Interstitial $(SRCROOT)/Sources/CloudXMetaAdapter/Native $(SRCROOT)/Sources/CloudXMetaAdapter/Rewarded $(SRCROOT)/Sources/CloudXMetaAdapter/Utils' 2>&1 | tee xcodebuild-sim.log || print_error "Failed to build static framework for simulator."
 
