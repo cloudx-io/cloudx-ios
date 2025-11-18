@@ -185,12 +185,8 @@ static void initializeLogger() {
 #pragma mark - CLXAdapterBannerDelegate
 
 - (void)didLoadBanner:(id<CLXAdapterBanner>)banner {
-    [logger debug:@"[CloudXBannerAdView] didLoadBanner called"];
-    
     UIView *bannerView = banner.bannerView;
     if (bannerView) {
-        [logger debug:@"[CloudXBannerAdView] Adding banner view to view hierarchy"];
-        
         bannerView.userInteractionEnabled = YES;
         [self addSubview:bannerView];
         
@@ -198,21 +194,16 @@ static void initializeLogger() {
         // Category default guarantees method exists - no need for respondsToSelector check
         BOOL isFlexible = [banner isFlexibleSize];
         
-        [logger debug:[NSString stringWithFormat:@"[CloudXBannerAdView] Banner isFlexible: %d, size: %.0fx%.0f", 
-                      isFlexible, bannerView.bounds.size.width, bannerView.bounds.size.height]];
-        
         if (isFlexible) {
             // Flexible banner - stretch to fill container
             bannerView.frame = self.bounds;
             bannerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-            [logger debug:@"[CloudXBannerAdView] Flexible banner - stretching to container"];
         } else {
             // Fixed-size banner - center it
             CGSize bannerSize = bannerView.bounds.size;
             CGFloat x = (self.bounds.size.width - bannerSize.width) / 2.0;
             CGFloat y = (self.bounds.size.height - bannerSize.height) / 2.0;
             bannerView.frame = CGRectMake(x, y, bannerSize.width, bannerSize.height);
-            [logger debug:[NSString stringWithFormat:@"[CloudXBannerAdView] Fixed-size banner - centering at x=%.0f", x]];
         }
         
         // Force layout update
@@ -274,8 +265,6 @@ static void initializeLogger() {
 #pragma mark - BaseAdDelegate
 
 - (void)didLoadWithAd:(CLXAd *)ad {
-    [logger debug:@"[CloudXBannerAdView] didLoadWithAd called - displaying banner"];
-    
     // Store the ad object for use in other delegate methods
     // This fixes the unsafe cast bug and enables proper ad metadata access
     _ad = ad;
@@ -291,8 +280,6 @@ static void initializeLogger() {
         }
         
         if (currentBanner && currentBanner.bannerView) {
-            [logger debug:@"[CloudXBannerAdView] Found banner view, adding to hierarchy"];
-            
             // Remove any existing banner views to prevent duplicates
             for (UIView *subview in [self.subviews copy]) {
                 [subview removeFromSuperview];
@@ -306,24 +293,16 @@ static void initializeLogger() {
             // Category default guarantees method exists - no need for respondsToSelector check
             BOOL isFlexible = [currentBanner isFlexibleSize];
             
-            [logger debug:[NSString stringWithFormat:@"[CloudXBannerAdView] currentBanner class: %@, isFlexibleSize: %d", 
-                          [currentBanner class], isFlexible]];
-            [logger debug:[NSString stringWithFormat:@"[CloudXBannerAdView] Banner size: %.0fx%.0f, will %@", 
-                          bannerView.bounds.size.width, bannerView.bounds.size.height,
-                          isFlexible ? @"stretch to container" : @"center in container"]];
-            
             if (isFlexible) {
                 // Flexible banner - stretch to fill container
                 bannerView.frame = self.bounds;
                 bannerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-                [logger debug:@"[CloudXBannerAdView] Flexible banner - stretching to container"];
             } else {
                 // Fixed-size banner - center it
                 CGSize bannerSize = bannerView.bounds.size;
                 CGFloat x = (self.bounds.size.width - bannerSize.width) / 2.0;
                 CGFloat y = (self.bounds.size.height - bannerSize.height) / 2.0;
                 bannerView.frame = CGRectMake(x, y, bannerSize.width, bannerSize.height);
-                [logger debug:[NSString stringWithFormat:@"[CloudXBannerAdView] Fixed-size banner - centering at x=%.0f", x]];
             }
             
             // Force layout update
