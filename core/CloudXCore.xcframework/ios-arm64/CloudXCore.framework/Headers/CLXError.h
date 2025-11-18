@@ -164,4 +164,17 @@ extern NSString * const CLXErrorDomain;
 
 @end
 
+/**
+ * NSError category for enhanced error message formatting
+ */
+@interface NSError (CLXErrorFormatting)
+
+/**
+ * Returns a comprehensive error message including both localizedDescription and localizedFailureReason
+ * @return Combined error message with server details if available
+ */
+- (NSString *)clx_fullErrorMessage;
+
+@end
+
 NS_ASSUME_NONNULL_END

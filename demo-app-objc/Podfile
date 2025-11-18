@@ -1,22 +1,18 @@
-source 'https://cdn.cocoapods.org/'
-
-# Uncomment the next line to define a global platform for your project
-platform :ios, '14.0'
+platform :ios, '15.0'
 
 target 'CloudXObjCRemotePods' do
-  # Pods for CloudXObjCRemotePods - Remote installation from public repo
-  # This demonstrates how external developers would install CloudX from GitHub
-  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-core'
-  pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-renderer'
-  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-meta'
+  use_frameworks! :linkage => :static
+
+  # Release Candidate v1.2.0-rc.1 - Install from GitHub releases
+  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-rc.1-core'
+  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-rc.1-meta'
+  pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-rc.1-renderer'
+  pod 'CloudXVungleAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-rc.1-vungle'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths
-    # Pods for testing
   end
 
   target 'CloudXObjCRemotePodsUITests' do
-    # Pods for testing
   end
-
 end

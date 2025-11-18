@@ -45,15 +45,15 @@
     if (self) {
         // Production Configuration
         _currentConfig = [[CLXDemoConfig alloc]
-            initWithAppKey:@"xcQftcBSUmqzuv1LfET2o"
-            hashedUserId:@"test-user-123"
-            bannerPlacement:@"swift-demo-banner-1"
-            mrecPlacement:@"swift-demo-mrec-1"
-            interstitialPlacement:@"swift-demo-interstitial-1"
-            nativePlacement:@"metaNative"
-            nativeBannerPlacement:@"metaNative"
-            rewardedPlacement:@"metaRewarded"
-            rewardedInterstitialPlacement:@"metaRewarded"];
+            initWithAppKey:@"ihtOXvp3X9JlMQ5p0_RYL"
+            hashedUserId:@"prod-user-123"
+            bannerPlacement:@"demo-banner-1"
+            mrecPlacement:@"demo-mrec-1"
+            interstitialPlacement:@"demo-interstitial-1"
+            nativePlacement:@"-"
+            nativeBannerPlacement:@"-"
+            rewardedPlacement:@"-"
+            rewardedInterstitialPlacement:@"-"];
     }
     return self;
 }

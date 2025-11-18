@@ -239,6 +239,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)deinitialize;
 
+#pragma mark - Adapter Readiness (Internal)
+
+/**
+ * Check if a specific adapter has completed initialization
+ * @param adapterName The name of the adapter (e.g., "meta", "vungle")
+ * @return YES if the adapter is ready, NO otherwise
+ * @discussion Internal API used by bid request logic to avoid race conditions during SDK initialization
+ */
+- (BOOL)isAdapterReady:(NSString *)adapterName;
+
 @end
 
 NS_ASSUME_NONNULL_END
