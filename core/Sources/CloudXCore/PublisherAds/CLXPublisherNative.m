@@ -208,7 +208,7 @@ NS_ASSUME_NONNULL_BEGIN
         if (!strongSelf) return;
         
         if (error) {
-            [strongSelf.logger error:[NSString stringWithFormat:@"[%@] Bid request failed: %@", strongSelf.currentCorrelationId, error.localizedDescription]];
+            [strongSelf.logger error:[NSString stringWithFormat:@"[%@] Bid request failed: %@", strongSelf.currentCorrelationId, error.clx_fullErrorMessage]];
             
             // Implement waterfall backoff delay logic
             NSError *backoffError;

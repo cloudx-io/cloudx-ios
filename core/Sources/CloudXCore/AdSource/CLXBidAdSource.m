@@ -18,6 +18,7 @@
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXWinLossTracker.h>
 #import <CloudXCore/CLXBidLifecycleEvent.h>
+#import <CloudXCore/CloudXCore.h>
 
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBidNetworkService.h>
@@ -456,8 +457,17 @@ NS_ASSUME_NONNULL_BEGIN
     dispatch_group_t group = dispatch_group_create();
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     
+    // Get ready adapters from CloudXCore
+    CloudXCore *core = [CloudXCore shared];
+    
     for (NSString *adapterName in self.bidTokenSources.allKeys) {
         id<CLXBidTokenSource> tokenSource = self.bidTokenSources[adapterName];
+        
+        // Check if adapter is ready before requesting token
+        if (![core isAdapterReady:adapterName]) {
+            [self.logger info:[NSString stringWithFormat:@"⏳ Skipping token request for %@ - adapter not ready yet (still initializing)", adapterName]];
+            continue;
+        }
         
         dispatch_group_enter(group);
         [tokenSource getTokenWithCompletion:^(NSDictionary<NSString *,NSString *> * _Nullable token, NSError * _Nullable error) {

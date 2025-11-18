@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXPrebidAdapter'
-  s.version = '1.2.0'
+  s.version = '1.2.0-rc.1'
   s.summary = 'CloudX Prebid Adapter for in-house demand sources'
   s.description = 'Prebid adapter for CloudX iOS SDK for rendering ad markup from CloudX demand sources'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'

@@ -60,7 +60,7 @@
             if (![CLXMolocoInitializer isInitialized]) {
                 NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed
                                              description:@"Moloco SDK not initialized"];
-                [self.logger error:@"Cannot generate token - SDK not initialized"];
+                [self.logger error:@"Cannot generate token - Moloco SDK not initialized. This may occur if Moloco has not been configured for this app in the CloudX dashboard. Please verify your Moloco adapter configuration includes a valid app_key."];
                 if (completion) completion(nil, error);
                 return;
             }

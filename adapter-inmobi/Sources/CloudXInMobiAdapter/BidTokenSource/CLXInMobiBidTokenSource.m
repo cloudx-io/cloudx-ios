@@ -53,7 +53,7 @@
         @try {
             // Check if InMobi SDK is initialized
             if (![IMSdk isSDKInitialized]) {
-                [self.logger error:@"InMobi SDK not initialized"];
+                [self.logger error:@"InMobi SDK not initialized. This may occur if InMobi has not been configured for this app in the CloudX dashboard. Please verify your InMobi adapter configuration includes a valid account_id."];
                 
                 NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
                                              description:@"InMobi SDK not initialized"];

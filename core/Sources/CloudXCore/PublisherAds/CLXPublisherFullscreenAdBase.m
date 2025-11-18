@@ -8,7 +8,6 @@
  */
 
 #import <CloudXCore/CLXPublisherFullscreenAdBase.h>
-
 #import <CloudXCore/CLXAdapterInterstitial.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXAdapterRewarded.h>
@@ -32,6 +31,7 @@
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXAdType.h>
 #import <CloudXCore/CLXAd.h>
+#import <CloudXCore/CloudXCoreAPI.h>
 #import <objc/runtime.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -82,6 +82,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 @property (nonatomic, strong) CLXConfigImpressionModel *impModel;
 @property (nonatomic, strong) id<CLXWinLossTracking> winLossTracker;
 
+// Queued load request handling (for SDK init race condition)
+@property (nonatomic, assign) BOOL hasPendingLoadRequest;
+
 @end
 
 @implementation CLXPublisherFullscreenAdBase
@@ -120,9 +123,16 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         _impModel = impModel;
         _forceCloseEventDelay = 30.0;
         _closeEventReceived = NO;
+        _hasPendingLoadRequest = NO;
         
         // Initialize Analytics tracking service
         _rillTrackingService = [[CLXRillTrackingService alloc] initWithReportingService:_reportingService];
+        
+        // Listen for SDK initialization completion (internal notification)
+        [[NSNotificationCenter defaultCenter] addObserver:self 
+                                                 selector:@selector(handleSDKInitialized:) 
+                                                     name:@"CLXSDKInitializedNotification" 
+                                                   object:nil];
         
         // Initialize win/loss tracker
         _winLossTracker = [CLXWinLossTracker shared];
@@ -185,6 +195,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)destroy {
     [self.logger debug:[NSString stringWithFormat:@"Destroying fullscreen ad for placement: %@", self.placementID]];
     
+    // Remove notification observer
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"CLXSDKInitializedNotification" object:nil];
+    
     // Set state to destroyed
     self.currentState = CLXFullscreenAdStateDESTROYED;
     
@@ -197,6 +210,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 - (void)dealloc {
     [self.logger debug:[NSString stringWithFormat:@"Deallocating fullscreen ad for placement: %@", _placementID]];
+    
+    // Remove notification observer
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"CLXSDKInitializedNotification" object:nil];
     
     // Clean up current adapter
     id currentAdapter = [self getCurrentAdapter];
@@ -211,6 +227,37 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 #pragma mark - Public Methods
 
 - (void)load {
+    // Check if SDK is initialized
+    if (![[CloudXCore shared] isInitialized]) {
+        [self.logger info:[NSString stringWithFormat:@"SDK not yet initialized, queuing load request for placement: %@", self.placementID]];
+        self.hasPendingLoadRequest = YES;
+        return;
+    }
+    
+    // SDK is ready, proceed with load
+    [self performLoad];
+}
+
+// Internal method to actually perform the load operation
+- (void)performLoad {
+    // Check if we need to look up the real placement config (temporary config has empty ID)
+    if ([self.placementID length] == 0 && [[CloudXCore shared] isInitialized]) {
+        // SDK is now initialized - look up the real placement config
+        NSDictionary *adPlacements = [[CloudXCore shared] valueForKey:@"adPlacements"];
+        CLXSDKConfigPlacement *realPlacement = adPlacements[self.placementName];
+        if (realPlacement) {
+            [self.logger debug:[NSString stringWithFormat:@"Updating placement config for: %@ (ID: %@)", self.placementName, realPlacement.id]];
+            _placementID = realPlacement.id;
+        } else {
+            [self.logger error:[NSString stringWithFormat:@"Placement not found after SDK init: %@", self.placementName]];
+            NSError *error = [NSError errorWithDomain:@"CLXErrorDomain"
+                                                code:-1
+                                            userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Placement not found: %@", self.placementName]}];
+            [self handleBidResponse:nil error:error];
+            return;
+        }
+    }
+    
     // Generate correlation ID for this ad load request
     self.currentCorrelationId = [[NSUUID UUID] UUIDString];
     
@@ -249,6 +296,15 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     }];
 }
 
+// Handle SDK initialization notification
+- (void)handleSDKInitialized:(NSNotification *)notification {
+    if (self.hasPendingLoadRequest) {
+        [self.logger info:[NSString stringWithFormat:@"SDK initialized, executing queued load request for placement: %@", self.placementID]];
+        self.hasPendingLoadRequest = NO;
+        [self performLoad];
+    }
+}
+
 - (void)showFromViewController:(UIViewController *)viewController {
     [self.logger debug:[NSString stringWithFormat:@"showFromViewController called - Ready: %d, State: %ld", self.isReady, (long)self.currentState]];
     
@@ -256,7 +312,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     if (self.currentState != CLXFullscreenAdStateREADY) {
         [self.logger error:[NSString stringWithFormat:@"Cannot show ad - invalid state: %ld", (long)self.currentState]];
         NSError *error = [NSError errorWithDomain:@"CLXErrorDomain" 
-                                             code:CLXErrorCodeNoFill 
+                                             code:CLXErrorCodeAdNotReady 
                                          userInfo:@{NSLocalizedDescriptionKey: @"Ad not ready"}];
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -348,7 +404,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 - (void)handleBidResponse:(CLXBidAdSourceResponse *)response error:(NSError *)error {
     if (error) {
-        [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherFullscreenAd] Bid request failed: %@", self.currentCorrelationId, error.localizedDescription]];
+        [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherFullscreenAd] Bid request failed: %@", self.currentCorrelationId, error.clx_fullErrorMessage]];
         
         // Transition back to idle
         self.currentState = CLXFullscreenAdStateIDLE;
@@ -367,7 +423,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     if (!adapter) {
         [self.logger error:@"Failed to create adapter from bid response"];
         [self handleBidResponse:nil error:[NSError errorWithDomain:@"CLXErrorDomain" 
-                                                              code:CLXErrorCodeNoFill 
+                                                              code:CLXErrorCodeLoadFailed 
                                                           userInfo:@{NSLocalizedDescriptionKey: @"Failed to create adapter"}]];
         return;
     }

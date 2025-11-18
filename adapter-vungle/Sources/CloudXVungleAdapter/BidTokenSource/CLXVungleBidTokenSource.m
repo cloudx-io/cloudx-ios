@@ -67,7 +67,7 @@
                 NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
                                              description:@"Vungle SDK not initialized"];
                 
-                [self.logger error:@"Cannot generate bid token - Vungle SDK not initialized"];
+                [self.logger error:@"Cannot generate bid token - Vungle SDK not initialized. This may occur if Vungle has not been configured for this app in the CloudX dashboard. Please verify your Vungle adapter configuration includes a valid app_id."];
                 if (completion) {
                     completion(nil, error);
                 }
@@ -115,7 +115,7 @@
 - (nullable NSString *)getBiddingTokenSync {
     // Check if Vungle SDK is initialized
     if (![VungleAds isInitialized]) {
-        [self.logger error:@"Cannot generate bid token - Vungle SDK not initialized"];
+        [self.logger error:@"Cannot generate bid token - Vungle SDK not initialized. This may occur if Vungle has not been configured for this app in the CloudX dashboard. Please verify your Vungle adapter configuration includes a valid app_id."];
         return nil;
     }
     

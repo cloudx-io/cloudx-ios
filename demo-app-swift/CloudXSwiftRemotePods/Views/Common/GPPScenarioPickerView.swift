@@ -236,6 +236,8 @@ class GPPScenarioPickerView: UIView {
     }
     
     /// Dynamically determine SID based on actual CloudFront geo location
+    /// Real CMPs set SIDs based on what sections are in the GPP string, not geo-location
+    /// For demo purposes, we use geo to auto-select the appropriate test scenario
     private func dynamicGPPSid() -> [Int] {
         let geoService = CLXGeoLocationService.shared()
         let isCalifornia = geoService.isCaliforniaUser()
@@ -248,8 +250,10 @@ class GPPScenarioPickerView: UIView {
             DemoAppLogger.sharedInstance.logMessage("📍 Detected US (non-CA) → Using SID 7 (US-National)")
             return [7]  // US-National
         } else {
-            DemoAppLogger.sharedInstance.logMessage("📍 Detected Non-US → Using empty SID array")
-            return []   // Non-US regions
+            // Real CMPs would not set GPP for non-US regions, or would set appropriate EU sections
+            // For demo: don't set GPP at all for non-US (return nil marker)
+            DemoAppLogger.sharedInstance.logMessage("📍 Detected Non-US → GPP should not be set for this region")
+            return [-1]   // Special marker: don't set GPP
         }
     }
     
@@ -265,35 +269,66 @@ class GPPScenarioPickerView: UIView {
             
         case .ccpaConsent:
             DemoAppLogger.sharedInstance.logMessage("🧪 GPP Scenario: CCPA Consent (Allow All) - AUTO-DETECTING LOCATION")
-            setIABGPPString("DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA")
-            setIABGPPSid(dynamicGPPSid())  // Dynamic based on real location
+            let sidConsent = dynamicGPPSid()
+            if sidConsent.first != -1 {
+                setIABGPPString("DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA")
+                setIABGPPSid(sidConsent)
+            } else {
+                DemoAppLogger.sharedInstance.logMessage("⚠️ Non-US region: GPP not set (real CMPs wouldn't set US privacy for non-US users)")
+            }
             
         case .ccpaOptOut:
             DemoAppLogger.sharedInstance.logMessage("🧪 GPP Scenario: CCPA Opt-Out (Disallow All) - AUTO-DETECTING LOCATION")
-            setIABGPPString("DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA")
-            setIABGPPSid(dynamicGPPSid())  // Dynamic based on real location
+            let sidOptOut = dynamicGPPSid()
+            if sidOptOut.first != -1 {
+                setIABGPPString("DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA")
+                setIABGPPSid(sidOptOut)
+                CloudXCore.setCCPAPrivacyString("1YNN")  // Legacy CCPA string: Y = opt-out
+            } else {
+                DemoAppLogger.sharedInstance.logMessage("⚠️ Non-US region: GPP not set (real CMPs wouldn't set US privacy for non-US users)")
+            }
             
         case .nonUS:
             DemoAppLogger.sharedInstance.logMessage("🧪 GPP Scenario: Non-US (Allow All) - AUTO-DETECTING LOCATION")
-            setIABGPPString("DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA")
-            setIABGPPSid(dynamicGPPSid())  // Dynamic based on real location
+            let sidNonUS = dynamicGPPSid()
+            if sidNonUS.first != -1 {
+                setIABGPPString("DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA")
+                setIABGPPSid(sidNonUS)
+            } else {
+                DemoAppLogger.sharedInstance.logMessage("⚠️ Non-US region detected: GPP not set (simulating real CMP behavior)")
+            }
             
         case .usNonCalifornia:
             DemoAppLogger.sharedInstance.logMessage("🧪 GPP Scenario: US Non-California - AUTO-DETECTING LOCATION")
-            setIABGPPString("DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA")
-            setIABGPPSid(dynamicGPPSid())  // Dynamic based on real location
+            let sidUSNonCA = dynamicGPPSid()
+            if sidUSNonCA.first != -1 {
+                setIABGPPString("DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA")
+                setIABGPPSid(sidUSNonCA)
+            } else {
+                DemoAppLogger.sharedInstance.logMessage("⚠️ Non-US region: GPP not set (real CMPs wouldn't set US privacy for non-US users)")
+            }
             
         case .coppaFlagged:
             DemoAppLogger.sharedInstance.logMessage("🧪 GPP Scenario: COPPA Flagged - AUTO-DETECTING LOCATION")
             CloudXCore.setIsAgeRestrictedUser(true)
-            setIABGPPString("DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA")
-            setIABGPPSid(dynamicGPPSid())  // Dynamic based on real location
+            let sidCoppa = dynamicGPPSid()
+            if sidCoppa.first != -1 {
+                setIABGPPString("DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA")
+                setIABGPPSid(sidCoppa)
+            } else {
+                DemoAppLogger.sharedInstance.logMessage("⚠️ Non-US region: GPP not set (real CMPs wouldn't set US privacy for non-US users)")
+            }
             
         case .coppaWithConsent:
             DemoAppLogger.sharedInstance.logMessage("🧪 GPP Scenario: COPPA + GPP Consent - AUTO-DETECTING LOCATION")
             CloudXCore.setIsAgeRestrictedUser(true)
-            setIABGPPString("DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA")
-            setIABGPPSid(dynamicGPPSid())  // Dynamic based on real location
+            let sidCoppaConsent = dynamicGPPSid()
+            if sidCoppaConsent.first != -1 {
+                setIABGPPString("DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA")
+                setIABGPPSid(sidCoppaConsent)
+            } else {
+                DemoAppLogger.sharedInstance.logMessage("⚠️ Non-US region: GPP not set (real CMPs wouldn't set US privacy for non-US users)")
+            }
             
         case .attDenied:
             DemoAppLogger.sharedInstance.logMessage("🧪 GPP Scenario: ATT Denied (real geo data from CloudFront API)")

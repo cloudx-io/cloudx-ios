@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXCore'
-  s.version          = '1.2.0'
+  s.version = '1.2.0-rc.1'
   s.summary          = 'CloudX Core Framework'
   s.description      = 'Core framework for CloudX functionality - local development version'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   # Local development - no git source needed
   s.source           = { :path => '.' }
   
-  s.ios.deployment_target = '14.0'
+  s.ios.deployment_target = '15.0'
   
   # Source files for local development - relative to this podspec location
   s.source_files = 'Sources/CloudXCore/**/*.{h,m}'

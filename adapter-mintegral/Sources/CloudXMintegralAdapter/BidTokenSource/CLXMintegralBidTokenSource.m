@@ -45,7 +45,7 @@
             if (![CLXMintegralInitializer isInitialized]) {
                 NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed
                                              description:@"Mintegral SDK not initialized"];
-                [self.logger error:@"Cannot generate token - Mintegral SDK not initialized"];
+                [self.logger error:@"Cannot generate token - Mintegral SDK not initialized. This may occur if Mintegral has not been configured for this app in the CloudX dashboard. Please verify your Mintegral adapter configuration includes a valid app_id."];
                 if (completion) completion(nil, error);
                 return;
             }

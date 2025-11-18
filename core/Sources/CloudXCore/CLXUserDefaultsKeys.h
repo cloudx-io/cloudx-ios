@@ -82,10 +82,12 @@ NS_ASSUME_NONNULL_BEGIN
 // Additional configuration keys
 #define kCLXCoreIfaConfigKey @"CLXCore_ifa_config"
 
-// Privacy service keys (already properly prefixed)
-#define kCLXPrivacyGDPRConsentKey @"CLXPrivacyGDPRConsent"
-#define kCLXPrivacyCCPAPrivacyKey @"CLXPrivacyCCPAPrivacy"
-#define kCLXPrivacyGDPRAppliesKey @"CLXPrivacyGDPRApplies"
+// Privacy service keys
+// IAB standard keys for CMP compatibility (GDPR TCF, CCPA/US Privacy)
+#define kCLXPrivacyGDPRConsentKey @"IABTCF_TCString"
+#define kCLXPrivacyCCPAPrivacyKey @"IABUSPrivacy_String"
+#define kCLXPrivacyGDPRAppliesKey @"IABTCF_gdprApplies"
+// COPPA is SDK-specific (not IAB standard), stored in UserDefaults with CloudX prefix
 #define kCLXPrivacyCOPPAAppliesKey @"CLXPrivacyCOPPAApplies"
 #define kCLXPrivacyHashedUserIdKey @"CLXPrivacy_hashedUserID"
 #define kCLXPrivacyHashedGeoIpKey @"CLXPrivacyHashedGeoIp"

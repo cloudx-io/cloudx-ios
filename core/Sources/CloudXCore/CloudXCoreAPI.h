@@ -43,8 +43,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) NSString *sdkVersion;
 
-
-
+/**
+ * Indicates whether the SDK has completed initialization
+ */
+@property (nonatomic, readonly) BOOL isInitialized;
 
 /**
  * Initialize the SDK to start serving ads
@@ -238,6 +240,16 @@ NS_ASSUME_NONNULL_BEGIN
  * After calling this, you can reinitialize the SDK if needed.
  */
 - (void)deinitialize;
+
+#pragma mark - Adapter Readiness (Internal)
+
+/**
+ * Check if a specific adapter has completed initialization
+ * @param adapterName The name of the adapter (e.g., "meta", "vungle")
+ * @return YES if the adapter is ready, NO otherwise
+ * @discussion Internal API used by bid request logic to avoid race conditions during SDK initialization
+ */
+- (BOOL)isAdapterReady:(NSString *)adapterName;
 
 @end
 

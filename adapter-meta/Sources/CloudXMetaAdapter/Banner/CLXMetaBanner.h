@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL timeout;
 @property (nonatomic, strong, nullable) FBAdView *bannerView;
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
+@property (nonatomic, assign, readonly) BOOL isFlexibleSize;
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
 
 - (instancetype)initWithBidPayload:(NSString *)bidPayload

@@ -60,6 +60,12 @@
 #import <CloudXCore/CLXPublisherBanner.h>
 #import <CloudXCore/CLXPublisherNative.h>
 #import <CloudXCore/CLXRewarded.h>
+#import <CloudXCore/CLXBiddingConfig.h>
+#import <CloudXCore/CLXSettings.h>
+#import <CloudXCore/CLXPrivacyService.h>
+
+// Internal notification name for SDK initialization completion
+static NSString * const CLXSDKInitializedNotification = @"CLXSDKInitializedNotification";
 
 @interface CloudXCore ()
 @property (nonatomic, strong) id<CLXInitService> initService;
@@ -79,6 +85,7 @@
 @property (nonatomic, strong) CLXAppSessionService *appSessionService;
 @property (nonatomic, strong) CLXBidNetworkServiceClass *bidNetworkService;
 @property (nonatomic, strong) CLXAdNetworkFactories *adNetworkFactories;
+@property (nonatomic, strong) NSMutableSet<NSString *> *readyAdapters;
 @end
 
 static CloudXCore *_sharedInstance = nil;
@@ -135,6 +142,7 @@ static CloudXCore *_sharedInstance = nil;
         _abTestName = @"RandomTest";
         // Default auction URL now comes from SDK response only
         _defaultAuctionURL = @"";
+        _readyAdapters = [NSMutableSet set];
         
         [self.logger info:[NSString stringWithFormat:@"Instance initialized - AB Test: %@ (%.3f), Default URL: %@", _abTestName, _abTestValue, _defaultAuctionURL]];
     }
@@ -292,6 +300,11 @@ static CloudXCore *_sharedInstance = nil;
             [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsDictKey];
         }
         
+        // Create bid request for SDK init tracking to populate bidRequest.* fields
+        NSDictionary *sdkInitBidRequest = [self createSDKInitBidRequestWithAuctionId:auctionID impModel:impModel];
+        [[CLXTrackingFieldResolver shared] setRequestData:auctionID bidRequestJSON:sdkInitBidRequest];
+        [self.logger debug:[NSString stringWithFormat:@"Created bid request for SDK init tracking - Auction ID: %@", auctionID]];
+        
         CLXRillImpressionModel *model = [[CLXRillImpressionModel alloc] initWithLastBidResponse:nil impModel:impModel adapterName:@"" loadBannerTimesCount:0 placementID:@""];
         
         NSString* encodedString = [CLXRillImpressionInitService createDataStringWithRillImpressionModel:model];
@@ -370,6 +383,7 @@ static CloudXCore *_sharedInstance = nil;
             [initializer initializeWithConfig:bidderConfig completion:^(BOOL success, NSError * _Nullable error) {
                 if (success) {
                     [self.logger info:[NSString stringWithFormat:@"Successfully initialized network: %@", mappedNetworkName]];
+                    [self markAdapterReady:mappedNetworkName];
                 } else {
                     [self.logger error:[NSString stringWithFormat:@"Failed to initialize network: %@ - %@", mappedNetworkName, error.localizedDescription]];
                 }
@@ -465,6 +479,9 @@ static CloudXCore *_sharedInstance = nil;
     // Mark as initialized
     _isInitialized = YES;
     
+    // Post internal notification for ad objects to resume queued operations
+    [[NSNotificationCenter defaultCenter] postNotificationName:CLXSDKInitializedNotification object:nil];
+    
     // Track initialization metrics
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
@@ -491,6 +508,45 @@ static CloudXCore *_sharedInstance = nil;
     
     if (completion) {
         completion(YES, nil);
+    }
+}
+
+#pragma mark - Adapter Readiness Tracking
+
+/**
+ * Check if a specific adapter has reported ready status
+ * @param adapterName The name of the adapter (e.g., "meta", "vungle")
+ * @return YES if the adapter is ready, NO otherwise
+ */
+- (BOOL)isAdapterReady:(NSString *)adapterName {
+    @synchronized(self.readyAdapters) {
+        return [self.readyAdapters containsObject:adapterName];
+    }
+}
+
+/**
+ * Mark an adapter as ready for use
+ * @param adapterName The name of the adapter (e.g., "meta", "vungle")
+ */
+- (void)markAdapterReady:(NSString *)adapterName {
+    @synchronized(self.readyAdapters) {
+        if (![self.readyAdapters containsObject:adapterName]) {
+            [self.readyAdapters addObject:adapterName];
+            [self.logger debug:[NSString stringWithFormat:@"[AdapterReadiness] %@ is now ready (%lu/%lu adapters ready)", 
+                adapterName, 
+                (unsigned long)self.readyAdapters.count,
+                (unsigned long)_adNetworkFactories.bidTokenSources.count]];
+        }
+    }
+}
+
+/**
+ * Get the names of all adapters that are ready
+ * @return Set of ready adapter names
+ */
+- (NSSet<NSString *> *)getReadyAdapters {
+    @synchronized(self.readyAdapters) {
+        return [self.readyAdapters copy];
     }
 }
 
@@ -624,11 +680,22 @@ static CloudXCore *_sharedInstance = nil;
         return nil;
     }
     
-    // Get placement from config
+    // Get placement from config (may be nil if SDK not initialized yet)
     CLXSDKConfigPlacement *placementConfig = _adPlacements[placement];
-    if (!placementConfig) {
+    if (!placementConfig && _isInitialized) {
+        // SDK is initialized but placement not found - this is an error
         [self.logger error:[NSString stringWithFormat:@"Placement not found: %@", placement]];
         return nil;
+    }
+    
+    if (!placementConfig) {
+        // SDK not initialized yet - create temporary placement config
+        // Banner will wait for SDK init and look up real placement when load() is called
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - creating banner with temporary config for placement: %@", placement]];
+        placementConfig = [[CLXSDKConfigPlacement alloc] init];
+        placementConfig.name = placement;
+        placementConfig.id = @""; // Will be populated after SDK init
+        placementConfig.bannerRefreshRateMs = @(30000); // Default 30s refresh
     }
     
     // Generate unique auction ID for this banner impression
@@ -671,11 +738,21 @@ static CloudXCore *_sharedInstance = nil;
         return nil;
     }
     
-    // Get placement from config
+    // Get placement from config (may be nil if SDK not initialized yet)
     CLXSDKConfigPlacement *placementConfig = _adPlacements[placement];
-    if (!placementConfig) {
+    if (!placementConfig && _isInitialized) {
+        // SDK is initialized but placement not found - this is an error
         [self.logger error:[NSString stringWithFormat:@"Placement not found: %@", placement]];
         return nil;
+    }
+    
+    if (!placementConfig) {
+        // SDK not initialized yet - create temporary placement config
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - creating MREC with temporary config for placement: %@", placement]];
+        placementConfig = [[CLXSDKConfigPlacement alloc] init];
+        placementConfig.name = placement;
+        placementConfig.id = @"";
+        placementConfig.bannerRefreshRateMs = @(30000);
     }
     
     // Generate unique auction ID for this MREC impression
@@ -717,11 +794,20 @@ static CloudXCore *_sharedInstance = nil;
         return nil;
     }
     
-    // Get placement from config
+    // Get placement from config (may be nil if SDK not initialized yet)
     CLXSDKConfigPlacement *placementConfig = _adPlacements[placement];
-    if (!placementConfig) {
+    if (!placementConfig && _isInitialized) {
+        // SDK is initialized but placement not found - this is an error
         [self.logger error:[NSString stringWithFormat:@"Placement not found: %@", placement]];
         return nil;
+    }
+    
+    if (!placementConfig) {
+        // SDK not initialized yet - create temporary placement config
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - creating interstitial with temporary config for placement: %@", placement]];
+        placementConfig = [[CLXSDKConfigPlacement alloc] init];
+        placementConfig.name = placement;
+        placementConfig.id = @"";
     }
     
     // Generate unique auction ID for this interstitial impression
@@ -759,11 +845,20 @@ static CloudXCore *_sharedInstance = nil;
         return nil;
     }
     
-    // Get placement from config
+    // Get placement from config (may be nil if SDK not initialized yet)
     CLXSDKConfigPlacement *placementConfig = _adPlacements[placement];
-    if (!placementConfig) {
+    if (!placementConfig && _isInitialized) {
+        // SDK is initialized but placement not found - this is an error
         [self.logger error:[NSString stringWithFormat:@"Placement not found: %@", placement]];
         return nil;
+    }
+    
+    if (!placementConfig) {
+        // SDK not initialized yet - create temporary placement config
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - creating rewarded ad with temporary config for placement: %@", placement]];
+        placementConfig = [[CLXSDKConfigPlacement alloc] init];
+        placementConfig.name = placement;
+        placementConfig.id = @"";
     }
     
     // Generate unique auction ID for this rewarded impression
@@ -995,6 +1090,43 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 #pragma mark - SDK Lifecycle
+
+/**
+ * Creates a minimal bid request for SDK init tracking
+ * This ensures bidRequest.* fields are populated in the tracking payload
+ */
+- (NSDictionary *)createSDKInitBidRequestWithAuctionId:(NSString *)auctionId impModel:(CLXConfigImpressionModel *)impModel {
+    // Create a minimal bid request for SDK init (similar to Android's approach)
+    // Use empty/minimal values for ad-specific fields since this is not an actual ad request
+    CLXBiddingConfigRequest *bidRequest = [[CLXBiddingConfigRequest alloc] initWithAdType:CLXAdTypeBanner
+                                                                                 adUnitID:@""
+                                                                       storedImpressionId:@""
+                                                                                   dealID:@""
+                                                                                 bidFloor:@0
+                                                                          displayManager:[CLXSystemInformation shared].displayManager ?: @""
+                                                                      displayManagerVer:[CLXSystemInformation shared].sdkVersion ?: @""
+                                                                             publisherID:@""
+                                                                                location:nil
+                                                                               userAgent:nil
+                                                                             adapterInfo:@{}
+                                                                   nativeAdRequirements:nil
+                                                                   skadRequestParameters:nil
+                                                                                   tmax:nil
+                                                                               impModel:impModel
+                                                                               settings:[CLXSettings sharedInstance]
+                                                                         privacyService:[CLXPrivacyService sharedInstance]];
+    
+    // Override the request ID with the auction ID for tracking
+    bidRequest.requestID = auctionId;
+    
+    // Convert to JSON
+    NSMutableDictionary *bidRequestJSON = [[bidRequest json] mutableCopy];
+    
+    // Set empty imp array for SDK init (no actual ad request)
+    bidRequestJSON[@"imp"] = @[];
+    
+    return [bidRequestJSON copy];
+}
 
 - (void)deinitialize {
     [self.logger info:@"Deinitializing SDK"];

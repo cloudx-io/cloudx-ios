@@ -38,6 +38,7 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 
 #import <CloudXCore/CLXXorEncryption.h>
+#import <CloudXCore/CloudXCoreAPI.h>
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
@@ -97,6 +98,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) CLXAppSessionService *appSessionService;
 @property (nonatomic, strong) id<CLXWinLossTracking> winLossTracker;
 
+// Queued load request handling (for SDK init race condition)
+@property (nonatomic, assign) BOOL hasPendingLoadRequest;
+
 @end
 
 @implementation CLXPublisherBanner
@@ -145,9 +149,16 @@ NS_ASSUME_NONNULL_BEGIN
         _forceStop = NO;
         _successWin = NO;
         _autoRefreshEnabled = YES; // Auto-refresh is enabled by default
+        _hasPendingLoadRequest = NO;
         // Note: Loop-index now managed by CLXPlacementLoopIndexTracker (per-placement)
         // Initialize Analytics tracking service
         _rillTrackingService = [[CLXRillTrackingService alloc] initWithReportingService:reportingService];
+        
+        // Listen for SDK initialization completion (internal notification)
+        [[NSNotificationCenter defaultCenter] addObserver:self 
+                                                 selector:@selector(handleSDKInitialized:) 
+                                                     name:@"CLXSDKInitializedNotification" 
+                                                   object:nil];
         
         // Initialize win/loss tracker
         _winLossTracker = [CLXWinLossTracker shared];
@@ -207,6 +218,45 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - CloudXBanner Protocol
 
 - (void)load {
+    // Check if SDK is initialized
+    if (![[CloudXCore shared] isInitialized]) {
+        [self.logger info:[NSString stringWithFormat:@"SDK not yet initialized, queuing load request for placement: %@", self.placementID]];
+        self.hasPendingLoadRequest = YES;
+        return;
+    }
+    
+    // SDK is ready, proceed with load
+    [self performLoad];
+}
+
+// Internal method to actually perform the load operation
+- (void)performLoad {
+    // Check if we need to look up the real placement config (temporary config has empty ID)
+    if ([self.placementID length] == 0 && [[CloudXCore shared] isInitialized]) {
+        // SDK is now initialized - look up the real placement config
+        NSDictionary *adPlacements = [[CloudXCore shared] valueForKey:@"adPlacements"];
+        CLXSDKConfigPlacement *realPlacement = adPlacements[self.placementName];
+        if (realPlacement) {
+            [self.logger debug:[NSString stringWithFormat:@"Updating placement config for: %@ (ID: %@)", self.placementName, realPlacement.id]];
+            self.placement = realPlacement;
+            self.placementID = realPlacement.id;
+            self.dealID = realPlacement.dealId;
+            self.refreshSeconds = (realPlacement.bannerRefreshRateMs ?: 30000) / 1000.0;
+            self.placementSuffix = realPlacement.firstImpressionPlacementSuffix ?: @"";
+            self.impressionIndexStart = realPlacement.firstImpressionLoopIndexStart ?: 0;
+            self.impressionIndexEnd = realPlacement.firstImpressionLoopIndexEnd ?: 0;
+        } else {
+            [self.logger error:[NSString stringWithFormat:@"Placement not found after SDK init: %@", self.placementName]];
+            if (self.delegate && [self.delegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
+                NSError *error = [NSError errorWithDomain:@"CLXErrorDomain"
+                                                    code:-1
+                                                userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Placement not found: %@", self.placementName]}];
+                [self.delegate failToLoadWithAd:self error:error];
+            }
+            return;
+        }
+    }
+    
     // Generate correlation ID for this ad load request
     self.currentCorrelationId = [[NSUUID UUID] UUIDString];
     
@@ -234,6 +284,15 @@ NS_ASSUME_NONNULL_BEGIN
     
     // Implement async banner update request
     [self requestBannerUpdate];
+}
+
+// Handle SDK initialization notification
+- (void)handleSDKInitialized:(NSNotification *)notification {
+    if (self.hasPendingLoadRequest) {
+        [self.logger info:[NSString stringWithFormat:@"SDK initialized, executing queued load request for placement: %@", self.placementID]];
+        self.hasPendingLoadRequest = NO;
+        [self performLoad];
+    }
 }
 
 #pragma mark - Private Methods
@@ -268,7 +327,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.logger debug:[NSString stringWithFormat:@"[%@] Bid request completion - Response: %@, Error: %@", strongSelf.currentCorrelationId, response ? @"YES" : @"NO", error ? error.localizedDescription : @"None"]];
 
         if (error) {
-            [self.logger error:[NSString stringWithFormat:@"[%@] Bid request failed - %@ (Domain: %@, Code: %ld)", strongSelf.currentCorrelationId, error.localizedDescription, error.domain, (long)error.code]];
+            [self.logger error:[NSString stringWithFormat:@"[%@] Bid request failed - %@ (Domain: %@, Code: %ld)", strongSelf.currentCorrelationId, error.clx_fullErrorMessage, error.domain, (long)error.code]];
             
             // Store the original error to preserve detailed server messages
             strongSelf.lastBidError = error;
@@ -350,9 +409,16 @@ NS_ASSUME_NONNULL_BEGIN
     } else {
         [self.logger info:[NSString stringWithFormat:@"[%@] Waterfall exhausted (no fill) - propagating to delegate", self.currentCorrelationId]];
         
-        // Convert internal BidAdSource errors to public CLXError domain
-        NSString *message = self.lastBidError.localizedDescription ?: @"No ad available - waterfall exhausted";
-        NSError *errorToReport = [CLXError errorWithCode:CLXErrorCodeNoFill description:message];
+        // Preserve original error if available, otherwise create no-fill error
+        NSError *errorToReport;
+        if (self.lastBidError) {
+            // Preserve the original error code and detailed message
+            NSString *message = self.lastBidError.clx_fullErrorMessage;
+            errorToReport = [CLXError errorWithCode:self.lastBidError.code description:message];
+        } else {
+            // No error but no response either - genuine no fill
+            errorToReport = [CLXError errorWithCode:CLXErrorCodeNoFill description:@"No ad available - waterfall exhausted"];
+        }
         
         [self failToLoadBanner:nil error:errorToReport];
     }
@@ -601,9 +667,9 @@ NS_ASSUME_NONNULL_BEGIN
     // Convert internal BidAdSource errors to public CLXError domain
     NSError *delegateError = error;
     if (error && [error.domain isEqualToString:@"CLXBidAdSource"]) {
-        // Preserve detailed message but use public error domain
-        NSString *message = error.localizedDescription ?: @"Ad failed to load";
-        delegateError = [CLXError errorWithCode:CLXErrorCodeNoFill description:message];
+        // Preserve both error code and detailed message
+        NSString *message = error.clx_fullErrorMessage ?: @"Ad failed to load";
+        delegateError = [CLXError errorWithCode:error.code description:message];
     }
     
     // Start timer for next refresh interval (no banner-level retry)
@@ -711,6 +777,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)destroy {
     [self.logger debug:[NSString stringWithFormat:@"Destroying banner for placement: %@", self.placementID]];
+    
+    // Remove notification observer
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"CLXSDKInitializedNotification" object:nil];
     
     self.isDestroyed = YES;
     self.isLoading = NO;

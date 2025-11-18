@@ -92,6 +92,10 @@
     return ready;
 }
 
+- (BOOL)isFlexibleSize {
+    return YES;  // Meta banners are flexible and expand to container width
+}
+
 - (void)load {
     [self.logger debug:[NSString stringWithFormat:@"Loading ad - Placement: %@, HasBidPayload: %@", 
                        _placementID, self.bidPayload ? @"YES" : @"NO"]];

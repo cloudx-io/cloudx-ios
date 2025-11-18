@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   # For local development with :path in Podfile
   s.source = { :path => '.' }
   
-  s.ios.deployment_target = '14.0'
+  s.ios.deployment_target = '15.0'
   
   # LOCAL DEVELOPMENT: Build from source files
   s.source_files = 'Sources/CloudXMolocoAdapter/**/*.{h,m}'

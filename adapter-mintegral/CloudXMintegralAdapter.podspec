@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.authors = { 'CloudX' => 'support@cloudx.com' }
   s.source = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => s.version.to_s }
 
-  s.ios.deployment_target = '14.0'
+  s.ios.deployment_target = '15.0'
   s.source_files = 'Sources/CloudXMintegralAdapter/**/*.{h,m}'
   s.public_header_files = 'Sources/CloudXMintegralAdapter/**/*.h'
   s.resource_bundles = {

@@ -20,11 +20,13 @@
 #   core     = CloudXCore SDK
 #   meta     = CloudXMetaAdapter
 #   renderer = CloudXRenderer
+#   vungle   = CloudXVungleAdapter
 #
 # EXAMPLES:
 #   ./update-version-constant.sh core "X.Y.Z-dev.156+abc1234"
 #   ./update-version-constant.sh meta "X.Y.Z-local+def5678"
 #   ./update-version-constant.sh renderer "X.Y.Z-rc.1+abc1234"
+#   ./update-version-constant.sh vungle "X.Y.Z-rc.1+abc1234"
 #
 # AUTOMATED USAGE:
 #   - Called by GitHub Actions workflows on every push (develop/release)
@@ -68,9 +70,13 @@ case $COMPONENT in
         VERSION_FILE="renderer-cloudx/Sources/CloudXRenderer/CLXRendererVersion.m"
         CONSTANT_NAME="CLXRendererVersion"
         ;;
+    vungle)
+        VERSION_FILE="adapter-vungle/Sources/CloudXVungleAdapter/CLXVungleAdapterVersion.m"
+        CONSTANT_NAME="CLXVungleAdapterVersion"
+        ;;
     *)
         echo "Error: Unknown component '$COMPONENT'" >&2
-        echo "Valid components: core, meta, renderer" >&2
+        echo "Valid components: core, meta, renderer, vungle" >&2
         exit 1
         ;;
 esac

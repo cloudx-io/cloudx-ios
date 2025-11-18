@@ -171,9 +171,14 @@
     // Including GDPR data in bid requests will cause 502 errors
     NSUserDefaults *defaults = self.userDefaults;
     if ([defaults objectForKey:kCLXPrivacyGDPRAppliesKey]) {
-        NSNumber *applies = @([defaults boolForKey:kCLXPrivacyGDPRAppliesKey]);
-        [self.logger debug:[NSString stringWithFormat:@"GDPR applies (INTERNAL): %@", applies]];
-        return applies;
+        // IAB TCF spec requires integer: 0 = does not apply, 1 = applies
+        NSInteger gdprValue = [defaults integerForKey:kCLXPrivacyGDPRAppliesKey];
+        if (gdprValue == 0 || gdprValue == 1) {
+            NSNumber *applies = @(gdprValue);
+            [self.logger debug:[NSString stringWithFormat:@"GDPR applies (INTERNAL): %@", applies]];
+            return applies;
+        }
+        [self.logger warn:[NSString stringWithFormat:@"GDPR applies has invalid value: %ld (expected 0 or 1)", (long)gdprValue]];
     }
     [self.logger debug:@"GDPR applies (INTERNAL): (unknown)"];
     return nil;
@@ -239,7 +244,9 @@
 - (void)setHasUserConsent:(nullable NSNumber *)hasUserConsent {
     [self.logger debug:[NSString stringWithFormat:@"Setting GDPR consent: %@", hasUserConsent ? (hasUserConsent.boolValue ? @"YES" : @"NO") : @"(cleared)"]];
     if (hasUserConsent) {
-        [[NSUserDefaults standardUserDefaults] setBool:[hasUserConsent boolValue] forKey:kCLXPrivacyGDPRAppliesKey];
+        // IAB TCF spec requires integer: 0 = does not apply, 1 = applies
+        NSInteger gdprValue = [hasUserConsent boolValue] ? 1 : 0;
+        [[NSUserDefaults standardUserDefaults] setInteger:gdprValue forKey:kCLXPrivacyGDPRAppliesKey];
     } else {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
     }

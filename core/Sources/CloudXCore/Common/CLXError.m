@@ -200,3 +200,20 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
 }
 
 @end
+
+#pragma mark - NSError (CLXErrorFormatting)
+
+@implementation NSError (CLXErrorFormatting)
+
+- (NSString *)clx_fullErrorMessage {
+    NSString *message = self.localizedDescription ?: @"Unknown error";
+    
+    // Append server details if available
+    if (self.localizedFailureReason && self.localizedFailureReason.length > 0) {
+        return [NSString stringWithFormat:@"%@ - %@", message, self.localizedFailureReason];
+    }
+    
+    return message;
+}
+
+@end

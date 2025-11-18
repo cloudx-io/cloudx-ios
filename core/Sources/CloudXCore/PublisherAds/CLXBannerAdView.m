@@ -79,8 +79,30 @@ static void initializeLogger() {
         if ([_banner respondsToSelector:@selector(setDelegate:)]) {
             [_banner setDelegate:self];
         }
+        
+        // Set content hugging/compression priorities to ensure Auto Layout respects intrinsic size
+        // This allows the view to work with both fixed constraints and flexible constraints
+        [self setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
+        [self setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+        [self setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
+        [self setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
     }
     return self;
+}
+
+#pragma mark - Auto Layout Support
+
+- (CGSize)intrinsicContentSize {
+    // Return the standard ad size based on banner type
+    // This enables Auto Layout to properly size the banner view without
+    // requiring host apps to explicitly set width/height constraints
+    switch (self.adFormat) {
+        case CLXBannerTypeMREC:
+            return CGSizeMake(300, 250);
+        case CLXBannerTypeW320H50:
+        default:
+            return CGSizeMake(320, 50);
+    }
 }
 
 - (void)didMoveToSuperview {
@@ -169,10 +191,29 @@ static void initializeLogger() {
     if (bannerView) {
         [logger debug:@"[CloudXBannerAdView] Adding banner view to view hierarchy"];
         
-        bannerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         bannerView.userInteractionEnabled = YES;
         [self addSubview:bannerView];
-        bannerView.frame = self.bounds;
+        
+        // Check if adapter declares flexible sizing capability
+        // Category default guarantees method exists - no need for respondsToSelector check
+        BOOL isFlexible = [banner isFlexibleSize];
+        
+        [logger debug:[NSString stringWithFormat:@"[CloudXBannerAdView] Banner isFlexible: %d, size: %.0fx%.0f", 
+                      isFlexible, bannerView.bounds.size.width, bannerView.bounds.size.height]];
+        
+        if (isFlexible) {
+            // Flexible banner - stretch to fill container
+            bannerView.frame = self.bounds;
+            bannerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+            [logger debug:@"[CloudXBannerAdView] Flexible banner - stretching to container"];
+        } else {
+            // Fixed-size banner - center it
+            CGSize bannerSize = bannerView.bounds.size;
+            CGFloat x = (self.bounds.size.width - bannerSize.width) / 2.0;
+            CGFloat y = (self.bounds.size.height - bannerSize.height) / 2.0;
+            bannerView.frame = CGRectMake(x, y, bannerSize.width, bannerSize.height);
+            [logger debug:[NSString stringWithFormat:@"[CloudXBannerAdView] Fixed-size banner - centering at x=%.0f", x]];
+        }
         
         // Force layout update
         [self setNeedsLayout];
@@ -258,10 +299,32 @@ static void initializeLogger() {
             }
             
             UIView *bannerView = currentBanner.bannerView;
-            bannerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
             bannerView.userInteractionEnabled = YES;
             [self addSubview:bannerView];
-            bannerView.frame = self.bounds;
+            
+            // Check if adapter declares flexible sizing capability
+            // Category default guarantees method exists - no need for respondsToSelector check
+            BOOL isFlexible = [currentBanner isFlexibleSize];
+            
+            [logger debug:[NSString stringWithFormat:@"[CloudXBannerAdView] currentBanner class: %@, isFlexibleSize: %d", 
+                          [currentBanner class], isFlexible]];
+            [logger debug:[NSString stringWithFormat:@"[CloudXBannerAdView] Banner size: %.0fx%.0f, will %@", 
+                          bannerView.bounds.size.width, bannerView.bounds.size.height,
+                          isFlexible ? @"stretch to container" : @"center in container"]];
+            
+            if (isFlexible) {
+                // Flexible banner - stretch to fill container
+                bannerView.frame = self.bounds;
+                bannerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+                [logger debug:@"[CloudXBannerAdView] Flexible banner - stretching to container"];
+            } else {
+                // Fixed-size banner - center it
+                CGSize bannerSize = bannerView.bounds.size;
+                CGFloat x = (self.bounds.size.width - bannerSize.width) / 2.0;
+                CGFloat y = (self.bounds.size.height - bannerSize.height) / 2.0;
+                bannerView.frame = CGRectMake(x, y, bannerSize.width, bannerSize.height);
+                [logger debug:[NSString stringWithFormat:@"[CloudXBannerAdView] Fixed-size banner - centering at x=%.0f", x]];
+            }
             
             // Force layout update
             [self setNeedsLayout];

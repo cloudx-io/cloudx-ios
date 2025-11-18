@@ -1,13 +1,14 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '14.0'
+platform :ios, '15.0'
 
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
-  # Pods for CloudXObjCRemotePods - LOCAL development with source files
+  # Pods for LOCAL development with source files from private repo
   pod 'CloudXCore', :path => '../core'
-  pod 'CloudXRenderer', :path => '../../cloudx-ios/renderer-cloudx'  # Binary framework from public repo
   pod 'CloudXMetaAdapter', :path => '../adapter-meta'
+  pod 'CloudXRenderer', :path => '../renderer-cloudx'
+  pod 'CloudXVungleAdapter', :path => '../adapter-vungle'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths

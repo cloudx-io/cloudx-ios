@@ -70,6 +70,10 @@
     return [VungleAds sdkVersion] ?: @"unknown";
 }
 
+- (BOOL)isFlexibleSize {
+    return NO;  // Vungle banners are fixed-size and should be centered
+}
+
 - (UIView *)bannerView {
     return self.vungleBannerView;
 }
