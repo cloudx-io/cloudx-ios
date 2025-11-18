@@ -41,6 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
 
+@required
+
 /**
  * Loads the banner.
  */
@@ -52,6 +54,24 @@ NS_ASSUME_NONNULL_BEGIN
 /// Destroys the banner ad.
 - (void)destroy;
 
+@optional
+
+/**
+ * Indicates whether the banner view can dynamically resize to fill its container.
+ * - YES: Banner is flexible and will expand to container width (e.g., Meta banners)
+ * - NO: Banner is fixed-size and should be centered (e.g., Vungle 320x50 banners)
+ * Default implementation returns NO (fixed-size).
+ * @return YES if the banner is flexible, NO if fixed-size
+ */
+- (BOOL)isFlexibleSize;
+
+@end
+
+/**
+ * Category providing default implementation for optional CLXAdapterBanner methods.
+ * This ensures methods are always available even in framework builds.
+ */
+@interface NSObject (CLXAdapterBannerDefaults)
 @end
 
 /**
