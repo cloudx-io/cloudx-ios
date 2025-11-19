@@ -1,70 +1,157 @@
 # CloudX iOS SDK
 
-The CloudX iOS SDK is a comprehensive mobile advertising solution that provides programmatic advertising capabilities for iOS applications. This unified repository contains the complete CloudX iOS SDK ecosystem including the core SDK and various adapter implementations.
+**AI-powered mobile advertising for iOS.** Maximize revenue with intelligent ad optimization and real-time bidding.
 
-## Quick Start
+[![Platform](https://img.shields.io/badge/platform-iOS%2014.0%2B-blue.svg)](https://developer.apple.com/ios/)
+[![CocoaPods](https://img.shields.io/badge/CocoaPods-compatible-green.svg)](https://cocoapods.org)
+[![SPM](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-orange.svg)](https://swift.org/package-manager/)
+[![License](https://img.shields.io/badge/license-BSL%201.1-lightgrey.svg)](LICENSE)
 
-### CocoaPods Installation
+---
+
+## 🚀 Get Started in 30 Seconds
+
+### Install
 
 ```ruby
-platform :ios, '14.0'
-
-target 'YourApp' do
-  use_frameworks!
-  
-  # CloudX SDK 
-  pod 'CloudXSDK', '~> 0.1.0'
-  
-  # Optional: CloudX Adapters (at least one is needed to show ads)
-  pod 'CloudXMetaAdapter', '~> 1.2.0'
-  pod 'CloudXRenderer', '~> 1.2.0'       
-end
+# Add to your Podfile
+pod 'CloudXCore'
 ```
 
-### ⚠️ Important: Xcode 15+ Configuration
-
-**If using CocoaPods with Xcode 15 or later**, you must disable User Script Sandboxing in your Xcode project:
-
-1. Select your project in Xcode
-2. Select your app target  
-3. Go to **Build Settings**
-4. Search for "User Script Sandboxing"
-5. Set **ENABLE_USER_SCRIPT_SANDBOXING** to **No**
-
-This is required for CocoaPods to properly embed dynamic frameworks. This is a standard requirement for all iOS SDKs that use dynamic frameworks (including AppLovin SDK, Firebase, Google Mobile Ads, etc.).
-
-## Components
-
-- **[`core/`](core/README.md)** - CloudXCore framework providing the foundational SDK functionality for programmatic advertising *(binary xcframework distribution)*
-- **[`adapter-meta/`](adapter-meta/README.md)** - CloudXMetaAdapter for Meta Audience Network integration *(binary xcframework distribution)*
-- **[`renderer-cloudx/`](renderer-cloudx/README.md)** - CloudXRenderer for rendering creative content with MRAID support *(binary xcframework distribution)*
-- **[`demo-app-objc/`](demo-app-objc/)** - Complete Objective-C demo application showcasing CloudX SDK integration and usage patterns
-- **[`demo-app-swift/`](demo-app-swift/)** - Complete Swift demo application demonstrating CloudX SDK implementation in Swift projects
-
-For detailed installation instructions and usage examples, please refer to the individual component READMEs linked above.
-
-## Release Strategy
-
-This repository uses **component-specific releases** with **tagged distribution** to provide both organizational clarity and distribution flexibility.
-
-### Component-Specific Releases
-
-- **CloudXCore**: Binary xcframework distribution with tags like `v1.2.0-core`
-- **CloudXMetaAdapter**: Binary xcframework distribution with tags like `v1.2.0-meta`
-- **CloudXRenderer**: Binary xcframework distribution with tags like `v1.2.0-renderer`
-- **Individual Versioning**: Each component maintains its own version to allow independent updates
-- **Clear Release Assets**: Each release provides the appropriate xcframework binary for that component
-
-#### Release Tag Format
-```
-v1.2.0-core      # Core SDK release (binary xcframework)
-v1.2.0-meta      # Meta Adapter release (binary xcframework)
-v1.2.0-renderer  # Renderer release (binary xcframework)
+```bash
+pod install
 ```
 
-#### Distribution Methods
-- **CloudXCore**: Pre-built xcframework for core SDK functionality
-- **CloudXMetaAdapter**: Pre-built xcframework for Meta Audience Network integration
-- **CloudXRenderer**: Pre-built xcframework for creative rendering with MRAID support
-- **CocoaPods Installation**: All components distributed via CocoaPods with git+tag references
+### Initialize & Load
 
+```swift
+import CloudXCore
+
+// 1. Initialize (in AppDelegate)
+CloudXCore.shared.initializeSDK(withAppKey: "YOUR_APP_KEY") { error in
+    print(error == nil ? "Ready!" : "Error: \(error!)")
+}
+
+// 2. Create banner ad (in ViewController)
+let banner = CloudXCore.shared.createBanner(
+    withPlacement: "YOUR_PLACEMENT_ID",
+    viewController: self,
+    delegate: self,
+    tmax: 10.0
+)
+view.addSubview(banner)
+```
+
+**That's it.** You're monetizing.
+
+---
+
+## 📚 Complete Documentation
+
+**Everything you need is in our docs** →
+
+### **[📖 Read the Full iOS Documentation](https://docs.cloudx.io/ios/installation)**
+
+Detailed guides for every step:
+
+- **[Installation Guide](https://docs.cloudx.io/ios/installation)** - Setup, requirements, Info.plist configuration
+- **[Quickstart Guide](https://docs.cloudx.io/ios/quickstart)** - All ad formats with code examples
+- **[Configuration Guide](https://docs.cloudx.io/ios/configuration)** - Privacy, targeting, advanced features
+
+---
+
+## ⚡ Key Features
+
+- **AI-Optimized Yield** - Intelligent ad selection maximizes your revenue
+- **Multiple Ad Formats** - Banner, MREC, interstitial, and rewarded video
+- **Real-Time Bidding** - Server-side header bidding with dynamic optimization
+- **Privacy First** - GDPR, CCPA, COPPA, and ATT compliant out of the box
+- **SwiftUI Ready** - Works seamlessly with UIKit and SwiftUI
+- **Lightning Fast** - Optimized for performance and user experience
+
+---
+
+## ⚠️ Important: Xcode 15+ Setup
+
+**If using CocoaPods with Xcode 15+**, disable User Script Sandboxing:
+
+1. Select your project target
+2. Build Settings → Search "User Script Sandboxing"  
+3. Set **ENABLE_USER_SCRIPT_SANDBOXING** to **No**
+
+This is required for all iOS SDKs using dynamic frameworks.
+
+---
+
+## 📦 Ad Formats
+
+Load any ad format in 3 lines:
+
+```swift
+// Banner (320×50)
+let banner = CloudXCore.shared.createBanner(withPlacement: "...", viewController: self, delegate: self)
+
+// Interstitial
+let interstitial = CloudXCore.shared.createInterstitial(withPlacement: "...", viewController: self, delegate: self)
+
+// Rewarded
+let rewarded = CloudXCore.shared.createRewarded(withPlacement: "...", viewController: self, delegate: self)
+```
+
+**[→ See complete examples in the Quickstart Guide](https://docs.cloudx.io/ios/quickstart)**
+
+---
+
+## 🎯 What's Included
+
+### SDK Components (via CocoaPods)
+
+```ruby
+pod 'CloudXCore'           # Core SDK (required)
+pod 'CloudXMetaAdapter'    # Meta Audience Network
+pod 'CloudXVungleAdapter'  # Vungle
+pod 'CloudXRenderer'       # Creative renderer
+```
+
+### Demo Apps
+
+- `demo-app-swift/` - Swift example app
+- `demo-app-objc/` - Objective-C example app
+
+Both include all ad formats, privacy controls, and best practices.
+
+---
+
+## 📋 Requirements
+
+- iOS 14.0+
+- Xcode 15.3+
+- Swift 5.9+ or Objective-C
+- CocoaPods 1.10+ or Swift Package Manager
+
+---
+
+## 🛠️ Need Help?
+
+- **📖 Documentation** - [docs.cloudx.io/ios](https://docs.cloudx.io/ios/installation)
+- **💬 Support** - [hello@cloudx.io](mailto:hello@cloudx.io)
+- **🐛 Issues** - [GitHub Issues](https://github.com/cloudx-io/cloudx-ios/issues)
+- **📊 Dashboard** - [app.cloudx.io](https://app.cloudx.io)
+
+---
+
+## 🔗 Resources
+
+- [iOS Installation Guide](https://docs.cloudx.io/ios/installation)
+- [iOS Quickstart Guide](https://docs.cloudx.io/ios/quickstart)
+- [iOS Configuration Guide](https://docs.cloudx.io/ios/configuration)
+- [API Reference](https://docs.cloudx.io/api-reference/ios-api)
+- [CloudX Website](https://cloudx.io)
+
+---
+
+<p align="center">
+  <strong>Start monetizing in minutes</strong>
+  <br>
+  <a href="https://docs.cloudx.io/ios/installation">Read the Documentation →</a>
+</p>
