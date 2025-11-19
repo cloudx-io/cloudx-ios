@@ -43,6 +43,8 @@
 
 static BOOL isInitialized = NO;
 static NSString * const kSDKVersion = @"10.8.8"; // InMobi SDK version
+static NSString *partnerName = nil; // tp parameter from server config
+static NSArray<NSString *> *placementIds = nil; // Placement IDs from server config
 
 + (CLXLogger *)logger {
     static CLXLogger *logger = nil;
@@ -55,6 +57,14 @@ static NSString * const kSDKVersion = @"10.8.8"; // InMobi SDK version
 
 + (BOOL)isInitialized {
     return isInitialized;
+}
+
++ (NSString *)partnerName {
+    return partnerName;
+}
+
++ (NSArray<NSString *> *)placementIds {
+    return placementIds;
 }
 
 + (instancetype)createInstance {
@@ -82,11 +92,16 @@ static NSString * const kSDKVersion = @"10.8.8"; // InMobi SDK version
                   completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
     [[CLXInMobiInitializer logger] debug:@"Initializing InMobi SDK adapter"];
     
-    // Extract account ID from config
+    // Extract configuration from initData
     NSString *accountID = nil;
     if (config && config.initializationData) {
         accountID = config.initializationData[@"accountId"];
-        [[CLXInMobiInitializer logger] debug:[NSString stringWithFormat:@"Account ID from config: %@", accountID ?: @"nil"]];
+        partnerName = config.initializationData[@"tp"];
+        placementIds = config.initializationData[@"placementIds"];
+        
+        [[CLXInMobiInitializer logger] debug:[NSString stringWithFormat:@"Account ID: %@", accountID ?: @"nil"]];
+        [[CLXInMobiInitializer logger] debug:[NSString stringWithFormat:@"Partner name (tp): %@", partnerName ?: @"nil"]];
+        [[CLXInMobiInitializer logger] debug:[NSString stringWithFormat:@"Placement IDs: %@", placementIds ?: @"nil"]];
     }
     
     if (!accountID || accountID.length == 0) {
@@ -113,9 +128,9 @@ static NSString * const kSDKVersion = @"10.8.8"; // InMobi SDK version
             
             // Set log level for debugging
             #ifdef DEBUG
-            [IMSdk setLogLevel:kIMSDKLogLevelDebug];
+            [IMSdk setLogLevel:IMSDKLogLevelDebug];
             #else
-            [IMSdk setLogLevel:kIMSDKLogLevelError];
+            [IMSdk setLogLevel:IMSDKLogLevelError];
             #endif
             
             isInitialized = YES;
@@ -141,37 +156,22 @@ static NSString * const kSDKVersion = @"10.8.8"; // InMobi SDK version
 - (NSDictionary *)getConsentDictionary {
     NSMutableDictionary *consent = [NSMutableDictionary dictionary];
     
-    // Get GDPR consent from CloudX Settings if available
-    // InMobi expects keys: @"gdpr_consent_available", @"gdpr"
-    // For now, return empty dict - can be enhanced later
+    // InMobi reads privacy settings from IAB standards (TCF for GDPR, US Privacy String for CCPA)
+    // The SDK automatically reads these from UserDefaults per IAB specifications:
+    // - GDPR: IABTCF_TCString, IABTCF_gdprApplies
+    // - CCPA: IABUSPrivacy_String
+    //
+    // InMobi does NOT have an explicit COPPA API. For COPPA compliance:
+    // - Publishers should use IAB GDPR consent mechanisms
+    // - Or rely on InMobi's automatic IAB string reading
+    // - Child-directed apps should not use InMobi SDK per their TOS
+    //
+    // We pass an empty consent dictionary and let InMobi SDK read IAB strings directly
+    
+    [[CLXInMobiInitializer logger] debug:@"InMobi will read GDPR/CCPA from IAB UserDefaults (TCF/US Privacy String)"];
+    [[CLXInMobiInitializer logger] debug:@"InMobi does not have explicit COPPA API - relies on IAB standards"];
     
     return [consent copy];
-}
-
-// Ensure classes are loaded for static frameworks
-__attribute__((visibility("default"))) void CloudXInMobiAdapterRegister(void) {
-    static CLXLogger *registrationLogger = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        registrationLogger = [[CLXLogger alloc] initWithCategory:@"InMobiAdapterRegistration"];
-    });
-    
-    [registrationLogger debug:@"Loading InMobi adapter classes"];
-    
-    // Force load all classes
-    [CLXInMobiInitializer class];
-    [CLXInMobiBannerFactory class];
-    [CLXInMobiInterstitialFactory class];
-    [CLXInMobiRewardedFactory class];
-    [CLXInMobiNativeFactory class];
-    [CLXInMobiBidTokenSource class];
-    
-    [registrationLogger debug:@"InMobi adapter classes loaded successfully"];
-}
-
-// Call registration during class load
-+ (void)load {
-    CloudXInMobiAdapterRegister();
 }
 
 @end

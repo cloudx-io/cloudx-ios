@@ -108,8 +108,8 @@
                                                          context:@"Native Load"
                                                      placementID:@(_placementID).stringValue];
     
-    if ([self.delegate respondsToSelector:@selector(didFailToLoadWithNative:error:)]) {
-        [self.delegate didFailToLoadWithNative:self error:clxError];
+    if ([self.delegate respondsToSelector:@selector(failToLoadWithNative:error:)]) {
+        [self.delegate failToLoadWithNative:self error:clxError];
     }
 }
 

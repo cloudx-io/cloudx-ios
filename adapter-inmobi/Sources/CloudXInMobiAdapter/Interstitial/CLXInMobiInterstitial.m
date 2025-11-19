@@ -104,7 +104,7 @@
             [self.delegate didShowWithInterstitial:self];
         }
         
-        [_interstitial showFromViewController:viewController withAnimation:kIMInterstitialAnimationTypeCoverVertical];
+        [_interstitial showFrom:viewController];
     } else {
         [self.logger error:@"Cannot show ad - not ready"];
         

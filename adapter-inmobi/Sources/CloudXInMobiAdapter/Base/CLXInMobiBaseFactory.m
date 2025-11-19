@@ -42,7 +42,7 @@
     
     // For header bidding, payload should not be empty
     if (bidPayload.length == 0) {
-        [self.logger warning:@"Empty bid payload provided for header bidding"];
+        [self.logger warn:@"Empty bid payload provided for header bidding"];
         return NO;
     }
     

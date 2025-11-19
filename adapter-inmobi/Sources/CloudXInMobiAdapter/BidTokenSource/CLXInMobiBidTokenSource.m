@@ -14,7 +14,14 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXSettings.h>
+#import <CloudXCore/CLXSystemInformation.h>
 #import <InMobiSDK/InMobiSDK.h>
+
+#if __has_include(<CloudXInMobiAdapter/CLXInMobiInitializer.h>)
+#import <CloudXInMobiAdapter/CLXInMobiInitializer.h>
+#else
+#import "../Initializers/CLXInMobiInitializer.h"
+#endif
 
 @interface CLXInMobiBidTokenSource ()
 @property (nonatomic, strong) CLXLogger *logger;
@@ -52,7 +59,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         @try {
             // Check if InMobi SDK is initialized
-            if (![IMSdk isSDKInitialized]) {
+            if (![CLXInMobiInitializer isInitialized]) {
                 [self.logger error:@"InMobi SDK not initialized. This may occur if InMobi has not been configured for this app in the CloudX dashboard. Please verify your InMobi adapter configuration includes a valid account_id."];
                 
                 NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
@@ -64,8 +71,23 @@
                 return;
             }
             
-            // Get InMobi bidder token
-            NSDictionary *tokenDict = [IMSdk getToken];
+            // Prepare extras for InMobi token request with partner info from server config
+            NSString *tp = [CLXInMobiInitializer partnerName];
+            NSString *tpVer = [CLXSystemInformation shared].sdkVersion;
+            
+            NSMutableDictionary *extras = [NSMutableDictionary dictionary];
+            if (tp) {
+                extras[@"tp"] = tp;
+            }
+            if (tpVer) {
+                extras[@"tp-ver"] = tpVer;
+            }
+            
+            [self.logger debug:[NSString stringWithFormat:@"Requesting InMobi token with partner extras - tp: %@, tp-ver: %@", 
+                               tp ?: @"(none)", tpVer ?: @"(none)"]];
+            
+            // Get InMobi bidder token with partner information
+            NSDictionary *tokenDict = [IMSdk getTokenWithExtras:[extras copy] andKeywords:nil];
             NSString *token = tokenDict[@"token"];
             NSString *idfa = [[CLXSettings sharedInstance] getIFA];
             

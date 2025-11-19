@@ -73,10 +73,10 @@
             return CLXErrorCodeNoFill;
             
         case 2:  // Invalid request
-            return CLXErrorCodeInvalidConfig;
+            return CLXErrorCodeInvalidAdUnit;
             
         case 4:  // Timeout
-            return CLXErrorCodeTimeout;
+            return CLXErrorCodeLoadTimeout;
             
         case 10: // Native not ready
         case 7:  // Ad active

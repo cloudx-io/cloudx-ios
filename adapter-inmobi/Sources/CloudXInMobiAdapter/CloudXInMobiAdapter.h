@@ -16,6 +16,10 @@ FOUNDATION_EXPORT const unsigned char CloudXInMobiAdapterVersionString[];
 // Registration function for static frameworks
 __attribute__((visibility("default"))) void CloudXInMobiAdapterRegister(void);
 
+// Adapter registration class
+@interface CloudXInMobiAdapter : NSObject
+@end
+
 // Public headers - Initializer
 #import "CLXInMobiInitializer.h"
 

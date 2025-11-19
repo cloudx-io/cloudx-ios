@@ -47,6 +47,18 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)sdkVersion;
 
 /**
+ * Gets the partner name (tp parameter) from server configuration
+ * @return Partner name string or nil if not configured
+ */
++ (nullable NSString *)partnerName;
+
+/**
+ * Gets the placement IDs from server configuration
+ * @return Array of placement ID strings or nil if not configured
+ */
++ (nullable NSArray<NSString *> *)placementIds;
+
+/**
  * Initializes the InMobi SDK with the provided configuration
  * @param config The bidder configuration containing account ID and placement IDs
  * @param completion Completion block called with success/failure result
