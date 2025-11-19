@@ -1,6 +1,6 @@
 # CloudX iOS SDK
 
-**Powerful programmatic advertising for iOS.** Real-time bidding, multiple ad formats, built for revenue.
+**AI-powered mobile advertising for iOS.** Maximize revenue with intelligent ad optimization and real-time bidding.
 
 [![Platform](https://img.shields.io/badge/platform-iOS%2014.0%2B-blue.svg)](https://developer.apple.com/ios/)
 [![CocoaPods](https://img.shields.io/badge/CocoaPods-compatible-green.svg)](https://cocoapods.org)
@@ -62,12 +62,12 @@ Detailed guides for every step:
 
 ## ⚡ Key Features
 
-- **Banner & MREC** - 320×50 and 300×250 ads
-- **Interstitial** - Full-screen ads between content
-- **Rewarded Video** - Reward users for ad engagement
-- **Real-Time Bidding** - Server-side header bidding for maximum CPMs
-- **Privacy Built-In** - GDPR, CCPA, COPPA, ATT compliant
-- **SwiftUI Ready** - Works with UIKit and SwiftUI
+- **AI-Optimized Yield** - Intelligent ad selection maximizes your revenue
+- **Multiple Ad Formats** - Banner, MREC, interstitial, and rewarded video
+- **Real-Time Bidding** - Server-side header bidding with dynamic optimization
+- **Privacy First** - GDPR, CCPA, COPPA, and ATT compliant out of the box
+- **SwiftUI Ready** - Works seamlessly with UIKit and SwiftUI
+- **Lightning Fast** - Optimized for performance and user experience
 
 ---
 
