@@ -1,14 +1,13 @@
 #import "CLXMintegralInitializer.h"
 #import <CloudXCore/CLXLogger.h>
-#import <CloudXCore/CLXSettings.h>
+#import <CloudXCore/CLXPrivacyService.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CloudXCore.h>
-#import <CloudXCore/CLXPrivacyService.h>
-// Placeholder for Mintegral SDK
-// #import <MTGSDK/MTGSDK.h>
+#import <MTGSDK/MTGSDK.h>
 #import "CLXMintegralInterstitialFactory.h"
 #import "CLXMintegralBannerFactory.h"
 #import "CLXMintegralRewardedFactory.h"
+#import "CLXMintegralBidTokenSource.h"
 
 @interface CLXMintegralInitializer ()
 @property (nonatomic, strong) CLXLogger *logger;
@@ -29,9 +28,8 @@ static NSString * const kSDKVersion = @"7.6.3"; // Mintegral SDK version (update
 }
 
 + (NSString *)sdkVersion {
-    // TODO: Replace with actual Mintegral SDK version query
-    // return [[MTGSDK sharedInstance] sdkVersion];
-    return kSDKVersion;
+    NSString *version = [[MTGSDK sharedInstance] sdkVersion];
+    return version ?: kSDKVersion;
 }
 
 - (instancetype)init {
@@ -70,22 +68,22 @@ static NSString * const kSDKVersion = @"7.6.3"; // Mintegral SDK version (update
     
     dispatch_async(dispatch_get_main_queue(), ^{
         @try {
-            [self.logger debug:[NSString stringWithFormat:@"Initializing Mintegral with AppID: %@", appID]];
+            [self.logger debug:[NSString stringWithFormat:@"Initializing Mintegral SDK with AppID: %@", appID]];
             
-            // Configure privacy settings BEFORE SDK initialization
+            // Configure privacy settings BEFORE SDK initialization (critical for COPPA)
             [self configurePrivacySettings];
             
-            // TODO: Replace with actual Mintegral SDK initialization
-            // [[MTGSDK sharedInstance] setAppID:appID AppKey:appKey];
+            // Initialize Mintegral SDK
+            [[MTGSDK sharedInstance] setAppID:appID ApiKey:appKey];
             
-            // Placeholder: Simulate successful initialization
-            [self.logger info:@"Mintegral SDK initialization API would be called here"];
+            [self.logger info:[NSString stringWithFormat:@"Mintegral SDK initialized with version: %@", 
+                             [[MTGSDK sharedInstance] sdkVersion] ?: @"unknown"]];
             
             // Register factories with CloudX Core
             [self registerFactories];
             
             isInitialized = YES;
-            [self.logger info:@"Mintegral SDK initialized successfully"];
+            [self.logger success:@"Mintegral adapter initialized successfully"];
             
             if (completion) completion(YES, nil);
             
@@ -99,28 +97,28 @@ static NSString * const kSDKVersion = @"7.6.3"; // Mintegral SDK version (update
 }
 
 - (void)configurePrivacySettings {
-    // NOTE: Mintegral SDK is currently not integrated (commented out in Podfile)
-    // When Mintegral SDK is integrated, update this method with actual privacy APIs
-    //
-    // Privacy Implementation Notes:
-    // - Mintegral likely reads GDPR/CCPA from IAB standards (TCF/US Privacy String)
-    // - Check Mintegral SDK documentation for explicit COPPA APIs when integrating
-    // - Many ad networks removed explicit COPPA APIs in favor of IAB standard compliance
-    //
-    // Placeholder implementation for when SDK is integrated:
-    
     CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
+    
+    // COPPA - MUST be set BEFORE SDK initialization
+    // Mintegral uses setCOPPAIsAgeRestrictedUser: for COPPA compliance
     BOOL coppaEnabled = [privacyService isCoppaEnabled];
+    [[MTGSDK sharedInstance] setCOPPAIsAgeRestrictedUser:coppaEnabled];
+    [self.logger info:[NSString stringWithFormat:@"Mintegral COPPA set to %@ (user %@ 13)",
+                      coppaEnabled ? @"YES" : @"NO",
+                      coppaEnabled ? @"under" : @"over"]];
     
-    [self.logger debug:@"Mintegral SDK not integrated - privacy settings cannot be configured"];
-    [self.logger debug:[NSString stringWithFormat:@"COPPA status (for when SDK is integrated): %@", 
-                       coppaEnabled ? @"enabled" : @"disabled"]];
+    // GDPR - Mintegral automatically reads IAB TCF strings from UserDefaults
+    // Keys: IABTCF_TCString, IABTCF_gdprApplies, IABTCF_PurposeConsents
+    // If explicit consent status needed, use: [[MTGSDK sharedInstance] setConsentStatus:]
+    [self.logger debug:@"Mintegral reads GDPR consent from IAB TCF strings (UserDefaults)"];
     
-    // TODO: When Mintegral SDK is integrated, add privacy API calls here
-    // Example (update with actual Mintegral APIs):
-    // if (coppaEnabled) {
-    //     [[MTGSDK sharedInstance] setCoppaEnabled:YES];
-    // }
+    // CCPA - Mintegral automatically reads IAB US Privacy String from UserDefaults
+    // Key: IABUSPrivacy_String
+    // If explicit Do Not Sell needed, use: [[MTGSDK sharedInstance] setDoNotSell:]
+    [self.logger debug:@"Mintegral reads CCPA from IAB US Privacy String (UserDefaults)"];
+    
+    // Note: Similar to InMobi, Mintegral automatically reads IAB standard strings.
+    // We only need to explicitly set COPPA since it's not part of IAB standards.
 }
 
 - (void)registerFactories {
@@ -136,6 +134,32 @@ static NSString * const kSDKVersion = @"7.6.3"; // Mintegral SDK version (update
                                         forAdType:CLXAdTypeRewarded];
     
     [self.logger info:@"Registered 3 Mintegral ad format factories"];
+}
+
+#pragma mark - Static Framework Class Loading
+
+// Ensure all classes are loaded when using static frameworks
+__attribute__((visibility("default"))) void CloudXMintegralAdapterRegister(void) {
+    static CLXLogger *registrationLogger = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        registrationLogger = [[CLXLogger alloc] initWithCategory:@"MintegralAdapterRegistration"];
+    });
+    
+    [registrationLogger debug:@"Loading Mintegral adapter classes"];
+    
+    // Force load all classes by referencing them
+    [CLXMintegralInitializer class];
+    [CLXMintegralBannerFactory class];
+    [CLXMintegralInterstitialFactory class];
+    [CLXMintegralRewardedFactory class];
+    [CLXMintegralBidTokenSource class];
+    
+    [registrationLogger debug:@"Mintegral adapter classes loaded successfully"];
+}
+
++ (void)load {
+    CloudXMintegralAdapterRegister();
 }
 
 @end

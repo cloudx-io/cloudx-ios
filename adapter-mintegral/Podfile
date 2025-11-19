@@ -3,14 +3,10 @@ use_frameworks! :linkage => :static
 
 target 'CloudXMintegralAdapter' do
   pod 'CloudXCore', :path => '../core'
-  # Mintegral SDK - Update version as needed
-  # pod 'MintegralAdSDK', '~> 7.6'
-  # Or individual Mintegral subspecs:
-  # pod 'MintegralAdSDK/BannerAd'
-  # pod 'MintegralAdSDK/InterstitialVideoAd'
-  # pod 'MintegralAdSDK/RewardVideoAd'
-  # pod 'MintegralAdSDK/BidRewardVideoAd'
-  # pod 'MintegralAdSDK/BidInterstitialVideoAd'
+  # Mintegral SDK with bidding support
+  pod 'MintegralAdSDK/BidBannerAd', '~> 7.6'
+  pod 'MintegralAdSDK/BidInterstitialVideoAd', '~> 7.6'
+  pod 'MintegralAdSDK/BidRewardVideoAd', '~> 7.6'
 end
 
 post_install do |installer|

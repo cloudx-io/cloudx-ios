@@ -1,9 +1,8 @@
 #import "CLXMintegralBidTokenSource.h"
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
-#import <CloudXCore/CLXSettings.h>
-// Placeholder for Mintegral SDK
-// #import <MTGSDK/MTGSDK.h>
+#import <CloudXCore/CLXAdTrackingService.h>
+#import <MTGSDK/MTGSDK.h>
 #import "CLXMintegralInitializer.h"
 
 @interface CLXMintegralBidTokenSource ()
@@ -50,25 +49,25 @@
                 return;
             }
             
-            // TODO: Replace with actual Mintegral bid token API
-            // NSString *bidToken = [[MTGSDK sharedInstance] getBidToken];
+            // Get bidding token from Mintegral SDK
+            NSString *bidToken = [[MTGSDK sharedInstance] getBidToken];
             
-            // Placeholder: Generate mock token for testing
-            NSString *bidToken = [NSString stringWithFormat:@"MTG_TOKEN_%@", 
-                                 [[NSUUID UUID] UUIDString]];
+            if (!bidToken || bidToken.length == 0) {
+                [self.logger warning:@"Mintegral returned empty bid token"];
+                bidToken = @""; // Use empty string instead of nil
+            } else {
+                [self.logger debug:[NSString stringWithFormat:@"Generated bid token (prefix): %@...", 
+                                  [bidToken substringToIndex:MIN(20, bidToken.length)]]];
+            }
             
             // Get IDFA if available
-            NSString *idfa = [[CLXSettings sharedInstance] getIFA];
+            NSString *idfa = [CLXAdTrackingService getIDFA];
             
             // Build token dictionary
             NSMutableDictionary *tokenDict = [NSMutableDictionary dictionary];
             
             if (bidToken && bidToken.length > 0) {
                 tokenDict[@"bid_token"] = bidToken;
-                [self.logger debug:[NSString stringWithFormat:@"Generated bid token: %@", 
-                                  [bidToken substringToIndex:MIN(20, bidToken.length)]]];
-            } else {
-                [self.logger warning:@"Mintegral returned empty bid token"];
             }
             
             if (idfa && idfa.length > 0) {
