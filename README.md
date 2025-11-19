@@ -1,200 +1,157 @@
 # CloudX iOS SDK
 
-> **Modern programmatic advertising for iOS applications**
+**Powerful programmatic advertising for iOS.** Real-time bidding, multiple ad formats, built for revenue.
 
-CloudX iOS SDK provides a complete mobile advertising solution with real-time bidding, multiple ad formats, and seamless integration. Built for performance and ease of use.
+[![Platform](https://img.shields.io/badge/platform-iOS%2014.0%2B-blue.svg)](https://developer.apple.com/ios/)
+[![CocoaPods](https://img.shields.io/badge/CocoaPods-compatible-green.svg)](https://cocoapods.org)
+[![SPM](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-orange.svg)](https://swift.org/package-manager/)
+[![License](https://img.shields.io/badge/license-BSL%201.1-lightgrey.svg)](LICENSE)
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Get Started in 30 Seconds
 
-Get started in 3 simple steps:
-
-### 1. Install via CocoaPods
+### Install
 
 ```ruby
-platform :ios, '14.0'
-use_frameworks!
-
-target 'YourApp' do
-  # Core SDK
-  pod 'CloudXCore'
-  
-  # Optional: Adapters
-  pod 'CloudXMetaAdapter'
-  pod 'CloudXVungleAdapter'
-end
+# Add to your Podfile
+pod 'CloudXCore'
 ```
 
-### 2. Initialize the SDK
+```bash
+pod install
+```
+
+### Initialize & Load
 
 ```swift
 import CloudXCore
 
+// 1. Initialize (in AppDelegate)
 CloudXCore.shared.initializeSDK(withAppKey: "YOUR_APP_KEY") { error in
-    if error == nil {
-        print("CloudX SDK ready!")
-    }
+    print(error == nil ? "Ready!" : "Error: \(error!)")
 }
-```
 
-### 3. Load Your First Ad
-
-```swift
+// 2. Create banner ad (in ViewController)
 let banner = CloudXCore.shared.createBanner(
     withPlacement: "YOUR_PLACEMENT_ID",
     viewController: self,
     delegate: self,
     tmax: 10.0
 )
+view.addSubview(banner)
 ```
 
----
-
-## 📚 Documentation
-
-**Complete documentation is available on our Mintlify docs site:**
-
-### Essential Guides
-
-- **[Installation Guide](https://docs.cloudx.io/ios/installation)** - Setup instructions, requirements, and Info.plist configuration
-- **[Quickstart Guide](https://docs.cloudx.io/ios/quickstart)** - Initialize the SDK and load your first ads (banner, interstitial, rewarded)
-- **[Configuration Guide](https://docs.cloudx.io/ios/configuration)** - Privacy settings, targeting, logging, and advanced options
-
-### Additional Resources
-
-- **[API Reference](https://docs.cloudx.io/api-reference/ios-api)** - Complete API documentation
-- **[Dashboard](https://app.cloudx.io)** - Manage placements and view analytics
-- **[Support](mailto:hello@cloudx.io)** - Contact our team
+**That's it.** You're monetizing.
 
 ---
 
-## 💡 Features
+## 📚 Complete Documentation
 
-- **Multiple Ad Formats** - Banner (320×50), MREC (300×250), Interstitial, Rewarded
-- **Real-Time Bidding** - Server-side header bidding for maximum yield
-- **Privacy Compliant** - Built-in support for GDPR, CCPA, COPPA, and ATT
-- **SwiftUI Support** - Works seamlessly with both UIKit and SwiftUI
-- **Binary Distribution** - Fast compilation with pre-built xcframeworks
-- **Comprehensive Adapters** - Integration with industry-standard ad networks
+**Everything you need is in our docs** →
+
+### **[📖 Read the Full iOS Documentation](https://docs.cloudx.io/ios/installation)**
+
+Detailed guides for every step:
+
+- **[Installation Guide](https://docs.cloudx.io/ios/installation)** - Setup, requirements, Info.plist configuration
+- **[Quickstart Guide](https://docs.cloudx.io/ios/quickstart)** - All ad formats with code examples
+- **[Configuration Guide](https://docs.cloudx.io/ios/configuration)** - Privacy, targeting, advanced features
 
 ---
 
-## 📦 What's Included
+## ⚡ Key Features
 
-This repository contains the CloudX iOS SDK ecosystem with binary distributions:
+- **Banner & MREC** - 320×50 and 300×250 ads
+- **Interstitial** - Full-screen ads between content
+- **Rewarded Video** - Reward users for ad engagement
+- **Real-Time Bidding** - Server-side header bidding for maximum CPMs
+- **Privacy Built-In** - GDPR, CCPA, COPPA, ATT compliant
+- **SwiftUI Ready** - Works with UIKit and SwiftUI
 
-### Core Components
+---
 
-- **`core/`** - CloudXCore framework (binary xcframework)
-  - Main SDK with bidding engine and ad serving
-  - CocoaPods: `pod 'CloudXCore'`
+## ⚠️ Important: Xcode 15+ Setup
 
-- **`renderer-cloudx/`** - CloudXRenderer framework (binary xcframework)
-  - Creative rendering with MRAID support
-  - CocoaPods: `pod 'CloudXRenderer'`
+**If using CocoaPods with Xcode 15+**, disable User Script Sandboxing:
 
-### Adapters
+1. Select your project target
+2. Build Settings → Search "User Script Sandboxing"  
+3. Set **ENABLE_USER_SCRIPT_SANDBOXING** to **No**
 
-- **`adapter-meta/`** - Meta Audience Network adapter (binary xcframework)
-  - CocoaPods: `pod 'CloudXMetaAdapter'`
-  
-- **`adapter-vungle/`** - Vungle adapter (binary xcframework)
-  - CocoaPods: `pod 'CloudXVungleAdapter'`
+This is required for all iOS SDKs using dynamic frameworks.
 
-### Demo Applications
+---
 
-- **`demo-app-objc/`** - Complete Objective-C demo application
-- **`demo-app-swift/`** - Complete Swift demo application
+## 📦 Ad Formats
 
-Both demos showcase all ad formats, privacy controls, and integration patterns.
+Load any ad format in 3 lines:
+
+```swift
+// Banner (320×50)
+let banner = CloudXCore.shared.createBanner(withPlacement: "...", viewController: self, delegate: self)
+
+// Interstitial
+let interstitial = CloudXCore.shared.createInterstitial(withPlacement: "...", viewController: self, delegate: self)
+
+// Rewarded
+let rewarded = CloudXCore.shared.createRewarded(withPlacement: "...", viewController: self, delegate: self)
+```
+
+**[→ See complete examples in the Quickstart Guide](https://docs.cloudx.io/ios/quickstart)**
+
+---
+
+## 🎯 What's Included
+
+### SDK Components (via CocoaPods)
+
+```ruby
+pod 'CloudXCore'           # Core SDK (required)
+pod 'CloudXMetaAdapter'    # Meta Audience Network
+pod 'CloudXVungleAdapter'  # Vungle
+pod 'CloudXRenderer'       # Creative renderer
+```
+
+### Demo Apps
+
+- `demo-app-swift/` - Swift example app
+- `demo-app-objc/` - Objective-C example app
+
+Both include all ad formats, privacy controls, and best practices.
 
 ---
 
 ## 📋 Requirements
 
-- **iOS**: 14.0 or higher
-- **Xcode**: 15.3 or higher
-- **Swift**: 5.9+ (if using Swift)
-- **CocoaPods**: 1.10+ or Swift Package Manager
-
-### ⚠️ Xcode 15+ Users
-
-If using CocoaPods with Xcode 15+, disable User Script Sandboxing:
-
-1. Select your project target
-2. Go to **Build Settings**
-3. Search for "User Script Sandboxing"
-4. Set **ENABLE_USER_SCRIPT_SANDBOXING** to **No**
-
-This is required for CocoaPods to embed dynamic frameworks properly (standard for all iOS SDKs using dynamic frameworks).
+- iOS 14.0+
+- Xcode 15.3+
+- Swift 5.9+ or Objective-C
+- CocoaPods 1.10+ or Swift Package Manager
 
 ---
 
-## 🔄 Installation Methods
+## 🛠️ Need Help?
 
-### CocoaPods (Recommended)
-
-```ruby
-pod 'CloudXCore', '~> 1.2.0'
-pod 'CloudXMetaAdapter', '~> 1.2.0'
-```
-
-### Swift Package Manager
-
-```swift
-dependencies: [
-    .package(url: "https://github.com/cloudx-io/cloudx-ios", from: "1.2.0")
-]
-```
-
-**Note**: Some adapters may not be available via SPM. Use CocoaPods for full adapter support.
+- **📖 Documentation** - [docs.cloudx.io/ios](https://docs.cloudx.io/ios/installation)
+- **💬 Support** - [hello@cloudx.io](mailto:hello@cloudx.io)
+- **🐛 Issues** - [GitHub Issues](https://github.com/cloudx-io/cloudx-ios/issues)
+- **📊 Dashboard** - [app.cloudx.io](https://app.cloudx.io)
 
 ---
 
-## 🏷️ Release Strategy
+## 🔗 Resources
 
-This repository uses **component-specific releases** with semantic versioning:
-
-- **CloudXCore**: `v1.2.0-core`
-- **CloudXMetaAdapter**: `v1.2.0-meta`
-- **CloudXRenderer**: `v1.2.0-renderer`
-- **CloudXVungleAdapter**: `v1.2.0-vungle`
-
-Each component maintains independent versioning for flexible updates.
-
----
-
-## 🛠️ Support
-
-Need help? We're here for you:
-
-- 📧 **Email**: [hello@cloudx.io](mailto:hello@cloudx.io)
-- 📖 **Documentation**: [docs.cloudx.io](https://docs.cloudx.io)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/cloudx-io/cloudx-ios/issues)
-- 💬 **Dashboard**: [app.cloudx.io](https://app.cloudx.io)
-
----
-
-## 📄 License
-
-CloudX iOS SDK is licensed under the **Business Source License 1.1**.
-
-See [LICENSE](LICENSE) for details.
-
----
-
-## 🔗 Links
-
-- **Documentation**: [docs.cloudx.io/ios](https://docs.cloudx.io/ios/installation)
-- **GitHub**: [github.com/cloudx-io/cloudx-ios](https://github.com/cloudx-io/cloudx-ios)
-- **Website**: [cloudx.io](https://cloudx.io)
-- **Blog**: [cloudx.io/blog](https://cloudx.io/blog)
+- [iOS Installation Guide](https://docs.cloudx.io/ios/installation)
+- [iOS Quickstart Guide](https://docs.cloudx.io/ios/quickstart)
+- [iOS Configuration Guide](https://docs.cloudx.io/ios/configuration)
+- [API Reference](https://docs.cloudx.io/api-reference/ios-api)
+- [CloudX Website](https://cloudx.io)
 
 ---
 
 <p align="center">
-  <strong>Made with ❤️ by CloudX</strong>
+  <strong>Start monetizing in minutes</strong>
   <br>
-  Empowering mobile monetization
+  <a href="https://docs.cloudx.io/ios/installation">Read the Documentation →</a>
 </p>
