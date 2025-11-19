@@ -4,7 +4,6 @@
 
 [![Platform](https://img.shields.io/badge/platform-iOS%2014.0%2B-blue.svg)](https://developer.apple.com/ios/)
 [![CocoaPods](https://img.shields.io/badge/CocoaPods-compatible-green.svg)](https://cocoapods.org)
-[![SPM](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-orange.svg)](https://swift.org/package-manager/)
 [![License](https://img.shields.io/badge/license-BSL%201.1-lightgrey.svg)](LICENSE)
 
 ---
@@ -127,7 +126,7 @@ Both include all ad formats, privacy controls, and best practices.
 - iOS 14.0+
 - Xcode 15.3+
 - Swift 5.9+ or Objective-C
-- CocoaPods 1.10+ or Swift Package Manager
+- CocoaPods 1.10+
 
 ---
 
