@@ -14,6 +14,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <CloudXCore/CLXSettings.h>
+#import <CloudXCore/CLXPrivacyService.h>
 
 // Import CloudXCore for both SPM and CocoaPods
 #if __has_include(<CloudXCore/CloudXCore.h>)
@@ -156,38 +157,41 @@ static NSString * const kSDKVersion = @"1.0.0"; // Moloco SDK version
 #pragma mark - Private Methods
 
 - (void)configurePrivacySettings {
-    CLXSettings *settings = [CLXSettings sharedInstance];
+    CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
     
     // Use CloudX core's tracking service for consistency
     BOOL idfaAllowed = [CLXAdTrackingService isIDFAAccessAllowed];
     
     // Configure Moloco SDK privacy settings
-    // Note: Update with actual Moloco SDK privacy API
-    // This is a placeholder - adjust based on actual Moloco SDK documentation
+    // Note: Moloco SDK APIs are placeholders - verify with actual Moloco SDK documentation
     
-    // GDPR
-    if (settings.gdprConsentAvailable) {
-        [MolocoSDK setGDPRConsent:settings.gdprConsentAccepted];
-        [[CLXMolocoInitializer logger] debug:[NSString stringWithFormat:@"GDPR consent: %@", 
-                                             settings.gdprConsentAccepted ? @"granted" : @"denied"]];
-    }
+    // COPPA - Required for child-directed apps
+    BOOL coppaEnabled = [privacyService isCoppaEnabled];
+    [MolocoSDK setCOPPAEnabled:coppaEnabled];
+    [[CLXMolocoInitializer logger] info:[NSString stringWithFormat:@"Moloco COPPA enabled: %@", 
+                                         coppaEnabled ? @"YES" : @"NO"]];
     
-    // CCPA
-    if (settings.usPrivacyString) {
-        [MolocoSDK setUSPrivacyString:settings.usPrivacyString];
-        [[CLXMolocoInitializer logger] debug:[NSString stringWithFormat:@"CCPA string: %@", settings.usPrivacyString]];
-    }
+    // GDPR - Moloco likely reads IAB TCF strings automatically
+    // If explicit API is needed, uncomment and verify:
+    // NSString *gdprString = [privacyService gdprConsentString];  // Internal method
+    // if (gdprString) {
+    //     [MolocoSDK setGDPRConsent:YES];
+    //     [[CLXMolocoInitializer logger] debug:@"GDPR consent: granted"];
+    // }
+    [[CLXMolocoInitializer logger] debug:@"Moloco reads GDPR from IAB TCF strings (UserDefaults)"];
     
-    // COPPA
-    if (settings.coppaEnabled) {
-        [MolocoSDK setCOPPAEnabled:settings.coppaEnabled];
-        [[CLXMolocoInitializer logger] debug:[NSString stringWithFormat:@"COPPA enabled: %@", 
-                                             settings.coppaEnabled ? @"YES" : @"NO"]];
-    }
+    // CCPA - Moloco likely reads IAB US Privacy strings automatically
+    // If explicit API is needed, uncomment and verify:
+    // NSString *ccpaString = [privacyService ccpaPrivacyString];
+    // if (ccpaString) {
+    //     [MolocoSDK setUSPrivacyString:ccpaString];
+    //     [[CLXMolocoInitializer logger] debug:[NSString stringWithFormat:@"CCPA string: %@", ccpaString]];
+    // }
+    [[CLXMolocoInitializer logger] debug:@"Moloco reads CCPA from IAB US Privacy String (UserDefaults)"];
     
     // ATT/IDFA
     [MolocoSDK setTrackingEnabled:idfaAllowed];
-    [[CLXMolocoInitializer logger] info:[NSString stringWithFormat:@"Tracking enabled: %@", 
+    [[CLXMolocoInitializer logger] info:[NSString stringWithFormat:@"Moloco tracking enabled: %@", 
                                         idfaAllowed ? @"YES" : @"NO"]];
 }
 
@@ -202,32 +206,6 @@ static NSString * const kSDKVersion = @"1.0.0"; // Moloco SDK version
                                         forAdType:CLXAdTypeNative];
     
     [[CLXMolocoInitializer logger] debug:@"Registered all Moloco factories"];
-}
-
-// Ensure classes are loaded for static frameworks
-__attribute__((visibility("default"))) void CloudXMolocoAdapterRegister(void) {
-    static CLXLogger *registrationLogger = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        registrationLogger = [[CLXLogger alloc] initWithCategory:@"MolocoAdapterRegistration"];
-    });
-    
-    [registrationLogger debug:@"Loading Moloco adapter classes"];
-    
-    // Force load all classes by referencing them
-    [CLXMolocoInitializer class];
-    [CLXMolocoBannerFactory class];
-    [CLXMolocoInterstitialFactory class];
-    [CLXMolocoRewardedFactory class];
-    [CLXMolocoNativeFactory class];
-    [CLXMolocoBidTokenSource class];
-    
-    [registrationLogger debug:@"Moloco adapter classes loaded successfully"];
-}
-
-// Call registration during class load
-+ (void)load {
-    CloudXMolocoAdapterRegister();
 }
 
 @end

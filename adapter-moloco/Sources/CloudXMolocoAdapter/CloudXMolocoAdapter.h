@@ -13,6 +13,10 @@ FOUNDATION_EXPORT const unsigned char CloudXMolocoAdapterVersionString[];
 // Registration function for static frameworks
 __attribute__((visibility("default"))) void CloudXMolocoAdapterRegister(void);
 
+// Adapter registration class
+@interface CloudXMolocoAdapter : NSObject
+@end
+
 // Public headers
 #import "CLXMolocoInitializer.h"
 #import "CLXMolocoBidTokenSource.h"

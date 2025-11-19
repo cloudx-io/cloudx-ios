@@ -3,6 +3,7 @@
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXPrivacyService.h>
 // Placeholder for Mintegral SDK
 // #import <MTGSDK/MTGSDK.h>
 #import "CLXMintegralInterstitialFactory.h"
@@ -98,28 +99,28 @@ static NSString * const kSDKVersion = @"7.6.3"; // Mintegral SDK version (update
 }
 
 - (void)configurePrivacySettings {
-    CLXSettings *settings = [CLXSettings sharedInstance];
+    // NOTE: Mintegral SDK is currently not integrated (commented out in Podfile)
+    // When Mintegral SDK is integrated, update this method with actual privacy APIs
+    //
+    // Privacy Implementation Notes:
+    // - Mintegral likely reads GDPR/CCPA from IAB standards (TCF/US Privacy String)
+    // - Check Mintegral SDK documentation for explicit COPPA APIs when integrating
+    // - Many ad networks removed explicit COPPA APIs in favor of IAB standard compliance
+    //
+    // Placeholder implementation for when SDK is integrated:
     
-    // GDPR Consent
-    if (settings.gdprConsentAvailable) {
-        // TODO: Replace with actual Mintegral GDPR API
-        // [[MTGSDK sharedInstance] setConsentStatus:settings.gdprConsentAccepted];
-        [self.logger debug:[NSString stringWithFormat:@"Mintegral GDPR Consent: %d", settings.gdprConsentAccepted]];
-    }
+    CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
+    BOOL coppaEnabled = [privacyService isCoppaEnabled];
     
-    // CCPA
-    if (settings.usPrivacyString) {
-        // TODO: Replace with actual Mintegral CCPA API
-        // [[MTGSDK sharedInstance] setDoNotSell:!settings.ccpaConsentAccepted];
-        [self.logger debug:[NSString stringWithFormat:@"Mintegral CCPA String: %@", settings.usPrivacyString]];
-    }
+    [self.logger debug:@"Mintegral SDK not integrated - privacy settings cannot be configured"];
+    [self.logger debug:[NSString stringWithFormat:@"COPPA status (for when SDK is integrated): %@", 
+                       coppaEnabled ? @"enabled" : @"disabled"]];
     
-    // COPPA
-    if (settings.coppaEnabled) {
-        // TODO: Replace with actual Mintegral COPPA API
-        // [[MTGSDK sharedInstance] setCoppaEnabled:settings.coppaEnabled];
-        [self.logger debug:[NSString stringWithFormat:@"Mintegral COPPA Enabled: %d", settings.coppaEnabled]];
-    }
+    // TODO: When Mintegral SDK is integrated, add privacy API calls here
+    // Example (update with actual Mintegral APIs):
+    // if (coppaEnabled) {
+    //     [[MTGSDK sharedInstance] setCoppaEnabled:YES];
+    // }
 }
 
 - (void)registerFactories {

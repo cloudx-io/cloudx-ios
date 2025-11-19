@@ -13,6 +13,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <CloudXCore/CLXSettings.h>
+#import <CloudXCore/CLXPrivacyService.h>
 
 // Import CloudXCore for both SPM and CocoaPods
 #if __has_include(<CloudXCore/CloudXCore.h>)
@@ -207,6 +208,22 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
     
     [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"ATE flag set to %@ - Based on CloudX tracking service", 
                                       idfaAllowed ? @"YES" : @"NO"]];
+    
+    // Configure COPPA (mixed audience) setting
+    [self configureCOPPASettings];
+}
+
+- (void)configureCOPPASettings {
+    CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
+    BOOL coppaEnabled = [privacyService isCoppaEnabled];
+    
+    // Meta requires mixedAudience=YES for apps with child users (COPPA compliance)
+    // Note: Meta prohibits use in child-directed apps; this is for mixed-audience apps only
+    [FBAdSettings setMixedAudience:coppaEnabled];
+    
+    [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"Meta mixedAudience set to %@ (COPPA %@)", 
+                                      coppaEnabled ? @"YES" : @"NO",
+                                      coppaEnabled ? @"enabled" : @"disabled"]];
 }
 
 /**
@@ -238,33 +255,6 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
     BOOL isTestMode = [FBAdSettings isTestMode];
     
     [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Meta test mode: %@ | Debug logging enabled", isTestMode ? @"enabled" : @"disabled"]];
-}
-
-// Ensure classes are loaded for static frameworks
-__attribute__((visibility("default"))) void CloudXMetaAdapterRegister(void) {
-    // Create a local logger for registration - avoid exposing internal logger publicly
-    static CLXLogger *registrationLogger = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        registrationLogger = [[CLXLogger alloc] initWithCategory:@"MetaAdapterRegistration"];
-    });
-    
-    [registrationLogger debug:@"Loading Meta adapter classes"];
-    
-    // Force load all classes by referencing them
-    [CLXMetaInitializer class];
-    [CLXMetaBannerFactory class];
-    [CLXMetaInterstitialFactory class];
-    [CLXMetaRewardedFactory class];
-    [CLXMetaNativeFactory class];
-    [CLXMetaBidTokenSource class];
-    
-    [registrationLogger debug:@"Meta adapter classes loaded successfully"];
-}
-
-// Call registration during class load
-+ (void)load {
-    CloudXMetaAdapterRegister();
 }
 
 @end 
