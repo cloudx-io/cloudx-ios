@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # ============================================================================
-# CloudX Renderer - Dynamic XCFramework Release Script
+# CloudX Renderer - Static XCFramework Release Script
 # ============================================================================
 #
 # OVERVIEW:
-#   Builds CloudXRenderer as a DYNAMIC xcframework and prepares for binary distribution.
+#   Builds CloudXRenderer as a STATIC xcframework and prepares for binary distribution.
 #   This is used by CI/CD but can also be run locally for testing.
 #
 # USAGE:
@@ -14,7 +14,7 @@
 #
 # WHAT IT DOES:
 #   1. Validates version format and prerequisites
-#   2. Builds DYNAMIC xcframework for iOS device + simulator
+#   2. Builds STATIC xcframework for iOS device + simulator
 #   3. Uploads dSYMs to Sentry for symbolication
 #   4. Strips debug symbols from framework binary
 #   5. Creates distributable .zip file
@@ -80,7 +80,7 @@ OUTPUT_XCFRAMEWORK="${MODULE_NAME}.xcframework"
 ZIP_OUTPUT="${MODULE_NAME}.xcframework.zip"
 
 echo ""
-echo "🚀 Building ${MODULE_NAME} v${VERSION} as XCFramework (DYNAMIC)"
+echo "🚀 Building ${MODULE_NAME} v${VERSION} as STATIC XCFramework"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
@@ -113,7 +113,7 @@ mkdir -p "$ARCHIVE_DIR"
 print_success "Build directory cleaned"
 
 # Build for iOS Device
-print_step "📱 Building for iOS device..."
+print_step "📱 Building for iOS device (STATIC)..."
 set -o pipefail
 IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   -workspace CloudXRenderer.xcworkspace \
@@ -123,11 +123,12 @@ IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   -configuration Release \
   SKIP_INSTALL=NO \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-  CODE_SIGNING_ALLOWED=NO | tee xcodebuild-ios.log
-print_success "iOS device build completed"
+  CODE_SIGNING_ALLOWED=NO \
+  MACH_O_TYPE=staticlib | tee xcodebuild-ios.log
+print_success "iOS device build completed (STATIC)"
 
 # Build for iOS Simulator
-print_step "🖥️  Building for iOS simulator..."
+print_step "🖥️  Building for iOS simulator (STATIC)..."
 IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   -workspace CloudXRenderer.xcworkspace \
   -scheme CloudXRenderer \
@@ -136,16 +137,17 @@ IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   -configuration Release \
   SKIP_INSTALL=NO \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-  CODE_SIGNING_ALLOWED=NO | tee xcodebuild-sim.log
-print_success "iOS simulator build completed"
+  CODE_SIGNING_ALLOWED=NO \
+  MACH_O_TYPE=staticlib | tee xcodebuild-sim.log
+print_success "iOS simulator build completed (STATIC)"
 
 # Create XCFramework
-print_step "🧱 Creating .xcframework (DYNAMIC)..."
+print_step "🧱 Creating STATIC .xcframework..."
 xcodebuild -create-xcframework \
   -framework "$ARCHIVE_DIR/ios_devices.xcarchive/Products/Library/Frameworks/${MODULE_NAME}.framework" \
   -framework "$ARCHIVE_DIR/ios_simulator.xcarchive/Products/Library/Frameworks/${MODULE_NAME}.framework" \
   -output "$OUTPUT_XCFRAMEWORK"
-print_success "XCFramework created: $OUTPUT_XCFRAMEWORK"
+print_success "STATIC XCFramework created: $OUTPUT_XCFRAMEWORK"
 
 # Upload dSYMs to Sentry
 if [ "$SKIP_SENTRY" = false ]; then
@@ -185,12 +187,12 @@ print_success "Checksum: $CHECKSUM"
 # Generate release metadata
 print_step "📝 Generating release metadata..."
 cat > release_metadata.txt << EOF
-CloudXRenderer v$VERSION - XCFramework Release (DYNAMIC)
+CloudXRenderer v$VERSION - STATIC XCFramework Release
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 VERSION:    $VERSION
 TAG:        v${VERSION}-renderer
-TYPE:       DYNAMIC FRAMEWORK
+TYPE:       STATIC FRAMEWORK
 SIZE:       $ZIP_SIZE
 CHECKSUM:   $CHECKSUM
 
@@ -236,8 +238,10 @@ echo "   • $OUTPUT_XCFRAMEWORK"
 echo "   • $ZIP_OUTPUT ($ZIP_SIZE)"
 echo "   • release_metadata.txt"
 echo ""
-echo "🏗️  Framework Type: DYNAMIC (like CloudXCore)"
-echo "   Users must set: ENABLE_USER_SCRIPT_SANDBOXING = NO"
+echo "🏗️  Framework Type: STATIC"
+echo "   ✅ No dSYM warnings"
+echo "   ✅ Faster app launch times"
+echo "   ✅ Industry standard (matches AdMob, Meta, IronSource)"
 echo ""
 echo "📄 View release metadata:"
 echo "   cat release_metadata.txt"

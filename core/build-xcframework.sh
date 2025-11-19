@@ -5,7 +5,7 @@
 # ============================================================================
 #
 # OVERVIEW:
-#   Builds CloudXCore as a dynamic xcframework and prepares for binary distribution.
+#   Builds CloudXCore as a STATIC xcframework and prepares for binary distribution.
 #   This is used by CI/CD but can also be run locally for testing.
 #
 # USAGE:
@@ -80,7 +80,7 @@ OUTPUT_XCFRAMEWORK="${MODULE_NAME}.xcframework"
 ZIP_OUTPUT="${MODULE_NAME}.xcframework.zip"
 
 echo ""
-echo "🚀 Building ${MODULE_NAME} v${VERSION} as XCFramework"
+echo "🚀 Building ${MODULE_NAME} v${VERSION} as STATIC XCFramework"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
@@ -113,7 +113,7 @@ mkdir -p "$ARCHIVE_DIR"
 print_success "Build directory cleaned"
 
 # Build for iOS Device
-print_step "📱 Building for iOS device..."
+print_step "📱 Building for iOS device (STATIC)..."
 set -o pipefail
 IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   -project CloudXCore.xcodeproj \
@@ -128,11 +128,12 @@ IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   DEPLOYMENT_POSTPROCESSING=YES \
   STRIP_INSTALLED_PRODUCT=YES \
   STRIP_STYLE=non-global \
-  COPY_PHASE_STRIP=YES | tee xcodebuild-ios.log
-print_success "iOS device build completed"
+  COPY_PHASE_STRIP=YES \
+  MACH_O_TYPE=staticlib | tee xcodebuild-ios.log
+print_success "iOS device build completed (STATIC)"
 
 # Build for iOS Simulator
-print_step "🖥️  Building for iOS simulator..."
+print_step "🖥️  Building for iOS simulator (STATIC)..."
 IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   -project CloudXCore.xcodeproj \
   -scheme CloudXCore \
@@ -146,16 +147,17 @@ IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   DEPLOYMENT_POSTPROCESSING=YES \
   STRIP_INSTALLED_PRODUCT=YES \
   STRIP_STYLE=non-global \
-  COPY_PHASE_STRIP=YES | tee xcodebuild-sim.log
-print_success "iOS simulator build completed"
+  COPY_PHASE_STRIP=YES \
+  MACH_O_TYPE=staticlib | tee xcodebuild-sim.log
+print_success "iOS simulator build completed (STATIC)"
 
 # Create XCFramework
-print_step "🧱 Creating .xcframework..."
+print_step "🧱 Creating STATIC .xcframework..."
 xcodebuild -create-xcframework \
   -framework "$ARCHIVE_DIR/ios_devices.xcarchive/Products/Library/Frameworks/${MODULE_NAME}.framework" \
   -framework "$ARCHIVE_DIR/ios_simulator.xcarchive/Products/Library/Frameworks/${MODULE_NAME}.framework" \
   -output "$OUTPUT_XCFRAMEWORK"
-print_success "XCFramework created: $OUTPUT_XCFRAMEWORK"
+print_success "STATIC XCFramework created: $OUTPUT_XCFRAMEWORK"
 
 # Note: dSYM generation disabled - no debug symbols to upload or strip
 print_step "ℹ️  Debug symbols disabled (no dSYMs generated)"
@@ -175,11 +177,12 @@ print_success "Checksum: $CHECKSUM"
 # Generate release metadata
 print_step "📝 Generating release metadata..."
 cat > release_metadata.txt << EOF
-CloudXCore v$VERSION - XCFramework Release
+CloudXCore v$VERSION - STATIC XCFramework Release
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 VERSION:    $VERSION
 TAG:        v${VERSION}-core
+TYPE:       STATIC FRAMEWORK
 SIZE:       $ZIP_SIZE
 CHECKSUM:   $CHECKSUM
 

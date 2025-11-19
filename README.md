@@ -30,10 +30,10 @@ https://github.com/cloudx-io/cloudx-ios
 
 ## Components
 
-- **[`core/`](core/README.md)** - The foundational CloudX Core SDK written in Objective-C that provides the base functionality for programmatic advertising *(source-based distribution)*
-- **[`adapter-meta/`](adapter-meta/README.md)** - Meta (Facebook Audience Network) adapter for integrating Meta's advertising platform *(framework-based distribution)*
-- **[`adapter-vungle/`](adapter-vungle/README.md)** - Vungle (Liftoff) adapter for integrating Vungle/Liftoff advertising with header bidding support *(source-based distribution)*
-- **[`renderer-cloudx/`](renderer-cloudx/README.md)** - CloudX Renderer for header bidding integration with CloudX's programmatic platform
+- **[`core/`](core/README.md)** - The foundational CloudX Core SDK written in Objective-C that provides the base functionality for programmatic advertising *(source-based distribution, static framework)*
+- **[`adapter-meta/`](adapter-meta/README.md)** - Meta (Facebook Audience Network) adapter for integrating Meta's advertising platform *(static framework distribution)*
+- **[`adapter-vungle/`](adapter-vungle/README.md)** - Vungle (Liftoff) adapter for integrating Vungle/Liftoff advertising with header bidding support *(source-based distribution, static framework)*
+- **[`renderer-cloudx/`](renderer-cloudx/README.md)** - CloudX Renderer for header bidding integration with CloudX's programmatic platform *(static framework)*
 - **[`demo-app-objc/`](demo-app-objc/)** - Complete Objective-C demo application showcasing CloudX SDK integration and usage patterns
 - **[`demo-app-swift/`](demo-app-swift/)** - Complete Swift demo application demonstrating CloudX SDK implementation in Swift projects
 
@@ -59,10 +59,19 @@ vX.Y.Z-vungle   # Vungle Adapter release (source distribution)
 ```
 
 #### Distribution Methods
-- **Core SDK**: Direct source integration via CocoaPods/SPM for easier debugging and customization
-- **Meta Adapter**: Pre-built xcframework for faster build times and simplified integration
-- **Vungle Adapter**: Direct source integration via CocoaPods/SPM for easier debugging and full transparency
+- **Core SDK**: Direct source integration via CocoaPods/SPM or static xcframework for production use
+- **Meta Adapter**: Pre-built static xcframework for faster build times and simplified integration
+- **Vungle Adapter**: Direct source integration via CocoaPods/SPM or static xcframework for production use
+- **Renderer**: Static xcframework for optimal performance and clean integration
 - **Automated Releases**: GitHub Actions automatically build, test, and publish releases when tags are pushed
+
+#### Framework Type: Static (v1.2.0+)
+All CloudX frameworks are built as **static frameworks** to provide:
+- ✅ Faster app launch times (no dynamic linking overhead)
+- ✅ No dSYM warnings in Xcode
+- ✅ Industry-standard architecture
+- ✅ Cleaner App Store submissions
+- ✅ Better performance and memory efficiency
 
 ### Release Assets
 
@@ -73,9 +82,14 @@ Each component release provides the appropriate assets for its distribution meth
 - No binary downloads required
 - Full source code availability for debugging
 
-#### Meta Adapter Assets (Framework Distribution) 
+#### Meta Adapter Assets (Static Framework Distribution) 
 ```
 CloudXMetaAdapter-vX.Y.Z.xcframework.zip  # Static xcframework for integration
+```
+
+#### Renderer Assets (Static Framework Distribution)
+```
+CloudXRenderer-vX.Y.Z.xcframework.zip     # Static xcframework for integration
 ```
 
 #### Benefits
