@@ -361,7 +361,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
     [self.banner failToLoadBanner:nil error:waterfallError];
     
     XCTAssertTrue(self.mockDelegate.failToLoadCalled, @"Delegate should be notified of failure");
-    XCTAssertEqual(self.mockDelegate.lastError.code, CLXErrorCodeNoFill, @"Error should be converted to NO_FILL");
+    XCTAssertEqual(self.mockDelegate.lastError.code, CLXBidAdSourceErrorNoBid, @"Error code should be preserved from original error");
     XCTAssertEqualObjects(self.mockDelegate.lastError.domain, CLXErrorDomain, @"Error domain should be CLXErrorDomain");
 }
 

@@ -5,6 +5,7 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CLXEventTrackerBulkApi.h>
 #import <CloudXCore/CLXEventAM.h>
+#import <CloudXCore/CLXError.h>
 
 @interface CLXEventTrackerBulkApiTests : XCTestCase
 @property (nonatomic, strong) CLXEventTrackerBulkApiImpl *bulkApi;

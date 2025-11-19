@@ -131,7 +131,7 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
 @property (nonatomic, strong) NSMutableArray<NSDictionary *> *eventLog;
 @property (nonatomic, assign) NSInteger didLoadCount;
 @property (nonatomic, assign) NSInteger failToLoadCount;
-@property (nonatomic, assign) NSInteger noFillErrorCount;
+@property (nonatomic, assign) NSInteger noBidErrorCount;
 @property (nonatomic, strong, nullable) NSError *lastError;
 @end
 
@@ -143,7 +143,7 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
         _eventLog = [[NSMutableArray alloc] init];
         _didLoadCount = 0;
         _failToLoadCount = 0;
-        _noFillErrorCount = 0;
+        _noBidErrorCount = 0;
     }
     return self;
 }
@@ -166,8 +166,8 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
 - (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
     self.failToLoadCount++;
     self.lastError = error;
-    if (error.code == CLXErrorCodeNoFill) {
-        self.noFillErrorCount++;
+    if (error.code == CLXBidAdSourceErrorNoBid) {
+        self.noBidErrorCount++;
     }
     [self logEvent:@"failToLoadWithAd" withData:@{
         @"ad": ad ? NSStringFromClass([ad class]) : @"nil",
@@ -213,8 +213,8 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
 - (void)failToLoadBanner:(nullable id<CLXAdapterBanner>)banner error:(nullable NSError *)error {
     self.failToLoadCount++;
     self.lastError = error;
-    if (error.code == CLXErrorCodeNoFill) {
-        self.noFillErrorCount++;
+    if (error.code == CLXBidAdSourceErrorNoBid) {
+        self.noBidErrorCount++;
     }
     NSString *bannerID = banner ? [(PreciseTimingMockAdapter *)banner adapterID] : @"nil";
     [self logEvent:@"failToLoadBanner" withData:@{
@@ -442,9 +442,9 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
     [self.banner failToLoadBanner:nil error:waterfallError];
     
     XCTAssertEqual(self.specDelegate.failToLoadCount, 1, @"Should have failed to load");
-    XCTAssertEqual(self.specDelegate.noFillErrorCount, 1, @"Should have converted to NO_FILL error per spec");
-    XCTAssertEqual(self.specDelegate.lastError.code, CLXErrorCodeNoFill, @"Error code should be NO_FILL per spec");
-    XCTAssertEqualObjects(self.specDelegate.lastError.domain, CLXErrorDomain, @"Error domain should be CLXErrorDomain per spec");
+    XCTAssertEqual(self.specDelegate.noBidErrorCount, 1, @"Should have NoBid error");
+    XCTAssertEqual(self.specDelegate.lastError.code, CLXBidAdSourceErrorNoBid, @"Error code should be preserved from original error");
+    XCTAssertEqualObjects(self.specDelegate.lastError.domain, CLXErrorDomain, @"Error domain should be CLXErrorDomain");
 }
 
 // Test NO_FILL maintains refresh cadence
@@ -455,9 +455,9 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
                                               userInfo:@{NSLocalizedDescriptionKey: @"All bids failed in waterfall."}];
     
     [self.banner failToLoadBanner:nil error:waterfallError];
-    XCTAssertEqual(self.specDelegate.noFillErrorCount, 1, @"Should have NO_FILL error");
+    XCTAssertEqual(self.specDelegate.noBidErrorCount, 1, @"Should have NoBid error");
     
-    // Test that the banner can recover from NO_FILL errors
+    // Test that the banner can recover from no-bid errors
     XCTAssertTrue(self.banner.isVisible, @"Banner should maintain visibility state after error");
 }
 

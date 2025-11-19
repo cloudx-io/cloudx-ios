@@ -16,12 +16,12 @@
 @end
 
 // Testing category to expose internal methods for testing
-// These methods are internal because server support for GDPR/COPPA is not yet implemented
+// GDPR methods are internal because server support is not yet implemented. COPPA is enabled per OpenRTB spec.
 @interface CLXPrivacyService (Testing)
 - (BOOL)shouldClearPersonalDataIgnoringATT; // Test without ATT dependency
 - (nullable NSString *)gdprConsentString; // Internal - server not supported
 - (nullable NSNumber *)gdprApplies; // Internal - server not supported
-- (nullable NSNumber *)coppaApplies; // Internal - server not supported
+- (nullable NSNumber *)coppaApplies; // Returns integer 0 or 1 per OpenRTB spec
 @end
 
 // Testing category to mock ATT service for testing
