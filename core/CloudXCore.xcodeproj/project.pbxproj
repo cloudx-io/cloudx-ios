@@ -54,6 +54,13 @@
 		19656C242E91CF3100BFA06E /* CLXBidLifecycleEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19656C232E91CF3100BFA06E /* CLXBidLifecycleEvent.m */; };
 		196A3EE72EA191170079FD56 /* CLXCDPIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196A3EE62EA191170079FD56 /* CLXCDPIntegrationTests.m */; };
 		196A3EE82EA191170079FD56 /* CLXBidAdSourceCDPFlowTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196A3EE52EA191170079FD56 /* CLXBidAdSourceCDPFlowTests.m */; };
+		196C043F2ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C04382ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m */; };
+		196C04402ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C043A2ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m */; };
+		196C04412ECDBC1B0087146A /* CLXLoggerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C043C2ECDBC1B0087146A /* CLXLoggerTests.m */; };
+		196C04422ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C04392ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m */; };
+		196C04442ECDBC1B0087146A /* CLXKeyValueStateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C043B2ECDBC1B0087146A /* CLXKeyValueStateTests.m */; };
+		196C04462ECDBC1B0087146A /* CLXSDKLifecycleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C043E2ECDBC1B0087146A /* CLXSDKLifecycleTests.m */; };
+		196C05BA2ECDDEA60087146A /* CLXSDKInitQueueTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C05B92ECDDEA60087146A /* CLXSDKInitQueueTests.m */; };
 		1979919A2E74921400EBA0A3 /* CLXGPPProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 197991992E74921400EBA0A3 /* CLXGPPProvider.m */; };
 		1979919D2E74923900EBA0A3 /* CLXGppConsent.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919B2E74923900EBA0A3 /* CLXGppConsent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1979919E2E74923900EBA0A3 /* CLXGPPProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -386,6 +393,13 @@
 		19656C232E91CF3100BFA06E /* CLXBidLifecycleEvent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidLifecycleEvent.m; sourceTree = "<group>"; };
 		196A3EE52EA191170079FD56 /* CLXBidAdSourceCDPFlowTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidAdSourceCDPFlowTests.m; sourceTree = "<group>"; };
 		196A3EE62EA191170079FD56 /* CLXCDPIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXCDPIntegrationTests.m; sourceTree = "<group>"; };
+		196C04382ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXDynamicPathInjectionTests.m; sourceTree = "<group>"; };
+		196C04392ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXEventTrackerBulkApiTests.m; sourceTree = "<group>"; };
+		196C043A2ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXKeyValueBidRequestInjectionTests.m; sourceTree = "<group>"; };
+		196C043B2ECDBC1B0087146A /* CLXKeyValueStateTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXKeyValueStateTests.m; sourceTree = "<group>"; };
+		196C043C2ECDBC1B0087146A /* CLXLoggerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXLoggerTests.m; sourceTree = "<group>"; };
+		196C043E2ECDBC1B0087146A /* CLXSDKLifecycleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSDKLifecycleTests.m; sourceTree = "<group>"; };
+		196C05B92ECDDEA60087146A /* CLXSDKInitQueueTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSDKInitQueueTests.m; sourceTree = "<group>"; };
 		197991992E74921400EBA0A3 /* CLXGPPProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGPPProvider.m; sourceTree = "<group>"; };
 		1979919B2E74923900EBA0A3 /* CLXGppConsent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGppConsent.h; sourceTree = "<group>"; };
 		1979919C2E74923900EBA0A3 /* CLXGPPProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXGPPProvider.h; sourceTree = "<group>"; };
@@ -763,6 +777,13 @@
 		19C7247E2E2390420012CFC7 /* CloudXCoreTests */ = {
 			isa = PBXGroup;
 			children = (
+				196C05B92ECDDEA60087146A /* CLXSDKInitQueueTests.m */,
+				196C04382ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m */,
+				196C04392ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m */,
+				196C043A2ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m */,
+				196C043B2ECDBC1B0087146A /* CLXKeyValueStateTests.m */,
+				196C043C2ECDBC1B0087146A /* CLXLoggerTests.m */,
+				196C043E2ECDBC1B0087146A /* CLXSDKLifecycleTests.m */,
 				19FF30F72EA6E81A0006F05A /* CLXLoopIndexTrackerTests.m */,
 				19FF30F82EA6E81A0006F05A /* CLXSessionDepthIntegrationTests.m */,
 				19FF30F92EA6E81A0006F05A /* CLXSessionDepthUnitTests.m */,
@@ -1602,6 +1623,7 @@
 				19D92B412E690C2A00C84DAE /* CLXAdFormatDelegateCallbackTests.m in Sources */,
 				19D92B422E690C2A00C84DAE /* CLXDelegateCallbackTypeTests.m in Sources */,
 				19D929042E6403E000C84DAE /* CLXBiddingConfigPrivacyTests.m in Sources */,
+				196C05BA2ECDDEA60087146A /* CLXSDKInitQueueTests.m in Sources */,
 				1916B0F92E7DECDD00E49E3E /* MockCLXWinLossTracker.m in Sources */,
 				19D92C812E6B7F7300C84DAE /* CLXBannerAdViewUnitTests.m in Sources */,
 				19D9283F2E63A99000C84DAE /* CLXInterstitialIntegrationTests.m in Sources */,
@@ -1621,6 +1643,12 @@
 				197994812E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m in Sources */,
 				1916B1702E7E061B00E49E3E /* CLXWinLossNetworkServiceTests.m in Sources */,
 				1916B1712E7E061B00E49E3E /* CLXSQLiteDatabaseTests.m in Sources */,
+				196C043F2ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m in Sources */,
+				196C04402ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m in Sources */,
+				196C04412ECDBC1B0087146A /* CLXLoggerTests.m in Sources */,
+				196C04422ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m in Sources */,
+				196C04442ECDBC1B0087146A /* CLXKeyValueStateTests.m in Sources */,
+				196C04462ECDBC1B0087146A /* CLXSDKLifecycleTests.m in Sources */,
 				1916B2672E819FD400E49E3E /* CLXMetricsEventDaoTests.m in Sources */,
 				1916B2682E819FD400E49E3E /* CLXMetricsEventTests.m in Sources */,
 				19FF30FA2EA6E81A0006F05A /* CLXSessionDepthIntegrationTests.m in Sources */,

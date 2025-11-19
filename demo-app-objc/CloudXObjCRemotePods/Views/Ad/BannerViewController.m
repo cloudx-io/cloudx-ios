@@ -95,6 +95,17 @@
     self.gppScenarioPicker.translatesAutoresizingMaskIntoConstraints = NO;
     [buttonStack addArrangedSubview:self.gppScenarioPicker];
     
+    // TEMPORARY: Init SDK button for queue testing
+    UIButton *initSDKButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [initSDKButton setTitle:@"🔧 Init SDK (Test)" forState:UIControlStateNormal];
+    [initSDKButton addTarget:self action:@selector(initSDKForTesting) forControlEvents:UIControlEventTouchUpInside];
+    initSDKButton.backgroundColor = [UIColor systemBlueColor];
+    [initSDKButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    initSDKButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    initSDKButton.layer.cornerRadius = 8;
+    initSDKButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:initSDKButton];
+    
     // Load Banner button
     UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [loadButton setTitle:@"Load Banner" forState:UIControlStateNormal];
@@ -122,6 +133,8 @@
     [NSLayoutConstraint activateConstraints:@[
         [buttonStack.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
         [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
+        [initSDKButton.widthAnchor constraintEqualToConstant:200],
+        [initSDKButton.heightAnchor constraintEqualToConstant:44],
         [loadButton.widthAnchor constraintEqualToConstant:200],
         [loadButton.heightAnchor constraintEqualToConstant:44],
         [self.autoRefreshButton.widthAnchor constraintEqualToConstant:200],

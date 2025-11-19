@@ -159,6 +159,21 @@ NS_ASSUME_NONNULL_BEGIN
     // Store correlation ID for this request
     self.currentCorrelationId = correlationId;
     
+    // Re-resolve bidNetworkService if nil (happens when banner created before SDK init)
+    if (!self.bidNetworkService) {
+        CLXDIContainer *container = [CLXDIContainer shared];
+        self.bidNetworkService = [container resolveType:ServiceTypeSingleton class:[CLXBidNetworkServiceClass class]];
+        if (self.bidNetworkService) {
+            [self.logger debug:@"BidNetworkService resolved from DI container"];
+        } else {
+            [self.logger error:@"BidNetworkService not available in DI container - SDK may not be initialized"];
+            if (completion) {
+                completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:2 userInfo:@{NSLocalizedDescriptionKey: @"BidNetworkService not available"}]);
+            }
+            return;
+        }
+    }
+    
     [self.logger info:[NSString stringWithFormat:@"[%@] Auction started - AdUnit: %@, Placement: %@, AdType: %ld", correlationId, adUnitID, self.placementID, (long)self.adType]];
     
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
@@ -457,17 +472,11 @@ NS_ASSUME_NONNULL_BEGIN
     dispatch_group_t group = dispatch_group_create();
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     
-    // Get ready adapters from CloudXCore
-    CloudXCore *core = [CloudXCore shared];
+    // Request bid tokens from all available adapters
+    // Note: All adapters are guaranteed initialized when SDK is ready (blocking init)
     
     for (NSString *adapterName in self.bidTokenSources.allKeys) {
         id<CLXBidTokenSource> tokenSource = self.bidTokenSources[adapterName];
-        
-        // Check if adapter is ready before requesting token
-        if (![core isAdapterReady:adapterName]) {
-            [self.logger info:[NSString stringWithFormat:@"⏳ Skipping token request for %@ - adapter not ready yet (still initializing)", adapterName]];
-            continue;
-        }
         
         dispatch_group_enter(group);
         [tokenSource getTokenWithCompletion:^(NSDictionary<NSString *,NSString *> * _Nullable token, NSError * _Nullable error) {

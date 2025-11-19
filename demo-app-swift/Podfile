@@ -20,3 +20,4 @@ target 'CloudXSwiftRemotePods' do
   end
 
 end
+  pod 'AppLovinSDK'

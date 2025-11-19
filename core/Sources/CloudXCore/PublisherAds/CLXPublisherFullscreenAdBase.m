@@ -32,9 +32,16 @@
 #import <CloudXCore/CLXAdType.h>
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CloudXCoreAPI.h>
+#import <CloudXCore/CLXConfigImpressionModel.h>
+#import <CloudXCore/CLXSDKConfig.h>
 #import <objc/runtime.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+// Private category to access internal SDK methods (framework-internal only, not exposed in public API)
+@interface CloudXCore (Internal)
+- (nullable CLXConfigImpressionModel *)createImpModelWithAuctionID:(NSString *)auctionID;
+@end
 
 /**
  * Ad state enumeration defining the lifecycle states of fullscreen ads
@@ -83,7 +90,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 @property (nonatomic, strong) id<CLXWinLossTracking> winLossTracker;
 
 // Queued load request handling (for SDK init race condition)
-@property (nonatomic, assign) BOOL hasPendingLoadRequest;
+@property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
 
 @end
 
@@ -123,7 +130,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         _impModel = impModel;
         _forceCloseEventDelay = 30.0;
         _closeEventReceived = NO;
-        _hasPendingLoadRequest = NO;
+        _pendingLoadRequestCount = 0;
         
         // Initialize Analytics tracking service
         _rillTrackingService = [[CLXRillTrackingService alloc] initWithReportingService:_reportingService];
@@ -131,7 +138,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         // Listen for SDK initialization completion (internal notification)
         [[NSNotificationCenter defaultCenter] addObserver:self 
                                                  selector:@selector(handleSDKInitialized:) 
-                                                     name:@"CLXSDKInitializedNotification" 
+                                                     name:CLXSDKInitializedNotification 
                                                    object:nil];
         
         // Initialize win/loss tracker
@@ -211,8 +218,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)dealloc {
     [self.logger debug:[NSString stringWithFormat:@"Deallocating fullscreen ad for placement: %@", _placementID]];
     
-    // Remove notification observer
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"CLXSDKInitializedNotification" object:nil];
+    // CRITICAL: Remove notification observer to prevent crashes if ad deallocated without destroy
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:CLXSDKInitializedNotification object:nil];
     
     // Clean up current adapter
     id currentAdapter = [self getCurrentAdapter];
@@ -229,8 +236,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)load {
     // Check if SDK is initialized
     if (![[CloudXCore shared] isInitialized]) {
-        [self.logger info:[NSString stringWithFormat:@"SDK not yet initialized, queuing load request for placement: %@", self.placementID]];
-        self.hasPendingLoadRequest = YES;
+        self.pendingLoadRequestCount++;
+        [self.logger info:[NSString stringWithFormat:@"SDK not yet initialized, queuing load request #%lu for placement: %@", (unsigned long)self.pendingLoadRequestCount, self.placementID]];
         return;
     }
     
@@ -242,12 +249,20 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)performLoad {
     // Check if we need to look up the real placement config (temporary config has empty ID)
     if ([self.placementID length] == 0 && [[CloudXCore shared] isInitialized]) {
-        // SDK is now initialized - look up the real placement config
-        NSDictionary *adPlacements = [[CloudXCore shared] valueForKey:@"adPlacements"];
-        CLXSDKConfigPlacement *realPlacement = adPlacements[self.placementName];
+        // SDK is now initialized - look up the real placement config using public API
+        CLXSDKConfigPlacement *realPlacement = [[CloudXCore shared] placementConfigForName:self.placementName];
         if (realPlacement) {
             [self.logger debug:[NSString stringWithFormat:@"Updating placement config for: %@ (ID: %@)", self.placementName, realPlacement.id]];
             _placementID = realPlacement.id;
+            
+            // Create impression model now that SDK is initialized (ensures app.id is populated)
+            NSString *auctionID = [[NSUUID UUID] UUIDString];
+            self.impModel = [[CloudXCore shared] createImpModelWithAuctionID:auctionID];
+            if (self.impModel) {
+                [self.logger debug:[NSString stringWithFormat:@"Created impression model with appID: %@", self.impModel.sdkConfig.appID]];
+            } else {
+                [self.logger error:@"Failed to create impression model after SDK init"];
+            }
         } else {
             [self.logger error:[NSString stringWithFormat:@"Placement not found after SDK init: %@", self.placementName]];
             NSError *error = [NSError errorWithDomain:@"CLXErrorDomain"
@@ -298,9 +313,11 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 // Handle SDK initialization notification
 - (void)handleSDKInitialized:(NSNotification *)notification {
-    if (self.hasPendingLoadRequest) {
-        [self.logger info:[NSString stringWithFormat:@"SDK initialized, executing queued load request for placement: %@", self.placementID]];
-        self.hasPendingLoadRequest = NO;
+    NSUInteger queuedRequests = self.pendingLoadRequestCount;
+    if (queuedRequests > 0) {
+        [self.logger info:[NSString stringWithFormat:@"SDK initialized, executing %lu queued load request(s) for placement: %@", (unsigned long)queuedRequests, self.placementID]];
+        self.pendingLoadRequestCount = 0;
+        // Execute load once (multiple load() calls for same ad are redundant)
         [self performLoad];
     }
 }

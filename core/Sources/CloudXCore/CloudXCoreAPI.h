@@ -4,6 +4,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ * Notification posted when SDK initialization completes
+ * @discussion Internal notification used by ad objects to coordinate queued operations
+ */
+FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
+
 // Forward declarations for public interfaces
 @protocol CLXBannerDelegate;
 @protocol CLXInterstitialDelegate;
@@ -13,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXBannerAdView;
 @class CLXNativeAdView;
 @class CLXSDKConfigResponse;
+@class CLXSDKConfigPlacement;
 @class CLXInterstitial;
 @class CLXRewarded;
 
@@ -250,6 +257,14 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion Internal API used by bid request logic to avoid race conditions during SDK initialization
  */
 - (BOOL)isAdapterReady:(NSString *)adapterName;
+
+/**
+ * Look up placement configuration by name
+ * @param placementName The placement name
+ * @return Placement configuration or nil if not found
+ * @discussion Internal API used by ad objects to look up placement configuration after SDK initialization
+ */
+- (nullable CLXSDKConfigPlacement *)placementConfigForName:(NSString *)placementName;
 
 @end
 

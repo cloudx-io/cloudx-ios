@@ -75,6 +75,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) CLXConfigImpressionModel *impModel;
 @property (nonatomic, strong) id<CLXWinLossTracking> winLossTracker;
 
+// Queued load request handling (for SDK init race condition)
+@property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
+
 @end
 
 @implementation CLXPublisherNative
@@ -112,9 +115,16 @@ NS_ASSUME_NONNULL_BEGIN
         _forceStop = NO;
         _successWin = NO;
         _loadNativeTimesCount = 0;
+        _pendingLoadRequestCount = 0;
         
         // Initialize Analytics tracking service
         _rillTrackingService = [[CLXRillTrackingService alloc] initWithReportingService:reportingService];
+        
+        // Listen for SDK initialization completion (internal notification)
+        [[NSNotificationCenter defaultCenter] addObserver:self 
+                                                 selector:@selector(handleSDKInitialized:) 
+                                                     name:CLXSDKInitializedNotification 
+                                                   object:nil];
         
         // Initialize win/loss tracker
         _winLossTracker = [CLXWinLossTracker shared];
@@ -167,9 +177,29 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+#pragma mark - Lifecycle
+
+- (void)dealloc {
+    // CRITICAL: Remove notification observer to prevent crashes if native ad deallocated without destroy
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:CLXSDKInitializedNotification object:nil];
+}
+
 #pragma mark - CloudXNative Protocol
 
 - (void)load {
+    // Check if SDK is initialized
+    if (![[CloudXCore shared] isInitialized]) {
+        self.pendingLoadRequestCount++;
+        [self.logger info:[NSString stringWithFormat:@"SDK not yet initialized, queuing load request #%lu for placement: %@", (unsigned long)self.pendingLoadRequestCount, self.placementID]];
+        return;
+    }
+    
+    // SDK is ready, proceed with load
+    [self performLoad];
+}
+
+// Internal method to actually perform the load operation
+- (void)performLoad {
     // Generate correlation ID for this ad load request
     self.currentCorrelationId = [[NSUUID UUID] UUIDString];
     
@@ -183,6 +213,17 @@ NS_ASSUME_NONNULL_BEGIN
     
     // Implement async native update request
     [self requestNativeUpdate];
+}
+
+// Handle SDK initialization notification
+- (void)handleSDKInitialized:(NSNotification *)notification {
+    NSUInteger queuedRequests = self.pendingLoadRequestCount;
+    if (queuedRequests > 0) {
+        [self.logger info:[NSString stringWithFormat:@"SDK initialized, executing %lu queued load request(s) for placement: %@", (unsigned long)queuedRequests, self.placementID]];
+        self.pendingLoadRequestCount = 0;
+        // Execute load once (multiple load() calls for same ad are redundant)
+        [self performLoad];
+    }
 }
 
 
