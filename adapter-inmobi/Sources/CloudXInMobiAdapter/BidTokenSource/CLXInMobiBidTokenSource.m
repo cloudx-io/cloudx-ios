@@ -97,7 +97,7 @@
                 // Fallback: some InMobi SDK versions might return a dictionary
                 token = ((NSDictionary *)tokenResponse)[@"token"];
             } else if (tokenResponse != nil) {
-                [self.logger warning:[NSString stringWithFormat:@"Unexpected token response type: %@", NSStringFromClass([tokenResponse class])]];
+                [self.logger warn:[NSString stringWithFormat:@"Unexpected token response type: %@", NSStringFromClass([tokenResponse class])]];
             }
             
             NSString *idfa = [[CLXSettings sharedInstance] getIFA];

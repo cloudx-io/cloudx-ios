@@ -44,35 +44,42 @@
 }
 
 - (nullable id<CLXAdapterInterstitial>)createWithAdId:(NSString *)adId
-                                          placementId:(NSString *)placementId
-                                           bidPayload:(nullable NSString *)bidPayload
-                                                bidID:(NSString *)bidID
+                                                bidId:(NSString *)bidId
+                                                  adm:(NSString *)adm
+                                               extras:(NSDictionary<NSString *, NSString *> *)extras
                                              delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
-    
-    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating interstitial - AdID: %@, Placement: %@, BidID: %@", 
-                                    adId, placementId, bidID]];
-    
-    // Extract InMobi placement ID
+
+    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating interstitial - AdID: %@, BidID: %@",
+                                    adId, bidId]];
+
+    // Extract InMobi placement ID from extras
+    NSString *placementId = extras[@"placement_id"];
     long long inmobiPlacementID = [self.baseFactory extractPlacementID:placementId];
     if (inmobiPlacementID == 0) {
         [self.baseFactory.logger error:@"Invalid placement ID"];
         return nil;
     }
-    
+
+    // Validate bid payload (adm)
+    if (![self.baseFactory validateBidPayload:adm]) {
+        [self.baseFactory.logger error:@"Invalid bid payload"];
+        return nil;
+    }
+
     // Convert bid payload string to NSData if present
     NSData *bidPayloadData = nil;
-    if (bidPayload && bidPayload.length > 0) {
-        bidPayloadData = [bidPayload dataUsingEncoding:NSUTF8StringEncoding];
+    if (adm && adm.length > 0) {
+        bidPayloadData = [adm dataUsingEncoding:NSUTF8StringEncoding];
     }
-    
+
     // Create interstitial adapter
     CLXInMobiInterstitial *interstitial = [[CLXInMobiInterstitial alloc] initWithBidPayload:bidPayloadData
                                                                                  placementID:inmobiPlacementID
-                                                                                       bidID:bidID
+                                                                                       bidID:bidId
                                                                                     delegate:delegate];
-    
+
     [self.baseFactory.logger debug:@"Interstitial adapter created successfully"];
-    
+
     return interstitial;
 }
 

@@ -24,6 +24,7 @@
 #endif
 
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXBannerType.h>
 
 @interface CLXInMobiBannerFactory ()
 @property (nonatomic, strong) CLXInMobiBaseFactory *baseFactory;
@@ -44,36 +45,56 @@
 }
 
 - (nullable id<CLXAdapterBanner>)createWithViewController:(UIViewController *)viewController
-                                                     adId:(NSString *)adId
-                                              placementId:(NSString *)placementId
-                                               bidPayload:(nullable NSString *)bidPayload
-                                                    bidID:(NSString *)bidID
-                                               bannerSize:(CGSize)bannerSize
-                                                 delegate:(id<CLXAdapterBannerDelegate>)delegate {
-    
-    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating banner - AdID: %@, Placement: %@, Size: %.0fx%.0f", 
-                                    adId, placementId, bannerSize.width, bannerSize.height]];
-    
+                                                        type:(CLXBannerType)type
+                                                        adId:(NSString *)adId
+                                                       bidId:(NSString *)bidId
+                                                         adm:(NSString *)adm
+                                             hasClosedButton:(BOOL)hasClosedButton
+                                                      extras:(NSDictionary<NSString *, NSString *> *)extras
+                                                    delegate:(id<CLXAdapterBannerDelegate>)delegate {
+
+    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating banner - AdID: %@, BidID: %@, Type: %ld",
+                                    adId, bidId, (long)type]];
+
+    // Extract placement ID from extras
+    NSString *placementId = extras[@"placement_id"];
+    if (!placementId) {
+        [self.baseFactory.logger error:@"Missing placement_id in extras"];
+        return nil;
+    }
+
     long long inmobiPlacementID = [self.baseFactory extractPlacementID:placementId];
     if (inmobiPlacementID == 0) {
         [self.baseFactory.logger error:@"Invalid placement ID"];
         return nil;
     }
-    
-    NSData *bidPayloadData = nil;
-    if (bidPayload && bidPayload.length > 0) {
-        bidPayloadData = [bidPayload dataUsingEncoding:NSUTF8StringEncoding];
+
+    // Convert banner type to size
+    CGSize bannerSize;
+    switch (type) {
+        case CLXBannerTypeMREC:
+            bannerSize = CGSizeMake(300, 250);
+            break;
+        case CLXBannerTypeW320H50:
+        default:
+            bannerSize = CGSizeMake(320, 50);
+            break;
     }
-    
+
+    NSData *bidPayloadData = nil;
+    if (adm && adm.length > 0) {
+        bidPayloadData = [adm dataUsingEncoding:NSUTF8StringEncoding];
+    }
+
     CLXInMobiBanner *banner = [[CLXInMobiBanner alloc] initWithBidPayload:bidPayloadData
                                                                placementID:inmobiPlacementID
-                                                                     bidID:bidID
+                                                                     bidID:bidId
                                                                       size:bannerSize
                                                             viewController:viewController
                                                                   delegate:delegate];
-    
+
     [self.baseFactory.logger debug:@"Banner adapter created successfully"];
-    
+
     return banner;
 }
 

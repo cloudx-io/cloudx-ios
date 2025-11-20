@@ -71,12 +71,12 @@
     
     // Dev Configuration (MetaTestiOS - bundle: cloudx.CloudXObjCRemotePods)
     CLXDemoConfig *devConfig = [[CLXDemoConfig alloc]
-        initWithAppKey:@"9o_9omGptuyS2n5wV0QJu"
+        initWithAppKey:@"NddUgEiyx_bbYax2BQGI2"
         hashedUserId:@"test-user-123"
         baseURL:@"https://pro-dev.cloudx.io/sdk"
-        bannerPlacement:@"metaBanner"
-        mrecPlacement:@"metaMREC"
-        interstitialPlacement:@"metaInterstitial"
+        bannerPlacement:@"inmobi-banner"
+        mrecPlacement:@"inmobi-mrec"
+        interstitialPlacement:@"inmobi-interstitial"
         nativePlacement:@"metaNative"
         nativeBannerPlacement:@"metaNative"
         rewardedPlacement:@"metaRewarded"
