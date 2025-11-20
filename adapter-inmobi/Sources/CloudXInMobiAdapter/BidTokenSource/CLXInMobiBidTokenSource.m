@@ -87,8 +87,19 @@
                                tp ?: @"(none)", tpVer ?: @"(none)"]];
             
             // Get InMobi bidder token with partner information
-            NSDictionary *tokenDict = [IMSdk getTokenWithExtras:[extras copy] andKeywords:nil];
-            NSString *token = tokenDict[@"token"];
+            id tokenResponse = [IMSdk getTokenWithExtras:[extras copy] andKeywords:nil];
+            
+            // InMobi SDK returns the token directly as a string, not in a dictionary
+            NSString *token = nil;
+            if ([tokenResponse isKindOfClass:[NSString class]]) {
+                token = (NSString *)tokenResponse;
+            } else if ([tokenResponse isKindOfClass:[NSDictionary class]]) {
+                // Fallback: some InMobi SDK versions might return a dictionary
+                token = ((NSDictionary *)tokenResponse)[@"token"];
+            } else if (tokenResponse != nil) {
+                [self.logger warning:[NSString stringWithFormat:@"Unexpected token response type: %@", NSStringFromClass([tokenResponse class])]];
+            }
+            
             NSString *idfa = [[CLXSettings sharedInstance] getIFA];
             
             [self.logger debug:[NSString stringWithFormat:@"InMobi bidder token: %@ | IDFA from CLXSettings: %@", 
