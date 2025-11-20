@@ -13,7 +13,7 @@ import AdSupport
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
-    var window: UIWindow? {
+    @objc var window: UIWindow? {
         // Fallback window for Meta SDK compatibility
         // In scene-based apps, the actual window is managed by SceneDelegate
         // but some SDKs still expect AppDelegate to have a window property

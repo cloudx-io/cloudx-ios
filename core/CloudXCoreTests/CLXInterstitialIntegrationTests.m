@@ -165,7 +165,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     self.testDelegate = [[IntegrationTestDelegate alloc] init];
     
     // Create interstitial using public API (this will likely fail due to invalid placement, but that's OK for testing)
-    self.interstitial = [CloudXCore.shared createInterstitialWithPlacement:kTestPlacementID delegate:self.testDelegate];
+    self.interstitial = [CloudXCore.shared createInterstitialWithPlacement:kTestPlacementID];
+    self.interstitial.delegate = self.testDelegate;
     
     // If creation failed (expected for test placement), create a mock for state testing
     if (!self.interstitial) {
@@ -344,7 +345,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     
     @autoreleasepool {
         IntegrationTestDelegate *delegate = [[IntegrationTestDelegate alloc] init];
-        CLXInterstitial *interstitial = [CloudXCore.shared createInterstitialWithPlacement:kTestPlacementID delegate:delegate];
+        CLXInterstitial *interstitial = [CloudXCore.shared createInterstitialWithPlacement:kTestPlacementID];
+        interstitial.delegate = delegate;
         
         weakInterstitial = interstitial;
         weakDelegate = delegate;

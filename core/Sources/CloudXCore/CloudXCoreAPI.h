@@ -149,22 +149,20 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 /**
  * Create an interstitial ad
  * @param placement The placement name. This should match the placement name in the CloudX dashboard
- * @param delegate The delegate to receive ad events
  * @return A CLXInterstitial object
+ * @discussion Set the delegate property on the returned object to receive ad events
  */
 - (nullable CLXInterstitial *)createInterstitialWithPlacement:(NSString *)placement
-                                                     delegate:(nullable id<CLXInterstitialDelegate>)delegate
-    NS_SWIFT_NAME(createInterstitial(placement:delegate:));
+    NS_SWIFT_NAME(createInterstitial(placement:));
 
 /**
  * Create a rewarded ad
  * @param placement The placement name. This should match the placement name in the CloudX dashboard
- * @param delegate The delegate to receive ad events
  * @return A CLXRewarded object
+ * @discussion Set the delegate property on the returned object to receive ad events
  */
 - (nullable CLXRewarded *)createRewardedWithPlacement:(NSString *)placement
-                                             delegate:(nullable id<CLXRewardedDelegate>)delegate
-    NS_SWIFT_NAME(createRewarded(placement:delegate:));
+    NS_SWIFT_NAME(createRewarded(placement:));
 
 /**
  * Create a native ad

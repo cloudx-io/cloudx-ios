@@ -112,7 +112,8 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
         
         // Create rewarded with comprehensive logging
         DemoAppLogger.sharedInstance.logMessage("📱 [Rewarded] Calling createRewarded...")
-        rewardedAd = CloudXCore.shared.createRewarded(placement: placement, delegate: self)
+        rewardedAd = CloudXCore.shared.createRewarded(placement: placement)
+        rewardedAd?.delegate = self
         
         if let rewardedAd = rewardedAd {
             DemoAppLogger.sharedInstance.logMessage("✅ [Rewarded] Rewarded ad instance created successfully")

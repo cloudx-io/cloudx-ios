@@ -278,8 +278,8 @@ Interstitial ads are full-screen ads that appear between app content.
 
 - (void)createInterstitialAd {
     // Create interstitial ad
-    self.interstitialAd = [[CloudXCore shared] createInterstitialWithPlacement:@"your-interstitial-placement"
-                                                                      delegate:self];
+    self.interstitialAd = [[CloudXCore shared] createInterstitialWithPlacement:@"your-interstitial-placement"];
+    self.interstitialAd.delegate = self;
     
     if (self.interstitialAd) {
         // Load the ad
@@ -413,8 +413,8 @@ Rewarded ads are full-screen ads that provide rewards to users for watching.
 
 - (void)createRewardedAd {
     // Create rewarded ad
-    self.rewardedAd = [[CloudXCore shared] createRewardedWithPlacement:@"your-rewarded-placement"
-                                                              delegate:self];
+    self.rewardedAd = [[CloudXCore shared] createRewardedWithPlacement:@"your-rewarded-placement"];
+    self.rewardedAd.delegate = self;
     
     if (self.rewardedAd) {
         // Load the ad
@@ -1187,8 +1187,8 @@ extension MainViewController: CLXBannerDelegate, CLXInterstitialDelegate, CLXRew
 |--------|-------------|
 | `createBannerWithPlacement:viewController:delegate:tmax:` | Create banner ad |
 | `createMRECWithPlacement:viewController:delegate:` | Create MREC ad |
-| `createInterstitialWithPlacement:delegate:` | Create interstitial ad |
-| `createRewardedWithPlacement:delegate:` | Create rewarded ad |
+| `createInterstitialWithPlacement:` | Create interstitial ad (set delegate property after creation) |
+| `createRewardedWithPlacement:` | Create rewarded ad (set delegate property after creation) |
 | `createNativeAdWithPlacement:viewController:delegate:` | Create native ad |
 
 ### User Targeting Methods
