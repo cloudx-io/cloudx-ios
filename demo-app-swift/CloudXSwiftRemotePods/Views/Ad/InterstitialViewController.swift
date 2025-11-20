@@ -91,7 +91,8 @@ class InterstitialViewController: BaseAdViewController {
             placement = settings.interstitialPlacement
         }
         
-        interstitialAd = cloudX.createInterstitial(placement: placement, delegate: self)
+        interstitialAd = cloudX.createInterstitial(placement: placement)
+        interstitialAd?.delegate = self
         
         if let interstitialAd = interstitialAd {
             interstitialAd.load()

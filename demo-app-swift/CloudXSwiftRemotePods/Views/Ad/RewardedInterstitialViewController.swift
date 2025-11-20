@@ -86,7 +86,8 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         
         // Create rewarded interstitial with comprehensive logging
         DemoAppLogger.sharedInstance.logMessage("📱 [RewardedInterstitial] Calling createRewarded...")
-        rewardedInterstitialAd = CloudXCore.shared.createRewarded(placement: placement, delegate: self)
+        rewardedInterstitialAd = CloudXCore.shared.createRewarded(placement: placement)
+        rewardedInterstitialAd?.delegate = self
         
         if let rewardedInterstitialAd = rewardedInterstitialAd {
             DemoAppLogger.sharedInstance.logMessage("✅ [RewardedInterstitial] Rewarded interstitial ad instance created successfully")
