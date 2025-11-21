@@ -703,8 +703,7 @@ static CloudXCore *_sharedInstance = nil;
 
 - (CLXBannerAdView *)createBannerWithPlacement:(NSString *)placement
                                     viewController:(UIViewController *)viewController
-                                         delegate:(id<CLXBannerDelegate>)delegate
-                                             tmax:(NSNumber *)tmax {
+                                         delegate:(id<CLXBannerDelegate>)delegate {
     // Track banner creation method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
@@ -763,7 +762,7 @@ static CloudXCore *_sharedInstance = nil;
                                                               bidRequestTimeout:3.0
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
-                                                                           tmax:tmax
+                                                                          tmax:nil
                                                               ];
     
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeW320H50 delegate:delegate];

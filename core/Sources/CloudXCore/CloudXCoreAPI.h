@@ -125,14 +125,12 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  * @param placement The placement name. This should match the placement name in the CloudX dashboard
  * @param viewController The view controller in which the ad will be displayed
  * @param delegate The delegate to receive ad events
- * @param tmax Optional timeout value for bid requests
  * @return A CLXBannerAdView object
  */
 - (nullable CLXBannerAdView *)createBannerWithPlacement:(NSString *)placement
-                                            viewController:(UIViewController *)viewController
-                                                  delegate:(nullable id<CLXBannerDelegate>)delegate
-                                                      tmax:(nullable NSNumber *)tmax
-    NS_SWIFT_NAME(createBanner(placement:viewController:delegate:tmax:));
+                                           viewController:(UIViewController *)viewController
+                                                 delegate:(nullable id<CLXBannerDelegate>)delegate
+    NS_SWIFT_NAME(createBanner(placement:viewController:delegate:));
 
 /**
  * Create a MREC ad

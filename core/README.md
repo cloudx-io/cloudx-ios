@@ -1185,7 +1185,7 @@ extension MainViewController: CLXBannerDelegate, CLXInterstitialDelegate, CLXRew
 
 | Method | Description |
 |--------|-------------|
-| `createBannerWithPlacement:viewController:delegate:tmax:` | Create banner ad |
+| `createBannerWithPlacement:viewController:delegate:` | Create banner ad |
 | `createMRECWithPlacement:viewController:delegate:` | Create MREC ad |
 | `createInterstitialWithPlacement:` | Create interstitial ad (set delegate property after creation) |
 | `createRewardedWithPlacement:` | Create rewarded ad (set delegate property after creation) |
