@@ -210,8 +210,8 @@
     } else if ([field isEqualToString:@"sdk.releaseVersion"]) {
         return self.sdkVersion ?: @"1.0.0";
     } else if ([field isEqualToString:@"sdk.deviceTypeName"]) {
-        NSInteger deviceTypeAsInt = [CLXSystemInformation shared].deviceType;
-        return @(deviceTypeAsInt);
+        // Return string for analytics ("phone", "tablet", "unknown")
+        return DeviceTypeToString([CLXSystemInformation shared].deviceType);
     } else if ([field isEqualToString:@"sdk.appBundle"] || [field isEqualToString:@"sdk.app.bundle"]) {
         return self.appBundle;
     } else if ([field isEqualToString:@"sdk.responseTimeMillis"]) {
