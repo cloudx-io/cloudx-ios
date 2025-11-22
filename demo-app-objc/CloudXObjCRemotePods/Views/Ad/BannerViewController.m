@@ -186,11 +186,7 @@
                                                       viewController:self
                                                           delegate:self];
     
-    if (!self.bannerAd) {
-        [self showAlertWithTitle:@"Error" message:@"Failed to create banner."];
-        return;
-    }
-    
+    // SDK now always returns non-nil - validation errors deferred to load() callback
     // Add banner to view hierarchy immediately
     [self addBannerToViewHierarchy];
 }
