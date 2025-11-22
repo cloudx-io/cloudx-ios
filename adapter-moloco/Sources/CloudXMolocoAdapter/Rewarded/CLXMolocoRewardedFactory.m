@@ -60,19 +60,17 @@
                                                                fallbackAdId:adId 
                                                                      logger:self.logger];
     
+    // v1.3.0: No longer return nil for validation errors
+    // Validation now happens in load() with proper error callbacks
     if (!placementID || placementID.length == 0) {
-        [self.logger error:@"Invalid placement ID"];
-        if ([delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
-            NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                         description:@"Invalid placement ID"];
-            [delegate didFailToLoadWithRewarded:nil error:error];
-        }
-        return nil;
+        [self.logger error:@"Invalid placement ID - validation will be deferred to load()"];
     }
     
+    // ALWAYS create and return adapter (even with invalid placementID)
+    // Validation errors will be reported in load() via delegate callback
     CLXMolocoRewarded *rewarded = 
         [[CLXMolocoRewarded alloc] initWithBidPayload:bidPayload
-                                          placementID:placementID
+                                          placementID:placementID  // May be nil
                                                 bidID:bidID
                                              delegate:delegate];
     

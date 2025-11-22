@@ -27,6 +27,7 @@
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, assign) long long placementID;
 @property (nonatomic, weak) UIViewController *viewController;
+@property (nonatomic, assign) CGSize bannerSize;  // Store for deferred creation
 @end
 
 @implementation CLXInMobiBanner
@@ -40,19 +41,24 @@
     self = [super init];
     if (self) {
         _bidPayload = bidPayload;
-        _placementID = placementID;
+        _placementID = placementID;  // May be 0 (invalid) - validation in load()
         _bidID = [bidID copy];
         _delegate = delegate;
         _viewController = viewController;
+        _bannerSize = size;  // Store for deferred creation
         _sdkVersion = @"10.8.8";
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXInMobiBanner"];
         _timeoutInterval = 30.0;
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %lld, BidID: %@, Size: %.0fx%.0f", 
-                           placementID, bidID, size.width, size.height]];
+        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %lld%@, BidID: %@, Size: %.0fx%.0f", 
+                           placementID, (placementID == 0 ? @" (invalid)" : @""), bidID, size.width, size.height]];
         
-        _banner = [[IMBanner alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height) placementId:placementID];
-        _banner.delegate = self;
+        // Only create banner if placementID is valid
+        // Otherwise defer to load() for validation
+        if (placementID != 0) {
+            _banner = [[IMBanner alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height) placementId:placementID];
+            _banner.delegate = self;
+        }
     }
     return self;
 }
@@ -66,6 +72,26 @@
 }
 
 - (void)load {
+    // Validate placement ID at load time (deferred validation pattern)
+    if (_placementID == 0) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                     description:@"[InMobi] Invalid or missing placement ID for banner ad"];
+        [self.logger error:error.localizedDescription];
+        
+        if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
+            [self.delegate failToLoadBanner:self error:error];
+        }
+        return;
+    }
+    
+    // Create banner now if not already created (deferred from init)
+    if (!_banner) {
+        _banner = [[IMBanner alloc] initWithFrame:CGRectMake(0, 0, _bannerSize.width, _bannerSize.height) 
+                                      placementId:_placementID];
+        _banner.delegate = self;
+        [self.logger debug:@"Created banner with validated placement ID"];
+    }
+    
     if (_isLoading) {
         [self.logger debug:@"Load already in progress"];
         return;

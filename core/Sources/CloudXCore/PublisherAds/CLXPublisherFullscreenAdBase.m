@@ -92,6 +92,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 // Queued load request handling (for SDK init race condition)
 @property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
 
+// Deferred error (set during create if validation fails)
+@property (nonatomic, strong, nullable) NSError *deferredError;
+
 @end
 
 @implementation CLXPublisherFullscreenAdBase
@@ -234,6 +237,13 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 #pragma mark - Public Methods
 
 - (void)load {
+    // Check for deferred error from create method
+    if (self.deferredError) {
+        [self.logger error:[NSString stringWithFormat:@"Fullscreen ad creation failed with deferred error: %@", self.deferredError.localizedDescription]];
+        [self notifyLoadFailure:self.deferredError];
+        return;
+    }
+    
     // Check if SDK is initialized
     if (![[CloudXCore shared] isInitialized]) {
         self.pendingLoadRequestCount++;

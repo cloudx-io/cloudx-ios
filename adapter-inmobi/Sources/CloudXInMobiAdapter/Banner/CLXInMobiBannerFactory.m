@@ -64,9 +64,11 @@
     }
 
     long long inmobiPlacementID = [self.baseFactory extractPlacementID:placementId];
+    
+    // v1.3.0: No longer return nil for validation errors
+    // Validation now happens in load() with proper error callbacks
     if (inmobiPlacementID == 0) {
-        [self.baseFactory.logger error:@"Invalid placement ID"];
-        return nil;
+        [self.baseFactory.logger error:@"Invalid placement ID - validation will be deferred to load()"];
     }
 
     // Convert banner type to size
@@ -86,8 +88,10 @@
         bidPayloadData = [adm dataUsingEncoding:NSUTF8StringEncoding];
     }
 
+    // ALWAYS create and return adapter (even with invalid placementID = 0)
+    // Validation errors will be reported in load() via delegate callback
     CLXInMobiBanner *banner = [[CLXInMobiBanner alloc] initWithBidPayload:bidPayloadData
-                                                               placementID:inmobiPlacementID
+                                                               placementID:inmobiPlacementID  // May be 0 (invalid)
                                                                      bidID:bidId
                                                                       size:bannerSize
                                                             viewController:viewController

@@ -39,22 +39,27 @@
 @implementation CLXMolocoNative
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
-                       placementID:(NSString *)placementID
+                       placementID:(nullable NSString *)placementID
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterNativeDelegate>)delegate {
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
-        _placementID = [placementID copy];
+        _placementID = [placementID copy];  // Now nullable - validation in load()
         _bidID = [bidID copy];
         _delegate = delegate;
         _sdkVersion = [CLXMolocoInitializer sdkVersion];
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMolocoNative"];
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %@, BidID: %@", placementID, bidID]];
+        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %@, BidID: %@", 
+                           placementID ?: @"(nil)", bidID]];
         
-        _nativeAd = [[MolocoNativeAd alloc] initWithPlacementID:placementID];
-        _nativeAd.delegate = self;
+        // Only create native ad if placementID is valid
+        // Otherwise defer to load() for validation
+        if (placementID && placementID.length > 0) {
+            _nativeAd = [[MolocoNativeAd alloc] initWithPlacementID:placementID];
+            _nativeAd.delegate = self;
+        }
     }
     return self;
 }
@@ -68,6 +73,25 @@
 }
 
 - (void)load {
+    // Validate placement ID at load time (deferred validation pattern)
+    if (!_placementID || _placementID.length == 0) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                     description:@"[Moloco] Invalid or missing placement ID for native ad"];
+        [self.logger error:error.localizedDescription];
+        
+        if ([self.delegate respondsToSelector:@selector(didFailToLoadWithNative:error:)]) {
+            [self.delegate didFailToLoadWithNative:self error:error];
+        }
+        return;
+    }
+    
+    // Create native ad now if not already created (deferred from init)
+    if (!_nativeAd) {
+        _nativeAd = [[MolocoNativeAd alloc] initWithPlacementID:_placementID];
+        _nativeAd.delegate = self;
+        [self.logger debug:@"Created native ad with validated placement ID"];
+    }
+    
     if (_isLoading) {
         [self.logger debug:@"Load already in progress"];
         return;

@@ -39,23 +39,28 @@
 @implementation CLXMolocoRewarded
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
-                       placementID:(NSString *)placementID
+                       placementID:(nullable NSString *)placementID
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterRewardedDelegate>)delegate {
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
-        _placementID = [placementID copy];
+        _placementID = [placementID copy];  // Now nullable - validation in load()
         _bidID = [bidID copy];
         _delegate = delegate;
         _sdkVersion = [CLXMolocoInitializer sdkVersion];
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMolocoRewarded"];
         _hasGrantedReward = NO;
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %@, BidID: %@", placementID, bidID]];
+        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %@, BidID: %@", 
+                           placementID ?: @"(nil)", bidID]];
         
-        _rewardedAd = [[MolocoRewardedAd alloc] initWithPlacementID:placementID];
-        _rewardedAd.delegate = self;
+        // Only create rewarded ad if placementID is valid
+        // Otherwise defer to load() for validation
+        if (placementID && placementID.length > 0) {
+            _rewardedAd = [[MolocoRewardedAd alloc] initWithPlacementID:placementID];
+            _rewardedAd.delegate = self;
+        }
     }
     return self;
 }
@@ -75,6 +80,25 @@
 }
 
 - (void)load {
+    // Validate placement ID at load time (deferred validation pattern)
+    if (!_placementID || _placementID.length == 0) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                     description:@"[Moloco] Invalid or missing placement ID for rewarded ad"];
+        [self.logger error:error.localizedDescription];
+        
+        if ([self.delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
+            [self.delegate didFailToLoadWithRewarded:self error:error];
+        }
+        return;
+    }
+    
+    // Create rewarded ad now if not already created (deferred from init)
+    if (!_rewardedAd) {
+        _rewardedAd = [[MolocoRewardedAd alloc] initWithPlacementID:_placementID];
+        _rewardedAd.delegate = self;
+        [self.logger debug:@"Created rewarded ad with validated placement ID"];
+    }
+    
     if (_isLoading) {
         [self.logger debug:@"Load already in progress"];
         return;

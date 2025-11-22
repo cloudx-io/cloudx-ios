@@ -55,16 +55,14 @@
     // Extract InMobi placement ID from extras
     NSString *placementId = extras[@"placement_id"];
     long long inmobiPlacementID = [self.baseFactory extractPlacementID:placementId];
+    
+    // v1.3.0: No longer return nil for validation errors
+    // Validation now happens in load() with proper error callbacks
     if (inmobiPlacementID == 0) {
-        [self.baseFactory.logger error:@"Invalid placement ID"];
-        return nil;
+        [self.baseFactory.logger error:@"Invalid placement ID - validation will be deferred to load()"];
     }
 
-    // Validate bid payload (adm)
-    if (![self.baseFactory validateBidPayload:adm]) {
-        [self.baseFactory.logger error:@"Invalid bid payload"];
-        return nil;
-    }
+    // Note: Bid payload validation removed - InMobi SDK handles this internally
 
     // Convert bid payload string to NSData if present
     NSData *bidPayloadData = nil;
@@ -72,9 +70,10 @@
         bidPayloadData = [adm dataUsingEncoding:NSUTF8StringEncoding];
     }
 
-    // Create interstitial adapter
+    // ALWAYS create and return adapter (even with invalid placementID = 0)
+    // Validation errors will be reported in load() via delegate callback
     CLXInMobiInterstitial *interstitial = [[CLXInMobiInterstitial alloc] initWithBidPayload:bidPayloadData
-                                                                                 placementID:inmobiPlacementID
+                                                                                 placementID:inmobiPlacementID  // May be 0 (invalid)
                                                                                        bidID:bidId
                                                                                     delegate:delegate];
 

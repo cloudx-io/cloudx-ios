@@ -46,31 +46,30 @@
     
     CLXLogger *logger = [[self class] logger];
     
-    // Validate required parameters
+    // v1.3.0: No longer return nil for validation errors
+    // Validation now happens in load() with proper error callbacks
+    
+    // Log warnings for missing parameters (validation deferred to load())
     if (!viewController) {
-        [logger error:@"Cannot create banner adapter - viewController is nil"];
-        return nil;
+        [logger error:@"viewController is nil - validation will be deferred to load()"];
     }
     
     if (!bidId || bidId.length == 0) {
-        [logger error:@"Cannot create banner adapter - bidId is nil or empty"];
-        return nil;
+        [logger error:@"bidId is nil or empty - validation will be deferred to load()"];
     }
     
     if (!delegate) {
-        [logger error:@"Cannot create banner adapter - delegate is nil"];
-        return nil;
+        [logger error:@"delegate is nil - validation will be deferred to load()"];
     }
     
-    // Validate banner type support
+    // Validate banner type support (log warning only)
     if (![self isBannerTypeSupported:type]) {
-        [logger error:[NSString stringWithFormat:@"Unsupported banner type: %ld", (long)type]];
-        return nil;
+        [logger error:[NSString stringWithFormat:@"Unsupported banner type: %ld - validation will be deferred to load()", (long)type]];
     }
     
-    // Validate Vungle SDK initialization
+    // Vungle SDK initialization check (log warning only)
     if (![CLXVungleBaseFactory validateVungleInitialization:logger]) {
-        return nil;
+        [logger error:@"Vungle SDK not initialized - validation will be deferred to load()"];
     }
     
     // Resolve placement ID from extras or fallback to adId
@@ -78,10 +77,9 @@
                                                                 fallbackAdId:adId
                                                                       logger:logger];
     
-    // Validate the resolved placement ID
+    // Log warning if placement ID is invalid (validation deferred to load())
     if (!placementId || placementId.length == 0) {
-        [logger error:@"Cannot create banner adapter - no valid placement ID (checked extras and adId)"];
-        return nil;
+        [logger error:@"No valid placement ID - validation will be deferred to load()"];
     }
     
     // Extract bid payload from ADM if present
@@ -102,20 +100,16 @@
         [logger debug:@"Close button requested - Vungle banners handle this automatically" ];
     }
     
-    // Create and return the adapter
+    // ALWAYS create and return adapter (even with invalid parameters)
+    // Validation errors will be reported in load() via delegate callback
     CLXVungleBanner *adapter = [[CLXVungleBanner alloc] initWithBidPayload:bidPayload
-                                                               placementID:placementId
+                                                               placementID:placementId  // May be nil
                                                                      bidID:bidId
                                                                       type:type
-                                                            viewController:viewController
-                                                                  delegate:delegate];
+                                                            viewController:viewController  // May be nil
+                                                                  delegate:delegate];  // May be nil
     
-    if (!adapter) {
-        [logger error:@"Failed to create Vungle banner adapter" ];
-        return nil;
-    }
-    
-    [logger debug:@"Successfully created Vungle banner adapter" ];
+    [logger debug:@"Successfully created Vungle banner adapter"];
     return adapter;
 }
 

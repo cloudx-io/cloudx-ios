@@ -94,6 +94,23 @@
 #pragma mark - CLXAdapterNative Protocol
 
 - (void)load {
+    // Validate placement ID at load time
+    if (!self.placementID || self.placementID.length == 0) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                     description:@"[Vungle] Invalid or missing placement ID for native ad"];
+        [self.logger error:error.localizedDescription];
+        [self handleLoadFailure:error];
+        return;
+    }
+    
+    // Validate delegate at load time
+    if (!self.delegate) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidConfiguration
+                                     description:@"[Vungle] Missing delegate for native ad"];
+        [self.logger error:error.localizedDescription];
+        return;
+    }
+    
     if (self.isDestroyed) {
         [self.logger error:@"Cannot load - adapter is destroyed"];
         return;

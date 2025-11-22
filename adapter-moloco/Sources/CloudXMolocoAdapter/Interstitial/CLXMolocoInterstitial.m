@@ -38,23 +38,27 @@
 @implementation CLXMolocoInterstitial
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
-                       placementID:(NSString *)placementID
+                       placementID:(nullable NSString *)placementID
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
-        _placementID = [placementID copy];
+        _placementID = [placementID copy];  // Now nullable - validation in load()
         _bidID = [bidID copy];
         _delegate = delegate;
         _sdkVersion = [CLXMolocoInitializer sdkVersion];
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMolocoInterstitial"];
         
         [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %@, BidID: %@, HasBidPayload: %@", 
-                           placementID, bidID, bidPayload ? @"YES" : @"NO"]];
+                           placementID ?: @"(nil)", bidID, bidPayload ? @"YES" : @"NO"]];
         
-        _interstitial = [[MolocoInterstitial alloc] initWithPlacementID:placementID];
-        _interstitial.delegate = self;
+        // Only create interstitial if placementID is valid
+        // Otherwise defer to load() for validation
+        if (placementID && placementID.length > 0) {
+            _interstitial = [[MolocoInterstitial alloc] initWithPlacementID:placementID];
+            _interstitial.delegate = self;
+        }
     }
     return self;
 }
@@ -74,6 +78,25 @@
 }
 
 - (void)load {
+    // Validate placement ID at load time (deferred validation pattern)
+    if (!_placementID || _placementID.length == 0) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                     description:@"[Moloco] Invalid or missing placement ID for interstitial ad"];
+        [self.logger error:error.localizedDescription];
+        
+        if ([self.delegate respondsToSelector:@selector(didFailToLoadWithInterstitial:error:)]) {
+            [self.delegate didFailToLoadWithInterstitial:self error:error];
+        }
+        return;
+    }
+    
+    // Create interstitial now if not already created (deferred from init)
+    if (!_interstitial) {
+        _interstitial = [[MolocoInterstitial alloc] initWithPlacementID:_placementID];
+        _interstitial.delegate = self;
+        [self.logger debug:@"Created interstitial with validated placement ID"];
+    }
+    
     if (_isLoading) {
         [self.logger debug:@"Load already in progress"];
         return;

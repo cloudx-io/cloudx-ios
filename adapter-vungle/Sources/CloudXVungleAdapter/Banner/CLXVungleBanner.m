@@ -35,19 +35,19 @@
 #pragma mark - Initialization
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
-                       placementID:(NSString *)placementID
+                       placementID:(nullable NSString *)placementID
                              bidID:(NSString *)bidID
                               type:(CLXBannerType)type
                     viewController:(UIViewController *)viewController
-                          delegate:(id<CLXAdapterBannerDelegate>)delegate {
+                          delegate:(nullable id<CLXAdapterBannerDelegate>)delegate {
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
-        _placementID = [placementID copy];
+        _placementID = [placementID copy];  // Now nullable - validation in load()
         _bidID = [bidID copy];
         _bannerType = type;
-        _viewController = viewController;
-        _delegate = delegate;
+        _viewController = viewController;  // Now nullable - validation in load()
+        _delegate = delegate;  // Now nullable - validation in load()
         _logger = [[CLXLogger alloc] initWithCategory:@"VungleBanner"];
         _timeoutInterval = 30.0; // Default 30 second timeout
         _isLoaded = NO;
@@ -55,7 +55,7 @@
         _isDestroyed = NO;
         
         [_logger debug:[NSString stringWithFormat:@"Initialized Vungle banner - Placement: %@, BidID: %@, Type: %ld, HasBidPayload: %@", 
-                          placementID, bidID, (long)type, bidPayload ? @"YES" : @"NO"]];
+                          placementID ?: @"(nil)", bidID, (long)type, bidPayload ? @"YES" : @"NO"]];
     }
     return self;
 }
@@ -81,6 +81,33 @@
 #pragma mark - CLXAdapterBanner Protocol
 
 - (void)load {
+    // Validate placement ID at load time (deferred validation pattern)
+    if (!self.placementID || self.placementID.length == 0) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                     description:@"[Vungle] Invalid or missing placement ID for banner ad"];
+        [self.logger error:error.localizedDescription];
+        [self handleLoadFailure:error];
+        return;
+    }
+    
+    // Validate viewController at load time
+    if (!self.viewController) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidConfiguration
+                                     description:@"[Vungle] Missing viewController for banner ad"];
+        [self.logger error:error.localizedDescription];
+        [self handleLoadFailure:error];
+        return;
+    }
+    
+    // Validate delegate at load time
+    if (!self.delegate) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidConfiguration
+                                     description:@"[Vungle] Missing delegate for banner ad"];
+        [self.logger error:error.localizedDescription];
+        // Cannot call handleLoadFailure without delegate, just log
+        return;
+    }
+    
     if (self.isDestroyed) {
         [self.logger error:@"Cannot load - adapter is destroyed"];
         return;

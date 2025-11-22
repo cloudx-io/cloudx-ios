@@ -709,22 +709,27 @@ static CloudXCore *_sharedInstance = nil;
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
     [self.logger debug:[NSString stringWithFormat:@"Creating banner for placement: %@", placement]];
     
+    // v1.3.0: Defer validation errors to load() - always return non-nil
+    NSError *deferredError = nil;
+    
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
-        [self.logger error:@"Cannot create banner: No adapters registered. At least one adapter framework must be included in your project to show ads."];
-        return nil;
+        [self.logger error:@"No adapters registered - error will be deferred to load()"];
+        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersRegistered
+                                    description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
     
     // Get placement from config (may be nil if SDK not initialized yet)
     CLXSDKConfigPlacement *placementConfig = [self placementConfigForName:placement];
-    if (!placementConfig && _isInitialized) {
+    if (!placementConfig && _isInitialized && !deferredError) {
         // SDK is initialized but placement not found - this is an error
-        [self.logger error:[NSString stringWithFormat:@"Placement not found: %@", placement]];
-        return nil;
+        [self.logger error:[NSString stringWithFormat:@"Placement not found - error will be deferred to load(): %@", placement]];
+        deferredError = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                    description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
     }
     
     if (!placementConfig) {
-        // SDK not initialized yet - create temporary placement config
+        // SDK not initialized yet OR placement not found - create temporary placement config
         // Banner will queue load() calls until SDK init completes
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - creating banner with temporary config for placement: %@", placement]];
         placementConfig = [[CLXSDKConfigPlacement alloc] init];
@@ -747,14 +752,14 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger debug:@"Deferring impression model creation until SDK initialization"];
     }
     
-    // Create banner using real adNetworkFactories
+    // ALWAYS create banner (errors deferred to load())
     CLXPublisherBanner *banner = [[CLXPublisherBanner alloc] initWithViewController:viewController
                                                                      placement:placementConfig
                                                                         userID:@""
                                                                    publisherID:@""
-                                                    suspendPreloadWhenInvisible:NO
+                                                   suspendPreloadWhenInvisible:NO
                                                                      delegate:delegate
-                                                                                                                                       bannerType:CLXBannerTypeW320H50
+                                                                                                                                      bannerType:CLXBannerTypeW320H50
                                                        waterfallMaxBackOffTime:5.0
                                                                        impModel:impModel
                                                                     adFactories:_adNetworkFactories.banners
@@ -765,6 +770,12 @@ static CloudXCore *_sharedInstance = nil;
                                                                           tmax:nil
                                                               ];
     
+    // Set deferred error if validation failed (using KVC to access private property)
+    if (deferredError) {
+        [banner setValue:deferredError forKey:@"deferredError"];
+    }
+    
+    // ALWAYS return non-nil
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeW320H50 delegate:delegate];
 }
 
@@ -775,22 +786,27 @@ static CloudXCore *_sharedInstance = nil;
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateMrec];
     
+    // v1.3.0: Defer validation errors to load() - always return non-nil
+    NSError *deferredError = nil;
+    
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
-        [self.logger error:@"Cannot create MREC: No adapters registered. At least one adapter framework must be included in your project to show ads."];
-        return nil;
+        [self.logger error:@"No adapters registered - error will be deferred to load()"];
+        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersRegistered
+                                    description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
     
     // Get placement from config (may be nil if SDK not initialized yet)
     CLXSDKConfigPlacement *placementConfig = [self placementConfigForName:placement];
-    if (!placementConfig && _isInitialized) {
+    if (!placementConfig && _isInitialized && !deferredError) {
         // SDK is initialized but placement not found - this is an error
-        [self.logger error:[NSString stringWithFormat:@"Placement not found: %@", placement]];
-        return nil;
+        [self.logger error:[NSString stringWithFormat:@"Placement not found - error will be deferred to load(): %@", placement]];
+        deferredError = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                    description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
     }
     
     if (!placementConfig) {
-        // SDK not initialized yet - create temporary placement config
+        // SDK not initialized yet OR placement not found - create temporary placement config
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - creating MREC with temporary config for placement: %@", placement]];
         placementConfig = [[CLXSDKConfigPlacement alloc] init];
         placementConfig.name = placement;
@@ -811,14 +827,14 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger debug:@"Deferring impression model creation until SDK initialization"];
     }
     
-    // Create banner using real adNetworkFactories
+    // ALWAYS create banner (errors deferred to load())
     CLXPublisherBanner *banner = [[CLXPublisherBanner alloc] initWithViewController:viewController
                                                                      placement:placementConfig
                                                                         userID:@""
                                                                    publisherID:@""
                                                     suspendPreloadWhenInvisible:NO
                                                                      delegate:delegate
-                                                                                                                                       bannerType:CLXBannerTypeMREC
+                                                                                                                                      bannerType:CLXBannerTypeMREC
                                                        waterfallMaxBackOffTime:5.0
                                                                        impModel:impModel
                                                                     adFactories:_adNetworkFactories.banners
@@ -829,6 +845,12 @@ static CloudXCore *_sharedInstance = nil;
                                                                            tmax:nil
                                                               ];
     
+    // Set deferred error if validation failed (using KVC to access private property)
+    if (deferredError) {
+        [banner setValue:deferredError forKey:@"deferredError"];
+    }
+    
+    // ALWAYS return non-nil
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeMREC delegate:delegate];
 }
 
@@ -837,22 +859,27 @@ static CloudXCore *_sharedInstance = nil;
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateInterstitial];
     
+    // v1.3.0: Defer validation errors to load() - always return non-nil
+    NSError *deferredError = nil;
+    
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
-        [self.logger error:@"Cannot create interstitial: No adapters registered. At least one adapter framework must be included in your project to show ads."];
-        return nil;
+        [self.logger error:@"No adapters registered - error will be deferred to load()"];
+        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersRegistered
+                                    description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
     
     // Get placement from config (may be nil if SDK not initialized yet)
     CLXSDKConfigPlacement *placementConfig = [self placementConfigForName:placement];
-    if (!placementConfig && _isInitialized) {
+    if (!placementConfig && _isInitialized && !deferredError) {
         // SDK is initialized but placement not found - this is an error
-        [self.logger error:[NSString stringWithFormat:@"Placement not found: %@", placement]];
-        return nil;
+        [self.logger error:[NSString stringWithFormat:@"Placement not found - error will be deferred to load(): %@", placement]];
+        deferredError = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                    description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
     }
     
     if (!placementConfig) {
-        // SDK not initialized yet - create temporary placement config
+        // SDK not initialized yet OR placement not found - create temporary placement config
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - creating interstitial with temporary config for placement: %@", placement]];
         placementConfig = [[CLXSDKConfigPlacement alloc] init];
         placementConfig.name = placement;
@@ -872,7 +899,7 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger debug:@"Deferring impression model creation until SDK initialization"];
     }
     
-    // Create interstitial using separate concrete class (SOLID principles)
+    // ALWAYS create interstitial (errors deferred to load())
     CLXInterstitial *interstitial = [[CLXInterstitial alloc] initWithPlacement:placementConfig
                                                                      publisherID:@""
                                                                           userID:@""
@@ -885,6 +912,12 @@ static CloudXCore *_sharedInstance = nil;
                                                                reportingService:_reportingService
                                                                        settings:[CLXSettings sharedInstance]];
     
+    // Set deferred error if validation failed (using KVC to access private property)
+    if (deferredError) {
+        [interstitial setValue:deferredError forKey:@"deferredError"];
+    }
+    
+    // ALWAYS return non-nil
     return interstitial;
 }
 
@@ -893,22 +926,27 @@ static CloudXCore *_sharedInstance = nil;
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateRewarded];
     
+    // v1.3.0: Defer validation errors to load() - always return non-nil
+    NSError *deferredError = nil;
+    
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
-        [self.logger error:@"Cannot create rewarded ad: No adapters registered. At least one adapter framework must be included in your project to show ads."];
-        return nil;
+        [self.logger error:@"No adapters registered - error will be deferred to load()"];
+        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersRegistered
+                                    description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
     
     // Get placement from config (may be nil if SDK not initialized yet)
     CLXSDKConfigPlacement *placementConfig = [self placementConfigForName:placement];
-    if (!placementConfig && _isInitialized) {
+    if (!placementConfig && _isInitialized && !deferredError) {
         // SDK is initialized but placement not found - this is an error
-        [self.logger error:[NSString stringWithFormat:@"Placement not found: %@", placement]];
-        return nil;
+        [self.logger error:[NSString stringWithFormat:@"Placement not found - error will be deferred to load(): %@", placement]];
+        deferredError = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                    description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
     }
     
     if (!placementConfig) {
-        // SDK not initialized yet - create temporary placement config
+        // SDK not initialized yet OR placement not found - create temporary placement config
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - creating rewarded ad with temporary config for placement: %@", placement]];
         placementConfig = [[CLXSDKConfigPlacement alloc] init];
         placementConfig.name = placement;
@@ -928,7 +966,7 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger debug:@"Deferring impression model creation until SDK initialization"];
     }
     
-    // Create rewarded using separate concrete class (SOLID principles)
+    // ALWAYS create rewarded (errors deferred to load())
     CLXRewarded *rewarded = [[CLXRewarded alloc] initWithPlacement:placementConfig
                                                          publisherID:@""
                                                               userID:@""
@@ -941,6 +979,12 @@ static CloudXCore *_sharedInstance = nil;
                                                    reportingService:_reportingService
                                                            settings:[CLXSettings sharedInstance]];
     
+    // Set deferred error if validation failed (using KVC to access private property)
+    if (deferredError) {
+        [rewarded setValue:deferredError forKey:@"deferredError"];
+    }
+    
+    // ALWAYS return non-nil
     return rewarded;
 }
 

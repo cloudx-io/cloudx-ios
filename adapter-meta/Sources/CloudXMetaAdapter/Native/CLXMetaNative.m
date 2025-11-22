@@ -46,7 +46,7 @@
 @implementation CLXMetaNative
 
 - (instancetype)initWithBidPayload:(NSString *)bidPayload
-                       placementID:(NSString *)placementID
+                       placementID:(nullable NSString *)placementID
                             bidID:(NSString *)bidID
                              type:(CLXNativeTemplate)type
                     viewController:(UIViewController *)viewController
@@ -54,7 +54,7 @@
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
-        _placementID = [placementID copy];
+        _placementID = [placementID copy];  // Now nullable - validation in load()
         _bidID = [bidID copy];
         _type = type;
         _viewController = viewController;
@@ -62,10 +62,15 @@
         _sdkVersion = FB_AD_SDK_VERSION;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMetaNative"];
         
-        [self.logger debug:[NSString stringWithFormat:@"Initialized for placement: %@ | bidPayload: %@", placementID, bidPayload ? @"YES" : @"NO"]];
+        [self.logger debug:[NSString stringWithFormat:@"Initialized for placement: %@ | bidPayload: %@", 
+                           placementID ?: @"(nil)", bidPayload ? @"YES" : @"NO"]];
         
-        _nativeAd = [[FBNativeAd alloc] initWithPlacementID:placementID];
-        _nativeAd.delegate = self;
+        // Only create native ad if placementID is valid
+        // Otherwise defer to load() for validation
+        if (placementID && placementID.length > 0) {
+            _nativeAd = [[FBNativeAd alloc] initWithPlacementID:placementID];
+            _nativeAd.delegate = self;
+        }
     }
     return self;
 }
@@ -88,6 +93,25 @@
 }
 
 - (void)loadAd {
+    // Validate placement ID at load time (deferred validation pattern)
+    if (!_placementID || _placementID.length == 0) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                     description:@"[Meta] Invalid or missing placement ID for native ad"];
+        [self.logger error:error.localizedDescription];
+        
+        if ([self.delegate respondsToSelector:@selector(failToLoadWithNative:error:)]) {
+            [self.delegate failToLoadWithNative:self error:error];
+        }
+        return;
+    }
+    
+    // Create native ad now if not already created (deferred from init)
+    if (!_nativeAd) {
+        _nativeAd = [[FBNativeAd alloc] initWithPlacementID:_placementID];
+        _nativeAd.delegate = self;
+        [self.logger debug:@"Created native ad with validated placement ID"];
+    }
+    
     // Prevent concurrent loading attempts
     if (_isLoading) {
         [self.logger debug:@"⚠️ [CLXMetaNative] Load already in progress, ignoring duplicate request"];

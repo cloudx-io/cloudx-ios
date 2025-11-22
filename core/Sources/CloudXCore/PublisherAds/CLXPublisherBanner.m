@@ -106,6 +106,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Queued load request handling (for SDK init race condition)
 @property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
 
+// Deferred error (set during create if validation fails)
+@property (nonatomic, strong, nullable) NSError *deferredError;
+
 @end
 
 @implementation CLXPublisherBanner
@@ -228,6 +231,15 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - CloudXBanner Protocol
 
 - (void)load {
+    // Check for deferred error from create method
+    if (self.deferredError) {
+        [self.logger error:[NSString stringWithFormat:@"Banner creation failed with deferred error: %@", self.deferredError.localizedDescription]];
+        if ([self.delegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
+            [self.delegate failToLoadWithAd:self error:self.deferredError];
+        }
+        return;
+    }
+    
     // Check if SDK is initialized
     if (![[CloudXCore shared] isInitialized]) {
         self.pendingLoadRequestCount++;

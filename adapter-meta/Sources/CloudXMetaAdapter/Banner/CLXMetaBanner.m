@@ -28,27 +28,28 @@
 @interface CLXMetaBanner ()
 
 @property (nonatomic, copy) NSString *bidID;
-@property (nonatomic, copy) NSString *placementID;
+@property (nonatomic, copy, nullable) NSString *placementID;  // Now nullable
 @property (nonatomic, copy) NSString *bidPayload;
 @property (nonatomic, strong) UIViewController *viewController;
 @property (nonatomic, assign) CLXBannerType type;
 @property (nonatomic, strong) CLXLogger *logger;
+@property (nonatomic, assign) NSInteger deferredTemplate;  // Store for deferred creation
 
 @end
 
 @implementation CLXMetaBanner
 
 - (instancetype)initWithBidPayload:(NSString *)bidPayload
-                      placementID:(NSString *)placementID
-                           bidID:(NSString *)bidID
-                            type:(CLXBannerType)type
-                   viewController:(UIViewController *)viewController
-                        delegate:(id<CLXAdapterBannerDelegate>)delegate {
+                       placementID:(nullable NSString *)placementID
+                            bidID:(NSString *)bidID
+                             type:(CLXBannerType)type
+                    viewController:(UIViewController *)viewController
+                         delegate:(id<CLXAdapterBannerDelegate>)delegate {
     
     self = [super init];
     if (self) {
         _bidPayload = bidPayload;
-        _placementID = placementID;
+        _placementID = placementID;  // Now nullable - validation in load()
         _bidID = bidID;
         _type = type;
         _viewController = viewController;
@@ -57,25 +58,29 @@
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMetaBanner"];
         
         // Parse template from bid payload to ensure exact size match with Meta's bid
-        NSInteger template = [self parseTemplateFromBidPayload:bidPayload];
-        FBAdSize fbAdSize = [self fbAdSizeForTemplate:template fallbackType:type];
+        _deferredTemplate = [self parseTemplateFromBidPayload:bidPayload];
+        FBAdSize fbAdSize = [self fbAdSizeForTemplate:_deferredTemplate fallbackType:type];
         
         [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %@, BidID: %@, Type: %ld, Template: %ld, HasBidPayload: %@", 
-                           placementID, bidID, (long)type, (long)template, bidPayload ? @"YES" : @"NO"]];
+                           placementID ?: @"(nil)", bidID, (long)type, (long)_deferredTemplate, bidPayload ? @"YES" : @"NO"]];
         
-        // Ensure Facebook SDK initialization happens on main thread to prevent crashes
-        if ([NSThread isMainThread]) {
-            _bannerView = [[FBAdView alloc] initWithPlacementID:placementID
-                                                          adSize:fbAdSize
-                                              rootViewController:viewController];
-            _bannerView.delegate = self;
-        } else {
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                self->_bannerView = [[FBAdView alloc] initWithPlacementID:placementID
-                                                                    adSize:fbAdSize
-                                                        rootViewController:viewController];
-                self->_bannerView.delegate = self;
-            });
+        // Only create banner view if placementID is valid
+        // Otherwise defer to load() for validation
+        if (placementID && placementID.length > 0) {
+            // Ensure Facebook SDK initialization happens on main thread to prevent crashes
+            if ([NSThread isMainThread]) {
+                _bannerView = [[FBAdView alloc] initWithPlacementID:placementID
+                                                              adSize:fbAdSize
+                                                  rootViewController:viewController];
+                _bannerView.delegate = self;
+            } else {
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    self->_bannerView = [[FBAdView alloc] initWithPlacementID:placementID
+                                                                        adSize:fbAdSize
+                                                            rootViewController:viewController];
+                    self->_bannerView.delegate = self;
+                });
+            }
         }
     }
     return self;
@@ -97,6 +102,39 @@
 }
 
 - (void)load {
+    // Validate placement ID at load time (deferred validation pattern)
+    if (!_placementID || _placementID.length == 0) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                     description:@"[Meta] Invalid or missing placement ID for banner ad"];
+        [self.logger error:error.localizedDescription];
+        
+        if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
+            [self.delegate failToLoadBanner:self error:error];
+        }
+        return;
+    }
+    
+    // Create banner view now if not already created (deferred from init)
+    if (!_bannerView) {
+        FBAdSize fbAdSize = [self fbAdSizeForTemplate:_deferredTemplate fallbackType:_type];
+        [self.logger debug:@"Creating banner view with validated placement ID"];
+        
+        // Ensure Facebook SDK initialization happens on main thread to prevent crashes
+        if ([NSThread isMainThread]) {
+            _bannerView = [[FBAdView alloc] initWithPlacementID:_placementID
+                                                          adSize:fbAdSize
+                                              rootViewController:_viewController];
+            _bannerView.delegate = self;
+        } else {
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                self->_bannerView = [[FBAdView alloc] initWithPlacementID:self->_placementID
+                                                                    adSize:fbAdSize
+                                                        rootViewController:self->_viewController];
+                self->_bannerView.delegate = self;
+            });
+        }
+    }
+    
     [self.logger debug:[NSString stringWithFormat:@"Loading ad - Placement: %@, HasBidPayload: %@", 
                        _placementID, self.bidPayload ? @"YES" : @"NO"]];
     

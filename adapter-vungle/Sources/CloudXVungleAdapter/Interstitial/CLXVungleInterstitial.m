@@ -32,15 +32,15 @@
 #pragma mark - Initialization
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
-                       placementID:(NSString *)placementID
+                       placementID:(nullable NSString *)placementID
                              bidID:(NSString *)bidID
-                          delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
+                          delegate:(nullable id<CLXAdapterInterstitialDelegate>)delegate {
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
-        _placementID = [placementID copy];
+        _placementID = [placementID copy];  // Nullable - validation in load()
         _bidID = [bidID copy];
-        _delegate = delegate;
+        _delegate = delegate;  // Nullable - validation in load()
         _logger = [[CLXLogger alloc] initWithCategory:@"VungleInterstitial"];
         _timeoutInterval = 30.0; // Default 30 second timeout
         _isLoaded = NO;
@@ -48,7 +48,7 @@
         _isDestroyed = NO;
         
         [_logger debug:[NSString stringWithFormat:@"Initialized Vungle interstitial - Placement: %@, BidID: %@, HasBidPayload: %@", 
-                          placementID, bidID, bidPayload ? @"YES" : @"NO"]];
+                          placementID ?: @"(nil)", bidID, bidPayload ? @"YES" : @"NO"]];
     }
     return self;
 }
@@ -70,6 +70,23 @@
 #pragma mark - CLXAdapterInterstitial Protocol
 
 - (void)load {
+    // Validate placement ID at load time
+    if (!self.placementID || self.placementID.length == 0) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                     description:@"[Vungle] Invalid or missing placement ID for interstitial ad"];
+        [self.logger error:error.localizedDescription];
+        [self handleLoadFailure:error];
+        return;
+    }
+    
+    // Validate delegate at load time
+    if (!self.delegate) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidConfiguration
+                                     description:@"[Vungle] Missing delegate for interstitial ad"];
+        [self.logger error:error.localizedDescription];
+        return;
+    }
+    
     if (self.isDestroyed) {
         [self.logger error:@"Cannot load - adapter is destroyed"];
         return;

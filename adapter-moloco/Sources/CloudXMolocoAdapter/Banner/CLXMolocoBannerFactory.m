@@ -52,8 +52,8 @@
                                      bidPayload:(nullable NSString *)bidPayload
                                           bidID:(NSString *)bidID
                                    adapterExtras:(nullable NSDictionary<NSString *, NSString *> *)adapterExtras
-                                       delegate:(id<CLXAdapterBannerDelegate>)delegate
-                                         adSize:(CLXBannerAdSize)adSize {
+                                        delegate:(id<CLXAdapterBannerDelegate>)delegate
+                                          adSize:(CLXBannerAdSize)adSize {
     
     [self.logger debug:[NSString stringWithFormat:@"Creating banner - AdId: %@, Size: %dx%d", 
                        adId, (int)adSize.width, (int)adSize.height]];
@@ -62,19 +62,18 @@
                                                                fallbackAdId:adId 
                                                                      logger:self.logger];
     
+    // v1.3.0: No longer return nil for validation errors
+    // Validation now happens in load() with proper error callbacks
+    // This aligns iOS behavior with Android
     if (!placementID || placementID.length == 0) {
-        [self.logger error:@"Invalid placement ID"];
-        if ([delegate respondsToSelector:@selector(didFailToLoadWithBanner:error:)]) {
-            NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                         description:@"Invalid placement ID"];
-            [delegate didFailToLoadWithBanner:nil error:error];
-        }
-        return nil;
+        [self.logger error:@"Invalid placement ID - validation will be deferred to load()"];
     }
     
+    // ALWAYS create and return adapter (even with invalid placementID)
+    // Validation errors will be reported in load() via delegate callback
     CLXMolocoBanner *banner = 
         [[CLXMolocoBanner alloc] initWithBidPayload:bidPayload
-                                        placementID:placementID
+                                        placementID:placementID  // May be nil
                                               bidID:bidID
                                            delegate:delegate
                                              adSize:adSize];

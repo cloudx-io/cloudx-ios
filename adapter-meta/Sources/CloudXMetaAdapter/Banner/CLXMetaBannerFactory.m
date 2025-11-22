@@ -65,14 +65,16 @@
                                                               fallbackAdId:adId 
                                                                     logger:[CLXMetaBannerFactory logger]];
     
-    // Validate placement ID
+    // v1.3.0: No longer return nil for validation errors
+    // Validation now happens in load() with proper error callbacks
     if (!metaPlacementID || metaPlacementID.length == 0) {
-        [[CLXMetaBannerFactory logger] error:@"Cannot create banner adapter - placement ID is nil or empty"];
-        return nil;
+        [[CLXMetaBannerFactory logger] error:@"Invalid placement ID - validation will be deferred to load()"];
     }
     
+    // ALWAYS create and return adapter (even with invalid placementID)
+    // Validation errors will be reported in load() via delegate callback
     CLXMetaBanner *banner = [[CLXMetaBanner alloc] initWithBidPayload:adm
-                                                           placementID:metaPlacementID
+                                                           placementID:metaPlacementID  // May be nil
                                                                 bidID:bidId
                                                                  type:type
                                                         viewController:viewController

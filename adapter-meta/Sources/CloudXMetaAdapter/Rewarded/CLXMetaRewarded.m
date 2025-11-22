@@ -43,22 +43,27 @@
 @implementation CLXMetaRewarded
 
 - (instancetype)initWithBidPayload:(NSString *)bidPayload
-                       placementID:(NSString *)placementID
+                       placementID:(nullable NSString *)placementID
                             bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterRewardedDelegate>)delegate {
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
-        _placementID = [placementID copy];
+        _placementID = [placementID copy];  // Now nullable - validation in load()
         _bidID = [bidID copy];
         _delegate = delegate;
         _sdkVersion = FB_AD_SDK_VERSION;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMetaRewarded"];
         
-        [self.logger debug:[NSString stringWithFormat:@"Initialized for placement: %@ | bidPayload: %@", placementID, bidPayload ? @"YES" : @"NO"]];
+        [self.logger debug:[NSString stringWithFormat:@"Initialized for placement: %@ | bidPayload: %@", 
+                           placementID ?: @"(nil)", bidPayload ? @"YES" : @"NO"]];
         
-        _rewarded = [[FBRewardedVideoAd alloc] initWithPlacementID:placementID];
-        _rewarded.delegate = self;
+        // Only create rewarded ad if placementID is valid
+        // Otherwise defer to load() for validation
+        if (placementID && placementID.length > 0) {
+            _rewarded = [[FBRewardedVideoAd alloc] initWithPlacementID:placementID];
+            _rewarded.delegate = self;
+        }
     }
     return self;
 }
@@ -73,6 +78,25 @@
 }
 
 - (void)load {
+    // Validate placement ID at load time (deferred validation pattern)
+    if (!_placementID || _placementID.length == 0) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                     description:@"[Meta] Invalid or missing placement ID for rewarded ad"];
+        [self.logger error:error.localizedDescription];
+        
+        if ([self.delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
+            [self.delegate didFailToLoadWithRewarded:self error:error];
+        }
+        return;
+    }
+    
+    // Create rewarded ad now if not already created (deferred from init)
+    if (!_rewarded) {
+        _rewarded = [[FBRewardedVideoAd alloc] initWithPlacementID:_placementID];
+        _rewarded.delegate = self;
+        [self.logger debug:@"Created rewarded ad with validated placement ID"];
+    }
+    
     // Prevent concurrent loading attempts
     if (_isLoading) {
         [self.logger debug:@"⚠️ [CLXMetaRewarded] Load already in progress, ignoring duplicate request"];

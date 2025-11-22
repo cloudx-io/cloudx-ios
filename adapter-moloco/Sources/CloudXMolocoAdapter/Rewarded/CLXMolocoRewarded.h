@@ -22,8 +22,21 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *bidPayload;
 @property (nonatomic, strong, nullable) MolocoRewardedAd *rewardedAd;
 
+/**
+ * Initialize Moloco rewarded adapter
+ * 
+ * @param bidPayload Optional bid payload from server
+ * @param placementID Moloco placement ID (now nullable - validation deferred to load())
+ * @param bidID Bid identifier
+ * @param delegate Adapter delegate for callbacks
+ * @return Initialized adapter instance
+ *
+ * @discussion As of v1.3.0, placementID can be nil. Validation occurs in load()
+ *             and errors are reported via delegate callback.
+ * @since 1.3.0 placementID parameter is now nullable
+ */
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
-                       placementID:(NSString *)placementID
+                       placementID:(nullable NSString *)placementID
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterRewardedDelegate>)delegate;
 

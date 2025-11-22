@@ -30,6 +30,10 @@ typedef NS_ENUM(NSInteger, CLXLossReason) {
  * 500-599: Configuration and setup errors
  */
 typedef NS_ENUM(NSInteger, CLXErrorCode) {
+    // GENERAL ERRORS (0-99)
+    /// Unknown or unspecified error
+    CLXErrorCodeUnknown = 0,
+    
     // INITIALIZATION ERRORS (100-199)
     /// SDK failed to initialize
     CLXErrorCodeNotInitialized = 100,
@@ -96,7 +100,15 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     /// Banner view is nil or invalid
     CLXErrorCodeInvalidBannerView = 503,
     /// Native view is nil or invalid
-    CLXErrorCodeInvalidNativeView = 504
+    CLXErrorCodeInvalidNativeView = 504,
+    /// No adapters registered (no adapter frameworks included in project)
+    CLXErrorCodeNoAdaptersRegistered = 505,
+    /// Invalid adapter configuration
+    CLXErrorCodeInvalidConfiguration = 506,
+    /// Invalid ad unit ID provided
+    CLXErrorCodeInvalidAdUnitID = 507,
+    /// Invalid bid response
+    CLXErrorCodeInvalidBidResponse = 508
 };
 
 /**

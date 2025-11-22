@@ -39,14 +39,14 @@
 @implementation CLXMolocoBanner
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
-                       placementID:(NSString *)placementID
+                       placementID:(nullable NSString *)placementID
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterBannerDelegate>)delegate
                             adSize:(CLXBannerAdSize)adSize {
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
-        _placementID = [placementID copy];
+        _placementID = [placementID copy];  // Now nullable - validation in load()
         _bidID = [bidID copy];
         _delegate = delegate;
         _adSize = adSize;
@@ -54,12 +54,15 @@
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMolocoBanner"];
         
         [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %@, BidID: %@, Size: %dx%d", 
-                           placementID, bidID, (int)adSize.width, (int)adSize.height]];
+                           placementID ?: @"(nil)", bidID, (int)adSize.width, (int)adSize.height]];
         
-        // Convert CLXBannerAdSize to Moloco banner size
-        CGSize molocoSize = CGSizeMake(adSize.width, adSize.height);
-        _bannerView = [[MolocoBannerView alloc] initWithPlacementID:placementID size:molocoSize];
-        _bannerView.delegate = self;
+        // Only create banner view if placementID is valid
+        // Otherwise defer to load() for validation
+        if (placementID && placementID.length > 0) {
+            CGSize molocoSize = CGSizeMake(adSize.width, adSize.height);
+            _bannerView = [[MolocoBannerView alloc] initWithPlacementID:placementID size:molocoSize];
+            _bannerView.delegate = self;
+        }
     }
     return self;
 }
@@ -73,6 +76,26 @@
 }
 
 - (void)load {
+    // Validate placement ID at load time (deferred validation pattern)
+    if (!_placementID || _placementID.length == 0) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                     description:@"[Moloco] Invalid or missing placement ID for banner ad"];
+        [self.logger error:error.localizedDescription];
+        
+        if ([self.delegate respondsToSelector:@selector(didFailToLoadWithBanner:error:)]) {
+            [self.delegate didFailToLoadWithBanner:self error:error];
+        }
+        return;
+    }
+    
+    // Create banner view now if not already created (deferred from init)
+    if (!_bannerView) {
+        CGSize molocoSize = CGSizeMake(_adSize.width, _adSize.height);
+        _bannerView = [[MolocoBannerView alloc] initWithPlacementID:_placementID size:molocoSize];
+        _bannerView.delegate = self;
+        [self.logger debug:@"Created banner view with validated placement ID"];
+    }
+    
     if (_isLoading) {
         [self.logger debug:@"Load already in progress"];
         return;

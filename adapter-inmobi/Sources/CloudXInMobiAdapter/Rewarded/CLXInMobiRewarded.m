@@ -37,17 +37,22 @@
     self = [super init];
     if (self) {
         _bidPayload = bidPayload;
-        _placementID = placementID;
+        _placementID = placementID;  // May be 0 (invalid) - validation in load()
         _bidID = [bidID copy];
         _delegate = delegate;
         _sdkVersion = @"10.8.8";
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXInMobiRewarded"];
         _timeoutInterval = 30.0;
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %lld, BidID: %@", placementID, bidID]];
+        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %lld%@, BidID: %@", 
+                           placementID, (placementID == 0 ? @" (invalid)" : @""), bidID]];
         
-        _interstitial = [[IMInterstitial alloc] initWithPlacementId:placementID];
-        _interstitial.delegate = self;
+        // Only create rewarded if placementID is valid
+        // Otherwise defer to load() for validation
+        if (placementID != 0) {
+            _interstitial = [[IMInterstitial alloc] initWithPlacementId:placementID];
+            _interstitial.delegate = self;
+        }
     }
     return self;
 }
@@ -67,6 +72,25 @@
 }
 
 - (void)load {
+    // Validate placement ID at load time (deferred validation pattern)
+    if (_placementID == 0) {
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                     description:@"[InMobi] Invalid or missing placement ID for rewarded ad"];
+        [self.logger error:error.localizedDescription];
+        
+        if ([self.delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
+            [self.delegate didFailToLoadWithRewarded:self error:error];
+        }
+        return;
+    }
+    
+    // Create rewarded now if not already created (deferred from init)
+    if (!_interstitial) {
+        _interstitial = [[IMInterstitial alloc] initWithPlacementId:_placementID];
+        _interstitial.delegate = self;
+        [self.logger debug:@"Created rewarded with validated placement ID"];
+    }
+    
     if (_isLoading) {
         [self.logger debug:@"Load already in progress"];
         return;

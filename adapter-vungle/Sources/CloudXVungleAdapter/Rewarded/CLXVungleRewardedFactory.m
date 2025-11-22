@@ -43,20 +43,17 @@
     
     CLXLogger *logger = [[self class] logger];
     
-    // Validate required parameters
+    // v1.3.0: No longer return nil - validation deferred to load()
     if (!bidId || bidId.length == 0) {
-        [logger error:@"Cannot create rewarded adapter - bidId is nil or empty"];
-        return nil;
+        [logger error:@"bidId is nil or empty - validation will be deferred to load()"];
     }
     
     if (!delegate) {
-        [logger error:@"Cannot create rewarded adapter - delegate is nil"];
-        return nil;
+        [logger error:@"delegate is nil - validation will be deferred to load()"];
     }
     
-    // Validate Vungle SDK initialization
     if (![CLXVungleBaseFactory validateVungleInitialization:logger]) {
-        return nil;
+        [logger error:@"Vungle SDK not initialized - validation will be deferred to load()"];
     }
     
     // Resolve placement ID from extras or fallback to adId
@@ -64,10 +61,8 @@
                                                                 fallbackAdId:adId
                                                                       logger:logger];
     
-    // Validate the resolved placement ID
     if (!placementId || placementId.length == 0) {
-        [logger error:@"Cannot create rewarded adapter - no valid placement ID (checked extras and adId)"];
-        return nil;
+        [logger error:@"No valid placement ID - validation will be deferred to load()"];
     }
     
     // Extract bid payload from ADM if present
@@ -83,11 +78,11 @@
                     placementId, bidId, bidPayload ? @"YES" : @"NO"]
            ];
     
-    // Create and return the adapter
+    // ALWAYS create and return adapter
     CLXVungleRewarded *adapter = [[CLXVungleRewarded alloc] initWithBidPayload:bidPayload
-                                                                   placementID:placementId
+                                                                   placementID:placementId  // May be nil
                                                                          bidID:bidId
-                                                                      delegate:delegate];
+                                                                      delegate:delegate];  // May be nil
     
     if (!adapter) {
         [logger error:@"Failed to create Vungle rewarded adapter" ];

@@ -83,19 +83,22 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Initializes a new Vungle banner adapter
  * @param bidPayload The bid payload for programmatic ads (nil for waterfall)
- * @param placementID The Vungle placement ID
+ * @param placementID The Vungle placement ID (nullable - validation deferred to load())
  * @param bidID The CloudX bid ID
  * @param type The banner type/size
  * @param viewController The view controller for presenting the banner
- * @param delegate The CloudX adapter delegate
+ * @param delegate The CloudX adapter delegate (nullable - validation deferred to load())
  * @return Initialized banner adapter
+ * @discussion As of v1.3.0, placementID and delegate can be nil. Validation occurs in load()
+ *             and errors are reported via delegate callback.
+ * @since 1.3.0 placementID and delegate parameters are now nullable
  */
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
-                       placementID:(NSString *)placementID
+                       placementID:(nullable NSString *)placementID
                              bidID:(NSString *)bidID
                               type:(CLXBannerType)type
                     viewController:(UIViewController *)viewController
-                          delegate:(id<CLXAdapterBannerDelegate>)delegate;
+                          delegate:(nullable id<CLXAdapterBannerDelegate>)delegate;
 
 /**
  * Loads the banner ad
