@@ -101,9 +101,8 @@ class BannerViewController: BaseAdViewController {
             createAndAddBannerToView()
         }
         
-        guard let bannerAd = bannerAd else {
-            return // Failed to create
-        }
+        // SDK now guarantees non-nil return from create methods
+        guard let bannerAd = bannerAd else { return }
         
         // Start loading
         isLoading = true
@@ -140,14 +139,11 @@ class BannerViewController: BaseAdViewController {
                                       viewController: self, 
                                       delegate: self)
         
-        if bannerAd == nil {
-            DemoAppLogger.sharedInstance.logMessage("❌ Failed to create Banner ad instance")
-            showAlert(title: "Error", message: "Failed to create Banner ad instance")
-        } else {
-            DemoAppLogger.sharedInstance.logMessage("✅ Banner ad instance created successfully")
-            // Add banner to view hierarchy immediately
-            addBannerToViewHierarchy()
-        }
+        // SDK now always returns non-nil - validation errors deferred to load() callback
+        DemoAppLogger.sharedInstance.logMessage("✅ Banner ad instance created successfully")
+        
+        // Add banner to view hierarchy immediately
+        addBannerToViewHierarchy()
     }
     
     private func addBannerToViewHierarchy() {
