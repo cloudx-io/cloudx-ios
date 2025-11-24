@@ -153,14 +153,15 @@
 
 #pragma mark - CLXInterstitialDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
+- (void)didLoadAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Interstitial didLoadWithAd" ad:ad];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Interstitial failToLoadWithAd" ad:ad];
+- (void)didFailToLoadAdWithError:(NSError *)error {
+    // No ad object exists on failure, so use logMessage instead of logAdEvent
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Interstitial failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -171,11 +172,11 @@
     });
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
+- (void)didDisplayAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Interstitial didShowWithAd" ad:ad];
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
     [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Interstitial failToShowWithAd" ad:ad];
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -186,7 +187,7 @@
     });
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
+- (void)didHideAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Interstitial didHideWithAd" ad:ad];
     
     self.showAdWhenLoaded = NO;
@@ -196,15 +197,15 @@
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
+- (void)didClickAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Interstitial didClickWithAd" ad:ad];
 }
 
-- (void)impressionOn:(CLXAd *)ad {
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Interstitial impressionOn" ad:ad];
 }
 
-- (void)revenuePaid:(CLXAd *)ad {
+- (void)didPayRevenueForAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Interstitial revenuePaid" ad:ad];
 }
 

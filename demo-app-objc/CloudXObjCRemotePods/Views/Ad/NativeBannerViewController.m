@@ -173,15 +173,16 @@
 
 #pragma mark - CLXNativeDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
+- (void)didLoadAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"✅ NativeBanner didLoadWithAd" ad:ad];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self updateStatusUIWithState:AdStateReady];
     });
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ NativeBanner failToLoadWithAd - Error: %@", error.localizedDescription]];
+- (void)didFailToLoadAdWithError:(NSError *)error {
+    // No ad object exists on failure, so use logMessage instead of logAdEvent
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ NativeBanner failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeBannerAd = nil;
@@ -190,11 +191,11 @@
     });
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
+- (void)didDisplayAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👀 NativeBanner didShowWithAd" ad:ad];
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ NativeBanner failToShowWithAd - Error: %@", error.localizedDescription]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -204,20 +205,20 @@
     });
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
+- (void)didHideAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 NativeBanner didHideWithAd - Ad: %@", ad]];
     self.nativeBannerAd = nil;
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
+- (void)didClickAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 NativeBanner didClickWithAd - Ad: %@", ad]];
 }
 
-- (void)impressionOn:(CLXAd *)ad {
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ NativeBanner impressionOn" ad:ad];
 }
 
-- (void)revenuePaid:(CLXAd *)ad {
+- (void)didPayRevenueForAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 NativeBanner revenuePaid" ad:ad];
 }
 

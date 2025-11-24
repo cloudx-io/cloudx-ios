@@ -211,15 +211,16 @@
 
 #pragma mark - CLXRewardedDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
+- (void)didLoadAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Rewarded didLoadWithAd" ad:ad];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
     // Do NOT show the ad here!
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failToLoadWithAd - Error: %@", error.localizedDescription]];
+- (void)didFailToLoadAdWithError:(NSError *)error {
+    // No ad object exists on failure, so use logMessage instead of logAdEvent
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -231,11 +232,11 @@
     });
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
+- (void)didDisplayAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 Rewarded didShowWithAd - Ad: %@", ad]];
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failToShowWithAd - Error: %@", error.localizedDescription]];
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -246,7 +247,7 @@
     });
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
+- (void)didHideAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 Rewarded didHideWithAd - Ad: %@", ad]];
     self.rewardedAd = nil;
     // Create new ad instance for next time
@@ -254,15 +255,15 @@
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
+- (void)didClickAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 Rewarded didClickWithAd - Ad: %@", ad]];
 }
 
-- (void)impressionOn:(CLXAd *)ad {
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ Rewarded impressionOn - Ad: %@", ad]];
 }
 
-- (void)revenuePaid:(CLXAd *)ad {
+- (void)didPayRevenueForAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Rewarded revenuePaid" ad:ad];
 }
 
