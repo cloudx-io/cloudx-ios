@@ -271,8 +271,9 @@
     // Don't auto-show - user must press Show Banner button
 }
 
-- (void)didFailToLoadAdWithError:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Banner failToLoadWithAd" ad:ad];
+- (void)didFailToLoadAdWithError:(NSError *)error {
+    // No ad object exists on failure, so use logMessage instead of logAdEvent
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
     
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];

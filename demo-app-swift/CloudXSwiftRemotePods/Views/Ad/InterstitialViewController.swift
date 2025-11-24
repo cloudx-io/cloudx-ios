@@ -185,15 +185,16 @@ class InterstitialViewController: BaseAdViewController {
 }
 
 extension InterstitialViewController: CLXInterstitialDelegate {
-    func didLoad(with ad: CLXAd) {
+    func didLoad(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("✅ Interstitial didLoadAd", ad: ad)
         isLoading = false
         updateStatusUI(state: AdState.ready)
         // Don't auto-show - wait for user to press Show Interstitial button
     }
     
-    func failToLoad(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ Interstitial didFailToLoadAd", ad: ad)
+    func didFailToLoadAd(error: Error) {
+        // No ad object exists on failure, so use logMessage instead of logAdEvent
+        DemoAppLogger.sharedInstance.logMessage("❌ Interstitial failed to load - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: AdState.noAd)
         
@@ -204,11 +205,11 @@ extension InterstitialViewController: CLXInterstitialDelegate {
         }
     }
     
-    func didShow(with ad: CLXAd) {
+    func didDisplay(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👀 Interstitial didDisplayAd", ad: ad)
     }
     
-    func failToShow(with ad: CLXAd, error: Error) {
+    func didFailToDisplay(_ ad: CLXAd, error: Error) {
         DemoAppLogger.sharedInstance.logAdEvent("❌ Interstitial didFailToDisplayAd", ad: ad)
         updateStatusUI(state: AdState.noAd)
         
@@ -219,7 +220,7 @@ extension InterstitialViewController: CLXInterstitialDelegate {
         }
     }
     
-    func didHide(with ad: CLXAd) {
+    func didHide(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("🔚 Interstitial didHideAd", ad: ad)
         
         showAdWhenLoaded = false
@@ -229,15 +230,15 @@ extension InterstitialViewController: CLXInterstitialDelegate {
         updateStatusUI(state: AdState.noAd)
     }
     
-    func didClick(with ad: CLXAd) {
+    func didClick(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👆 Interstitial didClickAd", ad: ad)
     }
     
-    func impression(on ad: CLXAd) {
+    func didRecordImpression(for ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👁️ Interstitial didRecordImpression", ad: ad)
     }
     
-    func didPayRevenue(_ ad: CLXAd) {
+    func didPayRevenue(for ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("💰 Interstitial didPayRevenue", ad: ad)
     }
 } 

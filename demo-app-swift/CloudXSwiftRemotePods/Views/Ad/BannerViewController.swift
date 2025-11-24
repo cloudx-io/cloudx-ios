@@ -191,7 +191,8 @@ extension BannerViewController: CLXBannerDelegate {
     }
     
     func didFailToLoadAd(error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ Banner didFailToLoadAd", ad: nil)
+        // No ad object exists on failure, so use logMessage instead of logAdEvent
+        DemoAppLogger.sharedInstance.logMessage("❌ Banner failed to load - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: .noAd)
         bannerAd = nil

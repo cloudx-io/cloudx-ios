@@ -154,7 +154,7 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
     
     // MARK: - CLXNativeDelegate
     
-    func didLoad(with ad: CLXAd) {
+    func didLoad(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("✅ Native didLoadAd", ad: ad)
         DispatchQueue.main.async { [weak self] in
             self?.isLoading = false
@@ -164,8 +164,9 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
         // Don't auto-show - user must press Show Native button
     }
     
-    func failToLoad(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ Native didFailToLoadAd", ad: ad)
+    func didFailToLoadAd(error: Error) {
+        // No ad object exists on failure, so use logMessage instead of logAdEvent
+        DemoAppLogger.sharedInstance.logMessage("❌ Native failed to load - Error: \(error.localizedDescription)")
         
         DispatchQueue.main.async { [weak self] in
             self?.nativeAd = nil
@@ -174,11 +175,11 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
         }
     }
     
-    func didShow(with ad: CLXAd) {
+    func didDisplay(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👀 Native didDisplayAd", ad: ad)
     }
     
-    func failToShow(with ad: CLXAd, error: Error) {
+    func didFailToDisplay(_ ad: CLXAd, error: Error) {
         DemoAppLogger.sharedInstance.logAdEvent("❌ Native didFailToDisplayAd", ad: ad)
         
         DispatchQueue.main.async { [weak self] in
@@ -188,20 +189,20 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
         }
     }
     
-    func didHide(with ad: CLXAd) {
+    func didHide(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("🔚 Native didHideAd", ad: ad)
         nativeAd = nil
     }
     
-    func didClick(with ad: CLXAd) {
+    func didClick(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👆 Native didClickAd", ad: ad)
     }
     
-    func impression(on ad: CLXAd) {
+    func didRecordImpression(for ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👁️ Native didRecordImpression", ad: ad)
     }
     
-    func didPayRevenue(_ ad: CLXAd) {
+    func didPayRevenue(for ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("💰 Native didPayRevenue", ad: ad)
     }
 }
