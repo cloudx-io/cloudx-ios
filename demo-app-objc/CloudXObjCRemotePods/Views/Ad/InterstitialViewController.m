@@ -159,8 +159,9 @@
     [self updateStatusUIWithState:AdStateReady];
 }
 
-- (void)didFailToLoadAdWithError:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Interstitial failToLoadWithAd" ad:ad];
+- (void)didFailToLoadAdWithError:(NSError *)error {
+    // No ad object exists on failure, so use logMessage instead of logAdEvent
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Interstitial failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     

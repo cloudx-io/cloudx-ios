@@ -165,15 +165,16 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
     
     // MARK: - CLXNativeDelegate
     
-    func didLoad(with ad: CLXAd) {
+    func didLoad(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("✅ NativeBanner didLoadAd", ad: ad)
         DispatchQueue.main.async { [weak self] in
             self?.updateStatusUI(state: .ready)
         }
     }
     
-    func failToLoad(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logMessage("❌ NativeBanner didFailToLoadAd - Error: \(error.localizedDescription)")
+    func didFailToLoadAd(error: Error) {
+        // No ad object exists on failure, so use logMessage instead of logAdEvent
+        DemoAppLogger.sharedInstance.logMessage("❌ NativeBanner failed to load - Error: \(error.localizedDescription)")
         
         DispatchQueue.main.async { [weak self] in
             self?.nativeBannerAd = nil
@@ -182,12 +183,12 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
         }
     }
     
-    func didShow(with ad: CLXAd) {
+    func didDisplay(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👀 NativeBanner didDisplayAd", ad: ad)
     }
     
-    func failToShow(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logMessage("❌ NativeBanner didFailToDisplayAd - Error: \(error.localizedDescription)")
+    func didFailToDisplay(_ ad: CLXAd, error: Error) {
+        DemoAppLogger.sharedInstance.logAdEvent("❌ NativeBanner didFailToDisplayAd", ad: ad)
         
         DispatchQueue.main.async { [weak self] in
             self?.nativeBannerAd = nil
@@ -196,20 +197,20 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
         }
     }
     
-    func didHide(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logMessage("🔚 NativeBanner didHideAd - Ad: \(ad)")
+    func didHide(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("🔚 NativeBanner didHideAd", ad: ad)
         nativeBannerAd = nil
     }
     
-    func didClick(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logMessage("👆 NativeBanner didClickAd - Ad: \(ad)")
+    func didClick(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👆 NativeBanner didClickAd", ad: ad)
     }
     
-    func impression(on ad: CLXAd) {
+    func didRecordImpression(for ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👁️ NativeBanner didRecordImpression", ad: ad)
     }
     
-    func didPayRevenue(_ ad: CLXAd) {
+    func didPayRevenue(for ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("💰 NativeBanner didPayRevenue", ad: ad)
     }
 }
