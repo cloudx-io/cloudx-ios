@@ -184,15 +184,14 @@ class BannerViewController: BaseAdViewController {
 }
 
 extension BannerViewController: CLXBannerDelegate {
-    func didLoad(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("✅ Banner didLoadAd", ad: ad)
+    func didLoad(with ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("✅ Banner didLoadWithAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .ready)
     }
     
-    func didFailToLoadAd(error: Error) {
-        // No ad object exists on failure, so use logMessage instead of logAdEvent
-        DemoAppLogger.sharedInstance.logMessage("❌ Banner failed to load - Error: \(error.localizedDescription)")
+    func failToLoad(with ad: CLXAd, error: Error) {
+        DemoAppLogger.sharedInstance.logAdEvent("❌ Banner failToLoadWithAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .noAd)
         bannerAd = nil
@@ -203,12 +202,12 @@ extension BannerViewController: CLXBannerDelegate {
         }
     }
     
-    func didDisplay(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👀 Banner didDisplayAd", ad: ad)
+    func didShow(with ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👀 Banner didShowWithAd", ad: ad)
     }
     
-    func didFailToDisplay(_ ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ Banner didFailToDisplayAd", ad: ad)
+    func failToShow(with ad: CLXAd, error: Error) {
+        DemoAppLogger.sharedInstance.logAdEvent("❌ Banner failToShowWithAd", ad: ad)
         bannerAd = nil
         
         DispatchQueue.main.async { [weak self] in
@@ -217,21 +216,21 @@ extension BannerViewController: CLXBannerDelegate {
         }
     }
     
-    func didHide(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🔚 Banner didHideAd", ad: ad)
+    func didHide(with ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("🔚 Banner didHideWithAd", ad: ad)
         bannerAd = nil
     }
     
-    func didClick(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👆 Banner didClickAd", ad: ad)
+    func didClick(with ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👆 Banner didClickWithAd", ad: ad)
     }
     
-    func didRecordImpression(for ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ Banner didRecordImpression", ad: ad)
+    func impression(on ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👁️ Banner impressionOn", ad: ad)
     }
     
-    func didPayRevenue(for ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("💰 Banner didPayRevenue", ad: ad)
+    func revenuePaid(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("💰 Banner revenuePaid", ad: ad)
     }
     
     // NEW MAX SDK Compatibility Delegate Methods

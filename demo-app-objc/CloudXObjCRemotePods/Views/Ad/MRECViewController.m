@@ -176,7 +176,7 @@
 
 #pragma mark - CLXBannerDelegate
 
-- (void)didLoadAd:(CLXAd *)ad {
+- (void)didLoadWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"✅ MREC didLoadWithAd" ad:ad];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
@@ -184,9 +184,8 @@
     // Don't auto-show - user must press Show MREC button
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
-    // No ad object exists on failure, so use logMessage instead of logAdEvent
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ MREC failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
+- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ MREC failToLoadWithAd" ad:ad];
     self.isLoading = NO;
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -195,11 +194,11 @@
     });
 }
 
-- (void)didDisplayAd:(CLXAd *)ad {
+- (void)didShowWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👀 MREC didShowWithAd" ad:ad];
 }
 
-- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
     [[DemoAppLogger sharedInstance] logAdEvent:@"❌ MREC failToShowWithAd" ad:ad];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -208,20 +207,20 @@
     });
 }
 
-- (void)didHideAd:(CLXAd *)ad {
+- (void)didHideWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 MREC didHideWithAd" ad:ad];
     self.mrecAd = nil;
 }
 
-- (void)didClickAd:(CLXAd *)ad {
+- (void)didClickWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 MREC didClickWithAd" ad:ad];
 }
 
-- (void)didRecordImpressionForAd:(CLXAd *)ad {
+- (void)impressionOn:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ MREC impressionOn" ad:ad];
 }
 
-- (void)didPayRevenueForAd:(CLXAd *)ad {
+- (void)revenuePaid:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 MREC revenuePaid" ad:ad];
 }
 

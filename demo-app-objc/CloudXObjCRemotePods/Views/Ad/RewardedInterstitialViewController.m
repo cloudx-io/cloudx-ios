@@ -133,15 +133,14 @@
 
 #pragma mark - CLXRewardedInterstitialDelegate
 
-- (void)didLoadAd:(CLXAd *)ad {
+- (void)didLoadWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ RewardedInterstitial didLoadWithAd - Ad: %@", ad]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
-    // No ad object exists on failure, so use logMessage instead of logAdEvent
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ RewardedInterstitial failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
+- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ RewardedInterstitial failToLoadWithAd - Error: %@", error.localizedDescription]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -153,11 +152,11 @@
     });
 }
 
-- (void)didDisplayAd:(CLXAd *)ad {
+- (void)didShowWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 RewardedInterstitial didShowWithAd - Ad: %@", ad]];
 }
 
-- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ RewardedInterstitial failToShowWithAd - Error: %@", error.localizedDescription]];
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -169,22 +168,22 @@
     });
 }
 
-- (void)didHideAd:(CLXAd *)ad {
+- (void)didHideWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 RewardedInterstitial didHideWithAd - Ad: %@", ad]];
     self.rewardedInterstitialAd = nil;
     [self loadRewardedInterstitial];
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
-- (void)didClickAd:(CLXAd *)ad {
+- (void)didClickWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 RewardedInterstitial didClickWithAd - Ad: %@", ad]];
 }
 
-- (void)didRecordImpressionForAd:(CLXAd *)ad {
+- (void)impressionOn:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ RewardedInterstitial impressionOn - Ad: %@", ad]];
 }
 
-- (void)didPayRevenueForAd:(CLXAd *)ad {
+- (void)revenuePaid:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 RewardedInterstitial revenuePaid - Ad: %@", ad]];
 }
 

@@ -262,7 +262,7 @@
 }
 
 #pragma mark - CLXBannerDelegate
-- (void)didLoadAd:(CLXAd *)ad {
+- (void)didLoadWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Banner didLoadWithAd" ad:ad];
     
     self.isLoading = NO;
@@ -271,9 +271,8 @@
     // Don't auto-show - user must press Show Banner button
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
-    // No ad object exists on failure, so use logMessage instead of logAdEvent
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
+- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Banner failToLoadWithAd" ad:ad];
     
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
@@ -285,11 +284,11 @@
     });
 }
 
-- (void)didDisplayAd:(CLXAd *)ad {
+- (void)didShowWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Banner didShowWithAd" ad:ad];
 }
 
-- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
     [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Banner failToShowWithAd" ad:ad];
     
     self.bannerAd = nil;
@@ -300,20 +299,20 @@
     });
 }
 
-- (void)didHideAd:(CLXAd *)ad {
+- (void)didHideWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Banner didHideWithAd" ad:ad];
     self.bannerAd = nil;
 }
 
-- (void)didClickAd:(CLXAd *)ad {
+- (void)didClickWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Banner didClickWithAd" ad:ad];
 }
 
-- (void)didRecordImpressionForAd:(CLXAd *)ad {
+- (void)impressionOn:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Banner impressionOn" ad:ad];
 }
 
-- (void)didPayRevenueForAd:(CLXAd *)ad {
+- (void)revenuePaid:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Banner revenuePaid" ad:ad];
 }
 
