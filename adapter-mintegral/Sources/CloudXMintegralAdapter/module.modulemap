@@ -1,7 +1,0 @@
-framework module CloudXMintegralAdapter {
-  umbrella header "CloudXMintegralAdapter.h"
-  
-  export *
-  module * { export * }
-}
-
