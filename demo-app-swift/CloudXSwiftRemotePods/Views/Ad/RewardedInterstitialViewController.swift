@@ -133,15 +133,14 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
     
     // MARK: - CLXRewardedDelegate
     
-    func didLoad(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("✅ RewardedInterstitial didLoadAd", ad: ad)
+    func didLoad(with ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("✅ RewardedInterstitial didLoadWithAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .ready)
     }
     
-    func didFailToLoadAd(error: Error) {
-        // No ad object exists on failure, so use logMessage instead of logAdEvent
-        DemoAppLogger.sharedInstance.logMessage("❌ RewardedInterstitial failed to load - Error: \(error.localizedDescription)")
+    func failToLoad(with ad: CLXAd, error: Error) {
+        DemoAppLogger.sharedInstance.logAdEvent("❌ RewardedInterstitial failToLoadWithAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .noAd)
         
@@ -152,12 +151,12 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         }
     }
     
-    func didDisplay(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👀 RewardedInterstitial didDisplayAd", ad: ad)
+    func didShow(with ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👀 RewardedInterstitial didShowWithAd", ad: ad)
     }
     
-    func didFailToDisplay(_ ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ RewardedInterstitial didFailToDisplayAd", ad: ad)
+    func failToShow(with ad: CLXAd, error: Error) {
+        DemoAppLogger.sharedInstance.logAdEvent("❌ RewardedInterstitial failToShowWithAd", ad: ad)
         updateStatusUI(state: .noAd)
         
         DispatchQueue.main.async { [weak self] in
@@ -167,27 +166,27 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         }
     }
     
-    func didHide(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🔚 RewardedInterstitial didHideAd", ad: ad)
+    func didHide(with ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("🔚 RewardedInterstitial didHideWithAd", ad: ad)
         rewardedInterstitialAd = nil
         loadRewardedInterstitial()
         updateStatusUI(state: .noAd)
     }
     
-    func didClick(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👆 RewardedInterstitial didClickAd", ad: ad)
+    func didClick(with ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👆 RewardedInterstitial didClickWithAd", ad: ad)
     }
     
-    func didRecordImpression(for ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ RewardedInterstitial didRecordImpression", ad: ad)
+    func impression(on ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👁️ RewardedInterstitial impressionOn", ad: ad)
     }
     
-    func didPayRevenue(for ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("💰 RewardedInterstitial didPayRevenue", ad: ad)
+    func revenuePaid(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("💰 RewardedInterstitial revenuePaid", ad: ad)
     }
     
-    func didRewardUser(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🎁 RewardedInterstitial didRewardUser", ad: ad)
+    func userRewarded(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("🎁 RewardedInterstitial userRewarded", ad: ad)
         DispatchQueue.main.async { [weak self] in
             self?.showAlert(title: "Reward Earned! 🎉", message: "User has successfully earned a reward from interstitial!")
         }

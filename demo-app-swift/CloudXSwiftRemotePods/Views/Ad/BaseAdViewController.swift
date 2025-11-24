@@ -68,26 +68,6 @@ class BaseAdViewController: UIViewController, AdStateManaging {
         updateStatusUI(state: .noAd)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        // Clear logs when switching between different ad formats (tabs)
-        let currentAdFormat = String(describing: type(of: self))
-        
-        if let lastFormat = BaseAdViewController.lastAdFormat, lastFormat != currentAdFormat {
-            // Switching between different ad formats - clear logs for clean slate
-            DemoAppLogger.sharedInstance.clearLogs()
-            DemoAppLogger.sharedInstance.logMessage("[\(currentAdFormat)] Switched from \(lastFormat) - logs cleared")
-        }
-        // No log for same format - keep it clean
-        
-        // Remember current ad format for next time (session only)
-        BaseAdViewController.lastAdFormat = currentAdFormat
-    }
-    
-    // Static variable to track last ad format across all instances
-    private static var lastAdFormat: String?
-    
     func showAlert(title: String, message: String) {
         DispatchQueue.main.async {
             let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)

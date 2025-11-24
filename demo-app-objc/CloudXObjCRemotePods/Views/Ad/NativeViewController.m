@@ -160,7 +160,7 @@
 
 #pragma mark - CLXNativeDelegate
 
-- (void)didLoadAd:(CLXAd *)ad {
+- (void)didLoadWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Native didLoadWithAd" ad:ad];
     dispatch_async(dispatch_get_main_queue(), ^{
         self.isLoading = NO;
@@ -170,9 +170,8 @@
     // Don't auto-show - user must press Show Native button
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
-    // No ad object exists on failure, so use logMessage instead of logAdEvent
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Native failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
+- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Native failToLoadWithAd" ad:ad];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeAd = nil;
@@ -181,11 +180,11 @@
     });
 }
 
-- (void)didDisplayAd:(CLXAd *)ad {
+- (void)didShowWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Native didShowWithAd" ad:ad];
 }
 
-- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
     [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Native failToShowWithAd" ad:ad];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -195,20 +194,20 @@
     });
 }
 
-- (void)didHideAd:(CLXAd *)ad {
+- (void)didHideWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Native didHideWithAd" ad:ad];
     self.nativeAd = nil;
 }
 
-- (void)didClickAd:(CLXAd *)ad {
+- (void)didClickWithAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Native didClickWithAd" ad:ad];
 }
 
-- (void)didRecordImpressionForAd:(CLXAd *)ad {
+- (void)impressionOn:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Native impressionOn" ad:ad];
 }
 
-- (void)didPayRevenueForAd:(CLXAd *)ad {
+- (void)revenuePaid:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Native revenuePaid" ad:ad];
 }
 
