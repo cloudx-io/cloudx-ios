@@ -23,52 +23,51 @@ NS_ASSUME_NONNULL_BEGIN
  * Called when ad is loaded.
  * @param ad The ad that was loaded
  */
-- (void)didLoadWithAd:(CLXAd *)ad;
+- (void)didLoadAd:(CLXAd *)ad NS_SWIFT_NAME(didLoad(_:));
 
 /**
  * Called when ad fails to load with error.
- * @param ad The ad that failed to load
  * @param error The error that caused the failure
  */
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error;
+- (void)didFailToLoadAdWithError:(NSError *)error NS_SWIFT_NAME(didFailToLoadAd(error:));
 
 /**
- * Called when ad is shown.
- * @param ad The ad that was shown
+ * Called when ad is displayed.
+ * @param ad The ad that was displayed
  */
-- (void)didShowWithAd:(CLXAd *)ad;
+- (void)didDisplayAd:(CLXAd *)ad NS_SWIFT_NAME(didDisplay(_:));
 
 /**
- * Called when ad fails to show.
- * @param ad The ad that failed to show
+ * Called when ad fails to display.
+ * @param ad The ad that failed to display
  * @param error The error that caused the failure
  */
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error;
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error NS_SWIFT_NAME(didFailToDisplay(_:error:));
 
 /**
- * Called when ad is closed.
- * @param ad The ad that was closed
+ * Called when ad is hidden.
+ * @param ad The ad that was hidden
  */
-- (void)didHideWithAd:(CLXAd *)ad;
+- (void)didHideAd:(CLXAd *)ad NS_SWIFT_NAME(didHide(_:));
 
 /**
  * Called when ad is clicked.
  * @param ad The ad that was clicked
  */
-- (void)didClickWithAd:(CLXAd *)ad;
+- (void)didClickAd:(CLXAd *)ad NS_SWIFT_NAME(didClick(_:));
 
 /**
  * Called when ad impression is detected.
  * @param ad The ad that was shown
  */
-- (void)impressionOn:(CLXAd *)ad;
+- (void)didRecordImpressionForAd:(CLXAd *)ad NS_SWIFT_NAME(didRecordImpression(for:));
 
 /**
  * Called when revenue is paid for the ad.
  * Triggered after NURL is successfully sent to server endpoint.
  * @param ad The ad for which revenue was paid
  */
-- (void)revenuePaid:(CLXAd *)ad;
+- (void)didPayRevenueForAd:(CLXAd *)ad NS_SWIFT_NAME(didPayRevenue(for:));
 
 @end
 

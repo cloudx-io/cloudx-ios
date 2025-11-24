@@ -177,8 +177,14 @@
     self.isShowing = YES;
     
     // Notify delegate that banner is shown
+    NSLog(@"🔵 [CLXVungleBanner] STEP 1: About to call didShowBanner: on delegate: %@", self.delegate);
+    NSLog(@"🔵 [CLXVungleBanner] STEP 1: Delegate responds to selector: %d", [self.delegate respondsToSelector:@selector(didShowBanner:)]);
     if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
+        NSLog(@"🔵 [CLXVungleBanner] STEP 1: Calling [delegate didShowBanner:self]");
         [self.delegate didShowBanner:self];
+        NSLog(@"🔵 [CLXVungleBanner] STEP 1: Returned from [delegate didShowBanner:self]");
+    } else {
+        NSLog(@"🔴 [CLXVungleBanner] STEP 1: Delegate does NOT respond to didShowBanner: - THIS IS THE BUG!");
     }
 }
 
@@ -251,6 +257,11 @@
     }
     
     [self.logger debug:@"Banner ad did present"];
+    
+    // Forward the display callback to the SDK
+    if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
+        [self.delegate didShowBanner:self];
+    }
 }
 
 - (void)bannerAdDidTrackImpression:(VungleBannerView *)bannerView {

@@ -158,43 +158,42 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
     [self.eventLog addObject:[logEntry copy]];
 }
 
-- (void)didLoadWithAd:(CLXAd *)ad {
+- (void)didLoadAd:(CLXAd *)ad {
     self.didLoadCount++;
-    [self logEvent:@"didLoadWithAd" withData:@{@"ad": NSStringFromClass([ad class])}];
+    [self logEvent:@"didLoadAd" withData:@{@"ad": NSStringFromClass([ad class])}];
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToLoadAdWithError:(NSError *)error {
     self.failToLoadCount++;
     self.lastError = error;
     if (error.code == CLXBidAdSourceErrorNoBid) {
         self.noBidErrorCount++;
     }
-    [self logEvent:@"failToLoadWithAd" withData:@{
-        @"ad": ad ? NSStringFromClass([ad class]) : @"nil",
+    [self logEvent:@"didFailToLoadAdWithError" withData:@{
         @"error_code": @(error.code),
         @"error_domain": error.domain ?: @"unknown",
         @"error_description": error.localizedDescription ?: @"no description"
     }];
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
-    [self logEvent:@"didShowWithAd" withData:@{@"ad": ad ? NSStringFromClass([ad class]) : @"nil"}];
+- (void)didDisplayAd:(CLXAd *)ad {
+    [self logEvent:@"didDisplayAd" withData:@{@"ad": ad ? NSStringFromClass([ad class]) : @"nil"}];
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    [self logEvent:@"failToShowWithAd" withData:@{@"error": error.localizedDescription ?: @"no description"}];
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+    [self logEvent:@"didFailToDisplayAd" withData:@{@"error": error.localizedDescription ?: @"no description"}];
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
-    [self logEvent:@"didHideWithAd" withData:nil];
+- (void)didHideAd:(CLXAd *)ad {
+    [self logEvent:@"didHideAd" withData:nil];
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
-    [self logEvent:@"didClickWithAd" withData:nil];
+- (void)didClickAd:(CLXAd *)ad {
+    [self logEvent:@"didClickAd" withData:nil];
 }
 
-- (void)impressionOn:(CLXAd *)ad {
-    [self logEvent:@"impressionOn" withData:nil];
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
+    [self logEvent:@"didRecordImpressionForAd" withData:nil];
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {

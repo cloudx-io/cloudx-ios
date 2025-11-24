@@ -239,6 +239,11 @@
 - (void)adViewWillLogImpression:(FBAdView *)adView {
     [self.logger info:@"Ad impression logged"];
     
+    // Forward the display callback to the SDK
+    if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
+        [self.delegate didShowBanner:self];
+    }
+    
     // Forward to CloudX delegate if it supports impression tracking
     if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
         [self.delegate impressionBanner:self];

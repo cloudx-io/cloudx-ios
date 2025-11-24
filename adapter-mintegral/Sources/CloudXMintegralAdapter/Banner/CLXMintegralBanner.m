@@ -64,8 +64,8 @@
     [self.logger info:@"Loaded successfully"];
     _isLoading = NO;
     
-    if ([self.delegate respondsToSelector:@selector(didLoadWithBanner:view:)]) {
-        [self.delegate didLoadWithBanner:self view:adView];
+    if ([self.delegate respondsToSelector:@selector(didLoadBanner:)]) {
+        [self.delegate didLoadBanner:self];
     }
 }
 
@@ -78,32 +78,38 @@
                                                                 context:@"Banner Load"
                                                             placementID:_placementID];
     
-    if ([self.delegate respondsToSelector:@selector(didFailToLoadWithBanner:error:)]) {
-        [self.delegate didFailToLoadWithBanner:self error:mappedError];
+    if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
+        [self.delegate failToLoadBanner:self error:mappedError];
     }
 }
 
 - (void)adViewWillLogImpression:(MTGBidBannerAdView *)adView {
     [self.logger info:@"Did present"];
     
-    if ([self.delegate respondsToSelector:@selector(impressionWithBanner:)]) {
-        [self.delegate impressionWithBanner:self];
+    // Forward the display callback to the SDK
+    if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
+        [self.delegate didShowBanner:self];
+    }
+    
+    // Forward impression tracking
+    if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
+        [self.delegate impressionBanner:self];
     }
 }
 
 - (void)adViewDidClicked:(MTGBidBannerAdView *)adView {
     [self.logger info:@"Did click"];
     
-    if ([self.delegate respondsToSelector:@selector(clickWithBanner:)]) {
-        [self.delegate clickWithBanner:self];
+    if ([self.delegate respondsToSelector:@selector(clickBanner:)]) {
+        [self.delegate clickBanner:self];
     }
 }
 
 - (void)adViewClosed:(MTGBidBannerAdView *)adView {
     [self.logger info:@"Did close"];
     
-    if ([self.delegate respondsToSelector:@selector(didCloseWithBanner:)]) {
-        [self.delegate didCloseWithBanner:self];
+    if ([self.delegate respondsToSelector:@selector(closeBanner:)]) {
+        [self.delegate closeBanner:self];
     }
 }
 

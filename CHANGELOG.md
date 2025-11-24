@@ -31,7 +31,7 @@ This brings iOS behavior into full parity with industry-standard SDKs and improv
 
 #### Migration Guide
 
-**Before (v1.1.x):**
+**Before (v1.2.x):**
 ```objc
 CLXBannerAdView *banner = [[CloudXCore shared] createBannerWithPlacement:@"placement_id"
                                                              viewController:self

@@ -46,67 +46,66 @@
 // We track which delegate protocol called them using the callback name
 
 // Test that all delegate callbacks receive CLXAd objects
-- (void)didLoadWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"didLoadWithAd"];
+- (void)didLoadAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didLoadAd"];
     [self.receivedAdObjects addObject:ad ?: [NSNull null]];
     [self.receivedAdTypes addObject:NSStringFromClass([ad class])];
     
-    XCTAssertNotNil(ad, @"didLoadWithAd should receive non-nil CLXAd object");
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didLoadWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertNotNil(ad, @"didLoadAd should receive non-nil CLXAd object");
+    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didLoadAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    [self.receivedCallbacks addObject:@"failToLoadWithAd"];
-    [self.receivedAdObjects addObject:ad ?: [NSNull null]];
-    [self.receivedAdTypes addObject:NSStringFromClass([ad class])];
+- (void)didFailToLoadAdWithError:(NSError *)error {
+    [self.receivedCallbacks addObject:@"didFailToLoadAdWithError"];
+    [self.receivedAdObjects addObject:[NSNull null]]; // No ad object for load failure
+    [self.receivedAdTypes addObject:@"NSNull"];
     
-    XCTAssertNotNil(ad, @"failToLoadWithAd should receive non-nil CLXAd object");
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"failToLoadWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertNotNil(error, @"didFailToLoadAdWithError should receive non-nil error");
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"didShowWithAd"];
+- (void)didDisplayAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didDisplayAd"];
     [self.receivedAdObjects addObject:ad ?: [NSNull null]];
     [self.receivedAdTypes addObject:NSStringFromClass([ad class])];
     
-    XCTAssertNotNil(ad, @"didShowWithAd should receive non-nil CLXAd object");
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didShowWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertNotNil(ad, @"didDisplayAd should receive non-nil CLXAd object");
+    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didDisplayAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    [self.receivedCallbacks addObject:@"failToShowWithAd"];
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+    [self.receivedCallbacks addObject:@"didFailToDisplayAd"];
     [self.receivedAdObjects addObject:ad ?: [NSNull null]];
     [self.receivedAdTypes addObject:NSStringFromClass([ad class])];
     
-    XCTAssertNotNil(ad, @"failToShowWithAd should receive non-nil CLXAd object");
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"failToShowWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertNotNil(ad, @"didFailToDisplayAd should receive non-nil CLXAd object");
+    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didFailToDisplayAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"didHideWithAd"];
+- (void)didHideAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didHideAd"];
     [self.receivedAdObjects addObject:ad ?: [NSNull null]];
     [self.receivedAdTypes addObject:NSStringFromClass([ad class])];
     
-    XCTAssertNotNil(ad, @"didHideWithAd should receive non-nil CLXAd object");
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didHideWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertNotNil(ad, @"didHideAd should receive non-nil CLXAd object");
+    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didHideAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"didClickWithAd"];
+- (void)didClickAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didClickAd"];
     [self.receivedAdObjects addObject:ad ?: [NSNull null]];
     [self.receivedAdTypes addObject:NSStringFromClass([ad class])];
     
-    XCTAssertNotNil(ad, @"didClickWithAd should receive non-nil CLXAd object");
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didClickWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertNotNil(ad, @"didClickAd should receive non-nil CLXAd object");
+    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didClickAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
-- (void)impressionOn:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"impressionOn"];
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didRecordImpressionForAd"];
     [self.receivedAdObjects addObject:ad ?: [NSNull null]];
     [self.receivedAdTypes addObject:NSStringFromClass([ad class])];
     
-    XCTAssertNotNil(ad, @"impressionOn should receive non-nil CLXAd object");
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"impressionOn should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertNotNil(ad, @"didRecordImpressionForAd should receive non-nil CLXAd object");
+    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didRecordImpressionForAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
 // Rewarded-specific delegate method
@@ -166,43 +165,49 @@
     [self.receivedAdTypes removeAllObjects];
     
     // Test banner delegate methods
-    [self didLoadWithAd:testAd];
-    [self failToLoadWithAd:testAd error:testError];
-    [self didShowWithAd:testAd];
-    [self didClickWithAd:testAd];
-    [self impressionOn:testAd];
+    [self didLoadAd:testAd];
+    [self didFailToLoadAdWithError:testError];
+    [self didDisplayAd:testAd];
+    [self didClickAd:testAd];
+    [self didRecordImpressionForAd:testAd];
     
     // Test interstitial delegate methods (same signatures as banner)
-    [self didLoadWithAd:testAd];
-    [self failToLoadWithAd:testAd error:testError];
-    [self didShowWithAd:testAd];
-    [self failToShowWithAd:testAd error:testError];
-    [self didHideWithAd:testAd];
-    [self didClickWithAd:testAd];
-    [self impressionOn:testAd];
+    [self didLoadAd:testAd];
+    [self didFailToLoadAdWithError:testError];
+    [self didDisplayAd:testAd];
+    [self didFailToDisplayAd:testAd error:testError];
+    [self didHideAd:testAd];
+    [self didClickAd:testAd];
+    [self didRecordImpressionForAd:testAd];
     
     // Test rewarded delegate methods (includes reward callback)
     [self userDidEarnRewardWithAd:testAd];
     
     // Test native delegate methods (same as base ad delegate)
-    [self didLoadWithAd:testAd];
-    [self failToLoadWithAd:testAd error:testError];
-    [self didShowWithAd:testAd];
-    [self didClickWithAd:testAd];
-    [self impressionOn:testAd];
+    [self didLoadAd:testAd];
+    [self didFailToLoadAdWithError:testError];
+    [self didDisplayAd:testAd];
+    [self didClickAd:testAd];
+    [self didRecordImpressionForAd:testAd];
     
-    // Verify all callbacks received CLXAd objects
+    // Verify all callbacks received CLXAd objects (except didFailToLoadAdWithError which receives only error)
     XCTAssertGreaterThan(self.receivedCallbacks.count, 0, @"Should have received delegate callbacks");
     XCTAssertEqual(self.receivedCallbacks.count, self.receivedAdObjects.count, @"Each callback should have an ad object");
     
-    // Verify all received objects are CLXAd instances
+    // Verify all received objects are CLXAd instances (except didFailToLoadAdWithError)
     for (NSInteger i = 0; i < self.receivedAdObjects.count; i++) {
         id adObject = self.receivedAdObjects[i];
         NSString *callback = self.receivedCallbacks[i];
         
-        XCTAssertFalse([adObject isKindOfClass:[NSNull class]], @"Callback %@ should not receive nil ad object", callback);
-        XCTAssertTrue([adObject isKindOfClass:[CLXAd class]], 
-                      @"Callback %@ should receive CLXAd object, got %@", callback, NSStringFromClass([adObject class]));
+        // didFailToLoadAdWithError is the only callback that doesn't receive an ad object (only error)
+        if ([callback isEqualToString:@"didFailToLoadAdWithError"]) {
+            XCTAssertTrue([adObject isKindOfClass:[NSNull class]], 
+                         @"Callback %@ should receive NSNull (no ad object on load failure)", callback);
+        } else {
+            XCTAssertFalse([adObject isKindOfClass:[NSNull class]], @"Callback %@ should not receive nil ad object", callback);
+            XCTAssertTrue([adObject isKindOfClass:[CLXAd class]], 
+                          @"Callback %@ should receive CLXAd object, got %@", callback, NSStringFromClass([adObject class]));
+        }
     }
 }
 
@@ -226,24 +231,18 @@
     [self.receivedAdTypes removeAllObjects];
     
     // Test failure callback for each format
-    [self failToLoadWithAd:testAd error:testError]; // Banner/Interstitial/Rewarded/Native all use this
+    [self didFailToLoadAdWithError:testError]; // Banner/Interstitial/Rewarded/Native all use this
     
     // Verify delegate was called
-    XCTAssertTrue([self.receivedCallbacks containsObject:@"failToLoadWithAd"], 
-                 @"All ad format failures should call failToLoadWithAd delegate");
-    XCTAssertEqual(self.receivedAdObjects.count, 1, @"Should receive one ad object in failure callback");
+    XCTAssertTrue([self.receivedCallbacks containsObject:@"didFailToLoadAdWithError"], 
+                 @"All ad format failures should call didFailToLoadAdWithError delegate");
+    XCTAssertEqual(self.receivedAdObjects.count, 1, @"Should receive one object (NSNull) in failure callback");
     
-    // Verify ad object is correct type
+    // Verify no ad object is passed for load failure
     if (self.receivedAdObjects.count > 0) {
         id adObject = self.receivedAdObjects.firstObject;
-        XCTAssertTrue([adObject isKindOfClass:[CLXAd class]], 
-                     @"Failure callback should receive CLXAd object");
-        
-        CLXAd *receivedAd = (CLXAd *)adObject;
-        XCTAssertEqualObjects(receivedAd.placementId, testAd.placementId, 
-                            @"Failed ad should have correct placement ID");
-        XCTAssertEqualObjects(receivedAd.bidder, testAd.bidder, 
-                            @"Failed ad should have correct bidder");
+        XCTAssertTrue([adObject isKindOfClass:[NSNull class]], 
+                     @"Load failure callback should NOT receive CLXAd object");
     }
 }
 
@@ -264,19 +263,31 @@
     [self.receivedAdObjects removeAllObjects];
     
     // Test multiple failure scenarios to ensure consistency
-    [self failToLoadWithAd:testAd error:testError];
-    [self failToShowWithAd:testAd error:testError]; // Only for interstitial/rewarded
+    [self didFailToLoadAdWithError:testError];
+    [self didFailToDisplayAd:testAd error:testError]; // Only for interstitial/rewarded
     
     // Verify both failure types were captured
-    XCTAssertTrue([self.receivedCallbacks containsObject:@"failToLoadWithAd"], 
+    XCTAssertTrue([self.receivedCallbacks containsObject:@"didFailToLoadAdWithError"], 
                  @"Should capture load failure callback");
-    XCTAssertTrue([self.receivedCallbacks containsObject:@"failToShowWithAd"], 
-                 @"Should capture show failure callback");
+    XCTAssertTrue([self.receivedCallbacks containsObject:@"didFailToDisplayAd"], 
+                 @"Should capture display failure callback");
     
-    // Verify all failure callbacks received proper ad objects
-    for (id adObject in self.receivedAdObjects) {
-        XCTAssertTrue([adObject isKindOfClass:[CLXAd class]], 
-                     @"All failure callbacks should receive CLXAd objects");
+    // Verify failure callbacks received proper ad objects
+    // didFailToLoadAdWithError should receive NSNull (no ad object)
+    // didFailToDisplayAd should receive CLXAd object
+    XCTAssertEqual(self.receivedAdObjects.count, 2, @"Should have two failure callbacks");
+    
+    for (NSInteger i = 0; i < self.receivedCallbacks.count; i++) {
+        NSString *callback = self.receivedCallbacks[i];
+        id adObject = self.receivedAdObjects[i];
+        
+        if ([callback isEqualToString:@"didFailToLoadAdWithError"]) {
+            XCTAssertTrue([adObject isKindOfClass:[NSNull class]], 
+                         @"didFailToLoadAdWithError should receive NSNull (no ad on load failure)");
+        } else if ([callback isEqualToString:@"didFailToDisplayAd"]) {
+            XCTAssertTrue([adObject isKindOfClass:[CLXAd class]], 
+                         @"didFailToDisplayAd should receive CLXAd object");
+        }
     }
 }
 

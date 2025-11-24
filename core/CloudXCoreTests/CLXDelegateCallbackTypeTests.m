@@ -31,46 +31,45 @@
 #pragma mark - Test Delegate Implementation
 
 // Test that all interstitial delegate callbacks receive CLXAd objects
-- (void)didLoadWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"didLoadWithAd"];
+- (void)didLoadAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didLoadAd"];
     [self.receivedAdObjects addObject:ad];
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didLoadWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didLoadAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    [self.receivedCallbacks addObject:@"failToLoadWithAd"];
-    [self.receivedAdObjects addObject:ad];
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"failToLoadWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+- (void)didFailToLoadAdWithError:(NSError *)error {
+    [self.receivedCallbacks addObject:@"didFailToLoadAdWithError"];
+    XCTAssertNotNil(error, @"didFailToLoadAdWithError should receive non-nil error");
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"didShowWithAd"];
+- (void)didDisplayAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didDisplayAd"];
     [self.receivedAdObjects addObject:ad];
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didShowWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didDisplayAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    [self.receivedCallbacks addObject:@"failToShowWithAd"];
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+    [self.receivedCallbacks addObject:@"didFailToDisplayAd"];
     [self.receivedAdObjects addObject:ad];
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"failToShowWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didFailToDisplayAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"didHideWithAd"];
+- (void)didHideAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didHideAd"];
     [self.receivedAdObjects addObject:ad];
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didHideWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didHideAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"didClickWithAd"];
+- (void)didClickAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didClickAd"];
     [self.receivedAdObjects addObject:ad];
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didClickWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didClickAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
-- (void)impressionOn:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"impressionOn"];
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didRecordImpressionForAd"];
     [self.receivedAdObjects addObject:ad];
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"impressionOn should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didRecordImpressionForAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
@@ -173,18 +172,18 @@
     NSError *testError = [NSError errorWithDomain:@"test" code:1 userInfo:nil];
     
     // These should compile without warnings if signatures are correct
-    [self didLoadWithAd:testAd];
-    [self failToLoadWithAd:testAd error:testError];
-    [self didShowWithAd:testAd];
-    [self failToShowWithAd:testAd error:testError];
-    [self didHideWithAd:testAd];
-    [self didClickWithAd:testAd];
-    [self impressionOn:testAd];
+    [self didLoadAd:testAd];
+    [self didFailToLoadAdWithError:testError];
+    [self didDisplayAd:testAd];
+    [self didFailToDisplayAd:testAd error:testError];
+    [self didHideAd:testAd];
+    [self didClickAd:testAd];
+    [self didRecordImpressionForAd:testAd];
     [self closedByUserActionWithAd:testAd];
     
     // Verify all callbacks were received
     XCTAssertEqual(self.receivedCallbacks.count, 8, @"All delegate methods should have been called");
-    XCTAssertEqual(self.receivedAdObjects.count, 8, @"All delegate methods should have received ad objects");
+    XCTAssertEqual(self.receivedAdObjects.count, 7, @"All delegate methods (except didFailToLoadAdWithError) should have received ad objects");
     
     // Verify all received objects are CLXAd instances
     for (id adObject in self.receivedAdObjects) {

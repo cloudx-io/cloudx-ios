@@ -476,9 +476,9 @@ NS_ASSUME_NONNULL_BEGIN
     if ([self.delegate respondsToSelector:@selector(didLoadWithNative:)]) {
         [self.delegate didLoadWithNative:native];
     }
-            if ([self.delegate respondsToSelector:@selector(didLoadWithAd:)]) {
+            if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
             CLXAd *delegateAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-            [self.delegate didLoadWithAd:delegateAd];
+            [self.delegate didLoadAd:delegateAd];
         }
     
     __weak typeof(self) weakSelf = self;
@@ -558,8 +558,8 @@ NS_ASSUME_NONNULL_BEGIN
     if ([self.delegate respondsToSelector:@selector(failToLoadWithNative:error:)]) {
         [self.delegate failToLoadWithNative:native error:delegateError];
     }
-    if ([self.delegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-        [self.delegate failToLoadWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName] error:delegateError];
+    if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+        [self.delegate didFailToLoadAdWithError:delegateError];
     }
 }
 
@@ -586,8 +586,8 @@ NS_ASSUME_NONNULL_BEGIN
     if ([self.delegate respondsToSelector:@selector(didShowWithNative:)]) {
         [self.delegate didShowWithNative:native];
     }
-    if ([self.delegate respondsToSelector:@selector(didShowWithAd:)]) {
-        [self.delegate didShowWithAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
+    if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
+        [self.delegate didDisplayAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
     }
 }
 
@@ -614,10 +614,10 @@ NS_ASSUME_NONNULL_BEGIN
             [self.logger debug:@"[PublisherNative] RENDER_SUCCESS event (burl) fired"];
             
             // Trigger revenue callback immediately (no longer depends on NURL network call)
-            CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID];
-            if (self.delegate && [self.delegate respondsToSelector:@selector(revenuePaid:)]) {
+            CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+            if (self.delegate && [self.delegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self.delegate revenuePaid:adObject];
+                    [self.delegate didPayRevenueForAd:adObject];
                 });
             }
         } else {
@@ -630,9 +630,9 @@ NS_ASSUME_NONNULL_BEGIN
     if ([self.delegate respondsToSelector:@selector(impressionWithNative:)]) {
         [self.delegate impressionWithNative:native];
     }
-            if ([self.delegate respondsToSelector:@selector(impressionOn:)]) {
+            if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
             CLXAd *impressionAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-            [self.delegate impressionOn:impressionAd];
+            [self.delegate didRecordImpressionForAd:impressionAd];
         }
 }
 
@@ -649,9 +649,9 @@ NS_ASSUME_NONNULL_BEGIN
     if ([self.delegate respondsToSelector:@selector(clickWithNative:)]) {
         [self.delegate clickWithNative:native];
     }
-            if ([self.delegate respondsToSelector:@selector(didClickWithAd:)]) {
+            if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
             CLXAd *clickAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-            [self.delegate didClickWithAd:clickAd];
+            [self.delegate didClickAd:clickAd];
         }
 }
 

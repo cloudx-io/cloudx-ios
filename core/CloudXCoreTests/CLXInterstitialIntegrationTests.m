@@ -54,44 +54,44 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     return self;
 }
 
-- (void)didLoadWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"didLoadWithAd"];
+- (void)didLoadAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didLoadAd"];
     if (self.expectLoadSuccess && self.loadExpectation) {
         [self.loadExpectation fulfill];
     }
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    [self.receivedCallbacks addObject:@"failToLoadWithAd"];
+- (void)didFailToLoadAdWithError:(NSError *)error {
+    [self.receivedCallbacks addObject:@"didFailToLoadAdWithError"];
     if (!self.expectLoadSuccess && self.loadExpectation) {
         [self.loadExpectation fulfill];
     }
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"didShowWithAd"];
+- (void)didDisplayAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didDisplayAd"];
     if (self.showExpectation) {
         [self.showExpectation fulfill];
     }
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    [self.receivedCallbacks addObject:@"failToShowWithAd"];
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+    [self.receivedCallbacks addObject:@"didFailToDisplayAd"];
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"didHideWithAd"];
+- (void)didHideAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didHideAd"];
     if (self.closeExpectation) {
         [self.closeExpectation fulfill];
     }
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"didClickWithAd"];
+- (void)didClickAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didClickAd"];
 }
 
-- (void)impressionOn:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"impressionOn"];
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
+    [self.receivedCallbacks addObject:@"didRecordImpressionForAd"];
     if (self.impressionExpectation) {
         [self.impressionExpectation fulfill];
     }
@@ -109,38 +109,38 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 @implementation MainThreadCheckDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
-    XCTAssertTrue([NSThread isMainThread], @"didLoadWithAd should be called on main thread");
+- (void)didLoadAd:(CLXAd *)ad {
+    XCTAssertTrue([NSThread isMainThread], @"didLoadAd should be called on main thread");
     if (self.expectation) {
         [self.expectation fulfill];
     }
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    XCTAssertTrue([NSThread isMainThread], @"failToLoadWithAd should be called on main thread");
+- (void)didFailToLoadAdWithError:(NSError *)error {
+    XCTAssertTrue([NSThread isMainThread], @"didFailToLoadAdWithError should be called on main thread");
     if (self.expectation) {
         [self.expectation fulfill];
     }
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
-    XCTAssertTrue([NSThread isMainThread], @"didShowWithAd should be called on main thread");
+- (void)didDisplayAd:(CLXAd *)ad {
+    XCTAssertTrue([NSThread isMainThread], @"didDisplayAd should be called on main thread");
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    XCTAssertTrue([NSThread isMainThread], @"failToShowWithAd should be called on main thread");
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+    XCTAssertTrue([NSThread isMainThread], @"didFailToDisplayAd should be called on main thread");
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
-    XCTAssertTrue([NSThread isMainThread], @"didHideWithAd should be called on main thread");
+- (void)didHideAd:(CLXAd *)ad {
+    XCTAssertTrue([NSThread isMainThread], @"didHideAd should be called on main thread");
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
-    XCTAssertTrue([NSThread isMainThread], @"didClickWithAd should be called on main thread");
+- (void)didClickAd:(CLXAd *)ad {
+    XCTAssertTrue([NSThread isMainThread], @"didClickAd should be called on main thread");
 }
 
-- (void)impressionOn:(CLXAd *)ad {
-    XCTAssertTrue([NSThread isMainThread], @"impressionOn should be called on main thread");
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
+    XCTAssertTrue([NSThread isMainThread], @"didRecordImpressionForAd should be called on main thread");
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {

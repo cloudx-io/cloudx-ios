@@ -152,39 +152,38 @@ static const NSTimeInterval kTestTimeout = 0.5;
     [self.eventLog addObject:[NSString stringWithFormat:@"%.3f: %@", [[NSDate date] timeIntervalSince1970], event]];
 }
 
-- (void)didLoadWithAd:(CLXAd *)ad {
+- (void)didLoadAd:(CLXAd *)ad {
     self.didLoadCount++;
     self.lastAd = ad;
-    [self logEvent:@"didLoadWithAd"];
+    [self logEvent:@"didLoadAd"];
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToLoadAdWithError:(NSError *)error {
     self.failToLoadCount++;
-    self.lastAd = ad;
     self.lastError = error;
-    [self logEvent:[NSString stringWithFormat:@"failToLoadWithAd: %@", error.localizedDescription]];
+    [self logEvent:[NSString stringWithFormat:@"didFailToLoadAdWithError: %@", error.localizedDescription]];
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
+- (void)didDisplayAd:(CLXAd *)ad {
     self.didShowCount++;
     self.lastAd = ad;
-    [self logEvent:@"didShowWithAd"];
+    [self logEvent:@"didDisplayAd"];
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    [self logEvent:[NSString stringWithFormat:@"failToShowWithAd: %@", error.localizedDescription]];
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+    [self logEvent:[NSString stringWithFormat:@"didFailToDisplayAd: %@", error.localizedDescription]];
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
-    [self logEvent:@"didHideWithAd"];
+- (void)didHideAd:(CLXAd *)ad {
+    [self logEvent:@"didHideAd"];
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
-    [self logEvent:@"didClickWithAd"];
+- (void)didClickAd:(CLXAd *)ad {
+    [self logEvent:@"didClickAd"];
 }
 
-- (void)impressionOn:(CLXAd *)ad {
-    [self logEvent:@"impressionOn"];
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
+    [self logEvent:@"didRecordImpressionForAd"];
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {

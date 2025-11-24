@@ -66,28 +66,27 @@ NS_ASSUME_NONNULL_END
 
 @implementation MockBannerDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
+- (void)didLoadAd:(CLXAd *)ad {
     self.didLoadCalled = YES;
     self.lastAd = ad;
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToLoadAdWithError:(NSError *)error {
     self.failToLoadCalled = YES;
-    self.lastAd = ad;
     self.lastError = error;
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
+- (void)didDisplayAd:(CLXAd *)ad {
     self.didShowCalled = YES;
     self.lastAd = ad;
 }
 
-- (void)impressionOn:(CLXAd *)ad {
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
     self.impressionCalled = YES;
     self.lastAd = ad;
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
+- (void)didClickAd:(CLXAd *)ad {
     self.clickCalled = YES;
     self.lastAd = ad;
 }

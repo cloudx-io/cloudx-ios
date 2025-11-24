@@ -111,13 +111,13 @@
 
 #pragma mark - Native Ad View Bridge Tests
 
-// Test that CLXNativeAdView has revenuePaid bridge method
+// Test that CLXNativeAdView has didPayRevenueForAd bridge method
 - (void)testNativeAdViewHasRevenuePaidBridge {
-    XCTAssertTrue([CLXNativeAdView instancesRespondToSelector:@selector(revenuePaid:)], 
-                  @"CLXNativeAdView should have revenuePaid: bridge method");
+    XCTAssertTrue([CLXNativeAdView instancesRespondToSelector:@selector(didPayRevenueForAd:)], 
+                  @"CLXNativeAdView should have didPayRevenueForAd: bridge method");
 }
 
-// Test CLXNativeAdView revenuePaid bridge functionality
+// Test CLXNativeAdView didPayRevenueForAd bridge functionality
 - (void)testNativeAdViewRevenuePaidBridge {
     // Create a simple test to verify the bridge method exists and can be called
     CLXNativeAdView *nativeAdView = [[CLXNativeAdView alloc] init];
@@ -130,7 +130,7 @@
                                                  revenue:@1.50];
     
     // This should not crash - the bridge method should handle nil delegate gracefully
-    XCTAssertNoThrow([nativeAdView revenuePaid:testAd], @"CLXNativeAdView revenuePaid should not crash with nil delegate");
+    XCTAssertNoThrow([nativeAdView didPayRevenueForAd:testAd], @"CLXNativeAdView didPayRevenueForAd should not crash with nil delegate");
 }
 
 @end

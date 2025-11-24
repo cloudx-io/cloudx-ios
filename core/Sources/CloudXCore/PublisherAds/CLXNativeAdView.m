@@ -107,10 +107,10 @@ static void initializeLogger() {
     if (!nativeView) {
         [logger error:@"[CloudXNativeAdView] didLoadWithNative failed: nativeView is nil"];
         dispatch_async(dispatch_get_main_queue(), ^{
-            if ([self.delegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
+            if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
                 NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidNativeView 
                                                description:@"Native view is nil"];
-                [self.delegate failToLoadWithAd:[CLXAd adFromBid:((CLXPublisherNative *)self.native).lastBidResponse.bid placementId:((CLXPublisherNative *)self.native).placementID placementName:((CLXPublisherNative *)self.native).placementName] error:error];
+                [self.delegate didFailToLoadAdWithError:error];
             }
         });
         return;
@@ -126,10 +126,10 @@ static void initializeLogger() {
     
     // Notify delegate that ad is loaded (this will update the status label to green)
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(didLoadWithAd:)]) {
+        if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
             CLXPublisherNative *publisherNative = (CLXPublisherNative *)self.native;
             CLXAd *delegateAd = [CLXAd adFromBid:publisherNative.lastBidResponse.bid placementId:publisherNative.placementID placementName:publisherNative.placementName];
-            [self.delegate didLoadWithAd:delegateAd];
+            [self.delegate didLoadAd:delegateAd];
         }
     });
 }
@@ -139,8 +139,8 @@ static void initializeLogger() {
     
     // Notify delegate on main thread
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-            [self.delegate failToLoadWithAd:[CLXAd adFromBid:((CLXPublisherNative *)self.native).lastBidResponse.bid placementId:((CLXPublisherNative *)self.native).placementID placementName:((CLXPublisherNative *)self.native).placementName] error:error];
+        if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+            [self.delegate didFailToLoadAdWithError:error];
         }
     });
 }
@@ -148,8 +148,8 @@ static void initializeLogger() {
 - (void)didShowWithNative:(id<CLXAdapterNative>)native {
     [logger debug:@"[CloudXNativeAdView] didShowWithNative called"];
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(didShowWithAd:)]) {
-            [self.delegate didShowWithAd:[CLXAd adFromBid:((CLXPublisherNative *)self.native).lastBidResponse.bid placementId:((CLXPublisherNative *)self.native).placementID placementName:((CLXPublisherNative *)self.native).placementName]];
+        if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
+            [self.delegate didDisplayAd:[CLXAd adFromBid:((CLXPublisherNative *)self.native).lastBidResponse.bid placementId:((CLXPublisherNative *)self.native).placementID placementName:((CLXPublisherNative *)self.native).placementName]];
         }
     });
 }
@@ -157,19 +157,19 @@ static void initializeLogger() {
 - (void)impressionWithNative:(id<CLXAdapterNative>)native {
     [logger debug:@"[CloudXNativeAdView] impressionWithNative called"];
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(impressionOn:)]) {
+        if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
             CLXPublisherNative *publisherNative = (CLXPublisherNative *)self.native;
             CLXAd *impressionAd = [CLXAd adFromBid:publisherNative.lastBidResponse.bid placementId:publisherNative.placementID placementName:publisherNative.placementName];
-            [self.delegate impressionOn:impressionAd];
+            [self.delegate didRecordImpressionForAd:impressionAd];
         }
     });
 }
 
 // Revenue callback bridge method - called by CLXPublisherNative completion block
-- (void)revenuePaid:(CLXAd *)ad {
+- (void)didPayRevenueForAd:(CLXAd *)ad {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(revenuePaid:)]) {
-            [self.delegate revenuePaid:ad];
+        if ([self.delegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
+            [self.delegate didPayRevenueForAd:ad];
         }
     });
 }
@@ -177,8 +177,8 @@ static void initializeLogger() {
 - (void)clickWithNative:(id<CLXAdapterNative>)native {
     [logger debug:@"[CloudXNativeAdView] clickWithNative called"];
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(didClickWithAd:)]) {
-            [self.delegate didClickWithAd:[CLXAd adFromBid:((CLXPublisherNative *)self.native).lastBidResponse.bid placementId:((CLXPublisherNative *)self.native).placementID placementName:((CLXPublisherNative *)self.native).placementName]];
+        if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
+            [self.delegate didClickAd:[CLXAd adFromBid:((CLXPublisherNative *)self.native).lastBidResponse.bid placementId:((CLXPublisherNative *)self.native).placementID placementName:((CLXPublisherNative *)self.native).placementName]];
         }
     });
 }

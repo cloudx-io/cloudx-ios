@@ -82,8 +82,8 @@
                                      description:@"[Moloco] Invalid or missing placement ID for banner ad"];
         [self.logger error:error.localizedDescription];
         
-        if ([self.delegate respondsToSelector:@selector(didFailToLoadWithBanner:error:)]) {
-            [self.delegate didFailToLoadWithBanner:self error:error];
+        if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
+            [self.delegate failToLoadBanner:self error:error];
         }
         return;
     }
@@ -142,8 +142,8 @@
     [self.logger info:@"Banner loaded successfully"];
     _isLoading = NO;
     
-    if ([self.delegate respondsToSelector:@selector(didLoadWithBanner:)]) {
-        [self.delegate didLoadWithBanner:self];
+    if ([self.delegate respondsToSelector:@selector(didLoadBanner:)]) {
+        [self.delegate didLoadBanner:self];
     }
 }
 
@@ -156,24 +156,30 @@
                                                             context:@"Banner Load"
                                                         placementID:_placementID];
     
-    if ([self.delegate respondsToSelector:@selector(didFailToLoadWithBanner:error:)]) {
-        [self.delegate didFailToLoadWithBanner:self error:mappedError];
+    if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
+        [self.delegate failToLoadBanner:self error:mappedError];
     }
 }
 
 - (void)molocoBannerWillAppear:(MolocoBannerView *)bannerView {
     [self.logger debug:@"Banner will appear"];
     
-    if ([self.delegate respondsToSelector:@selector(impressionWithBanner:)]) {
-        [self.delegate impressionWithBanner:self];
+    // Forward the display callback to the SDK
+    if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
+        [self.delegate didShowBanner:self];
+    }
+    
+    // Forward impression tracking
+    if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
+        [self.delegate impressionBanner:self];
     }
 }
 
 - (void)molocoBannerDidClick:(MolocoBannerView *)bannerView {
     [self.logger info:@"Banner clicked"];
     
-    if ([self.delegate respondsToSelector:@selector(clickWithBanner:)]) {
-        [self.delegate clickWithBanner:self];
+    if ([self.delegate respondsToSelector:@selector(clickBanner:)]) {
+        [self.delegate clickBanner:self];
     }
 }
 

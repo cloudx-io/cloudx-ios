@@ -107,26 +107,26 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)notifyLoadSuccess {
-    if ([self.delegate respondsToSelector:@selector(didLoadWithAd:)]) {
-        [self.delegate didLoadWithAd:[self createAdObject]];
+    if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
+        [self.delegate didLoadAd:[self createAdObject]];
     }
 }
 
 - (void)notifyLoadFailure:(NSError *)error {
-    if ([self.delegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-        [self.delegate failToLoadWithAd:[self createAdObject] error:error];
+    if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+        [self.delegate didFailToLoadAdWithError:error];
     }
 }
 
 - (void)notifyShowFailure:(NSError *)error {
-    if ([self.delegate respondsToSelector:@selector(failToShowWithAd:error:)]) {
-        [self.delegate failToShowWithAd:[self createAdObject] error:error];
+    if ([self.delegate respondsToSelector:@selector(didFailToDisplayAd:error:)]) {
+        [self.delegate didFailToDisplayAd:[self createAdObject] error:error];
     }
 }
 
 - (void)notifyForceClose {
-    if ([self.delegate respondsToSelector:@selector(didHideWithAd:)]) {
-        [self.delegate didHideWithAd:[self createAdObject]];
+    if ([self.delegate respondsToSelector:@selector(didHideAd:)]) {
+        [self.delegate didHideAd:[self createAdObject]];
     }
 }
 
@@ -162,8 +162,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)didShowWithRewarded:(id<CLXAdapterRewarded>)rewarded {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(didShowWithAd:)]) {
-            [self.delegate didShowWithAd:[self createAdObject]];
+        if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
+            [self.delegate didDisplayAd:[self createAdObject]];
         }
     });
 }
@@ -172,14 +172,14 @@ NS_ASSUME_NONNULL_BEGIN
     [self fireRenderSuccessEventForBidID:rewarded.bidID adType:CLXAdTypeRewarded];
     
     CLXAd *adObject = [self createAdObject];
-    if (self.delegate && [self.delegate respondsToSelector:@selector(revenuePaid:)]) {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.delegate revenuePaid:adObject];
+            [self.delegate didPayRevenueForAd:adObject];
         });
     }
     
-    if ([self.delegate respondsToSelector:@selector(impressionOn:)]) {
-        [self.delegate impressionOn:adObject];
+    if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
+        [self.delegate didRecordImpressionForAd:adObject];
     }
 }
 
@@ -188,8 +188,8 @@ NS_ASSUME_NONNULL_BEGIN
     self.currentAdapter = nil;
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(didHideWithAd:)]) {
-            [self.delegate didHideWithAd:[self createAdObject]];
+        if ([self.delegate respondsToSelector:@selector(didHideAd:)]) {
+            [self.delegate didHideAd:[self createAdObject]];
         }
     });
 }
@@ -198,8 +198,8 @@ NS_ASSUME_NONNULL_BEGIN
     [self handleClickTracking];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(didClickWithAd:)]) {
-            [self.delegate didClickWithAd:[self createAdObject]];
+        if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
+            [self.delegate didClickAd:[self createAdObject]];
         }
     });
 }

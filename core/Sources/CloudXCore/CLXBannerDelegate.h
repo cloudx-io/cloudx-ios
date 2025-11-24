@@ -26,13 +26,13 @@ NS_ASSUME_NONNULL_BEGIN
  * Called when the banner ad expands.
  * @param ad The banner ad that expanded
  */
-- (void)didExpandAd:(CLXAd *)ad;
+- (void)didExpandAd:(CLXAd *)ad NS_SWIFT_NAME(didExpand(_:));
 
 /**
  * Called when the banner ad collapses.
  * @param ad The banner ad that collapsed
  */
-- (void)didCollapseAd:(CLXAd *)ad;
+- (void)didCollapseAd:(CLXAd *)ad NS_SWIFT_NAME(didCollapse(_:));
 
 @end
 

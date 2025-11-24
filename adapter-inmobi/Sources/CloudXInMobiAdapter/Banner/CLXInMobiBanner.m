@@ -111,8 +111,15 @@
 
 - (void)showFromViewController:(UIViewController *)viewController {
     [self.logger info:@"Banner shown (added to view hierarchy)"];
+    
+    // Forward the display callback to the SDK
     if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
         [self.delegate didShowBanner:self];
+    }
+    
+    // Forward impression tracking
+    if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
+        [self.delegate impressionBanner:self];
     }
 }
 
@@ -160,10 +167,6 @@
     
     if ([self.delegate respondsToSelector:@selector(clickBanner:)]) {
         [self.delegate clickBanner:self];
-    }
-    
-    if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
-        [self.delegate impressionBanner:self];
     }
 }
 

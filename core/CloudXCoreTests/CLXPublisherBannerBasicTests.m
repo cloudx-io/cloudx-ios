@@ -70,35 +70,34 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
 
 @implementation BasicMockDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
+- (void)didLoadAd:(CLXAd *)ad {
     self.didLoadCount++;
     self.lastAd = ad;
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToLoadAdWithError:(NSError *)error {
     self.failToLoadCount++;
-    self.lastAd = ad;
     self.lastError = error;
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
+- (void)didDisplayAd:(CLXAd *)ad {
     self.didShowCount++;
     self.lastAd = ad;
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
     // Not used in basic tests
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
+- (void)didHideAd:(CLXAd *)ad {
     // Not used in basic tests
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
+- (void)didClickAd:(CLXAd *)ad {
     // Not used in basic tests
 }
 
-- (void)impressionOn:(CLXAd *)ad {
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
     // Not used in basic tests
 }
 

@@ -159,14 +159,15 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
     
     // MARK: - CLXRewardedDelegate
     
-    func didLoad(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("✅ Rewarded didLoadWithAd", ad: ad)
+    func didLoad(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("✅ Rewarded didLoadAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .ready)
     }
     
-    func failToLoad(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ Rewarded failToLoadWithAd", ad: ad)
+    func didFailToLoadAd(error: Error) {
+        // No ad object exists on failure, so use logMessage instead of logAdEvent
+        DemoAppLogger.sharedInstance.logMessage("❌ Rewarded failed to load - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: .noAd)
         
@@ -177,37 +178,37 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
         }
     }
     
-    func didShow(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👀 Rewarded didShowWithAd", ad: ad)
+    func didDisplay(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👀 Rewarded didDisplayAd", ad: ad)
     }
     
-    func failToShow(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ Rewarded failToShowWithAd", ad: ad)
+    func didFailToDisplay(_ ad: CLXAd, error: Error) {
+        DemoAppLogger.sharedInstance.logAdEvent("❌ Rewarded didFailToDisplayAd", ad: ad)
         updateStatusUI(state: .noAd)
         
         DispatchQueue.main.async { [weak self] in
             self?.rewardedAd = nil
             let errorMessage = (error as NSError).detailedDemoDescription
-            self?.showAlert(title: "Rewarded Ad Show Failed", message: errorMessage)
+            self?.showAlert(title: "Rewarded Ad Display Failed", message: errorMessage)
         }
     }
     
-    func didHide(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🔚 Rewarded didHideWithAd", ad: ad)
+    func didHide(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("🔚 Rewarded didHideAd", ad: ad)
         rewardedAd = nil
         updateStatusUI(state: .noAd)
     }
     
-    func didClick(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👆 Rewarded didClickWithAd", ad: ad)
+    func didClick(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👆 Rewarded didClickAd", ad: ad)
     }
     
-    func impression(on ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ Rewarded impressionOn", ad: ad)
+    func didRecordImpression(for ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👁️ Rewarded didRecordImpression", ad: ad)
     }
     
-    func revenuePaid(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("💰 Rewarded revenuePaid", ad: ad)
+    func didPayRevenue(for ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("💰 Rewarded didPayRevenue", ad: ad)
     }
     
     func userRewarded(_ ad: CLXAd) {

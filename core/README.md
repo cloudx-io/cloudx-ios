@@ -171,19 +171,19 @@ Banner ads are rectangular ads that appear at the top or bottom of the screen.
 
 #pragma mark - CLXBannerDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
+- (void)didLoadAd:(CLXAd *)ad {
     NSLog(@"✅ Banner ad loaded successfully");
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToLoadAdWithError:(NSError *)error {
     NSLog(@"❌ Banner ad failed to load: %@", error.localizedDescription);
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
+- (void)didDisplayAd:(CLXAd *)ad {
     NSLog(@"👀 Banner ad shown");
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
+- (void)didClickAd:(CLXAd *)ad {
     NSLog(@"👆 Banner ad clicked");
 }
 
@@ -235,19 +235,19 @@ class YourViewController: UIViewController, CLXBannerDelegate {
 
 // MARK: - CLXBannerDelegate
 extension YourViewController {
-    func didLoad(with ad: CLXAd) {
+    func didLoad(_ ad: CLXAd) {
         print("✅ Banner ad loaded successfully")
     }
     
-    func failToLoad(with ad: CLXAd, error: Error) {
+    func didFailToLoadAd(error: Error) {
         print("❌ Banner ad failed to load: \(error.localizedDescription)")
     }
     
-    func didShow(with ad: CLXAd) {
+    func didDisplay(_ ad: CLXAd) {
         print("👀 Banner ad shown")
     }
     
-    func didClick(with ad: CLXAd) {
+    func didClick(_ ad: CLXAd) {
         print("👆 Banner ad clicked")
     }
     
@@ -297,15 +297,15 @@ Interstitial ads are full-screen ads that appear between app content.
 
 #pragma mark - CLXInterstitialDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
+- (void)didLoadAd:(CLXAd *)ad {
     NSLog(@"✅ Interstitial ad loaded successfully");
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToLoadAdWithError:(NSError *)error {
     NSLog(@"❌ Interstitial ad failed to load: %@", error.localizedDescription);
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
+- (void)didDisplayAd:(CLXAd *)ad {
     NSLog(@"👀 Interstitial ad shown");
 }
 
@@ -362,15 +362,15 @@ class YourViewController: UIViewController, CLXInterstitialDelegate {
 
 // MARK: - CLXInterstitialDelegate
 extension YourViewController {
-    func didLoad(with ad: CLXAd) {
+    func didLoad(_ ad: CLXAd) {
         print("✅ Interstitial ad loaded successfully")
     }
     
-    func failToLoad(with ad: CLXAd, error: Error) {
+    func didFailToLoadAd(error: Error) {
         print("❌ Interstitial ad failed to load: \(error.localizedDescription)")
     }
     
-    func didShow(with ad: CLXAd) {
+    func didDisplay(_ ad: CLXAd) {
         print("👀 Interstitial ad shown")
     }
     
@@ -432,15 +432,15 @@ Rewarded ads are full-screen ads that provide rewards to users for watching.
 
 #pragma mark - CLXRewardedDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
+- (void)didLoadAd:(CLXAd *)ad {
     NSLog(@"✅ Rewarded ad loaded successfully");
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToLoadAdWithError:(NSError *)error {
     NSLog(@"❌ Rewarded ad failed to load: %@", error.localizedDescription);
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
+- (void)didDisplayAd:(CLXAd *)ad {
     NSLog(@"👀 Rewarded ad shown");
 }
 
@@ -524,15 +524,15 @@ class YourViewController: UIViewController, CLXRewardedDelegate {
 
 // MARK: - CLXRewardedDelegate
 extension YourViewController {
-    func didLoad(with ad: CLXAd) {
+    func didLoad(_ ad: CLXAd) {
         print("✅ Rewarded ad loaded successfully")
     }
     
-    func failToLoad(with ad: CLXAd, error: Error) {
+    func didFailToLoadAd(error: Error) {
         print("❌ Rewarded ad failed to load: \(error.localizedDescription)")
     }
     
-    func didShow(with ad: CLXAd) {
+    func didDisplay(_ ad: CLXAd) {
         print("👀 Rewarded ad shown")
     }
     
@@ -622,15 +622,15 @@ Native ads are designed to match the look and feel of your app's content.
 
 #pragma mark - CLXNativeDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
+- (void)didLoadAd:(CLXAd *)ad {
     NSLog(@"✅ Native ad loaded successfully");
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToLoadAdWithError:(NSError *)error {
     NSLog(@"❌ Native ad failed to load: %@", error.localizedDescription);
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
+- (void)didDisplayAd:(CLXAd *)ad {
     NSLog(@"👀 Native ad shown");
 }
 
@@ -686,15 +686,15 @@ class YourViewController: UIViewController, CLXNativeDelegate {
 
 // MARK: - CLXNativeDelegate
 extension YourViewController {
-    func didLoad(with ad: CLXAd) {
+    func didLoad(_ ad: CLXAd) {
         print("✅ Native ad loaded successfully")
     }
     
-    func failToLoad(with ad: CLXAd, error: Error) {
+    func didFailToLoadAd(error: Error) {
         print("❌ Native ad failed to load: \(error.localizedDescription)")
     }
     
-    func didShow(with ad: CLXAd) {
+    func didDisplay(_ ad: CLXAd) {
         print("👀 Native ad shown")
     }
     
@@ -757,19 +757,19 @@ MREC ads are 300x250 pixel banner ads that provide more space for rich content.
 
 #pragma mark - CLXBannerDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
+- (void)didLoadAd:(CLXAd *)ad {
     NSLog(@"✅ MREC ad loaded successfully");
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToLoadAdWithError:(NSError *)error {
     NSLog(@"❌ MREC ad failed to load: %@", error.localizedDescription);
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
+- (void)didDisplayAd:(CLXAd *)ad {
     NSLog(@"👀 MREC ad shown");
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
+- (void)didClickAd:(CLXAd *)ad {
     NSLog(@"👆 MREC ad clicked");
 }
 
@@ -819,19 +819,19 @@ class YourViewController: UIViewController, CLXBannerDelegate {
 
 // MARK: - CLXBannerDelegate
 extension YourViewController {
-    func didLoad(with ad: CLXAd) {
+    func didLoad(_ ad: CLXAd) {
         print("✅ MREC ad loaded successfully")
     }
     
-    func failToLoad(with ad: CLXAd, error: Error) {
+    func didFailToLoadAd(error: Error) {
         print("❌ MREC ad failed to load: \(error.localizedDescription)")
     }
     
-    func didShow(with ad: CLXAd) {
+    func didDisplay(_ ad: CLXAd) {
         print("👀 MREC ad shown")
     }
     
-    func didClick(with ad: CLXAd) {
+    func didClick(_ ad: CLXAd) {
         print("👆 MREC ad clicked")
     }
     
@@ -1215,9 +1215,9 @@ extension MainViewController: CLXBannerDelegate, CLXInterstitialDelegate, CLXRew
 ### Delegate Callbacks
 
 All ad types support these common callbacks:
-- `didLoadWithAd:` - Ad loaded successfully
-- `failToLoadWithAd:error:` - Ad failed to load
-- `didShowWithAd:` - Ad was shown
+- `didLoadAd:` - Ad loaded successfully
+- `didFailToLoadAdWithError:` - Ad failed to load (no ad object, only error)
+- `didDisplayAd:` - Ad was displayed
 - `failToShowWithAd:error:` - Ad failed to show
 - `didHideWithAd:` - Ad was hidden
 - `didClickWithAd:` - Ad was clicked
@@ -1233,8 +1233,8 @@ All ad types support these common callbacks:
 
 When you call `load`, the SDK automatically tries multiple ad sources in priority order. **You don't need to do anything** - the SDK handles retries internally.
 
-- **Success**: Your `didLoadWithAd:` callback fires when ANY source succeeds
-- **Failure**: Your `failToLoadWithAd:error:` callback fires ONLY after ALL sources fail
+- **Success**: Your `didLoadAd:` callback fires when ANY source succeeds
+- **Failure**: Your `didFailToLoadAdWithError:` callback fires ONLY after ALL sources fail
 - **No manual intervention needed** - the waterfall happens automatically and transparently
 
 ```objc

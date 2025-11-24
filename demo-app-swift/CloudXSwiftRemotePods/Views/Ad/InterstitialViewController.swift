@@ -185,15 +185,16 @@ class InterstitialViewController: BaseAdViewController {
 }
 
 extension InterstitialViewController: CLXInterstitialDelegate {
-    func didLoad(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("✅ Interstitial didLoadWithAd", ad: ad)
+    func didLoad(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("✅ Interstitial didLoadAd", ad: ad)
         isLoading = false
         updateStatusUI(state: AdState.ready)
         // Don't auto-show - wait for user to press Show Interstitial button
     }
     
-    func failToLoad(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ Interstitial failToLoadWithAd", ad: ad)
+    func didFailToLoadAd(error: Error) {
+        // No ad object exists on failure, so use logMessage instead of logAdEvent
+        DemoAppLogger.sharedInstance.logMessage("❌ Interstitial failed to load - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: AdState.noAd)
         
@@ -204,12 +205,12 @@ extension InterstitialViewController: CLXInterstitialDelegate {
         }
     }
     
-    func didShow(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👀 Interstitial didShowWithAd", ad: ad)
+    func didDisplay(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👀 Interstitial didDisplayAd", ad: ad)
     }
     
-    func failToShow(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ Interstitial failToShowWithAd", ad: ad)
+    func didFailToDisplay(_ ad: CLXAd, error: Error) {
+        DemoAppLogger.sharedInstance.logAdEvent("❌ Interstitial didFailToDisplayAd", ad: ad)
         updateStatusUI(state: AdState.noAd)
         
         DispatchQueue.main.async { [weak self] in
@@ -219,8 +220,8 @@ extension InterstitialViewController: CLXInterstitialDelegate {
         }
     }
     
-    func didHide(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🔚 Interstitial didHideWithAd", ad: ad)
+    func didHide(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("🔚 Interstitial didHideAd", ad: ad)
         
         showAdWhenLoaded = false
         interstitialAd = nil
@@ -229,15 +230,15 @@ extension InterstitialViewController: CLXInterstitialDelegate {
         updateStatusUI(state: AdState.noAd)
     }
     
-    func didClick(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👆 Interstitial didClickWithAd", ad: ad)
+    func didClick(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👆 Interstitial didClickAd", ad: ad)
     }
     
-    func impression(on ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ Interstitial impressionOn", ad: ad)
+    func didRecordImpression(for ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👁️ Interstitial didRecordImpression", ad: ad)
     }
     
-    func revenuePaid(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("💰 Interstitial revenuePaid", ad: ad)
+    func didPayRevenue(for ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("💰 Interstitial didPayRevenue", ad: ad)
     }
 } 

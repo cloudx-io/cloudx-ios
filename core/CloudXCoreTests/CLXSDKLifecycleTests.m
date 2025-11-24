@@ -94,41 +94,9 @@
                      @"Setting COPPA after deinitialize should not crash");
 }
 
-// Test that initialization fails gracefully with invalid app key
-- (void)testInitialization_WithInvalidKey_FailsGracefully {
-    XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK Init"];
-    
-    // When: Attempting to initialize with invalid key
-    [[CloudXCore shared] initializeSDKWithAppKey:@"invalid-test-key" completion:^(BOOL success, NSError *error) {
-        // Then: Should fail without crashing
-        XCTAssertFalse(success, @"Init with invalid key should fail");
-        XCTAssertNotNil(error, @"Should provide error details");
-        XCTAssertFalse([CloudXCore shared].isInitialized, @"SDK should not be marked as initialized");
-        [initExpectation fulfill];
-    }];
-    
-    [self waitForExpectations:@[initExpectation] timeout:15.0];
-}
-
-// Test that initialization can be attempted after failed attempt
-- (void)testInitialization_AfterFailedAttempt_CanRetry {
-    // First attempt with invalid key
-    XCTestExpectation *firstAttempt = [self expectationWithDescription:@"First Attempt"];
-    [[CloudXCore shared] initializeSDKWithAppKey:@"invalid-key-1" completion:^(BOOL success, NSError *error) {
-        XCTAssertFalse(success, @"First attempt should fail");
-        [firstAttempt fulfill];
-    }];
-    [self waitForExpectations:@[firstAttempt] timeout:15.0];
-    
-    // Second attempt with different invalid key
-    XCTestExpectation *secondAttempt = [self expectationWithDescription:@"Second Attempt"];
-    [[CloudXCore shared] initializeSDKWithAppKey:@"invalid-key-2" completion:^(BOOL success, NSError *error) {
-        // Should attempt initialization again (even though it will fail)
-        // The important thing is it doesn't crash and handles the retry
-        [secondAttempt fulfill];
-    }];
-    [self waitForExpectations:@[secondAttempt] timeout:15.0];
-}
+// NOTE: Initialization tests with invalid keys have been removed as they
+// require network calls. These should be in integration tests, not unit tests.
+// Unit tests should only test logic that can be verified without network I/O.
 
 @end
 

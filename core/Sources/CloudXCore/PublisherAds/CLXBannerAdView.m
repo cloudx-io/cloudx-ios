@@ -14,6 +14,7 @@
 #import <CloudXCore/CLXAdapterBanner.h>
 #import <CloudXCore/CLXPublisherBanner.h>
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXBidAdSource.h>
 #import <UIKit/UIKit.h>
 
 // Category to expose internal methods for banner view access
@@ -25,6 +26,9 @@
 @interface CLXPublisherBanner (CLXBannerAdViewAccess)
 @property (nonatomic, strong, nullable, readonly) id<CLXAdapterBanner> bannerOnScreen;
 @property (nonatomic, strong, nullable, readonly) id<CLXAdapterBanner> prefetchedBanner;
+@property (nonatomic, strong, nullable, readonly) CLXBidAdSourceResponse *lastBidResponse;
+@property (nonatomic, copy, readonly) NSString *placementName;
+@property (nonatomic, weak, nullable, readonly) UIViewController *viewController;
 @end
 
 @interface CLXBannerAdView () <CLXAdapterBannerDelegate>
@@ -114,12 +118,8 @@ static void initializeLogger() {
         [(CLXPublisherBanner *)self.banner setVisible:isVisible];
     }
     
-    // Call didShowWithAd when banner is added to superview (becomes visible)
-    if (self.superview && [self.banner isKindOfClass:[CLXPublisherBanner class]]) {
-        if ([self.banner respondsToSelector:@selector(didShowBanner:)]) {
-            [(CLXPublisherBanner *)self.banner didShowBanner:nil];
-        }
-    }
+    // Note: didShowBanner is now triggered by adapter.showFromViewController: in didLoadBanner:
+    // This ensures the ad object is available before didDisplayAd is called
 }
 
 - (void)didMoveToWindow {
@@ -185,6 +185,14 @@ static void initializeLogger() {
 #pragma mark - CLXAdapterBannerDelegate
 
 - (void)didLoadBanner:(id<CLXAdapterBanner>)banner {
+    // Create and store the ad object for use in other delegate methods
+    if ([self.banner isKindOfClass:[CLXPublisherBanner class]]) {
+        CLXPublisherBanner *publisherBanner = (CLXPublisherBanner *)self.banner;
+        _ad = [CLXAd adFromBid:publisherBanner.lastBidResponse.bid 
+                    placementId:publisherBanner.placementID 
+                   placementName:publisherBanner.placementName];
+    }
+    
     UIView *bannerView = banner.bannerView;
     if (bannerView) {
         bannerView.userInteractionEnabled = YES;
@@ -209,42 +217,56 @@ static void initializeLogger() {
         // Force layout update
         [self setNeedsLayout];
         [self layoutIfNeeded];
+        
+        // Tell the adapter to show the banner (required to trigger didShowBanner: callback)
+        UIViewController *viewController = nil;
+        if ([self.banner isKindOfClass:[CLXPublisherBanner class]]) {
+            CLXPublisherBanner *publisherBanner = (CLXPublisherBanner *)self.banner;
+            viewController = publisherBanner.viewController;
+            [logger debug:[NSString stringWithFormat:@"[CLXBannerAdView] About to call showFromViewController with VC: %@", viewController]];
+        }
+        
+        if (viewController) {
+            [logger info:@"[CLXBannerAdView] Calling banner.showFromViewController"];
+            [banner showFromViewController:viewController];
+            [logger info:@"[CLXBannerAdView] Returned from banner.showFromViewController"];
+        } else {
+            [logger warn:@"[CLXBannerAdView] No view controller available to show banner - didDisplayAd will not be called"];
+        }
     } else {
         [logger error:@"Banner view is nil, cannot add to hierarchy"];
     }
     
-    // Note: didLoadWithAd: is called directly by CLXPublisherBanner, not here
+    // Note: didLoadAd: is called directly by CLXPublisherBanner, not here
     // This avoids duplicate delegate calls and ensures proper CLXAd is passed
 }
 
 - (void)failToLoadBanner:(id<CLXAdapterBanner>)banner error:(NSError *)error {
-    if ([self.delegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-        // Use stored ad if available, otherwise create a placeholder
-        // Note: self.ad may be nil if this is the first load attempt
-        CLXAd *adToPass = self.ad;
-        if (!adToPass) {
-            [logger warn:@"[CloudXBannerAdView] failToLoadBanner called with no ad object"];
-        }
-        [self.delegate failToLoadWithAd:adToPass error:error];
+    if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+        [self.delegate didFailToLoadAdWithError:error];
     }
 }
 
 - (void)didShowBanner:(id<CLXAdapterBanner>)banner {
-    if ([self.delegate respondsToSelector:@selector(didShowWithAd:)]) {
-        // Use stored ad object (should be populated after didLoadWithAd)
+    [logger info:@"[CLXBannerAdView] didShowBanner called from adapter"];
+    if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
+        // Use stored ad object (should be populated after didLoadAd)
         if (self.ad) {
-            [self.delegate didShowWithAd:self.ad];
+            [logger info:[NSString stringWithFormat:@"[CLXBannerAdView] Calling delegate.didDisplayAd with ad: %@", self.ad]];
+            [self.delegate didDisplayAd:self.ad];
         } else {
-            [logger error:@"didShowBanner called but self.ad is nil"];
+            [logger error:@"[CLXBannerAdView] didShowBanner called but self.ad is nil"];
         }
+    } else {
+        [logger warn:@"[CLXBannerAdView] Delegate does not respond to didDisplayAd:"];
     }
 }
 
 - (void)impressionBanner:(id<CLXAdapterBanner>)banner {
-    if ([self.delegate respondsToSelector:@selector(impressionOn:)]) {
-        // Use stored ad object (should be populated after didLoadWithAd)
+    if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
+        // Use stored ad object (should be populated after didLoadAd)
         if (self.ad) {
-            [self.delegate impressionOn:self.ad];
+            [self.delegate didRecordImpressionForAd:self.ad];
         } else {
             [logger error:@"impressionBanner called but self.ad is nil"];
         }
@@ -252,10 +274,10 @@ static void initializeLogger() {
 }
 
 - (void)clickBanner:(id<CLXAdapterBanner>)banner {
-    if ([self.delegate respondsToSelector:@selector(didClickWithAd:)]) {
-        // Use stored ad object (should be populated after didLoadWithAd)
+    if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
+        // Use stored ad object (should be populated after didLoadAd)
         if (self.ad) {
-            [self.delegate didClickWithAd:self.ad];
+            [self.delegate didClickAd:self.ad];
         } else {
             [logger error:@"clickBanner called but self.ad is nil"];
         }
@@ -264,7 +286,7 @@ static void initializeLogger() {
 
 #pragma mark - BaseAdDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
+- (void)didLoadAd:(CLXAd *)ad {
     // Store the ad object for use in other delegate methods
     // This fixes the unsafe cast bug and enables proper ad metadata access
     _ad = ad;
@@ -314,50 +336,58 @@ static void initializeLogger() {
     }
     
     // Forward the callback to the external delegate
-    if ([self.delegate respondsToSelector:@selector(didLoadWithAd:)]) {
-        [self.delegate didLoadWithAd:ad];
+    if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
+        [self.delegate didLoadAd:ad];
     }
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    if ([self.delegate respondsToSelector:@selector(failToLoadWithAd:error:)]) {
-        [self.delegate failToLoadWithAd:ad error:error];
+- (void)didFailToLoadAdWithError:(NSError *)error {
+    if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+        [self.delegate didFailToLoadAdWithError:error];
     }
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
-    if ([self.delegate respondsToSelector:@selector(didShowWithAd:)]) {
-        [self.delegate didShowWithAd:ad];
+- (void)didDisplayAd:(CLXAd *)ad {
+    NSLog(@"🟡 [CLXBannerAdView] STEP 3: didDisplayAd called with ad: %@", ad);
+    NSLog(@"🟡 [CLXBannerAdView] STEP 3: self.delegate = %@", self.delegate);
+    NSLog(@"🟡 [CLXBannerAdView] STEP 3: Delegate responds to selector: %d", [self.delegate respondsToSelector:@selector(didDisplayAd:)]);
+    
+    if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
+        NSLog(@"🟡 [CLXBannerAdView] STEP 3: Calling [delegate didDisplayAd:%@]", ad);
+        [self.delegate didDisplayAd:ad];
+        NSLog(@"🟡 [CLXBannerAdView] STEP 3: Returned from [delegate didDisplayAd:]");
+    } else {
+        NSLog(@"🔴 [CLXBannerAdView] STEP 3: Delegate does NOT respond to didDisplayAd: - THIS IS THE BUG!");
     }
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    if ([self.delegate respondsToSelector:@selector(failToShowWithAd:error:)]) {
-        [self.delegate failToShowWithAd:ad error:error];
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+    if ([self.delegate respondsToSelector:@selector(didFailToDisplayAd:error:)]) {
+        [self.delegate didFailToDisplayAd:ad error:error];
     }
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
-    if ([self.delegate respondsToSelector:@selector(didHideWithAd:)]) {
-        [self.delegate didHideWithAd:ad];
+- (void)didHideAd:(CLXAd *)ad {
+    if ([self.delegate respondsToSelector:@selector(didHideAd:)]) {
+        [self.delegate didHideAd:ad];
     }
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
-    if ([self.delegate respondsToSelector:@selector(didClickWithAd:)]) {
-        [self.delegate didClickWithAd:ad];
+- (void)didClickAd:(CLXAd *)ad {
+    if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
+        [self.delegate didClickAd:ad];
     }
 }
 
-- (void)impressionOn:(CLXAd *)ad {
-    if ([self.delegate respondsToSelector:@selector(impressionOn:)]) {
-        [self.delegate impressionOn:ad];
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
+    if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
+        [self.delegate didRecordImpressionForAd:ad];
     }
 }
 
-- (void)revenuePaid:(CLXAd *)ad {
-    if ([self.delegate respondsToSelector:@selector(revenuePaid:)]) {
-        [self.delegate revenuePaid:ad];
+- (void)didPayRevenueForAd:(CLXAd *)ad {
+    if ([self.delegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
+        [self.delegate didPayRevenueForAd:ad];
     }
 }
 
