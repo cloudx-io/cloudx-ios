@@ -134,13 +134,13 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
     // MARK: - CLXRewardedDelegate
     
     func didLoad(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("✅ RewardedInterstitial didLoadWithAd", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("✅ RewardedInterstitial didLoadAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .ready)
     }
     
     func failToLoad(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ RewardedInterstitial failToLoadWithAd", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("❌ RewardedInterstitial didFailToLoadAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .noAd)
         
@@ -152,11 +152,11 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
     }
     
     func didShow(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👀 RewardedInterstitial didShowWithAd", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("👀 RewardedInterstitial didDisplayAd", ad: ad)
     }
     
     func failToShow(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ RewardedInterstitial failToShowWithAd", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("❌ RewardedInterstitial didFailToDisplayAd", ad: ad)
         updateStatusUI(state: .noAd)
         
         DispatchQueue.main.async { [weak self] in
@@ -167,22 +167,22 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
     }
     
     func didHide(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🔚 RewardedInterstitial didHideWithAd", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("🔚 RewardedInterstitial didHideAd", ad: ad)
         rewardedInterstitialAd = nil
         loadRewardedInterstitial()
         updateStatusUI(state: .noAd)
     }
     
     func didClick(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👆 RewardedInterstitial didClickWithAd", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("👆 RewardedInterstitial didClickAd", ad: ad)
     }
     
     func impression(on ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ RewardedInterstitial impressionOn", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("👁️ RewardedInterstitial didRecordImpression", ad: ad)
     }
     
-    func revenuePaid(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("💰 RewardedInterstitial revenuePaid", ad: ad)
+    func didPayRevenue(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("💰 RewardedInterstitial didPayRevenue", ad: ad)
     }
     
     func userRewarded(_ ad: CLXAd) {

@@ -196,7 +196,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
     // MARK: - CLXBannerDelegate
     
     func didLoad(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("✅ MREC didLoadWithAd", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("✅ MREC didLoadAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .ready)
         
@@ -204,7 +204,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
     }
     
     func failToLoad(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ MREC failToLoadWithAd", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("❌ MREC didFailToLoadAd", ad: ad)
         isLoading = false
         
         DispatchQueue.main.async { [weak self] in
@@ -214,11 +214,11 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
     }
     
     func didShow(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👀 MREC didShowWithAd", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("👀 MREC didDisplayAd", ad: ad)
     }
     
     func failToShow(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ MREC failToShowWithAd", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("❌ MREC didFailToDisplayAd", ad: ad)
         
         DispatchQueue.main.async { [weak self] in
             let errorMessage = error.localizedDescription
@@ -227,24 +227,24 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
     }
     
     func didHide(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🔚 MREC didHideWithAd", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("🔚 MREC didHideAd", ad: ad)
         mrecAd = nil
     }
     
     func didClick(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👆 MREC didClickWithAd", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("👆 MREC didClickAd", ad: ad)
     }
     
     func impression(on ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ MREC impressionOn", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("👁️ MREC didRecordImpression", ad: ad)
     }
     
-    func revenuePaid(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("💰 MREC revenuePaid", ad: ad)
+    func didPayRevenue(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("💰 MREC didPayRevenue", ad: ad)
     }
     
     // Banner-specific delegate methods (MREC is a banner type)
-    func didExpand(_ ad: CLXAd) {
+    func didExpandAd(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("🔍 MREC didExpandAd", ad: ad)
         
         DispatchQueue.main.async { [weak self] in
@@ -253,7 +253,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         }
     }
     
-    func didCollapse(_ ad: CLXAd) {
+    func didCollapseAd(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("🔍 MREC didCollapseAd", ad: ad)
         
         DispatchQueue.main.async { [weak self] in

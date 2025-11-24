@@ -1,0 +1,161 @@
+name: Release CloudXMolocoAdapter
+
+on:
+  push:
+    tags:
+      - 'v*-moloco'
+
+jobs:
+  release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+
+    steps:
+      - name: 𝔠 Debug available Xcode versions
+        run: ls -la /Applications/ | grep -i xcode
+
+      - name: 𝔠 Switch to Xcode 16.1
+        run: sudo xcode-select -s /Applications/Xcode_16.1.app
+
+      - name: 🗖 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🤠 Clean build artifacts
+        run: |
+          rm -rf build
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+
+      - name: 🛠 Install CocoaPods
+        run: sudo gem install cocoapods --no-document
+
+      - name: 🔢 Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          VERSION_NO_SUFFIX=${VERSION%-moloco}
+          echo "version=$VERSION_NO_SUFFIX" >> $GITHUB_OUTPUT
+          echo "full_version=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+
+      - name: 📀 Build static xcframework
+        run: |
+          cd adapter-moloco
+          bash build_frameworks.sh
+
+      - name: 📦 Rename framework with version
+        run: |
+          cd adapter-moloco
+          VERSION=${{ steps.version.outputs.version }}
+          mv CloudXMolocoAdapter.xcframework.zip CloudXMolocoAdapter-v$VERSION.xcframework.zip
+
+      - name: 🔢 Compute SwiftPM checksum
+        id: checksum
+        run: |
+          cd adapter-moloco
+          VERSION=${{ steps.version.outputs.version }}
+          CHECKSUM=$(swift package compute-checksum CloudXMolocoAdapter-v$VERSION.xcframework.zip)
+          echo "checksum=$CHECKSUM" >> $GITHUB_OUTPUT
+
+      - name: 📝 Update podspec
+        run: |
+          cd adapter-moloco
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          cp CloudXMolocoAdapter.podspec CloudXMolocoAdapter-release.podspec
+          sed -i '' "s/s\.version.*=.*/s.version = '$VERSION'/" CloudXMolocoAdapter-release.podspec
+          sed -i '' "s|releases/download/v[^/]*/|releases/download/${FULL_VERSION}/|" CloudXMolocoAdapter-release.podspec
+
+      - name: 📊 Create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          cat > release_notes.md << EOF
+          CloudXMolocoAdapter v$VERSION SDK release
+          
+          ## Installation
+          
+          ### CocoaPods
+          \`\`\`ruby
+          pod 'CloudXMolocoAdapter', '~> $VERSION'
+          \`\`\`
+          
+          ### Swift Package Manager
+          Add repository: https://github.com/cloudx-io/cloudx-ios
+          
+          ### Manual Installation
+          Download CloudXMolocoAdapter-v$VERSION.xcframework.zip
+          
+          ## SwiftPM Checksum
+          ${{ steps.checksum.outputs.checksum }}
+          EOF
+          
+          gh release create "$FULL_VERSION" \
+            --title "CloudXMolocoAdapter v$VERSION" \
+            --notes-file release_notes.md \
+            --latest
+
+      - name: 📦 Upload xcframework to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          gh release upload "$FULL_VERSION" \
+            adapter-moloco/CloudXMolocoAdapter-v$VERSION.xcframework.zip
+
+      - name: 🧪 Validate podspec
+        run: |
+          cd adapter-moloco
+          cp CloudXMolocoAdapter-release.podspec CloudXMolocoAdapter.podspec
+          pod spec lint CloudXMolocoAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose
+
+      - name: ⏳ Wait for CloudXCore dependency
+        run: |
+          echo "🔍 Checking for CloudXCore dependency availability..."
+          
+          if pod trunk info CloudXCore > /dev/null 2>&1; then
+            echo "✅ CloudXCore is available"
+          else
+            echo "❌ CloudXCore not found"
+            exit 1
+          fi
+
+      - name: 📤 Push podspec to CocoaPods trunk
+        run: |
+          mkdir -p ~/.cocoapods/trunk
+          echo '{"trunk":{"token":"${{ secrets.COCOAPODS_TRUNK_TOKEN }}"}}' > ~/.cocoapods/trunk/me.json
+          cd adapter-moloco
+          
+          cp CloudXMolocoAdapter-release.podspec CloudXMolocoAdapter.podspec
+          
+          for i in {1..5}; do
+            if pod trunk push CloudXMolocoAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose; then
+              echo "✅ Pod trunk push succeeded"
+              break
+            else
+              if [ $i -lt 5 ]; then
+                sleep 30
+              else
+                exit 1
+              fi
+            fi
+          done
+
+      - name: 📌 Upload xcodebuild logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-logs
+          path: |
+            adapter-moloco/xcodebuild-ios.log
+            adapter-moloco/xcodebuild-sim.log
+

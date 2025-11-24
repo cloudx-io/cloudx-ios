@@ -1,0 +1,7 @@
+framework module CloudXMediationMintegralAdapter {
+  umbrella header "CloudXMediationMintegralAdapter.h"
+  
+  export *
+  module * { export * }
+}
+
