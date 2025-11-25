@@ -28,8 +28,8 @@ pod install
 import CloudXCore
 
 // 1. Initialize (in AppDelegate)
-// Production: testMode defaults to false
-CloudXCore.shared.initializeSDK(appKey: "YOUR_APP_KEY") { success, error in
+// Production: Use testMode:false for real ads
+CloudXCore.shared.initializeSDK(appKey: "YOUR_APP_KEY", testMode: false) { success, error in
     print(success ? "Ready!" : "Error: \(error!)")
 }
 
