@@ -28,15 +28,10 @@ pod install
 import CloudXCore
 
 // 1. Initialize (in AppDelegate)
-// Production: Use testMode:false for real ads
+// testMode: false = production, true = test ads
 CloudXCore.shared.initializeSDK(appKey: "YOUR_APP_KEY", testMode: false) { success, error in
     print(success ? "Ready!" : "Error: \(error!)")
 }
-
-// Development/QA: Enable test mode for testing
-// CloudXCore.shared.initializeSDK(appKey: "YOUR_APP_KEY", testMode: true) { success, error in
-//     print(success ? "Test mode enabled" : "Error: \(error!)")
-// }
 
 // 2. Create banner ad (in ViewController)
 let banner = CloudXCore.shared.createBanner(
