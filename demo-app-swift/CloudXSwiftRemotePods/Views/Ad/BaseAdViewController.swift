@@ -110,10 +110,19 @@ class BaseAdViewController: UIViewController, AdStateManaging {
             cloudX.setHashedUserID(config.hashedUserId)
         }
 
+        // Determine test mode based on build configuration
+        #if targetEnvironment(simulator)
+        let testMode = true
+        #elseif DEBUG
+        let testMode = true
+        #else
+        let testMode = false
+        #endif
+        
         return await withCheckedContinuation { continuation in
-            cloudX.initializeSDK(appKey: appKey) { success, error in
+            cloudX.initializeSDK(appKey: appKey, testMode: testMode) { success, error in
                 if success {
-                    print("✅ SDK Initialized: \(success)")
+                    print("✅ SDK Initialized (testMode: \(testMode))")
                     NotificationCenter.default.post(name: .sdkInitialized, object: nil)
                 } else {
                     print("❌ SDK Init Failed: \(error?.localizedDescription ?? "Unknown error")")

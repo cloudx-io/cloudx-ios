@@ -16,8 +16,11 @@ static NSString *const kDevInitURL = @"https://pro-dev.cloudx.io/sdk";
 static NSString *const kStagingInitURL = @"https://pro-stage.cloudx.io/sdk";
 static NSString *const kProductionInitURL = @"https://pro.cloudx.io/sdk";
 
-// MARK: - User Defaults Key
+// MARK: - User Defaults Key (Internal use only)
 static NSString *const kEnvironmentKey = @"CLXEnvironment";
+
+// MARK: - Internal Override Key (for CloudX internal testing only)
+static NSString *const kInternalEnvironmentOverrideKey = @"CLXCore_Internal_EnvironmentOverride";
 
 @implementation CLXURLProvider
 
@@ -40,42 +43,34 @@ static NSString *const kEnvironmentKey = @"CLXEnvironment";
 // MARK: - Private Helper Methods
 
 + (NSString *)initializationURL {
-#ifdef DEBUG
-    // In DEBUG builds, check user preference
-    NSString *environment = [[NSUserDefaults standardUserDefaults] stringForKey:kEnvironmentKey];
+    // Check for internal override (CloudX internal testing only)
+    NSString *internalOverride = [[NSUserDefaults standardUserDefaults] stringForKey:kInternalEnvironmentOverrideKey];
     
-    if ([environment isEqualToString:@"dev"]) {
+    if ([internalOverride isEqualToString:@"dev"]) {
+        [[CLXLogger shared] info:@"[CLXURLProvider] Using DEV environment (internal override)"];
         return kDevInitURL;
-    } else if ([environment isEqualToString:@"production"]) {
-        return kProductionInitURL;
-    } else {
-        // Default to staging in DEBUG builds
+    } else if ([internalOverride isEqualToString:@"staging"]) {
+        [[CLXLogger shared] info:@"[CLXURLProvider] Using STAGING environment (internal override)"];
         return kStagingInitURL;
     }
-#else
-    // Production builds always use production
+    
+    // Default: Always use production for all builds
     return kProductionInitURL;
-#endif
 }
 
 + (NSString *)environmentName {
-#ifdef DEBUG
-    NSString *environment = [[NSUserDefaults standardUserDefaults] stringForKey:kEnvironmentKey];
+    NSString *internalOverride = [[NSUserDefaults standardUserDefaults] stringForKey:kInternalEnvironmentOverrideKey];
     
-    if ([environment isEqualToString:@"dev"]) {
+    if ([internalOverride isEqualToString:@"dev"]) {
         return @"development";
-    } else if ([environment isEqualToString:@"production"]) {
-        return @"production";
-    } else {
+    } else if ([internalOverride isEqualToString:@"staging"]) {
         return @"staging";
     }
-#else
+    
     return @"production";
-#endif
 }
 
 + (void)setEnvironment:(NSString *)environment {
-#ifdef DEBUG
     // Validate environment
     NSArray *validEnvironments = @[@"dev", @"staging", @"production"];
     if (![validEnvironments containsObject:environment]) {
@@ -84,15 +79,16 @@ static NSString *const kEnvironmentKey = @"CLXEnvironment";
         return;
     }
     
-    // Store the environment preference
-    [[NSUserDefaults standardUserDefaults] setObject:environment forKey:kEnvironmentKey];
+    if ([environment isEqualToString:@"production"]) {
+        // Clear override to use default production
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kInternalEnvironmentOverrideKey];
+    } else {
+        // Store the environment override
+        [[NSUserDefaults standardUserDefaults] setObject:environment forKey:kInternalEnvironmentOverrideKey];
+    }
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     [[CLXLogger shared] info:[NSString stringWithFormat:@"[CLXURLProvider] Environment set to: %@", environment]];
-#else
-    // Ignored in production builds
-    [[CLXLogger shared] info:@"[CLXURLProvider] Environment switching disabled in production builds"];
-#endif
 }
 
 @end 

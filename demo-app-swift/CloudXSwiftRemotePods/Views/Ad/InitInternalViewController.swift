@@ -112,31 +112,17 @@ class InitInternalViewController: BaseAdViewController {
     }
     
     private func updateButtonStates() {
-        let configManager = CLXDemoConfigManager.sharedManager
-        let isDebugBuild = configManager.isDebugBuild
-        
         let buttons = [devButton, stagingButton, prodButton]
         
         for button in buttons {
             guard let button = button else { continue }
             let buttonEnvironment = CLXDemoEnvironment(rawValue: button.tag) ?? .dev
-            let shouldEnable: Bool
             
-            if isDebugBuild {
-                shouldEnable = (buttonEnvironment == .dev || buttonEnvironment == .staging)
-            } else {
-                shouldEnable = (buttonEnvironment == .production)
-            }
-            
-            button.isEnabled = shouldEnable
-            
-            if shouldEnable {
-                button.backgroundColor = color(for: buttonEnvironment)
-                button.alpha = 1.0
-            } else {
-                button.backgroundColor = .systemGray
-                button.alpha = 0.5
-            }
+            // All environment buttons are now enabled regardless of build configuration
+            // The SDK uses the environment override from CLXURLProvider internally
+            button.isEnabled = true
+            button.backgroundColor = color(for: buttonEnvironment)
+            button.alpha = 1.0
         }
     }
     
@@ -226,7 +212,8 @@ class InitInternalViewController: BaseAdViewController {
         // Clear DI container to force fresh services with new environment
         CLXDIContainer.shared().reset()
         
-        // Set environment in our centralized config FIRST (before any SDK calls)
+        // Set environment using internal override key BEFORE SDK init
+        // This controls which server (dev/staging/production) the SDK connects to
         let environmentKey: String
         switch environment {
         case .dev:
@@ -234,18 +221,11 @@ class InitInternalViewController: BaseAdViewController {
         case .staging:
             environmentKey = "staging"
         case .production:
-            // Production doesn't need environment override - it's the default for non-DEBUG
             environmentKey = "production"
         }
         
-        // Set the debug environment in our centralized config
-        if environment != .production {
-            CLXURLProvider.setEnvironment(environmentKey)
-        }
-        
-        // Also set the old key for backward compatibility with demo app config
-        UserDefaults.standard.set(environmentKey, forKey: "CLXDemoEnvironment")
-        UserDefaults.standard.synchronize()
+        // Set the internal environment override (production clears it to use default)
+        CLXURLProvider.setEnvironment(environmentKey)
         
         DemoAppLogger.sharedInstance.logMessage("Initializing SDK with \(environmentName) environment")
         
@@ -254,15 +234,17 @@ class InitInternalViewController: BaseAdViewController {
             CloudXCore.shared.setHashedUserID(config.hashedUserId)
         }
         
+        // Determine test mode based on build configuration
+        #if targetEnvironment(simulator)
+        let testMode = true
+        #elseif DEBUG
+        let testMode = true
+        #else
+        let testMode = false
+        #endif
+        
         // Use standard CloudXCore initialization which will now use our environment override
-        CloudXCore.shared.initializeSDK(appKey: config.appKey) { [weak self] success, error in
-            // Clear old environment override after initialization (success or failure)
-            UserDefaults.standard.removeObject(forKey: "CLXDemoEnvironment")
-            UserDefaults.standard.synchronize()
-            
-            // Note: We keep the CLXDebugEnvironment setting in our centralized config
-            // so it persists for subsequent SDK operations
-            
+        CloudXCore.shared.initializeSDK(appKey: config.appKey, testMode: testMode) { [weak self] success, error in
             if success {
                 DemoAppLogger.sharedInstance.logMessage("✅ SDK initialized successfully with \(environmentName) environment")
                 self?.isSDKInitialized = true

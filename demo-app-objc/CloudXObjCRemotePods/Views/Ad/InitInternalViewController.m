@@ -118,31 +118,16 @@
 }
 
 - (void)updateButtonStates {
-    CLXDemoConfigManager *configManager = [CLXDemoConfigManager sharedManager];
-    BOOL isDebugBuild = [configManager isDebugBuild];
-    
     NSArray<UIButton *> *buttons = @[self.devButton, self.stagingButton, self.prodButton];
     
     for (UIButton *button in buttons) {
         CLXDemoEnvironment buttonEnvironment = (CLXDemoEnvironment)button.tag;
-        BOOL shouldEnable = NO;
         
-        if (isDebugBuild) {
-            shouldEnable = (buttonEnvironment == CLXDemoEnvironmentDev || 
-                           buttonEnvironment == CLXDemoEnvironmentStaging);
-        } else {
-            shouldEnable = (buttonEnvironment == CLXDemoEnvironmentProduction);
-        }
-        
-        button.enabled = shouldEnable;
-        
-        if (shouldEnable) {
-            button.backgroundColor = [self colorForEnvironment:buttonEnvironment];
-            button.alpha = 1.0;
-        } else {
-            button.backgroundColor = [UIColor systemGrayColor];
-            button.alpha = 0.5;
-        }
+        // All environment buttons are now enabled regardless of build configuration
+        // The SDK uses the environment override from CLXURLProvider internally
+        button.enabled = YES;
+        button.backgroundColor = [self colorForEnvironment:buttonEnvironment];
+        button.alpha = 1.0;
     }
 }
 
@@ -235,7 +220,8 @@
     // Clear DI container to force fresh services with new environment
     [[CLXDIContainer shared] reset];
     
-    // Set environment in our centralized config FIRST (before any SDK calls)
+    // Set environment using internal override key BEFORE SDK init
+    // This controls which server (dev/staging/production) the SDK connects to
     NSString *environmentKey;
     switch (environment) {
         case CLXDemoEnvironmentDev:
@@ -245,35 +231,30 @@
             environmentKey = @"staging";
             break;
         case CLXDemoEnvironmentProduction:
-            // Production doesn't need environment override - it's the default for non-DEBUG
             environmentKey = @"production";
             break;
     }
     
-    // Set the debug environment in our centralized config
-    if (environment != CLXDemoEnvironmentProduction) {
-        [CLXURLProvider setEnvironment:environmentKey];
-    }
-    
-    // INTERNAL USE ONLY: Also set the old key for backward compatibility with demo app config
-    [[NSUserDefaults standardUserDefaults] setObject:environmentKey forKey:@"CLXDemoEnvironment"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    // Set the internal environment override (production clears it to use default)
+    [CLXURLProvider setEnvironment:environmentKey];
     
     // Set hashed user ID before initialization if provided
     if (config.hashedUserId.length > 0) {
         [[CloudXCore shared] setHashedUserID:config.hashedUserId];
     }
     
+    // Determine test mode based on build configuration
+    BOOL testMode = NO;
+    #if TARGET_IPHONE_SIMULATOR
+        testMode = YES;
+    #elif DEBUG
+        testMode = YES;
+    #endif
+    
     // Use standard CloudXCore initialization which will now use our environment override
     [[CloudXCore shared] initializeSDKWithAppKey:config.appKey 
-                                completion:^(BOOL success, NSError * _Nullable error) {
-        // Clear old environment override after initialization (success or failure)
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CLXDemoEnvironment"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        
-        // Note: We keep the CLXDebugEnvironment setting in our centralized config
-        // so it persists for subsequent SDK operations
-        
+                                        testMode:testMode
+                                      completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ SDK initialized successfully with %@ environment", environmentName]];
             self.isSDKInitialized = YES;

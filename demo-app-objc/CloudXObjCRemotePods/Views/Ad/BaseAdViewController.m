@@ -78,7 +78,17 @@
         }
         
         [self updateStatusUIWithState:AdStateLoading];
-        [[CloudXCore shared] initializeSDKWithAppKey:appKey completion:^(BOOL success, NSError * _Nullable error) {
+        
+        // Determine test mode based on build configuration
+        // Simulator or DEBUG builds get test mode, RELEASE builds get production
+        BOOL testMode = NO;
+        #if TARGET_IPHONE_SIMULATOR
+            testMode = YES;
+        #elif DEBUG
+            testMode = YES;
+        #endif
+        
+        [[CloudXCore shared] initializeSDKWithAppKey:appKey testMode:testMode completion:^(BOOL success, NSError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (success) {
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"cloudXSDKInitialized" object:nil];

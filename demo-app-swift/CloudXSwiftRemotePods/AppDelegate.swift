@@ -51,17 +51,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         CloudXCore.setMinLogLevel(.verbose)
         CloudXCore.setLoggingEmojisEnabled(true)
         
-        // DEMO APP ONLY: Force test mode for all bid requests
-        // This internal flag ensures test=1 is always set in bid requests for demo app
-        // regardless of build configuration (simulator/device, debug/release)
-        UserDefaults.standard.set(true, forKey: "CLXCore_Internal_ForceTestMode")
-        
-        // DEMO APP ONLY: Enable Meta test mode for release builds
-        // This ensures Meta SDK registers device as test device and serves test ads
-        UserDefaults.standard.set(true, forKey: "CLXMetaTestModeEnabled")
-        
-        UserDefaults.standard.synchronize()
-        
         // Auto-clear all privacy test settings on every launch
         // This ensures clean state for testing and prevents COPPA/GPP settings from persisting
         clearAllPrivacyTestSettings()
@@ -128,5 +117,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 
+}
+
+// MARK: - Notification Names
+extension NSNotification.Name {
+    static let sdkInitialized = NSNotification.Name("CloudXSDKInitialized")
 }
 

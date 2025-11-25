@@ -397,7 +397,7 @@ static MockRillEventReporter *sharedInstance = nil;
     
     // When: Initialize SDK
     XCTestExpectation *expectation = [self expectationWithDescription:@"SDK Init"];
-    [[CloudXCore shared] initializeSDKWithAppKey:kTestAppKey completion:^(BOOL success, NSError *error) {
+    [[CloudXCore shared] initializeSDKWithAppKey:kTestAppKey testMode:NO completion:^(BOOL success, CLXError *error) {
         if (success) {
             // Replace the reporting service with our mock after initialization
             [[CloudXCore shared] setValue:self.mockReporter forKey:@"reportingService"];

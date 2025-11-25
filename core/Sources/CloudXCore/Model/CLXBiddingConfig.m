@@ -443,29 +443,17 @@ static void initializeLogger() {
         [[CLXTrackingFieldResolver shared] setLoopIndex:_requestID loopIndex:loopIndexInt];
         [logger debug:[NSString stringWithFormat:@"Stored loop-index=%ld for auction: %@", (long)loopIndexInt, _requestID]];
         
-        // Check if test mode has been forced via internal API (for demo/test apps only)
-        NSNumber *forceTestMode = [[NSUserDefaults standardUserDefaults] objectForKey:@"CLXCore_Internal_ForceTestMode"];
+        // Read test mode from SDK init configuration
+        // Test mode is set during initializeSDKWithAppKey:testMode:completion:
+        // Simulator always has test mode enabled automatically
+        BOOL testModeEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kCLXCoreTestModeKey];
         
-        if (forceTestMode && [forceTestMode boolValue]) {
+        if (testModeEnabled) {
             _test = @1;
-            [logger debug:@"Force test mode enabled - test flag set to: 1"];
+            [logger debug:@"Test mode enabled via SDK init - test flag set to: 1"];
         } else {
-            // Set test flag based on simulator detection and build configuration
-            // Simulator (any build) → test=1 (Meta registers simulator as test device)
-            // Real device + DEBUG → test=1 (device registered as test device in Meta adapter)
-            // Real device + RELEASE → test=0 (production mode)
-            #if TARGET_IPHONE_SIMULATOR
-            _test = @1;
-            [logger debug:@"Simulator detected - test flag set to: 1"];
-            #else
-            #ifdef DEBUG
-            _test = @1;
-            [logger debug:@"Real device + DEBUG build - test flag set to: 1"];
-            #else
             _test = @0;
-            [logger debug:@"Real device + RELEASE build - test flag set to: 0"];
-            #endif
-            #endif
+            [logger debug:@"Production mode - test flag set to: 0"];
         }
     }
     return self;

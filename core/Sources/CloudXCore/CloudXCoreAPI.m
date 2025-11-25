@@ -176,8 +176,13 @@ static CloudXCore *_sharedInstance = nil;
                                                   testGroupName:_abTestName];
 }
 
-- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL, NSError * _Nullable))completion {
-    [self.logger info:[NSString stringWithFormat:@"[CloudXCore] initializeSDKWithAppKey called with appKey: %@", appKey]];
+- (void)initializeSDKWithAppKey:(NSString *)appKey testMode:(BOOL)testMode completion:(void (^)(BOOL, CLXError * _Nullable))completion {
+    [self.logger info:[NSString stringWithFormat:@"[CloudXCore] initializeSDKWithAppKey called with appKey: %@, testMode: %@", appKey, testMode ? @"YES" : @"NO"]];
+    
+    // Store test mode setting immediately (before any adapter initialization)
+    // This allows adapters to read the setting during their initialization
+    [[NSUserDefaults standardUserDefaults] setBool:testMode forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     // Track SDK initialization method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
@@ -244,7 +249,9 @@ static CloudXCore *_sharedInstance = nil;
             [self.logger error:[NSString stringWithFormat:@"Error domain: %@, code: %ld, description: %@", error.domain, (long)error.code, error.localizedDescription]];
             [self.logger error:[NSString stringWithFormat:@"Error class: %@", NSStringFromClass([error class])]];
             if (completion) {
-                completion(NO, error);
+                // Ensure we pass a CLXError to the completion handler
+                CLXError *clxError = [error isKindOfClass:[CLXError class]] ? (CLXError *)error : [CLXError errorWithCode:CLXErrorCodeNotInitialized description:error.localizedDescription underlyingError:error];
+                completion(NO, clxError);
             }
             return;
         }
@@ -346,7 +353,7 @@ static CloudXCore *_sharedInstance = nil;
     }];
 }
 
-- (void)processSDKConfig:(CLXSDKConfigResponse *)config completion:(void (^)(BOOL, NSError * _Nullable))completion {
+- (void)processSDKConfig:(CLXSDKConfigResponse *)config completion:(void (^)(BOOL, CLXError * _Nullable))completion {
     [self.logger debug:[NSString stringWithFormat:@"Processing SDK config - Session: %@, Account: %@, Bidders: %lu", config.sessionID, config.accountID, (unsigned long)config.bidders.count]];
     
     _sdkConfig = config;
@@ -1161,7 +1168,7 @@ static CloudXCore *_sharedInstance = nil;
     CloudXCore *shared = [CloudXCore shared];
     if (shared.isInitialized) {
         CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXCore"];
-        [logger warn:@"⚠️ setIsAgeRestrictedUser called AFTER SDK initialization. COPPA status should be set BEFORE calling initializeSDKWithAppKey:completion: to ensure all adapter SDKs are properly configured. Some adapters (e.g., Vungle) require COPPA to be set before initialization and may not pick up this change."];
+        [logger warn:@"⚠️ setIsAgeRestrictedUser called AFTER SDK initialization. COPPA status should be set BEFORE calling initializeSDKWithAppKey:testMode:completion: to ensure all adapter SDKs are properly configured. Some adapters (e.g., Vungle) require COPPA to be set before initialization and may not pick up this change."];
     }
     
     [[CLXPrivacyService sharedInstance] setIsAgeRestrictedUser:@(isAgeRestrictedUser)];

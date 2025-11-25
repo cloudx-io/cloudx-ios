@@ -14,7 +14,7 @@
 #import "Mocks/CLXMockInitService.h"
 
 @interface CloudXCore (Testing)
-- (instancetype)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL success, NSError *error))completion;
+- (void)initializeSDKWithAppKey:(NSString *)appKey testMode:(BOOL)testMode completion:(void (^)(BOOL success, CLXError *error))completion;
 - (void)setHashedUserID:(NSString *)hashedUserID;
 - (void)setKeyValueDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary;
 - (void)setBidderKeyValue:(NSString *)bidder key:(NSString *)key value:(NSString *)value;
@@ -75,7 +75,7 @@
             NSString *appKey = [NSString stringWithFormat:@"concurrent-app-key-%ld", (long)index];
             
             CloudXCore *sdk = [CloudXCore shared];
-            [sdk initializeSDKWithAppKey:appKey completion:^(BOOL success, NSError *error) {
+            [sdk initializeSDKWithAppKey:appKey testMode:NO completion:^(BOOL success, CLXError *error) {
                 NSLog(@"🧪 SDK init %ld completed - success: %@, error: %@", (long)index, success ? @"YES" : @"NO", error);
                 XCTestExpectation *expectation = expectations[index];
                 [expectation fulfill];
@@ -108,7 +108,7 @@
     // Initialize SDK first
     XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
     CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
         NSLog(@"🧪 SDK initialization completed - success: %@, error: %@", success ? @"YES" : @"NO", error);
         [initExpectation fulfill];
     }];
@@ -190,7 +190,7 @@
     // Initialize SDK first
     XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
     CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, NSError *error) {
+    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
         NSLog(@"🧪 SDK initialization completed - success: %@, error: %@", success ? @"YES" : @"NO", error);
         [initExpectation fulfill];
     }];

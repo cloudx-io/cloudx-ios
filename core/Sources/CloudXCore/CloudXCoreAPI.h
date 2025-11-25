@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXError.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -58,10 +59,22 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 /**
  * Initialize the SDK to start serving ads
  * @param appKey The app key provided by CloudX
+ * @param testMode YES to enable test mode (test ads, no billing), NO for production (default: NO)
  * @param completion A completion handler that will be called once the SDK is initialized
+ * @discussion When testMode is YES:
+ * - Bid requests will include test=1 flag (OpenRTB spec)
+ * - Adapter SDKs will be configured for test mode (e.g., Meta test ads)
+ * - No real monetization will occur
+ * 
+ * Use testMode:YES during development and QA testing.
+ * Use testMode:NO for production (real ads with actual billing).
+ * The host app has full control over the testMode setting.
+ * 
+ * In Swift, you can omit testMode to use the default value (false):
+ * CloudXCore.shared.initializeSDK(appKey: "key") { success, error in ... }
  */
-- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(nullable void (^)(BOOL success, NSError * _Nullable error))completion
-    NS_SWIFT_NAME(initializeSDK(appKey:completion:));
+- (void)initializeSDKWithAppKey:(NSString *)appKey testMode:(BOOL)testMode completion:(nullable void (^)(BOOL success, CLXError * _Nullable error))completion
+    NS_SWIFT_NAME(initializeSDK(appKey:testMode:completion:));
 
 /**
  * Set the hashed user ID for auction requests

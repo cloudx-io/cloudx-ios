@@ -72,20 +72,10 @@ import CloudXCore
 
 **Objective-C:**
 ```objc
-// Initialize with app key only
+// Initialize CloudX SDK (testMode: NO = production, YES = test ads)
 [[CloudXCore shared] initializeSDKWithAppKey:@"your-app-key-here" 
-                             completion:^(BOOL success, NSError * _Nullable error) {
-    if (success) {
-        NSLog(@"✅ CloudX SDK initialized successfully");
-    } else {
-        NSLog(@"❌ Failed to initialize CloudX SDK: %@", error.localizedDescription);
-    }
-}];
-
-// Initialize with app key and hashed user ID
-[[CloudXCore shared] initializeSDKWithAppKey:@"your-app-key-here" 
-                           hashedUserID:@"user-id-optional" 
-                             completion:^(BOOL success, NSError * _Nullable error) {
+                                    testMode:NO
+                                  completion:^(BOOL success, CLXError * _Nullable error) {
     if (success) {
         NSLog(@"✅ CloudX SDK initialized successfully");
     } else {
@@ -96,18 +86,8 @@ import CloudXCore
 
 **Swift:**
 ```swift
-// Initialize with app key only
-CloudXCore.shared.initSDK(withAppKey: "your-app-key-here") { success, error in
-    if success {
-        print("✅ CloudX SDK initialized successfully")
-    } else {
-        print("❌ Failed to initialize CloudX SDK: \(error?.localizedDescription ?? "Unknown error")")
-    }
-}
-
-// Initialize with app key and hashed user ID
-CloudXCore.shared.initSDK(withAppKey: "your-app-key-here", 
-                         hashedUserID: "user-id-optional") { success, error in
+// Initialize CloudX SDK (testMode: false = production, true = test ads)
+CloudXCore.shared.initializeSDK(appKey: "your-app-key-here", testMode: false) { success, error in
     if success {
         print("✅ CloudX SDK initialized successfully")
     } else {
@@ -115,6 +95,20 @@ CloudXCore.shared.initSDK(withAppKey: "your-app-key-here",
     }
 }
 ```
+
+#### Test Mode
+
+The SDK supports an optional `testMode` parameter to control whether test ads or production ads are served:
+
+- **Production (`testMode: false`)**: Real ads with actual billing. Use for production releases.
+- **Test Mode (`testMode: true`)**: Test ads without billing. Use for development and QA testing.
+
+When `testMode` is enabled:
+- Bid requests include `test=1` flag per OpenRTB spec
+- Adapter SDKs are configured for test mode (e.g., Meta test ads)
+- No real monetization occurs
+
+**Important:** The host app has full control over test mode. Set `testMode` explicitly based on your build configuration or testing needs.
 
 ### 3. Check SDK Status
 
@@ -175,7 +169,7 @@ Banner ads are rectangular ads that appear at the top or bottom of the screen.
     NSLog(@"✅ Banner ad loaded successfully");
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAdWithError:(CLXError *)error {
     NSLog(@"❌ Banner ad failed to load: %@", error.localizedDescription);
 }
 
@@ -301,7 +295,7 @@ Interstitial ads are full-screen ads that appear between app content.
     NSLog(@"✅ Interstitial ad loaded successfully");
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAdWithError:(CLXError *)error {
     NSLog(@"❌ Interstitial ad failed to load: %@", error.localizedDescription);
 }
 
@@ -309,7 +303,7 @@ Interstitial ads are full-screen ads that appear between app content.
     NSLog(@"👀 Interstitial ad shown");
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)failToShowWithAd:(CLXAd *)ad error:(CLXError *)error {
     NSLog(@"❌ Interstitial ad failed to show: %@", error.localizedDescription);
 }
 
@@ -436,7 +430,7 @@ Rewarded ads are full-screen ads that provide rewards to users for watching.
     NSLog(@"✅ Rewarded ad loaded successfully");
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAdWithError:(CLXError *)error {
     NSLog(@"❌ Rewarded ad failed to load: %@", error.localizedDescription);
 }
 
@@ -444,7 +438,7 @@ Rewarded ads are full-screen ads that provide rewards to users for watching.
     NSLog(@"👀 Rewarded ad shown");
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)failToShowWithAd:(CLXAd *)ad error:(CLXError *)error {
     NSLog(@"❌ Rewarded ad failed to show: %@", error.localizedDescription);
 }
 
@@ -626,7 +620,7 @@ Native ads are designed to match the look and feel of your app's content.
     NSLog(@"✅ Native ad loaded successfully");
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAdWithError:(CLXError *)error {
     NSLog(@"❌ Native ad failed to load: %@", error.localizedDescription);
 }
 
@@ -634,7 +628,7 @@ Native ads are designed to match the look and feel of your app's content.
     NSLog(@"👀 Native ad shown");
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
+- (void)failToShowWithAd:(CLXAd *)ad error:(CLXError *)error {
     NSLog(@"❌ Native ad failed to show: %@", error.localizedDescription);
 }
 
@@ -761,7 +755,7 @@ MREC ads are 300x250 pixel banner ads that provide more space for rich content.
     NSLog(@"✅ MREC ad loaded successfully");
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAdWithError:(CLXError *)error {
     NSLog(@"❌ MREC ad failed to load: %@", error.localizedDescription);
 }
 
@@ -1030,8 +1024,8 @@ Here's a complete example showing how to integrate all ad types in a single app:
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Initialize CloudX SDK
     [[CloudXCore shared] initializeSDKWithAppKey:@"your-app-key-here" 
-                              hashedUserID:@"user-id-optional" 
-                                completion:^(BOOL success, NSError * _Nullable error) {
+                                        testMode:NO
+                                      completion:^(BOOL success, CLXError * _Nullable error) {
         if (success) {
             NSLog(@"✅ CloudX SDK initialized successfully");
         } else {
@@ -1176,8 +1170,7 @@ extension MainViewController: CLXBannerDelegate, CLXInterstitialDelegate, CLXRew
 
 | Method | Description |
 |--------|-------------|
-| `initializeSDKWithAppKey:completion:` | Initialize SDK with app key |
-| `initializeSDKWithAppKey:hashedUserID:completion:` | Initialize SDK with app key and user ID |
+| `initializeSDKWithAppKey:testMode:completion:` | Initialize SDK with app key and test mode (YES=test ads, NO=production) |
 | `isInitialized` | Check if SDK is initialized |
 | `sdkVersion` | Get SDK version |
 
@@ -1216,13 +1209,15 @@ extension MainViewController: CLXBannerDelegate, CLXInterstitialDelegate, CLXRew
 
 All ad types support these common callbacks:
 - `didLoadAd:` - Ad loaded successfully
-- `didFailToLoadAdWithError:` - Ad failed to load (no ad object, only error)
+- `didFailToLoadAdWithError:` - Ad failed to load (receives `CLXError` object with details)
 - `didDisplayAd:` - Ad was displayed
-- `failToShowWithAd:error:` - Ad failed to show
+- `failToShowWithAd:error:` - Ad failed to show (receives `CLXError` object)
 - `didHideWithAd:` - Ad was hidden
 - `didClickWithAd:` - Ad was clicked
 - `impressionOn:` - Ad impression recorded
 - `closedByUserActionWithAd:` - Ad closed by user
+
+**Note:** All error callbacks use `CLXError` (not `NSError`) which provides structured error information including error codes, descriptions, and underlying causes.
 
 **Rewarded ads additionally support:**
 - `userRewarded:` - User earned reward
@@ -1250,7 +1245,7 @@ When you call `load`, the SDK automatically tries multiple ad sources in priorit
 ### Common Issues
 
 1. **SDK not initialized**
-   - Ensure you call `initializeSDKWithAppKey:completion:` before creating ads
+   - Ensure you call `initializeSDKWithAppKey:testMode:completion:` before creating ads
    - Check that the completion block is called with success
 
 2. **Ads not loading**
@@ -1282,8 +1277,8 @@ The CloudX SDK provides logging to help with integration and troubleshooting.
 // Enable verbose logging (call early in app lifecycle, before SDK initialization)
 [CloudXCore setLoggingEnabled:YES];
 
-// Initialize SDK
-[[CloudXCore shared] initializeSDKWithAppKey:@"your-app-key" completion:^(BOOL success, NSError * _Nullable error) {
+// Initialize SDK (testMode:NO for production)
+[[CloudXCore shared] initializeSDKWithAppKey:@"your-app-key" testMode:NO completion:^(BOOL success, CLXError * _Nullable error) {
     // Handle initialization
 }];
 ```
@@ -1293,8 +1288,8 @@ The CloudX SDK provides logging to help with integration and troubleshooting.
 // Enable verbose logging (call early in app lifecycle, before SDK initialization)
 CloudXCore.setLoggingEnabled(true)
 
-// Initialize SDK
-CloudXCore.shared.initializeSDK(appKey: "your-app-key") { success, error in
+// Initialize SDK (testMode:false for production)
+CloudXCore.shared.initializeSDK(appKey: "your-app-key", testMode: false) { success, error in
     // Handle initialization
 }
 ```

@@ -110,34 +110,18 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
     // Configure production settings (always needed)
     [self configureAdvertiserTrackingEnabled];
     
-    // Configure test settings (only for development/testing)
-    // Check if running on simulator
-    BOOL isSimulator = NO;
-    #if TARGET_OS_SIMULATOR
-        isSimulator = YES;
-    #endif
+    // Read test mode from SDK init configuration (set during initializeSDKWithAppKey:testMode:completion:)
+    // This key is automatically set to YES on simulator by CloudXCore
+    BOOL testModeEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"CLXCore_testMode"];
     
-    // Check UserDefaults override (for TestFlight/special cases)
-    BOOL testModeOverride = [[NSUserDefaults standardUserDefaults] boolForKey:@"CLXMetaTestModeEnabled"];
+    if (testModeEnabled) {
+        [[CLXMetaInitializer logger] info:@"Test mode enabled via SDK init - configuring Meta test settings"];
+        [self configureTestSettings];
+    } else {
+        [[CLXMetaInitializer logger] info:@"Production mode - Meta will serve real ads"];
+    }
     
-    // Enable test mode if: Debug build, Simulator, or UserDefaults override
-    if (isSimulator) {
-        [[CLXMetaInitializer logger] info:@"📱 [CLXMetaInitializer] Running on simulator - enabling test mode"];
-        [self configureTestSettings];
-    }
-    #ifdef DEBUG
-    else {
-        [[CLXMetaInitializer logger] info:@"Debug build - enabling test mode"];
-        [self configureTestSettings];
-    }
-    #else
-    else if (testModeOverride) {
-        [[CLXMetaInitializer logger] info:@"⚠️ [CLXMetaInitializer] Test mode enabled via UserDefaults override"];
-        [self configureTestSettings];
-    }
-    #endif
-    
-    // Initialize Meta FAN SDK with placement IDs like MAX does
+    // Initialize Meta FAN SDK with placement IDs
     [self initializeMetaSDKWithConfig:config];
     
     isInitialized = YES;
@@ -229,14 +213,15 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
 /**
  * Configures Meta test settings for development/testing
  * 
- * Test mode can be enabled in two ways:
- * 1. Automatically in DEBUG builds
- * 2. Via UserDefaults override: [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"CLXMetaTestModeEnabled"];
+ * Test mode is controlled via SDK initialization:
+ * [[CloudXCore shared] initializeSDKWithAppKey:@"key" testMode:YES completion:...];
  *
- * When enabled, registers the current device as a test device to receive test ads.
- * This only affects the current device - other users will see production ads.
+ * When enabled:
+ * - Registers the current device as a test device to receive test ads
+ * - Sets Meta logging level for debugging
+ * - Simulator always has test mode enabled automatically
  *
- * Note: Remember to disable UserDefaults override before final App Store release!
+ * Note: Use testMode:NO for production App Store releases!
  */
 - (void)configureTestSettings {
     // Dynamically get current device's test hash instead of hardcoding
