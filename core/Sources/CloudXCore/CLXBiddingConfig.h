@@ -201,7 +201,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXBiddingConfigUserExtUids : NSObject
 @property (nonatomic, copy, nullable) NSString *id;
-@property (nonatomic, copy, nullable) NSString *atype;
+@property (nonatomic, strong, nullable) NSNumber *atype;
 @end
 
 // MARK: - Regulations

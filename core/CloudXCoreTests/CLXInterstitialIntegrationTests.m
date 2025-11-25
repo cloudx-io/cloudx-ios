@@ -308,11 +308,18 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 - (void)testDelegateCallbacksAreOnMainThread {
     // Verifies that all delegate callbacks are delivered on the main thread as required for UI updates
+    //
+    // NOTE: With deferred initialization, if SDK is not initialized, load() queues the request
+    // and no callback occurs until SDK init completes. This test marks SDK as initialized
+    // to ensure callbacks happen for thread verification.
     
     if (!self.interstitial) {
         XCTAssertNil(self.interstitial, @"Cannot test main thread callbacks on nil interstitial");
         return;
     }
+    
+    // Mark SDK as initialized so load() triggers actual callbacks instead of queueing
+    [[CloudXCore shared] setValue:@YES forKey:@"_isInitialized"];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Main thread callbacks"];
     
@@ -333,6 +340,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
             XCTAssertTrue(YES, @"No callbacks occurred, which is expected for invalid test placement");
         }
     }];
+    
+    // Restore SDK state
+    [[CloudXCore shared] setValue:@NO forKey:@"_isInitialized"];
 }
 
 // MARK: - Memory Management Tests

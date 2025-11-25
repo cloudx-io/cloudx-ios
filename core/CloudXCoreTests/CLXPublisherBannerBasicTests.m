@@ -191,8 +191,8 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
                                                            bannerType:CLXBannerTypeW320H50
                                                  waterfallMaxBackOffTime:30.0
                                                             impModel:self.testImpModel
-                                                        adFactories:@{}
-                                                     bidTokenSources:@{}
+                                                         adFactories:@{}
+                                                      bidTokenSources:@{}
                                                   bidRequestTimeout:5.0
                                                    reportingService:nil
                                                             settings:self.testSettings

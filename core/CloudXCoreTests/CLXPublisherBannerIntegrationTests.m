@@ -338,10 +338,6 @@ static const NSTimeInterval kTestTimeout = 0.5;
     self.testImpModel = [[CLXConfigImpressionModel alloc] init];
     self.testSettings = [[CLXSettings alloc] init];
     
-    // Create banner with mock factory
-    NSDictionary *testFactories = @{kTestNetwork: self.mockFactory};
-    NSDictionary *testBidTokenSources = @{kTestNetwork: [[IntegrationMockBidTokenSource alloc] init]};
-    
     self.banner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
                                                            placement:self.testPlacement
                                                               userID:kTestUserID
@@ -351,8 +347,8 @@ static const NSTimeInterval kTestTimeout = 0.5;
                                                            bannerType:CLXBannerTypeW320H50
                                                  waterfallMaxBackOffTime:30.0
                                                             impModel:self.testImpModel
-                                                        adFactories:testFactories
-                                                     bidTokenSources:testBidTokenSources
+                                                         adFactories:@{kTestNetwork: self.mockFactory}
+                                                      bidTokenSources:@{}
                                                   bidRequestTimeout:kTestTimeout
                                                    reportingService:[[IntegrationMockReportingService alloc] init]
                                                             settings:self.testSettings

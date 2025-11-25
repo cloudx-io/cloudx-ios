@@ -47,6 +47,10 @@ static const NSTimeInterval kTestTimeout = 2.0;
 @property (nonatomic, strong, nullable, readwrite) id<CLXAdapterBanner> bannerOnScreen;
 @property (nonatomic, assign, readwrite) BOOL hasPendingRefresh;
 @property (nonatomic, assign, readwrite) BOOL isVisible;
+// Deferred initialization properties
+@property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
+@property (nonatomic, strong, nullable) NSError *deferredError;
+@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
 
 // Expose private methods for testing
 - (void)setVisible:(BOOL)visible;
@@ -144,8 +148,6 @@ static const NSTimeInterval kTestTimeout = 2.0;
 @property (nonatomic, strong) CLXSDKConfigPlacement *testPlacement;
 @property (nonatomic, strong) CLXConfigImpressionModel *testImpModel;
 @property (nonatomic, strong) CLXSettings *testSettings;
-@property (nonatomic, strong) NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *testFactories;
-@property (nonatomic, strong) NSDictionary<NSString *, id<CLXBidTokenSource>> *testBidTokenSources;
 @property (nonatomic, strong) MockReportingService *mockReportingService;
 @end
 
@@ -171,11 +173,10 @@ static const NSTimeInterval kTestTimeout = 2.0;
     // Create test settings
     self.testSettings = [[CLXSettings alloc] init];
     
-    // Create test factories and bid token sources
-    self.testFactories = @{kTestNetwork: self.mockFactory};
-    self.testBidTokenSources = @{kTestNetwork: [[MockBidTokenSource alloc] init]};
+    // Create banner instance with injected mock factory for testability
+    NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *testAdFactories = @{kTestNetwork: self.mockFactory};
+    NSDictionary<NSString *, id<CLXBidTokenSource>> *testBidTokenSources = @{};
     
-    // Create banner instance
     self.banner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
                                                            placement:self.testPlacement
                                                               userID:kTestUserID
@@ -185,8 +186,8 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                            bannerType:CLXBannerTypeW320H50
                                                  waterfallMaxBackOffTime:30.0
                                                             impModel:self.testImpModel
-                                                        adFactories:self.testFactories
-                                                     bidTokenSources:self.testBidTokenSources
+                                                         adFactories:testAdFactories
+                                                      bidTokenSources:testBidTokenSources
                                                   bidRequestTimeout:kTestTimeout
                                                    reportingService:self.mockReportingService
                                                             settings:self.testSettings
@@ -222,6 +223,9 @@ static const NSTimeInterval kTestTimeout = 2.0;
     const NSTimeInterval customInterval = 15.0;
     self.testPlacement.bannerRefreshRateMs = (int64_t)(customInterval * 1000);
     
+    NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *testAdFactories = @{kTestNetwork: self.mockFactory};
+    NSDictionary<NSString *, id<CLXBidTokenSource>> *testBidTokenSources = @{};
+    
     CLXPublisherBanner *customBanner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
                                                                                 placement:self.testPlacement
                                                                                    userID:kTestUserID
@@ -231,8 +235,8 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                                                 bannerType:CLXBannerTypeW320H50
                                                                       waterfallMaxBackOffTime:30.0
                                                                                  impModel:self.testImpModel
-                                                                             adFactories:self.testFactories
-                                                                          bidTokenSources:self.testBidTokenSources
+                                                                              adFactories:testAdFactories
+                                                                           bidTokenSources:testBidTokenSources
                                                                        bidRequestTimeout:kTestTimeout
                                                                         reportingService:self.mockReportingService
                                                                                  settings:self.testSettings
@@ -485,13 +489,13 @@ static const NSTimeInterval kTestTimeout = 2.0;
 
 #pragma mark - Banner Creation Tests
 
-// Test banner creation with valid network
+// Test banner creation with valid network uses injected factory
 - (void)testBannerCreationWithValidNetwork {
     id<CLXAdapterBanner> createdBanner = [self.banner createBannerInstanceWithAdId:kTestAdID
-                                                                             bidId:kTestBidID
-                                                                               adm:@"test-adm"
-                                                                     adapterExtras:@{}
-                                                                              burl:@"test-burl"
+                                                                            bidId:kTestBidID
+                                                                              adm:@"test-adm"
+                                                                    adapterExtras:@{}
+                                                                             burl:nil
                                                                    hasClosedButton:NO
                                                                            network:kTestNetwork];
     
@@ -502,10 +506,10 @@ static const NSTimeInterval kTestTimeout = 2.0;
 // Test banner creation with invalid network returns nil
 - (void)testBannerCreationWithInvalidNetworkReturnsNil {
     id<CLXAdapterBanner> createdBanner = [self.banner createBannerInstanceWithAdId:kTestAdID
-                                                                             bidId:kTestBidID
-                                                                               adm:@"test-adm"
-                                                                     adapterExtras:@{}
-                                                                              burl:@"test-burl"
+                                                                            bidId:kTestBidID
+                                                                              adm:@"test-adm"
+                                                                    adapterExtras:@{}
+                                                                             burl:nil
                                                                    hasClosedButton:NO
                                                                            network:@"invalid-network"];
     
@@ -517,14 +521,135 @@ static const NSTimeInterval kTestTimeout = 2.0;
     self.mockFactory.shouldReturnNil = YES;
     
     id<CLXAdapterBanner> createdBanner = [self.banner createBannerInstanceWithAdId:kTestAdID
-                                                                             bidId:kTestBidID
-                                                                               adm:@"test-adm"
-                                                                     adapterExtras:@{}
-                                                                              burl:@"test-burl"
+                                                                            bidId:kTestBidID
+                                                                              adm:@"test-adm"
+                                                                    adapterExtras:@{}
+                                                                             burl:nil
                                                                    hasClosedButton:NO
                                                                            network:kTestNetwork];
     
     XCTAssertNil(createdBanner, @"Should return nil when factory returns nil");
+}
+
+#pragma mark - Hybrid Fallback Tests
+
+// Test that banner with empty injected factories still initializes (will use fallback)
+- (void)testBannerInitializesWithEmptyInjectedFactories {
+    // Create banner with empty factories (simulates deferred init scenario)
+    CLXPublisherBanner *emptyFactoriesBanner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
+                                                                                        placement:self.testPlacement
+                                                                                           userID:kTestUserID
+                                                                                      publisherID:kTestPublisherID
+                                                                         suspendPreloadWhenInvisible:NO
+                                                                                          delegate:self.mockDelegate
+                                                                                        bannerType:CLXBannerTypeW320H50
+                                                                              waterfallMaxBackOffTime:30.0
+                                                                                         impModel:self.testImpModel
+                                                                                      adFactories:@{}
+                                                                                   bidTokenSources:@{}
+                                                                               bidRequestTimeout:kTestTimeout
+                                                                                reportingService:self.mockReportingService
+                                                                                         settings:self.testSettings
+                                                                                            tmax:@30];
+    
+    XCTAssertNotNil(emptyFactoriesBanner, @"Banner should initialize even with empty factories");
+    XCTAssertEqual(emptyFactoriesBanner.bannerType, CLXBannerTypeW320H50, @"Banner type should be set correctly");
+    [emptyFactoriesBanner destroy];
+}
+
+// Test that banner with nil placement (deferred init) still initializes
+- (void)testBannerInitializesWithNilPlacement {
+    // Create banner with nil placement (simulates SDK not initialized scenario)
+    CLXPublisherBanner *deferredBanner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
+                                                                                  placement:nil
+                                                                                     userID:kTestUserID
+                                                                                publisherID:kTestPublisherID
+                                                                   suspendPreloadWhenInvisible:NO
+                                                                                    delegate:self.mockDelegate
+                                                                                  bannerType:CLXBannerTypeW320H50
+                                                                        waterfallMaxBackOffTime:30.0
+                                                                                   impModel:nil
+                                                                                adFactories:@{}
+                                                                             bidTokenSources:@{}
+                                                                         bidRequestTimeout:kTestTimeout
+                                                                          reportingService:self.mockReportingService
+                                                                                   settings:self.testSettings
+                                                                                      tmax:@30];
+    
+    XCTAssertNotNil(deferredBanner, @"Banner should initialize with nil placement for deferred init");
+    XCTAssertEqual(deferredBanner.bannerType, CLXBannerTypeW320H50, @"Banner type should be set correctly");
+    XCTAssertFalse(deferredBanner.isReady, @"Banner should not be ready with nil placement");
+    [deferredBanner destroy];
+}
+
+// Test that injected factory takes precedence over CloudXCore fallback
+- (void)testInjectedFactoryTakesPrecedenceOverFallback {
+    // Banner was created with mockFactory for kTestNetwork
+    // When we create a banner for that network, it should use our mock, not CloudXCore
+    
+    id<CLXAdapterBanner> createdBanner = [self.banner createBannerInstanceWithAdId:kTestAdID
+                                                                            bidId:kTestBidID
+                                                                              adm:@"test-adm"
+                                                                    adapterExtras:@{}
+                                                                             burl:nil
+                                                                   hasClosedButton:NO
+                                                                           network:kTestNetwork];
+    
+    // Should get our mock adapter, not something from CloudXCore
+    XCTAssertEqual(createdBanner, self.mockFactory.mockAdapter, 
+                   @"Injected factory should take precedence - returned adapter should be our mock");
+}
+
+#pragma mark - Deferred Initialization Property Tests
+
+// Test that pendingLoadRequestCount property exists and is accessible
+- (void)testPendingLoadRequestCountPropertyExists {
+    XCTAssertTrue([self.banner respondsToSelector:@selector(pendingLoadRequestCount)],
+                  @"Banner should have pendingLoadRequestCount property for queue tracking");
+    XCTAssertEqual(self.banner.pendingLoadRequestCount, 0, @"Initial pending count should be 0");
+}
+
+// Test that requestedPlacementName can be set for deferred initialization
+- (void)testRequestedPlacementNameCanBeSetForDeferredInit {
+    // Create banner with nil placement
+    CLXPublisherBanner *deferredBanner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
+                                                                                  placement:nil
+                                                                                     userID:kTestUserID
+                                                                                publisherID:kTestPublisherID
+                                                                   suspendPreloadWhenInvisible:NO
+                                                                                    delegate:self.mockDelegate
+                                                                                  bannerType:CLXBannerTypeW320H50
+                                                                        waterfallMaxBackOffTime:30.0
+                                                                                   impModel:nil
+                                                                                adFactories:@{}
+                                                                             bidTokenSources:@{}
+                                                                         bidRequestTimeout:kTestTimeout
+                                                                          reportingService:self.mockReportingService
+                                                                                   settings:self.testSettings
+                                                                                      tmax:@30];
+    
+    // Set requestedPlacementName via KVC (as CloudXCoreAPI does)
+    [deferredBanner setValue:@"test-placement" forKey:@"requestedPlacementName"];
+    
+    NSString *storedName = [deferredBanner valueForKey:@"requestedPlacementName"];
+    XCTAssertEqualObjects(storedName, @"test-placement", 
+                          @"requestedPlacementName should be stored for deferred initialization");
+    
+    [deferredBanner destroy];
+}
+
+// Test that deferredError can be set for validation failures
+- (void)testDeferredErrorCanBeSetForValidationFailures {
+    NSError *testError = [NSError errorWithDomain:@"TestDomain" 
+                                             code:100 
+                                         userInfo:@{NSLocalizedDescriptionKey: @"Test validation error"}];
+    
+    // Set deferred error via KVC (as CloudXCoreAPI does)
+    [self.banner setValue:testError forKey:@"deferredError"];
+    
+    NSError *storedError = [self.banner valueForKey:@"deferredError"];
+    XCTAssertEqualObjects(storedError, testError, 
+                          @"deferredError should be stored for deferred validation reporting");
 }
 
 #pragma mark - Spec Compliance Tests

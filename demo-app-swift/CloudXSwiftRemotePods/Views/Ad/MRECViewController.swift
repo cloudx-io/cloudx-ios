@@ -105,6 +105,19 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         mrecAd.load()
     }
     
+    // TEMP: For testing deferred initialization flow
+    @objc private func initSDK() {
+        let config = CLXDemoConfigManager.sharedManager.currentConfig
+        DemoAppLogger.sharedInstance.logMessage("🧪 Manually initializing SDK (production)...")
+        CloudXCore.shared.initializeSDK(appKey: config.appKey) { success, error in
+            if success {
+                DemoAppLogger.sharedInstance.logMessage("✅ SDK initialized successfully")
+            } else {
+                DemoAppLogger.sharedInstance.logMessage("❌ SDK init failed: \(error?.localizedDescription ?? "unknown")")
+            }
+        }
+    }
+    
     private func createAndAddMRECToView() {
         guard mrecAd == nil else { return }
         

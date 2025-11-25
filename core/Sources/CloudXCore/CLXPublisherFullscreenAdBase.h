@@ -31,12 +31,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Initializes a fullscreen ad with the given parameters.
+ * @param placement The placement configuration (nil if SDK not initialized, will be resolved on load)
+ * @param publisherID The publisher ID
+ * @param userID The user ID
+ * @param rewardedCallbackUrl The rewarded callback URL
+ * @param impModel The impression model (nil if SDK not initialized, will be created on load)
+ * @param adFactories The ad network factories
+ * @param waterfallMaxBackOffTime Maximum backoff time for waterfall
+ * @param bidTokenSources Dictionary of bid token sources
+ * @param bidRequestTimeout Bid request timeout
+ * @param reportingService The reporting service
+ * @param settings The settings instance
  */
-- (instancetype)initWithPlacement:(CLXSDKConfigPlacement *)placement
+- (instancetype)initWithPlacement:(nullable CLXSDKConfigPlacement *)placement
                       publisherID:(NSString *)publisherID
                            userID:(nullable NSString *)userID
               rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl
-                         impModel:(CLXConfigImpressionModel *)impModel
+                         impModel:(nullable CLXConfigImpressionModel *)impModel
                       adFactories:(nullable CLXAdNetworkFactories *)adFactories
          waterfallMaxBackOffTime:(nullable NSNumber *)waterfallMaxBackOffTime
                   bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources

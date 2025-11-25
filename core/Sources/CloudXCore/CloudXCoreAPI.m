@@ -728,28 +728,17 @@ static CloudXCore *_sharedInstance = nil;
                                     description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
     }
     
-    if (!placementConfig) {
-        // SDK not initialized yet OR placement not found - create temporary placement config
-        // Banner will queue load() calls until SDK init completes
-        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - creating banner with temporary config for placement: %@", placement]];
-        placementConfig = [[CLXSDKConfigPlacement alloc] init];
-        placementConfig.name = placement;
-        placementConfig.id = @""; // Will be populated after SDK init
-        placementConfig.bannerRefreshRateMs = @(30000); // Default 30s refresh
-    }
-    
-    // Generate unique auction ID for this banner impression
-    NSString *auctionID = [[NSUUID UUID] UUIDString];
-    
-    // Create impression model only if SDK is initialized (nil check for sdkConfig)
+    // Defer placement config and impression model creation if SDK not ready
     CLXConfigImpressionModel *impModel = nil;
-    if (_sdkConfig) {
+    if (placementConfig && _sdkConfig) {
+        // SDK is initialized - create impression model now
+        NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else {
-        // SDK not initialized - impression model will be created later in performLoad
-        [self.logger debug:@"Deferring impression model creation until SDK initialization"];
+    } else if (!placementConfig) {
+        // SDK not initialized yet - defer all initialization to load() time
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring banner initialization for placement: %@", placement]];
     }
     
     // ALWAYS create banner (errors deferred to load())
@@ -759,11 +748,11 @@ static CloudXCore *_sharedInstance = nil;
                                                                    publisherID:@""
                                                    suspendPreloadWhenInvisible:NO
                                                                      delegate:delegate
-                                                                                                                                      bannerType:CLXBannerTypeW320H50
+                                                                   bannerType:CLXBannerTypeW320H50
                                                        waterfallMaxBackOffTime:5.0
                                                                        impModel:impModel
                                                                     adFactories:_adNetworkFactories.banners
-                                                                bidTokenSources:_adNetworkFactories.bidTokenSources
+                                                                 bidTokenSources:_adNetworkFactories.bidTokenSources
                                                               bidRequestTimeout:3.0
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
@@ -773,6 +762,11 @@ static CloudXCore *_sharedInstance = nil;
     // Set deferred error if validation failed (using KVC to access private property)
     if (deferredError) {
         [banner setValue:deferredError forKey:@"deferredError"];
+    }
+    
+    // If SDK not initialized, store the requested placement name for deferred lookup
+    if (!placementConfig) {
+        [banner setValue:placement forKey:@"requestedPlacementName"];
     }
     
     // ALWAYS return non-nil
@@ -805,26 +799,17 @@ static CloudXCore *_sharedInstance = nil;
                                     description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
     }
     
-    if (!placementConfig) {
-        // SDK not initialized yet OR placement not found - create temporary placement config
-        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - creating MREC with temporary config for placement: %@", placement]];
-        placementConfig = [[CLXSDKConfigPlacement alloc] init];
-        placementConfig.name = placement;
-        placementConfig.id = @"";
-        placementConfig.bannerRefreshRateMs = @(30000);
-    }
-    
-    // Generate unique auction ID for this MREC impression
-    NSString *auctionID = [[NSUUID UUID] UUIDString];
-    
-    // Create impression model only if SDK is initialized
+    // Defer placement config and impression model creation if SDK not ready
     CLXConfigImpressionModel *impModel = nil;
-    if (_sdkConfig) {
+    if (placementConfig && _sdkConfig) {
+        // SDK is initialized - create impression model now
+        NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else {
-        [self.logger debug:@"Deferring impression model creation until SDK initialization"];
+    } else if (!placementConfig) {
+        // SDK not initialized yet - defer all initialization to load() time
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring MREC initialization for placement: %@", placement]];
     }
     
     // ALWAYS create banner (errors deferred to load())
@@ -834,11 +819,11 @@ static CloudXCore *_sharedInstance = nil;
                                                                    publisherID:@""
                                                     suspendPreloadWhenInvisible:NO
                                                                      delegate:delegate
-                                                                                                                                      bannerType:CLXBannerTypeMREC
+                                                                   bannerType:CLXBannerTypeMREC
                                                        waterfallMaxBackOffTime:5.0
                                                                        impModel:impModel
                                                                     adFactories:_adNetworkFactories.banners
-                                                                bidTokenSources:_adNetworkFactories.bidTokenSources
+                                                                 bidTokenSources:_adNetworkFactories.bidTokenSources
                                                               bidRequestTimeout:3.0
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
@@ -848,6 +833,11 @@ static CloudXCore *_sharedInstance = nil;
     // Set deferred error if validation failed (using KVC to access private property)
     if (deferredError) {
         [banner setValue:deferredError forKey:@"deferredError"];
+    }
+    
+    // If SDK not initialized, store the requested placement name for deferred lookup
+    if (!placementConfig) {
+        [banner setValue:placement forKey:@"requestedPlacementName"];
     }
     
     // ALWAYS return non-nil
@@ -878,25 +868,17 @@ static CloudXCore *_sharedInstance = nil;
                                     description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
     }
     
-    if (!placementConfig) {
-        // SDK not initialized yet OR placement not found - create temporary placement config
-        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - creating interstitial with temporary config for placement: %@", placement]];
-        placementConfig = [[CLXSDKConfigPlacement alloc] init];
-        placementConfig.name = placement;
-        placementConfig.id = @"";
-    }
-    
-    // Generate unique auction ID for this interstitial impression
-    NSString *auctionID = [[NSUUID UUID] UUIDString];
-    
-    // Create impression model only if SDK is initialized
+    // Defer placement config and impression model creation if SDK not ready
     CLXConfigImpressionModel *impModel = nil;
-    if (_sdkConfig) {
+    if (placementConfig && _sdkConfig) {
+        // SDK is initialized - create impression model now
+        NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else {
-        [self.logger debug:@"Deferring impression model creation until SDK initialization"];
+    } else if (!placementConfig) {
+        // SDK not initialized yet - defer all initialization to load() time
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring interstitial initialization for placement: %@", placement]];
     }
     
     // ALWAYS create interstitial (errors deferred to load())
@@ -915,6 +897,11 @@ static CloudXCore *_sharedInstance = nil;
     // Set deferred error if validation failed (using KVC to access private property)
     if (deferredError) {
         [interstitial setValue:deferredError forKey:@"deferredError"];
+    }
+    
+    // If SDK not initialized, store the requested placement name for deferred lookup
+    if (!placementConfig) {
+        [interstitial setValue:placement forKey:@"requestedPlacementName"];
     }
     
     // ALWAYS return non-nil
@@ -945,25 +932,17 @@ static CloudXCore *_sharedInstance = nil;
                                     description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
     }
     
-    if (!placementConfig) {
-        // SDK not initialized yet OR placement not found - create temporary placement config
-        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - creating rewarded ad with temporary config for placement: %@", placement]];
-        placementConfig = [[CLXSDKConfigPlacement alloc] init];
-        placementConfig.name = placement;
-        placementConfig.id = @"";
-    }
-    
-    // Generate unique auction ID for this rewarded impression
-    NSString *auctionID = [[NSUUID UUID] UUIDString];
-    
-    // Create impression model only if SDK is initialized
+    // Defer placement config and impression model creation if SDK not ready
     CLXConfigImpressionModel *impModel = nil;
-    if (_sdkConfig) {
+    if (placementConfig && _sdkConfig) {
+        // SDK is initialized - create impression model now
+        NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else {
-        [self.logger debug:@"Deferring impression model creation until SDK initialization"];
+    } else if (!placementConfig) {
+        // SDK not initialized yet - defer all initialization to load() time
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring rewarded initialization for placement: %@", placement]];
     }
     
     // ALWAYS create rewarded (errors deferred to load())
@@ -982,6 +961,11 @@ static CloudXCore *_sharedInstance = nil;
     // Set deferred error if validation failed (using KVC to access private property)
     if (deferredError) {
         [rewarded setValue:deferredError forKey:@"deferredError"];
+    }
+    
+    // If SDK not initialized, store the requested placement name for deferred lookup
+    if (!placementConfig) {
+        [rewarded setValue:placement forKey:@"requestedPlacementName"];
     }
     
     // ALWAYS return non-nil
@@ -1043,6 +1027,11 @@ static CloudXCore *_sharedInstance = nil;
     CLXAdapterFactoryResolver *adapterResolver = [[CLXAdapterFactoryResolver alloc] init];
     NSDictionary *factoriesDict = [adapterResolver resolveAdNetworkFactories];
     _adNetworkFactories = [[CLXAdNetworkFactories alloc] initWithDictionary:factoriesDict];
+}
+
+// Internal getter for ad network factories - used by banner/fullscreen ads for deferred initialization
+- (CLXAdNetworkFactories *)adNetworkFactories {
+    return _adNetworkFactories;
 }
 
 - (void)filterConfig {

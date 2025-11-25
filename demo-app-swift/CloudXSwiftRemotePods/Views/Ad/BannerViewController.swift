@@ -72,6 +72,7 @@ class BannerViewController: BaseAdViewController {
         autoRefreshButton.translatesAutoresizingMaskIntoConstraints = false
         buttonStack.addArrangedSubview(autoRefreshButton)
         
+        
         // Button constraints
         NSLayoutConstraint.activate([
             buttonStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),

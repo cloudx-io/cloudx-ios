@@ -341,7 +341,7 @@ static void initializeLogger() {
         if (hashedUserId && hashedUserId.length > 0) {
             CLXBiddingConfigUserExtUids * uids = [[CLXBiddingConfigUserExtUids alloc] init];
             uids.id = hashedUserId;
-            uids.atype = @"3";
+            uids.atype = @3;
             
             CLXBiddingConfigUserExtEids *eidItem = [[CLXBiddingConfigUserExtEids alloc] init];
             eidItem.source = bundle;
@@ -906,7 +906,7 @@ static void initializeLogger() {
                 for (CLXBiddingConfigUserExtUids *uid in eidItem.uids) {
                     [uidsArray addObject:@{
                         @"id": uid.id ?: @"",
-                        @"atype": uid.atype ?: @"3"
+                        @"atype": uid.atype ?: @3
                     }];
                 }
             }

@@ -95,17 +95,20 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 // Deferred error (set during create if validation fails)
 @property (nonatomic, strong, nullable) NSError *deferredError;
 
+// Requested placement name for deferred initialization
+@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+
 @end
 
 @implementation CLXPublisherFullscreenAdBase
 
 #pragma mark - Initialization
 
-- (instancetype)initWithPlacement:(CLXSDKConfigPlacement *)placement
+- (instancetype)initWithPlacement:(nullable CLXSDKConfigPlacement *)placement
                       publisherID:(NSString *)publisherID
                            userID:(nullable NSString *)userID
               rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl
-                         impModel:(CLXConfigImpressionModel *)impModel
+                         impModel:(nullable CLXConfigImpressionModel *)impModel
                       adFactories:(nullable CLXAdNetworkFactories *)adFactories
          waterfallMaxBackOffTime:(nullable NSNumber *)waterfallMaxBackOffTime
                   bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
@@ -117,7 +120,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         // Set up logging for this fullscreen ad instance
         _logger = [[CLXLogger alloc] initWithCategory:@"FullscreenAd"];
         
-        [self.logger debug:[NSString stringWithFormat:@"Initializing fullscreen ad - Placement: %@, Type: %ld", placement.id, (long)[self adType]]];
+        [self.logger debug:[NSString stringWithFormat:@"Initializing fullscreen ad - Placement: %@, Type: %ld", placement.id ?: @"(deferred)", (long)[self adType]]];
         
         // Start in idle state, ready to load ads
         _currentState = CLXFullscreenAdStateIDLE;
@@ -125,8 +128,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         // Configure instance properties
         _adFactories = adFactories;
         _rewardedCallbackUrl = [rewardedCallbackUrl copy];
-        _placementID = [placement.id copy];
-        _placementName = [placement.name copy];
+        _placementID = placement ? [placement.id copy] : nil;
+        _placementName = placement ? [placement.name copy] : nil;
         _reportingService = reportingService;
         _userID = [userID copy];
         _settings = settings;
@@ -155,35 +158,40 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                                                        appKey:appKey
                                                                           url:metricsURL];
         
-        // Configure bid source for ad request management
-        BOOL hasCloseButton = placement.hasCloseButton ?: NO;
-        
-        __weak typeof(self) weakSelf = self;
-        _bidAdSource = [[CLXBidAdSource alloc] initWithUserID:userID
-                                               placementID:_placementID
-                                                    dealID:placement.dealId
-                                             hasCloseButton:hasCloseButton
-                                               publisherID:publisherID
-                                                    adType:[self adType]
-                                            bidTokenSources:bidTokenSources
-                                     nativeAdRequirements:nil
-                                                      tmax:nil
-                                           reportingService:_reportingService
-                                               createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            if (!strongSelf) {
-                return nil;
-            }
+        // Configure bid source for ad request management (only if placement available)
+        if (placement) {
+            BOOL hasCloseButton = placement.hasCloseButton ?: NO;
             
-            return [strongSelf createAdapterWithAdId:adId
-                                               bidId:bidId
-                                                 adm:adm
-                                       adapterExtras:adapterExtras
-                                                burl:burl
-                                             network:network];
-        }];
-        
-        [self.logger debug:[NSString stringWithFormat:@"Initialized fullscreen ad in IDLE state for placement: %@", _placementID]];
+            __weak typeof(self) weakSelf = self;
+            _bidAdSource = [[CLXBidAdSource alloc] initWithUserID:userID
+                                                   placementID:_placementID
+                                                        dealID:placement.dealId
+                                                 hasCloseButton:hasCloseButton
+                                                   publisherID:publisherID
+                                                        adType:[self adType]
+                                                bidTokenSources:bidTokenSources
+                                         nativeAdRequirements:nil
+                                                          tmax:nil
+                                               reportingService:_reportingService
+                                                   createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) {
+                    return nil;
+                }
+                
+                return [strongSelf createAdapterWithAdId:adId
+                                                   bidId:bidId
+                                                     adm:adm
+                                           adapterExtras:adapterExtras
+                                                    burl:burl
+                                                 network:network];
+            }];
+            [self.logger debug:[NSString stringWithFormat:@"Initialized fullscreen ad in IDLE state for placement: %@", _placementID]];
+        } else {
+            // SDK not initialized - bid source will be created in performLoad
+            _bidAdSource = nil;
+            [self.logger debug:@"Deferring bid source creation until SDK initialization"];
+        }
     }
     return self;
 }
@@ -240,14 +248,16 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Check for deferred error from create method
     if (self.deferredError) {
         [self.logger error:[NSString stringWithFormat:@"Fullscreen ad creation failed with deferred error: %@", self.deferredError.localizedDescription]];
-        [self notifyLoadFailure:self.deferredError];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self notifyLoadFailure:self.deferredError];
+        });
         return;
     }
     
     // Check if SDK is initialized
     if (![[CloudXCore shared] isInitialized]) {
         self.pendingLoadRequestCount++;
-        [self.logger info:[NSString stringWithFormat:@"SDK not yet initialized, queuing load request #%lu for placement: %@", (unsigned long)self.pendingLoadRequestCount, self.placementID]];
+        [self.logger info:[NSString stringWithFormat:@"SDK not yet initialized, queuing load request #%lu for placement: %@", (unsigned long)self.pendingLoadRequestCount, self.requestedPlacementName ?: self.placementID]];
         return;
     }
     
@@ -257,13 +267,14 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 // Internal method to actually perform the load operation
 - (void)performLoad {
-    // Check if we need to look up the real placement config (temporary config has empty ID)
-    if ([self.placementID length] == 0 && [[CloudXCore shared] isInitialized]) {
-        // SDK is now initialized - look up the real placement config using public API
-        CLXSDKConfigPlacement *realPlacement = [[CloudXCore shared] placementConfigForName:self.placementName];
+    // Check if we need to complete deferred initialization (bidAdSource is nil)
+    if (!self.bidAdSource && self.requestedPlacementName && [[CloudXCore shared] isInitialized]) {
+        // SDK is now initialized - complete initialization with real placement config
+        CLXSDKConfigPlacement *realPlacement = [[CloudXCore shared] placementConfigForName:self.requestedPlacementName];
         if (realPlacement) {
-            [self.logger debug:[NSString stringWithFormat:@"Updating placement config for: %@ (ID: %@)", self.placementName, realPlacement.id]];
+            [self.logger debug:[NSString stringWithFormat:@"Completing deferred initialization for: %@ (ID: %@)", self.requestedPlacementName, realPlacement.id]];
             _placementID = realPlacement.id;
+            _placementName = realPlacement.name;
             
             // Create impression model now that SDK is initialized (ensures app.id is populated)
             NSString *auctionID = [[NSUUID UUID] UUIDString];
@@ -273,11 +284,43 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
             } else {
                 [self.logger error:@"Failed to create impression model after SDK init"];
             }
+            
+            // Create bid source now
+            BOOL hasCloseButton = realPlacement.hasCloseButton ?: NO;
+            NSDictionary<NSString *, id<CLXBidTokenSource>> *bidTokenSources = self.adFactories.bidTokenSources;
+            
+            __weak typeof(self) weakSelf = self;
+            self.bidAdSource = [[CLXBidAdSource alloc] initWithUserID:self.userID
+                                                          placementID:_placementID
+                                                               dealID:realPlacement.dealId
+                                                        hasCloseButton:hasCloseButton
+                                                          publisherID:@""
+                                                               adType:[self adType]
+                                                       bidTokenSources:bidTokenSources
+                                                nativeAdRequirements:nil
+                                                                 tmax:nil
+                                                      reportingService:self.reportingService
+                                                          createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) {
+                    return nil;
+                }
+                
+                return [strongSelf createAdapterWithAdId:adId
+                                                   bidId:bidId
+                                                     adm:adm
+                                           adapterExtras:adapterExtras
+                                                    burl:burl
+                                                 network:network];
+            }];
+            
+            // Clear the requested placement name since initialization is complete
+            self.requestedPlacementName = nil;
         } else {
-            [self.logger error:[NSString stringWithFormat:@"Placement not found after SDK init: %@", self.placementName]];
+            [self.logger error:[NSString stringWithFormat:@"Placement not found after SDK init: %@", self.requestedPlacementName]];
             NSError *error = [NSError errorWithDomain:@"CLXErrorDomain"
                                                 code:-1
-                                            userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Placement not found: %@", self.placementName]}];
+                                            userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Placement not found: %@", self.requestedPlacementName]}];
             [self handleBidResponse:nil error:error];
             return;
         }

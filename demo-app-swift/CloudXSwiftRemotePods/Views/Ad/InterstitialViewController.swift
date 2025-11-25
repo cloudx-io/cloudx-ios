@@ -103,6 +103,19 @@ class InterstitialViewController: BaseAdViewController {
         }
     }
     
+    // TEMP: For testing deferred initialization flow
+    @objc private func initSDK() {
+        let config = CLXDemoConfigManager.sharedManager.currentConfig
+        DemoAppLogger.sharedInstance.logMessage("🧪 Manually initializing SDK (production)...")
+        cloudX.initializeSDK(appKey: config.appKey) { success, error in
+            if success {
+                DemoAppLogger.sharedInstance.logMessage("✅ SDK initialized successfully")
+            } else {
+                DemoAppLogger.sharedInstance.logMessage("❌ SDK init failed: \(error?.localizedDescription ?? "unknown")")
+            }
+        }
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         resetAdState()

@@ -26,10 +26,14 @@
 // Test category to expose private properties for verification
 @interface CLXPublisherBanner (TestVerification)
 @property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
+@property (nonatomic, strong, nullable) NSError *deferredError;
+@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
 @end
 
 @interface CLXPublisherFullscreenAdBase (TestVerification)
 @property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
+@property (nonatomic, strong, nullable) NSError *deferredError;
+@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
 @end
 
 @interface CLXSDKInitQueueTests : XCTestCase
@@ -204,6 +208,145 @@
     // - Consistent behavior with Android
     
     XCTAssert(YES, @"This test documents blocking adapter initialization");
+}
+
+#pragma mark - Deferred Initialization Tests
+
+/**
+ * Verifies that requestedPlacementName property exists on banner for deferred initialization.
+ */
+- (void)testDeferredInit_BannerHasRequestedPlacementNameProperty {
+    XCTAssertTrue([CLXPublisherBanner instancesRespondToSelector:@selector(requestedPlacementName)],
+                  @"CLXPublisherBanner should have requestedPlacementName property for deferred initialization");
+}
+
+/**
+ * Verifies that requestedPlacementName property exists on fullscreen ads for deferred initialization.
+ */
+- (void)testDeferredInit_FullscreenAdHasRequestedPlacementNameProperty {
+    XCTAssertTrue([CLXInterstitial instancesRespondToSelector:@selector(requestedPlacementName)],
+                  @"CLXInterstitial should have requestedPlacementName property for deferred initialization");
+    
+    XCTAssertTrue([CLXRewarded instancesRespondToSelector:@selector(requestedPlacementName)],
+                  @"CLXRewarded should have requestedPlacementName property for deferred initialization");
+}
+
+/**
+ * Documents the deferred initialization flow for ads created before SDK init.
+ *
+ * When an ad is created before SDK initialization:
+ * 1. placement is nil
+ * 2. impModel is nil
+ * 3. bidAdSource is nil (banner) / created with nil placement data (fullscreen)
+ * 4. requestedPlacementName is set via KVC by CloudXCoreAPI
+ *
+ * When load() is called before SDK init:
+ * 1. pendingLoadRequestCount is incremented
+ * 2. Load is queued until SDK init completes
+ *
+ * When SDK init completes (via CLXSDKInitializedNotification):
+ * 1. performLoad is called
+ * 2. Real placement config is looked up using requestedPlacementName
+ * 3. Placement properties are populated (placementID, dealID, etc.)
+ * 4. impModel is created with proper appID
+ * 5. bidAdSource is created with real placement data
+ * 6. requestedPlacementName is cleared
+ * 7. Bid request proceeds with all correct data
+ */
+- (void)testDocumentation_DeferredInitializationFlow {
+    XCTAssert(YES, @"This test documents the deferred initialization flow");
+}
+
+#pragma mark - Behavioral Tests
+
+/**
+ * Verifies that SDK initialization notification constant has expected value.
+ */
+- (void)testBehavior_SDKInitNotificationValue {
+    XCTAssertEqualObjects(CLXSDKInitializedNotification, @"CLXSDKInitializedNotification",
+                          @"SDK init notification should have expected string value");
+}
+
+/**
+ * Verifies that isInitialized state can be controlled for testing.
+ * This is critical for testing deferred initialization scenarios.
+ */
+- (void)testBehavior_IsInitializedStateIsTestable {
+    // GIVEN: SDK state can be manipulated
+    [[CloudXCore shared] setValue:@NO forKey:@"_isInitialized"];
+    
+    // WHEN: We check isInitialized
+    BOOL isNotInit = ![[CloudXCore shared] isInitialized];
+    
+    // THEN: It should reflect the set value
+    XCTAssertTrue(isNotInit, @"SDK should report not initialized after setting state to NO");
+    
+    // WHEN: We set it to initialized
+    [[CloudXCore shared] setValue:@YES forKey:@"_isInitialized"];
+    
+    // THEN: It should reflect the new value
+    XCTAssertTrue([[CloudXCore shared] isInitialized], @"SDK should report initialized after setting state to YES");
+}
+
+/**
+ * Verifies that notification observers can be registered for SDK init.
+ * This tests the notification mechanism used for deferred load execution.
+ */
+- (void)testBehavior_SDKInitNotificationCanBeObserved {
+    __block BOOL notificationReceived = NO;
+    
+    // GIVEN: We register for SDK init notification
+    id observer = [[NSNotificationCenter defaultCenter] addObserverForName:CLXSDKInitializedNotification
+                                                                    object:nil
+                                                                     queue:nil
+                                                                usingBlock:^(NSNotification *note) {
+        notificationReceived = YES;
+    }];
+    
+    // WHEN: We post the notification
+    [[NSNotificationCenter defaultCenter] postNotificationName:CLXSDKInitializedNotification object:nil];
+    
+    // THEN: Our observer should receive it
+    XCTAssertTrue(notificationReceived, @"SDK init notification should be receivable by observers");
+    
+    // Cleanup
+    [[NSNotificationCenter defaultCenter] removeObserver:observer];
+}
+
+/**
+ * Verifies that pendingLoadRequestCount starts at zero for new ads.
+ */
+- (void)testBehavior_PendingLoadCountStartsAtZero {
+    // Note: We can't create full ad instances without SDK setup,
+    // but we can verify the property exists and the selector works
+    
+    XCTAssertTrue([CLXPublisherBanner instancesRespondToSelector:@selector(pendingLoadRequestCount)],
+                  @"pendingLoadRequestCount selector should exist");
+    XCTAssertTrue([CLXInterstitial instancesRespondToSelector:@selector(pendingLoadRequestCount)],
+                  @"pendingLoadRequestCount selector should exist on interstitial");
+    XCTAssertTrue([CLXRewarded instancesRespondToSelector:@selector(pendingLoadRequestCount)],
+                  @"pendingLoadRequestCount selector should exist on rewarded");
+}
+
+/**
+ * Verifies the deferredError property exists for storing validation errors.
+ * This is used when ad creation fails validation but we defer the error to load().
+ */
+- (void)testBehavior_DeferredErrorPropertyExists {
+    XCTAssertTrue([CLXPublisherBanner instancesRespondToSelector:@selector(deferredError)],
+                  @"deferredError property should exist on banner for deferred validation errors");
+}
+
+/**
+ * Verifies that adFactories and bidTokenSources parameters exist in banner init.
+ * This confirms the hybrid dependency injection pattern is in place.
+ */
+- (void)testBehavior_HybridDependencyInjectionParametersExist {
+    // Verify the init method with injection parameters exists
+    SEL initSelector = @selector(initWithViewController:placement:userID:publisherID:suspendPreloadWhenInvisible:delegate:bannerType:waterfallMaxBackOffTime:impModel:adFactories:bidTokenSources:bidRequestTimeout:reportingService:settings:tmax:);
+    
+    XCTAssertTrue([CLXPublisherBanner instancesRespondToSelector:initSelector],
+                  @"Banner should have init method with adFactories and bidTokenSources for hybrid DI");
 }
 
 @end

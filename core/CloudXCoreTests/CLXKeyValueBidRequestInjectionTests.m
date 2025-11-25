@@ -237,6 +237,31 @@
                   @"EIDs should be cleared when privacy denies");
 }
 
+/**
+ * Verifies that atype field in EIDs is serialized as an integer per OpenRTB 2.5 spec.
+ * The atype value of 3 indicates "third-party authenticated" identity type.
+ */
+- (void)testHashedUserId_AtypeIsIntegerNotString {
+    self.kvState.hashedUserId = @"hashed-test123";
+    self.mockPrivacyService.shouldClearPersonalData = NO;
+    
+    CLXBiddingConfigRequest *config = [self createTestBiddingConfig];
+    NSDictionary *json = [config json];
+    
+    NSArray *eids = json[@"user"][@"ext"][@"eids"];
+    XCTAssertNotNil(eids, @"EIDs should exist when privacy allows");
+    XCTAssertGreaterThan(eids.count, 0, @"Should have at least one EID entry");
+    
+    NSDictionary *uid = eids[0][@"uids"][0];
+    XCTAssertNotNil(uid, @"UIDs entry should exist");
+    
+    id atype = uid[@"atype"];
+    XCTAssertNotNil(atype, @"atype should be present");
+    XCTAssertTrue([atype isKindOfClass:[NSNumber class]], 
+                  @"atype should be NSNumber (integer), not NSString per OpenRTB 2.5 spec");
+    XCTAssertEqualObjects(atype, @3, @"atype should be 3 (third-party authenticated)");
+}
+
 #pragma mark - No Key-Values Set Tests
 
 - (void)testNoKeyValuesSet_NoInjection {

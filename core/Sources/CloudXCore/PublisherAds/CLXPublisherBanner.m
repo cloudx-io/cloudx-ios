@@ -46,6 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Private category to access internal SDK methods (framework-internal only, not exposed in public API)
 @interface CloudXCore (Internal)
+@property (nonatomic, strong, readonly) CLXAdNetworkFactories *adNetworkFactories;
 - (nullable CLXConfigImpressionModel *)createImpModelWithAuctionID:(NSString *)auctionID;
 @end
 
@@ -63,7 +64,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Private properties
 @property (nonatomic, strong, nullable) id<CLXBidAdSourceProtocol> bidAdSource;
-@property (nonatomic, strong) NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *adFactories;
 @property (nonatomic, weak, nullable) UIViewController *viewController;
 @property (nonatomic, strong, nullable) CLXBidAdSourceResponse *lastBidResponse;
 @property (nonatomic, strong, nullable) CLXBidResponse *currentBidResponse;
@@ -91,9 +91,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *placementSuffix;
 @property (nonatomic, assign) NSInteger impressionIndexStart;
 @property (nonatomic, assign) NSInteger impressionIndexEnd;
-@property (nonatomic, strong) CLXSDKConfigPlacement *placement;
-@property (nonatomic, strong) CLXConfigImpressionModel *impModel;
+@property (nonatomic, strong, nullable) CLXSDKConfigPlacement *placement;
+@property (nonatomic, strong, nullable) CLXConfigImpressionModel *impModel;
 @property (nonatomic, strong, nullable) NSNumber *tmax;
+@property (nonatomic, copy, nullable) NSString *requestedPlacementName; // Stored for deferred initialization
 
 // Store the last bid request error to preserve detailed server messages
 @property (nonatomic, strong, nullable) NSError *lastBidError;
@@ -109,6 +110,10 @@ NS_ASSUME_NONNULL_BEGIN
 // Deferred error (set during create if validation fails)
 @property (nonatomic, strong, nullable) NSError *deferredError;
 
+// Injected factories for testability (falls back to CloudXCore if empty)
+@property (nonatomic, strong) NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *adFactories;
+@property (nonatomic, strong) NSDictionary<NSString *, id<CLXBidTokenSource>> *bidTokenSources;
+
 @end
 
 @implementation CLXPublisherBanner
@@ -118,14 +123,14 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Initialization
 
 - (instancetype)initWithViewController:(UIViewController *)viewController
-                             placement:(CLXSDKConfigPlacement *)placement
+                             placement:(nullable CLXSDKConfigPlacement *)placement
                                 userID:(NSString *)userID
                            publisherID:(NSString *)publisherID
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
                                delegate:(nullable id<CLXBannerDelegate>)delegate
                              bannerType:(CLXBannerType)bannerType
                    waterfallMaxBackOffTime:(NSTimeInterval)waterfallMaxBackOffTime
-                                  impModel:(CLXConfigImpressionModel *)impModel
+                                  impModel:(nullable CLXConfigImpressionModel *)impModel
                               adFactories:(NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *)adFactories
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
@@ -139,18 +144,34 @@ NS_ASSUME_NONNULL_BEGIN
         _suspendPreloadWhenInvisible = suspendPreloadWhenInvisible;
         _delegate = delegate;
         _bannerType = bannerType;
-        _adFactories = [adFactories copy];
         _viewController = viewController;
-        _refreshSeconds = (placement.bannerRefreshRateMs ?: 10000) / 1000.0;
-        _placementID = [placement.id copy];
-        _placementName = [placement.name copy];
-        _dealID = [placement.dealId copy];
+        _adFactories = [adFactories copy];
+        _bidTokenSources = [bidTokenSources copy];
+        
+        // Initialize from placement config if available, otherwise defer
+        if (placement) {
+            _refreshSeconds = (placement.bannerRefreshRateMs ?: 10000) / 1000.0;
+            _placementID = [placement.id copy];
+            _placementName = [placement.name copy];
+            _dealID = [placement.dealId copy];
+            _placement = placement;
+            _placementSuffix = [placement.firstImpressionPlacementSuffix ?: @"" copy];
+            _impressionIndexStart = placement.firstImpressionLoopIndexStart ?: 0;
+            _impressionIndexEnd = placement.firstImpressionLoopIndexEnd ?: 0;
+        } else {
+            // SDK not initialized - set defaults, real values will be populated in performLoad
+            _refreshSeconds = 30.0; // Default refresh
+            _placementID = nil;
+            _placementName = nil; // Will be set via KVC
+            _dealID = nil;
+            _placement = nil;
+            _placementSuffix = @"";
+            _impressionIndexStart = 0;
+            _impressionIndexEnd = 0;
+        }
+        
         _reportingService = reportingService;
         _impModel = impModel;
-        _placement = placement;
-        _placementSuffix = [placement.firstImpressionPlacementSuffix ?: @"" copy];
-        _impressionIndexStart = placement.firstImpressionLoopIndexStart ?: 0;
-        _impressionIndexEnd = placement.firstImpressionLoopIndexEnd ?: 0;
         _isReady = NO;
         _isLoading = NO;
         _isDestroyed = NO;
@@ -191,32 +212,14 @@ NS_ASSUME_NONNULL_BEGIN
                                                                                  appKey:appKey
                                                                                     url:metricsURL];
         
-        // Initialize bid ad source
-        BOOL hasCloseButton = placement.hasCloseButton ?: NO;
-        NSInteger adType = (bannerType == CLXBannerTypeW320H50) ? CLXAdTypeBanner : CLXAdTypeMrec;
-        
-        __weak typeof(self) weakSelf = self;
-        _bidAdSource = [[CLXBidAdSource alloc] initWithUserID:userID
-                                               placementID:_placementID
-                                                    dealID:_dealID
-                                             hasCloseButton:hasCloseButton
-                                               publisherID:publisherID
-                                                   adType:adType
-                                           bidTokenSources:bidTokenSources
-                                    nativeAdRequirements:nil
-                                                     tmax:_tmax
-                                          reportingService:_reportingService
-                                               createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            if (!strongSelf) return nil;
-            return [strongSelf createBannerInstanceWithAdId:adId
-                                                      bidId:bidId
-                                                         adm:adm
-                                               adapterExtras:adapterExtras
-                                                        burl:burl
-                                              hasClosedButton:hasCloseButton
-                                                      network:network];
-        }];
+        // Initialize bid ad source only if placement is available
+        if (placement) {
+            _bidAdSource = [self createBidAdSourceForPlacement:placement];
+        } else {
+            // SDK not initialized - bid source will be created in performLoad
+            _bidAdSource = nil;
+            [_logger debug:@"Deferring bid source creation until SDK initialization"];
+        }
         
         [_logger debug:[NSString stringWithFormat:@"Initialized PublisherBanner for placement: %@", _placementID]];
     }
@@ -234,16 +237,18 @@ NS_ASSUME_NONNULL_BEGIN
     // Check for deferred error from create method
     if (self.deferredError) {
         [self.logger error:[NSString stringWithFormat:@"Banner creation failed with deferred error: %@", self.deferredError.localizedDescription]];
-        if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
-            [self.delegate didFailToLoadAdWithError:self.deferredError];
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+                [self.delegate didFailToLoadAdWithError:self.deferredError];
+            }
+        });
         return;
     }
     
     // Check if SDK is initialized
     if (![[CloudXCore shared] isInitialized]) {
         self.pendingLoadRequestCount++;
-        [self.logger info:[NSString stringWithFormat:@"SDK not yet initialized, queuing load request #%lu for placement: %@", (unsigned long)self.pendingLoadRequestCount, self.placementID]];
+        [self.logger info:[NSString stringWithFormat:@"SDK not yet initialized, queuing load request #%lu for placement: %@", (unsigned long)self.pendingLoadRequestCount, self.requestedPlacementName ?: self.placementID]];
         return;
     }
     
@@ -253,14 +258,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Internal method to actually perform the load operation
 - (void)performLoad {
-    // Check if we need to look up the real placement config (temporary config has empty ID)
-    if ([self.placementID length] == 0 && [[CloudXCore shared] isInitialized]) {
-        // SDK is now initialized - look up the real placement config using public API
-        CLXSDKConfigPlacement *realPlacement = [[CloudXCore shared] placementConfigForName:self.placementName];
+    // Check if we need to complete deferred initialization (bidAdSource is nil)
+    if (!self.bidAdSource && self.requestedPlacementName && [[CloudXCore shared] isInitialized]) {
+        // SDK is now initialized - complete initialization with real placement config
+        CLXSDKConfigPlacement *realPlacement = [[CloudXCore shared] placementConfigForName:self.requestedPlacementName];
         if (realPlacement) {
-            [self.logger debug:[NSString stringWithFormat:@"Updating placement config for: %@ (ID: %@)", self.placementName, realPlacement.id]];
+            [self.logger debug:[NSString stringWithFormat:@"Completing deferred initialization for: %@ (ID: %@)", self.requestedPlacementName, realPlacement.id]];
+            
             self.placement = realPlacement;
             self.placementID = realPlacement.id;
+            self.placementName = realPlacement.name;
             self.dealID = realPlacement.dealId;
             self.refreshSeconds = (realPlacement.bannerRefreshRateMs ?: 30000) / 1000.0;
             self.placementSuffix = realPlacement.firstImpressionPlacementSuffix ?: @"";
@@ -275,12 +282,18 @@ NS_ASSUME_NONNULL_BEGIN
             } else {
                 [self.logger error:@"Failed to create impression model after SDK initialization"];
             }
+            
+            // Create bid source now that we have real placement data
+            self.bidAdSource = [self createBidAdSourceForPlacement:realPlacement];
+            
+            // Clear the requested placement name since initialization is complete
+            self.requestedPlacementName = nil;
         } else {
-            [self.logger error:[NSString stringWithFormat:@"Placement not found after SDK init: %@", self.placementName]];
+            [self.logger error:[NSString stringWithFormat:@"Placement not found after SDK init: %@", self.requestedPlacementName]];
             if (self.delegate && [self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
                 NSError *error = [NSError errorWithDomain:@"CLXErrorDomain"
                                                     code:-1
-                                                userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Placement not found: %@", self.placementName]}];
+                                                userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Placement not found: %@", self.requestedPlacementName]}];
                 [self.delegate didFailToLoadAdWithError:error];
             }
             return;
@@ -343,6 +356,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     // Use placement ID directly as stored impression ID
     NSString *storedImpressionId = self.placementID;
+
     // Request bid from bid ad source
     __weak typeof(self) weakSelf = self;
     [self.bidAdSource requestBidWithAdUnitID:self.placementID
@@ -461,6 +475,50 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
+- (CLXBidAdSource *)createBidAdSourceForPlacement:(CLXSDKConfigPlacement *)placement {
+    BOOL hasCloseButton = placement.hasCloseButton ?: NO;
+    NSInteger adType = (self.bannerType == CLXBannerTypeW320H50) ? CLXAdTypeBanner : CLXAdTypeMrec;
+    
+    // Use injected bidTokenSources if populated (for testability), otherwise fetch from CloudXCore
+    NSDictionary<NSString *, id<CLXBidTokenSource>> *bidTokenSources = self.bidTokenSources;
+    if (!bidTokenSources || bidTokenSources.count == 0) {
+        // Fallback to CloudXCore for deferred init case or when not injected
+        bidTokenSources = [[CloudXCore shared] adNetworkFactories].bidTokenSources;
+    }
+    
+    // These fields are always empty strings in CloudX implementation
+    NSString *userID = @"";
+    NSString *publisherID = @"";
+    
+    // Warn if bidTokenSources is still missing after fallback
+    if (!bidTokenSources || bidTokenSources.count == 0) {
+        [self.logger error:@"bidTokenSources is nil or empty - SDK may not be fully initialized"];
+    }
+    
+    __weak typeof(self) weakSelf = self;
+    return [[CLXBidAdSource alloc] initWithUserID:userID
+                                       placementID:self.placementID
+                                            dealID:self.dealID
+                                     hasCloseButton:hasCloseButton
+                                       publisherID:publisherID
+                                            adType:adType
+                                   bidTokenSources:bidTokenSources
+                            nativeAdRequirements:nil
+                                              tmax:self.tmax
+                                  reportingService:self.reportingService
+                                       createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return nil;
+        return [strongSelf createBannerInstanceWithAdId:adId
+                                                  bidId:bidId
+                                                     adm:adm
+                                           adapterExtras:adapterExtras
+                                                    burl:burl
+                                          hasClosedButton:hasCloseButton
+                                                  network:network];
+    }];
+}
+
 - (nullable id<CLXAdapterBanner>)createBannerInstanceWithAdId:(NSString *)adId
                                                            bidId:(NSString *)bidId
                                                               adm:(NSString *)adm
@@ -470,7 +528,12 @@ NS_ASSUME_NONNULL_BEGIN
                                                            network:(NSString *)network {
     [self.logger debug:[NSString stringWithFormat:@"Creating banner instance - AdID: %@, BidID: %@, Network: %@", adId, bidId, network]];
     
+    // Use injected adFactories if populated (for testability), otherwise fetch from CloudXCore
     id<CLXAdapterBannerFactory> factory = self.adFactories[network];
+    if (!factory) {
+        // Fallback to CloudXCore for deferred init case or when not injected
+        factory = [[CloudXCore shared] adNetworkFactories].banners[network];
+    }
     if (!factory) {
         [self.logger error:[NSString stringWithFormat:@"No factory found for network: %@", network]];
         return nil;

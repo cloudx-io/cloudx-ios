@@ -78,6 +78,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Queued load request handling (for SDK init race condition)
 @property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
 
+// Store requested placement name for deferred initialization
+@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+
 @end
 
 @implementation CLXPublisherNative
@@ -190,7 +193,7 @@ NS_ASSUME_NONNULL_BEGIN
     // Check if SDK is initialized
     if (![[CloudXCore shared] isInitialized]) {
         self.pendingLoadRequestCount++;
-        [self.logger info:[NSString stringWithFormat:@"SDK not yet initialized, queuing load request #%lu for placement: %@", (unsigned long)self.pendingLoadRequestCount, self.placementID]];
+        [self.logger info:[NSString stringWithFormat:@"SDK not yet initialized, queuing load request #%lu for placement: %@", (unsigned long)self.pendingLoadRequestCount, self.requestedPlacementName ?: self.placementID]];
         return;
     }
     
