@@ -78,7 +78,8 @@
         }
         
         [self updateStatusUIWithState:AdStateLoading];
-        [[CloudXCore shared] initializeSDKWithAppKey:appKey completion:^(BOOL success, NSError * _Nullable error) {
+        // Production demo app - use testMode:NO for real ads
+        [[CloudXCore shared] initializeSDKWithAppKey:appKey testMode:NO completion:^(BOOL success, CLXError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (success) {
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"cloudXSDKInitialized" object:nil];
