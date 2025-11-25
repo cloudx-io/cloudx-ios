@@ -66,7 +66,7 @@ Detailed guides for every step:
 - **AI-Optimized Yield** - Intelligent ad selection maximizes your revenue
 - **Multiple Ad Formats** - Banner, MREC, interstitial, and rewarded video
 - **Real-Time Bidding** - Server-side header bidding with dynamic optimization
-- **Privacy First** - GDPR, CCPA, COPPA, and ATT compliant out of the box
+- **Privacy First** - GDPR, CCPA, and ATT compliant out of the box
 - **SwiftUI Ready** - Works seamlessly with UIKit and SwiftUI
 - **Lightning Fast** - Optimized for performance and user experience
 

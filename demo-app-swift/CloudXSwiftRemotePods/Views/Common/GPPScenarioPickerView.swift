@@ -53,12 +53,9 @@
 //     4. CCPA Opt-Out (.YA) - User opted out
 //     5. Non-US (Germany) - EU privacy (GDPR)
 //     6. US Non-California (NY) - US-National GPP
-//     7. ⭐️ COPPA Flagged - Age-restricted users
-//     8. ⭐️ COPPA + GPP Consent - Tests COPPA precedence
-//     9. ⭐️ ATT Denied - iOS tracking disabled (requires Settings config)
+//     7. ⭐️ ATT Denied - iOS tracking disabled (requires Settings config)
 //
 //  🎯 Privacy Compliance Testing:
-//     - COPPA (Children's Online Privacy Protection Act)
 //     - CCPA (California Consumer Privacy Act)
 //     - GPP (Global Privacy Platform - US-CA, US-National, EU)
 //     - ATT (App Tracking Transparency)
@@ -76,7 +73,6 @@
 //  - IABGPP_GppSID - IAB GPP Section ID (7=US-National, 8=US-CA/EU)
 //  
 //  Also calls CloudXCore public APIs for other privacy settings:
-//  - setIsAgeRestrictedUser: - Enables COPPA compliance
 //  - setIsUserConsent: - Sets user consent flag
 //  - setIsDoNotSell: - Sets CCPA do-not-sell flag
 //  
@@ -95,8 +91,6 @@ enum GPPTestScenario: Int {
     case ccpaOptOut                     // CCPA opt-out (.YA)
     case nonUS                          // EU/Germany (GDPR)
     case usNonCalifornia                // US non-CA (Oregon, NY, etc)
-    case coppaFlagged                   // COPPA age-restricted
-    case coppaWithConsent               // COPPA + GPP consent (precedence test)
     case attDenied                      // ATT tracking disabled
 }
 
@@ -194,8 +188,6 @@ class GPPScenarioPickerView: UIView {
         addScenarioAction(to: alert, scenario: .ccpaOptOut, title: "CCPA Opt-Out (.YA)", subtitle: "User opted out")
         addScenarioAction(to: alert, scenario: .nonUS, title: "Non-US (Germany)", subtitle: "Outside US jurisdiction")
         addScenarioAction(to: alert, scenario: .usNonCalifornia, title: "US Non-California (NY)", subtitle: "US but not CA")
-        addScenarioAction(to: alert, scenario: .coppaFlagged, title: "⭐️ COPPA Flagged", subtitle: "Age-restricted user")
-        addScenarioAction(to: alert, scenario: .coppaWithConsent, title: "⭐️ COPPA + GPP Consent", subtitle: "COPPA should win")
         addScenarioAction(to: alert, scenario: .attDenied, title: "⭐️ ATT Denied", subtitle: "Tracking disabled in iOS Settings")
         
         // Cancel action
@@ -283,18 +275,6 @@ class GPPScenarioPickerView: UIView {
             setIABGPPString("DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA")
             setIABGPPSid(dynamicGPPSid())  // Dynamic based on real location
             
-        case .coppaFlagged:
-            DemoAppLogger.sharedInstance.logMessage("🧪 GPP Scenario: COPPA Flagged - AUTO-DETECTING LOCATION")
-            CloudXCore.setIsAgeRestrictedUser(true)
-            setIABGPPString("DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA")
-            setIABGPPSid(dynamicGPPSid())  // Dynamic based on real location
-            
-        case .coppaWithConsent:
-            DemoAppLogger.sharedInstance.logMessage("🧪 GPP Scenario: COPPA + GPP Consent - AUTO-DETECTING LOCATION")
-            CloudXCore.setIsAgeRestrictedUser(true)
-            setIABGPPString("DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA")
-            setIABGPPSid(dynamicGPPSid())  // Dynamic based on real location
-            
         case .attDenied:
             DemoAppLogger.sharedInstance.logMessage("🧪 GPP Scenario: ATT Denied (real geo data from CloudFront API)")
             DemoAppLogger.sharedInstance.logMessage("⚠️ To test: Go to iOS Settings → Privacy & Security → Tracking → Disable for this app")
@@ -329,7 +309,6 @@ class GPPScenarioPickerView: UIView {
         UserDefaults.standard.synchronize()
         
         // Clear CloudX privacy settings (public APIs that still exist)
-        CloudXCore.setIsAgeRestrictedUser(false)
         CloudXCore.setIsUserConsent(true)
         CloudXCore.setIsDoNotSell(false)
     }
