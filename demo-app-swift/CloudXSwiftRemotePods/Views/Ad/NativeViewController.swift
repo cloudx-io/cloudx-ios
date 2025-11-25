@@ -164,7 +164,7 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
         // Don't auto-show - user must press Show Native button
     }
     
-    func didFailToLoadAd(error: Error) {
+    func didFailToLoadAd(error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
         DemoAppLogger.sharedInstance.logMessage("❌ Native failed to load - Error: \(error.localizedDescription)")
         
@@ -179,7 +179,7 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
         DemoAppLogger.sharedInstance.logAdEvent("👀 Native didDisplayAd", ad: ad)
     }
     
-    func didFailToDisplay(_ ad: CLXAd, error: Error) {
+    func didFailToDisplay(_ ad: CLXAd, error: CLXError) {
         DemoAppLogger.sharedInstance.logAdEvent("❌ Native didFailToDisplayAd", ad: ad)
         
         DispatchQueue.main.async { [weak self] in

@@ -172,7 +172,7 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
         }
     }
     
-    func didFailToLoadAd(error: Error) {
+    func didFailToLoadAd(error: CLXError) {
         DemoAppLogger.sharedInstance.logMessage("❌ NativeBanner didFailToLoadAd - Error: \(error.localizedDescription)")
         
         DispatchQueue.main.async { [weak self] in
@@ -186,7 +186,7 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
         DemoAppLogger.sharedInstance.logAdEvent("👀 NativeBanner didDisplayAd", ad: ad)
     }
     
-    func didFailToDisplay(_ ad: CLXAd, error: Error) {
+    func didFailToDisplay(_ ad: CLXAd, error: CLXError) {
         DemoAppLogger.sharedInstance.logMessage("❌ NativeBanner didFailToDisplayAd - Error: \(error.localizedDescription)")
         
         DispatchQueue.main.async { [weak self] in

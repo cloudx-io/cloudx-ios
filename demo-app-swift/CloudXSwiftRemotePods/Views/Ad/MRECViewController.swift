@@ -105,19 +105,6 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         mrecAd.load()
     }
     
-    // TEMP: For testing deferred initialization flow
-    @objc private func initSDK() {
-        let config = CLXDemoConfigManager.sharedManager.currentConfig
-        DemoAppLogger.sharedInstance.logMessage("🧪 Manually initializing SDK (production)...")
-        CloudXCore.shared.initializeSDK(appKey: config.appKey) { success, error in
-            if success {
-                DemoAppLogger.sharedInstance.logMessage("✅ SDK initialized successfully")
-            } else {
-                DemoAppLogger.sharedInstance.logMessage("❌ SDK init failed: \(error?.localizedDescription ?? "unknown")")
-            }
-        }
-    }
-    
     private func createAndAddMRECToView() {
         guard mrecAd == nil else { return }
         
@@ -216,7 +203,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         // Don't auto-show - user must press Show MREC button
     }
     
-    func didFailToLoadAd(error: Error) {
+    func didFailToLoadAd(error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
         DemoAppLogger.sharedInstance.logMessage("❌ MREC failed to load - Error: \(error.localizedDescription)")
         isLoading = false
@@ -231,7 +218,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         DemoAppLogger.sharedInstance.logAdEvent("👀 MREC didDisplayAd", ad: ad)
     }
     
-    func didFailToDisplay(_ ad: CLXAd, error: Error) {
+    func didFailToDisplay(_ ad: CLXAd, error: CLXError) {
         DemoAppLogger.sharedInstance.logAdEvent("❌ MREC didFailToDisplayAd", ad: ad)
         
         DispatchQueue.main.async { [weak self] in

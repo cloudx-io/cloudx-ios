@@ -10,7 +10,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Loss reasons following OpenRTB standard - matching Android LossReason enum
+ * Loss reasons following OpenRTB standard
  * See: OpenRTB 2.5+ specification for standard loss reason codes
  */
 typedef NS_ENUM(NSInteger, CLXLossReason) {
@@ -137,6 +137,16 @@ extern NSString * const CLXErrorDomain;
 + (instancetype)errorWithCode:(CLXErrorCode)code description:(NSString *)description;
 
 /**
+ * Creates an error with the specified CloudX error code, description, and underlying error
+ * @param code The CloudX error code
+ * @param description Custom error description
+ * @param underlyingError The original error that caused this error (optional)
+ * @return A new CLXError instance
+ * @discussion Use this to preserve the root cause error chain for debugging
+ */
++ (instancetype)errorWithCode:(CLXErrorCode)code description:(NSString *)description underlyingError:(nullable NSError *)underlyingError;
+
+/**
  * Creates an error with appropriate CloudX error code based on HTTP status code
  * @param httpStatusCode The HTTP status code from server response
  * @return A new CLXError instance with appropriate error code and description
@@ -173,6 +183,13 @@ extern NSString * const CLXErrorDomain;
  * @return An initialized CLXError instance
  */
 - (instancetype)initWithCode:(CLXErrorCode)code userInfo:(nullable NSDictionary *)userInfo;
+
+/**
+ * The underlying error that caused this error, if any
+ * @return The original error or nil if none was provided
+ * @discussion Accessible via userInfo[NSUnderlyingErrorKey] per standard NSError patterns
+ */
+@property (nonatomic, readonly, nullable) NSError *underlyingError;
 
 @end
 

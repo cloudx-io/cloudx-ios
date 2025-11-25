@@ -170,7 +170,7 @@
     // Don't auto-show - user must press Show Native button
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAdWithError:(CLXError *)error {
     [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Native didFailToLoadAd" ad:nil];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -184,7 +184,7 @@
     [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Native didDisplayAd" ad:ad];
 }
 
-- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
     [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Native didFailToDisplayAd" ad:ad];
     
     dispatch_async(dispatch_get_main_queue(), ^{

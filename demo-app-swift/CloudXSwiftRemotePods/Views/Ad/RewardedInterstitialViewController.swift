@@ -139,7 +139,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         updateStatusUI(state: .ready)
     }
     
-    func didFailToLoadAd(error: Error) {
+    func didFailToLoadAd(error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
         DemoAppLogger.sharedInstance.logMessage("❌ RewardedInterstitial failed to load - Error: \(error.localizedDescription)")
         isLoading = false
@@ -156,7 +156,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         DemoAppLogger.sharedInstance.logAdEvent("👀 RewardedInterstitial didDisplayAd", ad: ad)
     }
     
-    func didFailToDisplay(_ ad: CLXAd, error: Error) {
+    func didFailToDisplay(_ ad: CLXAd, error: CLXError) {
         DemoAppLogger.sharedInstance.logAdEvent("❌ RewardedInterstitial didFailToDisplayAd", ad: ad)
         updateStatusUI(state: .noAd)
         

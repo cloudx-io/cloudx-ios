@@ -165,7 +165,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
         updateStatusUI(state: .ready)
     }
     
-    func didFailToLoadAd(error: Error) {
+    func didFailToLoadAd(error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
         DemoAppLogger.sharedInstance.logMessage("❌ Rewarded failed to load - Error: \(error.localizedDescription)")
         isLoading = false
@@ -182,7 +182,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
         DemoAppLogger.sharedInstance.logAdEvent("👀 Rewarded didDisplayAd", ad: ad)
     }
     
-    func didFailToDisplay(_ ad: CLXAd, error: Error) {
+    func didFailToDisplay(_ ad: CLXAd, error: CLXError) {
         DemoAppLogger.sharedInstance.logAdEvent("❌ Rewarded didFailToDisplayAd", ad: ad)
         updateStatusUI(state: .noAd)
         

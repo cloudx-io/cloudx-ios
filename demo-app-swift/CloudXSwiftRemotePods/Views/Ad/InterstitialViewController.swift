@@ -103,19 +103,6 @@ class InterstitialViewController: BaseAdViewController {
         }
     }
     
-    // TEMP: For testing deferred initialization flow
-    @objc private func initSDK() {
-        let config = CLXDemoConfigManager.sharedManager.currentConfig
-        DemoAppLogger.sharedInstance.logMessage("🧪 Manually initializing SDK (production)...")
-        cloudX.initializeSDK(appKey: config.appKey) { success, error in
-            if success {
-                DemoAppLogger.sharedInstance.logMessage("✅ SDK initialized successfully")
-            } else {
-                DemoAppLogger.sharedInstance.logMessage("❌ SDK init failed: \(error?.localizedDescription ?? "unknown")")
-            }
-        }
-    }
-    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         resetAdState()
@@ -205,7 +192,7 @@ extension InterstitialViewController: CLXInterstitialDelegate {
         // Don't auto-show - wait for user to press Show Interstitial button
     }
     
-    func didFailToLoadAd(error: Error) {
+    func didFailToLoadAd(error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
         DemoAppLogger.sharedInstance.logMessage("❌ Interstitial failed to load - Error: \(error.localizedDescription)")
         isLoading = false
@@ -222,7 +209,7 @@ extension InterstitialViewController: CLXInterstitialDelegate {
         DemoAppLogger.sharedInstance.logAdEvent("👀 Interstitial didDisplayAd", ad: ad)
     }
     
-    func didFailToDisplay(_ ad: CLXAd, error: Error) {
+    func didFailToDisplay(_ ad: CLXAd, error: CLXError) {
         DemoAppLogger.sharedInstance.logAdEvent("❌ Interstitial didFailToDisplayAd", ad: ad)
         updateStatusUI(state: AdState.noAd)
         

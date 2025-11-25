@@ -87,9 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
             [logger error:@"Interstitial load timeout after 30 seconds"];
             [self transitionToIdleState];
             
-            NSError *timeoutError = [NSError errorWithDomain:@"CLXErrorDomain" 
-                                                        code:CLXErrorCodeLoadTimeout 
-                                                    userInfo:@{NSLocalizedDescriptionKey: @"Load timeout"}];
+            CLXError *timeoutError = [CLXError errorWithCode:CLXErrorCodeLoadTimeout];
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self notifyLoadFailure:timeoutError];

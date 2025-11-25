@@ -21,6 +21,14 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
     return [self errorWithCode:code userInfo:@{NSLocalizedDescriptionKey: description}];
 }
 
++ (instancetype)errorWithCode:(CLXErrorCode)code description:(NSString *)description underlyingError:(NSError *)underlyingError {
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:description forKey:NSLocalizedDescriptionKey];
+    if (underlyingError) {
+        userInfo[NSUnderlyingErrorKey] = underlyingError;
+    }
+    return [self errorWithCode:code userInfo:userInfo];
+}
+
 + (instancetype)errorWithHTTPStatusCode:(NSInteger)httpStatusCode {
     return [self errorWithHTTPStatusCode:httpStatusCode serverMessage:nil];
 }
@@ -193,10 +201,21 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
     }
 }
 
+#pragma mark - Properties
+
+- (NSError *)underlyingError {
+    return self.userInfo[NSUnderlyingErrorKey];
+}
+
 #pragma mark - NSObject
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"CLXError: %ld - %@", (long)self.code, self.localizedDescription];
+    NSString *baseDescription = [NSString stringWithFormat:@"CLXError: %ld - %@", (long)self.code, self.localizedDescription];
+    NSError *underlying = self.underlyingError;
+    if (underlying) {
+        return [NSString stringWithFormat:@"%@ (caused by: %@)", baseDescription, underlying.localizedDescription];
+    }
+    return baseDescription;
 }
 
 @end

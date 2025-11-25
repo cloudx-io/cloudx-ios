@@ -291,9 +291,8 @@ NS_ASSUME_NONNULL_BEGIN
         } else {
             [self.logger error:[NSString stringWithFormat:@"Placement not found after SDK init: %@", self.requestedPlacementName]];
             if (self.delegate && [self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
-                NSError *error = [NSError errorWithDomain:@"CLXErrorDomain"
-                                                    code:-1
-                                                userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Placement not found: %@", self.requestedPlacementName]}];
+                CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidPlacement 
+                                              description:[NSString stringWithFormat:@"Placement not found: %@", self.requestedPlacementName]];
                 [self.delegate didFailToLoadAdWithError:error];
             }
             return;

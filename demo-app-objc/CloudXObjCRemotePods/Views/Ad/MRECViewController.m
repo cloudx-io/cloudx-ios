@@ -184,7 +184,7 @@
     // Don't auto-show - user must press Show MREC button
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAdWithError:(CLXError *)error {
     // No ad object exists on failure, so use logMessage instead of logAdEvent
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ MREC failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
     self.isLoading = NO;
@@ -199,7 +199,7 @@
     [[DemoAppLogger sharedInstance] logAdEvent:@"👀 MREC didDisplayAd" ad:ad];
 }
 
-- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
     [[DemoAppLogger sharedInstance] logAdEvent:@"❌ MREC didFailToDisplayAd" ad:ad];
     
     dispatch_async(dispatch_get_main_queue(), ^{

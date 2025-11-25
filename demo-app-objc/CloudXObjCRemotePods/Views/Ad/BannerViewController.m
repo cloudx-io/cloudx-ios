@@ -275,7 +275,7 @@
     // Don't auto-show - user must press Show Banner button
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAdWithError:(CLXError *)error {
     // No ad object exists on failure, so use logMessage instead of logAdEvent
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
     
@@ -293,7 +293,7 @@
     [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Banner didDisplayAd" ad:ad];
 }
 
-- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
     [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Banner didFailToDisplayAd" ad:ad];
     
     self.bannerAd = nil;

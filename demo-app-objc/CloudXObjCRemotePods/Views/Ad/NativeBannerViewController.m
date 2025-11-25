@@ -180,7 +180,7 @@
     });
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAdWithError:(CLXError *)error {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ NativeBanner failToLoadWithAd - Error: %@", error.localizedDescription]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -194,7 +194,7 @@
     [[DemoAppLogger sharedInstance] logAdEvent:@"👀 NativeBanner didDisplayAd" ad:ad];
 }
 
-- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ NativeBanner failToShowWithAd - Error: %@", error.localizedDescription]];
     
     dispatch_async(dispatch_get_main_queue(), ^{

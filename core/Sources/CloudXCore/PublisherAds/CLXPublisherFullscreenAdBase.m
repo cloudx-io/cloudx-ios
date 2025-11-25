@@ -318,9 +318,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
             self.requestedPlacementName = nil;
         } else {
             [self.logger error:[NSString stringWithFormat:@"Placement not found after SDK init: %@", self.requestedPlacementName]];
-            NSError *error = [NSError errorWithDomain:@"CLXErrorDomain"
-                                                code:-1
-                                            userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Placement not found: %@", self.requestedPlacementName]}];
+            CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidPlacement 
+                                          description:[NSString stringWithFormat:@"Placement not found: %@", self.requestedPlacementName]];
             [self handleBidResponse:nil error:error];
             return;
         }
@@ -381,9 +380,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Verify ad is ready before attempting to show
     if (self.currentState != CLXFullscreenAdStateREADY) {
         [self.logger error:[NSString stringWithFormat:@"Cannot show ad - invalid state: %ld", (long)self.currentState]];
-        NSError *error = [NSError errorWithDomain:@"CLXErrorDomain" 
-                                             code:CLXErrorCodeAdNotReady 
-                                         userInfo:@{NSLocalizedDescriptionKey: @"Ad not ready"}];
+        CLXError *error = [CLXError errorWithCode:CLXErrorCodeAdNotReady];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [self notifyShowFailure:error];

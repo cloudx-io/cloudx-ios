@@ -553,9 +553,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSError *delegateError = error;
     if (!delegateError) {
         // Only create a default error if none was provided
-        delegateError = [NSError errorWithDomain:@"CLXErrorDomain"
-                                            code:CLXErrorCodeNoFill
-                                        userInfo:nil];
+        delegateError = [CLXError errorWithCode:CLXErrorCodeNoFill];
     }
     
     if ([self.delegate respondsToSelector:@selector(failToLoadWithNative:error:)]) {

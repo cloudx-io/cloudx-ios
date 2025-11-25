@@ -159,7 +159,7 @@
     [self updateStatusUIWithState:AdStateReady];
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAdWithError:(CLXError *)error {
     // No ad object exists on failure, so use logMessage instead of logAdEvent
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Interstitial failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
     self.isLoading = NO;
@@ -176,7 +176,7 @@
     [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Interstitial didDisplayAd" ad:ad];
 }
 
-- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
     [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Interstitial didFailToDisplayAd" ad:ad];
     [self updateStatusUIWithState:AdStateNoAd];
     

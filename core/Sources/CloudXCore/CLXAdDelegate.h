@@ -10,6 +10,7 @@
 #import <Foundation/Foundation.h>
 
 @class CLXAd;
+@class CLXError;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -27,9 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Called when ad fails to load with error.
- * @param error The error that caused the failure
+ * @param error The CLXError containing error code, message, and optional underlying error
  */
-- (void)didFailToLoadAdWithError:(NSError *)error NS_SWIFT_NAME(didFailToLoadAd(error:));
+- (void)didFailToLoadAdWithError:(CLXError *)error NS_SWIFT_NAME(didFailToLoadAd(error:));
 
 /**
  * Called when ad is displayed.
@@ -40,9 +41,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Called when ad fails to display.
  * @param ad The ad that failed to display
- * @param error The error that caused the failure
+ * @param error The CLXError containing error code, message, and optional underlying error
  */
-- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error NS_SWIFT_NAME(didFailToDisplay(_:error:));
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error NS_SWIFT_NAME(didFailToDisplay(_:error:));
 
 /**
  * Called when ad is hidden.
