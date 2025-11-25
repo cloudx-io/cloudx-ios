@@ -28,8 +28,9 @@ pod install
 import CloudXCore
 
 // 1. Initialize (in AppDelegate)
-CloudXCore.shared.initializeSDK(withAppKey: "YOUR_APP_KEY") { error in
-    print(error == nil ? "Ready!" : "Error: \(error!)")
+// testMode: false = production, true = test ads
+CloudXCore.shared.initializeSDK(appKey: "YOUR_APP_KEY", testMode: false) { success, error in
+    print(success ? "Ready!" : "Error: \(error!)")
 }
 
 // 2. Create banner ad (in ViewController)

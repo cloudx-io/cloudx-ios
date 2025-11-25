@@ -73,8 +73,10 @@
     }
     
     // Use standard CloudXCore initialization
+    // Production demo app - use testMode:NO for real ads
     [[CloudXCore shared] initializeSDKWithAppKey:config.appKey 
-                                completion:^(BOOL success, NSError * _Nullable error) {
+                                testMode:NO
+                                completion:^(BOOL success, CLXError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (success) {
                 [[DemoAppLogger sharedInstance] logMessage:@"✅ SDK initialized successfully"];

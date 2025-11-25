@@ -72,7 +72,8 @@ class InitViewController: BaseAdViewController {
             CloudXCore.shared.setHashedUserID(config.hashedUserId)
         }
         
-        CloudXCore.shared.initializeSDK(appKey: config.appKey) { [weak self] success, error in
+        // Production demo app - use testMode: false for real ads
+        CloudXCore.shared.initializeSDK(appKey: config.appKey, testMode: false) { [weak self] success, error in
             guard let self = self else { return }
             
             if success {

@@ -70,7 +70,8 @@ class InitInternalViewController: BaseAdViewController {
         }
         
         // Use standard CloudXCore initialization
-        CloudXCore.shared.initializeSDK(appKey: config.appKey) { [weak self] success, error in
+        // Production demo app - use testMode: false for real ads
+        CloudXCore.shared.initializeSDK(appKey: config.appKey, testMode: false) { [weak self] success, error in
             guard let self = self else { return }
             
             DispatchQueue.main.async {
