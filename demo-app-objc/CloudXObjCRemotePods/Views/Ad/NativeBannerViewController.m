@@ -173,15 +173,15 @@
 
 #pragma mark - CLXNativeDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ NativeBanner didLoadWithAd" ad:ad];
+- (void)didLoadAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ NativeBanner didLoadAd" ad:ad];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self updateStatusUIWithState:AdStateReady];
     });
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ NativeBanner failToLoadWithAd - Error: %@", error.localizedDescription]];
+- (void)didFailToLoadAdWithError:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ NativeBanner failed to load - Error: %@", error.localizedDescription]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeBannerAd = nil;
@@ -190,12 +190,12 @@
     });
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 NativeBanner didShowWithAd" ad:ad];
+- (void)didDisplayAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 NativeBanner didDisplayAd" ad:ad];
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ NativeBanner failToShowWithAd - Error: %@", error.localizedDescription]];
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ NativeBanner didFailToDisplayAd - Error: %@", error.localizedDescription]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeBannerAd = nil;
@@ -204,21 +204,21 @@
     });
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 NativeBanner didHideWithAd - Ad: %@", ad]];
+- (void)didHideAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 NativeBanner didHideAd - Ad: %@", ad]];
     self.nativeBannerAd = nil;
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 NativeBanner didClickWithAd - Ad: %@", ad]];
+- (void)didClickAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 NativeBanner didClickAd - Ad: %@", ad]];
 }
 
-- (void)impressionOn:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ NativeBanner impressionOn" ad:ad];
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ NativeBanner didRecordImpressionForAd" ad:ad];
 }
 
-- (void)revenuePaid:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 NativeBanner revenuePaid" ad:ad];
+- (void)didPayRevenueForAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 NativeBanner didPayRevenueForAd" ad:ad];
 }
 
 @end

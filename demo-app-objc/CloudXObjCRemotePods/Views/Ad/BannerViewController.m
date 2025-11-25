@@ -262,8 +262,8 @@
 }
 
 #pragma mark - CLXBannerDelegate
-- (void)didLoadWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Banner didLoadWithAd" ad:ad];
+- (void)didLoadAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Banner didLoadAd" ad:ad];
     
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
@@ -271,8 +271,8 @@
     // Don't auto-show - user must press Show Banner button
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Banner failToLoadWithAd" ad:ad];
+- (void)didFailToLoadAdWithError:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
     
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
@@ -284,12 +284,12 @@
     });
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Banner didShowWithAd" ad:ad];
+- (void)didDisplayAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Banner didDisplayAd" ad:ad];
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Banner failToShowWithAd" ad:ad];
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Banner didFailToDisplayAd" ad:ad];
     
     self.bannerAd = nil;
     
@@ -299,21 +299,21 @@
     });
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Banner didHideWithAd" ad:ad];
+- (void)didHideAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Banner didHideAd" ad:ad];
     self.bannerAd = nil;
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Banner didClickWithAd" ad:ad];
+- (void)didClickAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Banner didClickAd" ad:ad];
 }
 
-- (void)impressionOn:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Banner impressionOn" ad:ad];
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Banner didRecordImpressionForAd" ad:ad];
 }
 
-- (void)revenuePaid:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Banner revenuePaid" ad:ad];
+- (void)didPayRevenueForAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Banner didPayRevenueForAd" ad:ad];
 }
 
 // NEW MAX SDK Compatibility Delegate Methods
