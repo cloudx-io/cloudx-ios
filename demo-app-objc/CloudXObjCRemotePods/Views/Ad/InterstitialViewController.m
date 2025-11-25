@@ -153,14 +153,14 @@
 
 #pragma mark - CLXInterstitialDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Interstitial didLoadWithAd" ad:ad];
+- (void)didLoadAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Interstitial didLoadAd" ad:ad];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Interstitial failToLoadWithAd" ad:ad];
+- (void)didFailToLoadAdWithError:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Interstitial failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -171,12 +171,12 @@
     });
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Interstitial didShowWithAd" ad:ad];
+- (void)didDisplayAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Interstitial didDisplayAd" ad:ad];
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Interstitial failToShowWithAd" ad:ad];
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Interstitial didFailToDisplayAd" ad:ad];
     [self updateStatusUIWithState:AdStateNoAd];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -186,8 +186,8 @@
     });
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Interstitial didHideWithAd" ad:ad];
+- (void)didHideAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Interstitial didHideAd" ad:ad];
     
     self.showAdWhenLoaded = NO;
     self.interstitialAd = nil;
@@ -196,16 +196,16 @@
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Interstitial didClickWithAd" ad:ad];
+- (void)didClickAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Interstitial didClickAd" ad:ad];
 }
 
-- (void)impressionOn:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Interstitial impressionOn" ad:ad];
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Interstitial didRecordImpressionForAd" ad:ad];
 }
 
-- (void)revenuePaid:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Interstitial revenuePaid" ad:ad];
+- (void)didPayRevenueForAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Interstitial didPayRevenueForAd" ad:ad];
 }
 
 @end 

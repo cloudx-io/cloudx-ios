@@ -211,15 +211,15 @@
 
 #pragma mark - CLXRewardedDelegate
 
-- (void)didLoadWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Rewarded didLoadWithAd" ad:ad];
+- (void)didLoadAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Rewarded didLoadAd" ad:ad];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
     // Do NOT show the ad here!
 }
 
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failToLoadWithAd - Error: %@", error.localizedDescription]];
+- (void)didFailToLoadAdWithError:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failed to load - Error: %@", error.localizedDescription]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -231,12 +231,12 @@
     });
 }
 
-- (void)didShowWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 Rewarded didShowWithAd - Ad: %@", ad]];
+- (void)didDisplayAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 Rewarded didDisplayAd - Ad: %@", ad]];
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(NSError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failToShowWithAd - Error: %@", error.localizedDescription]];
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded didFailToDisplayAd - Error: %@", error.localizedDescription]];
     [self updateStatusUIWithState:AdStateNoAd];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -246,24 +246,24 @@
     });
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 Rewarded didHideWithAd - Ad: %@", ad]];
+- (void)didHideAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 Rewarded didHideAd - Ad: %@", ad]];
     self.rewardedAd = nil;
     // Create new ad instance for next time
     [self createRewardedAd];
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 Rewarded didClickWithAd - Ad: %@", ad]];
+- (void)didClickAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 Rewarded didClickAd - Ad: %@", ad]];
 }
 
-- (void)impressionOn:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ Rewarded impressionOn - Ad: %@", ad]];
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ Rewarded didRecordImpressionForAd - Ad: %@", ad]];
 }
 
-- (void)revenuePaid:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Rewarded revenuePaid" ad:ad];
+- (void)didPayRevenueForAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Rewarded didPayRevenueForAd" ad:ad];
 }
 
 - (void)userRewarded:(CLXAd *)ad {

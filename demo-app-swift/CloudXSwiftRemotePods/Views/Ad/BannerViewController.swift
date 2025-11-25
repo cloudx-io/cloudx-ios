@@ -184,71 +184,71 @@ class BannerViewController: BaseAdViewController {
 }
 
 extension BannerViewController: CLXBannerDelegate {
-    func didLoad(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("✅ Banner didLoadWithAd", ad: ad)
+    func didLoad(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("✅ Banner didLoadAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .ready)
     }
     
-    func failToLoad(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ Banner failToLoadWithAd", ad: ad)
+    func didFailToLoadAd(error: CLXError) {
+        DemoAppLogger.sharedInstance.logMessage("❌ Banner failed to load - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: .noAd)
         bannerAd = nil
         
         DispatchQueue.main.async { [weak self] in
-            let errorMessage = (error as NSError).detailedDemoDescription
+            let errorMessage = error.detailedDemoDescription
             self?.showAlert(title: "Banner Ad Load Failed", message: errorMessage)
         }
     }
     
-    func didShow(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👀 Banner didShowWithAd", ad: ad)
+    func didDisplay(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👀 Banner didDisplayAd", ad: ad)
     }
     
-    func failToShow(with ad: CLXAd, error: Error) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ Banner failToShowWithAd", ad: ad)
+    func didFailToDisplay(_ ad: CLXAd, error: CLXError) {
+        DemoAppLogger.sharedInstance.logAdEvent("❌ Banner didFailToDisplayAd", ad: ad)
         bannerAd = nil
         
         DispatchQueue.main.async { [weak self] in
-            let errorMessage = (error as NSError).detailedDemoDescription
-            self?.showAlert(title: "Banner Ad Show Failed", message: errorMessage)
+            let errorMessage = error.detailedDemoDescription
+            self?.showAlert(title: "Banner Ad Display Failed", message: errorMessage)
         }
     }
     
-    func didHide(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🔚 Banner didHideWithAd", ad: ad)
+    func didHide(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("🔚 Banner didHideAd", ad: ad)
         bannerAd = nil
     }
     
-    func didClick(with ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👆 Banner didClickWithAd", ad: ad)
+    func didClick(_ ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👆 Banner didClickAd", ad: ad)
     }
     
-    func impression(on ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ Banner impressionOn", ad: ad)
+    func didRecordImpression(for ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("👁️ Banner didRecordImpression", ad: ad)
     }
     
-    func revenuePaid(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("💰 Banner revenuePaid", ad: ad)
+    func didPayRevenue(for ad: CLXAd) {
+        DemoAppLogger.sharedInstance.logAdEvent("💰 Banner didPayRevenue", ad: ad)
     }
     
-    // NEW MAX SDK Compatibility Delegate Methods
+    // Banner-specific delegate methods
     func didExpand(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("🔍 Banner didExpandAd", ad: ad)
         
         DispatchQueue.main.async { [weak self] in
             self?.showAlert(title: "Banner Expanded!", 
-                           message: "Banner ad expanded to full screen. This is a new MAX SDK compatibility feature.")
+                           message: "Banner ad expanded to full screen.")
         }
     }
     
     func didCollapse(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🔍 Banner didCollapseAd", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("🔽 Banner didCollapseAd", ad: ad)
         
         DispatchQueue.main.async { [weak self] in
             self?.showAlert(title: "Banner Collapsed!", 
-                           message: "Banner ad collapsed from full screen. This is a new MAX SDK compatibility feature.")
+                           message: "Banner ad collapsed back to normal size.")
         }
     }
 }
