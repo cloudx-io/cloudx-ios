@@ -179,19 +179,9 @@
 #pragma mark - Privacy Settings
 
 - (void)configurePrivacySettings {
-    CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
+    // GDPR - Vungle reads IAB TCF strings automatically from UserDefaults
     
-    // COPPA - Must be set BEFORE initialization
-    BOOL coppaEnabled = [privacyService isCoppaEnabled];
-    [VunglePrivacySettings setCOPPAStatus:coppaEnabled];
-    [self.logger info:[NSString stringWithFormat:@"Vungle COPPA status set to %@ (user %@ 13)", 
-                      coppaEnabled ? @"YES" : @"NO",
-                      coppaEnabled ? @"under" : @"over"]];
-    
-    // GDPR - Vungle reads IAB TCF strings automatically, but we can also set explicitly
-    // Note: Most mediation platforms let the SDK read IAB strings directly from UserDefaults
-    
-    // CCPA - Vungle reads IAB US Privacy strings automatically, but we can also set explicitly
+    // CCPA - Vungle reads IAB US Privacy strings automatically from UserDefaults
     // Note: Most mediation platforms let the SDK read IAB strings directly from UserDefaults
 }
 

@@ -34,17 +34,15 @@ class BannerViewController: BaseAdViewController {
         // 3. Zero code footprint in parent - follows DRY principle
         //
         // FEATURES:
-        // - 9 privacy test scenarios (COPPA, CCPA, GPP, ATT, regional variations)
+        // - Privacy test scenarios (CCPA, GPP, ATT, regional variations)
         // - Action sheet picker with full scenario names and descriptions
         // - Automatic CloudXCore privacy SDK integration
         // - Console logging for test verification
         //
         // TESTING COVERAGE:
         // - CCPA Consent/Opt-Out
-        // - COPPA (age-restricted users)
         // - ATT (iOS App Tracking Transparency) - Must be manually enabled/disabled in iOS Settings
         // - GPP regional (US-CA, US-National, EU)
-        // - Combined scenarios (COPPA + GPP consent precedence)
         //
         gppScenarioPicker = GPPScenarioPickerView()
         gppScenarioPicker.translatesAutoresizingMaskIntoConstraints = false

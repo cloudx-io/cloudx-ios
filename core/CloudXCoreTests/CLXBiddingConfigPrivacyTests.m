@@ -14,11 +14,10 @@
 #import <CoreLocation/CoreLocation.h>
 
 // Test category to expose internal methods for testing
-// GDPR methods are internal because server support is not yet implemented. COPPA is now supported per OpenRTB spec.
+// GDPR methods are internal because server support is not yet implemented.
 @interface CLXPrivacyService (Testing)
 - (nullable NSString *)gdprConsentString; // Internal - server not supported
 - (nullable NSNumber *)gdprApplies; // Internal - server not supported
-- (nullable NSNumber *)coppaApplies; // Returns integer 0 or 1 per OpenRTB spec
 // Note: No longer supports UserDefaults injection to ensure real-world collision testing
 @end
 
@@ -84,7 +83,6 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCOPPAAppliesKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -161,47 +159,17 @@
     XCTAssertEqualObjects(config.regulations.ext.iab.usPrivacyString, testCCPAString, @"US privacy string should match CCPA string");
 }
 
-// Test that COPPA applicable flag is included in bidding config when enabled
-- (void)testCOPPAApplicable_ShouldBeIncludedInBiddingConfig {
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyCOPPAAppliesKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc] 
-        initWithAdType:CLXAdTypeBanner
-                     adUnitID:@"test-ad-unit"
-            storedImpressionId:@"test-impression"
-                        dealID:@"test-deal"
-                     bidFloor:@1.0
-                displayManager:@"test-manager"
-            displayManagerVer:@"1.0"
-                   publisherID:@"test-pub"
-                      location:[[CLLocation alloc] initWithLatitude:37.7749 longitude:-122.4194]
-                     userAgent:@"test-agent"
-                   adapterInfo:@{}
-           nativeAdRequirements:nil
-           skadRequestParameters:@{}
-                          tmax:@3.0
-                      impModel:self.mockImpModel
-                      settings:[CLXSettings sharedInstance]
-            privacyService:[CLXPrivacyService sharedInstance]];
-    
-    // COPPA is now enabled per OpenRTB spec (integer 0 or 1)
-    XCTAssertNotNil(config.regulations.coppa, @"COPPA should be present when enabled");
-    XCTAssertEqual([config.regulations.coppa intValue], 1, @"COPPA should be 1 when age-restricted user (OpenRTB integer format)");
-}
-
-// Test that CCPA and COPPA privacy settings are included in bidding config
+// Test that CCPA privacy settings are included in bidding config
 - (void)testCCPAPrivacySettings_ShouldBeIncludedInBiddingConfig {
     [self clearPrivacySettings]; // Ensure clean state
     
     NSString *testGDPRConsent = @"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA";
     NSString *testCCPAString = @"1YNN";
     
-    // Set all privacy settings, but only CCPA should be included in bidding config
+    // Set privacy settings - CCPA should be included in bidding config
     [[NSUserDefaults standardUserDefaults] setObject:testGDPRConsent forKey:kCLXPrivacyGDPRConsentKey];
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
     [[NSUserDefaults standardUserDefaults] setObject:testCCPAString forKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyCOPPAAppliesKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     // Verify CCPA data was stored and can be read by privacy service
@@ -237,10 +205,6 @@
     
     // CCPA should be included (server supported)
     XCTAssertEqualObjects(config.regulations.ext.iab.usPrivacyString, testCCPAString, @"US privacy string should match CCPA string");
-    
-    // COPPA is now enabled per OpenRTB spec (returns integer 0 or 1)
-    XCTAssertNotNil(config.regulations.coppa, @"COPPA should be present when set");
-    XCTAssertEqual([config.regulations.coppa intValue], 1, @"COPPA should be 1 when age-restricted user (OpenRTB integer format)");
     
     // GDPR should NOT be included (server not supported yet)
     XCTAssertNil(config.regulations.ext.iab.gdprApplies, @"GDPR applies should not be included (server not supported)");

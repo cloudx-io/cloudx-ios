@@ -14,12 +14,11 @@
 #import <CoreLocation/CoreLocation.h>
 
 // Testing category to expose internal methods for testing
-// GDPR methods are internal because server support is not yet implemented. COPPA is enabled per OpenRTB spec.
+// GDPR methods are internal because server support is not yet implemented.
 @interface CLXPrivacyService (Testing)
 - (BOOL)shouldClearPersonalDataIgnoringATT; // Test without ATT dependency
 - (nullable NSString *)gdprConsentString; // Internal - server not supported
 - (nullable NSNumber *)gdprApplies; // Internal - server not supported
-- (nullable NSNumber *)coppaApplies; // Returns integer 0 or 1 per OpenRTB spec
 @end
 
 // Note: Using public buildPayload method for robust integration testing instead of private methods
@@ -73,7 +72,6 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCOPPAAppliesKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedUserIdKey];
     // Also clear old unprefixed key for backward compatibility during transition
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreHashedUserIDKey];

@@ -1163,17 +1163,6 @@ static CloudXCore *_sharedInstance = nil;
     [[CLXPrivacyService sharedInstance] setHasUserConsent:@(isUserConsent)];
 }
 
-+ (void)setIsAgeRestrictedUser:(BOOL)isAgeRestrictedUser {
-    // Check if SDK is already initialized and warn developer
-    CloudXCore *shared = [CloudXCore shared];
-    if (shared.isInitialized) {
-        CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXCore"];
-        [logger warn:@"⚠️ setIsAgeRestrictedUser called AFTER SDK initialization. COPPA status should be set BEFORE calling initializeSDKWithAppKey:testMode:completion: to ensure all adapter SDKs are properly configured. Some adapters (e.g., Vungle) require COPPA to be set before initialization and may not pick up this change."];
-    }
-    
-    [[CLXPrivacyService sharedInstance] setIsAgeRestrictedUser:@(isAgeRestrictedUser)];
-}
-
 + (void)setIsDoNotSell:(BOOL)isDoNotSell {
     [[CLXPrivacyService sharedInstance] setDoNotSell:@(isDoNotSell)];
 }

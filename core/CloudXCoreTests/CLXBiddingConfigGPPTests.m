@@ -108,43 +108,13 @@
     XCTAssertEqualObjects(regsExt[@"gpp_sid"], testGppSid, @"GPP SID should be included");
 }
 
-// DEPRECATED: Test replaced by testCOPPAIncludedInBidRequest_Enabled (CX-1912)
-// Old behavior: COPPA was disabled (nil) until server support
-// New behavior: COPPA is now supported by server and included in bid requests
-- (void)testCOPPAFlagIncludedWhenEnabled_Legacy {
-    [self.privacyService setIsAgeRestrictedUser:@YES];
-    
-    CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
-    NSDictionary *json = [config json];
-    
-    NSNumber *coppaFlag = json[@"regs"][@"coppa"];
-    // CX-1912: COPPA is now included in bid requests per OpenRTB spec (integer 0 or 1)
-    XCTAssertNotNil(coppaFlag, @"COPPA flag is now supported by server");
-    XCTAssertEqual([coppaFlag intValue], 1, @"COPPA should be 1 when age-restricted (OpenRTB integer format)");
-}
-
-// DEPRECATED: Test replaced by testCOPPAIncludedInBidRequest_Disabled (CX-1912)
-// Old behavior: COPPA was not included when disabled
-// New behavior: COPPA field is always present (true/false based on setting)
-- (void)testCOPPAFlagNotIncludedWhenDisabled_Legacy {
-    [self.privacyService setIsAgeRestrictedUser:@NO];
-    
-    CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
-    NSDictionary *json = [config json];
-    
-    NSNumber *coppaFlag = json[@"regs"][@"coppa"];
-    // CX-1912: COPPA field is present with integer value per OpenRTB spec
-    XCTAssertNotNil(coppaFlag, @"COPPA field should be present");
-    XCTAssertEqual([coppaFlag intValue], 0, @"COPPA should be 0 when not age-restricted (OpenRTB integer format)");
-}
-
 #pragma mark - Personal Data Clearing in Bid Requests
 
 // Test IFA is cleared when privacy requires it
 - (void)testIFAClearedWhenPrivacyRequires {
-    // Set up scenario that requires data clearing (COPPA enabled)
+    // Set up scenario that requires data clearing (CCPA opt-out)
     [self setupUSUser];
-    [self.privacyService setIsAgeRestrictedUser:@YES];
+    [self.privacyService setCCPAPrivacyString:@"1YYN"];
     
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
     NSDictionary *json = [config json];
@@ -155,9 +125,9 @@
 
 // Test geo coordinates are cleared when privacy requires it
 - (void)testGeoCoordinatesClearedWhenPrivacyRequires {
-    // Set up scenario that requires data clearing (COPPA enabled)
+    // Set up scenario that requires data clearing (CCPA opt-out)
     [self setupUSUser];
-    [self.privacyService setIsAgeRestrictedUser:@YES];
+    [self.privacyService setCCPAPrivacyString:@"1YYN"];
     
     CLLocation *testLocation = [[CLLocation alloc] initWithLatitude:37.7749 longitude:-122.4194];
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithLocation:testLocation];
@@ -171,15 +141,15 @@
 
 // Test user data is cleared when privacy requires it
 - (void)testUserDataClearedWhenPrivacyRequires {
-    // Set up scenario that requires data clearing (COPPA enabled)
+    // Set up scenario that requires data clearing (CCPA opt-out)
     [self setupUSUser];
-    [self.privacyService setIsAgeRestrictedUser:@YES];
+    [self.privacyService setCCPAPrivacyString:@"1YYN"];
     
     // Debug: Check what the privacy service is actually returning
     BOOL shouldClear = [self.privacyService shouldClearPersonalData];
     NSLog(@"🔍 DEBUG: shouldClearPersonalData returned: %@", shouldClear ? @"YES" : @"NO");
     
-    XCTAssertTrue(shouldClear, @"Privacy service should require data clearing when COPPA is enabled (unified privacy architecture)");
+    XCTAssertTrue(shouldClear, @"Privacy service should require data clearing when CCPA opt-out is enabled (unified privacy architecture)");
     
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
     NSDictionary *json = [config json];
@@ -191,9 +161,8 @@
 
 // Test device and geo data behavior when privacy theoretically allows it
 - (void)testDataBehaviorWhenPrivacyAllows {
-    // Set up scenario that would allow data (non-US user, no COPPA)
+    // Set up scenario that would allow data (non-US user)
     [self setupNonUSUser];
-    [self.privacyService setIsAgeRestrictedUser:@NO];
     
     CLLocation *testLocation = [[CLLocation alloc] initWithLatitude:37.7749 longitude:-122.4194];
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithLocation:testLocation];
@@ -389,34 +358,6 @@
     // When no GPP string, gpp_sid should not be present
     XCTAssertNil(regsExt[@"gpp"], @"GPP string should be absent");
     XCTAssertNil(regsExt[@"gpp_sid"], @"gpp_sid should be absent when no GPP string");
-}
-
-// CX-1912: COPPA field included in bid request when enabled
-- (void)testCOPPAIncludedInBidRequest_Enabled {
-    [self setupUSUser];
-    [self.privacyService setIsAgeRestrictedUser:@YES];
-    
-    CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
-    NSDictionary *json = [config json];
-    
-    // CX-1912 FIX: COPPA must be present in bid request per OpenRTB spec (integer 0 or 1)
-    NSNumber *coppaValue = json[@"regs"][@"coppa"];
-    XCTAssertNotNil(coppaValue, @"COPPA field must be present in bid request");
-    XCTAssertEqual([coppaValue intValue], 1, @"COPPA value should be 1 when age-restricted user (OpenRTB integer format)");
-}
-
-// CX-1912: COPPA field included with false value when disabled
-- (void)testCOPPAIncludedInBidRequest_Disabled {
-    [self setupUSUser];
-    [self.privacyService setIsAgeRestrictedUser:@NO];
-    
-    CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
-    NSDictionary *json = [config json];
-    
-    // CX-1912: COPPA should be present with integer 0 per OpenRTB spec
-    NSNumber *coppaValue = json[@"regs"][@"coppa"];
-    XCTAssertNotNil(coppaValue, @"COPPA field should be present even when disabled");
-    XCTAssertEqual([coppaValue intValue], 0, @"COPPA value should be 0 when not age-restricted (OpenRTB integer format)");
 }
 
 // CX-1904: DNT field set correctly in device (not hardcoded to 0)

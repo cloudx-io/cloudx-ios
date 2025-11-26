@@ -160,7 +160,6 @@
     [self.privacyService setCCPAPrivacyString:@"1YNN"];
     
     [self setupCaliforniaUser];
-    [self.privacyService setIsAgeRestrictedUser:@NO];
     
     // GPP should take precedence over legacy CCPA
     BOOL shouldClear = [self.privacyService shouldClearPersonalData];
@@ -179,7 +178,6 @@
     [self.privacyService setCCPAPrivacyString:@"1YYN"];
     
     [self setupCaliforniaUser];
-    [self.privacyService setIsAgeRestrictedUser:@NO];
     
     // Should resolve conflict (GPP should take precedence)
     BOOL shouldClear = [self.privacyService shouldClearPersonalData];
@@ -315,58 +313,6 @@
     // May or may not trim depending on implementation
     XCTAssertTrue((isUS && isCalifornia) || (!isUS && !isCalifornia), 
                  @"Should handle whitespace consistently");
-}
-
-#pragma mark - P0: COPPA Override Scenarios
-
-// Test COPPA overrides GPP consent even with explicit allowance
-- (void)testCOPPAOverridesGPPExplicitConsent {
-    // Set up GPP with explicit consent (allow all)
-    [self.gppProvider setGppString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
-    [self.gppProvider setGppSid:@[@7, @8]];
-    
-    // Set COPPA enabled
-    [self.privacyService setIsAgeRestrictedUser:@YES];
-    
-    [self setupUSUser];
-    
-    // COPPA should override GPP consent
-    BOOL shouldClear = [self.privacyService shouldClearPersonalData];
-    XCTAssertTrue(shouldClear, @"COPPA should override GPP consent and require data clearing");
-}
-
-// Test COPPA=NO with GPP opt-out respects GPP
-- (void)testCOPPADisabledRespectsGPPOptOut {
-    // Set up GPP with opt-out (disallow all)
-    [self.gppProvider setGppString:@"DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA"];
-    [self.gppProvider setGppSid:@[@7, @8]];
-    
-    // Explicitly disable COPPA
-    [self.privacyService setIsAgeRestrictedUser:@NO];
-    
-    [self setupCaliforniaUser];
-    
-    // Should respect GPP opt-out
-    BOOL shouldClear = [self.privacyService shouldClearPersonalData];
-    // Behavior depends on implementation
-    XCTAssertTrue(shouldClear == YES || shouldClear == NO, @"Should evaluate GPP opt-out when COPPA disabled");
-}
-
-// Test COPPA=nil (not set) with GPP consent
-- (void)testCOPPANotSetWithGPPConsent {
-    // Set up GPP with consent
-    [self.gppProvider setGppString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
-    [self.gppProvider setGppSid:@[@7, @8]];
-    
-    // Don't set COPPA (nil state)
-    [self.privacyService setIsAgeRestrictedUser:nil];
-    
-    [self setupUSUser];
-    
-    // Should allow data when COPPA not set and GPP allows
-    BOOL shouldClear = [self.privacyService shouldClearPersonalData];
-    // In test environment, ATT may affect this
-    XCTAssertTrue(shouldClear == YES || shouldClear == NO, @"Should evaluate GPP when COPPA not set");
 }
 
 #pragma mark - P0: Concurrent Access and Thread Safety

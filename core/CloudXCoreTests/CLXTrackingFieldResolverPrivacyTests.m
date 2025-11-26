@@ -16,12 +16,11 @@
 @end
 
 // Testing category to expose internal methods for testing
-// GDPR methods are internal because server support is not yet implemented. COPPA is enabled per OpenRTB spec.
+// GDPR methods are internal because server support is not yet implemented.
 @interface CLXPrivacyService (Testing)
 - (BOOL)shouldClearPersonalDataIgnoringATT; // Test without ATT dependency
 - (nullable NSString *)gdprConsentString; // Internal - server not supported
 - (nullable NSNumber *)gdprApplies; // Internal - server not supported
-- (nullable NSNumber *)coppaApplies; // Returns integer 0 or 1 per OpenRTB spec
 @end
 
 // Testing category to mock ATT service for testing
@@ -68,7 +67,6 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCOPPAAppliesKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreHashedUserIDKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreRawGeoHeadersKey];
@@ -111,7 +109,6 @@
     
     [[NSUserDefaults standardUserDefaults] setObject:validGDPRConsent forKey:kCLXPrivacyGDPRConsentKey];
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kCLXPrivacyCOPPAAppliesKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey]; // Ensure no CCPA blocking
     [[NSUserDefaults standardUserDefaults] synchronize];
     
@@ -162,27 +159,26 @@
 
 // Test privacy blocks personal data - comprehensive validation of fallback behavior
 - (void)testPrivacyBlocksPersonalData_ShouldReturnSessionIdFallback {
-    // GIVEN: COPPA applies (strict privacy blocking)
+    // GIVEN: CCPA opt-out applies (strict privacy blocking)
     NSString *originalIFA = @"AEBE52E7-03EE-455A-B3C4-E57283966239";
     NSString *expectedSessionId = @"test-session-67890";
     
-    // Set up US user (COPPA only applies to US users)
+    // Set up US user for CCPA
     [self setupUSUser];
     
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyCOPPAAppliesKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey]; // Ensure no GDPR override
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey]; // Ensure no CCPA override
+    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey]; // CCPA opt-out
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     // WHEN: Privacy service is queried
     BOOL shouldClearData = [self.privacyService shouldClearPersonalDataIgnoringATT];
-    XCTAssertTrue(shouldClearData, @"Privacy service should block personal data when COPPA applies");
+    XCTAssertTrue(shouldClearData, @"Privacy service should block personal data when CCPA opt-out applies");
     
     // AND: Bid request contains real IFA
     NSDictionary *testBidRequest = @{
         @"device": @{
             @"ifa": originalIFA,
-            @"dnt": @NO  // Even with DNT=false, COPPA should override
+            @"dnt": @NO  // Even with DNT=false, CCPA should override
         },
         @"id": @"bid-request-456"
     };
@@ -220,7 +216,7 @@
     // GIVEN: Privacy allows personal data BUT device has DNT=true
     [[NSUserDefaults standardUserDefaults] setObject:@"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA" forKey:kCLXPrivacyGDPRConsentKey];
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kCLXPrivacyCOPPAAppliesKey];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
     
     // Set up hashed fallbacks
     NSString *hashedUserId = @"hashed-user-abc123";
@@ -267,8 +263,8 @@
 
 // Test edge case - no fallbacks available, should gracefully handle
 - (void)testNoFallbacksAvailable_ShouldHandleGracefully {
-    // GIVEN: Privacy blocks data AND no fallbacks are set
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyCOPPAAppliesKey];
+    // GIVEN: Privacy blocks data (CCPA opt-out) AND no fallbacks are set
+    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreHashedUserIDKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
     [[NSUserDefaults standardUserDefaults] synchronize];

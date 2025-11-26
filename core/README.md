@@ -847,7 +847,7 @@ extension YourViewController {
 
 ### Privacy Compliance & GPP Integration
 
-The CloudX SDK supports privacy compliance for GDPR, CCPA, and COPPA regulations. Publishers are responsible for obtaining consent through their Consent Management Platform (CMP) and providing the privacy signals to our SDK.
+The CloudX SDK supports privacy compliance for GDPR and CCPA regulations. Publishers are responsible for obtaining consent through their Consent Management Platform (CMP) and providing the privacy signals to our SDK.
 
 **Objective-C:**
 ```objc
@@ -856,9 +856,6 @@ The CloudX SDK supports privacy compliance for GDPR, CCPA, and COPPA regulations
 
 // Set GDPR consent (⚠️ Not yet supported by CloudX servers)
 [CloudXCore setIsUserConsent:YES];
-
-// Set COPPA compliance (⚠️ Not yet supported by CloudX servers)
-[CloudXCore setIsAgeRestrictedUser:YES];
 
 // Set "do not sell" preference (CCPA)
 [CloudXCore setIsDoNotSell:YES];
@@ -872,9 +869,6 @@ CloudXCore.setCCPAPrivacyString("1YNN")
 // Set GDPR consent (⚠️ Not yet supported by CloudX servers)
 CloudXCore.setIsUserConsent(true)
 
-// Set COPPA compliance (⚠️ Not yet supported by CloudX servers)
-CloudXCore.setIsAgeRestrictedUser(true)
-
 // Set "do not sell" preference (CCPA)
 CloudXCore.setIsDoNotSell(true)
 ```
@@ -885,7 +879,6 @@ CloudXCore.setIsDoNotSell(true)
 |--------|------|-------------|
 | `setCCPAPrivacyString:` | String | Set CCPA privacy string (e.g., "1YNN") |
 | `setIsUserConsent:` | Boolean | Set GDPR consent (⚠️ Not yet supported by servers) |
-| `setIsAgeRestrictedUser:` | Boolean | Set COPPA compliance (⚠️ Not yet supported by servers) |
 | `setIsDoNotSell:` | Boolean | Set "do not sell" preference for CCPA compliance |
 
 #### GPP String Integration
@@ -899,12 +892,10 @@ NSString *gppString = @"DBACNYA~CPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA~1YN
 // Your CMP should parse the GPP string and provide:
 NSString *ccpaString = [yourCMP extractCCPAStringFromGPP:gppString];
 BOOL gdprConsent = [yourCMP extractGDPRConsentFromGPP:gppString];
-BOOL coppaApplies = [yourCMP extractCOPPAFromGPP:gppString];
 
 // Then set the individual components using CloudX privacy API
 [CloudXCore setCCPAPrivacyString:ccpaString];
 [CloudXCore setIsUserConsent:gdprConsent];
-[CloudXCore setIsAgeRestrictedUser:coppaApplies];
 ```
 
 #### Privacy-Aware Ad Serving
@@ -912,7 +903,6 @@ BOOL coppaApplies = [yourCMP extractCOPPAFromGPP:gppString];
 The SDK automatically uses privacy information to:
 - Respect CCPA "do not sell" preferences (fully supported)
 - Handle GDPR consent flags (⚠️ server support pending)
-- Handle COPPA age restrictions (⚠️ server support pending)
 - Provide privacy-safe fallbacks for ad targeting
 
 **Note**: Publishers must obtain proper consent through their own Consent Management Platform before providing privacy signals to the SDK. Currently, only CCPA is fully supported by CloudX servers.

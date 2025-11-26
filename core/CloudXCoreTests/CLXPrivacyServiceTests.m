@@ -11,12 +11,11 @@
 #import "CLXUserDefaultsTestHelper.h"
 
 // Test category to expose internal methods for testing
-// These methods are internal because server support for GDPR/COPPA is not yet implemented
+// These methods are internal because server support for GDPR is not yet implemented
 @interface CLXPrivacyService (Testing)
 - (BOOL)shouldClearPersonalDataIgnoringATT; // Test without ATT dependency
 - (nullable NSString *)gdprConsentString; // Internal - server not supported
 - (nullable NSNumber *)gdprApplies; // Internal - server not supported
-- (nullable NSNumber *)coppaApplies; // Internal - server not supported
 // Note: No longer supports UserDefaults injection to ensure real-world collision testing
 @end
 
@@ -24,7 +23,6 @@
 @interface CloudXCore (Testing)
 + (void)setCCPAPrivacyStringWithService:(nullable NSString *)ccpaPrivacyString privacyService:(CLXPrivacyService *)privacyService;
 + (void)setIsUserConsentWithService:(BOOL)isUserConsent privacyService:(CLXPrivacyService *)privacyService;
-+ (void)setIsAgeRestrictedUserWithService:(BOOL)isAgeRestrictedUser privacyService:(CLXPrivacyService *)privacyService;
 + (void)setIsDoNotSellWithService:(BOOL)isDoNotSell privacyService:(CLXPrivacyService *)privacyService;
 @end
 
@@ -37,10 +35,6 @@
 
 + (void)setIsUserConsentWithService:(BOOL)isUserConsent privacyService:(CLXPrivacyService *)privacyService {
     [privacyService setHasUserConsent:@(isUserConsent)];
-}
-
-+ (void)setIsAgeRestrictedUserWithService:(BOOL)isAgeRestrictedUser privacyService:(CLXPrivacyService *)privacyService {
-    [privacyService setIsAgeRestrictedUser:@(isAgeRestrictedUser)];
 }
 
 + (void)setIsDoNotSellWithService:(BOOL)isDoNotSell privacyService:(CLXPrivacyService *)privacyService {
@@ -76,7 +70,6 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCOPPAAppliesKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreHashedUserIDKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -192,35 +185,6 @@
     }
 }
 
-// Test comprehensive COPPA validation with edge cases
-- (void)testCOPPAApplicable_ShouldClearPersonalData {
-    // Test COPPA applicable scenarios
-    [self clearPrivacySettings];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyCOPPAAppliesKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
-    XCTAssertTrue(shouldClear, @"COPPA applicable should clear personal data");
-    
-    // Verify getter returns correct value (OpenRTB spec: integer 0 or 1)
-    NSNumber *coppaApplies = [self.privacyService coppaApplies];
-    XCTAssertNotNil(coppaApplies, @"COPPA applies should be retrievable");
-    XCTAssertEqual([coppaApplies intValue], 1, @"COPPA applies should be 1 (OpenRTB integer format)");
-    
-    // Test COPPA not applicable
-    [self clearPrivacySettings];
-    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kCLXPrivacyCOPPAAppliesKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
-    XCTAssertFalse(shouldClear, @"COPPA not applicable should allow personal data");
-    
-    // Test missing COPPA flag (should default to not applicable)
-    [self clearPrivacySettings];
-    shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
-    XCTAssertFalse(shouldClear, @"Missing COPPA flag should default to allowing personal data");
-}
-
 // Test hashed identifier management
 - (void)testHashedIdentifierManagement {
     NSString *testHashedUserId = @"hashed-user-12345";
@@ -256,23 +220,11 @@
     BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
     XCTAssertTrue(shouldClear, @"CCPA opt-out should override GDPR consent");
     
-    // Scenario 2: GDPR allows, CCPA allows, but COPPA blocks - COPPA should win
+    // Scenario 2: All privacy frameworks allow data
     [self clearPrivacySettings];
     [[NSUserDefaults standardUserDefaults] setObject:@"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA" forKey:kCLXPrivacyGDPRConsentKey];
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
     [[NSUserDefaults standardUserDefaults] setObject:@"1NNN" forKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyCOPPAAppliesKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
-    XCTAssertTrue(shouldClear, @"COPPA should override both GDPR and CCPA consent");
-    
-    // Scenario 3: All privacy frameworks allow data
-    [self clearPrivacySettings];
-    [[NSUserDefaults standardUserDefaults] setObject:@"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA" forKey:kCLXPrivacyGDPRConsentKey];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] setObject:@"1NNN" forKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kCLXPrivacyCOPPAAppliesKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
@@ -316,24 +268,6 @@
     XCTAssertNil(gdprApplies, @"GDPR consent should be cleared when set to nil");
 }
 
-// Test COPPA age restriction API (with server warning)
-- (void)testPublicCOPPAAPI {
-    [self clearPrivacySettings];
-    
-    // Test setting COPPA flag through public API
-    [self.privacyService setIsAgeRestrictedUser:@YES];
-    
-    // Verify it was stored (using internal method since this is for testing)
-    // OpenRTB spec requires integer: 0 = no, 1 = yes
-    NSNumber *coppaApplies = [self.privacyService coppaApplies];
-    XCTAssertEqual([coppaApplies intValue], 1, @"COPPA flag should be 1 (OpenRTB integer format)");
-    
-    // Test clearing COPPA flag
-    [self.privacyService setIsAgeRestrictedUser:nil];
-    coppaApplies = [self.privacyService coppaApplies];
-    XCTAssertNil(coppaApplies, @"COPPA flag should be cleared when set to nil");
-}
-
 // Test do not sell convenience API
 - (void)testPublicDoNotSellAPI {
     [self clearPrivacySettings];
@@ -368,10 +302,6 @@
     [CloudXCore setIsUserConsentWithService:YES privacyService:self.privacyService];
     NSNumber *gdprApplies = [self.privacyService gdprApplies];
     XCTAssertEqualObjects(gdprApplies, @YES, @"CloudXCore setIsUserConsent should delegate to CLXPrivacyService");
-    
-    [CloudXCore setIsAgeRestrictedUserWithService:YES privacyService:self.privacyService];
-    NSNumber *coppaApplies = [self.privacyService coppaApplies];
-    XCTAssertEqual([coppaApplies intValue], 1, @"CloudXCore setIsAgeRestrictedUser should delegate to CLXPrivacyService (OpenRTB integer format)");
     
     [CloudXCore setIsDoNotSellWithService:NO privacyService:self.privacyService];
     ccpaString = [self.privacyService ccpaPrivacyString];

@@ -14,7 +14,6 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <CloudXCore/CLXSettings.h>
-#import <CloudXCore/CLXPrivacyService.h>
 
 // Import CloudXCore for both SPM and CocoaPods
 #if __has_include(<CloudXCore/CloudXCore.h>)
@@ -157,19 +156,11 @@ static NSString * const kSDKVersion = @"1.0.0"; // Moloco SDK version
 #pragma mark - Private Methods
 
 - (void)configurePrivacySettings {
-    CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
-    
     // Use CloudX core's tracking service for consistency
     BOOL idfaAllowed = [CLXAdTrackingService isIDFAAccessAllowed];
     
     // Configure Moloco SDK privacy settings
     // Note: Moloco SDK APIs are placeholders - verify with actual Moloco SDK documentation
-    
-    // COPPA - Required for child-directed apps
-    BOOL coppaEnabled = [privacyService isCoppaEnabled];
-    [MolocoSDK setCOPPAEnabled:coppaEnabled];
-    [[CLXMolocoInitializer logger] info:[NSString stringWithFormat:@"Moloco COPPA enabled: %@", 
-                                         coppaEnabled ? @"YES" : @"NO"]];
     
     // GDPR - Moloco likely reads IAB TCF strings automatically
     // If explicit API is needed, uncomment and verify:

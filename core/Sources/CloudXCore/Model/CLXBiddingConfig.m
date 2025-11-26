@@ -24,11 +24,10 @@
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 
 // Internal methods category for accessing privacy methods that are not in public header
-// TEMP: Remove CLXPrivacyService private interface once server supports GDPR/COPPA
+// TEMP: Remove CLXPrivacyService private interface once server supports GDPR
 @interface CLXPrivacyService (Internal)
 - (nullable NSString *)gdprConsentString;
 - (nullable NSNumber *)gdprApplies;
-- (nullable NSNumber *)coppaApplies;
 @end
 
 // Privacy service parameter is now required in main interface - no separate testing category needed
@@ -369,8 +368,8 @@ static void initializeLogger() {
         _privacyService = privacyService;
         
         // Create regulations - only CCPA is supported by server currently
-        // GDPR and COPPA are temporarily disabled as server support is not yet implemented
-        // Including GDPR/COPPA data causes 502 bid request errors
+        // GDPR is temporarily disabled as server support is not yet implemented
+        // Including GDPR data causes 502 bid request errors
         CLXBiddingConfigRegulationsExtIAB *iab = [[CLXBiddingConfigRegulationsExtIAB alloc] init];
         iab.usPrivacyString = [privacyService ccpaPrivacyString]; // CCPA is server-supported
 
@@ -382,9 +381,6 @@ static void initializeLogger() {
 
         CLXBiddingConfigRegulations *regulations = [[CLXBiddingConfigRegulations alloc] init];
         regulations.ext = regExt;
-        
-        // COPPA is now enabled per OpenRTB spec (0 = no, 1 = yes)
-        regulations.coppa = [privacyService coppaApplies];
         
         // TODO: Re-enable GDPR once server support is implemented
         // iab.gdprApplies = [privacyService gdprApplies];
@@ -914,9 +910,6 @@ static void initializeLogger() {
 
 - (NSDictionary *)convertRegulationsToJSON {
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
-    if (self.regulations.coppa) {
-        json[@"coppa"] = self.regulations.coppa;
-    }
     if (self.regulations.ext) {
         json[@"ext"] = [self convertRegulationsExtToJSON:self.regulations.ext];
     }

@@ -203,31 +203,6 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 + (void)setIsUserConsent:(BOOL)isUserConsent;
 
 /**
- * Set whether user is age-restricted (COPPA)
- * @param isAgeRestrictedUser YES if user is age-restricted (under 13), NO otherwise
- * @discussion ⚠️ IMPORTANT: This method MUST be called BEFORE initializeSDKWithAppKey:completion:
- * 
- * COPPA (Children's Online Privacy Protection Act) compliance requires that privacy settings
- * be configured before SDK initialization. Some adapter SDKs (e.g., Vungle) have hard requirements
- * that COPPA status must be set before their SDK initializes.
- * 
- * Recommended usage:
- * @code
- * // 1. Set COPPA status FIRST
- * [CloudXCore setIsAgeRestrictedUser:YES];
- * 
- * // 2. Then initialize SDK
- * [[CloudXCore shared] initializeSDKWithAppKey:@"your-key" completion:^(BOOL success, NSError *error) {
- *     // SDK ready
- * }];
- * @endcode
- * 
- * If you call this method after SDK initialization, a warning will be logged and the change
- * may not be applied to all adapter SDKs.
- */
-+ (void)setIsAgeRestrictedUser:(BOOL)isAgeRestrictedUser;
-
-/**
  * Set "do not sell" preference (CCPA)
  * @param isDoNotSell YES to opt-out of data selling, NO otherwise
  * @discussion CCPA "do not sell my personal information" flag - converts to CCPA privacy string format

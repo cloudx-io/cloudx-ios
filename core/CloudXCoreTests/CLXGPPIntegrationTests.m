@@ -13,7 +13,6 @@
 // Test category to expose internal methods for testing
 @interface CLXPrivacyService (GPPTesting)
 - (BOOL)shouldClearPersonalDataForCompliance; // Test compliance logic without ATT
-- (BOOL)isCoppaEnabled;
 @end
 
 // Test category for geo service testing
@@ -51,13 +50,12 @@
     [self.gppProvider setGppString:nil];
     [self.gppProvider setGppSid:nil];
     
-    // Set up as US user without COPPA
+    // Set up as US user
     [self setupUSUser];
-    [self.privacyService setIsAgeRestrictedUser:@NO];
     
     // Test compliance logic without ATT dependency
     BOOL shouldClear = [self.privacyService shouldClearPersonalDataForCompliance];
-    XCTAssertFalse(shouldClear, @"Without GPP data and no COPPA, compliance logic should allow data");
+    XCTAssertFalse(shouldClear, @"Without GPP data, compliance logic should allow data");
 }
 
 // Test GPP CCPA consent should pass allowed personal data
@@ -69,9 +67,8 @@
     [self.gppProvider setGppString:gppString];
     [self.gppProvider setGppSid:gppSid];
     
-    // Set up as California user without COPPA
+    // Set up as California user
     [self setupCaliforniaUser];
-    [self.privacyService setIsAgeRestrictedUser:@NO];
     
     // Test compliance logic - should allow data with consent
     BOOL shouldClear = [self.privacyService shouldClearPersonalDataForCompliance];
@@ -87,9 +84,8 @@
     [self.gppProvider setGppString:gppString];
     [self.gppProvider setGppSid:gppSid];
     
-    // Set up as California user without COPPA
+    // Set up as California user
     [self setupCaliforniaUser];
-    [self.privacyService setIsAgeRestrictedUser:@NO];
     
     // Test compliance logic - should require data clearing with opt-out
     BOOL shouldClear = [self.privacyService shouldClearPersonalDataForCompliance];
@@ -107,7 +103,6 @@
     
     // Set up as non-US user
     [self setupNonUSUser];
-    [self.privacyService setIsAgeRestrictedUser:@NO];
     
     BOOL shouldClear = [self.privacyService shouldClearPersonalDataForCompliance];
     XCTAssertFalse(shouldClear, @"Non-US users should have no additional restrictions");
@@ -124,27 +119,9 @@
     
     // Set up as US user but not California
     [self setupUSNonCaliforniaUser];
-    [self.privacyService setIsAgeRestrictedUser:@NO];
     
     BOOL shouldClear = [self.privacyService shouldClearPersonalDataForCompliance];
     XCTAssertFalse(shouldClear, @"US non-California users without GPP opt-out should allow data");
-}
-
-// Test COPPA flagged app should remove all personal data
-- (void)testCOPPAFlagged_ShouldRemoveAllPersonalData {
-    // Set up GPP data that would normally allow data (allow all)
-    NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
-    NSArray *gppSid = @[@7, @8];
-    
-    [self.gppProvider setGppString:gppString];
-    [self.gppProvider setGppSid:gppSid];
-    
-    // Set up as US user with COPPA enabled
-    [self setupUSUser];
-    [self.privacyService setIsAgeRestrictedUser:@YES];
-    
-    BOOL shouldClear = [self.privacyService shouldClearPersonalDataForCompliance];
-    XCTAssertTrue(shouldClear, @"COPPA should override GPP consent and require data clearing");
 }
 
 // Test geographic targeting logic
@@ -163,21 +140,6 @@
     [self setupNonUSUser];
     XCTAssertFalse([self.geoService isUSUser], @"Should detect non-US user correctly");
     XCTAssertFalse([self.geoService isCaliforniaUser], @"Non-US user should not be detected as California");
-}
-
-// Test COPPA detection logic
-- (void)testCOPPADetection {
-    // Test COPPA enabled
-    [self.privacyService setIsAgeRestrictedUser:@YES];
-    XCTAssertTrue([self.privacyService isCoppaEnabled], @"Should detect COPPA enabled");
-    
-    // Test COPPA disabled
-    [self.privacyService setIsAgeRestrictedUser:@NO];
-    XCTAssertFalse([self.privacyService isCoppaEnabled], @"Should detect COPPA disabled");
-    
-    // Test COPPA not set
-    [self.privacyService setIsAgeRestrictedUser:nil];
-    XCTAssertFalse([self.privacyService isCoppaEnabled], @"Should default to COPPA disabled when not set");
 }
 
 #pragma mark - Helper Methods

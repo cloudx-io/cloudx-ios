@@ -12,7 +12,7 @@ The CloudX Mintegral Adapter enables publishers to monetize their iOS applicatio
 - ✅ Banner ads
 - ✅ Rewarded video ads
 - ✅ Header bidding support
-- ✅ GDPR, CCPA, and COPPA compliant
+- ✅ GDPR and CCPA compliant
 - ✅ iOS 14.0+ support
 
 ## Requirements
@@ -164,12 +164,6 @@ NSString *adID = @"YOUR_PLACEMENT_ID_YOUR_UNIT_ID";
 [[CLXSettings sharedInstance] setUSPrivacyString:@"1YNN"];
 ```
 
-### COPPA Compliance
-
-```objective-c
-[[CLXSettings sharedInstance] setCOPPAEnabled:YES];
-```
-
 ## Info.plist Configuration
 
 Add the following keys to your `Info.plist`:
@@ -254,5 +248,5 @@ CloudXMintegralAdapter is available under the Business Source License 1.1. See t
 - Initial release
 - Support for Interstitial, Banner, and Rewarded ads
 - Header bidding support
-- GDPR, CCPA, and COPPA compliance
+- GDPR and CCPA compliance
 

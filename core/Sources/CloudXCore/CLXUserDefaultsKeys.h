@@ -88,8 +88,6 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXPrivacyGDPRConsentKey @"IABTCF_TCString"
 #define kCLXPrivacyCCPAPrivacyKey @"IABUSPrivacy_String"
 #define kCLXPrivacyGDPRAppliesKey @"IABTCF_gdprApplies"
-// COPPA is SDK-specific (not IAB standard), stored in UserDefaults with CloudX prefix
-#define kCLXPrivacyCOPPAAppliesKey @"CLXPrivacyCOPPAApplies"
 #define kCLXPrivacyHashedUserIdKey @"CLXPrivacy_hashedUserID"
 #define kCLXPrivacyHashedGeoIpKey @"CLXPrivacyHashedGeoIp"
 

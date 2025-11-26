@@ -89,9 +89,6 @@
     
     XCTAssertNoThrow([[CloudXCore shared] setUserKeyValue:@"key" value:@"value"], 
                      @"Setting key-value after deinitialize should not crash");
-    
-    XCTAssertNoThrow([CloudXCore setIsAgeRestrictedUser:YES], 
-                     @"Setting COPPA after deinitialize should not crash");
 }
 
 // NOTE: Initialization tests with invalid keys have been removed as they

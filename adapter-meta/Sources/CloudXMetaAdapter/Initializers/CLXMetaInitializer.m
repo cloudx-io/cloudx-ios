@@ -192,22 +192,6 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
     
     [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"ATE flag set to %@ - Based on CloudX tracking service", 
                                       idfaAllowed ? @"YES" : @"NO"]];
-    
-    // Configure COPPA (mixed audience) setting
-    [self configureCOPPASettings];
-}
-
-- (void)configureCOPPASettings {
-    CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
-    BOOL coppaEnabled = [privacyService isCoppaEnabled];
-    
-    // Meta requires mixedAudience=YES for apps with child users (COPPA compliance)
-    // Note: Meta prohibits use in child-directed apps; this is for mixed-audience apps only
-    [FBAdSettings setMixedAudience:coppaEnabled];
-    
-    [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"Meta mixedAudience set to %@ (COPPA %@)", 
-                                      coppaEnabled ? @"YES" : @"NO",
-                                      coppaEnabled ? @"enabled" : @"disabled"]];
 }
 
 /**

@@ -1,6 +1,5 @@
 #import "CLXMintegralInitializer.h"
 #import <CloudXCore/CLXLogger.h>
-#import <CloudXCore/CLXPrivacyService.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CloudXCore.h>
 #import <MTGSDK/MTGSDK.h>
@@ -70,7 +69,7 @@ static NSString * const kSDKVersion = @"7.6.3"; // Mintegral SDK version (update
         @try {
             [self.logger debug:[NSString stringWithFormat:@"Initializing Mintegral SDK with AppID: %@", appID]];
             
-            // Configure privacy settings BEFORE SDK initialization (critical for COPPA)
+            // Configure privacy settings BEFORE SDK initialization
             [self configurePrivacySettings];
             
             // Initialize Mintegral SDK
@@ -97,28 +96,13 @@ static NSString * const kSDKVersion = @"7.6.3"; // Mintegral SDK version (update
 }
 
 - (void)configurePrivacySettings {
-    CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
-    
-    // COPPA - MUST be set BEFORE SDK initialization
-    // Mintegral uses setCOPPAIsAgeRestrictedUser: for COPPA compliance
-    BOOL coppaEnabled = [privacyService isCoppaEnabled];
-    [[MTGSDK sharedInstance] setCOPPAIsAgeRestrictedUser:coppaEnabled];
-    [self.logger info:[NSString stringWithFormat:@"Mintegral COPPA set to %@ (user %@ 13)",
-                      coppaEnabled ? @"YES" : @"NO",
-                      coppaEnabled ? @"under" : @"over"]];
-    
     // GDPR - Mintegral automatically reads IAB TCF strings from UserDefaults
     // Keys: IABTCF_TCString, IABTCF_gdprApplies, IABTCF_PurposeConsents
-    // If explicit consent status needed, use: [[MTGSDK sharedInstance] setConsentStatus:]
     [self.logger debug:@"Mintegral reads GDPR consent from IAB TCF strings (UserDefaults)"];
     
     // CCPA - Mintegral automatically reads IAB US Privacy String from UserDefaults
     // Key: IABUSPrivacy_String
-    // If explicit Do Not Sell needed, use: [[MTGSDK sharedInstance] setDoNotSell:]
     [self.logger debug:@"Mintegral reads CCPA from IAB US Privacy String (UserDefaults)"];
-    
-    // Note: Similar to InMobi, Mintegral automatically reads IAB standard strings.
-    // We only need to explicitly set COPPA since it's not part of IAB standards.
 }
 
 - (void)registerFactories {

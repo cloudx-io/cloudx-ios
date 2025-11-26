@@ -28,7 +28,6 @@
     [userDefaults removeObjectForKey:kCLXPrivacyGDPRConsentKey];
     [userDefaults removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
     [userDefaults removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
-    [userDefaults removeObjectForKey:kCLXPrivacyCOPPAAppliesKey];
     [userDefaults removeObjectForKey:kCLXPrivacyHashedUserIdKey];
     [userDefaults removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
     

@@ -4,8 +4,8 @@
 
 /**
  * @file CLXPrivacyService.m
- * @brief Implementation of privacy service for CCPA, COPPA, and personal data protection
- * @discussion GDPR methods are temporarily internal until server support is added. COPPA is now enabled and sent to server per OpenRTB spec.
+ * @brief Implementation of privacy service for CCPA and personal data protection
+ * @discussion GDPR methods are temporarily internal until server support is added.
  */
 
 #import <CloudXCore/CLXPrivacyService.h>
@@ -27,7 +27,6 @@
 @interface CLXPrivacyService (Internal)
 - (nullable NSString *)gdprConsentString;
 - (nullable NSNumber *)gdprApplies;
-- (nullable NSNumber *)coppaApplies;
 - (BOOL)shouldClearPersonalDataIgnoringATT;
 @end
 
@@ -65,19 +64,13 @@
 - (BOOL)shouldClearPersonalDataForCompliance {
     CLXGeoLocationService *geoService = [CLXGeoLocationService shared];
     
-    // Non-US users: no additional restrictions (matching Android)
+    // Non-US users: no additional restrictions
     if (![geoService isUSUser]) {
         [self.logger debug:@"Non-US user - no additional restrictions"];
         return NO;
     }
     
-    // US users: COPPA always takes precedence (matching Android)
-    if ([self isCoppaEnabled]) {
-        [self.logger debug:@"COPPA enabled for US user - clearing personal data"];
-        return YES;
-    }
-    
-    // US users: GPP consent evaluation based on geography (matching Android)
+    // US users: GPP consent evaluation based on geography
     CLXGPPProvider *gppProvider = [CLXGPPProvider sharedInstance];
     NSNumber *targetSid = [geoService isCaliforniaUser] ? @(CLXGppTargetUSCA) : @(CLXGppTargetUSNational);
     
@@ -99,7 +92,7 @@
 }
 
 - (BOOL)shouldClearPersonalDataIgnoringATT {
-    // INTERNAL METHOD: This method includes GDPR/COPPA checks that are not yet supported by server in bid requests
+    // INTERNAL METHOD: This method includes GDPR checks that are not yet supported by server in bid requests
     // Internal method includes comprehensive privacy checks - should not be exposed to publishers
     
     // Check GDPR consent (INTERNAL - server not supported yet)
@@ -126,13 +119,6 @@
         return YES;
     }
     
-    // Check COPPA (INTERNAL - server not supported yet)
-    NSNumber *coppaApplies = [self coppaApplies];
-    if (coppaApplies && [coppaApplies boolValue]) {
-        [self.logger verbose:@"COPPA applies - clearing personal data"];
-        return YES;
-    }
-    
     [self.logger verbose:@"Personal data can be used (ignoring ATT)"];
     return NO;
 }
@@ -156,7 +142,7 @@
     return @NO;
 }
 
-#pragma mark - Internal Privacy Methods (GDPR/COPPA - Server Not Supported)
+#pragma mark - Internal Privacy Methods (GDPR - Server Not Supported)
 
 - (nullable NSString *)gdprConsentString {
     // INTERNAL ONLY: GDPR support not yet implemented on server
@@ -181,19 +167,6 @@
         [self.logger warn:[NSString stringWithFormat:@"GDPR applies has invalid value: %ld (expected 0 or 1)", (long)gdprValue]];
     }
     [self.logger debug:@"GDPR applies (INTERNAL): (unknown)"];
-    return nil;
-}
-
-- (nullable NSNumber *)coppaApplies {
-    NSUserDefaults *defaults = self.userDefaults;
-    if ([defaults objectForKey:kCLXPrivacyCOPPAAppliesKey]) {
-        // OpenRTB spec requires integer: 0 = no, 1 = yes (not boolean)
-        BOOL coppaEnabled = [defaults boolForKey:kCLXPrivacyCOPPAAppliesKey];
-        NSNumber *applies = @(coppaEnabled ? 1 : 0);
-        [self.logger verbose:[NSString stringWithFormat:@"COPPA applies: %@", applies]];
-        return applies;
-    }
-    [self.logger verbose:@"COPPA applies: (unknown)"];
     return nil;
 }
 
@@ -253,16 +226,6 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-- (void)setIsAgeRestrictedUser:(nullable NSNumber *)isAgeRestrictedUser {
-    [self.logger debug:[NSString stringWithFormat:@"Setting COPPA flag: %@", isAgeRestrictedUser ? (isAgeRestrictedUser.boolValue ? @"YES" : @"NO") : @"(cleared)"]];
-    if (isAgeRestrictedUser) {
-        [[NSUserDefaults standardUserDefaults] setBool:[isAgeRestrictedUser boolValue] forKey:kCLXPrivacyCOPPAAppliesKey];
-    } else {
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCOPPAAppliesKey];
-    }
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
 - (void)setDoNotSell:(nullable NSNumber *)doNotSell {
     // Convert boolean to CCPA string format
     NSString *ccpaString = nil;
@@ -306,12 +269,6 @@
     } else {
         [self.logger info:@"GPP SID cleared"];
     }
-}
-
-
-- (BOOL)isCoppaEnabled {
-    NSNumber *coppaApplies = [self coppaApplies];
-    return coppaApplies && [coppaApplies boolValue];
 }
 
 @end

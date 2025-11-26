@@ -52,7 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         CloudXCore.setLoggingEmojisEnabled(true)
         
         // Auto-clear all privacy test settings on every launch
-        // This ensures clean state for testing and prevents COPPA/GPP settings from persisting
+        // This ensures clean state for testing and prevents GPP settings from persisting
         clearAllPrivacyTestSettings()
         
         // Request App Tracking Transparency permission
@@ -63,8 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     private func clearAllPrivacyTestSettings() {
         // Clear all CloudXCore privacy test settings to ensure clean state
-        // This prevents COPPA, GPP, and other privacy scenarios from persisting across app launches
-        CloudXCore.setIsAgeRestrictedUser(false)
+        // This prevents GPP and other privacy scenarios from persisting across app launches
         CloudXCore.setIsUserConsent(true)
         CloudXCore.setIsDoNotSell(false)
         CloudXCore.setCCPAPrivacyString(nil)

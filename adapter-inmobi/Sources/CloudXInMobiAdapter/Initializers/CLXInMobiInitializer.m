@@ -161,15 +161,9 @@ static NSArray<NSString *> *placementIds = nil; // Placement IDs from server con
     // - GDPR: IABTCF_TCString, IABTCF_gdprApplies
     // - CCPA: IABUSPrivacy_String
     //
-    // InMobi does NOT have an explicit COPPA API. For COPPA compliance:
-    // - Publishers should use IAB GDPR consent mechanisms
-    // - Or rely on InMobi's automatic IAB string reading
-    // - Child-directed apps should not use InMobi SDK per their TOS
-    //
     // We pass an empty consent dictionary and let InMobi SDK read IAB strings directly
     
     [[CLXInMobiInitializer logger] debug:@"InMobi will read GDPR/CCPA from IAB UserDefaults (TCF/US Privacy String)"];
-    [[CLXInMobiInitializer logger] debug:@"InMobi does not have explicit COPPA API - relies on IAB standards"];
     
     return [consent copy];
 }

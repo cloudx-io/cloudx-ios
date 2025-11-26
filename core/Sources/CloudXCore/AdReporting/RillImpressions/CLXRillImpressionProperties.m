@@ -58,7 +58,6 @@ RillImpressionBidRequestProperty const RillImpressionBidRequestPropertyExtAdapte
 RillImpressionBidRequestProperty const RillImpressionBidRequestPropertyExtPrebidAdservertargetingKey = @"bidRequest.ext.prebid.adservertargeting.key";
 RillImpressionBidRequestProperty const RillImpressionBidRequestPropertyExtPrebidAdservertargetingValue = @"bidRequest.ext.prebid.adservertargeting.value";
 RillImpressionBidRequestProperty const RillImpressionBidRequestPropertyExtPrebidAdservertargetingSource = @"bidRequest.ext.prebid.adservertargeting.source";
-RillImpressionBidRequestProperty const RillImpressionBidRequestPropertyRegsCoppa = @"bidRequest.regs.coppa";
 RillImpressionBidRequestProperty const RillImpressionBidRequestPropertyRegsExtCcpaDoNotSell = @"bidRequest.regs.ext.ccpa_do_not_sell";
 RillImpressionBidRequestProperty const RillImpressionBidRequestPropertyRegsExtGdprConsent = @"bidRequest.regs.ext.gdpr_consent";
 RillImpressionBidRequestProperty const RillImpressionBidRequestPropertyRegsExtIabGdprTcfv2GdprApplies = @"bidRequest.regs.ext.gdpr_tcfv2_gdpr_applies";

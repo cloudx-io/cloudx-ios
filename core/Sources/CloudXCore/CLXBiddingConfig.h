@@ -206,7 +206,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // MARK: - Regulations
 @interface CLXBiddingConfigRegulations : NSObject
-@property (nonatomic, strong, nullable) NSNumber *coppa;
 @property (nonatomic, strong, nullable) CLXBiddingConfigRegulationsExt *ext;
 @end
 

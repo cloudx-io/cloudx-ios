@@ -58,15 +58,7 @@
 //     - GPP SID: [7] (US-National, not CA-specific)
 //     - Expected: CCPA doesn't apply outside California
 //
-//  7. COPPA Flagged (GPPTestScenarioCOPPAFlagged)
-//     - isAgeRestrictedUser: YES
-//     - Expected: All personal data removed (lat/lon + IDFA)
-//
-//  8. COPPA + GPP Consent (GPPTestScenarioCOPPAWithConsent)
-//     - isAgeRestrictedUser: YES + Consent GPP string
-//     - Expected: COPPA takes precedence, data still removed
-//
-//  9. ATT Denied (GPPTestScenarioATTDenied)
+//  7. ATT Denied (GPPTestScenarioATTDenied)
 //     - Requires iOS Settings: Tracking disabled
 //     - Expected: Personal data removed by iOS system
 //
@@ -76,7 +68,6 @@
 //
 //  - IABGPP_HDR_GppString - IAB GPP consent string (CloudX reads this internally)
 //  - IABGPP_GppSID - IAB GPP Section ID string (CloudX reads this internally)
-//  - [CloudXCore setIsAgeRestrictedUser:] - Enables COPPA mode (CloudX API)
 //  - [CloudXCore setIsUserConsent:] - Sets user consent flag (CloudX API)
 //  - [CloudXCore setIsDoNotSell:] - Sets CCPA do-not-sell flag (CloudX API)
 //
@@ -131,8 +122,6 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
     GPPTestScenarioGPPCCPAOptOut,               // CCPA opt-out (.YA)
     GPPTestScenarioGPPNonUS,                    // EU/Germany (GDPR)
     GPPTestScenarioGPPUSNonCalifornia,          // US non-CA (Oregon, NY, etc)
-    GPPTestScenarioCOPPAFlagged,                // COPPA age-restricted
-    GPPTestScenarioCOPPAWithConsent,            // COPPA + GPP consent (precedence test)
     GPPTestScenarioATTDenied                    // ATT tracking disabled
 };
 
@@ -225,8 +214,6 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
     [self addScenarioAction:alert scenario:GPPTestScenarioGPPCCPAOptOut title:@"CCPA Opt-Out (.YA)" subtitle:@"User opted out"];
     [self addScenarioAction:alert scenario:GPPTestScenarioGPPNonUS title:@"Non-US (Germany)" subtitle:@"Outside US jurisdiction"];
     [self addScenarioAction:alert scenario:GPPTestScenarioGPPUSNonCalifornia title:@"US Non-California (NY)" subtitle:@"US but not CA"];
-    [self addScenarioAction:alert scenario:GPPTestScenarioCOPPAFlagged title:@"⭐️ COPPA Flagged" subtitle:@"Age-restricted user"];
-    [self addScenarioAction:alert scenario:GPPTestScenarioCOPPAWithConsent title:@"⭐️ COPPA + GPP Consent" subtitle:@"COPPA should win"];
     [self addScenarioAction:alert scenario:GPPTestScenarioATTDenied title:@"⭐️ ATT Denied" subtitle:@"Tracking disabled in iOS Settings"];
     
     // Cancel action
@@ -325,20 +312,6 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
             [self setIABGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             break;
             
-        case GPPTestScenarioCOPPAFlagged:
-            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: COPPA Flagged - AUTO-DETECTING LOCATION"];
-            [CloudXCore setIsAgeRestrictedUser:YES];
-            [self setIABGPPString:@"DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA"];
-            [self setIABGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
-            break;
-            
-        case GPPTestScenarioCOPPAWithConsent:
-            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: COPPA + GPP Consent - AUTO-DETECTING LOCATION"];
-            [CloudXCore setIsAgeRestrictedUser:YES];
-            [self setIABGPPString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
-            [self setIABGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
-            break;
-            
         case GPPTestScenarioATTDenied:
             [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: ATT Denied (real geo data from CloudFront API)"];
             [[DemoAppLogger sharedInstance] logMessage:@"⚠️ To test: Go to iOS Settings → Privacy & Security → Tracking → Disable for this app"];
@@ -378,7 +351,6 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     // Clear CloudX privacy settings (public APIs that still exist)
-    [CloudXCore setIsAgeRestrictedUser:NO];
     [CloudXCore setIsUserConsent:YES];
     [CloudXCore setIsDoNotSell:NO];
 }

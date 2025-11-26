@@ -165,15 +165,6 @@ let settings = CLXSettings.sharedInstance()
 settings.usPrivacyString = "1YNN" // Your IAB CCPA string
 ```
 
-### COPPA Compliance
-
-Enable COPPA mode if your app is directed at children:
-
-```swift
-let settings = CLXSettings.sharedInstance()
-settings.coppaEnabled = true
-```
-
 ## Troubleshooting
 
 ### Common Issues
@@ -227,6 +218,6 @@ This adapter is licensed under the Business Source License 1.1. See [LICENSE](LI
 ### Version 1.0.0
 - Initial release
 - Support for Interstitial, Banner, Rewarded, and Native ads
-- Full privacy compliance (GDPR, CCPA, COPPA, ATT)
+- Full privacy compliance (GDPR, CCPA, ATT)
 - Swift Package Manager and CocoaPods support
 
