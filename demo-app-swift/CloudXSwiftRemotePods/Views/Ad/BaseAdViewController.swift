@@ -90,8 +90,8 @@ class BaseAdViewController: UIViewController, AdStateManaging {
         }
 
         return await withCheckedContinuation { continuation in
-            // Production demo app - use testMode: false for real ads
-            cloudX.initializeSDK(appKey: appKey, testMode: false) { success, error in
+            // Demo app - use testMode: true for test ads
+            cloudX.initializeSDK(appKey: appKey, testMode: true) { success, error in
                 if success {
                     print("✅ SDK Initialized: \(success)")
                     NotificationCenter.default.post(name: .sdkInitialized, object: nil)

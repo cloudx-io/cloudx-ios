@@ -43,10 +43,10 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        // Production Configuration
+        // Production Configuration (MetaTestApp - bundle: cloudx.CloudXObjCRemotePods)
         _currentConfig = [[CLXDemoConfig alloc]
             initWithAppKey:@"ihtOXvp3X9JlMQ5p0_RYL"
-            hashedUserId:@"prod-user-123"
+            hashedUserId:@"test-user-123"
             bannerPlacement:@"demo-banner-1"
             mrecPlacement:@"demo-mrec-1"
             interstitialPlacement:@"demo-interstitial-1"
