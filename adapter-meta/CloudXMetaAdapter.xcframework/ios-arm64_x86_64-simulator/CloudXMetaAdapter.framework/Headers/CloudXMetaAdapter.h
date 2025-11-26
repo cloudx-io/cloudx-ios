@@ -16,6 +16,10 @@ FOUNDATION_EXPORT const unsigned char CloudXMetaAdapterVersionString[];
 // Registration function for static frameworks
 __attribute__((visibility("default"))) void CloudXMetaAdapterRegister(void);
 
+// Adapter registration class
+@interface CloudXMetaAdapter : NSObject
+@end
+
 // Public headers
 #import "CLXMetaBanner.h"
 #import "CLXMetaBannerFactory.h"

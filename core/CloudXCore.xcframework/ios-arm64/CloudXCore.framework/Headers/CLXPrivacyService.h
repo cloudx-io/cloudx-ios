@@ -4,10 +4,9 @@
 
 /**
  * @file CLXPrivacyService.h
- * @brief Privacy service for handling CCPA, COPPA, and personal data protection
- * @details This service provides privacy compliance functionality for CCPA and COPPA.
+ * @brief Privacy service for handling CCPA and personal data protection
+ * @details This service provides privacy compliance functionality for CCPA.
  *          GDPR support is temporarily internal as server-side support is not yet implemented.
- *          COPPA is now enabled and sent to server per OpenRTB spec.
  */
 
 #import <Foundation/Foundation.h>
@@ -17,9 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @class CLXPrivacyService
  * @brief Service for handling privacy compliance and personal data protection
- * @discussion This service manages privacy settings for CCPA and COPPA compliance and
+ * @discussion This service manages privacy settings for CCPA compliance and
  * determines when personal data should be cleared. GDPR support is temporarily internal
- * until server-side implementation is complete. COPPA is now enabled and sent to server per OpenRTB spec.
+ * until server-side implementation is complete.
  */
 @interface CLXPrivacyService : NSObject
 
@@ -88,20 +87,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion ⚠️ GDPR is not yet supported by CloudX servers. Please contact CloudX if you need GDPR support. CCPA is fully supported.
  */
 - (void)setHasUserConsent:(nullable NSNumber *)hasUserConsent;
-
-/**
- * @brief Sets whether the user is age-restricted (COPPA)
- * @param isAgeRestrictedUser YES if user is age-restricted, NO otherwise, nil to clear
- * @discussion COPPA data clearing is implemented but not included in bid requests (server limitation). CCPA is fully supported.                                                                                               
- */
-- (void)setIsAgeRestrictedUser:(nullable NSNumber *)isAgeRestrictedUser;
-
-/**
- * @brief Gets whether COPPA applies (user is age-restricted)
- * @return YES if COPPA applies, NO otherwise
- * @discussion Returns the current COPPA status set via setIsAgeRestrictedUser
- */
-- (BOOL)isCoppaEnabled;
 
 /**
  * @brief Sets the "do not sell" preference (CCPA)

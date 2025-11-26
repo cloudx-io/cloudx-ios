@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Called when user is rewarded.
  * @param ad ad that was rewarded
  */
-- (void)userRewarded:(CLXAd *)ad;
+- (void)userRewarded:(CLXAd *)ad NS_SWIFT_NAME(userRewarded(_:));
 
 @end
 

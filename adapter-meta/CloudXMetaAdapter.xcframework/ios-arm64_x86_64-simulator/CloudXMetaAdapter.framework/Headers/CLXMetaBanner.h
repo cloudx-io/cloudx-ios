@@ -21,8 +21,23 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) BOOL isFlexibleSize;
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
 
+/**
+ * Initialize Meta banner adapter
+ * 
+ * @param bidPayload Bid payload from server
+ * @param placementID Meta placement ID (now nullable - validation deferred to load())
+ * @param bidID Bid identifier
+ * @param type Banner type
+ * @param viewController View controller for presentation
+ * @param delegate Adapter delegate for callbacks
+ * @return Initialized adapter instance
+ *
+ * @discussion As of v1.3.0, placementID can be nil. Validation occurs in load()
+ *             and errors are reported via delegate callback.
+ * @since 1.3.0 placementID parameter is now nullable
+ */
 - (instancetype)initWithBidPayload:(NSString *)bidPayload
-                       placementID:(NSString *)placementID
+                       placementID:(nullable NSString *)placementID
                             bidID:(NSString *)bidID
                              type:(CLXBannerType)type
                     viewController:(UIViewController *)viewController
