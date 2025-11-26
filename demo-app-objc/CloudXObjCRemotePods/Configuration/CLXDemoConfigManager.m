@@ -90,10 +90,10 @@
         bannerPlacement:@"demo-banner-1"
         mrecPlacement:@"demo-mrec-1"
         interstitialPlacement:@"demo-interstitial-1"
-        nativePlacement:@"-"
-        nativeBannerPlacement:@"-"
-        rewardedPlacement:@"-"
-        rewardedInterstitialPlacement:@"-"];
+        nativePlacement:@"demo-native-1"
+        nativeBannerPlacement:@"demo-native-banner-1"
+        rewardedPlacement:@"demo-rewarded-1"
+        rewardedInterstitialPlacement:@"demo-rewarded-interstitial-1"];
     
     _configurations = @{
         @(CLXDemoEnvironmentStaging): stagingConfig,

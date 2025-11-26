@@ -56,8 +56,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    NSLog(@"[RewardedInterstitialViewController] viewWillAppear");
-    [self loadRewardedInterstitial];
+    // No auto-loading - user must press Load Rewarded Interstitial button
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -73,11 +72,16 @@
     return [[CLXDemoConfigManager sharedManager] currentConfig].rewardedInterstitialPlacement;
 }
 
-- (void)loadRewardedInterstitial {
-    NSLog(@"[RewardedInterstitialViewController] loadRewardedInterstitial called");
+- (void)loadRewardedInterstitialAd {
+    NSLog(@"[RewardedInterstitialViewController] loadRewardedInterstitialAd called");
 
-    if (self.isLoading || self.rewardedInterstitialAd) {
-        NSLog(@"[RewardedInterstitialViewController] Rewarded interstitial ad process already started");
+    if (self.isLoading) {
+        [self showAlertWithTitle:@"Info" message:@"Rewarded Interstitial is already loading."];
+        return;
+    }
+    
+    if (self.rewardedInterstitialAd) {
+        [self showAlertWithTitle:@"Info" message:@"Rewarded Interstitial already loaded. Use Show button to display it."];
         return;
     }
 
@@ -113,21 +117,20 @@
 - (void)showRewardedInterstitialAd {
     NSLog(@"[RewardedInterstitialViewController] 'Show Rewarded Interstitial' button tapped.");
     
+    if (!self.rewardedInterstitialAd) {
+        [self showAlertWithTitle:@"Error" message:@"No rewarded interstitial loaded. Please load first."];
+        return;
+    }
+    
+    if (self.isLoading) {
+        [self showAlertWithTitle:@"Info" message:@"Rewarded Interstitial is still loading. Please wait."];
+        return;
+    }
+    
     if (self.rewardedInterstitialAd.isReady) {
-        NSLog(@"✅ Ad is ready. Calling showFromViewController...");
         [self.rewardedInterstitialAd showFromViewController:self];
     } else {
-        NSLog(@"⏳ Ad not ready. Will attempt to load.");
-        if (!self.isLoading && self.rewardedInterstitialAd) {
-            NSLog(@"🔄 Starting new load since not currently loading");
-            [self.rewardedInterstitialAd load];
-        } else if (self.isLoading) {
-            NSLog(@"⏳ Already loading, just waiting for completion");
-        } else {
-            NSLog(@"❌ No rewarded interstitial instance available, creating new one");
-            [self loadRewardedInterstitial];
-        }
-        [self updateStatusUIWithState:AdStateLoading];
+        [self showAlertWithTitle:@"Error" message:@"Rewarded Interstitial is not ready. Please try loading again."];
     }
 }
 
@@ -171,7 +174,7 @@
 - (void)didHideAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 RewardedInterstitial didHideWithAd - Ad: %@", ad]];
     self.rewardedInterstitialAd = nil;
-    [self loadRewardedInterstitial];
+    // Don't auto-load - user must press Load Rewarded Interstitial button
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
