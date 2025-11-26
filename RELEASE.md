@@ -252,11 +252,12 @@ git push origin release/vX.Y.Z
 
 **Only proceed after Phase 4 testing is successful!**
 
-```bash
-# 1. Merge PUBLIC repo PR first
-#    Go to GitHub and merge cloudx-ios PR to main
+#### Step 1: Merge PUBLIC Repo PR
 
-# 2. Tag PUBLIC repo and create GitHub releases
+```bash
+# Go to GitHub and merge cloudx-ios PR to main
+# Then tag and create releases:
+
 cd cloudx-ios
 git checkout main
 git pull origin main
@@ -272,13 +273,38 @@ gh release create vX.Y.Z-core --title "CloudXCore X.Y.Z" core/CloudXCore.xcframe
 gh release create vX.Y.Z-meta --title "CloudXMetaAdapter X.Y.Z" adapter-meta/CloudXMetaAdapter.xcframework.zip
 gh release create vX.Y.Z-vungle --title "CloudXVungleAdapter X.Y.Z" adapter-vungle/CloudXVungleAdapter.xcframework.zip
 gh release create vX.Y.Z-renderer --title "CloudXRenderer X.Y.Z" renderer-cloudx/CloudXRenderer.xcframework.zip
+```
 
-# 3. Merge PRIVATE repo PRs
-#    Go to GitHub:
-#    - Merge release/X.Y.Z → develop (regular merge)
-#    - Merge release/X.Y.Z → main (SQUASH merge)
+#### Step 2: Merge PRIVATE Repo PRs
 
-# 4. Tag PRIVATE repo main
+```bash
+# Go to GitHub:
+# 1. Merge release/X.Y.Z → develop (regular merge)
+# 2. Merge release/X.Y.Z → main (SQUASH merge)
+```
+
+#### Step 3: Sync Main Back to Develop (CRITICAL)
+
+**⚠️ This step prevents merge conflicts in future releases!**
+
+After squash merging to main, sync the squashed commit back to develop:
+
+```bash
+cd cloudx-ios-private
+git checkout develop
+git pull origin develop
+git merge main -m "Sync release X.Y.Z from main"
+git push origin develop
+```
+
+**Why is this necessary?**
+- Squash merge creates a NEW commit that Git doesn't recognize as related to the original commits
+- Without this sync, the next release branch (created from develop) won't have main's history
+- This causes merge conflicts when trying to merge future releases to main
+
+#### Step 4: Tag PRIVATE Repo Main
+
+```bash
 cd cloudx-ios-private
 git checkout main
 git pull origin main
@@ -289,6 +315,32 @@ git tag vX.Y.Z-vungle
 git tag vX.Y.Z-renderer
 git push origin vX.Y.Z-core vX.Y.Z-meta vX.Y.Z-vungle vX.Y.Z-renderer
 ```
+
+---
+
+### First Release Bootstrap (One-Time Only)
+
+If this is your **first release** and main has diverged significantly from develop, you may encounter merge conflicts. To bootstrap:
+
+**Option A: Temporarily disable branch protection**
+1. Go to GitHub → Settings → Branches → main → Edit
+2. Disable "Require pull request before merging"
+3. Force push:
+   ```bash
+   git checkout main
+   git reset --hard release/X.Y.Z
+   git push origin main --force
+   ```
+4. Re-enable branch protection
+
+**Option B: Use GitHub's web UI to resolve conflicts**
+1. In the PR, click "Resolve conflicts"
+2. For each file, accept the incoming (release branch) version
+3. Mark as resolved and merge
+
+After bootstrapping, future releases will merge cleanly as long as you perform Step 3 (sync main → develop) after each release.
+
+---
 
 ### Phase 6: Push to CocoaPods Trunk (Required for `pod install` to work)
 
