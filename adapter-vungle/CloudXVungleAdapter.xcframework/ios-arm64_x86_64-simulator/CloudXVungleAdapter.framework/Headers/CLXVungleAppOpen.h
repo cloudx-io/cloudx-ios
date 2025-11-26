@@ -67,15 +67,18 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Initializes a new Vungle App Open adapter
  * @param bidPayload The bid payload for programmatic ads (nil for waterfall)
- * @param placementID The Vungle App Open placement ID
+ * @param placementID The Vungle App Open placement ID (nullable - validation deferred to load())
  * @param bidID The CloudX bid ID
- * @param delegate The CloudX adapter delegate
+ * @param delegate The CloudX adapter delegate (nullable - validation deferred to load())
  * @return Initialized App Open adapter
+ * @discussion As of v1.3.0, placementID and delegate can be nil. Validation occurs in load()
+ *             and errors are reported via delegate callback.
+ * @since 1.3.0 placementID and delegate parameters are now nullable
  */
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
-                       placementID:(NSString *)placementID
+                       placementID:(nullable NSString *)placementID
                              bidID:(NSString *)bidID
-                          delegate:(id<CLXAdapterInterstitialDelegate>)delegate;
+                          delegate:(nullable id<CLXAdapterInterstitialDelegate>)delegate;
 
 /**
  * Loads the App Open ad

@@ -3,11 +3,10 @@ platform :ios, '15.0'
 target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static
 
-  # Release Candidate v1.2.0-rc.1 - Install from GitHub releases
-  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-rc.1-core'
-  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-rc.1-meta'
-  pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-rc.1-renderer'
-  pod 'CloudXVungleAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-rc.1-vungle'
+  pod 'CloudXCore', '~> 1.2.0'
+  pod 'CloudXMetaAdapter', '~> 1.2.0'
+  pod 'CloudXRenderer', '~> 1.2.0'
+  pod 'CloudXVungleAdapter', '~> 1.2.0'
 
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths

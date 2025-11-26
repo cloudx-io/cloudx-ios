@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXError.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -58,10 +59,22 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 /**
  * Initialize the SDK to start serving ads
  * @param appKey The app key provided by CloudX
+ * @param testMode YES to enable test mode (test ads, no billing), NO for production (default: NO)
  * @param completion A completion handler that will be called once the SDK is initialized
+ * @discussion When testMode is YES:
+ * - Bid requests will include test=1 flag (OpenRTB spec)
+ * - Adapter SDKs will be configured for test mode (e.g., Meta test ads)
+ * - No real monetization will occur
+ * 
+ * Use testMode:YES during development and QA testing.
+ * Use testMode:NO for production (real ads with actual billing).
+ * The host app has full control over the testMode setting.
+ * 
+ * In Swift, you can omit testMode to use the default value (false):
+ * CloudXCore.shared.initializeSDK(appKey: "key") { success, error in ... }
  */
-- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(nullable void (^)(BOOL success, NSError * _Nullable error))completion
-    NS_SWIFT_NAME(initializeSDK(appKey:completion:));
+- (void)initializeSDKWithAppKey:(NSString *)appKey testMode:(BOOL)testMode completion:(nullable void (^)(BOOL success, CLXError * _Nullable error))completion
+    NS_SWIFT_NAME(initializeSDK(appKey:testMode:completion:));
 
 /**
  * Set the hashed user ID for auction requests
@@ -125,14 +138,12 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  * @param placement The placement name. This should match the placement name in the CloudX dashboard
  * @param viewController The view controller in which the ad will be displayed
  * @param delegate The delegate to receive ad events
- * @param tmax Optional timeout value for bid requests
  * @return A CLXBannerAdView object
  */
 - (nullable CLXBannerAdView *)createBannerWithPlacement:(NSString *)placement
-                                            viewController:(UIViewController *)viewController
-                                                  delegate:(nullable id<CLXBannerDelegate>)delegate
-                                                      tmax:(nullable NSNumber *)tmax
-    NS_SWIFT_NAME(createBanner(placement:viewController:delegate:tmax:));
+                                           viewController:(UIViewController *)viewController
+                                                 delegate:(nullable id<CLXBannerDelegate>)delegate
+    NS_SWIFT_NAME(createBanner(placement:viewController:delegate:));
 
 /**
  * Create a MREC ad
@@ -149,22 +160,20 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 /**
  * Create an interstitial ad
  * @param placement The placement name. This should match the placement name in the CloudX dashboard
- * @param delegate The delegate to receive ad events
  * @return A CLXInterstitial object
+ * @discussion Set the delegate property on the returned object to receive ad events
  */
 - (nullable CLXInterstitial *)createInterstitialWithPlacement:(NSString *)placement
-                                                     delegate:(nullable id<CLXInterstitialDelegate>)delegate
-    NS_SWIFT_NAME(createInterstitial(placement:delegate:));
+    NS_SWIFT_NAME(createInterstitial(placement:));
 
 /**
  * Create a rewarded ad
  * @param placement The placement name. This should match the placement name in the CloudX dashboard
- * @param delegate The delegate to receive ad events
  * @return A CLXRewarded object
+ * @discussion Set the delegate property on the returned object to receive ad events
  */
 - (nullable CLXRewarded *)createRewardedWithPlacement:(NSString *)placement
-                                             delegate:(nullable id<CLXRewardedDelegate>)delegate
-    NS_SWIFT_NAME(createRewarded(placement:delegate:));
+    NS_SWIFT_NAME(createRewarded(placement:));
 
 /**
  * Create a native ad
@@ -192,13 +201,6 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  * @discussion ⚠️ GDPR is not yet supported by CloudX servers. Please contact CloudX if you need GDPR support. CCPA is fully supported.
  */
 + (void)setIsUserConsent:(BOOL)isUserConsent;
-
-/**
- * Set whether user is age-restricted (COPPA)
- * @param isAgeRestrictedUser YES if user is age-restricted, NO otherwise
- * @discussion COPPA data clearing is implemented but not included in bid requests (server limitation). Android parity for data clearing behavior.
- */
-+ (void)setIsAgeRestrictedUser:(BOOL)isAgeRestrictedUser;
 
 /**
  * Set "do not sell" preference (CCPA)

@@ -73,9 +73,9 @@
     }
     
     // Use standard CloudXCore initialization
-    // Production demo app - use testMode:NO for real ads
+    // Demo app - use testMode:YES for test ads
     [[CloudXCore shared] initializeSDKWithAppKey:config.appKey 
-                                testMode:NO
+                                testMode:YES
                                 completion:^(BOOL success, CLXError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (success) {

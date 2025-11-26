@@ -36,12 +36,11 @@ class CLXDemoConfig {
 class CLXDemoConfigManager {
     static let sharedManager = CLXDemoConfigManager()
     
-    // Production-only configuration for remote pods demo
-    // Environment switching requires local source compilation with DEBUG flag
+    // Production configuration for remote pods demo
     let currentConfig: CLXDemoConfig
     
     private init() {
-        // Production Configuration
+        // Production Configuration (SwiftDemoApp - bundle: cloudx.CloudXSwiftRemotePods)
         self.currentConfig = CLXDemoConfig(
             appKey: "xcQftcBSUmqzuv1LfET2o",
             hashedUserId: "test-user-123",

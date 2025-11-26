@@ -1,52 +1,87 @@
-# Changelog
+# CloudX iOS SDK Changelog
 
 All notable changes to the CloudX iOS SDK will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+---
 
-## [1.2.0-rc.1] - 2024-11-16
+## [1.2.0] - 2025-11-26
 
-### Release Candidate
+### 🚀 First Official Release
 
-First release candidate for v1.2.0 with all active adapters.
+The **CloudX iOS SDK** is a comprehensive mobile advertising solution that provides programmatic advertising capabilities for iOS applications.
+
+### Features
+
+#### Ad Formats
+- **Banner Ads** (320×50) - Standard banner advertisements
+- **MREC Ads** (300×250) - Medium rectangle advertisements  
+- **Interstitial Ads** - Full-screen advertisements
+
+#### Core Capabilities
+- **Server-Side Header Bidding** - Real-time programmatic auction with multiple demand sources
+- **Unified Auction** - Single SDK manages bidding across all integrated demand partners
+- **Privacy Compliance** - Built-in support for GDPR, CCPA, and App Tracking Transparency (ATT)
+- **Comprehensive Analytics** - Session tracking, impression metrics, and revenue reporting
+
+#### Developer Experience
+- **Simple Integration** - Initialize once, create ads with a single method call
+- **Delegate-Based Callbacks** - Clear lifecycle events for ad loading, display, and errors
+- **Test Mode** - Built-in test mode for development and QA
+- **Flexible Logging** - Configurable log verbosity for debugging
+
+#### Architecture
+- **Static XCFramework Distribution** - Fast app launch times, no dSYM warnings
+- **Modular Adapter System** - Add only the demand partners you need
+- **iOS 15.0+** - Modern iOS support with Swift and Objective-C compatibility
 
 ### Components
 
-- **CloudXCore** v1.2.0-rc.1 - Core SDK with programmatic advertising capabilities
-- **CloudXMetaAdapter** v1.2.0-rc.1 - Meta (Facebook Audience Network) adapter
-- **CloudXRenderer** v1.2.0-rc.1 - CloudX rendering engine for header bidding
-- **CloudXVungleAdapter** v1.2.0-rc.1 - Vungle/Liftoff adapter with header bidding support
-
-### Distribution
-
-- All components distributed as XCFrameworks for optimal performance
-- Binary distribution for faster integration and smaller build times
-- Available via CocoaPods and Swift Package Manager
-
-### Testing
-
-This is a release candidate for testing purposes. Please verify:
-- Banner and interstitial ad formats
-- SDK version reporting (should show 1.2.0-rc.1)
-- All adapter integrations
-- No crashes or memory leaks
+| Component | Description |
+|-----------|-------------|
+| **CloudXCore** | Core SDK with programmatic advertising engine |
+| **CloudXMetaAdapter** | Meta Audience Network integration |
+| **CloudXVungleAdapter** | Vungle/Liftoff integration with header bidding |
+| **CloudXRenderer** | Creative rendering engine for CloudX demand |
 
 ### Installation
 
 ```ruby
-# CocoaPods - Git URL (Release Candidate)
-pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-rc.1-core'
-pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-rc.1-meta'
-pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-rc.1-renderer'
-pod 'CloudXVungleAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.2.0-rc.1-vungle'
+# Podfile
+platform :ios, '15.0'
+
+target 'YourApp' do
+  use_frameworks! :linkage => :static
+  
+  pod 'CloudXCore'
+  pod 'CloudXMetaAdapter'      # Optional
+  pod 'CloudXVungleAdapter'    # Optional
+  pod 'CloudXRenderer'         # For CloudX demand
+end
 ```
 
-### Notes
+### Quick Start
 
-- This is a pre-release version for testing
-- Not recommended for production use
-- Stable v1.2.0 will follow after RC testing period
+```objc
+// Initialize SDK
+[[CloudXCore shared] initializeSDKWithAppKey:@"YOUR_APP_KEY"
+                                    testMode:NO
+                                  completion:^(BOOL success, CLXError *error) {
+    if (success) {
+        NSLog(@"CloudX SDK initialized!");
+    }
+}];
 
+// Create and load a banner ad
+CLXBannerAdView *banner = [[CloudXCore shared] createBannerWithPlacement:@"PLACEMENT_ID"
+                                                           viewController:self
+                                                                 delegate:self];
+[self.view addSubview:banner];
+[banner load];
+```
+
+### Documentation
+
+For complete documentation, visit [docs.cloudx.io/ios](https://docs.cloudx.io/ios/installation)

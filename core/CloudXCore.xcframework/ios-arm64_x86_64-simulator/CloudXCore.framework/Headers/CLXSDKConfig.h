@@ -44,7 +44,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointObject *cdpEndpointURL;
 @property (nonatomic, copy, nullable) NSString *organizationID;
-@property (nonatomic, assign) NSInteger preCacheSize;
 @property (nonatomic, copy, nullable) NSString *impressionTrackerURL;
 @property (nonatomic, copy, nullable) NSString *metricsEndpointURL;
 @property (nonatomic, strong, nullable) CLXMetricsConfig *metricsConfig;
@@ -76,7 +75,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXSDKConfigResponse : NSObject
 @property (nonatomic, copy, nullable) NSString *metricsEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sessionID;
-@property (nonatomic, assign) NSInteger preCacheSize;
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointObject *cdpEndpointURL;
 @property (nonatomic, strong, nullable) CLXSDKConfigKeyValueObject *keyValuePaths;

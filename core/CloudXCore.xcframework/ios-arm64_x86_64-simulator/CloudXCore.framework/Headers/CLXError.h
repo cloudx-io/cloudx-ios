@@ -10,7 +10,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Loss reasons following OpenRTB standard - matching Android LossReason enum
+ * Loss reasons following OpenRTB standard
  * See: OpenRTB 2.5+ specification for standard loss reason codes
  */
 typedef NS_ENUM(NSInteger, CLXLossReason) {
@@ -30,6 +30,10 @@ typedef NS_ENUM(NSInteger, CLXLossReason) {
  * 500-599: Configuration and setup errors
  */
 typedef NS_ENUM(NSInteger, CLXErrorCode) {
+    // GENERAL ERRORS (0-99)
+    /// Unknown or unspecified error
+    CLXErrorCodeUnknown = 0,
+    
     // INITIALIZATION ERRORS (100-199)
     /// SDK failed to initialize
     CLXErrorCodeNotInitialized = 100,
@@ -96,7 +100,15 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     /// Banner view is nil or invalid
     CLXErrorCodeInvalidBannerView = 503,
     /// Native view is nil or invalid
-    CLXErrorCodeInvalidNativeView = 504
+    CLXErrorCodeInvalidNativeView = 504,
+    /// No adapters registered (no adapter frameworks included in project)
+    CLXErrorCodeNoAdaptersRegistered = 505,
+    /// Invalid adapter configuration
+    CLXErrorCodeInvalidConfiguration = 506,
+    /// Invalid ad unit ID provided
+    CLXErrorCodeInvalidAdUnitID = 507,
+    /// Invalid bid response
+    CLXErrorCodeInvalidBidResponse = 508
 };
 
 /**
@@ -123,6 +135,16 @@ extern NSString * const CLXErrorDomain;
  * @return A new CLXError instance
  */
 + (instancetype)errorWithCode:(CLXErrorCode)code description:(NSString *)description;
+
+/**
+ * Creates an error with the specified CloudX error code, description, and underlying error
+ * @param code The CloudX error code
+ * @param description Custom error description
+ * @param underlyingError The original error that caused this error (optional)
+ * @return A new CLXError instance
+ * @discussion Use this to preserve the root cause error chain for debugging
+ */
++ (instancetype)errorWithCode:(CLXErrorCode)code description:(NSString *)description underlyingError:(nullable NSError *)underlyingError;
 
 /**
  * Creates an error with appropriate CloudX error code based on HTTP status code
@@ -161,6 +183,13 @@ extern NSString * const CLXErrorDomain;
  * @return An initialized CLXError instance
  */
 - (instancetype)initWithCode:(CLXErrorCode)code userInfo:(nullable NSDictionary *)userInfo;
+
+/**
+ * The underlying error that caused this error, if any
+ * @return The original error or nil if none was provided
+ * @discussion Accessible via userInfo[NSUnderlyingErrorKey] per standard NSError patterns
+ */
+@property (nonatomic, readonly, nullable) NSError *underlyingError;
 
 @end
 

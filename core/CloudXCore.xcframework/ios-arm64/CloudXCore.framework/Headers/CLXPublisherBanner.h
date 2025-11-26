@@ -19,6 +19,7 @@
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXBannerDelegate.h>
 #import <CloudXCore/CLXSettings.h>
+#import <CloudXCore/CLXAdNetworkFactories.h>
 
 @class CLXEnvironmentConfig;
 
@@ -85,16 +86,16 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Initializes a new PublisherBanner with the given parameters.
  * @param viewController The view controller where the banner will be displayed
- * @param placement The placement configuration
+ * @param placement The placement configuration (nil if SDK not initialized, will be resolved on load)
  * @param userID The user ID
  * @param publisherID The publisher ID
  * @param suspendPreloadWhenInvisible Whether to suspend preloading when not visible
  * @param delegate The delegate to receive events
  * @param bannerType The type of banner
  * @param waterfallMaxBackOffTime Maximum backoff time for waterfall
- * @param impModel The impression model
- * @param adFactories Dictionary of banner ad factories
- * @param bidTokenSources Dictionary of bid token sources
+ * @param impModel The impression model (nil if SDK not initialized, will be created on load)
+ * @param adFactories Dictionary of banner ad factories (injected for testability, falls back to CloudXCore if empty)
+ * @param bidTokenSources Dictionary of bid token sources (injected for testability, falls back to CloudXCore if empty)
  * @param bidRequestTimeout Bid request timeout
  * @param reportingService The reporting service
  * @param settings The settings instance for configuration (injected for testability)
@@ -102,14 +103,14 @@ NS_ASSUME_NONNULL_BEGIN
  * @return Initialized PublisherBanner instance
  */
 - (instancetype)initWithViewController:(UIViewController *)viewController
-                             placement:(CLXSDKConfigPlacement *)placement
+                             placement:(nullable CLXSDKConfigPlacement *)placement
                                 userID:(NSString *)userID
                            publisherID:(NSString *)publisherID
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
                                delegate:(nullable id<CLXBannerDelegate>)delegate
                              bannerType:(CLXBannerType)bannerType
                    waterfallMaxBackOffTime:(NSTimeInterval)waterfallMaxBackOffTime
-                                  impModel:(CLXConfigImpressionModel *)impModel
+                                  impModel:(nullable CLXConfigImpressionModel *)impModel
                               adFactories:(NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *)adFactories
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
