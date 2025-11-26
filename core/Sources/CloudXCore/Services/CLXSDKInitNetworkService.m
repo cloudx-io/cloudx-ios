@@ -236,7 +236,6 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     config.organizationID = response[@"organizationID"];
     config.sessionID = response[@"sessionID"];
     config.appID = response[@"appID"];
-    config.preCacheSize = [response[@"preCacheSize"] integerValue];
     config.geoDataEndpointURL = response[@"geoDataEndpointURL"];
     
     // Parse tracking array for Analytics

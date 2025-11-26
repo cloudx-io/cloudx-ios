@@ -47,7 +47,6 @@
         @"organizationID": @"test-org",
         @"sessionID": @"test-session-12345",
         @"appID": @"test-app",
-        @"preCacheSize": @3,
         @"geoDataEndpointURL": @"https://geo.cloudx.io/data",
         @"auctionEndpointURL": @{
             @"test": @[

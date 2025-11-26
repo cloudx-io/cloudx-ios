@@ -36,7 +36,6 @@
         @"accountID": @"CLDX2_dc",
         @"organizationID": @"CLDX2",
         @"sessionID": @"test-session-123",
-        @"preCacheSize": @5,
         @"geoDataEndpointURL": @"https://geo.cloudx.io",
         @"tracking": @[
             @"bid.ext.prebid.meta.adaptercode",
@@ -76,7 +75,6 @@
     XCTAssertEqualObjects(config.accountID, @"CLDX2_dc", @"Should parse account ID");
     XCTAssertEqualObjects(config.organizationID, @"CLDX2", @"Should parse organization ID");
     XCTAssertEqualObjects(config.sessionID, @"test-session-123", @"Should parse session ID");
-    XCTAssertEqual(config.preCacheSize, 5, @"Should parse pre-cache size");
     XCTAssertEqualObjects(config.geoDataEndpointURL, @"https://geo.cloudx.io", @"Should parse geo endpoint URL");
     
     // Most importantly: verify tracking array is parsed

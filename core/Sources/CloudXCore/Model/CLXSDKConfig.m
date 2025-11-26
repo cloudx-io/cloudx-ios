@@ -79,7 +79,6 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _preCacheSize = 0;
         _placements = [NSArray array];
         _bidders = [NSArray array];
         _seatbid = [NSArray array];

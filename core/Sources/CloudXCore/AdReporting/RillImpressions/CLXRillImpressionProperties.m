@@ -2,7 +2,6 @@
 
 // MARK: - ConfigProperty
 RillImpressionConfigProperty const RillImpressionConfigPropertySessionID = @"config.sessionID";
-RillImpressionConfigProperty const RillImpressionConfigPropertyPreCacheSize = @"config.preCacheSize";
 RillImpressionConfigProperty const RillImpressionConfigPropertyCur = @"config.cur";
 RillImpressionConfigProperty const RillImpressionConfigPropertyId = @"config.id";
 RillImpressionConfigProperty const RillImpressionConfigPropertyBidid = @"config.bidid";

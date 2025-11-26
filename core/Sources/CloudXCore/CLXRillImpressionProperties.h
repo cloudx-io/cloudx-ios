@@ -5,7 +5,6 @@ NS_ASSUME_NONNULL_BEGIN
 // MARK: - ConfigProperty
 typedef NSString * const RillImpressionConfigProperty NS_TYPED_ENUM;
 FOUNDATION_EXPORT RillImpressionConfigProperty const RillImpressionConfigPropertySessionID;
-FOUNDATION_EXPORT RillImpressionConfigProperty const RillImpressionConfigPropertyPreCacheSize;
 FOUNDATION_EXPORT RillImpressionConfigProperty const RillImpressionConfigPropertyCur;
 FOUNDATION_EXPORT RillImpressionConfigProperty const RillImpressionConfigPropertyId;
 FOUNDATION_EXPORT RillImpressionConfigProperty const RillImpressionConfigPropertyBidid;
