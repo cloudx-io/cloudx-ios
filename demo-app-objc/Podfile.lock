@@ -12,43 +12,19 @@ PODS:
   - VungleAds (7.4.5)
 
 DEPENDENCIES:
-  - CloudXCore (from `https://github.com/cloudx-io/cloudx-ios.git`, branch `release/v1.2.0`)
-  - CloudXMetaAdapter (from `https://github.com/cloudx-io/cloudx-ios.git`, branch `release/v1.2.0`)
-  - CloudXRenderer (from `https://github.com/cloudx-io/cloudx-ios.git`, branch `release/v1.2.0`)
-  - CloudXVungleAdapter (from `https://github.com/cloudx-io/cloudx-ios.git`, branch `release/v1.2.0`)
+  - CloudXCore (~> 1.2.0)
+  - CloudXMetaAdapter (~> 1.2.0)
+  - CloudXRenderer (~> 1.2.0)
+  - CloudXVungleAdapter (~> 1.2.0)
 
 SPEC REPOS:
   trunk:
+    - CloudXCore
+    - CloudXMetaAdapter
+    - CloudXRenderer
+    - CloudXVungleAdapter
     - FBAudienceNetwork
     - VungleAds
-
-EXTERNAL SOURCES:
-  CloudXCore:
-    :branch: release/v1.2.0
-    :git: https://github.com/cloudx-io/cloudx-ios.git
-  CloudXMetaAdapter:
-    :branch: release/v1.2.0
-    :git: https://github.com/cloudx-io/cloudx-ios.git
-  CloudXRenderer:
-    :branch: release/v1.2.0
-    :git: https://github.com/cloudx-io/cloudx-ios.git
-  CloudXVungleAdapter:
-    :branch: release/v1.2.0
-    :git: https://github.com/cloudx-io/cloudx-ios.git
-
-CHECKOUT OPTIONS:
-  CloudXCore:
-    :commit: f7ac885dfa8bb1f05ec999f8a19149450b60af04
-    :git: https://github.com/cloudx-io/cloudx-ios.git
-  CloudXMetaAdapter:
-    :commit: f7ac885dfa8bb1f05ec999f8a19149450b60af04
-    :git: https://github.com/cloudx-io/cloudx-ios.git
-  CloudXRenderer:
-    :commit: f7ac885dfa8bb1f05ec999f8a19149450b60af04
-    :git: https://github.com/cloudx-io/cloudx-ios.git
-  CloudXVungleAdapter:
-    :commit: f7ac885dfa8bb1f05ec999f8a19149450b60af04
-    :git: https://github.com/cloudx-io/cloudx-ios.git
 
 SPEC CHECKSUMS:
   CloudXCore: 4beebbdd1a24357b01c558faba249e5e88c01d2e
@@ -58,6 +34,6 @@ SPEC CHECKSUMS:
   FBAudienceNetwork: 08e86d63a05b3a5a59414af12e4af8d756943c80
   VungleAds: 1da221690dd1a8710d0b6a4c7aeac14cb12d31ab
 
-PODFILE CHECKSUM: b05569664845e5ee153d9342cee7240d66abec54
+PODFILE CHECKSUM: 79591ddc186a6e2a6125d3cd89710141dbf094da
 
 COCOAPODS: 1.16.2
