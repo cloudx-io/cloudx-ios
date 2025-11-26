@@ -53,12 +53,9 @@
 //     4. CCPA Opt-Out (.YA) - User opted out
 //     5. Non-US (Germany) - EU privacy (GDPR)
 //     6. US Non-California (NY) - US-National GPP
-//     7. ⭐️ COPPA Flagged - Age-restricted users
-//     8. ⭐️ COPPA + GPP Consent - Tests COPPA precedence
-//     9. ⭐️ ATT Denied - iOS tracking disabled (requires Settings config)
+//     7. ⭐️ ATT Denied - iOS tracking disabled (requires Settings config)
 //
 //  🎯 Privacy Compliance Testing:
-//     - COPPA (Children's Online Privacy Protection Act)
 //     - CCPA (California Consumer Privacy Act)
 //     - GPP (Global Privacy Platform - US-CA, US-National, EU)
 //     - ATT (App Tracking Transparency)
@@ -76,7 +73,6 @@
 //  - IABGPP_GppSID - IAB GPP Section ID (7=US-National, 8=US-CA/EU)
 //  
 //  Also calls CloudXCore public APIs for other privacy settings:
-//  - setIsAgeRestrictedUser: - Enables COPPA compliance
 //  - setIsUserConsent: - Sets user consent flag
 //  - setIsDoNotSell: - Sets CCPA do-not-sell flag
 //  
@@ -139,7 +135,6 @@
 //      ┌─────────────────────────────────┐
 //      │   CloudXCore SDK                │
 //      │   - Reads GPP internally        │
-//      │   - setIsAgeRestrictedUser:     │
 //      └─────────────────────────────────┘
 
 #import <UIKit/UIKit.h>
