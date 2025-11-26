@@ -1,86 +1,87 @@
 # CloudX iOS SDK Changelog
 
-## [1.2.0] - TBD
+All notable changes to the CloudX iOS SDK will be documented in this file.
 
-### Major Breaking Change: Public API No Longer Returns `nil`
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-#### Overview
-**All public SDK `create` methods now ALWAYS return a non-nil object.** Validation errors that previously resulted in `nil` returns are now deferred and reported via delegate callbacks when `load()` is called.
+---
 
-This brings iOS behavior into full parity with industry-standard SDKs and improves error handling consistency.
+## [1.2.0] - 2025-11-26
 
-#### What Changed
+### 🚀 First Official Release
 
-##### Public API Methods (CloudXCore)
-- `createBannerWithPlacement:viewController:delegate:` - Now ALWAYS returns non-nil `CLXBannerAdView`
-- `createMRECWithPlacement:viewController:delegate:` - Now ALWAYS returns non-nil `CLXBannerAdView`
-- `createInterstitialWithPlacement:` - Now ALWAYS returns non-nil `CLXInterstitial`
-- `createRewardedWithPlacement:` - Now ALWAYS returns non-nil `CLXRewarded`
+The **CloudX iOS SDK** is a comprehensive mobile advertising solution that provides programmatic advertising capabilities for iOS applications.
 
-##### Error Handling
-- Validation errors (missing placement, no adapters registered, etc.) are now reported via delegate methods:
-  - Banner/MREC: `failToLoadWithAd:error:` (from `CLXAdDelegate` protocol)
-  - Interstitial: `failToLoadWithAd:error:` (from `CLXAdDelegate` protocol)
-  - Rewarded: `failToLoadWithAd:error:` (from `CLXAdDelegate` protocol)
+### Features
 
-##### Internal Changes
-- **All adapter factories** (`CLXMolocoBannerFactory`, `CLXMetaBannerFactory`, `CLXInMobiBannerFactory`, `CLXVungleBannerFactory`, etc.) now ALWAYS return non-nil adapter instances
-- **All adapters** defer validation to their `load()` method
-- Added `deferredError` property to `CLXPublisherBanner` and `CLXPublisherFullscreenAdBase` for validation error handling
-- Created `CLXAdapterErrorMapper` utility for standardized error code mapping
+#### Ad Formats
+- **Banner Ads** (320×50) - Standard banner advertisements
+- **MREC Ads** (300×250) - Medium rectangle advertisements  
+- **Interstitial Ads** - Full-screen advertisements
 
-#### Migration Guide
+#### Core Capabilities
+- **Server-Side Header Bidding** - Real-time programmatic auction with multiple demand sources
+- **Unified Auction** - Single SDK manages bidding across all integrated demand partners
+- **Privacy Compliance** - Built-in support for GDPR, CCPA, and App Tracking Transparency (ATT)
+- **Comprehensive Analytics** - Session tracking, impression metrics, and revenue reporting
 
-**Before (v1.2.x):**
+#### Developer Experience
+- **Simple Integration** - Initialize once, create ads with a single method call
+- **Delegate-Based Callbacks** - Clear lifecycle events for ad loading, display, and errors
+- **Test Mode** - Built-in test mode for development and QA
+- **Flexible Logging** - Configurable log verbosity for debugging
+
+#### Architecture
+- **Static XCFramework Distribution** - Fast app launch times, no dSYM warnings
+- **Modular Adapter System** - Add only the demand partners you need
+- **iOS 15.0+** - Modern iOS support with Swift and Objective-C compatibility
+
+### Components
+
+| Component | Description |
+|-----------|-------------|
+| **CloudXCore** | Core SDK with programmatic advertising engine |
+| **CloudXMetaAdapter** | Meta Audience Network integration |
+| **CloudXVungleAdapter** | Vungle/Liftoff integration with header bidding |
+| **CloudXRenderer** | Creative rendering engine for CloudX demand |
+
+### Installation
+
+```ruby
+# Podfile
+platform :ios, '15.0'
+
+target 'YourApp' do
+  use_frameworks! :linkage => :static
+  
+  pod 'CloudXCore'
+  pod 'CloudXMetaAdapter'      # Optional
+  pod 'CloudXVungleAdapter'    # Optional
+  pod 'CloudXRenderer'         # For CloudX demand
+end
+```
+
+### Quick Start
+
 ```objc
-CLXBannerAdView *banner = [[CloudXCore shared] createBannerWithPlacement:@"placement_id"
-                                                             viewController:self
-                                                                   delegate:self];
-if (!banner) {
-    NSLog(@"Failed to create banner");
-    return;
-}
+// Initialize SDK
+[[CloudXCore shared] initializeSDKWithAppKey:@"YOUR_APP_KEY"
+                                    testMode:NO
+                                  completion:^(BOOL success, CLXError *error) {
+    if (success) {
+        NSLog(@"CloudX SDK initialized!");
+    }
+}];
+
+// Create and load a banner ad
+CLXBannerAdView *banner = [[CloudXCore shared] createBannerWithPlacement:@"PLACEMENT_ID"
+                                                           viewController:self
+                                                                 delegate:self];
 [self.view addSubview:banner];
 [banner load];
 ```
 
-**After (v1.2.0):**
-```objc
-// create() now ALWAYS returns non-nil
-CLXBannerAdView *banner = [[CloudXCore shared] createBannerWithPlacement:@"placement_id"
-                                                             viewController:self
-                                                                   delegate:self];
-[self.view addSubview:banner];
-[banner load];  // Errors reported via delegate
+### Documentation
 
-// Handle errors in delegate method:
-- (void)failToLoadWithAd:(CLXAd *)ad error:(NSError *)error {
-    NSLog(@"Banner load failed: %@", error.localizedDescription);
-}
-```
-
-#### Benefits
-
-1. **Simpler Integration**: No nil checks required after `create()` calls
-2. **Better Error Messages**: Validation errors include detailed context and error codes
-3. **Consistent Behavior**: Matches behavior of modern ad SDKs
-4. **Pre-initialization Support**: Can create ads before SDK initialization completes - they queue automatically
-
-#### Affected Adapters
-
-All adapters have been refactored to support this pattern:
-- ✅ Moloco (Banner, Interstitial, Rewarded, Native)
-- ✅ Meta (Banner, Interstitial, Rewarded, Native)
-- ✅ InMobi (Banner, Interstitial, Rewarded, Native)
-- ✅ Vungle (Banner, Interstitial, Rewarded, Native, AppOpen)
-
-#### Backward Compatibility
-
-The `nullable` annotations remain on public API methods for backward compatibility, but in practice, `nil` will never be returned in v1.3.0+. Publishers should update their integration code to remove nil checks.
-
----
-
-## [1.2.0] - Previous Release
-
-(Previous changelog entries...)
-
+For complete documentation, visit [docs.cloudx.io/ios](https://docs.cloudx.io/ios/installation)

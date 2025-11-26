@@ -8,28 +8,29 @@ name: Release Candidate Build & Publish
 #
 # WHAT IT DOES:
 #   1. Extracts base version from podspecs
-#   2. Generates RC version: 1.1.58-rc.2+a1b2c3d
+#   2. Generates RC version: 1.2.0-rc.2+a1b2c3d
 #      - rc.2 = release candidate build #2 (from GitHub run number)
 #      - a1b2c3d = Git commit SHA
-#   3. Updates all version constants
+#   3. Updates all version constants (Core, Meta, Vungle, Renderer)
 #   4. Validates podspecs (ensures they're ready for CocoaPods)
-#   5. Builds all components (Core, Meta, Renderer)
+#   5. Builds all components as xcframeworks
 #   6. Creates GitHub pre-release with testing checklist
 #
-# GIT TAGS:
-#   NO git tags are created for RC builds (matches Android behavior).
-#   Only stable releases off main get tagged.
+# COMPONENTS BUILT:
+#   - CloudXCore
+#   - CloudXMetaAdapter
+#   - CloudXVungleAdapter
+#   - CloudXRenderer
 #
-# USAGE FOR PRE-PRODUCTION TESTING:
-#   Download xcframeworks from GitHub Pre-Releases or use:
-#     pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release/1.2.0'
+# GIT TAGS:
+#   NO git tags are created for RC builds.
+#   Only stable releases off main get tagged.
 #
 # RELEASE WORKFLOW:
 #   1. Create release/X.Y.Z branch → This workflow runs automatically
 #   2. Test the RC build thoroughly
-#   3. If tests pass, merge to main
-#   4. Manually push tag: git tag v1.1.58-core && git push origin v1.1.58-core
-#   5. Triggers stable-release.yml which pushes to CocoaPods Trunk (public!)
+#   3. If tests pass, merge to main (squash merge)
+#   4. Tag main with component tags: v1.2.0-core, v1.2.0-meta, etc.
 #
 # ============================================================================
 
@@ -76,6 +77,8 @@ jobs:
           echo "full_version=$FULL_VERSION" >> $GITHUB_OUTPUT
           echo "Generated RC version: $FULL_VERSION"
       
+      # ========== UPDATE ALL VERSION CONSTANTS ==========
+      
       - name: Update Core SDK version constant
         run: |
           ./scripts/update-version-constant.sh core "${{ steps.fullversion.outputs.full_version }}"
@@ -83,39 +86,49 @@ jobs:
       
       - name: Update Meta Adapter version constant
         run: |
-          META_BASE=$(grep "s.version.*=" adapter-meta/CloudXMetaAdapter.podspec | head -1 | sed "s/.*['\"]\\([^'\"]*\\)['\"].*/\\1/")
-          META_FULL=$(./scripts/generate-version.sh "$META_BASE" rc ${{ github.run_number }})
-          ./scripts/update-version-constant.sh meta "$META_FULL"
-          echo "Updated CLXMetaAdapterVersion.m to: $META_FULL"
+          ./scripts/update-version-constant.sh meta "${{ steps.fullversion.outputs.full_version }}"
+          echo "Updated CLXMetaAdapterVersion.m to: ${{ steps.fullversion.outputs.full_version }}"
+      
+      - name: Update Vungle Adapter version constant
+        run: |
+          ./scripts/update-version-constant.sh vungle "${{ steps.fullversion.outputs.full_version }}"
+          echo "Updated CLXVungleAdapterVersion.m to: ${{ steps.fullversion.outputs.full_version }}"
       
       - name: Update Renderer version constant
         run: |
-          RENDERER_BASE=$(grep "s.version.*=" renderer-cloudx/CloudXRenderer.podspec | head -1 | sed "s/.*['\"]\\([^'\"]*\\)['\"].*/\\1/")
-          RENDERER_FULL=$(./scripts/generate-version.sh "$RENDERER_BASE" rc ${{ github.run_number }})
-          ./scripts/update-version-constant.sh renderer "$RENDERER_FULL"
-          echo "Updated CLXRendererVersion.m to: $RENDERER_FULL"
+          ./scripts/update-version-constant.sh renderer "${{ steps.fullversion.outputs.full_version }}"
+          echo "Updated CLXRendererVersion.m to: ${{ steps.fullversion.outputs.full_version }}"
+      
+      # ========== VALIDATE PODSPECS ==========
       
       - name: Validate podspecs
         run: |
           pod lib lint core/CloudXCore.podspec --allow-warnings --skip-import-validation --skip-tests
           pod lib lint renderer-cloudx/CloudXRenderer.podspec --allow-warnings --skip-import-validation --skip-tests --include-podspecs='core/CloudXCore.podspec'
       
-      - name: Build Core framework
+      # ========== BUILD ALL XCFRAMEWORKS ==========
+      
+      - name: Build Core xcframework
         run: |
           cd core
-          xcodebuild -project CloudXCore.xcodeproj \
-            -scheme CloudXCore \
-            -configuration Release \
-            -destination 'generic/platform=iOS' \
-            -derivedDataPath build \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            clean build
+          ./build-xcframework.sh ${{ steps.fullversion.outputs.full_version }}
       
       - name: Build Meta Adapter xcframework
         run: |
           cd adapter-meta
-          ./build_frameworks.sh
+          ./build-xcframework.sh
+      
+      - name: Build Vungle Adapter xcframework
+        run: |
+          cd adapter-vungle
+          ./build-xcframework.sh
+      
+      - name: Build Renderer xcframework
+        run: |
+          cd renderer-cloudx
+          ./build-xcframework.sh ${{ steps.fullversion.outputs.full_version }}
+      
+      # ========== CREATE GITHUB RELEASE ==========
       
       - name: Create GitHub Release
         env:
@@ -131,32 +144,26 @@ jobs:
           **Commit:** \`${{ github.sha }}\`  
           **Branch:** \`${GITHUB_REF#refs/heads/}\`
           
+          ### 📦 Components Built
+          - CloudXCore
+          - CloudXMetaAdapter
+          - CloudXVungleAdapter
+          - CloudXRenderer
+          
           ### ✅ Pre-Release Testing
           
           This is a release candidate build for final validation before public release.
           
-          ### 📦 Installation (Podfile)
-          
-          \`\`\`ruby
-          # Use this specific RC build
-          pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => '$RELEASE_TAG-core'
-          pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => '$RELEASE_TAG-meta'
-          
-          # Or use latest release branch
-          pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => '${GITHUB_REF#refs/heads/}'
-          \`\`\`
-          
           ### 📋 Testing Checklist
           - [ ] Banner ads load correctly
+          - [ ] MREC ads load correctly
           - [ ] Interstitial ads display properly
-          - [ ] Rewarded ads work as expected
-          - [ ] Win/loss notifications fire
-          - [ ] Session metrics track correctly
+          - [ ] SDK version reports correctly in requests
           - [ ] No crashes or memory leaks
           
           ### 🔗 Links
-          - **Commit:** https://github.com/cloudx-io/cloudx-ios/commit/${{ github.sha }}
-          - **Workflow:** https://github.com/cloudx-io/cloudx-ios/actions/runs/${{ github.run_id }}
+          - **Commit:** https://github.com/cloudx-io/cloudx-ios-private/commit/${{ github.sha }}
+          - **Workflow:** https://github.com/cloudx-io/cloudx-ios-private/actions/runs/${{ github.run_id }}
           EOF
           
           gh release create "$RELEASE_TAG" \
@@ -165,8 +172,18 @@ jobs:
             --prerelease \
             --target ${{ github.sha }}
           
+          # Upload all xcframework zips
+          if [ -f core/CloudXCore.xcframework.zip ]; then
+            gh release upload "$RELEASE_TAG" core/CloudXCore.xcframework.zip
+          fi
           if [ -f adapter-meta/CloudXMetaAdapter.xcframework.zip ]; then
             gh release upload "$RELEASE_TAG" adapter-meta/CloudXMetaAdapter.xcframework.zip
+          fi
+          if [ -f adapter-vungle/CloudXVungleAdapter.xcframework.zip ]; then
+            gh release upload "$RELEASE_TAG" adapter-vungle/CloudXVungleAdapter.xcframework.zip
+          fi
+          if [ -f renderer-cloudx/CloudXRenderer.xcframework.zip ]; then
+            gh release upload "$RELEASE_TAG" renderer-cloudx/CloudXRenderer.xcframework.zip
           fi
       
       - name: Summary
@@ -177,13 +194,13 @@ jobs:
           echo "**Build Number:** ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📦 Testing This Build" >> $GITHUB_STEP_SUMMARY
-          echo "Download the xcframework from the GitHub Pre-Release above" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Note:** No git tags are created for RC builds (matches Android behavior)" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Components Built" >> $GITHUB_STEP_SUMMARY
+          echo "- CloudXCore" >> $GITHUB_STEP_SUMMARY
+          echo "- CloudXMetaAdapter" >> $GITHUB_STEP_SUMMARY
+          echo "- CloudXVungleAdapter" >> $GITHUB_STEP_SUMMARY
+          echo "- CloudXRenderer" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### ✅ Next Steps" >> $GITHUB_STEP_SUMMARY
           echo "1. Test this RC build thoroughly" >> $GITHUB_STEP_SUMMARY
-          echo "2. If all tests pass, merge to main" >> $GITHUB_STEP_SUMMARY
-          echo "3. Manually push tag to create stable release: \`git tag v1.1.X-core && git push origin v1.1.X-core\`" >> $GITHUB_STEP_SUMMARY
-
+          echo "2. If all tests pass, merge to main (squash merge)" >> $GITHUB_STEP_SUMMARY
+          echo "3. Tag main with component tags" >> $GITHUB_STEP_SUMMARY

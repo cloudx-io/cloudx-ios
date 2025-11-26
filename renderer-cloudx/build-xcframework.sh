@@ -112,6 +112,11 @@ rm -rf "$ARCHIVE_DIR" "$OUTPUT_XCFRAMEWORK" "$ZIP_OUTPUT" "release_metadata.txt"
 mkdir -p "$ARCHIVE_DIR"
 print_success "Build directory cleaned"
 
+# Install CocoaPods dependencies
+print_step "📦 Installing CocoaPods dependencies..."
+pod install || print_error "Pod install failed"
+print_success "CocoaPods dependencies installed"
+
 # Build for iOS Device
 print_step "📱 Building for iOS device (STATIC)..."
 set -o pipefail

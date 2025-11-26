@@ -9,5 +9,5 @@
 
 #import "CLXRendererVersion.h"
 
-NSString * const CLXRendererVersion = @"1.2.0-rc.1";
+NSString * const CLXRendererVersion = @"1.2.0";
 
