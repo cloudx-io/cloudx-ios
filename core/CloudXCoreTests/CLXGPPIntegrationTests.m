@@ -24,7 +24,7 @@
 @interface CLXGPPIntegrationTests : XCTestCase
 @property (nonatomic, strong) CLXPrivacyService *privacyService;
 @property (nonatomic, strong) CLXGeoLocationService *geoService;
-@property (nonatomic, strong) CLXGPPProvider *gppProvider;
+@property (nonatomic, strong) CLXConsentProvider *gppProvider;
 @end
 
 @implementation CLXGPPIntegrationTests
@@ -33,7 +33,7 @@
     [super setUp];
     self.privacyService = [CLXPrivacyService sharedInstance];
     self.geoService = [CLXGeoLocationService shared];
-    self.gppProvider = [CLXGPPProvider sharedInstance];
+    self.gppProvider = [CLXConsentProvider sharedInstance];
     [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
 }
 

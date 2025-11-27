@@ -36,7 +36,7 @@
 
 @interface CLXBiddingConfigGPPTests : XCTestCase
 @property (nonatomic, strong) CLXPrivacyService *privacyService;
-@property (nonatomic, strong) CLXGPPProvider *gppProvider;
+@property (nonatomic, strong) CLXConsentProvider *gppProvider;
 @property (nonatomic, strong) CLXSDKConfigResponse *mockSDKConfig;
 @property (nonatomic, strong) CLXConfigImpressionModel *mockImpModel;
 @end
@@ -46,7 +46,7 @@
 - (void)setUp {
     [super setUp];
     self.privacyService = [[CLXPrivacyService alloc] init];
-    self.gppProvider = [CLXGPPProvider sharedInstance];
+    self.gppProvider = [CLXConsentProvider sharedInstance];
     [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
     
     // Create mock SDK config with appID for tests

@@ -10,7 +10,7 @@
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXMetricsTrackerProtocol.h>
 #import <CloudXCore/CLXMetricsType.h>
-#import <CloudXCore/CLXGPPProvider.h>
+#import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXErrorReporter.h>
 #import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXBidNetworkService.h>

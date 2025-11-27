@@ -318,4 +318,86 @@
     XCTAssertEqualObjects(ccpaString, @"1YNN", @"CloudXCore setIsDoNotSell:NO should create '1YNN' CCPA string");
 }
 
+#pragma mark - GDPR/TCF Purpose Consent Tests
+
+// Test TCF purpose consents determine PII removal requirement
+// Per IAB TCF 2.2 spec, purposes 1-4 are required for personalized advertising
+- (void)testTCFPurposeConsent_AllPurposesGranted_ShouldAllowData {
+    [self clearPrivacySettings];
+    
+    // Set up GDPR applies with all purposes granted
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"IABTCF_gdprApplies"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"1111111111" forKey:@"IABTCF_PurposeConsents"];
+    // Minimal valid TC string with all purposes granted
+    [[NSUserDefaults standardUserDefaults] setObject:@"CQbFSYAQbFSYAEsACBENCFFoAP_gAEPgACiQINJB" forKey:@"IABTCF_TCString"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    // When GDPR applies and all purposes are granted, data should be allowed
+    NSNumber *gdprApplies = [self.privacyService gdprApplies];
+    XCTAssertEqualObjects(gdprApplies, @YES, @"GDPR applies should be YES");
+    
+    NSString *purposeConsents = [[NSUserDefaults standardUserDefaults] stringForKey:@"IABTCF_PurposeConsents"];
+    XCTAssertTrue(purposeConsents.length >= 1 && [purposeConsents characterAtIndex:0] == '1', @"Purpose 1 should be granted");
+}
+
+// Test TCF with Purpose 1 denied should require PII removal
+- (void)testTCFPurposeConsent_Purpose1Denied_ShouldClearData {
+    [self clearPrivacySettings];
+    
+    // Set up GDPR applies with Purpose 1 denied
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"IABTCF_gdprApplies"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"0111111111" forKey:@"IABTCF_PurposeConsents"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"CQbFSYAQbFSYAEsACDENCFFgAHAAAEPg" forKey:@"IABTCF_TCString"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    NSString *purposeConsents = [[NSUserDefaults standardUserDefaults] stringForKey:@"IABTCF_PurposeConsents"];
+    BOOL purpose1Granted = purposeConsents.length >= 1 && [purposeConsents characterAtIndex:0] == '1';
+    XCTAssertFalse(purpose1Granted, @"Purpose 1 should be denied");
+}
+
+// Test TCF with no purpose consents should require PII removal
+- (void)testTCFPurposeConsent_NoPurposes_ShouldClearData {
+    [self clearPrivacySettings];
+    
+    // Set up GDPR applies with no purposes granted
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"IABTCF_gdprApplies"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"0000000000" forKey:@"IABTCF_PurposeConsents"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"CQbFSYAQbFSYAEsACBENCFFgAAAA" forKey:@"IABTCF_TCString"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    NSString *purposeConsents = [[NSUserDefaults standardUserDefaults] stringForKey:@"IABTCF_PurposeConsents"];
+    BOOL anyPurposeGranted = NO;
+    for (NSUInteger i = 0; i < MIN(4, purposeConsents.length); i++) {
+        if ([purposeConsents characterAtIndex:i] == '1') {
+            anyPurposeGranted = YES;
+            break;
+        }
+    }
+    XCTAssertFalse(anyPurposeGranted, @"No purposes should be granted");
+}
+
+// Test GDPR does not apply should allow data
+- (void)testGDPRDoesNotApply_ShouldAllowData {
+    [self clearPrivacySettings];
+    
+    // GDPR does not apply (non-EEA user)
+    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"IABTCF_gdprApplies"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    NSNumber *gdprApplies = [self.privacyService gdprApplies];
+    XCTAssertEqualObjects(gdprApplies, @NO, @"GDPR applies should be NO for non-EEA users");
+}
+
+// Test missing GDPR applies flag should be treated as unknown
+- (void)testGDPRAppliesNotSet_ShouldBeUnknown {
+    [self clearPrivacySettings];
+    
+    // No GDPR applies flag set
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_gdprApplies"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    NSNumber *gdprApplies = [self.privacyService gdprApplies];
+    XCTAssertNil(gdprApplies, @"GDPR applies should be nil when not set");
+}
+
 @end

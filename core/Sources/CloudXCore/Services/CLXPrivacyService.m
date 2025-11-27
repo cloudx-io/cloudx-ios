@@ -12,7 +12,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
-#import <CloudXCore/CLXGPPProvider.h>
+#import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXGeoLocationService.h>
 
 // Private category for internal methods (not exposed in public header)
@@ -64,33 +64,76 @@
 - (BOOL)shouldClearPersonalDataForCompliance {
     CLXGeoLocationService *geoService = [CLXGeoLocationService shared];
     
-    // Non-US users: no additional restrictions
-    if (![geoService isUSUser]) {
-        [self.logger debug:@"Non-US user - no additional restrictions"];
-        return NO;
+    // EU users: Check GDPR consent
+    if ([geoService isEUUser]) {
+        return [self shouldClearPersonalDataForGDPR];
     }
     
     // US users: GPP consent evaluation based on geography
-    CLXGPPProvider *gppProvider = [CLXGPPProvider sharedInstance];
-    NSNumber *targetSid = [geoService isCaliforniaUser] ? @(CLXGppTargetUSCA) : @(CLXGppTargetUSNational);
-    
-    CLXGppConsent *gppConsent = [gppProvider decodeGppForTarget:targetSid];
-    if (gppConsent && [gppConsent requiresPiiRemoval]) {
-        [self.logger debug:[NSString stringWithFormat:@"GPP consent (SID %@) requires PII removal - clearing personal data", targetSid]];
-        return YES;
-    }
-    
-    // Legacy CCPA string check for backward compatibility
-    // IAB US Privacy String format: Position 3 (0-indexed: 2) is the opt-out flag
-    // 1YYN = opted out (Y at position 2), 1YNN = not opted out (N at position 2)
-    NSString *ccpaString = [self ccpaPrivacyString];
-    if (ccpaString.length >= 3 && [ccpaString characterAtIndex:2] == 'Y') {
-        [self.logger debug:@"Legacy CCPA opt-out detected (position 3 = Y) - clearing personal data"];
-        return YES;
+    if ([geoService isUSUser]) {
+        CLXConsentProvider *gppProvider = [CLXConsentProvider sharedInstance];
+        NSNumber *targetSid = [geoService isCaliforniaUser] ? @(CLXGppTargetUSCA) : @(CLXGppTargetUSNational);
+        
+        CLXPrivacyConsent *gppConsent = [gppProvider decodeGppForTarget:targetSid];
+        if (gppConsent && [gppConsent requiresPiiRemoval]) {
+            [self.logger debug:[NSString stringWithFormat:@"GPP consent (SID %@) requires PII removal - clearing personal data", targetSid]];
+            return YES;
+        }
+        
+        // Legacy CCPA string check for backward compatibility
+        // IAB US Privacy String format: Position 3 (0-indexed: 2) is the opt-out flag
+        // 1YYN = opted out (Y at position 2), 1YNN = not opted out (N at position 2)
+        NSString *ccpaString = [self ccpaPrivacyString];
+        if (ccpaString.length >= 3 && [ccpaString characterAtIndex:2] == 'Y') {
+            [self.logger debug:@"Legacy CCPA opt-out detected (position 3 = Y) - clearing personal data"];
+            return YES;
+        }
     }
     
     [self.logger verbose:@"Personal data can be used (all compliance checks passed)"];
     return NO;
+}
+
+- (BOOL)shouldClearPersonalDataForGDPR {
+    CLXConsentProvider *gppProvider = [CLXConsentProvider sharedInstance];
+    
+    // Priority 1: Check GPP Section 2 (EU TCF via GPP - new IAB standard)
+    NSArray<NSNumber *> *gppSid = [gppProvider gppSid];
+    if (gppSid && [gppSid containsObject:@(CLXGppTargetEUTCF)]) {
+        CLXPrivacyConsent *tcfConsent = [gppProvider decodeGppForTarget:@(CLXGppTargetEUTCF)];
+        if (tcfConsent) {
+            BOOL requiresPiiRemoval = [tcfConsent requiresPiiRemoval];
+            [self.logger debug:[NSString stringWithFormat:@"GPP EU TCF (SID 2) consent: requiresPiiRemoval=%@", @(requiresPiiRemoval)]];
+            return requiresPiiRemoval;
+        }
+    }
+    
+    // Priority 2: Legacy TCF flow - for CMPs that don't support GPP yet
+    NSNumber *gdprApplies = [gppProvider gdprApplies];
+    
+    // If GDPR doesn't apply, no restrictions
+    if (!gdprApplies || ![gdprApplies boolValue]) {
+        [self.logger debug:@"GDPR does not apply (legacy TCF) - no restrictions"];
+        return NO;
+    }
+    
+    // GDPR applies - decode the TC string
+    NSString *tcString = [gppProvider tcString];
+    if (!tcString || tcString.length == 0) {
+        [self.logger debug:@"GDPR applies but no TC string - clearing personal data"];
+        return YES;
+    }
+    
+    // Decode TC string to check purpose and vendor consents
+    CLXPrivacyConsent *tcfConsent = [gppProvider decodeTcString:tcString];
+    if (!tcfConsent) {
+        [self.logger debug:@"Failed to decode TC string - clearing personal data"];
+        return YES;
+    }
+    
+    BOOL requiresPiiRemoval = [tcfConsent requiresPiiRemoval];
+    [self.logger debug:[NSString stringWithFormat:@"Legacy TCF consent: requiresPiiRemoval=%@", @(requiresPiiRemoval)]];
+    return requiresPiiRemoval;
 }
 
 - (BOOL)shouldClearPersonalDataIgnoringATT {
@@ -250,13 +293,13 @@
 #pragma mark - GPP Methods
 
 - (nullable NSString *)gppString {
-    NSString *gppString = [[CLXGPPProvider sharedInstance] gppString];
+    NSString *gppString = [[CLXConsentProvider sharedInstance] gppString];
     [self.logger verbose:[NSString stringWithFormat:@"GPP string: %@", gppString ?: @"(none)"]];
     return gppString;
 }
 
 - (nullable NSArray<NSNumber *> *)gppSid {
-    NSArray<NSNumber *> *gppSid = [[CLXGPPProvider sharedInstance] gppSid];
+    NSArray<NSNumber *> *gppSid = [[CLXConsentProvider sharedInstance] gppSid];
     [self.logger debug:[NSString stringWithFormat:@"GPP SID: %@", gppSid ?: @"(none)"]];
     return gppSid;
 }
@@ -264,7 +307,7 @@
 #pragma mark - Publisher GPP API
 
 - (void)setGppString:(NSString *)gppString {
-    [[CLXGPPProvider sharedInstance] setGppString:gppString];
+    [[CLXConsentProvider sharedInstance] setGppString:gppString];
     if (gppString) {
         [self.logger info:[NSString stringWithFormat:@"GPP string set: %@", gppString]];
     } else {
@@ -273,7 +316,7 @@
 }
 
 - (void)setGppSid:(NSArray<NSNumber *> *)gppSid {
-    [[CLXGPPProvider sharedInstance] setGppSid:gppSid];
+    [[CLXConsentProvider sharedInstance] setGppSid:gppSid];
     if (gppSid && gppSid.count > 0) {
         [self.logger info:[NSString stringWithFormat:@"GPP SID set: %@", gppSid]];
     } else {

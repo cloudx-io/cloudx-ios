@@ -22,9 +22,9 @@
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXSessionMetrics.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
+#import <CloudXCore/CLXConsentProvider.h>
 
-// Internal methods category for accessing privacy methods that are not in public header
-// TEMP: Remove CLXPrivacyService private interface once server supports GDPR
+// Internal methods category for accessing privacy methods
 @interface CLXPrivacyService (Internal)
 - (nullable NSString *)gdprConsentString;
 - (nullable NSNumber *)gdprApplies;
@@ -367,25 +367,34 @@ static void initializeLogger() {
         // Store the privacy service for use in JSON conversion
         _privacyService = privacyService;
         
-        // Create regulations - only CCPA is supported by server currently
-        // GDPR is temporarily disabled as server support is not yet implemented
-        // Including GDPR data causes 502 bid request errors
+        // Create regulations with privacy compliance data
         CLXBiddingConfigRegulationsExtIAB *iab = [[CLXBiddingConfigRegulationsExtIAB alloc] init];
-        iab.usPrivacyString = [privacyService ccpaPrivacyString]; // CCPA is server-supported
+        
+        // CCPA/US Privacy
+        iab.usPrivacyString = [privacyService ccpaPrivacyString];
+        
+        // GDPR/TCF - include consent data when GDPR applies
+        NSNumber *gdprApplies = [privacyService gdprApplies];
+        if (gdprApplies) {
+            iab.gdprApplies = gdprApplies;
+            iab.tcString = [privacyService gdprConsentString];
+            [logger debug:[NSString stringWithFormat:@"GDPR data included - applies: %@, tcString: %@",
+                          gdprApplies, iab.tcString ? @"(present)" : @"(none)"]];
+        }
 
         CLXBiddingConfigRegulationsExt *regExt = [[CLXBiddingConfigRegulationsExt alloc] init];
         regExt.iab = iab;
+        
+        // Set top-level GDPR flag when applicable
+        if (gdprApplies && [gdprApplies boolValue]) {
+            regExt.gdpr = gdprApplies;
+        }
         
         // Include GPP compliance data in bid request regulations
         [self populateGPPDataForRegulationsExt:regExt withPrivacyService:privacyService];
 
         CLXBiddingConfigRegulations *regulations = [[CLXBiddingConfigRegulations alloc] init];
         regulations.ext = regExt;
-        
-        // TODO: Re-enable GDPR once server support is implemented
-        // iab.gdprApplies = [privacyService gdprApplies];
-        // iab.tcString = [privacyService gdprConsentString];
-        // regExt.gdpr = [privacyService gdprApplies];
 
         _regulations = regulations;
         
@@ -822,12 +831,16 @@ static void initializeLogger() {
  */
 - (void)populateGPPDataForRegulationsExt:(CLXBiddingConfigRegulationsExt *)regExt 
                       withPrivacyService:(CLXPrivacyService *)privacyService {
-    NSString *gppString = [privacyService gppString];
+    // Use resolution methods that fallback to legacy TCF when CMP doesn't provide GPP
+    // This ensures wide DSP coverage by always sending GPP format when consent is available
+    CLXConsentProvider *gppProvider = [CLXConsentProvider sharedInstance];
+    
+    NSString *gppString = [gppProvider resolveGppString];
     if (gppString) {
         regExt.gpp = gppString;
         
         // Per IAB spec, gpp_sid MUST be present when gpp string exists
-        NSArray<NSNumber *> *gppSid = [privacyService gppSid];
+        NSArray<NSNumber *> *gppSid = [gppProvider resolveGppSid];
         if (gppSid) {
             regExt.gppSid = gppSid;
         } else {
