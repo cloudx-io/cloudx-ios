@@ -248,30 +248,40 @@
 }
 
 // Test CCPA string parsing for different opt-out scenarios
+// IAB US Privacy String: Position 3 (0-indexed: 2) is the opt-out flag
+// 1YYN = Notice given, OPTED OUT (Y at position 3), Not LSPA
+// 1YNN = Notice given, NOT opted out (N at position 3), Not LSPA
 - (void)testCCPAStringParsing_ForDifferentOptOutScenarios {
     [self clearPrivacySettings];
     
     CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
     
-    // Test CCPA string "1YNN" - should clear personal data
-    [[NSUserDefaults standardUserDefaults] setObject:@"1YNN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    // Test CCPA string "1YYN" - should clear personal data (position 3 = Y = opted out)
+    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     NSString *retrievedCCPA = [privacyService ccpaPrivacyString];
-    XCTAssertEqualObjects(retrievedCCPA, @"1YNN", @"Should retrieve the set CCPA string");
+    XCTAssertEqualObjects(retrievedCCPA, @"1YYN", @"Should retrieve the set CCPA string");
     
     BOOL shouldClear = [privacyService shouldClearPersonalDataIgnoringATT];
-    XCTAssertTrue(shouldClear, @"CCPA opt-out string '1YNN' should clear personal data");
+    XCTAssertTrue(shouldClear, @"CCPA opt-out string '1YYN' (Y at position 3) should clear personal data");
     
-    // Test CCPA string "1NNN" - should allow personal data
-    [[NSUserDefaults standardUserDefaults] setObject:@"1NNN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    // Test CCPA string "1YNN" - should ALLOW personal data (position 3 = N = not opted out)
+    [[NSUserDefaults standardUserDefaults] setObject:@"1YNN" forKey:kCLXPrivacyCCPAPrivacyKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     NSString *retrievedCCPA2 = [privacyService ccpaPrivacyString];
-    XCTAssertEqualObjects(retrievedCCPA2, @"1NNN", @"Should retrieve the updated CCPA string");
+    XCTAssertEqualObjects(retrievedCCPA2, @"1YNN", @"Should retrieve the updated CCPA string");
     
     BOOL shouldClear2 = [privacyService shouldClearPersonalDataIgnoringATT];
-    XCTAssertFalse(shouldClear2, @"CCPA string '1NNN' should allow personal data");
+    XCTAssertFalse(shouldClear2, @"CCPA string '1YNN' (N at position 3) should allow personal data");
+    
+    // Test CCPA string "1NNN" - should also allow personal data
+    [[NSUserDefaults standardUserDefaults] setObject:@"1NNN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    BOOL shouldClear3 = [privacyService shouldClearPersonalDataIgnoringATT];
+    XCTAssertFalse(shouldClear3, @"CCPA string '1NNN' should also allow personal data");
 }
 
 @end

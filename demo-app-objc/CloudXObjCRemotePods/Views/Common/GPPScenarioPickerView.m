@@ -297,7 +297,8 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
             [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: CCPA Opt-Out (Disallow All) - AUTO-DETECTING LOCATION"];
             [self setIABGPPString:@"DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA"];
             [self setIABGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
-            [CloudXCore setCCPAPrivacyString:@"1YNN"];  // Legacy CCPA string: Y = opt-out
+            // IAB US Privacy: 1YYN = Version 1, Notice given, OPTED OUT, Not LSPA
+            [CloudXCore setCCPAPrivacyString:@"1YYN"];
             break;
             
         case GPPTestScenarioGPPNonUS:

@@ -275,7 +275,8 @@ class GPPScenarioPickerView: UIView {
             if sidOptOut.first != -1 {
                 setIABGPPString("DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA")
                 setIABGPPSid(sidOptOut)
-                CloudXCore.setCCPAPrivacyString("1YNN")  // Legacy CCPA string: Y = opt-out
+                // IAB US Privacy: 1YYN = Version 1, Notice given, OPTED OUT, Not LSPA
+                CloudXCore.setCCPAPrivacyString("1YYN")
             } else {
                 DemoAppLogger.sharedInstance.logMessage("⚠️ Non-US region: GPP not set (real CMPs wouldn't set US privacy for non-US users)")
             }

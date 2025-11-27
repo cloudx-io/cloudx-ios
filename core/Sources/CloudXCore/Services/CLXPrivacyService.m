@@ -81,9 +81,11 @@
     }
     
     // Legacy CCPA string check for backward compatibility
+    // IAB US Privacy String format: Position 3 (0-indexed: 2) is the opt-out flag
+    // 1YYN = opted out (Y at position 2), 1YNN = not opted out (N at position 2)
     NSString *ccpaString = [self ccpaPrivacyString];
-    if (ccpaString && [ccpaString containsString:@"Y"]) {
-        [self.logger debug:@"Legacy CCPA opt-out detected - clearing personal data"];
+    if (ccpaString.length >= 3 && [ccpaString characterAtIndex:2] == 'Y') {
+        [self.logger debug:@"Legacy CCPA opt-out detected (position 3 = Y) - clearing personal data"];
         return YES;
     }
     
@@ -113,9 +115,10 @@
     }
     
     // Check CCPA opt-out (PUBLIC - server supported)
+    // IAB US Privacy String format: Position 3 (0-indexed: 2) is the opt-out flag
     NSString *ccpaString = [self ccpaPrivacyString];
-    if (ccpaString && [ccpaString containsString:@"Y"]) {
-        [self.logger debug:@"CCPA opt-out detected - clearing personal data"];
+    if (ccpaString.length >= 3 && [ccpaString characterAtIndex:2] == 'Y') {
+        [self.logger debug:@"CCPA opt-out detected (position 3 = Y) - clearing personal data"];
         return YES;
     }
     
@@ -133,9 +136,10 @@
 
 - (nullable NSNumber *)ccpaApplies {
     // Check if CCPA privacy string indicates opt-out
+    // IAB US Privacy String format: Position 3 (0-indexed: 2) is the opt-out flag
     NSString *ccpaString = [self ccpaPrivacyString];
-    if (ccpaString && [ccpaString containsString:@"Y"]) {
-        [self.logger debug:@"CCPA applies: YES (opt-out detected)"];
+    if (ccpaString.length >= 3 && [ccpaString characterAtIndex:2] == 'Y') {
+        [self.logger debug:@"CCPA applies: YES (opt-out at position 3)"];
         return @YES;
     }
     [self.logger debug:@"CCPA applies: NO"];
@@ -228,10 +232,16 @@
 
 - (void)setDoNotSell:(nullable NSNumber *)doNotSell {
     // Convert boolean to CCPA string format
+    // IAB US Privacy String: "1" + Notice + OptOut + LSPA
+    // Position 1: Version (always 1)
+    // Position 2: Notice given (Y = yes, N = no)
+    // Position 3: Opt-out of sale (Y = opted out, N = did not opt out)
+    // Position 4: LSPA covered (N = no)
     NSString *ccpaString = nil;
     if (doNotSell) {
-        // CCPA string format: "1YNN" = opt-out, "1NNN" = no opt-out
-        ccpaString = doNotSell.boolValue ? @"1YNN" : @"1NNN";
+        // 1YYN = Notice given, user OPTED OUT of sale
+        // 1YNN = Notice given, user did NOT opt out
+        ccpaString = doNotSell.boolValue ? @"1YYN" : @"1YNN";
     }
     [self.logger debug:[NSString stringWithFormat:@"Setting do not sell: %@ (CCPA: %@)", doNotSell ? (doNotSell.boolValue ? @"YES" : @"NO") : @"(cleared)", ccpaString ?: @"(cleared)"]];
     [self setCCPAPrivacyString:ccpaString];

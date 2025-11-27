@@ -144,13 +144,18 @@
 }
 
 // Test comprehensive CCPA privacy string validation
+// IAB US Privacy String format:
+// Position 1: Version (always '1')
+// Position 2: Notice/Opportunity to Opt Out (Y/N/-)
+// Position 3: Opt-Out Sale (Y = opted out, N = did not opt out, - = N/A)
+// Position 4: LSPA Covered (Y/N/-)
 - (void)testCCPAOptOut_ShouldClearPersonalData {
-    // Test various CCPA opt-out scenarios (any string containing Y indicates opt-out)
+    // Test CCPA strings where position 3 = Y (opted out of sale)
     NSArray *ccpaOptOutStrings = @[
-        @"1YYN", // Standard opt-out
-        @"1YNN", // Opt-out with different flags  
-        @"1YYY", // Full opt-out
-        @"1-Y-"  // Minimal opt-out format (from Android implementation)
+        @"1YYN", // Notice given, OPTED OUT, Not LSPA
+        @"1NYN", // No notice, OPTED OUT, Not LSPA
+        @"1YYY", // Notice given, OPTED OUT, LSPA covered
+        @"1-Y-"  // N/A notice, OPTED OUT, N/A LSPA
     ];
     
     for (NSString *ccpaString in ccpaOptOutStrings) {
@@ -160,18 +165,19 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
-        XCTAssertTrue(shouldClear, @"CCPA opt-out string '%@' should clear personal data", ccpaString);
+        XCTAssertTrue(shouldClear, @"CCPA opt-out string '%@' (position 3 = Y) should clear personal data", ccpaString);
         
         // Verify getter returns the set value
         NSString *retrievedCCPA = [self.privacyService ccpaPrivacyString];
         XCTAssertEqualObjects(retrievedCCPA, ccpaString, @"Should retrieve the set CCPA string");
     }
     
-    // Test CCPA strings that should NOT trigger opt-out (no Y means consent/no opt-out)
+    // Test CCPA strings where position 3 != Y (did NOT opt out of sale)
     NSArray *ccpaAllowStrings = @[
-        @"1NNN", // No opt-out
-        @"1-N-", // Explicit consent (from Android implementation)
-        @"1---"  // CCPA does not apply (from Android implementation)
+        @"1YNN", // Notice given, NOT opted out, Not LSPA
+        @"1NNN", // No notice, NOT opted out, Not LSPA
+        @"1-N-", // N/A notice, NOT opted out, N/A LSPA
+        @"1---"  // All N/A - CCPA does not apply
     ];
     
     for (NSString *ccpaString in ccpaAllowStrings) {
@@ -181,7 +187,7 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
-        XCTAssertFalse(shouldClear, @"CCPA consent string '%@' should allow personal data", ccpaString);
+        XCTAssertFalse(shouldClear, @"CCPA consent string '%@' (position 3 != Y) should allow personal data", ccpaString);
     }
 }
 
@@ -269,20 +275,23 @@
 }
 
 // Test do not sell convenience API
+// IAB US Privacy String: Position 3 is the opt-out flag
+// 1YYN = Notice given, OPTED OUT, Not LSPA
+// 1YNN = Notice given, NOT opted out, Not LSPA
 - (void)testPublicDoNotSellAPI {
     [self clearPrivacySettings];
     
-    // Test setting do not sell = YES (should create "1YNN" CCPA string)
+    // Test setting do not sell = YES (should create "1YYN" CCPA string - Y at position 3)
     [self.privacyService setDoNotSell:@YES];
     
     NSString *ccpaString = [self.privacyService ccpaPrivacyString];
-    XCTAssertEqualObjects(ccpaString, @"1YNN", @"Do not sell YES should create '1YNN' CCPA string");
+    XCTAssertEqualObjects(ccpaString, @"1YYN", @"Do not sell YES should create '1YYN' CCPA string (opt-out at position 3)");
     
-    // Test setting do not sell = NO (should create "1NNN" CCPA string)
+    // Test setting do not sell = NO (should create "1YNN" CCPA string - N at position 3)
     [self.privacyService setDoNotSell:@NO];
     
     ccpaString = [self.privacyService ccpaPrivacyString];
-    XCTAssertEqualObjects(ccpaString, @"1NNN", @"Do not sell NO should create '1NNN' CCPA string");
+    XCTAssertEqualObjects(ccpaString, @"1YNN", @"Do not sell NO should create '1YNN' CCPA string (not opted out at position 3)");
     
     // Test clearing do not sell
     [self.privacyService setDoNotSell:nil];
@@ -303,9 +312,10 @@
     NSNumber *gdprApplies = [self.privacyService gdprApplies];
     XCTAssertEqualObjects(gdprApplies, @YES, @"CloudXCore setIsUserConsent should delegate to CLXPrivacyService");
     
+    // setIsDoNotSell:NO should create "1YNN" (not opted out at position 3)
     [CloudXCore setIsDoNotSellWithService:NO privacyService:self.privacyService];
     ccpaString = [self.privacyService ccpaPrivacyString];
-    XCTAssertEqualObjects(ccpaString, @"1NNN", @"CloudXCore setIsDoNotSell should delegate to CLXPrivacyService");
+    XCTAssertEqualObjects(ccpaString, @"1YNN", @"CloudXCore setIsDoNotSell:NO should create '1YNN' CCPA string");
 }
 
 @end
