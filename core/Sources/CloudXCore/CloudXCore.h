@@ -115,10 +115,6 @@
 #import <CloudXCore/CLXNativeAdView.h>
 #import <CloudXCore/CLXNativeTemplate.h>
 
-// Ad Cache
-#import <CloudXCore/CLXCachedInterstitial.h>
-#import <CloudXCore/CLXCachedRewarded.h>
-
 // Utils
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXSystemInformation.h>
@@ -140,8 +136,6 @@
 #import <CloudXCore/CLXReachabilityService.h>
 #import <CloudXCore/CLXBackgroundTimer.h>
 #import <CloudXCore/CLXBannerTimerService.h>
-#import <CloudXCore/CLXCacheAdService.h>
-#import <CloudXCore/CLXCacheAdQueue.h>
 #import <CloudXCore/CLXExponentialBackoffStrategy.h>
 #import <CloudXCore/CLXXorEncryption.h>
 
