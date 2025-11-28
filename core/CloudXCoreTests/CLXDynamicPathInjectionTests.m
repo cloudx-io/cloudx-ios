@@ -135,6 +135,87 @@
     XCTAssertEqualObjects(json[@"user"][@"name"], @"Bob", @"Should overwrite existing value");
 }
 
+/**
+ * CRITICAL BUG TEST: Verifies that injecting into a path where parent objects are 
+ * immutable (NSDictionary vs NSMutableDictionary) preserves existing data.
+ *
+ * This test reproduces the bug where injecting at "app.ext.data" would wipe out
+ * the existing "app.publisher.id" field because the app object was immutable.
+ * The fix ensures we create mutableCopy instead of new empty dictionary.
+ */
+- (void)testCritical_PreservesExistingDataWhenParentIsImmutable {
+    NSMutableDictionary *json = [NSMutableDictionary dictionary];
+    
+    // Simulate bid request structure where convertApplicationToJSON returns [json copy] (immutable)
+    json[@"app"] = @{
+        @"id": @"app-123",
+        @"bundle": @"com.example.app",
+        @"publisher": @{
+            @"id": @"publisher-456"
+        }
+    };
+    
+    // Inject at app.ext.data - this should NOT wipe out the existing app data
+    [json putAtDynamicPath:@"app.ext.data" value:@{@"version": @"1.0.0"}];
+    
+    // CRITICAL: Verify existing data is preserved
+    XCTAssertEqualObjects(json[@"app"][@"id"], @"app-123", 
+                         @"CRITICAL: app.id must be preserved after injection");
+    XCTAssertEqualObjects(json[@"app"][@"bundle"], @"com.example.app", 
+                         @"CRITICAL: app.bundle must be preserved after injection");
+    XCTAssertEqualObjects(json[@"app"][@"publisher"][@"id"], @"publisher-456", 
+                         @"CRITICAL: app.publisher.id must be preserved after injection");
+    
+    // And the new data should be there too
+    XCTAssertEqualObjects(json[@"app"][@"ext"][@"data"][@"version"], @"1.0.0", 
+                         @"Injected data should be present");
+}
+
+- (void)testCritical_PreservesExistingDataInNestedImmutableStructure {
+    NSMutableDictionary *json = [NSMutableDictionary dictionary];
+    
+    // Deeply nested immutable structure
+    json[@"app"] = @{
+        @"publisher": @{
+            @"id": @"pub-789",
+            @"ext": @{
+                @"prebid": @{
+                    @"parentAccount": @"parent-123"
+                }
+            }
+        }
+    };
+    
+    // Inject at app.ext.data - should not affect publisher subtree
+    [json putAtDynamicPath:@"app.ext.data" value:@{@"test": @"value"}];
+    
+    XCTAssertEqualObjects(json[@"app"][@"publisher"][@"id"], @"pub-789", 
+                         @"Publisher ID must be preserved");
+    XCTAssertEqualObjects(json[@"app"][@"publisher"][@"ext"][@"prebid"][@"parentAccount"], @"parent-123", 
+                         @"Nested prebid data must be preserved");
+    XCTAssertEqualObjects(json[@"app"][@"ext"][@"data"][@"test"], @"value", 
+                         @"Injected data should be present");
+}
+
+- (void)testCritical_PreservesExistingDataInImmutableArray {
+    NSMutableDictionary *json = [NSMutableDictionary dictionary];
+    
+    // Immutable array with immutable dictionary elements
+    json[@"user"] = @{
+        @"ext": @{
+            @"eids": @[@{@"source": @"existing.source", @"uids": @[@{@"id": @"existing-id"}]}]
+        }
+    };
+    
+    // Inject a new EID - should preserve existing
+    NSDictionary *newEid = @{@"source": @"new.source", @"uids": @[@{@"id": @"new-id"}]};
+    [json putAtDynamicPath:@"user.ext.eids[*]" value:newEid];
+    
+    // The wildcard replaces all elements, so the new value should be there
+    XCTAssertNotNil(json[@"user"][@"ext"][@"eids"], @"EIDs array should exist");
+    XCTAssertEqual([json[@"user"][@"ext"][@"eids"] count], 1, @"Should have one element");
+}
+
 - (void)testEdgeCase_ComplexNestedPath {
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
     json[@"bid"] = [@{@"seatbid": [@[[NSMutableDictionary dictionary]] mutableCopy]} mutableCopy];

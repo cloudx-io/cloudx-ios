@@ -973,6 +973,54 @@ CloudXCore.shared.setAppKeyValue("build_type", value: "release")
 CloudXCore.shared.clearAllKeyValues()
 ```
 
+### Best Practices: Maximizing Revenue with User Signals
+
+To maximize ad revenue (CPM) and fill rates, we recommend passing high-value, privacy-safe signals. Bidders pay significantly more for users with known purchase intent or high engagement.
+
+**Note:** All signals below must be **First-Party Data** (collected directly by your app) and should never include PII (Personally Identifiable Information) or precise location data.
+
+#### 1. Monetization Signals (Highest CPM Impact)
+*Bidders bid aggressively for known spenders.*
+
+| Key | Sample Values | Why it’s High ROI | Privacy Safe? |
+| :--- | :--- | :--- | :--- |
+| **`payer_status`** | `whale`, `dolphin`, `minnow`, `nonpayer` | **#1 Signal**. Immediate price floor increase. | ✅ First-party IAP data |
+| **`iap_total_bucket`** | `0`, `1-10`, `10-50`, `50-100`, `100+` | Bidders prefer hard number buckets. | ✅ Bucketed financial |
+| **`recency_purchase`** | `0-7d`, `8-30d`, `30d+`, `never` | Recent payers are more likely to convert again. | ✅ Transaction metadata |
+| **`subscription_status`**| `active`, `expired`, `trial`, `none` | Identifies high-quality recurring users. | ✅ Account state |
+| **`predicted_ltv`** | `high`, `medium`, `low` | Forward-looking predictive metric. | ✅ Derived internal metric |
+
+#### 2. Engagement & Retention
+*Signals that identify "hooked" users valuable to brand advertisers.*
+
+| Key | Sample Values | Why it’s High ROI | Privacy Safe? |
+| :--- | :--- | :--- | :--- |
+| **`user_tenure`** | `d0`, `d1`, `d7`, `d30`, `d90+` | Advertisers bid differently for new users vs. veterans. | ✅ Install timestamp math |
+| **`session_frequency`** | `daily`, `weekly`, `monthly` | Critical for predicting ad fatigue. | ✅ Session tracking |
+| **`level_achieved`** | `1`, `5`, `10`, `max` | Proof of deep engagement. | ✅ Game progression |
+| **`engagement_score`** | `high`, `med`, `low` | Composite score (e.g., sessions/day + duration). | ✅ Internal logic |
+| **`loyalty_tier`** | `bronze`, `silver`, `gold` | Gamified progression status. | ✅ Program status |
+
+#### 3. Ad Consumption Habits
+*Target users who actually interact with ads.*
+
+| Key | Sample Values | Why it’s High ROI | Privacy Safe? |
+| :--- | :--- | :--- | :--- |
+| **`ad_whale`** | `true`, `false` | User watches high volume (10+) of rewarded videos. | ✅ Usage history |
+| **`reward_affinity`** | `high`, `low` | Propensity to click rewarded ads. | ✅ Usage history |
+| **`interstitial_clicker`**| `true`, `false` | User has history of installing apps from ads. | ✅ Click history |
+
+#### 4. User Context (Privacy-Safe)
+*Broad segments only. No PII.*
+
+| Key | Sample Values | Why it’s High ROI | Privacy Safe? |
+| :--- | :--- | :--- | :--- |
+| **`age_bracket`** | `18-24`, `25-34`, `35+` | **Never** use exact age. Brackets are standard. | ✅ **Must be broad** |
+| **`gender_declared`** | `m`, `f`, `n/a` | **Only** if voluntarily provided by user. | ✅ Self-reported |
+| **`interests`** | `sports`, `strategy`, `news` | Contextual interests based on gameplay. | ✅ Publisher inferred |
+| **`device_tier`** | `high_end`, `mid`, `budget` | Proxy for disposable income (e.g., iPhone 16 vs 8). | ✅ Device model lookup |
+| **`connection_type`** | `wifi`, `5g`, `4g` | Heavy video ads prefer Wifi/5G. | ✅ Network info |
+
 ### Ad Lifecycle Management
 
 **Objective-C:**

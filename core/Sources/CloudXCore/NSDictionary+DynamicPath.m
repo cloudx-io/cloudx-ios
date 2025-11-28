@@ -36,11 +36,7 @@
     if (parts.count == 1) {
         // Final segment
         if (isWildcard) {
-            NSMutableArray *array = self[key];
-            if (![array isKindOfClass:[NSMutableArray class]]) {
-                array = [NSMutableArray array];
-                self[key] = array;
-            }
+            NSMutableArray *array = [self mutableArrayForKey:key];
             
             if (array.count == 0) {
                 [array addObject:value];
@@ -50,11 +46,7 @@
                 }
             }
         } else if (isIndexed && index >= 0) {
-            NSMutableArray *array = self[key];
-            if (![array isKindOfClass:[NSMutableArray class]]) {
-                array = [NSMutableArray array];
-                self[key] = array;
-            }
+            NSMutableArray *array = [self mutableArrayForKey:key];
             
             while (array.count <= index) {
                 [array addObject:[NSMutableDictionary dictionary]];
@@ -66,48 +58,85 @@
     } else {
         // Intermediate segment
         if (isWildcard) {
-            NSMutableArray *array = self[key];
-            if (![array isKindOfClass:[NSMutableArray class]]) {
-                array = [NSMutableArray array];
-                self[key] = array;
-            }
+            NSMutableArray *array = [self mutableArrayForKey:key];
             
             if (array.count == 0) {
                 NSMutableDictionary *dummy = [NSMutableDictionary dictionary];
                 [array addObject:dummy];
             }
             
-            for (id item in array) {
+            // Need to iterate with index to potentially replace immutable dicts
+            for (NSUInteger i = 0; i < array.count; i++) {
+                id item = array[i];
+                NSMutableDictionary *mutableItem;
+                
                 if ([item isKindOfClass:[NSMutableDictionary class]]) {
-                    [(NSMutableDictionary *)item putAtDynamicPathParts:rest value:value];
+                    mutableItem = item;
+                } else if ([item isKindOfClass:[NSDictionary class]]) {
+                    mutableItem = [item mutableCopy];
+                    array[i] = mutableItem;
+                } else {
+                    continue;
                 }
+                [mutableItem putAtDynamicPathParts:rest value:value];
             }
         } else if (isIndexed && index >= 0) {
-            NSMutableArray *array = self[key];
-            if (![array isKindOfClass:[NSMutableArray class]]) {
-                array = [NSMutableArray array];
-                self[key] = array;
-            }
+            NSMutableArray *array = [self mutableArrayForKey:key];
             
             while (array.count <= index) {
                 [array addObject:[NSMutableDictionary dictionary]];
             }
             
             id next = array[index];
-            if (![next isKindOfClass:[NSMutableDictionary class]]) {
-                next = [NSMutableDictionary dictionary];
-                array[index] = next;
+            NSMutableDictionary *mutableNext;
+            
+            if ([next isKindOfClass:[NSMutableDictionary class]]) {
+                mutableNext = next;
+            } else if ([next isKindOfClass:[NSDictionary class]]) {
+                mutableNext = [next mutableCopy];
+                array[index] = mutableNext;
+            } else {
+                mutableNext = [NSMutableDictionary dictionary];
+                array[index] = mutableNext;
             }
-            [(NSMutableDictionary *)next putAtDynamicPathParts:rest value:value];
+            [mutableNext putAtDynamicPathParts:rest value:value];
         } else {
-            NSMutableDictionary *child = self[key];
-            if (![child isKindOfClass:[NSMutableDictionary class]]) {
+            id existing = self[key];
+            NSMutableDictionary *child;
+            
+            if ([existing isKindOfClass:[NSMutableDictionary class]]) {
+                // Already mutable, use it directly
+                child = existing;
+            } else if ([existing isKindOfClass:[NSDictionary class]]) {
+                // Immutable dictionary - create mutable copy to preserve existing data
+                child = [existing mutableCopy];
+                self[key] = child;
+            } else {
+                // No existing value or wrong type - create new empty dict
                 child = [NSMutableDictionary dictionary];
                 self[key] = child;
             }
             [child putAtDynamicPathParts:rest value:value];
         }
     }
+}
+
+- (NSMutableArray *)mutableArrayForKey:(NSString *)key {
+    id existing = self[key];
+    NSMutableArray *array;
+    
+    if ([existing isKindOfClass:[NSMutableArray class]]) {
+        array = existing;
+    } else if ([existing isKindOfClass:[NSArray class]]) {
+        // Immutable array - create mutable copy to preserve existing data
+        array = [existing mutableCopy];
+        self[key] = array;
+    } else {
+        // No existing value or wrong type - create new empty array
+        array = [NSMutableArray array];
+        self[key] = array;
+    }
+    return array;
 }
 
 - (BOOL)isArrayIndexNotation:(NSString *)segment {
