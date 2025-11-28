@@ -75,7 +75,6 @@
     
     self.bidService = [[CLXBidNetworkServiceClass alloc] 
                       initWithAuctionEndpointUrl:@"https://test.cloudx.io/auction"
-                      cdpEndpointUrl:@"https://test.cloudx.io/cdp"
                       errorReporter:nil
                       urlSession:self.mockSession];
 }

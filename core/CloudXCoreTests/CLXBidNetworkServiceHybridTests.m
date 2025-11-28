@@ -17,8 +17,7 @@
 - (void)setUp {
     [super setUp];
     self.networkService = [[CLXBidNetworkServiceClass alloc] 
-                          initWithAuctionEndpointUrl:@"https://test.example.com/auction"
-                          cdpEndpointUrl:@"https://test.example.com/cdp"];
+                          initWithAuctionEndpointUrl:@"https://test.example.com/auction"];
 }
 
 #pragma mark - Hybrid Completion Handler Tests

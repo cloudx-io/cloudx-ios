@@ -465,7 +465,6 @@ static CloudXCore *_sharedInstance = nil;
     [endpointResolver resolveFromConfig:config];
     
     NSString *auctionEndpointUrl = endpointResolver.auctionEndpoint;
-    NSString *cdpEndpointUrl = endpointResolver.cdpEndpoint;
     NSString *metricsEndpointURL = config.metricsEndpointURL ?: @"";
     
     // Validate endpoints
@@ -473,12 +472,6 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger error:@"SDK init missing auctionEndpointURL - auction requests will fail"];
     } else {
         [self.logger info:[NSString stringWithFormat:@"Auction endpoint resolved: %@", auctionEndpointUrl]];
-    }
-    
-    if (cdpEndpointUrl.length > 0) {
-        [self.logger info:[NSString stringWithFormat:@"CDP endpoint resolved: %@", cdpEndpointUrl]];
-    } else {
-        [self.logger debug:@"[CloudXCore] No CDP endpoint configured - bid request enrichment disabled"];
     }
     
     if (!config.metricsEndpointURL) {
@@ -492,7 +485,7 @@ static CloudXCore *_sharedInstance = nil;
     // Register services in DI container 
         CLXDIContainer *container = [CLXDIContainer shared];
     [container registerType:[CLXAppSessionService class] instance:[[CLXAppSessionService alloc] initWithSessionID:config.sessionID ?: @"" appKey:_appKey url:metricsEndpointURL]];
-    [container registerType:[CLXBidNetworkServiceClass class] instance:[[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:auctionEndpointUrl cdpEndpointUrl:cdpEndpointUrl errorReporter:[CLXErrorReporter shared]]];
+    [container registerType:[CLXBidNetworkServiceClass class] instance:[[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:auctionEndpointUrl errorReporter:[CLXErrorReporter shared]]];
     [container resolveType:ServiceTypeSingleton class:[CLXAppSessionService class]];
     
     // Check if adapters are empty (skip in test mode)

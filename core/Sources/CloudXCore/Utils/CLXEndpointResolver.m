@@ -12,7 +12,6 @@
 
 @interface CLXEndpointResolver ()
 @property (nonatomic, copy, readwrite) NSString *auctionEndpoint;
-@property (nonatomic, copy, readwrite) NSString *cdpEndpoint;
 @property (nonatomic, copy, readwrite) NSString *geoEndpoint;
 @property (nonatomic, copy, readwrite) NSString *testGroupName;
 @property (nonatomic, strong) CLXLogger *logger;
@@ -24,7 +23,6 @@
     self = [super init];
     if (self) {
         _auctionEndpoint = @"";
-        _cdpEndpoint = @"";
         _geoEndpoint = @"";
         _testGroupName = @"";
         _logger = [[CLXLogger alloc] initWithCategory:@"EndpointResolver"];
@@ -51,7 +49,7 @@
     [self.logger debug:@"================"];
     [self.logger debug:[NSString stringWithFormat:@"Generated random value: %.4f", randomValue]];
     
-    // Collect test cases from both auction and CDP endpoints
+    // Collect test cases from auction endpoint
     NSMutableArray<NSDictionary *> *testCases = [NSMutableArray array];
     
     // Check auction endpoint for test variants
@@ -68,20 +66,6 @@
                         @"name": @"auction"
                     }];
                 }
-            }
-        }
-    }
-    
-    // Check CDP endpoint for test variants
-    if (config.cdpEndpointURL) {
-        if (config.cdpEndpointURL.test && config.cdpEndpointURL.test.count > 0) {
-            CLXSDKConfigEndpointValue *firstVariant = config.cdpEndpointURL.test.firstObject;
-            if (firstVariant.value.length > 0) {
-                [testCases addObject:@{
-                    @"variant": firstVariant,
-                    @"endpointObject": config.cdpEndpointURL,
-                    @"name": @"cdp"
-                }];
             }
         }
     }
@@ -115,20 +99,11 @@
         self.auctionEndpoint = [self getDefaultAuctionEndpoint:config];
     }
     
-    // Assign CDP endpoint
-    if (selectedTest && [selectedTest[@"name"] isEqualToString:@"cdp"]) {
-        CLXSDKConfigEndpointValue *variant = selectedTest[@"variant"];
-        self.cdpEndpoint = variant.value.length > 0 ? variant.value : [self getDefaultCDPEndpoint:config];
-    } else {
-        self.cdpEndpoint = [self getDefaultCDPEndpoint:config];
-    }
-    
     [self logEndpoints];
 }
 
 - (void)reset {
     self.auctionEndpoint = @"";
-    self.cdpEndpoint = @"";
     self.geoEndpoint = @"";
     self.testGroupName = @"";
 }
@@ -137,7 +112,6 @@
 
 - (void)assignDefaultsFromConfig:(CLXSDKConfigResponse *)config {
     self.auctionEndpoint = [self getDefaultAuctionEndpoint:config];
-    self.cdpEndpoint = [self getDefaultCDPEndpoint:config];
     [self logEndpoints];
 }
 
@@ -157,14 +131,6 @@
     return @"";
 }
 
-- (NSString *)getDefaultCDPEndpoint:(CLXSDKConfigResponse *)config {
-    if (!config.cdpEndpointURL) {
-        return @"";
-    }
-    
-    return config.cdpEndpointURL.defaultKey ?: @"";
-}
-
 - (void)logEndpoints {
     [self.logger debug:@"Resolved Endpoints:"];
     
@@ -172,11 +138,6 @@
         [NSString stringWithFormat:@"%@...", [self.auctionEndpoint substringToIndex:50]] : 
         self.auctionEndpoint;
     [self.logger debug:[NSString stringWithFormat:@"auction: %@", auctionPreview]];
-    
-    NSString *cdpPreview = self.cdpEndpoint.length > 50 ? 
-        [NSString stringWithFormat:@"%@...", [self.cdpEndpoint substringToIndex:50]] : 
-        self.cdpEndpoint;
-    [self.logger debug:[NSString stringWithFormat:@"cdp: %@", cdpPreview]];
     
     if (self.testGroupName.length > 0) {
         [self.logger debug:[NSString stringWithFormat:@"A/B Test Group: %@", self.testGroupName]];

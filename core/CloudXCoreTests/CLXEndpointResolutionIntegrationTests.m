@@ -58,9 +58,6 @@
             ],
             @"default": @"https://au.cloudx.io/openrtb2/auction"
         },
-        @"cdpEndpointURL": @{
-            @"default": @""
-        },
         @"impressionTrackerURL": @"https://tracker.cloudx.io/impression",
         @"metricsEndpointURL": @"https://metrics.cloudx.io/sdk",
         @"tracking": @[@"bid.w", @"bid.h"],
@@ -88,8 +85,6 @@
                  @"Should include query parameters");
     XCTAssertEqualObjects(resolver.testGroupName, @"variant-0",
                          @"Should set test group name");
-    XCTAssertEqualObjects(resolver.cdpEndpoint, @"",
-                         @"CDP endpoint should be empty");
 }
 
 /**
@@ -101,9 +96,6 @@
         @"accountID": @"test-account",
         @"sessionID": @"test-session",
         @"auctionEndpointURL": @"https://au.cloudx.io/openrtb2/auction",
-        @"cdpEndpointURL": @{
-            @"default": @"https://cdp.cloudx.io/enrich"
-        },
         @"bidders": @[],
         @"placements": @[]
     };
@@ -118,8 +110,6 @@
     // Then: Should use string values directly
     XCTAssertEqualObjects(resolver.auctionEndpoint, @"https://au.cloudx.io/openrtb2/auction",
                          @"Should use legacy string format");
-    XCTAssertEqualObjects(resolver.cdpEndpoint, @"https://cdp.cloudx.io/enrich",
-                         @"Should resolve CDP endpoint");
     XCTAssertEqualObjects(resolver.testGroupName, @"",
                          @"Should have no test group for legacy format");
 }
@@ -147,7 +137,6 @@
             ],
             @"default": @"https://au.cloudx.io/openrtb2/auction"
         },
-        @"cdpEndpointURL": @{@"default": @""},
         @"bidders": @[],
         @"placements": @[]
     };
@@ -183,47 +172,6 @@
 }
 
 /**
- * Test CDP endpoint A/B testing (independent from auction endpoint)
- */
-- (void)testIntegration_CDPEndpointABTesting_IndependentFromAuction {
-    // Given: SDK init response with A/B testing on CDP endpoint only
-    NSDictionary *sdkInitResponse = @{
-        @"accountID": @"test-account",
-        @"sessionID": @"test-session",
-        @"auctionEndpointURL": @{
-            @"default": @"https://au.cloudx.io/openrtb2/auction"
-        },
-        @"cdpEndpointURL": @{
-            @"test": @[
-                @{
-                    @"name": @"cdp-experimental",
-                    @"value": @"https://cdp-v2.cloudx.io/enrich",
-                    @"ratio": @1.0
-                }
-            ],
-            @"default": @"https://cdp.cloudx.io/enrich"
-        },
-        @"bidders": @[],
-        @"placements": @[]
-    };
-    
-    // When: Parse and resolve
-    CLXSDKInitNetworkService *networkService = [[CLXSDKInitNetworkService alloc] init];
-    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse];
-    
-    CLXEndpointResolver *resolver = [[CLXEndpointResolver alloc] init];
-    [resolver resolveFromConfig:config];
-    
-    // Then: Should use default auction but test CDP
-    XCTAssertEqualObjects(resolver.auctionEndpoint, @"https://au.cloudx.io/openrtb2/auction",
-                         @"Should use default auction endpoint");
-    XCTAssertEqualObjects(resolver.cdpEndpoint, @"https://cdp-v2.cloudx.io/enrich",
-                         @"Should use test CDP endpoint");
-    XCTAssertEqualObjects(resolver.testGroupName, @"cdp-experimental",
-                         @"Should set CDP test group name");
-}
-
-/**
  * Test malformed A/B test configuration (should fallback to defaults)
  */
 - (void)testIntegration_MalformedABTestConfig_FallbackToDefaults {
@@ -235,7 +183,6 @@
             @"test": @[@"invalid-format"],  // Invalid: should be dictionary
             @"default": @"https://au.cloudx.io/openrtb2/auction"
         },
-        @"cdpEndpointURL": @{@"default": @""},
         @"bidders": @[],
         @"placements": @[]
     };
@@ -272,7 +219,6 @@
             ],
             @"default": @"https://au.cloudx.io/openrtb2/auction"
         },
-        @"cdpEndpointURL": @{@"default": @""},
         @"bidders": @[],
         @"placements": @[]
     };
@@ -307,7 +253,6 @@
             ],
             @"default": @"https://au.cloudx.io/openrtb2/auction"
         },
-        @"cdpEndpointURL": @{@"default": @""},
         @"bidders": @[],
         @"placements": @[]
     };
@@ -335,7 +280,6 @@
         @"sessionID": @"test-session",
         @"geoDataEndpointURL": @"https://geo.cloudx.io/v2/data",
         @"auctionEndpointURL": @{@"default": @"https://au.cloudx.io/openrtb2/auction"},
-        @"cdpEndpointURL": @{@"default": @""},
         @"bidders": @[],
         @"placements": @[]
     };

@@ -21,9 +21,7 @@
 
 @interface CLXBidNetworkServiceClass ()
 @property (nonatomic, copy) NSString *endpoint;
-@property (nonatomic, copy) NSString *cdpEndpoint;
 @property (nonatomic, strong) CLXBaseNetworkService *baseNetworkService;
-@property (nonatomic, strong) CLXBaseNetworkService *cdpNetworkService;
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, copy) NSString *userAgent;
 @property (nonatomic, strong, nullable) CLXErrorReporter *errorReporter;
@@ -35,31 +33,25 @@
 
 @implementation CLXBidNetworkServiceClass
 
-- (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
-                           cdpEndpointUrl:(NSString *)cdpEndpointUrl {
-    return [self initWithAuctionEndpointUrl:auctionEndpointUrl cdpEndpointUrl:cdpEndpointUrl errorReporter:nil];
+- (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl {
+    return [self initWithAuctionEndpointUrl:auctionEndpointUrl errorReporter:nil];
 }
 
 - (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
-                           cdpEndpointUrl:(NSString *)cdpEndpointUrl
                             errorReporter:(nullable CLXErrorReporter *)errorReporter {
     // Use default URLSession
     NSURLSession *urlSession = [NSURLSession cloudxSessionWithIdentifier:@"auction"];
     return [self initWithAuctionEndpointUrl:auctionEndpointUrl 
-                            cdpEndpointUrl:cdpEndpointUrl 
                              errorReporter:errorReporter 
                                 urlSession:urlSession];
 }
 
 - (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
-                           cdpEndpointUrl:(NSString *)cdpEndpointUrl
                             errorReporter:(nullable CLXErrorReporter *)errorReporter
                                urlSession:(NSURLSession *)urlSession {
     self = [super init];
     if (self) {
         _endpoint = [auctionEndpointUrl copy];
-        _cdpEndpoint = [cdpEndpointUrl copy];
-        _isCDPEndpointEmpty = cdpEndpointUrl.length == 0;
         _logger = [[CLXLogger alloc] initWithCategory:@"BidNetworkService"];
         _errorReporter = errorReporter;
         
@@ -68,9 +60,6 @@
         
         // Initialize base network service with provided URLSession
         _baseNetworkService = [[CLXBaseNetworkService alloc] initWithBaseURL:auctionEndpointUrl urlSession:urlSession];
-        
-        // Initialize CDP network service with empty base URL (CDP uses full URLs)
-        _cdpNetworkService = [[CLXBaseNetworkService alloc] initWithBaseURL:@"" urlSession:urlSession];
         
         [self.logger info:[NSString stringWithFormat:@"Initialized with auction endpoint: %@", _endpoint]];
     }
@@ -255,46 +244,6 @@
         // Pass both parsed object and raw JSON to completion handler
         if (completion) {
             completion(bidResponse, [response isKindOfClass:[NSDictionary class]] ? (NSDictionary *)response : nil, nil);
-        }
-    }];
-}
-
-- (void)startCDPFlowWithBidRequest:(id)bidRequest
-                            appKey:(NSString *)appKey
-                       completion:(void (^)(id _Nullable, NSError * _Nullable))completion {
-    
-    [self.logger info:[NSString stringWithFormat:@"Starting CDP request to: %@", self.cdpEndpoint]];
-    
-    NSMutableDictionary *headers = [NSMutableDictionary dictionary];
-    headers[@"Content-Type"] = @"application/json";
-    headers[@"Authorization"] = [NSString stringWithFormat:@"Bearer %@", appKey];
-    headers[@"User-Agent"] = self.userAgent ?: @"";
-    
-    NSError *jsonError;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bidRequest options:0 error:&jsonError];
-    if (jsonError) {
-        [self.logger error:[NSString stringWithFormat:@"CDP request JSON serialization failed: %@", jsonError.localizedDescription]];
-        if (completion) {
-            completion(nil, jsonError);
-        }
-        return;
-    }
-    
-    [self.cdpNetworkService executeRequestWithEndpoint:self.cdpEndpoint
-                                         urlParameters:nil
-                                          requestBody:jsonData
-                                              headers:headers
-                                           maxRetries:1
-                                               delay:1.0
-                                          completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
-        if (error) {
-            [self.logger error:[NSString stringWithFormat:@"CDP request failed: %@", error.localizedDescription]];
-        } else {
-            [self.logger info:@"CDP request succeeded"];
-        }
-        
-        if (completion) {
-            completion(response, error);
         }
     }];
 }

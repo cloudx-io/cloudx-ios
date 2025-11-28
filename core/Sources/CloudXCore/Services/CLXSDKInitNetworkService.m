@@ -265,22 +265,6 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         config.auctionEndpointURL = endpointQuantum;
     }
     
-    // Parse CDP endpoint URL with A/B test support
-    id cdpEndpointValue = response[@"cdpEndpointURL"];
-    if (cdpEndpointValue) {
-        CLXSDKConfigEndpointObject *endpointObject = nil;
-        
-        if ([cdpEndpointValue isKindOfClass:[NSString class]]) {
-            // Simple string format - wrap in EndpointObject
-            endpointObject = [[CLXSDKConfigEndpointObject alloc] initWithTest:nil defaultKey:(NSString *)cdpEndpointValue];
-        } else if ([cdpEndpointValue isKindOfClass:[NSDictionary class]]) {
-            // Object format with default and test variants
-            endpointObject = [self parseEndpointObject:(NSDictionary *)cdpEndpointValue];
-        }
-        
-        config.cdpEndpointURL = endpointObject;
-    }
-    
     NSDictionary *keyValuePaths = response[@"keyValuePaths"];
     if (keyValuePaths) {
         CLXSDKConfigKeyValueObject *keyValuePath = [[CLXSDKConfigKeyValueObject alloc] init];

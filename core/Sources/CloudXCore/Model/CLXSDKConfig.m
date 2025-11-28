@@ -14,7 +14,6 @@
         _bidders = nil;
         _placements = nil;
         _auctionEndpointURL = nil;
-        _cdpEndpointURL = nil;
     }
     return self;
 }
@@ -29,7 +28,6 @@
         _bidders = nil;
         _placements = nil;
         _auctionEndpointURL = nil;
-        _cdpEndpointURL = nil;
     }
     return self;
 }

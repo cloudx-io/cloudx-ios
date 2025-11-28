@@ -42,7 +42,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSArray<CLXSDKConfigBidder *> *bidders;
 @property (nonatomic, copy, nullable) NSArray<CLXSDKConfigPlacement *> *placements;
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
-@property (nonatomic, strong, nullable) CLXSDKConfigEndpointObject *cdpEndpointURL;
 @property (nonatomic, copy, nullable) NSString *organizationID;
 @property (nonatomic, copy, nullable) NSString *impressionTrackerURL;
 @property (nonatomic, copy, nullable) NSString *metricsEndpointURL;
@@ -76,7 +75,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *metricsEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sessionID;
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
-@property (nonatomic, strong, nullable) CLXSDKConfigEndpointObject *cdpEndpointURL;
 @property (nonatomic, strong, nullable) CLXSDKConfigKeyValueObject *keyValuePaths;
 @property (nonatomic, copy, nullable) NSString *geoDataEndpointURL;
 @property (nonatomic, strong, nullable) NSArray<CLXSDKConfigPlacement *> *placements;

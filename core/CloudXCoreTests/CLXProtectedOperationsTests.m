@@ -154,13 +154,9 @@
  */
 - (void)testBidNetworkService_JSONOperations_InvalidData_ExceptionHandling {
     CLXBidNetworkServiceClass *bidService = [[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:@"https://test.com"
-                                                                                            cdpEndpointUrl:@"https://cdp.test.com"
                                                                                              errorReporter:self.errorReporter];
     
     XCTAssertNotNil(bidService, @"Bid network service should initialize");
-    
-    // Test that service can handle initialization without issues
-    XCTAssertFalse(bidService.isCDPEndpointEmpty, @"CDP endpoint should not be empty");
 }
 
 #pragma mark - Cross-Component Exception Handling Tests
