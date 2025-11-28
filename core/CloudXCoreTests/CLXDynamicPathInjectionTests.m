@@ -63,10 +63,10 @@
         [NSMutableDictionary dictionary]
     ] mutableCopy];
     
-    [json putAtDynamicPath:@"imp[*].ext.data.loop-index" value:@"1"];
+    [json putAtDynamicPath:@"imp[*].ext.data.custom-key" value:@"1"];
     
     NSArray *impressions = json[@"imp"];
-    XCTAssertEqualObjects(impressions[0][@"ext"][@"data"][@"loop-index"], @"1", 
+    XCTAssertEqualObjects(impressions[0][@"ext"][@"data"][@"custom-key"], @"1", 
                          @"Should create nested structure in array element");
 }
 
@@ -167,14 +167,14 @@
                          @"App key-values should be at correct path");
 }
 
-- (void)testRealWorld_ImpressionLoopIndex {
+- (void)testRealWorld_ImpressionCustomKey {
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
     json[@"imp"] = [@[[NSMutableDictionary dictionary]] mutableCopy];
     
-    [json putAtDynamicPath:@"imp[*].ext.data.loop-index" value:@"3"];
+    [json putAtDynamicPath:@"imp[*].ext.data.custom-key" value:@"3"];
     
-    XCTAssertEqualObjects(json[@"imp"][0][@"ext"][@"data"][@"loop-index"], @"3", 
-                         @"Loop index should be at correct path");
+    XCTAssertEqualObjects(json[@"imp"][0][@"ext"][@"data"][@"custom-key"], @"3", 
+                         @"Custom key should be at correct path");
 }
 
 - (void)testRealWorld_UserExtEids {

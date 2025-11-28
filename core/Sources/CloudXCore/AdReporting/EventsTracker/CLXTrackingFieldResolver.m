@@ -14,7 +14,6 @@
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSString *> *loadedBidMap;
 @property (nonatomic, strong) NSDictionary *configDataMap;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableDictionary<NSString *, NSString *> *> *sdkMap;
-@property (nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> *auctionedLoopIndex;
 
 @property (nonatomic, copy) NSString *sessionId;
 @property (nonatomic, copy) NSString *sdkVersion;
@@ -50,7 +49,6 @@
         _responseDataMap = [NSMutableDictionary dictionary];
         _loadedBidMap = [NSMutableDictionary dictionary];
         _sdkMap = [NSMutableDictionary dictionary];
-        _auctionedLoopIndex = [NSMutableDictionary dictionary];
         _logger = [[CLXLogger alloc] initWithCategory:@"TrackingFieldResolver"];
     }
     return self;
@@ -110,11 +108,6 @@
     [self.logger debug:[NSString stringWithFormat:@"Loaded bid saved: %@ for auction: %@", bidId, auctionId]];
 }
 
-- (void)setLoopIndex:(NSString *)auctionId loopIndex:(NSInteger)loopIndex {
-    self.auctionedLoopIndex[auctionId] = @(loopIndex);
-    [self.logger debug:[NSString stringWithFormat:@"Loop index set: %ld for auction: %@", (long)loopIndex, auctionId]];
-}
-
 - (void)setSessionConstData:(NSString *)sessionId
                  sdkVersion:(NSString *)sdkVersion
                  deviceType:(NSString *)deviceType
@@ -163,7 +156,6 @@
     [self.responseDataMap removeAllObjects];
     [self.loadedBidMap removeAllObjects];
     [self.sdkMap removeAllObjects];
-    [self.auctionedLoopIndex removeAllObjects];
     
     [self.logger debug:@"All tracking data cleared"];
 }
@@ -218,8 +210,6 @@
         // This should be set dynamically per auction
         NSMutableDictionary *auctionSdkMap = self.sdkMap[auctionId];
         return auctionSdkMap[field];
-    } else if ([field isEqualToString:@"sdk.loopIndex"]) {
-        return self.auctionedLoopIndex[auctionId];
     } else if ([field isEqualToString:@"sdk.ifa"]) {
         // Privacy logic implementation
         CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
@@ -812,12 +802,6 @@
 #pragma mark - Win/Loss Field Resolution
 
 - (nullable id)resolveField:(NSString *)fieldPath forAuction:(NSString *)auctionId {
-    // Handle SDK-level constants
-    if ([fieldPath isEqualToString:@"sdk.loopIndex"]) {
-        NSNumber *loopIndex = self.auctionedLoopIndex[auctionId];
-        return loopIndex ? [loopIndex stringValue] : nil;
-    }
-    
     // Delegate to existing field resolution logic
     return [self resolveField:auctionId field:fieldPath];
 }

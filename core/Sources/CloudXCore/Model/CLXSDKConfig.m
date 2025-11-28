@@ -154,7 +154,6 @@
     if (self) {
         _eids = @"";
         _appKeyValues = @"";
-        _placementLoopIndex = @"";
         _userKeyValues = @"";
     }
     return self;

@@ -271,7 +271,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 //@interface CLXBiddingConfigImpressionExtData : NSObject
-//@property (nonatomic, copy) NSString *loopIndex;
 //@end
 
 @interface CLXBiddingConfigImpressionExtStoredImpression : NSObject

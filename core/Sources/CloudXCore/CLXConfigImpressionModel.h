@@ -20,7 +20,6 @@ extern NSString * const CLXConfigImpressionModelDefaultTestGroupName;
 @property (nonatomic, readonly, copy) NSString *testGroupName;
 @property (nonatomic, readonly, copy, nullable) NSString *appKeyValues;
 @property (nonatomic, readonly, copy, nullable) NSString *eids;
-@property (nonatomic, readonly, copy, nullable) NSString *placementLoopIndex;
 @property (nonatomic, readonly, copy, nullable) NSString *userKeyValues;
 
 /**
@@ -52,7 +51,6 @@ extern NSString * const CLXConfigImpressionModelDefaultTestGroupName;
                     testGroupName:(NSString *)testGroupName
                      appKeyValues:(NSString *)appKeyValues
                              eids:(NSString *)eids
-               placementLoopIndex:(NSString *)placementLoopIndex
                     userKeyValues:(NSString *)userKeyValues __deprecated_msg("Use initWithSDKConfig:auctionID:testGroupName: instead");
 
 @end

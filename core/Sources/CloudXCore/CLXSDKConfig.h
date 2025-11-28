@@ -158,7 +158,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXSDKConfigKeyValueObject : NSObject
 @property (nonatomic, copy, nullable) NSString *appKeyValues;
 @property (nonatomic, copy, nullable) NSString *eids;
-@property (nonatomic, copy, nullable) NSString *placementLoopIndex;
 @property (nonatomic, copy, nullable) NSString *userKeyValues;
 - (instancetype)init;
 @end

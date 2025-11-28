@@ -135,7 +135,6 @@ static MockRillEventReporter *sharedInstance = nil;
             @"bidRequest.device.osv",
             @"sdk.sessionId",
             @"bidRequest.device.ifa",
-            @"bidRequest.loopIndex",
             @"config.testGroupName",
             @"config.placements[id=${bidRequest.imp.tagid}].name",
             @"bidRequest.device.geo.country",
@@ -172,7 +171,6 @@ static MockRillEventReporter *sharedInstance = nil;
 - (void)setRequestData:(NSString *)auctionId bidRequestJSON:(NSDictionary *)bidRequestJSON;
 - (void)setResponseData:(NSString *)auctionId bidResponseJSON:(NSDictionary *)bidResponseJSON;
 - (void)saveLoadedBid:(NSString *)auctionId bidId:(NSString *)bidId;
-- (void)setLoopIndex:(NSString *)auctionId loopIndex:(NSInteger)loopIndex;
 - (NSString *)buildPayload:(NSString *)auctionId;
 - (nullable id)resolveSdkField:(NSString *)auctionId field:(NSString *)field;
 @end
@@ -249,8 +247,7 @@ static MockRillEventReporter *sharedInstance = nil;
         },
         @"imp": @[@{
             @"tagid": kTestPlacementID
-        }],
-        @"loopIndex": @0
+        }]
     };
     
     [self.resolver setRequestData:kTestAuctionID bidRequestJSON:testBidRequest];
@@ -293,7 +290,6 @@ static MockRillEventReporter *sharedInstance = nil;
     
     [self.resolver setResponseData:kTestAuctionID bidResponseJSON:testBidResponse];
     [self.resolver saveLoadedBid:kTestAuctionID bidId:kTestBidID];
-    [self.resolver setLoopIndex:kTestAuctionID loopIndex:0];
 }
 
 // Creates a test CLXConfigImpressionModel
@@ -813,7 +809,7 @@ static MockRillEventReporter *sharedInstance = nil;
     
     if (payload.length > 0) {
         NSArray *fields = [payload componentsSeparatedByString:@";"];
-        XCTAssertEqual(fields.count, 26, @"Payload should have 26 fields, got %lu", (unsigned long)fields.count);
+        XCTAssertEqual(fields.count, 25, @"Payload should have 25 fields, got %lu", (unsigned long)fields.count);
         
         // Verify some key fields are populated (check if they exist in the payload)
         // Note: The exact format depends on server configuration
@@ -1068,7 +1064,6 @@ static MockRillEventReporter *sharedInstance = nil;
     
     [self.resolver setResponseData:kTestAuctionID bidResponseJSON:testBidResponseWithDebugDeal];
     [self.resolver saveLoadedBid:kTestAuctionID bidId:kTestBidID];
-    [self.resolver setLoopIndex:kTestAuctionID loopIndex:0];
     
     // When: Resolve bid.dealid field
     id dealId = [self.resolver resolveBidField:kTestAuctionID field:@"bid.dealid"];
@@ -1147,7 +1142,6 @@ static MockRillEventReporter *sharedInstance = nil;
     [self.resolver setResponseData:kTestAuctionID bidResponseJSON:testBidResponseWithCountry];
     [self.resolver setRequestData:kTestAuctionID bidRequestJSON:testBidRequest];
     [self.resolver saveLoadedBid:kTestAuctionID bidId:kTestBidID];
-    [self.resolver setLoopIndex:kTestAuctionID loopIndex:0];
     
     // When: Resolve bidRequest.device.geo.country field
     // Note: This uses internal method for testing - in production this is resolved via buildPayload

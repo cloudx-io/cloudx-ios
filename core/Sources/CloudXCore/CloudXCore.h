@@ -50,9 +50,6 @@
 #import <CloudXCore/CLXWinLossNetworkService.h>
 #import <CloudXCore/CLXAuctionBidManager.h>
 
-// Placement Loop Index Tracking
-#import <CloudXCore/CLXPlacementLoopIndexTracker.h>
-
 // Session Metrics Tracking
 #import <CloudXCore/CLXSessionMetrics.h>
 #import <CloudXCore/CLXSessionMetricsTracker.h>

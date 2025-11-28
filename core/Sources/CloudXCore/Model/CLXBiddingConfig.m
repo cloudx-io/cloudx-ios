@@ -149,29 +149,9 @@ static void initializeLogger() {
         storedImpression.adservertargeting = [targetingDict copy];
         storedImpression.storedimpression = idObj;
         
-        // Loop-index logic: matches Android behavior
-        // - Interstitials and Rewarded ads always use fixed value (1)
-        // - Banner/MREC ads use per-placement counter (NOT incremented here, only retrieved)
-        NSString *loopIndexValue;
-        if (adType == CLXAdTypeInterstitial || adType == CLXAdTypeRewarded) {
-            // Interstitials and Rewarded: always use 1 (fixed value, never increment)
-            loopIndexValue = @"1";
-            [logger debug:[NSString stringWithFormat:@"Using fixed loop-index=1 for %@ ad", 
-                          adType == CLXAdTypeInterstitial ? @"interstitial" : @"rewarded"]];
-        } else {
-            // Banner/MREC/Native: use per-placement counter from tracker
-            // Note: Counter is incremented separately by the ad load logic, not here
-            NSDictionary<NSString *, NSString *> *bannerUserDict = [[NSUserDefaults standardUserDefaults] objectForKey:kCLXCoreBannerUserKeyValueKey];
-            loopIndexValue = bannerUserDict[@"loop-index"] ?: @"1";
-            [logger debug:[NSString stringWithFormat:@"Using placement loop-index=%@ for banner/MREC", loopIndexValue]];
-        }
-        
         // Create impression ext
         CLXBiddingConfigImpressionExt *impExt = [[CLXBiddingConfigImpressionExt alloc] init];
         impExt.prebid = storedImpression;
-        
-        // Set loop-index in impression data
-        impExt.data = @{@"loop-index": loopIndexValue};
         
         // Create native ad if needed
         CLXBiddingConfigImpressionNative *native = nil;
@@ -442,11 +422,6 @@ static void initializeLogger() {
         
         _ext = ext;
         _requestID = [[NSUUID UUID] UUIDString];
-        
-        // Store loop index for win/loss tracking
-        NSInteger loopIndexInt = [loopIndexValue integerValue];
-        [[CLXTrackingFieldResolver shared] setLoopIndex:_requestID loopIndex:loopIndexInt];
-        [logger debug:[NSString stringWithFormat:@"Stored loop-index=%ld for auction: %@", (long)loopIndexInt, _requestID]];
         
         // Read test mode from SDK init configuration
         // Test mode is set during initializeSDKWithAppKey:testMode:completion:

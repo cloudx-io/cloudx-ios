@@ -48,9 +48,6 @@
                       abTestGroup:rillImpressionModel.impModel.testGroupName ?: @""
                         appBundle:appBundle];
     
-    // Set loop index
-    [resolver setLoopIndex:auctionId loopIndex:rillImpressionModel.loadBannerTimesCount];
-    
     // Set bid response data if available
     if (rillImpressionModel.lastBidResponse && rillImpressionModel.lastBidResponse.bid) {
         [resolver saveLoadedBid:auctionId bidId:rillImpressionModel.lastBidResponse.bid.id ?: @""];

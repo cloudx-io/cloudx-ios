@@ -226,14 +226,6 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
     } else if ([fieldPath isEqualToString:@"bid.price"]) {
         return @(bid.price);
         
-    } else if ([fieldPath isEqualToString:@"sdk.loopIndex"]) {
-        // Delegate to injected tracking field resolver for loop index
-        id loopIndex = [self.trackingFieldResolver resolveField:fieldPath forAuction:auctionId];
-        if ([loopIndex isKindOfClass:[NSString class]]) {
-            return @([((NSString *)loopIndex) integerValue]);
-        }
-        return loopIndex;
-        
     } else {
         // Delegate to injected tracking field resolver for other fields (bid.*, bidRequest.*, config.*)
         return [self.trackingFieldResolver resolveField:fieldPath forAuction:auctionId];
@@ -324,14 +316,6 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         // Return numeric loss reason value (for payload)
         NSInteger deviceTypeAsInt = [CLXSystemInformation shared].deviceType;
         return @(deviceTypeAsInt);
-        
-    } else if ([fieldPath isEqualToString:@"sdk.loopIndex"]) {
-        // Delegate to injected tracking field resolver for loop index
-        id loopIndex = [self.trackingFieldResolver resolveField:fieldPath forAuction:auctionId];
-        if ([loopIndex isKindOfClass:[NSString class]]) {
-            return @([((NSString *)loopIndex) integerValue]);
-        }
-        return loopIndex;
         
     } else {
         // Delegate to injected tracking field resolver for other fields

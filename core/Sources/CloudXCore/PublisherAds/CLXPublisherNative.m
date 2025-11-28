@@ -238,7 +238,7 @@ NS_ASSUME_NONNULL_BEGIN
         return;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherNative] Requesting native update - loop-index: %ld", self.currentCorrelationId, (long)self.loadNativeTimesCount]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherNative] Requesting native update", self.currentCorrelationId]];
     
     // Request bid from bid ad source
     __weak typeof(self) weakSelf = self;
@@ -272,14 +272,11 @@ NS_ASSUME_NONNULL_BEGIN
             // Store the full bid response for LURL firing by getting it from bidAdSource
             strongSelf.currentBidResponse = [strongSelf.bidAdSource getCurrentBidResponse];
             
-            // Get current loop index for Analytics tracking
-            NSInteger currentLoopIndex = [[CLXPlacementLoopIndexTracker shared] getCountForPlacement:strongSelf.placementName];
-            
             // Set up Analytics tracking data
             [strongSelf.rillTrackingService setupTrackingDataFromBidResponse:response
                                                                     impModel:strongSelf.impModel
                                                                  placementID:strongSelf.placementID
-                                                                   loadCount:currentLoopIndex];
+                                                                   loadCount:0];
             
             // Reset waterfall backoff algorithm
             [strongSelf.waterfallBackoffAlgorithm reset];
