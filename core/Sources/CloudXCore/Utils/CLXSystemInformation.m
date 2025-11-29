@@ -33,7 +33,6 @@ static CLXSystemInformation *sharedInstance = nil;
 @synthesize os = _os;
 @synthesize model = _model;
 @synthesize systemVersion = _systemVersion;
-@synthesize hardwareVersion = _hardwareVersion;
 @synthesize displayManager = _displayManager;
 @synthesize isAppStoreEnvironment = _isAppStoreEnvironment;
 
@@ -103,10 +102,6 @@ static CLXSystemInformation *sharedInstance = nil;
 
 - (NSString *)systemVersion {
     return [[UIDevice currentDevice] systemVersion];
-}
-
-- (NSString *)hardwareVersion {
-    return [UIDevice deviceGeneration];
 }
 
 - (NSString *)displayManager {
