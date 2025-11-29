@@ -4,6 +4,8 @@
 //
 
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXLogStore.h>
+#import <CloudXCore/CLXLogEntry.h>
 #import <os/log.h>
 
 // Class-level logging flags that affect all logger instances
@@ -158,6 +160,16 @@ static BOOL _globalTimestampsEnabled = NO;
     // Log using os_log (Xcode console shows these automatically)
     os_log_type_t osLogType = [self osLogTypeForLevel:level];
     os_log_with_type(self.osLog, osLogType, "%{public}@", formattedMessage);
+    
+    // Store in log buffer when testMode is enabled
+    // Include emoji prefix in stored message for better readability
+    NSString *storedMessage = emoji.length > 0 
+        ? [NSString stringWithFormat:@"%@ %@", emoji, message]
+        : message;
+    CLXLogEntry *entry = [[CLXLogEntry alloc] initWithLevel:level
+                                                   category:self.category
+                                                    message:storedMessage];
+    [[CLXLogStore shared] addEntry:entry];
 }
 
 #pragma mark - Convenience Methods

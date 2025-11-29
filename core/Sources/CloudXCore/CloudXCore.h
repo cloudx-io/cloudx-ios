@@ -114,6 +114,8 @@
 
 // Utils
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXLogEntry.h>
+#import <CloudXCore/CLXLogStore.h>
 #import <CloudXCore/CLXSystemInformation.h>
 #import <CloudXCore/CLXRetryHelper.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
