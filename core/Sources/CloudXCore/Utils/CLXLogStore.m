@@ -4,6 +4,7 @@
 
 #import <CloudXCore/CLXLogStore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CloudXCoreAPI.h>
 
 static const NSUInteger kCLXMaxLogEntries = 1000;
 
@@ -37,7 +38,10 @@ static const NSUInteger kCLXMaxLogEntries = 1000;
 }
 
 - (BOOL)isEnabled {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:kCLXCoreTestModeKey];
+    // Log collection is enabled when either testMode OR visualDebugging is enabled
+    // This allows debugging of real production ads when visualDebugging is enabled separately
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kCLXCoreTestModeKey] ||
+           [CloudXCore isVisualDebuggingEnabled];
 }
 
 - (void)addEntry:(CLXLogEntry *)entry {

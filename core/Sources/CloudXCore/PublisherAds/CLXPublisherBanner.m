@@ -40,6 +40,8 @@
 #import <CloudXCore/CloudXCoreAPI.h>
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXDebugOverlayManager.h>
+#import <CloudXCore/CLXDebugClickFeedback.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -234,9 +236,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)load {
     // Check for deferred error from create method
     if (self.deferredError) {
-        [self.logger error:[NSString stringWithFormat:@"Banner creation failed with deferred error: %@", self.deferredError.localizedDescription]];
         dispatch_async(dispatch_get_main_queue(), ^{
             if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+                [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" error:self.deferredError];
                 [self.delegate didFailToLoadAdWithError:self.deferredError];
             }
         });
@@ -287,10 +289,10 @@ NS_ASSUME_NONNULL_BEGIN
             // Clear the requested placement name since initialization is complete
             self.requestedPlacementName = nil;
         } else {
-            [self.logger error:[NSString stringWithFormat:@"Placement not found after SDK init: %@", self.requestedPlacementName]];
             if (self.delegate && [self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
                 CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidPlacement 
                                               description:[NSString stringWithFormat:@"Placement not found: %@", self.requestedPlacementName]];
+                [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" error:error];
                 [self.delegate didFailToLoadAdWithError:error];
             }
             return;
@@ -384,7 +386,7 @@ NS_ASSUME_NONNULL_BEGIN
             return;
         }
         
-        [self.logger info:[NSString stringWithFormat:@"[%@] Bid response received - Network: %@, BidID: %@, Price: %.2f, CreateBidAd: %d", strongSelf.currentCorrelationId, response.networkName, response.bidID, response.price, response.createBidAd != nil]];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] Bid response received - Network: %@, BidID: %@, Price: %.2f, CreateBidAd: %d", strongSelf.currentCorrelationId, response.networkName, response.bidID, response.price, response.createBidAd != nil]];
         
         strongSelf.lastBidResponse = response;
         
@@ -590,7 +592,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - CloudXAdapterBannerDelegate
 
 - (void)didLoadBanner:(id<CLXAdapterBanner>)banner {
-    [self.logger success:[NSString stringWithFormat:@"didLoadBanner called for placement: %@ (class: %@, timeout: %d)", self.placementID, NSStringFromClass([(NSObject *)banner class]), banner.timeout]];
+    [self.logger info:[NSString stringWithFormat:@"didLoadBanner called for placement: %@ (class: %@, timeout: %d)", self.placementID, NSStringFromClass([(NSObject *)banner class]), banner.timeout]];
 
     if (banner.timeout) {
         [banner destroy];
@@ -666,7 +668,9 @@ NS_ASSUME_NONNULL_BEGIN
 
     // Call the publisher delegate immediately upon successful load (industry standard)
     if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
-        [self.delegate didLoadAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
+        CLXAd *ad = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        [self.logger logDelegateCallback:@"✅ Banner didLoadAd" ad:ad];
+        [self.delegate didLoadAd:ad];
     }
 
     // Set manual refresh time to prevent impression fraud through rapid refresh manipulation.
@@ -753,28 +757,23 @@ NS_ASSUME_NONNULL_BEGIN
         [self timerDidReachEnd];
     }];
     
+    // Flash debug button to indicate error
+    [[CLXDebugOverlayManager shared] flashError];
+    
     // Emit error to delegate
     if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+        [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" error:delegateError];
         [self.delegate didFailToLoadAdWithError:delegateError];
-    } else {
-        [self.logger warn:@"Delegate does not respond to didFailToLoadAdWithError:"];
     }
    
 }
 
 - (void)didShowBanner:(id<CLXAdapterBanner>)banner {
-    NSLog(@"🟢 [CLXPublisherBanner] STEP 2: didShowBanner called - delegate: %@, respondsTo didDisplayAd: %d", 
-          self.delegate, [self.delegate respondsToSelector:@selector(didDisplayAd:)]);
-    
     CLXAd *ad = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-    NSLog(@"🟢 [CLXPublisherBanner] STEP 2: Created ad object: %@", ad);
     
     if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
-        NSLog(@"🟢 [CLXPublisherBanner] STEP 2: Calling [delegate didDisplayAd:%@]", ad);
+        [self.logger logDelegateCallback:@"👀 Banner didDisplayAd" ad:ad];
         [self.delegate didDisplayAd:ad];
-        NSLog(@"🟢 [CLXPublisherBanner] STEP 2: Returned from [delegate didDisplayAd:]");
-    } else {
-        NSLog(@"🔴 [CLXPublisherBanner] STEP 2: Delegate does NOT respond to didDisplayAd: - THIS IS THE BUG!");
     }
 }
 
@@ -818,17 +817,25 @@ NS_ASSUME_NONNULL_BEGIN
         [self.rillTrackingService sendImpressionEvent];
     }
     if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
-        [self.delegate didRecordImpressionForAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
+        CLXAd *ad = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        [self.logger logDelegateCallback:@"👁️ Banner didRecordImpression" ad:ad];
+        [self.delegate didRecordImpressionForAd:ad];
     }
 }
 
 - (void)clickBanner:(id<CLXAdapterBanner>)banner {
-    [self.logger debug:[NSString stringWithFormat:@"click delegate called for placement: %@", self.placementID]];
     [self.appSessionService addClickWithPlacementID:self.placementID];
-    // Send Analytics tracking click event
     [self.rillTrackingService sendClickEvent];
+    
+    // Show click confirmed feedback - stops pending animation and shows green border
+    if (banner.bannerView) {
+        [CLXDebugClickFeedback showClickConfirmedOnView:banner.bannerView];
+    }
+    
     if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
-        [self.delegate didClickAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
+        CLXAd *ad = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        [self.logger logDelegateCallback:@"👆 Banner didClickAd" ad:ad];
+        [self.delegate didClickAd:ad];
     }
 }
 

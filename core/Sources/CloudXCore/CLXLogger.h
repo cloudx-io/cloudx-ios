@@ -1,5 +1,8 @@
 #import <Foundation/Foundation.h>
 
+@class CLXAd;
+@class CLXError;
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSInteger, CLXLogLevel) {
@@ -41,6 +44,23 @@ typedef NS_ENUM(NSInteger, CLXLogEmoji) {
 // Convenience methods (INFO level + custom emoji)
 - (void)success:(NSString *)message;
 - (void)event:(NSString *)message;
+
+#pragma mark - Delegate Callback Logging
+
+/**
+ * Log a delegate callback at INFO level with formatted ad details.
+ * These logs mirror the format used in demo apps for easy debugging.
+ * @param callbackName The callback name with emoji (e.g., "✅ Banner didLoadAd")
+ * @param ad The ad object to format details from (nullable for error callbacks)
+ */
+- (void)logDelegateCallback:(NSString *)callbackName ad:(nullable CLXAd *)ad;
+
+/**
+ * Log a delegate error callback at ERROR level with error details.
+ * @param callbackName The callback name with emoji (e.g., "❌ Banner didFailToLoadAd")
+ * @param error The error object with failure details
+ */
+- (void)logDelegateError:(NSString *)callbackName error:(nullable CLXError *)error;
 
 /**
  * Enable or disable logging dynamically

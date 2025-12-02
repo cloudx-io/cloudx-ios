@@ -471,7 +471,7 @@ static void initializeLogger() {
         response.seatbid = [seatbids copy];
     }
     
-    [logger info:[NSString stringWithFormat:@"Successfully parsed bid response with %lu seatbids", (unsigned long)response.seatbid.count]];
+    [logger debug:[NSString stringWithFormat:@"Successfully parsed bid response with %lu seatbids", (unsigned long)response.seatbid.count]];
     return response;
 }
 

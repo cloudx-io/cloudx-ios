@@ -108,7 +108,7 @@
                             appKey:(NSString *)appKey
                       correlationId:(NSString *)correlationId
                         completion:(void (^)(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error))completion {
-    [self.logger info:[NSString stringWithFormat:@"[%@] [BidNetworkService] Starting auction request - AppKey: %@", correlationId, appKey]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] [BidNetworkService] Starting auction request - AppKey: %@", correlationId, appKey]];
     
     // Log the actual bid request JSON
     if (bidRequest) {
@@ -228,7 +228,7 @@
             return;
         }
         
-        [self.logger info:[NSString stringWithFormat:@"[%@] [BidNetworkService] Auction response received successfully", correlationId]];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] [BidNetworkService] Auction response received successfully", correlationId]];
         
         // Parse response dictionary into BidResponse object
         CLXBidResponse *bidResponse = [CLXBidResponse parseBidResponseFromDictionary:response];

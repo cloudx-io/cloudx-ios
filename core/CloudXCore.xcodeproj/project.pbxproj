@@ -84,7 +84,6 @@
 		198303D02EB1F8CA0080DDAF /* CLXInterstitial.m in Sources */ = {isa = PBXBuildFile; fileRef = 198303CD2EB1F8CA0080DDAF /* CLXInterstitial.m */; };
 		198303D12EB1F8CA0080DDAF /* CLXPublisherFullscreenAdBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 198303CE2EB1F8CA0080DDAF /* CLXPublisherFullscreenAdBase.m */; };
 		198303D22EB1F8CA0080DDAF /* CLXRewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = 198303CF2EB1F8CA0080DDAF /* CLXRewarded.m */; };
-		198303D52EB1FA040080DDAF /* CLXPublisherFullscreenAdBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 198303D32EB1FA040080DDAF /* CLXPublisherFullscreenAdBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		198303D62EB1FA040080DDAF /* CLXRewarded.h in Headers */ = {isa = PBXBuildFile; fileRef = 198303D42EB1FA040080DDAF /* CLXRewarded.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19A3BD122EC1CE1F009025A3 /* CloudXCoreInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 19A3BD112EC1CE1F009025A3 /* CloudXCoreInternal.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C7247B2E2390420012CFC7 /* CloudXCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19C724702E2390420012CFC7 /* CloudXCore.framework */; };
@@ -223,6 +222,18 @@
 		19D8D40A2EDAFC8000817D1E /* CLXLogEntry.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D8D4072EDAFC8000817D1E /* CLXLogEntry.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19D8D40D2EDAFCB000817D1E /* CLXLogStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D8D40C2EDAFCB000817D1E /* CLXLogStore.m */; };
 		19D8D40E2EDAFCB000817D1E /* CLXLogEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D8D40B2EDAFCB000817D1E /* CLXLogEntry.m */; };
+		19D8D4B82EDD7B0400817D1E /* CLXDebugClickFeedback.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D8D4AF2EDD7B0400817D1E /* CLXDebugClickFeedback.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		19D8D4B92EDD7B0400817D1E /* CLXDebugOverlayManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D8D4B52EDD7B0400817D1E /* CLXDebugOverlayManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		19D8D4BA2EDD7B0400817D1E /* CLXDebugLogViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D8D4B32EDD7B0400817D1E /* CLXDebugLogViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		19D8D4BB2EDD7B0400817D1E /* CLXDebugErrorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D8D4B12EDD7B0400817D1E /* CLXDebugErrorView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		19D8D4BC2EDD7B0400817D1E /* CLXDebugButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D8D4AD2EDD7B0400817D1E /* CLXDebugButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		19D8D4BD2EDD7B0400817D1E /* CLXDebugErrorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D8D4B22EDD7B0400817D1E /* CLXDebugErrorView.m */; };
+		19D8D4BE2EDD7B0400817D1E /* CLXDebugButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D8D4AE2EDD7B0400817D1E /* CLXDebugButton.m */; };
+		19D8D4BF2EDD7B0400817D1E /* CLXDebugLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D8D4B42EDD7B0400817D1E /* CLXDebugLogViewController.m */; };
+		19D8D4C02EDD7B0400817D1E /* CLXDebugOverlayManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D8D4B62EDD7B0400817D1E /* CLXDebugOverlayManager.m */; };
+		19D8D4C12EDD7B0400817D1E /* CLXDebugClickFeedback.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D8D4B02EDD7B0400817D1E /* CLXDebugClickFeedback.m */; };
+		19D8D4C42EDD7D3800817D1E /* CLXPublisherFullscreenAdBaseInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 198303D72EB269D20080DDAF /* CLXPublisherFullscreenAdBaseInternal.h */; };
+		19D8D4C52EDD7D4900817D1E /* CLXPublisherFullscreenAdBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 198303D32EB1FA040080DDAF /* CLXPublisherFullscreenAdBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19D926B32E610F4400C84DAE /* CLXAdType.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D926B22E610F4400C84DAE /* CLXAdType.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19D926B52E610FFB00C84DAE /* CLXSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D926B42E610FFB00C84DAE /* CLXSettings.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19D926BD2E61101200C84DAE /* CLXRetryHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D926BA2E61101200C84DAE /* CLXRetryHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -318,7 +329,6 @@
 		19FF30FC2EA6E81A0006F05A /* CLXSessionDepthUnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19FF30F92EA6E81A0006F05A /* CLXSessionDepthUnitTests.m */; };
 		4CB082B6B56BF7F6E2326FA3 /* CLXPublisherFullscreenAdBase.m in Sources */ = {isa = PBXBuildFile; fileRef = FE130BCA63E61DEDE9759912 /* CLXPublisherFullscreenAdBase.m */; };
 		76C392589B9EB51D6C79360A /* CLXInterstitial.m in Sources */ = {isa = PBXBuildFile; fileRef = 168C26A6C1BC9AE04A765A03 /* CLXInterstitial.m */; };
-		7F95952F0A16C19482E1C8AD /* CLXPublisherFullscreenAdBase.h in Headers */ = {isa = PBXBuildFile; fileRef = D3BD626817D65D02E7871508 /* CLXPublisherFullscreenAdBase.h */; };
 		EA6E5C231326BAA0E6B44342 /* CLXRewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C0B287DB7F3EE0A2635EB97 /* CLXRewarded.m */; };
 /* End PBXBuildFile section */
 
@@ -554,6 +564,16 @@
 		19D8D4082EDAFC8000817D1E /* CLXLogStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXLogStore.h; sourceTree = "<group>"; };
 		19D8D40B2EDAFCB000817D1E /* CLXLogEntry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXLogEntry.m; sourceTree = "<group>"; };
 		19D8D40C2EDAFCB000817D1E /* CLXLogStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXLogStore.m; sourceTree = "<group>"; };
+		19D8D4AD2EDD7B0400817D1E /* CLXDebugButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXDebugButton.h; sourceTree = "<group>"; };
+		19D8D4AE2EDD7B0400817D1E /* CLXDebugButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXDebugButton.m; sourceTree = "<group>"; };
+		19D8D4AF2EDD7B0400817D1E /* CLXDebugClickFeedback.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXDebugClickFeedback.h; sourceTree = "<group>"; };
+		19D8D4B02EDD7B0400817D1E /* CLXDebugClickFeedback.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXDebugClickFeedback.m; sourceTree = "<group>"; };
+		19D8D4B12EDD7B0400817D1E /* CLXDebugErrorView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXDebugErrorView.h; sourceTree = "<group>"; };
+		19D8D4B22EDD7B0400817D1E /* CLXDebugErrorView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXDebugErrorView.m; sourceTree = "<group>"; };
+		19D8D4B32EDD7B0400817D1E /* CLXDebugLogViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXDebugLogViewController.h; sourceTree = "<group>"; };
+		19D8D4B42EDD7B0400817D1E /* CLXDebugLogViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXDebugLogViewController.m; sourceTree = "<group>"; };
+		19D8D4B52EDD7B0400817D1E /* CLXDebugOverlayManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXDebugOverlayManager.h; sourceTree = "<group>"; };
+		19D8D4B62EDD7B0400817D1E /* CLXDebugOverlayManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXDebugOverlayManager.m; sourceTree = "<group>"; };
 		19D926B22E610F4400C84DAE /* CLXAdType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAdType.h; sourceTree = "<group>"; };
 		19D926B42E610FFB00C84DAE /* CLXSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSettings.h; sourceTree = "<group>"; };
 		19D926BA2E61101200C84DAE /* CLXRetryHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXRetryHelper.h; sourceTree = "<group>"; };
@@ -1010,6 +1030,7 @@
 		19C725422E2390810012CFC7 /* CloudXCore */ = {
 			isa = PBXGroup;
 			children = (
+				19D8D4B72EDD7B0400817D1E /* Debug */,
 				19D8D4072EDAFC8000817D1E /* CLXLogEntry.h */,
 				19D8D4082EDAFC8000817D1E /* CLXLogStore.h */,
 				19A3BD112EC1CE1F009025A3 /* CloudXCoreInternal.h */,
@@ -1174,6 +1195,23 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
+		19D8D4B72EDD7B0400817D1E /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				19D8D4AD2EDD7B0400817D1E /* CLXDebugButton.h */,
+				19D8D4AE2EDD7B0400817D1E /* CLXDebugButton.m */,
+				19D8D4AF2EDD7B0400817D1E /* CLXDebugClickFeedback.h */,
+				19D8D4B02EDD7B0400817D1E /* CLXDebugClickFeedback.m */,
+				19D8D4B12EDD7B0400817D1E /* CLXDebugErrorView.h */,
+				19D8D4B22EDD7B0400817D1E /* CLXDebugErrorView.m */,
+				19D8D4B32EDD7B0400817D1E /* CLXDebugLogViewController.h */,
+				19D8D4B42EDD7B0400817D1E /* CLXDebugLogViewController.m */,
+				19D8D4B52EDD7B0400817D1E /* CLXDebugOverlayManager.h */,
+				19D8D4B62EDD7B0400817D1E /* CLXDebugOverlayManager.m */,
+			);
+			path = Debug;
+			sourceTree = "<group>";
+		};
 		19D927C02E6233F400C84DAE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1328,19 +1366,23 @@
 				1979919E2E74923900EBA0A3 /* CLXConsentProvider.h in Headers */,
 				19EC25492EACB45F005C8EF6 /* CLXVersion.h in Headers */,
 				19656C1C2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h in Headers */,
-				198303D52EB1FA040080DDAF /* CLXPublisherFullscreenAdBase.h in Headers */,
 				198303D62EB1FA040080DDAF /* CLXRewarded.h in Headers */,
 				197992952E75E3B700EBA0A3 /* CLXErrorReporter.h in Headers */,
 				19A3BD122EC1CE1F009025A3 /* CloudXCoreInternal.h in Headers */,
 				19D8D4092EDAFC8000817D1E /* CLXLogStore.h in Headers */,
 				19D8D40A2EDAFC8000817D1E /* CLXLogEntry.h in Headers */,
+				19D8D4B82EDD7B0400817D1E /* CLXDebugClickFeedback.h in Headers */,
+				19D8D4B92EDD7B0400817D1E /* CLXDebugOverlayManager.h in Headers */,
+				19D8D4BA2EDD7B0400817D1E /* CLXDebugLogViewController.h in Headers */,
+				19D8D4BB2EDD7B0400817D1E /* CLXDebugErrorView.h in Headers */,
+				19D8D4BC2EDD7B0400817D1E /* CLXDebugButton.h in Headers */,
 				19F592DE2E98365E00C6E11D /* NSDictionary+DynamicPath.h in Headers */,
 				19F592E42E9836CD00C6E11D /* CLXKeyValueState.h in Headers */,
-				198303D52EB1FA040080DDAF /* CLXPublisherFullscreenAdBase.h in Headers */,
 				19C7257A2E2390810012CFC7 /* CLXBidNetworkService.h in Headers */,
 				19D92CA22E6E099C00C84DAE /* CLXUserDefaultsKeys.h in Headers */,
+				19D8D4C52EDD7D4900817D1E /* CLXPublisherFullscreenAdBase.h in Headers */,
 				19C725A72E2390810012CFC7 /* CLXLogger.h in Headers */,
-				7F95952F0A16C19482E1C8AD /* CLXPublisherFullscreenAdBase.h in Headers */,
+				19D8D4C42EDD7D3800817D1E /* CLXPublisherFullscreenAdBaseInternal.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1453,6 +1495,11 @@
 				19C725AC2E2390810012CFC7 /* CLXPublisherNative.m in Sources */,
 				19C725AE2E2390810012CFC7 /* CLXBackgroundTimer.m in Sources */,
 				19C725AF2E2390810012CFC7 /* CLXSDKConfig.m in Sources */,
+				19D8D4BD2EDD7B0400817D1E /* CLXDebugErrorView.m in Sources */,
+				19D8D4BE2EDD7B0400817D1E /* CLXDebugButton.m in Sources */,
+				19D8D4BF2EDD7B0400817D1E /* CLXDebugLogViewController.m in Sources */,
+				19D8D4C02EDD7B0400817D1E /* CLXDebugOverlayManager.m in Sources */,
+				19D8D4C12EDD7B0400817D1E /* CLXDebugClickFeedback.m in Sources */,
 				198303D02EB1F8CA0080DDAF /* CLXInterstitial.m in Sources */,
 				198303D12EB1F8CA0080DDAF /* CLXPublisherFullscreenAdBase.m in Sources */,
 				198303D22EB1F8CA0080DDAF /* CLXRewarded.m in Sources */,

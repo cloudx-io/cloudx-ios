@@ -174,7 +174,7 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
     
-    [self.logger info:[NSString stringWithFormat:@"[%@] Auction started - AdUnit: %@, Placement: %@, AdType: %ld", correlationId, adUnitID, self.placementID, (long)self.adType]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] Auction started - AdUnit: %@, Placement: %@, AdType: %ld", correlationId, adUnitID, self.placementID, (long)self.adType]];
     
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
@@ -243,7 +243,7 @@ NS_ASSUME_NONNULL_BEGIN
                 return;
             }
             
-            [self.logger info:[NSString stringWithFormat:@"[%@] Bid request created successfully", correlationId]];
+            [self.logger debug:[NSString stringWithFormat:@"[%@] Bid request created successfully", correlationId]];
             
             // Store bid request JSON in tracking field resolver
             if ([bidRequest isKindOfClass:[NSDictionary class]]) {
@@ -433,7 +433,7 @@ NS_ASSUME_NONNULL_BEGIN
         
         if (testAd != nil) {
             // SUCCESS - This bid can be created (but not yet confirmed as loaded)
-            [self.logger info:[NSString stringWithFormat:@"[%@] Waterfall success with bid %ld: rank=%ld, id=%@", 
+            [self.logger debug:[NSString stringWithFormat:@"[%@] Waterfall success with bid %ld: rank=%ld, id=%@", 
                               correlationId, (long)bidIndex + 1, (long)currentBid.ext.cloudx.rank, currentBid.id]];
             
             [self.appSessionService bidLoadedWithPlacementID:currentBid.id latency:self.latency];

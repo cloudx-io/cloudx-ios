@@ -124,6 +124,13 @@
 // State Management
 #import <CloudXCore/CLXKeyValueState.h>
 
+// Debug UI (visual debugging)
+#import <CloudXCore/CLXDebugOverlayManager.h>
+#import <CloudXCore/CLXDebugButton.h>
+#import <CloudXCore/CLXDebugLogViewController.h>
+#import <CloudXCore/CLXDebugErrorView.h>
+#import <CloudXCore/CLXDebugClickFeedback.h>
+
 // DI Container
 #import <CloudXCore/CLXDIContainer.h>
 

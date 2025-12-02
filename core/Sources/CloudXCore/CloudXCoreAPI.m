@@ -1,5 +1,6 @@
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXSystemInformation.h>
+#import <CloudXCore/CLXDebugOverlayManager.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXInitService.h>
 #import <CloudXCore/CLXLiveInitService.h>
@@ -509,6 +510,9 @@ static CloudXCore *_sharedInstance = nil;
     // Post internal notification for ad objects to resume queued operations
     [[NSNotificationCenter defaultCenter] postNotificationName:CLXSDKInitializedNotification object:nil];
     
+    // Visual debugging overlay is NOT auto-enabled - use setVisualDebuggingEnabled: to toggle
+    // This allows debugging of production ads without testMode polluting ad content
+    
     // Track initialization metrics
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
@@ -532,6 +536,11 @@ static CloudXCore *_sharedInstance = nil;
     }
     
     [self startTimer];
+    
+    // Show visual debugging overlay if enabled (testMode OR visualDebugging flag)
+    // This must be called after SDK init because the overlay manager is lazy-loaded
+    // and won't have received the NSUserDefaultsDidChangeNotification from earlier
+    [[CLXDebugOverlayManager shared] showIfEnabled];
     
     if (completion) {
         completion(YES, nil);
@@ -1158,6 +1167,26 @@ static CloudXCore *_sharedInstance = nil;
 
 + (void)setIsDoNotSell:(BOOL)isDoNotSell {
     [[CLXPrivacyService sharedInstance] setDoNotSell:@(isDoNotSell)];
+}
+
+#pragma mark - Visual Debugging
+
+// In-memory only - resets to NO on every app launch for safety
+// Prevents accidental release with visual debugging enabled
+static BOOL _visualDebuggingEnabled = NO;
+
++ (void)setVisualDebuggingEnabled:(BOOL)enabled {
+    _visualDebuggingEnabled = enabled;
+    
+    if (enabled) {
+        [[CLXDebugOverlayManager shared] showIfEnabled];
+    } else {
+        [[CLXDebugOverlayManager shared] hide];
+    }
+}
+
++ (BOOL)isVisualDebuggingEnabled {
+    return _visualDebuggingEnabled;
 }
 
 #pragma mark - Logging Control

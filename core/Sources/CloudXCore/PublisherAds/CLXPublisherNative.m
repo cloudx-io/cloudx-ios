@@ -32,7 +32,8 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXAdType.h>
-
+#import <CloudXCore/CLXDebugOverlayManager.h>
+#import <CloudXCore/CLXDebugClickFeedback.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -476,10 +477,11 @@ NS_ASSUME_NONNULL_BEGIN
     if ([self.delegate respondsToSelector:@selector(didLoadWithNative:)]) {
         [self.delegate didLoadWithNative:native];
     }
-            if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
-            CLXAd *delegateAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-            [self.delegate didLoadAd:delegateAd];
-        }
+    if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
+        CLXAd *delegateAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        [self.logger logDelegateCallback:@"✅ Native didLoadAd" ad:delegateAd];
+        [self.delegate didLoadAd:delegateAd];
+    }
     
     __weak typeof(self) weakSelf = self;
     [self.timerService startCountDownWithDeadline:self.refreshSeconds completion:^{
@@ -557,6 +559,8 @@ NS_ASSUME_NONNULL_BEGIN
         [self.delegate failToLoadWithNative:native error:delegateError];
     }
     if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+        [[CLXDebugOverlayManager shared] flashError];
+        [self.logger logDelegateError:@"❌ Native didFailToLoadAd" error:delegateError];
         [self.delegate didFailToLoadAdWithError:delegateError];
     }
 }
@@ -585,7 +589,9 @@ NS_ASSUME_NONNULL_BEGIN
         [self.delegate didShowWithNative:native];
     }
     if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
-        [self.delegate didDisplayAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
+        CLXAd *ad = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        [self.logger logDelegateCallback:@"👀 Native didDisplayAd" ad:ad];
+        [self.delegate didDisplayAd:ad];
     }
 }
 
@@ -628,29 +634,31 @@ NS_ASSUME_NONNULL_BEGIN
     if ([self.delegate respondsToSelector:@selector(impressionWithNative:)]) {
         [self.delegate impressionWithNative:native];
     }
-            if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
-            CLXAd *impressionAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-            [self.delegate didRecordImpressionForAd:impressionAd];
-        }
+    if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
+        CLXAd *impressionAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        [self.logger logDelegateCallback:@"👁️ Native didRecordImpression" ad:impressionAd];
+        [self.delegate didRecordImpressionForAd:impressionAd];
+    }
 }
 
 - (void)clickWithNative:(id<CLXAdapterNative>)native {
-    [self.logger debug:@"Native clicked"];
-    
-    // Call appSessionService.addClick
     [self.appSessionService addClickWithPlacementID:self.placementID];
-    
-    // Send Analytics tracking click event
     [self.rillTrackingService sendClickEvent];
+    
+    // Show click confirmed feedback - stops pending animation and shows green border
+    if (native.nativeView) {
+        [CLXDebugClickFeedback showClickConfirmedOnView:native.nativeView];
+    }
     
     // Call both old and new delegate methods for backward compatibility
     if ([self.delegate respondsToSelector:@selector(clickWithNative:)]) {
         [self.delegate clickWithNative:native];
     }
-            if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
-            CLXAd *clickAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-            [self.delegate didClickAd:clickAd];
-        }
+    if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
+        CLXAd *clickAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        [self.logger logDelegateCallback:@"👆 Native didClickAd" ad:clickAd];
+        [self.delegate didClickAd:clickAd];
+    }
 }
 
 #pragma mark - CLXAdLifecycle
