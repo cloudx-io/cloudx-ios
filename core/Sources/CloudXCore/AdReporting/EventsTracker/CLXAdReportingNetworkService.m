@@ -260,19 +260,15 @@
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [request setHTTPBody:jsonData];
     
-    __block NSError * __autoreleasing *blockError = error;
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
-                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (error) {
-            [self.logger error:[NSString stringWithFormat:@"CloudX: metricsTracking error: %@", error]];
+                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *networkError) {
+        if (networkError) {
+            [self.logger error:[NSString stringWithFormat:@"CloudX: metricsTracking error: %@", networkError]];
         } else {
             [self.logger debug:[NSString stringWithFormat:@"CloudX: metricsTracking: %@", fullURL]];
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
             [self.logger debug:[NSString stringWithFormat:@"CloudX: Tracking response status code: %ld", (long)[httpResponse statusCode]]];
-        }
-        if (error && blockError) {
-            *blockError = error;
         }
     }];
     [task resume];
@@ -341,16 +337,15 @@
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:fullURL];
     request.HTTPMethod = @"GET";
     
-    __block NSError * __autoreleasing *blockError = error;
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
-                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *networkError) {
         // Print the complete response JSON
         NSMutableDictionary *responseJSON = [NSMutableDictionary dictionary];
         
-        if (error) {
-            responseJSON[@"error"] = error.localizedDescription;
-            [self.logger error:[NSString stringWithFormat:@"ERROR: %@", error]];
+        if (networkError) {
+            responseJSON[@"error"] = networkError.localizedDescription;
+            [self.logger error:[NSString stringWithFormat:@"ERROR: %@", networkError]];
         } else {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
             responseJSON[@"statusCode"] = @(httpResponse.statusCode);
@@ -365,10 +360,6 @@
         }
         
         [self.logger debug:[NSString stringWithFormat:@"Response JSON: %@", responseJSON]];
-        
-        if (error && blockError) {
-            *blockError = error;
-        }
     }];
     [task resume];
 }
