@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXBiddingConfigUser;
 @class CLXBiddingConfigRegulations;
 @class CLXBiddingConfigRequestExt;
+@class CLXBiddingConfigSource;
 
 // Forward declarations for nested classes
 @class CLXBiddingConfigDeviceGeo;
@@ -88,6 +89,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) CLXBiddingConfigRequestExt *ext;
 @property (nonatomic, copy) NSString *requestID;
 @property (nonatomic, strong, nullable) NSNumber *test;
+// ORTB 2.5: Source object describing the upstream supply chain
+@property (nonatomic, strong, nullable) CLXBiddingConfigSource *source;
 
 - (instancetype)initWithAdType:(CLXAdType)adType
                      adUnitID:(NSString *)adUnitID
@@ -240,6 +243,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXBiddingConfigImpressionBanner : NSObject
 @property (nonatomic, strong) NSArray<CLXBiddingConfigImpressionBannerFormat *> *formats;
+// ORTB 2.5: Ad position on screen (see AdPosition enum values)
+@property (nonatomic, strong, nullable) NSNumber *pos;
+// ORTB 2.5: Indicates if banner is in top frame (1) or iframe (0). Always 1 for native apps.
+@property (nonatomic, strong, nullable) NSNumber *topframe;
 @end
 
 @interface CLXBiddingConfigImpressionBannerFormat : NSObject
@@ -312,6 +319,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *key;
 @property (nonatomic, copy) NSString *source;
 @property (nonatomic, copy) NSString *value;
+@end
+
+// MARK: - Source (ORTB 2.5)
+@interface CLXBiddingConfigSource : NSObject
+// ORTB 2.5: Entity responsible for the final impression sale decision (integer: 1 = exchange)
+@property (nonatomic, strong, nullable) NSNumber *fd;
+// ORTB 2.5: Transaction ID for this bid request
+@property (nonatomic, copy, nullable) NSString *tid;
+// ORTB 2.5: Payment ID chain string (ads.txt/sellers.json)
+@property (nonatomic, copy, nullable) NSString *pchain;
 @end
 
 // MARK: - Response classes removed

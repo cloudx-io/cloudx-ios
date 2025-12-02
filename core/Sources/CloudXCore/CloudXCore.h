@@ -13,6 +13,7 @@
 // Common
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXAdType.h>
+#import <CloudXCore/CLXORTBConstants.h>
 #import <CloudXCore/CLXURLProvider.h>
 
 // Services

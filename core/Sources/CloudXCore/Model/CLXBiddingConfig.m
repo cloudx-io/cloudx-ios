@@ -23,6 +23,10 @@
 #import <CloudXCore/CLXSessionMetrics.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 #import <CloudXCore/CLXConsentProvider.h>
+#import <CloudXCore/UIDevice+CLXIdentifier.h>
+#import <CloudXCore/CLXORTBConstants.h>
+
+
 
 // Internal methods category for accessing privacy methods
 @interface CLXPrivacyService (Internal)
@@ -113,7 +117,35 @@ static void initializeLogger() {
 
         // Create banner with formats
         CLXBiddingConfigImpressionBanner *banner = [[CLXBiddingConfigImpressionBanner alloc] init];
-        banner.formats = @[format]; // Single format as in Swift
+        banner.formats = @[format];
+        // ORTB 2.5: topframe indicates if ad is in top frame (1) or nested iframe (0).
+        // Native mobile apps always render ads directly in the view hierarchy - there are no
+        // iframes like in web environments. Therefore topframe is always 1 for iOS/Android SDKs.
+        banner.topframe = @1;
+        
+        // ORTB 2.5 Ad Position (Section 5.4)
+        // We can ONLY know position definitively for fullscreen ad types.
+        // For inline ads (banner, MREC, native), position depends entirely on where
+        // the publisher places the view. Best practice is to expose a public API
+        // (e.g. banner.adPosition) to let publishers explicitly declare this.
+        // Auto-detection via view frames is unreliable and discouraged.
+        switch (adType) {
+            case CLXAdTypeInterstitial:
+                // Interstitials are always fullscreen - this is definitive
+                banner.pos = CLXORTBAdPositionToNumber(CLXORTBAdPositionFullScreen);
+                break;
+            case CLXAdTypeRewarded:
+                // Rewarded ads are always fullscreen - this is definitive
+                banner.pos = CLXORTBAdPositionToNumber(CLXORTBAdPositionFullScreen);
+                break;
+            case CLXAdTypeBanner:
+            case CLXAdTypeMrec:
+            case CLXAdTypeNative:
+            default:
+                // Inline ads: position unknown without view frame detection
+                banner.pos = CLXORTBAdPositionToNumber(CLXORTBAdPositionUnknown);
+                break;
+        }
         
         // Interstitial and rewarded ads don't need banner formats
 
@@ -291,19 +323,25 @@ static void initializeLogger() {
         CLXBiddingConfigDevice *device = [[CLXBiddingConfigDevice alloc] init];
         device.ua = userAgent ?: @"ua";
         device.make = @"Apple";
-        device.model = [[UIDevice currentDevice] model];
+        // ORTB 2.5: device.model should be the device identifier (e.g., "iPhone15,2")
+        device.model = [CLXSystemInformation shared].model;
         device.os = @"iOS";
         device.osv = [[UIDevice currentDevice] systemVersion];
-        device.hwv = [[UIDevice currentDevice] systemVersion];
+        // ORTB 2.5: device.hwv is the hardware version.
+        // Use the device identifier (e.g., "iPhone17,1") which is always available and
+        // provides precise hardware info for bidders. This is more valuable than marketing
+        // names like "16 Pro" since bidders can map identifiers to exact specs.
+        device.hwv = [UIDevice deviceIdentifier];
         device.language = [[NSLocale currentLocale] languageCode];
         device.ifa = ifa;
         device.dnt = @(dnt ? 1 : 0);
-        device.devicetype = @([CLXSystemInformation shared].deviceType); // Use robust device type detection
+        device.devicetype = @([CLXSystemInformation shared].deviceType);
         device.h = @(screenHeight);
         device.w = @(screenWidth);
-        device.ppi = @([[UIScreen mainScreen] scale] * 163); // Approximate PPI
-        device.connectiontype = @([CLXReachabilityService shared].currentReachabilityType); // Use robust connection type detection
-        device.lmt = nil;
+        device.ppi = @([[UIScreen mainScreen] scale] * 163);
+        device.connectiontype = @([CLXReachabilityService shared].currentReachabilityType);
+        // ORTB 2.5: device.lmt indicates "Limit Ad Tracking" (1 = tracking restricted, 0 = unrestricted)
+        device.lmt = @(dnt ? 1 : 0);
         device.pxratio = @([[UIScreen mainScreen] scale]);
         device.geo = geo;
         device.ext = deviceExt;
@@ -423,6 +461,14 @@ static void initializeLogger() {
         _ext = ext;
         _requestID = [[NSUUID UUID] UUIDString];
         
+        // ORTB 2.5: Create source object for supply chain transparency
+        CLXBiddingConfigSource *source = [[CLXBiddingConfigSource alloc] init];
+        // tid = Transaction ID, using the same request ID for consistency
+        source.tid = _requestID;
+        // fd = 1 indicates exchange/SDK is responsible for final impression decision
+        source.fd = @1;
+        _source = source;
+        
         // Read test mode from SDK init configuration
         // Test mode is set during initializeSDKWithAppKey:testMode:completion:
         // Simulator always has test mode enabled automatically
@@ -452,6 +498,11 @@ static void initializeLogger() {
     json[@"user"] = [self convertUserToJSON];
     json[@"regs"] = [self convertRegulationsToJSON];
     json[@"ext"] = [self convertExtToJSON];
+    
+    // ORTB 2.5: Add source object for supply chain transparency
+    if (self.source) {
+        json[@"source"] = [self convertSourceToJSON];
+    }
     
     if (self.tmax) {
         json[@"tmax"] = self.tmax;
@@ -615,7 +666,20 @@ static void initializeLogger() {
             @"h": format.h ?: @0
         }];
     }
-    return @{@"format": [formatsArray copy]};
+    NSMutableDictionary *json = [NSMutableDictionary dictionary];
+    json[@"format"] = [formatsArray copy];
+    
+    // ORTB 2.5: Ad position on screen
+    if (banner.pos) {
+        json[@"pos"] = banner.pos;
+    }
+    
+    // ORTB 2.5: Top frame indicator (1 = top frame, 0 = iframe)
+    if (banner.topframe) {
+        json[@"topframe"] = banner.topframe;
+    }
+    
+    return [json copy];
 }
 
 - (NSDictionary *)convertVideoToJSON:(CLXBiddingConfigImpressionVideo *)video {
@@ -753,6 +817,7 @@ static void initializeLogger() {
     json[@"geo"] = [self convertDeviceGeoToJSON:self.device.geo];
     json[@"ext"] = [self convertDeviceExtToJSON:self.device.ext];
     
+    // ORTB 2.5: lmt (Limit Ad Tracking)
     if (self.device.lmt) {
         json[@"lmt"] = self.device.lmt;
     }
@@ -940,6 +1005,31 @@ static void initializeLogger() {
     return [json copy];
 }
 
+- (NSDictionary *)convertSourceToJSON {
+    if (!self.source) {
+        return nil;
+    }
+    
+    NSMutableDictionary *json = [NSMutableDictionary dictionary];
+    
+    // ORTB 2.5: fd indicates entity responsible for final impression sale decision
+    if (self.source.fd) {
+        json[@"fd"] = self.source.fd;
+    }
+    
+    // ORTB 2.5: tid is the transaction ID for this bid request
+    if (self.source.tid) {
+        json[@"tid"] = self.source.tid;
+    }
+    
+    // ORTB 2.5: pchain is the payment ID chain (ads.txt/sellers.json)
+    if (self.source.pchain) {
+        json[@"pchain"] = self.source.pchain;
+    }
+    
+    return [json copy];
+}
+
 - (NSDictionary *)convertExtToJSON {
     if (!self.ext) {
         return nil;
@@ -1047,6 +1137,10 @@ static void initializeLogger() {
 @implementation CLXBiddingConfigRequestExtPrebidDebug
 @end
 @implementation CLXBiddingConfigRequestExtAdserverTargeting
+@end
+
+#pragma mark - Source
+@implementation CLXBiddingConfigSource
 @end
 
 #pragma mark - Response
