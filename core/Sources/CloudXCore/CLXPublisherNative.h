@@ -48,14 +48,14 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Initializes a new CLXPublisherNative with the given parameters.
  * @param viewController The view controller where the native ad will be displayed
- * @param placement The placement configuration
+ * @param placement The placement configuration (nil if SDK not initialized, will be resolved on load)
  * @param userID The user ID
  * @param publisherID The publisher ID
  * @param suspendPreloadWhenInvisible Whether to suspend preloading when not visible
  * @param delegate The delegate to receive events
  * @param nativeType The type of native ad template
  * @param waterfallMaxBackOffTime Maximum backoff time for waterfall
- * @param impModel The impression model
+ * @param impModel The impression model (nil if SDK not initialized, will be created on load)
  * @param adFactories Dictionary of native ad factories
  * @param bidTokenSources Dictionary of bid token sources
  * @param bidRequestTimeout Bid request timeout
@@ -63,14 +63,14 @@ NS_ASSUME_NONNULL_BEGIN
  * @return Initialized CLXPublisherNative instance
  */
 - (instancetype)initWithViewController:(UIViewController *)viewController
-                             placement:(CLXSDKConfigPlacement *)placement
+                             placement:(nullable CLXSDKConfigPlacement *)placement
                                 userID:(NSString *)userID
                            publisherID:(NSString *)publisherID
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
                                delegate:(nullable id<CLXNativeDelegate, CLXAdapterNativeDelegate>)delegate
                              nativeType:(CLXNativeTemplate)nativeType
                    waterfallMaxBackOffTime:(NSTimeInterval)waterfallMaxBackOffTime
-                                  impModel:(CLXConfigImpressionModel *)impModel
+                                  impModel:(nullable CLXConfigImpressionModel *)impModel
                               adFactories:(NSDictionary<NSString *, id<CLXAdapterNativeFactory>> *)adFactories
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout

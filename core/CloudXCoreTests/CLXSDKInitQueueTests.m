@@ -17,6 +17,7 @@
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXPublisherBanner.h>
 #import <CloudXCore/CLXPublisherFullscreenAdBase.h>
+#import <CloudXCore/CLXPublisherNative.h>
 #import <CloudXCore/CLXInterstitial.h>
 #import <CloudXCore/CLXRewarded.h>
 #import <CloudXCore/CLXSDKConfig.h>
@@ -31,6 +32,12 @@
 @end
 
 @interface CLXPublisherFullscreenAdBase (TestVerification)
+@property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
+@property (nonatomic, strong, nullable) NSError *deferredError;
+@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+@end
+
+@interface CLXPublisherNative (TestVerification)
 @property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
 @property (nonatomic, strong, nullable) NSError *deferredError;
 @property (nonatomic, copy, nullable) NSString *requestedPlacementName;
@@ -232,13 +239,29 @@
 }
 
 /**
+ * Verifies that requestedPlacementName property exists on native ads for deferred initialization.
+ */
+- (void)testDeferredInit_NativeAdHasRequestedPlacementNameProperty {
+    XCTAssertTrue([CLXPublisherNative instancesRespondToSelector:@selector(requestedPlacementName)],
+                  @"CLXPublisherNative should have requestedPlacementName property for deferred initialization");
+}
+
+/**
+ * Verifies that deferredError property exists on native ads for storing validation errors.
+ */
+- (void)testDeferredInit_NativeAdHasDeferredErrorProperty {
+    XCTAssertTrue([CLXPublisherNative instancesRespondToSelector:@selector(deferredError)],
+                  @"CLXPublisherNative should have deferredError property for deferred validation errors");
+}
+
+/**
  * Documents the deferred initialization flow for ads created before SDK init.
  *
  * When an ad is created before SDK initialization:
  * 1. placement is nil
  * 2. impModel is nil
- * 3. bidAdSource is nil (banner) / created with nil placement data (fullscreen)
- * 4. requestedPlacementName is set via KVC by CloudXCoreAPI
+ * 3. bidAdSource is nil (banner/native) / created with nil placement data (fullscreen)
+ * 4. requestedPlacementName is set via private category by CloudXCoreAPI
  *
  * When load() is called before SDK init:
  * 1. pendingLoadRequestCount is incremented
