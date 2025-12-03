@@ -25,6 +25,7 @@
 #import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/UIDevice+CLXIdentifier.h>
 #import <CloudXCore/CLXORTBConstants.h>
+#import <CloudXCore/CLXSKAdNetworkService.h>
 
 
 
@@ -45,6 +46,48 @@ static CLXLogger *logger;
 __attribute__((constructor))
 static void initializeLogger() {
     logger = [[CLXLogger alloc] initWithCategory:@"BiddingConfig.m"];
+}
+
+/**
+ * Converts iOS ReachabilityType enum to ORTB 2.5 connection type values.
+ * ORTB 2.5 references AdCOM v1.0 for connection types.
+ *
+ * AdCOM v1.0 connection type values (ORTB standard):
+ * 0 = Unknown
+ * 1 = Ethernet
+ * 2 = WIFI
+ * 3 = Cellular Network - Unknown Generation
+ * 4 = Cellular Network - 2G
+ * 5 = Cellular Network - 3G
+ * 6 = Cellular Network - 4G
+ * 7 = Cellular Network - 5G
+ *
+ * Current iOS SDK support (ReachabilityType enum):
+ * - WiFi → 2 ✓
+ * - 2G/3G/4G → 4/5/6 ✓
+ * - 5G → Not yet supported (would map to 7)
+ *
+ * NOTE: iOS CLXReachabilityService currently defaults all cellular to 4G.
+ * Actual 2G/3G/4G/5G detection requires CoreTelephony API implementation.
+ * TODO: Add ReachabilityTypeWWAN5G case when detection is implemented.
+ */
+static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
+    switch (type) {
+        case ReachabilityTypeWiFi:
+            return 2; // WIFI
+        case ReachabilityTypeWWAN2G:
+            return 4; // Cellular 2G
+        case ReachabilityTypeWWAN3G:
+            return 5; // Cellular 3G
+        case ReachabilityTypeWWAN4G:
+            return 6; // Cellular 4G
+        // case ReachabilityTypeWWAN5G:  // TODO: Add when enum is extended
+        //     return 7; // Cellular 5G
+        case ReachabilityTypeNone:
+        case ReachabilityTypeUnknown:
+        default:
+            return 0; // Unknown
+    }
 }
 
 #pragma mark - CLXBiddingConfigRequest
@@ -185,6 +228,31 @@ static void initializeLogger() {
         CLXBiddingConfigImpressionExt *impExt = [[CLXBiddingConfigImpressionExt alloc] init];
         impExt.prebid = storedImpression;
         
+        // Create SKAdNetwork object for iOS attribution (IAB SKAN spec)
+        // This tells bidders which SKAN versions are supported and which network IDs
+        // are in the publisher's Info.plist for attribution
+        CLXSKAdNetworkService *skadService = [[CLXSKAdNetworkService alloc] initWithSystemVersion:[[UIDevice currentDevice] systemVersion]];
+        NSArray<NSString *> *skadVersions = skadService.versions;
+        NSArray<NSString *> *skadNetworkIds = skadService.skadPlistIds;
+        
+        if (skadVersions.count > 0 || skadNetworkIds.count > 0) {
+            CLXBiddingConfigImpressionExtSkadn *skadn = [[CLXBiddingConfigImpressionExtSkadn alloc] init];
+            // Highest supported version (last in array)
+            skadn.version = skadVersions.lastObject;
+            skadn.versions = skadVersions;
+            skadn.sourceapp = skadService.sourceApp;
+            skadn.skadnetids = skadNetworkIds;
+            impExt.skadn = skadn;
+            
+            [logger debug:[NSString stringWithFormat:@"[BiddingConfig] SKAdNetwork: version=%@, versions=%lu, sourceapp=%@, skadnetids=%lu",
+                          skadn.version,
+                          (unsigned long)skadn.versions.count,
+                          skadn.sourceapp,
+                          (unsigned long)(skadn.skadnetids.count ?: 0)]];
+        } else {
+            [logger debug:@"[BiddingConfig] SKAdNetwork: No SKAN versions or network IDs available"];
+        }
+        
         // Create native ad if needed
         CLXBiddingConfigImpressionNative *native = nil;
         if (adType == CLXAdTypeNative && nativeAdRequirements) {
@@ -215,8 +283,11 @@ static void initializeLogger() {
         
         impression.instl = (adType == CLXAdTypeInterstitial || adType == CLXAdTypeRewarded) ? @1 : @0;
         
-        // Match Swift SDK logic exactly - don't set bidfloor (it's commented out in Swift)
-        // impression.bidfloor = @(bidFloor);
+        // ORTB 2.5: bidfloor is the minimum bid price for this impression in CPM
+        // Only include if explicitly provided (non-zero value indicates publisher floor)
+        if (bidFloor && [bidFloor floatValue] > 0) {
+            impression.bidfloor = bidFloor;
+        }
         
         // Add missing fields to match Swift SDK
         impression.bidfloorcur = @"USD";
@@ -320,8 +391,18 @@ static void initializeLogger() {
         // Get DNT (Do Not Track) status from ATT/LAT settings
         BOOL dnt = [CLXAdTrackingService dnt];
         
+        // ORTB 2.5: device.ip is intentionally NOT set client-side.
+        // The ad exchange server populates device.ip from the HTTP request's source IP.
+        // This is the industry-standard approach because:
+        // 1. Security: Prevents IP spoofing for geo-arbitrage and fraud
+        // 2. Accuracy: Server sees the true client IP from the connection
+        // 3. Privacy: Client apps cannot reliably determine their public IP without external calls
         CLXBiddingConfigDevice *device = [[CLXBiddingConfigDevice alloc] init];
-        device.ua = userAgent ?: @"ua";
+        // ORTB 2.5: device.ua is the browser/app user agent string (RECOMMENDED but not REQUIRED).
+        // Only include if we have a real user agent - don't send fake/fallback values.
+        if (userAgent) {
+            device.ua = userAgent;
+        }
         device.make = @"Apple";
         // ORTB 2.5: device.model should be the device identifier (e.g., "iPhone15,2")
         device.model = [CLXSystemInformation shared].model;
@@ -339,7 +420,9 @@ static void initializeLogger() {
         device.h = @(screenHeight);
         device.w = @(screenWidth);
         device.ppi = @([[UIScreen mainScreen] scale] * 163);
-        device.connectiontype = @([CLXReachabilityService shared].currentReachabilityType);
+        // ORTB 2.5: connectiontype uses AdCOM v1.0 values (0-7)
+        // Convert iOS ReachabilityType to ORTB standard
+        device.connectiontype = @(ReachabilityTypeToORTBConnectionType([CLXReachabilityService shared].currentReachabilityType));
         // ORTB 2.5: device.lmt indicates "Limit Ad Tracking" (1 = tracking restricted, 0 = unrestricted)
         device.lmt = @(dnt ? 1 : 0);
         device.pxratio = @([[UIScreen mainScreen] scale]);
@@ -590,6 +673,11 @@ static void initializeLogger() {
     json[@"tagid"] = impression.tagid ?: @"";
     json[@"instl"] = impression.instl ?: @0;
     json[@"secure"] = @1;
+    
+    // ORTB 2.5: bidfloor - minimum bid price in CPM (only include if set by publisher)
+    if (impression.bidfloor) {
+        json[@"bidfloor"] = impression.bidfloor;
+    }
     json[@"bidfloorcur"] = impression.bidfloorcur ?: @"USD";
     json[@"exp"] = impression.exp ?: @14400;
     
@@ -714,6 +802,38 @@ static void initializeLogger() {
     if (ext.data) {
         json[@"data"] = ext.data;
     }
+    // Add SKAdNetwork object for iOS attribution (IAB SKAN spec)
+    if (ext.skadn) {
+        json[@"skadn"] = [self convertSkadnToJSON:ext.skadn];
+    }
+    
+    return [json copy];
+}
+
+/// Converts SKAdNetwork object to JSON per IAB SKAN specification
+/// This provides bidders with attribution capability information
+- (NSDictionary *)convertSkadnToJSON:(CLXBiddingConfigImpressionExtSkadn *)skadn {
+    NSMutableDictionary *json = [NSMutableDictionary dictionary];
+    
+    // version: Highest supported SKAN version (string)
+    if (skadn.version) {
+        json[@"version"] = skadn.version;
+    }
+    
+    // versions: Array of all supported SKAN versions
+    if (skadn.versions && skadn.versions.count > 0) {
+        json[@"versions"] = skadn.versions;
+    }
+    
+    // sourceapp: Publisher app bundle identifier
+    if (skadn.sourceapp) {
+        json[@"sourceapp"] = skadn.sourceapp;
+    }
+    
+    // skadnetids: Array of SKAdNetwork IDs from publisher's Info.plist
+    if (skadn.skadnetids && skadn.skadnetids.count > 0) {
+        json[@"skadnetids"] = skadn.skadnetids;
+    }
     
     return [json copy];
 }
@@ -798,7 +918,10 @@ static void initializeLogger() {
 
 - (NSDictionary *)convertDeviceToJSON {
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
-    json[@"ua"] = self.device.ua ?: @"";
+    // ORTB 2.5: device.ua is RECOMMENDED but not REQUIRED - only include if we have a real value
+    if (self.device.ua) {
+        json[@"ua"] = self.device.ua;
+    }
     json[@"make"] = self.device.make ?: @"";
     json[@"model"] = self.device.model ?: @"";
     json[@"os"] = self.device.os ?: @"";
@@ -1091,6 +1214,8 @@ static void initializeLogger() {
 @implementation CLXBiddingConfigImpressionNative
 @end
 @implementation CLXBiddingConfigImpressionExt
+@end
+@implementation CLXBiddingConfigImpressionExtSkadn
 @end
 @implementation CLXBiddingConfigImpressionExtStoredImpression
 @end

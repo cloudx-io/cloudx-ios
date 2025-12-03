@@ -54,6 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXBiddingConfigImpressionExtStoredImpression;
 @class CLXBiddingConfigImpressionExtAdserverTargeting;
 @class CLXBiddingConfigImpressionExtId;
+@class CLXBiddingConfigImpressionExtSkadn;
 @class CLXBiddingConfigImpressionPMPDeal;
 @class CLXBiddingConfigRequestExtPrebidDebug;
 @class CLXBiddingConfigRequestExtAdserverTargeting;
@@ -231,6 +232,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *impressionID;
 @property (nonatomic, copy) NSString *tagid;
 @property (nonatomic, strong) NSNumber *instl;
+/// ORTB 2.5: Minimum bid price for this impression in CPM
+@property (nonatomic, strong, nullable) NSNumber *bidfloor;
 @property (nonatomic, copy, nullable) NSString *bidfloorcur;
 @property (nonatomic, strong, nullable) NSNumber *exp;
 @property (nonatomic, strong, nullable) CLXBiddingConfigImpressionBanner *banner;
@@ -275,10 +278,22 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXBiddingConfigImpressionExtStoredImpression *prebid;
 @property (nonatomic, strong, nullable) NSDictionary *bidder;
 @property (nonatomic, strong, nullable) NSDictionary *data;
+/// SKAdNetwork object for iOS attribution (OpenRTB 2.6 / IAB SKAN spec)
+@property (nonatomic, strong, nullable) CLXBiddingConfigImpressionExtSkadn *skadn;
 @end
 
-//@interface CLXBiddingConfigImpressionExtData : NSObject
-//@end
+/// SKAdNetwork request object per IAB SKAN spec
+/// Tells bidders which SKAN versions are supported and which network IDs are in the publisher's plist
+@interface CLXBiddingConfigImpressionExtSkadn : NSObject
+/// Highest SKAN version supported by the device (e.g., "4.0")
+@property (nonatomic, copy, nullable) NSString *version;
+/// All SKAN versions supported by the device (e.g., ["2.0", "2.1", "2.2", "3.0", "4.0"])
+@property (nonatomic, strong, nullable) NSArray<NSString *> *versions;
+/// Publisher app's bundle identifier (source of the ad impression)
+@property (nonatomic, copy, nullable) NSString *sourceapp;
+/// Array of SKAdNetwork IDs from the publisher's Info.plist that bidders can use for attribution
+@property (nonatomic, strong, nullable) NSArray<NSString *> *skadnetids;
+@end
 
 @interface CLXBiddingConfigImpressionExtStoredImpression : NSObject
 @property (nonatomic, strong) NSArray<CLXBiddingConfigImpressionExtAdserverTargeting *> *adservertargeting;

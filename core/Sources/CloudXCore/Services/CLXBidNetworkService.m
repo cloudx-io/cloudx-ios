@@ -91,7 +91,7 @@
                                                                   displayManagerVer:[CLXSystemInformation shared].sdkVersion ?: @""
                                                                          publisherID:publisherID ?: @""
                                                                             location:nil
-                                                                           userAgent:nil
+                                                                           userAgent:self.userAgent
                                                                          adapterInfo:adapterInfo
                                                                nativeAdRequirements:nativeAdRequirements
                                                                skadRequestParameters:nil

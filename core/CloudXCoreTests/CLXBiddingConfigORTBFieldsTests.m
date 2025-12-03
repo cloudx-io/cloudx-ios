@@ -331,6 +331,214 @@
                           @"JSON source.fd should be 1 (integer)");
 }
 
+#pragma mark - imp.bidfloor Tests
+
+- (void)testBidfloor_WhenSet_ShouldBeIncludedInJSON {
+    // Create config with bidFloor set
+    CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc]
+        initWithAdType:CLXAdTypeBanner
+                     adUnitID:@"test-ad-unit"
+            storedImpressionId:@"test-impression"
+                        dealID:nil
+                     bidFloor:@2.5
+                displayManager:@"test-manager"
+            displayManagerVer:@"1.0"
+                   publisherID:@"test-pub"
+                      location:nil
+                     userAgent:@"test-agent"
+                   adapterInfo:@{}
+           nativeAdRequirements:nil
+           skadRequestParameters:nil
+                          tmax:@3000
+                      impModel:self.mockImpModel
+                      settings:[CLXSettings sharedInstance]
+                privacyService:self.privacyService];
+    
+    NSDictionary *json = [config json];
+    NSArray *impressions = json[@"imp"];
+    XCTAssertGreaterThan(impressions.count, 0, @"Should have at least one impression");
+    
+    NSDictionary *impJSON = impressions.firstObject;
+    XCTAssertNotNil(impJSON[@"bidfloor"], @"bidfloor should be present in JSON when set");
+    XCTAssertEqualObjects(impJSON[@"bidfloor"], @2.5, @"bidfloor value should match");
+}
+
+- (void)testBidfloor_WhenNil_ShouldBeOmittedFromJSON {
+    // Create config without bidFloor (nil)
+    CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc]
+        initWithAdType:CLXAdTypeBanner
+                     adUnitID:@"test-ad-unit"
+            storedImpressionId:@"test-impression"
+                        dealID:nil
+                     bidFloor:nil
+                displayManager:@"test-manager"
+            displayManagerVer:@"1.0"
+                   publisherID:@"test-pub"
+                      location:nil
+                     userAgent:@"test-agent"
+                   adapterInfo:@{}
+           nativeAdRequirements:nil
+           skadRequestParameters:nil
+                          tmax:@3000
+                      impModel:self.mockImpModel
+                      settings:[CLXSettings sharedInstance]
+                privacyService:self.privacyService];
+    
+    NSDictionary *json = [config json];
+    NSArray *impressions = json[@"imp"];
+    NSDictionary *impJSON = impressions.firstObject;
+    
+    // When bidfloor is nil, it should not be included in JSON
+    XCTAssertNil(impJSON[@"bidfloor"], @"bidfloor should be omitted from JSON when nil");
+}
+
+- (void)testBidfloor_WhenZero_ShouldBeOmittedFromJSON {
+    // Create config with bidFloor set to 0
+    CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc]
+        initWithAdType:CLXAdTypeBanner
+                     adUnitID:@"test-ad-unit"
+            storedImpressionId:@"test-impression"
+                        dealID:nil
+                     bidFloor:@0.0
+                displayManager:@"test-manager"
+            displayManagerVer:@"1.0"
+                   publisherID:@"test-pub"
+                      location:nil
+                     userAgent:@"test-agent"
+                   adapterInfo:@{}
+           nativeAdRequirements:nil
+           skadRequestParameters:nil
+                          tmax:@3000
+                      impModel:self.mockImpModel
+                      settings:[CLXSettings sharedInstance]
+                privacyService:self.privacyService];
+    
+    NSDictionary *json = [config json];
+    NSArray *impressions = json[@"imp"];
+    NSDictionary *impJSON = impressions.firstObject;
+    
+    // When bidfloor is 0, it should not be included in JSON (no floor = open auction)
+    XCTAssertNil(impJSON[@"bidfloor"], @"bidfloor should be omitted from JSON when zero");
+}
+
+- (void)testBidfloorCurrency_ShouldAlwaysBeUSD {
+    CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc]
+        initWithAdType:CLXAdTypeBanner
+                     adUnitID:@"test-ad-unit"
+            storedImpressionId:@"test-impression"
+                        dealID:nil
+                     bidFloor:@1.5
+                displayManager:@"test-manager"
+            displayManagerVer:@"1.0"
+                   publisherID:@"test-pub"
+                      location:nil
+                     userAgent:@"test-agent"
+                   adapterInfo:@{}
+           nativeAdRequirements:nil
+           skadRequestParameters:nil
+                          tmax:@3000
+                      impModel:self.mockImpModel
+                      settings:[CLXSettings sharedInstance]
+                privacyService:self.privacyService];
+    
+    NSDictionary *json = [config json];
+    NSArray *impressions = json[@"imp"];
+    NSDictionary *impJSON = impressions.firstObject;
+    
+    // bidfloorcur should always be USD
+    XCTAssertEqualObjects(impJSON[@"bidfloorcur"], @"USD",
+                          @"bidfloorcur should always be USD");
+}
+
+#pragma mark - device.connectiontype Tests
+
+- (void)testDeviceConnectionType_ShouldBePresent {
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    
+    XCTAssertNotNil(config.device.connectiontype, @"device.connectiontype should not be nil");
+}
+
+- (void)testDeviceConnectionType_ShouldBeORTBCompliant {
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    
+    // ORTB 2.5 AdCOM v1.0 connection type values: 0-7
+    NSInteger connType = [config.device.connectiontype integerValue];
+    XCTAssertTrue(connType >= 0 && connType <= 7,
+                  @"device.connectiontype should be ORTB-compliant value (0-7), got: %ld", (long)connType);
+}
+
+- (void)testDeviceConnectionTypeInJSON_ShouldBeIncluded {
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    NSDictionary *json = [config json];
+    
+    NSDictionary *deviceJSON = json[@"device"];
+    XCTAssertNotNil(deviceJSON[@"connectiontype"], @"device.connectiontype should be in JSON");
+    
+    NSInteger connType = [deviceJSON[@"connectiontype"] integerValue];
+    XCTAssertTrue(connType >= 0 && connType <= 7,
+                  @"JSON device.connectiontype should be ORTB-compliant (0-7)");
+}
+
+- (void)testDeviceConnectionType_ORTBValueMapping {
+    // This test verifies the mapping function logic
+    // Since we can't control the actual network state in tests,
+    // we verify the values are within ORTB spec range
+    
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    NSInteger connType = [config.device.connectiontype integerValue];
+    
+    // Expected ORTB values based on network state:
+    // 0 = Unknown
+    // 2 = WIFI
+    // 4 = Cellular 2G
+    // 5 = Cellular 3G
+    // 6 = Cellular 4G
+    
+    NSArray *validORTBValues = @[@0, @2, @4, @5, @6];
+    XCTAssertTrue([validORTBValues containsObject:@(connType)],
+                  @"device.connectiontype should be a valid ORTB value (0, 2, 4, 5, 6), got: %ld", (long)connType);
+}
+
+#pragma mark - device.ua Tests
+
+- (void)testDeviceUA_WhenProvided_ShouldBeIncluded {
+    // Test that device.ua is included when userAgent is provided
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    NSDictionary *json = [config json];
+    
+    NSDictionary *deviceJSON = json[@"device"];
+    XCTAssertNotNil(deviceJSON[@"ua"], @"device.ua should be present when userAgent is provided");
+    XCTAssertEqualObjects(deviceJSON[@"ua"], @"test-agent", @"device.ua should match provided userAgent");
+}
+
+- (void)testDeviceUA_WhenNil_ShouldBeOmitted {
+    // Test that device.ua is omitted when userAgent is nil (per ORTB 2.5 - RECOMMENDED not REQUIRED)
+    CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc]
+        initWithAdType:CLXAdTypeBanner
+                     adUnitID:@"test-ad-unit"
+            storedImpressionId:@"test-impression"
+                        dealID:nil
+                     bidFloor:@1.0
+                displayManager:@"test-manager"
+            displayManagerVer:@"1.0"
+                   publisherID:@"test-pub"
+                      location:nil
+                     userAgent:nil  // Explicitly nil
+                   adapterInfo:@{}
+           nativeAdRequirements:nil
+           skadRequestParameters:nil
+                          tmax:@3000
+                      impModel:self.mockImpModel
+                      settings:[CLXSettings sharedInstance]
+                privacyService:self.privacyService];
+    
+    NSDictionary *json = [config json];
+    NSDictionary *deviceJSON = json[@"device"];
+    
+    // When userAgent is nil, device.ua should be omitted (not empty string, not fake value)
+    XCTAssertNil(deviceJSON[@"ua"], @"device.ua should be omitted when userAgent is nil (ORTB 2.5: optional field)");
+}
+
 #pragma mark - Regression Tests
 
 - (void)testExistingFields_ShouldNotBeAffected {
