@@ -1,21 +1,22 @@
 Pod::Spec.new do |s|
-  s.name             = 'CloudXVungleAdapter'
+  s.name             = 'CloudXInMobiAdapter'
   s.version          = '1.2.1'
-  s.summary          = 'CloudX Vungle Adapter - Static Framework'
-  s.description      = 'Vungle/Liftoff adapter for CloudX iOS SDK - binary distribution'
+  s.summary          = 'CloudX InMobi Adapter - Static Framework'
+  s.description      = 'InMobi adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
   s.license          = { :type => 'Business Source License 1.1' }
   s.author           = { 'CloudX' => 'support@cloudx.io' }
-  s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "v#{s.version}-vungle" }
+  s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "v#{s.version}-inmobi" }
   
   s.ios.deployment_target = '15.0'
-  s.vendored_frameworks = 'adapter-vungle/CloudXVungleAdapter.xcframework'
+  s.vendored_frameworks = 'CloudXInMobiAdapter.xcframework'
   
   # Dependencies
   s.dependency 'CloudXCore', '1.2.1'
-  s.dependency 'VungleAds', '~> 7.4.0'
+  s.dependency 'InMobiSDK', '~> 10.8'
   
-  s.frameworks = ['AVFoundation', 'AudioToolbox', 'CFNetwork', 'CoreGraphics', 'CoreMedia', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']
+  s.frameworks = ['AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit']
+  s.weak_frameworks = ['Combine', 'CryptoKit', 'SafariServices', 'SwiftUI', 'WebKit']
   
   s.requires_arc = true
   s.static_framework = true
