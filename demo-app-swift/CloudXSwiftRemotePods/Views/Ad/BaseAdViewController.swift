@@ -147,9 +147,19 @@ class BaseAdViewController: UIViewController, AdStateManaging {
         ])
     }
     
+    private lazy var sdkDebuggerButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        button.layer.cornerRadius = 6
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(toggleSDKDebugger), for: .touchUpInside)
+        return button
+    }()
+    
     func setupShowLogsButton() {
+        // App Logs button (shows demo app logs)
         let showLogsButton = UIButton(type: .system)
-        showLogsButton.setTitle("Show Logs", for: .normal)
+        showLogsButton.setTitle("App Logs", for: .normal)
         showLogsButton.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
         showLogsButton.backgroundColor = UIColor.systemOrange
         showLogsButton.setTitleColor(UIColor.white, for: .normal)
@@ -159,13 +169,39 @@ class BaseAdViewController: UIViewController, AdStateManaging {
         showLogsButton.addTarget(self, action: #selector(showLogsModal), for: .touchUpInside)
         
         view.addSubview(showLogsButton)
+        view.addSubview(sdkDebuggerButton)
+        
+        updateSDKDebuggerButtonTitle()
         
         NSLayoutConstraint.activate([
             showLogsButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             showLogsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             showLogsButton.widthAnchor.constraint(equalToConstant: 100),
-            showLogsButton.heightAnchor.constraint(equalToConstant: 32)
+            showLogsButton.heightAnchor.constraint(equalToConstant: 32),
+            
+            sdkDebuggerButton.topAnchor.constraint(equalTo: showLogsButton.bottomAnchor, constant: 8),
+            sdkDebuggerButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            sdkDebuggerButton.widthAnchor.constraint(equalToConstant: 100),
+            sdkDebuggerButton.heightAnchor.constraint(equalToConstant: 32)
         ])
+    }
+    
+    private func updateSDKDebuggerButtonTitle() {
+        let isEnabled = CloudXCore.isVisualDebuggingEnabled()
+        if isEnabled {
+            sdkDebuggerButton.setTitle("Debugger ✓", for: .normal)
+            sdkDebuggerButton.backgroundColor = .systemGreen
+        } else {
+            sdkDebuggerButton.setTitle("Debugger", for: .normal)
+            sdkDebuggerButton.backgroundColor = .systemPurple
+        }
+        sdkDebuggerButton.setTitleColor(.white, for: .normal)
+    }
+    
+    @objc private func toggleSDKDebugger() {
+        let currentState = CloudXCore.isVisualDebuggingEnabled()
+        CloudXCore.setVisualDebuggingEnabled(!currentState)
+        updateSDKDebuggerButtonTitle()
     }
     
     @objc private func showLogsModal() {

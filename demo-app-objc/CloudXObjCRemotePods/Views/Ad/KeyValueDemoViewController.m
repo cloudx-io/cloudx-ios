@@ -201,20 +201,22 @@
     self.infoLabel.numberOfLines = 0;
     self.infoLabel.font = [UIFont systemFontOfSize:13];
     self.infoLabel.textColor = [UIColor secondaryLabelColor];
-    self.infoLabel.text = @"📌 Key-value pairs are injected into bid requests at server-configured paths.\n\n"
-                          @"👤 User-Level: User-specific targeting (e.g., age, interests)\n"
-                          @"   • Respects privacy regulations (GDPR/CCPA)\n"
-                          @"   • Cleared when privacy requires removing PII\n\n"
-                          @"📱 App-Level: App-specific targeting (e.g., app version, build)\n"
-                          @"   • Not affected by privacy regulations\n"
-                          @"   • Always included in bid requests\n\n"
-                          @"💡 The server controls where these values appear in the bid request via the keyValuePaths configuration.";
+    self.infoLabel.text = @"📌 Key-value pairs are injected into bid requests.\n\n"
+                          @"🔥 MONETIZATION (Whale Signals):\n"
+                          @"   • payer_status: whale/payer/nonpayer\n"
+                          @"   • iap_total_bucket, predicted_ltv\n\n"
+                          @"💪 ENGAGEMENT:\n"
+                          @"   • user_tenure, level_achieved, loyalty_tier\n\n"
+                          @"📺 AD HABITS:\n"
+                          @"   • ad_whale, reward_affinity\n\n"
+                          @"👤 User-Level: Privacy-aware (cleared on opt-out)\n"
+                          @"📱 App-Level: Always included";
     self.infoLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.infoSection addSubview:self.infoLabel];
     
     // Add sample data button
     UIButton *sampleButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [sampleButton setTitle:@"Load Sample Key-Values (for testing)" forState:UIControlStateNormal];
+    [sampleButton setTitle:@"🎯 Load HIGH-ROI Targeting Signals" forState:UIControlStateNormal];
     sampleButton.backgroundColor = [UIColor systemGreenColor];
     [sampleButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     sampleButton.layer.cornerRadius = 8;

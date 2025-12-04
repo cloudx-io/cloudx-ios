@@ -5,7 +5,6 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
     
     private var rewardedAd: CLXRewarded?
     private let settings = UserDefaultsSettings.shared
-    private var gppScenarioPicker: GPPScenarioPickerView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,11 +20,6 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
         buttonStack.alignment = .center
         buttonStack.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(buttonStack)
-        
-        // GPP Scenario Picker - Encapsulated Test Component
-        gppScenarioPicker = GPPScenarioPickerView()
-        gppScenarioPicker.translatesAutoresizingMaskIntoConstraints = false
-        buttonStack.addArrangedSubview(gppScenarioPicker)
         
         // Load Rewarded button
         let loadButton = UIButton(type: .system)
