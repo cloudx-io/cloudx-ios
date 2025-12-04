@@ -44,6 +44,7 @@ The **CloudX iOS SDK** is a comprehensive mobile advertising solution that provi
 | **CloudXCore** | Core SDK with programmatic advertising engine |
 | **CloudXMetaAdapter** | Meta Audience Network integration |
 | **CloudXVungleAdapter** | Vungle/Liftoff integration with header bidding |
+| **CloudXInMobiAdapter** | InMobi integration with header bidding |
 | **CloudXRenderer** | Creative rendering engine for CloudX demand |
 
 ### Installation
@@ -58,6 +59,7 @@ target 'YourApp' do
   pod 'CloudXCore'
   pod 'CloudXMetaAdapter'      # Optional
   pod 'CloudXVungleAdapter'    # Optional
+  pod 'CloudXInMobiAdapter'    # Optional
   pod 'CloudXRenderer'         # For CloudX demand
 end
 ```
