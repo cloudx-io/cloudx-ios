@@ -209,6 +209,34 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  */
 + (void)setIsDoNotSell:(BOOL)isDoNotSell;
 
+#pragma mark - Visual Debugging
+
+/**
+ * Enable or disable the visual debugging overlay
+ * @param enabled YES to show the debug overlay, NO to hide it
+ * @discussion When enabled, shows a floating debug button that provides:
+ * - Click visual feedback (border highlight on ad clicks)
+ * - Error display in ad containers (shows load/display errors)
+ * - Log viewer (tap the button to see SDK logs)
+ * - Error flash (button flashes red when errors occur)
+ *
+ * This is independent from testMode - you can debug real production ads.
+ * The overlay appears immediately when enabled and can be called at any time.
+ *
+ * Example:
+ * @code
+ * // Enable visual debugging for live ads
+ * [CloudXCore setVisualDebuggingEnabled:YES];
+ * @endcode
+ */
++ (void)setVisualDebuggingEnabled:(BOOL)enabled;
+
+/**
+ * Check if visual debugging is currently enabled
+ * @return YES if visual debugging overlay is enabled, NO otherwise
+ */
++ (BOOL)isVisualDebuggingEnabled;
+
 #pragma mark - Logging Control
 
 /**

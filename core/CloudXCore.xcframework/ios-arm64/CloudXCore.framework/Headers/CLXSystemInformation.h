@@ -72,9 +72,6 @@ typedef NS_ENUM(NSInteger, DeviceType) {
 /** The system version */
 @property (nonatomic, readonly) NSString *systemVersion;
 
-/** The hardware version */
-@property (nonatomic, readonly) NSString *hardwareVersion;
-
 /** The display manager */
 @property (nonatomic, readonly) NSString *displayManager;
 

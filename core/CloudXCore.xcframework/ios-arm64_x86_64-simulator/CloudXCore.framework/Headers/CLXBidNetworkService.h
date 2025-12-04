@@ -9,8 +9,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol CLXBidNetworkService <NSObject>
 
-@property (nonatomic, assign) BOOL isCDPEndpointEmpty;
-
 - (void)createBidRequestWithAdUnitID:(NSString *)adUnitID
                   storedImpressionId:(NSString *)storedImpressionId
                               adType:(CLXAdType)adType
@@ -30,25 +28,16 @@ NS_ASSUME_NONNULL_BEGIN
                       correlationId:(NSString *)correlationId
                         completion:(void (^)(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error))completion;
 
-- (void)startCDPFlowWithBidRequest:(id)bidRequest
-                            appKey:(NSString *)appKey
-                       completion:(void (^)(id _Nullable enrichedBidRequest, NSError * _Nullable error))completion;
-
 @end
 
 @interface CLXBidNetworkServiceClass : NSObject <CLXBidNetworkService>
 
-@property (nonatomic, assign) BOOL isCDPEndpointEmpty;
+- (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl;
 
 - (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
-                           cdpEndpointUrl:(NSString *)cdpEndpointUrl;
-
-- (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
-                           cdpEndpointUrl:(NSString *)cdpEndpointUrl
                             errorReporter:(nullable CLXErrorReporter *)errorReporter;
 
 - (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
-                           cdpEndpointUrl:(NSString *)cdpEndpointUrl
                             errorReporter:(nullable CLXErrorReporter *)errorReporter
                                urlSession:(NSURLSession *)urlSession;
 
