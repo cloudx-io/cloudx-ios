@@ -50,6 +50,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isCaliforniaUser;
 
 /**
+ * Determines if user is located in a GDPR region (EU/EEA)
+ * @return YES if GDPR applies to user based on geo headers, NO otherwise
+ * @discussion Uses gdpr-applies header from CloudX geo endpoint for determination.
+ *             Per IAB TCF spec, GDPR applies when user is in EU/EEA region.
+ */
+- (BOOL)isEUUser;
+
+/**
  * Gets the user's country code from geo headers
  * @return The country code (e.g., "USA", "GBR") if available, nil otherwise
  * @discussion Uses cloudfront-viewer-country-iso3 header for country determination

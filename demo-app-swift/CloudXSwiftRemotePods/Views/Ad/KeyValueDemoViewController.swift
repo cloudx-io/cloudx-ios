@@ -182,24 +182,27 @@ class KeyValueDemoViewController: UIViewController, UITableViewDelegate, UITable
         infoLabel.font = .systemFont(ofSize: 13)
         infoLabel.textColor = .secondaryLabel
         infoLabel.text = """
-        📌 Key-value pairs are injected into bid requests at server-configured paths.
+        📌 Key-value pairs are injected into bid requests.
         
-        👤 User-Level: User-specific targeting (e.g., age, interests)
-           • Respects privacy regulations (GDPR/CCPA)
-           • Cleared when privacy requires removing PII
+        🔥 MONETIZATION (Whale Signals):
+           • payer_status: whale/payer/nonpayer
+           • iap_total_bucket, predicted_ltv
         
-        📱 App-Level: App-specific targeting (e.g., app version, build)
-           • Not affected by privacy regulations
-           • Always included in bid requests
+        💪 ENGAGEMENT:
+           • user_tenure, level_achieved, loyalty_tier
         
-        💡 The server controls where these values appear in the bid request via the keyValuePaths configuration.
+        📺 AD HABITS:
+           • ad_whale, reward_affinity
+        
+        👤 User-Level: Privacy-aware (cleared on opt-out)
+        📱 App-Level: Always included
         """
         infoLabel.translatesAutoresizingMaskIntoConstraints = false
         infoSection.addSubview(infoLabel)
         
         // Add sample data button
         let sampleButton = UIButton(type: .system)
-        sampleButton.setTitle("Load Sample Key-Values (for testing)", for: .normal)
+        sampleButton.setTitle("🎯 Load HIGH-ROI Targeting Signals", for: .normal)
         sampleButton.backgroundColor = .systemGreen
         sampleButton.setTitleColor(.white, for: .normal)
         sampleButton.layer.cornerRadius = 8

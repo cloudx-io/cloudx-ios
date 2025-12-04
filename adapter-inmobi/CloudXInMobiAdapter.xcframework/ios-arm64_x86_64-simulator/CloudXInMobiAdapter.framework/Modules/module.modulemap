@@ -1,0 +1,7 @@
+framework module CloudXInMobiAdapter {
+    umbrella header "CloudXInMobiAdapter.h"
+    
+    export *
+    module * { export * }
+}
+

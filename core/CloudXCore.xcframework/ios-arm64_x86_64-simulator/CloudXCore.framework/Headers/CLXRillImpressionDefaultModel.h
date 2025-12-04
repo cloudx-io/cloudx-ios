@@ -23,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *osVersion;
 @property (nonatomic, copy) NSString *sessionId;
 @property (nonatomic, copy) NSString *ifa;
-@property (nonatomic) NSInteger loopIndex;
 @property (nonatomic, copy) NSString *testGroupName;
 
 - (NSString *)createParamString;

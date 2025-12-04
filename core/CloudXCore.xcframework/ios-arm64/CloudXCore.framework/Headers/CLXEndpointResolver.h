@@ -25,11 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly) NSString *auctionEndpoint;
 
 /**
- * @brief Resolved CDP endpoint URL
- */
-@property (nonatomic, copy, readonly) NSString *cdpEndpoint;
-
-/**
  * @brief Resolved geo endpoint URL
  */
 @property (nonatomic, copy, readonly) NSString *geoEndpoint;

@@ -4,13 +4,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UIDevice (Identifier)
 
+/// Returns the device hardware identifier (e.g., "iPhone17,1", "iPad14,1").
+/// On simulator returns architecture (e.g., "arm64", "x86_64").
 @property (nonatomic, class, readonly) NSString *deviceIdentifier;
-@property (nonatomic, class, readonly) NSString *deviceType;
-@property (nonatomic, class, readonly) NSString *deviceGeneration;
-@property (nonatomic, class, readonly) NSInteger ppi;
-
-+ (NSDictionary<NSString *, id> *)mapToDeviceWithIdentifier:(NSString *)identifier;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

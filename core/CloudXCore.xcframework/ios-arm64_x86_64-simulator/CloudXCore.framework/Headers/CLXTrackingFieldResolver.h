@@ -44,13 +44,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)saveLoadedBid:(NSString *)auctionId bidId:(NSString *)bidId;
 
 /**
- * Sets the loop index for an auction
- * @param auctionId The auction identifier
- * @param loopIndex The load attempt count
- */
-- (void)setLoopIndex:(NSString *)auctionId loopIndex:(NSInteger)loopIndex;
-
-/**
  * Sets session-level constant data
  * @param sessionId The session identifier
  * @param sdkVersion The SDK version string
