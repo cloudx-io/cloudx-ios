@@ -219,22 +219,6 @@ NS_ASSUME_NONNULL_BEGIN
             
             [self.logger debug:[NSString stringWithFormat:@"[%@] [CLXBidAdSource] Bid request creation completion called", correlationId]];
             
-            // Log the actual bid request JSON
-            if (bidRequest) {
-                NSError *jsonError;
-                NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bidRequest options:NSJSONWritingPrettyPrinted error:&jsonError];
-                if (jsonData && !jsonError) {
-                    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-                    [self.logger verbose:[NSString stringWithFormat:@"[%@] BidRequest JSON:\n%@", correlationId, jsonString]];
-                } else {
-                    [self.logger verbose:[NSString stringWithFormat:@"[%@] BidRequest: %@", correlationId, bidRequest]];
-                }
-            } else {
-                [self.logger debug:[NSString stringWithFormat:@"[%@] BidRequest: (null)", correlationId]];
-            }
-            
-            [self.logger debug:[NSString stringWithFormat:@"[%@] Error: %@", correlationId, error]];
-            
             if (error) {
                 [self.logger error:[NSString stringWithFormat:@"Bid request creation failed with error: %@", error.localizedDescription]];
                 if (completion) {

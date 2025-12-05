@@ -252,8 +252,6 @@
         [items addObject: dict];
     }
 
-    [self.logger debug:[NSString stringWithFormat:@"CloudX: METRICS data: %@", items]];
-    
     // Prepare JSON data
     NSDictionary *bodyDict = @{@"items": items};
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bodyDict options:0 error:nil];
@@ -265,10 +263,6 @@
                                             completionHandler:^(NSData *data, NSURLResponse *response, NSError *networkError) {
         if (networkError) {
             [self.logger error:[NSString stringWithFormat:@"CloudX: metricsTracking error: %@", networkError]];
-        } else {
-            [self.logger debug:[NSString stringWithFormat:@"CloudX: metricsTracking: %@", fullURL]];
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-            [self.logger debug:[NSString stringWithFormat:@"CloudX: Tracking response status code: %ld", (long)[httpResponse statusCode]]];
         }
     }];
     [task resume];
@@ -326,40 +320,15 @@
     NSString *fullURLString = [NSString stringWithFormat:@"%@?%@", urlString, queryString];
     NSURL *fullURL = [NSURL URLWithString:fullURLString];
     
-    // Print the complete request JSON
-    NSDictionary *requestJSON = @{
-        @"method": @"GET",
-        @"url": fullURLString,
-        @"parameters": params
-    };
-    [self.logger debug:[NSString stringWithFormat:@"Request JSON: %@", requestJSON]];
-    
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:fullURL];
     request.HTTPMethod = @"GET";
     
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
                                             completionHandler:^(NSData *data, NSURLResponse *response, NSError *networkError) {
-        // Print the complete response JSON
-        NSMutableDictionary *responseJSON = [NSMutableDictionary dictionary];
-        
         if (networkError) {
-            responseJSON[@"error"] = networkError.localizedDescription;
-            [self.logger error:[NSString stringWithFormat:@"ERROR: %@", networkError]];
-        } else {
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-            responseJSON[@"statusCode"] = @(httpResponse.statusCode);
-            responseJSON[@"headers"] = httpResponse.allHeaderFields ?: @{};
-            
-            if (data && data.length > 0) {
-                NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-                responseJSON[@"body"] = responseString ?: @"(could not decode)";
-            } else {
-                responseJSON[@"body"] = @"(empty)";
-            }
+            [self.logger error:[NSString stringWithFormat:@"Ad reporting request failed: %@", networkError.localizedDescription]];
         }
-        
-        [self.logger debug:[NSString stringWithFormat:@"Response JSON: %@", responseJSON]];
     }];
     [task resume];
 }

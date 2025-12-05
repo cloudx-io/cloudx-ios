@@ -98,18 +98,18 @@ cd adapter-vungle && rm -rf CloudXVungleAdapter.xcframework && unzip -o CloudXVu
 cd adapter-inmobi && rm -rf CloudXInMobiAdapter.xcframework && unzip -o CloudXInMobiAdapter.xcframework.zip && cd ..
 cd renderer-cloudx && rm -rf CloudXRenderer.xcframework && unzip -o CloudXRenderer.xcframework.zip && cd ..
 
-# 4. Update podspecs
-sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" CloudXCore.podspec
-sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" CloudXMetaAdapter.podspec
-sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" CloudXVungleAdapter.podspec
-sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" CloudXInMobiAdapter.podspec
-sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" CloudXRenderer.podspec
+# 4. Update podspecs (located alongside xcframeworks in subdirectories)
+sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" core/CloudXCore.podspec
+sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-meta/CloudXMetaAdapter.podspec
+sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-vungle/CloudXVungleAdapter.podspec
+sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-inmobi/CloudXInMobiAdapter.podspec
+sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" renderer-cloudx/CloudXRenderer.podspec
 
 # 5. Update dependency versions in adapter podspecs
-sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" CloudXMetaAdapter.podspec
-sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" CloudXVungleAdapter.podspec
-sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" CloudXInMobiAdapter.podspec
-sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" CloudXRenderer.podspec
+sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" adapter-meta/CloudXMetaAdapter.podspec
+sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" adapter-vungle/CloudXVungleAdapter.podspec
+sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" adapter-inmobi/CloudXInMobiAdapter.podspec
+sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" renderer-cloudx/CloudXRenderer.podspec
 
 # 6. Commit and push release branch
 git add -A
@@ -372,13 +372,13 @@ pod trunk register YOUR_EMAIL 'Your Name' --description='Release machine'
 # Check email and click verification link
 
 # Push each podspec to trunk (ORDER MATTERS - Core first!)
-pod trunk push CloudXCore.podspec --allow-warnings
+pod trunk push core/CloudXCore.podspec --allow-warnings
 
 # Wait for CloudXCore to be available, then push adapters
-pod trunk push CloudXRenderer.podspec --allow-warnings
-pod trunk push CloudXMetaAdapter.podspec --allow-warnings
-pod trunk push CloudXVungleAdapter.podspec --allow-warnings
-pod trunk push CloudXInMobiAdapter.podspec --allow-warnings
+pod trunk push renderer-cloudx/CloudXRenderer.podspec --allow-warnings
+pod trunk push adapter-meta/CloudXMetaAdapter.podspec --allow-warnings
+pod trunk push adapter-vungle/CloudXVungleAdapter.podspec --allow-warnings
+pod trunk push adapter-inmobi/CloudXInMobiAdapter.podspec --allow-warnings
 
 # Verify pods are published
 pod trunk info CloudXCore
@@ -543,11 +543,11 @@ git push origin --delete release/vX.Y.Z
 
 | Component | File |
 |-----------|------|
-| Core | `CloudXCore.podspec` |
-| Meta | `CloudXMetaAdapter.podspec` |
-| Vungle | `CloudXVungleAdapter.podspec` |
-| InMobi | `CloudXInMobiAdapter.podspec` |
-| Renderer | `CloudXRenderer.podspec` |
+| Core | `core/CloudXCore.podspec` |
+| Meta | `adapter-meta/CloudXMetaAdapter.podspec` |
+| Vungle | `adapter-vungle/CloudXVungleAdapter.podspec` |
+| InMobi | `adapter-inmobi/CloudXInMobiAdapter.podspec` |
+| Renderer | `renderer-cloudx/CloudXRenderer.podspec` |
 
 ---
 

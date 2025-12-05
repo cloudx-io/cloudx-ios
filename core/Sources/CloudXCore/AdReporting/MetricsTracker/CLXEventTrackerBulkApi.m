@@ -75,10 +75,6 @@
         return;
     }
     
-    // Log payload for debugging
-    NSString *payloadString = [[NSString alloc] initWithData:requestBody encoding:NSUTF8StringEncoding];
-    [self.logger debug:[NSString stringWithFormat:@"Metrics payload JSON: %@", payloadString]];
-    
     // Create request
     NSURL *url = [NSURL URLWithString:endpointUrl];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
