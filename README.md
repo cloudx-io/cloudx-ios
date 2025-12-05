@@ -1,10 +1,10 @@
 # CloudX iOS SDK
 
-The CloudX iOS SDK is a comprehensive mobile advertising solution that provides programmatic advertising capabilities for iOS applications. This unified repository contains the complete CloudX iOS SDK ecosystem including the core SDK and various adapter implementations.
+Requires iOS 14.0+.
 
-## Quick Start
+## Installation
 
-### CocoaPods Installation
+### CocoaPods
 
 ```ruby
 platform :ios, '14.0'
@@ -12,123 +12,28 @@ platform :ios, '14.0'
 target 'YourApp' do
   use_frameworks!
   
-  # CloudX Core SDK (source-based distribution)
+  # Core SDK
   pod 'CloudXCore'
   
-  # Optional: CloudX Adapters (framework-based distribution)
+  # Adapters (add as needed)
   pod 'CloudXMetaAdapter'
   pod 'CloudXVungleAdapter'
 end
 ```
 
-### Swift Package Manager
-
-Add this repository URL to your Xcode project:
+```bash
+pod install --repo-update
 ```
-https://github.com/cloudx-io/cloudx-ios
-```
-
-## Components
-
-- **[`core/`](core/README.md)** - The foundational CloudX Core SDK written in Objective-C that provides the base functionality for programmatic advertising *(source-based distribution, static framework)*
-- **[`adapter-meta/`](adapter-meta/README.md)** - Meta (Facebook Audience Network) adapter for integrating Meta's advertising platform *(static framework distribution)*
-- **[`adapter-vungle/`](adapter-vungle/README.md)** - Vungle (Liftoff) adapter for integrating Vungle/Liftoff advertising with header bidding support *(source-based distribution, static framework)*
-- **[`renderer-cloudx/`](renderer-cloudx/README.md)** - CloudX Renderer for header bidding integration with CloudX's programmatic platform *(static framework)*
-- **[`demo-app-objc/`](demo-app-objc/)** - Complete Objective-C demo application showcasing CloudX SDK integration and usage patterns
-- **[`demo-app-swift/`](demo-app-swift/)** - Complete Swift demo application demonstrating CloudX SDK implementation in Swift projects
-
-For detailed installation instructions and usage examples, please refer to the individual component READMEs linked above.
-
-## Release Strategy
-
-This repository uses **component-specific releases** with **tagged distribution** to provide both organizational clarity and distribution flexibility.
-
-### Component-Specific Releases
-
-- **Core SDK**: Source-based distribution with tags like `vX.Y.Z-core`
-- **Meta Adapter**: Framework-based distribution with tags like `vX.Y.Z-meta`
-- **Vungle Adapter**: Source-based distribution with tags like `vX.Y.Z-vungle`
-- **Individual Versioning**: Each component maintains its own version to allow independent updates
-- **Clear Release Assets**: Each release provides the appropriate distribution format for that component
-
-#### Release Tag Format
-```
-vX.Y.Z-core    # Core SDK release (source distribution)
-vX.Y.Z-meta    # Meta Adapter release (framework distribution)
-vX.Y.Z-vungle   # Vungle Adapter release (source distribution)
-```
-
-#### Distribution Methods
-- **Core SDK**: Direct source integration via CocoaPods/SPM or static xcframework for production use
-- **Meta Adapter**: Pre-built static xcframework for faster build times and simplified integration
-- **Vungle Adapter**: Direct source integration via CocoaPods/SPM or static xcframework for production use
-- **Renderer**: Static xcframework for optimal performance and clean integration
-- **Automated Releases**: GitHub Actions automatically build, test, and publish releases when tags are pushed
-
-#### Framework Type: Static (v1.2.0+)
-All CloudX frameworks are built as **static frameworks** to provide:
-- ✅ Faster app launch times (no dynamic linking overhead)
-- ✅ No dSYM warnings in Xcode
-- ✅ Industry-standard architecture
-- ✅ Cleaner App Store submissions
-- ✅ Better performance and memory efficiency
-
-### Release Assets
-
-Each component release provides the appropriate assets for its distribution method:
-
-#### Core SDK Assets (Source Distribution)
-- Direct source file access via CocoaPods/SPM
-- No binary downloads required
-- Full source code availability for debugging
-
-#### Meta Adapter Assets (Static Framework Distribution) 
-```
-CloudXMetaAdapter-vX.Y.Z.xcframework.zip  # Static xcframework for integration
-```
-
-#### Renderer Assets (Static Framework Distribution)
-```
-CloudXRenderer-vX.Y.Z.xcframework.zip     # Static xcframework for integration
-```
-
-#### Benefits
-- **Optimized Distribution**: Each component uses the most appropriate distribution method
-- **Independent Updates**: Components can be updated independently without affecting others
-- **Developer Choice**: Use source or framework distribution based on your needs
-- **Automated Pipeline**: Releases are automatically built and published via GitHub Actions
 
 ## Documentation
 
-For detailed documentation, installation instructions, and usage examples, please refer to the individual component READMEs:
-
-- **[Core SDK](core/README.md)** - Detailed core SDK documentation and installation
-- **[Meta Adapter](adapter-meta/README.md)** - Meta (Facebook Audience Network) integration guide and setup
-- **[Vungle Adapter](adapter-vungle/README.md)** - Vungle (Liftoff) integration guide with header bidding support
-- **[CloudX Renderer](renderer-cloudx/README.md)** - CloudX Renderer integration guide and configuration
-- **Demo Apps** - Explore the demo application directories for complete integration examples
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes in the appropriate component directory
-4. Add tests for your changes
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the individual LICENSE files in each component directory for details.
+- **[Core SDK](core/README.md)** - Initialization, ad integration, and advanced features
+- **[Meta Adapter](adapter-meta/README.md)** - Meta Audience Network integration
+- **[Vungle Adapter](adapter-vungle/README.md)** - Vungle/Liftoff integration
+- **[InMobi Adapter](adapter-inmobi/README.md)** - InMobi integration
+- **[Mintegral Adapter](adapter-mintegral/README.md)** - Mintegral integration
+- **[Moloco Adapter](adapter-moloco/README.md)** - Moloco integration
 
 ## Support
 
-For technical support and questions:
-- Create an issue in this repository
-- Contact the CloudX team at [support email]
-- Check the documentation in each component's README
-
-## Changelog
-
-See [RELEASES](https://github.com/cloudx-xenoss/cloudexchange.ios.sdk/releases) for detailed changelog and version history.
+For support, contact mobile@cloudx.io
