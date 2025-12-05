@@ -171,57 +171,6 @@
     XCTAssertEqual(obj.test[2].ratio, 0.2, @"Lambda-v2 should have 0.2 ratio");
 }
 
-/**
- * Test parsing CDP endpoint with A/B testing
- */
-- (void)testParseEndpoint_CDPWithABTesting {
-    // Given: SDK response with CDP endpoint having test variants
-    NSDictionary *response = @{
-        @"accountID": @"test-account",
-        @"sessionID": @"test-session",
-        @"cdpEndpointURL": @{
-            @"test": @[
-                @{
-                    @"name": @"cdp-variant-1",
-                    @"value": @"https://cdp-test.cloudx.io/enrich",
-                    @"ratio": @1.0
-                }
-            ],
-            @"default": @"https://cdp.cloudx.io/enrich"
-        }
-    };
-    
-    // When: Parse SDK config
-    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response];
-    
-    // Then: Should parse CDP endpoint with test variants
-    XCTAssertNotNil(config.cdpEndpointURL, @"CDP endpoint should be parsed");
-    XCTAssertEqualObjects(config.cdpEndpointURL.defaultKey, @"https://cdp.cloudx.io/enrich", @"Should have default URL");
-    XCTAssertNotNil(config.cdpEndpointURL.test, @"Should have test variants");
-    XCTAssertEqual(config.cdpEndpointURL.test.count, 1, @"Should have 1 test variant");
-}
-
-/**
- * Test parsing empty CDP endpoint (common production scenario)
- */
-- (void)testParseEndpoint_EmptyCDPEndpoint {
-    // Given: SDK response with empty CDP endpoint
-    NSDictionary *response = @{
-        @"accountID": @"test-account",
-        @"sessionID": @"test-session",
-        @"cdpEndpointURL": @{
-            @"default": @""
-        }
-    };
-    
-    // When: Parse SDK config
-    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response];
-    
-    // Then: Should parse empty CDP endpoint
-    XCTAssertNotNil(config.cdpEndpointURL, @"CDP endpoint object should exist");
-    XCTAssertEqualObjects(config.cdpEndpointURL.defaultKey, @"", @"Should have empty default");
-}
-
 #pragma mark - Endpoint Resolution Tests
 
 /**
@@ -235,10 +184,6 @@
     auctionQuantum.endpointString = @"https://au.cloudx.io/openrtb2/auction";
     config.auctionEndpointURL = auctionQuantum;
     
-    CLXSDKConfigEndpointObject *cdpObj = [[CLXSDKConfigEndpointObject alloc] init];
-    cdpObj.defaultKey = @"https://cdp.cloudx.io/enrich";
-    config.cdpEndpointURL = cdpObj;
-    
     config.geoDataEndpointURL = @"https://geo.cloudx.io/data";
     
     // When: Resolve endpoints
@@ -248,8 +193,6 @@
     // Then: Should use default values
     XCTAssertEqualObjects(resolver.auctionEndpoint, @"https://au.cloudx.io/openrtb2/auction", 
                          @"Should resolve auction endpoint");
-    XCTAssertEqualObjects(resolver.cdpEndpoint, @"https://cdp.cloudx.io/enrich", 
-                         @"Should resolve CDP endpoint");
     XCTAssertEqualObjects(resolver.geoEndpoint, @"https://geo.cloudx.io/data", 
                          @"Should resolve geo endpoint");
     XCTAssertEqualObjects(resolver.testGroupName, @"", @"Should have no test group");
@@ -274,10 +217,6 @@
     CLXSDKConfigEndpointQuantumValue *auctionQuantum = [[CLXSDKConfigEndpointQuantumValue alloc] init];
     auctionQuantum.endpointObject = auctionObj;
     config.auctionEndpointURL = auctionQuantum;
-    
-    CLXSDKConfigEndpointObject *cdpObj = [[CLXSDKConfigEndpointObject alloc] init];
-    cdpObj.defaultKey = @"";
-    config.cdpEndpointURL = cdpObj;
     
     // When: Resolve endpoints with any random value (should always select variant)
     CLXEndpointResolver *resolver = [[CLXEndpointResolver alloc] init];
@@ -310,10 +249,6 @@
     auctionQuantum.endpointObject = auctionObj;
     config.auctionEndpointURL = auctionQuantum;
     
-    CLXSDKConfigEndpointObject *cdpObj = [[CLXSDKConfigEndpointObject alloc] init];
-    cdpObj.defaultKey = @"";
-    config.cdpEndpointURL = cdpObj;
-    
     // When: Resolve with random value at lower bound (should select variant)
     CLXEndpointResolver *resolver = [[CLXEndpointResolver alloc] init];
     [resolver resolveFromConfig:config randomValue:0.3];
@@ -342,10 +277,6 @@
     CLXSDKConfigEndpointQuantumValue *auctionQuantum = [[CLXSDKConfigEndpointQuantumValue alloc] init];
     auctionQuantum.endpointObject = auctionObj;
     config.auctionEndpointURL = auctionQuantum;
-    
-    CLXSDKConfigEndpointObject *cdpObj = [[CLXSDKConfigEndpointObject alloc] init];
-    cdpObj.defaultKey = @"";
-    config.cdpEndpointURL = cdpObj;
     
     // When: Resolve with random value above threshold (should use default)
     CLXEndpointResolver *resolver = [[CLXEndpointResolver alloc] init];
@@ -378,10 +309,6 @@
     auctionQuantum.endpointObject = auctionObj;
     config.auctionEndpointURL = auctionQuantum;
     
-    CLXSDKConfigEndpointObject *cdpObj = [[CLXSDKConfigEndpointObject alloc] init];
-    cdpObj.defaultKey = @"";
-    config.cdpEndpointURL = cdpObj;
-    
     // When: Resolve endpoints
     CLXEndpointResolver *resolver = [[CLXEndpointResolver alloc] init];
     [resolver resolveFromConfig:config randomValue:0.5];
@@ -404,7 +331,6 @@
     
     // Then: Should handle gracefully with empty endpoints
     XCTAssertEqualObjects(resolver.auctionEndpoint, @"", @"Should have empty auction endpoint");
-    XCTAssertEqualObjects(resolver.cdpEndpoint, @"", @"Should have empty CDP endpoint");
     XCTAssertEqualObjects(resolver.geoEndpoint, @"", @"Should have empty geo endpoint");
 }
 
@@ -428,7 +354,6 @@
     
     // Then: All endpoints should be empty
     XCTAssertEqualObjects(resolver.auctionEndpoint, @"", @"Auction endpoint should be empty after reset");
-    XCTAssertEqualObjects(resolver.cdpEndpoint, @"", @"CDP endpoint should be empty after reset");
     XCTAssertEqualObjects(resolver.geoEndpoint, @"", @"Geo endpoint should be empty after reset");
     XCTAssertEqualObjects(resolver.testGroupName, @"", @"Test group name should be empty after reset");
 }

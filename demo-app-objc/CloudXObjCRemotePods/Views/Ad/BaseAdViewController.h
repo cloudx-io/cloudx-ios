@@ -18,6 +18,7 @@ typedef NS_ENUM(NSInteger, AdState) {
 @property (nonatomic, strong) UILabel *statusLabel;
 @property (nonatomic, strong) UIView *statusIndicator;
 @property (nonatomic, strong) UIStackView *statusStack;
+@property (nonatomic, strong) UIButton *sdkDebuggerButton;
 @property (nonatomic, assign) BOOL isLoading;
 
 - (void)showAlertWithTitle:(NSString *)title message:(NSString *)message;

@@ -120,9 +120,14 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
     GPPTestScenarioGPPAbsent,                   // No GPP string
     GPPTestScenarioGPPCCPAConsent,              // CCPA consent (.QA)
     GPPTestScenarioGPPCCPAOptOut,               // CCPA opt-out (.YA)
-    GPPTestScenarioGPPNonUS,                    // EU/Germany (GDPR)
+    GPPTestScenarioGPPNonUS,                    // EU/Germany (GDPR via GPP)
     GPPTestScenarioGPPUSNonCalifornia,          // US non-CA (Oregon, NY, etc)
-    GPPTestScenarioATTDenied                    // ATT tracking disabled
+    GPPTestScenarioATTDenied,                   // ATT tracking disabled
+    // GDPR/TCF Scenarios
+    GPPTestScenarioGDPRFullConsent,             // EU TCF: All purposes + vendor consent
+    GPPTestScenarioGDPRDenied,                  // EU TCF: No purposes consented
+    GPPTestScenarioGDPRPurpose1Denied,          // EU TCF: Purpose 1 (device access) denied
+    GPPTestScenarioGDPRVendorDenied             // EU TCF: Purposes OK but vendor denied
 };
 
 @interface GPPScenarioPickerView ()
@@ -216,6 +221,12 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
     [self addScenarioAction:alert scenario:GPPTestScenarioGPPUSNonCalifornia title:@"US Non-California (NY)" subtitle:@"US but not CA"];
     [self addScenarioAction:alert scenario:GPPTestScenarioATTDenied title:@"⭐️ ATT Denied" subtitle:@"Tracking disabled in iOS Settings"];
     
+    // GDPR/TCF Scenarios
+    [self addScenarioAction:alert scenario:GPPTestScenarioGDPRFullConsent title:@"🇪🇺 GDPR Full Consent" subtitle:@"All purposes + vendor OK"];
+    [self addScenarioAction:alert scenario:GPPTestScenarioGDPRDenied title:@"🇪🇺 GDPR Denied" subtitle:@"No purposes consented"];
+    [self addScenarioAction:alert scenario:GPPTestScenarioGDPRPurpose1Denied title:@"🇪🇺 GDPR Purpose 1 Denied" subtitle:@"Device access denied"];
+    [self addScenarioAction:alert scenario:GPPTestScenarioGDPRVendorDenied title:@"🇪🇺 GDPR Vendor Denied" subtitle:@"Purposes OK, vendor NO"];
+    
     // Cancel action
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
                                                            style:UIAlertActionStyleCancel
@@ -297,7 +308,8 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
             [[DemoAppLogger sharedInstance] logMessage:@"🧪 GPP Scenario: CCPA Opt-Out (Disallow All) - AUTO-DETECTING LOCATION"];
             [self setIABGPPString:@"DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA"];
             [self setIABGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
-            [CloudXCore setCCPAPrivacyString:@"1YNN"];  // Legacy CCPA string: Y = opt-out
+            // IAB US Privacy: 1YYN = Version 1, Notice given, OPTED OUT, Not LSPA
+            [CloudXCore setCCPAPrivacyString:@"1YYN"];
             break;
             
         case GPPTestScenarioGPPNonUS:
@@ -317,7 +329,67 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
             [[DemoAppLogger sharedInstance] logMessage:@"⚠️ To test: Go to iOS Settings → Privacy & Security → Tracking → Disable for this app"];
             [[DemoAppLogger sharedInstance] logMessage:@"⚠️ Then restart the app and select this scenario"];
             break;
+            
+        // GDPR/TCF Scenarios - Set IAB TCF UserDefaults keys
+        case GPPTestScenarioGDPRFullConsent:
+            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GDPR Scenario: Full Consent (All purposes + vendor)"];
+            [self setIABTCFGdprApplies:YES];
+            // TCF string with all purposes enabled and vendor 1510 (CloudX) consented
+            // This is a real TCF 2.2 string from Google UMP with full consent
+            [self setIABTCFString:@"CQbFSYAQbFSYAEsACBENCFFoAP_gAEPgACiQINJB7C7FbSFCyLZzaLsAMAhHRsAAQoQAAASBAmABQAKQIAQCgkAYFASABAACAAAAICRBIQIECAAAAUAAAAAAAAAEAAAAAAAIIAAAgAEAAAAIAAAKAIAAEAAIAAAAEAAAmAgAAIIACAAAgAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAQNVSD2F2K2kKFkWCmwXYAYBCujYAAhQgAAAkCBMACgAUgQAgFJIAgCIEAAAAAAAAAQEiCQAAQEBAAAIACAAAAAAAIAAAAAAAQQAABAAIAAAAAAAAUAQAAIAAQAAAAIAABEhAAAQQAEAAAAAAAQAAA"];
+            [self setIABTCFPurposeConsents:@"1111111111"];  // All 10 purposes granted
+            break;
+            
+        case GPPTestScenarioGDPRDenied:
+            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GDPR Scenario: Denied (No purposes consented)"];
+            [self setIABTCFGdprApplies:YES];
+            // TCF string with no purposes enabled
+            [self setIABTCFString:@"CQbFSYAQbFSYAEsACBENCFFgAAAAAEPgACiQAAANVSD2F2K2kKFkWCmwXYAYBCujYAAhQgAAAkCBMACgAUgQAgFJIAgCIEAAAAAAAAAQEiCQAAQEBAAAIACAAAAAAAIAAAAAAAQQAABAAIAAAAAAAAUAQAAIAAQAAAAIAABEhAAAQQAEAAAAAAAQAA"];
+            [self setIABTCFPurposeConsents:@"0000000000"];  // All purposes denied
+            break;
+            
+        case GPPTestScenarioGDPRPurpose1Denied:
+            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GDPR Scenario: Purpose 1 Denied (Device access denied)"];
+            [self setIABTCFGdprApplies:YES];
+            // TCF string with purpose 1 disabled, others enabled
+            [self setIABTCFString:@"CQbFSYAQbFSYAEsACDENCFFgAHAAAEPgACiQACBA1VIPYXYraQoWRYKbBdgBgEK6NgACFCAAACQIEwAKABSBACAUkgCAIgQAAAAAAAABASIJAABAQEAAAgAIAAAAAAAgAAAAAABBAAAEAAgAAAAAAABQBAAAgABAAAAAgAAESEAABBAAQAAAAAABAAA"];
+            [self setIABTCFPurposeConsents:@"0111111111"];  // Purpose 1 denied, others granted
+            break;
+            
+        case GPPTestScenarioGDPRVendorDenied:
+            [[DemoAppLogger sharedInstance] logMessage:@"🧪 GDPR Scenario: Vendor Denied (Purposes OK, CloudX vendor denied)"];
+            [self setIABTCFGdprApplies:YES];
+            // TCF string with all purposes but vendor consent section excludes CloudX (1510)
+            [self setIABTCFString:@"CQbFSYAQbFSYAEsACDENCFFgAPAAAEPgACiQAFIBA1VIPYXYraQoWRYKbBdgBgEK6NgACFCAAACQIEwAKABSBACAUkgCAIgQAAAAAAAABASIJAABAQEAAAgAIAAAAAAAgAAAAAABBAAAEAAgAAAAAAABQBAAAgABAAAAAgAAESEAABBAAQAAAAAABAAA"];
+            [self setIABTCFPurposeConsents:@"1111111111"];  // All purposes granted
+            // Note: Vendor consent is encoded in the TCF string itself - the above string excludes CloudX vendor ID
+            break;
     }
+}
+
+#pragma mark - IAB TCF UserDefaults Methods
+
+- (void)setIABTCFGdprApplies:(BOOL)applies {
+    [[NSUserDefaults standardUserDefaults] setInteger:(applies ? 1 : 0) forKey:@"IABTCF_gdprApplies"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)setIABTCFString:(nullable NSString *)tcString {
+    if (tcString) {
+        [[NSUserDefaults standardUserDefaults] setObject:tcString forKey:@"IABTCF_TCString"];
+    } else {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_TCString"];
+    }
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)setIABTCFPurposeConsents:(nullable NSString *)purposeConsents {
+    if (purposeConsents) {
+        [[NSUserDefaults standardUserDefaults] setObject:purposeConsents forKey:@"IABTCF_PurposeConsents"];
+    } else {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_PurposeConsents"];
+    }
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)setIABGPPString:(nullable NSString *)gppString {
@@ -345,9 +417,19 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
 }
 
 - (void)resetGPPSettings {
-    // Clear IAB UserDefaults directly (CloudX reads from these)
+    // Clear IAB GPP UserDefaults directly (CloudX reads from these)
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_HDR_GppString"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_GppSID"];
+    
+    // Clear IAB TCF UserDefaults (GDPR)
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_TCString"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_gdprApplies"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_PurposeConsents"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_VendorConsents"];
+    
+    // Clear IAB US Privacy (CCPA)
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABUSPrivacy_String"];
+    
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     // Clear CloudX privacy settings (public APIs that still exist)

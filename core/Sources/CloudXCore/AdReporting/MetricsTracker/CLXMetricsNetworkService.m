@@ -218,18 +218,6 @@
     // Convert to JSON
     NSDictionary *requestJSON = [self convertRequestToJSON:request];
     
-    // Log request for debugging
-    if (requestJSON) {
-        @try {
-            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:requestJSON options:NSJSONWritingPrettyPrinted error:nil];
-            NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-            [self.logger debug:[NSString stringWithFormat:@"Metrics request JSON: %@", jsonString]];
-        } @catch (NSException *exception) {
-            [self reportException:exception context:@{@"operation": @"metrics_json_debug_logging"}];
-            // Continue execution - debug logging failure should not affect metrics sending
-        }
-    }
-    
     // Create headers
     NSDictionary *headers = @{@"Authorization": [NSString stringWithFormat:@"Bearer %@", session.appKey]};
     

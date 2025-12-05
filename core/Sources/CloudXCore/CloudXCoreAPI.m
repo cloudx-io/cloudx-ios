@@ -1,5 +1,6 @@
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXSystemInformation.h>
+#import <CloudXCore/CLXDebugOverlayManager.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXInitService.h>
 #import <CloudXCore/CLXLiveInitService.h>
@@ -10,7 +11,7 @@
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXMetricsTrackerProtocol.h>
 #import <CloudXCore/CLXMetricsType.h>
-#import <CloudXCore/CLXGPPProvider.h>
+#import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXErrorReporter.h>
 #import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXBidNetworkService.h>
@@ -63,6 +64,28 @@
 #import <CloudXCore/CLXBiddingConfig.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXPrivacyService.h>
+#import <CloudXCore/CLXPublisherFullscreenAdBase.h>
+
+// Private category to expose deferred initialization properties for CLXPublisherBanner
+// These properties are declared in CLXPublisherBanner.m's class extension
+@interface CLXPublisherBanner (DeferredInit)
+@property (nonatomic, strong, nullable) NSError *deferredError;
+@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+@end
+
+// Private category to expose deferred initialization properties for fullscreen ads
+// These properties are declared in CLXPublisherFullscreenAdBase.m's class extension
+@interface CLXPublisherFullscreenAdBase (DeferredInit)
+@property (nonatomic, strong, nullable) NSError *deferredError;
+@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+@end
+
+// Private category to expose deferred initialization properties for native ads
+// These properties are declared in CLXPublisherNative.m's class extension
+@interface CLXPublisherNative (DeferredInit)
+@property (nonatomic, strong, nullable) NSError *deferredError;
+@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+@end
 
 // Internal notification name for SDK initialization completion (exported in header)
 NSString * const CLXSDKInitializedNotification = @"CLXSDKInitializedNotification";
@@ -465,7 +488,6 @@ static CloudXCore *_sharedInstance = nil;
     [endpointResolver resolveFromConfig:config];
     
     NSString *auctionEndpointUrl = endpointResolver.auctionEndpoint;
-    NSString *cdpEndpointUrl = endpointResolver.cdpEndpoint;
     NSString *metricsEndpointURL = config.metricsEndpointURL ?: @"";
     
     // Validate endpoints
@@ -473,12 +495,6 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger error:@"SDK init missing auctionEndpointURL - auction requests will fail"];
     } else {
         [self.logger info:[NSString stringWithFormat:@"Auction endpoint resolved: %@", auctionEndpointUrl]];
-    }
-    
-    if (cdpEndpointUrl.length > 0) {
-        [self.logger info:[NSString stringWithFormat:@"CDP endpoint resolved: %@", cdpEndpointUrl]];
-    } else {
-        [self.logger debug:@"[CloudXCore] No CDP endpoint configured - bid request enrichment disabled"];
     }
     
     if (!config.metricsEndpointURL) {
@@ -492,7 +508,7 @@ static CloudXCore *_sharedInstance = nil;
     // Register services in DI container 
         CLXDIContainer *container = [CLXDIContainer shared];
     [container registerType:[CLXAppSessionService class] instance:[[CLXAppSessionService alloc] initWithSessionID:config.sessionID ?: @"" appKey:_appKey url:metricsEndpointURL]];
-    [container registerType:[CLXBidNetworkServiceClass class] instance:[[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:auctionEndpointUrl cdpEndpointUrl:cdpEndpointUrl errorReporter:[CLXErrorReporter shared]]];
+    [container registerType:[CLXBidNetworkServiceClass class] instance:[[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:auctionEndpointUrl errorReporter:[CLXErrorReporter shared]]];
     [container resolveType:ServiceTypeSingleton class:[CLXAppSessionService class]];
     
     // Check if adapters are empty (skip in test mode)
@@ -515,6 +531,9 @@ static CloudXCore *_sharedInstance = nil;
     
     // Post internal notification for ad objects to resume queued operations
     [[NSNotificationCenter defaultCenter] postNotificationName:CLXSDKInitializedNotification object:nil];
+    
+    // Visual debugging overlay is NOT auto-enabled - use setVisualDebuggingEnabled: to toggle
+    // This allows debugging of production ads without testMode polluting ad content
     
     // Track initialization metrics
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
@@ -539,6 +558,11 @@ static CloudXCore *_sharedInstance = nil;
     }
     
     [self startTimer];
+    
+    // Show visual debugging overlay if enabled (testMode OR visualDebugging flag)
+    // This must be called after SDK init because the overlay manager is lazy-loaded
+    // and won't have received the NSUserDefaultsDidChangeNotification from earlier
+    [[CLXDebugOverlayManager shared] showIfEnabled];
     
     if (completion) {
         completion(YES, nil);
@@ -766,14 +790,14 @@ static CloudXCore *_sharedInstance = nil;
                                                                           tmax:nil
                                                               ];
     
-    // Set deferred error if validation failed (using KVC to access private property)
+    // Set deferred error if validation failed (via private category)
     if (deferredError) {
-        [banner setValue:deferredError forKey:@"deferredError"];
+        banner.deferredError = deferredError;
     }
     
     // If SDK not initialized, store the requested placement name for deferred lookup
     if (!placementConfig) {
-        [banner setValue:placement forKey:@"requestedPlacementName"];
+        banner.requestedPlacementName = placement;
     }
     
     // ALWAYS return non-nil
@@ -837,14 +861,14 @@ static CloudXCore *_sharedInstance = nil;
                                                                            tmax:nil
                                                               ];
     
-    // Set deferred error if validation failed (using KVC to access private property)
+    // Set deferred error if validation failed (via private category)
     if (deferredError) {
-        [banner setValue:deferredError forKey:@"deferredError"];
+        banner.deferredError = deferredError;
     }
     
     // If SDK not initialized, store the requested placement name for deferred lookup
     if (!placementConfig) {
-        [banner setValue:placement forKey:@"requestedPlacementName"];
+        banner.requestedPlacementName = placement;
     }
     
     // ALWAYS return non-nil
@@ -901,14 +925,14 @@ static CloudXCore *_sharedInstance = nil;
                                                                reportingService:_reportingService
                                                                        settings:[CLXSettings sharedInstance]];
     
-    // Set deferred error if validation failed (using KVC to access private property)
+    // Set deferred error if validation failed (via private category)
     if (deferredError) {
-        [interstitial setValue:deferredError forKey:@"deferredError"];
+        interstitial.deferredError = deferredError;
     }
     
     // If SDK not initialized, store the requested placement name for deferred lookup
     if (!placementConfig) {
-        [interstitial setValue:placement forKey:@"requestedPlacementName"];
+        interstitial.requestedPlacementName = placement;
     }
     
     // ALWAYS return non-nil
@@ -965,47 +989,60 @@ static CloudXCore *_sharedInstance = nil;
                                                    reportingService:_reportingService
                                                            settings:[CLXSettings sharedInstance]];
     
-    // Set deferred error if validation failed (using KVC to access private property)
+    // Set deferred error if validation failed (via private category)
     if (deferredError) {
-        [rewarded setValue:deferredError forKey:@"deferredError"];
+        rewarded.deferredError = deferredError;
     }
     
     // If SDK not initialized, store the requested placement name for deferred lookup
     if (!placementConfig) {
-        [rewarded setValue:placement forKey:@"requestedPlacementName"];
+        rewarded.requestedPlacementName = placement;
     }
     
     // ALWAYS return non-nil
     return rewarded;
 }
 
-- (nullable CLXNativeAdView *)createNativeAdWithPlacement:(NSString *)placement viewController:(UIViewController *)viewController delegate:(id)delegate {
+- (CLXNativeAdView *)createNativeAdWithPlacement:(NSString *)placement viewController:(UIViewController *)viewController delegate:(id)delegate {
     // Track native creation method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateNative];
     
     [self.logger debug:[NSString stringWithFormat:@"Creating native ad for placement: %@", placement]];
 
+    // v1.3.0: Defer validation errors to load() - always return non-nil
+    NSError *deferredError = nil;
+    
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
-        [self.logger error:@"Cannot create native ad: No adapters registered. At least one adapter framework must be included in your project to show ads."];
-        return nil;
+        [self.logger error:@"No adapters registered - error will be deferred to load()"];
+        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersRegistered
+                                    description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
 
-    // Get placement from config
-    CLXSDKConfigPlacement *placementConfig = _adPlacements[placement];
-    if (!placementConfig) {
-        [self.logger error:[NSString stringWithFormat:@"Placement not found: %@", placement]];
-        return nil;
+    // Get placement from config (may be nil if SDK not initialized yet)
+    CLXSDKConfigPlacement *placementConfig = [self placementConfigForName:placement];
+    if (!placementConfig && _isInitialized && !deferredError) {
+        // SDK is initialized but placement not found - this is an error
+        [self.logger error:[NSString stringWithFormat:@"Placement not found - error will be deferred to load(): %@", placement]];
+        deferredError = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+                                    description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
     }
     
-    // Generate unique auction ID for this native impression
-    NSString *auctionID = [[NSUUID UUID] UUIDString];
-    CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
-                                                                                  auctionID:auctionID
-                                                                              testGroupName:_abTestName];
+    // Defer placement config and impression model creation if SDK not ready
+    CLXConfigImpressionModel *impModel = nil;
+    if (placementConfig && _sdkConfig) {
+        // SDK is initialized - create impression model now
+        NSString *auctionID = [[NSUUID UUID] UUIDString];
+        impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
+                                                              auctionID:auctionID
+                                                          testGroupName:_abTestName];
+    } else if (!placementConfig) {
+        // SDK not initialized yet - defer all initialization to load() time
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring native initialization for placement: %@", placement]];
+    }
     
-    // Create native using real adNetworkFactories
+    // ALWAYS create native (errors deferred to load())
     CLXPublisherNative *native = [[CLXPublisherNative alloc] initWithViewController:viewController
                                                                      placement:placementConfig
                                                                         userID:@""
@@ -1020,12 +1057,21 @@ static CloudXCore *_sharedInstance = nil;
                                                               bidRequestTimeout:3.0
                                                               reportingService:_reportingService];
     
-    if (!native) {
-        [self.logger error:@"Failed to create native ad"];
-        return nil;
+    // Set deferred error if validation failed (via private category)
+    if (deferredError) {
+        native.deferredError = deferredError;
     }
     
-    return [[CLXNativeAdView alloc] initWithNative:native type:placementConfig.nativeTemplate delegate:delegate];
+    // If SDK not initialized, store the requested placement name for deferred lookup
+    if (!placementConfig) {
+        native.requestedPlacementName = placement;
+    }
+    
+    // Use default template if placementConfig is nil (deferred init case)
+    CLXNativeTemplate nativeTemplate = placementConfig ? placementConfig.nativeTemplate : CLXNativeTemplateDefault;
+    
+    // ALWAYS return non-nil
+    return [[CLXNativeAdView alloc] initWithNative:native type:nativeTemplate delegate:delegate];
 }
 
 #pragma mark - Private Helper Methods
@@ -1165,6 +1211,26 @@ static CloudXCore *_sharedInstance = nil;
 
 + (void)setIsDoNotSell:(BOOL)isDoNotSell {
     [[CLXPrivacyService sharedInstance] setDoNotSell:@(isDoNotSell)];
+}
+
+#pragma mark - Visual Debugging
+
+// In-memory only - resets to NO on every app launch for safety
+// Prevents accidental release with visual debugging enabled
+static BOOL _visualDebuggingEnabled = NO;
+
++ (void)setVisualDebuggingEnabled:(BOOL)enabled {
+    _visualDebuggingEnabled = enabled;
+    
+    if (enabled) {
+        [[CLXDebugOverlayManager shared] showIfEnabled];
+    } else {
+        [[CLXDebugOverlayManager shared] hide];
+    }
+}
+
++ (BOOL)isVisualDebuggingEnabled {
+    return _visualDebuggingEnabled;
 }
 
 #pragma mark - Logging Control

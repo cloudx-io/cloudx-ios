@@ -7,6 +7,9 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXLogStore.h>
+#import <CloudXCore/CLXLogEntry.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CloudXCore.h>
 
 @interface CLXLoggerTests : XCTestCase
@@ -161,6 +164,190 @@
     
     // Then: Error should still be visible (errors always show)
     XCTAssertTrue(YES, @"Errors show even when logging disabled");
+}
+
+#pragma mark - CLXLogStore Tests
+
+// Test that log store captures logs when testMode is enabled
+- (void)testLogStore_CapturesLogsWhenTestModeEnabled {
+    // Given: testMode enabled
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [[CLXLogStore shared] clear];
+    
+    // Small delay to ensure clear completes
+    [NSThread sleepForTimeInterval:0.05];
+    
+    // When: Logging messages
+    [self.logger info:@"Test message 1"];
+    [self.logger error:@"Test message 2"];
+    
+    // Small delay to allow async operations to complete
+    [NSThread sleepForTimeInterval:0.1];
+    
+    // Then: Logs should be stored
+    NSArray<CLXLogEntry *> *entries = [[CLXLogStore shared] allEntries];
+    XCTAssertEqual(entries.count, 2, @"Should have 2 log entries");
+    
+    // Cleanup
+    [[CLXLogStore shared] clear];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreTestModeKey];
+}
+
+// Test that log store does NOT capture logs when testMode is disabled
+- (void)testLogStore_DoesNotCaptureLogsWhenTestModeDisabled {
+    // Given: testMode disabled
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [[CLXLogStore shared] clear];
+    
+    // Small delay to ensure clear completes
+    [NSThread sleepForTimeInterval:0.05];
+    
+    // When: Logging messages
+    [self.logger info:@"This should not be stored"];
+    [self.logger error:@"Neither should this"];
+    
+    // Small delay to allow async operations to complete
+    [NSThread sleepForTimeInterval:0.1];
+    
+    // Then: No logs should be stored
+    NSUInteger count = [[CLXLogStore shared] count];
+    XCTAssertEqual(count, 0, @"Should have 0 log entries when testMode is disabled");
+    
+    // Cleanup
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreTestModeKey];
+}
+
+// Test LRU eviction - oldest logs are removed when limit is reached
+- (void)testLogStore_LRUEviction {
+    // Given: testMode enabled
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [[CLXLogStore shared] clear];
+    
+    [NSThread sleepForTimeInterval:0.05];
+    
+    // When: Adding more than maxLogEntries
+    NSUInteger maxEntries = [CLXLogStore maxLogEntries];
+    for (NSUInteger i = 0; i < maxEntries + 10; i++) {
+        [self.logger info:[NSString stringWithFormat:@"Log entry %lu", (unsigned long)i]];
+    }
+    
+    // Allow async operations to complete
+    [NSThread sleepForTimeInterval:0.5];
+    
+    // Then: Should only have maxLogEntries
+    NSUInteger count = [[CLXLogStore shared] count];
+    XCTAssertEqual(count, maxEntries, @"Should have exactly %lu entries after eviction", (unsigned long)maxEntries);
+    
+    // Verify oldest entries were removed (newest should be present)
+    NSArray<CLXLogEntry *> *entries = [[CLXLogStore shared] allEntries];
+    CLXLogEntry *newestEntry = entries.firstObject;
+    XCTAssertTrue([newestEntry.message containsString:@"1009"], @"Newest entry should be log 1009");
+    
+    // Cleanup
+    [[CLXLogStore shared] clear];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreTestModeKey];
+}
+
+// Test that allEntries returns logs in reverse chronological order (newest first)
+- (void)testLogStore_AllEntriesReturnsNewestFirst {
+    // Given: testMode enabled
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [[CLXLogStore shared] clear];
+    
+    [NSThread sleepForTimeInterval:0.05];
+    
+    // When: Logging messages in sequence
+    [self.logger info:@"First"];
+    [NSThread sleepForTimeInterval:0.01];
+    [self.logger info:@"Second"];
+    [NSThread sleepForTimeInterval:0.01];
+    [self.logger info:@"Third"];
+    
+    [NSThread sleepForTimeInterval:0.1];
+    
+    // Then: Newest should be first
+    NSArray<CLXLogEntry *> *entries = [[CLXLogStore shared] allEntries];
+    XCTAssertEqual(entries.count, 3, @"Should have 3 entries");
+    XCTAssertTrue([entries[0].message containsString:@"Third"], @"First entry should be 'Third' (newest)");
+    XCTAssertTrue([entries[2].message containsString:@"First"], @"Last entry should be 'First' (oldest)");
+    
+    // Cleanup
+    [[CLXLogStore shared] clear];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreTestModeKey];
+}
+
+// Test clear removes all entries
+- (void)testLogStore_ClearRemovesAllEntries {
+    // Given: testMode enabled with some logs
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [[CLXLogStore shared] clear];
+    
+    [NSThread sleepForTimeInterval:0.05];
+    
+    [self.logger info:@"Entry 1"];
+    [self.logger info:@"Entry 2"];
+    
+    [NSThread sleepForTimeInterval:0.1];
+    
+    XCTAssertEqual([[CLXLogStore shared] count], 2, @"Should have 2 entries before clear");
+    
+    // When: Clearing
+    [[CLXLogStore shared] clear];
+    
+    [NSThread sleepForTimeInterval:0.1];
+    
+    // Then: Should be empty
+    XCTAssertEqual([[CLXLogStore shared] count], 0, @"Should have 0 entries after clear");
+    
+    // Cleanup
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreTestModeKey];
+}
+
+// Test exportAsString produces formatted output
+- (void)testLogStore_ExportAsString {
+    // Given: testMode enabled with logs
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [[CLXLogStore shared] clear];
+    
+    [NSThread sleepForTimeInterval:0.05];
+    
+    [self.logger info:@"Test export message"];
+    
+    [NSThread sleepForTimeInterval:0.1];
+    
+    // When: Exporting
+    NSString *exported = [[CLXLogStore shared] exportAsString];
+    
+    // Then: Should contain expected content
+    XCTAssertTrue([exported containsString:@"CloudX SDK Debug Logs"], @"Should have header");
+    XCTAssertTrue([exported containsString:@"Test export message"], @"Should contain log message");
+    XCTAssertTrue([exported containsString:@"INFO"], @"Should contain log level");
+    
+    // Cleanup
+    [[CLXLogStore shared] clear];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreTestModeKey];
+}
+
+// Test CLXLogEntry formattedString
+- (void)testLogEntry_FormattedString {
+    // Given: A log entry
+    CLXLogEntry *entry = [[CLXLogEntry alloc] initWithLevel:CLXLogLevelError
+                                                   category:@"TestCategory"
+                                                    message:@"Test error message"];
+    
+    // When: Getting formatted string
+    NSString *formatted = [entry formattedString];
+    
+    // Then: Should contain expected components
+    XCTAssertTrue([formatted containsString:@"ERROR"], @"Should contain level");
+    XCTAssertTrue([formatted containsString:@"TestCategory"], @"Should contain category");
+    XCTAssertTrue([formatted containsString:@"Test error message"], @"Should contain message");
 }
 
 @end

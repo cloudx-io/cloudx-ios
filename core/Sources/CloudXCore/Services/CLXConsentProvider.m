@@ -3,12 +3,12 @@
  */
 
 /**
- * @file CLXGPPProvider.m
+ * @file CLXConsentProvider.m
  * @brief Implementation of GPP provider service
  * @details Handles GPP string parsing with support for US-CA and US-National sections
  */
 
-#import <CloudXCore/CLXGPPProvider.h>
+#import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXErrorReporter.h>
 
@@ -16,20 +16,39 @@
 NSString * const kIABGPP_GppString = @"IABGPP_HDR_GppString";
 NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
 
-@interface CLXGPPProvider ()
+// IAB TCF UserDefaults keys
+static NSString * const kIABTCF_TCString = @"IABTCF_TCString";
+static NSString * const kIABTCF_gdprApplies = @"IABTCF_gdprApplies";
+
+// GPP constants for legacy TCF fallback
+NSString * const kGPPHeaderTcfEuOnly = @"DBABMA";
+NSInteger const kGPPSidEuTcf = 2;
+
+// CloudX vendor ID in IAB Global Vendor List
+static NSInteger const kCloudXVendorId = 1510;
+
+// TCF v2 Core String bit offsets (per IAB spec)
+// https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20Consent%20string%20and%20vendor%20list%20formats%20v2.md
+static NSUInteger const kTCFPurposeConsentOffset = 152;     // Purposes 1-24 (24 bits)
+static NSUInteger const kTCFMaxVendorIdOffset = 213;        // MaxVendorId (16 bits)
+static NSUInteger const kTCFMaxVendorIdLength = 16;
+static NSUInteger const kTCFEncodingTypeOffset = 229;       // EncodingType (1 bit: 0=BitField, 1=Range)
+static NSUInteger const kTCFVendorConsentOffset = 230;      // Vendor consent section starts here
+
+@interface CLXConsentProvider ()
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, strong) NSUserDefaults *userDefaults;
 @property (nonatomic, strong, nullable) CLXErrorReporter *errorReporter;
 @end
 
-@interface CLXGPPProvider (ErrorReporting)
+@interface CLXConsentProvider (ErrorReporting)
 - (void)reportException:(NSException *)exception context:(NSDictionary<NSString *, NSString *> *)context;
 @end
 
-@implementation CLXGPPProvider
+@implementation CLXConsentProvider
 
 + (instancetype)sharedInstance {
-    static CLXGPPProvider *sharedInstance = nil;
+    static CLXConsentProvider *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[self alloc] initWithErrorReporter:[CLXErrorReporter shared]];
@@ -44,7 +63,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
 - (instancetype)initWithErrorReporter:(nullable CLXErrorReporter *)errorReporter {
     self = [super init];
     if (self) {
-        _logger = [[CLXLogger alloc] initWithCategory:@"CLXGPPProvider"];
+        _logger = [[CLXLogger alloc] initWithCategory:@"CLXConsentProvider"];
         _userDefaults = [NSUserDefaults standardUserDefaults];
         _errorReporter = errorReporter;
     }
@@ -105,7 +124,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     }
 }
 
-- (nullable CLXGppConsent *)decodeGppForTarget:(nullable NSNumber *)target {
+- (nullable CLXPrivacyConsent *)decodeGppForTarget:(nullable NSNumber *)target {
     NSString *gpp = [self gppString];
     NSArray<NSNumber *> *sids = [self gppSid];
     
@@ -116,7 +135,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     
     if (target) {
         // Decode specific target
-        CLXGppConsent *consent = [self decodeGppSection:gpp sids:sids targetSid:[target integerValue]];
+        CLXPrivacyConsent *consent = [self decodeGppSection:gpp sids:sids targetSid:[target integerValue]];
         if (consent && [consent requiresPiiRemoval]) {
             [self.logger debug:[NSString stringWithFormat:@"Decoded target %@ with PII removal required", target]];
             return consent;
@@ -126,17 +145,17 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     } else {
         // Auto-select: prioritize consent requiring PII removal, then first available
         NSArray<NSNumber *> *prioritySids = @[@(CLXGppTargetUSCA), @(CLXGppTargetUSNational)];
-        NSMutableArray<CLXGppConsent *> *decodedConsents = [NSMutableArray array];
+        NSMutableArray<CLXPrivacyConsent *> *decodedConsents = [NSMutableArray array];
         
         for (NSNumber *sidNumber in prioritySids) {
-            CLXGppConsent *consent = [self decodeGppSection:gpp sids:sids targetSid:[sidNumber integerValue]];
+            CLXPrivacyConsent *consent = [self decodeGppSection:gpp sids:sids targetSid:[sidNumber integerValue]];
             if (consent) {
                 [decodedConsents addObject:consent];
             }
         }
         
         // Find first consent requiring PII removal
-        for (CLXGppConsent *consent in decodedConsents) {
+        for (CLXPrivacyConsent *consent in decodedConsents) {
             if ([consent requiresPiiRemoval]) {
                 [self.logger debug:@"Auto-selected consent requiring PII removal"];
                 return consent;
@@ -154,7 +173,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     }
 }
 
-- (nullable CLXGppConsent *)decodeGppSection:(NSString *)gpp sids:(NSArray<NSNumber *> *)sids targetSid:(NSInteger)targetSid {
+- (nullable CLXPrivacyConsent *)decodeGppSection:(NSString *)gpp sids:(NSArray<NSNumber *> *)sids targetSid:(NSInteger)targetSid {
     if (![sids containsObject:@(targetSid)]) {
         [self.logger debug:[NSString stringWithFormat:@"SID %ld not present in GPP", (long)targetSid]];
         return nil;
@@ -171,6 +190,8 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
             return [self decodeUsCa:payload];
         } else if (targetSid == CLXGppTargetUSNational) {
             return [self decodeUsNational:payload];
+        } else if (targetSid == CLXGppTargetEUTCF) {
+            return [self decodeEuTcf:payload];
         } else {
             [self.logger error:[NSString stringWithFormat:@"Unsupported SID %ld", (long)targetSid]];
             return nil;
@@ -215,7 +236,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     return payload;
 }
 
-- (nullable CLXGppConsent *)decodeUsCa:(NSString *)payload {
+- (nullable CLXPrivacyConsent *)decodeUsCa:(NSString *)payload {
     @try {
         NSString *bits = [self base64UrlToBits:payload];
         if (!bits) {
@@ -227,7 +248,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
         NSNumber *saleOptOut = [self readBits:bits start:12 length:2];
         NSNumber *sharingOptOut = [self readBits:bits start:14 length:2];
         
-        CLXGppConsent *consent = [[CLXGppConsent alloc] initWithSaleOptOut:saleOptOut sharingOptOut:sharingOptOut];
+        CLXPrivacyConsent *consent = [[CLXPrivacyConsent alloc] initWithSaleOptOut:saleOptOut sharingOptOut:sharingOptOut];
         [self.logger debug:[NSString stringWithFormat:@"US-CA decoded: %@", consent]];
         return consent;
     } @catch (NSException *exception) {
@@ -236,7 +257,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     }
 }
 
-- (nullable CLXGppConsent *)decodeUsNational:(NSString *)payload {
+- (nullable CLXPrivacyConsent *)decodeUsNational:(NSString *)payload {
     @try {
         NSString *bits = [self base64UrlToBits:payload];
         if (!bits) {
@@ -255,7 +276,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
         // Default saleOptOut to 0 when unknown/N/A (matching Android logic)
         NSNumber *effectiveSaleOptOut = saleOptOut ?: @0;
         
-        CLXGppConsent *consent = [[CLXGppConsent alloc] initWithSaleOptOut:effectiveSaleOptOut sharingOptOut:effectiveSharingOptOut];
+        CLXPrivacyConsent *consent = [[CLXPrivacyConsent alloc] initWithSaleOptOut:effectiveSaleOptOut sharingOptOut:effectiveSharingOptOut];
         [self.logger debug:[NSString stringWithFormat:@"US-National decoded: %@", consent]];
         return consent;
     } @catch (NSException *exception) {
@@ -363,6 +384,304 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
     }
 }
 
+#pragma mark - TCF (GDPR) Methods
+
+- (nullable NSString *)tcString {
+    @try {
+        NSString *tcString = [self.userDefaults stringForKey:kIABTCF_TCString];
+        if (tcString.length > 0) {
+            [self.logger verbose:[NSString stringWithFormat:@"TCF string: %@", tcString]];
+            return tcString;
+        }
+        [self.logger verbose:@"TCF string: (none)"];
+        return nil;
+    } @catch (NSException *exception) {
+        [self.logger error:[NSString stringWithFormat:@"Failed to read TCF string: %@", exception.reason]];
+        return nil;
+    }
+}
+
+- (nullable NSNumber *)gdprApplies {
+    @try {
+        // IAB TCF spec requires integer: 0 = does not apply, 1 = applies
+        if (![self.userDefaults objectForKey:kIABTCF_gdprApplies]) {
+            [self.logger verbose:@"GDPR applies: (unknown)"];
+            return nil;
+        }
+        
+        NSInteger gdprValue = [self.userDefaults integerForKey:kIABTCF_gdprApplies];
+        if (gdprValue == 0) {
+            [self.logger verbose:@"GDPR applies: NO"];
+            return @NO;
+        } else if (gdprValue == 1) {
+            [self.logger verbose:@"GDPR applies: YES"];
+            return @YES;
+        } else {
+            [self.logger warn:[NSString stringWithFormat:@"GDPR applies has invalid value: %ld (expected 0 or 1)", (long)gdprValue]];
+            return nil;
+        }
+    } @catch (NSException *exception) {
+        [self.logger error:[NSString stringWithFormat:@"Failed to read GDPR applies: %@", exception.reason]];
+        return nil;
+    }
+}
+
+- (nullable CLXPrivacyConsent *)decodeTcString:(NSString *)tcString {
+    if (!tcString || tcString.length == 0) {
+        [self.logger error:@"Cannot decode nil or empty TCF string"];
+        return nil;
+    }
+    
+    @try {
+        NSString *bits = [self base64UrlToBits:tcString];
+        if (!bits) {
+            [self.logger error:@"Failed to decode TCF string to bits"];
+            return nil;
+        }
+        
+        [self.logger debug:[NSString stringWithFormat:@"Decoded TCF bit string length: %lu bits", (unsigned long)bits.length]];
+        
+        // Read purpose consents (purposes 1-4)
+        NSNumber *purpose1 = [self readBitAsBool:bits index:kTCFPurposeConsentOffset];
+        NSNumber *purpose2 = [self readBitAsBool:bits index:kTCFPurposeConsentOffset + 1];
+        NSNumber *purpose3 = [self readBitAsBool:bits index:kTCFPurposeConsentOffset + 2];
+        NSNumber *purpose4 = [self readBitAsBool:bits index:kTCFPurposeConsentOffset + 3];
+        
+        // Read vendor consent for CloudX
+        NSNumber *vendorConsent = [self parseVendorConsent:bits vendorId:kCloudXVendorId];
+        
+        CLXPrivacyConsent *consent = [[CLXPrivacyConsent alloc] initWithPurpose1:purpose1
+                                                                purpose2:purpose2
+                                                                purpose3:purpose3
+                                                                purpose4:purpose4
+                                                           vendorConsent:vendorConsent];
+        
+        [self.logger debug:[NSString stringWithFormat:@"TCF decoded: %@", consent]];
+        return consent;
+    } @catch (NSException *exception) {
+        [self.logger error:[NSString stringWithFormat:@"TCF string decode failed: %@", exception.reason]];
+        [self reportException:exception context:@{@"operation": @"decodeTcString"}];
+        return nil;
+    }
+}
+
+- (nullable CLXPrivacyConsent *)decodeEuTcf:(NSString *)payload {
+    @try {
+        if (!payload || payload.length == 0) {
+            [self.logger error:@"Failed to extract Section 2 payload from GPP string"];
+            return nil;
+        }
+        
+        return [self decodeTcString:payload];
+    } @catch (NSException *exception) {
+        [self.logger error:[NSString stringWithFormat:@"EU-TCF decode failed: %@", exception.reason]];
+        return nil;
+    }
+}
+
+- (nullable NSString *)extractTcStringFromGpp {
+    NSString *gpp = [self gppString];
+    NSArray<NSNumber *> *sids = [self gppSid];
+    
+    if (!gpp || !sids || sids.count == 0) {
+        return nil;
+    }
+    
+    if (![sids containsObject:@(kGPPSidEuTcf)]) {
+        return nil;
+    }
+    
+    return [self selectSectionPayload:gpp sids:sids targetSid:kGPPSidEuTcf];
+}
+
+#pragma mark - TCF Vendor Consent Parsing
+
+- (nullable NSNumber *)readBitAsBool:(NSString *)bits index:(NSUInteger)index {
+    if (index >= bits.length) {
+        return @NO;
+    }
+    return @([bits characterAtIndex:index] == '1');
+}
+
+- (NSInteger)readInt:(NSString *)bits offset:(NSUInteger)offset length:(NSUInteger)length {
+    if (offset + length > bits.length) {
+        return 0;
+    }
+    
+    NSString *substring = [bits substringWithRange:NSMakeRange(offset, length)];
+    NSInteger value = 0;
+    for (NSUInteger i = 0; i < length; i++) {
+        if ([substring characterAtIndex:i] == '1') {
+            value |= (1 << (length - 1 - i));
+        }
+    }
+    return value;
+}
+
+/**
+ * Parses vendor consent section from TCF v2 Core String.
+ * The vendor consent section can be encoded as BitField or Range.
+ */
+- (nullable NSNumber *)parseVendorConsent:(NSString *)bits vendorId:(NSInteger)vendorId {
+    @try {
+        if (bits.length < kTCFVendorConsentOffset) {
+            [self.logger error:[NSString stringWithFormat:@"TCF string too short (%lu bits), missing vendor consent section", (unsigned long)bits.length]];
+            return @NO;
+        }
+        
+        NSInteger maxVendorId = [self readInt:bits offset:kTCFMaxVendorIdOffset length:kTCFMaxVendorIdLength];
+        
+        if (maxVendorId < vendorId) {
+            [self.logger debug:[NSString stringWithFormat:@"Vendor %ld is beyond MaxVendorId (%ld), no consent", (long)vendorId, (long)maxVendorId]];
+            return @NO;
+        }
+        
+        BOOL isRangeEncoding = [bits characterAtIndex:kTCFEncodingTypeOffset] == '1';
+        
+        if (isRangeEncoding) {
+            return [self parseVendorConsentRange:bits vendorId:vendorId offset:kTCFVendorConsentOffset];
+        } else {
+            return [self parseVendorConsentBitField:bits vendorId:vendorId offset:kTCFVendorConsentOffset];
+        }
+    } @catch (NSException *exception) {
+        [self.logger error:[NSString stringWithFormat:@"Failed to parse vendor consent: %@", exception.reason]];
+        return @NO;
+    }
+}
+
+/**
+ * Parses BitField encoding for vendor consent.
+ * BitField format: MaxVendorId bits starting at offset, where bit i represents vendor ID i+1
+ */
+- (NSNumber *)parseVendorConsentBitField:(NSString *)bits vendorId:(NSInteger)vendorId offset:(NSUInteger)offset {
+    // In BitField, vendor IDs start at 1, so vendor 1 is at bit 0, vendor N at bit N-1
+    NSUInteger bitIndex = offset + (vendorId - 1);
+    
+    if (bitIndex >= bits.length) {
+        [self.logger error:[NSString stringWithFormat:@"BitField too short for vendor %ld", (long)vendorId]];
+        return @NO;
+    }
+    
+    return @([bits characterAtIndex:bitIndex] == '1');
+}
+
+/**
+ * Parses Range encoding for vendor consent.
+ * Range format:
+ * - NumEntries (12 bits): Number of range entries
+ * - For each entry:
+ *   - IsRange (1 bit): 0=single ID, 1=range
+ *   - If IsRange=0: StartVendorId (16 bits)
+ *   - If IsRange=1: StartVendorId (16 bits) + EndVendorId (16 bits)
+ */
+- (NSNumber *)parseVendorConsentRange:(NSString *)bits vendorId:(NSInteger)vendorId offset:(NSUInteger)offset {
+    NSUInteger currentOffset = offset;
+    
+    // Read NumEntries (12 bits)
+    if (currentOffset + 12 > bits.length) {
+        [self.logger error:@"Range encoding too short, missing NumEntries"];
+        return @NO;
+    }
+    
+    NSInteger numEntries = [self readInt:bits offset:currentOffset length:12];
+    currentOffset += 12;
+    
+    // Check each range entry
+    for (NSInteger i = 0; i < numEntries; i++) {
+        if (currentOffset + 1 > bits.length) {
+            [self.logger error:[NSString stringWithFormat:@"Range encoding too short at entry %ld", (long)i]];
+            return @NO;
+        }
+        
+        BOOL isRange = [bits characterAtIndex:currentOffset] == '1';
+        currentOffset += 1;
+        
+        if (!isRange) {
+            // Single vendor ID (16 bits)
+            if (currentOffset + 16 > bits.length) {
+                [self.logger error:@"Range encoding too short for single vendor ID"];
+                return @NO;
+            }
+            
+            NSInteger singleVendorId = [self readInt:bits offset:currentOffset length:16];
+            currentOffset += 16;
+            
+            if (singleVendorId == vendorId) {
+                return @YES;
+            }
+        } else {
+            // Range: StartVendorId (16 bits) + EndVendorId (16 bits)
+            if (currentOffset + 32 > bits.length) {
+                [self.logger error:@"Range encoding too short for vendor range"];
+                return @NO;
+            }
+            
+            NSInteger startVendorId = [self readInt:bits offset:currentOffset length:16];
+            currentOffset += 16;
+            
+            NSInteger endVendorId = [self readInt:bits offset:currentOffset length:16];
+            currentOffset += 16;
+            
+            if (vendorId >= startVendorId && vendorId <= endVendorId) {
+                return @YES;
+            }
+        }
+    }
+    
+    // Vendor not found in any range
+    return @NO;
+}
+
+#pragma mark - GPP Resolution Methods (Legacy Fallback)
+
+- (nullable NSNumber *)resolveGdprApplies {
+    // Priority 1: GPP SID contains 2 (EU TCF section)
+    NSArray<NSNumber *> *sids = [self gppSid];
+    if (sids && [sids containsObject:@(kGPPSidEuTcf)]) {
+        [self.logger debug:@"GDPR applies resolved from GPP SID containing 2"];
+        return @YES;
+    }
+    
+    // Priority 2: Legacy IABTCF_gdprApplies flag
+    return [self gdprApplies];
+}
+
+- (nullable NSString *)resolveGppString {
+    // Priority 1: GPP string from CMP
+    NSString *gpp = [self gppString];
+    if (gpp && gpp.length > 0) {
+        return gpp;
+    }
+    
+    // Priority 2: Construct from legacy TC string
+    NSString *legacyTcString = [self tcString];
+    if (legacyTcString && legacyTcString.length > 0) {
+        // Construct GPP format: "[GPP_HEADER_TCF_EU_ONLY]~[tcString]"
+        NSString *constructedGpp = [NSString stringWithFormat:@"%@~%@", kGPPHeaderTcfEuOnly, legacyTcString];
+        [self.logger debug:[NSString stringWithFormat:@"Constructed GPP from legacy TCF: %@", constructedGpp]];
+        return constructedGpp;
+    }
+    
+    return nil;
+}
+
+- (nullable NSArray<NSNumber *> *)resolveGppSid {
+    // Priority 1: GPP SID from CMP
+    NSArray<NSNumber *> *sids = [self gppSid];
+    if (sids && sids.count > 0) {
+        return sids;
+    }
+    
+    // Priority 2: [2] when constructing from legacy TC string
+    NSString *legacyTcString = [self tcString];
+    if (legacyTcString && legacyTcString.length > 0) {
+        [self.logger debug:@"Constructed GPP SID [2] from legacy TCF presence"];
+        return @[@(kGPPSidEuTcf)];
+    }
+    
+    return nil;
+}
+
 #pragma mark - Publisher API Methods
 
 - (void)setGppString:(nullable NSString *)gppString {
@@ -395,7 +714,7 @@ NSString * const kIABGPP_GppSID = @"IABGPP_GppSID";
 
 #pragma mark - Error Reporting Helper
 
-@implementation CLXGPPProvider (ErrorReporting)
+@implementation CLXConsentProvider (ErrorReporting)
 
 - (void)reportException:(NSException *)exception context:(NSDictionary<NSString *, NSString *> *)context {
     // Only report if error reporter was injected

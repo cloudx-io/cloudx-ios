@@ -121,6 +121,30 @@
     return isCalifornia;
 }
 
+- (BOOL)isEUUser {
+    NSDictionary *geoHeaders = [self geoHeaders];
+    if (!geoHeaders) {
+        [self.logger debug:@"No geo headers - assuming non-EU user"];
+        return NO;
+    }
+    
+    // Check gdpr-applies header from CloudX geo endpoint
+    // Per IAB TCF spec, this indicates if GDPR applies to the user's location
+    id gdprAppliesObj = geoHeaders[@"gdpr-applies"];
+    NSString *gdprApplies = nil;
+    
+    if ([gdprAppliesObj isKindOfClass:[NSString class]]) {
+        gdprApplies = (NSString *)gdprAppliesObj;
+    } else if ([gdprAppliesObj isKindOfClass:[NSNumber class]]) {
+        gdprApplies = [(NSNumber *)gdprAppliesObj boolValue] ? @"true" : @"false";
+    }
+    
+    BOOL isEU = [gdprApplies.lowercaseString isEqualToString:@"true"];
+    
+    [self.logger verbose:[NSString stringWithFormat:@"gdpr-applies: %@, isEU: %@", gdprApplies ?: @"(none)", @(isEU)]];
+    return isEU;
+}
+
 - (nullable NSString *)countryCode {
     NSDictionary *geoHeaders = [self geoHeaders];
     if (!geoHeaders) {

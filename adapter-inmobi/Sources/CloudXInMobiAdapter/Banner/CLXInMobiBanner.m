@@ -71,6 +71,10 @@
     return self.banner;
 }
 
+- (BOOL)isFlexibleSize {
+    return NO;
+}
+
 - (void)load {
     // Validate placement ID at load time (deferred validation pattern)
     if (_placementID == 0) {

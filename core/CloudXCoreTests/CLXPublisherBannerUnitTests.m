@@ -628,11 +628,10 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                                                    settings:self.testSettings
                                                                                       tmax:@30];
     
-    // Set requestedPlacementName via KVC (as CloudXCoreAPI does)
-    [deferredBanner setValue:@"test-placement" forKey:@"requestedPlacementName"];
+    // Set requestedPlacementName via private category (as CloudXCoreAPI does)
+    deferredBanner.requestedPlacementName = @"test-placement";
     
-    NSString *storedName = [deferredBanner valueForKey:@"requestedPlacementName"];
-    XCTAssertEqualObjects(storedName, @"test-placement", 
+    XCTAssertEqualObjects(deferredBanner.requestedPlacementName, @"test-placement", 
                           @"requestedPlacementName should be stored for deferred initialization");
     
     [deferredBanner destroy];
@@ -644,11 +643,10 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                              code:100 
                                          userInfo:@{NSLocalizedDescriptionKey: @"Test validation error"}];
     
-    // Set deferred error via KVC (as CloudXCoreAPI does)
-    [self.banner setValue:testError forKey:@"deferredError"];
+    // Set deferred error via private category (as CloudXCoreAPI does)
+    self.banner.deferredError = testError;
     
-    NSError *storedError = [self.banner valueForKey:@"deferredError"];
-    XCTAssertEqualObjects(storedError, testError, 
+    XCTAssertEqualObjects(self.banner.deferredError, testError, 
                           @"deferredError should be stored for deferred validation reporting");
 }
 

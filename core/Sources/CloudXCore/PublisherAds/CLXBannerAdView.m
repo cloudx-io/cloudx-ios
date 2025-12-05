@@ -15,7 +15,11 @@
 #import <CloudXCore/CLXPublisherBanner.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBidAdSource.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXDebugOverlayManager.h>
+#import <CloudXCore/CLXDebugErrorView.h>
+#import <CloudXCore/CLXDebugClickFeedback.h>
 
 // Category to expose internal methods for banner view access
 @interface CLXPublisherBanner (CLXBannerVisibility)
@@ -31,12 +35,14 @@
 @property (nonatomic, weak, nullable, readonly) UIViewController *viewController;
 @end
 
-@interface CLXBannerAdView () <CLXAdapterBannerDelegate>
+@interface CLXBannerAdView () <CLXAdapterBannerDelegate, UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) id<CLXBanner> banner;
 @property (nonatomic, strong, readwrite) CLXAd *ad;
 @property (nonatomic, copy, readwrite) NSString *adUnitIdentifier;
 @property (nonatomic, assign, readwrite) CLXBannerType adFormat;
+@property (nonatomic, strong) UIGestureRecognizer *debugTapGesture;
+@property (nonatomic, weak) UIView *currentBannerView;  // Track the actual third-party SDK view
 
 @end
 
@@ -90,8 +96,70 @@ static void initializeLogger() {
         [self setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         [self setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
         [self setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+        
+        // Setup debug gesture only if visual debugging is enabled
+        [self updateDebugGestureState];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(updateDebugGestureState)
+                                                     name:NSUserDefaultsDidChangeNotification
+                                                   object:nil];
     }
     return self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSUserDefaultsDidChangeNotification object:nil];
+}
+
+- (void)updateDebugGestureState {
+    // Visual debugging is completely separate from testMode
+    BOOL isEnabled = [CloudXCore isVisualDebuggingEnabled];
+    
+    UIView *targetView = self.currentBannerView ?: self;
+    
+    if (isEnabled && !self.debugTapGesture && targetView) {
+        UILongPressGestureRecognizer *gesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleDebugTouch:)];
+        gesture.minimumPressDuration = 0;
+        gesture.cancelsTouchesInView = NO;
+        gesture.delaysTouchesBegan = NO;
+        gesture.delaysTouchesEnded = NO;
+        gesture.delegate = self;
+        self.debugTapGesture = gesture;
+        [targetView addGestureRecognizer:gesture];
+    } else if (!isEnabled && self.debugTapGesture) {
+        UIView *gestureView = self.debugTapGesture.view;
+        if (gestureView) {
+            [gestureView removeGestureRecognizer:self.debugTapGesture];
+        }
+        self.debugTapGesture = nil;
+    }
+}
+
+- (void)attachDebugGestureToBannerView:(UIView *)bannerView {
+    self.currentBannerView = bannerView;
+    
+    if (self.debugTapGesture) {
+        UIView *oldView = self.debugTapGesture.view;
+        if (oldView) {
+            [oldView removeGestureRecognizer:self.debugTapGesture];
+        }
+        [bannerView addGestureRecognizer:self.debugTapGesture];
+    } else {
+        [self updateDebugGestureState];
+    }
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return YES;
+}
+
+- (void)handleDebugTouch:(UILongPressGestureRecognizer *)gesture {
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        // Show white border on touch down (on the actual ad view)
+        [CLXDebugClickFeedback showClickPendingOnView:self.currentBannerView ?: self];
+    }
 }
 
 #pragma mark - Auto Layout Support
@@ -198,6 +266,9 @@ static void initializeLogger() {
         bannerView.userInteractionEnabled = YES;
         [self addSubview:bannerView];
         
+        // Attach debug gesture to the ACTUAL banner view (third-party SDK's view)
+        [self attachDebugGestureToBannerView:bannerView];
+        
         // Check if adapter declares flexible sizing capability
         // Category default guarantees method exists - no need for respondsToSelector check
         BOOL isFlexible = [banner isFlexibleSize];
@@ -274,8 +345,10 @@ static void initializeLogger() {
 }
 
 - (void)clickBanner:(id<CLXAdapterBanner>)banner {
+    // Show green border on same view where white pending border was shown
+    [CLXDebugClickFeedback showClickConfirmedOnView:self.currentBannerView ?: self];
+    
     if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
-        // Use stored ad object (should be populated after didLoadAd)
         if (self.ad) {
             [self.delegate didClickAd:self.ad];
         } else {
@@ -311,6 +384,9 @@ static void initializeLogger() {
             bannerView.userInteractionEnabled = YES;
             [self addSubview:bannerView];
             
+            // Attach debug gesture to the ACTUAL banner view (third-party SDK's view)
+            [self attachDebugGestureToBannerView:bannerView];
+            
             // Check if adapter declares flexible sizing capability
             // Category default guarantees method exists - no need for respondsToSelector check
             BOOL isFlexible = [currentBanner isFlexibleSize];
@@ -342,22 +418,33 @@ static void initializeLogger() {
 }
 
 - (void)didFailToLoadAdWithError:(NSError *)error {
+    // Flash debug button if testMode is enabled
+    [[CLXDebugOverlayManager shared] flashError];
+    
+    // Show error in container if visual debugging is enabled
+    if ([CloudXCore isVisualDebuggingEnabled]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // Remove any existing subviews
+            for (UIView *subview in [self.subviews copy]) {
+                [subview removeFromSuperview];
+            }
+            
+            // Add error view
+            CLXDebugErrorView *errorView = [CLXDebugErrorView errorViewWithFrame:self.bounds
+                                                                           title:@"Load Failed"
+                                                                         message:error.localizedDescription];
+            [self addSubview:errorView];
+        });
+    }
+    
     if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
         [self.delegate didFailToLoadAdWithError:error];
     }
 }
 
 - (void)didDisplayAd:(CLXAd *)ad {
-    NSLog(@"🟡 [CLXBannerAdView] STEP 3: didDisplayAd called with ad: %@", ad);
-    NSLog(@"🟡 [CLXBannerAdView] STEP 3: self.delegate = %@", self.delegate);
-    NSLog(@"🟡 [CLXBannerAdView] STEP 3: Delegate responds to selector: %d", [self.delegate respondsToSelector:@selector(didDisplayAd:)]);
-    
     if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
-        NSLog(@"🟡 [CLXBannerAdView] STEP 3: Calling [delegate didDisplayAd:%@]", ad);
         [self.delegate didDisplayAd:ad];
-        NSLog(@"🟡 [CLXBannerAdView] STEP 3: Returned from [delegate didDisplayAd:]");
-    } else {
-        NSLog(@"🔴 [CLXBannerAdView] STEP 3: Delegate does NOT respond to didDisplayAd: - THIS IS THE BUG!");
     }
 }
 

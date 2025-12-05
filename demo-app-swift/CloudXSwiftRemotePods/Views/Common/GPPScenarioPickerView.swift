@@ -89,9 +89,14 @@ enum GPPTestScenario: Int {
     case gppAbsent                      // No GPP string
     case ccpaConsent                    // CCPA consent (.QA)
     case ccpaOptOut                     // CCPA opt-out (.YA)
-    case nonUS                          // EU/Germany (GDPR)
+    case nonUS                          // EU/Germany (GDPR via GPP)
     case usNonCalifornia                // US non-CA (Oregon, NY, etc)
     case attDenied                      // ATT tracking disabled
+    // GDPR/TCF Scenarios
+    case gdprFullConsent                // EU TCF: All purposes + vendor consent
+    case gdprDenied                     // EU TCF: No purposes consented
+    case gdprPurpose1Denied             // EU TCF: Purpose 1 (device access) denied
+    case gdprVendorDenied               // EU TCF: Purposes OK but vendor denied
 }
 
 /// A self-contained component for GPP privacy compliance testing
@@ -190,6 +195,12 @@ class GPPScenarioPickerView: UIView {
         addScenarioAction(to: alert, scenario: .usNonCalifornia, title: "US Non-California (NY)", subtitle: "US but not CA")
         addScenarioAction(to: alert, scenario: .attDenied, title: "⭐️ ATT Denied", subtitle: "Tracking disabled in iOS Settings")
         
+        // GDPR/TCF Scenarios
+        addScenarioAction(to: alert, scenario: .gdprFullConsent, title: "🇪🇺 GDPR Full Consent", subtitle: "All purposes + vendor OK")
+        addScenarioAction(to: alert, scenario: .gdprDenied, title: "🇪🇺 GDPR Denied", subtitle: "No purposes consented")
+        addScenarioAction(to: alert, scenario: .gdprPurpose1Denied, title: "🇪🇺 GDPR Purpose 1 Denied", subtitle: "Device access denied")
+        addScenarioAction(to: alert, scenario: .gdprVendorDenied, title: "🇪🇺 GDPR Vendor Denied", subtitle: "Purposes OK, vendor NO")
+        
         // Cancel action
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
@@ -275,7 +286,8 @@ class GPPScenarioPickerView: UIView {
             if sidOptOut.first != -1 {
                 setIABGPPString("DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA")
                 setIABGPPSid(sidOptOut)
-                CloudXCore.setCCPAPrivacyString("1YNN")  // Legacy CCPA string: Y = opt-out
+                // IAB US Privacy: 1YYN = Version 1, Notice given, OPTED OUT, Not LSPA
+                CloudXCore.setCCPAPrivacyString("1YYN")
             } else {
                 DemoAppLogger.sharedInstance.logMessage("⚠️ Non-US region: GPP not set (real CMPs wouldn't set US privacy for non-US users)")
             }
@@ -304,7 +316,58 @@ class GPPScenarioPickerView: UIView {
             DemoAppLogger.sharedInstance.logMessage("🧪 GPP Scenario: ATT Denied (real geo data from CloudFront API)")
             DemoAppLogger.sharedInstance.logMessage("⚠️ To test: Go to iOS Settings → Privacy & Security → Tracking → Disable for this app")
             DemoAppLogger.sharedInstance.logMessage("⚠️ Then restart the app and select this scenario")
+            
+        // GDPR/TCF Scenarios - Set IAB TCF UserDefaults keys
+        case .gdprFullConsent:
+            DemoAppLogger.sharedInstance.logMessage("🧪 GDPR Scenario: Full Consent (All purposes + vendor)")
+            setIABTCFGdprApplies(true)
+            // TCF string with all purposes enabled and vendor 1510 (CloudX) consented
+            setIABTCFString("CQbFSYAQbFSYAEsACBENCFFoAP_gAEPgACiQINJB7C7FbSFCyLZzaLsAMAhHRsAAQoQAAASBAmABQAKQIAQCgkAYFASABAACAAAAICRBIQIECAAAAUAAAAAAAAAEAAAAAAAIIAAAgAEAAAAIAAAKAIAAEAAIAAAAEAAAmAgAAIIACAAAgAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAQNVSD2F2K2kKFkWCmwXYAYBCujYAAhQgAAAkCBMACgAUgQAgFJIAgCIEAAAAAAAAAQEiCQAAQEBAAAIACAAAAAAAIAAAAAAAQQAABAAIAAAAAAAAUAQAAIAAQAAAAIAABEhAAAQQAEAAAAAAAQAAA")
+            setIABTCFPurposeConsents("1111111111")  // All 10 purposes granted
+            
+        case .gdprDenied:
+            DemoAppLogger.sharedInstance.logMessage("🧪 GDPR Scenario: Denied (No purposes consented)")
+            setIABTCFGdprApplies(true)
+            setIABTCFString("CQbFSYAQbFSYAEsACBENCFFgAAAAAEPgACiQAAANVSD2F2K2kKFkWCmwXYAYBCujYAAhQgAAAkCBMACgAUgQAgFJIAgCIEAAAAAAAAAQEiCQAAQEBAAAIACAAAAAAAIAAAAAAAQQAABAAIAAAAAAAAUAQAAIAAQAAAAIAABEhAAAQQAEAAAAAAAQAA")
+            setIABTCFPurposeConsents("0000000000")  // All purposes denied
+            
+        case .gdprPurpose1Denied:
+            DemoAppLogger.sharedInstance.logMessage("🧪 GDPR Scenario: Purpose 1 Denied (Device access denied)")
+            setIABTCFGdprApplies(true)
+            setIABTCFString("CQbFSYAQbFSYAEsACDENCFFgAHAAAEPgACiQACBA1VIPYXYraQoWRYKbBdgBgEK6NgACFCAAACQIEwAKABSBACAUkgCAIgQAAAAAAAABASIJAABAQEAAAgAIAAAAAAAgAAAAAABBAAAEAAgAAAAAAABQBAAAgABAAAAAgAAESEAABBAAQAAAAAABAAA")
+            setIABTCFPurposeConsents("0111111111")  // Purpose 1 denied, others granted
+            
+        case .gdprVendorDenied:
+            DemoAppLogger.sharedInstance.logMessage("🧪 GDPR Scenario: Vendor Denied (Purposes OK, CloudX vendor denied)")
+            setIABTCFGdprApplies(true)
+            setIABTCFString("CQbFSYAQbFSYAEsACDENCFFgAPAAAEPgACiQAFIBA1VIPYXYraQoWRYKbBdgBgEK6NgACFCAAACQIEwAKABSBACAUkgCAIgQAAAAAAAABASIJAABAQEAAAgAIAAAAAAAgAAAAAABBAAAEAAgAAAAAAABQBAAAgABAAAAAgAAESEAABBAAQAAAAAABAAA")
+            setIABTCFPurposeConsents("1111111111")  // All purposes granted
         }
+    }
+    
+    // MARK: - IAB TCF UserDefaults Methods
+    
+    private func setIABTCFGdprApplies(_ applies: Bool) {
+        UserDefaults.standard.set(applies ? 1 : 0, forKey: "IABTCF_gdprApplies")
+        UserDefaults.standard.synchronize()
+    }
+    
+    private func setIABTCFString(_ tcString: String?) {
+        if let tcString = tcString {
+            UserDefaults.standard.set(tcString, forKey: "IABTCF_TCString")
+        } else {
+            UserDefaults.standard.removeObject(forKey: "IABTCF_TCString")
+        }
+        UserDefaults.standard.synchronize()
+    }
+    
+    private func setIABTCFPurposeConsents(_ purposeConsents: String?) {
+        if let purposeConsents = purposeConsents {
+            UserDefaults.standard.set(purposeConsents, forKey: "IABTCF_PurposeConsents")
+        } else {
+            UserDefaults.standard.removeObject(forKey: "IABTCF_PurposeConsents")
+        }
+        UserDefaults.standard.synchronize()
     }
     
     private func setIABGPPString(_ gppString: String?) {
@@ -328,9 +391,19 @@ class GPPScenarioPickerView: UIView {
     }
     
     private func resetGPPSettings() {
-        // Clear IAB UserDefaults directly (CloudX reads from these)
+        // Clear IAB GPP UserDefaults directly (CloudX reads from these)
         UserDefaults.standard.removeObject(forKey: "IABGPP_HDR_GppString")
         UserDefaults.standard.removeObject(forKey: "IABGPP_GppSID")
+        
+        // Clear IAB TCF UserDefaults (GDPR)
+        UserDefaults.standard.removeObject(forKey: "IABTCF_TCString")
+        UserDefaults.standard.removeObject(forKey: "IABTCF_gdprApplies")
+        UserDefaults.standard.removeObject(forKey: "IABTCF_PurposeConsents")
+        UserDefaults.standard.removeObject(forKey: "IABTCF_VendorConsents")
+        
+        // Clear IAB US Privacy (CCPA)
+        UserDefaults.standard.removeObject(forKey: "IABUSPrivacy_String")
+        
         UserDefaults.standard.synchronize()
         
         // Clear CloudX privacy settings (public APIs that still exist)

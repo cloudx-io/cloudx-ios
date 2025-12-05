@@ -57,7 +57,6 @@
             @"bidRequest.device.osv",
             @"sdk.sessionId",
             @"bidRequest.device.ifa",
-            @"bidRequest.loopIndex",
             @"config.testGroupName",
             @"config.placements[id=${bidRequest.imp.tagid}].name",
             @"bidRequest.device.geo.country",
@@ -79,7 +78,7 @@
     
     // Most importantly: verify tracking array is parsed
     XCTAssertNotNil(config.tracking, @"Tracking array should be parsed");
-    XCTAssertEqual(config.tracking.count, 26, @"Should parse all 26 tracking fields");
+    XCTAssertEqual(config.tracking.count, 25, @"Should parse all 25 tracking fields");
     XCTAssertEqualObjects(config.tracking[0], @"bid.ext.prebid.meta.adaptercode", @"First field should be bidder field");
     XCTAssertEqualObjects(config.tracking[1], @"bid.w", @"Second field should be width");
     XCTAssertEqualObjects(config.tracking[2], @"bid.h", @"Third field should be height");

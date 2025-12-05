@@ -109,14 +109,14 @@
     
     NSString *testGDPRConsent = @"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA";
     [[NSUserDefaults standardUserDefaults] setObject:testGDPRConsent forKey:kCLXPrivacyGDPRConsentKey];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:kCLXPrivacyGDPRAppliesKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     // Verify data was actually stored
     NSString *storedConsent = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXPrivacyGDPRConsentKey];
     XCTAssertEqualObjects(storedConsent, testGDPRConsent, @"GDPR consent should be stored in UserDefaults");
-    BOOL storedApplies = [[NSUserDefaults standardUserDefaults] boolForKey:kCLXPrivacyGDPRAppliesKey];
-    XCTAssertTrue(storedApplies, @"GDPR applies should be stored as YES in UserDefaults");
+    NSInteger storedApplies = [[NSUserDefaults standardUserDefaults] integerForKey:kCLXPrivacyGDPRAppliesKey];
+    XCTAssertEqual(storedApplies, 1, @"GDPR applies should be stored as 1 in UserDefaults");
     
     CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
     XCTAssertEqualObjects([privacyService gdprConsentString], testGDPRConsent, @"Privacy service should return correct GDPR consent");
@@ -140,9 +140,11 @@
                       impModel:self.mockImpModel
                       settings:[CLXSettings sharedInstance]
             privacyService:privacyService];
-    // GDPR should NOT be included in bidding config as server doesn't support it yet
-    XCTAssertNil(biddingConfig.regulations.ext.iab.tcString, @"Bidding config should not include GDPR consent (server not supported)");
-    XCTAssertNil(biddingConfig.regulations.ext.iab.gdprApplies, @"Bidding config should not include GDPR applies (server not supported)");
+    // GDPR is now included in bidding config
+    XCTAssertNotNil(biddingConfig.regulations.ext.iab.tcString, @"Bidding config should include GDPR consent");
+    XCTAssertEqualObjects(biddingConfig.regulations.ext.iab.tcString, testGDPRConsent, @"TC string should match set value");
+    XCTAssertNotNil(biddingConfig.regulations.ext.iab.gdprApplies, @"Bidding config should include GDPR applies");
+    XCTAssertEqualObjects(biddingConfig.regulations.ext.iab.gdprApplies, @YES, @"GDPR applies should be YES");
 }
 
 // Test that privacy-compliant IFA resolution works correctly
@@ -248,30 +250,120 @@
 }
 
 // Test CCPA string parsing for different opt-out scenarios
+// IAB US Privacy String: Position 3 (0-indexed: 2) is the opt-out flag
+// 1YYN = Notice given, OPTED OUT (Y at position 3), Not LSPA
+// 1YNN = Notice given, NOT opted out (N at position 3), Not LSPA
 - (void)testCCPAStringParsing_ForDifferentOptOutScenarios {
     [self clearPrivacySettings];
     
     CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
     
-    // Test CCPA string "1YNN" - should clear personal data
-    [[NSUserDefaults standardUserDefaults] setObject:@"1YNN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    // Test CCPA string "1YYN" - should clear personal data (position 3 = Y = opted out)
+    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     NSString *retrievedCCPA = [privacyService ccpaPrivacyString];
-    XCTAssertEqualObjects(retrievedCCPA, @"1YNN", @"Should retrieve the set CCPA string");
+    XCTAssertEqualObjects(retrievedCCPA, @"1YYN", @"Should retrieve the set CCPA string");
     
     BOOL shouldClear = [privacyService shouldClearPersonalDataIgnoringATT];
-    XCTAssertTrue(shouldClear, @"CCPA opt-out string '1YNN' should clear personal data");
+    XCTAssertTrue(shouldClear, @"CCPA opt-out string '1YYN' (Y at position 3) should clear personal data");
     
-    // Test CCPA string "1NNN" - should allow personal data
-    [[NSUserDefaults standardUserDefaults] setObject:@"1NNN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    // Test CCPA string "1YNN" - should ALLOW personal data (position 3 = N = not opted out)
+    [[NSUserDefaults standardUserDefaults] setObject:@"1YNN" forKey:kCLXPrivacyCCPAPrivacyKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     NSString *retrievedCCPA2 = [privacyService ccpaPrivacyString];
-    XCTAssertEqualObjects(retrievedCCPA2, @"1NNN", @"Should retrieve the updated CCPA string");
+    XCTAssertEqualObjects(retrievedCCPA2, @"1YNN", @"Should retrieve the updated CCPA string");
     
     BOOL shouldClear2 = [privacyService shouldClearPersonalDataIgnoringATT];
-    XCTAssertFalse(shouldClear2, @"CCPA string '1NNN' should allow personal data");
+    XCTAssertFalse(shouldClear2, @"CCPA string '1YNN' (N at position 3) should allow personal data");
+    
+    // Test CCPA string "1NNN" - should also allow personal data
+    [[NSUserDefaults standardUserDefaults] setObject:@"1NNN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    BOOL shouldClear3 = [privacyService shouldClearPersonalDataIgnoringATT];
+    XCTAssertFalse(shouldClear3, @"CCPA string '1NNN' should also allow personal data");
+}
+
+#pragma mark - GDPR/TCF Integration Tests
+
+// Test TCF consent flow from UserDefaults through Privacy Service
+- (void)testTCFConsentFlow_FromUserDefaultsToPrivacyService {
+    [self clearPrivacySettings];
+    
+    // Set up TCF consent in UserDefaults (as a CMP would)
+    NSString *testTcString = @"CQbFSYAQbFSYAEsACBENCFFoAP_gAEPgACiQINJB";
+    [[NSUserDefaults standardUserDefaults] setObject:testTcString forKey:@"IABTCF_TCString"];
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"IABTCF_gdprApplies"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"1111111111" forKey:@"IABTCF_PurposeConsents"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    // Verify GPP provider reads TCF correctly
+    CLXConsentProvider *gppProvider = [CLXConsentProvider sharedInstance];
+    NSString *retrievedTcString = [gppProvider tcString];
+    XCTAssertEqualObjects(retrievedTcString, testTcString, @"GPP provider should read TCF string from UserDefaults");
+    
+    NSNumber *gdprApplies = [gppProvider gdprApplies];
+    XCTAssertEqualObjects(gdprApplies, @YES, @"GPP provider should read GDPR applies flag");
+}
+
+// Test GDPR in bid request when GDPR applies
+- (void)testGDPRInBidRequest_WhenGDPRApplies {
+    [self clearPrivacySettings];
+    
+    // Set up GDPR applies with consent
+    NSString *testTcString = @"CQbFSYAQbFSYAEsACBENCFFoAP_gAEPgACiQINJB";
+    [[NSUserDefaults standardUserDefaults] setObject:testTcString forKey:@"IABTCF_TCString"];
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"IABTCF_gdprApplies"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
+    CLXBiddingConfigRequest *biddingConfig = [[CLXBiddingConfigRequest alloc] 
+        initWithAdType:CLXAdTypeBanner
+                     adUnitID:@"test-ad-unit"
+            storedImpressionId:@"test-impression"
+                        dealID:@"test-deal"
+                     bidFloor:@1.0
+                displayManager:@"test-manager"
+            displayManagerVer:@"1.0"
+                   publisherID:@"test-pub"
+                      location:[[CLLocation alloc] initWithLatitude:37.7749 longitude:-122.4194]
+                     userAgent:@"test-agent"
+                   adapterInfo:@{}
+           nativeAdRequirements:nil
+           skadRequestParameters:@{}
+                          tmax:@3.0
+                      impModel:self.mockImpModel
+                      settings:[CLXSettings sharedInstance]
+            privacyService:privacyService];
+    
+    // GDPR data should now be included in bid request
+    XCTAssertNotNil(biddingConfig.regulations.ext.iab.gdprApplies, @"GDPR applies should be included in bid request");
+    XCTAssertEqualObjects(biddingConfig.regulations.ext.iab.gdprApplies, @YES, @"GDPR applies should be YES");
+    XCTAssertEqualObjects(biddingConfig.regulations.ext.iab.tcString, testTcString, @"TC string should be included in bid request");
+}
+
+// Test GPP resolution fallback from legacy TCF
+- (void)testGPPResolution_FallbackFromLegacyTCF {
+    [self clearPrivacySettings];
+    
+    // Clear GPP but set legacy TCF
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_HDR_GppString"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_GppSID"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"CQbFSYAQbFSYAEsACBENCFF" forKey:@"IABTCF_TCString"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    CLXConsentProvider *gppProvider = [CLXConsentProvider sharedInstance];
+    
+    // Resolved GPP should be constructed from legacy TCF
+    NSString *resolvedGpp = [gppProvider resolveGppString];
+    XCTAssertNotNil(resolvedGpp, @"Should resolve GPP from legacy TCF");
+    XCTAssertTrue([resolvedGpp hasPrefix:@"DBABMA~"], @"Resolved GPP should have TCF-only header");
+    
+    // Resolved SID should be [2] (EU TCF)
+    NSArray *resolvedSid = [gppProvider resolveGppSid];
+    XCTAssertEqualObjects(resolvedSid, @[@2], @"Resolved SID should be [2] for legacy TCF");
 }
 
 @end

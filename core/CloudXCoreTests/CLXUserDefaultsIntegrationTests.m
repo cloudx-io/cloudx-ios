@@ -22,7 +22,6 @@
 @end
 
 @interface CLXPublisherBanner (Testing)
-- (void)updateBidRequestWithLoopIndex;
 @end
 
 @interface CLXBidAdSource (Testing)

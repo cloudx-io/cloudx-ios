@@ -11,7 +11,6 @@
 #import "CLXUserDefaultsTestHelper.h"
 
 @interface CLXPublisherBanner (Testing)
-- (void)updateBidRequestWithLoopIndex;
 @end
 
 @interface CLXPublisherNative (Testing)

@@ -16,6 +16,7 @@
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXAdType.h>
 #import <CloudXCore/CLXAd.h>
+#import <CloudXCore/CLXDebugOverlayManager.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -39,24 +40,23 @@ NS_ASSUME_NONNULL_BEGIN
                        adapterExtras:(NSDictionary<NSString *, NSString *> *)adapterExtras
                                 burl:(nullable NSString *)burl
                              network:(NSString *)network {
-    CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Rewarded"];
-    [logger debug:[NSString stringWithFormat:@"Creating rewarded: AdID=%@, BidID=%@, Network=%@", adId, bidId, network]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating rewarded: AdID=%@, BidID=%@, Network=%@", adId, bidId, network]];
     
     CLXAdNetworkFactories *factories = [self valueForKey:@"adFactories"];
     if (!factories) {
-        [logger error:@"❌ adFactories is nil!"];
+        [self.logger error:@"❌ adFactories is nil!"];
         return nil;
     }
     
-    [logger debug:[NSString stringWithFormat:@"adFactories.rewardedInterstitials: %@", factories.rewardedInterstitials]];
+    [self.logger debug:[NSString stringWithFormat:@"adFactories.rewardedInterstitials: %@", factories.rewardedInterstitials]];
     
     id<CLXAdapterRewardedFactory> factory = factories.rewardedInterstitials[network];
     if (!factory) {
-        [logger error:[NSString stringWithFormat:@"❌ No rewarded factory found for network: %@ (Available: %@)", network, [factories.rewardedInterstitials allKeys]]];
+        [self.logger error:[NSString stringWithFormat:@"❌ No rewarded factory found for network: %@ (Available: %@)", network, [factories.rewardedInterstitials allKeys]]];
         return nil;
     }
     
-    [logger info:[NSString stringWithFormat:@"Rewarded factory found for network: %@ (class: %@)", network, NSStringFromClass([factory class])]];
+    [self.logger debug:[NSString stringWithFormat:@"Rewarded factory found for network: %@ (class: %@)", network, NSStringFromClass([factory class])]];
     
     id<CLXAdapterRewarded> rewarded = [factory createWithAdId:adId
                                                          bidId:bidId
@@ -65,11 +65,11 @@ NS_ASSUME_NONNULL_BEGIN
                                                       delegate:self];
     
     if (!rewarded) {
-        [logger error:@"❌ Factory returned nil rewarded"];
+        [self.logger error:@"❌ Factory returned nil rewarded"];
         return nil;
     }
     
-    [logger info:[NSString stringWithFormat:@"Rewarded created - Network: %@, BidID: %@", rewarded.network, rewarded.bidID]];
+    [self.logger debug:[NSString stringWithFormat:@"Rewarded created - Network: %@, BidID: %@", rewarded.network, rewarded.bidID]];
     
     return rewarded;
 }
@@ -85,8 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
     // Set up 30-second timeout for adapter loading
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(30.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.isLoading) {
-            CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Rewarded"];
-            [logger error:@"Rewarded load timeout after 30 seconds"];
+            [self.logger error:@"Rewarded load timeout after 30 seconds"];
             [self transitionToIdleState];
             
             CLXError *timeoutError = [CLXError errorWithCode:CLXErrorCodeLoadTimeout];
@@ -106,33 +105,40 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)notifyLoadSuccess {
     if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
-        [self.delegate didLoadAd:[self createAdObject]];
+        CLXAd *ad = [self createAdObject];
+        [self.logger logDelegateCallback:@"✅ Rewarded didLoadAd" ad:ad];
+        [self.delegate didLoadAd:ad];
     }
 }
 
 - (void)notifyLoadFailure:(NSError *)error {
+    [[CLXDebugOverlayManager shared] flashError];
     if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+        [self.logger logDelegateError:@"❌ Rewarded didFailToLoadAd" error:error];
         [self.delegate didFailToLoadAdWithError:error];
     }
 }
 
 - (void)notifyShowFailure:(NSError *)error {
+    [[CLXDebugOverlayManager shared] flashError];
     if ([self.delegate respondsToSelector:@selector(didFailToDisplayAd:error:)]) {
+        [self.logger logDelegateError:@"❌ Rewarded didFailToDisplayAd" error:error];
         [self.delegate didFailToDisplayAd:[self createAdObject] error:error];
     }
 }
 
 - (void)notifyForceClose {
     if ([self.delegate respondsToSelector:@selector(didHideAd:)]) {
-        [self.delegate didHideAd:[self createAdObject]];
+        CLXAd *ad = [self createAdObject];
+        [self.logger logDelegateCallback:@"🔚 Rewarded didHideAd" ad:ad];
+        [self.delegate didHideAd:ad];
     }
 }
 
 #pragma mark - CLXAdapterRewardedDelegate
 
 - (void)didLoadWithRewarded:(id<CLXAdapterRewarded>)rewarded {
-    CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Rewarded"];
-    [logger debug:@"Rewarded adapter loaded successfully"];
+    [self.logger debug:@"Rewarded adapter loaded successfully"];
     
     self.currentAdapter = rewarded;
     [self transitionToReadyState];
@@ -146,8 +152,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)didFailToLoadWithRewarded:(id<CLXAdapterRewarded>)rewarded error:(NSError *)error {
-    CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Rewarded"];
-    [logger error:[NSString stringWithFormat:@"❌ didFailToLoadWithRewarded (%@): %@", rewarded, error.localizedDescription]];
+    [self.logger error:[NSString stringWithFormat:@"❌ didFailToLoadWithRewarded (%@): %@", rewarded, error.localizedDescription]];
     
     [self sendLossNotificationForFailedAd];
     self.currentAdapter = nil;
@@ -161,7 +166,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didShowWithRewarded:(id<CLXAdapterRewarded>)rewarded {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
-            [self.delegate didDisplayAd:[self createAdObject]];
+            CLXAd *ad = [self createAdObject];
+            [self.logger logDelegateCallback:@"👀 Rewarded didDisplayAd" ad:ad];
+            [self.delegate didDisplayAd:ad];
         }
     });
 }
@@ -177,6 +184,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
     
     if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
+        [self.logger logDelegateCallback:@"👁️ Rewarded didRecordImpression" ad:adObject];
         [self.delegate didRecordImpressionForAd:adObject];
     }
 }
@@ -187,7 +195,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(didHideAd:)]) {
-            [self.delegate didHideAd:[self createAdObject]];
+            CLXAd *ad = [self createAdObject];
+            [self.logger logDelegateCallback:@"🔚 Rewarded didHideAd" ad:ad];
+            [self.delegate didHideAd:ad];
         }
     });
 }
@@ -197,17 +207,18 @@ NS_ASSUME_NONNULL_BEGIN
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
-            [self.delegate didClickAd:[self createAdObject]];
+            CLXAd *ad = [self createAdObject];
+            [self.logger logDelegateCallback:@"👆 Rewarded didClickAd" ad:ad];
+            [self.delegate didClickAd:ad];
         }
     });
 }
 
 - (void)userRewardWithRewarded:(id<CLXAdapterRewarded>)rewarded {
-    CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Rewarded"];
-    [logger debug:@"User rewarded"];
-    
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(userRewarded:)]) {
+            CLXAd *ad = [self createAdObject];
+            [self.logger logDelegateCallback:@"🎁 Rewarded userRewarded" ad:ad];
             [self.delegate userRewarded:self];
         }
     });
@@ -220,8 +231,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)expiredWithRewarded:(id<CLXAdapterRewarded>)rewarded {
-    CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Rewarded"];
-    [logger debug:@"Rewarded adapter expired"];
+    [self.logger debug:@"Rewarded adapter expired"];
     self.currentAdapter = nil;
     [self transitionToIdleState];
 }

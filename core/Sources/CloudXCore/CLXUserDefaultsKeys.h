@@ -70,6 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXCoreReportingServiceKey @"CLXCore_reportingService"
 #define kCLXCoreCampaignIdKey @"CLXCore_campaignId"
 #define kCLXCoreTestModeKey @"CLXCore_testMode"
+#define kCLXCoreVisualDebuggingKey @"CLXCore_visualDebugging"
 
 // Banner-specific additional keys
 #define kCLXBannerMetricsDictKey @"CLXBanner_metricsDict"

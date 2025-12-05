@@ -19,7 +19,6 @@ NSString * const CLXConfigImpressionModelDefaultTestGroupName = @"RandomTest";
         _testGroupName = [CLXConfigImpressionModelDefaultTestGroupName copy];
         _appKeyValues = @"app.ext.data";
         _eids = @"user.ext.eids[*]";
-        _placementLoopIndex = @"imp[*].ext.data.loop-index";
         _userKeyValues = @"user.ext.data";
     }
     return self;
@@ -48,7 +47,6 @@ NSString * const CLXConfigImpressionModelDefaultTestGroupName = @"RandomTest";
         // Extract key-value paths from SDK config
         _appKeyValues = [sdkConfig.keyValuePaths.appKeyValues copy];
         _eids = [sdkConfig.keyValuePaths.eids copy];
-        _placementLoopIndex = [sdkConfig.keyValuePaths.placementLoopIndex copy];
         _userKeyValues = [sdkConfig.keyValuePaths.userKeyValues copy];
     }
     return self;
@@ -63,7 +61,6 @@ NSString * const CLXConfigImpressionModelDefaultTestGroupName = @"RandomTest";
                     testGroupName:(NSString *)testGroupName
                      appKeyValues:(NSString *)appKeyValues
                              eids:(NSString *)eids
-               placementLoopIndex:(NSString *)placementLoopIndex
                     userKeyValues:(NSString *)userKeyValues {
     self = [super init];
     if (self) {
@@ -76,7 +73,6 @@ NSString * const CLXConfigImpressionModelDefaultTestGroupName = @"RandomTest";
         _testGroupName = [testGroupName copy];
         _appKeyValues = [appKeyValues copy];
         _eids = [eids copy];
-        _placementLoopIndex = [placementLoopIndex copy];
         _userKeyValues = [userKeyValues copy];
     }
     return self;

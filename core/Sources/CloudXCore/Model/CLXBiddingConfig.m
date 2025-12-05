@@ -22,9 +22,14 @@
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXSessionMetrics.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
+#import <CloudXCore/CLXConsentProvider.h>
+#import <CloudXCore/UIDevice+CLXIdentifier.h>
+#import <CloudXCore/CLXORTBConstants.h>
+#import <CloudXCore/CLXSKAdNetworkService.h>
 
-// Internal methods category for accessing privacy methods that are not in public header
-// TEMP: Remove CLXPrivacyService private interface once server supports GDPR
+
+
+// Internal methods category for accessing privacy methods
 @interface CLXPrivacyService (Internal)
 - (nullable NSString *)gdprConsentString;
 - (nullable NSNumber *)gdprApplies;
@@ -41,6 +46,48 @@ static CLXLogger *logger;
 __attribute__((constructor))
 static void initializeLogger() {
     logger = [[CLXLogger alloc] initWithCategory:@"BiddingConfig.m"];
+}
+
+/**
+ * Converts iOS ReachabilityType enum to ORTB 2.5 connection type values.
+ * ORTB 2.5 references AdCOM v1.0 for connection types.
+ *
+ * AdCOM v1.0 connection type values (ORTB standard):
+ * 0 = Unknown
+ * 1 = Ethernet
+ * 2 = WIFI
+ * 3 = Cellular Network - Unknown Generation
+ * 4 = Cellular Network - 2G
+ * 5 = Cellular Network - 3G
+ * 6 = Cellular Network - 4G
+ * 7 = Cellular Network - 5G
+ *
+ * Current iOS SDK support (ReachabilityType enum):
+ * - WiFi → 2 ✓
+ * - 2G/3G/4G → 4/5/6 ✓
+ * - 5G → Not yet supported (would map to 7)
+ *
+ * NOTE: iOS CLXReachabilityService currently defaults all cellular to 4G.
+ * Actual 2G/3G/4G/5G detection requires CoreTelephony API implementation.
+ * TODO: Add ReachabilityTypeWWAN5G case when detection is implemented.
+ */
+static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
+    switch (type) {
+        case ReachabilityTypeWiFi:
+            return 2; // WIFI
+        case ReachabilityTypeWWAN2G:
+            return 4; // Cellular 2G
+        case ReachabilityTypeWWAN3G:
+            return 5; // Cellular 3G
+        case ReachabilityTypeWWAN4G:
+            return 6; // Cellular 4G
+        // case ReachabilityTypeWWAN5G:  // TODO: Add when enum is extended
+        //     return 7; // Cellular 5G
+        case ReachabilityTypeNone:
+        case ReachabilityTypeUnknown:
+        default:
+            return 0; // Unknown
+    }
 }
 
 #pragma mark - CLXBiddingConfigRequest
@@ -113,7 +160,35 @@ static void initializeLogger() {
 
         // Create banner with formats
         CLXBiddingConfigImpressionBanner *banner = [[CLXBiddingConfigImpressionBanner alloc] init];
-        banner.formats = @[format]; // Single format as in Swift
+        banner.formats = @[format];
+        // ORTB 2.5: topframe indicates if ad is in top frame (1) or nested iframe (0).
+        // Native mobile apps always render ads directly in the view hierarchy - there are no
+        // iframes like in web environments. Therefore topframe is always 1 for iOS/Android SDKs.
+        banner.topframe = @1;
+        
+        // ORTB 2.5 Ad Position (Section 5.4)
+        // We can ONLY know position definitively for fullscreen ad types.
+        // For inline ads (banner, MREC, native), position depends entirely on where
+        // the publisher places the view. Best practice is to expose a public API
+        // (e.g. banner.adPosition) to let publishers explicitly declare this.
+        // Auto-detection via view frames is unreliable and discouraged.
+        switch (adType) {
+            case CLXAdTypeInterstitial:
+                // Interstitials are always fullscreen - this is definitive
+                banner.pos = CLXORTBAdPositionToNumber(CLXORTBAdPositionFullScreen);
+                break;
+            case CLXAdTypeRewarded:
+                // Rewarded ads are always fullscreen - this is definitive
+                banner.pos = CLXORTBAdPositionToNumber(CLXORTBAdPositionFullScreen);
+                break;
+            case CLXAdTypeBanner:
+            case CLXAdTypeMrec:
+            case CLXAdTypeNative:
+            default:
+                // Inline ads: position unknown without view frame detection
+                banner.pos = CLXORTBAdPositionToNumber(CLXORTBAdPositionUnknown);
+                break;
+        }
         
         // Interstitial and rewarded ads don't need banner formats
 
@@ -149,29 +224,34 @@ static void initializeLogger() {
         storedImpression.adservertargeting = [targetingDict copy];
         storedImpression.storedimpression = idObj;
         
-        // Loop-index logic: matches Android behavior
-        // - Interstitials and Rewarded ads always use fixed value (1)
-        // - Banner/MREC ads use per-placement counter (NOT incremented here, only retrieved)
-        NSString *loopIndexValue;
-        if (adType == CLXAdTypeInterstitial || adType == CLXAdTypeRewarded) {
-            // Interstitials and Rewarded: always use 1 (fixed value, never increment)
-            loopIndexValue = @"1";
-            [logger debug:[NSString stringWithFormat:@"Using fixed loop-index=1 for %@ ad", 
-                          adType == CLXAdTypeInterstitial ? @"interstitial" : @"rewarded"]];
-        } else {
-            // Banner/MREC/Native: use per-placement counter from tracker
-            // Note: Counter is incremented separately by the ad load logic, not here
-            NSDictionary<NSString *, NSString *> *bannerUserDict = [[NSUserDefaults standardUserDefaults] objectForKey:kCLXCoreBannerUserKeyValueKey];
-            loopIndexValue = bannerUserDict[@"loop-index"] ?: @"1";
-            [logger debug:[NSString stringWithFormat:@"Using placement loop-index=%@ for banner/MREC", loopIndexValue]];
-        }
-        
         // Create impression ext
         CLXBiddingConfigImpressionExt *impExt = [[CLXBiddingConfigImpressionExt alloc] init];
         impExt.prebid = storedImpression;
         
-        // Set loop-index in impression data
-        impExt.data = @{@"loop-index": loopIndexValue};
+        // Create SKAdNetwork object for iOS attribution (IAB SKAN spec)
+        // This tells bidders which SKAN versions are supported and which network IDs
+        // are in the publisher's Info.plist for attribution
+        CLXSKAdNetworkService *skadService = [[CLXSKAdNetworkService alloc] initWithSystemVersion:[[UIDevice currentDevice] systemVersion]];
+        NSArray<NSString *> *skadVersions = skadService.versions;
+        NSArray<NSString *> *skadNetworkIds = skadService.skadPlistIds;
+        
+        if (skadVersions.count > 0 || skadNetworkIds.count > 0) {
+            CLXBiddingConfigImpressionExtSkadn *skadn = [[CLXBiddingConfigImpressionExtSkadn alloc] init];
+            // Highest supported version (last in array)
+            skadn.version = skadVersions.lastObject;
+            skadn.versions = skadVersions;
+            skadn.sourceapp = skadService.sourceApp;
+            skadn.skadnetids = skadNetworkIds;
+            impExt.skadn = skadn;
+            
+            [logger debug:[NSString stringWithFormat:@"[BiddingConfig] SKAdNetwork: version=%@, versions=%lu, sourceapp=%@, skadnetids=%lu",
+                          skadn.version,
+                          (unsigned long)skadn.versions.count,
+                          skadn.sourceapp,
+                          (unsigned long)(skadn.skadnetids.count ?: 0)]];
+        } else {
+            [logger debug:@"[BiddingConfig] SKAdNetwork: No SKAN versions or network IDs available"];
+        }
         
         // Create native ad if needed
         CLXBiddingConfigImpressionNative *native = nil;
@@ -203,8 +283,11 @@ static void initializeLogger() {
         
         impression.instl = (adType == CLXAdTypeInterstitial || adType == CLXAdTypeRewarded) ? @1 : @0;
         
-        // Match Swift SDK logic exactly - don't set bidfloor (it's commented out in Swift)
-        // impression.bidfloor = @(bidFloor);
+        // ORTB 2.5: bidfloor is the minimum bid price for this impression in CPM
+        // Only include if explicitly provided (non-zero value indicates publisher floor)
+        if (bidFloor && [bidFloor floatValue] > 0) {
+            impression.bidfloor = bidFloor;
+        }
         
         // Add missing fields to match Swift SDK
         impression.bidfloorcur = @"USD";
@@ -308,22 +391,40 @@ static void initializeLogger() {
         // Get DNT (Do Not Track) status from ATT/LAT settings
         BOOL dnt = [CLXAdTrackingService dnt];
         
+        // ORTB 2.5: device.ip is intentionally NOT set client-side.
+        // The ad exchange server populates device.ip from the HTTP request's source IP.
+        // This is the industry-standard approach because:
+        // 1. Security: Prevents IP spoofing for geo-arbitrage and fraud
+        // 2. Accuracy: Server sees the true client IP from the connection
+        // 3. Privacy: Client apps cannot reliably determine their public IP without external calls
         CLXBiddingConfigDevice *device = [[CLXBiddingConfigDevice alloc] init];
-        device.ua = userAgent ?: @"ua";
+        // ORTB 2.5: device.ua is the browser/app user agent string (RECOMMENDED but not REQUIRED).
+        // Only include if we have a real user agent - don't send fake/fallback values.
+        if (userAgent) {
+            device.ua = userAgent;
+        }
         device.make = @"Apple";
-        device.model = [[UIDevice currentDevice] model];
+        // ORTB 2.5: device.model should be the device identifier (e.g., "iPhone15,2")
+        device.model = [CLXSystemInformation shared].model;
         device.os = @"iOS";
         device.osv = [[UIDevice currentDevice] systemVersion];
-        device.hwv = [[UIDevice currentDevice] systemVersion];
+        // ORTB 2.5: device.hwv is the hardware version.
+        // Use the device identifier (e.g., "iPhone17,1") which is always available and
+        // provides precise hardware info for bidders. This is more valuable than marketing
+        // names like "16 Pro" since bidders can map identifiers to exact specs.
+        device.hwv = [UIDevice deviceIdentifier];
         device.language = [[NSLocale currentLocale] languageCode];
         device.ifa = ifa;
         device.dnt = @(dnt ? 1 : 0);
-        device.devicetype = @([CLXSystemInformation shared].deviceType); // Use robust device type detection
+        device.devicetype = @([CLXSystemInformation shared].deviceType);
         device.h = @(screenHeight);
         device.w = @(screenWidth);
-        device.ppi = @([[UIScreen mainScreen] scale] * 163); // Approximate PPI
-        device.connectiontype = @([CLXReachabilityService shared].currentReachabilityType); // Use robust connection type detection
-        device.lmt = nil;
+        device.ppi = @([[UIScreen mainScreen] scale] * 163);
+        // ORTB 2.5: connectiontype uses AdCOM v1.0 values (0-7)
+        // Convert iOS ReachabilityType to ORTB standard
+        device.connectiontype = @(ReachabilityTypeToORTBConnectionType([CLXReachabilityService shared].currentReachabilityType));
+        // ORTB 2.5: device.lmt indicates "Limit Ad Tracking" (1 = tracking restricted, 0 = unrestricted)
+        device.lmt = @(dnt ? 1 : 0);
         device.pxratio = @([[UIScreen mainScreen] scale]);
         device.geo = geo;
         device.ext = deviceExt;
@@ -367,25 +468,34 @@ static void initializeLogger() {
         // Store the privacy service for use in JSON conversion
         _privacyService = privacyService;
         
-        // Create regulations - only CCPA is supported by server currently
-        // GDPR is temporarily disabled as server support is not yet implemented
-        // Including GDPR data causes 502 bid request errors
+        // Create regulations with privacy compliance data
         CLXBiddingConfigRegulationsExtIAB *iab = [[CLXBiddingConfigRegulationsExtIAB alloc] init];
-        iab.usPrivacyString = [privacyService ccpaPrivacyString]; // CCPA is server-supported
+        
+        // CCPA/US Privacy
+        iab.usPrivacyString = [privacyService ccpaPrivacyString];
+        
+        // GDPR/TCF - include consent data when GDPR applies
+        NSNumber *gdprApplies = [privacyService gdprApplies];
+        if (gdprApplies) {
+            iab.gdprApplies = gdprApplies;
+            iab.tcString = [privacyService gdprConsentString];
+            [logger debug:[NSString stringWithFormat:@"GDPR data included - applies: %@, tcString: %@",
+                          gdprApplies, iab.tcString ? @"(present)" : @"(none)"]];
+        }
 
         CLXBiddingConfigRegulationsExt *regExt = [[CLXBiddingConfigRegulationsExt alloc] init];
         regExt.iab = iab;
+        
+        // Set top-level GDPR flag when applicable
+        if (gdprApplies && [gdprApplies boolValue]) {
+            regExt.gdpr = gdprApplies;
+        }
         
         // Include GPP compliance data in bid request regulations
         [self populateGPPDataForRegulationsExt:regExt withPrivacyService:privacyService];
 
         CLXBiddingConfigRegulations *regulations = [[CLXBiddingConfigRegulations alloc] init];
         regulations.ext = regExt;
-        
-        // TODO: Re-enable GDPR once server support is implemented
-        // iab.gdprApplies = [privacyService gdprApplies];
-        // iab.tcString = [privacyService gdprConsentString];
-        // regExt.gdpr = [privacyService gdprApplies];
 
         _regulations = regulations;
         
@@ -434,10 +544,13 @@ static void initializeLogger() {
         _ext = ext;
         _requestID = [[NSUUID UUID] UUIDString];
         
-        // Store loop index for win/loss tracking
-        NSInteger loopIndexInt = [loopIndexValue integerValue];
-        [[CLXTrackingFieldResolver shared] setLoopIndex:_requestID loopIndex:loopIndexInt];
-        [logger debug:[NSString stringWithFormat:@"Stored loop-index=%ld for auction: %@", (long)loopIndexInt, _requestID]];
+        // ORTB 2.5: Create source object for supply chain transparency
+        CLXBiddingConfigSource *source = [[CLXBiddingConfigSource alloc] init];
+        // tid = Transaction ID, using the same request ID for consistency
+        source.tid = _requestID;
+        // fd = 1 indicates exchange/SDK is responsible for final impression decision
+        source.fd = @1;
+        _source = source;
         
         // Read test mode from SDK init configuration
         // Test mode is set during initializeSDKWithAppKey:testMode:completion:
@@ -468,6 +581,11 @@ static void initializeLogger() {
     json[@"user"] = [self convertUserToJSON];
     json[@"regs"] = [self convertRegulationsToJSON];
     json[@"ext"] = [self convertExtToJSON];
+    
+    // ORTB 2.5: Add source object for supply chain transparency
+    if (self.source) {
+        json[@"source"] = [self convertSourceToJSON];
+    }
     
     if (self.tmax) {
         json[@"tmax"] = self.tmax;
@@ -555,6 +673,11 @@ static void initializeLogger() {
     json[@"tagid"] = impression.tagid ?: @"";
     json[@"instl"] = impression.instl ?: @0;
     json[@"secure"] = @1;
+    
+    // ORTB 2.5: bidfloor - minimum bid price in CPM (only include if set by publisher)
+    if (impression.bidfloor) {
+        json[@"bidfloor"] = impression.bidfloor;
+    }
     json[@"bidfloorcur"] = impression.bidfloorcur ?: @"USD";
     json[@"exp"] = impression.exp ?: @14400;
     
@@ -631,7 +754,20 @@ static void initializeLogger() {
             @"h": format.h ?: @0
         }];
     }
-    return @{@"format": [formatsArray copy]};
+    NSMutableDictionary *json = [NSMutableDictionary dictionary];
+    json[@"format"] = [formatsArray copy];
+    
+    // ORTB 2.5: Ad position on screen
+    if (banner.pos) {
+        json[@"pos"] = banner.pos;
+    }
+    
+    // ORTB 2.5: Top frame indicator (1 = top frame, 0 = iframe)
+    if (banner.topframe) {
+        json[@"topframe"] = banner.topframe;
+    }
+    
+    return [json copy];
 }
 
 - (NSDictionary *)convertVideoToJSON:(CLXBiddingConfigImpressionVideo *)video {
@@ -665,6 +801,38 @@ static void initializeLogger() {
     }
     if (ext.data) {
         json[@"data"] = ext.data;
+    }
+    // Add SKAdNetwork object for iOS attribution (IAB SKAN spec)
+    if (ext.skadn) {
+        json[@"skadn"] = [self convertSkadnToJSON:ext.skadn];
+    }
+    
+    return [json copy];
+}
+
+/// Converts SKAdNetwork object to JSON per IAB SKAN specification
+/// This provides bidders with attribution capability information
+- (NSDictionary *)convertSkadnToJSON:(CLXBiddingConfigImpressionExtSkadn *)skadn {
+    NSMutableDictionary *json = [NSMutableDictionary dictionary];
+    
+    // version: Highest supported SKAN version (string)
+    if (skadn.version) {
+        json[@"version"] = skadn.version;
+    }
+    
+    // versions: Array of all supported SKAN versions
+    if (skadn.versions && skadn.versions.count > 0) {
+        json[@"versions"] = skadn.versions;
+    }
+    
+    // sourceapp: Publisher app bundle identifier
+    if (skadn.sourceapp) {
+        json[@"sourceapp"] = skadn.sourceapp;
+    }
+    
+    // skadnetids: Array of SKAdNetwork IDs from publisher's Info.plist
+    if (skadn.skadnetids && skadn.skadnetids.count > 0) {
+        json[@"skadnetids"] = skadn.skadnetids;
     }
     
     return [json copy];
@@ -750,7 +918,10 @@ static void initializeLogger() {
 
 - (NSDictionary *)convertDeviceToJSON {
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
-    json[@"ua"] = self.device.ua ?: @"";
+    // ORTB 2.5: device.ua is RECOMMENDED but not REQUIRED - only include if we have a real value
+    if (self.device.ua) {
+        json[@"ua"] = self.device.ua;
+    }
     json[@"make"] = self.device.make ?: @"";
     json[@"model"] = self.device.model ?: @"";
     json[@"os"] = self.device.os ?: @"";
@@ -769,6 +940,7 @@ static void initializeLogger() {
     json[@"geo"] = [self convertDeviceGeoToJSON:self.device.geo];
     json[@"ext"] = [self convertDeviceExtToJSON:self.device.ext];
     
+    // ORTB 2.5: lmt (Limit Ad Tracking)
     if (self.device.lmt) {
         json[@"lmt"] = self.device.lmt;
     }
@@ -822,12 +994,16 @@ static void initializeLogger() {
  */
 - (void)populateGPPDataForRegulationsExt:(CLXBiddingConfigRegulationsExt *)regExt 
                       withPrivacyService:(CLXPrivacyService *)privacyService {
-    NSString *gppString = [privacyService gppString];
+    // Use resolution methods that fallback to legacy TCF when CMP doesn't provide GPP
+    // This ensures wide DSP coverage by always sending GPP format when consent is available
+    CLXConsentProvider *gppProvider = [CLXConsentProvider sharedInstance];
+    
+    NSString *gppString = [gppProvider resolveGppString];
     if (gppString) {
         regExt.gpp = gppString;
         
         // Per IAB spec, gpp_sid MUST be present when gpp string exists
-        NSArray<NSNumber *> *gppSid = [privacyService gppSid];
+        NSArray<NSNumber *> *gppSid = [gppProvider resolveGppSid];
         if (gppSid) {
             regExt.gppSid = gppSid;
         } else {
@@ -952,6 +1128,31 @@ static void initializeLogger() {
     return [json copy];
 }
 
+- (NSDictionary *)convertSourceToJSON {
+    if (!self.source) {
+        return nil;
+    }
+    
+    NSMutableDictionary *json = [NSMutableDictionary dictionary];
+    
+    // ORTB 2.5: fd indicates entity responsible for final impression sale decision
+    if (self.source.fd) {
+        json[@"fd"] = self.source.fd;
+    }
+    
+    // ORTB 2.5: tid is the transaction ID for this bid request
+    if (self.source.tid) {
+        json[@"tid"] = self.source.tid;
+    }
+    
+    // ORTB 2.5: pchain is the payment ID chain (ads.txt/sellers.json)
+    if (self.source.pchain) {
+        json[@"pchain"] = self.source.pchain;
+    }
+    
+    return [json copy];
+}
+
 - (NSDictionary *)convertExtToJSON {
     if (!self.ext) {
         return nil;
@@ -1014,6 +1215,8 @@ static void initializeLogger() {
 @end
 @implementation CLXBiddingConfigImpressionExt
 @end
+@implementation CLXBiddingConfigImpressionExtSkadn
+@end
 @implementation CLXBiddingConfigImpressionExtStoredImpression
 @end
 @implementation CLXBiddingConfigImpressionExtAdserverTargeting
@@ -1059,6 +1262,10 @@ static void initializeLogger() {
 @implementation CLXBiddingConfigRequestExtPrebidDebug
 @end
 @implementation CLXBiddingConfigRequestExtAdserverTargeting
+@end
+
+#pragma mark - Source
+@implementation CLXBiddingConfigSource
 @end
 
 #pragma mark - Response

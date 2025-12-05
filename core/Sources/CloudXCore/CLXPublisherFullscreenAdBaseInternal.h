@@ -14,6 +14,7 @@
 #import <CloudXCore/CLXPublisherFullscreenAdBase.h>
 #import <CloudXCore/CLXBidAdSource.h>
 #import <CloudXCore/CLXAd.h>
+#import <CloudXCore/CLXLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -43,6 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Access to private properties (read-only)
 @property (nonatomic, strong, readonly, nullable) CLXBidAdSourceResponse *lastBidResponse;
+@property (nonatomic, strong, readonly) CLXLogger *logger;
 
 @end
 

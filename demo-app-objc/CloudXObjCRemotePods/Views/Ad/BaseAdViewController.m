@@ -203,8 +203,9 @@
 }
 
 - (void)setupShowLogsButton {
+    // App Logs button (shows demo app logs)
     UIButton *showLogsButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [showLogsButton setTitle:@"Show Logs" forState:UIControlStateNormal];
+    [showLogsButton setTitle:@"App Logs" forState:UIControlStateNormal];
     showLogsButton.titleLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightMedium];
     showLogsButton.backgroundColor = [UIColor systemOrangeColor];
     [showLogsButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -215,12 +216,46 @@
     
     [self.view addSubview:showLogsButton];
     
+    // SDK Debugger button (toggles visual debugging)
+    self.sdkDebuggerButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [self updateSDKDebuggerButtonTitle];
+    self.sdkDebuggerButton.titleLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightMedium];
+    self.sdkDebuggerButton.layer.cornerRadius = 6;
+    self.sdkDebuggerButton.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [self.sdkDebuggerButton addTarget:self action:@selector(toggleSDKDebugger) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.view addSubview:self.sdkDebuggerButton];
+    
     [NSLayoutConstraint activateConstraints:@[
         [showLogsButton.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:20],
         [showLogsButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-20],
         [showLogsButton.widthAnchor constraintEqualToConstant:100],
-        [showLogsButton.heightAnchor constraintEqualToConstant:32]
+        [showLogsButton.heightAnchor constraintEqualToConstant:32],
+        
+        [self.sdkDebuggerButton.topAnchor constraintEqualToAnchor:showLogsButton.bottomAnchor constant:8],
+        [self.sdkDebuggerButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-20],
+        [self.sdkDebuggerButton.widthAnchor constraintEqualToConstant:100],
+        [self.sdkDebuggerButton.heightAnchor constraintEqualToConstant:32]
     ]];
+}
+
+- (void)updateSDKDebuggerButtonTitle {
+    BOOL isEnabled = [CloudXCore isVisualDebuggingEnabled];
+    if (isEnabled) {
+        [self.sdkDebuggerButton setTitle:@"Debugger ✓" forState:UIControlStateNormal];
+        self.sdkDebuggerButton.backgroundColor = [UIColor systemGreenColor];
+    } else {
+        [self.sdkDebuggerButton setTitle:@"Debugger" forState:UIControlStateNormal];
+        self.sdkDebuggerButton.backgroundColor = [UIColor systemPurpleColor];
+    }
+    [self.sdkDebuggerButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+}
+
+- (void)toggleSDKDebugger {
+    BOOL currentState = [CloudXCore isVisualDebuggingEnabled];
+    [CloudXCore setVisualDebuggingEnabled:!currentState];
+    [self updateSDKDebuggerButtonTitle];
 }
 
 - (void)showLogsModal {

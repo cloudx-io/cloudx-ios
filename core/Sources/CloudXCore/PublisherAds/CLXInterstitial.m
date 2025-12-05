@@ -16,6 +16,7 @@
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXAdType.h>
 #import <CloudXCore/CLXAd.h>
+#import <CloudXCore/CLXDebugOverlayManager.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -39,22 +40,21 @@ NS_ASSUME_NONNULL_BEGIN
                        adapterExtras:(NSDictionary<NSString *, NSString *> *)adapterExtras
                                 burl:(nullable NSString *)burl
                              network:(NSString *)network {
-    CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Interstitial"];
-    [logger debug:[NSString stringWithFormat:@"Creating interstitial: AdID=%@, BidID=%@, Network=%@, ADM=%lu chars", adId, bidId, network, (unsigned long)adm.length]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating interstitial: AdID=%@, BidID=%@, Network=%@, ADM=%lu chars", adId, bidId, network, (unsigned long)adm.length]];
     
     CLXAdNetworkFactories *factories = [self valueForKey:@"adFactories"];
     if (!factories) {
-        [logger error:@"❌ adFactories is nil!"];
+        [self.logger error:@"❌ adFactories is nil!"];
         return nil;
     }
     
     id<CLXAdapterInterstitialFactory> factory = factories.interstitials[network];
     if (!factory) {
-        [logger error:[NSString stringWithFormat:@"❌ No factory found for network: %@ (Available: %@)", network, [factories.interstitials allKeys]]];
+        [self.logger error:[NSString stringWithFormat:@"❌ No factory found for network: %@ (Available: %@)", network, [factories.interstitials allKeys]]];
         return nil;
     }
     
-    [logger info:[NSString stringWithFormat:@"Interstitial factory found for network: %@ (class: %@)", network, NSStringFromClass([factory class])]];
+    [self.logger debug:[NSString stringWithFormat:@"Interstitial factory found for network: %@ (class: %@)", network, NSStringFromClass([factory class])]];
     
     id<CLXAdapterInterstitial> interstitial = [factory createWithAdId:adId
                                                                  bidId:bidId
@@ -63,11 +63,11 @@ NS_ASSUME_NONNULL_BEGIN
                                                               delegate:self];
     
     if (!interstitial) {
-        [logger error:@"❌ Factory returned nil interstitial"];
+        [self.logger error:@"❌ Factory returned nil interstitial"];
         return nil;
     }
     
-    [logger info:[NSString stringWithFormat:@"Interstitial created - Network: %@, BidID: %@", interstitial.network, interstitial.bidID]];
+    [self.logger debug:[NSString stringWithFormat:@"Interstitial created - Network: %@, BidID: %@", interstitial.network, interstitial.bidID]];
     
     return interstitial;
 }
@@ -83,8 +83,7 @@ NS_ASSUME_NONNULL_BEGIN
     // Set up 30-second timeout for adapter loading
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(30.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.isLoading) {
-            CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Interstitial"];
-            [logger error:@"Interstitial load timeout after 30 seconds"];
+            [self.logger error:@"Interstitial load timeout after 30 seconds"];
             [self transitionToIdleState];
             
             CLXError *timeoutError = [CLXError errorWithCode:CLXErrorCodeLoadTimeout];
@@ -104,33 +103,40 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)notifyLoadSuccess {
     if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
-        [self.delegate didLoadAd:[self createAdObject]];
+        CLXAd *ad = [self createAdObject];
+        [self.logger logDelegateCallback:@"✅ Interstitial didLoadAd" ad:ad];
+        [self.delegate didLoadAd:ad];
     }
 }
 
 - (void)notifyLoadFailure:(NSError *)error {
+    [[CLXDebugOverlayManager shared] flashError];
     if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+        [self.logger logDelegateError:@"❌ Interstitial didFailToLoadAd" error:error];
         [self.delegate didFailToLoadAdWithError:error];
     }
 }
 
 - (void)notifyShowFailure:(NSError *)error {
+    [[CLXDebugOverlayManager shared] flashError];
     if ([self.delegate respondsToSelector:@selector(didFailToDisplayAd:error:)]) {
+        [self.logger logDelegateError:@"❌ Interstitial didFailToDisplayAd" error:error];
         [self.delegate didFailToDisplayAd:[self createAdObject] error:error];
     }
 }
 
 - (void)notifyForceClose {
     if ([self.delegate respondsToSelector:@selector(didHideAd:)]) {
-        [self.delegate didHideAd:[self createAdObject]];
+        CLXAd *ad = [self createAdObject];
+        [self.logger logDelegateCallback:@"🔚 Interstitial didHideAd" ad:ad];
+        [self.delegate didHideAd:ad];
     }
 }
 
 #pragma mark - CLXAdapterInterstitialDelegate
 
 - (void)didLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
-    CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Interstitial"];
-    [logger debug:[NSString stringWithFormat:@"didLoadWithInterstitial - Class: %@", NSStringFromClass([(NSObject *)interstitial class])]];
+    [self.logger debug:[NSString stringWithFormat:@"didLoadWithInterstitial - Class: %@", NSStringFromClass([(NSObject *)interstitial class])]];
     
     self.currentAdapter = interstitial;
     [self transitionToReadyState];
@@ -144,8 +150,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)didFailToLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial error:(NSError *)error {
-    CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Interstitial"];
-    [logger error:[NSString stringWithFormat:@"❌ didFailToLoadWithInterstitial (%@): %@", interstitial, error.localizedDescription]];
+    [self.logger error:[NSString stringWithFormat:@"❌ didFailToLoadWithInterstitial (%@): %@", interstitial, error.localizedDescription]];
     
     [self sendLossNotificationForFailedAd];
     self.currentAdapter = nil;
@@ -159,7 +164,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didShowWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
-            [self.delegate didDisplayAd:[self createAdObject]];
+            CLXAd *ad = [self createAdObject];
+            [self.logger logDelegateCallback:@"👀 Interstitial didDisplayAd" ad:ad];
+            [self.delegate didDisplayAd:ad];
         }
     });
 }
@@ -175,6 +182,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
     
     if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
+        [self.logger logDelegateCallback:@"👁️ Interstitial didRecordImpression" ad:adObject];
         [self.delegate didRecordImpressionForAd:adObject];
     }
 }
@@ -185,7 +193,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(didHideAd:)]) {
-            [self.delegate didHideAd:[self createAdObject]];
+            CLXAd *ad = [self createAdObject];
+            [self.logger logDelegateCallback:@"🔚 Interstitial didHideAd" ad:ad];
+            [self.delegate didHideAd:ad];
         }
     });
 }
@@ -201,14 +211,15 @@ NS_ASSUME_NONNULL_BEGIN
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
-            [self.delegate didClickAd:[self createAdObject]];
+            CLXAd *ad = [self createAdObject];
+            [self.logger logDelegateCallback:@"👆 Interstitial didClickAd" ad:ad];
+            [self.delegate didClickAd:ad];
         }
     });
 }
 
 - (void)expiredWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
-    CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"Interstitial"];
-    [logger debug:@"Interstitial adapter expired"];
+    [self.logger debug:@"Interstitial adapter expired"];
     self.currentAdapter = nil;
     [self transitionToIdleState];
 }

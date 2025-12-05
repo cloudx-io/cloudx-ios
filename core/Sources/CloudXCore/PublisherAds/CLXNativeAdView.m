@@ -6,6 +6,8 @@
 #import <CloudXCore/CLXPublisherNative.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
+#import <CloudXCore/CLXDebugClickFeedback.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <UIKit/UIKit.h>
 
 // Category to expose internal properties of CLXPublisherNative
@@ -15,14 +17,15 @@
 @property (nonatomic, copy, readonly) NSString *placementName;
 @end
 
-@interface CLXNativeAdView () {
+@interface CLXNativeAdView () <UIGestureRecognizerDelegate> {
     id<CLXNative> _native;
     CLXNativeTemplate _type;
 }
 
 @property (nonatomic, strong) id<CLXNative> native;
 @property (nonatomic, assign) CLXNativeTemplate type;
-
+@property (nonatomic, strong) UIGestureRecognizer *debugTapGesture;
+@property (nonatomic, weak) UIView *currentNativeView;  // Track the actual third-party SDK view
 
 @end
 
@@ -52,8 +55,74 @@ static void initializeLogger() {
         }
         self.backgroundColor = [UIColor clearColor];
         self.userInteractionEnabled = YES;
+        
+        // Setup debug gesture only if visual debugging is enabled
+        [self updateDebugGestureState];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(updateDebugGestureState)
+                                                     name:NSUserDefaultsDidChangeNotification
+                                                   object:nil];
     }
     return self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSUserDefaultsDidChangeNotification object:nil];
+}
+
+- (void)updateDebugGestureState {
+    // Visual debugging is completely separate from testMode
+    BOOL isEnabled = [CloudXCore isVisualDebuggingEnabled];
+    
+    // Attach gesture to the ACTUAL native view (third-party SDK's view), not the container
+    UIView *targetView = self.currentNativeView ?: self;
+    
+    if (isEnabled && !self.debugTapGesture && targetView) {
+        // Use long press with 0 duration to fire immediately on touch down
+        UILongPressGestureRecognizer *gesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleDebugTouch:)];
+        gesture.minimumPressDuration = 0;
+        gesture.cancelsTouchesInView = NO;
+        gesture.delaysTouchesBegan = NO;
+        gesture.delaysTouchesEnded = NO;
+        gesture.delegate = self;  // Allow simultaneous recognition with third-party gestures
+        self.debugTapGesture = gesture;
+        [targetView addGestureRecognizer:gesture];
+    } else if (!isEnabled && self.debugTapGesture) {
+        UIView *gestureView = self.debugTapGesture.view;
+        if (gestureView) {
+            [gestureView removeGestureRecognizer:self.debugTapGesture];
+        }
+        self.debugTapGesture = nil;
+    }
+}
+
+- (void)attachDebugGestureToNativeView:(UIView *)nativeView {
+    // Store reference and re-attach gesture to the new native view
+    self.currentNativeView = nativeView;
+    
+    // If we already have a gesture, move it to the new view
+    if (self.debugTapGesture) {
+        UIView *oldView = self.debugTapGesture.view;
+        if (oldView) {
+            [oldView removeGestureRecognizer:self.debugTapGesture];
+        }
+        [nativeView addGestureRecognizer:self.debugTapGesture];
+    } else {
+        // Re-check if we should add the gesture
+        [self updateDebugGestureState];
+    }
+}
+
+- (void)handleDebugTouch:(UILongPressGestureRecognizer *)gesture {
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        [CLXDebugClickFeedback showClickPendingOnView:self.currentNativeView ?: self];
+    }
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return YES;
 }
 
 - (CGSize)sizeForTemplateType:(NSInteger)type {
@@ -121,6 +190,9 @@ static void initializeLogger() {
     nativeView.userInteractionEnabled = YES;
     [self addSubview:nativeView];
     
+    // Attach debug gesture to the ACTUAL native view (third-party SDK's view)
+    [self attachDebugGestureToNativeView:nativeView];
+    
     // Set isReady to true so UI knows ad is ready (matching Swift behavior)
     self.isReady = YES;
     
@@ -176,6 +248,10 @@ static void initializeLogger() {
 
 - (void)clickWithNative:(id<CLXAdapterNative>)native {
     [logger debug:@"[CloudXNativeAdView] clickWithNative called"];
+    
+    // Show green border on same view where white pending border was shown
+    [CLXDebugClickFeedback showClickConfirmedOnView:self.currentNativeView ?: self];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
             [self.delegate didClickAd:[CLXAd adFromBid:((CLXPublisherNative *)self.native).lastBidResponse.bid placementId:((CLXPublisherNative *)self.native).placementID placementName:((CLXPublisherNative *)self.native).placementName]];

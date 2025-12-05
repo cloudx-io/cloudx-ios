@@ -129,7 +129,6 @@
     paths.userKeyValues = @"user.ext.data";
     paths.appKeyValues = @"app.ext.data";
     paths.eids = @"user.ext.eids[*]";
-    paths.placementLoopIndex = @"imp[*].ext.data.loop-index";
     
     self.state.keyValuePaths = paths;
     
@@ -139,8 +138,6 @@
                          @"App KV path should be stored");
     XCTAssertEqualObjects(self.state.keyValuePaths.eids, @"user.ext.eids[*]", 
                          @"EIDs path should be stored");
-    XCTAssertEqualObjects(self.state.keyValuePaths.placementLoopIndex, @"imp[*].ext.data.loop-index", 
-                         @"Loop index path should be stored");
 }
 
 - (void)testKeyValuePaths_CanBeNil {

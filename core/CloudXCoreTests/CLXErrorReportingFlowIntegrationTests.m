@@ -10,7 +10,7 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CLXErrorReporter.h>
-#import <CloudXCore/CLXGPPProvider.h>
+#import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXBidNetworkService.h>
 #import <CloudXCore/CLXMetricsNetworkService.h>
 #import <CloudXCore/CLXLogger.h>
@@ -64,7 +64,7 @@
 
 @interface CLXErrorReportingFlowIntegrationTests : XCTestCase
 @property (nonatomic, strong) CLXErrorReporter *errorReporter;
-@property (nonatomic, strong) CLXGPPProvider *gppProvider;
+@property (nonatomic, strong) CLXConsentProvider *gppProvider;
 @property (nonatomic, strong) MockMetricsNetworkService *mockNetworkService;
 @property (nonatomic, strong) NSMutableArray<NSString *> *capturedLogs;
 @end
@@ -74,7 +74,7 @@
 - (void)setUp {
     [super setUp];
     self.errorReporter = [[CLXErrorReporter alloc] init];
-    self.gppProvider = [[CLXGPPProvider alloc] initWithErrorReporter:self.errorReporter];
+    self.gppProvider = [[CLXConsentProvider alloc] initWithErrorReporter:self.errorReporter];
     self.mockNetworkService = [[MockMetricsNetworkService alloc] init];
     self.capturedLogs = [NSMutableArray array];
     [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
@@ -104,7 +104,7 @@
     [self.gppProvider setGppSid:@[@7]]; // US-CA section
     
     // Step 2: Trigger the exception by attempting to decode
-    CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@7];
+    CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@7];
     
     // The consent should be nil due to invalid base64, but no crash should occur
     XCTAssertNil(consent, @"GPP decoding with invalid base64 should return nil");

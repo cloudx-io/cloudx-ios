@@ -4,6 +4,10 @@
 //
 
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXLogStore.h>
+#import <CloudXCore/CLXLogEntry.h>
+#import <CloudXCore/CLXAd.h>
+#import <CloudXCore/CLXError.h>
 #import <os/log.h>
 
 // Class-level logging flags that affect all logger instances
@@ -158,6 +162,16 @@ static BOOL _globalTimestampsEnabled = NO;
     // Log using os_log (Xcode console shows these automatically)
     os_log_type_t osLogType = [self osLogTypeForLevel:level];
     os_log_with_type(self.osLog, osLogType, "%{public}@", formattedMessage);
+    
+    // Store in log buffer when testMode is enabled
+    // Include emoji prefix in stored message for better readability
+    NSString *storedMessage = emoji.length > 0 
+        ? [NSString stringWithFormat:@"%@ %@", emoji, message]
+        : message;
+    CLXLogEntry *entry = [[CLXLogEntry alloc] initWithLevel:level
+                                                   category:self.category
+                                                    message:storedMessage];
+    [[CLXLogStore shared] addEntry:entry];
 }
 
 #pragma mark - Convenience Methods
@@ -188,6 +202,54 @@ static BOOL _globalTimestampsEnabled = NO;
 
 - (void)event:(NSString *)message {
     [self logAtLevel:CLXLogLevelInfo emojiType:CLXLogEmojiEvent message:message];
+}
+
+#pragma mark - Delegate Callback Logging
+
+- (void)logDelegateCallback:(NSString *)callbackName ad:(CLXAd *)ad {
+    NSMutableString *message = [NSMutableString stringWithString:callbackName];
+    
+    if (ad) {
+        [message appendString:@"\n  📍 Placement: "];
+        [message appendString:ad.placementName ?: @"(null)"];
+        
+        [message appendString:@"\n  🆔 Placement ID: "];
+        [message appendString:ad.placementId ?: @"(null)"];
+        
+        [message appendString:@"\n  🏢 Bidder: "];
+        [message appendString:ad.bidder ?: @"(null)"];
+        
+        [message appendString:@"\n  🔗 External ID: "];
+        [message appendString:ad.externalPlacementId ?: @"(null)"];
+        
+        [message appendString:@"\n  💰 Revenue: "];
+        if (ad.revenue) {
+            [message appendFormat:@"$%.6f", ad.revenue.doubleValue];
+        } else {
+            [message appendString:@"(null)"];
+        }
+    } else {
+        [message appendString:@" - Ad: (null)"];
+    }
+    
+    [self logAtLevel:CLXLogLevelInfo emojiType:CLXLogEmojiInfo message:message];
+}
+
+- (void)logDelegateError:(NSString *)callbackName error:(CLXError *)error {
+    NSMutableString *message = [NSMutableString stringWithString:callbackName];
+    
+    if (error) {
+        [message appendString:@"\n  ⚠️ Error: "];
+        [message appendString:error.localizedDescription ?: @"Unknown error"];
+        
+        if (error.code != 0) {
+            [message appendFormat:@"\n  🔢 Code: %ld", (long)error.code];
+        }
+    } else {
+        [message appendString:@" - Error: (null)"];
+    }
+    
+    [self logAtLevel:CLXLogLevelError emojiType:CLXLogEmojiError message:message];
 }
 
 @end

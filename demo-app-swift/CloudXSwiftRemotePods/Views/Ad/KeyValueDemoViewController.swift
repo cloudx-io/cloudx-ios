@@ -182,24 +182,27 @@ class KeyValueDemoViewController: UIViewController, UITableViewDelegate, UITable
         infoLabel.font = .systemFont(ofSize: 13)
         infoLabel.textColor = .secondaryLabel
         infoLabel.text = """
-        📌 Key-value pairs are injected into bid requests at server-configured paths.
+        📌 Key-value pairs are injected into bid requests.
         
-        👤 User-Level: User-specific targeting (e.g., age, interests)
-           • Respects privacy regulations (GDPR/CCPA)
-           • Cleared when privacy requires removing PII
+        🔥 MONETIZATION (Whale Signals):
+           • payer_status: whale/payer/nonpayer
+           • iap_total_bucket, predicted_ltv
         
-        📱 App-Level: App-specific targeting (e.g., app version, build)
-           • Not affected by privacy regulations
-           • Always included in bid requests
+        💪 ENGAGEMENT:
+           • user_tenure, level_achieved, loyalty_tier
         
-        💡 The server controls where these values appear in the bid request via the keyValuePaths configuration.
+        📺 AD HABITS:
+           • ad_whale, reward_affinity
+        
+        👤 User-Level: Privacy-aware (cleared on opt-out)
+        📱 App-Level: Always included
         """
         infoLabel.translatesAutoresizingMaskIntoConstraints = false
         infoSection.addSubview(infoLabel)
         
         // Add sample data button
         let sampleButton = UIButton(type: .system)
-        sampleButton.setTitle("Load Sample Key-Values (for testing)", for: .normal)
+        sampleButton.setTitle("🎯 Load HIGH-ROI Targeting Signals", for: .normal)
         sampleButton.backgroundColor = .systemGreen
         sampleButton.setTitleColor(.white, for: .normal)
         sampleButton.layer.cornerRadius = 8
@@ -305,44 +308,149 @@ class KeyValueDemoViewController: UIViewController, UITableViewDelegate, UITable
     }
     
     @objc private func loadSampleKeyValues() {
-        DemoAppLogger.sharedInstance.logMessage("🧪 Loading sample key-values for privacy testing...")
+        DemoAppLogger.sharedInstance.logMessage("🧪 Loading HIGH-ROI targeting key-values...")
         
-        // User-level key-values (should be cleared when privacy requires it)
-        CloudXCore.shared.setUserKeyValue("age", value: "28")
-        CloudXCore.shared.setUserKeyValue("gender", value: "male")
-        CloudXCore.shared.setUserKeyValue("interest", value: "gaming")
-        CloudXCore.shared.setUserKeyValue("membership", value: "premium")
+        // 💡 PRO TIP:
+        // These key-values represent the "Golden List" of high-value signals that mobile ad bidders pay a premium for.
+        // By passing these signals as First-Party Data, you help bidders identify high-quality users (e.g., payers,
+        // frequent users, heavy ad watchers) without violating privacy rules.
+        //
+        // The values below create a "Whale" profile (high-spending, highly engaged user) to demonstrate
+        // how to structure these signals for maximum CPM lift.
         
-        // App-level key-values (never cleared)
+        // ============================================
+        // 1. MONETIZATION & SPEND (The "Whale" Signals)
+        // ============================================
+        
+        // #1 Signal. Immediate price floor increase for known spenders.
+        CloudXCore.shared.setUserKeyValue("payer_status", value: "whale")
+        
+        // Bidders prefer hard number buckets over abstract segments.
+        CloudXCore.shared.setUserKeyValue("iap_total_bucket", value: "50-100")
+        
+        // Recent payers are significantly more likely to convert again.
+        CloudXCore.shared.setUserKeyValue("recency_purchase", value: "0-7d")
+        
+        // Identifies high-quality recurring revenue users.
+        CloudXCore.shared.setUserKeyValue("subscription_status", value: "active")
+        
+        // Forward-looking predictive metric (gold for bidders).
+        CloudXCore.shared.setUserKeyValue("predicted_ltv", value: "high")
+        
+        // ============================================
+        // 2. ENGAGEMENT & RETENTION
+        // ============================================
+        
+        // Advertisers bid differently for new users vs. loyal veterans.
+        CloudXCore.shared.setUserKeyValue("user_tenure", value: "d30")
+        
+        // Critical for predicting ad fatigue and engagement quality.
+        CloudXCore.shared.setUserKeyValue("session_frequency", value: "daily")
+        
+        // Proof of deep engagement; correlates with viewability.
+        CloudXCore.shared.setUserKeyValue("level_achieved", value: "42")
+        
+        // Composite score (e.g., sessions/day + duration).
+        CloudXCore.shared.setUserKeyValue("engagement_score", value: "high")
+        
+        // Users on old versions often monetize poorly or have bugs.
+        CloudXCore.shared.setUserKeyValue("app_version_age", value: "latest")
+        
+        // Gamified progression status for VIP management.
+        CloudXCore.shared.setUserKeyValue("loyalty_tier", value: "gold")
+        
+        // ============================================
+        // 3. AD CONSUMPTION HABITS
+        // ============================================
+        
+        // User watches high volume (10+) of rewarded videos/day.
+        CloudXCore.shared.setUserKeyValue("ad_whale", value: "true")
+        
+        // Propensity to click/engage with rewarded video units.
+        CloudXCore.shared.setUserKeyValue("reward_affinity", value: "high")
+        
+        // Helps with frequency capping and inventory pricing logic.
+        CloudXCore.shared.setUserKeyValue("ads_today_bucket", value: "6-15")
+        
+        // User has history of installing apps from interstitial ads.
+        CloudXCore.shared.setUserKeyValue("interstitial_clicker", value: "true")
+        
+        // Impressions shown later in a session often perform differently.
+        CloudXCore.shared.setUserKeyValue("session_depth", value: "5")
+        
+        // ============================================
+        // 4. USER CONTEXT & DEMOGRAPHICS (Privacy-Safe)
+        // ============================================
+        
+        // Never use exact age. Brackets are standard and safe.
+        CloudXCore.shared.setUserKeyValue("age_bracket", value: "25-34")
+        
+        // Only if voluntarily provided by user.
+        CloudXCore.shared.setUserKeyValue("gender_declared", value: "n/a")
+        
+        // Contextual interests based on app usage patterns.
+        CloudXCore.shared.setUserKeyValue("interests", value: "strategy,rpg,tech")
+        
+        // Proxy for disposable income (e.g., iPhone 16 Pro vs iPhone 8).
+        CloudXCore.shared.setUserKeyValue("device_tier", value: "high_end")
+        
+        // Heavy video ads prefer Wifi/5G connections.
+        CloudXCore.shared.setUserKeyValue("connection_type", value: "wifi")
+        
+        // Critical for age-gated ad categories (alcohol, gambling).
+        CloudXCore.shared.setUserKeyValue("age_verified", value: "true")
+        
+        // ============================================
+        // 5. ACQUISITION & SOCIAL
+        // ============================================
+        
+        // Paid users often have higher LTV than organic users.
+        CloudXCore.shared.setUserKeyValue("install_source", value: "paid_fb")
+        
+        // Verified real human signal (anti-fraud).
+        CloudXCore.shared.setUserKeyValue("social_login", value: "true")
+        
+        // Re-engagement potential signal for advertisers.
+        CloudXCore.shared.setUserKeyValue("push_opt_in", value: "true")
+        
+        // User plays your other games (portfolio value).
+        CloudXCore.shared.setUserKeyValue("cross_promo_user", value: "true")
+        
+        // ============================================
+        // APP-LEVEL KEY-VALUES (never cleared)
+        // ============================================
         CloudXCore.shared.setAppKeyValue("app_version", value: "1.2.3")
         CloudXCore.shared.setAppKeyValue("build_type", value: "debug")
         CloudXCore.shared.setAppKeyValue("platform", value: "ios")
-        CloudXCore.shared.setAppKeyValue("app_category", value: "entertainment")
+        CloudXCore.shared.setAppKeyValue("app_category", value: "IAB9-5")
         
-        DemoAppLogger.sharedInstance.logMessage("✅ Sample key-values loaded:")
-        DemoAppLogger.sharedInstance.logMessage("   User-Level: age, gender, interest, membership")
-        DemoAppLogger.sharedInstance.logMessage("   App-Level: app_version, build_type, platform, app_category")
+        DemoAppLogger.sharedInstance.logMessage("✅ HIGH-ROI targeting key-values loaded:")
         DemoAppLogger.sharedInstance.logMessage("")
-        DemoAppLogger.sharedInstance.logMessage("🧪 PRIVACY TEST INSTRUCTIONS:")
-        DemoAppLogger.sharedInstance.logMessage("1. Load a banner ad and check bid request JSON")
-        DemoAppLogger.sharedInstance.logMessage("2. Verify user KVs at path: user.ext.data")
-        DemoAppLogger.sharedInstance.logMessage("3. Verify app KVs at path: app.ext.data")
-        DemoAppLogger.sharedInstance.logMessage("4. Go to Settings → Deny ATT / Set CCPA opt-out")
-        DemoAppLogger.sharedInstance.logMessage("5. Load banner again - user KVs should be GONE")
-        DemoAppLogger.sharedInstance.logMessage("6. App KVs should STILL be present")
+        DemoAppLogger.sharedInstance.logMessage("🔥 MONETIZATION (Whale Signals):")
+        DemoAppLogger.sharedInstance.logMessage("   payer_status=whale, iap=50-100, LTV=high")
+        DemoAppLogger.sharedInstance.logMessage("")
+        DemoAppLogger.sharedInstance.logMessage("💪 ENGAGEMENT:")
+        DemoAppLogger.sharedInstance.logMessage("   tenure=d30, level=42, loyalty=gold")
+        DemoAppLogger.sharedInstance.logMessage("")
+        DemoAppLogger.sharedInstance.logMessage("📺 AD HABITS:")
+        DemoAppLogger.sharedInstance.logMessage("   ad_whale=true, reward_affinity=high")
+        DemoAppLogger.sharedInstance.logMessage("")
+        DemoAppLogger.sharedInstance.logMessage("🧪 TEST: Load a banner ad and check bid request for user.ext.data")
         
         refreshDisplayedData()
         
-        showAlert(title: "Sample Data Loaded",
+        showAlert(title: "HIGH-ROI Targeting Loaded",
                  message: """
-                 8 sample key-values loaded:
+                 26 targeting key-values loaded:
                  
-                 User-Level (4): age, gender, interest, membership
-                 
-                 App-Level (4): app_version, build_type, platform, app_category
+                 🔥 Monetization: payer, iap, LTV
+                 💪 Engagement: tenure, level, loyalty
+                 📺 Ad Habits: ad_whale, reward_affinity
+                 👤 Demographics: age_bracket, device_tier
                  
                  Load a banner ad to see them in the bid request!
-                 """)
+                 """
+        )
     }
     
     // MARK: - UITableViewDataSource

@@ -32,9 +32,17 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXAdType.h>
-
+#import <CloudXCore/CLXDebugOverlayManager.h>
+#import <CloudXCore/CLXDebugClickFeedback.h>
+#import <CloudXCore/CloudXCoreAPI.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+// Private category to access internal SDK methods (framework-internal only, not exposed in public API)
+@interface CloudXCore (Internal)
+@property (nonatomic, strong, readonly) CLXAdNetworkFactories *adNetworkFactories;
+- (nullable CLXConfigImpressionModel *)createImpModelWithAuctionID:(NSString *)auctionID;
+@end
 
 @interface CLXPublisherNative () <CLXAdapterNativeDelegate>
 
@@ -81,6 +89,12 @@ NS_ASSUME_NONNULL_BEGIN
 // Store requested placement name for deferred initialization
 @property (nonatomic, copy, nullable) NSString *requestedPlacementName;
 
+// Deferred error (set during create if validation fails)
+@property (nonatomic, strong, nullable) NSError *deferredError;
+
+// Store bid token sources for deferred initialization
+@property (nonatomic, strong) NSDictionary<NSString *, id<CLXBidTokenSource>> *bidTokenSources;
+
 @end
 
 @implementation CLXPublisherNative
@@ -90,14 +104,14 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Initialization
 
 - (instancetype)initWithViewController:(UIViewController *)viewController
-                             placement:(CLXSDKConfigPlacement *)placement
+                             placement:(nullable CLXSDKConfigPlacement *)placement
                                 userID:(NSString *)userID
                            publisherID:(NSString *)publisherID
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
                                delegate:(nullable id<CLXAdapterNativeDelegate>)delegate
                              nativeType:(CLXNativeTemplate)nativeType
                    waterfallMaxBackOffTime:(NSTimeInterval)waterfallMaxBackOffTime
-                                  impModel:(CLXConfigImpressionModel *)impModel
+                                  impModel:(nullable CLXConfigImpressionModel *)impModel
                               adFactories:(NSDictionary<NSString *, id<CLXAdapterNativeFactory>> *)adFactories
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
@@ -111,6 +125,7 @@ NS_ASSUME_NONNULL_BEGIN
         _reportingService = reportingService;
         _placement = placement;
         _adFactories = adFactories;
+        _bidTokenSources = bidTokenSources; // Store for deferred init
         _impModel = impModel;
         _isReady = NO;
         _isLoading = NO;
@@ -147,35 +162,39 @@ NS_ASSUME_NONNULL_BEGIN
                                                                                  appKey:appKey
                                                                                     url:[[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @""];
         
-        // Get app key from UserDefaults (matching Swift SDK behavior)
-        __weak typeof(self) weakSelf = self;
-        
-        // Calculate TMAX from placement configuration (convert milliseconds to seconds)
-        // Use nil to match Swift version behavior (no timeout)
-        NSNumber *tmax = nil;
-        
-        _bidAdSource = [[CLXBidAdSource alloc] initWithUserID:userID
-                                               placementID:_placementID
-                                                    dealID:placement.dealId
-                                             hasCloseButton:NO
-                                               publisherID:publisherID
-                                                    adType:CLXAdTypeNative
-                                            bidTokenSources:bidTokenSources
-                                     nativeAdRequirements:[CLXNativeTemplateHelper nativeAdRequirementsForTemplate:nativeType]
-                                                      tmax:tmax
-                                           reportingService:_reportingService
-                                               createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            if (!strongSelf) return nil;
-            return [strongSelf createNativeInstanceWithAdId:adId
-                                                      bidId:bidId
-                                                         adm:adm
-                                               adapterExtras:adapterExtras
-                                                        burl:burl
-                                                      network:network];
-        }];
-        
-        [_logger debug:[NSString stringWithFormat:@"Initialized CLXPublisherNative for placement: %@", _placementID]];
+        // Only create bidAdSource if placement is available (defer if SDK not initialized)
+        if (placement) {
+            __weak typeof(self) weakSelf = self;
+            
+            // Calculate TMAX from placement configuration (convert milliseconds to seconds)
+            // Use nil to match Swift version behavior (no timeout)
+            NSNumber *tmax = nil;
+            
+            _bidAdSource = [[CLXBidAdSource alloc] initWithUserID:userID
+                                                   placementID:_placementID
+                                                        dealID:placement.dealId
+                                                 hasCloseButton:NO
+                                                   publisherID:publisherID
+                                                        adType:CLXAdTypeNative
+                                                bidTokenSources:bidTokenSources
+                                         nativeAdRequirements:[CLXNativeTemplateHelper nativeAdRequirementsForTemplate:nativeType]
+                                                          tmax:tmax
+                                               reportingService:_reportingService
+                                                   createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) return nil;
+                return [strongSelf createNativeInstanceWithAdId:adId
+                                                          bidId:bidId
+                                                             adm:adm
+                                                   adapterExtras:adapterExtras
+                                                            burl:burl
+                                                          network:network];
+            }];
+            
+            [_logger debug:[NSString stringWithFormat:@"Initialized CLXPublisherNative for placement: %@", _placementID]];
+        } else {
+            [_logger debug:@"Initialized CLXPublisherNative with deferred placement (SDK not yet initialized)"];
+        }
     }
     return self;
 }
@@ -190,6 +209,17 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - CloudXNative Protocol
 
 - (void)load {
+    // Check for deferred error from create method
+    if (self.deferredError) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+                [self.logger logDelegateError:@"❌ Native didFailToLoadAd" error:self.deferredError];
+                [self.delegate didFailToLoadAdWithError:self.deferredError];
+            }
+        });
+        return;
+    }
+    
     // Check if SDK is initialized
     if (![[CloudXCore shared] isInitialized]) {
         self.pendingLoadRequestCount++;
@@ -203,6 +233,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Internal method to actually perform the load operation
 - (void)performLoad {
+    // Check if we need to complete deferred initialization (bidAdSource is nil)
+    if (!self.bidAdSource && self.requestedPlacementName && [[CloudXCore shared] isInitialized]) {
+        // SDK is now initialized - complete initialization with real placement config
+        CLXSDKConfigPlacement *realPlacement = [[CloudXCore shared] placementConfigForName:self.requestedPlacementName];
+        if (realPlacement) {
+            [self.logger debug:[NSString stringWithFormat:@"Completing deferred initialization for: %@ (ID: %@)", self.requestedPlacementName, realPlacement.id]];
+            
+            self.placement = realPlacement;
+            self.placementID = realPlacement.id;
+            self.placementName = realPlacement.name;
+            self.refreshSeconds = (realPlacement.bannerRefreshRateMs ?: 10000) / 1000.0;
+            
+            // Create impression model now that SDK is initialized
+            NSString *auctionID = [[NSUUID UUID] UUIDString];
+            self.impModel = [[CloudXCore shared] createImpModelWithAuctionID:auctionID];
+            if (self.impModel) {
+                [self.logger debug:[NSString stringWithFormat:@"Created impression model with appID: %@", self.impModel.sdkConfig.appID]];
+            } else {
+                [self.logger error:@"Failed to create impression model after SDK initialization"];
+            }
+            
+            // Create bid source now that we have real placement data
+            self.bidAdSource = [self createBidAdSourceForPlacement:realPlacement];
+            
+            // Clear the requested placement name since initialization is complete
+            self.requestedPlacementName = nil;
+        } else {
+            if (self.delegate && [self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+                CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidPlacement 
+                                              description:[NSString stringWithFormat:@"Placement not found: %@", self.requestedPlacementName]];
+                [self.logger logDelegateError:@"❌ Native didFailToLoadAd" error:error];
+                [self.delegate didFailToLoadAdWithError:error];
+            }
+            return;
+        }
+    }
+    
     // Generate correlation ID for this ad load request
     self.currentCorrelationId = [[NSUUID UUID] UUIDString];
     
@@ -216,6 +283,33 @@ NS_ASSUME_NONNULL_BEGIN
     
     // Implement async native update request
     [self requestNativeUpdate];
+}
+
+// Helper method to create bid ad source for a placement
+- (CLXBidAdSource *)createBidAdSourceForPlacement:(CLXSDKConfigPlacement *)placement {
+    NSNumber *tmax = nil;
+    
+    __weak typeof(self) weakSelf = self;
+    return [[CLXBidAdSource alloc] initWithUserID:@""
+                                      placementID:placement.id
+                                           dealID:placement.dealId
+                                    hasCloseButton:NO
+                                      publisherID:@""
+                                           adType:CLXAdTypeNative
+                                   bidTokenSources:self.bidTokenSources
+                            nativeAdRequirements:[CLXNativeTemplateHelper nativeAdRequirementsForTemplate:CLXNativeTemplateDefault]
+                                             tmax:tmax
+                                  reportingService:self.reportingService
+                                      createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return nil;
+        return [strongSelf createNativeInstanceWithAdId:adId
+                                                  bidId:bidId
+                                                     adm:adm
+                                           adapterExtras:adapterExtras
+                                                    burl:burl
+                                                  network:network];
+    }];
 }
 
 // Handle SDK initialization notification
@@ -238,7 +332,7 @@ NS_ASSUME_NONNULL_BEGIN
         return;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherNative] Requesting native update - loop-index: %ld", self.currentCorrelationId, (long)self.loadNativeTimesCount]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherNative] Requesting native update", self.currentCorrelationId]];
     
     // Request bid from bid ad source
     __weak typeof(self) weakSelf = self;
@@ -272,14 +366,11 @@ NS_ASSUME_NONNULL_BEGIN
             // Store the full bid response for LURL firing by getting it from bidAdSource
             strongSelf.currentBidResponse = [strongSelf.bidAdSource getCurrentBidResponse];
             
-            // Get current loop index for Analytics tracking
-            NSInteger currentLoopIndex = [[CLXPlacementLoopIndexTracker shared] getCountForPlacement:strongSelf.placementName];
-            
             // Set up Analytics tracking data
             [strongSelf.rillTrackingService setupTrackingDataFromBidResponse:response
                                                                     impModel:strongSelf.impModel
                                                                  placementID:strongSelf.placementID
-                                                                   loadCount:currentLoopIndex];
+                                                                   loadCount:0];
             
             // Reset waterfall backoff algorithm
             [strongSelf.waterfallBackoffAlgorithm reset];
@@ -479,10 +570,11 @@ NS_ASSUME_NONNULL_BEGIN
     if ([self.delegate respondsToSelector:@selector(didLoadWithNative:)]) {
         [self.delegate didLoadWithNative:native];
     }
-            if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
-            CLXAd *delegateAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-            [self.delegate didLoadAd:delegateAd];
-        }
+    if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
+        CLXAd *delegateAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        [self.logger logDelegateCallback:@"✅ Native didLoadAd" ad:delegateAd];
+        [self.delegate didLoadAd:delegateAd];
+    }
     
     __weak typeof(self) weakSelf = self;
     [self.timerService startCountDownWithDeadline:self.refreshSeconds completion:^{
@@ -560,6 +652,8 @@ NS_ASSUME_NONNULL_BEGIN
         [self.delegate failToLoadWithNative:native error:delegateError];
     }
     if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+        [[CLXDebugOverlayManager shared] flashError];
+        [self.logger logDelegateError:@"❌ Native didFailToLoadAd" error:delegateError];
         [self.delegate didFailToLoadAdWithError:delegateError];
     }
 }
@@ -588,7 +682,9 @@ NS_ASSUME_NONNULL_BEGIN
         [self.delegate didShowWithNative:native];
     }
     if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
-        [self.delegate didDisplayAd:[CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName]];
+        CLXAd *ad = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        [self.logger logDelegateCallback:@"👀 Native didDisplayAd" ad:ad];
+        [self.delegate didDisplayAd:ad];
     }
 }
 
@@ -631,29 +727,31 @@ NS_ASSUME_NONNULL_BEGIN
     if ([self.delegate respondsToSelector:@selector(impressionWithNative:)]) {
         [self.delegate impressionWithNative:native];
     }
-            if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
-            CLXAd *impressionAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-            [self.delegate didRecordImpressionForAd:impressionAd];
-        }
+    if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
+        CLXAd *impressionAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        [self.logger logDelegateCallback:@"👁️ Native didRecordImpression" ad:impressionAd];
+        [self.delegate didRecordImpressionForAd:impressionAd];
+    }
 }
 
 - (void)clickWithNative:(id<CLXAdapterNative>)native {
-    [self.logger debug:@"Native clicked"];
-    
-    // Call appSessionService.addClick
     [self.appSessionService addClickWithPlacementID:self.placementID];
-    
-    // Send Analytics tracking click event
     [self.rillTrackingService sendClickEvent];
+    
+    // Show click confirmed feedback - stops pending animation and shows green border
+    if (native.nativeView) {
+        [CLXDebugClickFeedback showClickConfirmedOnView:native.nativeView];
+    }
     
     // Call both old and new delegate methods for backward compatibility
     if ([self.delegate respondsToSelector:@selector(clickWithNative:)]) {
         [self.delegate clickWithNative:native];
     }
-            if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
-            CLXAd *clickAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-            [self.delegate didClickAd:clickAd];
-        }
+    if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
+        CLXAd *clickAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        [self.logger logDelegateCallback:@"👆 Native didClickAd" ad:clickAd];
+        [self.delegate didClickAd:clickAd];
+    }
 }
 
 #pragma mark - CLXAdLifecycle

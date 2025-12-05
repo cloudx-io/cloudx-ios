@@ -1,0 +1,585 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		/* Banner */
+		A100000000000001 /* CLXInMobiBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000001 /* CLXInMobiBanner.m */; };
+		A100000000000002 /* CLXInMobiBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000002 /* CLXInMobiBanner.h */; };
+		A100000000000003 /* CLXInMobiBannerFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000003 /* CLXInMobiBannerFactory.m */; };
+		A100000000000004 /* CLXInMobiBannerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000004 /* CLXInMobiBannerFactory.h */; };
+		/* Base */
+		A100000000000005 /* CLXInMobiBaseFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000005 /* CLXInMobiBaseFactory.m */; };
+		A100000000000006 /* CLXInMobiBaseFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000006 /* CLXInMobiBaseFactory.h */; };
+		/* BidTokenSource */
+		A100000000000007 /* CLXInMobiBidTokenSource.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000007 /* CLXInMobiBidTokenSource.m */; };
+		A100000000000008 /* CLXInMobiBidTokenSource.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000008 /* CLXInMobiBidTokenSource.h */; };
+		/* Initializers */
+		A100000000000009 /* CLXInMobiInitializer.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000009 /* CLXInMobiInitializer.m */; };
+		A10000000000000A /* CLXInMobiInitializer.h in Headers */ = {isa = PBXBuildFile; fileRef = A20000000000000A /* CLXInMobiInitializer.h */; };
+		/* Interstitial */
+		A10000000000000B /* CLXInMobiInterstitial.m in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000B /* CLXInMobiInterstitial.m */; };
+		A10000000000000C /* CLXInMobiInterstitial.h in Headers */ = {isa = PBXBuildFile; fileRef = A20000000000000C /* CLXInMobiInterstitial.h */; };
+		A10000000000000D /* CLXInMobiInterstitialFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000D /* CLXInMobiInterstitialFactory.m */; };
+		A10000000000000E /* CLXInMobiInterstitialFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A20000000000000E /* CLXInMobiInterstitialFactory.h */; };
+		/* Native */
+		A10000000000000F /* CLXInMobiNative.m in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000F /* CLXInMobiNative.m */; };
+		A100000000000010 /* CLXInMobiNative.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000010 /* CLXInMobiNative.h */; };
+		A100000000000011 /* CLXInMobiNativeFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000011 /* CLXInMobiNativeFactory.m */; };
+		A100000000000012 /* CLXInMobiNativeFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000012 /* CLXInMobiNativeFactory.h */; };
+		/* Rewarded */
+		A100000000000013 /* CLXInMobiRewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000013 /* CLXInMobiRewarded.m */; };
+		A100000000000014 /* CLXInMobiRewarded.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000014 /* CLXInMobiRewarded.h */; };
+		A100000000000015 /* CLXInMobiRewardedFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000015 /* CLXInMobiRewardedFactory.m */; };
+		A100000000000016 /* CLXInMobiRewardedFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000016 /* CLXInMobiRewardedFactory.h */; };
+		/* Utils */
+		A100000000000017 /* CLXInMobiErrorHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000017 /* CLXInMobiErrorHandler.m */; };
+		A100000000000018 /* CLXInMobiErrorHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000018 /* CLXInMobiErrorHandler.h */; };
+		/* Root files */
+		A100000000000019 /* CloudXInMobiAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000019 /* CloudXInMobiAdapter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A10000000000001A /* CloudXInMobiAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000001A /* CloudXInMobiAdapter.m */; };
+		A10000000000001B /* CLXInMobiAdapterVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = A20000000000001B /* CLXInMobiAdapterVersion.h */; };
+		A10000000000001C /* CLXInMobiAdapterVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000001C /* CLXInMobiAdapterVersion.m */; };
+		/* Pods Framework */
+		A100000000000020 /* Pods_CloudXInMobiAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A200000000000020 /* Pods_CloudXInMobiAdapter.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		/* Banner */
+		A200000000000001 /* CLXInMobiBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBanner.m; sourceTree = "<group>"; };
+		A200000000000002 /* CLXInMobiBanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBanner.h; sourceTree = "<group>"; };
+		A200000000000003 /* CLXInMobiBannerFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBannerFactory.m; sourceTree = "<group>"; };
+		A200000000000004 /* CLXInMobiBannerFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBannerFactory.h; sourceTree = "<group>"; };
+		/* Base */
+		A200000000000005 /* CLXInMobiBaseFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBaseFactory.m; sourceTree = "<group>"; };
+		A200000000000006 /* CLXInMobiBaseFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBaseFactory.h; sourceTree = "<group>"; };
+		/* BidTokenSource */
+		A200000000000007 /* CLXInMobiBidTokenSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBidTokenSource.m; sourceTree = "<group>"; };
+		A200000000000008 /* CLXInMobiBidTokenSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBidTokenSource.h; sourceTree = "<group>"; };
+		/* Initializers */
+		A200000000000009 /* CLXInMobiInitializer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiInitializer.m; sourceTree = "<group>"; };
+		A20000000000000A /* CLXInMobiInitializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiInitializer.h; sourceTree = "<group>"; };
+		/* Interstitial */
+		A20000000000000B /* CLXInMobiInterstitial.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiInterstitial.m; sourceTree = "<group>"; };
+		A20000000000000C /* CLXInMobiInterstitial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiInterstitial.h; sourceTree = "<group>"; };
+		A20000000000000D /* CLXInMobiInterstitialFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiInterstitialFactory.m; sourceTree = "<group>"; };
+		A20000000000000E /* CLXInMobiInterstitialFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiInterstitialFactory.h; sourceTree = "<group>"; };
+		/* Native */
+		A20000000000000F /* CLXInMobiNative.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiNative.m; sourceTree = "<group>"; };
+		A200000000000010 /* CLXInMobiNative.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiNative.h; sourceTree = "<group>"; };
+		A200000000000011 /* CLXInMobiNativeFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiNativeFactory.m; sourceTree = "<group>"; };
+		A200000000000012 /* CLXInMobiNativeFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiNativeFactory.h; sourceTree = "<group>"; };
+		/* Rewarded */
+		A200000000000013 /* CLXInMobiRewarded.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiRewarded.m; sourceTree = "<group>"; };
+		A200000000000014 /* CLXInMobiRewarded.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiRewarded.h; sourceTree = "<group>"; };
+		A200000000000015 /* CLXInMobiRewardedFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiRewardedFactory.m; sourceTree = "<group>"; };
+		A200000000000016 /* CLXInMobiRewardedFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiRewardedFactory.h; sourceTree = "<group>"; };
+		/* Utils */
+		A200000000000017 /* CLXInMobiErrorHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiErrorHandler.m; sourceTree = "<group>"; };
+		A200000000000018 /* CLXInMobiErrorHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiErrorHandler.h; sourceTree = "<group>"; };
+		/* Root files */
+		A200000000000019 /* CloudXInMobiAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CloudXInMobiAdapter.h; sourceTree = "<group>"; };
+		A20000000000001A /* CloudXInMobiAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CloudXInMobiAdapter.m; sourceTree = "<group>"; };
+		A20000000000001B /* CLXInMobiAdapterVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiAdapterVersion.h; sourceTree = "<group>"; };
+		A20000000000001C /* CLXInMobiAdapterVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiAdapterVersion.m; sourceTree = "<group>"; };
+		A20000000000001D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A20000000000001E /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
+		/* Pods xcconfig files */
+		A20000000000001F /* Pods-CloudXInMobiAdapter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXInMobiAdapter.debug.xcconfig"; path = "Target Support Files/Pods-CloudXInMobiAdapter/Pods-CloudXInMobiAdapter.debug.xcconfig"; sourceTree = "<group>"; };
+		A200000000000021 /* Pods-CloudXInMobiAdapter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXInMobiAdapter.release.xcconfig"; path = "Target Support Files/Pods-CloudXInMobiAdapter/Pods-CloudXInMobiAdapter.release.xcconfig"; sourceTree = "<group>"; };
+		/* Pods Framework */
+		A200000000000020 /* Pods_CloudXInMobiAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXInMobiAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		/* Framework product */
+		A300000000000001 /* CloudXInMobiAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXInMobiAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A400000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A100000000000020 /* Pods_CloudXInMobiAdapter.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A500000000000001 /* Banner */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000002 /* CLXInMobiBanner.h */,
+				A200000000000001 /* CLXInMobiBanner.m */,
+				A200000000000004 /* CLXInMobiBannerFactory.h */,
+				A200000000000003 /* CLXInMobiBannerFactory.m */,
+			);
+			path = Banner;
+			sourceTree = "<group>";
+		};
+		A500000000000002 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000006 /* CLXInMobiBaseFactory.h */,
+				A200000000000005 /* CLXInMobiBaseFactory.m */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
+		A500000000000003 /* BidTokenSource */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000008 /* CLXInMobiBidTokenSource.h */,
+				A200000000000007 /* CLXInMobiBidTokenSource.m */,
+			);
+			path = BidTokenSource;
+			sourceTree = "<group>";
+		};
+		A500000000000004 /* Initializers */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000A /* CLXInMobiInitializer.h */,
+				A200000000000009 /* CLXInMobiInitializer.m */,
+			);
+			path = Initializers;
+			sourceTree = "<group>";
+		};
+		A500000000000005 /* Interstitial */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000C /* CLXInMobiInterstitial.h */,
+				A20000000000000B /* CLXInMobiInterstitial.m */,
+				A20000000000000E /* CLXInMobiInterstitialFactory.h */,
+				A20000000000000D /* CLXInMobiInterstitialFactory.m */,
+			);
+			path = Interstitial;
+			sourceTree = "<group>";
+		};
+		A500000000000006 /* Native */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000010 /* CLXInMobiNative.h */,
+				A20000000000000F /* CLXInMobiNative.m */,
+				A200000000000012 /* CLXInMobiNativeFactory.h */,
+				A200000000000011 /* CLXInMobiNativeFactory.m */,
+			);
+			path = Native;
+			sourceTree = "<group>";
+		};
+		A500000000000007 /* Rewarded */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000014 /* CLXInMobiRewarded.h */,
+				A200000000000013 /* CLXInMobiRewarded.m */,
+				A200000000000016 /* CLXInMobiRewardedFactory.h */,
+				A200000000000015 /* CLXInMobiRewardedFactory.m */,
+			);
+			path = Rewarded;
+			sourceTree = "<group>";
+		};
+		A500000000000008 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000018 /* CLXInMobiErrorHandler.h */,
+				A200000000000017 /* CLXInMobiErrorHandler.m */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		A500000000000009 /* CloudXInMobiAdapter */ = {
+			isa = PBXGroup;
+			children = (
+				A500000000000001 /* Banner */,
+				A500000000000002 /* Base */,
+				A500000000000003 /* BidTokenSource */,
+				A500000000000004 /* Initializers */,
+				A500000000000005 /* Interstitial */,
+				A500000000000006 /* Native */,
+				A500000000000007 /* Rewarded */,
+				A500000000000008 /* Utils */,
+				A200000000000019 /* CloudXInMobiAdapter.h */,
+				A20000000000001A /* CloudXInMobiAdapter.m */,
+				A20000000000001B /* CLXInMobiAdapterVersion.h */,
+				A20000000000001C /* CLXInMobiAdapterVersion.m */,
+				A20000000000001D /* Info.plist */,
+				A20000000000001E /* module.modulemap */,
+			);
+			path = CloudXInMobiAdapter;
+			sourceTree = "<group>";
+		};
+		A50000000000000A /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				A500000000000009 /* CloudXInMobiAdapter */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		A50000000000000B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A300000000000001 /* CloudXInMobiAdapter.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A50000000000000C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000001F /* Pods-CloudXInMobiAdapter.debug.xcconfig */,
+				A200000000000021 /* Pods-CloudXInMobiAdapter.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		A50000000000000D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000020 /* Pods_CloudXInMobiAdapter.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A50000000000000E /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				A50000000000000A /* Sources */,
+				A50000000000000B /* Products */,
+				A50000000000000C /* Pods */,
+				A50000000000000D /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		A600000000000001 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A100000000000002 /* CLXInMobiBanner.h in Headers */,
+				A100000000000004 /* CLXInMobiBannerFactory.h in Headers */,
+				A100000000000006 /* CLXInMobiBaseFactory.h in Headers */,
+				A100000000000008 /* CLXInMobiBidTokenSource.h in Headers */,
+				A10000000000000A /* CLXInMobiInitializer.h in Headers */,
+				A10000000000000C /* CLXInMobiInterstitial.h in Headers */,
+				A10000000000000E /* CLXInMobiInterstitialFactory.h in Headers */,
+				A100000000000010 /* CLXInMobiNative.h in Headers */,
+				A100000000000012 /* CLXInMobiNativeFactory.h in Headers */,
+				A100000000000014 /* CLXInMobiRewarded.h in Headers */,
+				A100000000000016 /* CLXInMobiRewardedFactory.h in Headers */,
+				A100000000000018 /* CLXInMobiErrorHandler.h in Headers */,
+				A100000000000019 /* CloudXInMobiAdapter.h in Headers */,
+				A10000000000001B /* CLXInMobiAdapterVersion.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		A700000000000001 /* CloudXInMobiAdapter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A900000000000001 /* Build configuration list for PBXNativeTarget "CloudXInMobiAdapter" */;
+			buildPhases = (
+				AB00000000000001 /* [CP] Check Pods Manifest.lock */,
+				A600000000000001 /* Headers */,
+				A800000000000001 /* Sources */,
+				A400000000000001 /* Frameworks */,
+				AA00000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CloudXInMobiAdapter;
+			productName = CloudXInMobiAdapter;
+			productReference = A300000000000001 /* CloudXInMobiAdapter.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AC00000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					A700000000000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = AD00000000000001 /* Build configuration list for PBXProject "CloudXInMobiAdapter" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A50000000000000E /* Root */;
+			productRefGroup = A50000000000000B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A700000000000001 /* CloudXInMobiAdapter */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AA00000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		AB00000000000001 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXInMobiAdapter-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A800000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A100000000000001 /* CLXInMobiBanner.m in Sources */,
+				A100000000000003 /* CLXInMobiBannerFactory.m in Sources */,
+				A100000000000005 /* CLXInMobiBaseFactory.m in Sources */,
+				A100000000000007 /* CLXInMobiBidTokenSource.m in Sources */,
+				A100000000000009 /* CLXInMobiInitializer.m in Sources */,
+				A10000000000000B /* CLXInMobiInterstitial.m in Sources */,
+				A10000000000000D /* CLXInMobiInterstitialFactory.m in Sources */,
+				A10000000000000F /* CLXInMobiNative.m in Sources */,
+				A100000000000011 /* CLXInMobiNativeFactory.m in Sources */,
+				A100000000000013 /* CLXInMobiRewarded.m in Sources */,
+				A100000000000015 /* CLXInMobiRewardedFactory.m in Sources */,
+				A100000000000017 /* CLXInMobiErrorHandler.m in Sources */,
+				A10000000000001A /* CloudXInMobiAdapter.m in Sources */,
+				A10000000000001C /* CLXInMobiAdapterVersion.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AE00000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		AE00000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AF00000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A20000000000001F /* Pods-CloudXInMobiAdapter.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/CloudXInMobiAdapter/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cloudx.CloudXInMobiAdapter;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AF00000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A200000000000021 /* Pods-CloudXInMobiAdapter.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/CloudXInMobiAdapter/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cloudx.CloudXInMobiAdapter;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AD00000000000001 /* Build configuration list for PBXProject "CloudXInMobiAdapter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AE00000000000001 /* Debug */,
+				AE00000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A900000000000001 /* Build configuration list for PBXNativeTarget "CloudXInMobiAdapter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF00000000000001 /* Debug */,
+				AF00000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AC00000000000001 /* Project object */;
+}
+

@@ -40,7 +40,6 @@
     [resultString appendString:[(self.osVersion ? self.osVersion : @"") semicolon]];
     [resultString appendString:[(self.sessionId ? self.sessionId : @"") semicolon]];
     [resultString appendString:[(self.ifa ? self.ifa : @"") semicolon]];
-    [resultString appendString:[(self.loopIndex ? [NSString stringWithFormat:@"%ld", (long)self.loopIndex] : @"") semicolon]];
     [resultString appendString:[(self.testGroupName ? self.testGroupName : @"") semicolon]];
     return resultString;
 }

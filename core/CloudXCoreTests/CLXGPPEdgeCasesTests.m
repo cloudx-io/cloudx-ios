@@ -12,7 +12,7 @@
 #import "CLXUserDefaultsTestHelper.h"
 
 @interface CLXGPPEdgeCasesTests : XCTestCase
-@property (nonatomic, strong) CLXGPPProvider *gppProvider;
+@property (nonatomic, strong) CLXConsentProvider *gppProvider;
 @property (nonatomic, strong) CLXPrivacyService *privacyService;
 @property (nonatomic, strong) CLXGeoLocationService *geoService;
 @end
@@ -21,7 +21,7 @@
 
 - (void)setUp {
     [super setUp];
-    self.gppProvider = [[CLXGPPProvider alloc] initWithErrorReporter:nil];
+    self.gppProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil];
     self.privacyService = [CLXPrivacyService sharedInstance];
     self.geoService = [CLXGeoLocationService shared];
     [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
@@ -43,7 +43,7 @@
     [self.gppProvider setGppSid:gppSid];
     
     // Should handle multiple SIDs without crashing
-    CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:nil];
+    CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:nil];
     XCTAssertTrue(consent != nil || consent == nil, @"Should handle multi-SID scenario gracefully");
 }
 
@@ -99,7 +99,7 @@
     [self.gppProvider setGppSid:nil];
     
     // Should not crash when decoding without SID
-    CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@7];
+    CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@7];
     XCTAssertTrue(consent != nil || consent == nil, @"Should handle GPP string without SID gracefully");
 }
 
@@ -109,7 +109,7 @@
     [self.gppProvider setGppSid:@[@7, @8]];
     
     // Should not crash when SID is set but no GPP string
-    CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@7];
+    CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@7];
     XCTAssertNil(consent, @"Should return nil when SID is set but no GPP string");
 }
 
@@ -196,7 +196,7 @@
     [self.gppProvider setGppSid:testGppSid];
     
     // Create new instance
-    CLXGPPProvider *newProvider = [[CLXGPPProvider alloc] initWithErrorReporter:nil];
+    CLXConsentProvider *newProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil];
     
     // Should retrieve same data
     NSString *retrievedString = [newProvider gppString];
@@ -217,7 +217,7 @@
     [self.gppProvider setGppSid:nil];
     
     // Create new instance
-    CLXGPPProvider *newProvider = [[CLXGPPProvider alloc] initWithErrorReporter:nil];
+    CLXConsentProvider *newProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil];
     
     // Should remain cleared
     XCTAssertNil([newProvider gppString], @"Cleared GPP string should persist as nil");
@@ -234,7 +234,7 @@
     [self.gppProvider setGppSid:@[@7]];
     
     // Should handle single section GPP string
-    CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@7];
+    CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@7];
     XCTAssertTrue(consent != nil || consent == nil, @"Should handle single section GPP string");
 }
 
@@ -246,7 +246,7 @@
     [self.gppProvider setGppSid:@[@7, @8]];
     
     // Should handle extra sections gracefully
-    CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@7];
+    CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@7];
     XCTAssertTrue(consent != nil || consent == nil, @"Should handle three section GPP string");
 }
 
@@ -258,7 +258,7 @@
     [self.gppProvider setGppSid:@[@7]];
     
     // Should handle malformed section structure
-    CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@7];
+    CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@7];
     XCTAssertTrue(consent != nil || consent == nil, @"Should handle malformed GPP string structure gracefully");
 }
 
@@ -402,7 +402,7 @@
         [self.gppProvider setGppSid:@[@7, @8]];
         
         // Should not crash with real-world formats
-        CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@7];
+        CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@7];
         XCTAssertTrue(consent != nil || consent == nil, @"Should handle real GPP format: %@", gppString);
         
         // Should be able to retrieve what was set

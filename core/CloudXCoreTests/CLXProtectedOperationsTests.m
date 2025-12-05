@@ -9,7 +9,7 @@
  */
 
 #import <XCTest/XCTest.h>
-#import <CloudXCore/CLXGPPProvider.h>
+#import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXURLProvider.h>
 #import <CloudXCore/CLXMetricsNetworkService.h>
@@ -18,7 +18,7 @@
 #import "Helper/CLXUserDefaultsTestHelper.h"
 
 @interface CLXProtectedOperationsTests : XCTestCase
-@property (nonatomic, strong) CLXGPPProvider *gppProvider;
+@property (nonatomic, strong) CLXConsentProvider *gppProvider;
 @property (nonatomic, strong) CLXErrorReporter *errorReporter;
 @end
 
@@ -27,7 +27,7 @@
 - (void)setUp {
     [super setUp];
     self.errorReporter = [[CLXErrorReporter alloc] init];
-    self.gppProvider = [[CLXGPPProvider alloc] initWithErrorReporter:self.errorReporter];
+    self.gppProvider = [[CLXConsentProvider alloc] initWithErrorReporter:self.errorReporter];
     [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
 }
 
@@ -52,7 +52,7 @@
     [self.gppProvider setGppSid:@[@7]]; // US-National section
     
     // This should trigger our string manipulation protection when parsing bits - simplified
-    CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@7];
+    CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@7];
     // Should return nil or valid consent, but never crash
     XCTAssertTrue(YES, @"GPP bit string parsing should handle invalid ranges gracefully");
 }
@@ -75,7 +75,7 @@
         [self.gppProvider setGppSid:@[@7]];
         
         // Simplified to avoid macro expansion issues
-        CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:@7];
+        CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@7];
         // Should handle corrupted base64 gracefully
         XCTAssertTrue(YES, @"GPP base64 decoding should handle corrupted data without crashing");
     }
@@ -154,13 +154,9 @@
  */
 - (void)testBidNetworkService_JSONOperations_InvalidData_ExceptionHandling {
     CLXBidNetworkServiceClass *bidService = [[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:@"https://test.com"
-                                                                                            cdpEndpointUrl:@"https://cdp.test.com"
                                                                                              errorReporter:self.errorReporter];
     
     XCTAssertNotNil(bidService, @"Bid network service should initialize");
-    
-    // Test that service can handle initialization without issues
-    XCTAssertFalse(bidService.isCDPEndpointEmpty, @"CDP endpoint should not be empty");
 }
 
 #pragma mark - Cross-Component Exception Handling Tests
@@ -213,7 +209,7 @@
     
     NSString *gppString = [self.gppProvider gppString];
     NSArray *gppSid = [self.gppProvider gppSid];
-    CLXGppConsent *consent = [self.gppProvider decodeGppForTarget:nil];
+    CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:nil];
     
     XCTAssertTrue(YES, @"Should handle nil values gracefully");
 }

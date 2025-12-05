@@ -10,6 +10,7 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
+#import <CloudXCore/CLXConsentProvider.h>
 #import "CLXUserDefaultsTestHelper.h"
 #import <CoreLocation/CoreLocation.h>
 
@@ -88,9 +89,11 @@
 
 // Test that GDPR consent string is properly included in bidding config
 - (void)testGDPRConsentString_ShouldBeIncludedInBiddingConfig {
+    [self clearPrivacySettings];
+    
     NSString *testConsentString = @"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA";
     [[NSUserDefaults standardUserDefaults] setObject:testConsentString forKey:kCLXPrivacyGDPRConsentKey];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:kCLXPrivacyGDPRAppliesKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc] 
@@ -112,9 +115,11 @@
                       settings:[CLXSettings sharedInstance]
             privacyService:[CLXPrivacyService sharedInstance]];
     
-    // GDPR should NOT be included in bidding config as server doesn't support it yet
-    XCTAssertNil(config.regulations.ext.iab.tcString, @"TC string should not be included (server not supported)");
-    XCTAssertNil(config.regulations.ext.iab.gdprApplies, @"GDPR applies should not be included (server not supported)");
+    // GDPR is now supported in bid requests
+    XCTAssertNotNil(config.regulations.ext.iab.tcString, @"TC string should be included in bid request");
+    XCTAssertEqualObjects(config.regulations.ext.iab.tcString, testConsentString, @"TC string should match set value");
+    XCTAssertNotNil(config.regulations.ext.iab.gdprApplies, @"GDPR applies should be included in bid request");
+    XCTAssertEqualObjects(config.regulations.ext.iab.gdprApplies, @YES, @"GDPR applies should be YES");
 }
 
 // Test that CCPA privacy string is properly included in bidding config
@@ -203,12 +208,145 @@
     XCTAssertNotNil(config.regulations.ext, @"Regulations ext should be present");
     XCTAssertNotNil(config.regulations.ext.iab, @"IAB ext should be present");
     
-    // CCPA should be included (server supported)
+    // CCPA should be included
     XCTAssertEqualObjects(config.regulations.ext.iab.usPrivacyString, testCCPAString, @"US privacy string should match CCPA string");
     
-    // GDPR should NOT be included (server not supported yet)
-    XCTAssertNil(config.regulations.ext.iab.gdprApplies, @"GDPR applies should not be included (server not supported)");
-    XCTAssertNil(config.regulations.ext.iab.tcString, @"TC string should not be included (server not supported)");
+    // GDPR is now supported in bid requests
+    XCTAssertNotNil(config.regulations.ext.iab.gdprApplies, @"GDPR applies should be included");
+    XCTAssertEqualObjects(config.regulations.ext.iab.gdprApplies, @YES, @"GDPR applies should be YES");
+    XCTAssertEqualObjects(config.regulations.ext.iab.tcString, testGDPRConsent, @"TC string should match GDPR consent");
+}
+
+#pragma mark - GDPR Bid Request Tests
+
+// Test GDPR applies flag in bid request when set to YES
+- (void)testGDPRAppliesYes_ShouldBeIncludedInBidRequest {
+    [self clearPrivacySettings];
+    
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"IABTCF_gdprApplies"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"CQbFSYAQbFSYAEsACBENCFF" forKey:@"IABTCF_TCString"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc] 
+        initWithAdType:CLXAdTypeBanner
+                     adUnitID:@"test-ad-unit"
+            storedImpressionId:@"test-impression"
+                        dealID:@"test-deal"
+                     bidFloor:@1.0
+                displayManager:@"test-manager"
+            displayManagerVer:@"1.0"
+                   publisherID:@"test-pub"
+                      location:[[CLLocation alloc] initWithLatitude:37.7749 longitude:-122.4194]
+                     userAgent:@"test-agent"
+                   adapterInfo:@{}
+           nativeAdRequirements:nil
+           skadRequestParameters:@{}
+                          tmax:@3.0
+                      impModel:self.mockImpModel
+                      settings:[CLXSettings sharedInstance]
+            privacyService:self.privacyService];
+    
+    XCTAssertNotNil(config.regulations.ext.iab.gdprApplies, @"GDPR applies should be included");
+    XCTAssertEqualObjects(config.regulations.ext.iab.gdprApplies, @YES, @"GDPR applies should be YES");
+}
+
+// Test GDPR applies flag in bid request when set to NO
+- (void)testGDPRAppliesNo_ShouldNotClearData {
+    [self clearPrivacySettings];
+    
+    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"IABTCF_gdprApplies"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    // When GDPR doesn't apply, bidding config should still function normally
+    CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc] 
+        initWithAdType:CLXAdTypeBanner
+                     adUnitID:@"test-ad-unit"
+            storedImpressionId:@"test-impression"
+                        dealID:@"test-deal"
+                     bidFloor:@1.0
+                displayManager:@"test-manager"
+            displayManagerVer:@"1.0"
+                   publisherID:@"test-pub"
+                      location:[[CLLocation alloc] initWithLatitude:37.7749 longitude:-122.4194]
+                     userAgent:@"test-agent"
+                   adapterInfo:@{}
+           nativeAdRequirements:nil
+           skadRequestParameters:@{}
+                          tmax:@3.0
+                      impModel:self.mockImpModel
+                      settings:[CLXSettings sharedInstance]
+            privacyService:self.privacyService];
+    
+    // When GDPR doesn't apply, gdprApplies should be nil or not set
+    // The bid request should still be valid
+    XCTAssertNotNil(config, @"Bidding config should be created successfully");
+}
+
+// Test GPP resolution in bid request when GPP string available
+- (void)testGPPString_ShouldBeIncludedInBidRequest {
+    [self clearPrivacySettings];
+    
+    NSString *testGppString = @"DBABLA~BVVqAAEABBENA.QA";
+    [[NSUserDefaults standardUserDefaults] setObject:testGppString forKey:@"IABGPP_HDR_GppString"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"8" forKey:@"IABGPP_GppSID"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc] 
+        initWithAdType:CLXAdTypeBanner
+                     adUnitID:@"test-ad-unit"
+            storedImpressionId:@"test-impression"
+                        dealID:@"test-deal"
+                     bidFloor:@1.0
+                displayManager:@"test-manager"
+            displayManagerVer:@"1.0"
+                   publisherID:@"test-pub"
+                      location:[[CLLocation alloc] initWithLatitude:37.7749 longitude:-122.4194]
+                     userAgent:@"test-agent"
+                   adapterInfo:@{}
+           nativeAdRequirements:nil
+           skadRequestParameters:@{}
+                          tmax:@3.0
+                      impModel:self.mockImpModel
+                      settings:[CLXSettings sharedInstance]
+            privacyService:self.privacyService];
+    
+    XCTAssertNotNil(config.regulations.ext.gpp, @"GPP string should be included in bid request");
+    XCTAssertNotNil(config.regulations.ext.gppSid, @"GPP SID should be included in bid request");
+}
+
+// Test GPP resolution fallback from legacy TCF
+- (void)testGPPFallbackFromLegacyTCF_ShouldConstructGPP {
+    [self clearPrivacySettings];
+    
+    // Clear GPP but set legacy TCF
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_HDR_GppString"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_GppSID"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"CQbFSYAQbFSYAEsACBENCFF" forKey:@"IABTCF_TCString"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc] 
+        initWithAdType:CLXAdTypeBanner
+                     adUnitID:@"test-ad-unit"
+            storedImpressionId:@"test-impression"
+                        dealID:@"test-deal"
+                     bidFloor:@1.0
+                displayManager:@"test-manager"
+            displayManagerVer:@"1.0"
+                   publisherID:@"test-pub"
+                      location:[[CLLocation alloc] initWithLatitude:37.7749 longitude:-122.4194]
+                     userAgent:@"test-agent"
+                   adapterInfo:@{}
+           nativeAdRequirements:nil
+           skadRequestParameters:@{}
+                          tmax:@3.0
+                      impModel:self.mockImpModel
+                      settings:[CLXSettings sharedInstance]
+            privacyService:self.privacyService];
+    
+    // GPP should be constructed from legacy TCF
+    XCTAssertNotNil(config.regulations.ext.gpp, @"GPP should be constructed from legacy TCF");
+    XCTAssertTrue([config.regulations.ext.gpp hasPrefix:@"DBABMA~"], @"Constructed GPP should have TCF-only header");
+    XCTAssertEqualObjects(config.regulations.ext.gppSid, (@[@2]), @"Constructed GPP SID should be [2]");
 }
 
 @end
