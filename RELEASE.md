@@ -50,7 +50,10 @@ sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-vungle/CloudXVungleAd
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-inmobi/CloudXInMobiAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" renderer-cloudx/CloudXRenderer.podspec
 
-# 5. Update CHANGELOG.md with release date
+# 5. Update ALL CHANGELOGs with release notes:
+#    - cloudx-ios-private/CHANGELOG.md (internal)
+#    - cloudx-ios/CHANGELOG.md (public - copy from internal after Phase 3)
+#    - docs/ios/changelog.mdx (public docs - add version entry)
 
 # 6. Build xcframeworks
 cd core && ./build-xcframework.sh X.Y.Z && cd ..
@@ -517,6 +520,20 @@ git push origin --delete release/vX.Y.Z
 
 ---
 
+## CHANGELOGs (All Must Be Updated)
+
+**⚠️ THREE CHANGELOGs must be updated for each release:**
+
+| File | Repository | When to Update |
+|------|------------|----------------|
+| `CHANGELOG.md` | cloudx-ios-private | Phase 1 (prepare release) |
+| `CHANGELOG.md` | cloudx-ios | Phase 3 (copy from internal) |
+| `ios/changelog.mdx` | docs | Phase 3 (add version entry) |
+
+**Format:** Follow [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format with sections for Added, Changed, Fixed, Removed.
+
+---
+
 ## Version Files
 
 ### Version Constants (Private Repo)
@@ -573,7 +590,7 @@ pod trunk me
 2. **Never push source code to public repo** - Binary distribution only
 3. **Always squash merge to main** - Clean release history
 4. **Tag main after squash merge** - Component-specific tags
-5. **Update CHANGELOG.md** - Document what's in each release
+5. **Update ALL CHANGELOGs** - Internal (cloudx-ios-private), public (cloudx-ios), AND docs (docs/ios/changelog.mdx)
 6. **Test demo apps BEFORE merging PRs** - Verify xcframeworks work
 7. **Push to CocoaPods Trunk** - Required for public `pod install`
 
