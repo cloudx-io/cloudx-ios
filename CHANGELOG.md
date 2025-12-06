@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.1] - 2025-12-04
+
+### Added
+- **Visual Debugger Button** - New debugging tool for development and QA
+- **High-ROI Key-Value Targeting Examples** - Enhanced demo apps with targeting signal examples
+
+### Fixed
+- Corrected vendored_frameworks paths in podspecs
+
+---
+
 ## [1.2.0] - 2025-11-26
 
 ### 🚀 First Official Release
