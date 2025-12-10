@@ -24,12 +24,28 @@
     self.logger = [[CLXLogger alloc] initWithCategory:@"test"];
     self.capturedLogs = [NSMutableArray array];
     
+    // IMPORTANT: Disable testMode first to stop other tests from logging
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    // Wait for any pending log operations from other tests, then clear
+    [[CLXLogStore shared] flush];
+    [[CLXLogStore shared] clear];
+    
     // Reset to default state
     [CloudXCore setLoggingEnabled:YES];
     [CloudXCore setMinLogLevel:CLXLogLevelVerbose];
 }
 
 - (void)tearDown {
+    // Disable testMode to prevent logging from other tests
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    // Wait for any pending operations, then clear
+    [[CLXLogStore shared] flush];
+    [[CLXLogStore shared] clear];
+    
     self.capturedLogs = nil;
     self.logger = nil;
     [super tearDown];
@@ -175,15 +191,12 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     [[CLXLogStore shared] clear];
     
-    // Small delay to ensure clear completes
-    [NSThread sleepForTimeInterval:0.05];
-    
     // When: Logging messages
     [self.logger info:@"Test message 1"];
     [self.logger error:@"Test message 2"];
     
-    // Small delay to allow async operations to complete
-    [NSThread sleepForTimeInterval:0.1];
+    // Wait for async operations to complete
+    [[CLXLogStore shared] flush];
     
     // Then: Logs should be stored
     NSArray<CLXLogEntry *> *entries = [[CLXLogStore shared] allEntries];
@@ -201,15 +214,12 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     [[CLXLogStore shared] clear];
     
-    // Small delay to ensure clear completes
-    [NSThread sleepForTimeInterval:0.05];
-    
     // When: Logging messages
     [self.logger info:@"This should not be stored"];
     [self.logger error:@"Neither should this"];
     
-    // Small delay to allow async operations to complete
-    [NSThread sleepForTimeInterval:0.1];
+    // Wait for async operations to complete
+    [[CLXLogStore shared] flush];
     
     // Then: No logs should be stored
     NSUInteger count = [[CLXLogStore shared] count];
@@ -226,16 +236,14 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     [[CLXLogStore shared] clear];
     
-    [NSThread sleepForTimeInterval:0.05];
-    
     // When: Adding more than maxLogEntries
     NSUInteger maxEntries = [CLXLogStore maxLogEntries];
     for (NSUInteger i = 0; i < maxEntries + 10; i++) {
         [self.logger info:[NSString stringWithFormat:@"Log entry %lu", (unsigned long)i]];
     }
     
-    // Allow async operations to complete
-    [NSThread sleepForTimeInterval:0.5];
+    // Wait for all async operations to complete
+    [[CLXLogStore shared] flush];
     
     // Then: Should only have maxLogEntries
     NSUInteger count = [[CLXLogStore shared] count];
@@ -246,7 +254,8 @@
     CLXLogEntry *newestEntry = entries.firstObject;
     XCTAssertTrue([newestEntry.message containsString:@"1009"], @"Newest entry should be log 1009");
     
-    // Cleanup
+    // Cleanup - flush again to ensure all operations complete before clearing
+    [[CLXLogStore shared] flush];
     [[CLXLogStore shared] clear];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreTestModeKey];
 }
@@ -258,16 +267,13 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     [[CLXLogStore shared] clear];
     
-    [NSThread sleepForTimeInterval:0.05];
-    
     // When: Logging messages in sequence
     [self.logger info:@"First"];
-    [NSThread sleepForTimeInterval:0.01];
     [self.logger info:@"Second"];
-    [NSThread sleepForTimeInterval:0.01];
     [self.logger info:@"Third"];
     
-    [NSThread sleepForTimeInterval:0.1];
+    // Wait for async operations to complete
+    [[CLXLogStore shared] flush];
     
     // Then: Newest should be first
     NSArray<CLXLogEntry *> *entries = [[CLXLogStore shared] allEntries];
@@ -287,19 +293,16 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     [[CLXLogStore shared] clear];
     
-    [NSThread sleepForTimeInterval:0.05];
-    
     [self.logger info:@"Entry 1"];
     [self.logger info:@"Entry 2"];
     
-    [NSThread sleepForTimeInterval:0.1];
+    // Wait for async operations to complete
+    [[CLXLogStore shared] flush];
     
     XCTAssertEqual([[CLXLogStore shared] count], 2, @"Should have 2 entries before clear");
     
     // When: Clearing
     [[CLXLogStore shared] clear];
-    
-    [NSThread sleepForTimeInterval:0.1];
     
     // Then: Should be empty
     XCTAssertEqual([[CLXLogStore shared] count], 0, @"Should have 0 entries after clear");
@@ -315,11 +318,10 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     [[CLXLogStore shared] clear];
     
-    [NSThread sleepForTimeInterval:0.05];
-    
     [self.logger info:@"Test export message"];
     
-    [NSThread sleepForTimeInterval:0.1];
+    // Wait for async operations to complete
+    [[CLXLogStore shared] flush];
     
     // When: Exporting
     NSString *exported = [[CLXLogStore shared] exportAsString];

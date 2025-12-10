@@ -57,6 +57,9 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 
 #import <CloudXCore/CLXConfigImpressionModel.h>
+#import <CloudXCore/CLXRillImpressionModel.h>
+#import <CloudXCore/CLXRillImpressionInitService.h>
+#import <CloudXCore/NSString+CLXSemicolon.h>
 #import <CloudXCore/CLXSDKConfigPlacement.h>
 #import <CloudXCore/CLXPublisherBanner.h>
 #import <CloudXCore/CLXPublisherNative.h>

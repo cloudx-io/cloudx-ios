@@ -4,6 +4,7 @@
 #import <CloudXCore/CLXNativeTemplate.h>
 #import <CloudXCore/CLXAdapterNative.h>
 #import <CloudXCore/CLXPublisherNative.h>
+#import <CloudXCore/CLXBidAdSource.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXDebugClickFeedback.h>
