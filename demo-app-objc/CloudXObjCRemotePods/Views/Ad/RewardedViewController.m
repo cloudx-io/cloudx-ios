@@ -232,11 +232,11 @@
 }
 
 - (void)didDisplayAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 Rewarded didShowWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Rewarded didDisplayAd" ad:ad];
 }
 
 - (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failToShowWithAd - Error: %@", error.localizedDescription]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Rewarded didFailToDisplayAd" ad:ad];
     [self updateStatusUIWithState:AdStateNoAd];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -247,19 +247,17 @@
 }
 
 - (void)didHideAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 Rewarded didHideWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Rewarded didHideAd" ad:ad];
     self.rewardedAd = nil;
-    // Create new ad instance for next time
-    [self createRewardedAd];
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
 - (void)didClickAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 Rewarded didClickWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Rewarded didClickAd" ad:ad];
 }
 
 - (void)didRecordImpressionForAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👁️ Rewarded impressionOn - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Rewarded didRecordImpressionForAd" ad:ad];
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {
@@ -267,9 +265,9 @@
 }
 
 - (void)userRewarded:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🎁 Rewarded userRewarded - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"🎁 Rewarded userRewarded - Reward Earned!" ad:ad];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self showAlertWithTitle:@"Reward" message:@"User has earned a reward!"];
+        [self showAlertWithTitle:@"Reward Earned! 🎉" message:@"User has successfully earned a reward!"];
     });
 }
 
