@@ -2,9 +2,9 @@
 #import <UIKit/UIKit.h>
 #import <sys/utsname.h>
 
-@implementation UIDevice (Identifier)
+@implementation UIDevice (CLXIdentifier)
 
-+ (NSString *)deviceIdentifier {
++ (NSString *)clx_deviceIdentifier {
     static NSString *identifier = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -15,16 +15,16 @@
     return identifier;
 }
 
-+ (NSString *)deviceType {
-    return [self mapToDeviceWithIdentifier:self.deviceIdentifier][@"deviceType"];
++ (NSString *)clx_deviceType {
+    return [self clx_mapToDeviceWithIdentifier:self.clx_deviceIdentifier][@"deviceType"];
 }
 
-+ (NSString *)deviceGeneration {
-    return [self mapToDeviceWithIdentifier:self.deviceIdentifier][@"deviceGeneration"];
++ (NSString *)clx_deviceGeneration {
+    return [self clx_mapToDeviceWithIdentifier:self.clx_deviceIdentifier][@"deviceGeneration"];
 }
 
-+ (NSInteger)ppi {
-    return [[self mapToDeviceWithIdentifier:self.deviceIdentifier][@"ppi"] integerValue];
++ (NSInteger)clx_ppi {
+    return [[self clx_mapToDeviceWithIdentifier:self.clx_deviceIdentifier][@"ppi"] integerValue];
 }
 
 #pragma mark - Fallback for Unknown Devices
@@ -32,7 +32,7 @@
 /// Generates fallback device info for unknown device identifiers.
 /// Parses the identifier to extract device type and uses the identifier as the generation.
 /// This ensures future devices always return meaningful values without SDK updates.
-+ (NSDictionary<NSString *, id> *)fallbackDeviceInfoForIdentifier:(NSString *)identifier {
++ (NSDictionary<NSString *, id> *)clx_fallbackDeviceInfoForIdentifier:(NSString *)identifier {
     NSString *deviceType = @"Unknown";
     NSInteger defaultPPI = 460; // Modern device default
     
@@ -65,8 +65,8 @@
     };
 }
 
-+ (NSDictionary<NSString *, id> *)mapToDeviceWithIdentifier:(NSString *)identifier {
-    // Device map for known devices. For unknown devices, fallbackDeviceInfoForIdentifier
++ (NSDictionary<NSString *, id> *)clx_mapToDeviceWithIdentifier:(NSString *)identifier {
+    // Device map for known devices. For unknown devices, clx_fallbackDeviceInfoForIdentifier
     // extracts the device type from the identifier prefix and uses the identifier as generation.
     // This approach is future-proof: new devices automatically get reasonable values.
     static NSDictionary *deviceMap = nil;
@@ -133,7 +133,7 @@
     NSDictionary *deviceInfo = deviceMap[identifier];
     if (!deviceInfo) {
         // Fallback: parse the identifier to provide meaningful values for future devices
-        return [self fallbackDeviceInfoForIdentifier:identifier];
+        return [self clx_fallbackDeviceInfoForIdentifier:identifier];
     }
     return deviceInfo;
 }

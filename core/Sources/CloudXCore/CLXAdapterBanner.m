@@ -10,7 +10,7 @@
  */
 @implementation NSObject (CLXAdapterBannerDefaults)
 
-- (BOOL)isFlexibleSize {
+- (BOOL)clx_isFlexibleSize {
     // Default implementation: banners are fixed-size unless overridden
     return NO;
 }

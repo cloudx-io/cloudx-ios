@@ -1,12 +1,12 @@
 #import <CloudXCore/NSString+CLXSemicolon.h>
 
-@implementation NSString (Semicolon)
+@implementation NSString (CLXSemicolon)
 
-- (NSString *)semicolon {
+- (NSString *)clx_semicolon {
     return [self stringByAppendingString:@";"];
 }
 
-- (NSString *)base64Encoded {
+- (NSString *)clx_base64Encoded {
     NSData *data = [self dataUsingEncoding:NSUTF8StringEncoding];
     return [data base64EncodedStringWithOptions:0];
 }
@@ -14,9 +14,9 @@
 @end
 
 
-@implementation NSString (URLEncoding)
+@implementation NSString (CLXURLEncoding)
 
-- (NSString *)urlQueryEncodedString {
+- (NSString *)clx_urlQueryEncodedString {
     NSMutableCharacterSet *allowed = [NSMutableCharacterSet alphanumericCharacterSet];
     [allowed addCharactersInString:@"-._~"];
     return [self stringByAddingPercentEncodingWithAllowedCharacters:allowed];

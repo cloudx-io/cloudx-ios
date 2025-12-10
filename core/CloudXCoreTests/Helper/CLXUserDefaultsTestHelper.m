@@ -34,6 +34,14 @@
     // Clear any other keys that might be used in migration tests
     [userDefaults removeObjectForKey:kCLXCoreIfaConfigKey];
     
+    // Clear IAB GPP keys (used by CLXConsentProvider)
+    [userDefaults removeObjectForKey:@"IABGPP_HDR_GppString"];
+    [userDefaults removeObjectForKey:@"IABGPP_GppSID"];
+    
+    // Clear IAB TCF keys
+    [userDefaults removeObjectForKey:@"IABTCF_TCString"];
+    [userDefaults removeObjectForKey:@"IABTCF_gdprApplies"];
+    
     [userDefaults synchronize];
     
     // Reset DI container to ensure test isolation

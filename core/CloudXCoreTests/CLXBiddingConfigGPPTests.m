@@ -49,6 +49,10 @@
     self.gppProvider = [CLXConsentProvider sharedInstance];
     [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
     
+    // Explicitly clear GPP state for each test
+    [self.gppProvider setGppString:nil];
+    [self.gppProvider setGppSid:nil];
+    
     // Create mock SDK config with appID for tests
     self.mockSDKConfig = [[CLXSDKConfigResponse alloc] init];
     self.mockSDKConfig.appID = @"test-app-id-from-sdk";
@@ -62,6 +66,9 @@
 }
 
 - (void)tearDown {
+    // Clear GPP state to prevent interference with other tests
+    [self.gppProvider setGppString:nil];
+    [self.gppProvider setGppSid:nil];
     [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
     [super tearDown];
 }
@@ -80,16 +87,20 @@
     XCTAssertEqualObjects(gppInRequest, testGppString, @"GPP string should be included in bid request");
 }
 
-// Test GPP SID array is included in bid request regulations
-- (void)testGPPSidIncludedInBidRequest {
+// Test GPP SID is NOT included without GPP string (per OpenRTB 2.6 spec)
+// gpp_sid is intended to be used in conjunction with gpp - including gpp_sid
+// without a corresponding gpp string does not align with the specification.
+- (void)testGPPSidNotIncludedWithoutGPPString {
     NSArray *testGppSid = @[@7, @8];
     [self.gppProvider setGppSid:testGppSid];
+    // Note: NOT setting GPP string
     
     CLXBiddingConfigRequest *config = [self createTestBiddingConfig];
     NSDictionary *json = [config json];
     
+    // Per OpenRTB 2.6 spec, gpp_sid should NOT be included without gpp string
     NSArray *gppSidInRequest = json[@"regs"][@"ext"][@"gpp_sid"];
-    XCTAssertEqualObjects(gppSidInRequest, testGppSid, @"GPP SID array should be included in bid request");
+    XCTAssertNil(gppSidInRequest, @"GPP SID should NOT be included without GPP string (per OpenRTB 2.6 spec)");
 }
 
 // Test both GPP string and SID are included together

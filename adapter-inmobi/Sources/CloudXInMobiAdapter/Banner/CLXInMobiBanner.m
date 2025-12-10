@@ -71,7 +71,7 @@
     return self.banner;
 }
 
-- (BOOL)isFlexibleSize {
+- (BOOL)clx_isFlexibleSize {
     return NO;
 }
 

@@ -412,7 +412,7 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         // Use the device identifier (e.g., "iPhone17,1") which is always available and
         // provides precise hardware info for bidders. This is more valuable than marketing
         // names like "16 Pro" since bidders can map identifiers to exact specs.
-        device.hwv = [UIDevice deviceIdentifier];
+        device.hwv = [UIDevice clx_deviceIdentifier];
         device.language = [[NSLocale currentLocale] languageCode];
         device.ifa = ifa;
         device.dnt = @(dnt ? 1 : 0);
@@ -634,14 +634,14 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
     if (paths.userKeyValues && !shouldRemovePII && state.userKeyValues.count > 0) {
         NSDictionary *userKV = [state.userKeyValues copy];
         [logger debug:[NSString stringWithFormat:@"Injecting %lu user key-values at path: %@", (unsigned long)userKV.count, paths.userKeyValues]];
-        [json putAtDynamicPath:paths.userKeyValues value:userKV];
+        [json clx_putAtDynamicPath:paths.userKeyValues value:userKV];
     }
     
     // Inject app key-values (not affected by privacy)
     if (paths.appKeyValues && state.appKeyValues.count > 0) {
         NSDictionary *appKV = [state.appKeyValues copy];
         [logger debug:[NSString stringWithFormat:@"Injecting %lu app key-values at path: %@", (unsigned long)appKV.count, paths.appKeyValues]];
-        [json putAtDynamicPath:paths.appKeyValues value:appKV];
+        [json clx_putAtDynamicPath:paths.appKeyValues value:appKV];
     }
     
     // Inject hashed user ID as eids (respect privacy)
@@ -655,7 +655,7 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
             }]
         };
         [logger debug:[NSString stringWithFormat:@"Injecting hashed user ID at path: %@", paths.eids]];
-        [json putAtDynamicPath:paths.eids value:eid];
+        [json clx_putAtDynamicPath:paths.eids value:eid];
     }
 }
 

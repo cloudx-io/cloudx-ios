@@ -232,7 +232,7 @@
     NSData *secret = [CLXXorEncryption generateXorSecret: accountId];
     NSString *campaignId = [CLXXorEncryption generateCampaignIdBase64: accountId];
     
-    NSString *safeCampaignId = [campaignId urlQueryEncodedString];
+    NSString *safeCampaignId = [campaignId clx_urlQueryEncodedString];
     
     for (NSString *key in metricsDictionary.allKeys) {
         NSString *methodPayload = [encodedString stringByAppendingString:key];
@@ -241,7 +241,7 @@
         NSString *finalPayload = [valuePayload stringByAppendingString:@";"];
         NSString *encrypted = [CLXXorEncryption encrypt: finalPayload secret: secret];
         
-        NSString *safeEncrypted = [encrypted urlQueryEncodedString];
+        NSString *safeEncrypted = [encrypted clx_urlQueryEncodedString];
         NSDictionary *dict = @{
             @"eventName": key,
             @"campaignId": safeCampaignId,

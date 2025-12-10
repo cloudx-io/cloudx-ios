@@ -369,9 +369,9 @@ static CloudXCore *_sharedInstance = nil;
         
         NSString *encrypted = [CLXXorEncryption encrypt: payload secret: secret];
         
-        NSString *safeEncrypted = [encrypted urlQueryEncodedString];
+        NSString *safeEncrypted = [encrypted clx_urlQueryEncodedString];
         
-        NSString *safeCampaignId = [campaignId urlQueryEncodedString];
+        NSString *safeCampaignId = [campaignId clx_urlQueryEncodedString];
         
         if (encodedString.length > 0) {
             [self.reportingService rillTrackingWithActionString:@"sdkinitenc" campaignId: safeCampaignId encodedString: safeEncrypted];
@@ -1186,13 +1186,13 @@ static CloudXCore *_sharedInstance = nil;
     
     // Generate campaign ID for tracking
     NSString *campaignId = [CLXXorEncryption generateCampaignIdBase64:accountId];
-    NSString *safeCampaignId = [campaignId urlQueryEncodedString];
+    NSString *safeCampaignId = [campaignId clx_urlQueryEncodedString];
     
     // Create error-specific encoded string by appending error details
     NSString *errorPayload = [NSString stringWithFormat:@"%@;%@", encodedString, errorDetails];
     NSData *secret = [CLXXorEncryption generateXorSecret:accountId];
     NSString *errorEncrypted = [CLXXorEncryption encrypt:errorPayload secret:secret];
-    NSString *safeErrorEncrypted = [errorEncrypted urlQueryEncodedString];
+    NSString *safeErrorEncrypted = [errorEncrypted clx_urlQueryEncodedString];
     
     // Send SDK error tracking event
     [sharedInstance.reportingService rillTrackingWithActionString:@"sdkerrorenc" 

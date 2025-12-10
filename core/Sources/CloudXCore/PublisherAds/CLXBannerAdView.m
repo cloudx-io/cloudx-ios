@@ -271,7 +271,7 @@ static void initializeLogger() {
         
         // Check if adapter declares flexible sizing capability
         // Category default guarantees method exists - no need for respondsToSelector check
-        BOOL isFlexible = [banner isFlexibleSize];
+        BOOL isFlexible = [banner clx_isFlexibleSize];
         
         if (isFlexible) {
             // Flexible banner - stretch to fill container
@@ -389,7 +389,7 @@ static void initializeLogger() {
             
             // Check if adapter declares flexible sizing capability
             // Category default guarantees method exists - no need for respondsToSelector check
-            BOOL isFlexible = [currentBanner isFlexibleSize];
+            BOOL isFlexible = [currentBanner clx_isFlexibleSize];
             
             if (isFlexible) {
                 // Flexible banner - stretch to fill container

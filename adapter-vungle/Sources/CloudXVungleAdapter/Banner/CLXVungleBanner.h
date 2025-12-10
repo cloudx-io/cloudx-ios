@@ -45,12 +45,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
 
 /**
- * Indicates whether the banner view can dynamically resize to fill its container.
- * Vungle banners are fixed-size (320x50, etc.) and should be centered.
- */
-@property (nonatomic, assign, readonly) BOOL isFlexibleSize;
-
-/**
  * Timeout interval for ad loading
  */
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;

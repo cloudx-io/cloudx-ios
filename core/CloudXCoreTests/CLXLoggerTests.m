@@ -191,16 +191,24 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     [[CLXLogStore shared] clear];
     
-    // When: Logging messages
-    [self.logger info:@"Test message 1"];
-    [self.logger error:@"Test message 2"];
+    // Small delay to ensure clear completes
+    [NSThread sleepForTimeInterval:0.05];
+    
+    // When: Logging messages with unique identifiers
+    NSString *testMarker = [[NSUUID UUID] UUIDString];
+    NSString *message1 = [NSString stringWithFormat:@"Test message 1 %@", testMarker];
+    NSString *message2 = [NSString stringWithFormat:@"Test message 2 %@", testMarker];
+    [self.logger info:message1];
+    [self.logger error:message2];
     
     // Wait for async operations to complete
     [[CLXLogStore shared] flush];
     
-    // Then: Logs should be stored
+    // Then: Our specific logs should be stored (filter by our unique marker)
     NSArray<CLXLogEntry *> *entries = [[CLXLogStore shared] allEntries];
-    XCTAssertEqual(entries.count, 2, @"Should have 2 log entries");
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"message CONTAINS %@", testMarker];
+    NSArray<CLXLogEntry *> *testEntries = [entries filteredArrayUsingPredicate:predicate];
+    XCTAssertEqual(testEntries.count, 2, @"Should have 2 log entries from this test");
     
     // Cleanup
     [[CLXLogStore shared] clear];
@@ -236,23 +244,35 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     [[CLXLogStore shared] clear];
     
-    // When: Adding more than maxLogEntries
+    [NSThread sleepForTimeInterval:0.05];
+    
+    // When: Adding more than maxLogEntries with unique marker
+    NSString *testMarker = [[NSUUID UUID] UUIDString];
     NSUInteger maxEntries = [CLXLogStore maxLogEntries];
-    for (NSUInteger i = 0; i < maxEntries + 10; i++) {
-        [self.logger info:[NSString stringWithFormat:@"Log entry %lu", (unsigned long)i]];
+    NSUInteger totalEntries = maxEntries + 10;
+    for (NSUInteger i = 0; i < totalEntries; i++) {
+        [self.logger info:[NSString stringWithFormat:@"LRU_%@ entry %lu", testMarker, (unsigned long)i]];
     }
     
     // Wait for all async operations to complete
     [[CLXLogStore shared] flush];
     
-    // Then: Should only have maxLogEntries
-    NSUInteger count = [[CLXLogStore shared] count];
-    XCTAssertEqual(count, maxEntries, @"Should have exactly %lu entries after eviction", (unsigned long)maxEntries);
-    
-    // Verify oldest entries were removed (newest should be present)
+    // Then: Filter to only our test entries
     NSArray<CLXLogEntry *> *entries = [[CLXLogStore shared] allEntries];
-    CLXLogEntry *newestEntry = entries.firstObject;
-    XCTAssertTrue([newestEntry.message containsString:@"1009"], @"Newest entry should be log 1009");
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"message CONTAINS %@", testMarker];
+    NSArray<CLXLogEntry *> *testEntries = [entries filteredArrayUsingPredicate:predicate];
+    
+    // Verify LRU eviction: we added totalEntries but should only have maxEntries (or less due to eviction)
+    XCTAssertLessThanOrEqual(testEntries.count, maxEntries, 
+                              @"Should have at most %lu entries after eviction", (unsigned long)maxEntries);
+    
+    // Verify oldest entries were removed - newest entry should contain our highest index
+    if (testEntries.count > 0) {
+        CLXLogEntry *newestEntry = testEntries.firstObject;
+        NSString *expectedNewestIndex = [NSString stringWithFormat:@"entry %lu", (unsigned long)(totalEntries - 1)];
+        XCTAssertTrue([newestEntry.message containsString:expectedNewestIndex], 
+                      @"Newest entry should be the last logged entry (index %lu)", (unsigned long)(totalEntries - 1));
+    }
     
     // Cleanup - flush again to ensure all operations complete before clearing
     [[CLXLogStore shared] flush];

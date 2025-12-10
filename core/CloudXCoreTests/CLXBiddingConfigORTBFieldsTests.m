@@ -91,7 +91,7 @@
     CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
     
     // Verify device.model matches the UIDevice category method
-    NSString *expectedIdentifier = [UIDevice deviceIdentifier];
+    NSString *expectedIdentifier = [UIDevice clx_deviceIdentifier];
     XCTAssertEqualObjects(config.device.model, expectedIdentifier,
                           @"device.model should match UIDevice.deviceIdentifier");
 }
@@ -122,7 +122,7 @@
                              @"device.hwv should NOT equal device.osv - hwv is hardware version, osv is OS version");
     
     // Verify it matches the device identifier
-    XCTAssertEqualObjects(hwv, [UIDevice deviceIdentifier],
+    XCTAssertEqualObjects(hwv, [UIDevice clx_deviceIdentifier],
                           @"device.hwv should match UIDevice.deviceIdentifier");
 }
 
@@ -137,7 +137,7 @@
     NSString *trimmed = [[hwv componentsSeparatedByCharactersInSet:[versionChars invertedSet]] componentsJoinedByString:@""];
     
     // For simulator (x86, i386, or arm64 on Apple Silicon Macs), hwv might be the arch string
-    NSString *deviceId = [UIDevice deviceIdentifier];
+    NSString *deviceId = [UIDevice clx_deviceIdentifier];
     BOOL isSimulator = [deviceId hasPrefix:@"x86"] || [deviceId hasPrefix:@"i386"] || [deviceId hasPrefix:@"arm64"];
     if (!isSimulator) {
         XCTAssertFalse([trimmed isEqualToString:hwv],

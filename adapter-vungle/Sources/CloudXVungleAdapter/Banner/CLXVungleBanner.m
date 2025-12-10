@@ -70,7 +70,7 @@
     return [VungleAds sdkVersion] ?: @"unknown";
 }
 
-- (BOOL)isFlexibleSize {
+- (BOOL)clx_isFlexibleSize {
     return NO;  // Vungle banners are fixed-size and should be centered
 }
 

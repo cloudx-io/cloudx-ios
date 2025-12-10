@@ -97,8 +97,12 @@
     return ready;
 }
 
-- (BOOL)isFlexibleSize {
+- (BOOL)clx_isFlexibleSize {
     return YES;  // Meta banners are flexible and expand to container width
+}
+
+- (BOOL)isFlexibleSize {
+    return [self clx_isFlexibleSize];
 }
 
 - (void)load {
