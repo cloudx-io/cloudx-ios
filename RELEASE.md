@@ -8,18 +8,44 @@ The CloudX iOS SDK uses a **Gitflow** branching strategy with two repositories:
 
 | Repository | Purpose | Contains |
 |------------|---------|----------|
-| `cloudx-ios-private` | Source code | All source files, build scripts, tests |
-| `cloudx-ios` | Binary distribution | XCFrameworks, podspecs, demo apps |
+| `cloudx-ios-private` | Source code + dSYMs | All source files, build scripts, tests, **dSYM releases** |
+| `cloudx-ios` | Binary distribution | XCFrameworks (stripped), podspecs, demo apps |
 
 ## Components
 
-| Component | Description |
-|-----------|-------------|
-| **CloudXCore** | Core SDK with programmatic advertising engine |
-| **CloudXMetaAdapter** | Meta Audience Network integration |
-| **CloudXVungleAdapter** | Vungle/Liftoff integration |
-| **CloudXInMobiAdapter** | InMobi integration |
-| **CloudXRenderer** | Creative rendering engine |
+| Component | Type | Description |
+|-----------|------|-------------|
+| **CloudXCore** | **DYNAMIC** | Core SDK with programmatic advertising engine |
+| **CloudXMetaAdapter** | Static | Meta Audience Network integration |
+| **CloudXVungleAdapter** | Static | Vungle/Liftoff integration |
+| **CloudXInMobiAdapter** | Static | InMobi integration |
+| **CloudXRenderer** | Static | Creative rendering engine |
+
+## dSYM Strategy (CloudXCore Only)
+
+CloudXCore is distributed as a **dynamic framework** to enable crash symbolication:
+
+| Artifact | Repository | Purpose |
+|----------|------------|---------|
+| `CloudXCore.xcframework.zip` | `cloudx-ios` (PUBLIC) | Stripped binary for distribution |
+| `CloudXCore-dSYMs.zip` | `cloudx-ios-private` (PRIVATE) | Debug symbols for crash analysis |
+
+**⚠️ dSYMs are strictly internal and must NEVER be shared publicly.**
+
+### Crash Symbolication Workflow
+
+When a host app crashes in CloudXCore code:
+
+1. Host app owner sends unsymbolicated crash report to CloudX team
+2. CloudX downloads corresponding dSYMs from private repo release
+3. CloudX symbolicates crash internally using `atos` or `symbolicatecrash`
+4. CloudX provides fix or symbolicated stack trace to host app owner
+
+```bash
+# Example: Symbolicate a crash address
+atos -o CloudXCore-ios.dSYM/Contents/Resources/DWARF/CloudXCore \
+     -arch arm64 -l <load_address> <symbol_address>
+```
 
 ---
 
@@ -319,7 +345,7 @@ git push origin develop
 - Without this sync, the next release branch (created from develop) won't have main's history
 - This causes merge conflicts when trying to merge future releases to main
 
-#### Step 4: Tag PRIVATE Repo Main
+#### Step 4: Tag PRIVATE Repo Main and Create dSYM Release
 
 ```bash
 cd cloudx-ios-private
@@ -333,6 +359,38 @@ git tag vX.Y.Z-inmobi
 git tag vX.Y.Z-renderer
 git push origin vX.Y.Z-core vX.Y.Z-meta vX.Y.Z-vungle vX.Y.Z-inmobi vX.Y.Z-renderer
 ```
+
+#### Step 5: Upload dSYMs to PRIVATE Release (CloudXCore Only)
+
+**⚠️ CRITICAL: dSYMs must stay in the PRIVATE repo - never upload to public repo!**
+
+```bash
+cd cloudx-ios-private
+
+# Create private release with dSYMs for crash symbolication
+gh release create vX.Y.Z-core \
+  --title "CloudXCore X.Y.Z dSYMs (INTERNAL)" \
+  --notes "## CloudXCore v X.Y.Z dSYMs
+
+⚠️ **CONFIDENTIAL**: These dSYMs are for internal crash symbolication only.
+Never share these files outside the CloudX organization.
+
+### Usage
+When a host app owner reports a crash in CloudXCore:
+1. Download \`CloudXCore-dSYMs.zip\` from this release
+2. Use atos or symbolicatecrash to symbolicate the crash
+
+### Corresponding Public Release
+https://github.com/cloudx-io/cloudx-ios/releases/tag/vX.Y.Z-core" \
+  core/CloudXCore-dSYMs.zip
+
+echo "✅ dSYMs uploaded to private release"
+echo "🔗 https://github.com/cloudx-io/cloudx-ios-private/releases/tag/vX.Y.Z-core"
+```
+
+**Verification:** Confirm dSYMs are only in the private repo:
+- ✅ `cloudx-ios-private` release has `CloudXCore-dSYMs.zip`
+- ✅ `cloudx-ios` release has ONLY `CloudXCore.xcframework.zip` (no dSYMs!)
 
 ---
 
@@ -586,6 +644,8 @@ pod trunk me
 
 ## Important Rules
 
+### General Release Rules
+
 1. **Never push directly to main or develop** - Always use PRs
 2. **Never push source code to public repo** - Binary distribution only
 3. **Always squash merge to main** - Clean release history
@@ -594,17 +654,80 @@ pod trunk me
 6. **Test demo apps BEFORE merging PRs** - Verify xcframeworks work
 7. **Push to CocoaPods Trunk** - Required for public `pod install`
 
+### Framework Type Rules (CRITICAL)
+
+| Component | Framework Type | Has dSYMs? | Notes |
+|-----------|---------------|------------|-------|
+| **CloudXCore** | **DYNAMIC** | ✅ Yes (private) | Only component built as dynamic framework |
+| CloudXMetaAdapter | Static | ❌ No | Remains static - DO NOT CHANGE |
+| CloudXVungleAdapter | Static | ❌ No | Remains static - DO NOT CHANGE |
+| CloudXInMobiAdapter | Static | ❌ No | Remains static - DO NOT CHANGE |
+| CloudXRenderer | Static | ❌ No | Remains static - DO NOT CHANGE |
+
+**Why only CloudXCore is dynamic:**
+- CloudXCore contains our proprietary code that we want to debug via crash reports
+- Adapters are open source and will be moved to public repos - no need for private dSYMs
+- Dynamic frameworks enable host apps to capture crash reports we can symbolicate
+
+### `-ObjC` Linker Flag (CRITICAL for Dynamic Framework)
+
+⚠️ **The PUBLIC repo's `CloudXCore.podspec` MUST include the `-ObjC` linker flag!**
+
+Dynamic frameworks don't automatically load Objective-C categories at runtime. Without this flag, apps will crash with errors like:
+```
+-[CLXRendererBanner clx_isFlexibleSize]: unrecognized selector sent to instance
+```
+
+The public repo podspec must include:
+```ruby
+s.user_target_xcconfig = {
+  'OTHER_LDFLAGS' => '$(inherited) -ObjC'
+}
+```
+
+| Distribution Type | `-ObjC` Required? | Why |
+|------------------|-------------------|-----|
+| Source files | ❌ No | Categories compiled directly into binary |
+| Static framework | ❌ No | Symbols linked into app binary |
+| **Dynamic framework** | ✅ **YES** | Categories loaded at runtime - linker skips "unused" symbols |
+
+**This flag was NOT needed when CloudXCore was static, but IS required now that it's dynamic.**
+
+### dSYM Confidentiality Rules (CRITICAL)
+
+🔒 **dSYMs are STRICTLY INTERNAL and must NEVER be exposed publicly.**
+
+| Action | Allowed? |
+|--------|----------|
+| Upload dSYMs to `cloudx-ios-private` releases | ✅ Yes |
+| Upload dSYMs to `cloudx-ios` releases | 🚫 **NEVER** |
+| Push dSYMs to CocoaPods trunk | 🚫 **NEVER** |
+| Upload dSYMs to Sentry/Crashlytics | 🚫 **NEVER** |
+| Share dSYMs with customers | 🚫 **NEVER** |
+| Include dSYMs in public xcframework zip | 🚫 **NEVER** |
+
+**Why:** dSYMs can be used to reverse-engineer our code structure, function names, and logic.
+
 ---
 
 ## Troubleshooting
 
 ### Build Artifacts
 
-The build scripts may generate `release_metadata.txt` files in component directories. These are informational only and should **not be committed**. Delete them before committing:
+The build scripts may generate temporary files that should **not be committed**:
 
 ```bash
+# Delete metadata files (informational only)
 rm -f core/release_metadata.txt renderer-cloudx/release_metadata.txt
+
+# Delete local dSYM archives (already uploaded to private release)
+rm -f core/CloudXCore-dSYMs.zip
+
+# Clean build directories
+rm -rf core/build
 ```
+
+**⚠️ Never commit dSYM files to any repository** - they should only exist in private GitHub releases.
 
 ### Build Failures
 
@@ -645,4 +768,44 @@ pod repo update
 
 # Check if pod is available
 pod search CloudXCore
+```
+
+### dSYM Issues
+
+**dSYMs not generated:**
+```bash
+# Ensure DEBUG_INFORMATION_FORMAT is set correctly
+cd core
+grep -r "DEBUG_INFORMATION_FORMAT" CloudXCore.xcodeproj/project.pbxproj
+# Should show: DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym" for Release
+
+# Rebuild with explicit dSYM generation
+./build-xcframework.sh X.Y.Z
+ls -la build/dSYMs/  # Should contain .dSYM folders
+```
+
+**Symbolicating a crash report:**
+```bash
+# Download dSYMs from private release
+gh release download vX.Y.Z-core --repo cloudx-io/cloudx-ios-private --pattern "*dSYMs*"
+unzip CloudXCore-dSYMs.zip
+
+# Symbolicate using atos
+atos -o build/dSYMs/CloudXCore-ios.dSYM/Contents/Resources/DWARF/CloudXCore \
+     -arch arm64 -l 0x100000000 0x100001234
+
+# Or use symbolicatecrash
+export DEVELOPER_DIR=$(xcode-select -p)
+symbolicatecrash crash.ips build/dSYMs/CloudXCore-ios.dSYM > symbolicated.crash
+```
+
+**Verify dSYMs match framework:**
+```bash
+# Get UUID from framework
+dwarfdump --uuid CloudXCore.xcframework/ios-arm64/CloudXCore.framework/CloudXCore
+
+# Get UUID from dSYM
+dwarfdump --uuid CloudXCore-ios.dSYM
+
+# UUIDs must match for symbolication to work
 ```

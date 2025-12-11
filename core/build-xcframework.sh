@@ -4,38 +4,79 @@
 # CloudX Core SDK - XCFramework Release Script
 # ============================================================================
 #
+# ⚠️  THIS SCRIPT IS FOR CloudXCore ONLY ⚠️
+#
+#   This dynamic framework build applies ONLY to the core SDK (CloudXCore).
+#   Adapters (Meta, Vungle, InMobi, etc.) remain STATIC frameworks.
+#   DO NOT apply these build settings to adapter projects.
+#
+# ============================================================================
+#
 # OVERVIEW:
-#   Builds CloudXCore as a STATIC xcframework and prepares for binary distribution.
+#   Builds CloudXCore as a DYNAMIC xcframework with dSYMs for crash symbolication.
+#   The dynamic framework allows host apps to capture crash reports that can be
+#   symbolicated by CloudX using the privately-stored dSYMs.
+#
+#   ⚠️  dSYMs are generated for INTERNAL USE ONLY - they are never distributed
+#   publicly. dSYMs stay in our private repo so we can symbolicate crash reports
+#   that customers send us, without exposing our source code structure.
+#
 #   This is used by CI/CD but can also be run locally for testing.
 #
 # USAGE:
 #   cd cloudx-ios-private/core
-#   ./release-core-xcframework.sh 1.2.0
+#   ./build-xcframework.sh 1.2.0
 #
 # WHAT IT DOES:
 #   1. Validates version format and prerequisites
-#   2. Builds xcframework for iOS device + simulator
-#   3. Uploads dSYMs to Sentry for symbolication
-#   4. Strips debug symbols from framework binary
-#   5. Creates distributable .zip file
+#   2. Builds DYNAMIC xcframework for iOS device + simulator
+#   3. Generates dSYMs for crash symbolication
+#   4. Creates distributable .zip file (stripped framework, no debug symbols)
+#   5. Creates private dSYMs archive (for internal crash analysis)
 #   6. Computes SwiftPM checksum for Package.swift
 #   7. Outputs release artifacts and metadata
 #
 # REQUIREMENTS:
 #   - Xcode 15.3+ installed
-#   - SENTRY_AUTH_TOKEN environment variable (for dSYM uploads)
-#   - sentry-cli installed (curl -sL https://sentry.io/get-cli/ | bash)
 #
 # OUTPUT ARTIFACTS:
-#   - CloudXCore.xcframework/          (unzipped framework)
-#   - CloudXCore.xcframework.zip       (distributable binary)
+#   - CloudXCore.xcframework/          (dynamic framework, stripped)
+#   - CloudXCore.xcframework.zip       (distributable binary for public repo)
+#   - CloudXCore-dSYMs.zip             (dSYMs for private repo)
 #   - release_metadata.txt             (version, checksum, URLs)
 #
-# DISTRIBUTION:
-#   The generated xcframework.zip should be:
-#   1. Uploaded to GitHub Release on cloudx-io/cloudx-ios
-#   2. Referenced in CloudXCore.podspec with version and download URL
-#   3. Referenced in Package.swift with checksum
+# ============================================================================
+# ⚠️  dSYM CONFIDENTIALITY - READ CAREFULLY ⚠️
+# ============================================================================
+#
+#   The dSYMs contain debug symbols that allow crash reports to be symbolicated.
+#   These dSYMs are STRICTLY INTERNAL and must NEVER be distributed publicly.
+#
+#   WHY: dSYMs can be used to reverse-engineer our code. Keeping them private
+#        protects our intellectual property while still allowing us to debug
+#        crashes reported by host app developers.
+#
+#   DISTRIBUTION RULES:
+#     ✅ CloudXCore.xcframework.zip → PUBLIC (cloudx-io/cloudx-ios releases)
+#     🔒 CloudXCore-dSYMs.zip       → PRIVATE (cloudx-io/cloudx-ios-private releases ONLY)
+#
+#   🚫 NEVER upload dSYMs to:
+#      - The public cloudx-ios repo
+#      - CocoaPods trunk
+#      - GitHub releases on public repos
+#      - Sentry, Crashlytics, or any third-party crash reporting service
+#      - Any external location accessible outside our GitHub org
+#
+#   The dSYMs exist SOLELY for our internal crash analysis workflow.
+#
+# ============================================================================
+#
+# CRASH SYMBOLICATION WORKFLOW:
+#   When a host app crashes in CloudXCore code:
+#   1. Host app owner sends unsymbolicated crash report to CloudX team
+#   2. CloudX downloads corresponding dSYMs from PRIVATE repo release
+#   3. CloudX uses dSYMs to symbolicate crash internally (atos, symbolicatecrash)
+#   4. CloudX provides symbolicated stack trace or fix to host app owner
 #
 # ============================================================================
 
@@ -78,9 +119,10 @@ RELEASE_NAME="CloudXCore@$VERSION"
 ARCHIVE_DIR="./build"
 OUTPUT_XCFRAMEWORK="${MODULE_NAME}.xcframework"
 ZIP_OUTPUT="${MODULE_NAME}.xcframework.zip"
+DSYM_OUTPUT="${MODULE_NAME}-dSYMs.zip"
 
 echo ""
-echo "🚀 Building ${MODULE_NAME} v${VERSION} as STATIC XCFramework"
+echo "🚀 Building ${MODULE_NAME} v${VERSION} as DYNAMIC XCFramework"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
@@ -92,28 +134,14 @@ fi
 print_success "Using Xcode at: $(xcode-select -p)"
 xcodebuild -version
 
-# Validate sentry-cli for dSYM uploads
-if ! command -v sentry-cli &> /dev/null; then
-    print_warning "sentry-cli not found. dSYM upload will be skipped."
-    print_warning "Install with: curl -sL https://sentry.io/get-cli/ | bash"
-    SKIP_SENTRY=true
-else
-    if [ -z "$SENTRY_AUTH_TOKEN" ]; then
-        print_warning "SENTRY_AUTH_TOKEN not set. dSYM upload will be skipped."
-        SKIP_SENTRY=true
-    else
-        SKIP_SENTRY=false
-    fi
-fi
-
 # Clean build directory
 print_step "🧹 Cleaning build directory..."
-rm -rf "$ARCHIVE_DIR" "$OUTPUT_XCFRAMEWORK" "$ZIP_OUTPUT" "release_metadata.txt"
+rm -rf "$ARCHIVE_DIR" "$OUTPUT_XCFRAMEWORK" "$ZIP_OUTPUT" "$DSYM_OUTPUT" "release_metadata.txt"
 mkdir -p "$ARCHIVE_DIR"
 print_success "Build directory cleaned"
 
 # Build for iOS Device
-print_step "📱 Building for iOS device (STATIC)..."
+print_step "📱 Building for iOS device (DYNAMIC)..."
 set -o pipefail
 IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   -project CloudXCore.xcodeproj \
@@ -124,16 +152,11 @@ IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   SKIP_INSTALL=NO \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
   CODE_SIGNING_ALLOWED=NO \
-  DEBUG_INFORMATION_FORMAT=dwarf \
-  DEPLOYMENT_POSTPROCESSING=YES \
-  STRIP_INSTALLED_PRODUCT=YES \
-  STRIP_STYLE=non-global \
-  COPY_PHASE_STRIP=YES \
-  MACH_O_TYPE=staticlib | tee xcodebuild-ios.log
-print_success "iOS device build completed (STATIC)"
+  DEBUG_INFORMATION_FORMAT=dwarf-with-dsym | tee xcodebuild-ios.log
+print_success "iOS device build completed (DYNAMIC with dSYM)"
 
 # Build for iOS Simulator
-print_step "🖥️  Building for iOS simulator (STATIC)..."
+print_step "🖥️  Building for iOS simulator (DYNAMIC)..."
 IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   -project CloudXCore.xcodeproj \
   -scheme CloudXCore \
@@ -143,25 +166,68 @@ IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   SKIP_INSTALL=NO \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
   CODE_SIGNING_ALLOWED=NO \
-  DEBUG_INFORMATION_FORMAT=dwarf \
-  DEPLOYMENT_POSTPROCESSING=YES \
-  STRIP_INSTALLED_PRODUCT=YES \
-  STRIP_STYLE=non-global \
-  COPY_PHASE_STRIP=YES \
-  MACH_O_TYPE=staticlib | tee xcodebuild-sim.log
-print_success "iOS simulator build completed (STATIC)"
+  DEBUG_INFORMATION_FORMAT=dwarf-with-dsym | tee xcodebuild-sim.log
+print_success "iOS simulator build completed (DYNAMIC with dSYM)"
 
-# Create XCFramework
-print_step "🧱 Creating STATIC .xcframework..."
+# Create XCFramework with dSYMs
+print_step "🧱 Creating DYNAMIC .xcframework with dSYMs..."
 xcodebuild -create-xcframework \
   -framework "$ARCHIVE_DIR/ios_devices.xcarchive/Products/Library/Frameworks/${MODULE_NAME}.framework" \
+  -debug-symbols "$(pwd)/$ARCHIVE_DIR/ios_devices.xcarchive/dSYMs/${MODULE_NAME}.framework.dSYM" \
   -framework "$ARCHIVE_DIR/ios_simulator.xcarchive/Products/Library/Frameworks/${MODULE_NAME}.framework" \
+  -debug-symbols "$(pwd)/$ARCHIVE_DIR/ios_simulator.xcarchive/dSYMs/${MODULE_NAME}.framework.dSYM" \
   -output "$OUTPUT_XCFRAMEWORK"
-print_success "STATIC XCFramework created: $OUTPUT_XCFRAMEWORK"
+print_success "DYNAMIC XCFramework created: $OUTPUT_XCFRAMEWORK"
 
-# Note: dSYM generation disabled - no debug symbols to upload or strip
-print_step "ℹ️  Debug symbols disabled (no dSYMs generated)"
-print_success "Framework built without debug symbols"
+# Archive dSYMs for private distribution (crash symbolication)
+print_step "📦 Archiving dSYMs for private distribution..."
+DSYM_DIR="./build/dSYMs"
+mkdir -p "$DSYM_DIR"
+cp -R "$ARCHIVE_DIR/ios_devices.xcarchive/dSYMs/${MODULE_NAME}.framework.dSYM" "$DSYM_DIR/${MODULE_NAME}-ios.dSYM"
+cp -R "$ARCHIVE_DIR/ios_simulator.xcarchive/dSYMs/${MODULE_NAME}.framework.dSYM" "$DSYM_DIR/${MODULE_NAME}-simulator.dSYM"
+
+# Create dSYM metadata file
+cat > "$DSYM_DIR/dSYM_metadata.txt" << EOF
+CloudXCore dSYM Archive
+=======================
+Version: $VERSION
+Created: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+Contents:
+- ${MODULE_NAME}-ios.dSYM        (iOS device architecture)
+- ${MODULE_NAME}-simulator.dSYM  (iOS simulator architecture)
+
+Usage:
+  To symbolicate a crash report:
+  1. Extract this archive
+  2. Use atos or symbolicatecrash with the appropriate dSYM
+  
+  Example with atos:
+    atos -o ${MODULE_NAME}-ios.dSYM/Contents/Resources/DWARF/${MODULE_NAME} -arch arm64 -l <load_address> <symbol_address>
+
+  Example with symbolicatecrash:
+    symbolicatecrash crash.ips ${MODULE_NAME}-ios.dSYM > symbolicated.crash
+EOF
+
+zip -r "$DSYM_OUTPUT" "$DSYM_DIR" > /dev/null
+DSYM_SIZE=$(du -h "$DSYM_OUTPUT" | awk '{print $1}')
+print_success "dSYMs archived: $DSYM_OUTPUT ($DSYM_SIZE)"
+print_warning "⚠️  KEEP dSYMs PRIVATE - Upload to cloudx-ios-private releases only!"
+
+# Strip debug symbols from XCFramework for public distribution
+print_step "🔪 Stripping debug symbols from XCFramework..."
+find "$OUTPUT_XCFRAMEWORK" -name "*.framework" | while read FRAMEWORK; do
+    BINARY_NAME=$(basename "$FRAMEWORK" .framework)
+    BINARY_PATH="$FRAMEWORK/$BINARY_NAME"
+    if [ -f "$BINARY_PATH" ]; then
+        echo "  Stripping: $BINARY_PATH"
+        strip -x "$BINARY_PATH"
+    fi
+done
+
+# Remove embedded dSYMs from xcframework (keep only in private archive)
+find "$OUTPUT_XCFRAMEWORK" -name "*.dSYM" -type d -exec rm -rf {} + 2>/dev/null || true
+print_success "Debug symbols stripped from distributable framework"
 
 # Zip the xcframework
 print_step "📦 Zipping .xcframework..."
@@ -177,34 +243,46 @@ print_success "Checksum: $CHECKSUM"
 # Generate release metadata
 print_step "📝 Generating release metadata..."
 cat > release_metadata.txt << EOF
-CloudXCore v$VERSION - STATIC XCFramework Release
+CloudXCore v$VERSION - DYNAMIC XCFramework Release
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 VERSION:    $VERSION
 TAG:        v${VERSION}-core
-TYPE:       STATIC FRAMEWORK
-SIZE:       $ZIP_SIZE
+TYPE:       DYNAMIC FRAMEWORK
+SIZE:       $ZIP_SIZE (framework) / $DSYM_SIZE (dSYMs)
 CHECKSUM:   $CHECKSUM
+
+⚠️  dSYM CONFIDENTIALITY NOTICE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The dSYMs in $DSYM_OUTPUT are STRICTLY INTERNAL.
+NEVER upload dSYMs to the public repo or any external service.
+dSYMs can be used to reverse-engineer our code - keep them private!
 
 NEXT STEPS:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. Upload to GitHub Release:
+1. Upload FRAMEWORK to PUBLIC GitHub Release:
    - Repository: cloudx-io/cloudx-ios
    - Tag: v${VERSION}-core
    - Attach: $ZIP_OUTPUT
 
-2. Update cloudx-ios/core/CloudXCore.podspec:
+2. Upload dSYMs to PRIVATE GitHub Release:
+   - Repository: cloudx-io/cloudx-ios-private
+   - Tag: v${VERSION}-core
+   - Attach: $DSYM_OUTPUT
+   ⚠️  This must stay in the PRIVATE repo!
+
+3. Update cloudx-ios/core/CloudXCore.podspec:
    s.version = '$VERSION'
    s.source = {
      :http => 'https://github.com/cloudx-io/cloudx-ios/releases/download/v${VERSION}-core/CloudXCore.xcframework.zip'
    }
 
-3. Update cloudx-ios/core/Package.swift:
+4. Update cloudx-ios/core/Package.swift:
    url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v${VERSION}-core/CloudXCore.xcframework.zip",
    checksum: "$CHECKSUM"
 
-4. Push to CocoaPods:
+5. Push to CocoaPods:
    cd cloudx-ios/core
    pod trunk push CloudXCore.podspec --allow-warnings
 
@@ -219,16 +297,20 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo -e "${GREEN}✅ XCFramework build completed successfully!${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "📦 Artifacts:"
+echo "📦 PUBLIC Artifacts (for cloudx-ios):"
 echo "   • $OUTPUT_XCFRAMEWORK"
 echo "   • $ZIP_OUTPUT ($ZIP_SIZE)"
-echo "   • release_metadata.txt"
+echo ""
+echo "🔒 PRIVATE Artifacts (for cloudx-ios-private ONLY):"
+echo "   • $DSYM_OUTPUT ($DSYM_SIZE)"
+echo -e "   ${YELLOW}⚠️  NEVER upload dSYMs to public repo!${NC}"
 echo ""
 echo "📄 View release metadata:"
 echo "   cat release_metadata.txt"
 echo ""
-echo "🔗 GitHub Release URL:"
-echo "   https://github.com/cloudx-io/cloudx-ios/releases/tag/v${VERSION}-core"
+echo "🔗 GitHub Release URLs:"
+echo "   PUBLIC:  https://github.com/cloudx-io/cloudx-ios/releases/tag/v${VERSION}-core"
+echo "   PRIVATE: https://github.com/cloudx-io/cloudx-ios-private/releases/tag/v${VERSION}-core"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""

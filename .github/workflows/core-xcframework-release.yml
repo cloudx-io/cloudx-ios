@@ -1,5 +1,14 @@
 name: Release CloudXCore XCFramework
 
+# ============================================================================
+# This workflow builds CloudXCore as a DYNAMIC framework and:
+#   1. Creates a PUBLIC release with the stripped xcframework (cloudx-ios)
+#   2. Creates a PRIVATE release with dSYMs for crash symbolication (cloudx-ios-private)
+#
+# ⚠️  dSYMs are STRICTLY INTERNAL and must never be exposed publicly.
+#     They allow CloudX to symbolicate crash reports from host apps.
+# ============================================================================
+
 on:
   push:
     tags:
@@ -12,7 +21,6 @@ jobs:
       contents: write
 
     env:
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       CLOUDX_PUBLIC_REPO_TOKEN: ${{ secrets.CLOUDX_PUBLIC_REPO_TOKEN }}
       COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
@@ -30,9 +38,6 @@ jobs:
           rm -rf ~/Library/Developer/Xcode/DerivedData
           rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
 
-      - name: 🕵️ Install sentry-cli
-        run: curl -sL https://sentry.io/get-cli/ | bash
-
       - name: 🔢 Extract version from tag
         id: version
         run: |
@@ -42,7 +47,7 @@ jobs:
           echo "full_version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=v${VERSION_NO_SUFFIX}-core" >> $GITHUB_OUTPUT
 
-      - name: 📱 Build iOS Device Archive
+      - name: 📱 Build iOS Device Archive (DYNAMIC with dSYM)
         working-directory: core
         run: |
           set -o pipefail
@@ -54,9 +59,10 @@ jobs:
             -configuration Release \
             SKIP_INSTALL=NO \
             BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-            CODE_SIGNING_ALLOWED=NO | tee xcodebuild-ios.log
+            CODE_SIGNING_ALLOWED=NO \
+            DEBUG_INFORMATION_FORMAT=dwarf-with-dsym | tee xcodebuild-ios.log
 
-      - name: 🖥️ Build iOS Simulator Archive
+      - name: 🖥️ Build iOS Simulator Archive (DYNAMIC with dSYM)
         working-directory: core
         run: |
           set -o pipefail
@@ -68,29 +74,52 @@ jobs:
             -configuration Release \
             SKIP_INSTALL=NO \
             BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-            CODE_SIGNING_ALLOWED=NO | tee xcodebuild-sim.log
+            CODE_SIGNING_ALLOWED=NO \
+            DEBUG_INFORMATION_FORMAT=dwarf-with-dsym | tee xcodebuild-sim.log
 
-      - name: 🧱 Create XCFramework
+      - name: 🧱 Create XCFramework with dSYMs
         working-directory: core
         run: |
           xcodebuild -create-xcframework \
             -framework build/ios_devices.xcarchive/Products/Library/Frameworks/CloudXCore.framework \
+            -debug-symbols "$(pwd)/build/ios_devices.xcarchive/dSYMs/CloudXCore.framework.dSYM" \
             -framework build/ios_simulator.xcarchive/Products/Library/Frameworks/CloudXCore.framework \
+            -debug-symbols "$(pwd)/build/ios_simulator.xcarchive/dSYMs/CloudXCore.framework.dSYM" \
             -output CloudXCore.xcframework
 
-      - name: 🕵️ Upload dSYMs to Sentry
+      - name: 📦 Archive dSYMs for private release
         working-directory: core
         run: |
           VERSION=${{ steps.version.outputs.version }}
-          RELEASE_NAME="CloudXCore@$VERSION"
-          sentry-cli releases new "$RELEASE_NAME" || true
-          sentry-cli debug-files upload build/ios_devices.xcarchive/dSYMs || true
-          sentry-cli debug-files upload build/ios_simulator.xcarchive/dSYMs || true
-          sentry-cli releases finalize "$RELEASE_NAME" || true
+          mkdir -p build/dSYMs
+          cp -R build/ios_devices.xcarchive/dSYMs/CloudXCore.framework.dSYM build/dSYMs/CloudXCore-ios.dSYM
+          cp -R build/ios_simulator.xcarchive/dSYMs/CloudXCore.framework.dSYM build/dSYMs/CloudXCore-simulator.dSYM
+          
+          # Create metadata file
+          cat > build/dSYMs/dSYM_metadata.txt << EOF
+          CloudXCore dSYM Archive
+          =======================
+          Version: $VERSION
+          Created: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          Contents:
+          - CloudXCore-ios.dSYM        (iOS device architecture)
+          - CloudXCore-simulator.dSYM  (iOS simulator architecture)
+          
+          Usage:
+            atos -o CloudXCore-ios.dSYM/Contents/Resources/DWARF/CloudXCore -arch arm64 -l <load_address> <symbol_address>
+          EOF
+          
+          zip -r CloudXCore-dSYMs.zip build/dSYMs
+          echo "✅ dSYMs archived for private release"
 
-      - name: 🔪 Strip debug symbols from XCFramework
+      - name: 🔪 Strip debug symbols from XCFramework (for public distribution)
         working-directory: core
         run: |
+          # Remove embedded dSYMs from xcframework
+          find CloudXCore.xcframework -name "*.dSYM" -type d -exec rm -rf {} + 2>/dev/null || true
+          
+          # Strip debug symbols from binaries
           find CloudXCore.xcframework -name "*.framework" | while read FRAMEWORK; do
             BINARY_NAME=$(basename "$FRAMEWORK" .framework)
             BINARY_PATH="$FRAMEWORK/$BINARY_NAME"
@@ -99,6 +128,7 @@ jobs:
               strip -x "$BINARY_PATH"
             fi
           done
+          echo "✅ XCFramework stripped for public distribution"
 
       - name: 📦 Zip XCFramework
         working-directory: core
@@ -182,8 +212,10 @@ jobs:
               'CLANG_ENABLE_MODULES' => 'YES',
               'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
             }
+            # -ObjC flag is REQUIRED for dynamic framework to load Objective-C categories
             s.user_target_xcconfig = {
-              'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
+              'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO',
+              'OTHER_LDFLAGS' => '$(inherited) -ObjC'
             }
             
             s.swift_versions = ['5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9', '6.0', '6.1', '6.2']
@@ -314,6 +346,51 @@ jobs:
           echo ""
           echo "✅ CloudXCore successfully published to CocoaPods!"
 
+      - name: 🔒 Create PRIVATE release with dSYMs (cloudx-ios-private)
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          TAG=${{ steps.version.outputs.tag }}
+          
+          # Create private release notes
+          cat > private_release_notes.md << EOF
+          # CloudXCore v$VERSION - dSYMs (INTERNAL ONLY)
+          
+          ⚠️ **CONFIDENTIAL**: These dSYMs are for internal crash symbolication only.
+          Never share these files outside the CloudX organization.
+          
+          ## Contents
+          
+          - \`CloudXCore-dSYMs.zip\` - Debug symbols for iOS device + simulator
+          
+          ## Usage
+          
+          When a host app owner reports a crash in CloudXCore:
+          
+          1. Download \`CloudXCore-dSYMs.zip\` from this release
+          2. Extract the archive
+          3. Use atos or symbolicatecrash to symbolicate:
+          
+          \`\`\`bash
+          # Using atos
+          atos -o CloudXCore-ios.dSYM/Contents/Resources/DWARF/CloudXCore -arch arm64 -l <load_address> <symbol_address>
+          
+          # Using symbolicatecrash
+          symbolicatecrash crash.ips CloudXCore-ios.dSYM > symbolicated.crash
+          \`\`\`
+          
+          ## Corresponding Public Release
+          
+          https://github.com/cloudx-io/cloudx-ios/releases/tag/$TAG
+          EOF
+          
+          # Create private release with dSYMs
+          gh release create "$TAG" \
+            --title "CloudXCore v$VERSION dSYMs (INTERNAL)" \
+            --notes-file private_release_notes.md \
+            core/CloudXCore-dSYMs.zip
+          
+          echo "✅ Private dSYM release created at: https://github.com/cloudx-io/cloudx-ios-private/releases/tag/$TAG"
+
       - name: 📊 Release Summary
         run: |
           VERSION=${{ steps.version.outputs.version }}
@@ -325,13 +402,16 @@ jobs:
           echo "✅ CloudXCore v$VERSION Released Successfully!"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo ""
-          echo "📦 Distribution: Binary XCFramework"
+          echo "📦 Distribution: DYNAMIC XCFramework"
           echo "🏷️  Version: $VERSION"
           echo "🔖 Tag: $TAG"
           echo "🧮 Checksum: $CHECKSUM"
           echo ""
-          echo "🔗 Release URL:"
+          echo "🔗 PUBLIC Release (framework):"
           echo "   https://github.com/cloudx-io/cloudx-ios/releases/tag/$TAG"
+          echo ""
+          echo "🔒 PRIVATE Release (dSYMs for crash symbolication):"
+          echo "   https://github.com/cloudx-io/cloudx-ios-private/releases/tag/$TAG"
           echo ""
           echo "📚 CocoaPods:"
           echo "   pod 'CloudXCore', '~> $VERSION'"
