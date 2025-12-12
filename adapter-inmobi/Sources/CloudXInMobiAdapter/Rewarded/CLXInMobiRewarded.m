@@ -203,15 +203,20 @@
     [self.logger debug:@"Rewarded will dismiss"];
 }
 
+- (void)interstitialAdImpressed:(IMInterstitial *)interstitial {
+    // Native SDK impression callback - fires when ad is actually displayed/rendered
+    [self.logger info:@"Rewarded impression tracked by ad network SDK"];
+    
+    if ([self.delegate respondsToSelector:@selector(impressionWithRewarded:)]) {
+        [self.delegate impressionWithRewarded:self];
+    }
+}
+
 - (void)interstitial:(IMInterstitial *)interstitial didInteractWithParams:(nullable NSDictionary *)params {
     [self.logger info:@"Rewarded clicked"];
     
     if ([self.delegate respondsToSelector:@selector(clickWithRewarded:)]) {
         [self.delegate clickWithRewarded:self];
-    }
-    
-    if ([self.delegate respondsToSelector:@selector(impressionWithRewarded:)]) {
-        [self.delegate impressionWithRewarded:self];
     }
 }
 
@@ -225,6 +230,14 @@
 
 - (void)userWillLeaveApplicationFromInterstitial:(IMInterstitial *)interstitial {
     [self.logger debug:@"User will leave application"];
+}
+
+#pragma mark - Additional SDK callbacks (logging only - no delegate action)
+
+- (void)interstitialDidReceiveAd:(IMInterstitial *)interstitial {
+    // NO-OP: Ad content received before load completes. Logged for diagnostics only.
+    // Our SDK fires didLoadWithRewarded: when the ad is fully ready.
+    [self.logger debug:@"Rewarded did receive ad content"];
 }
 
 @end

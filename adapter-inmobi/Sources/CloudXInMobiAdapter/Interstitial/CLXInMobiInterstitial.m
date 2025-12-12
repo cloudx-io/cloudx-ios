@@ -213,22 +213,40 @@
     [self.logger debug:@"Interstitial will dismiss"];
 }
 
-- (void)interstitial:(IMInterstitial *)interstitial didInteractWithParams:(nullable NSDictionary *)params {
-    [self.logger info:@"Interstitial clicked"];
+- (void)interstitialAdImpressed:(IMInterstitial *)interstitial {
+    // Native SDK impression callback - fires when ad is actually displayed/rendered
+    [self.logger info:@"Interstitial impression tracked by ad network SDK"];
     
-    // InMobi fires this on click
-    if ([self.delegate respondsToSelector:@selector(clickWithInterstitial:)]) {
-        [self.delegate clickWithInterstitial:self];
-    }
-    
-    // Also fire impression (InMobi doesn't have separate impression callback)
     if ([self.delegate respondsToSelector:@selector(impressionWithInterstitial:)]) {
         [self.delegate impressionWithInterstitial:self];
     }
 }
 
+- (void)interstitial:(IMInterstitial *)interstitial didInteractWithParams:(nullable NSDictionary *)params {
+    [self.logger info:@"Interstitial clicked"];
+    
+    if ([self.delegate respondsToSelector:@selector(clickWithInterstitial:)]) {
+        [self.delegate clickWithInterstitial:self];
+    }
+}
+
 - (void)userWillLeaveApplicationFromInterstitial:(IMInterstitial *)interstitial {
     [self.logger debug:@"User will leave application"];
+}
+
+#pragma mark - Additional SDK callbacks (logging only - no delegate action)
+
+- (void)interstitial:(IMInterstitial *)interstitial rewardActionCompletedWithRewards:(NSDictionary *)rewards {
+    // NO-OP: Rewards are not supported in the interstitial ad format.
+    // If the ad network sends rewards for interstitials, we log but do not propagate.
+    // Use the Rewarded ad format for reward-based ads.
+    [self.logger warning:[NSString stringWithFormat:@"Unexpected reward on interstitial ad (not supported): %@", rewards]];
+}
+
+- (void)interstitialDidReceiveAd:(IMInterstitial *)interstitial {
+    // NO-OP: Ad content received before load completes. Logged for diagnostics only.
+    // Our SDK fires didLoadWithInterstitial: when the ad is fully ready.
+    [self.logger debug:@"Interstitial did receive ad content"];
 }
 
 @end

@@ -75,6 +75,10 @@
     return NO;
 }
 
+- (BOOL)isFlexibleSize {
+    return [self clx_isFlexibleSize];
+}
+
 - (void)load {
     // Validate placement ID at load time (deferred validation pattern)
     if (_placementID == 0) {
@@ -114,17 +118,9 @@
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
-    [self.logger info:@"Banner shown (added to view hierarchy)"];
-    
-    // Forward the display callback to the SDK
-    if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
-        [self.delegate didShowBanner:self];
-    }
-    
-    // Forward impression tracking
-    if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
-        [self.delegate impressionBanner:self];
-    }
+    // NO-OP: Impressions are tracked via bannerAdImpressed: callback from the ad network SDK.
+    // This method is called by the core SDK but is not needed for this adapter.
+    [self.logger debug:@"showFromViewController called (no-op for this adapter)"];
 }
 
 - (void)destroy {
@@ -149,6 +145,19 @@
     
     if ([self.delegate respondsToSelector:@selector(didLoadBanner:)]) {
         [self.delegate didLoadBanner:self];
+    }
+}
+
+- (void)bannerAdImpressed:(IMBanner *)banner {
+    // Native SDK impression callback - fires when ad is actually displayed/rendered
+    [self.logger info:@"Banner impression tracked by ad network SDK"];
+    
+    if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
+        [self.delegate didShowBanner:self];
+    }
+    
+    if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
+        [self.delegate impressionBanner:self];
     }
 }
 
@@ -198,6 +207,21 @@
     if ([self.delegate respondsToSelector:@selector(didCollapseBanner:)]) {
         [self.delegate didCollapseBanner:self];
     }
+}
+
+#pragma mark - Additional SDK callbacks (logging only - no delegate action)
+
+- (void)banner:(IMBanner *)banner didReceiveWithMetaInfo:(IMAdMetaInfo *)metaInfo {
+    // NO-OP: Metadata received before load completes. Logged for diagnostics only.
+    // Our SDK fires didLoadBanner: when the ad is fully ready, not on metadata receipt.
+    [self.logger debug:[NSString stringWithFormat:@"Banner received meta info - bidValue: %@", metaInfo.bidInfo]];
+}
+
+- (void)banner:(IMBanner *)banner rewardActionCompletedWithRewards:(NSDictionary *)rewards {
+    // NO-OP: Rewarded banners are not supported in our banner ad format.
+    // If the ad network sends rewards for banners, we log but do not propagate.
+    // Use the Rewarded ad format for reward-based ads.
+    [self.logger warning:[NSString stringWithFormat:@"Unexpected reward on banner ad (not supported): %@", rewards]];
 }
 
 @end
