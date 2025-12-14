@@ -88,6 +88,8 @@ NS_ASSUME_NONNULL_BEGIN
 // Visibility and prefetch properties
 @property (nonatomic, assign, readwrite) BOOL isVisible;
 @property (nonatomic, assign) BOOL hasPendingRefresh;
+// Set to YES after load failure to allow retry even when not visible
+@property (nonatomic, assign) BOOL bypassVisibilityCheck;
 @property (nonatomic, strong, nullable) id<CLXAdapterBanner> prefetchedBanner;
 @property (nonatomic, copy) NSString *placementSuffix;
 @property (nonatomic, assign) NSInteger impressionIndexStart;
@@ -118,8 +120,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation CLXPublisherBanner
-
-
 
 #pragma mark - Initialization
 
@@ -198,6 +198,7 @@ NS_ASSUME_NONNULL_BEGIN
         // Initialize visibility and prefetch properties
         _isVisible = YES;
         _hasPendingRefresh = NO;
+        _bypassVisibilityCheck = NO;
         _prefetchedBanner = nil;
         
         // Initialize timer service
@@ -566,8 +567,10 @@ NS_ASSUME_NONNULL_BEGIN
         return;
     }
     
-    if (self.isVisible) {
-        [self.logger debug:@"Banner is visible - requesting update"];
+    // Timer runs when: (visible OR bypassing visibility) AND autoRefreshEnabled
+    // The bypass allows retries after load failures even when the banner view isn't visible
+    if (self.isVisible || self.bypassVisibilityCheck) {
+        [self.logger debug:[NSString stringWithFormat:@"Requesting update (visible=%d, bypass=%d)", self.isVisible, self.bypassVisibilityCheck]];
         self.previousBanner = self.currentLoadingBanner;
         [self requestBannerUpdate];
     } else {
@@ -673,6 +676,9 @@ NS_ASSUME_NONNULL_BEGIN
         [self.delegate didLoadAd:ad];
     }
 
+    // Reset bypass flag on successful load - return to normal visibility-gated behavior
+    self.bypassVisibilityCheck = NO;
+    
     // Set manual refresh time to prevent impression fraud through rapid refresh manipulation.
     // This protects against two attack vectors:
     // 1) Show Banner -> Stop Auto-Refresh -> Start Auto-Refresh: Without this timestamp,
@@ -750,6 +756,11 @@ NS_ASSUME_NONNULL_BEGIN
         delegateError = [CLXError errorWithCode:error.code description:message];
     }
     
+    // Set bypass flag to allow retry even when banner isn't visible
+    // This ensures refresh continues after failures, enabling recovery without requiring visibility
+    self.bypassVisibilityCheck = YES;
+    [self.logger debug:@"Bypass visibility check enabled for retry after failure"];
+    
     // Start timer for next refresh interval (no banner-level retry)
     [self.logger debug:@"Starting timer for next refresh interval..."];
     [self.timerService startCountDownWithDeadline:self.refreshSeconds completion:^{
@@ -780,7 +791,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)impressionBanner:(id<CLXAdapterBanner>)banner {
     [self.logger debug:[NSString stringWithFormat:@"impression delegate called for placement: %@", self.placementID]];
     
-    // NEW: Record session depth impression (iOS feature parity with Android)
+    // Record session depth impression
     NSInteger adType = (self.bannerType == CLXBannerTypeW320H50) ? CLXAdTypeBanner : CLXAdTypeMrec;
     [[CLXSessionMetricsTracker sharedInstance] recordImpressionForPlacement:self.placementName adType:adType];
     
@@ -893,8 +904,9 @@ NS_ASSUME_NONNULL_BEGIN
         self.previousBanner = nil;
     }
     
-    // Clear pending refresh flag
+    // Clear pending refresh flag and bypass flag
     self.hasPendingRefresh = NO;
+    self.bypassVisibilityCheck = NO;
     
     // Clean up prefetched banner
     if (self.prefetchedBanner) {
@@ -911,6 +923,9 @@ NS_ASSUME_NONNULL_BEGIN
         [self.logger debug:[NSString stringWithFormat:@"Visibility changed to: %@", visible ? @"visible" : @"hidden"]];
         
         if (visible) {
+            // Banner became visible - reset bypass flag since we now have normal visibility
+            self.bypassVisibilityCheck = NO;
+            
             // Banner became visible - execute any pending refresh
             // Fix: Prevent double-loading during initial MREC setup by checking if we're already loading
             if (self.hasPendingRefresh && self.autoRefreshEnabled && !self.isLoading) {

@@ -287,19 +287,34 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     [[CLXLogStore shared] clear];
     
+    // Use unique markers to identify our test entries (avoids race conditions with other tests)
+    NSString *uniqueMarker = [[NSUUID UUID] UUIDString];
+    NSString *firstMsg = [NSString stringWithFormat:@"First_%@", uniqueMarker];
+    NSString *secondMsg = [NSString stringWithFormat:@"Second_%@", uniqueMarker];
+    NSString *thirdMsg = [NSString stringWithFormat:@"Third_%@", uniqueMarker];
+    
     // When: Logging messages in sequence
-    [self.logger info:@"First"];
-    [self.logger info:@"Second"];
-    [self.logger info:@"Third"];
+    [self.logger info:firstMsg];
+    [self.logger info:secondMsg];
+    [self.logger info:thirdMsg];
     
     // Wait for async operations to complete
     [[CLXLogStore shared] flush];
     
-    // Then: Newest should be first
-    NSArray<CLXLogEntry *> *entries = [[CLXLogStore shared] allEntries];
-    XCTAssertEqual(entries.count, 3, @"Should have 3 entries");
-    XCTAssertTrue([entries[0].message containsString:@"Third"], @"First entry should be 'Third' (newest)");
-    XCTAssertTrue([entries[2].message containsString:@"First"], @"Last entry should be 'First' (oldest)");
+    // Then: Filter to only our test entries and verify order (newest first)
+    NSArray<CLXLogEntry *> *allEntries = [[CLXLogStore shared] allEntries];
+    NSMutableArray<CLXLogEntry *> *testEntries = [NSMutableArray array];
+    for (CLXLogEntry *entry in allEntries) {
+        if ([entry.message containsString:uniqueMarker]) {
+            [testEntries addObject:entry];
+        }
+    }
+    
+    XCTAssertEqual(testEntries.count, 3, @"Should have 3 test entries");
+    if (testEntries.count >= 3) {
+        XCTAssertTrue([testEntries[0].message containsString:@"Third"], @"First entry should be 'Third' (newest)");
+        XCTAssertTrue([testEntries[2].message containsString:@"First"], @"Last entry should be 'First' (oldest)");
+    }
     
     // Cleanup
     [[CLXLogStore shared] clear];
@@ -313,19 +328,37 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     [[CLXLogStore shared] clear];
     
-    [self.logger info:@"Entry 1"];
-    [self.logger info:@"Entry 2"];
+    // Use unique markers to identify our test entries
+    NSString *uniqueMarker = [[NSUUID UUID] UUIDString];
+    [self.logger info:[NSString stringWithFormat:@"Entry1_%@", uniqueMarker]];
+    [self.logger info:[NSString stringWithFormat:@"Entry2_%@", uniqueMarker]];
     
     // Wait for async operations to complete
     [[CLXLogStore shared] flush];
     
-    XCTAssertEqual([[CLXLogStore shared] count], 2, @"Should have 2 entries before clear");
+    // Count only our test entries before clear
+    NSArray<CLXLogEntry *> *entriesBefore = [[CLXLogStore shared] allEntries];
+    NSUInteger testEntriesBeforeClear = 0;
+    for (CLXLogEntry *entry in entriesBefore) {
+        if ([entry.message containsString:uniqueMarker]) {
+            testEntriesBeforeClear++;
+        }
+    }
+    XCTAssertEqual(testEntriesBeforeClear, 2, @"Should have 2 test entries before clear");
     
     // When: Clearing
     [[CLXLogStore shared] clear];
     
-    // Then: Should be empty
-    XCTAssertEqual([[CLXLogStore shared] count], 0, @"Should have 0 entries after clear");
+    // Then: Our entries should be gone (and ideally all entries)
+    [[CLXLogStore shared] flush]; // Ensure clear is processed
+    NSArray<CLXLogEntry *> *entriesAfter = [[CLXLogStore shared] allEntries];
+    NSUInteger testEntriesAfterClear = 0;
+    for (CLXLogEntry *entry in entriesAfter) {
+        if ([entry.message containsString:uniqueMarker]) {
+            testEntriesAfterClear++;
+        }
+    }
+    XCTAssertEqual(testEntriesAfterClear, 0, @"Should have 0 test entries after clear");
     
     // Cleanup
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreTestModeKey];

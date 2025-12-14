@@ -10,6 +10,11 @@
 #import <CloudXCore/CloudXCore.h>
 #import <objc/runtime.h>
 
+// Category to expose internal methods for testing
+@interface CLXPublisherBanner (IntegrationTesting)
+- (void)setVisible:(BOOL)visible;
+@end
+
 // MARK: - Test Constants
 
 static NSString * const kTestPlacementID = @"integration-test-placement";

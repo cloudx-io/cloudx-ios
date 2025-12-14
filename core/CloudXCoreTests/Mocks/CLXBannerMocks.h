@@ -56,6 +56,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) id<CLXBannerDelegate> delegate;
 @property (nonatomic, assign) BOOL startAutoRefreshCalled;
 @property (nonatomic, assign) BOOL stopAutoRefreshCalled;
+@property (nonatomic, assign) BOOL setVisibleCalled;
+@property (nonatomic, assign) BOOL lastVisibleValue;
 @end
 
 NS_ASSUME_NONNULL_END
@@ -192,6 +194,11 @@ NS_ASSUME_NONNULL_END
 
 - (void)stopAutoRefresh {
     self.stopAutoRefreshCalled = YES;
+}
+
+- (void)setVisible:(BOOL)visible {
+    self.setVisibleCalled = YES;
+    self.lastVisibleValue = visible;
 }
 
 // CLXBanner protocol methods

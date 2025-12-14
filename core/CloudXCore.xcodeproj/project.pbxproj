@@ -52,7 +52,7 @@
 		19656C242E91CF3100BFA06E /* CLXBidLifecycleEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19656C232E91CF3100BFA06E /* CLXBidLifecycleEvent.m */; };
 		196B5A682EE9970A00262ECF /* CLXAdapterBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 196B5A672EE9970A00262ECF /* CLXAdapterBanner.m */; };
 		196B5A6C2EE9976600262ECF /* CLXAdapterErrorMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 196B5A6A2EE9976600262ECF /* CLXAdapterErrorMapper.m */; };
-		196B5A6D2EE9976600262ECF /* CLXAdapterErrorMapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 196B5A692EE9976600262ECF /* CLXAdapterErrorMapper.h */; };
+		196B5EB62EEC460F00262ECF /* CLXAdapterErrorMapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 196B5EB32EEC460F00262ECF /* CLXAdapterErrorMapper.h */; };
 		196C043F2ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C04382ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m */; };
 		196C04402ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C043A2ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m */; };
 		196C04412ECDBC1B0087146A /* CLXLoggerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C043C2ECDBC1B0087146A /* CLXLoggerTests.m */; };
@@ -396,8 +396,8 @@
 		19656C1B2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXBidLifecycleEvent.h; sourceTree = "<group>"; };
 		19656C232E91CF3100BFA06E /* CLXBidLifecycleEvent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidLifecycleEvent.m; sourceTree = "<group>"; };
 		196B5A672EE9970A00262ECF /* CLXAdapterBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterBanner.m; sourceTree = "<group>"; };
-		196B5A692EE9976600262ECF /* CLXAdapterErrorMapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAdapterErrorMapper.h; sourceTree = "<group>"; };
 		196B5A6A2EE9976600262ECF /* CLXAdapterErrorMapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterErrorMapper.m; sourceTree = "<group>"; };
+		196B5EB32EEC460F00262ECF /* CLXAdapterErrorMapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAdapterErrorMapper.h; sourceTree = "<group>"; };
 		196C04382ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXDynamicPathInjectionTests.m; sourceTree = "<group>"; };
 		196C04392ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXEventTrackerBulkApiTests.m; sourceTree = "<group>"; };
 		196C043A2ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXKeyValueBidRequestInjectionTests.m; sourceTree = "<group>"; };
@@ -1045,7 +1045,7 @@
 		19C725422E2390810012CFC7 /* CloudXCore */ = {
 			isa = PBXGroup;
 			children = (
-				196B5A692EE9976600262ECF /* CLXAdapterErrorMapper.h */,
+				196B5EB32EEC460F00262ECF /* CLXAdapterErrorMapper.h */,
 				19D8D2202EDA04C900817D1E /* CLXORTBConstants.h */,
 				19D8D4B72EDD7B0400817D1E /* Debug */,
 				19D8D4072EDAFC8000817D1E /* CLXLogEntry.h */,
@@ -1289,7 +1289,7 @@
 				19C725632E2390810012CFC7 /* CLXBidderConfig.h in Headers */,
 				19C725662E2390810012CFC7 /* CLXBidAdSource.h in Headers */,
 				19C725672E2390810012CFC7 /* CLXExponentialBackoffStrategy.h in Headers */,
-				196B5A6D2EE9976600262ECF /* CLXAdapterErrorMapper.h in Headers */,
+				196B5EB62EEC460F00262ECF /* CLXAdapterErrorMapper.h in Headers */,
 				19C725682E2390810012CFC7 /* CLXAdapterFactoryResolver.h in Headers */,
 				19C725692E2390810012CFC7 /* UIDevice+CLXIdentifier.h in Headers */,
 				19C7256A2E2390810012CFC7 /* CLXDestroyable.h in Headers */,

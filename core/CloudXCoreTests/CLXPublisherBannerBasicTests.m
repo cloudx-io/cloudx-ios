@@ -144,6 +144,7 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
 @property (nonatomic, strong, nullable, readwrite) id<CLXAdapterBanner> prefetchedBanner;
 @property (nonatomic, strong, nullable, readwrite) id<CLXAdapterBanner> bannerOnScreen;
 @property (nonatomic, assign, readwrite) BOOL isVisible;
+@property (nonatomic, assign) BOOL bypassVisibilityCheck; // For testing bypass feature
 // Expose private methods for testing
 - (void)setVisible:(BOOL)visible;
 - (void)timerDidReachEnd;
@@ -352,10 +353,124 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
     [self.banner _timerDidReachEndSynchronous];
     XCTAssertFalse(self.banner.hasPendingRefresh, @"Should not queue when visible");
     
-    // Test timer expiry while hidden (should queue)
+    // Test timer expiry while hidden (should queue when bypass is OFF)
     [self.banner setVisible:NO];
+    self.banner.bypassVisibilityCheck = NO; // Ensure bypass is off
     [self.banner _timerDidReachEndSynchronous];
-    XCTAssertTrue(self.banner.hasPendingRefresh, @"Should queue when hidden");
+    XCTAssertTrue(self.banner.hasPendingRefresh, @"Should queue when hidden and bypass is OFF");
+}
+
+#pragma mark - Bypass Visibility Check Tests (PR #98 feature)
+
+// Test that bypass flag starts as NO
+- (void)testBypassVisibilityCheckStartsDisabled {
+    XCTAssertFalse(self.banner.bypassVisibilityCheck, @"Bypass should be OFF initially");
+}
+
+// Test that load failure enables bypass
+- (void)testLoadFailureEnablesbypassVisibilityCheck {
+    XCTAssertFalse(self.banner.bypassVisibilityCheck, @"Bypass should start OFF");
+    
+    NSError *testError = [NSError errorWithDomain:@"TestError" code:100 userInfo:nil];
+    [self.banner failToLoadBanner:nil error:testError];
+    
+    XCTAssertTrue(self.banner.bypassVisibilityCheck, @"Bypass should be ON after load failure");
+}
+
+// Test that successful load disables bypass
+- (void)testSuccessfulLoadDisablesBypassVisibilityCheck {
+    // First, enable bypass via failure
+    NSError *testError = [NSError errorWithDomain:@"TestError" code:100 userInfo:nil];
+    [self.banner failToLoadBanner:nil error:testError];
+    XCTAssertTrue(self.banner.bypassVisibilityCheck, @"Bypass should be ON after failure");
+    
+    // Now load successfully
+    BasicMockAdapter *mockAdapter = [[BasicMockAdapter alloc] initWithID:@"test-adapter"];
+    self.banner.currentLoadingBanner = mockAdapter;
+    [self.banner didLoadBanner:mockAdapter];
+    
+    XCTAssertFalse(self.banner.bypassVisibilityCheck, @"Bypass should be OFF after successful load");
+}
+
+// Test that becoming visible disables bypass
+- (void)testBecomingVisibleDisablesBypassVisibilityCheck {
+    // Enable bypass via failure
+    NSError *testError = [NSError errorWithDomain:@"TestError" code:100 userInfo:nil];
+    [self.banner failToLoadBanner:nil error:testError];
+    XCTAssertTrue(self.banner.bypassVisibilityCheck, @"Bypass should be ON after failure");
+    
+    // Hide banner
+    [self.banner setVisible:NO];
+    XCTAssertTrue(self.banner.bypassVisibilityCheck, @"Bypass should remain ON while hidden");
+    
+    // Make visible
+    [self.banner setVisible:YES];
+    XCTAssertFalse(self.banner.bypassVisibilityCheck, @"Bypass should be OFF after becoming visible");
+}
+
+// Test timer fires load (not queue) when hidden WITH bypass enabled
+- (void)testTimerLoadsWhenHiddenWithBypassEnabled {
+    // Hide banner and enable bypass
+    [self.banner setVisible:NO];
+    self.banner.bypassVisibilityCheck = YES;
+    self.banner.hasPendingRefresh = NO; // Reset
+    
+    // Timer fires while hidden with bypass
+    [self.banner _timerDidReachEndSynchronous];
+    
+    // Should NOT queue (hasPendingRefresh should stay NO because it triggered a load)
+    // The bypass allows load to proceed despite being hidden
+    XCTAssertFalse(self.banner.hasPendingRefresh, 
+                  @"Should NOT queue when bypass is enabled - should trigger load instead");
+}
+
+// Test complete bypass flow: failure → hidden → timer → load while hidden
+- (void)testCompleteBypassFlow {
+    // 1. Start visible, trigger a failure
+    XCTAssertTrue(self.banner.isVisible, @"Should start visible");
+    NSError *testError = [NSError errorWithDomain:@"TestError" code:100 userInfo:nil];
+    [self.banner failToLoadBanner:nil error:testError];
+    XCTAssertTrue(self.banner.bypassVisibilityCheck, @"Bypass should be enabled after failure");
+    
+    // 2. Hide banner (simulates publisher showing fallback ad)
+    [self.banner setVisible:NO];
+    XCTAssertFalse(self.banner.isVisible, @"Banner should be hidden");
+    XCTAssertTrue(self.banner.bypassVisibilityCheck, @"Bypass should remain enabled while hidden");
+    
+    // 3. Timer fires - should trigger load (not queue) because bypass is enabled
+    self.banner.hasPendingRefresh = NO;
+    [self.banner _timerDidReachEndSynchronous];
+    XCTAssertFalse(self.banner.hasPendingRefresh, 
+                  @"Should NOT queue - bypass should allow load while hidden");
+    
+    // 4. Simulate successful load while hidden
+    BasicMockAdapter *mockAdapter = [[BasicMockAdapter alloc] initWithID:@"prefetch-adapter"];
+    self.banner.currentLoadingBanner = mockAdapter;
+    [self.banner didLoadBanner:mockAdapter];
+    
+    // 5. Banner should be prefetched (not displayed since hidden)
+    XCTAssertEqual(self.banner.prefetchedBanner, mockAdapter, 
+                  @"Should prefetch banner when loading while hidden");
+    XCTAssertFalse(self.banner.bypassVisibilityCheck, 
+                  @"Bypass should be disabled after successful load");
+    
+    // 6. Make visible - prefetched banner should display
+    [self.banner setVisible:YES];
+    XCTAssertEqual(self.banner.bannerOnScreen, mockAdapter, 
+                  @"Prefetched banner should be displayed when becoming visible");
+    XCTAssertNil(self.banner.prefetchedBanner, 
+                @"Prefetch should be cleared after display");
+}
+
+// Test destroy clears bypass flag
+- (void)testDestroyCleansBypassFlag {
+    // Enable bypass
+    self.banner.bypassVisibilityCheck = YES;
+    XCTAssertTrue(self.banner.bypassVisibilityCheck, @"Bypass should be enabled");
+    
+    [self.banner destroy];
+    
+    XCTAssertFalse(self.banner.bypassVisibilityCheck, @"Bypass should be cleared on destroy");
 }
 
 @end
