@@ -240,7 +240,7 @@
     // NO-OP: Rewards are not supported in the interstitial ad format.
     // If the ad network sends rewards for interstitials, we log but do not propagate.
     // Use the Rewarded ad format for reward-based ads.
-    [self.logger warning:[NSString stringWithFormat:@"Unexpected reward on interstitial ad (not supported): %@", rewards]];
+    [self.logger warn:[NSString stringWithFormat:@"Unexpected reward on interstitial ad (not supported): %@", rewards]];
 }
 
 - (void)interstitialDidReceiveAd:(IMInterstitial *)interstitial {

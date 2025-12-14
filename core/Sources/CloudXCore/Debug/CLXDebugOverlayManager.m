@@ -5,6 +5,7 @@
 #import "CLXDebugOverlayManager.h"
 #import "CLXDebugButton.h"
 #import "CLXDebugLogViewController.h"
+#import "CLXUIApplicationProxy.h"
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CloudXCoreAPI.h>
 
@@ -172,23 +173,7 @@
 }
 
 - (UIWindow *)findKeyWindow {
-    if (@available(iOS 13.0, *)) {
-        for (UIWindowScene *scene in [UIApplication sharedApplication].connectedScenes) {
-            if (scene.activationState == UISceneActivationStateForegroundActive) {
-                for (UIWindow *window in scene.windows) {
-                    if (window.isKeyWindow) {
-                        return window;
-                    }
-                }
-            }
-        }
-    }
-    
-    // Fallback for older iOS
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    return [UIApplication sharedApplication].keyWindow;
-#pragma clang diagnostic pop
+    return [CLXUIApplicationProxy keyWindow];
 }
 
 - (void)hide {

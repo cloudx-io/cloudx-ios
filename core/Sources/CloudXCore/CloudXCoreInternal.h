@@ -120,6 +120,7 @@
 // Utilities
 #import <CloudXCore/CLXXorEncryption.h>
 #import <CloudXCore/CLXErrorReporter.h>
+#import <CloudXCore/CLXUIApplicationProxy.h>
 
 // Categories
 #import <CloudXCore/NSString+CLXSemicolon.h>

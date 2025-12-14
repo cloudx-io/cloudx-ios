@@ -22,6 +22,7 @@
 #import <Photos/Photos.h>
 #import <AVFoundation/AVFoundation.h>
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXUIApplicationProxy.h>
 
 /**
  * Private interface for CLXMRAIDManager
@@ -169,16 +170,13 @@
     _screenSize = screenBounds;
     _maxSize = screenBounds;
     
-    // Adjust for safe area on newer devices
-    if (@available(iOS 11.0, *)) {
-        UIWindow *window = [UIApplication sharedApplication].keyWindow;
-        if (window) {
-            UIEdgeInsets safeArea = window.safeAreaInsets;
-            _maxSize = CGRectMake(safeArea.left, 
-                                 safeArea.top,
-                                 screenBounds.size.width - safeArea.left - safeArea.right,
-                                 screenBounds.size.height - safeArea.top - safeArea.bottom);
-        }
+    // Adjust for safe area
+    UIEdgeInsets safeArea = [CLXUIApplicationProxy safeAreaInsets];
+    if (!UIEdgeInsetsEqualToEdgeInsets(safeArea, UIEdgeInsetsZero)) {
+        _maxSize = CGRectMake(safeArea.left, 
+                             safeArea.top,
+                             screenBounds.size.width - safeArea.left - safeArea.right,
+                             screenBounds.size.height - safeArea.top - safeArea.bottom);
     }
 }
 
@@ -639,7 +637,9 @@
 #pragma mark - Notification Handlers
 
 - (void)orientationDidChange:(NSNotification *)notification {
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    // Use the modern window scene API for orientation (iOS 13+, we require iOS 14+)
+    UIWindowScene *scene = [CLXUIApplicationProxy activeWindowScene];
+    UIInterfaceOrientation orientation = scene ? scene.interfaceOrientation : UIInterfaceOrientationUnknown;
     [self handleOrientationChange:orientation];
 }
 

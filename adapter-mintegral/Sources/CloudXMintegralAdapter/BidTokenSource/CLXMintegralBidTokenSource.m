@@ -53,7 +53,7 @@
             NSString *bidToken = [[MTGSDK sharedInstance] getBidToken];
             
             if (!bidToken || bidToken.length == 0) {
-                [self.logger warning:@"Mintegral returned empty bid token"];
+                [self.logger warn:@"Mintegral returned empty bid token"];
                 bidToken = @""; // Use empty string instead of nil
             } else {
                 [self.logger debug:[NSString stringWithFormat:@"Generated bid token (prefix): %@...", 

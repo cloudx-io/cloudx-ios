@@ -34,6 +34,7 @@
 #import <CloudXCore/CloudXCoreAPI.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXSDKConfig.h>
+#import "CLXUIApplicationProxy.h"
 #import <objc/runtime.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -488,8 +489,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     } else {
         // No presented VC found, or it was already dismissed
         // Try to find and dismiss from the root view controller as a fallback
-        UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
-        if (rootVC.presentedViewController) {
+        UIViewController *rootVC = [CLXUIApplicationProxy keyWindow].rootViewController;
+        if (rootVC && rootVC.presentedViewController) {
             [self.logger debug:@"Fallback: dismissing from root view controller"];
             [rootVC dismissViewControllerAnimated:NO completion:^{
                 [self.logger debug:@"Root VC presented view controller dismissed"];

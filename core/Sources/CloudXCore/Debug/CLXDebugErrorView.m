@@ -4,6 +4,7 @@
 
 #import "CLXDebugErrorView.h"
 #import "CLXDebugOverlayManager.h"
+#import "CLXUIApplicationProxy.h"
 
 @interface CLXDebugErrorView () {
     NSString *_storedTitle;
@@ -177,21 +178,7 @@
 }
 
 - (UIWindow *)findKeyWindow {
-    if (@available(iOS 13.0, *)) {
-        for (UIWindowScene *scene in [UIApplication sharedApplication].connectedScenes) {
-            if (scene.activationState == UISceneActivationStateForegroundActive) {
-                for (UIWindow *window in scene.windows) {
-                    if (window.isKeyWindow) {
-                        return window;
-                    }
-                }
-            }
-        }
-    }
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    return [UIApplication sharedApplication].keyWindow;
-#pragma clang diagnostic pop
+    return [CLXUIApplicationProxy keyWindow];
 }
 
 - (UIViewController *)topViewControllerFrom:(UIViewController *)vc {

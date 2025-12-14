@@ -221,7 +221,7 @@
     // NO-OP: Rewarded banners are not supported in our banner ad format.
     // If the ad network sends rewards for banners, we log but do not propagate.
     // Use the Rewarded ad format for reward-based ads.
-    [self.logger warning:[NSString stringWithFormat:@"Unexpected reward on banner ad (not supported): %@", rewards]];
+    [self.logger warn:[NSString stringWithFormat:@"Unexpected reward on banner ad (not supported): %@", rewards]];
 }
 
 @end
