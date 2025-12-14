@@ -25,14 +25,16 @@
         _delegate = delegate;
         _sdkVersion = [CLXMintegralInitializer sdkVersion];
         _network = @"mintegral";
+        _playVideoMute = NO;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMintegralInterstitial"];
         
         [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID:%@, UnitID:%@, BidID:%@", 
                            placementID, unitID, bidID]];
         
-        _interstitialManager = [[MTGBidInterstitialVideoAdManager alloc] initWithPlacementId:placementID 
-                                                                                       unitId:unitID 
-                                                                                     delegate:self];
+        // Use the NEW Interstitial Bid Ad Manager (matches AppLovin implementation)
+        _interstitialManager = [[MTGNewInterstitialBidAdManager alloc] initWithPlacementId:placementID 
+                                                                                    unitId:unitID 
+                                                                                  delegate:self];
     }
     return self;
 }
@@ -47,6 +49,9 @@
     [self.logger debug:[NSString stringWithFormat:@"Loading ad - PlacementID:%@, UnitID:%@", _placementID, _unitID]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
+        // Apply mute setting before loading
+        self.interstitialManager.playVideoMute = self.playVideoMute;
+        
         if (self.bidPayload && self.bidPayload.length > 0) {
             [self.interstitialManager loadAdWithBidToken:self.bidPayload];
         } else {
@@ -56,10 +61,16 @@
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
-    BOOL ready = self.interstitialManager && [self.interstitialManager isVideoReadyToPlay:_placementID unitId:_unitID];
+    BOOL ready = self.interstitialManager && [self.interstitialManager isAdReady];
     
     if (ready) {
         [self.logger info:@"Showing interstitial"];
+        
+        // Retrieve creative ID before showing
+        _creativeID = [self.interstitialManager getCreativeIdWithUnitId:self.interstitialManager.currentUnitId];
+        if (_creativeID) {
+            [self.logger debug:[NSString stringWithFormat:@"Creative ID: %@", _creativeID]];
+        }
         
         if ([self.delegate respondsToSelector:@selector(didShowWithInterstitial:)]) {
             [self.delegate didShowWithInterstitial:self];
@@ -79,18 +90,27 @@
     }
 }
 
-#pragma mark - MTGBidInterstitialVideoDelegate
+#pragma mark - MTGNewInterstitialBidAdDelegate
 
-- (void)onInterstitialVideoLoadSuccess:(MTGBidInterstitialVideoAdManager *)adManager {
-    [self.logger info:@"Loaded successfully"];
+- (void)newInterstitialBidAdResourceLoadSuccess:(MTGNewInterstitialBidAdManager *)adManager {
+    // Ad has loaded and video has been downloaded
+    [self.logger info:@"Loaded successfully (video downloaded)"];
     _isLoading = NO;
+    
+    // Retrieve creative ID
+    _creativeID = [adManager getCreativeIdWithUnitId:adManager.currentUnitId];
     
     if ([self.delegate respondsToSelector:@selector(didLoadWithInterstitial:)]) {
         [self.delegate didLoadWithInterstitial:self];
     }
 }
 
-- (void)onInterstitialVideoLoadFail:(nonnull NSError *)error adManager:(MTGBidInterstitialVideoAdManager *)adManager {
+- (void)newInterstitialBidAdLoadSuccess:(MTGNewInterstitialBidAdManager *)adManager {
+    // Ad has loaded but video still needs to be downloaded
+    [self.logger debug:@"Ad loaded, video downloading..."];
+}
+
+- (void)newInterstitialBidAdLoadFail:(NSError *)error adManager:(MTGNewInterstitialBidAdManager *)adManager {
     [self.logger error:[NSString stringWithFormat:@"Failed to load: %@", error.localizedDescription]];
     _isLoading = NO;
     
@@ -104,7 +124,7 @@
     }
 }
 
-- (void)onInterstitialVideoShowSuccess:(MTGBidInterstitialVideoAdManager *)adManager {
+- (void)newInterstitialBidAdShowSuccess:(MTGNewInterstitialBidAdManager *)adManager {
     [self.logger info:@"Did present"];
     
     if ([self.delegate respondsToSelector:@selector(impressionWithInterstitial:)]) {
@@ -112,7 +132,7 @@
     }
 }
 
-- (void)onInterstitialVideoShowFail:(nonnull NSError *)error adManager:(MTGBidInterstitialVideoAdManager *)adManager {
+- (void)newInterstitialBidAdShowFail:(NSError *)error adManager:(MTGNewInterstitialBidAdManager *)adManager {
     [self.logger error:[NSString stringWithFormat:@"Failed to show: %@", error.localizedDescription]];
     
     NSError *mappedError = [CLXMintegralErrorHandler handleNetworkError:error
@@ -125,7 +145,7 @@
     }
 }
 
-- (void)onInterstitialVideoAdClick:(MTGBidInterstitialVideoAdManager *)adManager {
+- (void)newInterstitialBidAdClicked:(MTGNewInterstitialBidAdManager *)adManager {
     [self.logger info:@"Did click"];
     
     if ([self.delegate respondsToSelector:@selector(clickWithInterstitial:)]) {
@@ -133,12 +153,20 @@
     }
 }
 
-- (void)onInterstitialVideoAdDismissedWithConverted:(BOOL)converted adManager:(MTGBidInterstitialVideoAdManager *)adManager {
+- (void)newInterstitialBidAdDismissedWithConverted:(BOOL)converted adManager:(MTGNewInterstitialBidAdManager *)adManager {
     [self.logger info:@"Did dismiss"];
     
     if ([self.delegate respondsToSelector:@selector(didCloseWithInterstitial:)]) {
         [self.delegate didCloseWithInterstitial:self];
     }
+}
+
+- (void)newInterstitialBidAdDidClosed:(MTGNewInterstitialBidAdManager *)adManager {
+    [self.logger debug:@"Video completed"];
+}
+
+- (void)newInterstitialBidAdEndCardShowSuccess:(MTGNewInterstitialBidAdManager *)adManager {
+    [self.logger debug:@"End card shown"];
 }
 
 @end
