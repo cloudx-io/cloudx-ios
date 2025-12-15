@@ -70,7 +70,6 @@ class BannerViewController: BaseAdViewController {
         autoRefreshButton.translatesAutoresizingMaskIntoConstraints = false
         buttonStack.addArrangedSubview(autoRefreshButton)
         
-        
         // Button constraints
         NSLayoutConstraint.activate([
             buttonStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -156,7 +155,6 @@ class BannerViewController: BaseAdViewController {
         
         // Add banner to view hierarchy
         bannerAd.translatesAutoresizingMaskIntoConstraints = false
-        bannerAd.backgroundColor = .red // DEBUG: Make banner container visible
         
         view.addSubview(bannerAd)
         

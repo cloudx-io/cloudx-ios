@@ -25,14 +25,14 @@
         _delegate = delegate;
         _sdkVersion = [CLXMintegralInitializer sdkVersion];
         _network = @"mintegral";
+        _playVideoMute = NO;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMintegralRewarded"];
         
         [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID:%@, UnitID:%@, BidID:%@", 
                            placementID, unitID, bidID]];
         
-        _rewardedManager = [[MTGBidRewardAdManager alloc] initWithPlacementId:placementID 
-                                                                        unitId:unitID 
-                                                                      delegate:self];
+        // NOTE: MTGBidRewardAdManager is a SINGLETON - we don't create instances
+        // We use [MTGBidRewardAdManager sharedInstance] for all operations
     }
     return self;
 }
@@ -47,26 +47,47 @@
     [self.logger debug:[NSString stringWithFormat:@"Loading rewarded - PlacementID:%@, UnitID:%@", _placementID, _unitID]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
+        // Apply mute setting before loading
+        [MTGBidRewardAdManager sharedInstance].playVideoMute = self.playVideoMute;
+        
         if (self.bidPayload && self.bidPayload.length > 0) {
-            [self.rewardedManager loadAdWithBidToken:self.bidPayload];
+            // Bidding flow - use singleton with bid token
+            [[MTGBidRewardAdManager sharedInstance] loadVideoWithBidToken:self.bidPayload
+                                                              placementId:self.placementID
+                                                                   unitId:self.unitID
+                                                                 delegate:self];
         } else {
-            [self.rewardedManager loadAd];
+            // Non-bidding flow - load without bid token
+            [[MTGBidRewardAdManager sharedInstance] loadVideoWithPlacementId:self.placementID
+                                                                      unitId:self.unitID
+                                                                    delegate:self];
         }
     });
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
-    BOOL ready = self.rewardedManager && [self.rewardedManager isVideoReadyToPlay:_placementID unitId:_unitID];
+    BOOL ready = [[MTGBidRewardAdManager sharedInstance] isVideoReadyToPlayWithPlacementId:_placementID unitId:_unitID];
     
     if (ready) {
         [self.logger info:@"Showing rewarded"];
+        
+        // Retrieve creative ID before showing
+        _creativeID = [[MTGBidRewardAdManager sharedInstance] getCreativeIdWithUnitId:_unitID];
+        if (_creativeID) {
+            [self.logger debug:[NSString stringWithFormat:@"Creative ID: %@", _creativeID]];
+        }
         
         if ([self.delegate respondsToSelector:@selector(didShowWithRewarded:)]) {
             [self.delegate didShowWithRewarded:self];
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.rewardedManager showAdWithViewController:viewController];
+            [[MTGBidRewardAdManager sharedInstance] showVideoWithPlacementId:self.placementID
+                                                                      unitId:self.unitID
+                                                                withRewardId:nil
+                                                                      userId:nil
+                                                                    delegate:self
+                                                              viewController:viewController];
         });
     } else {
         [self.logger error:@"Cannot show - ad not ready"];
@@ -79,18 +100,27 @@
     }
 }
 
-#pragma mark - MTGBidRewardAdLoadDelegate
+#pragma mark - MTGRewardAdLoadDelegate
 
-- (void)onAdLoadSuccess:(nullable id)adManager {
-    [self.logger info:@"Loaded successfully"];
+- (void)onVideoAdLoadSuccess:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
+    // Ad has loaded and video has been downloaded
+    [self.logger info:@"Loaded successfully (video downloaded)"];
     _isLoading = NO;
+    
+    // Retrieve creative ID
+    _creativeID = [[MTGBidRewardAdManager sharedInstance] getCreativeIdWithUnitId:unitId];
     
     if ([self.delegate respondsToSelector:@selector(didLoadWithRewarded:)]) {
         [self.delegate didLoadWithRewarded:self];
     }
 }
 
-- (void)onVideoAdLoadFailed:(nullable NSError *)error adManager:(nullable id)adManager {
+- (void)onAdLoadSuccess:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
+    // Ad has loaded but video still needs to be downloaded
+    [self.logger debug:@"Ad loaded, video downloading..."];
+}
+
+- (void)onVideoAdLoadFailed:(nullable NSString *)placementId unitId:(nullable NSString *)unitId error:(NSError *)error {
     [self.logger error:[NSString stringWithFormat:@"Failed to load: %@", error.localizedDescription]];
     _isLoading = NO;
     
@@ -104,9 +134,9 @@
     }
 }
 
-#pragma mark - MTGBidRewardAdShowDelegate
+#pragma mark - MTGRewardAdShowDelegate
 
-- (void)onAdShowSuccess:(nullable id)adManager {
+- (void)onVideoAdShowSuccess:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
     [self.logger info:@"Did present"];
     
     if ([self.delegate respondsToSelector:@selector(impressionWithRewarded:)]) {
@@ -114,7 +144,7 @@
     }
 }
 
-- (void)onVideoAdShowFailed:(nullable NSError *)error adManager:(nullable id)adManager {
+- (void)onVideoAdShowFailed:(nullable NSString *)placementId unitId:(nullable NSString *)unitId withError:(NSError *)error {
     [self.logger error:[NSString stringWithFormat:@"Failed to show: %@", error.localizedDescription]];
     
     NSError *mappedError = [CLXMintegralErrorHandler handleNetworkError:error
@@ -127,7 +157,7 @@
     }
 }
 
-- (void)onAdClicked:(nullable id)adManager {
+- (void)onVideoAdClicked:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
     [self.logger info:@"Did click"];
     
     if ([self.delegate respondsToSelector:@selector(clickWithRewarded:)]) {
@@ -135,7 +165,7 @@
     }
 }
 
-- (void)onAdDismissed:(nullable id)adManager withConverted:(BOOL)converted withRewardInfo:(nullable MTGRewardAdInfo *)rewardInfo {
+- (void)onVideoAdDismissed:(nullable NSString *)placementId unitId:(nullable NSString *)unitId withConverted:(BOOL)converted withRewardInfo:(nullable MTGRewardAdInfo *)rewardInfo {
     [self.logger info:[NSString stringWithFormat:@"Did dismiss - Converted:%d", converted]];
     
     if (converted && [self.delegate respondsToSelector:@selector(rewardedWithRewarded:)]) {
@@ -145,6 +175,18 @@
     if ([self.delegate respondsToSelector:@selector(didCloseWithRewarded:)]) {
         [self.delegate didCloseWithRewarded:self];
     }
+}
+
+- (void)onVideoAdDidClosed:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
+    [self.logger debug:@"Video completed"];
+}
+
+- (void)onVideoPlayCompleted:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
+    [self.logger debug:@"Video play completed"];
+}
+
+- (void)onVideoEndCardShowSuccess:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
+    [self.logger debug:@"End card shown"];
 }
 
 @end

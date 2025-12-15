@@ -219,7 +219,7 @@ NS_ASSUME_NONNULL_BEGIN
         if ([self.delegate respondsToSelector:@selector(userRewarded:)]) {
             CLXAd *ad = [self createAdObject];
             [self.logger logDelegateCallback:@"🎁 Rewarded userRewarded" ad:ad];
-            [self.delegate userRewarded:self];
+            [self.delegate userRewarded:ad];
         }
     });
 }

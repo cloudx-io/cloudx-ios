@@ -85,6 +85,11 @@ static const NSUInteger kCLXMaxLogEntries = 1000;
     });
 }
 
+- (void)flush {
+    // Dispatch sync with empty block to wait for all pending async operations
+    dispatch_sync(self.queue, ^{});
+}
+
 - (NSString *)exportAsString {
     NSArray<CLXLogEntry *> *entries = [self allEntries];
     

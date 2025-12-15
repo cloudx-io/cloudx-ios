@@ -97,8 +97,12 @@
     return ready;
 }
 
-- (BOOL)isFlexibleSize {
+- (BOOL)clx_isFlexibleSize {
     return YES;  // Meta banners are flexible and expand to container width
+}
+
+- (BOOL)isFlexibleSize {
+    return [self clx_isFlexibleSize];
 }
 
 - (void)load {
@@ -169,13 +173,12 @@
         return;
     }
     
-    [vc.view addSubview:self.bannerView];
+    // NOTE: The banner view is already added to CLXBannerAdView by the SDK.
+    // We should NOT add it again to vc.view here.
+    // This method is called to trigger any show-related callbacks (impressions, etc.)
+    // The view hierarchy is managed by CLXBannerAdView.
     
-    // Position banner at bottom of screen (can be customized)
-    CGFloat bannerHeight = (_type == CLXBannerTypeMREC) ? 250 : 50;
-    self.bannerView.frame = CGRectMake(0, vc.view.bounds.size.height - bannerHeight, vc.view.bounds.size.width, bannerHeight);
-    
-    [self.logger info:[NSString stringWithFormat:@"Banner displayed with frame: %@", NSStringFromCGRect(self.bannerView.frame)]];
+    [self.logger info:[NSString stringWithFormat:@"Banner showFromViewController called (view already in hierarchy via CLXBannerAdView)"]];
 }
 
 - (void)destroy {

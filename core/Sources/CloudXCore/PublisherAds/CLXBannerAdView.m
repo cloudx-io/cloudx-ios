@@ -21,9 +21,9 @@
 #import <CloudXCore/CLXDebugErrorView.h>
 #import <CloudXCore/CLXDebugClickFeedback.h>
 
-// Category to expose internal methods for banner view access
+// Category to expose internal visibility method (not in public header)
 @interface CLXPublisherBanner (CLXBannerVisibility)
-- (void)_internal_setVisible:(BOOL)visible;
+- (void)setVisible:(BOOL)visible;
 @end
 
 // Category to expose internal banner adapter properties
@@ -183,7 +183,57 @@ static void initializeLogger() {
     // Update visibility based on superview presence
     BOOL isVisible = (self.superview != nil && self.window != nil);
     if ([self.banner isKindOfClass:[CLXPublisherBanner class]]) {
-        [(CLXPublisherBanner *)self.banner setVisible:isVisible];
+        CLXPublisherBanner *publisherBanner = (CLXPublisherBanner *)self.banner;
+        
+        // IMPORTANT: Get prefetched banner BEFORE calling setVisible
+        // because setVisible moves prefetchedBanner → bannerOnScreen and clears it
+        id<CLXAdapterBanner> bannerToDisplay = nil;
+        if (isVisible) {
+            bannerToDisplay = publisherBanner.prefetchedBanner;
+            if (!bannerToDisplay) {
+                // Check bannerOnScreen in case it was already moved
+                bannerToDisplay = publisherBanner.bannerOnScreen;
+            }
+        }
+        
+        [publisherBanner setVisible:isVisible];
+        
+        // If becoming visible and there's a banner ready, display it now
+        // This handles the case where ad loaded while we were hidden (bypass scenario)
+        if (isVisible && bannerToDisplay && bannerToDisplay.bannerView) {
+            // Only add if not already added (check if banner view is in our subviews)
+            UIView *bannerView = bannerToDisplay.bannerView;
+            if (bannerView.superview != self) {
+                [logger debug:@"Displaying banner after returning to view hierarchy"];
+                
+                // Remove any existing banner views
+                for (UIView *subview in [self.subviews copy]) {
+                    [subview removeFromSuperview];
+                }
+                
+                bannerView.userInteractionEnabled = YES;
+                [self addSubview:bannerView];
+                
+                // Attach debug gesture
+                [self attachDebugGestureToBannerView:bannerView];
+                
+                // Check if adapter declares flexible sizing capability
+                BOOL isFlexible = [bannerToDisplay clx_isFlexibleSize];
+                
+                if (isFlexible) {
+                    bannerView.frame = self.bounds;
+                    bannerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+                } else {
+                    CGSize bannerSize = bannerView.bounds.size;
+                    CGFloat x = (self.bounds.size.width - bannerSize.width) / 2.0;
+                    CGFloat y = (self.bounds.size.height - bannerSize.height) / 2.0;
+                    bannerView.frame = CGRectMake(x, y, bannerSize.width, bannerSize.height);
+                }
+                
+                [self setNeedsLayout];
+                [self layoutIfNeeded];
+            }
+        }
     }
     
     // Note: didShowBanner is now triggered by adapter.showFromViewController: in didLoadBanner:
@@ -261,8 +311,13 @@ static void initializeLogger() {
                    placementName:publisherBanner.placementName];
     }
     
+    // Only manipulate the view hierarchy if we're actually in the view hierarchy
+    // This prevents crashes when banner refreshes while hidden (visibility bypass mode)
+    // Check both superview AND window for reliability (matches didMoveToSuperview logic)
+    BOOL isInViewHierarchy = (self.superview != nil && self.window != nil);
+    
     UIView *bannerView = banner.bannerView;
-    if (bannerView) {
+    if (bannerView && isInViewHierarchy) {
         bannerView.userInteractionEnabled = YES;
         [self addSubview:bannerView];
         
@@ -271,7 +326,7 @@ static void initializeLogger() {
         
         // Check if adapter declares flexible sizing capability
         // Category default guarantees method exists - no need for respondsToSelector check
-        BOOL isFlexible = [banner isFlexibleSize];
+        BOOL isFlexible = [banner clx_isFlexibleSize];
         
         if (isFlexible) {
             // Flexible banner - stretch to fill container
@@ -304,6 +359,8 @@ static void initializeLogger() {
         } else {
             [logger warn:@"[CLXBannerAdView] No view controller available to show banner - didDisplayAd will not be called"];
         }
+    } else if (!isInViewHierarchy) {
+        [logger debug:@"Banner loaded while not in view hierarchy - view will be added when visible"];
     } else {
         [logger error:@"Banner view is nil, cannot add to hierarchy"];
     }
@@ -364,6 +421,11 @@ static void initializeLogger() {
     // This fixes the unsafe cast bug and enables proper ad metadata access
     _ad = ad;
     
+    // Only manipulate the view hierarchy if we're actually in the view hierarchy
+    // This prevents crashes when banner refreshes while hidden (visibility bypass mode)
+    // Check both superview AND window for reliability (matches didMoveToSuperview logic)
+    BOOL isInViewHierarchy = (self.superview != nil && self.window != nil);
+    
     // Get the banner view from the underlying banner (CLXPublisherBanner)
     if ([self.banner isKindOfClass:[CLXPublisherBanner class]]) {
         CLXPublisherBanner *publisherBanner = (CLXPublisherBanner *)self.banner;
@@ -374,7 +436,7 @@ static void initializeLogger() {
             currentBanner = publisherBanner.prefetchedBanner;
         }
         
-        if (currentBanner && currentBanner.bannerView) {
+        if (currentBanner && currentBanner.bannerView && isInViewHierarchy) {
             // Remove any existing banner views to prevent duplicates
             for (UIView *subview in [self.subviews copy]) {
                 [subview removeFromSuperview];
@@ -389,7 +451,7 @@ static void initializeLogger() {
             
             // Check if adapter declares flexible sizing capability
             // Category default guarantees method exists - no need for respondsToSelector check
-            BOOL isFlexible = [currentBanner isFlexibleSize];
+            BOOL isFlexible = [currentBanner clx_isFlexibleSize];
             
             if (isFlexible) {
                 // Flexible banner - stretch to fill container
@@ -406,6 +468,8 @@ static void initializeLogger() {
             // Force layout update
             [self setNeedsLayout];
             [self layoutIfNeeded];
+        } else if (!isInViewHierarchy) {
+            [logger debug:@"Banner loaded while not in view hierarchy - view will be added when visible"];
         } else {
             [logger error:@"No banner view available to display"];
         }

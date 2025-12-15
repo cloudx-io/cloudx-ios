@@ -76,8 +76,8 @@
     NSString *encrypted = [CLXXorEncryption encrypt:payloadString secret:secret];
     
     // Store URL-encoded values for tracking calls
-    _encodedString = [encrypted urlQueryEncodedString];
-    _campaignId = [campaignId urlQueryEncodedString];
+    _encodedString = [encrypted clx_urlQueryEncodedString];
+    _campaignId = [campaignId clx_urlQueryEncodedString];
     
     [self.logger debug:[NSString stringWithFormat:@"Analytics tracking data configured successfully - Campaign ID: %@", _campaignId]];
     

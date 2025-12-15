@@ -221,9 +221,6 @@ static id<CLXWinLossTracking> _testInstance = nil;
                                                                options:NSJSONWritingPrettyPrinted 
                                                                  error:&jsonError];
             if (jsonData) {
-                NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-                [self.logger verbose:[NSString stringWithFormat:@"Complete payload:\n%@", jsonString]];
-                
                 // Log presence of critical fields
                 BOOL hasBid = payload[@"bid"] != nil;
                 BOOL hasLossReasonCode = payload[@"lossReasonCode"] != nil;

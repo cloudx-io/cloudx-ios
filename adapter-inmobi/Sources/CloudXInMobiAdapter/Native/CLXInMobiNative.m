@@ -157,15 +157,20 @@
     [self.logger debug:@"User will leave application"];
 }
 
+- (void)nativeAdImpressed:(IMNative *)native {
+    // Native SDK impression callback - fires when ad is actually displayed/rendered
+    [self.logger info:@"Native impression tracked by ad network SDK"];
+    
+    if ([self.delegate respondsToSelector:@selector(impressionWithNative:)]) {
+        [self.delegate impressionWithNative:self];
+    }
+}
+
 - (void)native:(IMNative *)native didInteractWithParams:(nullable NSDictionary *)params {
     [self.logger info:@"Native clicked"];
     
     if ([self.delegate respondsToSelector:@selector(clickWithNative:)]) {
         [self.delegate clickWithNative:self];
-    }
-    
-    if ([self.delegate respondsToSelector:@selector(impressionWithNative:)]) {
-        [self.delegate impressionWithNative:self];
     }
 }
 

@@ -3,7 +3,17 @@
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <MTGSDK/MTGSDK.h>
+#import <MTGSDKBidding/MTGBiddingSDK.h>
 #import "CLXMintegralInitializer.h"
+
+// Mintegral Ad Type enum for buyerUIDWithDictionary
+typedef NS_ENUM(NSInteger, MintegralAdType) {
+    MintegralIntersitialAd = 1,
+    MintegralRewardVideoAd = 2,
+    MintegralBannerAd = 6,
+    MintegralSplashAd = 7,
+    MintegralNativeAd = 8,
+};
 
 @interface CLXMintegralBidTokenSource ()
 @property (nonatomic, strong) CLXLogger *logger;
@@ -35,6 +45,15 @@
 
 - (void)getTokenWithCompletion:(void (^)(NSDictionary<NSString *, NSString *> * _Nullable,
                                          NSError * _Nullable))completion {
+    // Use default implementation without ad info
+    [self getTokenWithPlacementId:nil unitId:nil adType:nil completion:completion];
+}
+
+- (void)getTokenWithPlacementId:(nullable NSString *)placementId
+                         unitId:(nullable NSString *)unitId
+                         adType:(nullable NSNumber *)adType
+                     completion:(void (^)(NSDictionary<NSString *, NSString *> * _Nullable,
+                                         NSError * _Nullable))completion {
     
     [self.logger debug:@"Getting Mintegral bid token"];
     
@@ -49,11 +68,25 @@
                 return;
             }
             
-            // Get bidding token from Mintegral SDK
-            NSString *bidToken = [[MTGSDK sharedInstance] getBidToken];
+            NSString *bidToken = nil;
+            
+            // Use enhanced buyerUIDWithDictionary if we have ad info (matching AppLovin)
+            if (placementId.length > 0 && unitId.length > 0 && adType != nil) {
+                NSDictionary *bidInfo = @{
+                    @"placementId": placementId ?: @"",
+                    @"unitId": unitId ?: @"",
+                    @"adType": adType
+                };
+                bidToken = [MTGBiddingSDK buyerUIDWithDictionary:bidInfo];
+                [self.logger debug:[NSString stringWithFormat:@"Using enhanced bid token with adType: %@", adType]];
+            } else {
+                // Fallback to basic buyerUID
+                bidToken = [MTGBiddingSDK buyerUID];
+                [self.logger debug:@"Using basic bid token"];
+            }
             
             if (!bidToken || bidToken.length == 0) {
-                [self.logger warning:@"Mintegral returned empty bid token"];
+                [self.logger warn:@"Mintegral returned empty bid token"];
                 bidToken = @""; // Use empty string instead of nil
             } else {
                 [self.logger debug:[NSString stringWithFormat:@"Generated bid token (prefix): %@...", 
@@ -89,6 +122,28 @@
             if (completion) completion(nil, error);
         }
     });
+}
+
+#pragma mark - Ad Type Helpers
+
++ (NSNumber *)adTypeForBanner {
+    return @(MintegralBannerAd);
+}
+
++ (NSNumber *)adTypeForInterstitial {
+    return @(MintegralIntersitialAd);
+}
+
++ (NSNumber *)adTypeForRewarded {
+    return @(MintegralRewardVideoAd);
+}
+
++ (NSNumber *)adTypeForNative {
+    return @(MintegralNativeAd);
+}
+
++ (NSNumber *)adTypeForSplash {
+    return @(MintegralSplashAd);
 }
 
 @end

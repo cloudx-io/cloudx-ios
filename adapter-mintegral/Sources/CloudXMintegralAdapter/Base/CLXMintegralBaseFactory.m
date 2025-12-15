@@ -33,7 +33,7 @@
     }
     
     if (bidPayload.length == 0) {
-        [self.logger warning:@"Empty bid payload for header bidding"];
+        [self.logger warn:@"Empty bid payload for header bidding"];
         return NO;
     }
     

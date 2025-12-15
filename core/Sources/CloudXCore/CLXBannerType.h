@@ -29,19 +29,4 @@ typedef NS_ENUM(NSInteger, CLXBannerType) {
     CLXBannerTypeMREC = 1
 };
 
-/**
- * Category to add size calculation functionality to CloudXBannerType
- */
-@interface NSValue (CLXBannerType)
-
-/**
- * Returns the size of the banner ad as a CGSize based on the enumeration case.
- * The size is determined by the device type for the CloudXBannerTypeW320H50 case.
- * @param bannerType The banner type
- * @return The size for the banner type
- */
-+ (CGSize)sizeForBannerType:(CLXBannerType)bannerType;
-
-@end
-
 NS_ASSUME_NONNULL_END 

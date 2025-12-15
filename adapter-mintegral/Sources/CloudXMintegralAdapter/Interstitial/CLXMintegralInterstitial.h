@@ -1,11 +1,18 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import <MTGSDKBidding/MTGBidInterstitialVideoAdManager.h>
+#import <MTGSDKNewInterstitial/MTGSDKNewInterstitial.h>
+#import <MTGSDKNewInterstitial/MTGNewInterstitialAdManager.h>
 #import <CloudXCore/CLXAdapterInterstitial.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXMintegralInterstitial : NSObject <MTGBidInterstitialVideoDelegate, CLXAdapterInterstitial>
+/**
+ * CLXMintegralInterstitial - Mintegral Interstitial Ad Implementation
+ *
+ * Uses the NEW Interstitial API (MTGNewInterstitialBidAdManager) as recommended
+ * by Mintegral and used by AppLovin's adapter.
+ */
+@interface CLXMintegralInterstitial : NSObject <MTGNewInterstitialBidAdDelegate, CLXAdapterInterstitial>
 
 @property (nonatomic, weak, nullable) id<CLXAdapterInterstitialDelegate> delegate;
 @property (nonatomic, strong, readonly) NSString *sdkVersion;
@@ -14,7 +21,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly) NSString *placementID;
 @property (nonatomic, strong, readonly) NSString *unitID;
 @property (nonatomic, copy, nullable) NSString *bidPayload;
-@property (nonatomic, strong, nullable) MTGBidInterstitialVideoAdManager *interstitialManager;
+@property (nonatomic, copy, nullable) NSString *creativeID;
+@property (nonatomic, assign) BOOL playVideoMute;
+@property (nonatomic, strong, nullable) MTGNewInterstitialBidAdManager *interstitialManager;
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID

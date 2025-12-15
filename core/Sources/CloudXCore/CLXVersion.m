@@ -9,5 +9,5 @@
 
 #import "CLXVersion.h"
 
-NSString * const CLXSDKVersion = @"1.2.1";
+NSString * const CLXSDKVersion = @"1.3.0";
 

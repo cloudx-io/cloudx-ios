@@ -97,7 +97,7 @@ static CLXSystemInformation *sharedInstance = nil;
 }
 
 - (NSString *)model {
-    return [UIDevice deviceIdentifier];
+    return [UIDevice clx_deviceIdentifier];
 }
 
 - (NSString *)systemVersion {

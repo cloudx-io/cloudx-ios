@@ -118,6 +118,7 @@
             if (jsonData && !jsonError) {
                 NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
                 [self.logger debug:[NSString stringWithFormat:@"[%@] [BidNetworkService] BidRequest JSON (%lu chars)", correlationId, (unsigned long)jsonString.length]];
+                [self.logger verbose:[NSString stringWithFormat:@"[%@] [BidNetworkService] bidrequest json:\n%@", correlationId, jsonString]];
             }
         } @catch (NSException *exception) {
             [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [BidNetworkService] Exception in bid_request_json_logging: %@ - %@", 

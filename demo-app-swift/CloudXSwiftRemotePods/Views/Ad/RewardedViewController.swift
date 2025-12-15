@@ -204,15 +204,15 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
     }
     
     func didRecordImpression(for ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ Rewarded didRecordImpression", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("👁️ Rewarded didRecordImpressionForAd", ad: ad)
     }
     
     func didPayRevenue(for ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("💰 Rewarded didPayRevenue", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("💰 Rewarded didPayRevenueForAd", ad: ad)
     }
     
     func userRewarded(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🎁 Rewarded userRewarded", ad: ad)
+        DemoAppLogger.sharedInstance.logAdEvent("🎁 Rewarded userRewarded - Reward Earned!", ad: ad)
         DispatchQueue.main.async { [weak self] in
             self?.showAlert(title: "Reward Earned! 🎉", message: "User has successfully earned a reward!")
         }

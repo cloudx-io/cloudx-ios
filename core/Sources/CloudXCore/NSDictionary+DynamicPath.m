@@ -4,9 +4,9 @@
 
 #import <CloudXCore/NSDictionary+DynamicPath.h>
 
-@implementation NSMutableDictionary (DynamicPath)
+@implementation NSMutableDictionary (CLXDynamicPath)
 
-- (void)putAtDynamicPath:(NSString *)path value:(id)value {
+- (void)clx_putAtDynamicPath:(NSString *)path value:(id)value {
     if (!path || path.length == 0) {
         return;
     }
@@ -16,10 +16,10 @@
         return;
     }
     
-    [self putAtDynamicPathParts:parts value:value];
+    [self clx_putAtDynamicPathParts:parts value:value];
 }
 
-- (void)putAtDynamicPathParts:(NSArray<NSString *> *)parts value:(id)value {
+- (void)clx_putAtDynamicPathParts:(NSArray<NSString *> *)parts value:(id)value {
     if (parts.count == 0) {
         return;
     }
@@ -29,14 +29,14 @@
     
     // Check for array notation
     BOOL isWildcard = [first hasSuffix:@"[*]"];
-    BOOL isIndexed = [self isArrayIndexNotation:first];
-    NSString *key = [self extractKey:first];
-    NSInteger index = [self extractIndex:first];
+    BOOL isIndexed = [self clx_isArrayIndexNotation:first];
+    NSString *key = [self clx_extractKey:first];
+    NSInteger index = [self clx_extractIndex:first];
     
     if (parts.count == 1) {
         // Final segment
         if (isWildcard) {
-            NSMutableArray *array = [self mutableArrayForKey:key];
+            NSMutableArray *array = [self clx_mutableArrayForKey:key];
             
             if (array.count == 0) {
                 [array addObject:value];
@@ -46,7 +46,7 @@
                 }
             }
         } else if (isIndexed && index >= 0) {
-            NSMutableArray *array = [self mutableArrayForKey:key];
+            NSMutableArray *array = [self clx_mutableArrayForKey:key];
             
             while (array.count <= index) {
                 [array addObject:[NSMutableDictionary dictionary]];
@@ -58,7 +58,7 @@
     } else {
         // Intermediate segment
         if (isWildcard) {
-            NSMutableArray *array = [self mutableArrayForKey:key];
+            NSMutableArray *array = [self clx_mutableArrayForKey:key];
             
             if (array.count == 0) {
                 NSMutableDictionary *dummy = [NSMutableDictionary dictionary];
@@ -78,10 +78,10 @@
                 } else {
                     continue;
                 }
-                [mutableItem putAtDynamicPathParts:rest value:value];
+                [mutableItem clx_putAtDynamicPathParts:rest value:value];
             }
         } else if (isIndexed && index >= 0) {
-            NSMutableArray *array = [self mutableArrayForKey:key];
+            NSMutableArray *array = [self clx_mutableArrayForKey:key];
             
             while (array.count <= index) {
                 [array addObject:[NSMutableDictionary dictionary]];
@@ -99,7 +99,7 @@
                 mutableNext = [NSMutableDictionary dictionary];
                 array[index] = mutableNext;
             }
-            [mutableNext putAtDynamicPathParts:rest value:value];
+            [mutableNext clx_putAtDynamicPathParts:rest value:value];
         } else {
             id existing = self[key];
             NSMutableDictionary *child;
@@ -116,12 +116,12 @@
                 child = [NSMutableDictionary dictionary];
                 self[key] = child;
             }
-            [child putAtDynamicPathParts:rest value:value];
+            [child clx_putAtDynamicPathParts:rest value:value];
         }
     }
 }
 
-- (NSMutableArray *)mutableArrayForKey:(NSString *)key {
+- (NSMutableArray *)clx_mutableArrayForKey:(NSString *)key {
     id existing = self[key];
     NSMutableArray *array;
     
@@ -139,13 +139,13 @@
     return array;
 }
 
-- (BOOL)isArrayIndexNotation:(NSString *)segment {
+- (BOOL)clx_isArrayIndexNotation:(NSString *)segment {
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@".*\\[\\d+\\]" options:0 error:nil];
     NSUInteger matches = [regex numberOfMatchesInString:segment options:0 range:NSMakeRange(0, segment.length)];
     return matches > 0;
 }
 
-- (NSString *)extractKey:(NSString *)segment {
+- (NSString *)clx_extractKey:(NSString *)segment {
     NSRange bracketRange = [segment rangeOfString:@"["];
     if (bracketRange.location != NSNotFound) {
         return [segment substringToIndex:bracketRange.location];
@@ -153,7 +153,7 @@
     return segment;
 }
 
-- (NSInteger)extractIndex:(NSString *)segment {
+- (NSInteger)clx_extractIndex:(NSString *)segment {
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@".*\\[(\\d+)\\]" options:0 error:nil];
     NSTextCheckingResult *match = [regex firstMatchInString:segment options:0 range:NSMakeRange(0, segment.length)];
     
@@ -167,4 +167,3 @@
 }
 
 @end
-

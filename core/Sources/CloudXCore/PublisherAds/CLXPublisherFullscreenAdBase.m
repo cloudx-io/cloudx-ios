@@ -34,6 +34,7 @@
 #import <CloudXCore/CloudXCoreAPI.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXSDKConfig.h>
+#import "CLXUIApplicationProxy.h"
 #import <objc/runtime.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -79,6 +80,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 @property (nonatomic, assign) NSTimeInterval forceCloseEventDelay;
 @property (nonatomic, assign) BOOL closeEventReceived;
 @property (nonatomic, strong, nullable) NSDate *impressionTime;
+@property (nonatomic, weak, nullable) UIViewController *presentingViewController;
 
 // Bid response data for NURL firing
 @property (nonatomic, strong, nullable) CLXBidResponse *currentBidResponse;
@@ -134,7 +136,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         _userID = [userID copy];
         _settings = settings;
         _impModel = impModel;
-        _forceCloseEventDelay = 30.0;
+        _forceCloseEventDelay = 60.0; // Safety timeout for stuck fullscreen ads
         _closeEventReceived = NO;
         _pendingLoadRequestCount = 0;
         
@@ -394,6 +396,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     
     // Set up display state
     self.closeEventReceived = NO;
+    self.presentingViewController = viewController;
     
     // Set up force close timer
     self.closeTimer = [NSTimer scheduledTimerWithTimeInterval:self.forceCloseEventDelay
@@ -402,7 +405,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         if (!self.closeEventReceived) {
             [self.logger debug:@"Force close timer fired - no close event received"];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self notifyForceClose];
+                [self forceCloseAdAndNotify];
             });
         }
         [self.closeTimer invalidate];
@@ -465,6 +468,41 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)notifyForceClose {
     [NSException raise:NSInternalInconsistencyException 
                 format:@"Subclass must override %@", NSStringFromSelector(_cmd)];
+}
+
+#pragma mark - Force Close Implementation
+
+- (void)forceCloseAdAndNotify {
+    NSString *networkName = self.lastBidResponse.networkName ?: @"unknown";
+    [self.logger error:[NSString stringWithFormat:@"⚠️ FORCE CLOSE: %@ adapter failed to dismiss after %.0fs timeout - this indicates an SDK bug", 
+                       networkName, self.forceCloseEventDelay]];
+    
+    // Try to dismiss any presented view controller on our presenting VC
+    UIViewController *presentingVC = self.presentingViewController;
+    if (presentingVC && presentingVC.presentedViewController) {
+        [self.logger debug:@"Found presented view controller - dismissing it"];
+        [presentingVC dismissViewControllerAnimated:NO completion:^{
+            [self.logger debug:@"Presented view controller dismissed successfully"];
+            self.presentingViewController = nil;
+            [self notifyForceClose];
+        }];
+    } else {
+        // No presented VC found, or it was already dismissed
+        // Try to find and dismiss from the root view controller as a fallback
+        UIViewController *rootVC = [CLXUIApplicationProxy keyWindow].rootViewController;
+        if (rootVC && rootVC.presentedViewController) {
+            [self.logger debug:@"Fallback: dismissing from root view controller"];
+            [rootVC dismissViewControllerAnimated:NO completion:^{
+                [self.logger debug:@"Root VC presented view controller dismissed"];
+                self.presentingViewController = nil;
+                [self notifyForceClose];
+            }];
+        } else {
+            [self.logger debug:@"No presented view controller found to dismiss"];
+            self.presentingViewController = nil;
+            [self notifyForceClose];
+        }
+    }
 }
 
 #pragma mark - Protected Helper Methods

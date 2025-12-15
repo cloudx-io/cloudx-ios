@@ -3,10 +3,19 @@ use_frameworks! :linkage => :static
 
 target 'CloudXMintegralAdapter' do
   pod 'CloudXCore', :path => '../core'
+  
   # Mintegral SDK with bidding support
-  pod 'MintegralAdSDK/BidBannerAd', '~> 7.6'
-  pod 'MintegralAdSDK/BidInterstitialVideoAd', '~> 7.6'
-  pod 'MintegralAdSDK/BidRewardVideoAd', '~> 7.6'
+  # Using updated SDK modules matching AppLovin adapter patterns
+  pod 'MintegralAdSDK', '~> 8.0'
+  
+  # Banner ads (standard + bidding)
+  pod 'MintegralAdSDK/BannerAd', '~> 8.0'
+  
+  # New Interstitial (standard + bidding) - uses MTGNewInterstitialBidAdManager
+  pod 'MintegralAdSDK/BidInterstitialVideoAd', '~> 8.0'
+  
+  # Rewarded Video (standard + bidding) - uses MTGBidRewardAdManager singleton
+  pod 'MintegralAdSDK/BidRewardVideoAd', '~> 8.0'
 end
 
 post_install do |installer|

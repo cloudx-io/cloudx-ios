@@ -50,6 +50,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)clear;
 
 /**
+ * Wait for all pending async operations to complete.
+ * Useful in tests to ensure all log entries have been processed.
+ */
+- (void)flush;
+
+/**
  * Export all logs as a single formatted string.
  * @return Formatted string with all log entries, newest first.
  */

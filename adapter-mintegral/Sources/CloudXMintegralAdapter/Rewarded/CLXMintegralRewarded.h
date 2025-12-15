@@ -1,11 +1,18 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import <MTGSDKBidding/MTGBidRewardAdManager.h>
+#import <MTGSDKReward/MTGBidRewardAdManager.h>
+#import <MTGSDKReward/MTGRewardAdInfo.h>
 #import <CloudXCore/CLXAdapterRewarded.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXMintegralRewarded : NSObject <MTGBidRewardAdLoadDelegate, MTGBidRewardAdShowDelegate, CLXAdapterRewarded>
+/**
+ * CLXMintegralRewarded - Mintegral Rewarded Ad Implementation
+ *
+ * IMPORTANT: Uses MTGBidRewardAdManager as a SINGLETON via [MTGBidRewardAdManager sharedInstance]
+ * This matches the AppLovin adapter pattern and Mintegral's recommended usage.
+ */
+@interface CLXMintegralRewarded : NSObject <MTGRewardAdLoadDelegate, MTGRewardAdShowDelegate, CLXAdapterRewarded>
 
 @property (nonatomic, weak, nullable) id<CLXAdapterRewardedDelegate> delegate;
 @property (nonatomic, strong, readonly) NSString *sdkVersion;
@@ -14,7 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly) NSString *placementID;
 @property (nonatomic, strong, readonly) NSString *unitID;
 @property (nonatomic, copy, nullable) NSString *bidPayload;
-@property (nonatomic, strong, nullable) MTGBidRewardAdManager *rewardedManager;
+@property (nonatomic, copy, nullable) NSString *creativeID;
+@property (nonatomic, assign) BOOL playVideoMute;
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID

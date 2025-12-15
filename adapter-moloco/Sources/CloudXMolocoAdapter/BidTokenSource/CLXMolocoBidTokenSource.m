@@ -78,7 +78,7 @@
                 [self.logger debug:[NSString stringWithFormat:@"Generated bid token: %@", 
                                    [bidToken substringToIndex:MIN(10, bidToken.length)]]];
             } else {
-                [self.logger warning:@"Bid token is empty"];
+                [self.logger warn:@"Bid token is empty"];
             }
             
             if (idfa && idfa.length > 0) {

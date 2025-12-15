@@ -1,8 +1,19 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXMintegralAdapter'
-  s.version = '1.0.0'
+  s.version = '1.1.0'
   s.summary = 'CloudX Adapter for Mintegral iOS SDK'
-  s.description = 'The CloudX Mintegral Adapter enables publishers to monetize their iOS applications through the CloudX SDK.'
+  s.description = <<-DESC
+    The CloudX Mintegral Adapter enables publishers to monetize their iOS applications 
+    through the CloudX SDK using Mintegral ad network.
+    
+    Features:
+    - Banner, Interstitial, and Rewarded Video ads
+    - Header bidding support with enhanced bid tokens
+    - Creative ID tracking for analytics
+    - Video mute control and banner configuration
+    - Channel attribution for Mintegral
+    - Comprehensive error code mapping
+  DESC
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
   s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
@@ -16,10 +27,13 @@ Pod::Spec.new do |s|
   }
 
   s.dependency 'CloudXCore'
-  s.dependency 'MintegralAdSDK', '~> 7.6'
-  s.dependency 'MintegralAdSDK/BidBannerAd', '~> 7.6'
-  s.dependency 'MintegralAdSDK/BidInterstitialVideoAd', '~> 7.6'
-  s.dependency 'MintegralAdSDK/BidRewardVideoAd', '~> 7.6'
+  
+  # Mintegral SDK 8.x with bidding support
+  # Uses newer SDK modules: MTGNewInterstitialBidAdManager, MTGBidRewardAdManager singleton
+  s.dependency 'MintegralAdSDK', '~> 8.0'
+  s.dependency 'MintegralAdSDK/BannerAd', '~> 8.0'
+  s.dependency 'MintegralAdSDK/BidInterstitialVideoAd', '~> 8.0'
+  s.dependency 'MintegralAdSDK/BidRewardVideoAd', '~> 8.0'
 
   s.frameworks = ['Foundation', 'UIKit', 'AdSupport', 'CoreGraphics', 'CoreTelephony', 'SystemConfiguration', 'AVFoundation', 'CoreMedia', 'QuartzCore', 'StoreKit', 'WebKit']
   s.weak_frameworks = ['AppTrackingTransparency']
