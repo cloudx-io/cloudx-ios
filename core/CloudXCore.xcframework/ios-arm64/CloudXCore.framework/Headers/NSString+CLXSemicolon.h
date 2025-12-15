@@ -2,17 +2,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSString (Semicolon)
+@interface NSString (CLXSemicolon)
 
-- (NSString *)semicolon;
-- (NSString *)base64Encoded;
+- (NSString *)clx_semicolon;
+- (NSString *)clx_base64Encoded;
 
 @end
 
-@interface NSString (URLEncoding)
+@interface NSString (CLXURLEncoding)
 
-- (NSString *)urlQueryEncodedString;
+- (NSString *)clx_urlQueryEncodedString;
 
 @end
 
 NS_ASSUME_NONNULL_END 
+

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXMetaAdapter'
-  s.version          = '1.2.1'
+  s.version = '1.3.0'
   s.summary          = 'CloudX Meta Adapter - Static Framework'
   s.description      = 'Meta (Facebook Audience Network) adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -9,10 +9,10 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "v#{s.version}-meta" }
   
   s.ios.deployment_target = '15.0'
-  s.vendored_frameworks = 'adapter-meta/CloudXMetaAdapter.xcframework'
+  s.vendored_frameworks = 'CloudXMetaAdapter.xcframework'
   
   # Dependencies
-  s.dependency 'CloudXCore', '1.2.1'
+  s.dependency 'CloudXCore', '1.3.0'
   s.dependency 'FBAudienceNetwork', '~> 6.20.1'
   
   s.frameworks = ['AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit']

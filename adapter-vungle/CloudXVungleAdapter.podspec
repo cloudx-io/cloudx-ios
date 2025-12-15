@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXVungleAdapter'
-  s.version          = '1.2.1'
+  s.version = '1.3.0'
   s.summary          = 'CloudX Vungle Adapter - Static Framework'
   s.description      = 'Vungle/Liftoff adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -9,10 +9,10 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "v#{s.version}-vungle" }
   
   s.ios.deployment_target = '15.0'
-  s.vendored_frameworks = 'adapter-vungle/CloudXVungleAdapter.xcframework'
+  s.vendored_frameworks = 'CloudXVungleAdapter.xcframework'
   
   # Dependencies
-  s.dependency 'CloudXCore', '1.2.1'
+  s.dependency 'CloudXCore', '1.3.0'
   s.dependency 'VungleAds', '~> 7.4.0'
   
   s.frameworks = ['AVFoundation', 'AudioToolbox', 'CFNetwork', 'CoreGraphics', 'CoreMedia', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']

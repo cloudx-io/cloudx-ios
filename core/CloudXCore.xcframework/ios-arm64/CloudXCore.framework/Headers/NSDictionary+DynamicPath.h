@@ -13,7 +13,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSMutableDictionary (DynamicPath)
+@interface NSMutableDictionary (CLXDynamicPath)
 
 /**
  * @brief Inject a value at a dynamic path in the dictionary
@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  * - Array wildcards: "imp[*].ext" (applies to all array elements)
  * - Auto-creates intermediate objects/arrays as needed
  */
-- (void)putAtDynamicPath:(NSString *)path value:(id)value;
+- (void)clx_putAtDynamicPath:(NSString *)path value:(id)value;
 
 @end
 
