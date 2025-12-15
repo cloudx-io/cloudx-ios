@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  PrivacyInfo.xcprivacy
+  CloudXCore
+  
+  Privacy Manifest for CloudX iOS SDK
+  
+  This file declares:
+  - Data types collected by the SDK
+  - APIs requiring privacy reasons
+  - Tracking domains used by the SDK
+  
+  For more information, see:
+  https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
+-->
+<plist version="1.0">
+<dict>
+    <!-- 
+        NSPrivacyTracking: Indicates if the SDK uses data for tracking as defined 
+        by App Tracking Transparency. CloudX respects ATT authorization status
+        and only uses IDFA when user grants permission.
+    -->
+    <key>NSPrivacyTracking</key>
+    <false/>
+    
+    <!--
+        NSPrivacyTrackingDomains: Domains that engage in tracking.
+        CloudX core SDK does not directly track; adapters may have their own domains.
+    -->
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+    
+    <!--
+        NSPrivacyCollectedDataTypes: Data types the SDK may collect.
+    -->
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array>
+        <!-- Device ID (IDFA) - Used for advertising when user grants ATT permission -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeDeviceID</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
+            </array>
+        </dict>
+        
+        <!-- Product Interaction - Ad impressions, clicks, and engagement -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeProductInteraction</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
+                <string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+            </array>
+        </dict>
+        
+        <!-- Performance Data - SDK performance metrics -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypePerformanceData</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+            </array>
+        </dict>
+        
+        <!-- Coarse Location - Approximate location for ad targeting (when available) -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeCoarseLocation</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
+            </array>
+        </dict>
+    </array>
+    
+    <!--
+        NSPrivacyAccessedAPITypes: System APIs requiring declared reasons.
+    -->
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <!-- 
+            UserDefaults: Used for storing IAB TCF/GPP consent strings,
+            CCPA privacy settings, and SDK configuration.
+            Reason CA92.1: Access info from same app or app group.
+        -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+        
+        <!--
+            System Boot Time: Used for session timing and analytics.
+            Reason 35F9.1: Measure time elapsed between events in app.
+        -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>35F9.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>

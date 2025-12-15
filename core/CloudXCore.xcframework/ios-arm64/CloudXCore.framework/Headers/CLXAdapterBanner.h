@@ -63,7 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Default implementation returns NO (fixed-size).
  * @return YES if the banner is flexible, NO if fixed-size
  */
-- (BOOL)isFlexibleSize;
+- (BOOL)clx_isFlexibleSize;
 
 @end
 
@@ -72,6 +72,7 @@ NS_ASSUME_NONNULL_BEGIN
  * This ensures methods are always available even in framework builds.
  */
 @interface NSObject (CLXAdapterBannerDefaults)
+- (BOOL)clx_isFlexibleSize;
 @end
 
 /**

@@ -119,13 +119,6 @@ NS_ASSUME_NONNULL_BEGIN
                                      tmax:(nullable NSNumber *)tmax;
 
 /**
- * Updates the visibility state of the banner.
- * Called by CLXBannerAdView when the banner enters or leaves the view hierarchy.
- * @param visible YES if the banner is visible on screen, NO if hidden
- */
-- (void)setVisible:(BOOL)visible;
-
-/**
  * Starts auto-refresh for the banner.
  * Auto-refresh will continue based on the placement configuration until stopped.
  */
