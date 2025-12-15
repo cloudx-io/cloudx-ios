@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXVungleAdapter'
-  s.version          = '1.2.1'
+  s.version = '1.3.0'
   s.summary = 'Vungle Adapter for CloudX iOS SDK'
   s.description = 'Vungle adapter for CloudX iOS SDK supporting all ad formats: Interstitial, Rewarded, Banner/MREC, Native, and App Open ads'
   s.homepage = 'https://github.com/cloudx-xenoss/CloudXVungleAdapter'

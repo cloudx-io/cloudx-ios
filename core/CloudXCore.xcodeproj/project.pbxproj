@@ -48,6 +48,8 @@
 		1916B26E2E819FD400E49E3E /* CLXMetricsIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2632E819FD400E49E3E /* CLXMetricsIntegrationTests.m */; };
 		1916B32C2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B32B2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m */; };
 		1916B32E2E832C0000E49E3E /* CLXAppIDIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B32D2E832C0000E49E3E /* CLXAppIDIntegrationTests.m */; };
+		194BB9E92EEEE08F0008DB33 /* CLXUIApplicationProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 194BB9E62EEEE08F0008DB33 /* CLXUIApplicationProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		194BB9EB2EEEE0AF0008DB33 /* CLXUIApplicationProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 194BB9EA2EEEE0AF0008DB33 /* CLXUIApplicationProxy.m */; };
 		19656C1C2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 19656C1B2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19656C242E91CF3100BFA06E /* CLXBidLifecycleEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19656C232E91CF3100BFA06E /* CLXBidLifecycleEvent.m */; };
 		196B5A682EE9970A00262ECF /* CLXAdapterBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 196B5A672EE9970A00262ECF /* CLXAdapterBanner.m */; };
@@ -393,6 +395,8 @@
 		1916B2662E819FD400E49E3E /* CLXMetricsTypeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsTypeTests.m; sourceTree = "<group>"; };
 		1916B32B2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAppKeyAppIDDistinctionTests.m; sourceTree = "<group>"; };
 		1916B32D2E832C0000E49E3E /* CLXAppIDIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAppIDIntegrationTests.m; sourceTree = "<group>"; };
+		194BB9E62EEEE08F0008DB33 /* CLXUIApplicationProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXUIApplicationProxy.h; sourceTree = "<group>"; };
+		194BB9EA2EEEE0AF0008DB33 /* CLXUIApplicationProxy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXUIApplicationProxy.m; sourceTree = "<group>"; };
 		19656C1B2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXBidLifecycleEvent.h; sourceTree = "<group>"; };
 		19656C232E91CF3100BFA06E /* CLXBidLifecycleEvent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidLifecycleEvent.m; sourceTree = "<group>"; };
 		196B5A672EE9970A00262ECF /* CLXAdapterBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterBanner.m; sourceTree = "<group>"; };
@@ -1026,6 +1030,7 @@
 		19C724DD2E2390810012CFC7 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				194BB9EA2EEEE0AF0008DB33 /* CLXUIApplicationProxy.m */,
 				19D8D40B2EDAFCB000817D1E /* CLXLogEntry.m */,
 				19D8D40C2EDAFCB000817D1E /* CLXLogStore.m */,
 				1979928C2E75E39600EBA0A3 /* ErrorReporting */,
@@ -1045,6 +1050,7 @@
 		19C725422E2390810012CFC7 /* CloudXCore */ = {
 			isa = PBXGroup;
 			children = (
+				194BB9E62EEEE08F0008DB33 /* CLXUIApplicationProxy.h */,
 				196B5EB32EEC460F00262ECF /* CLXAdapterErrorMapper.h */,
 				19D8D2202EDA04C900817D1E /* CLXORTBConstants.h */,
 				19D8D4B72EDD7B0400817D1E /* Debug */,
@@ -1397,6 +1403,7 @@
 				19D8D4BC2EDD7B0400817D1E /* CLXDebugButton.h in Headers */,
 				19F592DE2E98365E00C6E11D /* NSDictionary+DynamicPath.h in Headers */,
 				19F592E42E9836CD00C6E11D /* CLXKeyValueState.h in Headers */,
+				194BB9E92EEEE08F0008DB33 /* CLXUIApplicationProxy.h in Headers */,
 				19D8D2212EDA04C900817D1E /* CLXORTBConstants.h in Headers */,
 				19C7257A2E2390810012CFC7 /* CLXBidNetworkService.h in Headers */,
 				19D92CA22E6E099C00C84DAE /* CLXUserDefaultsKeys.h in Headers */,
@@ -1585,6 +1592,7 @@
 				19F853602E899BD2002619F1 /* CLXCloudXDatabase.m in Sources */,
 				19F853612E899BD2002619F1 /* CLXMetricsEventDaoImpl.m in Sources */,
 				19F853622E899BD2002619F1 /* CLXPerformanceDaoImpl.m in Sources */,
+				194BB9EB2EEEE0AF0008DB33 /* CLXUIApplicationProxy.m in Sources */,
 				19F853632E899BD2002619F1 /* CLXDatabaseSchema.m in Sources */,
 				19F853642E899BD2002619F1 /* CLXRillEvent.m in Sources */,
 				19F853652E899BD2002619F1 /* CLXRillEventDaoImpl.m in Sources */,
