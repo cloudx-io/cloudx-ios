@@ -44,14 +44,16 @@
 }
 
 - (nullable id<CLXAdapterRewarded>)createWithAdId:(NSString *)adId
-                                       placementId:(NSString *)placementId
-                                        bidPayload:(nullable NSString *)bidPayload
-                                             bidID:(NSString *)bidID
-                                          delegate:(id<CLXAdapterRewardedDelegate>)delegate {
+                                              bidId:(NSString *)bidId
+                                                adm:(NSString *)adm
+                                             extras:(NSDictionary<NSString *, NSString *> *)extras
+                                           delegate:(id<CLXAdapterRewardedDelegate>)delegate {
     
-    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating rewarded - AdID: %@, Placement: %@", adId, placementId]];
+    // Extract placement ID from extras (server provides this in adapter_extras)
+    NSString *placementIdString = extras[@"placement_id"];
+    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating rewarded - AdID: %@, BidID: %@, PlacementID: %@", adId, bidId, placementIdString]];
     
-    long long inmobiPlacementID = [self.baseFactory extractPlacementID:placementId];
+    long long inmobiPlacementID = [self.baseFactory extractPlacementID:placementIdString];
     
     // v1.3.0: No longer return nil for validation errors
     // Validation now happens in load() with proper error callbacks
@@ -60,15 +62,15 @@
     }
     
     NSData *bidPayloadData = nil;
-    if (bidPayload && bidPayload.length > 0) {
-        bidPayloadData = [bidPayload dataUsingEncoding:NSUTF8StringEncoding];
+    if (adm && adm.length > 0) {
+        bidPayloadData = [adm dataUsingEncoding:NSUTF8StringEncoding];
     }
     
     // ALWAYS create and return adapter (even with invalid placementID = 0)
     // Validation errors will be reported in load() via delegate callback
     CLXInMobiRewarded *rewarded = [[CLXInMobiRewarded alloc] initWithBidPayload:bidPayloadData
                                                                      placementID:inmobiPlacementID  // May be 0 (invalid)
-                                                                           bidID:bidID
+                                                                           bidID:bidId
                                                                         delegate:delegate];
     
     [self.baseFactory.logger debug:@"Rewarded adapter created successfully"];

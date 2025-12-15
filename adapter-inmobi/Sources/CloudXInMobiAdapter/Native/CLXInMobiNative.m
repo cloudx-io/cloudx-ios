@@ -26,6 +26,8 @@
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, assign) long long placementID;
+@property (nonatomic, strong, readwrite, nullable) UIView *nativeView;
+@property (nonatomic, weak, nullable) UIViewController *presentingViewController;
 @end
 
 @implementation CLXInMobiNative
@@ -59,6 +61,68 @@
 
 - (NSString *)bidID {
     return _bidID;
+}
+
+- (BOOL)isReady {
+    BOOL ready = _native && [_native isReady];
+    [self.logger debug:[NSString stringWithFormat:@"isReady: %@", ready ? @"YES" : @"NO"]];
+    return ready;
+}
+
+#pragma mark - Native Ad Content Properties
+
+- (nullable NSString *)adTitle {
+    return _native.adTitle;
+}
+
+- (nullable NSString *)adDescription {
+    return _native.adDescription;
+}
+
+- (nullable NSString *)adCtaText {
+    return _native.adCtaText;
+}
+
+- (nullable UIImage *)adIcon {
+    return _native.adIcon;
+}
+
+#pragma mark - View Methods
+
+- (nullable UIView *)primaryViewOfWidth:(CGFloat)width {
+    if (![self isReady]) {
+        [self.logger error:@"Cannot get primary view - native ad not ready"];
+        return nil;
+    }
+    
+    UIView *view = [_native primaryViewOfWidth:width];
+    self.nativeView = view;
+    return view;
+}
+
+- (void)showFromViewController:(UIViewController *)viewController {
+    if (![self isReady]) {
+        [self.logger error:@"Cannot show - native ad not ready"];
+        return;
+    }
+    
+    self.presentingViewController = viewController;
+    
+    // Get the primary view from InMobi
+    CGFloat width = viewController.view.bounds.size.width;
+    UIView *adView = [self primaryViewOfWidth:width];
+    
+    if (!adView) {
+        [self.logger error:@"Failed to get primary view from InMobi"];
+        return;
+    }
+    
+    [self.logger info:@"Showing native ad"];
+    
+    // Notify delegate that ad is being shown
+    if ([self.delegate respondsToSelector:@selector(didShowWithNative:)]) {
+        [self.delegate didShowWithNative:self];
+    }
 }
 
 - (void)load {
@@ -101,15 +165,36 @@
 - (void)destroy {
     [self.logger debug:@"Destroying native"];
     
+    // Recycle the primary view if it exists
     if (self.native) {
+        [self.native recyclePrimaryView];
         self.native.delegate = nil;
         self.native = nil;
     }
     
+    // Remove native view from superview if it was added
+    if (self.nativeView) {
+        [self.nativeView removeFromSuperview];
+        self.nativeView = nil;
+    }
+    
     self.delegate = nil;
+    self.presentingViewController = nil;
     _isLoading = NO;
     
     [self.logger debug:@"Destruction complete"];
+}
+
+#pragma mark - Click Handling
+
+- (void)reportClick {
+    if (![self isReady]) {
+        [self.logger error:@"Cannot report click - native ad not ready"];
+        return;
+    }
+    
+    [self.logger debug:@"Reporting click and opening landing page"];
+    [self.native reportAdClickAndOpenLandingPage];
 }
 
 #pragma mark - IMNativeDelegate
