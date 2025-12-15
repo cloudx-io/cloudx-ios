@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "v#{s.version}-core" }
   
   s.ios.deployment_target = '15.0'
-  s.vendored_frameworks = 'core/CloudXCore.xcframework'
+  s.vendored_frameworks = 'CloudXCore.xcframework'
   
   s.frameworks = ['Foundation', 'SafariServices', 'UIKit', 'CoreLocation', 'WebKit', 'CoreData']
   
@@ -19,7 +19,8 @@ Pod::Spec.new do |s|
     'DEFINES_MODULE' => 'YES'
   }
   s.user_target_xcconfig = {
-    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
+    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO',
+    'OTHER_LDFLAGS' => '$(inherited) -ObjC'
   }
   
   s.swift_versions = ['5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9', '6.0', '6.1', '6.2']
