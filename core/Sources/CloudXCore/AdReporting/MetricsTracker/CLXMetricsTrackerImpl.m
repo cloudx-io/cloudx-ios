@@ -144,15 +144,24 @@
 }
 
 - (void)trySendingPendingMetrics {
+    __weak typeof(self) weakSelf = self;
     dispatch_async(self.metricsQueue, ^{
-        [self _sendPendingMetrics];
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf) {
+            [strongSelf _sendPendingMetrics];
+        }
     });
 }
 
 - (void)stop {
     // Stop timer on main thread since that's where it was created
+    // Use weak self to avoid retain cycle and zombie access
+    __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self _stopPeriodicSending];
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf) {
+            [strongSelf _stopPeriodicSending];
+        }
     });
 }
 
@@ -190,26 +199,34 @@
         return;
     }
     
+    // Capture values needed in the block before dispatching
+    NSInteger intervalSeconds = self.sendIntervalSeconds;
+    __weak typeof(self) weakSelf = self;
+    
     // Create timer on the main thread's run loop
     dispatch_async(dispatch_get_main_queue(), ^{
-        __weak typeof(self) weakSelf = self;
-        self.sendTimer = [NSTimer scheduledTimerWithTimeInterval:self.sendIntervalSeconds
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return; // Object deallocated, don't create timer
+        }
+        
+        strongSelf.sendTimer = [NSTimer scheduledTimerWithTimeInterval:intervalSeconds
                                                          repeats:YES
                                                            block:^(NSTimer * _Nonnull timer) {
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            if (!strongSelf) {
+            __strong typeof(weakSelf) timerStrongSelf = weakSelf;
+            if (!timerStrongSelf) {
                 [timer invalidate];
                 return;
             }
             // Dispatch back to the metrics queue for thread-safe metric sending
-            dispatch_async(strongSelf.metricsQueue, ^{
+            dispatch_async(timerStrongSelf.metricsQueue, ^{
                 __strong typeof(weakSelf) innerStrongSelf = weakSelf;
                 if (innerStrongSelf) {
                     [innerStrongSelf _sendPendingMetrics];
                 }
             });
         }];
-        [self.logger debug:[NSString stringWithFormat:@"Metrics timer started - will fire every %ld seconds", (long)self.sendIntervalSeconds]];
+        [strongSelf.logger debug:[NSString stringWithFormat:@"Metrics timer started - will fire every %ld seconds", (long)intervalSeconds]];
     });
 }
 

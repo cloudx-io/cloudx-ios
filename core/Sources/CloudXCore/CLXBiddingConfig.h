@@ -242,6 +242,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXBiddingConfigImpressionExt *ext;
 @property (nonatomic, strong, nullable) CLXBiddingConfigImpressionPMP *pmp;
 @property (nonatomic, strong, nullable) NSArray<NSDictionary *> *metric;  // Session depth metrics
+/// ORTB 2.5: Name of ad mediation partner, SDK technology, or player responsible for rendering ad
+@property (nonatomic, copy, nullable) NSString *displaymanager;
+/// ORTB 2.5: Version of ad mediation partner, SDK technology, or player
+@property (nonatomic, copy, nullable) NSString *displaymanagerver;
+/// ORTB 2.5: Indicates if ad is rewarded (1 = rewarded, 0 = not rewarded)
+@property (nonatomic, strong, nullable) NSNumber *rwdd;
 @end
 
 @interface CLXBiddingConfigImpressionBanner : NSObject
@@ -267,6 +273,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSNumber *linearity;
 @property (nonatomic, strong) NSNumber *pos;
 @property (nonatomic, strong) NSArray<NSNumber *> *companiontype;
+/// ORTB 2.5: Minimum video ad duration in seconds
+@property (nonatomic, strong, nullable) NSNumber *minduration;
+/// ORTB 2.5: Maximum video ad duration in seconds
+@property (nonatomic, strong, nullable) NSNumber *maxduration;
+/// ORTB 2.5: Video start delay in seconds (0 = pre-roll, >0 = mid-roll delay, -1 = generic mid-roll, -2 = generic post-roll)
+@property (nonatomic, strong, nullable) NSNumber *startdelay;
+/// ORTB 2.5: Indicates if the video is skippable (1 = skippable, 0 = not skippable)
+@property (nonatomic, strong, nullable) NSNumber *skip;
+/// ORTB 2.5: Minimum duration in seconds before skip button appears (only applies when skip=1)
+@property (nonatomic, strong, nullable) NSNumber *skipmin;
+/// ORTB 2.5: Number of seconds into video when skip button appears (only applies when skip=1)
+@property (nonatomic, strong, nullable) NSNumber *skipafter;
+/// ORTB 2.5: Playback methods supported (1=auto-play sound on, 2=auto-play sound off, 3=click-to-play, 4=mouse-over)
+@property (nonatomic, strong, nullable) NSArray<NSNumber *> *playbackmethod;
 @end
 
 @interface CLXBiddingConfigImpressionNative : NSObject

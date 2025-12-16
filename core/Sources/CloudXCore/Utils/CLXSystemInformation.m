@@ -105,7 +105,7 @@ static CLXSystemInformation *sharedInstance = nil;
 }
 
 - (NSString *)displayManager {
-    return @"CLOUDX";
+    return @"cloudx";
 }
 
 - (BOOL)isAppStoreEnvironment {

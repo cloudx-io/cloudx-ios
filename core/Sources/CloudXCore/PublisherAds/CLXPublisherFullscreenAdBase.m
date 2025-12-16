@@ -39,6 +39,43 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#pragma mark - Force Close Timeout Constants
+/**
+ * Maximum time (in seconds) a fullscreen ad can remain on-screen before the SDK forcibly closes it.
+ * This is a SAFETY mechanism for stuck/broken ads, NOT a constraint on video content length.
+ *
+ * IMPORTANT: This is different from bid request `video.maxduration`:
+ *   - `maxduration` = max video FILE length sent to bidders (60s)
+ *   - Force close timeout = max TOTAL on-screen time (video + end card + user interaction)
+ *
+ * Timeline for a 60s rewarded video:
+ *   [0s]     Video starts
+ *   [60s]    Video ends, end card appears
+ *   [60-90s] User views end card, may interact with CTA
+ *   [90s+]   User dismisses or SDK force-closes if stuck
+ *
+ * Values chosen to be generous enough for legitimate ad experiences while still
+ * protecting users from truly stuck ads.
+ *
+ * 🔧 PUBLISHER CONFIGURABILITY CANDIDATE:
+ *    These values could potentially be configurable via server-side placement settings
+ *    if publishers need different timeout behaviors for their specific use cases.
+ */
+
+/// Force close timeout for REWARDED ads (120 seconds / 2 minutes)
+/// Rationale: Users must complete video to earn reward, so we allow extra time for:
+///   - Full video playback (up to 60s)
+///   - End card display and interaction (30-60s)
+///   - Network latency/buffering
+static const NSTimeInterval kCLXForceCloseTimeoutRewarded = 120.0;
+
+/// Force close timeout for INTERSTITIAL ads (90 seconds)
+/// Rationale: Shorter than rewarded because:
+///   - Skippable after ~5s (user can exit early)
+///   - Typically shorter video content
+///   - User didn't opt-in for extended experience
+static const NSTimeInterval kCLXForceCloseTimeoutInterstitial = 90.0;
+
 // Private category to access internal SDK methods (framework-internal only, not exposed in public API)
 @interface CloudXCore (Internal)
 - (nullable CLXConfigImpressionModel *)createImpModelWithAuctionID:(NSString *)auctionID;
@@ -136,7 +173,13 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         _userID = [userID copy];
         _settings = settings;
         _impModel = impModel;
-        _forceCloseEventDelay = 60.0; // Safety timeout for stuck fullscreen ads
+        
+        // Set force close timeout based on ad type
+        // See constant definitions above for detailed rationale
+        _forceCloseEventDelay = ([self adType] == CLXAdTypeRewarded) 
+            ? kCLXForceCloseTimeoutRewarded 
+            : kCLXForceCloseTimeoutInterstitial;
+        
         _closeEventReceived = NO;
         _pendingLoadRequestCount = 0;
         

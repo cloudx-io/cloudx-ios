@@ -28,6 +28,62 @@
 #import <CloudXCore/CLXSKAdNetworkService.h>
 
 
+#pragma mark - Video Bid Request Constants
+/**
+ * OpenRTB 2.5 Video Object Configuration Constants
+ *
+ * These values are sent in bid requests to tell DSPs/bidders what video content
+ * constraints we have. They constrain the VIDEO FILE that bidders return, NOT
+ * the total on-screen ad experience time.
+ *
+ * IMPORTANT DISTINCTION:
+ *   - These values → Constrain video FILE length in bid response
+ *   - Force close timeout → Constrains total ON-SCREEN time (video + end card + interaction)
+ *   - See CLXPublisherFullscreenAdBase.m for force close timeout constants
+ *
+ * Industry standard: maxduration=60 is typical for rewarded/interstitial video ads.
+ */
+
+/// Minimum video duration in seconds
+/// Rationale: Prevents extremely short videos that don't deliver advertiser value.
+/// Most DSPs won't bid with <5s videos anyway.
+static const NSInteger kCLXVideoMinDuration = 5;
+
+/// Maximum video duration in seconds
+/// Rationale: 60s is industry standard for rewarded video max. Balances:
+///   - Advertiser message delivery
+///   - User attention span
+///   - Completion rate optimization (drops significantly past 30-45s)
+/// Note: Most actual creatives are 15-30s; 60s is the upper bound.
+///
+/// 🔧 PUBLISHER CONFIGURABILITY CANDIDATE:
+///    Publishers may want shorter maxduration (e.g., 30s) for better UX,
+///    or this could be set per-placement via server config.
+static const NSInteger kCLXVideoMaxDuration = 60;
+
+/// Number of seconds a video must play before skip button appears (when skippable)
+/// Rationale: Industry standard is 5 seconds. Ensures advertisers get minimum exposure
+/// before users can skip. Used for interstitials (rewarded videos are non-skippable).
+///
+/// 🔧 PUBLISHER CONFIGURABILITY CANDIDATE:
+///    Some publishers prefer shorter (3s) or longer (10s) skip delays.
+///    Could be configurable per-placement.
+static const NSInteger kCLXVideoSkipAfterSeconds = 5;
+
+/// Minimum video duration before skip is allowed (skipmin field)
+/// Set to 0 = no minimum requirement (skipafter handles the timing)
+static const NSInteger kCLXVideoSkipMinDuration = 0;
+
+/// Video playback method(s) supported
+/// 1 = Auto-play with sound on (standard for fullscreen video ads)
+/// Other values: 2=auto-play sound off, 3=click-to-play, 4=mouse-over
+static const NSInteger kCLXVideoPlaybackMethodAutoPlaySoundOn = 1;
+
+/// Video start delay (pre-roll, mid-roll, post-roll positioning)
+/// 0 = pre-roll (starts immediately when ad displays)
+/// >0 = mid-roll delay in seconds
+/// -1 = generic mid-roll, -2 = generic post-roll
+static const NSInteger kCLXVideoStartDelayPreRoll = 0;
 
 // Internal methods category for accessing privacy methods
 @interface CLXPrivacyService (Internal)
@@ -204,6 +260,16 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         video.pos = @7;
         video.companiontype = @[@1, @2];
         
+        // ORTB 2.5: Video duration and skip configuration
+        // See constant definitions at top of file for detailed rationale on each value
+        video.minduration = @(kCLXVideoMinDuration);
+        video.maxduration = @(kCLXVideoMaxDuration);
+        video.startdelay = @(kCLXVideoStartDelayPreRoll);
+        video.skip = (adType == CLXAdTypeRewarded) ? @0 : @1;  // Rewarded = non-skippable, Interstitial = skippable
+        video.skipmin = @(kCLXVideoSkipMinDuration);
+        video.skipafter = @(kCLXVideoSkipAfterSeconds);        // Only applies when skip=1 (interstitials)
+        video.playbackmethod = @[@(kCLXVideoPlaybackMethodAutoPlaySoundOn)];
+        
         // Create stored impression ID
         CLXBiddingConfigImpressionExtId *idObj = [[CLXBiddingConfigImpressionExtId alloc] init];
         idObj.idValue = storedImpressionId;
@@ -278,10 +344,15 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         // Generate unique impression ID per request (OpenRTB compliance)
         impression.impressionID = [[NSUUID UUID] UUIDString];
         impression.tagid = storedImpressionId;
+        // ORTB 2.5: displaymanager identifies the SDK responsible for rendering
+        impression.displaymanager = displayManager;
+        impression.displaymanagerver = displayManagerVer;
         
         [logger debug:[NSString stringWithFormat:@"Creating impression - AdType: %ld, Dimensions: %ldx%ld", (long)adType, (long)screenWidth, (long)screenHeight]];
         
         impression.instl = (adType == CLXAdTypeInterstitial || adType == CLXAdTypeRewarded) ? @1 : @0;
+        // ORTB 2.5: rwdd indicates rewarded ad (1 = rewarded) - only set for rewarded ads
+        impression.rwdd = (adType == CLXAdTypeRewarded) ? @1 : nil;
         
         // ORTB 2.5: bidfloor is the minimum bid price for this impression in CPM
         // Only include if explicitly provided (non-zero value indicates publisher floor)
@@ -575,6 +646,8 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
     
     // Add basic fields
     json[@"id"] = self.requestID ?: @"";
+    // ORTB 2.5: Auction type (1 = First Price, 2 = Second Price)
+    json[@"at"] = @1;
     json[@"imp"] = [self convertImpressionsToJSON];
     json[@"app"] = [self convertApplicationToJSON];
     json[@"device"] = [self convertDeviceToJSON];
@@ -670,6 +743,13 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
 - (NSDictionary *)convertImpressionToJSON:(CLXBiddingConfigImpression *)impression {
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
     json[@"id"] = impression.impressionID ?: @"";
+    // ORTB 2.5: displaymanager identifies the SDK responsible for rendering
+    if (impression.displaymanager) {
+        json[@"displaymanager"] = impression.displaymanager;
+    }
+    if (impression.displaymanagerver) {
+        json[@"displaymanagerver"] = impression.displaymanagerver;
+    }
     json[@"tagid"] = impression.tagid ?: @"";
     json[@"instl"] = impression.instl ?: @0;
     json[@"secure"] = @1;
@@ -680,6 +760,11 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
     }
     json[@"bidfloorcur"] = impression.bidfloorcur ?: @"USD";
     json[@"exp"] = impression.exp ?: @14400;
+    
+    // ORTB 2.5: rwdd indicates rewarded ad
+    if (impression.rwdd) {
+        json[@"rwdd"] = impression.rwdd;
+    }
     
     if (impression.banner) {
         json[@"banner"] = [self convertBannerToJSON:impression.banner];
@@ -781,6 +866,30 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
     json[@"linearity"] = video.linearity ?: @0;
     json[@"pos"] = video.pos ?: @0;
     json[@"companiontype"] = video.companiontype ?: @[];
+    
+    // ORTB 2.5: Video duration and skip configuration
+    if (video.minduration) {
+        json[@"minduration"] = video.minduration;
+    }
+    if (video.maxduration) {
+        json[@"maxduration"] = video.maxduration;
+    }
+    if (video.startdelay != nil) {  // Can be 0, so check for nil explicitly
+        json[@"startdelay"] = video.startdelay;
+    }
+    if (video.skip != nil) {  // Can be 0, so check for nil explicitly
+        json[@"skip"] = video.skip;
+    }
+    if (video.skipmin != nil) {  // Can be 0, so check for nil explicitly
+        json[@"skipmin"] = video.skipmin;
+    }
+    if (video.skipafter) {
+        json[@"skipafter"] = video.skipafter;
+    }
+    if (video.playbackmethod) {
+        json[@"playbackmethod"] = video.playbackmethod;
+    }
+    
     return [json copy];
 }
 

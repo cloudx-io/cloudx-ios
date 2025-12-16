@@ -2,7 +2,7 @@
 // CLXError.m
 // CloudXCore
 //
-// Industry-standard error codes following AppLovin MAX, Google Mobile Ads, and Unity Ads patterns
+// Industry-standard error codes following common ad SDK patterns
 //
 
 #import "CLXError.h"
