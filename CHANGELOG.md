@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2025-12-16
+
+### Added
+- **Rewarded Video Reward Info** - New `CLXReward` class containing reward amount and currency (mirrors AppLovin MAX SDK's `MAReward`)
+  - `didRewardUserForAd:withReward:` delegate method provides reward details
+  - Reward configuration from server provisioning (`rewardAmount`, `rewardCurrency`, `rewardCallbackUrl`)
+  - Adapters can optionally pass network-specific reward info
+- **Reward Event Tracking** - Server notification for rewarded ad completions
+  - New `CLXBidLifecycleEventTypeReward` event type
+  - Automatic firing of reward notification when user earns reward
+
+---
+
 ## [1.3.0] - 2025-12-14
 
 ### Added
