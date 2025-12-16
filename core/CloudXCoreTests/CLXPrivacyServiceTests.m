@@ -19,29 +19,9 @@
 // Note: No longer supports UserDefaults injection to ensure real-world collision testing
 @end
 
-// Test category for CloudXCore to enable dependency injection
-@interface CloudXCore (Testing)
-+ (void)setCCPAPrivacyStringWithService:(nullable NSString *)ccpaPrivacyString privacyService:(CLXPrivacyService *)privacyService;
-+ (void)setIsUserConsentWithService:(BOOL)isUserConsent privacyService:(CLXPrivacyService *)privacyService;
-+ (void)setIsDoNotSellWithService:(BOOL)isDoNotSell privacyService:(CLXPrivacyService *)privacyService;
-@end
-
-// SOLID: Test-only category implementation (keeps core files clean)
-@implementation CloudXCore (Testing)
-
-+ (void)setCCPAPrivacyStringWithService:(nullable NSString *)ccpaPrivacyString privacyService:(CLXPrivacyService *)privacyService {
-    [privacyService setCCPAPrivacyString:ccpaPrivacyString];
-}
-
-+ (void)setIsUserConsentWithService:(BOOL)isUserConsent privacyService:(CLXPrivacyService *)privacyService {
-    [privacyService setHasUserConsent:@(isUserConsent)];
-}
-
-+ (void)setIsDoNotSellWithService:(BOOL)isDoNotSell privacyService:(CLXPrivacyService *)privacyService {
-    [privacyService setDoNotSell:@(isDoNotSell)];
-}
-
-@end
+// NOTE: Privacy setter APIs (setCCPAPrivacyString, setHasUserConsent, setDoNotSell) have been removed
+// to match Android SDK which relies entirely on IAB standard UserDefaults keys.
+// Tests now set privacy values directly via UserDefaults using IAB standard keys.
 
 @interface CLXPrivacyServiceTests : XCTestCase
 
@@ -237,85 +217,48 @@
     XCTAssertFalse(shouldClear, @"When all privacy frameworks allow, data should be allowed");
 }
 
-#pragma mark - Public API Tests
+#pragma mark - IAB Standard UserDefaults Tests
 
-// Test new public API methods work correctly
-- (void)testPublicCCPAPrivacyStringAPI {
-    // Test setting CCPA privacy string through public API
+// Test that SDK reads CCPA privacy string from IAB standard UserDefaults key
+- (void)testCCPAPrivacyStringFromIABUserDefaults {
     [self clearPrivacySettings];
     
+    // Set CCPA string via IAB standard key (as CMPs would)
     NSString *testCCPAString = @"1YNN";
-    [self.privacyService setCCPAPrivacyString:testCCPAString];
+    [[NSUserDefaults standardUserDefaults] setObject:testCCPAString forKey:kCLXPrivacyCCPAPrivacyKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
-    // Verify it was stored correctly
+    // Verify SDK reads it correctly
     NSString *retrievedCCPA = [self.privacyService ccpaPrivacyString];
-    XCTAssertEqualObjects(retrievedCCPA, testCCPAString, @"CCPA string should be stored and retrieved correctly");
+    XCTAssertEqualObjects(retrievedCCPA, testCCPAString, @"SDK should read CCPA string from IAB UserDefaults key");
     
     // Test clearing CCPA string
-    [self.privacyService setCCPAPrivacyString:nil];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
     NSString *clearedCCPA = [self.privacyService ccpaPrivacyString];
-    XCTAssertNil(clearedCCPA, @"CCPA string should be cleared when set to nil");
+    XCTAssertNil(clearedCCPA, @"CCPA string should be nil when UserDefaults key is removed");
 }
 
-// Test GDPR consent API (with server warning)
-- (void)testPublicGDPRConsentAPI {
+// Test SDK reads CCPA opt-out correctly from IAB US Privacy String
+// IAB US Privacy String format: 1[Notice][OptOut][LSPA]
+// Position 3 (index 2) is the opt-out flag: Y = opted out, N = not opted out
+- (void)testCCPAOptOutDetection {
     [self clearPrivacySettings];
     
-    // Test setting GDPR consent through public API
-    [self.privacyService setHasUserConsent:@YES];
+    // Test opt-out detected (Y at position 3)
+    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
-    // Verify it was stored (using internal method since this is for testing)
-    NSNumber *gdprApplies = [self.privacyService gdprApplies];
-    XCTAssertEqualObjects(gdprApplies, @YES, @"GDPR consent should be stored correctly");
+    NSNumber *ccpaApplies = [self.privacyService ccpaApplies];
+    XCTAssertEqualObjects(ccpaApplies, @YES, @"CCPA should detect opt-out from '1YYN' (Y at position 3)");
     
-    // Test clearing GDPR consent
-    [self.privacyService setHasUserConsent:nil];
-    gdprApplies = [self.privacyService gdprApplies];
-    XCTAssertNil(gdprApplies, @"GDPR consent should be cleared when set to nil");
-}
-
-// Test do not sell convenience API
-// IAB US Privacy String: Position 3 is the opt-out flag
-// 1YYN = Notice given, OPTED OUT, Not LSPA
-// 1YNN = Notice given, NOT opted out, Not LSPA
-- (void)testPublicDoNotSellAPI {
-    [self clearPrivacySettings];
+    // Test no opt-out (N at position 3)
+    [[NSUserDefaults standardUserDefaults] setObject:@"1YNN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
-    // Test setting do not sell = YES (should create "1YYN" CCPA string - Y at position 3)
-    [self.privacyService setDoNotSell:@YES];
-    
-    NSString *ccpaString = [self.privacyService ccpaPrivacyString];
-    XCTAssertEqualObjects(ccpaString, @"1YYN", @"Do not sell YES should create '1YYN' CCPA string (opt-out at position 3)");
-    
-    // Test setting do not sell = NO (should create "1YNN" CCPA string - N at position 3)
-    [self.privacyService setDoNotSell:@NO];
-    
-    ccpaString = [self.privacyService ccpaPrivacyString];
-    XCTAssertEqualObjects(ccpaString, @"1YNN", @"Do not sell NO should create '1YNN' CCPA string (not opted out at position 3)");
-    
-    // Test clearing do not sell
-    [self.privacyService setDoNotSell:nil];
-    ccpaString = [self.privacyService ccpaPrivacyString];
-    XCTAssertNil(ccpaString, @"Do not sell nil should clear CCPA string");
-}
-
-// Test CloudXCore public API delegates to CLXPrivacyService correctly
-- (void)testCloudXCorePublicAPIIntegration {
-    [self clearPrivacySettings];
-    
-    // SOLID: Test CloudXCore methods with dependency injection to our isolated privacy service
-    [CloudXCore setCCPAPrivacyStringWithService:@"1YNN" privacyService:self.privacyService];
-    NSString *ccpaString = [self.privacyService ccpaPrivacyString];
-    XCTAssertEqualObjects(ccpaString, @"1YNN", @"CloudXCore setCCPAPrivacyString should delegate to CLXPrivacyService");
-    
-    [CloudXCore setIsUserConsentWithService:YES privacyService:self.privacyService];
-    NSNumber *gdprApplies = [self.privacyService gdprApplies];
-    XCTAssertEqualObjects(gdprApplies, @YES, @"CloudXCore setIsUserConsent should delegate to CLXPrivacyService");
-    
-    // setIsDoNotSell:NO should create "1YNN" (not opted out at position 3)
-    [CloudXCore setIsDoNotSellWithService:NO privacyService:self.privacyService];
-    ccpaString = [self.privacyService ccpaPrivacyString];
-    XCTAssertEqualObjects(ccpaString, @"1YNN", @"CloudXCore setIsDoNotSell:NO should create '1YNN' CCPA string");
+    ccpaApplies = [self.privacyService ccpaApplies];
+    XCTAssertEqualObjects(ccpaApplies, @NO, @"CCPA should not detect opt-out from '1YNN' (N at position 3)");
 }
 
 #pragma mark - GDPR/TCF Purpose Consent Tests

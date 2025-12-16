@@ -70,14 +70,14 @@
 //  ----------------------------------------
 //  Writes directly to IAB standard UserDefaults keys (CloudX reads these internally):
 //  - IABGPP_HDR_GppString - IAB GPP consent string
-//  - IABGPP_GppSID - IAB GPP Section ID (7=US-National, 8=US-CA/EU)
+//  - IABGPP_GppSID - IAB GPP Section ID (7=US-National, 8=US-CA)
+//  - IABTCF_TCString - IAB TCF consent string for GDPR
+//  - IABTCF_gdprApplies - IAB flag indicating GDPR applies
+//  - IABUSPrivacy_String - IAB US Privacy string for CCPA
 //  
-//  Also calls CloudXCore public APIs for other privacy settings:
-//  - setIsUserConsent: - Sets user consent flag
-//  - setIsDoNotSell: - Sets CCPA do-not-sell flag
-//  
-//  NOTE: GPP public methods were removed from CloudX SDK to align with Android.
-//  Both platforms now read GPP from IAB standard storage. Publishers should use
+//  NOTE: Privacy setter APIs (setCCPAPrivacyString, setIsUserConsent, setIsDoNotSell)
+//  were removed from CloudX SDK to align with Android. Both platforms now read privacy
+//  data from IAB standard UserDefaults/SharedPreferences. Publishers should use
 //  IAB CMP SDKs; this component writes to IAB keys for demo/testing purposes only.
 //
 //  TESTING WORKFLOW:

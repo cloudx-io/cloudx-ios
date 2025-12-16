@@ -157,7 +157,9 @@
     [self.gppProvider setGppSid:@[@7, @8]];
     
     // Legacy CCPA says consent (1YNN = opt-out N, sale notice N, limited notice N)
-    [self.privacyService setCCPAPrivacyString:@"1YNN"];
+    // Set CCPA via IAB standard UserDefaults key
+    [[NSUserDefaults standardUserDefaults] setObject:@"1YNN" forKey:@"IABUSPrivacy_String"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     [self setupCaliforniaUser];
     
@@ -175,7 +177,9 @@
     [self.gppProvider setGppSid:@[@7, @8]];
     
     // Legacy CCPA says opt-out (1YYN = opt-out Y)
-    [self.privacyService setCCPAPrivacyString:@"1YYN"];
+    // Set CCPA opt-out via IAB standard UserDefaults key
+    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:@"IABUSPrivacy_String"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     [self setupCaliforniaUser];
     

@@ -441,20 +441,18 @@ static NSUInteger const kTCFVendorConsentOffset = 230;      // Vendor consent se
         
         [self.logger debug:[NSString stringWithFormat:@"Decoded TCF bit string length: %lu bits", (unsigned long)bits.length]];
         
-        // Read purpose consents (purposes 1-4)
+        // Read purpose consents (purposes 1-2 only)
+        // Only purposes 1-2 are required for basic ad serving (contextual ads)
+        // Purposes 3-4 (personalization) are not checked since CloudX serves contextual ads
         NSNumber *purpose1 = [self readBitAsBool:bits index:kTCFPurposeConsentOffset];
         NSNumber *purpose2 = [self readBitAsBool:bits index:kTCFPurposeConsentOffset + 1];
-        NSNumber *purpose3 = [self readBitAsBool:bits index:kTCFPurposeConsentOffset + 2];
-        NSNumber *purpose4 = [self readBitAsBool:bits index:kTCFPurposeConsentOffset + 3];
         
-        // Read vendor consent for CloudX
+        // Read vendor consent for CloudX (Vendor ID 1510)
         NSNumber *vendorConsent = [self parseVendorConsent:bits vendorId:kCloudXVendorId];
         
         CLXPrivacyConsent *consent = [[CLXPrivacyConsent alloc] initWithPurpose1:purpose1
-                                                                purpose2:purpose2
-                                                                purpose3:purpose3
-                                                                purpose4:purpose4
-                                                           vendorConsent:vendorConsent];
+                                                                        purpose2:purpose2
+                                                                   vendorConsent:vendorConsent];
         
         [self.logger debug:[NSString stringWithFormat:@"TCF decoded: %@", consent]];
         return consent;

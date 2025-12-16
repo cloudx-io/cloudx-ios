@@ -187,28 +187,6 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
                                                     delegate:(nullable id<CLXNativeDelegate>)delegate
     NS_SWIFT_NAME(createNativeAd(placement:viewController:delegate:));
 
-#pragma mark - Privacy Settings
-
-/**
- * Set CCPA privacy string
- * @param ccpaPrivacyString The CCPA privacy string (e.g., "1YNN")
- */
-+ (void)setCCPAPrivacyString:(nullable NSString *)ccpaPrivacyString;
-
-/**
- * Set whether user has given consent (GDPR)
- * @param isUserConsent YES if user has given consent, NO otherwise
- * @discussion ⚠️ GDPR is not yet supported by CloudX servers. Please contact CloudX if you need GDPR support. CCPA is fully supported.
- */
-+ (void)setIsUserConsent:(BOOL)isUserConsent;
-
-/**
- * Set "do not sell" preference (CCPA)
- * @param isDoNotSell YES to opt-out of data selling, NO otherwise
- * @discussion CCPA "do not sell my personal information" flag - converts to CCPA privacy string format
- */
-+ (void)setIsDoNotSell:(BOOL)isDoNotSell;
-
 #pragma mark - Visual Debugging
 
 /**

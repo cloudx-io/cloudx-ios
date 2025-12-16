@@ -54,7 +54,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         switch section {
         case 0: return 2 // SDK Settings
         case 1: return 6 // Placement Settings
-        case 2: return 3 // Privacy
+        case 2: return 5 // Privacy: Consent, US Privacy, GPP String, GPP SID, User Targeting
         case 3: return 4 // Logging: Enable, Emojis, Timestamps, Level
         default: return 0
         }
@@ -126,6 +126,14 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
                 cell.textLabel?.text = "US Privacy String"
                 textField.text = settings.usPrivacyString
             case 2:
+                cell.textLabel?.text = "GPP String"
+                textField.text = settings.gppString
+                textField.placeholder = "IABGPP_HDR_GppString"
+            case 3:
+                cell.textLabel?.text = "GPP SID"
+                textField.text = settings.gppSid
+                textField.placeholder = "e.g., 2_7_8"
+            case 4:
                 cell.textLabel?.text = "User Targeting"
                 let toggle = UISwitch()
                 toggle.isOn = settings.userTargeting
@@ -222,5 +230,27 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         else if tag == 15 { settings.nativeMediumPlacement = textField.text ?? "" }
         else if tag == 20 { settings.consentString = textField.text ?? "" }
         else if tag == 21 { settings.usPrivacyString = textField.text ?? "" }
+        else if tag == 22 { 
+            settings.gppString = textField.text ?? ""
+            // Also write to IAB standard UserDefaults key
+            if let gppString = textField.text, !gppString.isEmpty {
+                UserDefaults.standard.set(gppString, forKey: "IABGPP_HDR_GppString")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "IABGPP_HDR_GppString")
+            }
+            UserDefaults.standard.synchronize()
+            print("🔐 GPP String set: \(textField.text ?? "(cleared)")")
+        }
+        else if tag == 23 { 
+            settings.gppSid = textField.text ?? ""
+            // Also write to IAB standard UserDefaults key
+            if let gppSid = textField.text, !gppSid.isEmpty {
+                UserDefaults.standard.set(gppSid, forKey: "IABGPP_GppSID")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "IABGPP_GppSID")
+            }
+            UserDefaults.standard.synchronize()
+            print("🔐 GPP SID set: \(textField.text ?? "(cleared)")")
+        }
     }
 }

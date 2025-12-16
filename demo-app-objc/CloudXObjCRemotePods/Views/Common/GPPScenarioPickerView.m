@@ -68,12 +68,14 @@
 //
 //  - IABGPP_HDR_GppString - IAB GPP consent string (CloudX reads this internally)
 //  - IABGPP_GppSID - IAB GPP Section ID string (CloudX reads this internally)
-//  - [CloudXCore setIsUserConsent:] - Sets user consent flag (CloudX API)
-//  - [CloudXCore setIsDoNotSell:] - Sets CCPA do-not-sell flag (CloudX API)
+//  - IABTCF_TCString - IAB TCF consent string for GDPR (CloudX reads this internally)
+//  - IABTCF_gdprApplies - IAB flag indicating GDPR applies (CloudX reads this internally)
+//  - IABUSPrivacy_String - IAB US Privacy string for CCPA (CloudX reads this internally)
 //
-//  NOTE: GPP methods (setGPPString/setGPPSid) were removed from CloudX public API
-//  to align with Android's approach. Both platforms now read GPP from IAB standard
-//  storage. Publishers should use IAB CMP SDKs; this demo component writes directly
+//  NOTE: Privacy setter APIs (setCCPAPrivacyString, setIsUserConsent, setIsDoNotSell)
+//  were removed from CloudX public API to align with Android's approach. Both platforms
+//  now read privacy data from IAB standard UserDefaults/SharedPreferences.
+//  Publishers should use IAB CMP SDKs; this demo component writes directly
 //  to IAB keys for testing purposes only.
 //
 //  TESTING WORKFLOW:
@@ -309,7 +311,7 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
             [self setIABGPPString:@"DBABrw~BAAVAAAAAABA.QA~BAUAAABA.QA"];
             [self setIABGPPSid:[self dynamicGPPSid]];  // Dynamic based on real location
             // IAB US Privacy: 1YYN = Version 1, Notice given, OPTED OUT, Not LSPA
-            [CloudXCore setCCPAPrivacyString:@"1YYN"];
+            [self setIABUSPrivacyString:@"1YYN"];
             break;
             
         case GPPTestScenarioGPPNonUS:
@@ -416,6 +418,15 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+- (void)setIABUSPrivacyString:(nullable NSString *)usPrivacyString {
+    if (usPrivacyString) {
+        [[NSUserDefaults standardUserDefaults] setObject:usPrivacyString forKey:@"IABUSPrivacy_String"];
+    } else {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABUSPrivacy_String"];
+    }
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 - (void)resetGPPSettings {
     // Clear IAB GPP UserDefaults directly (CloudX reads from these)
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_HDR_GppString"];
@@ -431,10 +442,6 @@ typedef NS_ENUM(NSInteger, GPPTestScenario) {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABUSPrivacy_String"];
     
     [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    // Clear CloudX privacy settings (public APIs that still exist)
-    [CloudXCore setIsUserConsent:YES];
-    [CloudXCore setIsDoNotSell:NO];
 }
 
 #pragma mark - Helper

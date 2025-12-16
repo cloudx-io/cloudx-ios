@@ -66,15 +66,21 @@
 }
 
 - (void)clearAllPrivacyTestSettings {
-    // Clear all CloudXCore privacy test settings to ensure clean state
+    // Clear all IAB standard privacy settings to ensure clean state
     // This prevents GPP and other privacy scenarios from persisting across app launches
-    [CloudXCore setIsUserConsent:YES];
-    [CloudXCore setIsDoNotSell:NO];
-    [CloudXCore setCCPAPrivacyString:nil];
+    // CloudX SDK reads from these IAB standard UserDefaults keys automatically
     
-    // Clear IAB GPP UserDefaults (CloudX reads from these internally)
+    // Clear IAB GPP UserDefaults
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_HDR_GppString"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_GppSID"];
+    
+    // Clear IAB TCF UserDefaults (GDPR)
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_TCString"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_gdprApplies"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_PurposeConsents"];
+    
+    // Clear IAB US Privacy UserDefaults (CCPA)
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABUSPrivacy_String"];
     
     // Also clear any environment overrides
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CLXDemoEnvironment"];

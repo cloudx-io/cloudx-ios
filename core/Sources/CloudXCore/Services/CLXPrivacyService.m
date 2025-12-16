@@ -249,47 +249,6 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-#pragma mark - Public Privacy Setters
-
-- (void)setCCPAPrivacyString:(nullable NSString *)ccpaPrivacyString {
-    [self.logger debug:[NSString stringWithFormat:@"Setting CCPA privacy string: %@", ccpaPrivacyString ?: @"(cleared)"]];
-    if (ccpaPrivacyString) {
-        [[NSUserDefaults standardUserDefaults] setObject:ccpaPrivacyString forKey:kCLXPrivacyCCPAPrivacyKey];
-    } else {
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
-    }
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-- (void)setHasUserConsent:(nullable NSNumber *)hasUserConsent {
-    [self.logger debug:[NSString stringWithFormat:@"Setting GDPR consent: %@", hasUserConsent ? (hasUserConsent.boolValue ? @"YES" : @"NO") : @"(cleared)"]];
-    if (hasUserConsent) {
-        // IAB TCF spec requires integer: 0 = does not apply, 1 = applies
-        NSInteger gdprValue = [hasUserConsent boolValue] ? 1 : 0;
-        [[NSUserDefaults standardUserDefaults] setInteger:gdprValue forKey:kCLXPrivacyGDPRAppliesKey];
-    } else {
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
-    }
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-- (void)setDoNotSell:(nullable NSNumber *)doNotSell {
-    // Convert boolean to CCPA string format
-    // IAB US Privacy String: "1" + Notice + OptOut + LSPA
-    // Position 1: Version (always 1)
-    // Position 2: Notice given (Y = yes, N = no)
-    // Position 3: Opt-out of sale (Y = opted out, N = did not opt out)
-    // Position 4: LSPA covered (N = no)
-    NSString *ccpaString = nil;
-    if (doNotSell) {
-        // 1YYN = Notice given, user OPTED OUT of sale
-        // 1YNN = Notice given, user did NOT opt out
-        ccpaString = doNotSell.boolValue ? @"1YYN" : @"1YNN";
-    }
-    [self.logger debug:[NSString stringWithFormat:@"Setting do not sell: %@ (CCPA: %@)", doNotSell ? (doNotSell.boolValue ? @"YES" : @"NO") : @"(cleared)", ccpaString ?: @"(cleared)"]];
-    [self setCCPAPrivacyString:ccpaString];
-}
-
 #pragma mark - GPP Methods
 
 - (nullable NSString *)gppString {

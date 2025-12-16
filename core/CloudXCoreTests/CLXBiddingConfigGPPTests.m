@@ -125,7 +125,9 @@
 - (void)testIFAClearedWhenPrivacyRequires {
     // Set up scenario that requires data clearing (CCPA opt-out)
     [self setupUSUser];
-    [self.privacyService setCCPAPrivacyString:@"1YYN"];
+    // Set CCPA opt-out via IAB standard UserDefaults key
+    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:@"IABUSPrivacy_String"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
     NSDictionary *json = [config json];
@@ -138,7 +140,9 @@
 - (void)testGeoCoordinatesClearedWhenPrivacyRequires {
     // Set up scenario that requires data clearing (CCPA opt-out)
     [self setupUSUser];
-    [self.privacyService setCCPAPrivacyString:@"1YYN"];
+    // Set CCPA opt-out via IAB standard UserDefaults key
+    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:@"IABUSPrivacy_String"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     CLLocation *testLocation = [[CLLocation alloc] initWithLatitude:37.7749 longitude:-122.4194];
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithLocation:testLocation];
@@ -154,7 +158,9 @@
 - (void)testUserDataClearedWhenPrivacyRequires {
     // Set up scenario that requires data clearing (CCPA opt-out)
     [self setupUSUser];
-    [self.privacyService setCCPAPrivacyString:@"1YYN"];
+    // Set CCPA opt-out via IAB standard UserDefaults key
+    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:@"IABUSPrivacy_String"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     // Debug: Check what the privacy service is actually returning
     BOOL shouldClear = [self.privacyService shouldClearPersonalData];
@@ -197,7 +203,9 @@
     NSString *ccpaString = @"1YNN";
     NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     
-    [self.privacyService setCCPAPrivacyString:ccpaString];
+    // Set CCPA string via IAB standard UserDefaults key
+    [[NSUserDefaults standardUserDefaults] setObject:ccpaString forKey:@"IABUSPrivacy_String"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     [self.gppProvider setGppString:gppString];
     
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];

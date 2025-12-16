@@ -21,6 +21,8 @@ class UserDefaultsSettings: NSObject {
     var nativeMediumPlacement: String = ""
     var consentString: String = ""
     var usPrivacyString: String = ""
+    var gppString: String = ""
+    var gppSid: String = ""
     var userTargeting: Bool = false
     
     private override init() {

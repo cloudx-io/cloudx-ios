@@ -24,15 +24,11 @@
 
 - (instancetype)initWithPurpose1:(nullable NSNumber *)purpose1
                         purpose2:(nullable NSNumber *)purpose2
-                        purpose3:(nullable NSNumber *)purpose3
-                        purpose4:(nullable NSNumber *)purpose4
                    vendorConsent:(nullable NSNumber *)vendorConsent {
     self = [super init];
     if (self) {
         _purpose1 = purpose1;
         _purpose2 = purpose2;
-        _purpose3 = purpose3;
-        _purpose4 = purpose4;
         _vendorConsent = vendorConsent;
     }
     return self;
@@ -51,27 +47,33 @@
         return YES;
     }
     
-    // GDPR/TCF: Personal data must be cleared if any purpose is explicitly denied (value = NO)
+    // GDPR/TCF: Personal data must be cleared if purpose 1 or 2 is explicitly denied (value = NO)
     // Note: nil values are treated as consent granted (lenient interpretation per IAB guidance)
+    // Only purposes 1-2 are checked for basic ad serving (contextual ads)
+    // Purposes 3-4 (personalization) are not required since CloudX serves contextual ads
     if (self.purpose1 && ![self.purpose1 boolValue]) return YES;
     if (self.purpose2 && ![self.purpose2 boolValue]) return YES;
-    if (self.purpose3 && ![self.purpose3 boolValue]) return YES;
-    if (self.purpose4 && ![self.purpose4 boolValue]) return YES;
     
     // GDPR/TCF: Personal data must be cleared if vendor consent is explicitly denied
     if (self.vendorConsent && ![self.vendorConsent boolValue]) return YES;
+    
+    // CCPA strict: If all GDPR fields are nil (indicating CCPA consent, not TCF),
+    // and saleOptOut is also nil, this means truncated/malformed data → be safe and clear PII
+    // This matches Android's defensive CCPA parsing behavior
+    BOOL isCcpaConsent = (self.purpose1 == nil && self.purpose2 == nil && self.vendorConsent == nil);
+    if (isCcpaConsent && self.saleOptOut == nil) {
+        return YES;
+    }
     
     return NO;
 }
 
 - (NSString *)description {
     // Determine if this is a CCPA consent or TCF consent based on which fields are set
-    if (self.purpose1 || self.purpose2 || self.purpose3 || self.purpose4 || self.vendorConsent) {
-        return [NSString stringWithFormat:@"<CLXPrivacyConsent(TCF): p1=%@, p2=%@, p3=%@, p4=%@, vendor=%@, requiresPiiRemoval=%@>",
+    if (self.purpose1 || self.purpose2 || self.vendorConsent) {
+        return [NSString stringWithFormat:@"<CLXPrivacyConsent(TCF): p1=%@, p2=%@, vendor=%@, requiresPiiRemoval=%@>",
                 self.purpose1 ?: @"nil",
                 self.purpose2 ?: @"nil",
-                self.purpose3 ?: @"nil",
-                self.purpose4 ?: @"nil",
                 self.vendorConsent ?: @"nil",
                 @([self requiresPiiRemoval])];
     }
@@ -91,11 +93,9 @@
     BOOL ccpaEqual = (self.saleOptOut == other.saleOptOut || [self.saleOptOut isEqual:other.saleOptOut]) &&
                      (self.sharingOptOut == other.sharingOptOut || [self.sharingOptOut isEqual:other.sharingOptOut]);
     
-    // Compare TCF fields
+    // Compare TCF fields (only purposes 1-2)
     BOOL tcfEqual = (self.purpose1 == other.purpose1 || [self.purpose1 isEqual:other.purpose1]) &&
                     (self.purpose2 == other.purpose2 || [self.purpose2 isEqual:other.purpose2]) &&
-                    (self.purpose3 == other.purpose3 || [self.purpose3 isEqual:other.purpose3]) &&
-                    (self.purpose4 == other.purpose4 || [self.purpose4 isEqual:other.purpose4]) &&
                     (self.vendorConsent == other.vendorConsent || [self.vendorConsent isEqual:other.vendorConsent]);
     
     return ccpaEqual && tcfEqual;
@@ -107,8 +107,6 @@
     hash ^= [self.sharingOptOut hash];
     hash ^= [self.purpose1 hash];
     hash ^= [self.purpose2 hash];
-    hash ^= [self.purpose3 hash];
-    hash ^= [self.purpose4 hash];
     hash ^= [self.vendorConsent hash];
     return hash;
 }

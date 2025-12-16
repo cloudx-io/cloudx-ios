@@ -1202,20 +1202,6 @@ static CloudXCore *_sharedInstance = nil;
     [sharedInstance.logger info:@"Sent SDK error Analytics tracking event"];
 }
 
-#pragma mark - Privacy Settings
-
-+ (void)setCCPAPrivacyString:(nullable NSString *)ccpaPrivacyString {
-    [[CLXPrivacyService sharedInstance] setCCPAPrivacyString:ccpaPrivacyString];
-}
-
-+ (void)setIsUserConsent:(BOOL)isUserConsent {
-    [[CLXPrivacyService sharedInstance] setHasUserConsent:@(isUserConsent)];
-}
-
-+ (void)setIsDoNotSell:(BOOL)isDoNotSell {
-    [[CLXPrivacyService sharedInstance] setDoNotSell:@(isDoNotSell)];
-}
-
 #pragma mark - Visual Debugging
 
 // In-memory only - resets to NO on every app launch for safety
