@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2025-12-14
+
+### Added
+- **Banner Refresh Retry** - Banners now automatically retry loading after failure when hidden
+
+### Fixed
+- **App Extension Compatibility** - SDK now works correctly in App Extensions (no UIApplication calls)
+- **Rewarded Delegate Callbacks** - Fixed callback ordering bug
+- **Symbol Collisions** - All category methods now prefixed with `clx_` to prevent conflicts
+
+### Changed
+- **CloudXCore now distributed as Dynamic Framework** - Enables crash symbolication for SDK issues
+
+---
+
 ## [1.2.1] - 2025-12-04
 
 ### Added
