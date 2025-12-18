@@ -11,6 +11,7 @@
 #import <CloudXCore/CLXRillImpressionProperties.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXVersion.h>
 
 
 @interface CLXRillImpressionInitService ()
@@ -43,7 +44,7 @@
     // Set session data
     NSString *appBundle = [[NSBundle mainBundle] bundleIdentifier] ?: @"";
     [resolver setSessionConstData:rillImpressionModel.impModel.sessionID ?: @""
-                       sdkVersion:@"1.0.0"
+                       sdkVersion:CLXSDKVersion
                        deviceType:DeviceTypeToString([CLXSystemInformation shared].deviceType)
                       abTestGroup:rillImpressionModel.impModel.testGroupName ?: @""
                         appBundle:appBundle];

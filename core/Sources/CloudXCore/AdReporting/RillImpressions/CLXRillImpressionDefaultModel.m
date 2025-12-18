@@ -1,6 +1,7 @@
 #import <CloudXCore/CLXRillImpressionDefaultModel.h>
 #import <CloudXCore/CLXSystemInformation.h>
 #import <CloudXCore/NSString+CLXSemicolon.h>
+#import <CloudXCore/CLXVersion.h>
 
 @implementation CLXRillImpressionDefaultModel
 
@@ -10,7 +11,7 @@
         _width = 320;
         _height = 50;
         _creativeId = @"creativeId_absent_from_bid";
-        _releaseVersion = @"1.0.0";
+        _releaseVersion = CLXSDKVersion;
             _deviceName = [CLXSystemInformation shared].model;
     _deviceType = DeviceTypeToString([CLXSystemInformation shared].deviceType);
     _osName = [CLXSystemInformation shared].os;

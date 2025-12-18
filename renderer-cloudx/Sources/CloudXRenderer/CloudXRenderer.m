@@ -6,15 +6,15 @@
 //
 
 #import "CloudXRenderer.h"
+#import "CLXRendererVersion.h"
 #import <CloudXCore/CLXLogger.h>
 
 @implementation CloudXRenderer
 
 + (NSString *)version {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXRenderer"];
-    NSString *version = @"3.0.1";
-    [logger debug:[NSString stringWithFormat:@"CloudXRenderer version requested: %@", version]];
-    return version;
+    [logger debug:[NSString stringWithFormat:@"CloudXRenderer version requested: %@", CLXRendererVersion]];
+    return CLXRendererVersion;
 }
 
 + (NSString *)networkName {

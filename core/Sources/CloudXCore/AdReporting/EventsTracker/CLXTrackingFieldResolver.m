@@ -5,6 +5,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXPrivacyService.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXVersion.h>
 
 @interface CLXTrackingFieldResolver ()
 
@@ -200,7 +201,7 @@
     if ([field isEqualToString:@"sdk.sessionId"]) {
         return self.sessionId;
     } else if ([field isEqualToString:@"sdk.releaseVersion"]) {
-        return self.sdkVersion ?: @"1.0.0";
+        return self.sdkVersion ?: CLXSDKVersion;
     } else if ([field isEqualToString:@"sdk.deviceTypeName"]) {
         // Return string for analytics ("phone", "tablet", "unknown")
         return DeviceTypeToString([CLXSystemInformation shared].deviceType);

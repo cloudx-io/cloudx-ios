@@ -19,6 +19,8 @@ The CloudX iOS SDK uses a **Gitflow** branching strategy with two repositories:
 | **CloudXMetaAdapter** | Static | Meta Audience Network integration |
 | **CloudXVungleAdapter** | Static | Vungle/Liftoff integration |
 | **CloudXInMobiAdapter** | Static | InMobi integration |
+| **CloudXMintegralAdapter** | Static | Mintegral integration |
+| **CloudXMolocoAdapter** | Static | Moloco integration |
 | **CloudXRenderer** | Static | Creative rendering engine |
 
 ## dSYM Strategy (CloudXCore Only)
@@ -62,18 +64,22 @@ git pull origin develop
 # 2. Create release branch
 git checkout -b release/X.Y.Z
 
-# 3. Update version constants
+# 3. Update version constants (ALL components!)
 ./scripts/update-version-constant.sh core "X.Y.Z"
 ./scripts/update-version-constant.sh meta "X.Y.Z"
 ./scripts/update-version-constant.sh vungle "X.Y.Z"
 ./scripts/update-version-constant.sh inmobi "X.Y.Z"
+./scripts/update-version-constant.sh mintegral "X.Y.Z"
+./scripts/update-version-constant.sh moloco "X.Y.Z"
 ./scripts/update-version-constant.sh renderer "X.Y.Z"
 
-# 4. Update podspec versions
+# 4. Update podspec versions (ALL components!)
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" core/CloudXCore.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-meta/CloudXMetaAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-vungle/CloudXVungleAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-inmobi/CloudXInMobiAdapter.podspec
+sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-mintegral/CloudXMintegralAdapter.podspec
+sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-moloco/CloudXMolocoAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" renderer-cloudx/CloudXRenderer.podspec
 
 # 5. Update ALL CHANGELOGs with release notes:
@@ -596,13 +602,17 @@ git push origin --delete release/vX.Y.Z
 
 ### Version Constants (Private Repo)
 
-| Component | File |
-|-----------|------|
-| Core | `core/Sources/CloudXCore/CLXVersion.m` |
-| Meta | `adapter-meta/Sources/CloudXMetaAdapter/CLXMetaAdapterVersion.m` |
-| Vungle | `adapter-vungle/Sources/CloudXVungleAdapter/CLXVungleAdapterVersion.m` |
-| InMobi | `adapter-inmobi/Sources/CloudXInMobiAdapter/CLXInMobiAdapterVersion.m` |
-| Renderer | `renderer-cloudx/Sources/CloudXRenderer/CLXRendererVersion.m` |
+⚠️ **ALL components must have their version constants updated during each release!**
+
+| Component | File | Constant |
+|-----------|------|----------|
+| Core | `core/Sources/CloudXCore/CLXVersion.m` | `CLXSDKVersion` |
+| Meta | `adapter-meta/Sources/CloudXMetaAdapter/CLXMetaAdapterVersion.m` | `CLXMetaAdapterVersion` |
+| Vungle | `adapter-vungle/Sources/CloudXVungleAdapter/CLXVungleAdapterVersion.m` | `CLXVungleAdapterVersion` |
+| InMobi | `adapter-inmobi/Sources/CloudXInMobiAdapter/CLXInMobiAdapterVersion.m` | `CLXInMobiAdapterVersion` |
+| Mintegral | `adapter-mintegral/Sources/CloudXMintegralAdapter/CLXMintegralAdapterVersion.m` | `CLXMintegralAdapterVersion` |
+| Moloco | `adapter-moloco/Sources/CloudXMolocoAdapter/CLXMolocoAdapterVersion.m` | `CLXMolocoAdapterVersion` |
+| Renderer | `renderer-cloudx/Sources/CloudXRenderer/CLXRendererVersion.m` | `CLXRendererVersion` |
 
 ### Podspecs (Private Repo - Local Development)
 
@@ -612,6 +622,8 @@ git push origin --delete release/vX.Y.Z
 | Meta | `adapter-meta/CloudXMetaAdapter.podspec` |
 | Vungle | `adapter-vungle/CloudXVungleAdapter.podspec` |
 | InMobi | `adapter-inmobi/CloudXInMobiAdapter.podspec` |
+| Mintegral | `adapter-mintegral/CloudXMintegralAdapter.podspec` |
+| Moloco | `adapter-moloco/CloudXMolocoAdapter.podspec` |
 | Renderer | `renderer-cloudx/CloudXRenderer.podspec` |
 
 ### Podspecs (Public Repo - Binary Distribution)
@@ -622,6 +634,8 @@ git push origin --delete release/vX.Y.Z
 | Meta | `adapter-meta/CloudXMetaAdapter.podspec` |
 | Vungle | `adapter-vungle/CloudXVungleAdapter.podspec` |
 | InMobi | `adapter-inmobi/CloudXInMobiAdapter.podspec` |
+| Mintegral | `adapter-mintegral/CloudXMintegralAdapter.podspec` |
+| Moloco | `adapter-moloco/CloudXMolocoAdapter.podspec` |
 | Renderer | `renderer-cloudx/CloudXRenderer.podspec` |
 
 ---
@@ -712,19 +726,38 @@ s.user_target_xcconfig = {
 
 ## Troubleshooting
 
-### Build Artifacts
+### Build Artifacts (MUST CLEAN UP AFTER RELEASE)
 
-The build scripts may generate temporary files that should **not be committed**:
+⚠️ **The build scripts generate temporary files that should NOT be committed to the repo!**
+
+These files are generated during the build process and should be deleted after uploading to GitHub releases:
+
+| File | Purpose | Action |
+|------|---------|--------|
+| `**/release_metadata.txt` | Build info for humans | Delete after release |
+| `core/CloudXCore-dSYMs.zip` | Debug symbols for crash analysis | Upload to private GitHub release, then delete |
+| `**/*.xcframework.zip` | Framework archives | Upload to GitHub release, then delete |
+| `**/build/` | Build directories | Delete |
 
 ```bash
-# Delete metadata files (informational only)
+# Clean up after release (run from repo root)
 rm -f core/release_metadata.txt renderer-cloudx/release_metadata.txt
-
-# Delete local dSYM archives (already uploaded to private release)
 rm -f core/CloudXCore-dSYMs.zip
+rm -f core/CloudXCore.xcframework.zip
+rm -f adapter-*/CloudX*Adapter.xcframework.zip
+rm -f renderer-cloudx/CloudXRenderer.xcframework.zip
+rm -rf */build
+```
 
-# Clean build directories
-rm -rf core/build
+**Why these files appear as "untracked":**
+- The build scripts create these files locally
+- They should be uploaded to GitHub releases, NOT committed to the repo
+- After the release is complete, delete them to keep your working directory clean
+
+**Recommended .gitignore additions** (if not already present):
+```
+**/release_metadata.txt
+*-dSYMs.zip
 ```
 
 **⚠️ Never commit dSYM files to any repository** - they should only exist in private GitHub releases.

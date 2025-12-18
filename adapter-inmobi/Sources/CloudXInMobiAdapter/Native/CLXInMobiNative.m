@@ -20,6 +20,12 @@
 #import "../Utils/CLXInMobiErrorHandler.h"
 #endif
 
+#if __has_include(<CloudXInMobiAdapter/CLXInMobiInitializer.h>)
+#import <CloudXInMobiAdapter/CLXInMobiInitializer.h>
+#else
+#import "../Initializers/CLXInMobiInitializer.h"
+#endif
+
 @interface CLXInMobiNative () {
     NSString *_bidID;
 }
@@ -42,7 +48,7 @@
         _placementID = placementID;  // May be 0 (invalid) - validation in load()
         _bidID = [bidID copy];
         _delegate = delegate;
-        _sdkVersion = @"10.8.8";
+        _sdkVersion = [CLXInMobiInitializer sdkVersion];
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXInMobiNative"];
         _timeoutInterval = 30.0;
         

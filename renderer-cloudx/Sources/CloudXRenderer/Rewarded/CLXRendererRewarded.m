@@ -7,6 +7,7 @@
 
 #import "CLXRendererRewarded.h"
 #import "CLXFullscreenStaticContainerViewController.h"
+#import "CLXRendererVersion.h"
 #import <CloudXCore/CLXLogger.h>
 
 @interface CLXRendererRewarded () <CLXFullscreenStaticContainerViewControllerDelegate>
@@ -56,7 +57,7 @@
 }
 
 - (NSString *)sdkVersion {
-    return @"1.0.0";
+    return CLXRendererVersion;
 }
 
 - (void)load {

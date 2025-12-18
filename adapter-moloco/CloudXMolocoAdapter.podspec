@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXMolocoAdapter'
-  s.version = '1.0.0'
+  s.version = '1.3.0'
   s.summary = 'CloudX Adapter for Moloco iOS SDK'
   s.description = 'iOS adapter add-on to the CloudX iOS SDK for Moloco bidding'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'

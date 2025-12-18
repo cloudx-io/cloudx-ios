@@ -17,11 +17,13 @@
 #   ./update-version-constant.sh <component> <full_version>
 #
 # COMPONENTS:
-#   core     = CloudXCore SDK
-#   meta     = CloudXMetaAdapter
-#   renderer = CloudXRenderer
-#   vungle   = CloudXVungleAdapter
-#   inmobi   = CloudXInMobiAdapter
+#   core      = CloudXCore SDK
+#   meta      = CloudXMetaAdapter
+#   renderer  = CloudXRenderer
+#   vungle    = CloudXVungleAdapter
+#   inmobi    = CloudXInMobiAdapter
+#   mintegral = CloudXMintegralAdapter
+#   moloco    = CloudXMolocoAdapter
 #
 # EXAMPLES:
 #   ./update-version-constant.sh core "X.Y.Z-dev.156+abc1234"
@@ -29,6 +31,8 @@
 #   ./update-version-constant.sh renderer "X.Y.Z-rc.1+abc1234"
 #   ./update-version-constant.sh vungle "X.Y.Z-rc.1+abc1234"
 #   ./update-version-constant.sh inmobi "X.Y.Z-rc.1+abc1234"
+#   ./update-version-constant.sh mintegral "X.Y.Z-rc.1+abc1234"
+#   ./update-version-constant.sh moloco "X.Y.Z-rc.1+abc1234"
 #
 # AUTOMATED USAGE:
 #   - Called by GitHub Actions workflows on every push (develop/release)
@@ -54,7 +58,7 @@ FULL_VERSION=$2
 
 if [ -z "$COMPONENT" ] || [ -z "$FULL_VERSION" ]; then
     echo "Usage: $0 <component> <full_version>"
-    echo "Components: core, meta, renderer"
+    echo "Components: core, meta, renderer, vungle, inmobi, mintegral, moloco"
     exit 1
 fi
 
@@ -80,9 +84,17 @@ case $COMPONENT in
         VERSION_FILE="adapter-inmobi/Sources/CloudXInMobiAdapter/CLXInMobiAdapterVersion.m"
         CONSTANT_NAME="CLXInMobiAdapterVersion"
         ;;
+    mintegral)
+        VERSION_FILE="adapter-mintegral/Sources/CloudXMintegralAdapter/CLXMintegralAdapterVersion.m"
+        CONSTANT_NAME="CLXMintegralAdapterVersion"
+        ;;
+    moloco)
+        VERSION_FILE="adapter-moloco/Sources/CloudXMolocoAdapter/CLXMolocoAdapterVersion.m"
+        CONSTANT_NAME="CLXMolocoAdapterVersion"
+        ;;
     *)
         echo "Error: Unknown component '$COMPONENT'" >&2
-        echo "Valid components: core, meta, renderer, vungle, inmobi" >&2
+        echo "Valid components: core, meta, renderer, vungle, inmobi, mintegral, moloco" >&2
         exit 1
         ;;
 esac

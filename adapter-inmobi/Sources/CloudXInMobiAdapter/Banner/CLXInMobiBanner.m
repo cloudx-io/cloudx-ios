@@ -20,6 +20,12 @@
 #import "../Utils/CLXInMobiErrorHandler.h"
 #endif
 
+#if __has_include(<CloudXInMobiAdapter/CLXInMobiInitializer.h>)
+#import <CloudXInMobiAdapter/CLXInMobiInitializer.h>
+#else
+#import "../Initializers/CLXInMobiInitializer.h"
+#endif
+
 @interface CLXInMobiBanner () {
     NSString *_bidID;
 }
@@ -46,7 +52,7 @@
         _delegate = delegate;
         _viewController = viewController;
         _bannerSize = size;  // Store for deferred creation
-        _sdkVersion = @"10.8.8";
+        _sdkVersion = [CLXInMobiInitializer sdkVersion];
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXInMobiBanner"];
         _timeoutInterval = 30.0;
         

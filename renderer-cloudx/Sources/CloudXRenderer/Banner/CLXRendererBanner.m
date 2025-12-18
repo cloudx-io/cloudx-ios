@@ -17,6 +17,7 @@
 
 #import "CLXRendererBanner.h"
 #import "CLXWKScriptHelper.h"
+#import "CLXRendererVersion.h"
 #import <SafariServices/SafariServices.h>
 #import <CloudXCore/CLXLogger.h>
 
@@ -126,7 +127,7 @@
  * @return SDK version string
  */
 - (NSString *)sdkVersion {
-    return @"3.0.1";
+    return CLXRendererVersion;
 }
 
 /**

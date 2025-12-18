@@ -8,6 +8,7 @@
 #import "CLXRendererNative.h"
 #import "CLXNativeAdData.h"
 #import "CLXDemoAdapterError.h"
+#import "CLXRendererVersion.h"
 #import <SafariServices/SafariServices.h>
 #import <CloudXCore/CLXLogger.h>
 
@@ -62,7 +63,7 @@
 }
 
 - (NSString *)sdkVersion {
-    return @"1.0.0";
+    return CLXRendererVersion;
 }
 
 - (void)load {
