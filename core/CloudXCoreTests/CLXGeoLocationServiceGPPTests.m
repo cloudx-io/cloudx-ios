@@ -196,6 +196,84 @@
     XCTAssertFalse([self.geoService isCaliforniaUser], @"Canadian user should not be California user");
 }
 
+#pragma mark - EU User Detection Tests (gdpr-applies header)
+
+// Test EU user detection based on gdpr-applies header
+// This header is set by CloudFront for EU locations and must be captured from geo response
+- (void)testEUUserDetection_GdprAppliesTrue {
+    // Test gdpr-applies = true (string)
+    [self setGeoHeaders:@{
+        @"cloudfront-viewer-country-iso3": @"DEU",
+        @"gdpr-applies": @"true"
+    }];
+    XCTAssertTrue([self.geoService isEUUser], @"Should detect EU user when gdpr-applies is 'true'");
+    
+    // Test gdpr-applies = TRUE (uppercase)
+    [self setGeoHeaders:@{
+        @"cloudfront-viewer-country-iso3": @"FRA",
+        @"gdpr-applies": @"TRUE"
+    }];
+    XCTAssertTrue([self.geoService isEUUser], @"Should detect EU user when gdpr-applies is 'TRUE' (case insensitive)");
+    
+    // Test gdpr-applies = 1
+    [self setGeoHeaders:@{
+        @"cloudfront-viewer-country-iso3": @"ITA",
+        @"gdpr-applies": @"1"
+    }];
+    XCTAssertTrue([self.geoService isEUUser], @"Should detect EU user when gdpr-applies is '1'");
+}
+
+// Test non-EU user detection based on gdpr-applies header
+- (void)testEUUserDetection_GdprAppliesFalse {
+    // Test gdpr-applies = false
+    [self setGeoHeaders:@{
+        @"cloudfront-viewer-country-iso3": @"USA",
+        @"gdpr-applies": @"false"
+    }];
+    XCTAssertFalse([self.geoService isEUUser], @"Should not detect EU user when gdpr-applies is 'false'");
+    
+    // Test gdpr-applies = 0
+    [self setGeoHeaders:@{
+        @"cloudfront-viewer-country-iso3": @"USA",
+        @"gdpr-applies": @"0"
+    }];
+    XCTAssertFalse([self.geoService isEUUser], @"Should not detect EU user when gdpr-applies is '0'");
+}
+
+// Test EU user detection when gdpr-applies header is missing
+// This was the bug scenario - header not captured means isEUUser returns false
+- (void)testEUUserDetection_GdprAppliesMissing {
+    // Test with EU country but missing gdpr-applies header
+    // This simulates the bug where gdpr-applies wasn't captured
+    [self setGeoHeaders:@{
+        @"cloudfront-viewer-country-iso3": @"DEU"
+        // Note: no gdpr-applies header
+    }];
+    XCTAssertFalse([self.geoService isEUUser], @"Should not detect EU user when gdpr-applies header is missing");
+    
+    // Test with no geo headers at all
+    [self setGeoHeaders:nil];
+    XCTAssertFalse([self.geoService isEUUser], @"Should not detect EU user when no geo headers are present");
+}
+
+// Test that EU user detection is independent of country code
+// The gdpr-applies header is the authoritative signal from CloudFront
+- (void)testEUUserDetection_GdprAppliesOverridesCountry {
+    // EU country code but gdpr-applies = false (edge case)
+    [self setGeoHeaders:@{
+        @"cloudfront-viewer-country-iso3": @"DEU",
+        @"gdpr-applies": @"false"
+    }];
+    XCTAssertFalse([self.geoService isEUUser], @"gdpr-applies=false should override EU country code");
+    
+    // Non-EU country code but gdpr-applies = true (e.g., UK post-Brexit with GDPR-like laws)
+    [self setGeoHeaders:@{
+        @"cloudfront-viewer-country-iso3": @"GBR",
+        @"gdpr-applies": @"true"
+    }];
+    XCTAssertTrue([self.geoService isEUUser], @"gdpr-applies=true should indicate GDPR applies regardless of country code");
+}
+
 #pragma mark - Helper Methods
 
 - (void)setGeoHeaders:(NSDictionary *)headers {

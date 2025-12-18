@@ -156,10 +156,12 @@
             NSMutableDictionary *rawGeoHeaders = [NSMutableDictionary dictionary];
             
             // Store all raw CloudFront headers for privacy checks
+            // Also capture gdpr-applies header which is critical for EU user detection
             NSDictionary *allHeaders = [httpResponse allHeaderFields];
             for (NSString *headerKey in allHeaders) {
-                if ([headerKey hasPrefix:@"cloudfront-"] || [headerKey hasPrefix:@"CloudFront-"]) {
-                    NSString *lowerKey = [headerKey lowercaseString];
+                NSString *lowerKey = [headerKey lowercaseString];
+                // Include CloudFront headers and privacy-related headers (gdpr-applies)
+                if ([lowerKey hasPrefix:@"cloudfront-"] || [lowerKey isEqualToString:@"gdpr-applies"]) {
                     rawGeoHeaders[lowerKey] = allHeaders[headerKey];
                 }
             }
