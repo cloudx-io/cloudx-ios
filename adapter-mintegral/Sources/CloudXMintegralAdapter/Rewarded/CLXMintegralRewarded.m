@@ -166,10 +166,17 @@
 }
 
 - (void)onVideoAdDismissed:(nullable NSString *)placementId unitId:(nullable NSString *)unitId withConverted:(BOOL)converted withRewardInfo:(nullable MTGRewardAdInfo *)rewardInfo {
-    [self.logger info:[NSString stringWithFormat:@"Did dismiss - Converted:%d", converted]];
+    [self.logger info:[NSString stringWithFormat:@"Did dismiss - Converted:%d, RewardInfo:%@", converted, rewardInfo]];
     
-    if (converted && [self.delegate respondsToSelector:@selector(rewardedWithRewarded:)]) {
-        [self.delegate rewardedWithRewarded:self];
+    if (converted && [self.delegate respondsToSelector:@selector(userRewardWithRewarded:)]) {
+        // Try to pass reward info if available from Mintegral
+        if (rewardInfo && [self.delegate respondsToSelector:@selector(userRewardWithRewarded:amount:label:)]) {
+            NSInteger rewardAmount = [rewardInfo.rewardAmount integerValue] ?: 0;
+            NSString *rewardName = rewardInfo.rewardName;
+            [self.delegate userRewardWithRewarded:self amount:rewardAmount label:rewardName];
+        } else {
+            [self.delegate userRewardWithRewarded:self];
+        }
     }
     
     if ([self.delegate respondsToSelector:@selector(didCloseWithRewarded:)]) {

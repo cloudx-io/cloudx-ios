@@ -15,6 +15,8 @@
 #import <CloudXCore/CLXBidAdSource.h>
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXWinLossTracker.h>
+#import <CloudXCore/CLXBidResponse.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -44,7 +46,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Access to private properties (read-only)
 @property (nonatomic, strong, readonly, nullable) CLXBidAdSourceResponse *lastBidResponse;
+@property (nonatomic, strong, readonly, nullable) CLXBidResponse *currentBidResponse;
 @property (nonatomic, strong, readonly) CLXLogger *logger;
+@property (nonatomic, strong, readonly) id<CLXWinLossTracking> winLossTracker;
 
 @end
 

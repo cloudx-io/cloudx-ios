@@ -48,8 +48,13 @@
 		1916B26E2E819FD400E49E3E /* CLXMetricsIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B2632E819FD400E49E3E /* CLXMetricsIntegrationTests.m */; };
 		1916B32C2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B32B2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m */; };
 		1916B32E2E832C0000E49E3E /* CLXAppIDIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B32D2E832C0000E49E3E /* CLXAppIDIntegrationTests.m */; };
-		194BB9E92EEEE08F0008DB33 /* CLXUIApplicationProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 194BB9E62EEEE08F0008DB33 /* CLXUIApplicationProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		194BB9EB2EEEE0AF0008DB33 /* CLXUIApplicationProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 194BB9EA2EEEE0AF0008DB33 /* CLXUIApplicationProxy.m */; };
+		194BBEC52EF195A10008DB33 /* CLXReward.h in Headers */ = {isa = PBXBuildFile; fileRef = 194BBEC42EF195A10008DB33 /* CLXReward.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		194BBEC72EF196550008DB33 /* CLXReward.m in Sources */ = {isa = PBXBuildFile; fileRef = 194BBEC62EF196550008DB33 /* CLXReward.m */; };
+		194BC0BF2EF3F6520008DB33 /* CLXRewardedRewardLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 194BC0BD2EF3F6520008DB33 /* CLXRewardedRewardLogicTests.m */; };
+		194BC0C02EF3F6520008DB33 /* CLXRewardTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 194BC0BE2EF3F6520008DB33 /* CLXRewardTests.m */; };
+		194BC0C12EF3F6520008DB33 /* CLXBidLifecycleEventTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 194BC0BC2EF3F6520008DB33 /* CLXBidLifecycleEventTests.m */; };
+		194BC0C32EF3F7290008DB33 /* CLXUIApplicationProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 194BC0C22EF3F7290008DB33 /* CLXUIApplicationProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19656C1C2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 19656C1B2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19656C242E91CF3100BFA06E /* CLXBidLifecycleEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19656C232E91CF3100BFA06E /* CLXBidLifecycleEvent.m */; };
 		196B5A682EE9970A00262ECF /* CLXAdapterBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 196B5A672EE9970A00262ECF /* CLXAdapterBanner.m */; };
@@ -395,8 +400,13 @@
 		1916B2662E819FD400E49E3E /* CLXMetricsTypeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsTypeTests.m; sourceTree = "<group>"; };
 		1916B32B2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAppKeyAppIDDistinctionTests.m; sourceTree = "<group>"; };
 		1916B32D2E832C0000E49E3E /* CLXAppIDIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAppIDIntegrationTests.m; sourceTree = "<group>"; };
-		194BB9E62EEEE08F0008DB33 /* CLXUIApplicationProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXUIApplicationProxy.h; sourceTree = "<group>"; };
 		194BB9EA2EEEE0AF0008DB33 /* CLXUIApplicationProxy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXUIApplicationProxy.m; sourceTree = "<group>"; };
+		194BBEC42EF195A10008DB33 /* CLXReward.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXReward.h; sourceTree = "<group>"; };
+		194BBEC62EF196550008DB33 /* CLXReward.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXReward.m; sourceTree = "<group>"; };
+		194BC0BC2EF3F6520008DB33 /* CLXBidLifecycleEventTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidLifecycleEventTests.m; sourceTree = "<group>"; };
+		194BC0BD2EF3F6520008DB33 /* CLXRewardedRewardLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXRewardedRewardLogicTests.m; sourceTree = "<group>"; };
+		194BC0BE2EF3F6520008DB33 /* CLXRewardTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXRewardTests.m; sourceTree = "<group>"; };
+		194BC0C22EF3F7290008DB33 /* CLXUIApplicationProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXUIApplicationProxy.h; sourceTree = "<group>"; };
 		19656C1B2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXBidLifecycleEvent.h; sourceTree = "<group>"; };
 		19656C232E91CF3100BFA06E /* CLXBidLifecycleEvent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidLifecycleEvent.m; sourceTree = "<group>"; };
 		196B5A672EE9970A00262ECF /* CLXAdapterBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterBanner.m; sourceTree = "<group>"; };
@@ -792,6 +802,9 @@
 		19C7247E2E2390420012CFC7 /* CloudXCoreTests */ = {
 			isa = PBXGroup;
 			children = (
+				194BC0BC2EF3F6520008DB33 /* CLXBidLifecycleEventTests.m */,
+				194BC0BD2EF3F6520008DB33 /* CLXRewardedRewardLogicTests.m */,
+				194BC0BE2EF3F6520008DB33 /* CLXRewardTests.m */,
 				19D8D2222EDA068200817D1E /* CLXBiddingConfigORTBFieldsTests.m */,
 				196C05B92ECDDEA60087146A /* CLXSDKInitQueueTests.m */,
 				196C04382ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m */,
@@ -973,6 +986,7 @@
 		19C724C02E2390810012CFC7 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				194BBEC62EF196550008DB33 /* CLXReward.m */,
 				1979919F2E74924100EBA0A3 /* CLXPrivacyConsent.m */,
 				19C724A22E2390810012CFC7 /* CLXBiddingConfig.m */,
 				19C724B62E2390810012CFC7 /* CLXBidderConfig.m */,
@@ -1050,7 +1064,8 @@
 		19C725422E2390810012CFC7 /* CloudXCore */ = {
 			isa = PBXGroup;
 			children = (
-				194BB9E62EEEE08F0008DB33 /* CLXUIApplicationProxy.h */,
+				194BC0C22EF3F7290008DB33 /* CLXUIApplicationProxy.h */,
+				194BBEC42EF195A10008DB33 /* CLXReward.h */,
 				196B5EB32EEC460F00262ECF /* CLXAdapterErrorMapper.h */,
 				19D8D2202EDA04C900817D1E /* CLXORTBConstants.h */,
 				19D8D4B72EDD7B0400817D1E /* Debug */,
@@ -1401,11 +1416,12 @@
 				19D8D4BA2EDD7B0400817D1E /* CLXDebugLogViewController.h in Headers */,
 				19D8D4BB2EDD7B0400817D1E /* CLXDebugErrorView.h in Headers */,
 				19D8D4BC2EDD7B0400817D1E /* CLXDebugButton.h in Headers */,
+				194BC0C32EF3F7290008DB33 /* CLXUIApplicationProxy.h in Headers */,
 				19F592DE2E98365E00C6E11D /* NSDictionary+DynamicPath.h in Headers */,
 				19F592E42E9836CD00C6E11D /* CLXKeyValueState.h in Headers */,
-				194BB9E92EEEE08F0008DB33 /* CLXUIApplicationProxy.h in Headers */,
 				19D8D2212EDA04C900817D1E /* CLXORTBConstants.h in Headers */,
 				19C7257A2E2390810012CFC7 /* CLXBidNetworkService.h in Headers */,
+				194BBEC52EF195A10008DB33 /* CLXReward.h in Headers */,
 				19D92CA22E6E099C00C84DAE /* CLXUserDefaultsKeys.h in Headers */,
 				19D8D4C52EDD7D4900817D1E /* CLXPublisherFullscreenAdBase.h in Headers */,
 				19C725A72E2390810012CFC7 /* CLXLogger.h in Headers */,
@@ -1611,6 +1627,7 @@
 				19C725E22E2390810012CFC7 /* CLXAdNetworkFactories.m in Sources */,
 				19D8D40D2EDAFCB000817D1E /* CLXLogStore.m in Sources */,
 				19D8D40E2EDAFCB000817D1E /* CLXLogEntry.m in Sources */,
+				194BBEC72EF196550008DB33 /* CLXReward.m in Sources */,
 				1979928D2E75E39600EBA0A3 /* CLXErrorReporter.m in Sources */,
 				19C725E32E2390810012CFC7 /* CLXAdReportingNetworkService.m in Sources */,
 				19C725E42E2390810012CFC7 /* CLXLiveInitService.m in Sources */,
@@ -1642,6 +1659,9 @@
 				1916B1CD2E7F0F6D00E49E3E /* CLXWinLossRetryBatchingTests.m in Sources */,
 				1916B1CE2E7F0F6D00E49E3E /* CLXPublisherWinLossIntegrationTests.m in Sources */,
 				19D929C42E6644BB00C84DAE /* CLXPublisherBannerUnitTests.m in Sources */,
+				194BC0BF2EF3F6520008DB33 /* CLXRewardedRewardLogicTests.m in Sources */,
+				194BC0C02EF3F6520008DB33 /* CLXRewardTests.m in Sources */,
+				194BC0C12EF3F6520008DB33 /* CLXBidLifecycleEventTests.m in Sources */,
 				19D92C392E6A3B8E00C84DAE /* CLXPublisherBannerBasicTests.m in Sources */,
 				197994842E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m in Sources */,
 				1916B32C2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m in Sources */,

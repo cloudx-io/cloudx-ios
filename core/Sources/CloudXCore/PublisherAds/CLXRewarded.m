@@ -17,6 +17,12 @@
 #import <CloudXCore/CLXAdType.h>
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXDebugOverlayManager.h>
+#import <CloudXCore/CLXReward.h>
+#import <CloudXCore/CLXBidLifecycleEvent.h>
+#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXConfigImpressionModel.h>
+#import <CloudXCore/CLXSettings.h>
+#import <CloudXCore/CLXBidTokenSource.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -24,9 +30,52 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, nullable) id<CLXAdapterRewarded> currentAdapter;
 
+// Reward configuration from placement
+@property (nonatomic, assign) NSInteger placementRewardAmount;
+@property (nonatomic, copy, nullable) NSString *placementRewardCurrency;
+
 @end
 
 @implementation CLXRewarded
+
+#pragma mark - Initialization
+
+- (instancetype)initWithPlacement:(nullable CLXSDKConfigPlacement *)placement
+                      publisherID:(NSString *)publisherID
+                           userID:(nullable NSString *)userID
+              rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl
+                         impModel:(nullable CLXConfigImpressionModel *)impModel
+                      adFactories:(nullable CLXAdNetworkFactories *)adFactories
+         waterfallMaxBackOffTime:(nullable NSNumber *)waterfallMaxBackOffTime
+                  bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
+               bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
+                reportingService:(id<CLXAdEventReporting>)reportingService
+                        settings:(CLXSettings *)settings {
+    self = [super initWithPlacement:placement
+                        publisherID:publisherID
+                             userID:userID
+                rewardedCallbackUrl:rewardedCallbackUrl
+                           impModel:impModel
+                        adFactories:adFactories
+           waterfallMaxBackOffTime:waterfallMaxBackOffTime
+                    bidTokenSources:bidTokenSources
+                 bidRequestTimeout:bidRequestTimeout
+                  reportingService:reportingService
+                          settings:settings];
+    
+    if (self) {
+        // Capture reward configuration from placement
+        if (placement) {
+            _placementRewardAmount = placement.rewardAmount;
+            _placementRewardCurrency = [placement.rewardCurrency copy];
+            
+            CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXRewarded"];
+            [logger debug:[NSString stringWithFormat:@"Reward config from placement: amount=%ld, currency=%@", 
+                          (long)_placementRewardAmount, _placementRewardCurrency ?: @"(nil)"]];
+        }
+    }
+    return self;
+}
 
 #pragma mark - Abstract Method Implementations
 
@@ -215,13 +264,58 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)userRewardWithRewarded:(id<CLXAdapterRewarded>)rewarded {
+    // Default to placement-configured reward values
+    [self userRewardWithRewarded:rewarded amount:0 label:nil];
+}
+
+- (void)userRewardWithRewarded:(id<CLXAdapterRewarded>)rewarded amount:(NSInteger)amount label:(nullable NSString *)label {
+    // Fire reward notification event to server
+    [self fireRewardEventForBidID:rewarded.bidID];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(userRewarded:)]) {
-            CLXAd *ad = [self createAdObject];
-            [self.logger logDelegateCallback:@"🎁 Rewarded userRewarded" ad:ad];
-            [self.delegate userRewarded:ad];
+        CLXAd *ad = [self createAdObject];
+        
+        // Determine final reward values: adapter values override placement values if provided
+        // If adapter provides non-zero amount, use it; otherwise fall back to placement config
+        NSInteger finalAmount = (amount > 0) ? amount : self.placementRewardAmount;
+        NSString *finalLabel = (label.length > 0) ? label : self.placementRewardCurrency;
+        
+        // Create reward object
+        CLXReward *reward;
+        if (finalAmount > 0 || finalLabel.length > 0) {
+            reward = [CLXReward rewardWithAmount:finalAmount > 0 ? finalAmount : [CLXReward defaultAmount]
+                                           label:finalLabel.length > 0 ? finalLabel : [CLXReward defaultLabel]];
+        } else {
+            reward = [CLXReward reward];
         }
+        
+        [self.logger logDelegateCallback:[NSString stringWithFormat:@"🎁 Rewarded didRewardUser\n  🎯 Amount: %ld\n  🏷️ Currency: %@", (long)reward.amount, reward.label] ad:ad];
+        
+        // Notify delegate of reward (required method per CLXRewardedDelegate protocol)
+        [self.delegate didRewardUserForAd:ad withReward:reward];
     });
+}
+
+#pragma mark - Private Methods
+
+- (void)fireRewardEventForBidID:(NSString *)bidID {
+    if (bidID && self.currentBidResponse && self.currentBidResponse.id) {
+        CLXBidResponseBid *winningBid = [self.currentBidResponse findBidWithID:bidID];
+        double price = winningBid ? winningBid.price : 0.0;
+        
+        [self.logger debug:[NSString stringWithFormat:@"Firing REWARD event for bidID=%@, price=%.2f", bidID, price]];
+        
+        [self.winLossTracker sendEvent:self.currentBidResponse.id
+                                 bidId:bidID
+                                 event:[CLXBidLifecycleEvent rewardEvent]
+                            lossReason:nil
+                        winnerBidPrice:price];
+        
+        [self.logger debug:@"[CLXRewarded] REWARD event fired"];
+    } else {
+        [self.logger debug:[NSString stringWithFormat:@"Cannot fire reward event: bidID=%@, currentBidResponse=%@", 
+                           bidID ?: @"(nil)", self.currentBidResponse ? @"present" : @"(nil)"]];
+    }
 }
 
 - (void)didFailToShowWithRewarded:(id<CLXAdapterRewarded>)rewarded error:(NSError *)error {

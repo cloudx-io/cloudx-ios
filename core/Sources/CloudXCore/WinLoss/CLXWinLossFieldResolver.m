@@ -163,8 +163,10 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         return url;
         
     } else if ([fieldPath isEqualToString:@"sdk.win"]) {
-        // Return "win" only for win events (loadSuccess or renderSuccess)
-        if (event.type == CLXBidLifecycleEventTypeLoadSuccess || event.type == CLXBidLifecycleEventTypeRenderSuccess) {
+        // Return "win" only for win events (loadSuccess, renderSuccess, or reward)
+        if (event.type == CLXBidLifecycleEventTypeLoadSuccess || 
+            event.type == CLXBidLifecycleEventTypeRenderSuccess ||
+            event.type == CLXBidLifecycleEventTypeReward) {
             return @"win";
         }
         return nil;
@@ -176,9 +178,18 @@ static NSString *const kPlaceholderAuctionLoss = @"${AUCTION_LOSS}";
         }
         return nil;
         
+    } else if ([fieldPath isEqualToString:@"sdk.reward"]) {
+        // Return "reward" only for reward events
+        if (event.type == CLXBidLifecycleEventTypeReward) {
+            return @"reward";
+        }
+        return nil;
+        
     } else if ([fieldPath isEqualToString:@"sdk.[win|loss]"]) {
-        // Return "win" or "loss" based on event type
-        if (event.type == CLXBidLifecycleEventTypeLoadSuccess || event.type == CLXBidLifecycleEventTypeRenderSuccess) {
+        // Return "win" or "loss" based on event type (reward counts as win)
+        if (event.type == CLXBidLifecycleEventTypeLoadSuccess || 
+            event.type == CLXBidLifecycleEventTypeRenderSuccess ||
+            event.type == CLXBidLifecycleEventTypeReward) {
             return @"win";
         } else if (event.type == CLXBidLifecycleEventTypeLoss) {
             return @"loss";

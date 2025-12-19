@@ -54,6 +54,7 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 // Rewarded
 #import <CloudXCore/CLXRewarded.h>
 #import <CloudXCore/CLXRewardedDelegate.h>
+#import <CloudXCore/CLXReward.h>
 
 // Native
 #import <CloudXCore/CLXNative.h>

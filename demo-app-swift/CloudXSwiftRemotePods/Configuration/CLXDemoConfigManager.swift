@@ -45,7 +45,7 @@ class CLXDemoConfig {
 class CLXDemoConfigManager {
     static let sharedManager = CLXDemoConfigManager()
     
-    var currentEnvironment: CLXDemoEnvironment = .dev
+    var currentEnvironment: CLXDemoEnvironment = .production
     private let configurations: [CLXDemoEnvironment: CLXDemoConfig]
     
     var currentConfig: CLXDemoConfig {
@@ -67,18 +67,18 @@ class CLXDemoConfigManager {
             rewardedInterstitialPlacement: "-"
         )
         
-        // Dev Configuration (current production values)
+        // Dev Configuration (Test app)
         let devConfig = CLXDemoConfig(
-            appKey: "g0PdN9_0ilfIcuNXhBopl",
+            appKey: "E-B3dlMk92hcrUT-9xmMu",
             hashedUserId: "test-user-123",
-            baseURL: "https://pro-dev.cloudx.io/sdk",
-            bannerPlacement: "metaBanner",
-            mrecPlacement: "metaMREC",
-            interstitialPlacement: "metaInterstitial",
-            nativePlacement: "metaNative",
-            nativeBannerPlacement: "metaNative",
-            rewardedPlacement: "metaRewarded",
-            rewardedInterstitialPlacement: "metaRewarded"
+            baseURL: "https://provisioning-dev.cloudx.io/sdk",
+            bannerPlacement: "placement_1",
+            mrecPlacement: "place_2",
+            interstitialPlacement: "interstitial_home_entry",
+            nativePlacement: "-",
+            nativeBannerPlacement: "-",
+            rewardedPlacement: "objc-demo-rewarded",
+            rewardedInterstitialPlacement: "objc-demo-rewarded"
         )
         
         // Production Configuration

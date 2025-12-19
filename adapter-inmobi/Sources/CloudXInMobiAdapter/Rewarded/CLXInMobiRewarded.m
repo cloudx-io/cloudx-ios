@@ -229,7 +229,13 @@
 - (void)interstitial:(IMInterstitial *)interstitial rewardActionCompletedWithRewards:(NSDictionary *)rewards {
     [self.logger info:[NSString stringWithFormat:@"✅ Reward earned: %@", rewards]];
     
-    if ([self.delegate respondsToSelector:@selector(userRewardWithRewarded:)]) {
+    // Try to extract reward info from InMobi rewards dictionary
+    // InMobi typically provides keys like "currency" and "amount"
+    if (rewards && [self.delegate respondsToSelector:@selector(userRewardWithRewarded:amount:label:)]) {
+        NSInteger amount = [rewards[@"amount"] integerValue] ?: 0;
+        NSString *currency = rewards[@"currency"];
+        [self.delegate userRewardWithRewarded:self amount:amount label:currency];
+    } else if ([self.delegate respondsToSelector:@selector(userRewardWithRewarded:)]) {
         [self.delegate userRewardWithRewarded:self];
     }
 }

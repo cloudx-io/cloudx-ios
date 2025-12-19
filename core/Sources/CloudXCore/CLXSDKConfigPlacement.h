@@ -32,6 +32,11 @@ typedef NS_ENUM(NSInteger, SDKConfigAdType) {
 @property (nonatomic, copy, nullable) NSString *dealId;
 @property (nonatomic, copy, nullable) NSArray<id> *line_items;
 
+// Rewarded ad configuration
+@property (nonatomic, assign) NSInteger rewardAmount;
+@property (nonatomic, copy, nullable) NSString *rewardCurrency;
+@property (nonatomic, copy, nullable) NSString *rewardCallbackUrl;
+
 - (instancetype)init;
 - (NSString *)ilrdDescription;
 

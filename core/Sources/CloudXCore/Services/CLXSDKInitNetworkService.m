@@ -361,6 +361,18 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
             placement.bidResponseTimeoutMs = [placementDict[@"bidResponseTimeoutMs"] integerValue];
             placement.adLoadTimeoutMs = [placementDict[@"adLoadTimeoutMs"] integerValue];
             placement.bannerRefreshRateMs = [placementDict[@"bannerRefreshRateMs"] integerValue];
+            
+            // Parse reward configuration for rewarded placements
+            if (placementDict[@"rewardAmount"]) {
+                placement.rewardAmount = [placementDict[@"rewardAmount"] integerValue];
+            }
+            if (placementDict[@"rewardCurrency"]) {
+                placement.rewardCurrency = placementDict[@"rewardCurrency"];
+            }
+            if (placementDict[@"rewardCallbackUrl"]) {
+                placement.rewardCallbackUrl = placementDict[@"rewardCallbackUrl"];
+            }
+            
             [placements addObject:placement];
         }
         config.placements = [placements copy];

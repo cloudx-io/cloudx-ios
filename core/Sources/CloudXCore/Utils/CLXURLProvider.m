@@ -12,7 +12,7 @@
 #import <CloudXCore/CLXLogger.h>
 
 // MARK: - Environment URLs
-static NSString *const kDevInitURL = @"https://pro-dev.cloudx.io/sdk";
+static NSString *const kDevInitURL = @"https://provisioning-dev.cloudx.io/sdk";
 static NSString *const kStagingInitURL = @"https://pro-stage.cloudx.io/sdk";
 static NSString *const kProductionInitURL = @"https://pro.cloudx.io/sdk";
 

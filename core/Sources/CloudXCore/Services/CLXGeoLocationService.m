@@ -139,7 +139,9 @@
         gdprApplies = [(NSNumber *)gdprAppliesObj boolValue] ? @"true" : @"false";
     }
     
-    BOOL isEU = [gdprApplies.lowercaseString isEqualToString:@"true"];
+    // Accept "true" (case insensitive) or "1" as GDPR applies
+    NSString *lowerValue = gdprApplies.lowercaseString;
+    BOOL isEU = [lowerValue isEqualToString:@"true"] || [lowerValue isEqualToString:@"1"];
     
     [self.logger verbose:[NSString stringWithFormat:@"gdpr-applies: %@, isEU: %@", gdprApplies ?: @"(none)", @(isEU)]];
     return isEU;

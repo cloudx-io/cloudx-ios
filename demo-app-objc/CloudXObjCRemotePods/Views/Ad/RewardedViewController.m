@@ -264,11 +264,15 @@
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Rewarded didPayRevenueForAd" ad:ad];
 }
 
-- (void)userRewarded:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"🎁 Rewarded userRewarded - Reward Earned!" ad:ad];
+- (void)didRewardUserForAd:(CLXAd *)ad withReward:(CLXReward *)reward {
+    NSString *logMessage = [NSString stringWithFormat:@"🎁 Rewarded didRewardUser - Amount: %ld %@", (long)reward.amount, reward.label];
+    [[DemoAppLogger sharedInstance] logAdEvent:logMessage ad:ad];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self showAlertWithTitle:@"Reward Earned! 🎉" message:@"User has successfully earned a reward!"];
+        NSString *message = [NSString stringWithFormat:@"You earned %ld %@!", (long)reward.amount, reward.label];
+        [self showAlertWithTitle:@"Reward Earned! 🎉" message:message];
     });
 }
 
 @end 
+
+

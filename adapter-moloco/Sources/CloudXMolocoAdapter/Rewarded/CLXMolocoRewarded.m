@@ -225,8 +225,8 @@
     [self.logger info:@"User earned reward"];
     _hasGrantedReward = YES;
     
-    if ([self.delegate respondsToSelector:@selector(didRewardUserWithRewarded:)]) {
-        [self.delegate didRewardUserWithRewarded:self];
+    if ([self.delegate respondsToSelector:@selector(userRewardWithRewarded:)]) {
+        [self.delegate userRewardWithRewarded:self];
     }
 }
 

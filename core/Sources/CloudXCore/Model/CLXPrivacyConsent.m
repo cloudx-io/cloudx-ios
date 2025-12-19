@@ -58,10 +58,11 @@
     if (self.vendorConsent && ![self.vendorConsent boolValue]) return YES;
     
     // CCPA strict: If all GDPR fields are nil (indicating CCPA consent, not TCF),
-    // and saleOptOut is also nil, this means truncated/malformed data → be safe and clear PII
-    // This matches Android's defensive CCPA parsing behavior
+    // and saleOptOut is nil but sharingOptOut has a value, this means truncated/malformed data
+    // If BOTH are nil, it means "no CCPA data at all" which is fine (not opted out)
     BOOL isCcpaConsent = (self.purpose1 == nil && self.purpose2 == nil && self.vendorConsent == nil);
-    if (isCcpaConsent && self.saleOptOut == nil) {
+    if (isCcpaConsent && self.saleOptOut == nil && self.sharingOptOut != nil) {
+        // Has sharingOptOut but no saleOptOut - malformed, be defensive
         return YES;
     }
     

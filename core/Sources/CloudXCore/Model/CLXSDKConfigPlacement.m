@@ -23,6 +23,9 @@
         _nativeTemplate = CLXNativeTemplateDefault;
         _dealId = nil;
         _line_items = nil;
+        _rewardAmount = 0;
+        _rewardCurrency = nil;
+        _rewardCallbackUrl = nil;
     }
     return self;
 }

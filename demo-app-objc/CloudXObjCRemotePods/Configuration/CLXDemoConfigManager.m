@@ -50,7 +50,7 @@
     self = [super init];
     if (self) {
         [self setupConfigurations];
-        _currentEnvironment = CLXDemoEnvironmentDev; // Default to dev
+        _currentEnvironment = CLXDemoEnvironmentProduction; // Default to production for rewarded testing
     }
     return self;
 }
@@ -69,18 +69,18 @@
         rewardedPlacement:@"-"
         rewardedInterstitialPlacement:@"-"];
     
-    // Dev Configuration (MetaTestiOS - bundle: cloudx.CloudXObjCRemotePods)
+    // Dev Configuration (Test app - bundle: cloudx.CloudXObjCRemotePods)
     CLXDemoConfig *devConfig = [[CLXDemoConfig alloc]
-        initWithAppKey:@"NddUgEiyx_bbYax2BQGI2"
+        initWithAppKey:@"E-B3dlMk92hcrUT-9xmMu"
         hashedUserId:@"test-user-123"
-        baseURL:@"https://pro-dev.cloudx.io/sdk"
-        bannerPlacement:@"inmobi-banner"
-        mrecPlacement:@"inmobi-mrec"
-        interstitialPlacement:@"inmobi-interstitial"
-        nativePlacement:@"metaNative"
-        nativeBannerPlacement:@"metaNative"
-        rewardedPlacement:@"metaRewarded"
-        rewardedInterstitialPlacement:@"metaRewarded"];
+        baseURL:@"https://provisioning-dev.cloudx.io/sdk"
+        bannerPlacement:@"placement_1"
+        mrecPlacement:@"place_2"
+        interstitialPlacement:@"interstitial_home_entry"
+        nativePlacement:@"-"
+        nativeBannerPlacement:@"-"
+        rewardedPlacement:@"objc-demo-rewarded"
+        rewardedInterstitialPlacement:@"objc-demo-rewarded"];
     
     // Production Configuration (Blocky app - io.cloudx.Blocky)
     CLXDemoConfig *prodConfig = [[CLXDemoConfig alloc] 

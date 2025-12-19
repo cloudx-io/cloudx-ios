@@ -108,14 +108,16 @@
     XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didRecordImpressionForAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
-// Rewarded-specific delegate method
-- (void)userDidEarnRewardWithAd:(CLXAd *)ad {
-    [self.receivedCallbacks addObject:@"userDidEarnRewardWithAd"];
+// Rewarded-specific delegate method (mirrors AppLovin MAX SDK's MARewardedAdDelegate)
+- (void)didRewardUserForAd:(CLXAd *)ad withReward:(CLXReward *)reward {
+    [self.receivedCallbacks addObject:@"didRewardUserForAd:withReward:"];
     [self.receivedAdObjects addObject:ad ?: [NSNull null]];
     [self.receivedAdTypes addObject:NSStringFromClass([ad class])];
     
-    XCTAssertNotNil(ad, @"userDidEarnRewardWithAd should receive non-nil CLXAd object");
-    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"userDidEarnRewardWithAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertNotNil(ad, @"didRewardUserForAd:withReward: should receive non-nil CLXAd object");
+    XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didRewardUserForAd:withReward: should receive CLXAd object, got %@", NSStringFromClass([ad class]));
+    XCTAssertNotNil(reward, @"didRewardUserForAd:withReward: should receive non-nil CLXReward object");
+    XCTAssertTrue([reward isKindOfClass:[CLXReward class]], @"didRewardUserForAd:withReward: should receive CLXReward object, got %@", NSStringFromClass([reward class]));
 }
 
 #pragma mark - Integration Tests
@@ -180,8 +182,9 @@
     [self didClickAd:testAd];
     [self didRecordImpressionForAd:testAd];
     
-    // Test rewarded delegate methods (includes reward callback)
-    [self userDidEarnRewardWithAd:testAd];
+    // Test rewarded delegate methods (includes reward callback - mirrors AppLovin MAX SDK)
+    CLXReward *testReward = [CLXReward rewardWithAmount:100 label:@"coins"];
+    [self didRewardUserForAd:testAd withReward:testReward];
     
     // Test native delegate methods (same as base ad delegate)
     [self didLoadAd:testAd];

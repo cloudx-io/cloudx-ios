@@ -112,6 +112,83 @@
 }
 
 /**
+ * Test resolution of SDK-specific fields for REWARD events
+ * Reward events should be treated as wins (user completed the rewarded ad)
+ */
+- (void)testResolveField_SDKFields_RewardEvent {
+    [self setMockPayloadMapping:@{
+        @"win_field": @"sdk.win",
+        @"loss_field": @"sdk.loss",
+        @"reward_field": @"sdk.reward",
+        @"win_loss_field": @"sdk.[win|loss]",
+        @"sdk_field": @"sdk.sdk"
+    }];
+    
+    CLXBidResponseBid *testBid = [self createTestBid];
+    
+    // Test REWARD scenario - should be treated as a WIN
+    NSDictionary *rewardResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
+                                                                                  bid:testBid
+                                                                           lossReason:nil
+                                                                                event:[CLXBidLifecycleEvent rewardEvent]
+                                                                       loadedBidPrice:2.50];
+    
+    // Reward events should return "win" for sdk.win (reward is a type of win)
+    XCTAssertEqualObjects(rewardResult[@"win_field"], @"win", @"sdk.win should return 'win' for reward events");
+    
+    // Reward events should return nil for sdk.loss
+    XCTAssertNil(rewardResult[@"loss_field"], @"sdk.loss should return nil for reward events");
+    
+    // Reward events should return "reward" for sdk.reward
+    XCTAssertEqualObjects(rewardResult[@"reward_field"], @"reward", @"sdk.reward should return 'reward' for reward events");
+    
+    // Reward events should return "win" for sdk.[win|loss] (reward counts as win)
+    XCTAssertEqualObjects(rewardResult[@"win_loss_field"], @"win", @"sdk.[win|loss] should return 'win' for reward events");
+    
+    // sdk.sdk should always return "sdk"
+    XCTAssertEqualObjects(rewardResult[@"sdk_field"], @"sdk", @"sdk.sdk should always return 'sdk'");
+}
+
+/**
+ * Test that sdk.reward field only returns value for reward events
+ */
+- (void)testResolveField_RewardField_OnlyForRewardEvents {
+    [self setMockPayloadMapping:@{@"reward_field": @"sdk.reward"}];
+    
+    CLXBidResponseBid *testBid = [self createTestBid];
+    
+    // Test that sdk.reward returns nil for non-reward events
+    NSDictionary *loadSuccessResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
+                                                                                       bid:testBid
+                                                                                lossReason:nil
+                                                                                     event:[CLXBidLifecycleEvent loadSuccessEvent]
+                                                                            loadedBidPrice:2.50];
+    XCTAssertEqual(loadSuccessResult.count, 0, @"sdk.reward should return nil for loadSuccess events");
+    
+    NSDictionary *renderSuccessResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
+                                                                                         bid:testBid
+                                                                                  lossReason:nil
+                                                                                       event:[CLXBidLifecycleEvent renderSuccessEvent]
+                                                                              loadedBidPrice:2.50];
+    XCTAssertEqual(renderSuccessResult.count, 0, @"sdk.reward should return nil for renderSuccess events");
+    
+    NSDictionary *lossResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
+                                                                                bid:testBid
+                                                                         lossReason:@(102)
+                                                                              event:[CLXBidLifecycleEvent lossEvent]
+                                                                     loadedBidPrice:2.50];
+    XCTAssertEqual(lossResult.count, 0, @"sdk.reward should return nil for loss events");
+    
+    // Test that sdk.reward returns "reward" only for reward events
+    NSDictionary *rewardResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
+                                                                                  bid:testBid
+                                                                           lossReason:nil
+                                                                                event:[CLXBidLifecycleEvent rewardEvent]
+                                                                       loadedBidPrice:2.50];
+    XCTAssertEqualObjects(rewardResult[@"reward_field"], @"reward", @"sdk.reward should return 'reward' for reward events");
+}
+
+/**
  * Test URL field resolution with missing or malformed URLs
  */
 - (void)testResolveField_URLFields_MissingURLs {

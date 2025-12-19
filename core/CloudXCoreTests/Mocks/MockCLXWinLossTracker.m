@@ -311,8 +311,10 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
         NSString *type = @"unknown";
         if ([notificationType isEqualToString:@"loadSuccess"] || 
             [notificationType isEqualToString:@"renderSuccess"] ||
+            [notificationType isEqualToString:@"rewardEarned"] ||
             [notificationType isEqualToString:@"load_success"] || 
-            [notificationType isEqualToString:@"render_success"]) {
+            [notificationType isEqualToString:@"render_success"] ||
+            [notificationType isEqualToString:@"reward_earned"]) {
             type = @"win";
         } else if ([notificationType isEqualToString:@"loss"]) {
             type = @"loss";
@@ -359,12 +361,14 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
         }
         
         // Categorize by notificationType (support both camelCase and snake_case)
-        // camelCase: loadSuccess, renderSuccess, loss (from event.notificationType)
-        // snake_case: load_success, render_success, loss (from sdk.[notificationType])
+        // camelCase: loadSuccess, renderSuccess, rewardEarned, loss (from event.notificationType)
+        // snake_case: load_success, render_success, reward_earned, loss (from sdk.[notificationType])
         if ([notificationType isEqualToString:@"loadSuccess"] || 
             [notificationType isEqualToString:@"renderSuccess"] ||
+            [notificationType isEqualToString:@"rewardEarned"] ||
             [notificationType isEqualToString:@"load_success"] || 
-            [notificationType isEqualToString:@"render_success"]) {
+            [notificationType isEqualToString:@"render_success"] ||
+            [notificationType isEqualToString:@"reward_earned"]) {
             [self.winNotifications addObject:[notification copy]];
             _sendWinCallCount++;
         } else if ([notificationType isEqualToString:@"loss"]) {
@@ -405,6 +409,9 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
                 break;
             case CLXBidLifecycleEventTypeLoss:
                 eventTypeString = @"LOSS";
+                break;
+            case CLXBidLifecycleEventTypeReward:
+                eventTypeString = @"REWARD";
                 break;
         }
         
