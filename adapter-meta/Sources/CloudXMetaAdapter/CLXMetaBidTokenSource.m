@@ -51,8 +51,13 @@
 - (void)getTokenWithCompletion:(void (^)(NSDictionary<NSString *, NSString *> * _Nullable token, NSError * _Nullable error))completion {
     [self.logger debug:@"Getting Meta bidder token"];
     
-    // Ensure we're on main thread for Meta SDK calls
-    dispatch_async(dispatch_get_main_queue(), ^{
+    // IMPORTANT: Must use background queue, NOT main queue.
+    // [FBAdSettings bidderToken] is a blocking call that:
+    // 1. Acquires an internal lock in the Facebook SDK
+    // 2. Makes IPC calls to fetch device identifiers
+    // When another SDK (e.g., AppLovin MAX) concurrently calls bidderToken and holds the lock,
+    // this can take several seconds. Calling on main thread causes UI freeze/ANR.
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @try {
             // Get Meta bidder token - this is required for every bid request
             NSString *bidderToken = [FBAdSettings bidderToken];

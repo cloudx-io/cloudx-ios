@@ -59,8 +59,11 @@
 - (void)getTokenWithCompletion:(void (^)(NSDictionary<NSString *, NSString *> * _Nullable token, NSError * _Nullable error))completion {
     [self.logger debug:@"🔧 [CLXVungleBidTokenSource] Getting Vungle bidding token"];
     
-    // Ensure we're on main thread for Vungle SDK calls
-    dispatch_async(dispatch_get_main_queue(), ^{
+    // IMPORTANT: Must use background queue, NOT main queue.
+    // Bid token generation can be a blocking call that acquires internal locks.
+    // When another SDK concurrently calls the same method, this can take several seconds.
+    // Calling on main thread causes UI freeze/ANR.
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @try {
             // Check if Vungle SDK is initialized
             if (![VungleAds isInitialized]) {

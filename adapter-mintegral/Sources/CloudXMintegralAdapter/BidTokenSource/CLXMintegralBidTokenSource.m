@@ -57,7 +57,11 @@ typedef NS_ENUM(NSInteger, MintegralAdType) {
     
     [self.logger debug:@"Getting Mintegral bid token"];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
+    // IMPORTANT: Must use background queue, NOT main queue.
+    // Bid token generation can be a blocking call that acquires internal locks.
+    // When another SDK concurrently calls the same method, this can take several seconds.
+    // Calling on main thread causes UI freeze/ANR.
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @try {
             // Check if SDK is initialized
             if (![CLXMintegralInitializer isInitialized]) {
