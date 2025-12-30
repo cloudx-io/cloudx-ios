@@ -377,12 +377,14 @@ NS_ASSUME_NONNULL_BEGIN
     
     [self.logger debug:[NSString stringWithFormat:@"[%@] [CLXBidAdSource] Starting waterfall with %lu bids", correlationId, (unsigned long)sortedBids.count]];
     
-    // Try bids in waterfall order 
+    // Try bids in waterfall order with failure tracking
+    NSMutableArray<NSString *> *failureReasons = [NSMutableArray array];
     [self tryNextBidInWaterfall:sortedBids 
                       bidIndex:0 
                      auctionID:auctionID 
                     bidRequest:bidRequest 
                  correlationId:correlationId
+                failureReasons:failureReasons
                     completion:completion];
 }
 
@@ -391,12 +393,19 @@ NS_ASSUME_NONNULL_BEGIN
                     auctionID:(nullable NSString *)auctionID 
                    bidRequest:(NSDictionary *)bidRequest 
                 correlationId:(NSString *)correlationId
+               failureReasons:(NSMutableArray<NSString *> *)failureReasons
                    completion:(void (^)(CLXBidAdSourceResponse * _Nullable, NSError * _Nullable))completion {
     
     if (bidIndex >= sortedBids.count) {
-        [self.logger error:[NSString stringWithFormat:@"[%@] All bids failed in waterfall", correlationId]];
+        // Build detailed error message with all failure reasons
+        NSString *failureSummary = [self buildWaterfallFailureSummary:failureReasons bidCount:sortedBids.count];
+        [self.logger error:[NSString stringWithFormat:@"[%@] Waterfall exhausted: %@", correlationId, failureSummary]];
         if (completion) {
-            completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:CLXBidAdSourceErrorNoBid userInfo:@{NSLocalizedDescriptionKey: @"All bids failed in waterfall."}]);
+            NSDictionary *userInfo = @{
+                NSLocalizedDescriptionKey: failureSummary,
+                @"CLXBidFailureReasons": failureReasons ?: @[]
+            };
+            completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:CLXBidAdSourceErrorNoBid userInfo:userInfo]);
         }
         return;
     }
@@ -435,8 +444,13 @@ NS_ASSUME_NONNULL_BEGIN
     
     // FIRST FILTERING PHASE - This bid is completely discarded because it couldn't create a banner instance
     // We know it definitely can't show an ad, so send loss notification immediately with TechnicalError
-    [self.logger debug:[NSString stringWithFormat:@"[%@] Bid %ld failed creation: rank=%ld, id=%@", 
-                       correlationId, (long)bidIndex + 1, (long)currentBid.ext.cloudx.rank, currentBid.id]];
+    
+    // Build diagnostic failure reason for this bid
+    NSString *failureReason = [self diagnoseCreationFailure:currentBid bidIndex:bidIndex];
+    [failureReasons addObject:failureReason];
+    
+    [self.logger debug:[NSString stringWithFormat:@"[%@] Bid %ld failed: %@", 
+                       correlationId, (long)bidIndex + 1, failureReason]];
     
     // Send server-side loss notification for adapter creation failures
     if (auctionID && currentBid.id) {
@@ -460,6 +474,7 @@ NS_ASSUME_NONNULL_BEGIN
                      auctionID:auctionID 
                     bidRequest:bidRequest 
                  correlationId:correlationId
+               failureReasons:failureReasons
                     completion:completion];
 }
 
@@ -504,6 +519,67 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable CLXBidResponse *)getCurrentBidResponse {
     return self.currentBidResponse;
+}
+
+#pragma mark - Diagnostic Helpers
+
+/**
+ * Diagnose why a bid failed to create an ad instance.
+ * Provides actionable error messages for debugging.
+ */
+- (NSString *)diagnoseCreationFailure:(CLXBidResponseBid *)bid bidIndex:(NSInteger)bidIndex {
+    NSMutableArray<NSString *> *issues = [NSMutableArray array];
+    
+    // Check for empty/nil adm (most common issue)
+    if (!bid.adm || bid.adm.length == 0) {
+        [issues addObject:@"adm is empty or nil"];
+    }
+    
+    // Check for missing adaptercode (factory lookup will fail if adapter doesn't exist)
+    NSString *adapterCode = bid.ext.prebid.meta.adaptercode;
+    if (!adapterCode || adapterCode.length == 0) {
+        [issues addObject:@"missing ext.prebid.meta.adaptercode"];
+    }
+    
+    // Check for valid bid ID
+    if (!bid.id || bid.id.length == 0) {
+        [issues addObject:@"missing bid.id"];
+    }
+    
+    // Check creative ID
+    if (!bid.crid || bid.crid.length == 0) {
+        [issues addObject:@"missing crid"];
+    }
+    
+    // Build summary
+    NSString *bidIdentifier = bid.crid ?: bid.id ?: [NSString stringWithFormat:@"index-%ld", (long)bidIndex];
+    
+    if (issues.count == 0) {
+        // No obvious issues - factory returned nil for unknown reason
+        return [NSString stringWithFormat:@"Bid '%@': adapter factory returned nil (check renderer logs for details)", bidIdentifier];
+    }
+    
+    return [NSString stringWithFormat:@"Bid '%@': %@", bidIdentifier, [issues componentsJoinedByString:@", "]];
+}
+
+/**
+ * Build a human-readable summary of all waterfall failures.
+ */
+- (NSString *)buildWaterfallFailureSummary:(NSArray<NSString *> *)failureReasons bidCount:(NSUInteger)bidCount {
+    if (failureReasons.count == 0) {
+        return @"All bids failed in waterfall (no diagnostic info available).";
+    }
+    
+    NSMutableString *summary = [NSMutableString stringWithFormat:@"All %lu bid(s) failed:\n", (unsigned long)bidCount];
+    
+    for (NSUInteger i = 0; i < failureReasons.count; i++) {
+        [summary appendFormat:@"  [%lu] %@", (unsigned long)(i + 1), failureReasons[i]];
+        if (i < failureReasons.count - 1) {
+            [summary appendString:@"\n"];
+        }
+    }
+    
+    return summary;
 }
 
 @end
