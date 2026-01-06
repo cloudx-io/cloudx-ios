@@ -127,7 +127,8 @@
         return;
     }
     
-    [self.logger info:[NSString stringWithFormat:@"Loading banner ad for placement: %@", self.placementID]];
+    [self.logger info:[NSString stringWithFormat:@"Loading banner ad for placement: %@, isMainThread: %@", 
+                       self.placementID, [NSThread isMainThread] ? @"YES" : @"NO"]];
     
     // Convert CloudX banner type to Vungle ad size
     VungleAdSize *vungleAdSize = [self vungleAdSizeFromBannerType:self.bannerType];
@@ -139,21 +140,31 @@
         return;
     }
     
-    // Create Vungle banner view
-    self.vungleBannerView = [[VungleBannerView alloc] initWithPlacementId:self.placementID
-                                                            vungleAdSize:vungleAdSize];
-    self.vungleBannerView.delegate = self;
+    // CRITICAL: VungleBannerView is a UIView - must be created and loaded on main thread!
+    void (^createAndLoadBanner)(void) = ^{
+        // Create Vungle banner view
+        self.vungleBannerView = [[VungleBannerView alloc] initWithPlacementId:self.placementID
+                                                                vungleAdSize:vungleAdSize];
+        self.vungleBannerView.delegate = self;
+        
+        // Start timeout timer
+        [self startTimeoutTimer];
+        
+        // Load the ad
+        if (self.bidPayload) {
+            [self.logger debug:@"Loading banner with bid payload"];
+            [self.vungleBannerView load:self.bidPayload];
+        } else {
+            [self.logger debug:@"Loading waterfall banner ad"];
+            [self.vungleBannerView load:nil];
+        }
+    };
     
-    // Start timeout timer
-    [self startTimeoutTimer];
-    
-    // Load the ad
-    if (self.bidPayload) {
-        [self.logger debug:@"Loading banner with bid payload"];
-        [self.vungleBannerView load:self.bidPayload];
+    if ([NSThread isMainThread]) {
+        createAndLoadBanner();
     } else {
-        [self.logger debug:@"Loading waterfall banner ad"];
-        [self.vungleBannerView load:nil];
+        [self.logger debug:@"Not on main thread - dispatching VungleBannerView creation to main queue"];
+        dispatch_async(dispatch_get_main_queue(), createAndLoadBanner);
     }
 }
 
@@ -176,15 +187,8 @@
     [self.logger info:@"Showing banner ad"];
     self.isShowing = YES;
     
-    // Notify delegate that banner is shown
-    NSLog(@"🔵 [CLXVungleBanner] STEP 1: About to call didShowBanner: on delegate: %@", self.delegate);
-    NSLog(@"🔵 [CLXVungleBanner] STEP 1: Delegate responds to selector: %d", [self.delegate respondsToSelector:@selector(didShowBanner:)]);
     if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
-        NSLog(@"🔵 [CLXVungleBanner] STEP 1: Calling [delegate didShowBanner:self]");
         [self.delegate didShowBanner:self];
-        NSLog(@"🔵 [CLXVungleBanner] STEP 1: Returned from [delegate didShowBanner:self]");
-    } else {
-        NSLog(@"🔴 [CLXVungleBanner] STEP 1: Delegate does NOT respond to didShowBanner: - THIS IS THE BUG!");
     }
 }
 
@@ -199,17 +203,25 @@
     // Cancel timeout timer
     [self cancelTimeoutTimer];
     
-    // Remove from superview and cleanup
-    if (self.vungleBannerView) {
-        [self.vungleBannerView removeFromSuperview];
-        self.vungleBannerView.delegate = nil;
-        self.vungleBannerView = nil;
-    }
-    
+    // VungleBannerView is a UIView - must be cleaned up on main thread
+    VungleBannerView *viewToDestroy = self.vungleBannerView;
+    self.vungleBannerView = nil;
     self.delegate = nil;
     self.viewController = nil;
     self.isLoaded = NO;
     self.isShowing = NO;
+    
+    if (viewToDestroy) {
+        if ([NSThread isMainThread]) {
+            [viewToDestroy removeFromSuperview];
+            viewToDestroy.delegate = nil;
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [viewToDestroy removeFromSuperview];
+                viewToDestroy.delegate = nil;
+            });
+        }
+    }
 }
 
 #pragma mark - VungleBannerViewDelegate

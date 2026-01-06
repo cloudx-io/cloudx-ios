@@ -90,11 +90,7 @@
             [self.logger error:@"Invalid ad markup - empty or nil"];
         }
         
-        // Create close button on main thread for UI safety
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            self.closeButton = [UIButton buttonWithType:UIButtonTypeClose];
-            self.closeButton.translatesAutoresizingMaskIntoConstraints = NO;
-        });
+        // Note: Close button creation deferred to load() to avoid dispatch_sync deadlocks
         
         [self.logger debug:[NSString stringWithFormat:@"CloudXRendererBanner initialization completed - Instance: %p", self]];
     } else {
@@ -241,6 +237,11 @@
             }
             
             if (self.hasClosedButton) {
+                // Create close button on main thread (we're already on main thread via dispatch_async)
+                if (!self.closeButton) {
+                    self.closeButton = [UIButton buttonWithType:UIButtonTypeClose];
+                    self.closeButton.translatesAutoresizingMaskIntoConstraints = NO;
+                }
                 [self.closeButton addTarget:self action:@selector(closeBanner:) forControlEvents:UIControlEventTouchUpInside];
                 [self.webView addSubview:self.closeButton];
                 
@@ -293,9 +294,21 @@
  * Removes the WebView from its superview and invalidates its delegate.
  */
 - (void)destroy {
-    [self.webView removeFromSuperview];
-    self.webView.delegate = nil;
+    // WebView is a UIView - must be cleaned up on main thread
+    CLXRendererWebView *viewToDestroy = self.webView;
     self.webView = nil;
+    
+    if (viewToDestroy) {
+        if ([NSThread isMainThread]) {
+            [viewToDestroy removeFromSuperview];
+            viewToDestroy.delegate = nil;
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [viewToDestroy removeFromSuperview];
+                viewToDestroy.delegate = nil;
+            });
+        }
+    }
 }
 
 #pragma mark - Private Methods

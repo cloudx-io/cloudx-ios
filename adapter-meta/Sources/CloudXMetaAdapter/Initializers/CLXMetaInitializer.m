@@ -155,9 +155,9 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
         [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"Initializing Meta FAN SDK with %lu placement IDs: %@", (unsigned long)placementIDs.count, [placementIDs componentsJoinedByString:@", "]]];
         
         void (^facebookCompletionHandler)(FBAdInitResults *results) = ^(FBAdInitResults *initResult) {
-            [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"%@ [CLXMetaInitializer] Meta FAN SDK initialization %@: %@", 
+            [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"%@ Meta FAN SDK initialization %@: %@", 
                                                [initResult isSuccess] ? @"✅" : @"⚠️",
-                                               [initResult isSuccess] ? @"successful" : @"completed",
+                                               [initResult isSuccess] ? @"successful" : @"completed with issues",
                                                initResult.message ?: @"No message"]];
         };
         
@@ -170,9 +170,9 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
         
         // Still need to initialize Meta FAN SDK even without placement IDs
         void (^facebookCompletionHandler)(FBAdInitResults *results) = ^(FBAdInitResults *initResult) {
-            [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"%@ [CLXMetaInitializer] Meta FAN SDK default initialization %@: %@", 
+            [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"%@ Meta FAN SDK default initialization %@: %@", 
                                                [initResult isSuccess] ? @"✅" : @"⚠️",
-                                               [initResult isSuccess] ? @"successful" : @"completed",
+                                               [initResult isSuccess] ? @"successful" : @"completed with issues",
                                                initResult.message ?: @"No message"]];
         };
         

@@ -106,7 +106,9 @@
 }
 
 - (void)updateStatusUIWithState:(AdState)state {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    // Update UI immediately when already on main thread to avoid delays
+    // dispatch_async would queue the update AFTER synchronous SDK work completes
+    void (^updateBlock)(void) = ^{
         NSString *text;
         UIColor *color;
         
@@ -128,7 +130,13 @@
         self.statusLabel.text = text;
         self.statusLabel.textColor = color;
         self.statusIndicator.backgroundColor = color;
-    });
+    };
+    
+    if ([NSThread isMainThread]) {
+        updateBlock();
+    } else {
+        dispatch_async(dispatch_get_main_queue(), updateBlock);
+    }
 }
 
 - (void)setupStatusUI {

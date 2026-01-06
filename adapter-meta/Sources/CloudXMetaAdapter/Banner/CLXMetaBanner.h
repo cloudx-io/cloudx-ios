@@ -12,7 +12,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXMetaBanner : NSObject <FBAdViewDelegate, CLXAdapterBanner, CLXDestroyable>
+// NOTE: FBAdViewDelegate conformance moved to separate CLXMetaBannerAdViewDelegate class
+// to avoid NSProxy crashes with Meta SDK 6.21.0+
+@interface CLXMetaBanner : NSObject <CLXAdapterBanner, CLXDestroyable>
 
 @property (nonatomic, weak, nullable) id<CLXAdapterBannerDelegate> delegate;
 @property (nonatomic, assign) BOOL timeout;

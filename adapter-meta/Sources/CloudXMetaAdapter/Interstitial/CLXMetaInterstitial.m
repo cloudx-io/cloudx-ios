@@ -103,7 +103,7 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
     
     // Prevent concurrent loading attempts
     if (_isLoading) {
-        [self.logger debug:@"⚠️ [CLXMetaInterstitial] Load already in progress"];
+        [self.logger debug:@"Load already in progress"];
         return;
     }
     
@@ -112,13 +112,17 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
                        _placementID, self.bidPayload ? @"YES" : @"NO"]];
     
     // Ensure Meta SDK calls happen on main thread
+    __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.bidPayload) {
-            [self.interstitial loadAdWithBidPayload:self.bidPayload];
+        typeof(self) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        if (strongSelf.bidPayload) {
+            [strongSelf.interstitial loadAdWithBidPayload:strongSelf.bidPayload];
         } else {
             // loadAd will be deprecated so this shouldn't be hit
-            [self.interstitial loadAd];
-            [self.logger error:@"⚠️ [CLXMetaInterstitial] missing bid payload"];
+            [strongSelf.interstitial loadAd];
+            [strongSelf.logger error:@"Missing bid payload"];
         }
     });
 }
@@ -170,7 +174,7 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
 #pragma mark - FBInterstitialAdDelegate
 
 - (void)interstitialAdDidLoad:(FBInterstitialAd *)interstitialAd {
-    [self.logger info:[NSString stringWithFormat:@"Loaded successfully - Valid: %@", interstitialAd.isAdValid ? @"YES" : @"NO"]];
+    [self.logger info:[NSString stringWithFormat:@"✅ Loaded successfully - Valid: %@", interstitialAd.isAdValid ? @"YES" : @"NO"]];
     
     // Check if ad is valid before proceeding (per Meta official guidelines)
     if (!interstitialAd.isAdValid) {
@@ -234,7 +238,7 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
 }
 
 - (void)interstitialAdDidClick:(FBInterstitialAd *)interstitialAd {
-    [self.logger info:@"👆 [CLXMetaInterstitial] Ad clicked"];
+    [self.logger info:@"👆 Ad clicked"];
     
     // Forward to CloudX delegate
     if ([self.delegate respondsToSelector:@selector(clickWithInterstitial:)]) {

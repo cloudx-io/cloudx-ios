@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
   s.platform = :ios, '15.0'
-  s.swift_version = '5.9'
+  s.swift_version = '6.0'
   s.module_name = 'CloudXVungleAdapter'
   s.source = { :path => '.' }
   
@@ -23,7 +23,7 @@ Pod::Spec.new do |s|
   }
   
   s.dependency 'CloudXCore'
-  s.dependency 'VungleAds', '~> 7.4.0'
+  s.dependency 'VungleAds', '~> 7.6.0'
   
   s.framework = 'Foundation'
   s.framework = 'UIKit'

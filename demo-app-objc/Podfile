@@ -6,10 +6,10 @@ target 'CloudXObjCRemotePods' do
 
   # Pods for LOCAL development with source files from private repo
   pod 'CloudXCore', :path => '../core'
-  pod 'CloudXMetaAdapter', :path => '../adapter-meta'
-  pod 'CloudXRenderer', :path => '../renderer-cloudx'
   pod 'CloudXVungleAdapter', :path => '../adapter-vungle'
   pod 'CloudXInMobiAdapter', :path => '../adapter-inmobi'
+  pod 'CloudXMetaAdapter', :path => '../adapter-meta'
+  pod 'CloudXRenderer', :path => '../renderer-cloudx'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths

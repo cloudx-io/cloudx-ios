@@ -90,20 +90,54 @@
 }
 
 - (nullable UIImage *)adIcon {
-    return _native.adIcon;
+    // InMobi SDK 11.x: adIcon is now an IMAdIcon object with imageview property
+    return _native.adIcon.imageview.image;
 }
 
-#pragma mark - View Methods
+#pragma mark - View Methods (InMobi SDK 11.x)
 
-- (nullable UIView *)primaryViewOfWidth:(CGFloat)width {
+- (nullable UIView *)getMediaView {
     if (![self isReady]) {
-        [self.logger error:@"Cannot get primary view - native ad not ready"];
+        [self.logger error:@"Cannot get media view - native ad not ready"];
         return nil;
     }
     
-    UIView *view = [_native primaryViewOfWidth:width];
-    self.nativeView = view;
-    return view;
+    UIView *mediaView = [_native getMediaView];
+    [self.logger debug:@"Retrieved media view from InMobi native ad"];
+    return mediaView;
+}
+
+- (void)registerViewForInteractionWithContainer:(UIView *)containerView
+                                      titleView:(nullable UILabel *)titleView
+                                descriptionView:(nullable UILabel *)descriptionView
+                                        ctaView:(nullable UIView *)ctaView
+                                       iconView:(nullable UIImageView *)iconView {
+    if (![self isReady]) {
+        [self.logger error:@"Cannot register views - native ad not ready"];
+        return;
+    }
+    
+    // InMobi SDK 11.x uses IMNativeViewDataBuilder for view registration
+    IMNativeViewDataBuilder *builder = [[IMNativeViewDataBuilder alloc] initWithParentView:containerView];
+    
+    if (titleView) {
+        [builder setTitleView:titleView];
+    }
+    if (descriptionView) {
+        [builder setDescriptionView:descriptionView];
+    }
+    if (ctaView) {
+        [builder setCTAView:ctaView];
+    }
+    if (iconView) {
+        [builder setIconView:iconView];
+    }
+    
+    IMNativeViewData *viewData = [builder build];
+    [_native registerViewForTracking:viewData];
+    
+    self.nativeView = containerView;
+    [self.logger debug:@"Registered views for tracking with InMobi native ad"];
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
@@ -113,15 +147,6 @@
     }
     
     self.presentingViewController = viewController;
-    
-    // Get the primary view from InMobi
-    CGFloat width = viewController.view.bounds.size.width;
-    UIView *adView = [self primaryViewOfWidth:width];
-    
-    if (!adView) {
-        [self.logger error:@"Failed to get primary view from InMobi"];
-        return;
-    }
     
     [self.logger info:@"Showing native ad"];
     
@@ -171,9 +196,8 @@
 - (void)destroy {
     [self.logger debug:@"Destroying native"];
     
-    // Recycle the primary view if it exists
+    // Clean up native ad
     if (self.native) {
-        [self.native recyclePrimaryView];
         self.native.delegate = nil;
         self.native = nil;
     }
@@ -194,13 +218,10 @@
 #pragma mark - Click Handling
 
 - (void)reportClick {
-    if (![self isReady]) {
-        [self.logger error:@"Cannot report click - native ad not ready"];
-        return;
-    }
-    
-    [self.logger debug:@"Reporting click and opening landing page"];
-    [self.native reportAdClickAndOpenLandingPage];
+    // InMobi SDK 11.x: Click handling is now automatic through registered views
+    // The native ad tracks clicks on views registered via registerViewForTracking:
+    // This method is kept for API compatibility but is a no-op
+    [self.logger debug:@"Click handling is automatic through registered views in InMobi SDK 11.x"];
 }
 
 #pragma mark - IMNativeDelegate

@@ -114,7 +114,7 @@
     
     // Prevent concurrent loading attempts
     if (_isLoading) {
-        [self.logger debug:@"⚠️ [CLXMetaNative] Load already in progress, ignoring duplicate request"];
+        [self.logger debug:@"Load already in progress, ignoring duplicate request"];
         return;
     }
     
@@ -122,11 +122,15 @@
     [self.logger debug:[NSString stringWithFormat:@"Loading ad for placement: %@ | bidPayload: %@", _placementID, self.bidPayload ? @"YES" : @"NO"]];
     
     // Ensure Meta SDK calls happen on main thread
+    __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.bidPayload) {
-            [self.nativeAd loadAdWithBidPayload:self.bidPayload];
+        typeof(self) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        if (strongSelf.bidPayload) {
+            [strongSelf.nativeAd loadAdWithBidPayload:strongSelf.bidPayload];
         } else {
-            [self.nativeAd loadAd];
+            [strongSelf.nativeAd loadAd];
         }
     });
 }
@@ -224,7 +228,7 @@
 #pragma mark - FBNativeAdDelegate
 
 - (void)nativeAdDidLoad:(FBNativeAd *)nativeAd {
-    [self.logger info:@"Native ad loaded successfully"];
+    [self.logger info:@"✅ Native ad loaded successfully"];
     
     // If there is an existing valid native ad, unregister the view (per Meta guidelines)
     if (self.nativeAd && self.nativeAd.isAdValid) {
@@ -261,7 +265,7 @@
 }
 
 - (void)nativeAdDidClick:(FBNativeAd *)nativeAd {
-    [self.logger info:@"👆 [CLXMetaNative] Native ad clicked"];
+    [self.logger info:@"👆 Native ad clicked"];
     
     if ([self.delegate respondsToSelector:@selector(clickWithNative:)]) {
         [self.delegate clickWithNative:self];

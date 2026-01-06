@@ -99,7 +99,7 @@
     
     // Prevent concurrent loading attempts
     if (_isLoading) {
-        [self.logger debug:@"⚠️ [CLXMetaRewarded] Load already in progress, ignoring duplicate request"];
+        [self.logger debug:@"Load already in progress, ignoring duplicate request"];
         return;
     }
     
@@ -107,12 +107,16 @@
     [self.logger debug:[NSString stringWithFormat:@"Loading ad for placement: %@ | bidPayload: %@", _placementID, self.bidPayload ? @"YES" : @"NO"]];
     
     // Ensure Meta SDK calls happen on main thread
+    __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.bidPayload) {
-            [self.rewarded loadAdWithBidPayload:self.bidPayload];
+        typeof(self) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        if (strongSelf.bidPayload) {
+            [strongSelf.rewarded loadAdWithBidPayload:strongSelf.bidPayload];
         } else {
             // For auto play video ads, it's recommended to load the ad at least 30 seconds before it is shown
-            [self.rewarded loadAd];
+            [strongSelf.rewarded loadAd];
         }
     });
 }
@@ -127,7 +131,7 @@
         [_rewarded setRewardDataWithUserID:userID withCurrency:currency];
         [self.logger debug:[NSString stringWithFormat:@"Reward data set for user: %@ | currency: %@", userID, currency]];
     } else {
-        [self.logger error:@"⚠️ [CLXMetaRewarded] Cannot set reward data - rewarded ad not initialized"];
+        [self.logger error:@"Cannot set reward data - rewarded ad not initialized"];
     }
 }
 
@@ -157,7 +161,7 @@
 - (void)rewardedVideoAdDidLoad:(FBRewardedVideoAd *)rewardedVideoAd {
     // Check if ad is valid before proceeding (per Meta official guidelines)
     if (!rewardedVideoAd.isAdValid) {
-        [self.logger error:@"Ad loaded but is not valid"];
+        [self.logger error:@"⚠️ Ad loaded but is not valid"];
         _isLoading = NO;
         
         // Create an error for invalid ad and call failure delegate
@@ -170,7 +174,7 @@
         return;
     }
     
-    [self.logger info:@"Rewarded video ad loaded successfully"];
+    [self.logger info:@"✅ Rewarded video ad loaded successfully"];
     
     // Reset loading state
     _isLoading = NO;
@@ -196,7 +200,7 @@
 }
 
 - (void)rewardedVideoAdDidClick:(FBRewardedVideoAd *)rewardedVideoAd {
-    [self.logger info:@"👆 [CLXMetaRewarded] Rewarded video ad clicked"];
+    [self.logger info:@"👆 Rewarded video ad clicked"];
     
     if ([self.delegate respondsToSelector:@selector(clickWithRewarded:)]) {
         [self.delegate clickWithRewarded:self];
@@ -217,7 +221,7 @@
 }
 
 - (void)rewardedVideoAdVideoComplete:(FBRewardedVideoAd *)rewardedVideoAd {
-    [self.logger info:@"🎁 [CLXMetaRewarded] Rewarded video completed - reward earned"];
+    [self.logger info:@"🎁 Rewarded video completed - reward earned"];
     
     // NOTE: This callback fires for client-side reward validation.
     // If server-side validation is enabled, rewards should only be granted

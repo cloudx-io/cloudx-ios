@@ -56,15 +56,11 @@
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXInMobiBanner"];
         _timeoutInterval = 30.0;
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %lld%@, BidID: %@, Size: %.0fx%.0f", 
+        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %lld%@, BidID: %@, Size: %.0fx%.0f",
                            placementID, (placementID == 0 ? @" (invalid)" : @""), bidID, size.width, size.height]];
         
-        // Only create banner if placementID is valid
-        // Otherwise defer to load() for validation
-        if (placementID != 0) {
-            _banner = [[IMBanner alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height) placementId:placementID];
-            _banner.delegate = self;
-        }
+        // Banner creation is deferred to load() to ensure it happens on main thread
+        // without using dispatch_sync which can cause deadlocks
     }
     return self;
 }
@@ -98,27 +94,36 @@
         return;
     }
     
-    // Create banner now if not already created (deferred from init)
-    if (!_banner) {
-        _banner = [[IMBanner alloc] initWithFrame:CGRectMake(0, 0, _bannerSize.width, _bannerSize.height) 
-                                      placementId:_placementID];
-        _banner.delegate = self;
-        [self.logger debug:@"Created banner with validated placement ID"];
-    }
-    
     if (_isLoading) {
         [self.logger debug:@"Load already in progress"];
         return;
     }
     
     _isLoading = YES;
-    [self.logger debug:[NSString stringWithFormat:@"Loading banner - Placement: %lld", _placementID]];
     
+    // All UI operations happen on main thread via dispatch_async
+    // Using dispatch_async (not sync) to prevent deadlocks when returning from deep links
+    __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.bidPayload) {
-            [self.banner load:self.bidPayload];
+        typeof(self) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        // Create banner if not already created
+        if (!strongSelf.banner) {
+            CGSize size = strongSelf.bannerSize;
+            long long placement = strongSelf.placementID;
+            strongSelf.banner = [[IMBanner alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)
+                                                    placementId:placement];
+            strongSelf.banner.delegate = strongSelf;
+            [strongSelf.logger debug:[NSString stringWithFormat:@"Created banner - Placement: %lld", placement]];
+        }
+        
+        [strongSelf.logger debug:[NSString stringWithFormat:@"Loading banner - Placement: %lld", strongSelf.placementID]];
+        
+        if (strongSelf.bidPayload) {
+            [strongSelf.banner load:strongSelf.bidPayload];
         } else {
-            [self.banner load];
+            [strongSelf.banner load];
         }
     });
 }
@@ -132,13 +137,23 @@
 - (void)destroy {
     [self.logger debug:@"Destroying banner"];
     
-    if (self.banner) {
-        self.banner.delegate = nil;
-        self.banner = nil;
-    }
-    
+    // Clear delegate and state immediately (thread-safe)
     self.delegate = nil;
     _isLoading = NO;
+    
+    // IMBanner is a UIView - must be cleaned up on main thread
+    IMBanner *bannerToDestroy = self.banner;
+    self.banner = nil;
+    
+    if (bannerToDestroy) {
+        if ([NSThread isMainThread]) {
+            bannerToDestroy.delegate = nil;
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                bannerToDestroy.delegate = nil;
+            });
+        }
+    }
     
     [self.logger debug:@"Destruction complete"];
 }
@@ -182,7 +197,7 @@
 }
 
 - (void)banner:(IMBanner *)banner didInteractWithParams:(nullable NSDictionary *)params {
-    [self.logger info:@"Banner clicked"];
+    [self.logger info:@"👆 Banner clicked"];
     
     if ([self.delegate respondsToSelector:@selector(clickBanner:)]) {
         [self.delegate clickBanner:self];

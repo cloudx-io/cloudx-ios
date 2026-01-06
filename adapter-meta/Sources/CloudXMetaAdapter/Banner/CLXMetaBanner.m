@@ -28,12 +28,12 @@
 @interface CLXMetaBanner ()
 
 @property (nonatomic, copy) NSString *bidID;
-@property (nonatomic, copy, nullable) NSString *placementID;  // Now nullable
+@property (nonatomic, copy, nullable) NSString *placementID;
 @property (nonatomic, copy) NSString *bidPayload;
 @property (nonatomic, strong) UIViewController *viewController;
 @property (nonatomic, assign) CLXBannerType type;
 @property (nonatomic, strong) CLXLogger *logger;
-@property (nonatomic, assign) NSInteger deferredTemplate;  // Store for deferred creation
+@property (nonatomic, assign) NSInteger deferredTemplate;
 
 @end
 
@@ -49,7 +49,7 @@
     self = [super init];
     if (self) {
         _bidPayload = bidPayload;
-        _placementID = placementID;  // Now nullable - validation in load()
+        _placementID = placementID;
         _bidID = bidID;
         _type = type;
         _viewController = viewController;
@@ -59,29 +59,12 @@
         
         // Parse template from bid payload to ensure exact size match with Meta's bid
         _deferredTemplate = [self parseTemplateFromBidPayload:bidPayload];
-        FBAdSize fbAdSize = [self fbAdSizeForTemplate:_deferredTemplate fallbackType:type];
         
         [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %@, BidID: %@, Type: %ld, Template: %ld, HasBidPayload: %@", 
                            placementID ?: @"(nil)", bidID, (long)type, (long)_deferredTemplate, bidPayload ? @"YES" : @"NO"]];
         
-        // Only create banner view if placementID is valid
-        // Otherwise defer to load() for validation
-        if (placementID && placementID.length > 0) {
-            // Ensure Facebook SDK initialization happens on main thread to prevent crashes
-            if ([NSThread isMainThread]) {
-                _bannerView = [[FBAdView alloc] initWithPlacementID:placementID
-                                                              adSize:fbAdSize
-                                                  rootViewController:viewController];
-                _bannerView.delegate = self;
-            } else {
-                dispatch_sync(dispatch_get_main_queue(), ^{
-                    self->_bannerView = [[FBAdView alloc] initWithPlacementID:placementID
-                                                                        adSize:fbAdSize
-                                                            rootViewController:viewController];
-                    self->_bannerView.delegate = self;
-                });
-            }
-        }
+        // NOTE: FBAdView creation is deferred to load() to ensure it happens on main thread.
+        // This is because init may be called from a background thread (network callback).
     }
     return self;
 }
@@ -92,8 +75,7 @@
 
 - (BOOL)isReady {
     BOOL ready = self.bannerView != nil && self.bannerView.isAdValid;
-    [self.logger debug:[NSString stringWithFormat:@"isReady: %@ (view: %@, valid: %@)", 
-                       ready ? @"YES" : @"NO", self.bannerView ? @"YES" : @"NO", self.bannerView.isAdValid ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"isReady: %@", ready ? @"YES" : @"NO"]];
     return ready;
 }
 
@@ -118,36 +100,29 @@
         return;
     }
     
-    // Create banner view now if not already created (deferred from init)
-    if (!_bannerView) {
-        FBAdSize fbAdSize = [self fbAdSizeForTemplate:_deferredTemplate fallbackType:_type];
-        [self.logger debug:@"Creating banner view with validated placement ID"];
-        
-        // Ensure Facebook SDK initialization happens on main thread to prevent crashes
-        if ([NSThread isMainThread]) {
-            _bannerView = [[FBAdView alloc] initWithPlacementID:_placementID
-                                                          adSize:fbAdSize
-                                              rootViewController:_viewController];
-            _bannerView.delegate = self;
-        } else {
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                self->_bannerView = [[FBAdView alloc] initWithPlacementID:self->_placementID
-                                                                    adSize:fbAdSize
-                                                        rootViewController:self->_viewController];
-                self->_bannerView.delegate = self;
-            });
-        }
-    }
-    
     [self.logger debug:[NSString stringWithFormat:@"Loading ad - Placement: %@, HasBidPayload: %@", 
                        _placementID, self.bidPayload ? @"YES" : @"NO"]];
     
-    // Ensure Meta SDK calls happen on main thread
+    // FBAdView is a UIView and MUST be created on main thread
+    __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.bidPayload) {
-            [self.bannerView loadAdWithBidPayload:self.bidPayload];
+        typeof(self) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        // Create banner view on main thread if not already created
+        if (!strongSelf.bannerView) {
+            FBAdSize fbAdSize = [strongSelf fbAdSizeForTemplate:strongSelf.deferredTemplate fallbackType:strongSelf.type];
+            strongSelf.bannerView = [[FBAdView alloc] initWithPlacementID:strongSelf.placementID
+                                                                   adSize:fbAdSize
+                                                       rootViewController:strongSelf.viewController];
+            strongSelf.bannerView.delegate = strongSelf;
+            [strongSelf.logger debug:@"Created banner view on main thread"];
+        }
+        
+        if (strongSelf.bidPayload) {
+            [strongSelf.bannerView loadAdWithBidPayload:strongSelf.bidPayload];
         } else {
-            [self.bannerView loadAd];
+            [strongSelf.bannerView loadAd];
         }
     });
 }
@@ -167,37 +142,46 @@
         return;
     }
     
-    // Check if ad is valid before showing (per Meta official guidelines)
     if (!self.bannerView.isAdValid) {
         [self.logger error:@"Cannot show ad - not valid"];
         return;
     }
     
-    // NOTE: The banner view is already added to CLXBannerAdView by the SDK.
-    // We should NOT add it again to vc.view here.
-    // This method is called to trigger any show-related callbacks (impressions, etc.)
-    // The view hierarchy is managed by CLXBannerAdView.
-    
-    [self.logger info:[NSString stringWithFormat:@"Banner showFromViewController called (view already in hierarchy via CLXBannerAdView)"]];
+    [self.logger info:@"Banner showFromViewController called"];
 }
 
 - (void)destroy {
-    if (self.bannerView) {
-        [self.bannerView removeFromSuperview];
-        self.bannerView = nil;
+    [self.logger debug:@"Destroying banner"];
+    
+    // FBAdView is a UIView - must be cleaned up on main thread
+    FBAdView *viewToDestroy = self.bannerView;
+    self.bannerView = nil;
+    
+    if (viewToDestroy) {
+        if ([NSThread isMainThread]) {
+            viewToDestroy.delegate = nil;
+            [viewToDestroy removeFromSuperview];
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                viewToDestroy.delegate = nil;
+                [viewToDestroy removeFromSuperview];
+            });
+        }
     }
+    
+    [self.logger debug:@"Destruction complete"];
 }
 
 #pragma mark - FBAdViewDelegate
 
 - (void)adViewDidLoad:(FBAdView *)adView {
-    // Check if ad is valid before proceeding (per Meta official guidelines)
+    [self.logger info:[NSString stringWithFormat:@"✅ Loaded successfully - Valid: %@", adView.isAdValid ? @"YES" : @"NO"]];
+    
     if (!adView.isAdValid) {
         [self.logger error:@"Ad loaded but invalid"];
         
-        // Create an error for invalid ad and call failure delegate
         NSError *invalidAdError = [CLXError errorWithCode:CLXErrorCodeInvalidAd 
-                                                      description:@"Banner ad loaded but is not valid"];
+                                              description:@"Banner ad loaded but is not valid"];
         
         if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
             [self.delegate failToLoadBanner:self error:invalidAdError];
@@ -205,18 +189,12 @@
         return;
     }
     
-    [self.logger info:[NSString stringWithFormat:@"Ad loaded successfully and is valid | Delegate responds to didLoadBanner: %@", 
-                       [self.delegate respondsToSelector:@selector(didLoadBanner:)] ? @"YES" : @"NO"]];
-    
     if ([self.delegate respondsToSelector:@selector(didLoadBanner:)]) {
         [self.delegate didLoadBanner:self];
-    } else {
-        [self.logger error:@"Delegate does not respond to didLoadBanner"];
     }
 }
 
 - (void)adView:(FBAdView *)adView didFailWithError:(NSError *)error {
-    // Use centralized error handler for comprehensive logging and error enhancement
     NSError *enhancedError = [CLXMetaErrorHandler handleMetaError:error
                                                        withLogger:self.logger
                                                           context:@"Banner"
@@ -228,7 +206,7 @@
 }
 
 - (void)adViewDidClick:(FBAdView *)adView {
-    [self.logger info:@"👆 [CLXMetaBanner] Ad clicked"];
+    [self.logger info:@"👆 Ad clicked"];
     
     if ([self.delegate respondsToSelector:@selector(clickBanner:)]) {
         [self.delegate clickBanner:self];
@@ -236,34 +214,35 @@
 }
 
 - (void)adViewDidFinishHandlingClick:(FBAdView *)adView {
-    // No logging needed for this callback
+    // Click handling finished
 }
 
 - (void)adViewWillLogImpression:(FBAdView *)adView {
     [self.logger info:@"Ad impression logged"];
     
-    // Forward the display callback to the SDK
     if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
         [self.delegate didShowBanner:self];
     }
     
-    // Forward to CloudX delegate if it supports impression tracking
     if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
         [self.delegate impressionBanner:self];
     }
 }
 
+- (UIViewController *)viewControllerForPresentingModalView {
+    return self.viewController ?: [self topViewController];
+}
+
+#pragma mark - Template Parsing
+
 /**
  * Parses the Meta template number from the bid payload JSON.
  * Meta template numbers:
  * - 3: Rectangle 300x250 (MREC)
- * - 4: Banner 320x50 (fixed size) - uses deprecated kFBAdSize320x50
+ * - 4: Banner 320x50 (fixed size)
  * - 5: Banner adaptive height 50 (flexible width)
  * - 6: Banner 728x90 (tablet leaderboard)
  * - 7: Rectangle 300x250 (MREC alternate)
- *
- * Note: Template 4 requires the deprecated kFBAdSize320x50 for fixed sizing.
- *       kFBAdSizeHeight50Banner is adaptive/flexible and maps to template 5.
  */
 - (NSInteger)parseTemplateFromBidPayload:(NSString *)bidPayload {
     if (!bidPayload || bidPayload.length == 0) {
@@ -275,7 +254,6 @@
     NSDictionary *payload = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
     
     if (error || !payload) {
-        [self.logger debug:[NSString stringWithFormat:@"⚠️ [CLXMetaBanner] Failed to parse bid payload JSON: %@", error.localizedDescription]];
         return -1;
     }
     
@@ -286,50 +264,33 @@
         return template;
     }
     
-    [self.logger debug:@"⚠️ [CLXMetaBanner] No template field found in bid payload"];
     return -1;
 }
 
 /**
  * Maps Meta template number to the exact FBAdSize required by Meta Audience Network.
- * This ensures the FBAdView size exactly matches the bid template to prevent
- * "Bid for type X being used on template Y" errors.
  */
 - (FBAdSize)fbAdSizeForTemplate:(NSInteger)template fallbackType:(CLXBannerType)fallbackType {
-    FBAdSize fbAdSize;
-    
     switch (template) {
-        case 3: // MREC 300x250
-        case 7: // MREC 300x250 (alternate template)
-            fbAdSize = kFBAdSizeHeight250Rectangle;
-            [self.logger debug:[NSString stringWithFormat:@"📏 [CLXMetaBanner] Using kFBAdSizeHeight250Rectangle (template %ld - MREC)", (long)template]];
-            break;
+        case 3:
+        case 7:
+            return kFBAdSizeHeight250Rectangle;
             
-        case 4: // Banner 320x50 (fixed size)
+        case 4:
             #pragma clang diagnostic push
             #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            fbAdSize = kFBAdSize320x50;
+            return kFBAdSize320x50;
             #pragma clang diagnostic pop
-            [self.logger debug:@"📏 [CLXMetaBanner] Using kFBAdSize320x50 (template 4 - fixed 320x50)"];
-            break;
             
-        case 5: // Adaptive height 50 banner
-            fbAdSize = kFBAdSizeHeight50Banner;
-            [self.logger debug:@"📏 [CLXMetaBanner] Using kFBAdSizeHeight50Banner (template 5 - adaptive 50)"];
-            break;
+        case 5:
+            return kFBAdSizeHeight50Banner;
             
-        case 6: // Banner 728x90 (tablet leaderboard)
-            fbAdSize = kFBAdSizeHeight90Banner;
-            [self.logger debug:@"📏 [CLXMetaBanner] Using kFBAdSizeHeight90Banner (template 6 - 728x90)"];
-            break;
+        case 6:
+            return kFBAdSizeHeight90Banner;
             
-        default: // Fallback to CloudX banner type if template not found
-            [self.logger debug:[NSString stringWithFormat:@"⚠️ [CLXMetaBanner] Unknown template %ld, falling back to CloudX type: %ld", (long)template, (long)fallbackType]];
-            fbAdSize = [self fbAdSizeForType:fallbackType];
-            break;
+        default:
+            return [self fbAdSizeForType:fallbackType];
     }
-    
-    return fbAdSize;
 }
 
 - (FBAdSize)fbAdSizeForType:(CLXBannerType)type {
@@ -339,9 +300,42 @@
         case CLXBannerTypeMREC:
             return kFBAdSizeHeight250Rectangle;
         default:
-            [self.logger error:[NSString stringWithFormat:@"⚠️ [CLXMetaBanner] Unknown banner type: %ld, defaulting to 50Banner", (long)type]];
             return kFBAdSizeHeight50Banner;
     }
 }
 
-@end 
+#pragma mark - Helpers
+
+- (UIViewController *)topViewController {
+    UIViewController *rootVC = nil;
+    
+    if (@available(iOS 13.0, *)) {
+        NSSet *scenes = [UIApplication sharedApplication].connectedScenes;
+        for (UIWindowScene *scene in scenes) {
+            if (scene.activationState == UISceneActivationStateForegroundActive) {
+                for (UIWindow *window in scene.windows) {
+                    if (window.isKeyWindow) {
+                        rootVC = window.rootViewController;
+                        break;
+                    }
+                }
+                if (rootVC) break;
+            }
+        }
+    }
+    
+    if (!rootVC) {
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
+        #pragma clang diagnostic pop
+    }
+    
+    while (rootVC.presentedViewController) {
+        rootVC = rootVC.presentedViewController;
+    }
+    
+    return rootVC;
+}
+
+@end
