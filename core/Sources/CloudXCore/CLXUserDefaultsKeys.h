@@ -24,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXCoreSessionIDKey @"CLXCore_sessionIDKey"
 #define kCLXCoreAccountIDKey @"CLXCore_accId_config"
 #define kCLXCoreEncodedStringKey @"CLXCore_encodedString"
+/// Persistent install UUID for source.ext.cx.install_id (generated once per app install)
+#define kCLXCoreInstallIDKey @"CLXCore_installID"
 
 // Metrics and analytics keys
 #define kCLXCoreMetricsDictKey @"CLXCore_metricsDict"

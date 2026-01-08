@@ -58,6 +58,13 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXBiddingConfigImpressionPMPDeal;
 @class CLXBiddingConfigRequestExtPrebidDebug;
 @class CLXBiddingConfigRequestExtAdserverTargeting;
+@class CLXBiddingConfigImpressionBannerExt;
+@class CLXBiddingConfigImpressionVideoExt;
+@class CLXBiddingConfigImpressionExtCloudX;
+@class CLXBiddingConfigSourceExt;
+@class CLXBiddingConfigSourceExtCloudX;
+@class CLXBiddingConfigDeviceExtCloudX;
+@class CLXBiddingConfigApplicationPublisherExtInstalledSdk;
 // Response classes removed - use CLXBidResponse.h instead
 
 // MARK: - BiddingConfig
@@ -139,6 +146,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSNumber *pxratio;
 @property (nonatomic, strong) CLXBiddingConfigDeviceGeo *geo;
 @property (nonatomic, strong) CLXBiddingConfigDeviceExt *ext;
+// NOTE: device.carrier and device.mccmnc are NOT implemented.
+// CTCarrier API was deprecated in iOS 16 and returns nil/empty values in iOS 16.4+.
+// These fields would never be populated on modern iOS versions.
 @end
 
 @interface CLXBiddingConfigDeviceGeo : NSObject
@@ -157,6 +167,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXBiddingConfigDeviceExt : NSObject
 @property (nonatomic, copy, nullable) NSString *ifv;
+/// CloudX custom extension fields
+@property (nonatomic, strong, nullable) CLXBiddingConfigDeviceExtCloudX *cx;
+@end
+
+/// CloudX custom device extension fields for device.ext.cx.*
+@interface CLXBiddingConfigDeviceExtCloudX : NSObject
+/// Redundant hardware model backup field
+@property (nonatomic, copy, nullable) NSString *hw_model;
 @end
 
 // MARK: - Application
@@ -179,6 +197,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXBiddingConfigApplicationPublisherExt : NSObject
 @property (nonatomic, strong) CLXBiddingConfigApplicationPublisherPrebid *prebid;
+/// AppLovin-specific: Array of installed SDK adapter info (name, version)
+@property (nonatomic, strong, nullable) NSArray<CLXBiddingConfigApplicationPublisherExtInstalledSdk *> *installed_sdk;
+@end
+
+/// Installed SDK adapter info for publisher.ext.installed_sdk
+@interface CLXBiddingConfigApplicationPublisherExtInstalledSdk : NSObject
+/// Adapter SDK name
+@property (nonatomic, copy, nullable) NSString *id;
+/// Adapter SDK version
+@property (nonatomic, copy, nullable) NSString *sdk_version;
+/// Adapter version
+@property (nonatomic, copy, nullable) NSString *adapter_version;
 @end
 
 @interface CLXBiddingConfigApplicationPublisherPrebid : NSObject
@@ -189,6 +219,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXBiddingConfigUser : NSObject
 @property (nonatomic, copy, nullable) NSString *keywords;
 @property (nonatomic, strong, nullable) CLXBiddingConfigUserExt *ext;
+/// ORTB 2.5: Gender ("M" = male, "F" = female, "O" = other). Set via KV API.
+@property (nonatomic, copy, nullable) NSString *gender;
+/// ORTB 2.5: Year of birth as 4-digit integer (e.g., 1990). Set via KV API.
+@property (nonatomic, strong, nullable) NSNumber *yob;
 @end
 
 @interface CLXBiddingConfigUserExt : NSObject
@@ -256,6 +290,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSNumber *pos;
 // ORTB 2.5: Indicates if banner is in top frame (1) or iframe (0). Always 1 for native apps.
 @property (nonatomic, strong, nullable) NSNumber *topframe;
+/// ORTB 2.5: Banner width at root level (in addition to format array)
+@property (nonatomic, strong, nullable) NSNumber *w;
+/// ORTB 2.5: Banner height at root level (in addition to format array)
+@property (nonatomic, strong, nullable) NSNumber *h;
+/// ORTB 2.5: Unique identifier for this banner object. Standard convention is "1" for single banner per impression.
+@property (nonatomic, copy, nullable) NSString *bannerId;
+/// Extension object for banner-specific extensions
+@property (nonatomic, strong, nullable) CLXBiddingConfigImpressionBannerExt *ext;
+@end
+
+/// Banner extension object for banner.ext.*
+@interface CLXBiddingConfigImpressionBannerExt : NSObject
+/// AppLovin-specific: Banner type ("rewarded" for rewarded ads)
+@property (nonatomic, copy, nullable) NSString *bannertype;
 @end
 
 @interface CLXBiddingConfigImpressionBannerFormat : NSObject
@@ -273,20 +321,28 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSNumber *linearity;
 @property (nonatomic, strong) NSNumber *pos;
 @property (nonatomic, strong) NSArray<NSNumber *> *companiontype;
-/// ORTB 2.5: Minimum video ad duration in seconds
+/// ORTB 2.5: Minimum video ad duration in seconds (server-driven)
 @property (nonatomic, strong, nullable) NSNumber *minduration;
-/// ORTB 2.5: Maximum video ad duration in seconds
+/// ORTB 2.5: Maximum video ad duration in seconds (server-driven)
 @property (nonatomic, strong, nullable) NSNumber *maxduration;
-/// ORTB 2.5: Video start delay in seconds (0 = pre-roll, >0 = mid-roll delay, -1 = generic mid-roll, -2 = generic post-roll)
+/// ORTB 2.5: Video start delay in seconds (server-driven)
 @property (nonatomic, strong, nullable) NSNumber *startdelay;
 /// ORTB 2.5: Indicates if the video is skippable (1 = skippable, 0 = not skippable)
 @property (nonatomic, strong, nullable) NSNumber *skip;
-/// ORTB 2.5: Minimum duration in seconds before skip button appears (only applies when skip=1)
+/// ORTB 2.5: Minimum duration in seconds before skip button appears (server-driven)
 @property (nonatomic, strong, nullable) NSNumber *skipmin;
-/// ORTB 2.5: Number of seconds into video when skip button appears (only applies when skip=1)
+/// ORTB 2.5: Number of seconds into video when skip button appears (server-driven)
 @property (nonatomic, strong, nullable) NSNumber *skipafter;
-/// ORTB 2.5: Playback methods supported (1=auto-play sound on, 2=auto-play sound off, 3=click-to-play, 4=mouse-over)
+/// ORTB 2.5: Playback methods supported (server-driven)
 @property (nonatomic, strong, nullable) NSArray<NSNumber *> *playbackmethod;
+/// Extension object for video-specific extensions
+@property (nonatomic, strong, nullable) CLXBiddingConfigImpressionVideoExt *ext;
+@end
+
+/// Video extension object for video.ext.*
+@interface CLXBiddingConfigImpressionVideoExt : NSObject
+/// AppLovin-specific: Video type ("rewarded" for rewarded ads)
+@property (nonatomic, copy, nullable) NSString *videotype;
 @end
 
 @interface CLXBiddingConfigImpressionNative : NSObject
@@ -300,6 +356,22 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSDictionary *data;
 /// SKAdNetwork object for iOS attribution (OpenRTB 2.6 / IAB SKAN spec)
 @property (nonatomic, strong, nullable) CLXBiddingConfigImpressionExtSkadn *skadn;
+/// CloudX custom extension fields for imp.ext.cx.*
+@property (nonatomic, strong, nullable) CLXBiddingConfigImpressionExtCloudX *cx;
+@end
+
+/// CloudX custom impression extension fields for imp.ext.cx.*
+@interface CLXBiddingConfigImpressionExtCloudX : NSObject
+/// Session depth (number of ads shown in this session)
+@property (nonatomic, strong, nullable) NSNumber *depth;
+/// Ad format string ("banner", "mrec", "interstitial", "rewarded", "native")
+@property (nonatomic, copy, nullable) NSString *format;
+/// Session UUID for this app session
+@property (nonatomic, copy, nullable) NSString *sess_id;
+/// Session time in milliseconds
+@property (nonatomic, strong, nullable) NSNumber *sess_time;
+/// Placement ID from publisher configuration
+@property (nonatomic, copy, nullable) NSString *placement_id;
 @end
 
 /// SKAdNetwork request object per IAB SKAN spec
@@ -364,6 +436,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *tid;
 // ORTB 2.5: Payment ID chain string (ads.txt/sellers.json)
 @property (nonatomic, copy, nullable) NSString *pchain;
+/// Extension object for source-specific extensions
+@property (nonatomic, strong, nullable) CLXBiddingConfigSourceExt *ext;
+@end
+
+/// Source extension object for source.ext.*
+@interface CLXBiddingConfigSourceExt : NSObject
+/// CloudX custom extension fields for source.ext.cx.*
+@property (nonatomic, strong, nullable) CLXBiddingConfigSourceExtCloudX *cx;
+@end
+
+/// CloudX custom source extension fields for source.ext.cx.*
+@interface CLXBiddingConfigSourceExtCloudX : NSObject
+/// Persistent install UUID (generated once, stored in UserDefaults)
+@property (nonatomic, copy, nullable) NSString *install_id;
 @end
 
 // MARK: - Response classes removed

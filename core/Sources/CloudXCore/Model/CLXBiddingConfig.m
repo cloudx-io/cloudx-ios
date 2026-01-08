@@ -28,62 +28,9 @@
 #import <CloudXCore/CLXSKAdNetworkService.h>
 
 
-#pragma mark - Video Bid Request Constants
-/**
- * OpenRTB 2.5 Video Object Configuration Constants
- *
- * These values are sent in bid requests to tell DSPs/bidders what video content
- * constraints we have. They constrain the VIDEO FILE that bidders return, NOT
- * the total on-screen ad experience time.
- *
- * IMPORTANT DISTINCTION:
- *   - These values → Constrain video FILE length in bid response
- *   - Force close timeout → Constrains total ON-SCREEN time (video + end card + interaction)
- *   - See CLXPublisherFullscreenAdBase.m for force close timeout constants
- *
- * Industry standard: maxduration=60 is typical for rewarded/interstitial video ads.
- */
-
-/// Minimum video duration in seconds
-/// Rationale: Prevents extremely short videos that don't deliver advertiser value.
-/// Most DSPs won't bid with <5s videos anyway.
-static const NSInteger kCLXVideoMinDuration = 5;
-
-/// Maximum video duration in seconds
-/// Rationale: 60s is industry standard for rewarded video max. Balances:
-///   - Advertiser message delivery
-///   - User attention span
-///   - Completion rate optimization (drops significantly past 30-45s)
-/// Note: Most actual creatives are 15-30s; 60s is the upper bound.
-///
-/// 🔧 PUBLISHER CONFIGURABILITY CANDIDATE:
-///    Publishers may want shorter maxduration (e.g., 30s) for better UX,
-///    or this could be set per-placement via server config.
-static const NSInteger kCLXVideoMaxDuration = 60;
-
-/// Number of seconds a video must play before skip button appears (when skippable)
-/// Rationale: Industry standard is 5 seconds. Ensures advertisers get minimum exposure
-/// before users can skip. Used for interstitials (rewarded videos are non-skippable).
-///
-/// 🔧 PUBLISHER CONFIGURABILITY CANDIDATE:
-///    Some publishers prefer shorter (3s) or longer (10s) skip delays.
-///    Could be configurable per-placement.
-static const NSInteger kCLXVideoSkipAfterSeconds = 5;
-
-/// Minimum video duration before skip is allowed (skipmin field)
-/// Set to 0 = no minimum requirement (skipafter handles the timing)
-static const NSInteger kCLXVideoSkipMinDuration = 0;
-
-/// Video playback method(s) supported
-/// 1 = Auto-play with sound on (standard for fullscreen video ads)
-/// Other values: 2=auto-play sound off, 3=click-to-play, 4=mouse-over
-static const NSInteger kCLXVideoPlaybackMethodAutoPlaySoundOn = 1;
-
-/// Video start delay (pre-roll, mid-roll, post-roll positioning)
-/// 0 = pre-roll (starts immediately when ad displays)
-/// >0 = mid-roll delay in seconds
-/// -1 = generic mid-roll, -2 = generic post-roll
-static const NSInteger kCLXVideoStartDelayPreRoll = 0;
+// NOTE: Video policy constants (minduration, maxduration, skipafter, startdelay, playbackmethod, skipmin)
+// have been moved to server-side configuration to allow dynamic updates without SDK releases.
+// These values should be provided by the server in the init response or bid request enrichment.
 
 // Internal methods category for accessing privacy methods
 @interface CLXPrivacyService (Internal)
@@ -222,6 +169,20 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         // iframes like in web environments. Therefore topframe is always 1 for iOS/Android SDKs.
         banner.topframe = @1;
         
+        // ORTB 2.5: Banner width/height at root level (in addition to format array)
+        // Required by Meta, Mintegral; supported by Liftoff, InMobi, Magnite
+        banner.w = format.w;
+        banner.h = format.h;
+        // ORTB 2.5: Standard convention for single banner per impression
+        banner.bannerId = @"1";
+        
+        // AppLovin-specific: Banner type extension for rewarded ads
+        if (adType == CLXAdTypeRewarded) {
+            CLXBiddingConfigImpressionBannerExt *bannerExt = [[CLXBiddingConfigImpressionBannerExt alloc] init];
+            bannerExt.bannertype = @"rewarded";
+            banner.ext = bannerExt;
+        }
+        
         // ORTB 2.5 Ad Position (Section 5.4)
         // We can ONLY know position definitively for fullscreen ad types.
         // For inline ads (banner, MREC, native), position depends entirely on where
@@ -260,15 +221,17 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         video.pos = @7;
         video.companiontype = @[@1, @2];
         
-        // ORTB 2.5: Video duration and skip configuration
-        // See constant definitions at top of file for detailed rationale on each value
-        video.minduration = @(kCLXVideoMinDuration);
-        video.maxduration = @(kCLXVideoMaxDuration);
-        video.startdelay = @(kCLXVideoStartDelayPreRoll);
+        // ORTB 2.5: Video skip configuration (SDK knows if rewarded or interstitial)
+        // NOTE: Other video policy fields (minduration, maxduration, startdelay, skipmin, skipafter, playbackmethod)
+        // are now server-driven to allow dynamic configuration without SDK updates.
         video.skip = (adType == CLXAdTypeRewarded) ? @0 : @1;  // Rewarded = non-skippable, Interstitial = skippable
-        video.skipmin = @(kCLXVideoSkipMinDuration);
-        video.skipafter = @(kCLXVideoSkipAfterSeconds);        // Only applies when skip=1 (interstitials)
-        video.playbackmethod = @[@(kCLXVideoPlaybackMethodAutoPlaySoundOn)];
+        
+        // AppLovin-specific: Video type extension for rewarded ads
+        if (adType == CLXAdTypeRewarded) {
+            CLXBiddingConfigImpressionVideoExt *videoExt = [[CLXBiddingConfigImpressionVideoExt alloc] init];
+            videoExt.videotype = @"rewarded";
+            video.ext = videoExt;
+        }
         
         // Create stored impression ID
         CLXBiddingConfigImpressionExtId *idObj = [[CLXBiddingConfigImpressionExtId alloc] init];
@@ -318,6 +281,45 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         } else {
             [logger debug:@"[BiddingConfig] SKAdNetwork: No SKAN versions or network IDs available"];
         }
+        
+        // Create CloudX custom extension fields for imp.ext.cx
+        CLXBiddingConfigImpressionExtCloudX *impExtCx = [[CLXBiddingConfigImpressionExtCloudX alloc] init];
+        
+        // Set ad format string based on ad type
+        switch (adType) {
+            case CLXAdTypeBanner:
+                impExtCx.format = @"banner";
+                break;
+            case CLXAdTypeMrec:
+                impExtCx.format = @"mrec";
+                break;
+            case CLXAdTypeInterstitial:
+                impExtCx.format = @"interstitial";
+                break;
+            case CLXAdTypeRewarded:
+                impExtCx.format = @"rewarded";
+                break;
+            case CLXAdTypeNative:
+                impExtCx.format = @"native";
+                break;
+            default:
+                impExtCx.format = @"unknown";
+                break;
+        }
+        
+        // Set placement_id from storedImpressionId (this is the placement identifier)
+        impExtCx.placement_id = storedImpressionId;
+        
+        // Generate session UUID for this request
+        impExtCx.sess_id = [[NSUUID UUID] UUIDString];
+        
+        // Try to extract depth from impression metric array if available
+        // The metric array is set on the impression object later, so we extract from impModel
+        // Session time in milliseconds since app start (approximate)
+        NSTimeInterval sessionDuration = [[NSProcessInfo processInfo] systemUptime];
+        impExtCx.sess_time = @((NSInteger)(sessionDuration * 1000));
+        
+        impExt.cx = impExtCx;
         
         // Create native ad if needed
         CLXBiddingConfigImpressionNative *native = nil;
@@ -456,6 +458,11 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         CLXBiddingConfigDeviceExt *deviceExt = [[CLXBiddingConfigDeviceExt alloc] init];
         deviceExt.ifv = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         
+        // CloudX custom extension: Hardware model (redundant backup)
+        CLXBiddingConfigDeviceExtCloudX *deviceExtCx = [[CLXBiddingConfigDeviceExtCloudX alloc] init];
+        deviceExtCx.hw_model = [CLXSystemInformation shared].model;
+        deviceExt.cx = deviceExtCx;
+        
         // This handles all configuration scenarios with proper debug/production safety
         NSString *ifa = [settings getIFA];
         
@@ -500,6 +507,10 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         device.geo = geo;
         device.ext = deviceExt;
         
+        // NOTE: device.carrier and device.mccmnc are NOT implemented.
+        // CTCarrier API was deprecated in iOS 16 and returns nil/empty values in iOS 16.4+.
+        // These fields would never be populated on modern iOS versions.
+        
         _device = device;
         
         // Create user
@@ -533,6 +544,33 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         CLXBiddingConfigUser *user = [[CLXBiddingConfigUser alloc] init];
         user.keywords = userKeywords.length > 0 ? userKeywords : nil;
         user.ext = userExt;
+        
+        // ORTB 2.5: User demographics from KV API
+        // Publishers can set these via setKeyValueDictionary API with keys "gender" and "yob"
+        NSString *gender = userKeyValues[@"gender"];
+        if (gender && [gender isKindOfClass:[NSString class]] && gender.length > 0) {
+            // Validate gender value (M, F, or O per ORTB spec)
+            NSString *upperGender = [gender uppercaseString];
+            if ([upperGender isEqualToString:@"M"] || [upperGender isEqualToString:@"F"] || [upperGender isEqualToString:@"O"]) {
+                user.gender = upperGender;
+            }
+        }
+        
+        id yobValue = userKeyValues[@"yob"];
+        if (yobValue) {
+            NSNumber *yob = nil;
+            if ([yobValue isKindOfClass:[NSNumber class]]) {
+                yob = (NSNumber *)yobValue;
+            } else if ([yobValue isKindOfClass:[NSString class]]) {
+                NSInteger yobInt = [(NSString *)yobValue integerValue];
+                if (yobInt >= 1900 && yobInt <= 2100) {  // Reasonable year range
+                    yob = @(yobInt);
+                }
+            }
+            if (yob && [yob integerValue] >= 1900 && [yob integerValue] <= 2100) {
+                user.yob = yob;
+            }
+        }
         
         _user = user;
         
@@ -621,6 +659,24 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         source.tid = _requestID;
         // fd = 1 indicates exchange/SDK is responsible for final impression decision
         source.fd = @1;
+        
+        // CloudX custom extension: Persistent install UUID
+        // Generate once per app install, stored in UserDefaults
+        NSString *installId = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreInstallIDKey];
+        if (!installId) {
+            installId = [[NSUUID UUID] UUIDString];
+            [[NSUserDefaults standardUserDefaults] setObject:installId forKey:kCLXCoreInstallIDKey];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            [logger debug:[NSString stringWithFormat:@"[BiddingConfig] Generated new install_id: %@", installId]];
+        }
+        
+        CLXBiddingConfigSourceExtCloudX *sourceExtCx = [[CLXBiddingConfigSourceExtCloudX alloc] init];
+        sourceExtCx.install_id = installId;
+        
+        CLXBiddingConfigSourceExt *sourceExt = [[CLXBiddingConfigSourceExt alloc] init];
+        sourceExt.cx = sourceExtCx;
+        source.ext = sourceExt;
+        
         _source = source;
         
         // Read test mode from SDK init configuration
@@ -842,6 +898,19 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
     json[@"format"] = [formatsArray copy];
     
+    // ORTB 2.5: Banner width/height at root level (required by Meta, Mintegral)
+    if (banner.w) {
+        json[@"w"] = banner.w;
+    }
+    if (banner.h) {
+        json[@"h"] = banner.h;
+    }
+    
+    // ORTB 2.5: Banner ID (standard convention: "1" for single banner per impression)
+    if (banner.bannerId) {
+        json[@"id"] = banner.bannerId;
+    }
+    
     // ORTB 2.5: Ad position on screen
     if (banner.pos) {
         json[@"pos"] = banner.pos;
@@ -850,6 +919,17 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
     // ORTB 2.5: Top frame indicator (1 = top frame, 0 = iframe)
     if (banner.topframe) {
         json[@"topframe"] = banner.topframe;
+    }
+    
+    // Banner extension (e.g., bannertype for rewarded ads)
+    if (banner.ext) {
+        NSMutableDictionary *extJson = [NSMutableDictionary dictionary];
+        if (banner.ext.bannertype) {
+            extJson[@"bannertype"] = banner.ext.bannertype;
+        }
+        if (extJson.count > 0) {
+            json[@"ext"] = [extJson copy];
+        }
     }
     
     return [json copy];
@@ -890,6 +970,17 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         json[@"playbackmethod"] = video.playbackmethod;
     }
     
+    // Video extension (e.g., videotype for rewarded ads)
+    if (video.ext) {
+        NSMutableDictionary *extJson = [NSMutableDictionary dictionary];
+        if (video.ext.videotype) {
+            extJson[@"videotype"] = video.ext.videotype;
+        }
+        if (extJson.count > 0) {
+            json[@"ext"] = [extJson copy];
+        }
+    }
+    
     return [json copy];
 }
 
@@ -914,6 +1005,29 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
     // Add SKAdNetwork object for iOS attribution (IAB SKAN spec)
     if (ext.skadn) {
         json[@"skadn"] = [self convertSkadnToJSON:ext.skadn];
+    }
+    
+    // CloudX custom extension fields (imp.ext.cx)
+    if (ext.cx) {
+        NSMutableDictionary *cxJson = [NSMutableDictionary dictionary];
+        if (ext.cx.depth) {
+            cxJson[@"depth"] = ext.cx.depth;
+        }
+        if (ext.cx.format) {
+            cxJson[@"format"] = ext.cx.format;
+        }
+        if (ext.cx.sess_id) {
+            cxJson[@"sess_id"] = ext.cx.sess_id;
+        }
+        if (ext.cx.sess_time) {
+            cxJson[@"sess_time"] = ext.cx.sess_time;
+        }
+        if (ext.cx.placement_id) {
+            cxJson[@"placement_id"] = ext.cx.placement_id;
+        }
+        if (cxJson.count > 0) {
+            json[@"cx"] = [cxJson copy];
+        }
     }
     
     return [json copy];
@@ -1054,6 +1168,9 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         json[@"lmt"] = self.device.lmt;
     }
     
+    // NOTE: device.carrier and device.mccmnc are NOT included.
+    // CTCarrier API was deprecated in iOS 16 and returns nil/empty in iOS 16.4+.
+    
     return [json copy];
 }
 
@@ -1130,6 +1247,18 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
     if (ext.ifv) {
         json[@"ifv"] = ext.ifv;
     }
+    
+    // CloudX custom extension fields (device.ext.cx)
+    if (ext.cx) {
+        NSMutableDictionary *cxJson = [NSMutableDictionary dictionary];
+        if (ext.cx.hw_model) {
+            cxJson[@"hw_model"] = ext.cx.hw_model;
+        }
+        if (cxJson.count > 0) {
+            json[@"cx"] = [cxJson copy];
+        }
+    }
+    
     return [json copy];
 }
 
@@ -1143,6 +1272,13 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         json[@"keywords"] = self.user.keywords;
     }
     
+    // ORTB 2.5: User demographics (set via KV API)
+    if (self.user.gender && self.user.gender.length > 0) {
+        json[@"gender"] = self.user.gender;
+    }
+    if (self.user.yob) {
+        json[@"yob"] = self.user.yob;
+    }
     
     if (self.user.ext) {
         json[@"ext"] = [self convertUserExtToJSON:self.user.ext];
@@ -1257,6 +1393,23 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
     // ORTB 2.5: pchain is the payment ID chain (ads.txt/sellers.json)
     if (self.source.pchain) {
         json[@"pchain"] = self.source.pchain;
+    }
+    
+    // Source extension with CloudX custom fields (source.ext.cx)
+    if (self.source.ext) {
+        NSMutableDictionary *extJson = [NSMutableDictionary dictionary];
+        if (self.source.ext.cx) {
+            NSMutableDictionary *cxJson = [NSMutableDictionary dictionary];
+            if (self.source.ext.cx.install_id) {
+                cxJson[@"install_id"] = self.source.ext.cx.install_id;
+            }
+            if (cxJson.count > 0) {
+                extJson[@"cx"] = [cxJson copy];
+            }
+        }
+        if (extJson.count > 0) {
+            json[@"ext"] = [extJson copy];
+        }
     }
     
     return [json copy];
@@ -1375,6 +1528,28 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
 
 #pragma mark - Source
 @implementation CLXBiddingConfigSource
+@end
+
+@implementation CLXBiddingConfigSourceExt
+@end
+
+@implementation CLXBiddingConfigSourceExtCloudX
+@end
+
+#pragma mark - Extension Classes for New Fields
+@implementation CLXBiddingConfigImpressionBannerExt
+@end
+
+@implementation CLXBiddingConfigImpressionVideoExt
+@end
+
+@implementation CLXBiddingConfigImpressionExtCloudX
+@end
+
+@implementation CLXBiddingConfigDeviceExtCloudX
+@end
+
+@implementation CLXBiddingConfigApplicationPublisherExtInstalledSdk
 @end
 
 #pragma mark - Response

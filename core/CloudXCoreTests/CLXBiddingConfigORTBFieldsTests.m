@@ -675,30 +675,9 @@
     }
 }
 
-#pragma mark - Video Duration and Skip Tests
-
-- (void)testVideoMaxDuration_ForRewarded_ShouldBe60 {
-    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
-    NSDictionary *json = [config json];
-    
-    NSArray *impressions = json[@"imp"];
-    NSDictionary *videoJSON = impressions.firstObject[@"video"];
-    
-    XCTAssertNotNil(videoJSON, @"video object should be present for rewarded ads");
-    XCTAssertNotNil(videoJSON[@"maxduration"], @"video.maxduration should be present");
-    XCTAssertEqualObjects(videoJSON[@"maxduration"], @60, @"video.maxduration should be 60 seconds");
-}
-
-- (void)testVideoMinDuration_ForRewarded_ShouldBe5 {
-    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
-    NSDictionary *json = [config json];
-    
-    NSArray *impressions = json[@"imp"];
-    NSDictionary *videoJSON = impressions.firstObject[@"video"];
-    
-    XCTAssertNotNil(videoJSON[@"minduration"], @"video.minduration should be present");
-    XCTAssertEqualObjects(videoJSON[@"minduration"], @5, @"video.minduration should be 5 seconds");
-}
+#pragma mark - Video Skip Tests (SDK-driven, kept)
+// NOTE: Video policy fields (minduration, maxduration, skipafter, startdelay, playbackmethod, skipmin)
+// are now server-driven and removed from SDK. Only video.skip is still SDK-driven.
 
 - (void)testVideoSkip_ForRewarded_ShouldBeZero {
     CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
@@ -726,54 +705,52 @@
     }
 }
 
-- (void)testVideoSkipAfter_ForRewarded_ShouldBe5 {
+#pragma mark - New Bid Request Parity Fields Tests
+
+- (void)testBannerId_ShouldBeOne {
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    NSDictionary *json = [config json];
+    
+    NSArray *impressions = json[@"imp"];
+    NSDictionary *bannerJSON = impressions.firstObject[@"banner"];
+    
+    XCTAssertNotNil(bannerJSON, @"banner object should be present");
+    // ORTB 2.5: Standard convention for single banner per impression
+    XCTAssertEqualObjects(bannerJSON[@"id"], @"1", @"banner.id should be '1' per ORTB standard convention");
+}
+
+- (void)testBannerWidthHeight_ShouldMatchFormat {
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    NSDictionary *json = [config json];
+    
+    NSArray *impressions = json[@"imp"];
+    NSDictionary *bannerJSON = impressions.firstObject[@"banner"];
+    
+    XCTAssertNotNil(bannerJSON, @"banner object should be present");
+    XCTAssertNotNil(bannerJSON[@"w"], @"banner.w should be present at root level");
+    XCTAssertNotNil(bannerJSON[@"h"], @"banner.h should be present at root level");
+    // Banner size should be 320x50
+    XCTAssertEqualObjects(bannerJSON[@"w"], @320, @"banner.w should match format width");
+    XCTAssertEqualObjects(bannerJSON[@"h"], @50, @"banner.h should match format height");
+}
+
+- (void)testRewardedAds_ShouldHaveVideoNotBanner {
+    // Rewarded ads only have video object, not banner object
+    // This is intentional - rewarded ads are video-based
     CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
     NSDictionary *json = [config json];
     
     NSArray *impressions = json[@"imp"];
+    NSDictionary *bannerJSON = impressions.firstObject[@"banner"];
     NSDictionary *videoJSON = impressions.firstObject[@"video"];
     
-    XCTAssertNotNil(videoJSON[@"skipafter"], @"video.skipafter should be present");
-    XCTAssertEqualObjects(videoJSON[@"skipafter"], @5, @"video.skipafter should be 5 seconds");
+    // Banner should NOT be present for rewarded ads
+    XCTAssertNil(bannerJSON, @"banner should NOT be present for rewarded ads (video-only)");
+    // Video SHOULD be present for rewarded ads
+    XCTAssertNotNil(videoJSON, @"video should be present for rewarded ads");
 }
 
-- (void)testVideoStartDelay_ForRewarded_ShouldBeZero {
-    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
-    NSDictionary *json = [config json];
-    
-    NSArray *impressions = json[@"imp"];
-    NSDictionary *videoJSON = impressions.firstObject[@"video"];
-    
-    // startdelay = 0 means pre-roll (starts immediately)
-    XCTAssertNotNil(videoJSON[@"startdelay"], @"video.startdelay should be present");
-    XCTAssertEqualObjects(videoJSON[@"startdelay"], @0, @"video.startdelay should be 0 (pre-roll)");
-}
-
-- (void)testVideoPlaybackMethod_ForRewarded_ShouldBeAutoPlayWithSound {
-    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
-    NSDictionary *json = [config json];
-    
-    NSArray *impressions = json[@"imp"];
-    NSDictionary *videoJSON = impressions.firstObject[@"video"];
-    
-    // playbackmethod = [1] means auto-play with sound on
-    XCTAssertNotNil(videoJSON[@"playbackmethod"], @"video.playbackmethod should be present");
-    NSArray *methods = videoJSON[@"playbackmethod"];
-    XCTAssertTrue([methods containsObject:@1], @"video.playbackmethod should include 1 (auto-play with sound)");
-}
-
-- (void)testVideoSkipMin_ForRewarded_ShouldBeZero {
-    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
-    NSDictionary *json = [config json];
-    
-    NSArray *impressions = json[@"imp"];
-    NSDictionary *videoJSON = impressions.firstObject[@"video"];
-    
-    XCTAssertNotNil(videoJSON[@"skipmin"], @"video.skipmin should be present");
-    XCTAssertEqualObjects(videoJSON[@"skipmin"], @0, @"video.skipmin should be 0");
-}
-
-- (void)testAllVideoFields_ForRewarded_ShouldBePresent {
+- (void)testVideoExtVideotype_ForRewarded_ShouldBeRewarded {
     CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
     NSDictionary *json = [config json];
     
@@ -781,12 +758,67 @@
     NSDictionary *videoJSON = impressions.firstObject[@"video"];
     
     XCTAssertNotNil(videoJSON, @"video object should be present for rewarded ads");
+    NSDictionary *extJSON = videoJSON[@"ext"];
+    XCTAssertNotNil(extJSON, @"video.ext should be present for rewarded ads");
+    XCTAssertEqualObjects(extJSON[@"videotype"], @"rewarded", @"video.ext.videotype should be 'rewarded'");
+}
+
+- (void)testImpExtCxFormat_ShouldMatchAdType {
+    // Test rewarded
+    CLXBiddingConfigRequest *rewardedConfig = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
+    NSDictionary *rewardedJSON = [rewardedConfig json];
+    NSDictionary *rewardedExt = rewardedJSON[@"imp"][0][@"ext"][@"cx"];
+    XCTAssertEqualObjects(rewardedExt[@"format"], @"rewarded", @"imp.ext.cx.format should be 'rewarded'");
     
-    // All required video fields should be present
-    NSArray *requiredFields = @[@"maxduration", @"minduration", @"skip", @"skipafter", @"skipmin", @"startdelay", @"playbackmethod"];
-    for (NSString *field in requiredFields) {
-        XCTAssertNotNil(videoJSON[field], @"video.%@ should be present", field);
-    }
+    // Test banner
+    CLXBiddingConfigRequest *bannerConfig = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    NSDictionary *bannerJSON = [bannerConfig json];
+    NSDictionary *bannerExt = bannerJSON[@"imp"][0][@"ext"][@"cx"];
+    XCTAssertEqualObjects(bannerExt[@"format"], @"banner", @"imp.ext.cx.format should be 'banner'");
+    
+    // Test interstitial
+    CLXBiddingConfigRequest *interstitialConfig = [self createBiddingConfigWithAdType:CLXAdTypeInterstitial];
+    NSDictionary *interstitialJSON = [interstitialConfig json];
+    NSDictionary *interstitialExt = interstitialJSON[@"imp"][0][@"ext"][@"cx"];
+    XCTAssertEqualObjects(interstitialExt[@"format"], @"interstitial", @"imp.ext.cx.format should be 'interstitial'");
+}
+
+- (void)testImpExtCxPlacementId_ShouldBeSet {
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
+    NSDictionary *json = [config json];
+    
+    NSDictionary *cxExt = json[@"imp"][0][@"ext"][@"cx"];
+    XCTAssertNotNil(cxExt[@"placement_id"], @"imp.ext.cx.placement_id should be present");
+}
+
+- (void)testImpExtCxSessId_ShouldBeUUID {
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
+    NSDictionary *json = [config json];
+    
+    NSDictionary *cxExt = json[@"imp"][0][@"ext"][@"cx"];
+    XCTAssertNotNil(cxExt[@"sess_id"], @"imp.ext.cx.sess_id should be present");
+    // Verify it looks like a UUID (36 chars with hyphens)
+    NSString *sessId = cxExt[@"sess_id"];
+    XCTAssertEqual(sessId.length, 36, @"imp.ext.cx.sess_id should be a UUID (36 characters)");
+}
+
+- (void)testSourceExtCxInstallId_ShouldBePersistentUUID {
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
+    NSDictionary *json = [config json];
+    
+    NSDictionary *sourceExt = json[@"source"][@"ext"][@"cx"];
+    XCTAssertNotNil(sourceExt[@"install_id"], @"source.ext.cx.install_id should be present");
+    // Verify it looks like a UUID (36 chars with hyphens)
+    NSString *installId = sourceExt[@"install_id"];
+    XCTAssertEqual(installId.length, 36, @"source.ext.cx.install_id should be a UUID (36 characters)");
+}
+
+- (void)testDeviceExtCxHwModel_ShouldBePresent {
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
+    NSDictionary *json = [config json];
+    
+    NSDictionary *deviceExt = json[@"device"][@"ext"][@"cx"];
+    XCTAssertNotNil(deviceExt[@"hw_model"], @"device.ext.cx.hw_model should be present");
 }
 
 @end
