@@ -92,6 +92,59 @@
     XCTAssertTrue([description containsString:@"requiresPiiRemoval=1"], @"Description should contain PII removal flag");
 }
 
+#pragma mark - TCF (GDPR) Consent Tests
+
+// Test TCF consent with all purposes and vendor consent granted
+- (void)testTcfConsent_AllGranted_NoPiiRemoval {
+    CLXPrivacyConsent *consent = [[CLXPrivacyConsent alloc] initWithPurpose1:@YES
+                                                                    purpose2:@YES
+                                                               vendorConsent:@YES];
+    XCTAssertFalse([consent requiresPiiRemoval], @"All TCF consent granted should not require PII removal");
+}
+
+// Test TCF consent with purpose 1 denied
+- (void)testTcfConsent_Purpose1Denied_RequiresPiiRemoval {
+    CLXPrivacyConsent *consent = [[CLXPrivacyConsent alloc] initWithPurpose1:@NO
+                                                                    purpose2:@YES
+                                                               vendorConsent:@YES];
+    XCTAssertTrue([consent requiresPiiRemoval], @"Purpose 1 denied should require PII removal");
+}
+
+// Test TCF consent with purpose 2 denied
+- (void)testTcfConsent_Purpose2Denied_RequiresPiiRemoval {
+    CLXPrivacyConsent *consent = [[CLXPrivacyConsent alloc] initWithPurpose1:@YES
+                                                                    purpose2:@NO
+                                                               vendorConsent:@YES];
+    XCTAssertTrue([consent requiresPiiRemoval], @"Purpose 2 denied should require PII removal");
+}
+
+// Test TCF consent with vendor consent denied
+- (void)testTcfConsent_VendorDenied_RequiresPiiRemoval {
+    CLXPrivacyConsent *consent = [[CLXPrivacyConsent alloc] initWithPurpose1:@YES
+                                                                    purpose2:@YES
+                                                               vendorConsent:@NO];
+    XCTAssertTrue([consent requiresPiiRemoval], @"Vendor consent denied should require PII removal");
+}
+
+// Test TCF consent with nil values (lenient interpretation - consent granted)
+- (void)testTcfConsent_NilValues_NoPiiRemoval {
+    CLXPrivacyConsent *consent = [[CLXPrivacyConsent alloc] initWithPurpose1:nil
+                                                                    purpose2:nil
+                                                               vendorConsent:nil];
+    // When all values are nil, it means "no data at all" which is not an opt-out
+    // iOS is lenient here - only triggers strict check if sharingOptOut has value but saleOptOut is nil
+    XCTAssertFalse([consent requiresPiiRemoval], @"All nil values means no data, not opt-out");
+}
+
+// Test TCF consent with some nil values
+- (void)testTcfConsent_PartialNil_NoPiiRemoval {
+    CLXPrivacyConsent *consent = [[CLXPrivacyConsent alloc] initWithPurpose1:@YES
+                                                                    purpose2:nil
+                                                               vendorConsent:@YES];
+    // Some TCF fields set, so not CCPA consent, nil treated as granted
+    XCTAssertFalse([consent requiresPiiRemoval], @"Partial nil with YES values should not require PII removal");
+}
+
 // Test edge cases for PII removal logic
 - (void)testPiiRemovalEdgeCases {
     // Test with various numeric values beyond 0, 1, 2

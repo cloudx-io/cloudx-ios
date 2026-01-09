@@ -29,6 +29,32 @@ static NSInteger const kCloudXVendorId = 1510;
 
 // TCF v2 Core String bit offsets (per IAB spec)
 // https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20Consent%20string%20and%20vendor%20list%20formats%20v2.md
+//
+// Core String bit structure (identical for TCF v2.0, v2.1, v2.2):
+// Field                      | Bits | Offset | Type
+// ---------------------------|------|--------|-------
+// Version                    | 6    | 0      | Int
+// Created                    | 36   | 6      | Datetime
+// LastUpdated                | 36   | 42     | Datetime
+// CmpId                      | 12   | 78     | Int
+// CmpVersion                 | 12   | 90     | Int
+// ConsentScreen              | 6    | 102    | Int
+// ConsentLanguage            | 12   | 108    | String (2 char)
+// VendorListVersion          | 12   | 120    | Int
+// TcfPolicyVersion           | 6    | 132    | Int (2=v2.0, 3=v2.1, 4=v2.2)
+// IsServiceSpecific          | 1    | 138    | Boolean
+// UseNonStandardStacks       | 1    | 139    | Boolean
+// SpecialFeatureOptIns       | 12   | 140    | BitField
+// PurposesConsent            | 24   | 152    | BitField (Purposes 1-24)
+// PurposesLITransparency     | 24   | 176    | BitField
+// PurposeOneTreatment        | 1    | 200    | Boolean
+// PublisherCC                | 12   | 201    | String (2 char)
+// MaxVendorId                | 16   | 213    | Int
+// EncodingType               | 1    | 229    | Boolean (0=BitField, 1=Range)
+// [Vendor Consent Section]   | var  | 230+   | BitField or Range
+//
+// NOTE: These offsets are FIXED across all TCF v2 versions. The TcfPolicyVersion field
+// has ALWAYS existed at offset 132 - its VALUE indicates the version (2, 3, or 4).
 static NSUInteger const kTCFPurposeConsentOffset = 152;     // Purposes 1-24 (24 bits)
 static NSUInteger const kTCFMaxVendorIdOffset = 213;        // MaxVendorId (16 bits)
 static NSUInteger const kTCFMaxVendorIdLength = 16;
@@ -426,6 +452,16 @@ static NSUInteger const kTCFVendorConsentOffset = 230;      // Vendor consent se
     }
 }
 
+/**
+ * Decodes a TCF v2 consent string.
+ *
+ * CloudX requires purposes 1 and 2 per IAB GVL registration:
+ * - Purpose 1: Store and/or access information on a device
+ * - Purpose 2: Select basic ads
+ *
+ * @param tcString The base64url-encoded TC string (may include additional segments separated by '.')
+ * @return CLXPrivacyConsent with purpose and vendor consent, or nil on error
+ */
 - (nullable CLXPrivacyConsent *)decodeTcString:(NSString *)tcString {
     if (!tcString || tcString.length == 0) {
         [self.logger error:@"Cannot decode nil or empty TCF string"];
@@ -433,33 +469,47 @@ static NSUInteger const kTCFVendorConsentOffset = 230;      // Vendor consent se
     }
     
     @try {
-        NSString *bits = [self base64UrlToBits:tcString];
+        // TCF strings can have multiple segments separated by '.'
+        // Core string is always the first segment - extract it for decoding
+        NSString *coreString = tcString;
+        NSRange dotRange = [tcString rangeOfString:@"."];
+        if (dotRange.location != NSNotFound) {
+            coreString = [tcString substringToIndex:dotRange.location];
+            [self.logger debug:[NSString stringWithFormat:@"Extracted core string from TCF (had %lu segments)",
+                               (unsigned long)[[tcString componentsSeparatedByString:@"."] count]]];
+        }
+        
+        NSString *bits = [self base64UrlToBits:coreString];
         if (!bits) {
-            [self.logger error:@"Failed to decode TCF string to bits"];
-            return nil;
+            [self.logger error:@"Failed to decode TCF string to bits - returning fail-safe consent (PII removal required)"];
+            // Fail-safe: return consent that requires PII removal when we can't parse the TCF string
+            return [[CLXPrivacyConsent alloc] initWithPurpose1:@NO purpose2:@NO vendorConsent:@NO];
         }
         
         [self.logger debug:[NSString stringWithFormat:@"Decoded TCF bit string length: %lu bits", (unsigned long)bits.length]];
         
-        // Read purpose consents (purposes 1-2 only)
-        // Only purposes 1-2 are required for basic ad serving (contextual ads)
-        // Purposes 3-4 (personalization) are not checked since CloudX serves contextual ads
+        // Read purpose consents directly from TC string bits (matching Android approach)
+        // Purpose 1 = bit at offset 152, Purpose 2 = bit at offset 153
         NSNumber *purpose1 = [self readBitAsBool:bits index:kTCFPurposeConsentOffset];
         NSNumber *purpose2 = [self readBitAsBool:bits index:kTCFPurposeConsentOffset + 1];
         
         // Read vendor consent for CloudX (Vendor ID 1510)
         NSNumber *vendorConsent = [self parseVendorConsent:bits vendorId:kCloudXVendorId];
         
+        [self.logger debug:[NSString stringWithFormat:@"TCF consent - P1:%@ P2:%@ Vendor:%@ (CloudX ID %ld)",
+                           purpose1, purpose2, vendorConsent, (long)kCloudXVendorId]];
+        
         CLXPrivacyConsent *consent = [[CLXPrivacyConsent alloc] initWithPurpose1:purpose1
                                                                         purpose2:purpose2
                                                                    vendorConsent:vendorConsent];
         
-        [self.logger debug:[NSString stringWithFormat:@"TCF decoded: %@", consent]];
+        [self.logger debug:[NSString stringWithFormat:@"TCF decoded: requiresPiiRemoval=%@", [consent requiresPiiRemoval] ? @"YES" : @"NO"]];
         return consent;
     } @catch (NSException *exception) {
-        [self.logger error:[NSString stringWithFormat:@"TCF string decode failed: %@", exception.reason]];
+        [self.logger error:[NSString stringWithFormat:@"TCF string decode failed: %@ - returning fail-safe consent (PII removal required)", exception.reason]];
         [self reportException:exception context:@{@"operation": @"decodeTcString"}];
-        return nil;
+        // Fail-safe: return consent that requires PII removal when parsing fails
+        return [[CLXPrivacyConsent alloc] initWithPurpose1:@NO purpose2:@NO vendorConsent:@NO];
     }
 }
 
@@ -518,7 +568,11 @@ static NSUInteger const kTCFVendorConsentOffset = 230;      // Vendor consent se
 
 /**
  * Parses vendor consent section from TCF v2 Core String.
- * The vendor consent section can be encoded as BitField or Range.
+ *
+ * The vendor consent section starts at bit 230 (after all fixed fields).
+ * It can be encoded in two ways:
+ * - BitField (EncodingType=0): A bit array where bit i = consent for vendor i+1
+ * - Range (EncodingType=1): Optimized encoding with ranges of vendor IDs
  */
 - (nullable NSNumber *)parseVendorConsent:(NSString *)bits vendorId:(NSInteger)vendorId {
     @try {
@@ -535,6 +589,8 @@ static NSUInteger const kTCFVendorConsentOffset = 230;      // Vendor consent se
         }
         
         BOOL isRangeEncoding = [bits characterAtIndex:kTCFEncodingTypeOffset] == '1';
+        [self.logger debug:[NSString stringWithFormat:@"Vendor consent: MaxVendorId=%ld, EncodingType=%@",
+                           (long)maxVendorId, isRangeEncoding ? @"Range" : @"BitField"]];
         
         if (isRangeEncoding) {
             return [self parseVendorConsentRange:bits vendorId:vendorId offset:kTCFVendorConsentOffset];

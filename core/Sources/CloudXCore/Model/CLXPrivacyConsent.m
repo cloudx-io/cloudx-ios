@@ -49,8 +49,7 @@
     
     // GDPR/TCF: Personal data must be cleared if purpose 1 or 2 is explicitly denied (value = NO)
     // Note: nil values are treated as consent granted (lenient interpretation per IAB guidance)
-    // Only purposes 1-2 are checked for basic ad serving (contextual ads)
-    // Purposes 3-4 (personalization) are not required since CloudX serves contextual ads
+    // CloudX only requires purposes 1 and 2 per IAB GVL registration.
     if (self.purpose1 && ![self.purpose1 boolValue]) return YES;
     if (self.purpose2 && ![self.purpose2 boolValue]) return YES;
     

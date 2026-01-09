@@ -90,8 +90,7 @@ typedef NS_ENUM(NSInteger, CLXGppTarget) {
  * @param purpose2 Purpose 2 consent (select basic ads)
  * @param vendorConsent Vendor consent for CloudX (Vendor ID 1510)
  * @return Initialized consent object for GDPR/TCF
- * @note Only purposes 1-2 are checked for basic ad serving. Purposes 3-4 (personalization)
- *       are not required since CloudX serves contextual ads, not personalized ads.
+ * @note CloudX only requires purposes 1 and 2 per IAB GVL registration.
  */
 - (instancetype)initWithPurpose1:(nullable NSNumber *)purpose1
                         purpose2:(nullable NSNumber *)purpose2

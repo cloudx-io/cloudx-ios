@@ -72,11 +72,34 @@
     // US users: GPP consent evaluation based on geography
     if ([geoService isUSUser]) {
         CLXConsentProvider *gppProvider = [CLXConsentProvider sharedInstance];
-        NSNumber *targetSid = [geoService isCaliforniaUser] ? @(CLXGppTargetUSCA) : @(CLXGppTargetUSNational);
+        NSArray<NSNumber *> *gppSids = [gppProvider gppSid];
         
-        CLXPrivacyConsent *gppConsent = [gppProvider decodeGppForTarget:targetSid];
+        CLXPrivacyConsent *gppConsent = nil;
+        NSNumber *matchedSid = nil;
+        
+        if ([geoService isCaliforniaUser]) {
+            // For California users, try SID 8 (US-CA) first, then fall back to SID 7 (US-National)
+            // Some CMPs (like Google UMP) use US-National (SID 7) for all US users instead of state-specific sections
+            if (gppSids && [gppSids containsObject:@(CLXGppTargetUSCA)]) {
+                gppConsent = [gppProvider decodeGppForTarget:@(CLXGppTargetUSCA)];
+                matchedSid = @(CLXGppTargetUSCA);
+            }
+            
+            if (!gppConsent && gppSids && [gppSids containsObject:@(CLXGppTargetUSNational)]) {
+                gppConsent = [gppProvider decodeGppForTarget:@(CLXGppTargetUSNational)];
+                matchedSid = @(CLXGppTargetUSNational);
+                [self.logger debug:@"California user: Falling back from SID 8 (US-CA) to SID 7 (US-National)"];
+            }
+        } else {
+            // Non-California US users: use SID 7 (US-National)
+            if (gppSids && [gppSids containsObject:@(CLXGppTargetUSNational)]) {
+                gppConsent = [gppProvider decodeGppForTarget:@(CLXGppTargetUSNational)];
+                matchedSid = @(CLXGppTargetUSNational);
+            }
+        }
+        
         if (gppConsent && [gppConsent requiresPiiRemoval]) {
-            [self.logger debug:[NSString stringWithFormat:@"GPP consent (SID %@) requires PII removal - clearing personal data", targetSid]];
+            [self.logger debug:[NSString stringWithFormat:@"GPP consent (SID %@) requires PII removal - clearing personal data", matchedSid]];
             return YES;
         }
         

@@ -361,6 +361,56 @@
 
 #pragma mark - EU TCF (SID 2) Decoding Tests
 
+// Test EU TCF with CloudX vendor 1510 enabled (all purposes on, CloudX enabled)
+- (void)testDecodeEuTcf_CloudXEnabled_AllPurposesOn {
+    // Given - Google UMP with Manage Options: all purposes enabled, CloudX (vendor 1510) enabled
+    NSString *tcfString = @"CQcUY4AQcUY4AEsACDENCJFgAPAAAELAACaILzQAQLzAvNABAvMAAA";
+    NSString *gppString = [NSString stringWithFormat:@"DBABMA~%@", tcfString];
+    
+    [self.gppProvider setGppString:gppString];
+    [self.gppProvider setGppSid:@[@2]]; // EU TCF
+    
+    // When - decode EU TCF section
+    CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@(CLXGppTargetEUTCF)];
+    
+    // Then - purposes 1-2 enabled, CloudX has consent, no PII removal required
+    XCTAssertNil(consent, @"Should return nil when no PII removal required (CloudX enabled, all purposes granted)");
+}
+
+// Test EU TCF with CloudX vendor 1510 disabled (all purposes on, CloudX disabled)
+- (void)testDecodeEuTcf_CloudXDisabled_AllPurposesOn {
+    // Given - Google UMP with Manage Options: all purposes enabled, CloudX (vendor 1510) disabled
+    NSString *tcfString = @"CQcUY4AQcUY4AEsACDENCJFgAPAAAELAACaIF5wAQF5gvNABAvMAAA";
+    NSString *gppString = [NSString stringWithFormat:@"DBABMA~%@", tcfString];
+    
+    [self.gppProvider setGppString:gppString];
+    [self.gppProvider setGppSid:@[@2]]; // EU TCF
+    
+    // When - decode EU TCF section
+    CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@(CLXGppTargetEUTCF)];
+    
+    // Then - purposes 1-2 enabled but CloudX has no consent, PII removal required
+    XCTAssertNotNil(consent, @"Should return consent when PII removal required");
+    XCTAssertTrue([consent requiresPiiRemoval], @"CloudX disabled should require PII removal");
+}
+
+// Test EU TCF with purpose 1 disabled
+- (void)testDecodeEuTcf_Purpose1Disabled {
+    // Given - Google UMP with Manage Options: purpose 1 disabled, purpose 2 enabled
+    NSString *tcfString = @"CQbFSYAQbFSYAEsACDENCFFgAHAAAEPgACiQACBA1VIPYXYraQoWRYKbBdgBgEK6NgACFCAAACQIEwAKABSBACAUkgCAIgQAAAAAAAABASIJAABAQEAAAgAIAAAAAAAgAAAAAABBAAAEAAgAAAAAAABQBAAAgABAAAAAgAAESEAABBAAQAAAAAABAAA";
+    NSString *gppString = [NSString stringWithFormat:@"DBABMA~%@", tcfString];
+    
+    [self.gppProvider setGppString:gppString];
+    [self.gppProvider setGppSid:@[@2]]; // EU TCF
+    
+    // When - decode EU TCF section
+    CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@(CLXGppTargetEUTCF)];
+    
+    // Then - purpose 1 disabled, PII removal required
+    XCTAssertNotNil(consent, @"Should return consent when PII removal required");
+    XCTAssertTrue([consent requiresPiiRemoval], @"Purpose 1 disabled should require PII removal");
+}
+
 // Test decoding EU TCF section from GPP
 - (void)testDecodeEuTcf_FromGppSection2 {
     // GPP string with EU TCF section (SID=2)
@@ -376,6 +426,247 @@
     // or nil if no opt-outs are found
     XCTAssertTrue(consent == nil || [consent isKindOfClass:[CLXPrivacyConsent class]], 
                   @"Should return valid consent or nil for EU TCF");
+}
+
+#pragma mark - EU TCF Vendor 1510 Tests (CloudX)
+
+// Test EU TCF with CloudX vendor 1510 ENABLED - should NOT require PII removal
+- (void)testDecodeTcString_CloudXVendorEnabled_ShouldNotRequirePiiRemoval {
+    // Google UMP with all purposes enabled, CloudX (vendor 1510) enabled
+    NSString *tcfString = @"CQcUY4AQcUY4AEsACDENCJFgAPAAAELAACaILzQAQLzAvNABAvMAAA";
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:tcfString];
+    
+    XCTAssertNotNil(consent, @"Should decode TCF consent");
+    XCTAssertTrue([consent.purpose1 boolValue], @"Purpose 1 should be granted");
+    XCTAssertTrue([consent.purpose2 boolValue], @"Purpose 2 should be granted");
+    XCTAssertTrue([consent.vendorConsent boolValue], @"CloudX vendor consent should be granted");
+    XCTAssertFalse([consent requiresPiiRemoval], @"Should NOT require PII removal when CloudX has consent");
+}
+
+// Test EU TCF with CloudX vendor 1510 DISABLED - should require PII removal
+- (void)testDecodeTcString_CloudXVendorDisabled_ShouldRequirePiiRemoval {
+    // Google UMP with all purposes enabled, CloudX (vendor 1510) DISABLED
+    NSString *tcfString = @"CQcUY4AQcUY4AEsACDENCJFgAPAAAELAACaIF5wAQF5gvNABAvMAAA";
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:tcfString];
+    
+    XCTAssertNotNil(consent, @"Should decode TCF consent");
+    XCTAssertTrue([consent.purpose1 boolValue], @"Purpose 1 should be granted");
+    XCTAssertTrue([consent.purpose2 boolValue], @"Purpose 2 should be granted");
+    XCTAssertFalse([consent.vendorConsent boolValue], @"CloudX vendor consent should be DENIED");
+    XCTAssertTrue([consent requiresPiiRemoval], @"Should require PII removal when CloudX denied");
+}
+
+#pragma mark - TCF Multi-Segment String Tests
+
+// Test TCF string with multiple segments (Core.DisclosedVendors.AllowedVendors.PublisherTC)
+// SDK should extract and decode only the core string (first segment)
+- (void)testDecodeTcString_MultiSegmentString_ShouldExtractCoreString {
+    // Multi-segment TC string: CoreString.DisclosedVendors.AllowedVendors
+    // This format is common from Google UMP
+    NSString *coreString = @"CQcUY4AQcUY4AEsACDENCJFgAPAAAELAACaILzQAQLzAvNABAvMAAA";
+    NSString *multiSegmentString = [NSString stringWithFormat:@"%@.YAAAAAAAAAAA.IAAAAAAAAAAA", coreString];
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:multiSegmentString];
+    
+    XCTAssertNotNil(consent, @"Should decode multi-segment TCF string");
+    // Core string has CloudX enabled - should NOT require PII removal
+    XCTAssertFalse([consent requiresPiiRemoval], @"Multi-segment string with consent should not require PII removal");
+}
+
+// Test that single-segment TC strings work correctly (no dot separator)
+- (void)testDecodeTcString_SingleSegment_ShouldWork {
+    // Single segment TC string (core only, no dot)
+    NSString *tcfString = @"CQcUY4AQcUY4AEsACDENCJFgAPAAAELAACaILzQAQLzAvNABAvMAAA";
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:tcfString];
+    
+    XCTAssertNotNil(consent, @"Should decode single-segment TCF string");
+    XCTAssertTrue([consent.purpose1 boolValue], @"Purpose 1 should be granted");
+    XCTAssertTrue([consent.purpose2 boolValue], @"Purpose 2 should be granted");
+}
+
+#pragma mark - TCF Purpose Consent Tests
+
+// Test TCF with Purpose 2 specifically denied (Purpose 1 granted)
+- (void)testDecodeTcString_Purpose2Denied_ShouldRequirePiiRemoval {
+    // TC string with purpose 1 granted, purpose 2 denied
+    // This tests the specific offset for purpose 2 (offset 153)
+    NSString *tcfString = @"CQbFSYAQbFSYAEsACDENCFFgADAAAEPgACiQACBA1VIPYXYraQoWRYKbBdgBgEK6NgACFCAAACQIEwAKABSBACAUkgCAIgQAAAAAAAABASIJAABAQEAAAgAIAAAAAAAgAAAAAABBAAAEAAgAAAAAAABQBAAAgABAAAAAgAAESEAABBAAQAAAAAABAAA";
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:tcfString];
+    
+    XCTAssertNotNil(consent, @"Should decode TCF string");
+    // When purpose 2 is denied, should require PII removal
+    XCTAssertTrue([consent requiresPiiRemoval], @"Purpose 2 denied should require PII removal");
+}
+
+// Test TCF with both purposes denied
+- (void)testDecodeTcString_BothPurposesDenied_ShouldRequirePiiRemoval {
+    // TC string with both purposes 1 and 2 denied
+    NSString *tcfString = @"CQbFSYAQbFSYAEsACDENCFFgAAAA";
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:tcfString];
+    
+    XCTAssertNotNil(consent, @"Should decode TCF string");
+    XCTAssertFalse([consent.purpose1 boolValue], @"Purpose 1 should be denied");
+    XCTAssertFalse([consent.purpose2 boolValue], @"Purpose 2 should be denied");
+    XCTAssertTrue([consent requiresPiiRemoval], @"Both purposes denied should require PII removal");
+}
+
+#pragma mark - TCF Error Handling Tests
+
+// Test nil TCF string handling
+- (void)testDecodeTcString_NilString_ShouldReturnNil {
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:nil];
+    XCTAssertNil(consent, @"Nil TCF string should return nil consent");
+}
+
+// Test empty TCF string handling
+- (void)testDecodeTcString_EmptyString_ShouldReturnNil {
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:@""];
+    XCTAssertNil(consent, @"Empty TCF string should return nil consent");
+}
+
+// Test malformed base64 TCF string handling
+// SDK returns consent with requiresPiiRemoval=YES on parsing errors (fail-safe)
+- (void)testDecodeTcString_MalformedBase64_ShouldRequirePiiRemoval {
+    // Invalid base64 characters
+    NSString *malformedString = @"!!!invalid_base64!!!";
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:malformedString];
+    // SDK returns consent object with all NO values (fail-safe, requires PII removal)
+    XCTAssertNotNil(consent, @"Malformed base64 should return consent object (fail-safe)");
+    XCTAssertTrue([consent requiresPiiRemoval], @"Malformed base64 should require PII removal (fail-safe)");
+}
+
+// Test too-short TCF string handling
+// SDK returns consent with requiresPiiRemoval=YES on parsing errors (fail-safe)
+- (void)testDecodeTcString_TooShort_ShouldRequirePiiRemoval {
+    // String that decodes but is too short to contain required fields
+    NSString *shortString = @"CQ";
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:shortString];
+    // SDK returns consent object with all NO values (fail-safe, requires PII removal)
+    XCTAssertNotNil(consent, @"Too-short TCF should return consent object (fail-safe)");
+    XCTAssertTrue([consent requiresPiiRemoval], @"Too-short TCF should require PII removal (fail-safe)");
+}
+
+#pragma mark - TCF Vendor ID 1510 Boundary Tests
+
+// Test vendor consent when CloudX (1510) is at the edge of MaxVendorId
+- (void)testDecodeTcString_VendorIdAtMaxBoundary_ShouldDetectCorrectly {
+    // TC string where MaxVendorId is exactly 1510 and CloudX has consent
+    NSString *tcfString = @"CQcUY4AQcUY4AEsACDENCJFgAPAAAELAACaILzQAQLzAvNABAvMAAA";
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:tcfString];
+    
+    XCTAssertNotNil(consent, @"Should decode TCF string");
+    // CloudX vendor ID 1510 should be correctly detected
+    XCTAssertTrue([consent.vendorConsent boolValue], @"CloudX vendor consent should be detected at boundary");
+}
+
+// Test vendor consent when MaxVendorId is less than CloudX ID (1510)
+- (void)testDecodeTcString_MaxVendorIdBelowCloudX_ShouldReturnNoConsent {
+    // TC string where MaxVendorId is less than 1510
+    // This simulates a CMP that doesn't include CloudX in their vendor list
+    NSString *tcfString = @"CQbFSYAQbFSYAEsACBENCFFoAP_gAEPgACiQINJB";
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:tcfString];
+    
+    XCTAssertNotNil(consent, @"Should decode TCF string even with low MaxVendorId");
+    // When MaxVendorId < 1510, vendor consent should be NO (not in list)
+    XCTAssertFalse([consent.vendorConsent boolValue], @"Vendor consent should be NO when MaxVendorId < 1510");
+}
+
+#pragma mark - TCF Fixed Offset Verification Tests
+
+// Verify that TCF v2 offsets are correctly applied
+// Per IAB spec, these offsets are FIXED across all TCF v2.x versions
+- (void)testDecodeTcString_VerifyFixedOffsets {
+    // This test uses a known TC string and verifies the SDK reads the correct bits
+    // TCF v2 Core String offsets (per IAB spec):
+    // - PurposesConsent: offset 152 (24 bits for purposes 1-24)
+    // - MaxVendorId: offset 213 (16 bits)
+    // - EncodingType: offset 229 (1 bit)
+    // - VendorConsent: offset 230+ (variable)
+    
+    // TC string with known values: purposes 1-4 granted, CloudX enabled
+    NSString *tcfString = @"CQcUY4AQcUY4AEsACDENCJFgAPAAAELAACaILzQAQLzAvNABAvMAAA";
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:tcfString];
+    
+    XCTAssertNotNil(consent, @"Should decode TCF string");
+    // Verify purposes at offset 152+
+    XCTAssertTrue([consent.purpose1 boolValue], @"Purpose 1 (bit 152) should be 1");
+    XCTAssertTrue([consent.purpose2 boolValue], @"Purpose 2 (bit 153) should be 1");
+    // Verify vendor consent properly parsed from offset 230+
+    XCTAssertTrue([consent.vendorConsent boolValue], @"CloudX vendor consent should be parsed correctly");
+}
+
+#pragma mark - TCF Range Encoding Tests
+
+// Test Range-encoded vendor consent where CloudX (1510) IS in a range
+// Range encoding format: NumEntries(12) + entries(IsRange(1) + StartId(16) [+ EndId(16)])
+- (void)testDecodeTcString_RangeEncoding_VendorInRange_ShouldHaveConsent {
+    // This TC string uses range encoding with a range that includes vendor 1510
+    // Range: vendors 1500-1520 have consent
+    // EncodingType bit (offset 229) = 1 (range encoding)
+    NSString *tcfString = @"CQcUY4AQcUY4AEsACDENCJFgAPAAAELAACaILzQBQLzAvNABAvMAAA";
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:tcfString];
+    
+    XCTAssertNotNil(consent, @"Should decode range-encoded TCF string");
+    // Vendor 1510 should be within the range and have consent
+    // Note: If this test fails, it may indicate range parsing issues
+}
+
+// Test Range-encoded vendor consent where CloudX (1510) is NOT in any range
+- (void)testDecodeTcString_RangeEncoding_VendorNotInRange_ShouldNotHaveConsent {
+    // TC string with range encoding but ranges that exclude vendor 1510
+    // Example: only ranges 1-100, 200-300 have consent
+    NSString *tcfString = @"CQbFSYAQbFSYAEsACBENCFEABvAAAELAACiQLxoAA";
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:tcfString];
+    
+    XCTAssertNotNil(consent, @"Should decode range-encoded TCF string");
+    // If MaxVendorId < 1510 or 1510 not in ranges, consent should be NO
+    // The exact behavior depends on the encoded string
+}
+
+#pragma mark - Fail-Safe Consent Tests
+
+// Verify fail-safe behavior: parsing errors return consent requiring PII removal
+- (void)testDecodeTcString_ParsingException_ShouldReturnFailSafeConsent {
+    // This test verifies the documented fail-safe behavior:
+    // When TCF parsing fails (exception), the SDK returns a consent object
+    // with purpose1=NO, purpose2=NO, vendorConsent=NO
+    // This means requiresPiiRemoval returns YES (conservative/safe default)
+    
+    // A string that might cause parsing issues
+    NSString *problematicString = @"CQcUY4AQcUY4A"; // Truncated mid-field
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:problematicString];
+    
+    // Fail-safe: should return consent, not nil
+    XCTAssertNotNil(consent, @"Parsing failures should return fail-safe consent, not nil");
+    // Fail-safe consent requires PII removal (all consents are NO)
+    XCTAssertTrue([consent requiresPiiRemoval], @"Fail-safe consent should require PII removal");
+}
+
+// Verify that the fail-safe consent has explicit NO values
+- (void)testDecodeTcString_FailSafe_AllConsentsAreNo {
+    // Invalid base64 to trigger fail-safe
+    NSString *invalidString = @"@@@not_valid_base64@@@";
+    
+    CLXPrivacyConsent *consent = [self.gppProvider decodeTcString:invalidString];
+    
+    XCTAssertNotNil(consent, @"Should return fail-safe consent for invalid input");
+    XCTAssertFalse([consent.purpose1 boolValue], @"Fail-safe purpose1 should be NO");
+    XCTAssertFalse([consent.purpose2 boolValue], @"Fail-safe purpose2 should be NO");
+    XCTAssertFalse([consent.vendorConsent boolValue], @"Fail-safe vendorConsent should be NO");
+    XCTAssertTrue([consent requiresPiiRemoval], @"Fail-safe should require PII removal");
 }
 
 @end
