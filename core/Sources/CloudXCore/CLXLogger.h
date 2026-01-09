@@ -10,7 +10,8 @@ typedef NS_ENUM(NSInteger, CLXLogLevel) {
     CLXLogLevelDebug = 1,
     CLXLogLevelInfo = 2,
     CLXLogLevelWarn = 3,
-    CLXLogLevelError = 4
+    CLXLogLevelError = 4,
+    CLXLogLevelNone = 5    // Disables all logging
 };
 
 typedef NS_ENUM(NSInteger, CLXLogEmoji) {
@@ -63,14 +64,9 @@ typedef NS_ENUM(NSInteger, CLXLogEmoji) {
 - (void)logDelegateError:(NSString *)callbackName error:(nullable CLXError *)error;
 
 /**
- * Enable or disable logging dynamically
- * @param enabled YES to enable logging, NO to disable
- */
-- (void)setLoggingEnabled:(BOOL)enabled;
-
-/**
  * Set the minimum log level. Messages below this level will be suppressed.
  * @param minLogLevel The minimum log level (CLXLogLevel)
+ * @discussion Use CLXLogLevelNone to disable all logging.
  */
 - (void)setMinLogLevel:(CLXLogLevel)minLogLevel;
 

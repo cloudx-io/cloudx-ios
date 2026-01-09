@@ -194,18 +194,10 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 #pragma mark - Logging Control
 
 /**
- * Enable or disable SDK logging
- * @param enabled YES to enable logging, NO to disable
- * @discussion Controls verbose logging output from the SDK. Disabled by default in production.
- * Call this method early in your app lifecycle, before SDK initialization, to see all logs.
- */
-+ (void)setLoggingEnabled:(BOOL)enabled;
-
-/**
  * Set minimum log level for SDK logging
- * @param minLogLevel The minimum log level (CLXLogLevelVerbose, CLXLogLevelDebug, CLXLogLevelInfo, CLXLogLevelWarn, CLXLogLevelError)
+ * @param minLogLevel The minimum log level (CLXLogLevelVerbose, CLXLogLevelDebug, CLXLogLevelInfo, CLXLogLevelWarn, CLXLogLevelError, CLXLogLevelNone)
  * @discussion Controls which log messages are displayed. Only logs at or above this level will be shown.
- * Call this method early in your app lifecycle, before SDK initialization.
+ * Use CLXLogLevelNone to disable all logging. Call this method early in your app lifecycle.
  */
 + (void)setMinLogLevel:(CLXLogLevel)minLogLevel;
 

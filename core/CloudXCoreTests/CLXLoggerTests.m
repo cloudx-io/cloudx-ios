@@ -14,7 +14,6 @@
 
 @interface CLXLoggerTests : XCTestCase
 @property (nonatomic, strong) CLXLogger *logger;
-@property (nonatomic, strong) NSMutableArray<NSString *> *capturedLogs;
 @end
 
 @implementation CLXLoggerTests
@@ -22,7 +21,6 @@
 - (void)setUp {
     [super setUp];
     self.logger = [[CLXLogger alloc] initWithCategory:@"test"];
-    self.capturedLogs = [NSMutableArray array];
     
     // IMPORTANT: Disable testMode first to stop other tests from logging
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kCLXCoreTestModeKey];
@@ -32,8 +30,7 @@
     [[CLXLogStore shared] flush];
     [[CLXLogStore shared] clear];
     
-    // Reset to default state
-    [CloudXCore setLoggingEnabled:YES];
+    // Reset to default state (verbose shows all logs)
     [CloudXCore setMinLogLevel:CLXLogLevelVerbose];
 }
 
@@ -45,141 +42,167 @@
     // Wait for any pending operations, then clear
     [[CLXLogStore shared] flush];
     [[CLXLogStore shared] clear];
-    
-    self.capturedLogs = nil;
+
     self.logger = nil;
     [super tearDown];
 }
 
 #pragma mark - setMinLogLevel Tests
 
-// Test that ERROR level suppresses all lower priority logs
-- (void)testSetMinLogLevel_ERROR_SuppressesDebugAndInfo {
-    // Given: Min log level set to ERROR
-    [CloudXCore setMinLogLevel:CLXLogLevelError];
-    [CloudXCore setLoggingEnabled:YES];
-    
-    // When: Logging at different levels
-    // Debug and Info should be suppressed, Error should pass through
-    [self.logger debug:@"Debug message"];
-    [self.logger info:@"Info message"];
-    [self.logger error:@"Error message"];
-    
-    // Then: Only error should be logged (verified visually in console)
-    // This test verifies the method doesn't crash and filtering logic executes
-    XCTAssertTrue(YES, @"setMinLogLevel ERROR completed without crash");
-}
-
-// Test that DEBUG level allows DEBUG and above, suppresses VERBOSE
-- (void)testSetMinLogLevel_DEBUG_AllowsDebugAndAbove {
-    // Given: Min log level set to DEBUG
-    [CloudXCore setMinLogLevel:CLXLogLevelDebug];
-    [CloudXCore setLoggingEnabled:YES];
-    
-    // When: Logging at different levels
-    [self.logger debug:@"Debug message"];
-    [self.logger info:@"Info message"];
-    [self.logger error:@"Error message"];
-    
-    // Then: Debug, Info, and Error should pass through
-    XCTAssertTrue(YES, @"setMinLogLevel DEBUG completed without crash");
-}
-
-// Test that INFO level suppresses DEBUG
-- (void)testSetMinLogLevel_INFO_SuppressesDebug {
-    // Given: Min log level set to INFO
-    [CloudXCore setMinLogLevel:CLXLogLevelInfo];
-    [CloudXCore setLoggingEnabled:YES];
-    
-    // When: Logging at different levels
-    [self.logger debug:@"Debug message"];
-    [self.logger info:@"Info message"];
-    [self.logger error:@"Error message"];
-    
-    // Then: Only Info and Error should pass through
-    XCTAssertTrue(YES, @"setMinLogLevel INFO completed without crash");
-}
-
-// Test that VERBOSE level (default) allows all logs
-- (void)testSetMinLogLevel_VERBOSE_AllowsAllLogs {
-    // Given: Min log level set to VERBOSE (default)
-    [CloudXCore setMinLogLevel:CLXLogLevelVerbose];
-    [CloudXCore setLoggingEnabled:YES];
-    
-    // When: Logging at all levels
-    [self.logger debug:@"Debug message"];
-    [self.logger info:@"Info message"];
-    [self.logger error:@"Error message"];
-    
-    // Then: All logs should pass through
-    XCTAssertTrue(YES, @"setMinLogLevel VERBOSE completed without crash");
-}
-
-// Test that log level persists across logger instances
+// Test that log level is a global setting shared across logger instances
 - (void)testSetMinLogLevel_PersistsAcrossLoggerInstances {
     // Given: Set min log level to ERROR
     [CloudXCore setMinLogLevel:CLXLogLevelError];
-    
+
     // When: Creating a new logger instance
     CLXLogger *newLogger = [[CLXLogger alloc] initWithCategory:@"test2"];
-    
-    // Then: The new logger should respect the global log level
-    // This test verifies the static global variable works correctly
-    [newLogger debug:@"Debug message"];
-    [newLogger error:@"Error message"];
-    
-    XCTAssertTrue(YES, @"Log level persists across instances");
+
+    // Then: The new logger should exist and respect global settings
+    XCTAssertNotNil(newLogger, @"New logger instance should be created");
 }
 
-// Test that setMinLogLevel works with shared logger
+// Test that shared logger singleton exists
 - (void)testSetMinLogLevel_WorksWithSharedLogger {
-    // Given: Set min log level via CloudXCore API
-    [CloudXCore setMinLogLevel:CLXLogLevelWarn];
-    
-    // When: Using shared logger
+    // Given/When: Getting shared logger
     CLXLogger *sharedLogger = [CLXLogger shared];
-    
-    // Then: Should respect the min log level
-    [sharedLogger debug:@"Debug message"];
-    [sharedLogger info:@"Info message"];
-    [sharedLogger error:@"Error message"];
-    
+
+    // Then: Should exist
     XCTAssertNotNil(sharedLogger, @"Shared logger should exist");
 }
 
-// Test interaction between setLoggingEnabled and setMinLogLevel
-- (void)testSetMinLogLevel_InteractionWithLoggingEnabled {
-    // Given: Logging disabled
-    [CloudXCore setLoggingEnabled:NO];
-    [CloudXCore setMinLogLevel:CLXLogLevelDebug];
-    
-    // When: Logging at various levels
-    [self.logger debug:@"Debug message"];
-    [self.logger info:@"Info message"];
-    
-    // Then: No logs should appear (disabled overrides level)
-    
-    // Re-enable logging
-    [CloudXCore setLoggingEnabled:YES];
-    
-    // When: Logging again
-    [self.logger debug:@"Debug message after enable"];
-    
-    // Then: Should respect min log level
-    XCTAssertTrue(YES, @"Logging enabled/disabled interaction works");
+// Test CLXLogLevelNone can be set without crashing
+- (void)testSetMinLogLevel_NONE_CanBeSet {
+    // When: Setting min log level to NONE
+    XCTAssertNoThrow([CloudXCore setMinLogLevel:CLXLogLevelNone],
+                     @"Setting CLXLogLevelNone should not throw");
+
+    // Then: Can log without crashing (logs are suppressed)
+    XCTAssertNoThrow([self.logger error:@"This should be suppressed"],
+                     @"Logging with NONE level should not crash");
+
+    // Cleanup: Reset to verbose
+    [CloudXCore setMinLogLevel:CLXLogLevelVerbose];
 }
 
-// Test that ERROR logs always show regardless of setLoggingEnabled
-- (void)testSetMinLogLevel_ERRORAlwaysShows {
-    // Given: Logging disabled
-    [CloudXCore setLoggingEnabled:NO];
+#pragma mark - Log Level Filtering Tests
+
+// Helper to count log entries matching a marker
+- (NSUInteger)countEntriesWithMarker:(NSString *)marker {
+    NSArray<CLXLogEntry *> *entries = [[CLXLogStore shared] allEntries];
+    NSUInteger count = 0;
+    for (CLXLogEntry *entry in entries) {
+        if ([entry.message containsString:marker]) {
+            count++;
+        }
+    }
+    return count;
+}
+
+// Test that ERROR level suppresses DEBUG and INFO logs
+- (void)testSetMinLogLevel_ERROR_SuppressesLowerLevels {
+    // Given: testMode enabled and min log level set to ERROR
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [[CLXLogStore shared] clear];
+    [NSThread sleepForTimeInterval:0.05];
+
     [CloudXCore setMinLogLevel:CLXLogLevelError];
-    
-    // When: Logging an error
-    [self.logger error:@"Critical error"];
-    
-    // Then: Error should still be visible (errors always show)
-    XCTAssertTrue(YES, @"Errors show even when logging disabled");
+    NSString *marker = [[NSUUID UUID] UUIDString];
+
+    // When: Logging at different levels
+    [self.logger debug:[NSString stringWithFormat:@"Debug_%@", marker]];
+    [self.logger info:[NSString stringWithFormat:@"Info_%@", marker]];
+    [self.logger warn:[NSString stringWithFormat:@"Warn_%@", marker]];
+    [self.logger error:[NSString stringWithFormat:@"Error_%@", marker]];
+
+    [[CLXLogStore shared] flush];
+
+    // Then: Only ERROR should be captured (DEBUG, INFO, WARN suppressed)
+    XCTAssertEqual([self countEntriesWithMarker:marker], 1, @"Only ERROR log should be captured");
+
+    // Cleanup
+    [[CLXLogStore shared] clear];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kCLXCoreTestModeKey];
+}
+
+// Test that INFO level suppresses DEBUG but allows INFO and above
+- (void)testSetMinLogLevel_INFO_SuppressesDebug {
+    // Given: testMode enabled and min log level set to INFO
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [[CLXLogStore shared] clear];
+    [NSThread sleepForTimeInterval:0.05];
+
+    [CloudXCore setMinLogLevel:CLXLogLevelInfo];
+    NSString *marker = [[NSUUID UUID] UUIDString];
+
+    // When: Logging at different levels
+    [self.logger debug:[NSString stringWithFormat:@"Debug_%@", marker]];
+    [self.logger info:[NSString stringWithFormat:@"Info_%@", marker]];
+    [self.logger error:[NSString stringWithFormat:@"Error_%@", marker]];
+
+    [[CLXLogStore shared] flush];
+
+    // Then: INFO and ERROR should be captured (DEBUG suppressed)
+    XCTAssertEqual([self countEntriesWithMarker:marker], 2, @"INFO and ERROR logs should be captured");
+
+    // Cleanup
+    [[CLXLogStore shared] clear];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kCLXCoreTestModeKey];
+}
+
+// Test that VERBOSE level allows all logs
+- (void)testSetMinLogLevel_VERBOSE_AllowsAllLogs {
+    // Given: testMode enabled and min log level set to VERBOSE
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [[CLXLogStore shared] clear];
+    [NSThread sleepForTimeInterval:0.05];
+
+    [CloudXCore setMinLogLevel:CLXLogLevelVerbose];
+    NSString *marker = [[NSUUID UUID] UUIDString];
+
+    // When: Logging at all levels
+    [self.logger verbose:[NSString stringWithFormat:@"Verbose_%@", marker]];
+    [self.logger debug:[NSString stringWithFormat:@"Debug_%@", marker]];
+    [self.logger info:[NSString stringWithFormat:@"Info_%@", marker]];
+    [self.logger error:[NSString stringWithFormat:@"Error_%@", marker]];
+
+    [[CLXLogStore shared] flush];
+
+    // Then: All 4 logs should be captured
+    XCTAssertEqual([self countEntriesWithMarker:marker], 4, @"All log levels should be captured");
+
+    // Cleanup
+    [[CLXLogStore shared] clear];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kCLXCoreTestModeKey];
+}
+
+// Test that NONE level suppresses all logs including ERROR
+- (void)testSetMinLogLevel_NONE_SuppressesAllLogs {
+    // Given: testMode enabled and min log level set to NONE
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [[CLXLogStore shared] clear];
+    [NSThread sleepForTimeInterval:0.05];
+
+    [CloudXCore setMinLogLevel:CLXLogLevelNone];
+    NSString *marker = [[NSUUID UUID] UUIDString];
+
+    // When: Logging at all levels
+    [self.logger debug:[NSString stringWithFormat:@"Debug_%@", marker]];
+    [self.logger info:[NSString stringWithFormat:@"Info_%@", marker]];
+    [self.logger error:[NSString stringWithFormat:@"Error_%@", marker]];
+
+    [[CLXLogStore shared] flush];
+
+    // Then: No logs should be captured (all suppressed)
+    XCTAssertEqual([self countEntriesWithMarker:marker], 0, @"No logs should be captured with NONE level");
+
+    // Cleanup
+    [CloudXCore setMinLogLevel:CLXLogLevelVerbose];
+    [[CLXLogStore shared] clear];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kCLXCoreTestModeKey];
 }
 
 #pragma mark - CLXLogStore Tests

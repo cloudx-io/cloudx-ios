@@ -62,8 +62,7 @@
 
 // Test that deinitialize logs appropriate messages
 - (void)testDeinitialize_LogsMessages {
-    // Given: Logging is enabled
-    [CloudXCore setLoggingEnabled:YES];
+    // Given: Logging is enabled at INFO level
     [CloudXCore setMinLogLevel:CLXLogLevelInfo];
     
     // When: Deinitialize is called (even without initialization)

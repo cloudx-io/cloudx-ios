@@ -231,8 +231,8 @@
 
 - (void)loggingToggleChanged:(UISwitch *)sender {
     if (sender.tag == 300) {
-        // Logging Enabled/Disabled
-        [CloudXCore setLoggingEnabled:sender.isOn];
+        // Logging Enabled/Disabled (using CLXLogLevelNone to disable)
+        [CloudXCore setMinLogLevel:sender.isOn ? CLXLogLevelVerbose : CLXLogLevelNone];
         [[NSUserDefaults standardUserDefaults] setBool:!sender.isOn forKey:@"LoggingDisabled"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         NSLog(@"🪵 Logging %@", sender.isOn ? @"ENABLED" : @"DISABLED");

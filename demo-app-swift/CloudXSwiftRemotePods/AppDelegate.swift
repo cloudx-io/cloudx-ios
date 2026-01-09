@@ -47,7 +47,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         // Enable verbose logging for demo app
-        CloudXCore.setLoggingEnabled(true)
         CloudXCore.setMinLogLevel(.verbose)
         CloudXCore.setLoggingEmojisEnabled(true)
         

@@ -186,8 +186,8 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
     
     @objc private func loggingToggleChanged(_ sender: UISwitch) {
         if sender.tag == 300 {
-            // Logging Enabled/Disabled
-            CloudXCore.setLoggingEnabled(sender.isOn)
+            // Logging Enabled/Disabled (using CLXLogLevelNone to disable)
+            CloudXCore.setMinLogLevel(sender.isOn ? .verbose : .none)
             UserDefaults.standard.set(!sender.isOn, forKey: "LoggingDisabled")
             UserDefaults.standard.synchronize()
             print("🪵 Logging \(sender.isOn ? "ENABLED" : "DISABLED")")

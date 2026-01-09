@@ -1171,10 +1171,6 @@ static BOOL _visualDebuggingEnabled = NO;
 
 #pragma mark - Logging Control
 
-+ (void)setLoggingEnabled:(BOOL)enabled {
-    [[CLXLogger shared] setLoggingEnabled:enabled];
-}
-
 + (void)setMinLogLevel:(CLXLogLevel)minLogLevel {
     [[CLXLogger shared] setMinLogLevel:minLogLevel];
 }

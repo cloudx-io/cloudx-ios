@@ -376,16 +376,24 @@ class YourViewController: UIViewController, CLXInterstitialDelegate {
 
 ### Debug Logging
 
+Control SDK log output by setting the minimum log level. Available levels: `CLXLogLevelVerbose`, `CLXLogLevelDebug`, `CLXLogLevelInfo`, `CLXLogLevelWarn`, `CLXLogLevelError`, `CLXLogLevelNone`.
+
 **Objective-C:**
 ```objc
 // Enable verbose logging before SDK initialization
-[CloudXCore setLoggingEnabled:YES];
+[CloudXCore setMinLogLevel:CLXLogLevelVerbose];
+
+// Disable all logging
+[CloudXCore setMinLogLevel:CLXLogLevelNone];
 ```
 
 **Swift:**
 ```swift
 // Enable verbose logging before SDK initialization
-CloudXCore.setLoggingEnabled(true)
+CloudXCore.setMinLogLevel(.verbose)
+
+// Disable all logging
+CloudXCore.setMinLogLevel(.none)
 ```
 
 ### Test Mode

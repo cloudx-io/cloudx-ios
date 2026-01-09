@@ -11,7 +11,6 @@
 #import <os/log.h>
 
 // Class-level logging flags that affect all logger instances
-static BOOL _globalLoggingEnabled = YES;
 static CLXLogLevel _globalMinLogLevel = CLXLogLevelError;
 static BOOL _globalEmojisEnabled = YES;
 static BOOL _globalTimestampsEnabled = NO;
@@ -39,10 +38,6 @@ static BOOL _globalTimestampsEnabled = NO;
         _osLog = os_log_create("io.cloudx.sdk", category.UTF8String);
     }
     return self;
-}
-
-- (void)setLoggingEnabled:(BOOL)enabled {
-    _globalLoggingEnabled = enabled;
 }
 
 - (void)setMinLogLevel:(CLXLogLevel)minLogLevel {
@@ -96,6 +91,7 @@ static BOOL _globalTimestampsEnabled = NO;
         case CLXLogLevelInfo:    return @"INFO";
         case CLXLogLevelWarn:    return @"WARN";
         case CLXLogLevelError:   return @"ERROR";
+        case CLXLogLevelNone:    return @"NONE";
         default:                 return @"UNKNOWN";
     }
 }
@@ -107,6 +103,10 @@ static BOOL _globalTimestampsEnabled = NO;
         case CLXLogLevelInfo:    return OS_LOG_TYPE_INFO;
         case CLXLogLevelWarn:    return OS_LOG_TYPE_DEFAULT;
         case CLXLogLevelError:   return OS_LOG_TYPE_ERROR;
+        case CLXLogLevelNone:
+            // CLXLogLevelNone is only valid as a minLogLevel threshold, not as a message level
+            NSAssert(NO, @"CLXLogLevelNone should not be used as a log message level");
+            return OS_LOG_TYPE_DEBUG;
         default:                 return OS_LOG_TYPE_DEBUG;
     }
 }
@@ -117,16 +117,11 @@ static BOOL _globalTimestampsEnabled = NO;
          emojiType:(CLXLogEmoji)emojiType 
            message:(NSString *)message {
     
-    // Check if level should be suppressed
+    // Check if level should be suppressed (CLXLogLevelNone disables all logging)
     if (level < _globalMinLogLevel) {
         return;
     }
-    
-    // Check if logging is enabled (except for errors which always show)
-    if (level != CLXLogLevelError && !_globalLoggingEnabled) {
-        return;
-    }
-    
+
     // Format: [CloudX] <timestamp?> <emoji> <LEVEL>  | ClassName - message
     NSString *emoji = [self emojiForType:emojiType];
     NSString *typePrefix = [self emojiTypeNameForType:emojiType];

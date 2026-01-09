@@ -22,7 +22,6 @@
     // Override point for customization after application launch.
     
     // Enable verbose logging for demo app
-    [CloudXCore setLoggingEnabled:YES];
     [CloudXCore setMinLogLevel:CLXLogLevelVerbose];
     [CloudXCore setLoggingEmojisEnabled:YES];
     [CloudXCore setLoggingTimestampsEnabled:YES];
