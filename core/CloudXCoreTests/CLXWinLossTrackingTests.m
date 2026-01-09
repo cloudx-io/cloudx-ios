@@ -36,11 +36,12 @@ static const NSInteger kTestRank3 = 3;
 
 // Expose private methods for testing
 @interface CLXBidAdSource (Testing)
-- (void)tryNextBidInWaterfall:(NSArray<CLXBidResponseBid *> *)sortedBids 
-                     bidIndex:(NSInteger)bidIndex 
-                    auctionID:(nullable NSString *)auctionID 
-                   bidRequest:(NSDictionary *)bidRequest 
+- (void)tryNextBidInWaterfall:(NSArray<CLXBidResponseBid *> *)sortedBids
+                     bidIndex:(NSInteger)bidIndex
+                    auctionID:(nullable NSString *)auctionID
+                   bidRequest:(NSDictionary *)bidRequest
                 correlationId:(NSString *)correlationId
+               failureReasons:(NSMutableArray<NSString *> *)failureReasons
                    completion:(void (^)(CLXBidAdSourceResponse * _Nullable, NSError * _Nullable))completion;
 @end
 
@@ -218,11 +219,12 @@ static const NSInteger kTestRank3 = 3;
     
     // When: Waterfall tries this bid
     XCTestExpectation *expectation = [self expectationWithDescription:@"Waterfall completion"];
-    [bidAdSource tryNextBidInWaterfall:@[failingBid] 
-                              bidIndex:0 
-                             auctionID:kTestAuctionID 
-                            bidRequest:@{@"test": @"data"} 
+    [bidAdSource tryNextBidInWaterfall:@[failingBid]
+                              bidIndex:0
+                             auctionID:kTestAuctionID
+                            bidRequest:@{@"test": @"data"}
                          correlationId:@"test-correlation-id"
+                        failureReasons:[NSMutableArray array]
                             completion:^(CLXBidAdSourceResponse *response, NSError *error) {
         XCTAssertNil(response, @"Response should be nil for failed bid");
         XCTAssertNotNil(error, @"Error should be present for failed bid");
@@ -262,11 +264,12 @@ static const NSInteger kTestRank3 = 3;
     
     // When: Waterfall tries all bids
     XCTestExpectation *expectation = [self expectationWithDescription:@"Waterfall completion"];
-    [bidAdSource tryNextBidInWaterfall:failingBids 
-                              bidIndex:0 
-                             auctionID:kTestAuctionID 
-                            bidRequest:@{@"test": @"data"} 
+    [bidAdSource tryNextBidInWaterfall:failingBids
+                              bidIndex:0
+                             auctionID:kTestAuctionID
+                            bidRequest:@{@"test": @"data"}
                          correlationId:@"test-correlation-id"
+                        failureReasons:[NSMutableArray array]
                             completion:^(CLXBidAdSourceResponse *response, NSError *error) {
         XCTAssertNil(response, @"Response should be nil when all bids fail");
         XCTAssertNotNil(error, @"Error should be present when all bids fail");
@@ -306,11 +309,12 @@ static const NSInteger kTestRank3 = 3;
     
     // When: Waterfall tries this bid
     XCTestExpectation *expectation = [self expectationWithDescription:@"Waterfall completion"];
-    [bidAdSource tryNextBidInWaterfall:@[successfulBid] 
-                              bidIndex:0 
-                             auctionID:kTestAuctionID 
-                            bidRequest:@{@"test": @"data"} 
+    [bidAdSource tryNextBidInWaterfall:@[successfulBid]
+                              bidIndex:0
+                             auctionID:kTestAuctionID
+                            bidRequest:@{@"test": @"data"}
                          correlationId:@"test-correlation-id"
+                        failureReasons:[NSMutableArray array]
                             completion:^(CLXBidAdSourceResponse *response, NSError *error) {
         XCTAssertNotNil(response, @"Response should be present for successful bid");
         XCTAssertNil(error, @"Error should be nil for successful bid");
