@@ -18,7 +18,6 @@
 #import <CloudXCore/CLXPrivacyService.h>
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXKeyValueState.h>
-#import <CloudXCore/NSDictionary+DynamicPath.h>
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXSessionMetrics.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
@@ -236,21 +235,9 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         // Create stored impression ID
         CLXBiddingConfigImpressionExtId *idObj = [[CLXBiddingConfigImpressionExtId alloc] init];
         idObj.idValue = storedImpressionId;
-        
-        // Create targeting dictionary from UserDefaults
-        NSMutableArray *targetingDict = [NSMutableArray array];
-        NSDictionary *userDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
-        for (NSString *key in userDict.allKeys) {
-            CLXBiddingConfigImpressionExtAdserverTargeting *targeting = [[CLXBiddingConfigImpressionExtAdserverTargeting alloc] init];
-            targeting.key = key;
-            targeting.source = @"bidrequest";
-            targeting.value = userDict[key] ?: @"";
-            [targetingDict addObject:targeting];
-        }
-        
+
         // Create stored impression
         CLXBiddingConfigImpressionExtStoredImpression *storedImpression = [[CLXBiddingConfigImpressionExtStoredImpression alloc] init];
-        storedImpression.adservertargeting = [targetingDict copy];
         storedImpression.storedimpression = idObj;
         
         // Create impression ext
@@ -412,10 +399,8 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
             bundle = [[NSBundle mainBundle] bundleIdentifier];
         }
         
-        // Read app key values from UserDefaults (empty if not set)
-        // Note: iOS doesn't currently have a separate app key values API like Android
-        // This is reserved for future use
-        NSDictionary *appKeyValues = @{};
+        // Read app key values from CLXKeyValueState
+        NSDictionary *appKeyValues = [[CLXKeyValueState shared] appKeyValues] ?: @{};
         
         CLXBiddingConfigApplication *application = [[CLXBiddingConfigApplication alloc] init];
         // Use appID from SDK init response for bid request app.id field
@@ -424,7 +409,11 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         application.bundle = bundle;
         application.ver = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
         application.publisher = publisher;
-        application.ext.data = appKeyValues;
+
+        // Create ext with app key-values data
+        CLXBiddingConfigApplicationExt *appExt = [[CLXBiddingConfigApplicationExt alloc] init];
+        appExt.data = appKeyValues;
+        application.ext = appExt;
         
         self.application = application;
         
@@ -514,7 +503,7 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         _device = device;
         
         // Create user
-        NSString *hashedUserId = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedUserIDKey];
+        NSString *hashedUserId = [[CLXKeyValueState shared] hashedUserId];
         NSString *aiPrompt = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAIPromptKey];
         NSString *userKeywords = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserKeywordsKey];
         
@@ -532,9 +521,9 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
             eids = @[eidItem];
         }
         
-        // Read user key values from UserDefaults (empty if not set)
-        // Publishers can set these via setKeyValueDictionary API
-        NSDictionary *userKeyValues = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey] ?: @{};
+        // Read user key values from CLXKeyValueState
+        // Publishers can set these via setUserKeyValue API
+        NSDictionary *userKeyValues = [[CLXKeyValueState shared] userKeyValues] ?: @{};
         
         CLXBiddingConfigUserExt *userExt = [[CLXBiddingConfigUserExt alloc] init];
         //userExt.consent = @"gdpr-consent-string";
@@ -546,7 +535,7 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         user.ext = userExt;
         
         // ORTB 2.5: User demographics from KV API
-        // Publishers can set these via setKeyValueDictionary API with keys "gender" and "yob"
+        // Publishers can set these via setUserKeyValue API with keys "gender" and "yob"
         NSString *gender = userKeyValues[@"gender"];
         if (gender && [gender isKindOfClass:[NSString class]] && gender.length > 0) {
             // Validate gender value (M, F, or O per ORTB spec)
@@ -629,7 +618,9 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         for (NSString *key in adapterInfo.allKeys) {
             adapterExtras[key] = adapterInfo[key];
         }
-        
+
+        // Get user key-values for request-level adservertargeting
+        NSDictionary *userDict = [[CLXKeyValueState shared] userKeyValues];
         NSMutableArray *prebidArray = [NSMutableArray array];
         for (NSString *key in userDict.allKeys) {
             CLXBiddingConfigRequestExtAdserverTargeting *targeting = [[CLXBiddingConfigRequestExtAdserverTargeting alloc] init];
@@ -729,9 +720,6 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         [logger debug:@"[BiddingConfig] Test flag excluded from request (nil)"];
     }
     
-    // Inject key-value pairs at server-configured paths
-    [self injectKeyValuesIntoRequest:json];
-    
     // Debug logging
     [logger debug:[NSString stringWithFormat:@"Final bid request - Keys: %@, Imp count: %lu", [json allKeys], (unsigned long)[json[@"imp"] count]]];
     
@@ -746,46 +734,6 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
     }
     
     return [json copy];
-}
-
-- (void)injectKeyValuesIntoRequest:(NSMutableDictionary *)json {
-    CLXKeyValueState *state = [CLXKeyValueState shared];
-    CLXSDKConfigKeyValueObject *paths = state.keyValuePaths;
-    
-    if (!paths) {
-        [logger warn:@"[ObjC-BiddingConfig] No key-value paths configuration available"];
-        return;
-    }
-    
-    BOOL shouldRemovePII = [self.privacyService shouldClearPersonalData];
-    
-    // Inject user key-values (respect privacy)
-    if (paths.userKeyValues && !shouldRemovePII && state.userKeyValues.count > 0) {
-        NSDictionary *userKV = [state.userKeyValues copy];
-        [logger debug:[NSString stringWithFormat:@"Injecting %lu user key-values at path: %@", (unsigned long)userKV.count, paths.userKeyValues]];
-        [json clx_putAtDynamicPath:paths.userKeyValues value:userKV];
-    }
-    
-    // Inject app key-values (not affected by privacy)
-    if (paths.appKeyValues && state.appKeyValues.count > 0) {
-        NSDictionary *appKV = [state.appKeyValues copy];
-        [logger debug:[NSString stringWithFormat:@"Injecting %lu app key-values at path: %@", (unsigned long)appKV.count, paths.appKeyValues]];
-        [json clx_putAtDynamicPath:paths.appKeyValues value:appKV];
-    }
-    
-    // Inject hashed user ID as eids (respect privacy)
-    if (paths.eids && !shouldRemovePII && state.hashedUserId) {
-        NSString *bundle = [[NSBundle mainBundle] bundleIdentifier] ?: @"";
-        NSDictionary *eid = @{
-            @"source": bundle,
-            @"uids": @[@{
-                @"id": state.hashedUserId,
-                @"atype": @3
-            }]
-        };
-        [logger debug:[NSString stringWithFormat:@"Injecting hashed user ID at path: %@", paths.eids]];
-        [json clx_putAtDynamicPath:paths.eids value:eid];
-    }
 }
 
 - (NSArray *)convertImpressionsToJSON {
@@ -1062,17 +1010,7 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
 }
 
 - (NSDictionary *)convertStoredImpressionToJSON:(CLXBiddingConfigImpressionExtStoredImpression *)storedImpression {
-    NSMutableArray *targetingArray = [NSMutableArray array];
-    for (CLXBiddingConfigImpressionExtAdserverTargeting *targeting in storedImpression.adservertargeting) {
-        [targetingArray addObject:@{
-            @"key": targeting.key ?: @"",
-            @"source": targeting.source ?: @"",
-            @"value": targeting.value ?: @""
-        }];
-    }
-    
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
-    json[@"adservertargeting"] = [targetingArray copy];
     json[@"storedimpression"] = @{
         @"id": storedImpression.storedimpression.idValue ?: @""
     };
@@ -1481,8 +1419,6 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
 @end
 @implementation CLXBiddingConfigImpressionExtStoredImpression
 @end
-@implementation CLXBiddingConfigImpressionExtAdserverTargeting
-@end
 @implementation CLXBiddingConfigImpressionExtId
 @end
 @implementation CLXBiddingConfigImpressionPMP
@@ -1492,6 +1428,8 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
 
 #pragma mark - Application
 @implementation CLXBiddingConfigApplication
+@end
+@implementation CLXBiddingConfigApplicationExt
 @end
 @implementation CLXBiddingConfigApplicationPublisher
 @end

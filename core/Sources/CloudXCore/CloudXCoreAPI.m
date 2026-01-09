@@ -383,15 +383,7 @@ static CloudXCore *_sharedInstance = nil;
     [self.logger debug:[NSString stringWithFormat:@"Processing SDK config - Session: %@, Account: %@, Bidders: %lu", config.sessionID, config.accountID, (unsigned long)config.bidders.count]];
     
     _sdkConfig = config;
-    
-    // Store key-value paths configuration
-    if (config.keyValuePaths) {
-        [[CLXKeyValueState shared] setKeyValuePaths:config.keyValuePaths];
-        [self.logger info:@"Key-value paths configuration stored"];
-    } else {
-        [self.logger debug:@"[CloudXCore] No key-value paths configuration found in server response"];
-    }
-    
+
     // Set the tracking configuration for Analytics
     [[CLXTrackingFieldResolver shared] setConfig:config];
     
@@ -635,46 +627,11 @@ static CloudXCore *_sharedInstance = nil;
         metricsDict[@"method_set_hashed_user_id"] = @"1";
     }
     [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsDictKey];
-    [[NSUserDefaults standardUserDefaults] setValue:hashedUserID forKey:kCLXCoreHashedUserIDKey];
-    
-    // Also store in new state system for declarative injection
+
+    // Store in state system for bid request injection
     [[CLXKeyValueState shared] setHashedUserId:hashedUserID];
     
     [self.logger info:@"Hashed user ID stored successfully"];
-}
-
-- (void)setHashedKeyValue:(NSString *)key value:(NSString *)value {
-    // Track user key-value method call
-    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetUserKeyValues];
-    [[NSUserDefaults standardUserDefaults] setValue:key forKey:kCLXCoreHashedKeyKey];
-    [[NSUserDefaults standardUserDefaults] setValue:value forKey:kCLXCoreHashedValueKey];
-    [self.logger info:@"Hashed key-value pair stored successfully"];
-}
-
-- (void)setKeyValueDictionary:(NSDictionary<NSString *,NSString *> *)userDictionary {
-    // Track user key-values method call
-    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetUserKeyValues];
-    NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
-    NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
-    if ([metricsDict.allKeys containsObject:@"method_set_user_key_values"]) {
-        NSString *value = metricsDict[@"method_set_user_key_values"];
-        int number = [value intValue];
-        int new = number + 1;
-        metricsDict[@"method_set_user_key_values"] = [NSString stringWithFormat:@"%d", new];
-    } else {
-        metricsDict[@"method_set_user_key_values"] = @"1";
-    }
-    [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsDictKey];
-    [[NSUserDefaults standardUserDefaults] setObject:userDictionary forKey:kCLXCoreUserKeyValueKey];
-    
-    // Also store in new state system for declarative injection
-    for (NSString *key in userDictionary) {
-        [[CLXKeyValueState shared] setUserKeyValue:key value:userDictionary[key]];
-    }
-    
-    [self.logger info:@"User dictionary stored successfully"];
 }
 
 - (void)startTimer {
@@ -692,16 +649,6 @@ static CloudXCore *_sharedInstance = nil;
     //Send Analytics
     [self.reportingService metricsTrackingWithActionString:@"sdkmetricenc"];
     
-}
-
-- (void)setBidderKeyValue:(NSString *)bidder key:(NSString *)key value:(NSString *)value {
-    // Track app key-values method call (bidder key-values are app-level)
-    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetAppKeyValues];
-    [[NSUserDefaults standardUserDefaults] setValue:bidder forKey:kCLXCoreUserBidderKey];
-    [[NSUserDefaults standardUserDefaults] setValue:key forKey:kCLXCoreUserBidderKeyKey];
-    [[NSUserDefaults standardUserDefaults] setValue:value forKey:kCLXCoreUserBidderValueKey];
-    [self.logger info:@"Bidder key-value pair stored successfully"];
 }
 
 - (void)setUserKeyValue:(NSString *)key value:(NSString *)value {

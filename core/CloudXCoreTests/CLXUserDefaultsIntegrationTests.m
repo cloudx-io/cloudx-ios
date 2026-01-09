@@ -10,14 +10,14 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXLiveInitService.h>
+#import <CloudXCore/CLXKeyValueState.h>
 #import "CLXUserDefaultsTestHelper.h"
 #import "Mocks/CLXMockInitService.h"
 
 @interface CloudXCore (Testing)
 - (void)initializeSDKWithAppKey:(NSString *)appKey testMode:(BOOL)testMode completion:(void (^)(BOOL success, CLXError *error))completion;
 - (void)setHashedUserID:(NSString *)hashedUserID;
-- (void)setKeyValueDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary;
-- (void)setBidderKeyValue:(NSString *)bidder key:(NSString *)key value:(NSString *)value;
+- (void)setUserKeyValue:(NSString *)key value:(NSString *)value;
 - (void)resetForTesting;
 @end
 
@@ -130,22 +130,14 @@
     
     // Add user data
     [sdk setHashedUserID:@"integration-hashed-user"];
-    [sdk setKeyValueDictionary:@{@"age": @"30", @"location": @"NYC"}];
-    [sdk setBidderKeyValue:@"integration-bidder" key:@"bid-key" value:@"bid-value"];
-    
-    // Verify all user data is stored with ACTUAL unprefixed keys
-    NSString *storedHashedUserID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedUserIDKey];
-    NSDictionary *storedUserDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
-    NSString *storedBidder = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderKey];
-    NSString *storedBidderKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderKeyKey];
-    NSString *storedBidderValue = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderValueKey];
-    
-    XCTAssertEqualObjects(storedHashedUserID, @"integration-hashed-user", @"Hashed user ID should be stored with unprefixed key");
-    XCTAssertEqualObjects(storedUserDict[@"age"], @"30", @"User dictionary should be stored with unprefixed key");
-    XCTAssertEqualObjects(storedUserDict[@"location"], @"NYC", @"User dictionary should be stored with unprefixed key");
-    XCTAssertEqualObjects(storedBidder, @"integration-bidder", @"Bidder should be stored with unprefixed key");
-    XCTAssertEqualObjects(storedBidderKey, @"bid-key", @"Bidder key should be stored with unprefixed key");
-    XCTAssertEqualObjects(storedBidderValue, @"bid-value", @"Bidder value should be stored with unprefixed key");
+    [sdk setUserKeyValue:@"age" value:@"30"];
+    [sdk setUserKeyValue:@"location" value:@"NYC"];
+
+    // Verify hashed user ID is stored in CLXKeyValueState (in-memory, not UserDefaults)
+    NSString *storedHashedUserID = [[CLXKeyValueState shared] hashedUserId];
+
+    XCTAssertEqualObjects(storedHashedUserID, @"integration-hashed-user", @"Hashed user ID should be stored in CLXKeyValueState");
+    // Note: setUserKeyValue stores in CLXKeyValueState, not UserDefaults
 }
 
 // Test metrics accumulation across components using ACTUAL keys
@@ -189,40 +181,38 @@
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
     
-    // Add user data that publisher ads will use
-    [sdk setKeyValueDictionary:@{@"targeting": @"data"}];
-    
+    // Add user data that publisher ads will use (via CLXKeyValueState)
+    [sdk setUserKeyValue:@"targeting" value:@"data"];
+
     // Create publisher banner
     CLXPublisherBanner *banner = [[CLXPublisherBanner alloc] init];
     XCTAssertNotNil(banner, @"Publisher banner should be created");
-    
-    // Check if publisher banner can access core SDK data with ACTUAL unprefixed keys
+
+    // Check if publisher banner can access core SDK data with ACTUAL prefixed keys
     NSString *storedAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
     NSString *storedAccountID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAccountIDKey];
-    NSDictionary *storedUserData = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
     NSDictionary *storedMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
-    
+
     // Note: SDK init may fail in test environment
     if (storedAppKey && storedAccountID) {
-        NSLog(@"✅ Publisher banner can access SDK data with unprefixed keys");
-        XCTAssertNotNil(storedAppKey, @"Publisher banner accesses app key with unprefixed key");
-        XCTAssertNotNil(storedAccountID, @"Publisher banner accesses account ID with unprefixed key");
+        NSLog(@"✅ Publisher banner can access SDK data with prefixed keys");
+        XCTAssertNotNil(storedAppKey, @"Publisher banner accesses app key with prefixed key");
+        XCTAssertNotNil(storedAccountID, @"Publisher banner accesses account ID with prefixed key");
     } else {
         NSLog(@"⚠️ SDK init failed - demonstrating publisher banner collision risk");
-        // Manually demonstrate that publisher banner would access unprefixed keys
+        // Manually demonstrate that publisher banner would access prefixed keys
         [[NSUserDefaults standardUserDefaults] setObject:@"banner-app-key" forKey:kCLXCoreAppKeyKey];
         [[NSUserDefaults standardUserDefaults] setObject:@"banner-account" forKey:kCLXCoreAccountIDKey];
-        
+
         NSString *bannerAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
         NSString *bannerAccount = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAccountIDKey];
-        XCTAssertEqualObjects(bannerAppKey, @"banner-app-key", @"Publisher banner uses unprefixed keys");
-        XCTAssertEqualObjects(bannerAccount, @"banner-account", @"Publisher banner uses unprefixed keys");
+        XCTAssertEqualObjects(bannerAppKey, @"banner-app-key", @"Publisher banner uses prefixed keys");
+        XCTAssertEqualObjects(bannerAccount, @"banner-account", @"Publisher banner uses prefixed keys");
     }
-    
-    // User data should be stored regardless
-    XCTAssertEqualObjects(storedUserData[@"targeting"], @"data", @"Publisher banner accesses user data with unprefixed key");
+
+    // Note: User data is now stored in CLXKeyValueState, not UserDefaults
     if (storedMetrics) {
-        XCTAssertNotNil(storedMetrics, @"Publisher banner accesses metrics with unprefixed key");
+        XCTAssertNotNil(storedMetrics, @"Publisher banner accesses metrics with prefixed key");
     }
 }
 
@@ -237,41 +227,35 @@
         [initExpectation fulfill];
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
-    
-    // Add bidder data
-    [sdk setBidderKeyValue:@"test-bidder" key:@"test-key" value:@"test-value"];
-    
+
     // Create bid ad source
     CLXBidAdSource *bidAdSource = [[CLXBidAdSource alloc] init];
     XCTAssertNotNil(bidAdSource, @"Bid ad source should be created");
-    
-    // Check if bid ad source can access core SDK data with ACTUAL unprefixed keys
+
+    // Check if bid ad source can access core SDK data with ACTUAL prefixed keys
     NSString *storedAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
     NSString *storedSessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey];
-    NSString *storedBidder = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderKey];
     NSDictionary *storedMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
-    
+
     // Note: SDK init may fail in test environment
     if (storedAppKey && storedSessionID) {
-        NSLog(@"✅ Bid ad source can access SDK data with unprefixed keys");
-        XCTAssertNotNil(storedAppKey, @"Bid ad source accesses app key with unprefixed key");
-        XCTAssertNotNil(storedSessionID, @"Bid ad source accesses session ID with unprefixed key");
+        NSLog(@"✅ Bid ad source can access SDK data with prefixed keys");
+        XCTAssertNotNil(storedAppKey, @"Bid ad source accesses app key with prefixed key");
+        XCTAssertNotNil(storedSessionID, @"Bid ad source accesses session ID with prefixed key");
     } else {
         NSLog(@"⚠️ SDK init failed - demonstrating bid ad source collision risk");
-        // Manually demonstrate that bid ad source would access unprefixed keys
+        // Manually demonstrate that bid ad source would access prefixed keys
         [[NSUserDefaults standardUserDefaults] setObject:@"bid-app-key" forKey:kCLXCoreAppKeyKey];
         [[NSUserDefaults standardUserDefaults] setObject:@"bid-session" forKey:kCLXCoreSessionIDKey];
-        
+
         NSString *bidAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
         NSString *bidSession = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey];
-        XCTAssertEqualObjects(bidAppKey, @"bid-app-key", @"Bid ad source uses unprefixed keys");
-        XCTAssertEqualObjects(bidSession, @"bid-session", @"Bid ad source uses unprefixed keys");
+        XCTAssertEqualObjects(bidAppKey, @"bid-app-key", @"Bid ad source uses prefixed keys");
+        XCTAssertEqualObjects(bidSession, @"bid-session", @"Bid ad source uses prefixed keys");
     }
-    
-    // Bidder data should be stored regardless
-    XCTAssertEqualObjects(storedBidder, @"test-bidder", @"Bid ad source accesses bidder data with unprefixed key");
+
     if (storedMetrics) {
-        XCTAssertNotNil(storedMetrics, @"Bid ad source accesses metrics with unprefixed key");
+        XCTAssertNotNil(storedMetrics, @"Bid ad source accesses metrics with prefixed key");
     }
 }
 
@@ -284,14 +268,12 @@
     [[NSUserDefaults standardUserDefaults] setObject:@"external-account" forKey:kCLXCoreAccountIDKey];
     [[NSUserDefaults standardUserDefaults] setObject:@"external-session" forKey:kCLXCoreSessionIDKey];
     [[NSUserDefaults standardUserDefaults] setObject:@{@"external": @"metrics"} forKey:kCLXCoreMetricsDictKey];
-    [[NSUserDefaults standardUserDefaults] setObject:@{@"external": @"user"} forKey:kCLXCoreUserKeyValueKey];
-    [[NSUserDefaults standardUserDefaults] setObject:@"external-bidder" forKey:kCLXCoreUserBidderKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    
+
     // Verify external data is stored
     XCTAssertEqualObjects([[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey], @"external-app-key");
     XCTAssertEqualObjects([[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAccountIDKey], @"external-account");
-    
+
     // Initialize CloudXCore - this will overwrite ALL external data
     XCTestExpectation *expectation = [self expectationWithDescription:@"SDK initialization"];
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
@@ -301,19 +283,13 @@
         [expectation fulfill];
     }];
     [self waitForExpectations:@[expectation] timeout:5.0];
-    
-    // Add CloudXCore data
-    [sdk setKeyValueDictionary:@{@"cloudx": @"user"}];
-    [sdk setBidderKeyValue:@"cloudx-bidder" key:@"key" value:@"value"];
-    
+
     // Check what data survived - demonstrates collision risk
     NSString *finalAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
     NSString *finalAccountID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAccountIDKey];
     NSString *finalSessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey];
     NSDictionary *finalMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
-    NSDictionary *finalUserData = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
-    NSString *finalBidder = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderKey];
-    
+
     // Note: SDK init may fail, but user data operations should work
     if ([finalAppKey isEqualToString:@"cloudx-app-key"]) {
         // SDK init succeeded and overwrote external data - COLLISION!
@@ -326,12 +302,8 @@
         XCTAssertEqualObjects(finalAppKey, @"external-app-key", @"External app key preserved when SDK init fails");
         XCTAssertEqualObjects(finalAccountID, @"external-account", @"External account preserved when SDK init fails");
     }
-    
-    // User data operations should work regardless of SDK init
-    XCTAssertEqualObjects(finalUserData[@"cloudx"], @"user", @"CloudXCore user data is present");
-    XCTAssertEqualObjects(finalBidder, @"cloudx-bidder", @"CloudXCore bidder data overwrote external bidder - COLLISION!");
-    
-    NSLog(@"🔴 INTEGRATION COLLISION RISK DEMONSTRATED: Multiple components use same unprefixed keys!");
+
+    NSLog(@"🔴 INTEGRATION COLLISION RISK DEMONSTRATED: Multiple components use same prefixed keys!");
 }
 
 @end

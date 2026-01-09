@@ -4,6 +4,7 @@
 #import <CloudXCore/CLXSystemInformation.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXPrivacyService.h>
+#import <CloudXCore/CLXKeyValueState.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXVersion.h>
 
@@ -230,8 +231,8 @@
         if (isLimitedAdTrackingEnabled) {
             [self.logger debug:@"[CLXTrackingFieldResolver] DNT flag is set - using privacy-safe identifier"];
             
-            // Use hashed user ID if available
-            NSString *hashedUserId = [privacyService hashedUserId];
+            // Use hashed user ID if available (from CLXKeyValueState)
+            NSString *hashedUserId = [[CLXKeyValueState shared] hashedUserId];
             if (hashedUserId && hashedUserId.length > 0) {
                 [self.logger debug:@"[CLXTrackingFieldResolver] Using hashed user ID"];
                 return hashedUserId;

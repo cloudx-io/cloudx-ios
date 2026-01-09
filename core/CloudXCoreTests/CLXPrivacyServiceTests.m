@@ -50,7 +50,6 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreHashedUserIDKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
@@ -172,25 +171,16 @@
 }
 
 // Test hashed identifier management
-- (void)testHashedIdentifierManagement {
-    NSString *testHashedUserId = @"hashed-user-12345";
+- (void)testHashedGeoIpManagement {
     NSString *testHashedGeoIp = @"hashed-geo-67890";
-    
-    // Test setting and getting hashed user ID
-    [self.privacyService setHashedUserId:testHashedUserId];
-    NSString *retrievedUserId = [self.privacyService hashedUserId];
-    XCTAssertEqualObjects(retrievedUserId, testHashedUserId, @"Should set and retrieve hashed user ID");
-    
+
     // Test setting and getting hashed geo IP
     [self.privacyService setHashedGeoIp:testHashedGeoIp];
     NSString *retrievedGeoIp = [self.privacyService hashedGeoIp];
     XCTAssertEqualObjects(retrievedGeoIp, testHashedGeoIp, @"Should set and retrieve hashed geo IP");
-    
-    // Test clearing hashed identifiers
-    [self.privacyService setHashedUserId:nil];
+
+    // Test clearing hashed geo IP
     [self.privacyService setHashedGeoIp:nil];
-    
-    XCTAssertNil([self.privacyService hashedUserId], @"Should clear hashed user ID");
     XCTAssertNil([self.privacyService hashedGeoIp], @"Should clear hashed geo IP");
 }
 

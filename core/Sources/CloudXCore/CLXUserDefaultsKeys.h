@@ -32,17 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXCoreMetricsUrlKey @"CLXCore_metricsUrl"
 #define kCLXCoreImpressionTrackerUrlKey @"CLXCore_impressionTrackerUrl"
 
-// User data keys
-#define kCLXCoreUserKeyValueKey @"CLXCore_userKeyValue"
-#define kCLXCoreHashedUserIDKey @"CLXCore_hashedUserID"
-#define kCLXCoreHashedKeyKey @"CLXCore_hashedKey"
-#define kCLXCoreHashedValueKey @"CLXCore_hashedValue"
-
-// Bidder data keys
-#define kCLXCoreUserBidderKey @"CLXCore_userBidder"
-#define kCLXCoreUserBidderKeyKey @"CLXCore_userBidderKey"
-#define kCLXCoreUserBidderValueKey @"CLXCore_userBidderValue"
-
 // Additional configuration keys
 #define kCLXCoreBundleConfigKey @"CLXCore_bundle_config"
 #define kCLXCoreGeoHeadersKey @"CLXCore_geoHeaders"
@@ -91,7 +80,6 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXPrivacyGDPRConsentKey @"IABTCF_TCString"
 #define kCLXPrivacyCCPAPrivacyKey @"IABUSPrivacy_String"
 #define kCLXPrivacyGDPRAppliesKey @"IABTCF_gdprApplies"
-#define kCLXPrivacyHashedUserIdKey @"CLXPrivacy_hashedUserID"
 #define kCLXPrivacyHashedGeoIpKey @"CLXPrivacyHashedGeoIp"
 
 

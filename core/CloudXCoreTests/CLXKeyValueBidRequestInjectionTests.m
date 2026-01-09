@@ -66,14 +66,7 @@
     // Set up key-value state
     self.kvState = [CLXKeyValueState shared];
     [self.kvState clearAllKeyValues];
-    
-    // Configure server paths
-    CLXSDKConfigKeyValueObject *paths = [[CLXSDKConfigKeyValueObject alloc] init];
-    paths.userKeyValues = @"user.ext.data";
-    paths.appKeyValues = @"app.ext.data";
-    paths.eids = @"user.ext.eids[*]";
-    self.kvState.keyValuePaths = paths;
-    
+
     // Mock SDK config
     self.mockSDKConfig = [[CLXSDKConfigResponse alloc] init];
     self.mockSDKConfig.appID = @"test-app-id";
@@ -280,28 +273,6 @@
                   @"User ext.data should not exist without KVs");
     XCTAssertTrue(appExtData == nil || [appExtData count] == 0, 
                   @"App ext.data should not exist without KVs");
-}
-
-#pragma mark - No Server Paths Configured Tests
-
-- (void)testNoServerPaths_NoInjection {
-    // SOLID: Tests behavior when server doesn't provide path configuration
-    [self.kvState setUserKeyValue:@"age" value:@"28"];
-    [self.kvState setAppKeyValue:@"version" value:@"1.2.3"];
-    self.kvState.keyValuePaths = nil; // No server configuration
-    self.mockPrivacyService.shouldClearPersonalData = NO;
-    
-    CLXBiddingConfigRequest *config = [self createTestBiddingConfig];
-    NSDictionary *json = [config json];
-    
-    // Without paths, KVs cannot be injected
-    id userExtData = json[@"user"][@"ext"][@"data"];
-    id appExtData = json[@"app"][@"ext"][@"data"];
-    
-    XCTAssertTrue(userExtData == nil || [userExtData count] == 0, 
-                  @"Cannot inject without path configuration");
-    XCTAssertTrue(appExtData == nil || [appExtData count] == 0, 
-                  @"Cannot inject without path configuration");
 }
 
 #pragma mark - Empty Key-Values Tests

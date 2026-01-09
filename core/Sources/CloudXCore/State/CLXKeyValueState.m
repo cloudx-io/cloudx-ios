@@ -3,7 +3,6 @@
  */
 
 #import <CloudXCore/CLXKeyValueState.h>
-#import <CloudXCore/CLXSDKConfig.h>
 
 @interface CLXKeyValueState ()
 @property (nonatomic, strong, readwrite) NSMutableDictionary<NSString *, NSString *> *userKeyValues;
@@ -27,7 +26,6 @@
         _userKeyValues = [NSMutableDictionary dictionary];
         _appKeyValues = [NSMutableDictionary dictionary];
         _hashedUserId = nil;
-        _keyValuePaths = nil;
     }
     return self;
 }

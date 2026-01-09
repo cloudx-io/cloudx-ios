@@ -8,7 +8,6 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CLXKeyValueState.h>
-#import <CloudXCore/CLXSDKConfig.h>
 
 @interface CLXKeyValueStateTests : XCTestCase
 @property (nonatomic, strong) CLXKeyValueState *state;
@@ -122,32 +121,6 @@
     XCTAssertNil(self.state.hashedUserId, @"Hashed user ID should accept nil");
 }
 
-#pragma mark - Server Path Configuration Tests
-
-- (void)testKeyValuePaths_SetAndRetrieve {
-    CLXSDKConfigKeyValueObject *paths = [[CLXSDKConfigKeyValueObject alloc] init];
-    paths.userKeyValues = @"user.ext.data";
-    paths.appKeyValues = @"app.ext.data";
-    paths.eids = @"user.ext.eids[*]";
-    
-    self.state.keyValuePaths = paths;
-    
-    XCTAssertEqualObjects(self.state.keyValuePaths.userKeyValues, @"user.ext.data", 
-                         @"User KV path should be stored");
-    XCTAssertEqualObjects(self.state.keyValuePaths.appKeyValues, @"app.ext.data", 
-                         @"App KV path should be stored");
-    XCTAssertEqualObjects(self.state.keyValuePaths.eids, @"user.ext.eids[*]", 
-                         @"EIDs path should be stored");
-}
-
-- (void)testKeyValuePaths_CanBeNil {
-    CLXSDKConfigKeyValueObject *paths = [[CLXSDKConfigKeyValueObject alloc] init];
-    self.state.keyValuePaths = paths;
-    self.state.keyValuePaths = nil;
-    
-    XCTAssertNil(self.state.keyValuePaths, @"Paths should accept nil");
-}
-
 #pragma mark - Edge Cases
 
 - (void)testEdgeCase_NilKey {
@@ -188,19 +161,6 @@
                          @"User KV should not be affected");
     XCTAssertEqualObjects(self.state.appKeyValues[@"shared_key"], @"app_value", 
                          @"App KV should not be affected");
-}
-
-- (void)testDataIsolation_ClearDoesNotAffectPaths {
-    CLXSDKConfigKeyValueObject *paths = [[CLXSDKConfigKeyValueObject alloc] init];
-    paths.userKeyValues = @"user.ext.data";
-    self.state.keyValuePaths = paths;
-    
-    [self.state setUserKeyValue:@"age" value:@"25"];
-    [self.state clearAllKeyValues];
-    
-    XCTAssertNotNil(self.state.keyValuePaths, @"Paths should not be cleared by clearAllKeyValues");
-    XCTAssertEqualObjects(self.state.keyValuePaths.userKeyValues, @"user.ext.data", 
-                         @"Path configuration should persist");
 }
 
 #pragma mark - State Persistence Across Calls

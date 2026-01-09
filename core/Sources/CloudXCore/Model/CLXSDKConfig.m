@@ -145,20 +145,6 @@
 
 @end
 
-@implementation CLXSDKConfigKeyValueObject
-
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        _eids = @"";
-        _appKeyValues = @"";
-        _userKeyValues = @"";
-    }
-    return self;
-}
-
-@end
-
 @implementation CLXSDKConfigGeoBid
 
 - (instancetype)init {

@@ -51,18 +51,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSNumber *)ccpaApplies;
 
 /**
- * @brief Gets the hashed user ID for privacy-safe tracking
- * @return The hashed user ID if available, nil otherwise
- */
-- (nullable NSString *)hashedUserId;
-
-/**
- * @brief Sets the hashed user ID
- * @param hashedUserId The hashed user ID to store
- */
-- (void)setHashedUserId:(nullable NSString *)hashedUserId;
-
-/**
  * @brief Gets the hashed geo IP for privacy-safe tracking
  * @return The hashed geo IP if available, nil otherwise
  */

@@ -52,7 +52,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXBiddingConfigImpressionPMP;
 @class CLXBiddingConfigImpressionBannerFormat;
 @class CLXBiddingConfigImpressionExtStoredImpression;
-@class CLXBiddingConfigImpressionExtAdserverTargeting;
 @class CLXBiddingConfigImpressionExtId;
 @class CLXBiddingConfigImpressionExtSkadn;
 @class CLXBiddingConfigImpressionPMPDeal;
@@ -388,15 +387,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CLXBiddingConfigImpressionExtStoredImpression : NSObject
-@property (nonatomic, strong) NSArray<CLXBiddingConfigImpressionExtAdserverTargeting *> *adservertargeting;
 @property (nonatomic, strong) CLXBiddingConfigImpressionExtId *storedimpression;
 @property (nonatomic, strong, nullable) NSDictionary *bidder;
-@end
-
-@interface CLXBiddingConfigImpressionExtAdserverTargeting : NSObject
-@property (nonatomic, copy) NSString *key;
-@property (nonatomic, copy) NSString *source;
-@property (nonatomic, copy) NSString *value;
 @end
 
 @interface CLXBiddingConfigImpressionExtId : NSObject

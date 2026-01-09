@@ -10,14 +10,14 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXLiveInitService.h>
+#import <CloudXCore/CLXKeyValueState.h>
 #import "CLXUserDefaultsTestHelper.h"
 #import "Mocks/CLXMockInitService.h"
 
 @interface CloudXCore (Testing)
 - (void)initializeSDKWithAppKey:(NSString *)appKey testMode:(BOOL)testMode completion:(void (^)(BOOL success, CLXError *error))completion;
 - (void)setHashedUserID:(NSString *)hashedUserID;
-- (void)setKeyValueDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary;
-- (void)setBidderKeyValue:(NSString *)bidder key:(NSString *)key value:(NSString *)value;
+- (void)setUserKeyValue:(NSString *)key value:(NSString *)value;
 - (void)resetForTesting;
 @end
 
@@ -122,30 +122,23 @@
     for (NSInteger i = 0; i < numberOfConcurrentUpdates; i++) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSString *hashedUserID = [NSString stringWithFormat:@"concurrent-user-%ld", (long)i];
-            NSDictionary *userDict = @{
-                [NSString stringWithFormat:@"key_%ld", (long)i]: [NSString stringWithFormat:@"value_%ld", (long)i]
-            };
-            NSString *bidder = [NSString stringWithFormat:@"concurrent-bidder-%ld", (long)i];
-            
+
             [sdk setHashedUserID:hashedUserID];
-            [sdk setKeyValueDictionary:userDict];
-            [sdk setBidderKeyValue:bidder key:@"test-key" value:@"test-value"];
-            
+            [sdk setUserKeyValue:[NSString stringWithFormat:@"key_%ld", (long)i]
+                           value:[NSString stringWithFormat:@"value_%ld", (long)i]];
+
             [concurrencyExpectation fulfill];
         });
     }
-    
+
     [self waitForExpectations:@[concurrencyExpectation] timeout:3.0];
-    
-    // Verify final state - last writer wins (race condition with unprefixed keys)
-    NSString *finalHashedUserID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedUserIDKey];
-    NSDictionary *finalUserDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
-    NSString *finalBidder = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderKey];
-    
+
+    // Verify final state - last writer wins (race condition)
+    // Note: hashedUserId is stored in CLXKeyValueState (in-memory), not UserDefaults
+    NSString *finalHashedUserID = [[CLXKeyValueState shared] hashedUserId];
+
     XCTAssertNotNil(finalHashedUserID, @"Some hashed user ID should be stored after concurrent updates");
-    XCTAssertNotNil(finalUserDict, @"Some user dictionary should be stored after concurrent updates");
-    XCTAssertNotNil(finalBidder, @"Some bidder should be stored after concurrent updates");
-    
+
     // The exact values are unpredictable due to race conditions - this demonstrates the concurrency problem!
 }
 

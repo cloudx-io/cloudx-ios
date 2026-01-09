@@ -28,7 +28,6 @@
     [userDefaults removeObjectForKey:kCLXPrivacyGDPRConsentKey];
     [userDefaults removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
     [userDefaults removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
-    [userDefaults removeObjectForKey:kCLXPrivacyHashedUserIdKey];
     [userDefaults removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
     
     // Clear any other keys that might be used in migration tests
@@ -57,13 +56,6 @@
         kCLXCoreAccountIDKey,
         kCLXCoreEncodedStringKey,
         kCLXCoreMetricsDictKey,
-        kCLXCoreUserKeyValueKey,
-        kCLXCoreHashedUserIDKey,
-        kCLXCoreHashedKeyKey,
-        kCLXCoreHashedValueKey,
-        kCLXCoreUserBidderKey,
-        kCLXCoreUserBidderKeyKey,
-        kCLXCoreUserBidderValueKey,
         kCLXCoreBundleConfigKey,
         kCLXCoreGeoHeadersKey,
         kCLXCoreIFAConfigKey,

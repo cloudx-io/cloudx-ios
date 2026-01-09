@@ -62,7 +62,6 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CLXBanner_sessionIDKey"];
     // Also clear old unprefixed keys for backward compatibility during transition
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreMetricsDictKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreUserKeyValueKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreAppKeyKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreSessionIDKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -72,9 +71,6 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedUserIdKey];
-    // Also clear old unprefixed key for backward compatibility during transition
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreHashedUserIDKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
@@ -171,42 +167,32 @@
     XCTAssertNil(gdprConsent, @"GDPR consent should be nil when privacy blocks personal data");
 }
 
-// Test that hashed identifiers are properly used in privacy-compliant scenarios
-- (void)testHashedIdentifiersIntegration_InPrivacyCompliantScenarios {
+// Test that hashed geo IP is properly used in privacy-compliant scenarios
+- (void)testHashedGeoIpIntegration_InPrivacyCompliantScenarios {
     // GIVEN: Privacy settings that allow personal data but DNT is enabled
     [self setupPrivacyAllowingPersonalData];
-    
+
     CLXPrivacyService *privacyService = [CLXPrivacyService sharedInstance];
-    [privacyService setHashedUserId:@"hashed-user-integration-test"];
     [privacyService setHashedGeoIp:@"hashed-geo-integration-test"];
-    
-    // WHEN: Testing privacy service hashed identifier functionality
-    
-    // THEN: Verify hashed identifiers are properly stored and accessible
-    NSString *retrievedHashedUserId = [privacyService hashedUserId];
-    XCTAssertEqualObjects(retrievedHashedUserId, @"hashed-user-integration-test", 
-                         @"Hashed user ID should be correctly stored and retrievable");
-    
-    // Verify hashed geo IP functionality
+
+    // WHEN: Testing privacy service hashed geo IP functionality
+
+    // THEN: Verify hashed geo IP is properly stored and accessible
     NSString *retrievedHashedGeoIp = [privacyService hashedGeoIp];
-    XCTAssertEqualObjects(retrievedHashedGeoIp, @"hashed-geo-integration-test", 
+    XCTAssertEqualObjects(retrievedHashedGeoIp, @"hashed-geo-integration-test",
                          @"Hashed geo IP should be correctly stored and retrievable");
-    
+
     // Verify privacy service correctly evaluates consent (ignoring ATT for test consistency)
     BOOL shouldClearData = [privacyService shouldClearPersonalDataIgnoringATT];
     XCTAssertFalse(shouldClearData, @"With valid GDPR consent, privacy service should allow personal data");
-    
+
     // Verify that privacy service correctly integrates with the system
     XCTAssertNotNil(privacyService, @"Privacy service should be available for integration");
-    
+
     // Test that privacy settings persist correctly
     NSUserDefaults *testDefaults = [NSUserDefaults standardUserDefaults];
-    NSString *storedHashedUserId = [testDefaults objectForKey:kCLXPrivacyHashedUserIdKey];
-    XCTAssertEqualObjects(storedHashedUserId, @"hashed-user-integration-test", 
-                         @"Hashed user ID should persist in UserDefaults");
-    
     NSString *storedHashedGeoIp = [testDefaults objectForKey:kCLXPrivacyHashedGeoIpKey];
-    XCTAssertEqualObjects(storedHashedGeoIp, @"hashed-geo-integration-test", 
+    XCTAssertEqualObjects(storedHashedGeoIp, @"hashed-geo-integration-test",
                          @"Hashed geo IP should persist in UserDefaults");
 }
 

@@ -86,21 +86,6 @@
     XCTAssertEqualObjects(storedMetrics, bannerMetrics, @"CLXPublisherBanner should read prefixed metrics");
 }
 
-// Test that CLXPublisherBanner reads user key value data using ACTUAL key
-- (void)testPublisherBannerReadsUserKeyValue {
-    // Set up user key value data with ACTUAL unprefixed key
-    NSDictionary *userKeyValue = @{@"user_age": @"25", @"user_gender": @"M"};
-    [[NSUserDefaults standardUserDefaults] setObject:userKeyValue forKey:kCLXCoreUserKeyValueKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    // Create CLXPublisherBanner instance
-    CLXPublisherBanner *banner = [[CLXPublisherBanner alloc] init];
-    
-    // Verify it can read the user key value data with ACTUAL unprefixed key
-    NSDictionary *storedUserKeyValue = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
-    XCTAssertEqualObjects(storedUserKeyValue, userKeyValue, @"CLXPublisherBanner should read user key value with unprefixed key");
-}
-
 #pragma mark - CLXPublisherNative User Defaults Tests
 
 // Test that CLXPublisherNative reads metrics dictionary using ACTUAL key
@@ -117,21 +102,6 @@
     // Verify it can read the metrics dictionary with ACTUAL unprefixed key
     NSDictionary *storedMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     XCTAssertEqualObjects(storedMetrics, initialMetrics, @"CLXPublisherNative should read metrics with unprefixed key");
-}
-
-// Test that CLXPublisherNative reads user key value data using ACTUAL key
-- (void)testPublisherNativeReadsUserKeyValue {
-    // Set up user key value data with ACTUAL unprefixed key
-    NSDictionary *userKeyValue = @{@"native_user_data": @"native_value"};
-    [[NSUserDefaults standardUserDefaults] setObject:userKeyValue forKey:kCLXCoreUserKeyValueKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    // Create CLXPublisherNative instance
-    CLXPublisherNative *native = [[CLXPublisherNative alloc] init];
-    
-    // Verify it can read the user key value data with ACTUAL unprefixed key
-    NSDictionary *storedUserKeyValue = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
-    XCTAssertEqualObjects(storedUserKeyValue, userKeyValue, @"CLXPublisherNative should read user key value with unprefixed key");
 }
 
 #pragma mark - CLXPublisherFullscreenAdBase User Defaults Tests
@@ -152,48 +122,26 @@
     XCTAssertEqualObjects(storedMetrics, initialMetrics, @"Fullscreen ads should read metrics with unprefixed key");
 }
 
-// Test that fullscreen ads read user key value data using ACTUAL key
-- (void)testPublisherFullscreenReadsUserKeyValue {
-    // Set up user key value data with ACTUAL unprefixed key
-    NSDictionary *userKeyValue = @{@"fullscreen_user_data": @"fullscreen_value"};
-    [[NSUserDefaults standardUserDefaults] setObject:userKeyValue forKey:kCLXCoreUserKeyValueKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    // Create CLXInterstitial instance (concrete fullscreen ad class)
-    CLXInterstitial *fullscreen = [[CLXInterstitial alloc] init];
-    
-    // Verify it can read the user key value data with ACTUAL unprefixed key
-    NSDictionary *storedUserKeyValue = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
-    XCTAssertEqualObjects(storedUserKeyValue, userKeyValue, @"Fullscreen ads should read user key value with unprefixed key");
-}
-
 #pragma mark - Collision Risk Tests
 
 // Test collision risk between publisher ads and external apps
 - (void)testPublisherAdsCollisionRisk {
     // Simulate external app using same keys
     [[NSUserDefaults standardUserDefaults] setObject:@{@"external": @"metrics"} forKey:kCLXCoreMetricsDictKey];
-    [[NSUserDefaults standardUserDefaults] setObject:@{@"external": @"user_data"} forKey:kCLXCoreUserKeyValueKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    
+
     // Verify external data is stored
     NSDictionary *externalMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
-    NSDictionary *externalUserData = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
     XCTAssertEqualObjects(externalMetrics[@"external"], @"metrics", @"External metrics should be stored");
-    XCTAssertEqualObjects(externalUserData[@"external"], @"user_data", @"External user data should be stored");
-    
+
     // Publisher ads overwrite with their own data
     [[NSUserDefaults standardUserDefaults] setObject:@{@"publisher": @"metrics"} forKey:kCLXCoreMetricsDictKey];
-    [[NSUserDefaults standardUserDefaults] setObject:@{@"publisher": @"user_data"} forKey:kCLXCoreUserKeyValueKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    
+
     // External data is now lost - COLLISION!
     NSDictionary *finalMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
-    NSDictionary *finalUserData = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
     XCTAssertEqualObjects(finalMetrics[@"publisher"], @"metrics", @"Publisher metrics are present");
     XCTAssertNil(finalMetrics[@"external"], @"External metrics were lost - COLLISION!");
-    XCTAssertEqualObjects(finalUserData[@"publisher"], @"user_data", @"Publisher user data is present");
-    XCTAssertNil(finalUserData[@"external"], @"External user data was lost - COLLISION!");
 }
 
 @end

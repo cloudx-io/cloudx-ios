@@ -96,62 +96,6 @@
     XCTAssertEqualObjects(storedEncodedString, encodedString, @"Encoded string should be stored");
 }
 
-// Test what CloudXCoreAPI.m line 456 actually does
-- (void)testProvideUserDetails_StoresHashedUserID {
-    // This is what actually happens in setHashedUserID:
-    NSString *hashedUserID = @"test-hashed-user-id";
-    [[NSUserDefaults standardUserDefaults] setValue:hashedUserID forKey:kCLXCoreHashedUserIDKey];
-    
-    NSString *storedHashedUserID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedUserIDKey];
-    XCTAssertEqualObjects(storedHashedUserID, hashedUserID, @"Hashed user ID should be stored");
-}
-
-// Test what CloudXCoreAPI.m lines 464-465 actually do
-- (void)testUseHashedKeyValue_StoresKeyValuePair {
-    // This is what actually happens in setHashedKeyValue:value:
-    NSString *key = @"test-key";
-    NSString *value = @"test-value";
-    
-    [[NSUserDefaults standardUserDefaults] setValue:key forKey:kCLXCoreHashedKeyKey];
-    [[NSUserDefaults standardUserDefaults] setValue:value forKey:kCLXCoreHashedValueKey];
-    
-    NSString *storedKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedKeyKey];
-    NSString *storedValue = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedValueKey];
-    
-    XCTAssertEqualObjects(storedKey, key, @"Hashed key should be stored");
-    XCTAssertEqualObjects(storedValue, value, @"Hashed value should be stored");
-}
-
-// Test what CloudXCoreAPI.m line 483 actually does
-- (void)testUseKeyValues_StoresUserDictionary {
-    // This is what actually happens in setKeyValueDictionary:
-    NSDictionary *userDict = @{@"key1": @"value1", @"key2": @"value2"};
-    [[NSUserDefaults standardUserDefaults] setObject:userDict forKey:kCLXCoreUserKeyValueKey];
-    
-    NSDictionary *storedDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
-    XCTAssertEqualObjects(storedDict, userDict, @"User dictionary should be stored");
-}
-
-// Test what CloudXCoreAPI.m lines 509-511 actually do
-- (void)testUseBidderKeyValue_StoresBidderData {
-    // This is what actually happens in setBidderKeyValue:key:value:
-    NSString *bidder = @"test-bidder";
-    NSString *key = @"test-bidder-key";
-    NSString *value = @"test-bidder-value";
-    
-    [[NSUserDefaults standardUserDefaults] setValue:bidder forKey:kCLXCoreUserBidderKey];
-    [[NSUserDefaults standardUserDefaults] setValue:key forKey:kCLXCoreUserBidderKeyKey];
-    [[NSUserDefaults standardUserDefaults] setValue:value forKey:kCLXCoreUserBidderValueKey];
-    
-    NSString *storedBidder = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderKey];
-    NSString *storedKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderKeyKey];
-    NSString *storedValue = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderValueKey];
-    
-    XCTAssertEqualObjects(storedBidder, bidder, @"Bidder should be stored");
-    XCTAssertEqualObjects(storedKey, key, @"Bidder key should be stored");
-    XCTAssertEqualObjects(storedValue, value, @"Bidder value should be stored");
-}
-
 // Test what CloudXCoreAPI.m line 215 actually does
 - (void)testSDKInit_StoresGeoHeaders {
     // This is what actually happens when geo headers are set
@@ -206,73 +150,40 @@
     XCTAssertNil(finalMetricsDict[@"external"], @"CloudXCore overwrote external metrics - COLLISION!");
 }
 
-// Test showing how multiple SDKs would conflict
-- (void)testCollisionRisk_MultipleSDKsConflict {
-    // First SDK stores its data
-    [[NSUserDefaults standardUserDefaults] setObject:@"sdk1-user-data" forKey:kCLXCoreUserKeyValueKey];
-    [[NSUserDefaults standardUserDefaults] setObject:@"sdk1-bidder" forKey:kCLXCoreUserBidderKey];
-    [[NSUserDefaults standardUserDefaults] setObject:@"sdk1-hashed-id" forKey:kCLXCoreHashedUserIDKey];
-    
-    // Verify first SDK's data
-    XCTAssertEqualObjects([[NSUserDefaults standardUserDefaults] objectForKey:kCLXCoreUserKeyValueKey], @"sdk1-user-data");
-    XCTAssertEqualObjects([[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderKey], @"sdk1-bidder");
-    XCTAssertEqualObjects([[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedUserIDKey], @"sdk1-hashed-id");
-    
-    // Second SDK (CloudXCore) overwrites with its data
-    [[NSUserDefaults standardUserDefaults] setObject:@{@"cloudx": @"data"} forKey:kCLXCoreUserKeyValueKey];
-    [[NSUserDefaults standardUserDefaults] setValue:@"cloudx-bidder" forKey:kCLXCoreUserBidderKey];
-    [[NSUserDefaults standardUserDefaults] setValue:@"cloudx-hashed-id" forKey:kCLXCoreHashedUserIDKey];
-    
-    // First SDK's data is now LOST due to collision
-    NSDictionary *userKeyValue = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
-    NSString *userBidder = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderKey];
-    NSString *hashedUserID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedUserIDKey];
-    
-    XCTAssertEqualObjects(userKeyValue[@"cloudx"], @"data", @"CloudXCore data is present");
-    XCTAssertNil(userKeyValue[@"sdk1"], @"First SDK data was LOST - COLLISION!");
-    XCTAssertEqualObjects(userBidder, @"cloudx-bidder", @"CloudXCore bidder overwrote first SDK");
-    XCTAssertEqualObjects(hashedUserID, @"cloudx-hashed-id", @"CloudXCore hashed ID overwrote first SDK");
-}
-
 // Test showing the risk with common key names
 - (void)testCollisionRisk_CommonKeyNamesHighRisk {
-    // These are the ACTUAL keys CloudXCore uses - all are extremely generic and collision-prone
+    // These are the ACTUAL keys CloudXCore uses - all are generic and collision-prone
     NSArray *cloudXCoreKeys = @[
         kCLXCoreAppKeyKey,           // Used by countless apps
-        kCLXCoreSessionIDKey,     // Common session management
+        kCLXCoreSessionIDKey,        // Common session management
         kCLXCoreMetricsDictKey,      // Generic analytics storage
-        kCLXCoreUserKeyValueKey,     // Generic user data
-        kCLXCoreHashedUserIDKey,     // Common user identification
         kCLXCoreEncodedStringKey,    // Generic encoded data
         kCLXCoreGeoHeadersKey,       // Geographic data
-        kCLXCoreUserBidderKey,       // Bidding systems
-        kCLXCoreAccountIDKey      // Account configuration
+        kCLXCoreAccountIDKey         // Account configuration
     ];
-    
+
     // Simulate other apps using these same keys
     for (NSString *key in cloudXCoreKeys) {
         [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"external-%@", key] forKey:key];
     }
     [[NSUserDefaults standardUserDefaults] synchronize];
-    
+
     // Verify external data is stored
     for (NSString *key in cloudXCoreKeys) {
         NSString *expected = [NSString stringWithFormat:@"external-%@", key];
         XCTAssertEqualObjects([[NSUserDefaults standardUserDefaults] stringForKey:key], expected);
     }
-    
+
     // CloudXCore overwrites ALL of these
     [[NSUserDefaults standardUserDefaults] setValue:@"cloudx-app" forKey:kCLXCoreAppKeyKey];
     [[NSUserDefaults standardUserDefaults] setObject:@"cloudx-session" forKey:kCLXCoreSessionIDKey];
     [[NSUserDefaults standardUserDefaults] setObject:@{} forKey:kCLXCoreMetricsDictKey];
-    [[NSUserDefaults standardUserDefaults] setObject:@{@"cloudx": @"user"} forKey:kCLXCoreUserKeyValueKey];
-    [[NSUserDefaults standardUserDefaults] setValue:@"cloudx-hashed" forKey:kCLXCoreHashedUserIDKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    
+
     // All external data is now LOST
     XCTAssertEqualObjects([[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey], @"cloudx-app");
     XCTAssertNotEqualObjects([[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey], @"external-appKey");
-    
+
     // This demonstrates that CloudXCore's use of generic keys creates HIGH collision risk
 }
 

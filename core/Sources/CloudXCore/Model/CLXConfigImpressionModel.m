@@ -17,9 +17,6 @@ NSString * const CLXConfigImpressionModelDefaultTestGroupName = @"RandomTest";
         _accountID = @"TEST_ACCOUNT";
         _sdkConfig = nil; // No SDK config in test mode
         _testGroupName = [CLXConfigImpressionModelDefaultTestGroupName copy];
-        _appKeyValues = @"app.ext.data";
-        _eids = @"user.ext.eids[*]";
-        _userKeyValues = @"user.ext.data";
     }
     return self;
 }
@@ -43,37 +40,6 @@ NSString * const CLXConfigImpressionModelDefaultTestGroupName = @"RandomTest";
         
         // Use provided test group name or default
         _testGroupName = [testGroupName copy] ?: [CLXConfigImpressionModelDefaultTestGroupName copy];
-        
-        // Extract key-value paths from SDK config
-        _appKeyValues = [sdkConfig.keyValuePaths.appKeyValues copy];
-        _eids = [sdkConfig.keyValuePaths.eids copy];
-        _userKeyValues = [sdkConfig.keyValuePaths.userKeyValues copy];
-    }
-    return self;
-}
-
-- (instancetype)initWithSessionID:(NSString *)sessionID
-                        auctionID:(NSString *)auctionID
-             impressionTrackerURL:(NSString *)impressionTrackerURL
-                   organizationID:(NSString *)organizationID
-                        accountID:(NSString *)accountID
-                        sdkConfig:(nullable CLXSDKConfigResponse *)sdkConfig
-                    testGroupName:(NSString *)testGroupName
-                     appKeyValues:(NSString *)appKeyValues
-                             eids:(NSString *)eids
-                    userKeyValues:(NSString *)userKeyValues {
-    self = [super init];
-    if (self) {
-        _sessionID = [sessionID copy];
-        _auctionID = [auctionID copy];
-        _impressionTrackerURL = [impressionTrackerURL copy];
-        _organizationID = [organizationID copy];
-        _accountID = [accountID copy];
-        _sdkConfig = sdkConfig;
-        _testGroupName = [testGroupName copy];
-        _appKeyValues = [appKeyValues copy];
-        _eids = [eids copy];
-        _userKeyValues = [userKeyValues copy];
     }
     return self;
 }

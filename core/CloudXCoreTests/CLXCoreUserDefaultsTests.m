@@ -8,6 +8,7 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXKeyValueState.h>
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXLiveInitService.h>
 #import "../Sources/CloudXCore/CloudXCoreInternal.h"
@@ -17,9 +18,7 @@
 @interface CloudXCore (Testing)
 - (void)initializeSDKWithAppKey:(NSString *)appKey testMode:(BOOL)testMode completion:(void (^)(BOOL success, CLXError *error))completion;
 - (void)setHashedUserID:(NSString *)hashedUserID;
-- (void)setHashedKeyValue:(NSString *)key value:(NSString *)value;
-- (void)setKeyValueDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary;
-- (void)setBidderKeyValue:(NSString *)bidder key:(NSString *)key value:(NSString *)value;
+- (void)setUserKeyValue:(NSString *)key value:(NSString *)value;
 + (void)trackSDKError:(NSString *)error;
 - (void)resetForTesting;
 @end
@@ -212,85 +211,10 @@
     // Test storing hashed user ID
     NSString *testHashedUserID = @"hashed-user-123";
     [sdk setHashedUserID:testHashedUserID];
-    
-    // Verify hashed user ID is stored with ACTUAL prefixed key
-    NSString *storedHashedUserID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedUserIDKey];
-    XCTAssertEqualObjects(storedHashedUserID, testHashedUserID, @"Hashed user ID should be stored with unprefixed key");
-}
 
-// Test storing hashed key-value pair using ACTUAL keys
-- (void)testProvideUserDetailsWithHashedKeyValue {
-    // Initialize SDK first
-    XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
-    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
-    config.accountID = @"test-account";
-    CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
-        [initExpectation fulfill];
-    }];
-    [self waitForExpectations:@[initExpectation] timeout:5.0];
-    
-    // Test storing hashed key-value
-    NSString *testKey = @"test-key";
-    NSString *testValue = @"test-value";
-    [sdk setHashedKeyValue:testKey value:testValue];
-    
-    // Verify hashed key and value are stored with ACTUAL prefixed keys
-    NSString *storedKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedKeyKey];
-    NSString *storedValue = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedValueKey];
-    XCTAssertEqualObjects(storedKey, testKey, @"Hashed key should be stored with unprefixed key");
-    XCTAssertEqualObjects(storedValue, testValue, @"Hashed value should be stored with unprefixed key");
-}
-
-// Test storing user dictionary using ACTUAL key
-- (void)testProvideUserDetailsWithUserDictionary {
-    // Initialize SDK first
-    XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
-    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
-    config.accountID = @"test-account";
-    CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
-        [initExpectation fulfill];
-    }];
-    [self waitForExpectations:@[initExpectation] timeout:5.0];
-    
-    // Test storing user dictionary
-    NSDictionary *testUserDict = @{@"age": @"25", @"gender": @"M"};
-    [sdk setKeyValueDictionary:testUserDict];
-    
-    // Verify user dictionary is stored with ACTUAL prefixed key
-    NSDictionary *storedUserDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
-    XCTAssertEqualObjects(storedUserDict, testUserDict, @"User dictionary should be stored with unprefixed key");
-}
-
-#pragma mark - Bidder Tests
-
-// Test storing bidder key-value data using ACTUAL keys
-- (void)testUseBidderKeyValue {
-    // Initialize SDK first
-    XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
-    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
-    config.accountID = @"test-account";
-    CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
-        [initExpectation fulfill];
-    }];
-    [self waitForExpectations:@[initExpectation] timeout:5.0];
-    
-    // Test storing bidder data
-    NSString *testBidder = @"test-bidder";
-    NSString *testKey = @"bid-key";
-    NSString *testValue = @"bid-value";
-    [sdk setBidderKeyValue:testBidder key:testKey value:testValue];
-    
-    // Verify bidder data is stored with ACTUAL prefixed keys
-    NSString *storedBidder = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderKey];
-    NSString *storedKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderKeyKey];
-    NSString *storedValue = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderValueKey];
-    
-    XCTAssertEqualObjects(storedBidder, testBidder, @"Bidder should be stored with unprefixed key");
-    XCTAssertEqualObjects(storedKey, testKey, @"Bidder key should be stored with unprefixed key");
-    XCTAssertEqualObjects(storedValue, testValue, @"Bidder value should be stored with unprefixed key");
+    // Verify hashed user ID is stored in CLXKeyValueState (in-memory, not UserDefaults)
+    NSString *storedHashedUserID = [[CLXKeyValueState shared] hashedUserId];
+    XCTAssertEqualObjects(storedHashedUserID, testHashedUserID, @"Hashed user ID should be stored in CLXKeyValueState");
 }
 
 #pragma mark - Direct Collision Risk Demonstration
@@ -373,10 +297,8 @@
     [[NSUserDefaults standardUserDefaults] setObject:[[NSUUID UUID] UUIDString] forKey:kCLXCoreSessionIDKey];
     [[NSUserDefaults standardUserDefaults] setObject:@{} forKey:kCLXCoreMetricsDictKey];
     [[NSUserDefaults standardUserDefaults] setObject:@"cloudx-encoded" forKey:kCLXCoreEncodedStringKey];
-    [[NSUserDefaults standardUserDefaults] setValue:@"cloudx-hashed-user" forKey:kCLXCoreHashedUserIDKey];
-    [[NSUserDefaults standardUserDefaults] setObject:@{@"cloudx": @"user_data"} forKey:kCLXCoreUserKeyValueKey];
-    [[NSUserDefaults standardUserDefaults] setValue:@"cloudx-bidder" forKey:kCLXCoreUserBidderKey];
-    
+    // Note: hashedUserId is now stored in CLXKeyValueState, not UserDefaults
+
     // Verify external data is STILL INTACT - NO COLLISION!
     NSString *externalAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:@"appKey"];
     NSString *externalAccountID = [[NSUserDefaults standardUserDefaults] stringForKey:@"accId_config"];
@@ -384,19 +306,14 @@
     NSDictionary *externalMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"metricsDict"];
     NSString *externalEncodedString = [[NSUserDefaults standardUserDefaults] stringForKey:@"encodedString"];
     NSString *externalHashedUserID = [[NSUserDefaults standardUserDefaults] stringForKey:@"hashedUserID"];
-    NSDictionary *externalUserData = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"userKeyValue"];
-    NSString *externalBidder = [[NSUserDefaults standardUserDefaults] stringForKey:@"userBidder"];
-    
+
     // Verify CloudXCore data is stored in PREFIXED keys
     NSString *cloudxAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
     NSString *cloudxAccountID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAccountIDKey];
     NSString *cloudxSessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey];
     NSDictionary *cloudxMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     NSString *cloudxEncodedString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreEncodedStringKey];
-    NSString *cloudxHashedUserID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreHashedUserIDKey];
-    NSDictionary *cloudxUserData = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreUserKeyValueKey];
-    NSString *cloudxBidder = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserBidderKey];
-    
+
     // Assert external data is UNCHANGED
     XCTAssertEqualObjects(externalAppKey, @"external-app-key", @"External app key should be unchanged");
     XCTAssertEqualObjects(externalAccountID, @"external-account", @"External account should be unchanged");
@@ -404,19 +321,14 @@
     XCTAssertEqualObjects(externalMetrics[@"external"], @"metrics", @"External metrics should be unchanged");
     XCTAssertEqualObjects(externalEncodedString, @"external-encoded", @"External encoded string should be unchanged");
     XCTAssertEqualObjects(externalHashedUserID, @"external-hashed-user", @"External hashed user ID should be unchanged");
-    XCTAssertEqualObjects(externalUserData[@"external"], @"user_data", @"External user data should be unchanged");
-    XCTAssertEqualObjects(externalBidder, @"external-bidder", @"External bidder should be unchanged");
-    
+
     // Assert CloudXCore data is stored correctly in PREFIXED keys
     XCTAssertEqualObjects(cloudxAppKey, @"cloudx-app-key", @"CloudXCore app key should be stored in prefixed key");
     XCTAssertEqualObjects(cloudxAccountID, @"cloudx-account", @"CloudXCore account should be stored in prefixed key");
     XCTAssertNotNil(cloudxSessionID, @"CloudXCore session ID should be stored in prefixed key");
     XCTAssertNotNil(cloudxMetrics, @"CloudXCore metrics should be stored in prefixed key");
     XCTAssertEqualObjects(cloudxEncodedString, @"cloudx-encoded", @"CloudXCore encoded string should be stored in prefixed key");
-    XCTAssertEqualObjects(cloudxHashedUserID, @"cloudx-hashed-user", @"CloudXCore hashed user ID should be stored in prefixed key");
-    XCTAssertEqualObjects(cloudxUserData[@"cloudx"], @"user_data", @"CloudXCore user data should be stored in prefixed key");
-    XCTAssertEqualObjects(cloudxBidder, @"cloudx-bidder", @"CloudXCore bidder should be stored in prefixed key");
-    
+
     NSLog(@"✅ NO COLLISION: External app data remains intact!");
     NSLog(@"✅ CloudXCore data is safely stored in prefixed keys!");
     NSLog(@"✅ This demonstrates how prefixed keys prevent collisions!");

@@ -217,22 +217,6 @@
     return nil;
 }
 
-- (nullable NSString *)hashedUserId {
-    NSString *hashedId = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXPrivacyHashedUserIdKey];
-    [self.logger debug:[NSString stringWithFormat:@"Hashed user ID: %@", hashedId ? @"(present)" : @"(none)"]];
-    return hashedId;
-}
-
-- (void)setHashedUserId:(nullable NSString *)hashedUserId {
-    [self.logger debug:[NSString stringWithFormat:@"Setting hashed user ID: %@", hashedUserId ? @"(present)" : @"(none)"]];
-    if (hashedUserId) {
-        [[NSUserDefaults standardUserDefaults] setObject:hashedUserId forKey:kCLXPrivacyHashedUserIdKey];
-    } else {
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedUserIdKey];
-    }
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
 - (nullable NSString *)hashedGeoIp {
     NSString *hashedGeoIp = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXPrivacyHashedGeoIpKey];
     [self.logger debug:[NSString stringWithFormat:@"Hashed geo IP: %@", hashedGeoIp ? @"(present)" : @"(none)"]];

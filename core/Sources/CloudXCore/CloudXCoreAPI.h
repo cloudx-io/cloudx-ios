@@ -84,30 +84,6 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
     NS_SWIFT_NAME(setHashedUserID(_:));
 
 /**
- * Set a hashed key-value pair for auction requests
- * @param key The key provided by CloudX
- * @param value The value provided by CloudX
- */
-- (void)setHashedKeyValue:(NSString *)key value:(NSString *)value
-    NS_SWIFT_NAME(setHashedKeyValue(key:value:));
-
-/**
- * Set multiple key-value pairs for auction requests
- * @param userDictionary The dictionary of key-value pairs provided by CloudX
- */
-- (void)setKeyValueDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary
-    NS_SWIFT_NAME(setKeyValueDictionary(_:));
-
-/**
- * Set a bidder-specific key-value pair for auction requests
- * @param bidder The bidder name
- * @param key The key provided by CloudX
- * @param value The value provided by CloudX
- */
-- (void)setBidderKeyValue:(NSString *)bidder key:(NSString *)key value:(NSString *)value
-    NS_SWIFT_NAME(setBidderKeyValue(bidder:key:value:));
-
-/**
  * Set a user-level key-value pair for targeting
  * @param key The targeting key
  * @param value The targeting value

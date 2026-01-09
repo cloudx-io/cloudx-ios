@@ -264,16 +264,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         
         config.auctionEndpointURL = endpointQuantum;
     }
-    
-    NSDictionary *keyValuePaths = response[@"keyValuePaths"];
-    if (keyValuePaths) {
-        CLXSDKConfigKeyValueObject *keyValuePath = [[CLXSDKConfigKeyValueObject alloc] init];
-        keyValuePath.appKeyValues = keyValuePaths[@"appKeyValues"];
-        keyValuePath.eids = keyValuePaths[@"eids"];
-        keyValuePath.userKeyValues = keyValuePaths[@"userKeyValues"];
-        config.keyValuePaths = keyValuePath; // Actually assign the parsed object to config
-    }
-    
+
     // Parse geoHeaders
     NSArray *geoHeaders = response[@"geoHeaders"];
     if (geoHeaders && [geoHeaders isKindOfClass:[NSArray class]]) {

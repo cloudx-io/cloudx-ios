@@ -8,6 +8,7 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXKeyValueState.h>
 
 // Private interface to access internal methods for robust testing
 @interface CLXTrackingFieldResolver (Testing)
@@ -67,13 +68,15 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreHashedUserIDKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreRawGeoHeadersKey];
-    
+
+    // Clear CLXKeyValueState
+    [[CLXKeyValueState shared] setHashedUserId:nil];
+
     // Clear resolver data
     [self.resolver clear];
-    
+
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -221,7 +224,7 @@
     // Set up hashed fallbacks
     NSString *hashedUserId = @"hashed-user-abc123";
     NSString *hashedGeoIp = @"hashed-geo-def456";
-    [[NSUserDefaults standardUserDefaults] setObject:hashedUserId forKey:kCLXCoreHashedUserIDKey];
+    [[CLXKeyValueState shared] setHashedUserId:hashedUserId];
     [[NSUserDefaults standardUserDefaults] setObject:hashedGeoIp forKey:kCLXPrivacyHashedGeoIpKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
@@ -265,7 +268,7 @@
 - (void)testNoFallbacksAvailable_ShouldHandleGracefully {
     // GIVEN: Privacy blocks data (CCPA opt-out) AND no fallbacks are set
     [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreHashedUserIDKey];
+    [[CLXKeyValueState shared] setHashedUserId:nil];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     

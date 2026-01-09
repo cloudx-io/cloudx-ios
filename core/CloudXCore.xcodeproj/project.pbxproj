@@ -60,7 +60,6 @@
 		196B5A682EE9970A00262ECF /* CLXAdapterBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 196B5A672EE9970A00262ECF /* CLXAdapterBanner.m */; };
 		196B5A6C2EE9976600262ECF /* CLXAdapterErrorMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 196B5A6A2EE9976600262ECF /* CLXAdapterErrorMapper.m */; };
 		196B5EB62EEC460F00262ECF /* CLXAdapterErrorMapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 196B5EB32EEC460F00262ECF /* CLXAdapterErrorMapper.h */; };
-		196C043F2ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C04382ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m */; };
 		196C04402ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C043A2ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m */; };
 		196C04412ECDBC1B0087146A /* CLXLoggerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C043C2ECDBC1B0087146A /* CLXLoggerTests.m */; };
 		196C04422ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C04392ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m */; };
@@ -291,8 +290,6 @@
 		19D92D2D2E6F69EB00C84DAE /* CLXMockInitService.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D92D2C2E6F69EB00C84DAE /* CLXMockInitService.m */; };
 		19EC25492EACB45F005C8EF6 /* CLXVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 19EC25472EACB45F005C8EF6 /* CLXVersion.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19EC254A2EACB45F005C8EF6 /* CLXVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 19EC25482EACB45F005C8EF6 /* CLXVersion.m */; };
-		19F592DE2E98365E00C6E11D /* NSDictionary+DynamicPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F592DC2E98365E00C6E11D /* NSDictionary+DynamicPath.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		19F592DF2E98365E00C6E11D /* NSDictionary+DynamicPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F592DD2E98365E00C6E11D /* NSDictionary+DynamicPath.m */; };
 		19F592E42E9836CD00C6E11D /* CLXKeyValueState.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F592E12E9836CD00C6E11D /* CLXKeyValueState.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19F592E52E9836CD00C6E11D /* CLXKeyValueState.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F592E22E9836CD00C6E11D /* CLXKeyValueState.m */; };
 		19F75DD62EA2E3A300E889C0 /* CLXGPPEdgeCasesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F75DD42EA2E3A300E889C0 /* CLXGPPEdgeCasesTests.m */; };
@@ -412,7 +409,6 @@
 		196B5A672EE9970A00262ECF /* CLXAdapterBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterBanner.m; sourceTree = "<group>"; };
 		196B5A6A2EE9976600262ECF /* CLXAdapterErrorMapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterErrorMapper.m; sourceTree = "<group>"; };
 		196B5EB32EEC460F00262ECF /* CLXAdapterErrorMapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAdapterErrorMapper.h; sourceTree = "<group>"; };
-		196C04382ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXDynamicPathInjectionTests.m; sourceTree = "<group>"; };
 		196C04392ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXEventTrackerBulkApiTests.m; sourceTree = "<group>"; };
 		196C043A2ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXKeyValueBidRequestInjectionTests.m; sourceTree = "<group>"; };
 		196C043B2ECDBC1B0087146A /* CLXKeyValueStateTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXKeyValueStateTests.m; sourceTree = "<group>"; };
@@ -646,8 +642,6 @@
 		19D92D2C2E6F69EB00C84DAE /* CLXMockInitService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMockInitService.m; sourceTree = "<group>"; };
 		19EC25472EACB45F005C8EF6 /* CLXVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVersion.h; sourceTree = "<group>"; };
 		19EC25482EACB45F005C8EF6 /* CLXVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVersion.m; sourceTree = "<group>"; };
-		19F592DC2E98365E00C6E11D /* NSDictionary+DynamicPath.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+DynamicPath.h"; sourceTree = "<group>"; };
-		19F592DD2E98365E00C6E11D /* NSDictionary+DynamicPath.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+DynamicPath.m"; sourceTree = "<group>"; };
 		19F592E12E9836CD00C6E11D /* CLXKeyValueState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXKeyValueState.h; sourceTree = "<group>"; };
 		19F592E22E9836CD00C6E11D /* CLXKeyValueState.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXKeyValueState.m; sourceTree = "<group>"; };
 		19F75DD42EA2E3A300E889C0 /* CLXGPPEdgeCasesTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGPPEdgeCasesTests.m; sourceTree = "<group>"; };
@@ -807,7 +801,6 @@
 				194BC0BE2EF3F6520008DB33 /* CLXRewardTests.m */,
 				19D8D2222EDA068200817D1E /* CLXBiddingConfigORTBFieldsTests.m */,
 				196C05B92ECDDEA60087146A /* CLXSDKInitQueueTests.m */,
-				196C04382ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m */,
 				196C04392ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m */,
 				196C043A2ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m */,
 				196C043B2ECDBC1B0087146A /* CLXKeyValueStateTests.m */,
@@ -1119,8 +1112,6 @@
 				19D92A4D2E68C6DC00C84DAE /* CLXAdFormat.h */,
 				19D92A472E68C54C00C84DAE /* CLXAd.m */,
 				19D9287B2E63CBD300C84DAE /* CLXRillTrackingService.h */,
-				19F592DC2E98365E00C6E11D /* NSDictionary+DynamicPath.h */,
-				19F592DD2E98365E00C6E11D /* NSDictionary+DynamicPath.m */,
 				19D9287D2E63CBD300C84DAE /* CLXTrackingFieldResolver.h */,
 				19D926BA2E61101200C84DAE /* CLXRetryHelper.h */,
 				19D926B42E610FFB00C84DAE /* CLXSettings.h */,
@@ -1417,7 +1408,6 @@
 				19D8D4BB2EDD7B0400817D1E /* CLXDebugErrorView.h in Headers */,
 				19D8D4BC2EDD7B0400817D1E /* CLXDebugButton.h in Headers */,
 				194BC0C32EF3F7290008DB33 /* CLXUIApplicationProxy.h in Headers */,
-				19F592DE2E98365E00C6E11D /* NSDictionary+DynamicPath.h in Headers */,
 				19F592E42E9836CD00C6E11D /* CLXKeyValueState.h in Headers */,
 				19D8D2212EDA04C900817D1E /* CLXORTBConstants.h in Headers */,
 				19C7257A2E2390810012CFC7 /* CLXBidNetworkService.h in Headers */,
@@ -1550,7 +1540,6 @@
 				198303D22EB1F8CA0080DDAF /* CLXRewarded.m in Sources */,
 				19C725B02E2390810012CFC7 /* CLXSessionMetricPerformance.m in Sources */,
 				19C725B12E2390810012CFC7 /* CLXDIContainer.m in Sources */,
-				19F592DF2E98365E00C6E11D /* NSDictionary+DynamicPath.m in Sources */,
 				19C725B22E2390810012CFC7 /* CLXPublisherBanner.m in Sources */,
 				19C725B32E2390810012CFC7 /* CLXLogger.m in Sources */,
 				19C725B42E2390810012CFC7 /* UIDevice+CLXIdentifier.m in Sources */,
@@ -1696,7 +1685,6 @@
 				197994812E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m in Sources */,
 				1916B1702E7E061B00E49E3E /* CLXWinLossNetworkServiceTests.m in Sources */,
 				1916B1712E7E061B00E49E3E /* CLXSQLiteDatabaseTests.m in Sources */,
-				196C043F2ECDBC1B0087146A /* CLXDynamicPathInjectionTests.m in Sources */,
 				196C04402ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m in Sources */,
 				196C04412ECDBC1B0087146A /* CLXLoggerTests.m in Sources */,
 				196C04422ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m in Sources */,

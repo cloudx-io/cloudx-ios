@@ -30,7 +30,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXSDKConfigTargetingStrategy;
 @class CLXSDKConfigTargeting;
 @class CLXSDKConfigCondition;
-@class CLXSDKConfigKeyValueObject;
 @class CLXSDKConfigGeoBid;
 
 @interface CLXSDKConfig : NSObject
@@ -75,7 +74,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *metricsEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sessionID;
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
-@property (nonatomic, strong, nullable) CLXSDKConfigKeyValueObject *keyValuePaths;
 @property (nonatomic, copy, nullable) NSString *geoDataEndpointURL;
 @property (nonatomic, strong, nullable) NSArray<CLXSDKConfigPlacement *> *placements;
 @property (nonatomic, strong, nullable) NSArray<CLXSDKConfigBidder *> *bidders;
@@ -150,13 +148,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXSDKConfigEndpointObject : NSObject
 @property (nonatomic, copy, nullable) NSArray<CLXSDKConfigEndpointValue *> *test;
 @property (nonatomic, copy, nullable) NSString *defaultKey;
-- (instancetype)init;
-@end
-
-@interface CLXSDKConfigKeyValueObject : NSObject
-@property (nonatomic, copy, nullable) NSString *appKeyValues;
-@property (nonatomic, copy, nullable) NSString *eids;
-@property (nonatomic, copy, nullable) NSString *userKeyValues;
 - (instancetype)init;
 @end
 
