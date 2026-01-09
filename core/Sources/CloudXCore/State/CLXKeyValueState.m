@@ -11,6 +11,8 @@
 
 @implementation CLXKeyValueState
 
+@synthesize hashedUserId = _hashedUserId;
+
 + (instancetype)shared {
     static CLXKeyValueState *sharedInstance = nil;
     static dispatch_once_t onceToken;
@@ -30,22 +32,42 @@
     return self;
 }
 
+#pragma mark - Thread-Safe Accessors
+
+- (void)setHashedUserId:(NSString *)hashedUserId {
+    @synchronized(self) {
+        _hashedUserId = [hashedUserId copy];
+    }
+}
+
+- (NSString *)hashedUserId {
+    @synchronized(self) {
+        return _hashedUserId;
+    }
+}
+
 - (void)setUserKeyValue:(NSString *)key value:(NSString *)value {
     if (key && value) {
-        self.userKeyValues[key] = value;
+        @synchronized(self) {
+            self.userKeyValues[key] = value;
+        }
     }
 }
 
 - (void)setAppKeyValue:(NSString *)key value:(NSString *)value {
     if (key && value) {
-        self.appKeyValues[key] = value;
+        @synchronized(self) {
+            self.appKeyValues[key] = value;
+        }
     }
 }
 
 - (void)clearAllKeyValues {
-    [self.userKeyValues removeAllObjects];
-    [self.appKeyValues removeAllObjects];
-    self.hashedUserId = nil;
+    @synchronized(self) {
+        [self.userKeyValues removeAllObjects];
+        [self.appKeyValues removeAllObjects];
+        _hashedUserId = nil;
+    }
 }
 
 @end
