@@ -21,40 +21,27 @@ jobs:
   test:
     name: Run CloudXCore Unit Tests
     runs-on: macos-latest
-    timeout-minutes: 30
-    
+    timeout-minutes: 20
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Show Xcode version
-        run: |
-          xcodebuild -version
-          xcode-select -p
-      
-      - name: List available simulators
-        run: xcrun simctl list devices available
-      
+      - uses: actions/checkout@v4
+
       - name: Run unit tests
         working-directory: core
-        timeout-minutes: 25
         run: |
           set -o pipefail
           xcodebuild test \
             -project CloudXCore.xcodeproj \
             -scheme CloudXCore \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-            -enableCodeCoverage NO \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGN_IDENTITY="" \
-            2>&1 | tee xcodebuild.log | grep -E "Test Suite|Test Case|Executed|Assertion|error:|warning:" || cat xcodebuild.log
-      
+            -resultBundlePath TestResults.xcresult \
+            -quiet \
+            CODE_SIGNING_ALLOWED=NO
+
       - name: Upload test results
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: |
-            core/build/Logs/Test/*.xcresult
+          path: core/TestResults.xcresult
           retention-days: 7
-
