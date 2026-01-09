@@ -134,7 +134,7 @@ static BOOL _globalTimestampsEnabled = NO;
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
             timestampFormatter = [[NSDateFormatter alloc] init];
-            [timestampFormatter setDateFormat:@"HH:mm:ss.SSS"];
+            [timestampFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss.SSS"];
         });
         timestamp = [NSString stringWithFormat:@"[%@] ", [timestampFormatter stringFromDate:[NSDate date]]];
     }
