@@ -110,19 +110,14 @@ class BaseAdViewController: UIViewController, AdStateManaging {
             cloudX.setHashedUserID(config.hashedUserId)
         }
 
-        // Determine test mode based on build configuration
-        #if targetEnvironment(simulator)
-        let testMode = true
-        #elseif DEBUG
-        let testMode = true
-        #else
-        let testMode = false
-        #endif
+        // Test mode is now server-controlled via deviceConfig
+        // To enable test mode, whitelist your device IFA on the CloudX server dashboard
+        // Check logs for: "Device IFA for test whitelisting: XXXX-XXXX-XXXX-XXXX"
         
         return await withCheckedContinuation { continuation in
-            cloudX.initializeSDK(appKey: appKey, testMode: testMode) { success, error in
+            cloudX.initializeSDK(appKey: appKey) { success, error in
                 if success {
-                    print("✅ SDK Initialized (testMode: \(testMode))")
+                    print("✅ SDK Initialized")
                     NotificationCenter.default.post(name: .sdkInitialized, object: nil)
                 } else {
                     print("❌ SDK Init Failed: \(error?.localizedDescription ?? "Unknown error")")

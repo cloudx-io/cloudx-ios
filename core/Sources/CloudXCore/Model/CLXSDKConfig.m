@@ -264,4 +264,17 @@
     return self;
 }
 
+@end
+
+@implementation CLXSDKConfigDeviceConfig
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _test = 0;
+        _debug = NO;
+    }
+    return self;
+}
+
 @end 

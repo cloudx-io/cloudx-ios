@@ -15,7 +15,7 @@
 #import "Mocks/CLXMockInitService.h"
 
 @interface CloudXCore (Testing)
-- (void)initializeSDKWithAppKey:(NSString *)appKey testMode:(BOOL)testMode completion:(void (^)(BOOL success, CLXError *error))completion;
+- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL success, CLXError *error))completion;
 - (void)setHashedUserID:(NSString *)hashedUserID;
 - (void)setUserKeyValue:(NSString *)key value:(NSString *)value;
 - (void)resetForTesting;
@@ -74,7 +74,7 @@
     config.accountID = testAccountID;
     
     CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:testAppKey testMode:NO completion:^(BOOL success, CLXError *error) {
+    [sdk initializeSDKWithAppKey:testAppKey completion:^(BOOL success, CLXError *error) {
         [expectation fulfill];
     }];
     
@@ -123,7 +123,7 @@
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account";
     CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, CLXError *error) {
         [initExpectation fulfill];
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
@@ -147,7 +147,7 @@
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account";
     CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, CLXError *error) {
         [initExpectation fulfill];
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
@@ -176,7 +176,7 @@
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account";
     CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, CLXError *error) {
         [initExpectation fulfill];
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
@@ -223,7 +223,7 @@
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account";
     CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
+    [sdk initializeSDKWithAppKey:@"test-key" completion:^(BOOL success, CLXError *error) {
         [initExpectation fulfill];
     }];
     [self waitForExpectations:@[initExpectation] timeout:5.0];
@@ -279,7 +279,7 @@
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.accountID = @"test-account-123"; // This matches what CLXMockInitService returns
     CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"cloudx-app-key" testMode:NO completion:^(BOOL success, CLXError *error) {
+    [sdk initializeSDKWithAppKey:@"cloudx-app-key" completion:^(BOOL success, CLXError *error) {
         [expectation fulfill];
     }];
     [self waitForExpectations:@[expectation] timeout:5.0];

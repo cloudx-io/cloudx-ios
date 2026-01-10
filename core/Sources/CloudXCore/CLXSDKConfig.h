@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXSDKConfigTargeting;
 @class CLXSDKConfigCondition;
 @class CLXSDKConfigGeoBid;
+@class CLXSDKConfigDeviceConfig;
 
 @interface CLXSDKConfig : NSObject
 
@@ -90,6 +91,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *winLossNotificationURL;
 @property (nonatomic, strong, nullable) NSDictionary<NSString *, NSString *> *winLossNotificationPayloadConfig;
 @property (nonatomic, strong, nullable) CLXMetricsConfig *metricsConfig;
+/// Device-specific configuration from server (test mode, debug logging)
+@property (nonatomic, strong, nullable) CLXSDKConfigDeviceConfig *deviceConfig;
 
 - (instancetype)init;
 @end
@@ -187,6 +190,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSArray<NSArray<NSDictionary<NSString *, CLXSDKConfigQuantumValue *> *> *> *whitelist;
 @property (nonatomic, copy, nullable) NSArray<NSArray<NSDictionary<NSString *, CLXSDKConfigQuantumValue *> *> *> *blacklist;
 @property (nonatomic, assign) BOOL conditionsAnd;
+- (instancetype)init;
+@end
+
+/**
+ * Device configuration from server init response
+ * Controls test mode and debug logging on a per-device basis
+ */
+@interface CLXSDKConfigDeviceConfig : NSObject
+/// Test mode value from server (0 = production, non-zero = test mode)
+/// The value is passed through to bid requests as-is
+@property (nonatomic, assign) NSInteger test;
+/// Whether debug logging should be enabled for this device
+@property (nonatomic, assign) BOOL debug;
 - (instancetype)init;
 @end
 

@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)sdkVersion;
 
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config
+                    testMode:(BOOL)testMode
                   completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
 
 @end

@@ -192,7 +192,9 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     NSString *idfa = [CLXSystemInformation shared].idfa ?: @"00000-00000-00000-000000";
     NSString *idfv = [CLXSystemInformation shared].idfv ?: @"00000-00000-00000-000000";
     
-    [self.logger debug:[NSString stringWithFormat:@"Device info - IDFA: %@, Bundle: %@, OS: %@", idfa, [CLXSystemInformation shared].appBundleIdentifier, [CLXSystemInformation shared].osVersion]];
+    // Log IFA at INFO level for test whitelisting - developers can copy this to whitelist their device
+    [self.logger info:[NSString stringWithFormat:@"Device IFA for test whitelisting: %@", idfa]];
+    [self.logger debug:[NSString stringWithFormat:@"Device info - Bundle: %@, OS: %@, IDFV: %@", [CLXSystemInformation shared].appBundleIdentifier, [CLXSystemInformation shared].osVersion, idfv]];
     
     CLXSDKConfigRequest *request = [[CLXSDKConfigRequest alloc] init];
     request.bundle = [CLXSystemInformation shared].appBundleIdentifier;
@@ -312,6 +314,25 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         config.winLossNotificationPayloadConfig = nil;
         [self.logger debug:@"[SDK_INIT] No win/loss payload config found in response"];
     }
+    
+    // Parse deviceConfig for server-controlled test mode and debug logging
+    NSDictionary *deviceConfigDict = response[@"deviceConfig"];
+    CLXSDKConfigDeviceConfig *deviceConfig = [[CLXSDKConfigDeviceConfig alloc] init];
+    if (deviceConfigDict && [deviceConfigDict isKindOfClass:[NSDictionary class]]) {
+        NSNumber *testValue = deviceConfigDict[@"test"];
+        if (testValue && [testValue isKindOfClass:[NSNumber class]]) {
+            deviceConfig.test = [testValue integerValue];
+        }
+        NSNumber *debugValue = deviceConfigDict[@"debug"];
+        if (debugValue && [debugValue isKindOfClass:[NSNumber class]]) {
+            deviceConfig.debug = [debugValue boolValue];
+        }
+        [self.logger info:[NSString stringWithFormat:@"DeviceConfig parsed - test: %ld, debug: %@", 
+                          (long)deviceConfig.test, deviceConfig.debug ? @"YES" : @"NO"]];
+    } else {
+        [self.logger debug:@"No deviceConfig in response - using defaults (test=0, debug=NO)"];
+    }
+    config.deviceConfig = deviceConfig;
     
     // Parse bidders
     NSArray *biddersArray = response[@"bidders"];

@@ -32,7 +32,6 @@ pod install --repo-update
 #import <CloudXCore/CloudXCore.h>
 
 [[CloudXCore shared] initializeSDKWithAppKey:@"your-app-key-here" 
-                                    testMode:NO
                                   completion:^(BOOL success, CLXError * _Nullable error) {
     if (success) {
         NSLog(@"CloudX SDK initialized successfully");
@@ -46,7 +45,7 @@ pod install --repo-update
 ```swift
 import CloudXCore
 
-CloudXCore.shared.initializeSDK(appKey: "your-app-key-here", testMode: false) { success, error in
+CloudXCore.shared.initializeSDK(appKey: "your-app-key-here") { success, error in
     if success {
         print("CloudX SDK initialized successfully")
     } else {
@@ -398,21 +397,22 @@ CloudXCore.setMinLogLevel(.none)
 
 ### Test Mode
 
-Pass `testMode: true` during initialization to enable test ads during development:
+Test mode is now **server-controlled** via device whitelisting. This provides better security and control over which devices receive test ads.
 
-**Objective-C:**
-```objc
-[[CloudXCore shared] initializeSDKWithAppKey:@"your-app-key" testMode:YES completion:^(BOOL success, CLXError *error) {
-    // Test ads enabled
-}];
-```
+**To enable test mode:**
 
-**Swift:**
-```swift
-CloudXCore.shared.initializeSDK(appKey: "your-app-key", testMode: true) { success, error in
-    // Test ads enabled
-}
-```
+1. Initialize the SDK and check the logs for your device IFA:
+   ```
+   [CloudX][INFO] Device IFA for test whitelisting: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+   ```
+
+2. Copy the IFA and add it to your device whitelist on the CloudX server dashboard
+
+3. The server will return `deviceConfig.test = 1` for whitelisted devices
+
+4. The SDK will automatically configure adapters for test mode and include the test flag in bid requests
+
+**Note:** Test mode is determined by the server, so you don't need to change any code between development and production builds.
 
 ### Privacy Compliance
 

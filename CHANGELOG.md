@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Breaking Changes
+- **Test mode is now server-controlled** - Removed `testMode` parameter from `initializeSDKWithAppKey:completion:`
+  - To enable test mode, whitelist your device IFA on the CloudX server dashboard
+  - The SDK now logs the device IFA at INFO level during initialization for easy copy/paste
+  - Server returns `deviceConfig.test` value which is passed through to bid requests
+
+### Changed
+- **Device config parsing** - SDK now parses `deviceConfig` from server init response:
+  - `test`: Integer value passed to bid requests (0 = production, non-zero = test mode)
+  - `debug`: Boolean to enable verbose logging remotely
+- **Adapter initializer protocol** - Added `testMode:` parameter to `CLXAdNetworkInitializer` protocol
+- **Meta adapter** - Now uses server-controlled test mode instead of client-side flag
+
+---
+
 ## [1.3.0] - 2025-12-14
 
 ### Added
@@ -96,7 +113,6 @@ end
 ```objc
 // Initialize SDK
 [[CloudXCore shared] initializeSDKWithAppKey:@"YOUR_APP_KEY"
-                                    testMode:NO
                                   completion:^(BOOL success, CLXError *error) {
     if (success) {
         NSLog(@"CloudX SDK initialized!");

@@ -61,9 +61,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Initializes the InMobi SDK with the provided configuration
  * @param config The bidder configuration containing account ID and placement IDs
+ * @param testMode Whether test mode is enabled (from server deviceConfig)
  * @param completion Completion block called with success/failure result
  */
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config 
+                    testMode:(BOOL)testMode
                   completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
 
 @end

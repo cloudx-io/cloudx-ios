@@ -48,9 +48,11 @@ static NSString * const kSDKVersion = @"8.0.3"; // Mintegral SDK version (update
 }
 
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config
+                    testMode:(BOOL)testMode
                   completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
     
-    [self.logger debug:@"Initializing Mintegral adapter"];
+    [self.logger debug:[NSString stringWithFormat:@"Initializing Mintegral adapter (testMode: %@)", testMode ? @"YES" : @"NO"]];
+    // Note: testMode parameter received from server deviceConfig
     
     if (isInitialized) {
         [self.logger info:@"Mintegral SDK already initialized"];

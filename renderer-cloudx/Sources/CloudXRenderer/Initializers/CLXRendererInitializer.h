@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXRendererInitializer : NSObject <CLXAdNetworkInitializer>
 
 + (instancetype)createInstance;
-- (void)initializeWithConfig:(nullable CLXBidderConfig *)config completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
+- (void)initializeWithConfig:(nullable CLXBidderConfig *)config testMode:(BOOL)testMode completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
 
 @end
 

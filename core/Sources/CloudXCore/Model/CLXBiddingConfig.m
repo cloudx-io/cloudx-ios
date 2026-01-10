@@ -670,17 +670,17 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         
         _source = source;
         
-        // Read test mode from SDK init configuration
-        // Test mode is set during initializeSDKWithAppKey:testMode:completion:
-        // Simulator always has test mode enabled automatically
-        BOOL testModeEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:kCLXCoreTestModeKey];
+        // Read test mode from server deviceConfig
+        // Test mode is now server-controlled (set after init response parsing)
+        // The value is stored as an integer (0 = production, non-zero = test mode)
+        NSInteger testModeValue = [[NSUserDefaults standardUserDefaults] integerForKey:kCLXCoreTestModeKey];
         
-        if (testModeEnabled) {
-            _test = @1;
-            [logger debug:@"Test mode enabled via SDK init - test flag set to: 1"];
+        // Always include test field in bid request (OpenRTB spec)
+        _test = @(testModeValue);
+        if (testModeValue != 0) {
+            [logger info:[NSString stringWithFormat:@"Test mode enabled via deviceConfig - test flag: %ld", (long)testModeValue]];
         } else {
-            _test = @0;
-            [logger debug:@"Production mode - test flag set to: 0"];
+            [logger debug:@"Production mode - test flag: 0"];
         }
     }
     return self;

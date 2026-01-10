@@ -104,22 +104,16 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
 }
 
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config 
+                    testMode:(BOOL)testMode
                   completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
     [[CLXMetaInitializer logger] debug:@"Initializing Meta Audience Network adapter"];
     
     // Configure production settings (always needed)
     [self configureAdvertiserTrackingEnabled];
     
-    // Read test mode from SDK init configuration (set during initializeSDKWithAppKey:testMode:completion:)
-    // This key is automatically set to YES on simulator by CloudXCore
-    BOOL testModeEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"CLXCore_testMode"];
-    
-    if (testModeEnabled) {
-        [[CLXMetaInitializer logger] info:@"Test mode enabled via SDK init - configuring Meta test settings"];
-        [self configureTestSettings];
-    } else {
-        [[CLXMetaInitializer logger] info:@"Production mode - Meta will serve real ads"];
-    }
+    // Apply test mode from server deviceConfig (passed from CloudXCore)
+    [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"Setting Meta test mode: %@", testMode ? @"YES" : @"NO"]];
+    [self configureTestSettings:testMode];
     
     // Initialize Meta FAN SDK with placement IDs
     [self initializeMetaSDKWithConfig:config];
@@ -195,35 +189,43 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
 }
 
 /**
- * Configures Meta test settings for development/testing
+ * Configures Meta test settings based on server deviceConfig
  * 
- * Test mode is controlled via SDK initialization:
- * [[CloudXCore shared] initializeSDKWithAppKey:@"key" testMode:YES completion:...];
+ * Test mode is now controlled via server deviceConfig:
+ * - Whitelist your device IFA on the CloudX dashboard
+ * - The server will return deviceConfig.test != 0 for whitelisted devices
  *
  * When enabled:
  * - Registers the current device as a test device to receive test ads
  * - Sets Meta logging level for debugging
- * - Simulator always has test mode enabled automatically
  *
- * Note: Use testMode:NO for production App Store releases!
+ * Note: iOS Meta SDK uses addTestDevice: to enable test mode (unlike Android's setTestMode)
+ *
+ * @param enable Whether test mode should be enabled
  */
-- (void)configureTestSettings {
-    // Dynamically get current device's test hash instead of hardcoding
-    NSString *deviceHash = [FBAdSettings testDeviceHash];
-    if (deviceHash && deviceHash.length > 0) {
-        [FBAdSettings addTestDevice:deviceHash];
-        [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Test device registered dynamically: %@", deviceHash ? @"SUCCESS" : @"FAILED"]];
+- (void)configureTestSettings:(BOOL)enable {
+    if (enable) {
+        // Dynamically get current device's test hash and register for test ads
+        NSString *deviceHash = [FBAdSettings testDeviceHash];
+        if (deviceHash && deviceHash.length > 0) {
+            [FBAdSettings addTestDevice:deviceHash];
+            [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Test device registered: %@", deviceHash]];
+        } else {
+            [[CLXMetaInitializer logger] debug:@"Unable to retrieve device test hash"];
+        }
+        
+        // Set logging level for better debugging during development
+        [FBAdSettings setLogLevel:FBAdLogLevelLog];
     } else {
-        [[CLXMetaInitializer logger] debug:@"Unable to retrieve device test hash"];
+        // Clear test devices for production mode
+        [FBAdSettings clearTestDevices];
     }
-    
-    // Set logging level for better debugging during development
-    [FBAdSettings setLogLevel:FBAdLogLevelLog];
     
     // Check and log test mode status
     BOOL isTestMode = [FBAdSettings isTestMode];
-    
-    [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Meta test mode: %@ | Debug logging enabled", isTestMode ? @"enabled" : @"disabled"]];
+    [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Meta test mode: %@ (requested: %@)", 
+                                       isTestMode ? @"enabled" : @"disabled",
+                                       enable ? @"YES" : @"NO"]];
 }
 
 @end 

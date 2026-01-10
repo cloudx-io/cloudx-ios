@@ -12,8 +12,11 @@
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXSDKConfigPlacement.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
+#import <CloudXCore/CLXDIContainer.h>
+#import <CloudXCore/CLXLiveInitService.h>
 #import <objc/runtime.h>
 #import "../Sources/CloudXCore/CloudXCoreInternal.h"
+#import "Mocks/CLXMockInitService.h"
 
 // Private interface to access internal methods for testing
 @interface CLXTrackingFieldResolver (RillTrackingTesting)
@@ -188,17 +191,26 @@ static MockRillEventReporter *sharedInstance = nil;
 @property (nonatomic, strong) CLXTrackingFieldResolver *resolver;
 @property (nonatomic, strong) CLXSDKConfigResponse *mockSDKConfig;
 @property (nonatomic, strong) CLXConfigImpressionModel *mockImpModel;
+@property (nonatomic, strong) CLXMockInitService *mockInitService;
 @end
 
 @implementation CLXRillTrackingTests
 
 - (void)setUp {
     [super setUp];
+    
+    // Reset DI container to ensure clean state
+    [[CLXDIContainer shared] reset];
+    
     [[CloudXCore shared] resetForTesting];
     [MockRillEventReporter reset];
     self.mockReporter = [MockRillEventReporter shared];
     self.mockConfig = [[MockSDKConfigResponse alloc] init];
     self.resolver = [CLXTrackingFieldResolver shared];
+    
+    // Set up mock init service to avoid network calls
+    self.mockInitService = [[CLXMockInitService alloc] initWithSuccess:YES];
+    [[CLXDIContainer shared] registerType:[CLXLiveInitService class] instance:self.mockInitService];
     
     // Create mock SDK config with appID
     self.mockSDKConfig = [[CLXSDKConfigResponse alloc] init];
@@ -218,6 +230,7 @@ static MockRillEventReporter *sharedInstance = nil;
 
 - (void)tearDown {
     [MockRillEventReporter reset];
+    [[CLXDIContainer shared] reset];
     [super tearDown];
 }
 
@@ -393,7 +406,7 @@ static MockRillEventReporter *sharedInstance = nil;
     
     // When: Initialize SDK
     XCTestExpectation *expectation = [self expectationWithDescription:@"SDK Init"];
-    [[CloudXCore shared] initializeSDKWithAppKey:kTestAppKey testMode:NO completion:^(BOOL success, CLXError *error) {
+    [[CloudXCore shared] initializeSDKWithAppKey:kTestAppKey completion:^(BOOL success, CLXError *error) {
         if (success) {
             // Replace the reporting service with our mock after initialization
             [[CloudXCore shared] setValue:self.mockReporter forKey:@"reportingService"];

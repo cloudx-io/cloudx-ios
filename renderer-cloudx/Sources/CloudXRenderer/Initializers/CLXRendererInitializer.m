@@ -87,9 +87,9 @@ static BOOL isInitialized = NO;
  * @param config Bidder configuration (optional for Renderer)
  * @param completion Completion block called with initialization result
  */
-- (void)initializeWithConfig:(nullable CLXBidderConfig *)config completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
+- (void)initializeWithConfig:(nullable CLXBidderConfig *)config testMode:(BOOL)testMode completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXRendererInitializer"];
-    [logger debug:@"[INIT-ASYNC] CloudXRendererInitializer async initialization started"];
+    [logger debug:[NSString stringWithFormat:@"[INIT-ASYNC] CloudXRendererInitializer async initialization started (testMode: %@)", testMode ? @"YES" : @"NO"]];
     
     // Renderer is rendering-only, no special initialization needed
     // Set initialization state to true

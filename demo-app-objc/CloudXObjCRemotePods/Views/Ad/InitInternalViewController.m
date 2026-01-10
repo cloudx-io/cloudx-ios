@@ -257,17 +257,11 @@
         [[CloudXCore shared] setHashedUserID:config.hashedUserId];
     }
     
-    // Determine test mode based on build configuration
-    BOOL testMode = NO;
-    #if TARGET_IPHONE_SIMULATOR
-        testMode = YES;
-    #elif DEBUG
-        testMode = YES;
-    #endif
+    // Note: Test mode is now server-controlled via deviceConfig
+    // Whitelist your device IFA on the CloudX dashboard to enable test mode
     
     // Use standard CloudXCore initialization which will now use our environment override
     [[CloudXCore shared] initializeSDKWithAppKey:config.appKey 
-                                        testMode:testMode
                                       completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ SDK initialized successfully with %@ environment", environmentName]];

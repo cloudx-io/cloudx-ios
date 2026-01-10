@@ -105,8 +105,10 @@ static NSString * const kSDKVersion = @"1.0.0"; // Moloco SDK version
 }
 
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config 
+                    testMode:(BOOL)testMode
                   completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
-    [[CLXMolocoInitializer logger] debug:@"Initializing Moloco adapter"];
+    [[CLXMolocoInitializer logger] debug:[NSString stringWithFormat:@"Initializing Moloco adapter (testMode: %@)", testMode ? @"YES" : @"NO"]];
+    // Note: testMode parameter received from server deviceConfig
     
     if (isInitialized) {
         [[CLXMolocoInitializer logger] info:@"SDK already initialized"];

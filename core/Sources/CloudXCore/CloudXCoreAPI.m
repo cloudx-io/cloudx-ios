@@ -202,13 +202,11 @@ static CloudXCore *_sharedInstance = nil;
                                                   testGroupName:_abTestName];
 }
 
-- (void)initializeSDKWithAppKey:(NSString *)appKey testMode:(BOOL)testMode completion:(void (^)(BOOL, CLXError * _Nullable))completion {
-    [self.logger info:[NSString stringWithFormat:@"[CloudXCore] initializeSDKWithAppKey called with appKey: %@, testMode: %@", appKey, testMode ? @"YES" : @"NO"]];
+- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL, CLXError * _Nullable))completion {
+    [self.logger info:[NSString stringWithFormat:@"[CloudXCore] initializeSDKWithAppKey called with appKey: %@", appKey]];
     
-    // Store test mode setting immediately (before any adapter initialization)
-    // This allows adapters to read the setting during their initialization
-    [[NSUserDefaults standardUserDefaults] setBool:testMode forKey:kCLXCoreTestModeKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    // Note: Test mode is now server-controlled via deviceConfig
+    // The test mode value will be set after receiving the server response
     
     // Track SDK initialization method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
@@ -383,7 +381,39 @@ static CloudXCore *_sharedInstance = nil;
     [self.logger debug:[NSString stringWithFormat:@"Processing SDK config - Session: %@, Account: %@, Bidders: %lu", config.sessionID, config.accountID, (unsigned long)config.bidders.count]];
     
     _sdkConfig = config;
-
+    
+    // Apply server-controlled test mode and debug logging from deviceConfig
+    CLXSDKConfigDeviceConfig *deviceConfig = config.deviceConfig;
+    
+    // Start with server-provided values (or defaults)
+    NSInteger testModeValue = deviceConfig ? deviceConfig.test : 0;
+    BOOL debugEnabled = deviceConfig ? deviceConfig.debug : NO;
+    
+    // Apply debug logging if server says so
+    if (debugEnabled) {
+        [CloudXCore setMinLogLevel:CLXLogLevelVerbose];
+        [self.logger debug:@"Debug logging enabled via deviceConfig"];
+    }
+    
+#if TARGET_IPHONE_SIMULATOR
+    // Always enable test mode on simulator - ads won't fill in production mode anyway
+    // and there's no real device IFA to whitelist on the dashboard
+    if (testModeValue == 0) {
+        testModeValue = 1;
+        [self.logger info:@"Test mode automatically enabled for iOS Simulator"];
+    }
+#endif
+    
+    // Compute test mode enabled flag
+    BOOL testModeEnabled = (testModeValue != 0);
+    if (testModeEnabled) {
+        [self.logger info:[NSString stringWithFormat:@"Test mode enabled (test=%ld)", (long)testModeValue]];
+    }
+    
+    // Store test mode for bid requests (as integer value for OpenRTB)
+    [[NSUserDefaults standardUserDefaults] setInteger:testModeValue forKey:kCLXCoreTestModeKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
     // Set the tracking configuration for Analytics
     [[CLXTrackingFieldResolver shared] setConfig:config];
     
@@ -406,6 +436,8 @@ static CloudXCore *_sharedInstance = nil;
     NSDictionary *adNetworkInitializers = _adNetworkFactories.initializers;
     [self.logger debug:[NSString stringWithFormat:@"Initializing adapters - Available: %@", [adNetworkInitializers allKeys]]];
     
+    // testModeEnabled was already computed above (includes simulator detection)
+    
     if (adNetworkInitializers && adNetworkInitializers.count > 0) {
         // Create dispatch group to block until ALL adapters initialize
         dispatch_group_t adapterInitGroup = dispatch_group_create();
@@ -425,7 +457,7 @@ static CloudXCore *_sharedInstance = nil;
             // Convert SDKConfigBidder to CloudXBidderConfig 
             CLXBidderConfig *bidderConfig = [[CLXBidderConfig alloc] initWithInitializationData:adNetworkConfig.bidderInitData networkName:adNetworkConfig.networkName];
             
-            [initializer initializeWithConfig:bidderConfig completion:^(BOOL success, NSError * _Nullable error) {
+            [initializer initializeWithConfig:bidderConfig testMode:testModeEnabled completion:^(BOOL success, NSError * _Nullable error) {
                 if (success) {
                     [self.logger info:[NSString stringWithFormat:@"Successfully initialized network: %@", mappedNetworkName]];
                     [self markAdapterReady:mappedNetworkName];

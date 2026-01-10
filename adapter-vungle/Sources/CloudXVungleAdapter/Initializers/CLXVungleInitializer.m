@@ -68,7 +68,10 @@
 }
 
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config 
+                    testMode:(BOOL)testMode
                   completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
+    
+    // Note: testMode parameter received from server deviceConfig - Vungle doesn't require explicit test mode setting
     
     // Ensure we have a completion block
     void (^safeCompletion)(BOOL, NSError *) = completion ?: ^(BOOL success, NSError *error) {};

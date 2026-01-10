@@ -89,8 +89,10 @@ static NSArray<NSString *> *placementIds = nil; // Placement IDs from server con
 }
 
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config 
+                    testMode:(BOOL)testMode
                   completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
-    [[CLXInMobiInitializer logger] debug:@"Initializing InMobi SDK adapter"];
+    [[CLXInMobiInitializer logger] debug:[NSString stringWithFormat:@"Initializing InMobi SDK adapter (testMode: %@)", testMode ? @"YES" : @"NO"]];
+    // Note: testMode parameter received from server deviceConfig
     
     // Extract configuration from initData
     NSString *accountID = nil;

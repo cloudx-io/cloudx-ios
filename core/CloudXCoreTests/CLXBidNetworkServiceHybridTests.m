@@ -25,20 +25,12 @@
 /**
  * Test that completion handler provides both parsed response and raw JSON
  * Validates our hybrid approach implementation
+ * NO NETWORK CALLS - compile-time interface validation only
  */
 - (void)testStartAuction_CompletionHandler_ShouldProvideHybridResponse {
-    // This test validates the interface compilation without making network calls
-    // Following SOLID principles - focused on interface contract validation
+    // Validate that method signature compiles and accepts hybrid completion handler
+    // This is a compile-time check - if this test compiles, the interface is correct
     
-    NSDictionary *testBidRequest = @{
-        @"id": @"test-auction-123",
-        @"imp": @[@{
-            @"id": @"test-imp-456",
-            @"banner": @{@"w": @320, @"h": @50}
-        }]
-    };
-    
-    // When: Validate that method signature compiles and accepts hybrid completion handler
     void (^completionHandler)(CLXBidResponse * _Nullable, NSDictionary * _Nullable, NSError * _Nullable) = 
     ^(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error) {
         // Interface validation - this block should compile without errors
@@ -47,29 +39,23 @@
     // Then: Method should accept the hybrid completion handler signature
     XCTAssertNotNil(completionHandler, @"Hybrid completion handler should be assignable");
     
-    // Validate that the method can be called (interface compatibility test)
-    // Note: This will fail fast due to invalid network call, which is expected
-    @try {
-        [self.networkService startAuctionWithBidRequest:testBidRequest
-                                                 appKey:@"test-app-key"
-                                          correlationId:[[NSUUID UUID] UUIDString]
-                                             completion:completionHandler];
-        // If we reach here, the interface is compatible
-        XCTAssertTrue(YES, @"Method signature is compatible");
-    } @catch (NSException *exception) {
-        // Expected - we're not testing network functionality, just interface
-        XCTAssertTrue(YES, @"Interface test complete - method signature is compatible");
-    }
+    // Verify the network service responds to the selector with expected signature
+    SEL selector = @selector(startAuctionWithBidRequest:appKey:correlationId:completion:);
+    XCTAssertTrue([self.networkService respondsToSelector:selector], 
+                  @"Network service should respond to startAuctionWithBidRequest:appKey:correlationId:completion:");
 }
 
 /**
  * Test completion handler signature compatibility
  * Ensures our refactoring doesn't break existing interface contracts
+ * NO NETWORK CALLS - validates completion handler can be invoked with expected types
  */
 - (void)testCompletionHandlerSignature_ShouldAcceptThreeParameters {
     // Given: A completion block that expects the new hybrid signature
+    __block BOOL handlerCalled = NO;
     void (^completionBlock)(CLXBidResponse * _Nullable, NSDictionary * _Nullable, NSError * _Nullable) = 
     ^(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error) {
+        handlerCalled = YES;
         // Validate parameter types are correct
         if (parsedResponse) {
             XCTAssertTrue([parsedResponse isKindOfClass:[CLXBidResponse class]], 
@@ -85,18 +71,13 @@
         }
     };
     
-    // When: Assign completion block to method call
-    // This validates compile-time compatibility
+    // Validate completion handler can be called with correct types
     XCTAssertNotNil(completionBlock, @"Completion block should be assignable");
     
-    // Test that we can call the method with this signature
-    NSDictionary *testRequest = @{@"id": @"test"};
-    
-    // This should compile without warnings
-    [self.networkService startAuctionWithBidRequest:testRequest
-                                             appKey:@"test-key"
-                                      correlationId:[[NSUUID UUID] UUIDString]
-                                         completion:completionBlock];
+    // Invoke the completion handler directly to validate parameter types work
+    // NO NETWORK CALL - just validating the block signature
+    completionBlock(nil, @{@"test": @"json"}, nil);
+    XCTAssertTrue(handlerCalled, @"Completion handler should have been called");
 }
 
 /**

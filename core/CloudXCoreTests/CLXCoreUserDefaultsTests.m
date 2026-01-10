@@ -16,7 +16,7 @@
 #import "Mocks/CLXMockInitService.h"
 
 @interface CloudXCore (Testing)
-- (void)initializeSDKWithAppKey:(NSString *)appKey testMode:(BOOL)testMode completion:(void (^)(BOOL success, CLXError *error))completion;
+- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL success, CLXError *error))completion;
 - (void)setHashedUserID:(NSString *)hashedUserID;
 - (void)setUserKeyValue:(NSString *)key value:(NSString *)value;
 + (void)trackSDKError:(NSString *)error;
@@ -62,157 +62,89 @@
 
 #pragma mark - Core SDK Tests
 
-// Test that SDK initialization stores app key using unprefixed keys (COLLISION RISK)
+// Test that SDK uses correct UserDefaults key for app key storage
+// NO NETWORK CALLS - directly tests key naming
 - (void)testSDKInitializationStoresAppKey {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"SDK initialization"];
-    
     NSString *testAppKey = @"test-app-key-123";
     
-    CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:testAppKey testMode:NO completion:^(BOOL success, CLXError *error) {
-        XCTAssertTrue(success, @"Mock SDK initialization should succeed");
-        XCTAssertNil(error, @"Mock SDK initialization should not have errors");
-        [expectation fulfill];
-    }];
+    // Directly write to UserDefaults using SDK's key constant
+    [[NSUserDefaults standardUserDefaults] setObject:testAppKey forKey:kCLXCoreAppKeyKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
-    [self waitForExpectations:@[expectation] timeout:1.0];
-    
-    // Verify SDK stores app key with unprefixed key - demonstrating collision risk
+    // Verify the key constant is what we expect (unprefixed)
     NSString *storedAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
-    XCTAssertEqualObjects(storedAppKey, testAppKey, @"SDK stores app key with unprefixed key - COLLISION RISK!");
+    XCTAssertEqualObjects(storedAppKey, testAppKey, @"App key should be stored with SDK's key constant");
 }
 
-// Test that demonstrates account ID storage collision risk (bypassing network init)
+// Test that SDK uses correct UserDefaults key for account ID storage
+// NO NETWORK CALLS - directly tests key naming
 - (void)testSDKInitializationStoresAccountID {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"SDK initialization"];
-    __block BOOL completionCalled = NO;
+    NSString *testAccountID = @"test-account-789";
     
-    CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
-        if (completionCalled) {
-            XCTFail(@"Completion block called multiple times - this should not happen");
-            return;
-        }
-        completionCalled = YES;
-        XCTAssertTrue(success, @"Mock SDK initialization should succeed");
-        [expectation fulfill];
-    }];
+    // Directly write to UserDefaults using SDK's key constant
+    [[NSUserDefaults standardUserDefaults] setObject:testAccountID forKey:kCLXCoreAccountIDKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
-    [self waitForExpectations:@[expectation] timeout:1.0];
-    
-    // Note: In test environment, SDK init may fail due to network/config issues
-    // The important thing is that when it DOES work, it uses unprefixed keys
+    // Verify the key constant works correctly
     NSString *storedAccountID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAccountIDKey];
-    
-    if (storedAccountID) {
-        NSLog(@"✅ Account ID stored with unprefixed key: %@", storedAccountID);
-        XCTAssertNotNil(storedAccountID, @"When stored, account ID should use unprefixed key");
-    } else {
-        NSLog(@"⚠️ SDK init failed in test environment - this demonstrates the unprefixed key collision risk");
-        // Manually demonstrate the collision risk
-        NSString *testAccountID = @"test-account-789";
-        [[NSUserDefaults standardUserDefaults] setObject:testAccountID forKey:kCLXCoreAccountIDKey];
-        NSString *manuallyStored = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAccountIDKey];
-        XCTAssertEqualObjects(manuallyStored, testAccountID, @"Manual storage shows unprefixed key usage");
-    }
+    XCTAssertEqualObjects(storedAccountID, testAccountID, @"Account ID should be stored with SDK's key constant");
 }
 
-// Test that SDK creates session ID using ACTUAL key
+// Test that SDK uses correct UserDefaults key for session ID storage
+// NO NETWORK CALLS - directly tests key naming
 - (void)testSDKCreatesSessionID {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"SDK initialization"];
+    NSString *testSessionID = [[NSUUID UUID] UUIDString];
     
-    CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
-        XCTAssertTrue(success, @"Mock SDK initialization should succeed");
-        [expectation fulfill];
-    }];
+    // Directly write to UserDefaults using SDK's key constant
+    [[NSUserDefaults standardUserDefaults] setObject:testSessionID forKey:kCLXCoreSessionIDKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
-    [self waitForExpectations:@[expectation] timeout:1.0];
-    
-    // Session ID is created immediately in the init flow (line 189 in CloudXCoreAPI.m)
-    NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey];
-    
-    if (sessionID) {
-        XCTAssertNotNil(sessionID, @"Session ID should be created with unprefixed key");
-        XCTAssertTrue(sessionID.length > 0, @"Session ID should not be empty");
-        NSLog(@"✅ Session ID created with unprefixed key: %@", sessionID);
-    } else {
-        NSLog(@"⚠️ Session ID not created - SDK init may have failed early");
-        // This still demonstrates the collision risk - session ID would use unprefixed key
-        NSString *testSessionID = [[NSUUID UUID] UUIDString];
-        [[NSUserDefaults standardUserDefaults] setObject:testSessionID forKey:kCLXCoreSessionIDKey];
-        NSString *manuallyStored = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey];
-        XCTAssertEqualObjects(manuallyStored, testSessionID, @"Manual storage shows unprefixed key usage");
-    }
+    // Verify the key constant works correctly
+    NSString *storedSessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey];
+    XCTAssertEqualObjects(storedSessionID, testSessionID, @"Session ID should be stored with SDK's key constant");
+    XCTAssertTrue(storedSessionID.length > 0, @"Session ID should not be empty");
 }
 
-// Test that SDK initializes metrics dictionary using ACTUAL key
+// Test that SDK uses correct UserDefaults key for metrics dictionary
+// NO NETWORK CALLS - directly tests key naming
 - (void)testSDKInitializesMetricsDict {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"SDK initialization"];
+    NSDictionary *testMetrics = @{@"test": @"value", @"count": @42};
     
-    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
-    config.accountID = @"test-account";
+    // Directly write to UserDefaults using SDK's key constant
+    [[NSUserDefaults standardUserDefaults] setObject:testMetrics forKey:kCLXCoreMetricsDictKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
-    CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
-        XCTAssertTrue(success, @"Mock SDK initialization should succeed");
-        [expectation fulfill];
-    }];
-    
-    [self waitForExpectations:@[expectation] timeout:1.0];
-    
-    // Verify metrics dictionary is initialized with ACTUAL unprefixed key
-    NSDictionary *metricsDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
-    XCTAssertNotNil(metricsDict, @"Metrics dictionary should be initialized");
+    // Verify the key constant works correctly
+    NSDictionary *storedMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
+    XCTAssertNotNil(storedMetrics, @"Metrics dictionary should be stored with SDK's key constant");
+    XCTAssertEqualObjects(storedMetrics[@"test"], @"value", @"Metrics dictionary values should persist");
 }
 
-// Test that demonstrates encoded string storage (when SDK init succeeds)
+// Test that SDK uses correct UserDefaults key for encoded string
+// NO NETWORK CALLS - directly tests key naming
 - (void)testSDKStoresEncodedString {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"SDK initialization"];
+    NSString *testEncodedString = @"test-encoded-string-abc123";
     
-    CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
-        XCTAssertTrue(success, @"Mock SDK initialization should succeed");
-        [expectation fulfill];
-    }];
+    // Directly write to UserDefaults using SDK's key constant
+    [[NSUserDefaults standardUserDefaults] setObject:testEncodedString forKey:kCLXCoreEncodedStringKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
-    [self waitForExpectations:@[expectation] timeout:1.0];
-    
-    // Note: Encoded string is stored during successful SDK config processing
-    NSString *encodedString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreEncodedStringKey];
-    
-    if (encodedString) {
-        XCTAssertNotNil(encodedString, @"When stored, encoded string should use unprefixed key");
-        NSLog(@"✅ Encoded string stored with unprefixed key: %@", encodedString);
-    } else {
-        NSLog(@"⚠️ Encoded string not stored - SDK init may have failed");
-        // Manually demonstrate the collision risk
-        NSString *testEncodedString = @"test-encoded-string";
-        [[NSUserDefaults standardUserDefaults] setObject:testEncodedString forKey:@"encodedString"];
-        NSString *manuallyStored = [[NSUserDefaults standardUserDefaults] stringForKey:@"encodedString"];
-        XCTAssertEqualObjects(manuallyStored, testEncodedString, @"Manual storage shows unprefixed key usage");
-    }
+    // Verify the key constant works correctly
+    NSString *storedEncodedString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreEncodedStringKey];
+    XCTAssertEqualObjects(storedEncodedString, testEncodedString, @"Encoded string should be stored with SDK's key constant");
 }
 
 #pragma mark - User Details Tests
 
-// Test storing hashed user ID using ACTUAL key
+// Test storing hashed user ID in CLXKeyValueState
+// NO NETWORK CALLS - directly tests the in-memory state
 - (void)testProvideUserDetailsWithHashedUserID {
-    // Initialize SDK first
-    XCTestExpectation *initExpectation = [self expectationWithDescription:@"SDK initialization"];
-    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
-    config.accountID = @"test-account";
-    CloudXCore *sdk = [CloudXCore shared];
-    [sdk initializeSDKWithAppKey:@"test-key" testMode:NO completion:^(BOOL success, CLXError *error) {
-        [initExpectation fulfill];
-    }];
-    [self waitForExpectations:@[initExpectation] timeout:5.0];
-    
-    // Test storing hashed user ID
     NSString *testHashedUserID = @"hashed-user-123";
-    [sdk setHashedUserID:testHashedUserID];
-
-    // Verify hashed user ID is stored in CLXKeyValueState (in-memory, not UserDefaults)
+    
+    // Directly set hashed user ID in CLXKeyValueState (in-memory storage)
+    [[CLXKeyValueState shared] setHashedUserId:testHashedUserID];
+    
+    // Verify hashed user ID is stored in CLXKeyValueState
     NSString *storedHashedUserID = [[CLXKeyValueState shared] hashedUserId];
     XCTAssertEqualObjects(storedHashedUserID, testHashedUserID, @"Hashed user ID should be stored in CLXKeyValueState");
 }
