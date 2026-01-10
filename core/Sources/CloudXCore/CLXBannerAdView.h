@@ -35,12 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak, nullable) id<CLXBannerDelegate> delegate;
 
 /**
- * A boolean indicating whether the ad is loaded and ready to be shown.
- * Delegates to the underlying ad instance.
- */
-@property (nonatomic, assign, readonly) BOOL isReady;
-
-/**
  * A boolean indicating whether to suspend preloading the ad when it's not visible.
  */
 @property (nonatomic, assign) BOOL suspendPreloadWhenInvisible;

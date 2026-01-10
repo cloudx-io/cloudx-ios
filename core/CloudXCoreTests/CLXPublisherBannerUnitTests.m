@@ -210,7 +210,6 @@ static const NSTimeInterval kTestTimeout = 2.0;
 - (void)testBannerInitializationWithDefaults {
     XCTAssertNotNil(self.banner, @"Banner should be initialized");
     XCTAssertEqual(self.banner.bannerType, CLXBannerTypeW320H50, @"Banner type should match initialization");
-    XCTAssertFalse(self.banner.isReady, @"Banner should not be ready initially");
     XCTAssertTrue(self.banner.isVisible, @"Banner should be visible by default");
     XCTAssertFalse(self.banner.hasPendingRefresh, @"Banner should not have pending refresh initially");
     XCTAssertNil(self.banner.prefetchedBanner, @"Banner should not have prefetched banner initially");
@@ -578,7 +577,6 @@ static const NSTimeInterval kTestTimeout = 2.0;
     
     XCTAssertNotNil(deferredBanner, @"Banner should initialize with nil placement for deferred init");
     XCTAssertEqual(deferredBanner.bannerType, CLXBannerTypeW320H50, @"Banner type should be set correctly");
-    XCTAssertFalse(deferredBanner.isReady, @"Banner should not be ready with nil placement");
     [deferredBanner destroy];
 }
 

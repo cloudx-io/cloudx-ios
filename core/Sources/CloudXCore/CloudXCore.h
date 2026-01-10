@@ -91,7 +91,7 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXBidResponse.h>
 #import <CloudXCore/CLXBidderConfig.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
-#import <CloudXCore/CLXAdFormat.h>
+#import <CloudXCore/CLXFullscreenAd.h>
 
 // Adapter Services
 #import <CloudXCore/CLXAdTrackingService.h>

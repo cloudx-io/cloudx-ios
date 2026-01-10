@@ -214,7 +214,6 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
 - (void)testBannerInitializesWithCorrectProperties {
     XCTAssertNotNil(self.banner, @"Banner should be initialized");
     XCTAssertEqual(self.banner.bannerType, CLXBannerTypeW320H50, @"Banner type should match");
-    XCTAssertFalse(self.banner.isReady, @"Banner should not be ready initially");
     XCTAssertTrue(self.banner.isVisible, @"Banner should be visible by default");
     XCTAssertFalse(self.banner.hasPendingRefresh, @"Should not have pending refresh initially");
     XCTAssertNil(self.banner.prefetchedBanner, @"Should not have prefetched banner initially");

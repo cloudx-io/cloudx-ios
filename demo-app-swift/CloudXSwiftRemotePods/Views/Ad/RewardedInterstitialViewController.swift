@@ -186,10 +186,10 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         DemoAppLogger.sharedInstance.logAdEvent("💰 RewardedInterstitial didPayRevenue", ad: ad)
     }
     
-    func userRewarded(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🎁 RewardedInterstitial userRewarded", ad: ad)
+    func didRewardUser(for ad: CLXAd, with reward: CLXReward) {
+        DemoAppLogger.sharedInstance.logAdEvent("🎁 RewardedInterstitial userRewarded - Reward: \(reward.amount) \(reward.label)", ad: ad)
         DispatchQueue.main.async { [weak self] in
-            self?.showAlert(title: "Reward Earned! 🎉", message: "User has successfully earned a reward from interstitial!")
+            self?.showAlert(title: "Reward Earned! 🎉", message: "User earned \(reward.amount) \(reward.label) from interstitial!")
         }
     }
 }

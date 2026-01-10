@@ -8,7 +8,7 @@
  */
 
 #import <UIKit/UIKit.h>
-#import <CloudXCore/CLXAdFormat.h>
+#import <CloudXCore/CLXFullscreenAd.h>
 #import <CloudXCore/CLXAdEventReporting.h>
 
 @class CLXSDKConfigPlacement;
@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Base class containing all shared logic for fullscreen ads.
  * Subclasses must implement abstract methods to specialize behavior for interstitial vs rewarded.
  */
-@interface CLXPublisherFullscreenAdBase : NSObject <CLXAdFormat>
+@interface CLXPublisherFullscreenAdBase : NSObject <CLXFullscreenAd>
 
 /**
  * Initializes a fullscreen ad with the given parameters.

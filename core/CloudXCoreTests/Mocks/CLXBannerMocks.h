@@ -214,14 +214,6 @@ NS_ASSUME_NONNULL_END
     // Mock implementation - does nothing
 }
 
-- (BOOL)isReady {
-    return YES; // Mock always ready
-}
-
-- (BOOL)isLoading {
-    return NO; // Mock never loading
-}
-
 - (BOOL)isDestroyed {
     return NO; // Mock never destroyed
 }

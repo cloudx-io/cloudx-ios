@@ -241,7 +241,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     return self;
 }
 
-#pragma mark - CLXAdFormat Properties
+#pragma mark - CLXFullscreenAd Properties
 
 - (BOOL)isReady {
     return self.currentState == CLXFullscreenAdStateREADY;

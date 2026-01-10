@@ -73,12 +73,6 @@
     return @"meta";
 }
 
-- (BOOL)isReady {
-    BOOL ready = self.bannerView != nil && self.bannerView.isAdValid;
-    [self.logger debug:[NSString stringWithFormat:@"isReady: %@", ready ? @"YES" : @"NO"]];
-    return ready;
-}
-
 - (BOOL)clx_isFlexibleSize {
     return YES;  // Meta banners are flexible and expand to container width
 }

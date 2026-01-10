@@ -54,7 +54,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXPublisherBanner () <CLXAdapterBannerDelegate>
 
 // CLXAdLifecycle properties
-@property (nonatomic, assign, readwrite) BOOL isReady;
 @property (nonatomic, assign, readwrite) BOOL isLoading;
 @property (nonatomic, assign, readwrite) BOOL isDestroyed;
 
@@ -173,7 +172,6 @@ NS_ASSUME_NONNULL_BEGIN
         
         _reportingService = reportingService;
         _impModel = impModel;
-        _isReady = NO;
         _isLoading = NO;
         _isDestroyed = NO;
         _forceStop = NO;
@@ -634,7 +632,6 @@ NS_ASSUME_NONNULL_BEGIN
     }
 
     self.successWin = YES;
-    self.isReady = YES;
     self.isLoading = NO;
     
     // Handle visibility-aware display and prefetching
@@ -745,7 +742,6 @@ NS_ASSUME_NONNULL_BEGIN
     self.currentBidResponse = nil;
     self.lastBidError = nil; // Clear the stored error
     self.successWin = NO;
-    self.isReady = NO;
     self.isLoading = NO;
     
     // Convert internal BidAdSource errors to public CLXError domain
@@ -881,8 +877,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     self.isDestroyed = YES;
     self.isLoading = NO;
-    self.isReady = NO;
-    
+
     // Clean up any ongoing operations
     self.forceStop = YES;
     

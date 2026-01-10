@@ -3,8 +3,8 @@
  */
 
 /**
- * @file CLXAdFormat.h
- * @brief Common protocol for all ad formats with shared lifecycle methods
+ * @file CLXFullscreenAd.h
+ * @brief Protocol for fullscreen ad formats (interstitial, rewarded)
  */
 
 #import <Foundation/Foundation.h>
@@ -12,10 +12,14 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Common protocol for all ad formats that defines shared lifecycle methods.
- * This protocol provides the basic interface that all ad types (banner, interstitial, rewarded, native) implement.
+ * Protocol for fullscreen ad formats that require explicit show() gating.
+ * This protocol is used by interstitial and rewarded ads which need isReady
+ * to determine when show() can be called.
+ *
+ * Note: Banners do not use this protocol - they have their own CLXBanner protocol
+ * without isReady/isLoading/isDestroyed, matching Android SDK patterns.
  */
-@protocol CLXAdFormat <NSObject>
+@protocol CLXFullscreenAd <NSObject>
 
 /**
  * Indicates whether the ad is ready to be displayed.

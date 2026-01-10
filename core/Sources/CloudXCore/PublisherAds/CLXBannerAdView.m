@@ -271,18 +271,7 @@ static void initializeLogger() {
     [self.banner destroy];
 }
 
-- (BOOL)isReady {
-    // Delegate to the underlying banner since CLXAd is a data object
-    return self.banner.isReady;
-}
-
-- (BOOL)isLoading {
-    // Delegate to the underlying banner since CLXAd is a data object
-    return self.banner.isLoading;
-}
-
 - (BOOL)isDestroyed {
-    // Delegate to the underlying banner since CLXAd is a data object
     return self.banner.isDestroyed;
 }
 
