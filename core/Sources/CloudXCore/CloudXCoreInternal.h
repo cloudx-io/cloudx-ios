@@ -59,13 +59,11 @@
 #import <CloudXCore/CLXAdReportingNetworkService.h>
 
 // Metrics & Events
-#import <CloudXCore/CLXMetricsTracker.h>
 #import <CloudXCore/CLXMetricsTrackerImpl.h>
 #import <CloudXCore/CLXMetricsTrackerProtocol.h>
 #import <CloudXCore/CLXMetricsEvent.h>
 #import <CloudXCore/CLXMetricsEventDao.h>
 #import <CloudXCore/CLXMetricsEventDaoImpl.h>
-#import <CloudXCore/CLXMetricsNetworkService.h>
 #import <CloudXCore/CLXMetricsConfig.h>
 #import <CloudXCore/CLXMetricsDebugger.h>
 #import <CloudXCore/CLXMetricsType.h>

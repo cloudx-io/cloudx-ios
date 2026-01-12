@@ -9,6 +9,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CloudXCore/CLXMetricsTrackerProtocol.h>
+#import <CloudXCore/CLXEventTrackerBulkApi.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -26,9 +27,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 
 /**
- * For dependency injection and testing
+ * For dependency injection and testing (database only)
  */
 - (instancetype)initWithDatabase:(CLXSQLiteDatabase *)database;
+
+/**
+ * For full dependency injection and testing (database + bulk API)
+ * Use this initializer to inject a mock bulk API for verifying metrics are sent
+ */
+- (instancetype)initWithDatabase:(CLXSQLiteDatabase *)database
+                         bulkApi:(id<CLXEventTrackerBulkApi>)bulkApi;
 
 @end
 

@@ -35,9 +35,7 @@
                               @");";
     
     BOOL success = [self.database executeSQL:createTableSQL];
-    if (success) {
-        [self.logger debug:@"Metrics table created successfully"];
-    } else {
+    if (!success) {
         [self.logger error:@"Failed to create metrics table"];
     }
     return success;
@@ -63,13 +61,9 @@
     ];
     
     BOOL success = [self.database executeSQL:insertSQL withParameters:parameters];
-    if (success) {
-        [self.logger debug:[NSString stringWithFormat:@"Inserted metric: %@ (counter: %ld, latency: %ld)", 
-                           event.metricName, (long)event.counter, (long)event.totalLatency]];
-    } else {
+    if (!success) {
         [self.logger error:[NSString stringWithFormat:@"Failed to insert metric: %@", event.metricName]];
     }
-    
     return success;
 }
 
@@ -85,13 +79,8 @@
     NSArray<NSDictionary *> *results = [self.database executeQuery:selectSQL withParameters:parameters];
     
     if (results.count > 0) {
-        CLXMetricsEvent *event = [CLXMetricsEvent fromDictionary:results.firstObject];
-        [self.logger debug:[NSString stringWithFormat:@"Found existing metric: %@ (counter: %ld)", 
-                           metricName, (long)event.counter]];
-        return event;
+        return [CLXMetricsEvent fromDictionary:results.firstObject];
     }
-    
-    [self.logger debug:[NSString stringWithFormat:@"No existing metric found for: %@", metricName]];
     return nil;
 }
 
@@ -105,12 +94,9 @@
     NSArray *parameters = @[eventId];
     
     BOOL success = [self.database executeSQL:deleteSQL withParameters:parameters];
-    if (success) {
-        [self.logger debug:[NSString stringWithFormat:@"Deleted metric with ID: %@", eventId]];
-    } else {
+    if (!success) {
         [self.logger error:[NSString stringWithFormat:@"Failed to delete metric with ID: %@", eventId]];
     }
-    
     return success;
 }
 
@@ -128,8 +114,6 @@
             [self.logger error:[NSString stringWithFormat:@"Failed to create CLXMetricsEvent from row: %@", row]];
         }
     }
-    
-    [self.logger debug:[NSString stringWithFormat:@"Retrieved %lu metrics events", (unsigned long)events.count]];
     return [events copy];
 }
 

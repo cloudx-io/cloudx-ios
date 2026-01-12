@@ -289,19 +289,12 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     NSArray<NSDictionary *> *metricsConfigArr = response[@"metrics"];
     if (metricsConfigArr.count > 0) {
         NSDictionary *metricsConfigDict = metricsConfigArr[0];
-        config.metricsConfig = [CLXMetricsConfig fromDictionary: metricsConfigDict];
+        config.metricsConfig = [CLXMetricsConfig fromDictionary:metricsConfigDict];
         [self.logger debug:[NSString stringWithFormat:@"Parsed metrics config: %@", config.metricsConfig]];
     } else {
-        [self.logger debug:@"[SDKInitNetworkService] No metrics configuration found in server response"];
-        // Create default config to enable metrics with impression URL
-        CLXMetricsConfig *defaultConfig = [[CLXMetricsConfig alloc] init];
-        defaultConfig.sdkAPICalls.enabled = @YES;
-        defaultConfig.networkCalls.enabled = @YES;
-        defaultConfig.networkCalls.bidReq.enabled = @YES;
-        defaultConfig.networkCalls.sdkInitRequest.enabled = @NO; // Keep SDK init disabled by default
-        defaultConfig.networkCalls.geoReq.enabled = @YES;
-        config.metricsConfig = defaultConfig;
-        [self.logger debug:@"Created default metrics config for impression URL usage"];
+        // No metrics config from server = metrics disabled
+        config.metricsConfig = nil;
+        [self.logger debug:@"[SDKInitNetworkService] No metrics configuration from server - metrics tracking disabled"];
     }
     
     // Parse win/loss notification payload configuration

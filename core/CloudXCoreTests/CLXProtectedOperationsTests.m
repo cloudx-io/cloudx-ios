@@ -12,7 +12,6 @@
 #import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXURLProvider.h>
-#import <CloudXCore/CLXMetricsNetworkService.h>
 #import <CloudXCore/CLXBidNetworkService.h>
 #import <CloudXCore/CLXErrorReporter.h>
 #import "Helper/CLXUserDefaultsTestHelper.h"
@@ -131,22 +130,6 @@
 }
 
 #pragma mark - Network Service JSON Protection Tests
-
-/**
- * @brief Test network service JSON serialization protection
- * @discussion Tests our @try/@catch protection in network services JSON operations
- */
-- (void)testNetworkService_JSONSerialization_InvalidData_ExceptionHandling {
-    CLXMetricsNetworkService *metricsService = [[CLXMetricsNetworkService alloc] initWithBaseURL:@"https://test.com"
-                                                                                      urlSession:[NSURLSession sharedSession]
-                                                                                   errorReporter:self.errorReporter];
-    
-    // Test that the service can handle various scenarios without crashing
-    XCTAssertNotNil(metricsService, @"Metrics network service should initialize");
-    
-    // The actual JSON serialization protection is tested indirectly through normal operations
-    // since the protected code is in private methods called during network operations
-}
 
 /**
  * @brief Test bid network service JSON operations protection

@@ -36,15 +36,11 @@
     }
     
     if (!items || items.count == 0) {
-        [self.logger debug:@"No items to send"];
         if (completion) {
             completion(YES, nil);
         }
         return;
     }
-    
-    [self.logger debug:[NSString stringWithFormat:@"Sending %lu metrics events to %@", 
-                       (unsigned long)items.count, endpointUrl]];
     
     // Convert items to JSON array with URL encoding
     NSMutableArray *jsonArray = [NSMutableArray arrayWithCapacity:items.count];
@@ -83,9 +79,6 @@
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     request.timeoutInterval = self.timeoutMillis / 1000.0; // Convert to seconds
     
-    // Log request details
-    [self.logger debug:[NSString stringWithFormat:@"Request body size: %lu bytes", (unsigned long)requestBody.length]];
-    
     // Execute request
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
@@ -102,8 +95,6 @@
         NSInteger statusCode = httpResponse.statusCode;
         
         if (statusCode >= 200 && statusCode < 300) {
-            [self.logger debug:[NSString stringWithFormat:@"Successfully sent %lu metrics events (status: %ld)", 
-                               (unsigned long)items.count, (long)statusCode]];
             if (completion) {
                 completion(YES, nil);
             }

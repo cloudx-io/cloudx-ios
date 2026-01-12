@@ -38,13 +38,19 @@
 }
 
 - (instancetype)initWithDatabase:(CLXSQLiteDatabase *)database {
+    id<CLXEventTrackerBulkApi> bulkApi = [[CLXEventTrackerBulkApiImpl alloc] initWithTimeoutMillis:10000];
+    return [self initWithDatabase:database bulkApi:bulkApi];
+}
+
+- (instancetype)initWithDatabase:(CLXSQLiteDatabase *)database
+                         bulkApi:(id<CLXEventTrackerBulkApi>)bulkApi {
     self = [super init];
     if (self) {
         _database = database;
         _metricsDao = [[CLXMetricsEventDao alloc] initWithDatabase:database];
         _logger = [[CLXLogger alloc] initWithCategory:@"MetricsTrackerImpl"];
-        _bulkApi = [[CLXEventTrackerBulkApiImpl alloc] initWithTimeoutMillis:10000]; // 10 second timeout like Android
-        _sendIntervalSeconds = 60; // Default like Android
+        _bulkApi = bulkApi;
+        _sendIntervalSeconds = 60;
         _sessionId = @"";
         _basePayload = @"";
         _accountId = @"";
@@ -74,7 +80,7 @@
     dispatch_async(self.metricsQueue, ^{
         self.metricsConfig = config.metricsConfig;
         if (!self.metricsConfig) {
-            [self.logger info:@"Metrics configuration is nil, skipping metrics tracking"];
+            [self.logger info:@"📊 Metrics configuration is nil, metrics tracking DISABLED"];
             return;
         }
         
@@ -84,9 +90,18 @@
             self.endpoint = [NSString stringWithFormat:@"%@/bulk", metricsURL];
         } else {
             self.endpoint = nil;
-            [self.logger info:@"No impression tracker or metrics endpoint URL provided, metrics sending disabled"];
+            [self.logger info:@"📊 Metrics tracking enabled but NO ENDPOINT configured - events will be stored locally only"];
         }
         self.sendIntervalSeconds = self.metricsConfig.sendIntervalSeconds ?: 60;
+        
+        // Log config summary
+        BOOL sdkApiEnabled = [self.metricsConfig isSdkApiCallsEnabled];
+        BOOL networkEnabled = [self.metricsConfig isNetworkCallsEnabled];
+        [self.logger info:[NSString stringWithFormat:@"📊 Metrics ENABLED (sdk_api=%@, network=%@, interval=%lds, endpoint=%@)",
+                          sdkApiEnabled ? @"Y" : @"N",
+                          networkEnabled ? @"Y" : @"N",
+                          (long)self.sendIntervalSeconds,
+                          self.endpoint ? @"configured" : @"NONE"]];
         
         [self _startPeriodicSending];
     });
@@ -192,8 +207,6 @@
 }
 
 - (void)_startPeriodicSending {
-    [self _stopPeriodicSending]; // Stop any existing timer
-    
     if (self.sendIntervalSeconds <= 0) {
         [self.logger info:@"Invalid send interval, periodic sending disabled"];
         return;
@@ -203,12 +216,13 @@
     NSInteger intervalSeconds = self.sendIntervalSeconds;
     __weak typeof(self) weakSelf = self;
     
-    // Create timer on the main thread's run loop
+    // Stop existing timer and create new one - both on main thread for thread safety
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (!strongSelf) {
-            return; // Object deallocated, don't create timer
-        }
+        if (!strongSelf) return;
+        
+        // Stop existing timer on main thread where it was created
+        [strongSelf _stopPeriodicSending];
         
         strongSelf.sendTimer = [NSTimer scheduledTimerWithTimeInterval:intervalSeconds
                                                          repeats:YES
@@ -226,7 +240,6 @@
                 }
             });
         }];
-        [strongSelf.logger debug:[NSString stringWithFormat:@"Metrics timer started - will fire every %ld seconds", (long)intervalSeconds]];
     });
 }
 
@@ -269,17 +282,24 @@
         return;
     }
     
-    // Send via bulk API
+    [self.logger info:[NSString stringWithFormat:@"📤 Sending %lu metrics events...", (unsigned long)events.count]];
+    
+    // Send via bulk API - use weak self to avoid retain cycles
+    __weak typeof(self) weakSelf = self;
     [self.bulkApi sendToEndpoint:self.endpoint items:events completion:^(BOOL success, NSError * _Nullable error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
         if (success) {
-            // Delete successfully sent metrics
-            dispatch_async(self.metricsQueue, ^{
+            [strongSelf.logger info:[NSString stringWithFormat:@"✅ Successfully sent %lu metrics events", (unsigned long)events.count]];
+            // Delete successfully sent metrics - strongSelf is still valid in this scope
+            dispatch_async(strongSelf.metricsQueue, ^{
                 for (CLXMetricsEvent *metric in metrics) {
-                    [self.metricsDao deleteById:metric.eventId];
+                    [strongSelf.metricsDao deleteById:metric.eventId];
                 }
             });
         } else {
-            [self.logger warn:[NSString stringWithFormat:@"Failed to send metrics: %@", error.localizedDescription ?: @"Unknown error"]];
+            [strongSelf.logger warn:[NSString stringWithFormat:@"❌ Failed to send metrics: %@", error.localizedDescription ?: @"Unknown error"]];
         }
     }];
 }

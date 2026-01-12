@@ -6,7 +6,6 @@
 #import <CloudXCore/CLXLiveInitService.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXDIContainer.h>
-#import <CloudXCore/CLXMetricsTracker.h>
 #import <CloudXCore/CLXMetricsTrackerImpl.h>
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXMetricsTrackerProtocol.h>
@@ -106,7 +105,6 @@ NSString * const CLXSDKInitializedNotification = @"CLXSDKInitializedNotification
 @property (nonatomic, assign) double abTestValue;
 @property (nonatomic, copy) NSString *abTestName;
 @property (nonatomic, copy) NSString *defaultAuctionURL;
-@property (nonatomic, strong) CLXMetricsTracker *metricsTracker;
 @property (nonatomic, strong) CLXGeoLocationService *geoLocationService;
 @property (nonatomic, strong) CLXAppSessionService *appSessionService;
 @property (nonatomic, strong) CLXBidNetworkServiceClass *bidNetworkService;
@@ -139,11 +137,6 @@ static CloudXCore *_sharedInstance = nil;
     @synchronized([CLXDIContainer class]) {
         // Register core dependencies that other services depend on
         // Check-then-register pattern is now thread-safe within the synchronized block
-        if (![container resolveType:ServiceTypeSingleton class:[CLXMetricsTracker class]]) {
-            [container registerType:[CLXMetricsTracker class] instance:[[CLXMetricsTracker alloc] init]];
-        }
-        
-        // Register new MetricsTrackerImpl for proper metrics tracking
         if (![container resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]]) {
             [container registerType:[CLXMetricsTrackerImpl class] instance:[[CLXMetricsTrackerImpl alloc] init]];
         }
@@ -1268,7 +1261,6 @@ static BOOL _visualDebuggingEnabled = NO;
     _abTestValue = 0.0;
     _abTestName = nil;
     _defaultAuctionURL = nil;
-    _metricsTracker = nil;
     _geoLocationService = nil;
     _appSessionService = nil;
     _bidNetworkService = nil;
@@ -1291,7 +1283,6 @@ static BOOL _visualDebuggingEnabled = NO;
     _abTestValue = (double)arc4random() / UINT32_MAX;
     _abTestName = @"RandomTest";
     _defaultAuctionURL = @"";
-    _metricsTracker = nil;
     _geoLocationService = nil;
     _appSessionService = nil;
     _bidNetworkService = nil;

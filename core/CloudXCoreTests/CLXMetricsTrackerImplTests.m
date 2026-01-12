@@ -2,321 +2,235 @@
  * Copyright (c) 2024 CloudX. All rights reserved.
  */
 
+/**
+ * @file CLXMetricsTrackerImplTests.m
+ * @brief Unit tests for CLXMetricsTrackerImpl
+ * @details Tests core tracker functionality with mock dependencies
+ */
+
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CLXMetricsTrackerImpl.h>
 #import <CloudXCore/CLXMetricsEvent.h>
+#import <CloudXCore/CLXMetricsEventDao.h>
 #import <CloudXCore/CLXMetricsType.h>
 #import <CloudXCore/CLXMetricsConfig.h>
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXSQLiteDatabase.h>
-
-// Mock classes for testing
-@interface MockSQLiteDatabase : CLXSQLiteDatabase
-@property (nonatomic, assign) BOOL shouldFailOperations;
-@property (nonatomic, strong) NSMutableArray<NSDictionary *> *mockResults;
-@end
-
-@implementation MockSQLiteDatabase
-- (instancetype)init {
-    self = [super initWithDatabaseName:@"test_mock.db"];
-    if (self) {
-        _shouldFailOperations = NO;
-        _mockResults = [NSMutableArray array];
-    }
-    return self;
-}
-
-- (BOOL)executeSQL:(NSString *)sql {
-    return !self.shouldFailOperations;
-}
-
-- (BOOL)executeSQL:(NSString *)sql withParameters:(NSArray *)parameters {
-    return !self.shouldFailOperations;
-}
-
-- (NSArray<NSDictionary *> *)executeQuery:(NSString *)sql withParameters:(NSArray *)parameters {
-    if (self.shouldFailOperations) {
-        return @[];
-    }
-    
-    // For getAllByMetric queries, return empty array by default (no existing metrics)
-    // This prevents crashes when trying to access firstObject on nil results
-    if ([sql containsString:@"SELECT"] && [sql containsString:@"WHERE metricName"]) {
-        return @[]; // No existing metrics found
-    }
-    
-    return [self.mockResults copy];
-}
-
-- (BOOL)executeQuery:(NSString *)query {
-    return !self.shouldFailOperations;
-}
-@end
+#import "Helper/CLXMockBulkApi.h"
 
 @interface CLXMetricsTrackerImplTests : XCTestCase
-@property (nonatomic, strong) CLXMetricsTrackerImpl *metricsTracker;
-@property (nonatomic, strong) MockSQLiteDatabase *mockDatabase;
+@property (nonatomic, strong) CLXMetricsTrackerImpl *tracker;
+@property (nonatomic, strong) CLXSQLiteDatabase *testDatabase;
+@property (nonatomic, strong) CLXMetricsEventDao *dao;
+@property (nonatomic, strong) CLXMockBulkApi *mockBulkApi;
 @end
 
 @implementation CLXMetricsTrackerImplTests
 
 - (void)setUp {
     [super setUp];
-    self.mockDatabase = [[MockSQLiteDatabase alloc] init];
-    self.metricsTracker = [[CLXMetricsTrackerImpl alloc] initWithDatabase:self.mockDatabase];
+    
+    // Create isolated test database
+    NSString *uniqueDBName = [NSString stringWithFormat:@"test_tracker_%@.db", [[NSUUID UUID] UUIDString]];
+    self.testDatabase = [[CLXSQLiteDatabase alloc] initWithDatabaseName:uniqueDBName];
+    [self.testDatabase executeSQL:@"DROP TABLE IF EXISTS metrics_event_table"];
+    
+    self.dao = [[CLXMetricsEventDao alloc] initWithDatabase:self.testDatabase];
+    self.mockBulkApi = [[CLXMockBulkApi alloc] init];
+    
+    self.tracker = [[CLXMetricsTrackerImpl alloc] initWithDatabase:self.testDatabase
+                                                           bulkApi:self.mockBulkApi];
+    [self.tracker setBasicDataWithSessionId:@"test-session"
+                                  accountId:@"test-account"
+                                basePayload:@"test-payload"];
 }
 
 - (void)tearDown {
-    // Only stop if the tracker was actually started
-    if (self.metricsTracker) {
-        @try {
-            [self.metricsTracker stop];
-        } @catch (NSException *exception) {
-            NSLog(@"Exception during metrics tracker stop: %@", exception);
-        }
-    }
-    self.metricsTracker = nil;
-    self.mockDatabase = nil;
+    [self.tracker stop];
+    self.tracker = nil;
+    self.testDatabase = nil;
+    self.dao = nil;
+    self.mockBulkApi = nil;
     [super tearDown];
 }
 
+- (CLXSDKConfig *)createEnabledConfig {
+    CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
+    CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
+    
+    CLXMetricsConfigSDKAPICalls *sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
+    sdkAPICalls.enabled = @YES;
+    metricsConfig.sdkAPICalls = sdkAPICalls;
+    
+    CLXMetricsConfigNetworkCalls *networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    networkCalls.enabled = @YES;
+    CLXMetricsConfigNetworkSubConfig *bidReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    bidReq.enabled = @YES;
+    networkCalls.bidReq = bidReq;
+    metricsConfig.networkCalls = networkCalls;
+    
+    config.metricsConfig = metricsConfig;
+    config.impressionTrackerURL = @"https://test.example.com/track";
+    
+    return config;
+}
+
+#pragma mark - Initialization Tests
+
 - (void)testInitialization {
-    // Then
-    XCTAssertNotNil(self.metricsTracker);
-    // Note: sendIntervalSeconds is private property, so we can't test it directly
+    XCTAssertNotNil(self.tracker, @"Tracker should be created");
 }
 
-- (void)testStartWithConfig {
-    // Given
-    CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
-    CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sendIntervalSeconds = 120;
-    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
-    metricsConfig.sdkAPICalls.enabled = @YES;
-    metricsConfig.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
-    metricsConfig.networkCalls.enabled = @YES;
-    config.metricsConfig = metricsConfig;
-    config.impressionTrackerURL = @"https://test.example.com/t";
+- (void)testInitWithDatabaseBulkApi {
+    // Verify the injected bulkApi is used
+    [self.tracker startWithConfig:[self createEnabledConfig]];
+    [self.tracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+    [self.tracker trySendingPendingMetrics];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
     
-    // When
-    [self.metricsTracker startWithConfig:config];
-    
-    // Then - configuration applied successfully (sendIntervalSeconds is private)
-    XCTAssertNoThrow([self.metricsTracker trackMethodCall:@"test_method"]);
+    XCTAssertGreaterThan(self.mockBulkApi.sendCallCount, 0, @"Injected bulk API should be used");
 }
 
-- (void)testStartWithConfigImpressionURL {
-    // Given - Test that impressionTrackerURL is used for metrics endpoint
-    CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
-    CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
-    metricsConfig.sdkAPICalls.enabled = @YES;
-    config.metricsConfig = metricsConfig;
-    config.impressionTrackerURL = @"https://impression.example.com/track";
+#pragma mark - Type Validation Tests
+
+- (void)testInvalidMethodTypeIsRejected {
+    [self.tracker startWithConfig:[self createEnabledConfig]];
     
-    // When
-    [self.metricsTracker startWithConfig:config];
+    // Track invalid method type
+    [self.tracker trackMethodCall:@"invalid_method_type"];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
     
-    // Then - should use impression URL for metrics (endpoint construction is internal)
-    XCTAssertNoThrow([self.metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateBanner]);
+    // Should not store anything for invalid types
+    NSArray<CLXMetricsEvent *> *events = [self.dao getAll];
+    XCTAssertEqual(events.count, 0, @"Invalid method types should not be tracked");
 }
 
-- (void)testStartWithConfigMetricsURLFallback {
-    // Given - Test fallback to metricsEndpointURL when impressionTrackerURL is nil
-    CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
-    CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
-    metricsConfig.sdkAPICalls.enabled = @YES;
-    config.metricsConfig = metricsConfig;
-    config.metricsEndpointURL = @"https://metrics.example.com/api";
-    // impressionTrackerURL is nil, should fallback to metricsEndpointURL
+- (void)testInvalidNetworkTypeIsRejected {
+    [self.tracker startWithConfig:[self createEnabledConfig]];
     
-    // When
-    [self.metricsTracker startWithConfig:config];
+    // Track invalid network type
+    [self.tracker trackNetworkCall:@"invalid_network_type" latency:100];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
     
-    // Then - should use metrics URL as fallback
-    XCTAssertNoThrow([self.metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateBanner]);
+    // Should not store anything for invalid types
+    NSArray<CLXMetricsEvent *> *events = [self.dao getAll];
+    XCTAssertEqual(events.count, 0, @"Invalid network types should not be tracked");
 }
 
-- (void)testStartWithConfigNoEndpointURLs {
-    // Given - Test behavior when both URLs are nil
-    CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
-    CLXMetricsConfig *metricsConfig = [[CLXMetricsConfig alloc] init];
-    metricsConfig.sdkAPICalls = [[CLXMetricsConfigSDKAPICalls alloc] init];
-    metricsConfig.sdkAPICalls.enabled = @YES;
-    config.metricsConfig = metricsConfig;
-    // Both impressionTrackerURL and metricsEndpointURL are nil
+- (void)testNilMethodTypeIsHandled {
+    [self.tracker startWithConfig:[self createEnabledConfig]];
     
-    // When
-    [self.metricsTracker startWithConfig:config];
+    // Should not crash with nil
+    [self.tracker trackMethodCall:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
     
-    // Then - should still work but metrics sending will be disabled
-    XCTAssertNoThrow([self.metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateBanner]);
+    NSArray<CLXMetricsEvent *> *events = [self.dao getAll];
+    XCTAssertEqual(events.count, 0, @"Nil method types should not be tracked");
 }
 
-- (void)testStartWithNilConfig {
-    // When
-    [self.metricsTracker startWithConfig:nil];
+- (void)testNilNetworkTypeIsHandled {
+    [self.tracker startWithConfig:[self createEnabledConfig]];
     
-    // Then - should not crash and use defaults (sendIntervalSeconds is private)
-    XCTAssertNoThrow([self.metricsTracker trackMethodCall:@"test_method"]);
+    // Should not crash with nil
+    [self.tracker trackNetworkCall:nil latency:100];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+    
+    NSArray<CLXMetricsEvent *> *events = [self.dao getAll];
+    XCTAssertEqual(events.count, 0, @"Nil network types should not be tracked");
 }
 
-- (void)testSetBasicData {
-    // Given
-    NSString *sessionId = @"test-session-123";
-    NSString *accountId = @"test-account-456";
-    NSString *basePayload = @"test-base-payload";
+#pragma mark - Latency Handling Tests
+
+- (void)testZeroLatencyIsAccepted {
+    [self.tracker startWithConfig:[self createEnabledConfig]];
     
-    // When
-    [self.metricsTracker setBasicDataWithSessionId:sessionId
-                                         accountId:accountId
-                                       basePayload:basePayload];
+    [self.tracker trackNetworkCall:CLXMetricsTypeNetworkBidRequest latency:0];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
     
-    // Then - verify data is stored (we can't directly access private properties, so we'll test indirectly)
-    XCTAssertNoThrow([self.metricsTracker trackMethodCall:CLXMetricsTypeMethodSdkInit]);
+    CLXMetricsEvent *event = [self.dao getAllByMetric:CLXMetricsTypeNetworkBidRequest];
+    XCTAssertNotNil(event, @"Zero latency should be accepted");
+    XCTAssertEqual(event.totalLatency, 0, @"Latency should be 0");
 }
 
-- (void)testTrackMethodCall {
-    // Given
-    [self.metricsTracker setBasicDataWithSessionId:@"session1" accountId:@"account1" basePayload:@"payload1"];
+- (void)testNegativeLatencyIsAccepted {
+    // Negative latency might indicate clock issues but should still be tracked
+    [self.tracker startWithConfig:[self createEnabledConfig]];
     
-    // When
-    [self.metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
-    [self.metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateBanner]; // Track same method twice
+    [self.tracker trackNetworkCall:CLXMetricsTypeNetworkBidRequest latency:-50];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
     
-    // Then - should not crash (aggregation logic tested separately)
-    XCTAssertNoThrow([self.metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateInterstitial]);
+    CLXMetricsEvent *event = [self.dao getAllByMetric:CLXMetricsTypeNetworkBidRequest];
+    XCTAssertNotNil(event, @"Negative latency should be accepted");
+    XCTAssertEqual(event.totalLatency, -50, @"Latency should be -50");
 }
 
-- (void)testTrackMethodCallWithNilType {
-    // When/Then
-    XCTAssertNoThrow([self.metricsTracker trackMethodCall:nil]);
-}
+#pragma mark - Lifecycle Tests
 
-- (void)testTrackMethodCallWithInvalidType {
-    // When/Then
-    XCTAssertNoThrow([self.metricsTracker trackMethodCall:@"invalid_method_type"]);
-}
-
-- (void)testTrackNetworkCall {
-    // Given
-    [self.metricsTracker setBasicDataWithSessionId:@"session1" accountId:@"account1" basePayload:@"payload1"];
+- (void)testStopIsIdempotent {
+    [self.tracker startWithConfig:[self createEnabledConfig]];
     
-    // When
-    [self.metricsTracker trackNetworkCall:CLXMetricsTypeNetworkBidRequest latency:250];
-    [self.metricsTracker trackNetworkCall:CLXMetricsTypeNetworkBidRequest latency:300]; // Track same network call twice
+    // Multiple stops should not crash
+    [self.tracker stop];
+    [self.tracker stop];
+    [self.tracker stop];
     
-    // Then - should not crash (aggregation logic tested separately)
-    XCTAssertNoThrow([self.metricsTracker trackNetworkCall:CLXMetricsTypeNetworkGeoApi latency:150]);
+    // Should still be able to restart
+    [self.tracker startWithConfig:[self createEnabledConfig]];
+    XCTAssertTrue(YES, @"Multiple stops should not crash");
 }
 
-- (void)testTrackNetworkCallWithNilType {
-    // When/Then
-    XCTAssertNoThrow([self.metricsTracker trackNetworkCall:nil latency:100]);
-}
-
-- (void)testTrackNetworkCallWithInvalidType {
-    // When/Then
-    XCTAssertNoThrow([self.metricsTracker trackNetworkCall:@"invalid_network_type" latency:100]);
-}
-
-- (void)testTrackNetworkCallWithNegativeLatency {
-    // When/Then - should handle gracefully
-    XCTAssertNoThrow([self.metricsTracker trackNetworkCall:CLXMetricsTypeNetworkSdkInit latency:-50]);
-}
-
-- (void)testTrackNetworkCallWithZeroLatency {
-    // When/Then - should handle gracefully
-    XCTAssertNoThrow([self.metricsTracker trackNetworkCall:CLXMetricsTypeNetworkSdkInit latency:0]);
-}
-
-- (void)testTrySendingPendingMetrics {
-    // TEMPORARILY DISABLED: This test has complex mock database interactions
-    // that are causing crashes. The core functionality is validated by other tests.
-    // TODO: Implement proper mock for complete database interaction testing
+- (void)testStartStopCycles {
+    CLXSDKConfig *config = [self createEnabledConfig];
     
-    // Basic validation that the method exists and can be called safely
-    XCTAssertTrue([self.metricsTracker respondsToSelector:@selector(trySendingPendingMetrics)]);
+    // Multiple start/stop cycles
+    for (int i = 0; i < 5; i++) {
+        [self.tracker startWithConfig:config];
+        [self.tracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+        [self.tracker stop];
+    }
     
-    // The actual functionality is tested in CLXMetricsIntegrationTests
-    // which uses real database instances for end-to-end validation
+    XCTAssertTrue(YES, @"Multiple start/stop cycles should work");
 }
 
-- (void)testStop {
-    // Given
-    [self.metricsTracker setBasicDataWithSessionId:@"session1" accountId:@"account1" basePayload:@"payload1"];
-    
-    // When
-    [self.metricsTracker stop];
-    
-    // Then - should handle gracefully and not crash on subsequent calls
-    XCTAssertNoThrow([self.metricsTracker trackMethodCall:CLXMetricsTypeMethodSdkInit]);
-    XCTAssertNoThrow([self.metricsTracker stop]); // Stop again should be safe
-}
+#pragma mark - Thread Safety Tests
 
-- (void)testMultipleStartStopCycles {
-    // Given
-    CLXSDKConfig *config = [[CLXSDKConfig alloc] init];
+- (void)testConcurrentTracking {
+    [self.tracker startWithConfig:[self createEnabledConfig]];
     
-    // When/Then - multiple start/stop cycles should be safe
-    XCTAssertNoThrow([self.metricsTracker startWithConfig:config]);
-    XCTAssertNoThrow([self.metricsTracker stop]);
-    XCTAssertNoThrow([self.metricsTracker startWithConfig:config]);
-    XCTAssertNoThrow([self.metricsTracker stop]);
-}
-
-- (void)testConcurrentMethodCalls {
-    // Given - set up basic data for concurrent testing
-    [self.metricsTracker setBasicDataWithSessionId:@"session1" accountId:@"account1" basePayload:@"payload1"];
-    
-    // When - simulate concurrent calls
     dispatch_group_t group = dispatch_group_create();
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     
-    for (int i = 0; i < 10; i++) {
+    // Track from multiple threads concurrently
+    for (int i = 0; i < 20; i++) {
         dispatch_group_async(group, queue, ^{
-            [self.metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
-            [self.metricsTracker trackNetworkCall:CLXMetricsTypeNetworkBidRequest latency:100 + i];
+            [self.tracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
+            [self.tracker trackNetworkCall:CLXMetricsTypeNetworkBidRequest latency:100];
         });
     }
     
-    // Then - should not crash (test thread safety)
     dispatch_group_wait(group, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
-    // Test that we can still call methods without crashing after concurrent access
-    XCTAssertNoThrow([self.metricsTracker trackMethodCall:CLXMetricsTypeMethodSdkInit]);
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    
+    // Verify data was tracked (aggregated)
+    NSArray<CLXMetricsEvent *> *events = [self.dao getAll];
+    XCTAssertGreaterThan(events.count, 0, @"Concurrent tracking should work");
 }
 
-- (void)testDatabaseFailureHandling {
-    // Given
-    self.mockDatabase.shouldFailOperations = YES;
-    [self.metricsTracker setBasicDataWithSessionId:@"session1" accountId:@"account1" basePayload:@"payload1"];
-    
-    // When/Then - should handle database failures gracefully
-    XCTAssertNoThrow([self.metricsTracker trackMethodCall:CLXMetricsTypeMethodSdkInit]);
-    XCTAssertNoThrow([self.metricsTracker trackNetworkCall:CLXMetricsTypeNetworkBidRequest latency:200]);
-    XCTAssertNoThrow([self.metricsTracker trySendingPendingMetrics]);
-}
+#pragma mark - Basic Data Tests
 
-- (void)testMemoryManagement {
-    // Given - create many metrics trackers to test memory management
-    NSMutableArray *trackers = [NSMutableArray array];
+- (void)testSessionIdIsStoredInEvents {
+    [self.tracker setBasicDataWithSessionId:@"unique-session-xyz"
+                                  accountId:@"test-account"
+                                basePayload:@"test-payload"];
+    [self.tracker startWithConfig:[self createEnabledConfig]];
     
-    // When
-    for (int i = 0; i < 100; i++) {
-        MockSQLiteDatabase *db = [[MockSQLiteDatabase alloc] init];
-        CLXMetricsTrackerImpl *tracker = [[CLXMetricsTrackerImpl alloc] initWithDatabase:db];
-        [tracker setBasicDataWithSessionId:[NSString stringWithFormat:@"session%d", i]
-                                 accountId:[NSString stringWithFormat:@"account%d", i]
-                               basePayload:@"payload"];
-        [tracker trackMethodCall:CLXMetricsTypeMethodSdkInit];
-        [trackers addObject:tracker];
-    }
+    [self.tracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
     
-    // Then - cleanup should not crash
-    for (CLXMetricsTrackerImpl *tracker in trackers) {
-        XCTAssertNoThrow([tracker stop]);
-    }
+    CLXMetricsEvent *event = [self.dao getAllByMetric:CLXMetricsTypeMethodCreateBanner];
+    XCTAssertEqualObjects(event.sessionId, @"unique-session-xyz", @"Session ID should be stored");
 }
 
 @end
