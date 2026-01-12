@@ -30,7 +30,7 @@
     [[NSFileManager defaultManager] removeItemAtPath:self.testDatabasePath error:nil];
     
     self.database = [[CLXCloudXDatabase alloc] initWithDatabaseName:uniqueName];
-    XCTAssertTrue([self.database openDatabase], @"Should open database");
+    XCTAssertTrue([self.database isOpen], @"Database should be open after init");
     
     self.trackingService = [[CLXRillTrackingServiceV2 alloc] initWithEventDao:self.database.rillEventDao];
     // Don't set endpoints to prevent immediate network transmission in tests

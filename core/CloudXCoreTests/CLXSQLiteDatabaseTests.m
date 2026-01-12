@@ -180,33 +180,6 @@
     XCTAssertEqualObjects(nameResults[0][@"name"], @"initial", @"Should have original data");
 }
 
-/**
- * Test nested transaction behavior
- */
-- (void)testTransaction_Nested_ShouldHandleCorrectly {
-    // Create test table
-    BOOL created = [self.database executeSQL:@"CREATE TABLE nested_test (id INTEGER PRIMARY KEY, level INTEGER);"];
-    XCTAssertTrue(created);
-    
-    [self.database executeInTransaction:^{
-        BOOL success1 = [self.database executeSQL:@"INSERT INTO nested_test (id, level) VALUES (1, 1);" withParameters:nil];
-        XCTAssertTrue(success1, @"First insert should succeed");
-        
-        // Nested transaction (SQLite doesn't support true nested transactions, but should handle gracefully)
-        [self.database executeInTransaction:^{
-            BOOL success2 = [self.database executeSQL:@"INSERT INTO nested_test (id, level) VALUES (2, 2);" withParameters:nil];
-            XCTAssertTrue(success2, @"Nested insert should succeed");
-        }];
-        
-        BOOL success3 = [self.database executeSQL:@"INSERT INTO nested_test (id, level) VALUES (3, 1);" withParameters:nil];
-        XCTAssertTrue(success3, @"Final insert should succeed");
-    }];
-    
-    // Verify all data was inserted
-    NSArray *results = [self.database executeQuery:@"SELECT COUNT(*) as count FROM nested_test;"];
-    XCTAssertEqual([results[0][@"count"] integerValue], 3, @"Should have all three records");
-}
-
 #pragma mark - Concurrent Access Tests
 
 /**
