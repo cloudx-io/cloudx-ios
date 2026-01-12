@@ -15,10 +15,8 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 @protocol CLXBannerDelegate;
 @protocol CLXInterstitialDelegate;
 @protocol CLXRewardedDelegate;
-@protocol CLXNativeDelegate;
 
 @class CLXBannerAdView;
-@class CLXNativeAdView;
 @class CLXSDKConfigResponse;
 @class CLXSDKConfigPlacement;
 @class CLXInterstitial;
@@ -149,18 +147,6 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  */
 - (nullable CLXRewarded *)createRewardedWithPlacement:(NSString *)placement
     NS_SWIFT_NAME(createRewarded(placement:));
-
-/**
- * Create a native ad
- * @param placement The placement name. This should match the placement name in the CloudX dashboard
- * @param viewController The view controller in which the ad will be displayed
- * @param delegate The delegate to receive ad events
- * @return A CLXNativeAdView object
- */
-- (nullable CLXNativeAdView *)createNativeAdWithPlacement:(NSString *)placement
-                                              viewController:(UIViewController *)viewController
-                                                    delegate:(nullable id<CLXNativeDelegate>)delegate
-    NS_SWIFT_NAME(createNativeAd(placement:viewController:delegate:));
 
 #pragma mark - Visual Debugging
 

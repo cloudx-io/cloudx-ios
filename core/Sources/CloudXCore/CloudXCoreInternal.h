@@ -23,6 +23,14 @@
 #import <CloudXCore/CLXPublisherBanner.h>
 #import <CloudXCore/CLXPublisherNative.h>
 
+// Native (internal - not exposed in public API)
+#import <CloudXCore/CLXNative.h>
+#import <CloudXCore/CLXNativeDelegate.h>
+#import <CloudXCore/CLXNativeAdView.h>
+#import <CloudXCore/CLXNativeTemplate.h>
+#import <CloudXCore/CLXAdapterNative.h>
+#import <CloudXCore/CLXAdapterNativeFactory.h>
+
 // SDK Configuration (internal)
 #import <CloudXCore/CLXSDKConfigEndpointObject.h>
 

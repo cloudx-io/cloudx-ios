@@ -9,6 +9,8 @@
 
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXNative.h>
+#import <CloudXCore/CLXNativeDelegate.h>
 #import <CloudXCore/CLXAdapterNative.h>
 #import <CloudXCore/CLXAdapterNativeFactory.h>
 #import <CloudXCore/CLXNativeTemplate.h>
