@@ -112,7 +112,8 @@
     
     self.interstitialAd = [[CloudXCore shared] createInterstitialWithPlacement:placement];
     self.interstitialAd.delegate = self;
-    
+    self.interstitialAd.revenueDelegate = self;
+
     // Note: The interstitial ad will internally preserve the original placement name through our CLXAd factory method updates
     
     if (self.interstitialAd) {

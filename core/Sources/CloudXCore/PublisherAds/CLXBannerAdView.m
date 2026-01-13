@@ -89,6 +89,11 @@ static void initializeLogger() {
         if ([_banner respondsToSelector:@selector(setDelegate:)]) {
             [_banner setDelegate:self];
         }
+
+        // Set up revenue delegate relay
+        if ([_banner respondsToSelector:@selector(setRevenueDelegate:)]) {
+            [(CLXPublisherBanner *)_banner setRevenueDelegate:self];
+        }
         
         // Set content hugging/compression priorities to ensure Auto Layout respects intrinsic size
         // This allows the view to work with both fixed constraints and flexible constraints
@@ -526,8 +531,8 @@ static void initializeLogger() {
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {
-    if ([self.delegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
-        [self.delegate didPayRevenueForAd:ad];
+    if ([self.revenueDelegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
+        [self.revenueDelegate didPayRevenueForAd:ad];
     }
 }
 

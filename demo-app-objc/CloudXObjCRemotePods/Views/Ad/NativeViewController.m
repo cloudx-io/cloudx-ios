@@ -112,7 +112,8 @@
     self.nativeAd = [[CloudXCore shared] createNativeAdWithPlacement:placement
                                                       viewController:self
                                                             delegate:self];
-    
+    self.nativeAd.revenueDelegate = self;
+
     if (self.nativeAd) {
         [self.nativeAd load];
     } else {

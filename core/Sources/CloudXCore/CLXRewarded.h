@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXPublisherFullscreenAdBase.h>
 #import <CloudXCore/CLXRewardedDelegate.h>
+#import <CloudXCore/CLXAdRevenueDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,6 +24,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Delegate that receives events related to the rewarded ad.
  */
 @property (nonatomic, weak, nullable) id<CLXRewardedDelegate> delegate;
+
+/**
+ * Delegate that receives revenue events for the rewarded ad.
+ */
+@property (nonatomic, weak, nullable) id<CLXAdRevenueDelegate> revenueDelegate;
 
 @end
 

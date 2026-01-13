@@ -112,7 +112,8 @@
     NSLog(@"[RewardedViewController] Calling createRewardedWithPlacement: %@", placement);
     self.rewardedAd = [[CloudXCore shared] createRewardedWithPlacement:placement];
     self.rewardedAd.delegate = self;
-    
+    self.rewardedAd.revenueDelegate = self;
+
     if (self.rewardedAd) {
         NSLog(@"[RewardedViewController] ✅ Rewarded ad instance created successfully: %@", self.rewardedAd);
         NSLog(@"[RewardedViewController] Loading rewarded ad instance...");
@@ -137,6 +138,7 @@
     // SDK config debugging removed to avoid undeclared selector warnings
     self.rewardedAd = [[CloudXCore shared] createRewardedWithPlacement:placement];
     self.rewardedAd.delegate = self;
+    self.rewardedAd.revenueDelegate = self;
     if (self.rewardedAd) {
         NSLog(@"✅ Rewarded ad instance created successfully: %@", self.rewardedAd);
         [self startPollingReadyState];

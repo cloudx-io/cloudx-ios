@@ -1,7 +1,7 @@
 import UIKit
 import CloudXCore
 
-class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
+class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate, CLXAdRevenueDelegate {
     
     private var nativeBannerAd: CLXNativeAdView?
     private var adContainerView: UIView!
@@ -115,7 +115,8 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
         nativeBannerAd = CloudXCore.shared.createNativeAd(placement: placement,
                                                          viewController: self,
                                                          delegate: self)
-        
+        nativeBannerAd?.revenueDelegate = self
+
         if let nativeBannerAd = nativeBannerAd {
             print("[NativeBannerViewController] LOG: ✅ Native banner ad instance created successfully: \(nativeBannerAd)")
             print("[NativeBannerViewController] LOG: Loading native banner ad instance...")
@@ -172,8 +173,8 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
         }
     }
     
-    func didFailToLoadAd(error: CLXError) {
-        DemoAppLogger.sharedInstance.logMessage("❌ NativeBanner didFailToLoadAd - Error: \(error.localizedDescription)")
+    func didFailToLoadAd(_ placementName: String, error: CLXError) {
+        DemoAppLogger.sharedInstance.logMessage("❌ NativeBanner didFailToLoadAd for placement '\(placementName)' - Error: \(error.localizedDescription)")
         
         DispatchQueue.main.async { [weak self] in
             self?.nativeBannerAd = nil

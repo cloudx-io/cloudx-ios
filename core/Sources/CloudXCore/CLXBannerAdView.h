@@ -11,6 +11,7 @@
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXBannerType.h>
 #import <CloudXCore/CLXBannerDelegate.h>
+#import <CloudXCore/CLXAdRevenueDelegate.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -29,10 +30,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly) CLXAd *ad;
 
 /**
- * A weak reference to the object that implements CLXBannerDelegate protocol. 
+ * A weak reference to the object that implements CLXBannerDelegate protocol.
  * This object will receive events related to the banner ad.
  */
 @property (nonatomic, weak, nullable) id<CLXBannerDelegate> delegate;
+
+/**
+ * Delegate that receives revenue events for the banner ad.
+ */
+@property (nonatomic, weak, nullable) id<CLXAdRevenueDelegate> revenueDelegate;
 
 /**
  * A boolean indicating whether to suspend preloading the ad when it's not visible.

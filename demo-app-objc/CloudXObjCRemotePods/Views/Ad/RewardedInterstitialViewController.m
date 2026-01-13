@@ -96,7 +96,8 @@
     NSLog(@"[RewardedInterstitialViewController] Calling createRewardedWithPlacement: %@", placement);
     self.rewardedInterstitialAd = [[CloudXCore shared] createRewardedWithPlacement:placement];
     self.rewardedInterstitialAd.delegate = self;
-    
+    self.rewardedInterstitialAd.revenueDelegate = self;
+
     if (self.rewardedInterstitialAd) {
         NSLog(@"[RewardedInterstitialViewController] ✅ Rewarded interstitial ad instance created successfully: %@", self.rewardedInterstitialAd);
         NSLog(@"[RewardedInterstitialViewController] Loading rewarded interstitial ad instance...");

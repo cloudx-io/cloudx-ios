@@ -4,7 +4,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface InterstitialViewController : BaseAdViewController <CLXInterstitialDelegate>
+@interface InterstitialViewController : BaseAdViewController <CLXInterstitialDelegate, CLXAdRevenueDelegate>
 
 @end
 

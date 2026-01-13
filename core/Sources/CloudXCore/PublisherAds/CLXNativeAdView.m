@@ -54,6 +54,12 @@ static void initializeLogger() {
         if ([_native respondsToSelector:@selector(setDelegate:)]) {
             [_native setDelegate:(id)self];
         }
+
+        // Set up revenue delegate relay
+        if ([_native respondsToSelector:@selector(setRevenueDelegate:)]) {
+            [(CLXPublisherNative *)_native setRevenueDelegate:self];
+        }
+
         self.backgroundColor = [UIColor clearColor];
         self.userInteractionEnabled = YES;
         
@@ -241,8 +247,8 @@ static void initializeLogger() {
 // Revenue callback bridge method - called by CLXPublisherNative completion block
 - (void)didPayRevenueForAd:(CLXAd *)ad {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
-            [self.delegate didPayRevenueForAd:ad];
+        if ([self.revenueDelegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
+            [self.revenueDelegate didPayRevenueForAd:ad];
         }
     });
 }

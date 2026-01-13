@@ -183,7 +183,8 @@
     self.bannerAd = [[CloudXCore shared] createBannerWithPlacement:placement
                                                       viewController:self
                                                           delegate:self];
-    
+    self.bannerAd.revenueDelegate = self;
+
     if (!self.bannerAd) {
         [self showAlertWithTitle:@"Error" message:@"Failed to create banner."];
         return;

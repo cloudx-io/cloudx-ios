@@ -4,7 +4,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RewardedViewController : BaseAdViewController <CLXRewardedDelegate>
+@interface RewardedViewController : BaseAdViewController <CLXRewardedDelegate, CLXAdRevenueDelegate>
 
 @end
 

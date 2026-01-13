@@ -3,7 +3,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BannerViewController : BaseAdViewController <CLXBannerDelegate>
+@interface BannerViewController : BaseAdViewController <CLXBannerDelegate, CLXAdRevenueDelegate>
 
 @end
 

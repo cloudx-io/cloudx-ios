@@ -20,6 +20,7 @@
 #import <CloudXCore/CLXBannerDelegate.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXAdNetworkFactories.h>
+#import <CloudXCore/CLXAdRevenueDelegate.h>
 
 @class CLXEnvironmentConfig;
 
@@ -42,6 +43,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Delegate for banner ad events.
  */
 @property (nonatomic, weak, nullable) id<CLXBannerDelegate, CLXAdapterBannerDelegate> delegate;
+
+/**
+ * Delegate for revenue events (impression-level revenue data).
+ */
+@property (nonatomic, weak, nullable) id<CLXAdRevenueDelegate> revenueDelegate;
 
 /**
  * The type of banner ad.

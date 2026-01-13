@@ -143,6 +143,7 @@ class BannerViewController: BaseAdViewController {
             showAlert(title: "Error", message: "Failed to create Banner ad instance")
         } else {
             DemoAppLogger.sharedInstance.logMessage("✅ Banner ad instance created successfully")
+            bannerAd?.revenueDelegate = self
             // Add banner to view hierarchy immediately
             addBannerToViewHierarchy()
         }
@@ -184,16 +185,16 @@ class BannerViewController: BaseAdViewController {
     }
 }
 
-extension BannerViewController: CLXBannerDelegate {
+extension BannerViewController: CLXBannerDelegate, CLXAdRevenueDelegate {
     func didLoad(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("✅ Banner didLoadAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .ready)
     }
     
-    func didFailToLoadAd(error: CLXError) {
+    func didFailToLoadAd(_ placementName: String, error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
-        DemoAppLogger.sharedInstance.logMessage("❌ Banner failed to load - Error: \(error.localizedDescription)")
+        DemoAppLogger.sharedInstance.logMessage("❌ Banner failed to load for placement '\(placementName)' - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: .noAd)
         bannerAd = nil

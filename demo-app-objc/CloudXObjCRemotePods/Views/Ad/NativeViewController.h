@@ -4,7 +4,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NativeViewController : BaseAdViewController <CLXNativeDelegate>
+@interface NativeViewController : BaseAdViewController <CLXNativeDelegate, CLXAdRevenueDelegate>
 
 @end
 

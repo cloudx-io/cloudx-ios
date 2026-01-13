@@ -39,6 +39,7 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 // Ad Base
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXAdDelegate.h>
+#import <CloudXCore/CLXAdRevenueDelegate.h>
 #import <CloudXCore/CLXDestroyable.h>
 
 // Banner

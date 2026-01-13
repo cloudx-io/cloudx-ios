@@ -17,7 +17,7 @@
 #import <CloudXCore/CLXSDKConfigPlacement.h>
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXNativeAdView.h>
-
+#import <CloudXCore/CLXAdRevenueDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -39,6 +39,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Delegate for native ad events. Supports both old adapter methods and new CLXAd methods.
  */
 @property (nonatomic, weak, nullable) id<CLXNativeDelegate, CLXAdapterNativeDelegate> delegate;
+
+/**
+ * Delegate for revenue events (impression-level revenue data).
+ */
+@property (nonatomic, weak, nullable) id<CLXAdRevenueDelegate> revenueDelegate;
 
 /**
  * The type of native ad template.

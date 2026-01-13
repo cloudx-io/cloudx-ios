@@ -1,7 +1,7 @@
 import UIKit
 import CloudXCore
 
-class MRECViewController: BaseAdViewController, CLXBannerDelegate {
+class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueDelegate {
     
     private var mrecAd: CLXBannerAdView?
     private var autoRefreshButton: UIButton!
@@ -113,7 +113,8 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
             placement = settings.mrecPlacement
         }
         mrecAd = CloudXCore.shared.createMREC(placement: placement, viewController: self, delegate: self)
-        
+        mrecAd?.revenueDelegate = self
+
         guard let mrecAd = mrecAd else {
             showAlert(title: "Error", message: "Failed to create MREC.")
             return
@@ -203,9 +204,9 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         // Don't auto-show - user must press Show MREC button
     }
     
-    func didFailToLoadAd(error: CLXError) {
+    func didFailToLoadAd(_ placementName: String, error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
-        DemoAppLogger.sharedInstance.logMessage("❌ MREC failed to load - Error: \(error.localizedDescription)")
+        DemoAppLogger.sharedInstance.logMessage("❌ MREC failed to load for placement '\(placementName)' - Error: \(error.localizedDescription)")
         isLoading = false
         
         DispatchQueue.main.async { [weak self] in

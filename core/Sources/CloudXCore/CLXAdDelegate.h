@@ -64,13 +64,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)didRecordImpressionForAd:(CLXAd *)ad NS_SWIFT_NAME(didRecordImpression(for:));
 
-/**
- * Called when revenue is paid for the ad.
- * Triggered after NURL is successfully sent to server endpoint.
- * @param ad The ad for which revenue was paid
- */
-- (void)didPayRevenueForAd:(CLXAd *)ad NS_SWIFT_NAME(didPayRevenue(for:));
-
 @end
 
 NS_ASSUME_NONNULL_END

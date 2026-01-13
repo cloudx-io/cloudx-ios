@@ -60,7 +60,7 @@ CloudXCore.shared.initializeSDK(appKey: "your-app-key-here") { success, error in
 
 **Objective-C:**
 ```objc
-@interface YourViewController () <CLXBannerDelegate>
+@interface YourViewController () <CLXBannerDelegate, CLXAdRevenueDelegate>
 @property (nonatomic, strong) CLXBannerAdView *bannerAd;
 @end
 
@@ -71,18 +71,19 @@ CloudXCore.shared.initializeSDK(appKey: "your-app-key-here") { success, error in
                                                     viewController:self
                                                           delegate:self
                                                               tmax:nil];
-    
+    self.bannerAd.revenueDelegate = self;  // Set revenue delegate separately
+
     if (self.bannerAd) {
         self.bannerAd.translatesAutoresizingMaskIntoConstraints = NO;
         [self.view addSubview:self.bannerAd];
-        
+
         [NSLayoutConstraint activateConstraints:@[
             [self.bannerAd.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor],
             [self.bannerAd.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
             [self.bannerAd.widthAnchor constraintEqualToConstant:320],
             [self.bannerAd.heightAnchor constraintEqualToConstant:50]
         ]];
-        
+
         [self.bannerAd load];
     }
 }
@@ -105,8 +106,18 @@ CloudXCore.shared.initializeSDK(appKey: "your-app-key-here") { success, error in
     NSLog(@"Banner ad clicked");
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
+- (void)didHideAd:(CLXAd *)ad {
     NSLog(@"Banner ad hidden");
+}
+
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
+    NSLog(@"Banner ad impression recorded");
+}
+
+#pragma mark - CLXAdRevenueDelegate
+
+- (void)didPayRevenueForAd:(CLXAd *)ad {
+    NSLog(@"Banner revenue: %@ from %@", ad.revenue, ad.bidder);
 }
 
 @end
@@ -114,37 +125,38 @@ CloudXCore.shared.initializeSDK(appKey: "your-app-key-here") { success, error in
 
 **Swift:**
 ```swift
-class YourViewController: UIViewController, CLXBannerDelegate {
+class YourViewController: UIViewController, CLXBannerDelegate, CLXAdRevenueDelegate {
     private var bannerAd: CLXBannerAdView?
-    
+
     func createBannerAd() {
         bannerAd = CloudXCore.shared.createBanner(withPlacement: "your-banner-placement",
                                                  viewController: self,
                                                  delegate: self,
                                                  tmax: nil)
-        
+        bannerAd?.revenueDelegate = self  // Set revenue delegate separately
+
         if let bannerAd = bannerAd {
             bannerAd.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview(bannerAd)
-            
+
             NSLayoutConstraint.activate([
                 bannerAd.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
                 bannerAd.centerXAnchor.constraint(equalTo: view.centerXAnchor),
                 bannerAd.widthAnchor.constraint(equalToConstant: 320),
                 bannerAd.heightAnchor.constraint(equalToConstant: 50)
             ])
-            
+
             bannerAd.load()
         }
     }
-    
+
     // MARK: - CLXBannerDelegate
-    
+
     func didLoad(_ ad: CLXAd) {
         print("Banner ad loaded successfully")
     }
-    
-    func didFailToLoadAd(_ placementName: String, error: Error) {
+
+    func didFailToLoadAd(_ placementName: String, error: CLXError) {
         print("Banner ad (\(placementName)) failed to load: \(error.localizedDescription)")
     }
 
@@ -156,8 +168,18 @@ class YourViewController: UIViewController, CLXBannerDelegate {
         print("Banner ad clicked")
     }
 
-    func didHide(with ad: CLXAd) {
+    func didHide(_ ad: CLXAd) {
         print("Banner ad hidden")
+    }
+
+    func didRecordImpression(for ad: CLXAd) {
+        print("Banner ad impression recorded")
+    }
+
+    // MARK: - CLXAdRevenueDelegate
+
+    func didPayRevenue(for ad: CLXAd) {
+        print("Banner revenue: \(ad.revenue ?? 0) from \(ad.bidder ?? "unknown")")
     }
 }
 ```
@@ -166,7 +188,7 @@ class YourViewController: UIViewController, CLXBannerDelegate {
 
 **Objective-C:**
 ```objc
-@interface YourViewController () <CLXBannerDelegate>
+@interface YourViewController () <CLXBannerDelegate, CLXAdRevenueDelegate>
 @property (nonatomic, strong) CLXBannerAdView *mrecAd;
 @end
 
@@ -176,18 +198,19 @@ class YourViewController: UIViewController, CLXBannerDelegate {
     self.mrecAd = [[CloudXCore shared] createMRECWithPlacement:@"your-mrec-placement"
                                                 viewController:self
                                                       delegate:self];
-    
+    self.mrecAd.revenueDelegate = self;  // Set revenue delegate separately
+
     if (self.mrecAd) {
         self.mrecAd.translatesAutoresizingMaskIntoConstraints = NO;
         [self.view addSubview:self.mrecAd];
-        
+
         [NSLayoutConstraint activateConstraints:@[
             [self.mrecAd.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
             [self.mrecAd.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-20],
             [self.mrecAd.widthAnchor constraintEqualToConstant:300],
             [self.mrecAd.heightAnchor constraintEqualToConstant:250]
         ]];
-        
+
         [self.mrecAd load];
     }
 }
@@ -210,8 +233,14 @@ class YourViewController: UIViewController, CLXBannerDelegate {
     NSLog(@"MREC ad clicked");
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
+- (void)didHideAd:(CLXAd *)ad {
     NSLog(@"MREC ad hidden");
+}
+
+#pragma mark - CLXAdRevenueDelegate
+
+- (void)didPayRevenueForAd:(CLXAd *)ad {
+    NSLog(@"MREC revenue: %@ from %@", ad.revenue, ad.bidder);
 }
 
 @end
@@ -219,36 +248,37 @@ class YourViewController: UIViewController, CLXBannerDelegate {
 
 **Swift:**
 ```swift
-class YourViewController: UIViewController, CLXBannerDelegate {
+class YourViewController: UIViewController, CLXBannerDelegate, CLXAdRevenueDelegate {
     private var mrecAd: CLXBannerAdView?
-    
+
     func createMRECAd() {
         mrecAd = CloudXCore.shared.createMREC(withPlacement: "your-mrec-placement",
                                              viewController: self,
                                              delegate: self)
-        
+        mrecAd?.revenueDelegate = self  // Set revenue delegate separately
+
         if let mrecAd = mrecAd {
             mrecAd.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview(mrecAd)
-            
+
             NSLayoutConstraint.activate([
                 mrecAd.centerXAnchor.constraint(equalTo: view.centerXAnchor),
                 mrecAd.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
                 mrecAd.widthAnchor.constraint(equalToConstant: 300),
                 mrecAd.heightAnchor.constraint(equalToConstant: 250)
             ])
-            
+
             mrecAd.load()
         }
     }
-    
+
     // MARK: - CLXBannerDelegate
-    
+
     func didLoad(_ ad: CLXAd) {
         print("MREC ad loaded successfully")
     }
-    
-    func didFailToLoadAd(_ placementName: String, error: Error) {
+
+    func didFailToLoadAd(_ placementName: String, error: CLXError) {
         print("MREC ad (\(placementName)) failed to load: \(error.localizedDescription)")
     }
 
@@ -260,8 +290,14 @@ class YourViewController: UIViewController, CLXBannerDelegate {
         print("MREC ad clicked")
     }
 
-    func didHide(with ad: CLXAd) {
+    func didHide(_ ad: CLXAd) {
         print("MREC ad hidden")
+    }
+
+    // MARK: - CLXAdRevenueDelegate
+
+    func didPayRevenue(for ad: CLXAd) {
+        print("MREC revenue: \(ad.revenue ?? 0) from \(ad.bidder ?? "unknown")")
     }
 }
 ```
@@ -270,7 +306,7 @@ class YourViewController: UIViewController, CLXBannerDelegate {
 
 **Objective-C:**
 ```objc
-@interface YourViewController () <CLXInterstitialDelegate>
+@interface YourViewController () <CLXInterstitialDelegate, CLXAdRevenueDelegate>
 @property (nonatomic, strong) CLXInterstitial *interstitialAd;
 @end
 
@@ -279,7 +315,8 @@ class YourViewController: UIViewController, CLXBannerDelegate {
 - (void)createInterstitialAd {
     self.interstitialAd = [[CloudXCore shared] createInterstitialWithPlacement:@"your-interstitial-placement"];
     self.interstitialAd.delegate = self;
-    
+    self.interstitialAd.revenueDelegate = self;  // Set revenue delegate separately
+
     if (self.interstitialAd) {
         [self.interstitialAd load];
     }
@@ -307,17 +344,23 @@ class YourViewController: UIViewController, CLXBannerDelegate {
     NSLog(@"Interstitial ad displayed");
 }
 
-- (void)failToShowWithAd:(CLXAd *)ad error:(CLXError *)error {
+- (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
     NSLog(@"Interstitial ad failed to show: %@", error.localizedDescription);
 }
 
-- (void)didHideWithAd:(CLXAd *)ad {
+- (void)didHideAd:(CLXAd *)ad {
     NSLog(@"Interstitial ad hidden");
     [self createInterstitialAd]; // Reload for next use
 }
 
-- (void)didClickWithAd:(CLXAd *)ad {
+- (void)didClickAd:(CLXAd *)ad {
     NSLog(@"Interstitial ad clicked");
+}
+
+#pragma mark - CLXAdRevenueDelegate
+
+- (void)didPayRevenueForAd:(CLXAd *)ad {
+    NSLog(@"Interstitial revenue: %@ from %@", ad.revenue, ad.bidder);
 }
 
 @end
@@ -325,15 +368,16 @@ class YourViewController: UIViewController, CLXBannerDelegate {
 
 **Swift:**
 ```swift
-class YourViewController: UIViewController, CLXInterstitialDelegate {
+class YourViewController: UIViewController, CLXInterstitialDelegate, CLXAdRevenueDelegate {
     private var interstitialAd: CLXInterstitial?
-    
+
     func createInterstitialAd() {
-        interstitialAd = CloudXCore.shared.createInterstitial(withPlacement: "your-interstitial-placement",
-                                                             delegate: self)
+        interstitialAd = CloudXCore.shared.createInterstitial(withPlacement: "your-interstitial-placement")
+        interstitialAd?.delegate = self
+        interstitialAd?.revenueDelegate = self  // Set revenue delegate separately
         interstitialAd?.load()
     }
-    
+
     func showInterstitialAd() {
         if interstitialAd?.isReady == true {
             interstitialAd?.show(from: self)
@@ -341,14 +385,14 @@ class YourViewController: UIViewController, CLXInterstitialDelegate {
             print("Interstitial ad not ready")
         }
     }
-    
+
     // MARK: - CLXInterstitialDelegate
-    
+
     func didLoad(_ ad: CLXAd) {
         print("Interstitial ad loaded successfully")
     }
-    
-    func didFailToLoadAd(_ placementName: String, error: Error) {
+
+    func didFailToLoadAd(_ placementName: String, error: CLXError) {
         print("Interstitial ad (\(placementName)) failed to load: \(error.localizedDescription)")
     }
 
@@ -356,22 +400,54 @@ class YourViewController: UIViewController, CLXInterstitialDelegate {
         print("Interstitial ad displayed")
     }
 
-    func failToShow(with ad: CLXAd, error: Error) {
+    func didFailToDisplay(_ ad: CLXAd, error: CLXError) {
         print("Interstitial ad failed to show: \(error.localizedDescription)")
     }
 
-    func didHide(with ad: CLXAd) {
+    func didHide(_ ad: CLXAd) {
         print("Interstitial ad hidden")
         createInterstitialAd() // Reload for next use
     }
 
-    func didClick(with ad: CLXAd) {
+    func didClick(_ ad: CLXAd) {
         print("Interstitial ad clicked")
+    }
+
+    // MARK: - CLXAdRevenueDelegate
+
+    func didPayRevenue(for ad: CLXAd) {
+        print("Interstitial revenue: \(ad.revenue ?? 0) from \(ad.bidder ?? "unknown")")
     }
 }
 ```
 
 ## Advanced Features
+
+### Revenue Tracking
+
+Set a `revenueDelegate` on any ad format to receive revenue callbacks when an ad impression is tracked. The `CLXAd` object contains the revenue value in USD and the winning bidder name.
+
+**Objective-C:**
+```objc
+self.bannerAd.revenueDelegate = self;
+
+// CLXAdRevenueDelegate
+- (void)didPayRevenueForAd:(CLXAd *)ad {
+    NSLog(@"Revenue: %@ from %@", ad.revenue, ad.bidder);
+}
+```
+
+**Swift:**
+```swift
+bannerAd?.revenueDelegate = self
+
+// CLXAdRevenueDelegate
+func didPayRevenue(for ad: CLXAd) {
+    print("Revenue: \(ad.revenue ?? 0) from \(ad.bidder ?? "unknown")")
+}
+```
+
+Works with all ad formats (banner, MREC, interstitial, rewarded).
 
 ### Debug Logging
 

@@ -121,7 +121,8 @@
     self.nativeBannerAd = [[CloudXCore shared] createNativeAdWithPlacement:placement
                                                             viewController:self
                                                                   delegate:self];
-    
+    self.nativeBannerAd.revenueDelegate = self;
+
     if (self.nativeBannerAd) {
         NSLog(@"[NativeBannerViewController] LOG: ✅ Native banner ad instance created successfully: %@", self.nativeBannerAd);
         NSLog(@"[NativeBannerViewController] LOG: Loading native banner ad instance...");

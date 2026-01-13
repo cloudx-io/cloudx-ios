@@ -226,9 +226,9 @@ NS_ASSUME_NONNULL_BEGIN
     [self fireRenderSuccessEventForBidID:rewarded.bidID adType:CLXAdTypeRewarded];
     
     CLXAd *adObject = [self createAdObject];
-    if (self.delegate && [self.delegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
+    if (self.revenueDelegate && [self.revenueDelegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.delegate didPayRevenueForAd:adObject];
+            [self.revenueDelegate didPayRevenueForAd:adObject];
         });
     }
     

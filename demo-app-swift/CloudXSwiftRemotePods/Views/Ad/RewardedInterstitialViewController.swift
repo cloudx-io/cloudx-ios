@@ -1,7 +1,7 @@
 import UIKit
 import CloudXCore
 
-class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDelegate {
+class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRevenueDelegate {
     
     private var rewardedInterstitialAd: CLXRewarded?
     
@@ -88,6 +88,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         DemoAppLogger.sharedInstance.logMessage("📱 [RewardedInterstitial] Calling createRewarded...")
         rewardedInterstitialAd = CloudXCore.shared.createRewarded(placement: placement)
         rewardedInterstitialAd?.delegate = self
+        rewardedInterstitialAd?.revenueDelegate = self
         
         if let rewardedInterstitialAd = rewardedInterstitialAd {
             DemoAppLogger.sharedInstance.logMessage("✅ [RewardedInterstitial] Rewarded interstitial ad instance created successfully")
@@ -139,9 +140,9 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         updateStatusUI(state: .ready)
     }
     
-    func didFailToLoadAd(error: CLXError) {
+    func didFailToLoadAd(_ placementName: String, error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
-        DemoAppLogger.sharedInstance.logMessage("❌ RewardedInterstitial failed to load - Error: \(error.localizedDescription)")
+        DemoAppLogger.sharedInstance.logMessage("❌ RewardedInterstitial failed to load for placement '\(placementName)' - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: .noAd)
         

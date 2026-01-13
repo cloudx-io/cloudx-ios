@@ -1,7 +1,7 @@
 import UIKit
 import CloudXCore
 
-class NativeViewController: BaseAdViewController, CLXNativeDelegate {
+class NativeViewController: BaseAdViewController, CLXNativeDelegate, CLXAdRevenueDelegate {
     
     private var nativeAd: CLXNativeAdView?
     private var adContainerView: UIView!
@@ -108,7 +108,8 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
         nativeAd = CloudXCore.shared.createNativeAd(placement: placement,
                                                    viewController: self,
                                                    delegate: self)
-        
+        nativeAd?.revenueDelegate = self
+
         if let nativeAd = nativeAd {
             nativeAd.load()
         } else {
@@ -164,9 +165,9 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
         // Don't auto-show - user must press Show Native button
     }
     
-    func didFailToLoadAd(error: CLXError) {
+    func didFailToLoadAd(_ placementName: String, error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
-        DemoAppLogger.sharedInstance.logMessage("❌ Native failed to load - Error: \(error.localizedDescription)")
+        DemoAppLogger.sharedInstance.logMessage("❌ Native failed to load for placement '\(placementName)' - Error: \(error.localizedDescription)")
         
         DispatchQueue.main.async { [weak self] in
             self?.nativeAd = nil

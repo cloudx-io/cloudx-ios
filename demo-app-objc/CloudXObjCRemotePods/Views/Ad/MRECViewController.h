@@ -4,7 +4,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MRECViewController : BaseAdViewController <CLXBannerDelegate>
+@interface MRECViewController : BaseAdViewController <CLXBannerDelegate, CLXAdRevenueDelegate>
 
 @end
 

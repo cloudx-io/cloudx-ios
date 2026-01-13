@@ -109,28 +109,44 @@
 // Test removed - old protocol method no longer exists
 // Win/loss tracking now uses CLXWinLossTracker for server-side tracking
 
+#pragma mark - CLXAdRevenueDelegate Protocol Tests
+
+// Test that CLXAdRevenueDelegate protocol exists and has required method
+- (void)testRevenueDelegateProtocolExists {
+    Protocol *revenueDelegate = @protocol(CLXAdRevenueDelegate);
+    XCTAssertNotNil(revenueDelegate, @"CLXAdRevenueDelegate protocol should exist");
+}
+
+// Test that ad view classes have revenueDelegate property
+- (void)testAdViewClassesHaveRevenueDelegate {
+    XCTAssertTrue([CLXBannerAdView instancesRespondToSelector:@selector(revenueDelegate)],
+                  @"CLXBannerAdView should have revenueDelegate property");
+    XCTAssertTrue([CLXBannerAdView instancesRespondToSelector:@selector(setRevenueDelegate:)],
+                  @"CLXBannerAdView should have setRevenueDelegate: method");
+
+    XCTAssertTrue([CLXNativeAdView instancesRespondToSelector:@selector(revenueDelegate)],
+                  @"CLXNativeAdView should have revenueDelegate property");
+    XCTAssertTrue([CLXNativeAdView instancesRespondToSelector:@selector(setRevenueDelegate:)],
+                  @"CLXNativeAdView should have setRevenueDelegate: method");
+}
+
+// Test that fullscreen ad classes have revenueDelegate property
+- (void)testFullscreenAdClassesHaveRevenueDelegate {
+    XCTAssertTrue([CLXInterstitial instancesRespondToSelector:@selector(revenueDelegate)],
+                  @"CLXInterstitial should have revenueDelegate property");
+    XCTAssertTrue([CLXInterstitial instancesRespondToSelector:@selector(setRevenueDelegate:)],
+                  @"CLXInterstitial should have setRevenueDelegate: method");
+
+    XCTAssertTrue([CLXRewarded instancesRespondToSelector:@selector(revenueDelegate)],
+                  @"CLXRewarded should have revenueDelegate property");
+    XCTAssertTrue([CLXRewarded instancesRespondToSelector:@selector(setRevenueDelegate:)],
+                  @"CLXRewarded should have setRevenueDelegate: method");
+}
+
 #pragma mark - Native Ad View Bridge Tests
 
-// Test that CLXNativeAdView has didPayRevenueForAd bridge method
-- (void)testNativeAdViewHasRevenuePaidBridge {
-    XCTAssertTrue([CLXNativeAdView instancesRespondToSelector:@selector(didPayRevenueForAd:)], 
-                  @"CLXNativeAdView should have didPayRevenueForAd: bridge method");
-}
-
-// Test CLXNativeAdView didPayRevenueForAd bridge functionality
-- (void)testNativeAdViewRevenuePaidBridge {
-    // Create a simple test to verify the bridge method exists and can be called
-    CLXNativeAdView *nativeAdView = [[CLXNativeAdView alloc] init];
-    
-    // Create a test CLXAd object
-    CLXAd *testAd = [[CLXAd alloc] initWithPlacementName:@"test"
-                                             placementId:@"test-id"
-                                                  bidder:@"test-bidder"
-                                     externalPlacementId:@"ext-id"
-                                                 revenue:@1.50];
-    
-    // This should not crash - the bridge method should handle nil delegate gracefully
-    XCTAssertNoThrow([nativeAdView didPayRevenueForAd:testAd], @"CLXNativeAdView didPayRevenueForAd should not crash with nil delegate");
-}
+// Tests for didPayRevenueForAd: bridge method have been removed.
+// The bridge method is now internal - revenue callbacks are relayed via revenueDelegate.
+// See testAdViewClassesHaveRevenueDelegate above for verification of the new pattern.
 
 @end

@@ -712,9 +712,9 @@ NS_ASSUME_NONNULL_BEGIN
             
             // Trigger revenue callback immediately (no longer depends on NURL network call)
             CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-            if (self.delegate && [self.delegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
+            if (self.revenueDelegate && [self.revenueDelegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self.delegate didPayRevenueForAd:adObject];
+                    [self.revenueDelegate didPayRevenueForAd:adObject];
                 });
             }
         } else {
