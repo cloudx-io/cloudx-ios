@@ -163,10 +163,10 @@ static const NSTimeInterval kTestTimeout = 0.5;
     [self logEvent:@"didLoadAd"];
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAd:(NSString *)placementName error:(NSError *)error {
     self.failToLoadCount++;
     self.lastError = error;
-    [self logEvent:[NSString stringWithFormat:@"didFailToLoadAdWithError: %@", error.localizedDescription]];
+    [self logEvent:[NSString stringWithFormat:@"didFailToLoadAd: %@ error: %@", placementName, error.localizedDescription]];
 }
 
 - (void)didDisplayAd:(CLXAd *)ad {

@@ -75,7 +75,7 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
     self.lastAd = ad;
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAd:(NSString *)placementName error:(NSError *)error {
     self.failToLoadCount++;
     self.lastError = error;
 }

@@ -61,8 +61,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     }
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
-    [self.receivedCallbacks addObject:@"didFailToLoadAdWithError"];
+- (void)didFailToLoadAd:(NSString *)placementName error:(NSError *)error {
+    [self.receivedCallbacks addObject:@"didFailToLoadAd"];
     if (!self.expectLoadSuccess && self.loadExpectation) {
         [self.loadExpectation fulfill];
     }
@@ -116,8 +116,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     }
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
-    XCTAssertTrue([NSThread isMainThread], @"didFailToLoadAdWithError should be called on main thread");
+- (void)didFailToLoadAd:(NSString *)placementName error:(NSError *)error {
+    XCTAssertTrue([NSThread isMainThread], @"didFailToLoadAd should be called on main thread");
     if (self.expectation) {
         [self.expectation fulfill];
     }

@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL impressionCalled;
 @property (nonatomic, assign) BOOL clickCalled;
 @property (nonatomic, strong, nullable) NSError *lastError;
+@property (nonatomic, copy, nullable) NSString *lastPlacementName;
 @property (nonatomic, strong, nullable) CLXAd *lastAd;
 @property (nonatomic, strong, nullable) id<CLXAdapterBanner> lastBanner;
 // Additional properties for expand/collapse tracking
@@ -73,8 +74,9 @@ NS_ASSUME_NONNULL_END
     self.lastAd = ad;
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAd:(NSString *)placementName error:(NSError *)error {
     self.failToLoadCalled = YES;
+    self.lastPlacementName = placementName;
     self.lastError = error;
 }
 

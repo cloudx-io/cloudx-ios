@@ -93,8 +93,8 @@ CloudXCore.shared.initializeSDK(appKey: "your-app-key-here") { success, error in
     NSLog(@"Banner ad loaded successfully");
 }
 
-- (void)didFailToLoadAdWithError:(CLXError *)error {
-    NSLog(@"Banner ad failed to load: %@", error.localizedDescription);
+- (void)didFailToLoadAd:(NSString *)placementName error:(CLXError *)error {
+    NSLog(@"Banner ad (%@) failed to load: %@", placementName, error.localizedDescription);
 }
 
 - (void)didDisplayAd:(CLXAd *)ad {
@@ -144,18 +144,18 @@ class YourViewController: UIViewController, CLXBannerDelegate {
         print("Banner ad loaded successfully")
     }
     
-    func didFailToLoadAd(error: Error) {
-        print("Banner ad failed to load: \(error.localizedDescription)")
+    func didFailToLoadAd(_ placementName: String, error: Error) {
+        print("Banner ad (\(placementName)) failed to load: \(error.localizedDescription)")
     }
-    
+
     func didDisplay(_ ad: CLXAd) {
         print("Banner ad displayed")
     }
-    
+
     func didClick(_ ad: CLXAd) {
         print("Banner ad clicked")
     }
-    
+
     func didHide(with ad: CLXAd) {
         print("Banner ad hidden")
     }
@@ -198,8 +198,8 @@ class YourViewController: UIViewController, CLXBannerDelegate {
     NSLog(@"MREC ad loaded successfully");
 }
 
-- (void)didFailToLoadAdWithError:(CLXError *)error {
-    NSLog(@"MREC ad failed to load: %@", error.localizedDescription);
+- (void)didFailToLoadAd:(NSString *)placementName error:(CLXError *)error {
+    NSLog(@"MREC ad (%@) failed to load: %@", placementName, error.localizedDescription);
 }
 
 - (void)didDisplayAd:(CLXAd *)ad {
@@ -248,18 +248,18 @@ class YourViewController: UIViewController, CLXBannerDelegate {
         print("MREC ad loaded successfully")
     }
     
-    func didFailToLoadAd(error: Error) {
-        print("MREC ad failed to load: \(error.localizedDescription)")
+    func didFailToLoadAd(_ placementName: String, error: Error) {
+        print("MREC ad (\(placementName)) failed to load: \(error.localizedDescription)")
     }
-    
+
     func didDisplay(_ ad: CLXAd) {
         print("MREC ad displayed")
     }
-    
+
     func didClick(_ ad: CLXAd) {
         print("MREC ad clicked")
     }
-    
+
     func didHide(with ad: CLXAd) {
         print("MREC ad hidden")
     }
@@ -299,8 +299,8 @@ class YourViewController: UIViewController, CLXBannerDelegate {
     NSLog(@"Interstitial ad loaded successfully");
 }
 
-- (void)didFailToLoadAdWithError:(CLXError *)error {
-    NSLog(@"Interstitial ad failed to load: %@", error.localizedDescription);
+- (void)didFailToLoadAd:(NSString *)placementName error:(CLXError *)error {
+    NSLog(@"Interstitial ad (%@) failed to load: %@", placementName, error.localizedDescription);
 }
 
 - (void)didDisplayAd:(CLXAd *)ad {
@@ -348,23 +348,23 @@ class YourViewController: UIViewController, CLXInterstitialDelegate {
         print("Interstitial ad loaded successfully")
     }
     
-    func didFailToLoadAd(error: Error) {
-        print("Interstitial ad failed to load: \(error.localizedDescription)")
+    func didFailToLoadAd(_ placementName: String, error: Error) {
+        print("Interstitial ad (\(placementName)) failed to load: \(error.localizedDescription)")
     }
-    
+
     func didDisplay(_ ad: CLXAd) {
         print("Interstitial ad displayed")
     }
-    
+
     func failToShow(with ad: CLXAd, error: Error) {
         print("Interstitial ad failed to show: \(error.localizedDescription)")
     }
-    
+
     func didHide(with ad: CLXAd) {
         print("Interstitial ad hidden")
         createInterstitialAd() // Reload for next use
     }
-    
+
     func didClick(with ad: CLXAd) {
         print("Interstitial ad clicked")
     }

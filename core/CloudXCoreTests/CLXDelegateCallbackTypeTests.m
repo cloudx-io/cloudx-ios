@@ -37,9 +37,10 @@
     XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"didLoadAd should receive CLXAd object, got %@", NSStringFromClass([ad class]));
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
-    [self.receivedCallbacks addObject:@"didFailToLoadAdWithError"];
-    XCTAssertNotNil(error, @"didFailToLoadAdWithError should receive non-nil error");
+- (void)didFailToLoadAd:(NSString *)placementName error:(NSError *)error {
+    [self.receivedCallbacks addObject:@"didFailToLoadAd"];
+    XCTAssertNotNil(placementName, @"didFailToLoadAd should receive non-nil placementName");
+    XCTAssertNotNil(error, @"didFailToLoadAd should receive non-nil error");
 }
 
 - (void)didDisplayAd:(CLXAd *)ad {
@@ -173,17 +174,17 @@
     
     // These should compile without warnings if signatures are correct
     [self didLoadAd:testAd];
-    [self didFailToLoadAdWithError:testError];
+    [self didFailToLoadAd:@"test_placement" error:testError];
     [self didDisplayAd:testAd];
     [self didFailToDisplayAd:testAd error:testError];
     [self didHideAd:testAd];
     [self didClickAd:testAd];
     [self didRecordImpressionForAd:testAd];
     [self closedByUserActionWithAd:testAd];
-    
+
     // Verify all callbacks were received
     XCTAssertEqual(self.receivedCallbacks.count, 8, @"All delegate methods should have been called");
-    XCTAssertEqual(self.receivedAdObjects.count, 7, @"All delegate methods (except didFailToLoadAdWithError) should have received ad objects");
+    XCTAssertEqual(self.receivedAdObjects.count, 7, @"All delegate methods (except didFailToLoadAd) should have received ad objects");
     
     // Verify all received objects are CLXAd instances
     for (id adObject in self.receivedAdObjects) {

@@ -180,8 +180,8 @@
     });
 }
 
-- (void)didFailToLoadAdWithError:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ NativeBanner failToLoadWithAd - Error: %@", error.localizedDescription]];
+- (void)didFailToLoadAd:(NSString *)placementName error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ NativeBanner failed to load (%@) - Error: %@", placementName, error.localizedDescription]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeBannerAd = nil;

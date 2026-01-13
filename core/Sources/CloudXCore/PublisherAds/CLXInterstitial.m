@@ -111,9 +111,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)notifyLoadFailure:(NSError *)error {
     [[CLXDebugOverlayManager shared] flashError];
-    if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+    if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
         [self.logger logDelegateError:@"❌ Interstitial didFailToLoadAd" error:error];
-        [self.delegate didFailToLoadAdWithError:error];
+        [self.delegate didFailToLoadAd:self.placementName error:error];
     }
 }
 

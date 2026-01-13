@@ -212,9 +212,9 @@ NS_ASSUME_NONNULL_BEGIN
     // Check for deferred error from create method
     if (self.deferredError) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+            if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
                 [self.logger logDelegateError:@"❌ Native didFailToLoadAd" error:self.deferredError];
-                [self.delegate didFailToLoadAdWithError:self.deferredError];
+                [self.delegate didFailToLoadAd:self.placementName error:self.deferredError];
             }
         });
         return;
@@ -260,11 +260,11 @@ NS_ASSUME_NONNULL_BEGIN
             // Clear the requested placement name since initialization is complete
             self.requestedPlacementName = nil;
         } else {
-            if (self.delegate && [self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
-                CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidPlacement 
+            if (self.delegate && [self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
+                CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidPlacement
                                               description:[NSString stringWithFormat:@"Placement not found: %@", self.requestedPlacementName]];
                 [self.logger logDelegateError:@"❌ Native didFailToLoadAd" error:error];
-                [self.delegate didFailToLoadAdWithError:error];
+                [self.delegate didFailToLoadAd:self.placementName error:error];
             }
             return;
         }
@@ -651,10 +651,10 @@ NS_ASSUME_NONNULL_BEGIN
     if ([self.delegate respondsToSelector:@selector(failToLoadWithNative:error:)]) {
         [self.delegate failToLoadWithNative:native error:delegateError];
     }
-    if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
+    if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
         [[CLXDebugOverlayManager shared] flashError];
         [self.logger logDelegateError:@"❌ Native didFailToLoadAd" error:delegateError];
-        [self.delegate didFailToLoadAdWithError:delegateError];
+        [self.delegate didFailToLoadAd:self.placementName error:delegateError];
     }
 }
 

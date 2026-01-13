@@ -170,8 +170,8 @@
     // Don't auto-show - user must press Show Native button
 }
 
-- (void)didFailToLoadAdWithError:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Native didFailToLoadAd" ad:nil];
+- (void)didFailToLoadAd:(NSString *)placementName error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Native failed to load (%@)", placementName]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeAd = nil;

@@ -177,10 +177,10 @@ static void initializeLogger() {
     if (!nativeView) {
         [logger error:@"[CloudXNativeAdView] didLoadWithNative failed: nativeView is nil"];
         dispatch_async(dispatch_get_main_queue(), ^{
-            if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
-                NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidNativeView 
+            if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
+                NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidNativeView
                                                description:@"Native view is nil"];
-                [self.delegate didFailToLoadAdWithError:error];
+                [self.delegate didFailToLoadAd:((CLXPublisherNative *)self.native).placementName error:error];
             }
         });
         return;
@@ -209,11 +209,11 @@ static void initializeLogger() {
 
 - (void)failToLoadWithNative:(nullable id<CLXAdapterNative>)native error:(nullable NSError *)error {
     [logger error:[NSString stringWithFormat:@"[CloudXNativeAdView] failToLoadWithNative called with error: %@", error.localizedDescription]];
-    
+
     // Notify delegate on main thread
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
-            [self.delegate didFailToLoadAdWithError:error];
+        if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
+            [self.delegate didFailToLoadAd:((CLXPublisherNative *)self.native).placementName error:error];
         }
     });
 }

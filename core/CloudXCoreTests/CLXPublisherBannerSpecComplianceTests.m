@@ -163,13 +163,14 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
     [self logEvent:@"didLoadAd" withData:@{@"ad": NSStringFromClass([ad class])}];
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAd:(NSString *)placementName error:(NSError *)error {
     self.failToLoadCount++;
     self.lastError = error;
     if (error.code == CLXBidAdSourceErrorNoBid) {
         self.noBidErrorCount++;
     }
-    [self logEvent:@"didFailToLoadAdWithError" withData:@{
+    [self logEvent:@"didFailToLoadAd" withData:@{
+        @"placementName": placementName ?: @"nil",
         @"error_code": @(error.code),
         @"error_domain": error.domain ?: @"unknown",
         @"error_description": error.localizedDescription ?: @"no description"

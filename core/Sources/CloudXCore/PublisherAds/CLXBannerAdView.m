@@ -359,8 +359,8 @@ static void initializeLogger() {
 }
 
 - (void)failToLoadBanner:(id<CLXAdapterBanner>)banner error:(NSError *)error {
-    if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
-        [self.delegate didFailToLoadAdWithError:error];
+    if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
+        [self.delegate didFailToLoadAd:self.placement error:error];
     }
 }
 
@@ -470,10 +470,10 @@ static void initializeLogger() {
     }
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
+- (void)didFailToLoadAd:(NSString *)placementName error:(NSError *)error {
     // Flash debug button if testMode is enabled
     [[CLXDebugOverlayManager shared] flashError];
-    
+
     // Show error in container if visual debugging is enabled
     if ([CloudXCore isVisualDebuggingEnabled]) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -481,7 +481,7 @@ static void initializeLogger() {
             for (UIView *subview in [self.subviews copy]) {
                 [subview removeFromSuperview];
             }
-            
+
             // Add error view
             CLXDebugErrorView *errorView = [CLXDebugErrorView errorViewWithFrame:self.bounds
                                                                            title:@"Load Failed"
@@ -489,9 +489,9 @@ static void initializeLogger() {
             [self addSubview:errorView];
         });
     }
-    
-    if ([self.delegate respondsToSelector:@selector(didFailToLoadAdWithError:)]) {
-        [self.delegate didFailToLoadAdWithError:error];
+
+    if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
+        [self.delegate didFailToLoadAd:placementName error:error];
     }
 }
 

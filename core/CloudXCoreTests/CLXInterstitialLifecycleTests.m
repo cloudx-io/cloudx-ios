@@ -86,8 +86,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     self.lastLoadedAd = ad;
 }
 
-- (void)didFailToLoadAdWithError:(NSError *)error {
-    [self.callbackLog addObject:@"didFailToLoadAdWithError"];
+- (void)didFailToLoadAd:(NSString *)placementName error:(NSError *)error {
+    [self.callbackLog addObject:@"didFailToLoadAd"];
     self.lastLoadError = error;
 }
 
@@ -515,23 +515,23 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 }
 
 - (void)testFailToLoadDelegateCallback {
-    // Verifies that the didFailToLoadAdWithError delegate callback is triggered when an interstitial fails to load
-    XCTestExpectation *expectation = [self expectationWithDescription:@"didFailToLoadAdWithError callback"];
-    
+    // Verifies that the didFailToLoadAd delegate callback is triggered when an interstitial fails to load
+    XCTestExpectation *expectation = [self expectationWithDescription:@"didFailToLoadAd callback"];
+
     [self setCurrentState:CLXFullscreenAdStateLOADING onInterstitial:self.interstitial];
     self.interstitial.currentAdapter = self.mockAdapter;
-    
+
     NSError *testError = [NSError errorWithDomain:@"TestError" code:1001 userInfo:@{NSLocalizedDescriptionKey: @"Load failed"}];
-    
+
     // Simulate load failure
     [self.interstitial didFailToLoadWithInterstitial:self.mockAdapter error:testError];
-    
+
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didFailToLoadAdWithError"], @"didFailToLoadAdWithError should be called");
+        XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didFailToLoadAd"], @"didFailToLoadAd should be called");
         XCTAssertEqualObjects(self.mockDelegate.lastLoadError.localizedDescription, @"Load failed", @"Error should match");
         [expectation fulfill];
     });
-    
+
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
@@ -831,7 +831,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         // Verify failure callback
-        XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didFailToLoadAdWithError"], @"didFailToLoadAdWithError should be called");
+        XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didFailToLoadAd"], @"didFailToLoadAd should be called");
         
         // Verify no success callbacks
         XCTAssertFalse([self.mockDelegate.callbackLog containsObject:@"didLoadAd"], @"didLoadAd should not be called");
