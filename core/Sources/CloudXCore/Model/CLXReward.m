@@ -17,11 +17,11 @@
 @implementation CLXReward
 
 + (NSString *)defaultLabel {
-    return @"Reward";
+    return @"";
 }
 
 + (NSInteger)defaultAmount {
-    return 1;
+    return 0;
 }
 
 + (instancetype)reward {

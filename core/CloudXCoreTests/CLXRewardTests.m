@@ -25,9 +25,9 @@
  */
 - (void)testDefaultLabel_ReturnsExpectedValue {
     NSString *defaultLabel = [CLXReward defaultLabel];
-    
+
     XCTAssertNotNil(defaultLabel, @"defaultLabel should not be nil");
-    XCTAssertEqualObjects(defaultLabel, @"Reward", @"defaultLabel should be 'Reward'");
+    XCTAssertEqualObjects(defaultLabel, @"", @"defaultLabel should be empty string");
 }
 
 /**
@@ -35,8 +35,8 @@
  */
 - (void)testDefaultAmount_ReturnsExpectedValue {
     NSInteger defaultAmount = [CLXReward defaultAmount];
-    
-    XCTAssertEqual(defaultAmount, 1, @"defaultAmount should be 1");
+
+    XCTAssertEqual(defaultAmount, 0, @"defaultAmount should be 0");
 }
 
 #pragma mark - Factory Method Tests

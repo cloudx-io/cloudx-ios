@@ -71,8 +71,8 @@
  * Test: Default values are correct
  */
 - (void)testDefaultValues {
-    XCTAssertEqual([CLXReward defaultAmount], 1, @"Default amount should be 1");
-    XCTAssertEqualObjects([CLXReward defaultLabel], @"Reward", @"Default label should be 'Reward'");
+    XCTAssertEqual([CLXReward defaultAmount], 0, @"Default amount should be 0");
+    XCTAssertEqualObjects([CLXReward defaultLabel], @"", @"Default label should be empty string");
 }
 
 #pragma mark - Reward Merging Logic Tests (Simulated)
@@ -107,14 +107,14 @@
     // Simulate: adapter amount=0, placement amount=0
     NSInteger adapterAmount = 0;
     NSInteger placementAmount = 0;
-    
+
     // Merging logic: use adapter if > 0, else placement if > 0, else default
     NSInteger finalAmount = (adapterAmount > 0) ? adapterAmount : placementAmount;
     if (finalAmount <= 0) {
         finalAmount = [CLXReward defaultAmount];
     }
-    
-    XCTAssertEqual(finalAmount, 1, @"Should fall back to default when both are 0");
+
+    XCTAssertEqual(finalAmount, 0, @"Should fall back to default (0) when both are 0");
 }
 
 - (void)testMergingLogic_LabelFallback {
