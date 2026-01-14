@@ -64,7 +64,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
         case 0: return 2; // SDK Settings
-        case 1: return 6; // Placement Settings
+        case 1: return 4; // Placement Settings
         case 2: return 3; // Privacy: Consent, US Privacy, User Targeting
         case 3: return 4; // Logging: Enable, Emojis, Timestamps, Level
         default: return 0;
@@ -113,8 +113,6 @@
                 case 1: cell.textLabel.text = @"MREC"; textField.text = self.settings.mrecPlacement; break;
                 case 2: cell.textLabel.text = @"Interstitial"; textField.text = self.settings.interstitialPlacement; break;
                 case 3: cell.textLabel.text = @"Rewarded"; textField.text = self.settings.rewardedPlacement; break;
-                case 4: cell.textLabel.text = @"Native Small"; textField.text = self.settings.nativeSmallPlacement; break;
-                case 5: cell.textLabel.text = @"Native Medium"; textField.text = self.settings.nativeMediumPlacement; break;
             }
             break;
         case 2: // Privacy
@@ -267,8 +265,6 @@
     else if (tag == 11) self.settings.mrecPlacement = textField.text;
     else if (tag == 12) self.settings.interstitialPlacement = textField.text;
     else if (tag == 13) self.settings.rewardedPlacement = textField.text;
-    else if (tag == 14) self.settings.nativeSmallPlacement = textField.text;
-    else if (tag == 15) self.settings.nativeMediumPlacement = textField.text;
     else if (tag == 20) self.settings.consentString = textField.text;
     else if (tag == 21) self.settings.usPrivacyString = textField.text;
 }

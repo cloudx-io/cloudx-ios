@@ -53,7 +53,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
         case 0: return 2 // SDK Settings
-        case 1: return 6 // Placement Settings
+        case 1: return 4 // Placement Settings
         case 2: return 5 // Privacy: Consent, US Privacy, GPP String, GPP SID, User Targeting
         case 3: return 4 // Logging: Enable, Emojis, Timestamps, Level
         default: return 0
@@ -106,15 +106,9 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
             case 2: 
                 cell.textLabel?.text = "Interstitial"
                 textField.text = settings.interstitialPlacement
-            case 3: 
+            case 3:
                 cell.textLabel?.text = "Rewarded"
                 textField.text = settings.rewardedPlacement
-            case 4: 
-                cell.textLabel?.text = "Native Small"
-                textField.text = settings.nativeSmallPlacement
-            case 5: 
-                cell.textLabel?.text = "Native Medium"
-                textField.text = settings.nativeMediumPlacement
             default: break
             }
         case 2: // Privacy
@@ -226,8 +220,6 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         else if tag == 11 { settings.mrecPlacement = textField.text ?? "" }
         else if tag == 12 { settings.interstitialPlacement = textField.text ?? "" }
         else if tag == 13 { settings.rewardedPlacement = textField.text ?? "" }
-        else if tag == 14 { settings.nativeSmallPlacement = textField.text ?? "" }
-        else if tag == 15 { settings.nativeMediumPlacement = textField.text ?? "" }
         else if tag == 20 { settings.consentString = textField.text ?? "" }
         else if tag == 21 { settings.usPrivacyString = textField.text ?? "" }
         else if tag == 22 { 
