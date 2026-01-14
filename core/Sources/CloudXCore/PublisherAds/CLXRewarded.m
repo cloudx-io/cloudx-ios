@@ -231,11 +231,6 @@ NS_ASSUME_NONNULL_BEGIN
             [self.revenueDelegate didPayRevenueForAd:adObject];
         });
     }
-    
-    if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
-        [self.logger logDelegateCallback:@"👁️ Rewarded didRecordImpression" ad:adObject];
-        [self.delegate didRecordImpressionForAd:adObject];
-    }
 }
 
 - (void)didCloseWithRewarded:(id<CLXAdapterRewarded>)rewarded {

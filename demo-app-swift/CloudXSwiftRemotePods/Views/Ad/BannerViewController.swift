@@ -205,31 +205,8 @@ extension BannerViewController: CLXBannerDelegate, CLXAdRevenueDelegate {
         }
     }
     
-    func didDisplay(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👀 Banner didDisplayAd", ad: ad)
-    }
-    
-    func didFailToDisplay(_ ad: CLXAd, error: CLXError) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ Banner didFailToDisplayAd", ad: ad)
-        bannerAd = nil
-        
-        DispatchQueue.main.async { [weak self] in
-            let errorMessage = (error as NSError).detailedDemoDescription
-            self?.showAlert(title: "Banner Ad Display Failed", message: errorMessage)
-        }
-    }
-    
-    func didHide(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🔚 Banner didHideAd", ad: ad)
-        bannerAd = nil
-    }
-    
     func didClick(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👆 Banner didClickAd", ad: ad)
-    }
-    
-    func didRecordImpression(for ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ Banner didRecordImpression", ad: ad)
     }
     
     func didPayRevenue(for ad: CLXAd) {

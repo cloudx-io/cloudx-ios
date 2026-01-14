@@ -80,16 +80,6 @@ NS_ASSUME_NONNULL_END
     self.lastError = error;
 }
 
-- (void)didDisplayAd:(CLXAd *)ad {
-    self.didShowCalled = YES;
-    self.lastAd = ad;
-}
-
-- (void)didRecordImpressionForAd:(CLXAd *)ad {
-    self.impressionCalled = YES;
-    self.lastAd = ad;
-}
-
 - (void)didClickAd:(CLXAd *)ad {
     self.clickCalled = YES;
     self.lastAd = ad;

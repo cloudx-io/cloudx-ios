@@ -371,28 +371,9 @@ static void initializeLogger() {
 
 - (void)didShowBanner:(id<CLXAdapterBanner>)banner {
     [logger info:@"[CLXBannerAdView] didShowBanner called from adapter"];
-    if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
-        // Use stored ad object (should be populated after didLoadAd)
-        if (self.ad) {
-            [logger info:[NSString stringWithFormat:@"[CLXBannerAdView] Calling delegate.didDisplayAd with ad: %@", self.ad]];
-            [self.delegate didDisplayAd:self.ad];
-        } else {
-            [logger error:@"[CLXBannerAdView] didShowBanner called but self.ad is nil"];
-        }
-    } else {
-        [logger warn:@"[CLXBannerAdView] Delegate does not respond to didDisplayAd:"];
-    }
 }
 
 - (void)impressionBanner:(id<CLXAdapterBanner>)banner {
-    if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
-        // Use stored ad object (should be populated after didLoadAd)
-        if (self.ad) {
-            [self.delegate didRecordImpressionForAd:self.ad];
-        } else {
-            [logger error:@"impressionBanner called but self.ad is nil"];
-        }
-    }
 }
 
 - (void)clickBanner:(id<CLXAdapterBanner>)banner {
@@ -500,33 +481,9 @@ static void initializeLogger() {
     }
 }
 
-- (void)didDisplayAd:(CLXAd *)ad {
-    if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
-        [self.delegate didDisplayAd:ad];
-    }
-}
-
-- (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
-    if ([self.delegate respondsToSelector:@selector(didFailToDisplayAd:error:)]) {
-        [self.delegate didFailToDisplayAd:ad error:error];
-    }
-}
-
-- (void)didHideAd:(CLXAd *)ad {
-    if ([self.delegate respondsToSelector:@selector(didHideAd:)]) {
-        [self.delegate didHideAd:ad];
-    }
-}
-
 - (void)didClickAd:(CLXAd *)ad {
     if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
         [self.delegate didClickAd:ad];
-    }
-}
-
-- (void)didRecordImpressionForAd:(CLXAd *)ad {
-    if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
-        [self.delegate didRecordImpressionForAd:ad];
     }
 }
 

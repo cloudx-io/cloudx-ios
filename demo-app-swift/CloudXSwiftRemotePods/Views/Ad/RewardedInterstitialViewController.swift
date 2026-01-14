@@ -178,11 +178,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
     func didClick(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👆 RewardedInterstitial didClickAd", ad: ad)
     }
-    
-    func didRecordImpression(for ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ RewardedInterstitial didRecordImpression", ad: ad)
-    }
-    
+
     func didPayRevenue(for ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("💰 RewardedInterstitial didPayRevenue", ad: ad)
     }

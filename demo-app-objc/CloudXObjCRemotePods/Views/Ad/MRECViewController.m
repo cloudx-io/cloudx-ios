@@ -196,30 +196,8 @@
     });
 }
 
-- (void)didDisplayAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 MREC didDisplayAd" ad:ad];
-}
-
-- (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ MREC didFailToDisplayAd" ad:ad];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
-        [self showAlertWithTitle:@"MREC Ad Show Failed" message:errorMessage];
-    });
-}
-
-- (void)didHideAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 MREC didHideAd" ad:ad];
-    self.mrecAd = nil;
-}
-
 - (void)didClickAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 MREC didClickAd" ad:ad];
-}
-
-- (void)didRecordImpressionForAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ MREC didRecordImpressionForAd" ad:ad];
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {

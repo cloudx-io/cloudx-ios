@@ -677,14 +677,8 @@ NS_ASSUME_NONNULL_BEGIN
         [self.appSessionService addImpressionWithPlacementID:self.placementID];
     }
     
-    // Call both old and new delegate methods for backward compatibility
     if ([self.delegate respondsToSelector:@selector(didShowWithNative:)]) {
         [self.delegate didShowWithNative:native];
-    }
-    if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
-        CLXAd *ad = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-        [self.logger logDelegateCallback:@"👀 Native didDisplayAd" ad:ad];
-        [self.delegate didDisplayAd:ad];
     }
 }
 
@@ -723,14 +717,8 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
     
-    // Call both old and new delegate methods for backward compatibility
     if ([self.delegate respondsToSelector:@selector(impressionWithNative:)]) {
         [self.delegate impressionWithNative:native];
-    }
-    if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
-        CLXAd *impressionAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-        [self.logger logDelegateCallback:@"👁️ Native didRecordImpression" ad:impressionAd];
-        [self.delegate didRecordImpressionForAd:impressionAd];
     }
 }
 

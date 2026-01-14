@@ -180,11 +180,6 @@ NS_ASSUME_NONNULL_BEGIN
             [self.revenueDelegate didPayRevenueForAd:adObject];
         });
     }
-    
-    if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
-        [self.logger logDelegateCallback:@"👁️ Interstitial didRecordImpression" ad:adObject];
-        [self.delegate didRecordImpressionForAd:adObject];
-    }
 }
 
 - (void)didCloseWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {

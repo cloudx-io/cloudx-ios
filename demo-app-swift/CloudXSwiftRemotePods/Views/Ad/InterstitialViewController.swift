@@ -235,10 +235,6 @@ extension InterstitialViewController: CLXInterstitialDelegate, CLXAdRevenueDeleg
         DemoAppLogger.sharedInstance.logAdEvent("👆 Interstitial didClickAd", ad: ad)
     }
     
-    func didRecordImpression(for ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ Interstitial didRecordImpression", ad: ad)
-    }
-    
     func didPayRevenue(for ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("💰 Interstitial didPayRevenue", ad: ad)
     }

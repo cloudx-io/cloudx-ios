@@ -435,25 +435,17 @@ static const NSTimeInterval kTestTimeout = 2.0;
 // Test all adapter delegate methods forward correctly
 - (void)testAdapterDelegateMethodsForwardCorrectly {
     MockBannerAdapter *mockAdapter = [[MockBannerAdapter alloc] init];
-    
-    // Test didShowBanner
-    [self.banner didShowBanner:mockAdapter];
-    XCTAssertTrue(self.mockDelegate.didShowCalled, @"didShow should be forwarded to delegate");
-    
+
     // Reset delegate
-    self.mockDelegate.impressionCalled = NO;
     self.mockDelegate.clickCalled = NO;
-    
-    // Test impressionBanner
-    [self.banner impressionBanner:mockAdapter];
-    XCTAssertTrue(self.mockDelegate.impressionCalled, @"impression should be forwarded to delegate");
-    
+
     // Test clickBanner
     [self.banner clickBanner:mockAdapter];
     XCTAssertTrue(self.mockDelegate.clickCalled, @"click should be forwarded to delegate");
-    
-    // NOTE: closedByUserAction callback was intentionally removed from the public API
-    // to align with industry standards (AdMob, MAX, Unity, LevelPlay don't have this callback)
+
+    // NOTE: didDisplayAd, didRecordImpressionForAd, and closedByUserAction callbacks were
+    // intentionally removed from banner delegates to align with industry standards
+    // (AdMob, MAX, Unity, LevelPlay don't have these callbacks for inline ads)
 }
 
 #pragma mark - Destroy and Cleanup Tests

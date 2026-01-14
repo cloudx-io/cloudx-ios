@@ -215,30 +215,8 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         }
     }
     
-    func didDisplay(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👀 MREC didDisplayAd", ad: ad)
-    }
-    
-    func didFailToDisplay(_ ad: CLXAd, error: CLXError) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ MREC didFailToDisplayAd", ad: ad)
-        
-        DispatchQueue.main.async { [weak self] in
-            let errorMessage = error.localizedDescription
-            self?.showAlert(title: "MREC Error", message: errorMessage)
-        }
-    }
-    
-    func didHide(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🔚 MREC didHideAd", ad: ad)
-        mrecAd = nil
-    }
-    
     func didClick(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👆 MREC didClickAd", ad: ad)
-    }
-    
-    func didRecordImpression(for ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ MREC didRecordImpression", ad: ad)
     }
     
     func didPayRevenue(for ad: CLXAd) {

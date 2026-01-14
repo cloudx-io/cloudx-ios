@@ -288,32 +288,8 @@
     });
 }
 
-- (void)didDisplayAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Banner didDisplayAd" ad:ad];
-}
-
-- (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"❌ Banner didFailToDisplayAd" ad:ad];
-    
-    self.bannerAd = nil;
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
-        [self showAlertWithTitle:@"Banner Ad Show Failed" message:errorMessage];
-    });
-}
-
-- (void)didHideAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Banner didHideAd" ad:ad];
-    self.bannerAd = nil;
-}
-
 - (void)didClickAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Banner didClickAd" ad:ad];
-}
-
-- (void)didRecordImpressionForAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Banner didRecordImpressionForAd" ad:ad];
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {

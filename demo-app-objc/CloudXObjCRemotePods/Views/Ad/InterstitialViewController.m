@@ -202,10 +202,6 @@
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Interstitial didClickAd" ad:ad];
 }
 
-- (void)didRecordImpressionForAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Interstitial didRecordImpressionForAd" ad:ad];
-}
-
 - (void)didPayRevenueForAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Interstitial didPayRevenueForAd" ad:ad];
 }

@@ -776,12 +776,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)didShowBanner:(id<CLXAdapterBanner>)banner {
-    CLXAd *ad = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-    
-    if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
-        [self.logger logDelegateCallback:@"👀 Banner didDisplayAd" ad:ad];
-        [self.delegate didDisplayAd:ad];
-    }
 }
 
 - (void)impressionBanner:(id<CLXAdapterBanner>)banner {
@@ -822,11 +816,6 @@ NS_ASSUME_NONNULL_BEGIN
         
         // Send Analytics tracking impression event
         [self.rillTrackingService sendImpressionEvent];
-    }
-    if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
-        CLXAd *ad = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
-        [self.logger logDelegateCallback:@"👁️ Banner didRecordImpression" ad:ad];
-        [self.delegate didRecordImpressionForAd:ad];
     }
 }
 

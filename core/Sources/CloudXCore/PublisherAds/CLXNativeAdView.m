@@ -226,22 +226,10 @@ static void initializeLogger() {
 
 - (void)didShowWithNative:(id<CLXAdapterNative>)native {
     [logger debug:@"[CloudXNativeAdView] didShowWithNative called"];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(didDisplayAd:)]) {
-            [self.delegate didDisplayAd:[CLXAd adFromBid:((CLXPublisherNative *)self.native).lastBidResponse.bid placementId:((CLXPublisherNative *)self.native).placementID placementName:((CLXPublisherNative *)self.native).placementName]];
-        }
-    });
 }
 
 - (void)impressionWithNative:(id<CLXAdapterNative>)native {
     [logger debug:@"[CloudXNativeAdView] impressionWithNative called"];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(didRecordImpressionForAd:)]) {
-            CLXPublisherNative *publisherNative = (CLXPublisherNative *)self.native;
-            CLXAd *impressionAd = [CLXAd adFromBid:publisherNative.lastBidResponse.bid placementId:publisherNative.placementID placementName:publisherNative.placementName];
-            [self.delegate didRecordImpressionForAd:impressionAd];
-        }
-    });
 }
 
 // Revenue callback bridge method - called by CLXPublisherNative completion block

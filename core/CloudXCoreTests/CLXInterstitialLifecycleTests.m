@@ -66,7 +66,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 @property (nonatomic, strong) NSError *lastShowError;
 @property (nonatomic, strong) CLXAd *lastHiddenAd;
 @property (nonatomic, strong) CLXAd *lastClickedAd;
-@property (nonatomic, strong) CLXAd *lastImpressionAd;
 @property (nonatomic, strong) CLXAd *lastClosedByUserAd;
 @property (nonatomic, strong) XCTestExpectation *hideExpectation;
 @end
@@ -112,11 +111,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)didClickAd:(CLXAd *)ad {
     [self.callbackLog addObject:@"didClickAd"];
     self.lastClickedAd = ad;
-}
-
-- (void)didRecordImpressionForAd:(CLXAd *)ad {
-    [self.callbackLog addObject:@"didRecordImpressionForAd"];
-    self.lastImpressionAd = ad;
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
@@ -555,25 +549,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
-- (void)testImpressionDelegateCallback {
-    // Verifies that the didRecordImpressionForAd delegate callback is triggered when an interstitial impression is recorded
-    XCTestExpectation *expectation = [self expectationWithDescription:@"didRecordImpressionForAd callback"];
-    
-    [self setCurrentState:CLXFullscreenAdStateSHOWING onInterstitial:self.interstitial];
-    self.interstitial.currentAdapter = self.mockAdapter;
-    
-    // Simulate impression
-    [self.interstitial impressionWithInterstitial:self.mockAdapter];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didRecordImpressionForAd"], @"didRecordImpressionForAd should be called");
-        // CLXAd should be nil when no valid bid data is available
-        XCTAssertNil(self.mockDelegate.lastImpressionAd, @"Impression ad should be nil when no bid data available");
-        [expectation fulfill];
-    });
-    
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
-}
+// NOTE: testImpressionDelegateCallback was removed because didRecordImpressionForAd
+// callback was removed from CLXAdDelegate. Publishers should use CLXAdRevenueDelegate
+// for revenue/impression tracking instead.
 
 - (void)testDidClickDelegateCallback {
     // Verifies that the didClickAd delegate callback is triggered when a user clicks on the interstitial
@@ -749,7 +727,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         // Verify all delegate callbacks occurred in order
-        NSArray *expectedCallbacks = @[@"didLoadAd", @"didDisplayAd", @"didRecordImpressionForAd", @"didClickAd", @"didHideAd"];
+        // NOTE: didRecordImpressionForAd was removed - use CLXAdRevenueDelegate instead
+        NSArray *expectedCallbacks = @[@"didLoadAd", @"didDisplayAd", @"didClickAd", @"didHideAd"];
         for (NSString *callback in expectedCallbacks) {
             XCTAssertTrue([self.mockDelegate.callbackLog containsObject:callback], @"Callback %@ should be called", callback);
         }

@@ -8,7 +8,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CLXAdDelegate.h>
+#import <CloudXCore/CLXFullscreenAdDelegate.h>
 
 @class CLXReward;
 
@@ -17,11 +17,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @protocol CLXRewardedDelegate
  * @brief Delegate protocol for rewarded ad events
- * 
- * Extends CLXAdDelegate with rewarded-specific callbacks.
+ *
+ * Extends CLXFullscreenAdDelegate with rewarded-specific callbacks.
  * Mirrors AppLovin MAX SDK's MARewardedAdDelegate pattern.
  */
-@protocol CLXRewardedDelegate <CLXAdDelegate>
+@protocol CLXRewardedDelegate <CLXFullscreenAdDelegate>
 
 /**
  * The SDK invokes this method when a user should be granted a reward.
