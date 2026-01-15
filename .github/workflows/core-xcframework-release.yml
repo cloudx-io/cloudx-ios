@@ -77,14 +77,12 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             DEBUG_INFORMATION_FORMAT=dwarf-with-dsym | tee xcodebuild-sim.log
 
-      - name: 🧱 Create XCFramework with dSYMs
+      - name: 🧱 Create XCFramework
         working-directory: core
         run: |
           xcodebuild -create-xcframework \
             -framework build/ios_devices.xcarchive/Products/Library/Frameworks/CloudXCore.framework \
-            -debug-symbols "$(pwd)/build/ios_devices.xcarchive/dSYMs/CloudXCore.framework.dSYM" \
             -framework build/ios_simulator.xcarchive/Products/Library/Frameworks/CloudXCore.framework \
-            -debug-symbols "$(pwd)/build/ios_simulator.xcarchive/dSYMs/CloudXCore.framework.dSYM" \
             -output CloudXCore.xcframework
 
       - name: 📦 Archive dSYMs for private release
@@ -116,9 +114,6 @@ jobs:
       - name: 🔪 Strip debug symbols from XCFramework (for public distribution)
         working-directory: core
         run: |
-          # Remove embedded dSYMs from xcframework
-          find CloudXCore.xcframework -name "*.dSYM" -type d -exec rm -rf {} + 2>/dev/null || true
-          
           # Strip debug symbols from binaries
           find CloudXCore.xcframework -name "*.framework" | while read FRAMEWORK; do
             BINARY_NAME=$(basename "$FRAMEWORK" .framework)

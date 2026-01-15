@@ -169,13 +169,14 @@ IDE_ENABLE_FILE_SYSTEM_SYNCHRONIZED_GROUPS=NO xcodebuild archive \
   DEBUG_INFORMATION_FORMAT=dwarf-with-dsym | tee xcodebuild-sim.log
 print_success "iOS simulator build completed (DYNAMIC with dSYM)"
 
-# Create XCFramework with dSYMs
-print_step "🧱 Creating DYNAMIC .xcframework with dSYMs..."
+# Create XCFramework WITHOUT -debug-symbols flag
+# Note: We intentionally omit -debug-symbols to avoid adding DebugSymbolsPath entries
+# to Info.plist. dSYMs are archived separately for private distribution and should
+# not be referenced in the public xcframework.
+print_step "🧱 Creating DYNAMIC .xcframework (dSYMs archived separately)..."
 xcodebuild -create-xcframework \
   -framework "$ARCHIVE_DIR/ios_devices.xcarchive/Products/Library/Frameworks/${MODULE_NAME}.framework" \
-  -debug-symbols "$(pwd)/$ARCHIVE_DIR/ios_devices.xcarchive/dSYMs/${MODULE_NAME}.framework.dSYM" \
   -framework "$ARCHIVE_DIR/ios_simulator.xcarchive/Products/Library/Frameworks/${MODULE_NAME}.framework" \
-  -debug-symbols "$(pwd)/$ARCHIVE_DIR/ios_simulator.xcarchive/dSYMs/${MODULE_NAME}.framework.dSYM" \
   -output "$OUTPUT_XCFRAMEWORK"
 print_success "DYNAMIC XCFramework created: $OUTPUT_XCFRAMEWORK"
 
@@ -224,9 +225,6 @@ find "$OUTPUT_XCFRAMEWORK" -name "*.framework" | while read FRAMEWORK; do
         strip -x "$BINARY_PATH"
     fi
 done
-
-# Remove embedded dSYMs from xcframework (keep only in private archive)
-find "$OUTPUT_XCFRAMEWORK" -name "*.dSYM" -type d -exec rm -rf {} + 2>/dev/null || true
 print_success "Debug symbols stripped from distributable framework"
 
 # Zip the xcframework
