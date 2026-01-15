@@ -147,6 +147,32 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)trackSDKError:(NSError *)error;
 
+#pragma mark - Native Ads (Internal - not part of public API)
+
+/**
+ * Create a native ad (internal use only)
+ * @param placement The placement name
+ * @param viewController The view controller for presentation
+ * @param delegate The delegate to receive ad events
+ * @return A CLXNativeAdView object or nil if placement is invalid
+ * @discussion This API is internal and not exposed publicly. For adapter and testing use only.
+ */
+- (nullable CLXNativeAdView *)createNativeAdWithPlacement:(NSString *)placement
+                                           viewController:(UIViewController *)viewController
+                                                 delegate:(nullable id<CLXNativeDelegate>)delegate;
+
+/**
+ * Create a native banner ad (internal use only)
+ * @param placement The placement name
+ * @param viewController The view controller for presentation
+ * @param delegate The delegate to receive ad events
+ * @return A CLXNativeAdView object or nil if placement is invalid
+ * @discussion This API is internal and not exposed publicly. For adapter and testing use only.
+ */
+- (nullable CLXNativeAdView *)createNativeBannerWithPlacement:(NSString *)placement
+                                               viewController:(UIViewController *)viewController
+                                                     delegate:(nullable id<CLXNativeDelegate>)delegate;
+
 @end
 
 NS_ASSUME_NONNULL_END
