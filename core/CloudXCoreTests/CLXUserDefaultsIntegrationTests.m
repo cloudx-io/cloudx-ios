@@ -38,6 +38,10 @@
 - (void)setUp {
     [super setUp];
     
+    // Clear ALL CloudXCore User Defaults keys FIRST to ensure test isolation
+    // This is critical for preventing flaky tests where state leaks between test runs
+    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    
     // Reset CloudXCore singleton state for isolated tests
     [[CloudXCore shared] resetForTesting];
     
@@ -47,8 +51,6 @@
     // Inject mock into DI container BEFORE any CloudXCore instances are created
     CLXDIContainer *container = [CLXDIContainer shared];
     [container registerType:[CLXLiveInitService class] instance:self.mockInitService];
-    
-    // Don't clear UserDefaults in setUp - let tearDown handle cleanup to avoid race conditions
 }
 
 - (void)tearDown {

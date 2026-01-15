@@ -67,7 +67,15 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 @property (nonatomic, strong) CLXAd *lastHiddenAd;
 @property (nonatomic, strong) CLXAd *lastClickedAd;
 @property (nonatomic, strong) CLXAd *lastClosedByUserAd;
+// Expectation properties for reliable test synchronization
+@property (nonatomic, strong) XCTestExpectation *loadExpectation;
+@property (nonatomic, strong) XCTestExpectation *loadFailExpectation;
+@property (nonatomic, strong) XCTestExpectation *showExpectation;
+@property (nonatomic, strong) XCTestExpectation *showFailExpectation;
 @property (nonatomic, strong) XCTestExpectation *hideExpectation;
+@property (nonatomic, strong) XCTestExpectation *clickExpectation;
+// NOTE: impressionExpectation was removed because didRecordImpressionForAd
+// callback was removed from CLXAdDelegate. Publishers should use CLXAdRevenueDelegate instead.
 @end
 
 @implementation MockInterstitialDelegate
@@ -83,21 +91,33 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)didLoadAd:(CLXAd *)ad {
     [self.callbackLog addObject:@"didLoadAd"];
     self.lastLoadedAd = ad;
+    if (self.loadExpectation) {
+        [self.loadExpectation fulfill];
+    }
 }
 
 - (void)didFailToLoadAd:(NSString *)placementName error:(NSError *)error {
     [self.callbackLog addObject:@"didFailToLoadAd"];
     self.lastLoadError = error;
+    if (self.loadFailExpectation) {
+        [self.loadFailExpectation fulfill];
+    }
 }
 
 - (void)didDisplayAd:(CLXAd *)ad {
     [self.callbackLog addObject:@"didDisplayAd"];
     self.lastShownAd = ad;
+    if (self.showExpectation) {
+        [self.showExpectation fulfill];
+    }
 }
 
 - (void)didFailToDisplayAd:(CLXAd *)ad error:(NSError *)error {
     [self.callbackLog addObject:@"didFailToDisplayAd"];
     self.lastShowError = error;
+    if (self.showFailExpectation) {
+        [self.showFailExpectation fulfill];
+    }
 }
 
 - (void)didHideAd:(CLXAd *)ad {
@@ -111,6 +131,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)didClickAd:(CLXAd *)ad {
     [self.callbackLog addObject:@"didClickAd"];
     self.lastClickedAd = ad;
+    if (self.clickExpectation) {
+        [self.clickExpectation fulfill];
+    }
 }
 
 - (void)closedByUserActionWithAd:(CLXAd *)ad {
@@ -472,7 +495,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     [self.interstitial didCloseWithInterstitial:self.mockAdapter];
     
     // Wait for delegate callback
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
     
     // Verify delegate was called
     XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didHideAd"], 
@@ -489,6 +512,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)testDidLoadDelegateCallback {
     // Verifies that the didLoadAd delegate callback is triggered when an interstitial successfully loads
     XCTestExpectation *expectation = [self expectationWithDescription:@"didLoadAd callback"];
+    self.mockDelegate.loadExpectation = expectation;
     
     // Set up the interstitial in loading state
     [self setCurrentState:CLXFullscreenAdStateLOADING onInterstitial:self.interstitial];
@@ -497,20 +521,19 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Simulate successful load
     [self.interstitial didLoadWithInterstitial:self.mockAdapter];
     
-    // Check callback was made
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didLoadAd"], @"didLoadAd should be called");
-        // CLXAd should be nil when no valid bid data is available
-        XCTAssertNil(self.mockDelegate.lastLoadedAd, @"Loaded ad should be nil when no bid data available");
-        [expectation fulfill];
-    });
+    // Wait for delegate callback
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
     
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    // Verify callback was made
+    XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didLoadAd"], @"didLoadAd should be called");
+    // CLXAd should be nil when no valid bid data is available
+    XCTAssertNil(self.mockDelegate.lastLoadedAd, @"Loaded ad should be nil when no bid data available");
 }
 
 - (void)testFailToLoadDelegateCallback {
     // Verifies that the didFailToLoadAd delegate callback is triggered when an interstitial fails to load
     XCTestExpectation *expectation = [self expectationWithDescription:@"didFailToLoadAd callback"];
+    self.mockDelegate.loadFailExpectation = expectation;
 
     [self setCurrentState:CLXFullscreenAdStateLOADING onInterstitial:self.interstitial];
     self.interstitial.currentAdapter = self.mockAdapter;
@@ -520,18 +543,18 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Simulate load failure
     [self.interstitial didFailToLoadWithInterstitial:self.mockAdapter error:testError];
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didFailToLoadAd"], @"didFailToLoadAd should be called");
-        XCTAssertEqualObjects(self.mockDelegate.lastLoadError.localizedDescription, @"Load failed", @"Error should match");
-        [expectation fulfill];
-    });
+    // Wait for delegate callback
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
 
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    // Verify callback was made
+    XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didFailToLoadAd"], @"didFailToLoadAd should be called");
+    XCTAssertEqualObjects(self.mockDelegate.lastLoadError.localizedDescription, @"Load failed", @"Error should match");
 }
 
 - (void)testDidShowDelegateCallback {
     // Verifies that the didDisplayAd delegate callback is triggered when an interstitial is displayed to the user
     XCTestExpectation *expectation = [self expectationWithDescription:@"didDisplayAd callback"];
+    self.mockDelegate.showExpectation = expectation;
     
     [self setCurrentState:CLXFullscreenAdStateREADY onInterstitial:self.interstitial];
     self.interstitial.currentAdapter = self.mockAdapter;
@@ -539,14 +562,13 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Simulate show
     [self.interstitial didShowWithInterstitial:self.mockAdapter];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didDisplayAd"], @"didDisplayAd should be called");
-        // CLXAd should be nil when no valid bid data is available
-        XCTAssertNil(self.mockDelegate.lastShownAd, @"Shown ad should be nil when no bid data available");
-        [expectation fulfill];
-    });
+    // Wait for delegate callback
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
     
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    // Verify callback was made
+    XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didDisplayAd"], @"didDisplayAd should be called");
+    // CLXAd should be nil when no valid bid data is available
+    XCTAssertNil(self.mockDelegate.lastShownAd, @"Shown ad should be nil when no bid data available");
 }
 
 // NOTE: testImpressionDelegateCallback was removed because didRecordImpressionForAd
@@ -556,6 +578,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)testDidClickDelegateCallback {
     // Verifies that the didClickAd delegate callback is triggered when a user clicks on the interstitial
     XCTestExpectation *expectation = [self expectationWithDescription:@"didClickAd callback"];
+    self.mockDelegate.clickExpectation = expectation;
     
     [self setCurrentState:CLXFullscreenAdStateSHOWING onInterstitial:self.interstitial];
     self.interstitial.currentAdapter = self.mockAdapter;
@@ -563,19 +586,19 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Simulate click
     [self.interstitial clickWithInterstitial:self.mockAdapter];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didClickAd"], @"didClickAd should be called");
-        // CLXAd should be nil when no valid bid data is available
-        XCTAssertNil(self.mockDelegate.lastClickedAd, @"Clicked ad should be nil when no bid data available");
-        [expectation fulfill];
-    });
+    // Wait for delegate callback
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
     
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    // Verify callback was made
+    XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didClickAd"], @"didClickAd should be called");
+    // CLXAd should be nil when no valid bid data is available
+    XCTAssertNil(self.mockDelegate.lastClickedAd, @"Clicked ad should be nil when no bid data available");
 }
 
 - (void)testDidHideDelegateCallback {
     // Verifies that the didHideAd delegate callback is triggered when an interstitial is closed or hidden
     XCTestExpectation *expectation = [self expectationWithDescription:@"didHideAd callback"];
+    self.mockDelegate.hideExpectation = expectation;
     
     [self setCurrentState:CLXFullscreenAdStateSHOWING onInterstitial:self.interstitial];
     self.interstitial.currentAdapter = self.mockAdapter;
@@ -583,14 +606,13 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Simulate close
     [self.interstitial didCloseWithInterstitial:self.mockAdapter];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didHideAd"], @"didHideAd should be called");
-        // CLXAd should be nil when no valid bid data is available
-        XCTAssertNil(self.mockDelegate.lastHiddenAd, @"Hidden ad should be nil when no bid data available");
-        [expectation fulfill];
-    });
+    // Wait for delegate callback
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
     
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    // Verify callback was made
+    XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didHideAd"], @"didHideAd should be called");
+    // CLXAd should be nil when no valid bid data is available
+    XCTAssertNil(self.mockDelegate.lastHiddenAd, @"Hidden ad should be nil when no bid data available");
 }
 
 // MARK: - NURL Firing Tests
@@ -624,7 +646,16 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     [self.interstitial impressionWithInterstitial:self.mockAdapter];
     
     // Wait for impression event to propagate through ad lifecycle
-    [NSThread sleepForTimeInterval:0.2];
+    // NOTE: didRecordImpressionForAd was removed - use CLXAdRevenueDelegate instead
+    // Using predicate expectation to wait for win notification
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Win notification sent"];
+    expectation.assertForOverFulfill = NO;
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [expectation fulfill];
+    });
+    
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
     
     // Verify win notification was sent (replaces NURL firing)
     XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 1, @"One win notification should be sent");
@@ -686,7 +717,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 - (void)testCompleteSuccessfulLifecycle {
     // Tests the complete successful interstitial lifecycle from load to close, verifying all delegate callbacks and NURL firing
+    // Use hideExpectation to wait for the final callback in the lifecycle
     XCTestExpectation *expectation = [self expectationWithDescription:@"Complete lifecycle"];
+    self.mockDelegate.hideExpectation = expectation;
     
     // Set up bid response
     CLXBidResponseBid *mockBid = [[CLXBidResponseBid alloc] init];
@@ -725,47 +758,45 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Step 5: Close
     [self.interstitial didCloseWithInterstitial:self.mockAdapter];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        // Verify all delegate callbacks occurred in order
-        // NOTE: didRecordImpressionForAd was removed - use CLXAdRevenueDelegate instead
-        NSArray *expectedCallbacks = @[@"didLoadAd", @"didDisplayAd", @"didClickAd", @"didHideAd"];
-        for (NSString *callback in expectedCallbacks) {
-            XCTAssertTrue([self.mockDelegate.callbackLog containsObject:callback], @"Callback %@ should be called", callback);
-        }
-        
-        // Verify win notifications were sent (loadSuccess on load, renderSuccess on impression)
-        XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 2, @"Two win notifications should be sent: load and render");
-        
-        // Verify loadSuccess notification (first)
-        NSDictionary *loadNotification = self.mockWinLossTracker.winNotifications[0];
-        XCTAssertEqualObjects(loadNotification[@"notificationType"], @"loadSuccess", @"First notification should be loadSuccess");
-        XCTAssertEqualObjects(loadNotification[@"bidId"], kTestBidID, @"Correct bid ID should be used");
-        
-        // Verify renderSuccess notification (second - the impression)
-        NSDictionary *renderNotification = self.mockWinLossTracker.winNotifications[1];
-        XCTAssertEqualObjects(renderNotification[@"notificationType"], @"renderSuccess", @"Second notification should be renderSuccess");
-        XCTAssertEqualObjects(renderNotification[@"bidId"], kTestBidID, @"Correct bid ID should be used");
-        
-        // ENHANCED: Verify raw URL with macros intact (zero client-side hydration)
-        if (renderNotification[@"url"]) {
-            NSString *url = renderNotification[@"url"];
-            XCTAssertTrue([url containsString:@"${AUCTION_PRICE}"], @"URL must contain raw macro - server does hydration");
-            XCTAssertFalse([url containsString:@"price=5.99"], @"URL must NOT have client-side price hydration");
-        }
-        
-        // Verify final state
-        CLXFullscreenAdState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
-        XCTAssertEqual(currentState, CLXFullscreenAdStateIDLE, @"Should return to IDLE after close");
-        
-        [expectation fulfill];
-    });
+    // Wait for the final callback (didHideAd)
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
     
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    // Verify all delegate callbacks occurred in order
+    // NOTE: didRecordImpressionForAd was removed - use CLXAdRevenueDelegate instead
+    NSArray *expectedCallbacks = @[@"didLoadAd", @"didDisplayAd", @"didClickAd", @"didHideAd"];
+    for (NSString *callback in expectedCallbacks) {
+        XCTAssertTrue([self.mockDelegate.callbackLog containsObject:callback], @"Callback %@ should be called", callback);
+    }
+    
+    // Verify win notifications were sent (loadSuccess on load, renderSuccess on impression)
+    XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 2, @"Two win notifications should be sent: load and render");
+    
+    // Verify loadSuccess notification (first)
+    NSDictionary *loadNotification = self.mockWinLossTracker.winNotifications[0];
+    XCTAssertEqualObjects(loadNotification[@"notificationType"], @"loadSuccess", @"First notification should be loadSuccess");
+    XCTAssertEqualObjects(loadNotification[@"bidId"], kTestBidID, @"Correct bid ID should be used");
+    
+    // Verify renderSuccess notification (second - the impression)
+    NSDictionary *renderNotification = self.mockWinLossTracker.winNotifications[1];
+    XCTAssertEqualObjects(renderNotification[@"notificationType"], @"renderSuccess", @"Second notification should be renderSuccess");
+    XCTAssertEqualObjects(renderNotification[@"bidId"], kTestBidID, @"Correct bid ID should be used");
+    
+    // ENHANCED: Verify raw URL with macros intact (zero client-side hydration)
+    if (renderNotification[@"url"]) {
+        NSString *url = renderNotification[@"url"];
+        XCTAssertTrue([url containsString:@"${AUCTION_PRICE}"], @"URL must contain raw macro - server does hydration");
+        XCTAssertFalse([url containsString:@"price=5.99"], @"URL must NOT have client-side price hydration");
+    }
+    
+    // Verify final state
+    CLXFullscreenAdState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
+    XCTAssertEqual(currentState, CLXFullscreenAdStateIDLE, @"Should return to IDLE after close");
 }
 
 - (void)testLoadFailureLifecycle {
     // Tests the interstitial lifecycle when loading fails, verifying proper error handling and state transitions
     XCTestExpectation *expectation = [self expectationWithDescription:@"Load failure lifecycle"];
+    self.mockDelegate.loadFailExpectation = expectation;
     
     [self setCurrentState:CLXFullscreenAdStateLOADING onInterstitial:self.interstitial];
     self.interstitial.currentAdapter = self.mockAdapter;
@@ -808,34 +839,31 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Simulate load failure
     [self.interstitial didFailToLoadWithInterstitial:self.mockAdapter error:testError];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        // Verify failure callback
-        XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didFailToLoadAd"], @"didFailToLoadAd should be called");
-        
-        // Verify no success callbacks
-        XCTAssertFalse([self.mockDelegate.callbackLog containsObject:@"didLoadAd"], @"didLoadAd should not be called");
-        XCTAssertFalse([self.mockDelegate.callbackLog containsObject:@"didDisplayAd"], @"didDisplayAd should not be called");
-        
-        // Verify no win notification sent on load failure
-        XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 0, @"No win notification should be sent on load failure");
-        
-        // Verify loss notification IS sent on load failure
-        XCTAssertEqual(self.mockWinLossTracker.lossNotifications.count, 1, @"Loss notification should be sent on load failure");
-        
-        // Verify the loss notification contains correct data
-        if (self.mockWinLossTracker.lossNotifications.count > 0) {
-            NSDictionary *lossNotification = self.mockWinLossTracker.lossNotifications.firstObject;
-            XCTAssertEqualObjects(lossNotification[@"lossReason"], @(CLXLossReasonInternalError), @"Loss reason should be TechnicalError");
-        }
-        
-        // Verify state reset
-        CLXFullscreenAdState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
-        XCTAssertEqual(currentState, CLXFullscreenAdStateIDLE, @"Should return to IDLE after load failure");
-        
-        [expectation fulfill];
-    });
+    // Wait for delegate callback
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
     
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    // Verify failure callback
+    XCTAssertTrue([self.mockDelegate.callbackLog containsObject:@"didFailToLoadAd"], @"didFailToLoadAd should be called");
+    
+    // Verify no success callbacks
+    XCTAssertFalse([self.mockDelegate.callbackLog containsObject:@"didLoadAd"], @"didLoadAd should not be called");
+    XCTAssertFalse([self.mockDelegate.callbackLog containsObject:@"didDisplayAd"], @"didDisplayAd should not be called");
+    
+    // Verify no win notification sent on load failure
+    XCTAssertEqual(self.mockWinLossTracker.winNotifications.count, 0, @"No win notification should be sent on load failure");
+    
+    // Verify loss notification IS sent on load failure
+    XCTAssertEqual(self.mockWinLossTracker.lossNotifications.count, 1, @"Loss notification should be sent on load failure");
+    
+    // Verify the loss notification contains correct data
+    if (self.mockWinLossTracker.lossNotifications.count > 0) {
+        NSDictionary *lossNotification = self.mockWinLossTracker.lossNotifications.firstObject;
+        XCTAssertEqualObjects(lossNotification[@"lossReason"], @(CLXLossReasonInternalError), @"Loss reason should be TechnicalError");
+    }
+    
+    // Verify state reset
+    CLXFullscreenAdState currentState = [self getCurrentStateFromInterstitial:self.interstitial];
+    XCTAssertEqual(currentState, CLXFullscreenAdStateIDLE, @"Should return to IDLE after load failure");
 }
 
 @end

@@ -1340,6 +1340,7 @@ static BOOL _visualDebuggingEnabled = NO;
     _appSessionService = nil;
     _bidNetworkService = nil;
     _adNetworkFactories = nil;
+    [_readyAdapters removeAllObjects];
     
     // Note: We don't reset the singleton instance itself or the initService
     // as those are meant to persist across the app lifecycle

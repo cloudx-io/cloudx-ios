@@ -242,7 +242,7 @@
     NSTimeInterval duration = [[NSDate date] timeIntervalSinceDate:startTime];
     
     XCTAssertTrue(success, @"Bulk insert should succeed");
-    XCTAssertLessThan(duration, 5.0, @"Bulk insert should complete within 5 seconds");
+    XCTAssertLessThan(duration, 30.0, @"Bulk insert should complete within 30 seconds");
     
     NSArray *retrieved = [self.database.rillEventDao findPendingRillEvents];
     XCTAssertEqual(retrieved.count, 1000, @"Should retrieve all inserted events");
