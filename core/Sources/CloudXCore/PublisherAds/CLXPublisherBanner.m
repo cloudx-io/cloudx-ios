@@ -190,7 +190,8 @@ NS_ASSUME_NONNULL_BEGIN
         // Initialize win/loss tracker
         _winLossTracker = [CLXWinLossTracker shared];
         
-        _logger = [[CLXLogger alloc] initWithCategory:@"CloudXBanner"];
+        NSString *logCategory = (bannerType == CLXBannerTypeMREC) ? @"CloudXMREC" : @"CloudXBanner";
+        _logger = [[CLXLogger alloc] initWithCategory:logCategory];
         
         // Initialize waterfall backoff algorithm
         // Initialize visibility and prefetch properties
