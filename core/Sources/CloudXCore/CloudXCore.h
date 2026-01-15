@@ -98,6 +98,7 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXSystemInformation.h>
 #import <CloudXCore/CLXORTBConstants.h>
+#import <CloudXCore/CLXPlacementValidator.h>
 
 // =============================================================================
 // MARK: - INTERNAL (transitively imported for module compatibility)

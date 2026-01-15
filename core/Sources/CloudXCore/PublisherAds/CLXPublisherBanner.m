@@ -289,8 +289,14 @@ NS_ASSUME_NONNULL_BEGIN
             self.requestedPlacementName = nil;
         } else {
             if (self.delegate && [self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
-                CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidPlacement
-                                              description:[NSString stringWithFormat:@"Placement not found: %@", self.requestedPlacementName]];
+                // Provide detailed error message with available placements (mirrors Android PlacementValidator)
+                NSArray<NSString *> *availablePlacements = [[CloudXCore shared] availablePlacementNames];
+                NSString *availablePlacementsString = availablePlacements.count > 0 
+                    ? [availablePlacements componentsJoinedByString:@", "] 
+                    : @"none";
+                CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidPlacement 
+                                              description:[NSString stringWithFormat:@"Placement '%@' not found in SDK configuration. Available placements: [%@].", 
+                                                          self.requestedPlacementName, availablePlacementsString]];
                 [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" error:error];
                 [self.delegate didFailToLoadAd:self.placementName error:error];
             }

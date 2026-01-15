@@ -227,6 +227,13 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  */
 - (nullable CLXSDKConfigPlacement *)placementConfigForName:(NSString *)placementName;
 
+/**
+ * Get all available placement names from the SDK configuration
+ * @return Array of placement names, or empty array if SDK not initialized or no placements configured
+ * @discussion Internal API used for detailed error messages when placement validation fails
+ */
+- (NSArray<NSString *> *)availablePlacementNames;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -362,9 +362,15 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
             // Clear the requested placement name since initialization is complete
             self.requestedPlacementName = nil;
         } else {
-            [self.logger error:[NSString stringWithFormat:@"Placement not found after SDK init: %@", self.requestedPlacementName]];
+            // Provide detailed error message with available placements (mirrors Android PlacementValidator)
+            NSArray<NSString *> *availablePlacements = [[CloudXCore shared] availablePlacementNames];
+            NSString *availablePlacementsString = availablePlacements.count > 0 
+                ? [availablePlacements componentsJoinedByString:@", "] 
+                : @"none";
+            [self.logger error:[NSString stringWithFormat:@"Placement '%@' not found. Available: [%@]", self.requestedPlacementName, availablePlacementsString]];
             CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidPlacement 
-                                          description:[NSString stringWithFormat:@"Placement not found: %@", self.requestedPlacementName]];
+                                          description:[NSString stringWithFormat:@"Placement '%@' not found in SDK configuration. Available placements: [%@].", 
+                                                      self.requestedPlacementName, availablePlacementsString]];
             [self handleBidResponse:nil error:error];
             return;
         }

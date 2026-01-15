@@ -115,10 +115,24 @@ static NSString * const kTestAppKey = @"test-app-key-retry";
     // When: Sending win notification (will fail due to invalid endpoint)
     [self.realTracker sendEvent:kTestAuctionID bidId:kTestBidID event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0];
     
-    // Give network operation time to fail and cache event
-    [NSThread sleepForTimeInterval:3.0];
+    // Then: Poll for event to be cached (more reliable than fixed sleep in CI)
+    XCTestExpectation *cacheExpectation = [self expectationWithDescription:@"Event should be cached"];
     
-    // Then: Event should be cached for retry
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // Poll with timeout - check every 0.5s for up to 10s
+        for (int i = 0; i < 20; i++) {
+            [NSThread sleepForTimeInterval:0.5];
+            NSArray *cachedEvents = [self.realTracker getAllCachedEvents];
+            if (cachedEvents.count > 0) {
+                [cacheExpectation fulfill];
+                return;
+            }
+        }
+    });
+    
+    [self waitForExpectations:@[cacheExpectation] timeout:12.0];
+    
+    // Final verification
     NSArray *cachedEvents = [self.realTracker getAllCachedEvents];
     XCTAssertGreaterThan(cachedEvents.count, 0, @"Failed win notification should be cached");
 }
@@ -144,10 +158,24 @@ static NSString * const kTestAppKey = @"test-app-key-retry";
     // When: Sending loss notification (will fail due to invalid endpoint)
     [self.realTracker sendEvent:kTestAuctionID bidId:kTestBidID event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0];
     
-    // Give network operation time to fail and cache event
-    [NSThread sleepForTimeInterval:3.0];
+    // Then: Poll for event to be cached (more reliable than fixed sleep in CI)
+    XCTestExpectation *cacheExpectation = [self expectationWithDescription:@"Event should be cached"];
     
-    // Then: Event should be cached for retry
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // Poll with timeout - check every 0.5s for up to 10s
+        for (int i = 0; i < 20; i++) {
+            [NSThread sleepForTimeInterval:0.5];
+            NSArray *cachedEvents = [self.realTracker getAllCachedEvents];
+            if (cachedEvents.count > 0) {
+                [cacheExpectation fulfill];
+                return;
+            }
+        }
+    });
+    
+    [self waitForExpectations:@[cacheExpectation] timeout:12.0];
+    
+    // Final verification
     NSArray *cachedEvents = [self.realTracker getAllCachedEvents];
     XCTAssertGreaterThan(cachedEvents.count, 0, @"Failed loss notification should be cached");
 }

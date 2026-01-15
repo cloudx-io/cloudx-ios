@@ -26,6 +26,7 @@
 #import <CloudXCore/CLXWinLossTracker.h>
 #import <CloudXCore/CLXKeyValueState.h>
 #import <CloudXCore/CLXEndpointResolver.h>
+#import <CloudXCore/CLXPlacementValidator.h>
 
 // Adapter Protocols
 #import <CloudXCore/CLXAdapterNative.h>
@@ -637,6 +638,17 @@ static CloudXCore *_sharedInstance = nil;
     return _adPlacements[placementName];
 }
 
+/**
+ * Get all available placement names from the SDK configuration
+ * @return Array of placement names, or empty array if SDK not initialized or no placements configured
+ */
+- (NSArray<NSString *> *)availablePlacementNames {
+    if (!_adPlacements || _adPlacements.count == 0) {
+        return @[];
+    }
+    return [[_adPlacements allKeys] sortedArrayUsingSelector:@selector(compare:)];
+}
+
 - (void)setHashedUserID:(NSString *)hashedUserID {
     // Track hashed user ID method call
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
@@ -726,12 +738,20 @@ static CloudXCore *_sharedInstance = nil;
     }
     
     // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigPlacement *placementConfig = [self placementConfigForName:placement];
-    if (!placementConfig && _isInitialized && !deferredError) {
-        // SDK is initialized but placement not found - this is an error
-        [self.logger error:[NSString stringWithFormat:@"Placement not found - error will be deferred to load(): %@", placement]];
-        deferredError = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                    description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
+    CLXSDKConfigPlacement *placementConfig = nil;
+    if (_isInitialized && !deferredError) {
+        // SDK is initialized - validate placement with detailed error messages
+        CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateBannerPlacement:placement
+                                                                                             placements:_adPlacements];
+        if (validationResult.isSuccess) {
+            placementConfig = validationResult.placement;
+        } else {
+            [self.logger error:[NSString stringWithFormat:@"Placement validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
+            deferredError = validationResult.error;
+        }
+    } else if (!_isInitialized) {
+        // SDK not initialized yet - try to get placement (may be nil)
+        placementConfig = [self placementConfigForName:placement];
     }
     
     // Defer placement config and impression model creation if SDK not ready
@@ -742,7 +762,7 @@ static CloudXCore *_sharedInstance = nil;
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else if (!placementConfig) {
+    } else if (!placementConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring banner initialization for placement: %@", placement]];
     }
@@ -797,12 +817,20 @@ static CloudXCore *_sharedInstance = nil;
     }
     
     // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigPlacement *placementConfig = [self placementConfigForName:placement];
-    if (!placementConfig && _isInitialized && !deferredError) {
-        // SDK is initialized but placement not found - this is an error
-        [self.logger error:[NSString stringWithFormat:@"Placement not found - error will be deferred to load(): %@", placement]];
-        deferredError = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                    description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
+    CLXSDKConfigPlacement *placementConfig = nil;
+    if (_isInitialized && !deferredError) {
+        // SDK is initialized - validate placement with detailed error messages
+        CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateMRECPlacement:placement
+                                                                                           placements:_adPlacements];
+        if (validationResult.isSuccess) {
+            placementConfig = validationResult.placement;
+        } else {
+            [self.logger error:[NSString stringWithFormat:@"Placement validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
+            deferredError = validationResult.error;
+        }
+    } else if (!_isInitialized) {
+        // SDK not initialized yet - try to get placement (may be nil)
+        placementConfig = [self placementConfigForName:placement];
     }
     
     // Defer placement config and impression model creation if SDK not ready
@@ -813,7 +841,7 @@ static CloudXCore *_sharedInstance = nil;
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else if (!placementConfig) {
+    } else if (!placementConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring MREC initialization for placement: %@", placement]];
     }
@@ -866,12 +894,20 @@ static CloudXCore *_sharedInstance = nil;
     }
     
     // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigPlacement *placementConfig = [self placementConfigForName:placement];
-    if (!placementConfig && _isInitialized && !deferredError) {
-        // SDK is initialized but placement not found - this is an error
-        [self.logger error:[NSString stringWithFormat:@"Placement not found - error will be deferred to load(): %@", placement]];
-        deferredError = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                    description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
+    CLXSDKConfigPlacement *placementConfig = nil;
+    if (_isInitialized && !deferredError) {
+        // SDK is initialized - validate placement with detailed error messages
+        CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateInterstitialPlacement:placement
+                                                                                                   placements:_adPlacements];
+        if (validationResult.isSuccess) {
+            placementConfig = validationResult.placement;
+        } else {
+            [self.logger error:[NSString stringWithFormat:@"Placement validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
+            deferredError = validationResult.error;
+        }
+    } else if (!_isInitialized) {
+        // SDK not initialized yet - try to get placement (may be nil)
+        placementConfig = [self placementConfigForName:placement];
     }
     
     // Defer placement config and impression model creation if SDK not ready
@@ -882,7 +918,7 @@ static CloudXCore *_sharedInstance = nil;
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else if (!placementConfig) {
+    } else if (!placementConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring interstitial initialization for placement: %@", placement]];
     }
@@ -930,12 +966,20 @@ static CloudXCore *_sharedInstance = nil;
     }
     
     // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigPlacement *placementConfig = [self placementConfigForName:placement];
-    if (!placementConfig && _isInitialized && !deferredError) {
-        // SDK is initialized but placement not found - this is an error
-        [self.logger error:[NSString stringWithFormat:@"Placement not found - error will be deferred to load(): %@", placement]];
-        deferredError = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                    description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
+    CLXSDKConfigPlacement *placementConfig = nil;
+    if (_isInitialized && !deferredError) {
+        // SDK is initialized - validate placement with detailed error messages
+        CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateRewardedPlacement:placement
+                                                                                               placements:_adPlacements];
+        if (validationResult.isSuccess) {
+            placementConfig = validationResult.placement;
+        } else {
+            [self.logger error:[NSString stringWithFormat:@"Placement validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
+            deferredError = validationResult.error;
+        }
+    } else if (!_isInitialized) {
+        // SDK not initialized yet - try to get placement (may be nil)
+        placementConfig = [self placementConfigForName:placement];
     }
     
     // Defer placement config and impression model creation if SDK not ready
@@ -946,7 +990,7 @@ static CloudXCore *_sharedInstance = nil;
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else if (!placementConfig) {
+    } else if (!placementConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring rewarded initialization for placement: %@", placement]];
     }
@@ -996,12 +1040,21 @@ static CloudXCore *_sharedInstance = nil;
     }
 
     // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigPlacement *placementConfig = [self placementConfigForName:placement];
-    if (!placementConfig && _isInitialized && !deferredError) {
-        // SDK is initialized but placement not found - this is an error
-        [self.logger error:[NSString stringWithFormat:@"Placement not found - error will be deferred to load(): %@", placement]];
-        deferredError = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                    description:[NSString stringWithFormat:@"Placement not found: %@", placement]];
+    CLXSDKConfigPlacement *placementConfig = nil;
+    if (_isInitialized && !deferredError) {
+        // SDK is initialized - validate placement with detailed error messages
+        // Note: Native ads don't have a specific type in config, so we only validate existence
+        CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateNativePlacement:placement
+                                                                                             placements:_adPlacements];
+        if (validationResult.isSuccess) {
+            placementConfig = validationResult.placement;
+        } else {
+            [self.logger error:[NSString stringWithFormat:@"Placement validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
+            deferredError = validationResult.error;
+        }
+    } else if (!_isInitialized) {
+        // SDK not initialized yet - try to get placement (may be nil)
+        placementConfig = [self placementConfigForName:placement];
     }
     
     // Defer placement config and impression model creation if SDK not ready
@@ -1012,7 +1065,7 @@ static CloudXCore *_sharedInstance = nil;
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else if (!placementConfig) {
+    } else if (!placementConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring native initialization for placement: %@", placement]];
     }
