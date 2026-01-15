@@ -185,6 +185,7 @@
     [self.logger debug:[NSString stringWithFormat:@"Loading native - Placement: %lld", _placementID]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self.native setExtras:[CLXInMobiInitializer extras]];
         if (self.bidPayload) {
             [self.native load:self.bidPayload];
         } else {

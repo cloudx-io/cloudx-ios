@@ -109,6 +109,7 @@
     
     // Ensure InMobi SDK calls happen on main thread
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self.interstitial setExtras:[CLXInMobiInitializer extras]];
         if (self.bidPayload) {
             [self.interstitial load:self.bidPayload];
         } else {

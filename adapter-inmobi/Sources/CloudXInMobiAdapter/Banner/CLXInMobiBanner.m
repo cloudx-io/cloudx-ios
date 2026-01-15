@@ -119,7 +119,8 @@
         }
         
         [strongSelf.logger debug:[NSString stringWithFormat:@"Loading banner - Placement: %lld", strongSelf.placementID]];
-        
+        [strongSelf.banner setExtras:[CLXInMobiInitializer extras]];
+
         if (strongSelf.bidPayload) {
             [strongSelf.banner load:strongSelf.bidPayload];
         } else {

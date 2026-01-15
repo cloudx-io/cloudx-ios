@@ -59,6 +59,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSArray<NSString *> *)placementIds;
 
 /**
+ * Gets extras dictionary for InMobi ad requests (tp, tp-ver)
+ * Should be set on ad objects before calling load
+ * @return Dictionary with tp (partner name) and tp-ver (SDK version)
+ */
++ (NSDictionary<NSString *, NSString *> *)extras;
+
+/**
  * Initializes the InMobi SDK with the provided configuration
  * @param config The bidder configuration containing account ID and placement IDs
  * @param testMode Whether test mode is enabled (from server deviceConfig)

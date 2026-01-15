@@ -14,7 +14,6 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXSettings.h>
-#import <CloudXCore/CLXSystemInformation.h>
 #import <InMobiSDK/InMobiSDK.h>
 
 #if __has_include(<CloudXInMobiAdapter/CLXInMobiInitializer.h>)
@@ -74,23 +73,13 @@
                 return;
             }
             
-            // Prepare extras for InMobi token request with partner info from server config
-            NSString *tp = [CLXInMobiInitializer partnerName];
-            NSString *tpVer = [CLXSystemInformation shared].sdkVersion;
-            
-            NSMutableDictionary *extras = [NSMutableDictionary dictionary];
-            if (tp) {
-                extras[@"tp"] = tp;
-            }
-            if (tpVer) {
-                extras[@"tp-ver"] = tpVer;
-            }
-            
-            [self.logger debug:[NSString stringWithFormat:@"Requesting InMobi token with partner extras - tp: %@, tp-ver: %@", 
-                               tp ?: @"(none)", tpVer ?: @"(none)"]];
-            
+            NSDictionary *extras = [CLXInMobiInitializer extras];
+
+            [self.logger debug:[NSString stringWithFormat:@"Requesting InMobi token with partner extras - tp: %@, tp-ver: %@",
+                               extras[@"tp"] ?: @"(none)", extras[@"tp-ver"] ?: @"(none)"]];
+
             // Get InMobi bidder token with partner information
-            id tokenResponse = [IMSdk getTokenWithExtras:[extras copy] andKeywords:nil];
+            id tokenResponse = [IMSdk getTokenWithExtras:extras andKeywords:nil];
             
             // InMobi SDK returns the token directly as a string, not in a dictionary
             NSString *token = nil;

@@ -14,6 +14,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <CloudXCore/CLXSettings.h>
+#import <CloudXCore/CLXSystemInformation.h>
 #import <InMobiSDK/InMobiSDK.h>
 #import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <AdSupport/AdSupport.h>
@@ -65,6 +66,19 @@ static NSArray<NSString *> *placementIds = nil; // Placement IDs from server con
 
 + (NSArray<NSString *> *)placementIds {
     return placementIds;
+}
+
++ (NSDictionary<NSString *, NSString *> *)extras {
+    NSMutableDictionary *extras = [NSMutableDictionary dictionary];
+    NSString *tp = partnerName;
+    if (tp) {
+        extras[@"tp"] = tp;
+    }
+    NSString *tpVer = [CLXSystemInformation shared].sdkVersion;
+    if (tpVer) {
+        extras[@"tp-ver"] = tpVer;
+    }
+    return [extras copy];
 }
 
 + (instancetype)createInstance {
