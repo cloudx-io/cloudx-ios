@@ -7,6 +7,7 @@
 @interface CLXMintegralInterstitial ()
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, assign) BOOL isLoading;
+@property (nonatomic, assign) BOOL isDestroyed;
 @end
 
 @implementation CLXMintegralInterstitial
@@ -27,55 +28,67 @@
         _network = @"mintegral";
         _playVideoMute = NO;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMintegralInterstitial"];
+        _isDestroyed = NO;
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID:%@, UnitID:%@, BidID:%@", 
-                           placementID, unitID, bidID]];
-        
-        // Use the NEW Interstitial Bid Ad Manager (matches AppLovin implementation)
-        _interstitialManager = [[MTGNewInterstitialBidAdManager alloc] initWithPlacementId:placementID 
-                                                                                    unitId:unitID 
-                                                                                  delegate:self];
+        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID:%@, UnitID:%@", placementID, unitID]];
     }
     return self;
 }
 
 - (void)load {
+    if (self.isDestroyed) {
+        [self.logger error:@"Cannot load - adapter is destroyed"];
+        return;
+    }
+    
     if (_isLoading) {
         [self.logger debug:@"Load already in progress"];
         return;
     }
     
     _isLoading = YES;
-    [self.logger debug:[NSString stringWithFormat:@"Loading ad - PlacementID:%@, UnitID:%@", _placementID, _unitID]];
+    [self.logger debug:[NSString stringWithFormat:@"Loading interstitial - PlacementID:%@, UnitID:%@", _placementID, _unitID]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.isDestroyed) {
+            return;
+        }
+        
+        // Create the interstitial manager on main thread if not already created
+        if (!self.interstitialManager) {
+            self.interstitialManager = [[MTGNewInterstitialBidAdManager alloc] initWithPlacementId:self.placementID 
+                                                                                           unitId:self.unitID 
+                                                                                         delegate:self];
+        }
+        
         // Apply mute setting before loading
         self.interstitialManager.playVideoMute = self.playVideoMute;
         
         if (self.bidPayload && self.bidPayload.length > 0) {
             [self.interstitialManager loadAdWithBidToken:self.bidPayload];
         } else {
-            [self.interstitialManager loadAd];
+            // Waterfall/non-bidding not supported with MTGNewInterstitialBidAdManager
+            [self.logger error:@"Cannot load interstitial without bidPayload - requires bid token"];
+            self.isLoading = NO;
+            if ([self.delegate respondsToSelector:@selector(didFailToLoadWithInterstitial:error:)]) {
+                CLXError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed
+                                              description:@"Mintegral interstitial requires bid token for bidding flow"];
+                [self.delegate didFailToLoadWithInterstitial:self error:error];
+            }
         }
     });
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
+    if (self.isDestroyed) {
+        [self.logger error:@"Cannot show - adapter is destroyed"];
+        return;
+    }
+    
     BOOL ready = self.interstitialManager && [self.interstitialManager isAdReady];
     
     if (ready) {
         [self.logger info:@"Showing interstitial"];
-        
-        // Retrieve creative ID before showing
-        _creativeID = [self.interstitialManager getCreativeIdWithUnitId:self.interstitialManager.currentUnitId];
-        if (_creativeID) {
-            [self.logger debug:[NSString stringWithFormat:@"Creative ID: %@", _creativeID]];
-        }
-        
-        if ([self.delegate respondsToSelector:@selector(didShowWithInterstitial:)]) {
-            [self.delegate didShowWithInterstitial:self];
-        }
-        
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.interstitialManager showFromViewController:viewController];
         });
@@ -92,25 +105,35 @@
 
 #pragma mark - MTGNewInterstitialBidAdDelegate
 
+- (void)newInterstitialBidAdLoadSuccess:(MTGNewInterstitialBidAdManager *)adManager {
+    [self.logger debug:@"Ad load success (waiting for resources)"];
+}
+
 - (void)newInterstitialBidAdResourceLoadSuccess:(MTGNewInterstitialBidAdManager *)adManager {
-    // Ad has loaded and video has been downloaded
-    [self.logger info:@"Loaded successfully (video downloaded)"];
+    if (self.isDestroyed) {
+        return;
+    }
+    
+    [self.logger info:@"Interstitial loaded successfully"];
     _isLoading = NO;
     
     // Retrieve creative ID
     _creativeID = [adManager getCreativeIdWithUnitId:adManager.currentUnitId];
     
-    if ([self.delegate respondsToSelector:@selector(didLoadWithInterstitial:)]) {
-        [self.delegate didLoadWithInterstitial:self];
+    // Capture strong reference to delegate before dispatching to main thread
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(didLoadWithInterstitial:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate didLoadWithInterstitial:self];
+        });
     }
 }
 
-- (void)newInterstitialBidAdLoadSuccess:(MTGNewInterstitialBidAdManager *)adManager {
-    // Ad has loaded but video still needs to be downloaded
-    [self.logger debug:@"Ad loaded, video downloading..."];
-}
-
-- (void)newInterstitialBidAdLoadFail:(NSError *)error adManager:(MTGNewInterstitialBidAdManager *)adManager {
+- (void)newInterstitialBidAdLoadFail:(nonnull NSError *)error adManager:(MTGNewInterstitialBidAdManager *)adManager {
+    if (self.isDestroyed) {
+        return;
+    }
+    
     [self.logger error:[NSString stringWithFormat:@"Failed to load: %@", error.localizedDescription]];
     _isLoading = NO;
     
@@ -119,20 +142,44 @@
                                                                 context:@"Interstitial Load"
                                                             placementID:_placementID];
     
-    if ([self.delegate respondsToSelector:@selector(didFailToLoadWithInterstitial:error:)]) {
-        [self.delegate didFailToLoadWithInterstitial:self error:mappedError];
+    // Capture strong reference to delegate before dispatching to main thread
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(didFailToLoadWithInterstitial:error:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate didFailToLoadWithInterstitial:self error:mappedError];
+        });
     }
 }
 
 - (void)newInterstitialBidAdShowSuccess:(MTGNewInterstitialBidAdManager *)adManager {
-    [self.logger info:@"Did present"];
-    
-    if ([self.delegate respondsToSelector:@selector(impressionWithInterstitial:)]) {
-        [self.delegate impressionWithInterstitial:self];
+    if (self.isDestroyed) {
+        return;
     }
+    
+    [self.logger info:@"Interstitial displayed"];
+    
+    // Capture strong reference to delegate before dispatching to main thread
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (!delegate) {
+        return;
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([delegate respondsToSelector:@selector(didShowWithInterstitial:)]) {
+            [delegate didShowWithInterstitial:self];
+        }
+        
+        if ([delegate respondsToSelector:@selector(impressionWithInterstitial:)]) {
+            [delegate impressionWithInterstitial:self];
+        }
+    });
 }
 
-- (void)newInterstitialBidAdShowFail:(NSError *)error adManager:(MTGNewInterstitialBidAdManager *)adManager {
+- (void)newInterstitialBidAdShowFail:(nonnull NSError *)error adManager:(MTGNewInterstitialBidAdManager *)adManager {
+    if (self.isDestroyed) {
+        return;
+    }
+    
     [self.logger error:[NSString stringWithFormat:@"Failed to show: %@", error.localizedDescription]];
     
     NSError *mappedError = [CLXMintegralErrorHandler handleNetworkError:error
@@ -140,24 +187,44 @@
                                                                 context:@"Interstitial Show"
                                                             placementID:_placementID];
     
-    if ([self.delegate respondsToSelector:@selector(didFailToShowWithInterstitial:error:)]) {
-        [self.delegate didFailToShowWithInterstitial:self error:mappedError];
+    // Capture strong reference to delegate before dispatching to main thread
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(didFailToShowWithInterstitial:error:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate didFailToShowWithInterstitial:self error:mappedError];
+        });
     }
 }
 
 - (void)newInterstitialBidAdClicked:(MTGNewInterstitialBidAdManager *)adManager {
-    [self.logger info:@"Did click"];
+    if (self.isDestroyed) {
+        return;
+    }
     
-    if ([self.delegate respondsToSelector:@selector(clickWithInterstitial:)]) {
-        [self.delegate clickWithInterstitial:self];
+    [self.logger info:@"Interstitial clicked"];
+    
+    // Capture strong reference to delegate before dispatching to main thread
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(clickWithInterstitial:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate clickWithInterstitial:self];
+        });
     }
 }
 
 - (void)newInterstitialBidAdDismissedWithConverted:(BOOL)converted adManager:(MTGNewInterstitialBidAdManager *)adManager {
-    [self.logger info:@"Did dismiss"];
+    if (self.isDestroyed) {
+        return;
+    }
     
-    if ([self.delegate respondsToSelector:@selector(didCloseWithInterstitial:)]) {
-        [self.delegate didCloseWithInterstitial:self];
+    [self.logger info:@"Interstitial hidden"];
+    
+    // Capture strong reference to delegate before dispatching to main thread
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(didCloseWithInterstitial:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate didCloseWithInterstitial:self];
+        });
     }
 }
 
@@ -165,9 +232,34 @@
     [self.logger debug:@"Video completed"];
 }
 
+- (void)newInterstitialBidAdPlayCompleted:(MTGNewInterstitialBidAdManager *)adManager {
+    [self.logger debug:@"Video play completed"];
+}
+
 - (void)newInterstitialBidAdEndCardShowSuccess:(MTGNewInterstitialBidAdManager *)adManager {
     [self.logger debug:@"End card shown"];
 }
 
-@end
+#pragma mark - Lifecycle
 
+- (void)dealloc {
+    [self destroy];
+}
+
+- (void)destroy {
+    if (self.isDestroyed) {
+        return;
+    }
+    
+    [self.logger debug:@"Destroying interstitial adapter"];
+    self.isDestroyed = YES;
+    
+    if (self.interstitialManager) {
+        self.interstitialManager = nil;
+    }
+    
+    self.delegate = nil;
+    self.isLoading = NO;
+}
+
+@end

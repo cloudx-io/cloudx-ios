@@ -54,4 +54,3 @@ __attribute__((visibility("default"))) void CloudXMintegralAdapterRegister(void)
 }
 
 @end
-

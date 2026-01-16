@@ -12,6 +12,7 @@
 #import <CloudXCore/CLXLogger.h>
 
 // MARK: - Environment URLs
+static NSString *const kLocalInitURL = @"http://localhost:8090/sdk";
 static NSString *const kDevInitURL = @"https://provisioning-dev.cloudx.io/sdk";
 static NSString *const kStagingInitURL = @"https://pro-stage.cloudx.io/sdk";
 static NSString *const kProductionInitURL = @"https://pro.cloudx.io/sdk";
@@ -46,7 +47,10 @@ static NSString *const kInternalEnvironmentOverrideKey = @"CLXCore_Internal_Envi
     // Check for internal override (CloudX internal testing only)
     NSString *internalOverride = [[NSUserDefaults standardUserDefaults] stringForKey:kInternalEnvironmentOverrideKey];
     
-    if ([internalOverride isEqualToString:@"dev"]) {
+    if ([internalOverride isEqualToString:@"local"]) {
+        [[CLXLogger shared] info:@"[CLXURLProvider] Using LOCAL environment (internal override)"];
+        return kLocalInitURL;
+    } else if ([internalOverride isEqualToString:@"dev"]) {
         [[CLXLogger shared] info:@"[CLXURLProvider] Using DEV environment (internal override)"];
         return kDevInitURL;
     } else if ([internalOverride isEqualToString:@"staging"]) {
@@ -61,7 +65,9 @@ static NSString *const kInternalEnvironmentOverrideKey = @"CLXCore_Internal_Envi
 + (NSString *)environmentName {
     NSString *internalOverride = [[NSUserDefaults standardUserDefaults] stringForKey:kInternalEnvironmentOverrideKey];
     
-    if ([internalOverride isEqualToString:@"dev"]) {
+    if ([internalOverride isEqualToString:@"local"]) {
+        return @"local";
+    } else if ([internalOverride isEqualToString:@"dev"]) {
         return @"development";
     } else if ([internalOverride isEqualToString:@"staging"]) {
         return @"staging";
@@ -72,7 +78,7 @@ static NSString *const kInternalEnvironmentOverrideKey = @"CLXCore_Internal_Envi
 
 + (void)setEnvironment:(NSString *)environment {
     // Validate environment
-    NSArray *validEnvironments = @[@"dev", @"staging", @"production"];
+    NSArray *validEnvironments = @[@"local", @"dev", @"staging", @"production"];
     if (![validEnvironments containsObject:environment]) {
         [[CLXLogger shared] error:[NSString stringWithFormat:@"[CLXURLProvider] Invalid environment '%@'. Valid options: %@", 
               environment, validEnvironments]];

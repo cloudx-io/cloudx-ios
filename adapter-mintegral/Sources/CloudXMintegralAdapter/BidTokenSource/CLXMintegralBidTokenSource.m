@@ -6,14 +6,13 @@
 #import <MTGSDKBidding/MTGBiddingSDK.h>
 #import "CLXMintegralInitializer.h"
 
-// Mintegral Ad Type enum for buyerUIDWithDictionary
-typedef NS_ENUM(NSInteger, MintegralAdType) {
-    MintegralIntersitialAd = 1,
-    MintegralRewardVideoAd = 2,
-    MintegralBannerAd = 6,
-    MintegralSplashAd = 7,
-    MintegralNativeAd = 8,
-};
+// Mintegral Ad Type values for buyerUIDWithDictionary
+// Note: These match MTGAdType enum values from the SDK
+static const NSInteger kMintegralInterstitialAd = 1;
+static const NSInteger kMintegralRewardVideoAd = 2;
+static const NSInteger kMintegralBannerAd = 6;
+static const NSInteger kMintegralSplashAd = 7;
+static const NSInteger kMintegralNativeAd = 8;
 
 @interface CLXMintegralBidTokenSource ()
 @property (nonatomic, strong) CLXLogger *logger;
@@ -98,7 +97,7 @@ typedef NS_ENUM(NSInteger, MintegralAdType) {
             }
             
             // Get IDFA if available
-            NSString *idfa = [CLXAdTrackingService getIDFA];
+            NSString *idfa = [CLXAdTrackingService idfa];
             
             // Build token dictionary
             NSMutableDictionary *tokenDict = [NSMutableDictionary dictionary];
@@ -131,24 +130,23 @@ typedef NS_ENUM(NSInteger, MintegralAdType) {
 #pragma mark - Ad Type Helpers
 
 + (NSNumber *)adTypeForBanner {
-    return @(MintegralBannerAd);
+    return @(kMintegralBannerAd);
 }
 
 + (NSNumber *)adTypeForInterstitial {
-    return @(MintegralIntersitialAd);
+    return @(kMintegralInterstitialAd);
 }
 
 + (NSNumber *)adTypeForRewarded {
-    return @(MintegralRewardVideoAd);
+    return @(kMintegralRewardVideoAd);
 }
 
 + (NSNumber *)adTypeForNative {
-    return @(MintegralNativeAd);
+    return @(kMintegralNativeAd);
 }
 
 + (NSNumber *)adTypeForSplash {
-    return @(MintegralSplashAd);
+    return @(kMintegralSplashAd);
 }
 
 @end
-

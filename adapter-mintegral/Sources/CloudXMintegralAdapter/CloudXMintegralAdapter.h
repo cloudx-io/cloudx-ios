@@ -16,4 +16,3 @@ __attribute__((visibility("default"))) void CloudXMintegralAdapterRegister(void)
 #import "CLXMintegralInterstitialFactory.h"
 #import "CLXMintegralBannerFactory.h"
 #import "CLXMintegralRewardedFactory.h"
-

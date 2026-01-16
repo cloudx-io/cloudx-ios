@@ -56,6 +56,21 @@
 }
 
 - (void)setupConfigurations {
+    // Local Configuration (localhost testing - bundle: cloudx.CloudXObjCRemotePods)
+    // App key from database (SELECT app_key FROM apps WHERE bundle_id = 'cloudx.CloudXObjCRemotePods')
+    // Note: app_key != id. The YAML config shows id, but SDK needs the actual app_key column value
+    CLXDemoConfig *localConfig = [[CLXDemoConfig alloc]
+        initWithAppKey:@"E5RotGdN8i7hWhkax1e1o"
+        hashedUserId:@"test-user-123"
+        baseURL:@"http://localhost:8090/sdk"
+        bannerPlacement:@"banner"
+        mrecPlacement:@"mrec"
+        interstitialPlacement:@"interstitial"
+        nativePlacement:@"-"
+        nativeBannerPlacement:@"-"
+        rewardedPlacement:@"rewarded"
+        rewardedInterstitialPlacement:@"rewarded"];
+    
     // Staging Configuration (MetaTestApp-9-22-25 - bundle: cloudx.CloudXObjCRemotePods)
     CLXDemoConfig *stagingConfig = [[CLXDemoConfig alloc]
         initWithAppKey:@"A7ovaBRCcAL8lapKtoZmm"
@@ -96,6 +111,7 @@
         rewardedInterstitialPlacement:@"demo-rewarded-interstitial-1"];
     
     _configurations = @{
+        @(CLXDemoEnvironmentLocal): localConfig,
         @(CLXDemoEnvironmentStaging): stagingConfig,
         @(CLXDemoEnvironmentDev): devConfig,
         @(CLXDemoEnvironmentProduction): prodConfig
@@ -116,6 +132,8 @@
 
 - (NSString *)environmentName:(CLXDemoEnvironment)environment {
     switch (environment) {
+        case CLXDemoEnvironmentLocal:
+            return @"Local";
         case CLXDemoEnvironmentDev:
             return @"Development";
         case CLXDemoEnvironmentStaging:

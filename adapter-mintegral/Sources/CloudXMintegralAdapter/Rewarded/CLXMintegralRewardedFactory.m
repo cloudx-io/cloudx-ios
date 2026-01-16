@@ -1,6 +1,8 @@
 #import "CLXMintegralRewardedFactory.h"
 #import "CLXMintegralRewarded.h"
+#import "CLXMintegralIDExtractor.h"
 #import <CloudXCore/CLXError.h>
+#import <CloudXCore/CLXLogger.h>
 
 @implementation CLXMintegralRewardedFactory
 
@@ -13,45 +15,41 @@
 }
 
 - (nullable id<CLXAdapterRewarded>)createWithAdId:(NSString *)adId
-                                       bidPayload:(nullable NSString *)bidPayload
-                                            bidID:(NSString *)bidID
+                                            bidId:(NSString *)bidId
+                                              adm:(NSString *)adm
+                                           extras:(NSDictionary<NSString *, NSString *> *)extras
                                          delegate:(id<CLXAdapterRewardedDelegate>)delegate {
     
-    [self.logger debug:[NSString stringWithFormat:@"Creating rewarded - AdId:%@", adId]];
+    [self.logger debug:[NSString stringWithFormat:@"[RewardedFactory] Creating - adId:'%@', bidId:'%@'",
+                        adId ?: @"(nil)", bidId ?: @"(nil)"]];
     
-    NSArray *components = [adId componentsSeparatedByString:@"_"];
-    if (components.count < 2) {
-        [self.logger error:@"Invalid ad ID format. Expected: placementID_unitID"];
-        if ([delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
-            NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                         description:@"Invalid ad ID format. Expected: placementID_unitID"];
-            [delegate didFailToLoadWithRewarded:nil error:error];
-        }
-        return nil;
+    // Extract IDs using shared utility
+    CLXMintegralIDResult *ids = [CLXMintegralIDExtractor extractIDsFromExtras:extras
+                                                                         adId:adId
+                                                                   bidIdParam:bidId
+                                                                       logger:self.logger];
+    
+    // Log validation warning if unitID is missing (validation deferred to load())
+    if (!ids.unitID.length) {
+        [self.logger error:@"[RewardedFactory] Missing unit_id - validation will be deferred to load()"];
     }
     
-    NSString *placementID = components[0];
-    NSString *unitID = components[1];
+    // Use adm as bidPayload (nil-safe: messaging nil returns 0)
+    NSString *bidPayload = adm.length > 0 ? adm : nil;
     
-    if (placementID.length == 0 || unitID.length == 0) {
-        [self.logger error:@"Empty placement ID or unit ID"];
-        if ([delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
-            NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                         description:@"Empty placement ID or unit ID"];
-            [delegate didFailToLoadWithRewarded:nil error:error];
-        }
-        return nil;
-    }
+    [self.logger debug:[NSString stringWithFormat:@"[RewardedFactory] Creating Mintegral rewarded - placementID:%@, unitID:%@, hasBidPayload:%@",
+                        ids.placementID, ids.unitID, bidPayload ? @"YES" : @"NO"]];
     
-    CLXMintegralRewarded *rewarded = 
-        [[CLXMintegralRewarded alloc] initWithBidPayload:bidPayload
-                                             placementID:placementID
-                                                  unitID:unitID
-                                                   bidID:bidID
-                                                delegate:delegate];
+    // Always create and return adapter (even with invalid parameters)
+    // Validation errors will be reported in load() via delegate callback
+    CLXMintegralRewarded *rewarded = [[CLXMintegralRewarded alloc] initWithBidPayload:bidPayload
+                                                                          placementID:ids.placementID
+                                                                               unitID:ids.unitID
+                                                                                bidID:ids.bidID ?: @""
+                                                                             delegate:delegate];
     
+    [self.logger debug:@"[RewardedFactory] Mintegral rewarded adapter created successfully"];
     return rewarded;
 }
 
 @end
-

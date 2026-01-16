@@ -9,6 +9,7 @@ target 'CloudXObjCRemotePods' do
   pod 'CloudXVungleAdapter', :path => '../adapter-vungle'
   pod 'CloudXInMobiAdapter', :path => '../adapter-inmobi'
   pod 'CloudXMetaAdapter', :path => '../adapter-meta'
+  pod 'CloudXMintegralAdapter', :path => '../adapter-mintegral'
   pod 'CloudXRenderer', :path => '../renderer-cloudx'
 
   target 'CloudXObjCRemotePodsTests' do

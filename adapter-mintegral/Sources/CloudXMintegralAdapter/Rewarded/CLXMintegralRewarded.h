@@ -1,7 +1,8 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <MTGSDKReward/MTGBidRewardAdManager.h>
-#import <MTGSDKReward/MTGRewardAdInfo.h>
+#import <MTGSDKReward/MTGRewardAdManager.h>
+#import <MTGSDK/MTGRewardAdInfo.h>
 #import <CloudXCore/CLXAdapterRewarded.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -23,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *bidPayload;
 @property (nonatomic, copy, nullable) NSString *creativeID;
 @property (nonatomic, assign) BOOL playVideoMute;
+@property (nonatomic, assign, readonly) BOOL isReady;
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID
@@ -32,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)load;
 - (void)showFromViewController:(UIViewController *)viewController;
+- (void)destroy;
 
 @end
 

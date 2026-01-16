@@ -1,0 +1,206 @@
+name: Release CloudXMintegralAdapter (BETA)
+
+# SOFT RELEASE: This workflow creates GitHub releases but does NOT push to CocoaPods trunk.
+# Mintegral adapter is in beta and not yet production-ready.
+# Users can install via GitHub release or branch reference in Podfile.
+
+on:
+  push:
+    tags:
+      - 'v*-mintegral'
+
+jobs:
+  release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Debug available Xcode versions
+        run: ls -la /Applications/ | grep -i xcode
+
+      - name: Switch to Xcode 16.1
+        run: sudo xcode-select -s /Applications/Xcode_16.1.app
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Clean build artifacts
+        run: |
+          rm -rf build
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+
+      - name: Install CocoaPods
+        run: |
+          sudo gem install cocoapods --no-document
+
+      - name: Debug Print CocoaPods version and env
+        run: |
+          pod --version
+          pod env
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          VERSION_NO_SUFFIX=${VERSION%-mintegral}
+          echo "version=$VERSION_NO_SUFFIX" >> $GITHUB_OUTPUT
+          echo "full_version=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+
+      - name: Build static xcframework
+        run: |
+          cd adapter-mintegral
+          bash build_frameworks.sh
+
+      - name: Rename framework with version
+        run: |
+          cd adapter-mintegral
+          VERSION=${{ steps.version.outputs.version }}
+          mv CloudXMintegralAdapter.xcframework.zip CloudXMintegralAdapter-v$VERSION.xcframework.zip
+
+      - name: Compute SwiftPM checksum
+        id: checksum
+        run: |
+          cd adapter-mintegral
+          VERSION=${{ steps.version.outputs.version }}
+          CHECKSUM=$(swift package compute-checksum CloudXMintegralAdapter-v$VERSION.xcframework.zip)
+          echo "checksum=$CHECKSUM" >> $GITHUB_OUTPUT
+
+      - name: Update podspec and Package.swift
+        run: |
+          cd adapter-mintegral
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          # Create release podspec from remote template
+          cp CloudXMintegralAdapter-remote.podspec CloudXMintegralAdapter-release.podspec
+          
+          # Update version in release podspec
+          sed -i '' "s/s\.version.*=.*/s.version = '$VERSION'/" CloudXMintegralAdapter-release.podspec
+          
+          # Update source URL with correct version
+          sed -i '' "s|releases/download/v[^/]*/|releases/download/${FULL_VERSION}/|" CloudXMintegralAdapter-release.podspec
+          sed -i '' "s|CloudXMintegralAdapter-v[0-9.]*\.xcframework\.zip|CloudXMintegralAdapter-v${VERSION}.xcframework.zip|" CloudXMintegralAdapter-release.podspec
+          
+          # Update root Package.swift version and checksum for CloudXMintegralAdapter binary target
+          cd ..
+          sed -i '' "s|url: \".*CloudXMintegralAdapter.*\",|url: \"https://github.com/cloudx-io/cloudx-ios/releases/download/$FULL_VERSION/CloudXMintegralAdapter-v$VERSION.xcframework.zip\",|" Package.swift
+          sed -i '' "s|checksum: \".*\"|checksum: \"${{ steps.checksum.outputs.checksum }}\"|" Package.swift
+
+      - name: Create GitHub release (BETA - PRE-RELEASE)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          # Create release notes file with BETA warnings
+          cat > release_notes.md << EOF
+          # CloudXMintegralAdapter v$VERSION (BETA)
+          
+          > **WARNING: This is a BETA release and is NOT production-ready.**
+          > 
+          > The Mintegral adapter is still in development and may contain bugs or breaking changes.
+          > Use at your own risk in non-production environments.
+          
+          ## Installation
+          
+          ### CocoaPods (GitHub Reference)
+          
+          Since this is a beta release, it is NOT available on CocoaPods trunk.
+          Add to your Podfile with a direct GitHub reference:
+          
+          \`\`\`ruby
+          pod 'CloudXMintegralAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => '$FULL_VERSION'
+          \`\`\`
+          
+          ### Manual Installation
+          
+          Download \`CloudXMintegralAdapter-v$VERSION.xcframework.zip\` from this release.
+          
+          ## Requirements
+          
+          - iOS 15.0+
+          - Mintegral SDK 8.0+
+          - CloudXCore (matching version)
+          
+          ## Tested Formats
+          
+          | Format | Status |
+          |--------|--------|
+          | Banner | Tested |
+          | MREC | Tested |
+          | Interstitial | Tested |
+          | Rewarded | Tested |
+          
+          ## SwiftPM Checksum
+          
+          \`${{ steps.checksum.outputs.checksum }}\`
+          
+          ## Feedback
+          
+          Please report any issues or feedback to support@cloudx.com
+          EOF
+          
+          # Create PRE-RELEASE (not marked as latest)
+          gh release create "$FULL_VERSION" \
+            --title "CloudXMintegralAdapter v$VERSION (BETA)" \
+            --notes-file release_notes.md \
+            --prerelease
+
+      - name: Upload xcframework to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          FULL_VERSION=${{ steps.version.outputs.full_version }}
+          
+          # Upload the xcframework file to the existing release
+          gh release upload "$FULL_VERSION" \
+            adapter-mintegral/CloudXMintegralAdapter-v$VERSION.xcframework.zip
+
+      - name: Debug file structure
+        run: |
+          echo "=== Repository structure ==="
+          ls -la
+          echo "=== Adapter-mintegral directory ==="
+          ls -la adapter-mintegral/
+          echo "=== License file check ==="
+          if [ -f "adapter-mintegral/LICENSE" ]; then
+            echo "LICENSE file found at adapter-mintegral/LICENSE"
+            wc -l adapter-mintegral/LICENSE
+          else
+            echo "LICENSE file NOT found at adapter-mintegral/LICENSE"
+          fi
+
+      - name: Validate podspec (informational only)
+        run: |
+          cd adapter-mintegral
+          echo "=== Validating CloudXMintegralAdapter-release.podspec ==="
+          echo "Current directory: $(pwd)"
+          echo "Podspec content:"
+          cat CloudXMintegralAdapter-release.podspec
+          echo "=== Running podspec validation ==="
+          # Temporarily rename for validation (CocoaPods requires filename to match spec name)
+          cp CloudXMintegralAdapter-release.podspec CloudXMintegralAdapter.podspec
+          # Note: This is informational only - we do NOT push to trunk for beta releases
+          pod spec lint CloudXMintegralAdapter.podspec --allow-warnings --skip-import-validation --skip-tests --verbose || {
+            echo "Podspec validation had issues (this is informational for beta)"
+          }
+          rm CloudXMintegralAdapter.podspec
+
+      # NOTE: Intentionally NOT pushing to CocoaPods trunk
+      # This adapter is in BETA and not ready for public release
+      # Users must install via GitHub reference or manual download
+
+      - name: Upload xcodebuild logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-logs
+          path: |
+            adapter-mintegral/xcodebuild-ios.log
+            adapter-mintegral/xcodebuild-sim.log

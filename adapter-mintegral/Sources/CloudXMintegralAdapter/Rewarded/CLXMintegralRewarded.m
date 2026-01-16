@@ -7,6 +7,8 @@
 @interface CLXMintegralRewarded ()
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, assign) BOOL isLoading;
+@property (nonatomic, assign) BOOL isDestroyed;
+@property (nonatomic, assign, readwrite) BOOL isReady;
 @end
 
 @implementation CLXMintegralRewarded
@@ -27,17 +29,24 @@
         _network = @"mintegral";
         _playVideoMute = NO;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMintegralRewarded"];
+        _isDestroyed = NO;
+        _isReady = NO;
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID:%@, UnitID:%@, BidID:%@", 
-                           placementID, unitID, bidID]];
-        
-        // NOTE: MTGBidRewardAdManager is a SINGLETON - we don't create instances
-        // We use [MTGBidRewardAdManager sharedInstance] for all operations
+        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID:%@, UnitID:%@", placementID, unitID]];
     }
     return self;
 }
 
+- (void)dealloc {
+    [self destroy];
+}
+
 - (void)load {
+    if (self.isDestroyed) {
+        [self.logger error:@"Cannot load - adapter is destroyed"];
+        return;
+    }
+    
     if (_isLoading) {
         [self.logger debug:@"Load already in progress"];
         return;
@@ -47,39 +56,41 @@
     [self.logger debug:[NSString stringWithFormat:@"Loading rewarded - PlacementID:%@, UnitID:%@", _placementID, _unitID]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.isDestroyed) {
+            return;
+        }
+        
         // Apply mute setting before loading
         [MTGBidRewardAdManager sharedInstance].playVideoMute = self.playVideoMute;
         
         if (self.bidPayload && self.bidPayload.length > 0) {
-            // Bidding flow - use singleton with bid token
+            // Bidding flow - use MTGBidRewardAdManager with bid token
             [[MTGBidRewardAdManager sharedInstance] loadVideoWithBidToken:self.bidPayload
                                                               placementId:self.placementID
                                                                    unitId:self.unitID
                                                                  delegate:self];
         } else {
-            // Non-bidding flow - load without bid token
-            [[MTGBidRewardAdManager sharedInstance] loadVideoWithPlacementId:self.placementID
-                                                                      unitId:self.unitID
-                                                                    delegate:self];
+            // Non-bidding (waterfall) flow - use MTGRewardAdManager
+            [[MTGRewardAdManager sharedInstance] loadVideoWithPlacementId:self.placementID
+                                                                   unitId:self.unitID
+                                                                 delegate:self];
         }
     });
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
-    BOOL ready = [[MTGBidRewardAdManager sharedInstance] isVideoReadyToPlayWithPlacementId:_placementID unitId:_unitID];
+    if (self.isDestroyed) {
+        [self.logger error:@"Cannot show - adapter is destroyed"];
+        return;
+    }
+    
+    BOOL ready = self.isReady && [[MTGBidRewardAdManager sharedInstance] isVideoReadyToPlayWithPlacementId:_placementID unitId:_unitID];
     
     if (ready) {
         [self.logger info:@"Showing rewarded"];
         
         // Retrieve creative ID before showing
         _creativeID = [[MTGBidRewardAdManager sharedInstance] getCreativeIdWithUnitId:_unitID];
-        if (_creativeID) {
-            [self.logger debug:[NSString stringWithFormat:@"Creative ID: %@", _creativeID]];
-        }
-        
-        if ([self.delegate respondsToSelector:@selector(didShowWithRewarded:)]) {
-            [self.delegate didShowWithRewarded:self];
-        }
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [[MTGBidRewardAdManager sharedInstance] showVideoWithPlacementId:self.placementID
@@ -103,48 +114,84 @@
 #pragma mark - MTGRewardAdLoadDelegate
 
 - (void)onVideoAdLoadSuccess:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
-    // Ad has loaded and video has been downloaded
-    [self.logger info:@"Loaded successfully (video downloaded)"];
+    if (self.isDestroyed) {
+        return;
+    }
+    
+    [self.logger info:@"Rewarded loaded successfully"];
     _isLoading = NO;
+    _isReady = YES;
     
     // Retrieve creative ID
     _creativeID = [[MTGBidRewardAdManager sharedInstance] getCreativeIdWithUnitId:unitId];
     
-    if ([self.delegate respondsToSelector:@selector(didLoadWithRewarded:)]) {
-        [self.delegate didLoadWithRewarded:self];
+    // Capture strong reference to delegate before dispatching to main thread
+    id<CLXAdapterRewardedDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(didLoadWithRewarded:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate didLoadWithRewarded:self];
+        });
     }
 }
 
 - (void)onAdLoadSuccess:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
-    // Ad has loaded but video still needs to be downloaded
     [self.logger debug:@"Ad loaded, video downloading..."];
 }
 
 - (void)onVideoAdLoadFailed:(nullable NSString *)placementId unitId:(nullable NSString *)unitId error:(NSError *)error {
+    if (self.isDestroyed) {
+        return;
+    }
+    
     [self.logger error:[NSString stringWithFormat:@"Failed to load: %@", error.localizedDescription]];
     _isLoading = NO;
+    _isReady = NO;
     
     NSError *mappedError = [CLXMintegralErrorHandler handleNetworkError:error
                                                              withLogger:self.logger
                                                                 context:@"Rewarded Load"
                                                             placementID:_placementID];
     
-    if ([self.delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
-        [self.delegate didFailToLoadWithRewarded:self error:mappedError];
+    // Capture strong reference to delegate before dispatching to main thread
+    id<CLXAdapterRewardedDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate didFailToLoadWithRewarded:self error:mappedError];
+        });
     }
 }
 
 #pragma mark - MTGRewardAdShowDelegate
 
 - (void)onVideoAdShowSuccess:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
-    [self.logger info:@"Did present"];
-    
-    if ([self.delegate respondsToSelector:@selector(impressionWithRewarded:)]) {
-        [self.delegate impressionWithRewarded:self];
+    if (self.isDestroyed) {
+        return;
     }
+    
+    [self.logger info:@"Rewarded displayed"];
+    
+    // Capture strong reference to delegate before dispatching to main thread
+    id<CLXAdapterRewardedDelegate> delegate = self.delegate;
+    if (!delegate) {
+        return;
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([delegate respondsToSelector:@selector(didShowWithRewarded:)]) {
+            [delegate didShowWithRewarded:self];
+        }
+        
+        if ([delegate respondsToSelector:@selector(impressionWithRewarded:)]) {
+            [delegate impressionWithRewarded:self];
+        }
+    });
 }
 
 - (void)onVideoAdShowFailed:(nullable NSString *)placementId unitId:(nullable NSString *)unitId withError:(NSError *)error {
+    if (self.isDestroyed) {
+        return;
+    }
+    
     [self.logger error:[NSString stringWithFormat:@"Failed to show: %@", error.localizedDescription]];
     
     NSError *mappedError = [CLXMintegralErrorHandler handleNetworkError:error
@@ -152,49 +199,87 @@
                                                                 context:@"Rewarded Show"
                                                             placementID:_placementID];
     
-    if ([self.delegate respondsToSelector:@selector(didFailToShowWithRewarded:error:)]) {
-        [self.delegate didFailToShowWithRewarded:self error:mappedError];
+    // Capture strong reference to delegate before dispatching to main thread
+    id<CLXAdapterRewardedDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(didFailToShowWithRewarded:error:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate didFailToShowWithRewarded:self error:mappedError];
+        });
     }
 }
 
 - (void)onVideoAdClicked:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
-    [self.logger info:@"Did click"];
+    if (self.isDestroyed) {
+        return;
+    }
     
-    if ([self.delegate respondsToSelector:@selector(clickWithRewarded:)]) {
-        [self.delegate clickWithRewarded:self];
+    [self.logger info:@"Rewarded clicked"];
+    
+    // Capture strong reference to delegate before dispatching to main thread
+    id<CLXAdapterRewardedDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(clickWithRewarded:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate clickWithRewarded:self];
+        });
     }
 }
 
-- (void)onVideoAdDismissed:(nullable NSString *)placementId unitId:(nullable NSString *)unitId withConverted:(BOOL)converted withRewardInfo:(nullable MTGRewardAdInfo *)rewardInfo {
-    [self.logger info:[NSString stringWithFormat:@"Did dismiss - Converted:%d, RewardInfo:%@", converted, rewardInfo]];
+- (void)onVideoAdDismissed:(nullable NSString *)placementId 
+                    unitId:(nullable NSString *)unitId 
+             withConverted:(BOOL)converted 
+            withRewardInfo:(nullable MTGRewardAdInfo *)rewardInfo {
+    if (self.isDestroyed) {
+        return;
+    }
     
-    if (converted && [self.delegate respondsToSelector:@selector(userRewardWithRewarded:)]) {
-        // Try to pass reward info if available from Mintegral
-        if (rewardInfo && [self.delegate respondsToSelector:@selector(userRewardWithRewarded:amount:label:)]) {
-            NSInteger rewardAmount = [rewardInfo.rewardAmount integerValue] ?: 0;
-            NSString *rewardName = rewardInfo.rewardName;
-            [self.delegate userRewardWithRewarded:self amount:rewardAmount label:rewardName];
-        } else {
-            [self.delegate userRewardWithRewarded:self];
+    [self.logger info:[NSString stringWithFormat:@"Rewarded hidden - converted:%d", converted]];
+    _isReady = NO;
+    
+    // Capture strong reference to delegate and reward info before dispatching to main thread
+    id<CLXAdapterRewardedDelegate> delegate = self.delegate;
+    NSInteger rewardAmount = rewardInfo ? rewardInfo.rewardAmount : 0;
+    NSString *rewardName = rewardInfo ? [rewardInfo.rewardName copy] : nil;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (converted && delegate && [delegate respondsToSelector:@selector(userRewardWithRewarded:)]) {
+            if (rewardInfo && [delegate respondsToSelector:@selector(userRewardWithRewarded:amount:label:)]) {
+                [delegate userRewardWithRewarded:self amount:rewardAmount label:rewardName];
+            } else {
+                [delegate userRewardWithRewarded:self];
+            }
         }
-    }
-    
-    if ([self.delegate respondsToSelector:@selector(didCloseWithRewarded:)]) {
-        [self.delegate didCloseWithRewarded:self];
-    }
+        
+        if (delegate && [delegate respondsToSelector:@selector(didCloseWithRewarded:)]) {
+            [delegate didCloseWithRewarded:self];
+        }
+    });
 }
 
 - (void)onVideoAdDidClosed:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
-    [self.logger debug:@"Video completed"];
+    [self.logger debug:@"Video closed"];
 }
 
 - (void)onVideoPlayCompleted:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
     [self.logger debug:@"Video play completed"];
 }
 
-- (void)onVideoEndCardShowSuccess:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
+- (void)onEndcardShowSuccess:(nullable NSString *)placementId unitId:(nullable NSString *)unitId {
     [self.logger debug:@"End card shown"];
 }
 
-@end
+#pragma mark - Lifecycle
 
+- (void)destroy {
+    if (self.isDestroyed) {
+        return;
+    }
+    
+    [self.logger debug:@"Destroying rewarded adapter"];
+    self.isDestroyed = YES;
+    
+    self.delegate = nil;
+    self.isLoading = NO;
+    self.isReady = NO;
+}
+
+@end

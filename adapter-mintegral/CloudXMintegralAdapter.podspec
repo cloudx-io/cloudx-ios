@@ -17,11 +17,14 @@ Pod::Spec.new do |s|
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
   s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
-  s.source = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => s.version.to_s }
+  s.source = { :path => '.' }
 
   s.ios.deployment_target = '15.0'
+  
+  # Local distribution uses source files
   s.source_files = 'Sources/CloudXMintegralAdapter/**/*.{h,m}'
   s.public_header_files = 'Sources/CloudXMintegralAdapter/**/*.h'
+  s.module_map = 'Sources/CloudXMintegralAdapter/module.modulemap'
   s.resource_bundles = {
     'CloudXMintegralAdapter' => ['Sources/CloudXMintegralAdapter/PrivacyInfo.xcprivacy']
   }
@@ -29,23 +32,25 @@ Pod::Spec.new do |s|
   s.dependency 'CloudXCore'
   
   # Mintegral SDK 8.x with bidding support
-  # Uses newer SDK modules: MTGNewInterstitialBidAdManager, MTGBidRewardAdManager singleton
+  # Uses: MTGBannerAdView, MTGNewInterstitialBidAdManager, MTGBidRewardAdManager
   s.dependency 'MintegralAdSDK', '~> 8.0'
-  s.dependency 'MintegralAdSDK/BannerAd', '~> 8.0'
-  s.dependency 'MintegralAdSDK/BidInterstitialVideoAd', '~> 8.0'
+  s.dependency 'MintegralAdSDK/BidBannerAd', '~> 8.0'
+  s.dependency 'MintegralAdSDK/BidNewInterstitialAd', '~> 8.0'
   s.dependency 'MintegralAdSDK/BidRewardVideoAd', '~> 8.0'
 
   s.frameworks = ['Foundation', 'UIKit', 'AdSupport', 'CoreGraphics', 'CoreTelephony', 'SystemConfiguration', 'AVFoundation', 'CoreMedia', 'QuartzCore', 'StoreKit', 'WebKit']
   s.weak_frameworks = ['AppTrackingTransparency']
 
   s.pod_target_xcconfig = {
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
     'DEFINES_MODULE' => 'YES',
-    'CLANG_ENABLE_MODULES' => 'YES'
+    'CLANG_ENABLE_MODULES' => 'YES',
+    'OTHER_CFLAGS' => '-fmodules',
+    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
   }
   
   s.user_target_xcconfig = {
-    'OTHER_LDFLAGS' => '-ObjC'
+    'OTHER_LDFLAGS' => '-ObjC',
+    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
   }
   
   s.requires_arc = true

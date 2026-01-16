@@ -9,6 +9,7 @@
 @interface InitInternalViewController ()
 @property (nonatomic, assign) BOOL isSDKInitialized;
 @property (nonatomic, strong) UIStackView *buttonStackView;
+@property (nonatomic, strong) UIButton *localButton;
 @property (nonatomic, strong) UIButton *devButton;
 @property (nonatomic, strong) UIButton *stagingButton;
 @property (nonatomic, strong) UIButton *prodButton;
@@ -52,6 +53,10 @@
 
 - (void)setupEnvironmentButtons {
     // Create buttons
+    self.localButton = [self createButtonWithTitle:@"Init Local" 
+                                            action:@selector(initializeWithLocalEnvironment)
+                                       environment:CLXDemoEnvironmentLocal];
+    
     self.devButton = [self createButtonWithTitle:@"Init Dev" 
                                           action:@selector(initializeWithDevEnvironment)
                                      environment:CLXDemoEnvironmentDev];
@@ -64,8 +69,8 @@
                                             action:@selector(initializeWithProductionEnvironment)
                                        environment:CLXDemoEnvironmentProduction];
     
-    // Create stack view for buttons - Staging at top, Dev, Production at bottom
-    self.buttonStackView = [[UIStackView alloc] initWithArrangedSubviews:@[self.stagingButton, self.devButton, self.prodButton]];
+    // Create stack view for buttons - Local at top, then Staging, Dev, Production at bottom
+    self.buttonStackView = [[UIStackView alloc] initWithArrangedSubviews:@[self.localButton, self.stagingButton, self.devButton, self.prodButton]];
     self.buttonStackView.axis = UILayoutConstraintAxisVertical;
     self.buttonStackView.spacing = 16;
     self.buttonStackView.alignment = UIStackViewAlignmentFill;
@@ -78,6 +83,8 @@
     [NSLayoutConstraint activateConstraints:@[
         [self.buttonStackView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
         [self.buttonStackView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor],
+        [self.localButton.widthAnchor constraintEqualToConstant:200],
+        [self.localButton.heightAnchor constraintEqualToConstant:44],
         [self.stagingButton.widthAnchor constraintEqualToConstant:200],
         [self.stagingButton.heightAnchor constraintEqualToConstant:44],
         [self.devButton.widthAnchor constraintEqualToConstant:200],
@@ -106,6 +113,9 @@
 
 - (UIColor *)colorForEnvironment:(CLXDemoEnvironment)environment {
     switch (environment) {
+        case CLXDemoEnvironmentLocal:
+            // Orange for local
+            return [UIColor systemOrangeColor];
         case CLXDemoEnvironmentDev:
             return [UIColor systemBlueColor];
         case CLXDemoEnvironmentStaging:
@@ -118,7 +128,7 @@
 }
 
 - (void)updateButtonStates {
-    NSArray<UIButton *> *buttons = @[self.devButton, self.stagingButton, self.prodButton];
+    NSArray<UIButton *> *buttons = @[self.localButton, self.devButton, self.stagingButton, self.prodButton];
     
     for (UIButton *button in buttons) {
         CLXDemoEnvironment buttonEnvironment = (CLXDemoEnvironment)button.tag;
@@ -197,6 +207,10 @@
     }
 }
 
+- (void)initializeWithLocalEnvironment {
+    [self initializeWithEnvironment:CLXDemoEnvironmentLocal];
+}
+
 - (void)initializeWithDevEnvironment {
     [self initializeWithEnvironment:CLXDemoEnvironmentDev];
 }
@@ -235,9 +249,12 @@
     [[CLXDIContainer shared] reset];
     
     // Set environment using internal override key BEFORE SDK init
-    // This controls which server (dev/staging/production) the SDK connects to
+    // This controls which server (local/dev/staging/production) the SDK connects to
     NSString *environmentKey;
     switch (environment) {
+        case CLXDemoEnvironmentLocal:
+            environmentKey = @"local";
+            break;
         case CLXDemoEnvironmentDev:
             environmentKey = @"dev";
             break;

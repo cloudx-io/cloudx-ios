@@ -288,39 +288,44 @@
         }
         return;
     }
-    NSMutableString *urlString = [NSMutableString stringWithString:trackingString];
-    // Ensure trailing slash for proper path construction (server gives us "/t" but we need "/t/")
-    if (![urlString hasSuffix:@"/"]) {
-        [urlString appendString:@"/"];
-    }
-    [urlString appendString:actionString];
-    NSURL *url = [NSURL URLWithString:urlString];
-    if (!url) {
-        [self.logger error:[NSString stringWithFormat:@"Invalid URL constructed: %@", urlString]];
-        [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Invalid URL"}];
+    
+    // Use NSURLComponents for proper URL construction
+    // This handles cases where the base URL may already contain query parameters
+    NSURLComponents *urlComponents = [NSURLComponents componentsWithString:trackingString];
+    if (!urlComponents) {
+        [self.logger error:[NSString stringWithFormat:@"Invalid tracking URL: %@", trackingString]];
+        if (error) {
+            *error = [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Invalid URL"}];
+        }
         return;
     }
     
+    // Append action to the path (ensure trailing slash first)
+    NSString *path = urlComponents.path ?: @"";
+    if (![path hasSuffix:@"/"]) {
+        path = [path stringByAppendingString:@"/"];
+    }
+    urlComponents.path = [path stringByAppendingString:actionString];
+    
     NSString *eventName = [actionString stringByReplacingOccurrencesOfString:@"enc" withString:@""];
     
-    //eventValue=N%2FA&eventName=event+1&debug=true
+    // Build query items, preserving any existing ones from the base URL
+    NSMutableArray<NSURLQueryItem *> *queryItems = [NSMutableArray arrayWithArray:urlComponents.queryItems ?: @[]];
+    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"impression" value:encodedString]];
+    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"campaignId" value:campaignId]];
+    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"eventValue" value:@"N%2FA"]];
+    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"eventName" value:eventName]];
+    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"debug" value:@"true"]];
+    urlComponents.queryItems = queryItems;
     
-    NSDictionary *params = @{
-        @"impression": encodedString,
-        @"campaignId": campaignId,
-        @"eventValue": @"N%2FA",
-        @"eventName": eventName,
-        @"debug": @"true"
-    };
-    
-    // Convert params to query string
-    NSMutableArray *queryItems = [NSMutableArray array];
-    [params enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSString *value, BOOL *stop) {
-        [queryItems addObject:[NSString stringWithFormat:@"%@=%@", key, [value stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]]]];
-    }];
-    NSString *queryString = [queryItems componentsJoinedByString:@"&"];
-    NSString *fullURLString = [NSString stringWithFormat:@"%@?%@", urlString, queryString];
-    NSURL *fullURL = [NSURL URLWithString:fullURLString];
+    NSURL *fullURL = urlComponents.URL;
+    if (!fullURL) {
+        [self.logger error:[NSString stringWithFormat:@"Failed to construct URL from components: %@", urlComponents]];
+        if (error) {
+            *error = [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Invalid URL"}];
+        }
+        return;
+    }
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:fullURL];
     request.HTTPMethod = @"GET";

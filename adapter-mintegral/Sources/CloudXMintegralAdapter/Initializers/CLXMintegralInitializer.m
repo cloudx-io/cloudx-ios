@@ -1,7 +1,7 @@
 #import "CLXMintegralInitializer.h"
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
-#import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXBidderConfig.h>
 #import <MTGSDK/MTGSDK.h>
 #import "CLXMintegralInterstitialFactory.h"
 #import "CLXMintegralBannerFactory.h"
@@ -9,10 +9,8 @@
 #import "CLXMintegralBidTokenSource.h"
 
 // CloudX Channel Code for Mintegral attribution
-// NOTE: This code must be obtained from Mintegral directly for your partnership.
-// Contact Mintegral to request a channel code for CloudX attribution tracking.
-// Without a valid code, this feature will be disabled.
-static NSString * const kCloudXChannelCode = nil;  // TODO: Obtain from Mintegral
+// This is a unique identifier assigned by Mintegral for CloudX mediation
+static NSString * const kCloudXChannelCode = @"Y+H6DFttYrPQYcIAicKwJQKQYrN=";
 
 @interface CLXMintegralInitializer ()
 @property (nonatomic, strong) CLXLogger *logger;
@@ -60,8 +58,8 @@ static NSString * const kSDKVersion = @"8.0.3"; // Mintegral SDK version (update
         return;
     }
     
-    // Extract Mintegral-specific credentials
-    // Mintegral typically requires App ID and App Key
+    // Extract Mintegral-specific credentials from provisioning response
+    // AppLovin pattern: just use what the server provides
     NSString *appID = config.initializationData[@"appID"];
     NSString *appKey = config.initializationData[@"appKey"];
     
@@ -92,16 +90,13 @@ static NSString * const kSDKVersion = @"8.0.3"; // Mintegral SDK version (update
             [self.logger info:[NSString stringWithFormat:@"Mintegral SDK initialized with version: %@", 
                              [MTGSDK sdkVersion] ?: @"unknown"]];
             
-            // Register factories with CloudX Core
-            [self registerFactories];
-            
             isInitialized = YES;
             [self.logger success:@"Mintegral adapter initialized successfully"];
             
             if (completion) completion(YES, nil);
             
         } @catch (NSException *exception) {
-            NSError *error = [CLXError errorWithCode:CLXErrorCodeInternalError
+            NSError *error = [CLXError errorWithCode:CLXErrorCodeUnknown
                                          description:exception.reason ?: @"Unknown initialization error"];
             [self.logger error:[NSString stringWithFormat:@"Mintegral initialization failed: %@", exception.reason]];
             if (completion) completion(NO, error);
@@ -137,64 +132,48 @@ static NSString * const kSDKVersion = @"8.0.3"; // Mintegral SDK version (update
 #pragma clang diagnostic pop
     }
     @catch (NSException *exception) {
-        [self.logger warning:[NSString stringWithFormat:@"Failed to set channel code: %@", exception.reason]];
+        [self.logger warn:[NSString stringWithFormat:@"Failed to set channel code: %@", exception.reason]];
     }
 }
 
 - (void)configurePrivacySettings {
-    // GDPR - Mintegral automatically reads IAB TCF strings from UserDefaults
-    // Keys: IABTCF_TCString, IABTCF_gdprApplies, IABTCF_PurposeConsents
-    [self.logger debug:@"Mintegral reads GDPR consent from IAB TCF strings (UserDefaults)"];
+    MTGSDK *mtgSDK = [MTGSDK sharedInstance];
     
-    // CCPA - Mintegral automatically reads IAB US Privacy String from UserDefaults
-    // Key: IABUSPrivacy_String
-    [self.logger debug:@"Mintegral reads CCPA from IAB US Privacy String (UserDefaults)"];
+    // GDPR Consent - Check for IAB TCF consent or explicit consent
+    // Must be set BEFORE SDK initialization per Mintegral docs
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
-    // Note: If direct API control is needed in the future, use:
-    // [[MTGSDK sharedInstance] setConsentStatus:YES];  // GDPR
-    // [[MTGSDK sharedInstance] setDoNotTrackStatus:NO]; // CCPA
-}
-
-- (void)registerFactories {
-    [self.logger debug:@"Registering Mintegral ad format factories"];
+    // Check IAB TCF 2.0 consent (GDPR applies = 1, Purpose consent bit 1 = advertising)
+    NSNumber *gdprApplies = [defaults objectForKey:@"IABTCF_gdprApplies"];
+    NSString *purposeConsents = [defaults stringForKey:@"IABTCF_PurposeConsents"];
     
-    [[CloudXCore shared] registerAdNetworkFactory:[CLXMintegralInterstitialFactory createInstance]
-                                        forAdType:CLXAdTypeInterstitial];
+    if (gdprApplies != nil) {
+        if ([gdprApplies integerValue] == 1) {
+            // GDPR applies - check purpose consent (bit 1 is purpose 1 for advertising)
+            BOOL hasAdConsent = (purposeConsents.length > 0 && [purposeConsents characterAtIndex:0] == '1');
+            mtgSDK.consentStatus = hasAdConsent;
+            [self.logger debug:[NSString stringWithFormat:@"GDPR applies, consent status set to: %@", hasAdConsent ? @"YES" : @"NO"]];
+        } else {
+            // GDPR doesn't apply - allow tracking
+            mtgSDK.consentStatus = YES;
+            [self.logger debug:@"GDPR doesn't apply, consent status set to YES"];
+        }
+    } else {
+        [self.logger debug:@"No GDPR signal found, Mintegral will read IAB TCF strings from UserDefaults"];
+    }
     
-    [[CloudXCore shared] registerAdNetworkFactory:[CLXMintegralBannerFactory createInstance]
-                                        forAdType:CLXAdTypeBanner];
+    // CCPA / US Privacy - Check IAB US Privacy String
+    // Format: 1YNN = version, explicit notice, opt-out sale, LSPA covered
+    // If character 3 is 'Y', user has opted out of sale
+    NSString *usPrivacy = [defaults stringForKey:@"IABUSPrivacy_String"];
     
-    [[CloudXCore shared] registerAdNetworkFactory:[CLXMintegralRewardedFactory createInstance]
-                                        forAdType:CLXAdTypeRewarded];
-    
-    [self.logger info:@"Registered 3 Mintegral ad format factories"];
-}
-
-#pragma mark - Static Framework Class Loading
-
-// Ensure all classes are loaded when using static frameworks
-__attribute__((visibility("default"))) void CloudXMintegralAdapterRegister(void) {
-    static CLXLogger *registrationLogger = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        registrationLogger = [[CLXLogger alloc] initWithCategory:@"MintegralAdapterRegistration"];
-    });
-    
-    [registrationLogger debug:@"Loading Mintegral adapter classes"];
-    
-    // Force load all classes by referencing them
-    [CLXMintegralInitializer class];
-    [CLXMintegralBannerFactory class];
-    [CLXMintegralInterstitialFactory class];
-    [CLXMintegralRewardedFactory class];
-    [CLXMintegralBidTokenSource class];
-    
-    [registrationLogger debug:@"Mintegral adapter classes loaded successfully"];
-}
-
-+ (void)load {
-    CloudXMintegralAdapterRegister();
+    if (usPrivacy.length >= 3) {
+        BOOL doNotTrack = ([usPrivacy characterAtIndex:2] == 'Y');
+        mtgSDK.doNotTrackStatus = doNotTrack;
+        [self.logger debug:[NSString stringWithFormat:@"CCPA doNotTrack status set to: %@", doNotTrack ? @"YES" : @"NO"]];
+    } else {
+        [self.logger debug:@"No CCPA signal found, Mintegral will read IAB US Privacy from UserDefaults"];
+    }
 }
 
 @end
-

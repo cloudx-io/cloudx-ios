@@ -3,6 +3,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSInteger, CLXDemoEnvironment) {
+    CLXDemoEnvironmentLocal,
     CLXDemoEnvironmentDev,
     CLXDemoEnvironmentStaging,
     CLXDemoEnvironmentProduction

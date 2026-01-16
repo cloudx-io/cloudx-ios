@@ -42,7 +42,8 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     
     // Extract the base URL and endpoint from the full URL
     NSURL *url = [NSURL URLWithString:baseURL];
-    NSString *actualBaseURL = [NSString stringWithFormat:@"%@://%@", url.scheme, url.host];
+    NSString *portString = url.port ? [NSString stringWithFormat:@":%@", url.port] : @"";
+    NSString *actualBaseURL = [NSString stringWithFormat:@"%@://%@%@", url.scheme, url.host, portString];
     NSString *endpointPath = url.path;
     
     // Handle empty or nil path

@@ -13,15 +13,15 @@ The CloudX iOS SDK uses a **Gitflow** branching strategy with two repositories:
 
 ## Components
 
-| Component | Type | Description |
-|-----------|------|-------------|
-| **CloudXCore** | **DYNAMIC** | Core SDK with programmatic advertising engine |
-| **CloudXMetaAdapter** | Static | Meta Audience Network integration |
-| **CloudXVungleAdapter** | Static | Vungle/Liftoff integration |
-| **CloudXInMobiAdapter** | Static | InMobi integration |
-| **CloudXMintegralAdapter** | Static | Mintegral integration |
-| **CloudXMolocoAdapter** | Static | Moloco integration |
-| **CloudXRenderer** | Static | Creative rendering engine |
+| Component | Type | CocoaPods Trunk | Description |
+|-----------|------|-----------------|-------------|
+| **CloudXCore** | **DYNAMIC** | ✅ Published | Core SDK with programmatic advertising engine |
+| **CloudXMetaAdapter** | Static | ✅ Published | Meta Audience Network integration |
+| **CloudXVungleAdapter** | Static | ✅ Published | Vungle/Liftoff integration |
+| **CloudXInMobiAdapter** | Static | ✅ Published | InMobi integration |
+| **CloudXMintegralAdapter** | Static | ⚠️ **BETA** | Mintegral integration (not on trunk yet) |
+| **CloudXMolocoAdapter** | Static | ⚠️ **BETA** | Moloco integration (not on trunk yet) |
+| **CloudXRenderer** | Static | ✅ Published | Creative rendering engine |
 
 ## dSYM Strategy (CloudXCore Only)
 
@@ -428,6 +428,9 @@ After bootstrapping, future releases will merge cleanly as long as you perform S
 
 **⚠️ CRITICAL: This step is required for third-party developers to install via `pod 'CloudXCore'`**
 
+**⚠️ NOTE: CloudXMintegralAdapter is NOT pushed to CocoaPods trunk yet (BETA status).**
+When the Mintegral adapter is production-ready, add it to the trunk push commands below.
+
 ```bash
 cd cloudx-ios
 
@@ -447,12 +450,16 @@ pod trunk push adapter-meta/CloudXMetaAdapter.podspec --allow-warnings
 pod trunk push adapter-vungle/CloudXVungleAdapter.podspec --allow-warnings
 pod trunk push adapter-inmobi/CloudXInMobiAdapter.podspec --allow-warnings
 
+# TODO: Add Mintegral when ready for production release:
+# pod trunk push adapter-mintegral/CloudXMintegralAdapter.podspec --allow-warnings
+
 # Verify pods are published
 pod trunk info CloudXCore
 pod trunk info CloudXMetaAdapter
 pod trunk info CloudXVungleAdapter
 pod trunk info CloudXInMobiAdapter
 pod trunk info CloudXRenderer
+# pod trunk info CloudXMintegralAdapter  # Add when released to trunk
 ```
 
 **Note:** CocoaPods Trunk can take 5-15 minutes to propagate. Run `pod repo update` to get the latest specs.
@@ -488,6 +495,58 @@ open CloudXSwiftRemotePods.xcworkspace
 - [ ] At least one ad format loads correctly
 
 If `pod install` fails with version not found, wait a few more minutes for CDN propagation and run `pod repo update` again.
+
+---
+
+### Beta Adapter Releases (Mintegral, Moloco)
+
+**⚠️ The following adapters are in BETA and are NOT pushed to CocoaPods trunk:**
+
+| Adapter | Status | When to Release to Trunk |
+|---------|--------|--------------------------|
+| CloudXMintegralAdapter | BETA | When production-ready and fully tested |
+| CloudXMolocoAdapter | BETA | When production-ready and fully tested |
+
+#### How Beta Adapters Are Released
+
+Beta adapters use a **soft release** process:
+
+1. **GitHub Release Only** - Creates a pre-release on GitHub with xcframework
+2. **No CocoaPods Trunk Push** - NOT available via `pod 'CloudXMintegralAdapter'`
+3. **Pre-release Flag** - Marked as pre-release in GitHub (not "latest")
+
+#### How to Release a Beta Adapter
+
+```bash
+# Tag format: v{version}-{adapter}
+# Example for Mintegral:
+git tag v1.3.0-mintegral
+git push origin v1.3.0-mintegral
+
+# This triggers .github/workflows/mintegral-release.yml
+# which creates a GitHub pre-release but does NOT push to trunk
+```
+
+#### How Users Install Beta Adapters
+
+Users must reference the GitHub tag directly in their Podfile:
+
+```ruby
+# Podfile for Mintegral beta
+pod 'CloudXMintegralAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.3.0-mintegral'
+```
+
+#### Promoting Beta to Production
+
+When a beta adapter is ready for production:
+
+1. Update the adapter's release workflow to include `pod trunk push`
+2. Remove the `--prerelease` flag from `gh release create`
+3. Remove BETA warnings from README and podspec
+4. Add the adapter to the Phase 6 trunk push commands above
+5. Update the Components table to show ✅ Published
+
+---
 
 ### Phase 7: Update Cross-Platform SDKs
 
