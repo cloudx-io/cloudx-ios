@@ -29,5 +29,16 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+#pragma mark - Print Bid Response (QA)
+
+- (BOOL)printBidResponse {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:@"DemoApp.PrintBidResponse"];
+}
+
+- (void)setPrintBidResponse:(BOOL)printBidResponse {
+    [[NSUserDefaults standardUserDefaults] setBool:printBidResponse forKey:@"DemoApp.PrintBidResponse"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 @end
 

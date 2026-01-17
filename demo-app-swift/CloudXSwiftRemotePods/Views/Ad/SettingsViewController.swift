@@ -47,7 +47,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 4 // SDK, Placement, Privacy, Logging
+        return 5 // SDK, Placement, Privacy, Logging, QA Tools
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -56,6 +56,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         case 1: return 4 // Placement Settings
         case 2: return 5 // Privacy: Consent, US Privacy, GPP String, GPP SID, User Targeting
         case 3: return 4 // Logging: Enable, Emojis, Timestamps, Level
+        case 4: return 1 // QA Tools: Print Bid Response
         default: return 0
         }
     }
@@ -66,6 +67,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         case 1: return "Placement Settings"
         case 2: return "Privacy"
         case 3: return "Logging Controls 🪵"
+        case 4: return "🔍 QA Tools"
         default: return nil
         }
     }
@@ -73,6 +75,9 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if section == 3 {
             return "V=Verbose (all logs), D=Debug (dev logs), I=Info (key events), W=Warn (issues), E=Error (failures only). Toggle emojis to test plain text mode for log aggregation systems."
+        }
+        if section == 4 {
+            return "When enabled, the full bid response JSON from the server is printed to the Xcode console. This is for QA/internal testing only."
         }
         return nil
     }
@@ -173,6 +178,18 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
                 cell.accessoryView = levelControl
             default: break
             }
+        case 4: // QA Tools
+            textField.removeFromSuperview()
+            switch indexPath.row {
+            case 0:
+                cell.textLabel?.text = "Print Full Bid Response"
+                let toggle = UISwitch()
+                toggle.isOn = settings.printBidResponse
+                toggle.tag = 400
+                toggle.addTarget(self, action: #selector(printBidResponseToggleChanged(_:)), for: .valueChanged)
+                cell.accessoryView = toggle
+            default: break
+            }
         default: break
         }
         return cell
@@ -210,6 +227,19 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
     
     @objc private func userTargetingSwitchChanged(_ sender: UISwitch) {
         settings.userTargeting = sender.isOn
+    }
+    
+    // MARK: - QA Tools
+    
+    @objc private func printBidResponseToggleChanged(_ sender: UISwitch) {
+        settings.printBidResponse = sender.isOn
+        
+        // Enable swizzling when turned on
+        if sender.isOn {
+            CLXBidResponseSwizzler.enableSwizzling()
+        }
+        
+        print("🔍 Print Full Bid Response \(sender.isOn ? "ENABLED" : "DISABLED")")
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {

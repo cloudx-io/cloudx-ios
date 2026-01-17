@@ -8,6 +8,7 @@
 #import "SettingsViewController.h"
 #import "UserDefaultsSettings.h"
 #import <CloudXCore/CloudXCore.h>
+#import "CLXBidResponseSwizzler.h"
 
 @interface CLXTextField : UITextField
 @end
@@ -58,7 +59,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 4; // SDK, Placement, Privacy, Logging
+    return 5; // SDK, Placement, Privacy, Logging, QA Tools
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -67,6 +68,7 @@
         case 1: return 4; // Placement Settings
         case 2: return 3; // Privacy: Consent, US Privacy, User Targeting
         case 3: return 4; // Logging: Enable, Emojis, Timestamps, Level
+        case 4: return 1; // QA Tools: Print Bid Response
         default: return 0;
     }
 }
@@ -77,6 +79,7 @@
         case 1: return @"Placement Settings";
         case 2: return @"Privacy";
         case 3: return @"Logging Controls 🪵";
+        case 4: return @"🔍 QA Tools";
         default: return nil;
     }
 }
@@ -84,6 +87,9 @@
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     if (section == 3) {
         return @"V=Verbose (all logs), D=Debug (dev logs), I=Info (key events), W=Warn (issues), E=Error (failures only). Toggle emojis to test plain text mode for log aggregation systems.";
+    }
+    if (section == 4) {
+        return @"When enabled, the full bid response JSON from the server is printed to the Xcode console. This is for QA/internal testing only.";
     }
     return nil;
 }
@@ -193,6 +199,20 @@
                 }
             }
             break;
+        case 4: // QA Tools
+            [textField removeFromSuperview];
+            switch (indexPath.row) {
+                case 0: {
+                    cell.textLabel.text = @"Print Full Bid Response";
+                    UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectZero];
+                    toggle.on = self.settings.printBidResponse;
+                    toggle.tag = 400;
+                    [toggle addTarget:self action:@selector(printBidResponseToggleChanged:) forControlEvents:UIControlEventValueChanged];
+                    cell.accessoryView = toggle;
+                    break;
+                }
+            }
+            break;
     }
     return cell;
 }
@@ -255,6 +275,19 @@
     [[NSUserDefaults standardUserDefaults] setInteger:sender.selectedSegmentIndex forKey:@"LoggingLevel"];
     NSArray *levelNames = @[@"VERBOSE", @"DEBUG", @"INFO", @"WARN", @"ERROR"];
     NSLog(@"🪵 Log level set to: %@", levelNames[sender.selectedSegmentIndex]);
+}
+
+#pragma mark - QA Tools
+
+- (void)printBidResponseToggleChanged:(UISwitch *)sender {
+    self.settings.printBidResponse = sender.isOn;
+    
+    // Enable swizzling when turned on
+    if (sender.isOn) {
+        [CLXBidResponseSwizzler enableSwizzling];
+    }
+    
+    NSLog(@"🔍 Print Full Bid Response %@", sender.isOn ? @"ENABLED" : @"DISABLED");
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {

@@ -25,6 +25,18 @@ class UserDefaultsSettings: NSObject {
     var gppSid: String = ""
     var userTargeting: Bool = false
     
+    /// When enabled, the full bid response JSON is printed to the console for QA inspection.
+    /// This is a demo app-only feature and is NOT exposed in the SDK or public logs.
+    var printBidResponse: Bool {
+        get {
+            return UserDefaults.standard.bool(forKey: "DemoApp.PrintBidResponse")
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "DemoApp.PrintBidResponse")
+            UserDefaults.standard.synchronize()
+        }
+    }
+    
     private override init() {
         super.init()
     }

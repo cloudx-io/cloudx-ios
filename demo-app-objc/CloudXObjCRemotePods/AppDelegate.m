@@ -11,6 +11,7 @@
 #import <AdSupport/AdSupport.h>
 #import "DemoAppLogger.h"
 #import "AdDemoTabViewController.h"
+#import "CLXBidResponseSwizzler.h"
 
 @interface AppDelegate ()
 
@@ -29,6 +30,12 @@
     // Auto-clear all privacy test settings on every launch
     // This ensures clean state for testing and prevents GPP settings from persisting
     [self clearAllPrivacyTestSettings];
+    
+    // Enable bid response swizzling if the QA toggle was previously enabled
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DemoApp.PrintBidResponse"]) {
+        [CLXBidResponseSwizzler enableSwizzling];
+        NSLog(@"🔍 Print Full Bid Response enabled from previous session");
+    }
     
     // Request App Tracking Transparency permission
     [self requestAppTrackingTransparencyPermission];

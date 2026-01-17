@@ -54,6 +54,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // This ensures clean state for testing and prevents GPP settings from persisting
         clearAllPrivacyTestSettings()
         
+        // Enable bid response swizzling if the QA toggle was previously enabled
+        if UserDefaults.standard.bool(forKey: "DemoApp.PrintBidResponse") {
+            CLXBidResponseSwizzler.enableSwizzling()
+            print("🔍 Print Full Bid Response enabled from previous session")
+        }
+        
         // Request App Tracking Transparency permission
         requestAppTrackingTransparencyPermission()
         
