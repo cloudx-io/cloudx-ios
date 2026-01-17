@@ -107,7 +107,7 @@
         NSLog(@"Meta adapter discovered and validated in test environment");
     } else {
         NSLog(@"Meta adapter not available in test environment - this is expected for unit tests");
-        XCTAssertTrue(YES, @"Test passes when Meta adapter is not available");
+        // Test passes if no crash: Test passes when Meta adapter is not available
     }
 }
 

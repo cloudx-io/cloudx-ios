@@ -248,7 +248,15 @@ static const NSTimeInterval kTestTimeout = 0.5;
 
 @implementation IntegrationMockReportingService
 
-- (void)reportEvent:(NSString *)event withData:(NSDictionary *)data {
+- (void)metricsTrackingWithActionString:(NSString *)actionString {
+    // Mock implementation for integration tests
+}
+
+- (void)rillTrackingWithActionString:(NSString *)actionString campaignId:(NSString *)campaignId encodedString:(NSString *)encodedString {
+    // Mock implementation for integration tests
+}
+
+- (void)geoTrackingWithURLString:(NSString *)fullURL extras:(NSDictionary<NSString *, NSString *> *)extras {
     // Mock implementation for integration tests
 }
 

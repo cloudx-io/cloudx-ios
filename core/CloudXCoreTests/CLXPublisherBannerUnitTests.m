@@ -132,7 +132,15 @@ static const NSTimeInterval kTestTimeout = 2.0;
 
 @implementation MockReportingService
 
-- (void)reportEvent:(NSString *)event withData:(NSDictionary *)data {
+- (void)metricsTrackingWithActionString:(NSString *)actionString {
+    // Mock implementation
+}
+
+- (void)rillTrackingWithActionString:(NSString *)actionString campaignId:(NSString *)campaignId encodedString:(NSString *)encodedString {
+    // Mock implementation
+}
+
+- (void)geoTrackingWithURLString:(NSString *)fullURL extras:(NSDictionary<NSString *, NSString *> *)extras {
     // Mock implementation
 }
 

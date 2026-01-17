@@ -4,8 +4,9 @@
 
 /**
  * @file CLXProtectedOperationsTests.m
- * @brief Unit tests for @try/@catch protected operations across the SDK
- * @details Tests specific exception handling we added to critical operations
+ * @brief Smoke tests verifying protected operations don't crash with bad input
+ * @details These tests verify @try/@catch protection handles edge cases gracefully.
+ *          Tests pass if no crash occurs - no misleading XCTAssertTrue(YES) assertions.
  */
 
 #import <XCTest/XCTest.h>
@@ -37,209 +38,135 @@
     [super tearDown];
 }
 
-#pragma mark - GPP Provider String Manipulation Protection Tests
+#pragma mark - GPP Provider Protection Tests
 
-/**
- * @brief Test GPP bit string parsing with invalid ranges
- * @discussion Tests our @try/@catch protection in readBits:start:length: method
- */
-- (void)testGPPProvider_BitStringParsing_InvalidRange_ExceptionHandling {
-    // Test the protected readBits method indirectly through GPP decoding
+- (void)testGPPProvider_DecodeWithValidFormat_DoesNotCrash {
+    [self.gppProvider setGppString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"];
+    [self.gppProvider setGppSid:@[@7]];
     
-    // Set up invalid GPP data that will trigger string manipulation exceptions
-    [self.gppProvider setGppString:@"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA"]; // Valid format
-    [self.gppProvider setGppSid:@[@7]]; // US-National section
-    
-    // This should trigger our string manipulation protection when parsing bits - simplified
+    // Should not crash - consent may be nil for invalid/unsupported data
     CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@7];
-    // Should return nil or valid consent, but never crash
-    XCTAssertTrue(YES, @"GPP bit string parsing should handle invalid ranges gracefully");
+    // No assertion needed - test passes if no crash
+    (void)consent;
 }
 
-/**
- * @brief Test GPP provider with corrupted base64 data
- * @discussion Tests base64 decoding protection in base64UrlToBits method
- */
-- (void)testGPPProvider_Base64Decoding_CorruptedData_ExceptionHandling {
-    NSArray<NSString *> *corruptedBase64Strings = @[
-        @"Invalid!Base64@#$%",           // Invalid characters
-        @"DBABrw~CorruptedData!!!",      // Partially valid
-        @"",                             // Empty string
-        @"A",                           // Too short
-        @"DBABrw~" // Truncated
+- (void)testGPPProvider_CorruptedBase64_DoesNotCrash {
+    NSArray<NSString *> *corruptedStrings = @[
+        @"Invalid!Base64@#$%",
+        @"DBABrw~CorruptedData!!!",
+        @"",
+        @"A",
+        @"DBABrw~"
     ];
     
-    for (NSString *corruptedString in corruptedBase64Strings) {
+    for (NSString *corruptedString in corruptedStrings) {
         [self.gppProvider setGppString:corruptedString];
         [self.gppProvider setGppSid:@[@7]];
         
-        // Simplified to avoid macro expansion issues
+        // Should not crash with corrupted input
         CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:@7];
-        // Should handle corrupted base64 gracefully
-        XCTAssertTrue(YES, @"GPP base64 decoding should handle corrupted data without crashing");
+        (void)consent;
     }
 }
 
-#pragma mark - Settings UserDefaults Protection Tests
-
-/**
- * @brief Test Settings UserDefaults access under simulated corruption
- * @discussion Tests our @try/@catch protection in CLXSettings UserDefaults operations
- */
-- (void)testSettings_UserDefaultsAccess_CorruptedDefaults_ExceptionHandling {
-    // Test banner retries setting with various edge cases - simplified
-    CLXSettings *settings = [CLXSettings sharedInstance];
-    BOOL retries1 = [settings shouldEnableBannerRetries];
-    
-    // Set a valid value
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"CLXCoreEnableBannerRetries"];
-    BOOL retries2 = [settings shouldEnableBannerRetries];
-    
-    // Set an invalid value type (this might cause issues in some scenarios)
-    [[NSUserDefaults standardUserDefaults] setObject:@"not_a_bool" forKey:@"CLXCoreEnableBannerRetries"];
-    BOOL retries3 = [settings shouldEnableBannerRetries];
-    
-    // All calls should succeed without throwing
-    XCTAssertNotNil(@(retries1), @"Should handle default case");
-    XCTAssertNotNil(@(retries2), @"Should handle valid bool case");
-    XCTAssertNotNil(@(retries3), @"Should handle invalid type case");
-    
-    XCTAssertTrue(YES, @"Settings UserDefaults access should handle corruption gracefully");
-}
-
-#pragma mark - URL Provider Construction Protection Tests
-
-/**
- * @brief Test URL construction with malformed URL strings
- * @discussion Tests our @try/@catch protection in CLXURLProvider URL construction
- */
-- (void)testURLProvider_URLConstruction_MalformedURLs_ExceptionHandling {
-    // Test that URL construction methods handle edge cases - simplified
-    NSURL *initUrl = [CLXURLProvider initApiUrl];
-    NSString *auctionUrl = [CLXURLProvider auctionApiUrl];
-    NSString *metricsUrl = [CLXURLProvider metricsApiUrl];
-    
-    // Init URL should be valid (still used for SDK initialization)
-    XCTAssertNotNil(initUrl, @"Init API URL should be valid");
-    
-    // Auction and metrics URLs are now deprecated and return nil (URLs come from SDK response)
-    XCTAssertNil(auctionUrl, @"Auction API URL should be nil (deprecated - comes from SDK response)");
-    XCTAssertNil(metricsUrl, @"Metrics API URL should be nil (deprecated - comes from SDK response)");
-    
-    XCTAssertTrue(YES, @"URL construction should handle all scenarios gracefully");
-}
-
-#pragma mark - Network Service JSON Protection Tests
-
-/**
- * @brief Test bid network service JSON operations protection
- * @discussion Tests our @try/@catch protection in bid network service JSON operations
- */
-- (void)testBidNetworkService_JSONOperations_InvalidData_ExceptionHandling {
-    CLXBidNetworkServiceClass *bidService = [[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:@"https://test.com"
-                                                                                             errorReporter:self.errorReporter];
-    
-    XCTAssertNotNil(bidService, @"Bid network service should initialize");
-}
-
-#pragma mark - Cross-Component Exception Handling Tests
-
-/**
- * @brief Test exception handling consistency across components
- * @discussion Ensures all protected operations follow the same error handling pattern
- */
-- (void)testCrossComponent_ExceptionHandling_ConsistentBehavior {
-    // Test that all components handle exceptions consistently
-    
-    // GPP Provider - simplified to avoid macro expansion issues
-    [self.gppProvider setGppString:@"test"];
-    [self.gppProvider setGppSid:@[@1, @2, @3]];
-    NSString *gppString = [self.gppProvider gppString];
-    NSArray *gppSid = [self.gppProvider gppSid];
-    XCTAssertTrue(YES, @"GPP Provider should handle all operations gracefully");
-    
-    // Settings - simplified to avoid macro expansion issues
-    CLXSettings *settings = [CLXSettings sharedInstance];
-    BOOL setting = [settings shouldEnableBannerRetries];
-    XCTAssertTrue(YES, @"Settings should handle all operations gracefully");
-    
-    // URL Provider - simplified to avoid macro expansion issues
-    NSURL *url = [CLXURLProvider initApiUrl];
-    NSString *auctionUrl = [CLXURLProvider auctionApiUrl];
-    NSString *metricsUrl = [CLXURLProvider metricsApiUrl];
-    XCTAssertTrue(YES, @"URL Provider should handle all operations gracefully");
-}
-
-#pragma mark - Edge Case Protection Tests
-
-/**
- * @brief Test protection against edge cases that could cause crashes
- * @discussion Tests various edge cases that our @try/@catch blocks should handle
- */
-- (void)testEdgeCaseProtection_ExtremeScenariosHandling {
-    // Test GPP with extreme values
-    NSString *extremeGppString = [@"" stringByPaddingToLength:100000 withString:@"EXTREME" startingAtIndex:0];
-    
-    // Simplified to avoid macro expansion issues
-    [self.gppProvider setGppString:extremeGppString];
-    NSString *retrieved = [self.gppProvider gppString];
-    // Should handle extreme string lengths
-    XCTAssertTrue(YES, @"Should handle extreme GPP string lengths");
-    
-    // Test with nil and empty values - simplified
+- (void)testGPPProvider_NilValues_DoesNotCrash {
     [self.gppProvider setGppString:nil];
     [self.gppProvider setGppSid:nil];
     
+    // Should handle nil gracefully
     NSString *gppString = [self.gppProvider gppString];
     NSArray *gppSid = [self.gppProvider gppSid];
     CLXPrivacyConsent *consent = [self.gppProvider decodeGppForTarget:nil];
     
-    XCTAssertTrue(YES, @"Should handle nil values gracefully");
+    XCTAssertNil(gppString, @"GPP string should be nil after setting nil");
+    XCTAssertNil(gppSid, @"GPP SID should be nil after setting nil");
+    (void)consent;
 }
 
-#pragma mark - Performance Under Exception Conditions
+- (void)testGPPProvider_ExtremeStringLength_DoesNotCrash {
+    NSString *extremeString = [@"" stringByPaddingToLength:100000 withString:@"EXTREME" startingAtIndex:0];
+    
+    [self.gppProvider setGppString:extremeString];
+    NSString *retrieved = [self.gppProvider gppString];
+    
+    XCTAssertEqualObjects(retrieved, extremeString, @"Should store and retrieve extreme length string");
+}
 
-/**
- * @brief Test that exception handling doesn't significantly impact performance
- * @discussion Ensures our @try/@catch blocks don't create performance bottlenecks
- */
-- (void)testExceptionHandling_PerformanceImpact_Minimal {
+#pragma mark - Settings Protection Tests
+
+- (void)testSettings_UserDefaultsAccess_HandlesInvalidTypes {
+    CLXSettings *settings = [CLXSettings sharedInstance];
+    
+    // Default value
+    BOOL retries1 = [settings shouldEnableBannerRetries];
+    XCTAssertFalse(retries1, @"Default should be NO");
+    
+    // Valid bool value - use the actual key from CLXUserDefaultsKeys.h
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"CLXCore_EnableBannerRetries"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    BOOL retries2 = [settings shouldEnableBannerRetries];
+    XCTAssertTrue(retries2, @"Should return YES when set to YES");
+    
+    // Invalid type - should not crash
+    [[NSUserDefaults standardUserDefaults] setObject:@"not_a_bool" forKey:@"CLXCore_EnableBannerRetries"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    BOOL retries3 = [settings shouldEnableBannerRetries];
+    // Value is undefined but should not crash
+    (void)retries3;
+}
+
+#pragma mark - URL Provider Protection Tests
+
+- (void)testURLProvider_URLConstruction_ReturnsExpectedValues {
+    NSURL *initUrl = [CLXURLProvider initApiUrl];
+    NSString *auctionUrl = [CLXURLProvider auctionApiUrl];
+    NSString *metricsUrl = [CLXURLProvider metricsApiUrl];
+    
+    XCTAssertNotNil(initUrl, @"Init API URL should be valid");
+    XCTAssertNil(auctionUrl, @"Auction API URL should be nil (deprecated - comes from SDK response)");
+    XCTAssertNil(metricsUrl, @"Metrics API URL should be nil (deprecated - comes from SDK response)");
+}
+
+#pragma mark - Bid Network Service Tests
+
+- (void)testBidNetworkService_Initialization_Succeeds {
+    CLXBidNetworkServiceClass *bidService = [[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:@"https://test.com"
+                                                                                            errorReporter:self.errorReporter];
+    XCTAssertNotNil(bidService, @"Bid network service should initialize");
+}
+
+#pragma mark - Performance Tests
+
+- (void)testProtectedOperations_Performance_ReasonableOverhead {
     [self measureBlock:^{
-        // Perform operations that go through our protected code paths
         CLXSettings *settings = [CLXSettings sharedInstance];
         for (NSInteger i = 0; i < 1000; i++) {
             [self.gppProvider setGppString:[NSString stringWithFormat:@"test_%ld", (long)i]];
-            [self.gppProvider gppString];
-            [settings shouldEnableBannerRetries];
-            [CLXURLProvider initApiUrl];
+            (void)[self.gppProvider gppString];
+            (void)[settings shouldEnableBannerRetries];
+            (void)[CLXURLProvider initApiUrl];
         }
     }];
 }
 
-/**
- * @brief Test concurrent access to protected operations
- * @discussion Ensures thread safety of our exception handling
- */
-- (void)testProtectedOperations_ConcurrentAccess_ThreadSafety {
+#pragma mark - Thread Safety Tests
+
+- (void)testProtectedOperations_ConcurrentAccess_NoRaceConditions {
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     queue.maxConcurrentOperationCount = 10;
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Concurrent protected operations"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Concurrent operations"];
     
     __block NSInteger completedOperations = 0;
     NSInteger totalOperations = 100;
     
     for (NSInteger i = 0; i < totalOperations; i++) {
         [queue addOperationWithBlock:^{
-            // Simplified to avoid macro expansion issues
-            // Test various protected operations concurrently
             CLXSettings *settings = [CLXSettings sharedInstance];
-            [self.gppProvider setGppString:[NSString stringWithFormat:@"concurrent_test_%ld", (long)i]];
-            [self.gppProvider gppString];
-            [settings shouldEnableBannerRetries];
-            [CLXURLProvider initApiUrl];
-            
-            XCTAssertTrue(YES, @"Concurrent protected operations should be thread-safe");
+            [self.gppProvider setGppString:[NSString stringWithFormat:@"concurrent_%ld", (long)i]];
+            (void)[self.gppProvider gppString];
+            (void)[settings shouldEnableBannerRetries];
+            (void)[CLXURLProvider initApiUrl];
             
             @synchronized(self) {
                 completedOperations++;

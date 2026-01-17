@@ -21,7 +21,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol CLXBidNetworkService;
 @protocol CLXAppSessionService;
-@protocol AdEventReporting;
 
 /**
  * Error types for bid ad source operations

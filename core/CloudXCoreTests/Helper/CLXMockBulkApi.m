@@ -63,6 +63,11 @@
             completion(NO, error);
         }
     }
+    
+    // Notify test that send was called - use for XCTestExpectation synchronization
+    if (self.onSendCalled) {
+        self.onSendCalled();
+    }
 }
 
 - (void)reset {

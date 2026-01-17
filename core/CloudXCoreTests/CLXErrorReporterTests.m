@@ -311,7 +311,7 @@
                                          context:[context isKindOfClass:[NSDictionary class]] ? context : nil];
         }
         
-        XCTAssertTrue(YES, @"Error reporting should never crash with malicious input");
+        // Test passes if no crash: Error reporting should never crash with malicious input
     }
 }
 

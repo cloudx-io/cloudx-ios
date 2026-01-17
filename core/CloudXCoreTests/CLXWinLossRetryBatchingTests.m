@@ -252,7 +252,7 @@ static NSString * const kTestAppKey = @"test-app-key-retry";
     
     // The important thing is that the retry mechanism was invoked
     // In a real scenario with a working endpoint, events would be cleared
-    XCTAssertTrue(YES, @"Retry mechanism should be invoked without crashing");
+    // Test passes if no crash: Retry mechanism should be invoked without crashing
 }
 
 /**
@@ -407,7 +407,7 @@ static NSString * const kTestAppKey = @"test-app-key-retry";
     dispatch_group_wait(group, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC));
     
     // Then: Should not crash and should maintain consistency
-    XCTAssertTrue(YES, @"Concurrent retry operations should complete without crashing");
+    // Test passes if no crash: Concurrent retry operations should complete without crashing
 }
 
 #pragma mark - MARK: Database Consistency Tests
@@ -565,7 +565,7 @@ static NSString * const kTestAppKey = @"test-app-key-retry";
     
     // The test mainly ensures no crashes occur during large batch processing
     // Memory leak detection would be handled by Xcode's memory tools
-    XCTAssertTrue(YES, @"Large batch retry should complete without memory issues");
+    // Test passes if no crash: Large batch retry should complete without memory issues
 }
 
 /**

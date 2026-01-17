@@ -177,7 +177,7 @@
     
     // Should still be able to restart
     [self.tracker startWithConfig:[self createEnabledConfig]];
-    XCTAssertTrue(YES, @"Multiple stops should not crash");
+    // Test passes if no crash: Multiple stops should not crash
 }
 
 - (void)testStartStopCycles {
@@ -191,7 +191,7 @@
         [self.tracker stop];
     }
     
-    XCTAssertTrue(YES, @"Multiple start/stop cycles should work");
+    // Test passes if no crash: Multiple start/stop cycles should work
 }
 
 #pragma mark - Thread Safety Tests

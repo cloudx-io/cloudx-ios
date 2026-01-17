@@ -184,11 +184,11 @@
                 // Verify error reporting works - simplified to avoid macro expansion issues
                 NSDictionary *errorContext = @{@"operation": @"network_json_parsing", @"response_index": @(i)};
                 [self.errorReporter reportError:jsonError context:errorContext];
-                XCTAssertTrue(YES, @"Error reporting should handle JSON parsing errors");
+                // Test passes if no crash: Error reporting should handle JSON parsing errors
             } else if (jsonResponse) {
                 // JSON parsed but might be invalid for bid response - simplified approach
                 CLXBidResponse *bidResponse = [CLXBidResponse parseBidResponseFromDictionary:jsonResponse];
-                XCTAssertTrue(YES, @"Bid response parsing should handle any JSON structure");
+                // Test passes if no crash: Bid response parsing should handle any JSON structure
             }
         }
     }
@@ -223,7 +223,7 @@
             // Most error responses should result in 0 bids
         }
         
-        XCTAssertTrue(YES, @"Server error responses should be handled gracefully");
+        // Test passes if no crash: Server error responses should be handled gracefully
     }
 }
 
@@ -263,7 +263,7 @@
         NSArray *allBids = [response allBids];
         XCTAssertEqual(allBids.count, 100, @"Should parse all bids correctly");
         
-        XCTAssertTrue(YES, @"Large bid response parsing should be stable");
+        // Test passes if no crash: Large bid response parsing should be stable
     }
 }
 
@@ -302,7 +302,7 @@
             NSArray *bids = [response allBids];
             XCTAssertEqual(bids.count, 1, @"Should parse bid correctly in concurrent environment");
             
-            XCTAssertTrue(YES, @"Concurrent bid response parsing should be thread-safe");
+            // Test passes if no crash: Concurrent bid response parsing should be thread-safe
             
             @synchronized(self) {
                 completedOperations++;

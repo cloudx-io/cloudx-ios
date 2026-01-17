@@ -219,7 +219,7 @@ XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should handle nil 
         // Then: Should have called the win/loss tracker
         // Note: This will only work if the publisher actually has the required state set up
         // For now, we verify the method exists and can be called
-        XCTAssertTrue(YES, @"fireLosingBidLurls method was called successfully");
+        // Test passes if no crash: fireLosingBidLurls method was called successfully
     } else {
         XCTFail(@"CLXPublisherBanner must have fireLosingBidLurls method!");
     }
@@ -263,7 +263,7 @@ XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should handle nil 
         [fullscreenPublisher performSelector:@selector(fireLosingBidLurls)];
         
         // Then: Should have called the win/loss tracker
-        XCTAssertTrue(YES, @"fireLosingBidLurls method was called successfully on fullscreen publisher");
+        // Test passes if no crash: fireLosingBidLurls method was called successfully on fullscreen publisher
     } else {
         XCTFail(@"CLXPublisherFullscreenAd must have fireLosingBidLurls method - THIS WAS THE ORIGINAL BUG!");
     }
@@ -323,7 +323,7 @@ XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should handle nil 
         [nativePublisher performSelector:@selector(fireLosingBidLurls)];
         
         // Then: Should have called the win/loss tracker
-        XCTAssertTrue(YES, @"fireLosingBidLurls method was called successfully on native publisher");
+        // Test passes if no crash: fireLosingBidLurls method was called successfully on native publisher
         
         // ENHANCED: Verify raw URLs with macros intact (zero client-side hydration)
         if (self.mockTracker.lossNotifications.count > 0) {

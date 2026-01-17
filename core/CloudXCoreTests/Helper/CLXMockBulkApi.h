@@ -46,6 +46,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSError *errorToReturn;
 
 /**
+ * Callback invoked when sendToEndpoint is called. Use with XCTestExpectation
+ * for reliable async test synchronization instead of runUntilDate.
+ */
+@property (nonatomic, copy, nullable) void (^onSendCalled)(void);
+
+/**
  * Clears all captured data (sentEvents, calledEndpoints, sendCallCount)
  */
 - (void)reset;

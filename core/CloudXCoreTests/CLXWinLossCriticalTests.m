@@ -75,6 +75,8 @@
                                 lossReason:nil
                             winnerBidPrice:-1.0];
     
+    // Wait for async operations to complete
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     
     // Then: Should have fired the event
     XCTAssertEqual(self.mockTracker.allPayloadsSent.count, 1, @"Should send LOAD_SUCCESS payload");
@@ -119,7 +121,7 @@
                             winnerBidPrice:5.00];
     
     // Wait for async operations to complete
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     
     // Then: Should have fired the event
     XCTAssertEqual(self.mockTracker.allPayloadsSent.count, 1, @"Should send LOSS payload");
@@ -165,7 +167,7 @@
                             winnerBidPrice:-1.0];
     
     // Wait for async operations to complete
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     
     // Then: Should fire event with correct type in payload
     XCTAssertEqual(self.mockTracker.sendEventCallCount, 1, @"Should call sendEvent once");
@@ -200,7 +202,7 @@
                             winnerBidPrice:-1.0];
     
     // Wait for async operations to complete
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     
     // Then: Should fire event with correct type in payload
     XCTAssertEqual(self.mockTracker.sendEventCallCount, 1, @"Should call sendEvent once");
@@ -233,7 +235,7 @@
                             winnerBidPrice:-1.0];
     
     // Wait for async operations to complete
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     
     XCTAssertEqual(self.mockTracker.allPayloadsSent.count, 1, @"Should send payload");
     NSDictionary *loadSuccessPayload = self.mockTracker.allPayloadsSent.firstObject;
@@ -259,7 +261,7 @@
                             winnerBidPrice:5.0];
     
     // Wait for async operations to complete
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     
     XCTAssertEqual(self.mockTracker.allPayloadsSent.count, 1, @"Should send payload");
     NSDictionary *lossPayload = self.mockTracker.allPayloadsSent.firstObject;
@@ -284,7 +286,7 @@
     
     // Verify legacy methods are removed (compilation will fail if they exist and we try to call them)
     // This is a compile-time check, not a runtime check
-    XCTAssertTrue(YES, @"If this test compiles, legacy APIs are properly removed");
+    // Test passes if no crash: If this test compiles, legacy APIs are properly removed
 }
 
 #pragma mark - P0 CRITICAL: Server Payload Compliance
@@ -309,7 +311,7 @@
                             winnerBidPrice:-1.0];
     
     // Wait for async operations to complete
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     
     // Then: Verify server-required payload structure
     XCTAssertEqual(self.mockTracker.allPayloadsSent.count, 1, @"Should send payload");
@@ -375,8 +377,8 @@
                                 lossReason:nil
                             winnerBidPrice:-1.0];
     
-    // Wait for async operations
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    // Wait for async operations to complete
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     
     // Then: Verify bid object is present and complete
     XCTAssertEqual(self.mockTracker.allPayloadsSent.count, 1, @"Should send payload");
@@ -441,8 +443,8 @@
                                 lossReason:@(CLXLossReasonLostToHigherBid)  // 102
                             winnerBidPrice:5.0];
     
-    // Wait for async operations
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    // Wait for async operations to complete
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     
     // Then: Verify lossReasonCode is numeric
     XCTAssertEqual(self.mockTracker.allPayloadsSent.count, 1, @"Should send payload");
@@ -496,8 +498,8 @@
                                 lossReason:nil
                             winnerBidPrice:-1.0];
     
-    // Wait for async operations
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    // Wait for async operations to complete
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     
     // Then: Verify deviceTypeCode is numeric
     XCTAssertEqual(self.mockTracker.allPayloadsSent.count, 1, @"Should send payload");
@@ -556,8 +558,8 @@
                                 lossReason:@(CLXLossReasonLostToHigherBid)
                             winnerBidPrice:5.0];
     
-    // Wait for async operations
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    // Wait for async operations to complete
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     
     // Then: ALL THREE server-required fields must be present
     XCTAssertEqual(self.mockTracker.allPayloadsSent.count, 1, @"Should send payload");

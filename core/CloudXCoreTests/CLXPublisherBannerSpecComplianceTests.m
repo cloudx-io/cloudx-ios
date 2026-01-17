@@ -102,13 +102,14 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
     return self;
 }
 
-- (nullable id<CLXAdapterBanner>)createBannerWithAdId:(NSString *)adId
-                                                bidId:(NSString *)bidId
-                                                  adm:(NSString *)adm
-                                        adapterExtras:(NSDictionary<NSString *, NSString *> *)adapterExtras
-                                                 burl:(NSString *)burl
-                                       hasClosedButton:(BOOL)hasClosedButton
-                                           viewController:(UIViewController *)viewController {
+- (nullable id<CLXAdapterBanner>)createWithViewController:(UIViewController *)viewController
+                                                        type:(CLXBannerType)type
+                                                        adId:(NSString *)adId
+                                                       bidId:(NSString *)bidId
+                                                         adm:(NSString *)adm
+                                             hasClosedButton:(BOOL)hasClosedButton
+                                                      extras:(NSDictionary<NSString *, NSString *> *)extras
+                                                    delegate:(id<CLXAdapterBannerDelegate>)delegate {
     [self.creationTimes addObject:[NSDate date]];
     
     if (self.shouldReturnNil) {
@@ -120,6 +121,7 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
     PreciseTimingMockAdapter *adapter = [[PreciseTimingMockAdapter alloc] initWithID:adapterID];
     adapter.shouldFailLoad = self.shouldFailLoad;
     adapter.loadDelay = self.loadDelay;
+    adapter.delegate = delegate;
     
     [self.createdAdapters addObject:adapter];
     return adapter;
@@ -260,7 +262,15 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
 
 @implementation SpecMockReportingService
 
-- (void)reportEvent:(NSString *)event withData:(NSDictionary *)data {
+- (void)metricsTrackingWithActionString:(NSString *)actionString {
+    // Mock implementation for spec tests
+}
+
+- (void)rillTrackingWithActionString:(NSString *)actionString campaignId:(NSString *)campaignId encodedString:(NSString *)encodedString {
+    // Mock implementation for spec tests
+}
+
+- (void)geoTrackingWithURLString:(NSString *)fullURL extras:(NSDictionary<NSString *, NSString *> *)extras {
     // Mock implementation for spec tests
 }
 

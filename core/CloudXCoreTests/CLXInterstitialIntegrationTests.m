@@ -197,13 +197,15 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)testCannotShowWhenNotReady {
     // Verifies that attempting to show an interstitial before it's ready is handled gracefully without crashing
     if (self.interstitial) {
+        XCTAssertFalse([self.interstitial isReady], @"Interstitial should not be ready before load");
+        
         UIViewController *testVC = [[UIViewController alloc] init];
         
-        // Try to show when not ready - this should return NO or handle gracefully
+        // Try to show when not ready - should not crash
         [self.interstitial showFromViewController:testVC];
         
-        // The exact behavior depends on implementation, but it shouldn't crash
-        XCTAssertTrue(YES, @"Show attempt on unready interstitial should not crash");
+        // Still should not be ready (show should have been rejected)
+        XCTAssertFalse([self.interstitial isReady], @"Interstitial should still not be ready after failed show");
     } else {
         XCTAssertNil(self.interstitial, @"Cannot test show on nil interstitial");
     }
@@ -216,8 +218,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         [self.interstitial load];
         [self.interstitial load]; // Second call should be ignored or handled gracefully
         
-        // The exact behavior depends on implementation, but it shouldn't crash
-        XCTAssertTrue(YES, @"Multiple load calls should not crash");
+        // If we get here without crash, the test passes - no misleading assertion needed
     } else {
         XCTAssertNil(self.interstitial, @"Cannot test load on nil interstitial");
     }
@@ -239,16 +240,15 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Verifies that attempting operations on a destroyed interstitial fails gracefully without crashing
     if (self.interstitial) {
         [self.interstitial destroy];
+        XCTAssertFalse([self.interstitial isReady], @"Should not be ready after destroy");
         
-        // Try to load after destroy
+        // Try to load after destroy - should not crash
         [self.interstitial load];
+        XCTAssertFalse([self.interstitial isReady], @"Should still not be ready after load on destroyed interstitial");
         
-        // Try to show after destroy
+        // Try to show after destroy - should not crash
         UIViewController *testVC = [[UIViewController alloc] init];
         [self.interstitial showFromViewController:testVC];
-        
-        // Operations should not crash after destroy
-        XCTAssertTrue(YES, @"Operations should not crash after destroy");
     } else {
         XCTAssertNil(self.interstitial, @"Cannot test operations on nil interstitial");
     }
@@ -260,18 +260,21 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Verifies that the interstitial handles load calls gracefully without crashing
     // Since we're using an invalid placement ID, we don't expect any callbacks
     
+    if (!self.interstitial) {
+        return; // Skip if interstitial wasn't created
+    }
+    
     // Start load (this will likely fail silently due to invalid placement)
     [self.interstitial load];
     
     // Wait a short time to ensure no crashes occur
-    XCTestExpectation *expectation = [self expectationWithDescription:@"No crash test"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Load timeout test"];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        // Test passes if we get here without crashing
-        XCTAssertTrue(YES, @"Load call completed without crashing");
         [expectation fulfill];
     });
     
     [self waitForExpectationsWithTimeout:3.0 handler:nil];
+    // Test passes if we reach here without crash
 }
 
 // MARK: - Error Handling Tests
@@ -279,29 +282,38 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)testInvalidPlacementHandling {
     // Verifies that the interstitial handles invalid placement IDs gracefully without crashing
     
+    if (!self.interstitial) {
+        return; // Skip if interstitial wasn't created
+    }
+    
     // Try to load with invalid placement (our test placement should be invalid)
     [self.interstitial load];
     
     // Wait a short time to ensure no crashes occur
-    XCTestExpectation *expectation = [self expectationWithDescription:@"No crash test"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Invalid placement test"];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        // Test passes if we get here without crashing
-        XCTAssertTrue(YES, @"Invalid placement handled without crashing");
         [expectation fulfill];
     });
     
     [self waitForExpectationsWithTimeout:3.0 handler:nil];
+    // Test passes if we reach here without crash
 }
 
 - (void)testMultipleDestroyCallsSafe {
     // Verifies that calling destroy multiple times on the same interstitial is safe and doesn't cause crashes
     
-    [self.interstitial destroy];
-    [self.interstitial destroy]; // Second call should be safe
-    [self.interstitial destroy]; // Third call should be safe
+    if (!self.interstitial) {
+        return; // Skip if interstitial wasn't created
+    }
     
-    // Multiple destroy calls should not crash - we can't access private state, but we can verify no crash
-    XCTAssertTrue(YES, @"Multiple destroy calls should not crash");
+    [self.interstitial destroy];
+    XCTAssertFalse([self.interstitial isReady], @"Should not be ready after first destroy");
+    
+    [self.interstitial destroy]; // Second call should be safe
+    XCTAssertFalse([self.interstitial isReady], @"Should not be ready after second destroy");
+    
+    [self.interstitial destroy]; // Third call should be safe
+    XCTAssertFalse([self.interstitial isReady], @"Should not be ready after third destroy");
 }
 
 // MARK: - Delegate Callback Sequence Tests
@@ -335,10 +347,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     
     // Wait for any callbacks or timeout
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
-        if (error) {
-            // If no callbacks occurred (expected for invalid placement), that's still a valid test
-            XCTAssertTrue(YES, @"No callbacks occurred, which is expected for invalid test placement");
-        }
+        // If no callbacks occurred (expected for invalid placement), that's still a valid test
+        // Test passes regardless - we're verifying thread safety when callbacks DO occur
     }];
     
     // Restore SDK state
@@ -371,9 +381,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     
     // After autoreleasepool, objects should be deallocated if no retain cycles
     // Note: This test might be flaky due to autorelease timing
-    // In practice, we'd use more sophisticated memory testing tools
+    // In practice, we'd use more sophisticated memory testing tools like Instruments
     
-    XCTAssertTrue(YES, @"Memory management test completed without crash");
+    // If we reach here without crash, memory management is working correctly
 }
 
 // MARK: - Property Validation Tests

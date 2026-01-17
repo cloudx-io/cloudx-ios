@@ -150,7 +150,7 @@ NS_ASSUME_NONNULL_END
     return self;
 }
 
-- (void)loadBannerForBidResponse:(CLXBidResponse *)bidResponse adConfiguration:(CLXAdConfiguration *)adConfiguration {
+- (void)load {
     self.loadCalled = YES;
     
     if (self.shouldFailLoad) {
@@ -165,7 +165,7 @@ NS_ASSUME_NONNULL_END
     }
 }
 
-- (void)showBannerFromViewController:(UIViewController *)viewController {
+- (void)showFromViewController:(UIViewController *)viewController {
     self.showCalled = YES;
     if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
         [self.delegate didShowBanner:self];

@@ -26,7 +26,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol AdEventReporting;
+@protocol CLXAdEventReporting;
 
 /**
  * PublisherBanner implements the CloudXBanner protocol and handles banner ad loading,
@@ -120,7 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
                               adFactories:(NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *)adFactories
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
-                         reportingService:(id<AdEventReporting>)reportingService
+                         reportingService:(id<CLXAdEventReporting>)reportingService
                               settings:(CLXSettings *)settings
                                      tmax:(nullable NSNumber *)tmax;
 

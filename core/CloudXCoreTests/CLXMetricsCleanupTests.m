@@ -132,7 +132,7 @@
                      @"Cleanup method should exist and be callable");
     
     // Then - Test passes if no exception is thrown
-    XCTAssertTrue(YES, @"Cleanup method exists and is callable");
+    // Test passes if no crash: Cleanup method exists and is callable
 }
 
 - (void)testSendPendingMetricsWithNoEndpoint {
@@ -147,7 +147,7 @@
                      @"_sendPendingMetrics should not crash when no endpoint is configured");
     
     // Then - Test passes if no exception is thrown
-    XCTAssertTrue(YES, @"_sendPendingMetrics handles no endpoint gracefully");
+    // Test passes if no crash: _sendPendingMetrics handles no endpoint gracefully
 }
 
 - (void)testMetricsTrackerInitialization {

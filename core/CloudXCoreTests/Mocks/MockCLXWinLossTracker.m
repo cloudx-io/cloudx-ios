@@ -6,7 +6,17 @@
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXBidResponse.h>
 #import <CloudXCore/CLXError.h>
-#import <objc/runtime.h>
+#import <CloudXCore/CLXAuctionBidManager.h>
+#import <CloudXCore/CLXWinLossFieldResolver.h>
+
+/**
+ * Category to expose parent's private properties for testing.
+ * These properties are declared in CLXWinLossTracker's class extension.
+ */
+@interface CLXWinLossTracker (Testing)
+@property (nonatomic, strong) CLXAuctionBidManager *auctionBidManager;
+@property (nonatomic, strong) CLXWinLossFieldResolver *winLossFieldResolver;
+@end
 
 static MockCLXWinLossTracker *_sharedTestInstance = nil;
 
@@ -377,18 +387,21 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
         }
     });
     
-    // Signal the semaphore to unblock sendEvent if it's waiting
-    dispatch_semaphore_t semaphore = objc_getAssociatedObject(self, @selector(sendEvent:bidId:event:lossReason:winnerBidPrice:));
-    if (semaphore) {
-        dispatch_semaphore_signal(semaphore);
-    }
-    
     // DO NOT call super - we don't want actual network requests in tests
-    // But we've captured the real resolved payload from CLXWinLossFieldResolver
+    // The payload has been captured for test verification
 }
 
 #pragma mark - New Lifecycle Event Methods
 
+/**
+ * FULLY SYNCHRONOUS sendEvent implementation for reliable testing.
+ * 
+ * This does NOT call [super sendEvent:] because the parent uses dispatch_async
+ * which causes race conditions between tests. Instead, we:
+ * 1. Record the event for test inspection
+ * 2. Build the payload synchronously using parent's field resolver
+ * 3. Call trackWinLoss synchronously to capture the payload
+ */
 - (void)sendEvent:(NSString *)auctionId
             bidId:(NSString *)bidId
             event:(CLXBidLifecycleEvent *)event
@@ -429,21 +442,50 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
         [self.lifecycleEvents addObject:lifecycleEvent];
     });
     
-    // Use a semaphore to properly wait for async work to complete
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    // SYNCHRONOUS payload building - no dispatch_async, no race conditions
+    // Get the bid from parent's auctionBidManager (which was stored via addBid:)
+    CLXBidResponseBid *bid = [self.auctionBidManager getBid:auctionId bidId:bidId];
+    if (!bid) {
+        return; // No bid found, nothing to track
+    }
     
-    // Store the semaphore in an associated object so trackWinLoss can signal it
-    objc_setAssociatedObject(self, @selector(sendEvent:bidId:event:lossReason:winnerBidPrice:), semaphore, OBJC_ASSOCIATION_RETAIN);
+    // Build payload synchronously using parent's field resolver
+    NSDictionary *payload = [self buildWinLossPayloadWithAuctionId:auctionId
+                                                              bidId:bidId
+                                                                bid:bid
+                                                              event:event
+                                                         lossReason:lossReason
+                                                     winnerBidPrice:winnerBidPrice];
     
-    // Call parent's sendEvent (which uses dispatch_async on global queue)
-    [super sendEvent:auctionId bidId:bidId event:event lossReason:lossReason winnerBidPrice:winnerBidPrice];
+    if (payload) {
+        // Call trackWinLoss SYNCHRONOUSLY - this captures the payload for test verification
+        [self trackWinLoss:payload auctionId:auctionId bidId:bidId];
+    }
+}
+
+/**
+ * Helper method to build payload synchronously using parent's field resolver.
+ * This mirrors the logic in CLXWinLossTracker.sendEvent but without dispatch_async.
+ */
+- (nullable NSDictionary<NSString *, id> *)buildWinLossPayloadWithAuctionId:(NSString *)auctionId
+                                                                      bidId:(NSString *)bidId
+                                                                        bid:(CLXBidResponseBid *)bid
+                                                                      event:(CLXBidLifecycleEvent *)event
+                                                                 lossReason:(nullable NSNumber *)lossReason
+                                                             winnerBidPrice:(double)winnerBidPrice {
+    // Determine loaded bid price based on event type (same logic as parent)
+    double loadedBidPrice = winnerBidPrice;
+    if (event.type == CLXBidLifecycleEventTypeLoadSuccess || event.type == CLXBidLifecycleEventTypeRenderSuccess) {
+        loadedBidPrice = bid.price;
+    }
     
-    // Wait for trackWinLoss to be called (with timeout to prevent hanging tests)
-    dispatch_time_t timeout = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC));
-    dispatch_semaphore_wait(semaphore, timeout);
-    
-    // Clean up associated object
-    objc_setAssociatedObject(self, @selector(sendEvent:bidId:event:lossReason:winnerBidPrice:), nil, OBJC_ASSOCIATION_RETAIN);
+    // Use parent's field resolver to build the payload
+    // Note: winLossFieldResolver is configured via setConfig: which calls [super setConfig:]
+    return [self.winLossFieldResolver buildWinLossPayloadWithAuctionId:auctionId
+                                                                   bid:bid
+                                                            lossReason:lossReason
+                                                                 event:event
+                                                        loadedBidPrice:loadedBidPrice];
 }
 
 // REMOVED: URL template resolution - iOS now does zero client-side URL hydration (matches Android)

@@ -463,7 +463,7 @@
     }
     
     // This test primarily checks for memory leaks and crashes
-    XCTAssertTrue(YES, @"Should complete without crashes or excessive memory usage");
+    // Test passes if no crash: Should complete without crashes or excessive memory usage
 }
 
 @end

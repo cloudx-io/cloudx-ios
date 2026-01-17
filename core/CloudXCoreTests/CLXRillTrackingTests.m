@@ -787,7 +787,7 @@ static MockRillEventReporter *sharedInstance = nil;
     
     // Note: This is a placeholder for when SDK metrics tracking is implemented
     // The test structure is ready for the implementation
-    XCTAssertTrue(YES, @"SDK metrics test placeholder");
+    // Test passes if no crash: SDK metrics test placeholder
 }
 
 #pragma mark - Payload Validation Tests
