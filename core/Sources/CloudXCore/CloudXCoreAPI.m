@@ -72,21 +72,21 @@
 // Private category to expose deferred initialization properties for CLXPublisherBanner
 // These properties are declared in CLXPublisherBanner.m's class extension
 @interface CLXPublisherBanner (DeferredInit)
-@property (nonatomic, strong, nullable) NSError *deferredError;
+@property (nonatomic, strong, nullable) CLXError *deferredError;
 @property (nonatomic, copy, nullable) NSString *requestedPlacementName;
 @end
 
 // Private category to expose deferred initialization properties for fullscreen ads
 // These properties are declared in CLXPublisherFullscreenAdBase.m's class extension
 @interface CLXPublisherFullscreenAdBase (DeferredInit)
-@property (nonatomic, strong, nullable) NSError *deferredError;
+@property (nonatomic, strong, nullable) CLXError *deferredError;
 @property (nonatomic, copy, nullable) NSString *requestedPlacementName;
 @end
 
 // Private category to expose deferred initialization properties for native ads
 // These properties are declared in CLXPublisherNative.m's class extension
 @interface CLXPublisherNative (DeferredInit)
-@property (nonatomic, strong, nullable) NSError *deferredError;
+@property (nonatomic, strong, nullable) CLXError *deferredError;
 @property (nonatomic, copy, nullable) NSString *requestedPlacementName;
 @end
 
@@ -728,7 +728,7 @@ static CloudXCore *_sharedInstance = nil;
     [self.logger debug:[NSString stringWithFormat:@"Creating banner for placement: %@", placement]];
     
     // v1.3.0: Defer validation errors to load() - always return non-nil
-    NSError *deferredError = nil;
+    CLXError *deferredError = nil;
     
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
@@ -807,7 +807,7 @@ static CloudXCore *_sharedInstance = nil;
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateMrec];
     
     // v1.3.0: Defer validation errors to load() - always return non-nil
-    NSError *deferredError = nil;
+    CLXError *deferredError = nil;
     
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
@@ -884,7 +884,7 @@ static CloudXCore *_sharedInstance = nil;
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateInterstitial];
     
     // v1.3.0: Defer validation errors to load() - always return non-nil
-    NSError *deferredError = nil;
+    CLXError *deferredError = nil;
     
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
@@ -956,7 +956,7 @@ static CloudXCore *_sharedInstance = nil;
     [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateRewarded];
     
     // v1.3.0: Defer validation errors to load() - always return non-nil
-    NSError *deferredError = nil;
+    CLXError *deferredError = nil;
     
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
@@ -1030,7 +1030,7 @@ static CloudXCore *_sharedInstance = nil;
     [self.logger debug:[NSString stringWithFormat:@"Creating native ad for placement: %@", placement]];
 
     // v1.3.0: Defer validation errors to load() - always return non-nil
-    NSError *deferredError = nil;
+    CLXError *deferredError = nil;
     
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {

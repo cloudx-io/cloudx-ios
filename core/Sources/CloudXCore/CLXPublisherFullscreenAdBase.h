@@ -17,6 +17,7 @@
 @class CLXConfigImpressionModel;
 @class CLXBidAdSourceResponse;
 @class CLXAd;
+@class CLXError;
 @protocol CLXBidTokenSource;
 @protocol CLXAdapterInterstitial;
 @protocol CLXAdapterRewarded;
@@ -107,12 +108,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Notifies the delegate of load failure.
  */
-- (void)notifyLoadFailure:(NSError *)error NS_REQUIRES_SUPER;
+- (void)notifyLoadFailure:(CLXError *)error NS_REQUIRES_SUPER;
 
 /**
  * Notifies the delegate of show failure.
  */
-- (void)notifyShowFailure:(NSError *)error NS_REQUIRES_SUPER;
+- (void)notifyShowFailure:(CLXError *)error NS_REQUIRES_SUPER;
 
 /**
  * Notifies the delegate that the ad was force closed by timeout.

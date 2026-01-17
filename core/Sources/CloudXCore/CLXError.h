@@ -147,6 +147,17 @@ extern NSString * const CLXErrorDomain;
 + (instancetype)errorWithCode:(CLXErrorCode)code description:(NSString *)description underlyingError:(nullable NSError *)underlyingError;
 
 /**
+ * Converts an NSError to CLXError, preserving the original error code and type if already CLXError
+ * @param error The error to convert (may be NSError or CLXError)
+ * @param fallbackCode The CLXErrorCode to use for description fallback (not for the error code itself)
+ * @return A CLXError instance (original if already CLXError, wrapped otherwise), or nil if error is nil
+ * @discussion Use this helper method to safely convert adapter/external errors to CLXError
+ *             while maintaining type consistency. The original error code is preserved.
+ *             Follows DRY principle - centralizes error conversion logic.
+ */
++ (nullable instancetype)errorFromError:(nullable NSError *)error withFallbackCode:(CLXErrorCode)fallbackCode;
+
+/**
  * Creates an error with appropriate CloudX error code based on HTTP status code
  * @param httpStatusCode The HTTP status code from server response
  * @return A new CLXError instance with appropriate error code and description

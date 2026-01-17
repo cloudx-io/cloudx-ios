@@ -132,7 +132,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 @property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
 
 // Deferred error (set during create if validation fails)
-@property (nonatomic, strong, nullable) NSError *deferredError;
+@property (nonatomic, strong, nullable) CLXError *deferredError;
 
 // Requested placement name for deferred initialization
 @property (nonatomic, copy, nullable) NSString *requestedPlacementName;
@@ -504,12 +504,12 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                 format:@"Subclass must override %@", NSStringFromSelector(_cmd)];
 }
 
-- (void)notifyLoadFailure:(NSError *)error {
+- (void)notifyLoadFailure:(CLXError *)error {
     [NSException raise:NSInternalInconsistencyException 
                 format:@"Subclass must override %@", NSStringFromSelector(_cmd)];
 }
 
-- (void)notifyShowFailure:(NSError *)error {
+- (void)notifyShowFailure:(CLXError *)error {
     [NSException raise:NSInternalInconsistencyException 
                 format:@"Subclass must override %@", NSStringFromSelector(_cmd)];
 }
@@ -563,9 +563,11 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         // Transition back to idle
         self.currentState = CLXFullscreenAdStateIDLE;
         
+        CLXError *clxError = [CLXError errorFromError:error withFallbackCode:CLXErrorCodeLoadFailed];
+        
         // Call failure delegate
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self notifyLoadFailure:error];
+            [self notifyLoadFailure:clxError];
         });
         return;
     }
@@ -576,9 +578,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     id adapter = response.createBidAd();
     if (!adapter) {
         [self.logger error:@"Failed to create adapter from bid response"];
-        [self handleBidResponse:nil error:[NSError errorWithDomain:@"CLXErrorDomain" 
-                                                              code:CLXErrorCodeLoadFailed 
-                                                          userInfo:@{NSLocalizedDescriptionKey: @"Failed to create adapter"}]];
+        [self handleBidResponse:nil error:[CLXError errorWithCode:CLXErrorCodeLoadFailed 
+                                                      description:@"Failed to create adapter"]];
         return;
     }
     

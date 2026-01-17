@@ -29,6 +29,25 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
     return [self errorWithCode:code userInfo:userInfo];
 }
 
++ (instancetype)errorFromError:(NSError *)error withFallbackCode:(CLXErrorCode)fallbackCode {
+    if (!error) {
+        return nil;
+    }
+    
+    // If already a CLXError, return as-is (no wrapping needed)
+    if ([error isKindOfClass:[CLXError class]]) {
+        return (CLXError *)error;
+    }
+    
+    // Wrap NSError in CLXError, preserving the original error code and description
+    // Use NSError's designated initializer to avoid casting NSInteger to CLXErrorCode
+    NSString *description = error.localizedDescription ?: [self defaultDescriptionForCode:fallbackCode];
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:description forKey:NSLocalizedDescriptionKey];
+    userInfo[NSUnderlyingErrorKey] = error;
+    
+    return [[CLXError alloc] initWithDomain:CLXErrorDomain code:error.code userInfo:userInfo];
+}
+
 + (instancetype)errorWithHTTPStatusCode:(NSInteger)httpStatusCode {
     return [self errorWithHTTPStatusCode:httpStatusCode serverMessage:nil];
 }

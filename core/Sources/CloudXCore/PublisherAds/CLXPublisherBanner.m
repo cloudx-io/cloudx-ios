@@ -110,7 +110,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
 
 // Deferred error (set during create if validation fails)
-@property (nonatomic, strong, nullable) NSError *deferredError;
+@property (nonatomic, strong, nullable) CLXError *deferredError;
 
 // Injected factories for testability (falls back to CloudXCore if empty)
 @property (nonatomic, strong) NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *adFactories;
@@ -752,11 +752,9 @@ NS_ASSUME_NONNULL_BEGIN
     self.isLoading = NO;
     
     // Convert internal BidAdSource errors to public CLXError domain
-    NSError *delegateError = error;
-    if (error && [error.domain isEqualToString:@"CLXBidAdSource"]) {
-        // Preserve both error code and detailed message
-        NSString *message = error.clx_fullErrorMessage ?: @"Ad failed to load";
-        delegateError = [CLXError errorWithCode:error.code description:message];
+    CLXError *delegateError = [CLXError errorFromError:error withFallbackCode:CLXErrorCodeLoadFailed];
+    if (!delegateError) {
+        delegateError = [CLXError errorWithCode:CLXErrorCodeLoadFailed];
     }
     
     // Set bypass flag to allow retry even when banner isn't visible

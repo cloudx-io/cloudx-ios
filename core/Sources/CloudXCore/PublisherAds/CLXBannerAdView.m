@@ -16,6 +16,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBidAdSource.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import <CloudXCore/CLXError.h>
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXDebugOverlayManager.h>
 #import <CloudXCore/CLXDebugErrorView.h>
@@ -365,7 +366,12 @@ static void initializeLogger() {
 
 - (void)failToLoadBanner:(id<CLXAdapterBanner>)banner error:(NSError *)error {
     if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
-        [self.delegate didFailToLoadAd:self.placement error:error];
+        // Ensure we always have a valid CLXError for delegate (fallback if error is nil)
+        CLXError *clxError = [CLXError errorFromError:error withFallbackCode:CLXErrorCodeLoadFailed];
+        if (!clxError) {
+            clxError = [CLXError errorWithCode:CLXErrorCodeLoadFailed];
+        }
+        [self.delegate didFailToLoadAd:self.placement error:clxError];
     }
 }
 
@@ -477,7 +483,12 @@ static void initializeLogger() {
     }
 
     if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
-        [self.delegate didFailToLoadAd:placementName error:error];
+        // Ensure we always have a valid CLXError for delegate (fallback if error is nil)
+        CLXError *clxError = [CLXError errorFromError:error withFallbackCode:CLXErrorCodeLoadFailed];
+        if (!clxError) {
+            clxError = [CLXError errorWithCode:CLXErrorCodeLoadFailed];
+        }
+        [self.delegate didFailToLoadAd:placementName error:clxError];
     }
 }
 

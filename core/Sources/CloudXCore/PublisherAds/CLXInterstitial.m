@@ -109,7 +109,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)notifyLoadFailure:(NSError *)error {
+- (void)notifyLoadFailure:(CLXError *)error {
     [[CLXDebugOverlayManager shared] flashError];
     if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
         [self.logger logDelegateError:@"❌ Interstitial didFailToLoadAd" error:error];
@@ -117,7 +117,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)notifyShowFailure:(NSError *)error {
+- (void)notifyShowFailure:(CLXError *)error {
     [[CLXDebugOverlayManager shared] flashError];
     if ([self.delegate respondsToSelector:@selector(didFailToDisplayAd:error:)]) {
         [self.logger logDelegateError:@"❌ Interstitial didFailToDisplayAd" error:error];
@@ -156,8 +156,10 @@ NS_ASSUME_NONNULL_BEGIN
     self.currentAdapter = nil;
     [self transitionToIdleState];
     
+    CLXError *clxError = [CLXError errorFromError:error withFallbackCode:CLXErrorCodeLoadFailed];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self notifyLoadFailure:error];
+        [self notifyLoadFailure:clxError];
     });
 }
 
@@ -196,8 +198,10 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)didFailToShowWithInterstitial:(id<CLXAdapterInterstitial>)interstitial error:(NSError *)error {
+    CLXError *clxError = [CLXError errorFromError:error withFallbackCode:CLXErrorCodeShowFailed];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self notifyShowFailure:error];
+        [self notifyShowFailure:clxError];
     });
 }
 

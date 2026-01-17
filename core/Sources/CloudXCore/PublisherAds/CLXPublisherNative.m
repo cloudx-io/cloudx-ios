@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *requestedPlacementName;
 
 // Deferred error (set during create if validation fails)
-@property (nonatomic, strong, nullable) NSError *deferredError;
+@property (nonatomic, strong, nullable) CLXError *deferredError;
 
 // Store bid token sources for deferred initialization
 @property (nonatomic, strong) NSDictionary<NSString *, id<CLXBidTokenSource>> *bidTokenSources;
@@ -648,10 +648,10 @@ NS_ASSUME_NONNULL_BEGIN
     
     // Call both old and new delegate methods for backward compatibility
     // Preserve the original error to maintain detailed server messages
-    NSError *delegateError = error;
+    // Ensure we always have a valid CLXError for delegate (fallback if error is nil)
+    CLXError *delegateError = [CLXError errorFromError:error withFallbackCode:CLXErrorCodeLoadFailed];
     if (!delegateError) {
-        // Only create a default error if none was provided
-        delegateError = [CLXError errorWithCode:CLXErrorCodeNoFill];
+        delegateError = [CLXError errorWithCode:CLXErrorCodeLoadFailed];
     }
     
     if ([self.delegate respondsToSelector:@selector(failToLoadWithNative:error:)]) {

@@ -349,7 +349,10 @@ static const NSTimeInterval kTestTimeout = 2.0;
     [self.banner failToLoadBanner:nil error:testError];
     
     XCTAssertTrue(self.mockDelegate.failToLoadCalled, @"Delegate should be notified of failure");
-    XCTAssertEqual(self.mockDelegate.lastError, testError, @"Error should be passed to delegate");
+    // Error is wrapped in CLXError - check code and underlying error are preserved
+    XCTAssertTrue([self.mockDelegate.lastError isKindOfClass:[CLXError class]], @"Error should be CLXError");
+    XCTAssertEqual(self.mockDelegate.lastError.code, testError.code, @"Error code should be preserved");
+    XCTAssertEqualObjects(self.mockDelegate.lastError.userInfo[NSUnderlyingErrorKey], testError, @"Underlying error should be original");
     XCTAssertNil(self.banner.bannerOnScreen, @"No banner should be on screen after failure");
     XCTAssertNil(self.banner.prefetchedBanner, @"No banner should be prefetched after failure");
 }

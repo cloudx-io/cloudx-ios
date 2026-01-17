@@ -26,14 +26,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Find available iPhone simulator
+        id: simulator
+        run: |
+          # Get the first available iPhone (not iPad, not SE) simulator
+          SIMULATOR=$(xcrun simctl list devices available | grep "iPhone [0-9]" | grep -v "SE" | head -1 | sed 's/^[[:space:]]*//' | cut -d'(' -f1 | sed 's/[[:space:]]*$//')
+          echo "Found simulator: $SIMULATOR"
+          echo "name=$SIMULATOR" >> $GITHUB_OUTPUT
+
       - name: Run unit tests
         working-directory: core
         run: |
           set -o pipefail
+          echo "Using simulator: ${{ steps.simulator.outputs.name }}"
           xcodebuild test \
             -project CloudXCore.xcodeproj \
             -scheme CloudXCore \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -destination 'platform=iOS Simulator,name=${{ steps.simulator.outputs.name }}' \
             -resultBundlePath TestResults.xcresult \
             -quiet \
             CODE_SIGNING_ALLOWED=NO

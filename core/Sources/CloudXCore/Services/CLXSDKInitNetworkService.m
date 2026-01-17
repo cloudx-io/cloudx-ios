@@ -350,15 +350,15 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
             placement.id = placementDict[@"id"];
             placement.name = placementDict[@"name"];
             
-            // Convert string type to enum
+            // Convert string type to enum (case-insensitive comparison for server compatibility)
             NSString *typeString = placementDict[@"type"];
-            if ([typeString isEqualToString:@"banner"]) {
+            if ([typeString caseInsensitiveCompare:@"banner"] == NSOrderedSame) {
                 placement.type = SDKConfigAdTypeBanner;
-            } else if ([typeString isEqualToString:@"mrec"]) {
+            } else if ([typeString caseInsensitiveCompare:@"mrec"] == NSOrderedSame) {
                 placement.type = SDKConfigAdTypeMrec;
-            } else if ([typeString isEqualToString:@"interstitial"]) {
+            } else if ([typeString caseInsensitiveCompare:@"interstitial"] == NSOrderedSame) {
                 placement.type = SDKConfigAdTypeInterstitial;
-            } else if ([typeString isEqualToString:@"rewarded"]) {
+            } else if ([typeString caseInsensitiveCompare:@"rewarded"] == NSOrderedSame) {
                 placement.type = SDKConfigAdTypeRewarded;
             } else {
                 placement.type = SDKConfigAdTypeUnknown;
