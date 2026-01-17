@@ -29,6 +29,7 @@
 
 @property (nonatomic, copy) NSString *bidID;
 @property (nonatomic, copy, nullable) NSString *placementID;
+@property (nonatomic, copy, nullable) NSString *placementName;
 @property (nonatomic, copy) NSString *bidPayload;
 @property (nonatomic, strong) UIViewController *viewController;
 @property (nonatomic, assign) CLXBannerType type;
@@ -41,6 +42,7 @@
 
 - (instancetype)initWithBidPayload:(NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
+                     placementName:(nullable NSString *)placementName
                             bidID:(NSString *)bidID
                              type:(CLXBannerType)type
                     viewController:(UIViewController *)viewController
@@ -50,6 +52,7 @@
     if (self) {
         _bidPayload = bidPayload;
         _placementID = placementID;
+        _placementName = placementName;
         _bidID = bidID;
         _type = type;
         _viewController = viewController;
@@ -60,8 +63,8 @@
         // Parse template from bid payload to ensure exact size match with Meta's bid
         _deferredTemplate = [self parseTemplateFromBidPayload:bidPayload];
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %@, BidID: %@, Type: %ld, Template: %ld, HasBidPayload: %@", 
-                           placementID ?: @"(nil)", bidID, (long)type, (long)_deferredTemplate, bidPayload ? @"YES" : @"NO"]];
+        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@ (%@), BidID: %@, Type: %ld, Template: %ld, HasBidPayload: %@", 
+                           placementName ?: @"(unknown)", placementID ?: @"(nil)", bidID, (long)type, (long)_deferredTemplate, bidPayload ? @"YES" : @"NO"]];
         
         // NOTE: FBAdView creation is deferred to load() to ensure it happens on main thread.
         // This is because init may be called from a background thread (network callback).
@@ -84,8 +87,12 @@
 - (void)load {
     // Validate placement ID at load time (deferred validation pattern)
     if (!_placementID || _placementID.length == 0) {
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                     description:@"[Meta] Invalid or missing placement ID for banner ad"];
+        NSString *placementContext = _placementName ? [NSString stringWithFormat:@" for placement '%@'", _placementName] : @"";
+        NSString *errorMessage = [NSString stringWithFormat:@"Meta placement ID is empty%@. "
+                                  "Make sure to configure the Meta placement ID in your CloudX dashboard under Ad Unit Settings > Meta.",
+                                  placementContext];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
+                                     description:errorMessage];
         [self.logger error:error.localizedDescription];
         
         if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
@@ -94,8 +101,8 @@
         return;
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"Loading ad - Placement: %@, HasBidPayload: %@", 
-                       _placementID, self.bidPayload ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"Loading ad - Placement: %@ (%@), HasBidPayload: %@", 
+                       _placementName ?: @"(unknown)", _placementID, self.bidPayload ? @"YES" : @"NO"]];
     
     // FBAdView is a UIView and MUST be created on main thread
     __weak typeof(self) weakSelf = self;

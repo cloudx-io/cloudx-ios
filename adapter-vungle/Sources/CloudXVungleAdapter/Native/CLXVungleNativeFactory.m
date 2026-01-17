@@ -35,11 +35,14 @@
 
 #pragma mark - CLXAdapterNativeFactory Protocol
 
-- (nullable id<CLXAdapterNative>)createWithAdId:(NSString *)adId
-                                          bidId:(NSString *)bidId
-                                            adm:(NSString *)adm
-                                         extras:(NSDictionary<NSString *, NSString *> *)extras
-                                       delegate:(id<CLXAdapterNativeDelegate>)delegate {
+- (nullable id<CLXAdapterNative>)createWithViewController:(UIViewController *)viewController
+                                                       type:(CLXNativeTemplate)type
+                                                       adId:(NSString *)adId
+                                                      bidId:(NSString *)bidId
+                                                        adm:(NSString *)adm
+                                                     extras:(NSDictionary<NSString *, NSString *> *)extras
+                                              placementName:(NSString *)placementName
+                                                   delegate:(id<CLXAdapterNativeDelegate>)delegate {
     
     CLXLogger *logger = [[self class] logger];
     
@@ -58,8 +61,8 @@
     
     // Resolve placement ID from extras or fallback to adId
     NSString *placementId = [CLXVungleBaseFactory resolveVunglePlacementID:extras
-                                                                fallbackAdId:adId
-                                                                      logger:logger];
+                                                               fallbackAdId:adId
+                                                                     logger:logger];
     
     if (!placementId || placementId.length == 0) {
         [logger error:@"No valid placement ID - validation will be deferred to load()"];
@@ -74,13 +77,14 @@
                                                               placementId:placementId
                                                                    extras:extras];
     
-    [logger info:[NSString stringWithFormat:@"Creating Vungle native adapter - Placement: %@, BidID: %@, HasBidPayload: %@",
-                    placementId, bidId, bidPayload ? @"YES" : @"NO"]
+    [logger info:[NSString stringWithFormat:@"Creating Vungle native adapter - Placement: %@ (%@), BidID: %@, HasBidPayload: %@",
+                    placementName ?: @"(unknown)", placementId, bidId, bidPayload ? @"YES" : @"NO"]
            ];
     
     // ALWAYS create and return adapter
     CLXVungleNative *adapter = [[CLXVungleNative alloc] initWithBidPayload:bidPayload
                                                                placementID:placementId  // May be nil
+                                                             placementName:placementName  // For error messages
                                                                      bidID:bidId
                                                                   delegate:delegate];
     

@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///   - adm: ad markup with data for rendering
 ///   - hasClosedButton: whether the banner has a close button
 ///   - extras: adapters extra info
+///   - placementName: CloudX placement name for error messaging (may be nil for legacy callers)
 ///   - delegate: delegate for the adapter
 /// - Returns: CloudXAdapterBanner instance
 - (nullable id<CLXAdapterBanner>)createWithViewController:(UIViewController *)viewController
@@ -35,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          adm:(NSString *)adm
                                              hasClosedButton:(BOOL)hasClosedButton
                                                       extras:(NSDictionary<NSString *, NSString *> *)extras
+                                               placementName:(nullable NSString *)placementName
                                                     delegate:(id<CLXAdapterBannerDelegate>)delegate;
 
 @end

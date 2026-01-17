@@ -42,6 +42,7 @@
                                                       adm:(NSString *)adm
                                           hasClosedButton:(BOOL)hasClosedButton
                                                    extras:(NSDictionary<NSString *, NSString *> *)extras
+                                            placementName:(NSString *)placementName
                                                  delegate:(id<CLXAdapterBannerDelegate>)delegate {
     
     CLXLogger *logger = [[self class] logger];
@@ -74,8 +75,8 @@
     
     // Resolve placement ID from extras or fallback to adId
     NSString *placementId = [CLXVungleBaseFactory resolveVunglePlacementID:extras
-                                                                fallbackAdId:adId
-                                                                      logger:logger];
+                                                               fallbackAdId:adId
+                                                                     logger:logger];
     
     // Log warning if placement ID is invalid (validation deferred to load())
     if (!placementId || placementId.length == 0) {
@@ -91,8 +92,8 @@
                                                               placementId:placementId
                                                                    extras:extras];
     
-    [logger info:[NSString stringWithFormat:@"Creating Vungle banner adapter - Placement: %@, BidID: %@, Type: %ld, HasBidPayload: %@",
-                    placementId, bidId, (long)type, bidPayload ? @"YES" : @"NO"]
+    [logger info:[NSString stringWithFormat:@"Creating Vungle banner adapter - Placement: %@ (%@), BidID: %@, Type: %ld, HasBidPayload: %@",
+                    placementName ?: @"(unknown)", placementId, bidId, (long)type, bidPayload ? @"YES" : @"NO"]
            ];
     
     // Log close button parameter (note: Vungle banners don't typically support close buttons)
@@ -104,6 +105,7 @@
     // Validation errors will be reported in load() via delegate callback
     CLXVungleBanner *adapter = [[CLXVungleBanner alloc] initWithBidPayload:bidPayload
                                                                placementID:placementId  // May be nil
+                                                             placementName:placementName  // For error messages
                                                                      bidID:bidId
                                                                       type:type
                                                             viewController:viewController  // May be nil

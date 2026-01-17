@@ -53,6 +53,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) long long placementID;
 
 /**
+ * CloudX placement name for error messages
+ */
+@property (nonatomic, copy, readonly, nullable) NSString *placementName;
+
+/**
  * Bid payload for programmatic ads (nil for waterfall)
  */
 @property (nonatomic, strong, nullable) NSData *bidPayload;
@@ -66,12 +71,15 @@ NS_ASSUME_NONNULL_BEGIN
  * Initializes a new InMobi interstitial adapter
  * @param bidPayload The bid payload for programmatic ads (nil for waterfall)
  * @param placementID The InMobi placement ID
+ * @param placementName The CloudX placement name for error messages (nullable)
  * @param bidID The CloudX bid ID
  * @param delegate The CloudX adapter delegate
  * @return Initialized interstitial adapter
+ * @since 1.4.0 placementName parameter added for better error messages
  */
 - (instancetype)initWithBidPayload:(nullable NSData *)bidPayload
                        placementID:(long long)placementID
+                     placementName:(nullable NSString *)placementName
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterInterstitialDelegate>)delegate;
 

@@ -149,74 +149,106 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
     switch (code) {
         // INITIALIZATION ERRORS (100-199)
         case CLXErrorCodeNotInitialized:
-            return @"SDK not initialized";
+            return @"SDK not initialized. Please initialize the SDK before using it.";
         case CLXErrorCodeInitializationInProgress:
-            return @"SDK initialization already in progress";
+            return @"SDK initialization is already in progress.";
         case CLXErrorCodeNoAdaptersFound:
-            return @"No ad network adapters found";
+            return @"No ad network adapters found. Please ensure adapters are properly integrated.";
         case CLXErrorCodeInitializationTimeout:
-            return @"SDK initialization timeout";
+            return @"SDK initialization timed out.";
         case CLXErrorCodeInvalidAppKey:
-            return @"Invalid app key provided";
+            return @"Invalid app key provided. Please check your app key.";
         case CLXErrorCodeSDKDisabled:
-            return @"SDK disabled by kill switch";
+            return @"SDK is disabled by server configuration.";
             
         // NETWORK ERRORS (200-299)
         case CLXErrorCodeNetworkError:
-            return @"Network connectivity error";
+            return @"Network error occurred. Please check your internet connection.";
         case CLXErrorCodeNetworkTimeout:
-            return @"Network request timeout";
+            return @"Network request timed out.";
         case CLXErrorCodeInvalidResponse:
-            return @"Invalid server response";
+            return @"Invalid response received from server.";
         case CLXErrorCodeServerError:
-            return @"Server error occurred";
+            return @"Server error occurred.";
             
         // AD REQUEST/LOADING ERRORS (300-399)
         case CLXErrorCodeNoFill:
-            return @"No ad fill available";
+            return @"No ad available to display.";
         case CLXErrorCodeInvalidRequest:
-            return @"Invalid ad request parameters";
+            return @"Invalid ad request parameters.";
         case CLXErrorCodeInvalidPlacement:
-            return @"Invalid placement ID";
+            return @"Invalid placement ID. Please check your placement configuration.";
         case CLXErrorCodeLoadTimeout:
-            return @"Ad loading timeout";
+            return @"Ad loading timed out.";
         case CLXErrorCodeLoadFailed:
-            return @"Ad failed to load";
+            return @"Failed to load ad.";
         case CLXErrorCodeInvalidAd:
-            return @"Invalid or corrupted ad content";
+            return @"Ad content is invalid or corrupted.";
         case CLXErrorCodeTooManyRequests:
-            return @"Too many ad requests - rate limited";
+            return @"Too many ad requests. Please reduce request frequency.";
         case CLXErrorCodeRequestCancelled:
-            return @"Ad request was cancelled";
+            return @"Ad request was cancelled.";
         case CLXErrorCodeAdsDisabled:
-            return @"Ads disabled by kill switch";
+            return @"Ads are disabled by server configuration.";
             
         // AD DISPLAY/SHOW ERRORS (400-499)
         case CLXErrorCodeAdNotReady:
-            return @"Ad is not ready to be shown";
+            return @"Ad is not ready to be displayed.";
         case CLXErrorCodeAdAlreadyShown:
-            return @"Ad has already been shown";
+            return @"Ad has already been displayed.";
         case CLXErrorCodeAdExpired:
-            return @"Ad has expired";
+            return @"Ad has expired and cannot be displayed.";
         case CLXErrorCodeInvalidViewController:
-            return @"Invalid view controller for ad display";
+            return @"Invalid view controller provided for ad display.";
         case CLXErrorCodeShowFailed:
-            return @"Ad failed to show";
+            return @"Failed to display ad.";
             
         // CONFIGURATION/SETUP ERRORS (500-599)
         case CLXErrorCodeInvalidAdUnit:
-            return @"Invalid ad unit configuration";
+            return @"Invalid ad unit configuration.";
         case CLXErrorCodePermissionDenied:
-            return @"Required permissions not granted";
+            return @"Required permissions not granted.";
         case CLXErrorCodeUnsupportedAdFormat:
-            return @"Ad format not supported";
+            return @"Ad format not supported.";
         case CLXErrorCodeInvalidBannerView:
-            return @"Invalid banner view";
+            return @"Banner view is nil or invalid.";
         case CLXErrorCodeInvalidNativeView:
-            return @"Invalid native view";
+            return @"Native view is nil or invalid.";
+        case CLXErrorCodeNoAdaptersRegistered:
+            return @"No ad network adapters registered. Please include adapter frameworks in your project.";
+        case CLXErrorCodeInvalidConfiguration:
+            return @"Invalid adapter configuration.";
+        case CLXErrorCodeInvalidAdUnitID:
+            return @"Invalid ad unit ID provided.";
+        case CLXErrorCodeInvalidBidResponse:
+            return @"Invalid bid response received.";
+            
+        // ADAPTER ERRORS (600-699)
+        case CLXErrorCodeAdapterUnexpectedError:
+            return @"Ad network adapter encountered an unexpected error.";
+        case CLXErrorCodeAdapterInitializationError:
+            return @"Ad network adapter initialization failed.";
+        case CLXErrorCodeAdapterInvalidServerExtras:
+            return @"Ad network adapter received invalid server parameters.";
+        case CLXErrorCodeAdapterNoConnection:
+            return @"Ad network adapter failed to establish connection with ad server.";
+        case CLXErrorCodeAdapterNoFill:
+            return @"Ad network adapter could not fill the ad request - no inventory available.";
+        case CLXErrorCodeAdapterServerError:
+            return @"Ad network server returned an error response.";
+        case CLXErrorCodeAdapterTimeout:
+            return @"Ad network adapter request timed out.";
+        case CLXErrorCodeAdapterInvalidLoadState:
+            return @"Ad network adapter is in an invalid state for loading ads.";
+        case CLXErrorCodeAdapterInvalidConfiguration:
+            return @"Ad network adapter has invalid or missing configuration.";
+            
+        // GENERAL ERRORS (700-799)
+        case CLXErrorCodeUnexpectedError:
+            return @"An unexpected error occurred.";
             
         default:
-            return @"Unknown error occurred";
+            return @"An unknown error occurred.";
     }
 }
 

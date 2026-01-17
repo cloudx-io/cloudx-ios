@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly) NSString *network;
 @property (nonatomic, strong, readonly) NSString *bidID;
 @property (nonatomic, strong, readonly) NSString *placementID;
+@property (nonatomic, copy, readonly, nullable) NSString *placementName;
 @property (nonatomic, strong, readonly) NSString *unitID;
 @property (nonatomic, copy, nullable) NSString *bidPayload;
 @property (nonatomic, copy, nullable) NSString *creativeID;
@@ -27,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID
+                     placementName:(nullable NSString *)placementName
                             unitID:(NSString *)unitID
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterInterstitialDelegate>)delegate;

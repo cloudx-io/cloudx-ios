@@ -59,6 +59,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly) NSString *placementID;
 
 /**
+ * CloudX placement name for error messages
+ */
+@property (nonatomic, copy, readonly, nullable) NSString *placementName;
+
+/**
  * Bid payload for programmatic ads (nil for waterfall)
  */
 @property (nonatomic, copy, nullable) NSString *bidPayload;
@@ -72,15 +77,18 @@ NS_ASSUME_NONNULL_BEGIN
  * Initializes a new Vungle rewarded adapter
  * @param bidPayload The bid payload for programmatic ads (nil for waterfall)
  * @param placementID The Vungle placement ID (nullable - validation deferred to load())
+ * @param placementName The CloudX placement name for error messages (nullable)
  * @param bidID The CloudX bid ID
  * @param delegate The CloudX adapter delegate (nullable - validation deferred to load())
  * @return Initialized rewarded adapter
  * @discussion As of v1.3.0, placementID and delegate can be nil. Validation occurs in load()
  *             and errors are reported via delegate callback.
  * @since 1.3.0 placementID and delegate parameters are now nullable
+ * @since 1.4.0 placementName parameter added for better error messages
  */
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
+                     placementName:(nullable NSString *)placementName
                              bidID:(NSString *)bidID
                           delegate:(nullable id<CLXAdapterRewardedDelegate>)delegate;
 

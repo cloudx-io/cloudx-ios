@@ -33,6 +33,7 @@
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, assign) CLXBannerAdSize adSize;
+@property (nonatomic, copy, nullable) NSString *placementName;
 
 @end
 
@@ -40,6 +41,7 @@
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
+                     placementName:(nullable NSString *)placementName
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterBannerDelegate>)delegate
                             adSize:(CLXBannerAdSize)adSize {
@@ -47,14 +49,15 @@
     if (self) {
         _bidPayload = [bidPayload copy];
         _placementID = [placementID copy];  // Now nullable - validation in load()
+        _placementName = [placementName copy];  // For error messages
         _bidID = [bidID copy];
         _delegate = delegate;
         _adSize = adSize;
         _sdkVersion = [CLXMolocoInitializer sdkVersion];
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMolocoBanner"];
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %@, BidID: %@, Size: %dx%d", 
-                           placementID ?: @"(nil)", bidID, (int)adSize.width, (int)adSize.height]];
+        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@ (%@), BidID: %@, Size: %dx%d", 
+                           placementName ?: @"(unknown)", placementID ?: @"(nil)", bidID, (int)adSize.width, (int)adSize.height]];
         
         // Only create banner view if placementID is valid
         // Otherwise defer to load() for validation
@@ -78,8 +81,12 @@
 - (void)load {
     // Validate placement ID at load time (deferred validation pattern)
     if (!_placementID || _placementID.length == 0) {
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                     description:@"[Moloco] Invalid or missing placement ID for banner ad"];
+        NSString *placementContext = _placementName ? [NSString stringWithFormat:@" for placement '%@'", _placementName] : @"";
+        NSString *errorMessage = [NSString stringWithFormat:@"Moloco placement ID is empty%@. "
+                                  "Make sure to configure the Moloco placement ID in your CloudX dashboard under Ad Unit Settings > Moloco.",
+                                  placementContext];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
+                                     description:errorMessage];
         [self.logger error:error.localizedDescription];
         
         if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {

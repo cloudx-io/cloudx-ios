@@ -18,10 +18,11 @@
                                                 bidId:(NSString *)bidId
                                                   adm:(NSString *)adm
                                                extras:(NSDictionary<NSString *, NSString *> *)extras
+                                        placementName:(NSString *)placementName
                                              delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
     
-    [self.logger debug:[NSString stringWithFormat:@"[InterstitialFactory] Creating - adId:'%@', bidId:'%@'",
-                        adId ?: @"(nil)", bidId ?: @"(nil)"]];
+    [self.logger debug:[NSString stringWithFormat:@"[InterstitialFactory] Creating - Placement: %@ (%@), bidId:'%@'",
+                        placementName ?: @"(unknown)", adId ?: @"(nil)", bidId ?: @"(nil)"]];
     
     // Extract IDs using shared utility
     CLXMintegralIDResult *ids = [CLXMintegralIDExtractor extractIDsFromExtras:extras
@@ -37,13 +38,14 @@
     // Use adm as bidPayload (nil-safe: messaging nil returns 0)
     NSString *bidPayload = adm.length > 0 ? adm : nil;
     
-    [self.logger debug:[NSString stringWithFormat:@"[InterstitialFactory] Creating Mintegral interstitial - placementID:%@, unitID:%@, hasBidPayload:%@",
-                        ids.placementID, ids.unitID, bidPayload ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"[InterstitialFactory] Creating Mintegral interstitial - Placement: %@, placementID:%@, unitID:%@, hasBidPayload:%@",
+                        placementName ?: @"(unknown)", ids.placementID, ids.unitID, bidPayload ? @"YES" : @"NO"]];
     
     // Always create and return adapter (even with invalid parameters)
     // Validation errors will be reported in load() via delegate callback
     CLXMintegralInterstitial *interstitial = [[CLXMintegralInterstitial alloc] initWithBidPayload:bidPayload
                                                                                       placementID:ids.placementID
+                                                                                    placementName:placementName
                                                                                            unitID:ids.unitID
                                                                                             bidID:ids.bidID ?: @""
                                                                                          delegate:delegate];

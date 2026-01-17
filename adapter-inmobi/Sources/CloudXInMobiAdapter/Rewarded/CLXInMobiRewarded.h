@@ -20,11 +20,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly) NSString *network;
 @property (nonatomic, strong, readonly) NSString *bidID;
 @property (nonatomic, assign, readonly) long long placementID;
+@property (nonatomic, copy, readonly, nullable) NSString *placementName;
 @property (nonatomic, strong, nullable) NSData *bidPayload;
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
 
 - (instancetype)initWithBidPayload:(nullable NSData *)bidPayload
                        placementID:(long long)placementID
+                     placementName:(nullable NSString *)placementName
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterRewardedDelegate>)delegate;
 

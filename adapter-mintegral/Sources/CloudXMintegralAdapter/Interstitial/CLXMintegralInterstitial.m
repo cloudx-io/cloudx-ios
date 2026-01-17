@@ -8,12 +8,14 @@
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, assign) BOOL isDestroyed;
+@property (nonatomic, copy, nullable) NSString *placementName;
 @end
 
 @implementation CLXMintegralInterstitial
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID
+                     placementName:(nullable NSString *)placementName
                             unitID:(NSString *)unitID
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
@@ -21,6 +23,7 @@
     if (self) {
         _bidPayload = [bidPayload copy];
         _placementID = [placementID copy];
+        _placementName = [placementName copy];
         _unitID = [unitID copy];
         _bidID = [bidID copy];
         _delegate = delegate;
@@ -30,7 +33,7 @@
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMintegralInterstitial"];
         _isDestroyed = NO;
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID:%@, UnitID:%@", placementID, unitID]];
+        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@, PlacementID:%@, UnitID:%@", placementName ?: @"(unknown)", placementID, unitID]];
     }
     return self;
 }
@@ -46,8 +49,24 @@
         return;
     }
     
+    // Validate unitID at load time
+    if (!_unitID || _unitID.length == 0) {
+        NSString *placementContext = _placementName ? [NSString stringWithFormat:@" for placement '%@'", _placementName] : @"";
+        NSString *errorMessage = [NSString stringWithFormat:@"Mintegral unit ID is empty%@. "
+                                  "Make sure to configure the Mintegral unit ID in your CloudX dashboard under Ad Unit Settings > Mintegral.",
+                                  placementContext];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
+                                     description:errorMessage];
+        [self.logger error:error.localizedDescription];
+        
+        if ([self.delegate respondsToSelector:@selector(didFailToLoadWithInterstitial:error:)]) {
+            [self.delegate didFailToLoadWithInterstitial:self error:error];
+        }
+        return;
+    }
+    
     _isLoading = YES;
-    [self.logger debug:[NSString stringWithFormat:@"Loading interstitial - PlacementID:%@, UnitID:%@", _placementID, _unitID]];
+    [self.logger debug:[NSString stringWithFormat:@"Loading interstitial - Placement: %@, PlacementID:%@, UnitID:%@", _placementName ?: @"(unknown)", _placementID, _unitID]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.isDestroyed) {

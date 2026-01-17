@@ -547,6 +547,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                             adm:adm
                                                                 hasClosedButton:hasClosedButton
                                                                         extras:adapterExtras
+                                                                  placementName:self.placementName
                                                                       delegate:self];
     
     if (!creativeBanner) {

@@ -51,10 +51,11 @@
                                                          adm:(NSString *)adm
                                              hasClosedButton:(BOOL)hasClosedButton
                                                       extras:(NSDictionary<NSString *, NSString *> *)extras
+                                               placementName:(NSString *)placementName
                                                     delegate:(id<CLXAdapterBannerDelegate>)delegate {
 
-    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating banner - AdID: %@, BidID: %@, Type: %ld",
-                                    adId, bidId, (long)type]];
+    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating banner - Placement: %@ (%@), BidID: %@, Type: %ld",
+                                    placementName ?: @"(unknown)", adId, bidId, (long)type]];
 
     // Extract placement ID from extras
     NSString *placementId = extras[@"placement_id"];
@@ -92,6 +93,7 @@
     // Validation errors will be reported in load() via delegate callback
     CLXInMobiBanner *banner = [[CLXInMobiBanner alloc] initWithBidPayload:bidPayloadData
                                                                placementID:inmobiPlacementID  // May be 0 (invalid)
+                                                             placementName:placementName
                                                                      bidID:bidId
                                                                       size:bannerSize
                                                             viewController:viewController

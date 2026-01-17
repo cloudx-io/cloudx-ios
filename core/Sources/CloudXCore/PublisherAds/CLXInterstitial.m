@@ -60,6 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  bidId:bidId
                                                                    adm:adm
                                                                 extras:adapterExtras
+                                                         placementName:self.placementName
                                                               delegate:self];
     
     if (!interstitial) {

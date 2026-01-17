@@ -56,9 +56,10 @@
                                                           adm:(NSString *)adm
                                               hasClosedButton:(BOOL)hasClosedButton
                                                        extras:(NSDictionary<NSString *, NSString *> *)extras
+                                                placementName:(NSString *)placementName
                                                      delegate:(id<CLXAdapterBannerDelegate>)delegate {
     
-    [[CLXMetaBannerFactory logger] debug:[NSString stringWithFormat:@"Creating banner for placement: %@ | bidPayload: %@", adId, adm ? @"YES" : @"NO"]];
+    [[CLXMetaBannerFactory logger] debug:[NSString stringWithFormat:@"Creating banner for placement: %@ (%@) | bidPayload: %@", placementName ?: @"(unknown)", adId, adm ? @"YES" : @"NO"]];
     
     // Use shared base factory method to resolve Meta placement ID
     NSString *metaPlacementID = [CLXMetaBaseFactory resolveMetaPlacementID:extras 
@@ -75,6 +76,7 @@
     // Validation errors will be reported in load() via delegate callback
     CLXMetaBanner *banner = [[CLXMetaBanner alloc] initWithBidPayload:adm
                                                            placementID:metaPlacementID  // May be nil
+                                                         placementName:placementName  // For error messages
                                                                 bidID:bidId
                                                                  type:type
                                                         viewController:viewController

@@ -52,9 +52,10 @@
                                      bidPayload:(nullable NSString *)bidPayload
                                           bidID:(NSString *)bidID
                                    adapterExtras:(nullable NSDictionary<NSString *, NSString *> *)adapterExtras
+                                  placementName:(nullable NSString *)placementName
                                        delegate:(id<CLXAdapterNativeDelegate>)delegate {
     
-    [self.logger debug:[NSString stringWithFormat:@"Creating native ad - AdId: %@", adId]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating native ad - Placement: %@ (%@)", placementName ?: @"(unknown)", adId]];
     
     NSString *placementID = [CLXMolocoBaseFactory resolveMolocoPlacementID:adapterExtras 
                                                                fallbackAdId:adId 
@@ -71,6 +72,7 @@
     CLXMolocoNative *native = 
         [[CLXMolocoNative alloc] initWithBidPayload:bidPayload
                                         placementID:placementID  // May be nil
+                                      placementName:placementName
                                               bidID:bidID
                                            delegate:delegate];
     

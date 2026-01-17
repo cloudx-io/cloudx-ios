@@ -50,9 +50,10 @@
                                                     bidId:(NSString *)bidId
                                                       adm:(NSString *)adm
                                                    extras:(NSDictionary<NSString *, NSString *> *)extras
+                                            placementName:(NSString *)placementName
                                                 delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
     
-    [self.logger debug:[NSString stringWithFormat:@"Creating interstitial for placement: %@ | bidPayload: %@", adId, adm ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating interstitial for placement: %@ (%@) | bidPayload: %@", placementName ?: @"(unknown)", adId, adm ? @"YES" : @"NO"]];
     
     // Use shared base factory method to resolve Meta placement ID
     NSString *metaPlacementID = [CLXMetaBaseFactory resolveMetaPlacementID:extras 
@@ -69,6 +70,7 @@
     // Validation errors will be reported in load() via delegate callback
     CLXMetaInterstitial *interstitial = [[CLXMetaInterstitial alloc] initWithBidPayload:adm
                                                                             placementID:metaPlacementID  // May be nil
+                                                                          placementName:placementName  // For error messages
                                                                                   bidID:bidId
                                                                                delegate:delegate];
     

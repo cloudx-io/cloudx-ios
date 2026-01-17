@@ -52,11 +52,12 @@
                                      bidPayload:(nullable NSString *)bidPayload
                                           bidID:(NSString *)bidID
                                    adapterExtras:(nullable NSDictionary<NSString *, NSString *> *)adapterExtras
+                                  placementName:(nullable NSString *)placementName
                                         delegate:(id<CLXAdapterBannerDelegate>)delegate
                                           adSize:(CLXBannerAdSize)adSize {
     
-    [self.logger debug:[NSString stringWithFormat:@"Creating banner - AdId: %@, Size: %dx%d", 
-                       adId, (int)adSize.width, (int)adSize.height]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating banner - Placement: %@ (%@), Size: %dx%d", 
+                       placementName ?: @"(unknown)", adId, (int)adSize.width, (int)adSize.height]];
     
     NSString *placementID = [CLXMolocoBaseFactory resolveMolocoPlacementID:adapterExtras 
                                                                fallbackAdId:adId 
@@ -74,6 +75,7 @@
     CLXMolocoBanner *banner = 
         [[CLXMolocoBanner alloc] initWithBidPayload:bidPayload
                                         placementID:placementID  // May be nil
+                                      placementName:placementName
                                               bidID:bidID
                                            delegate:delegate
                                              adSize:adSize];

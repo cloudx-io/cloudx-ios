@@ -109,6 +109,7 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
                                                          adm:(NSString *)adm
                                              hasClosedButton:(BOOL)hasClosedButton
                                                       extras:(NSDictionary<NSString *, NSString *> *)extras
+                                               placementName:(nullable NSString *)placementName
                                                     delegate:(id<CLXAdapterBannerDelegate>)delegate {
     [self.creationTimes addObject:[NSDate date]];
     

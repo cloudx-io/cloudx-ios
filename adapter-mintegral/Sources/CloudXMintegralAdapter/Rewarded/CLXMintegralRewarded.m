@@ -9,12 +9,14 @@
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, assign) BOOL isDestroyed;
 @property (nonatomic, assign, readwrite) BOOL isReady;
+@property (nonatomic, copy, nullable) NSString *placementName;
 @end
 
 @implementation CLXMintegralRewarded
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID
+                     placementName:(nullable NSString *)placementName
                             unitID:(NSString *)unitID
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterRewardedDelegate>)delegate {
@@ -22,6 +24,7 @@
     if (self) {
         _bidPayload = [bidPayload copy];
         _placementID = [placementID copy];
+        _placementName = [placementName copy];
         _unitID = [unitID copy];
         _bidID = [bidID copy];
         _delegate = delegate;
@@ -32,7 +35,7 @@
         _isDestroyed = NO;
         _isReady = NO;
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID:%@, UnitID:%@", placementID, unitID]];
+        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@, PlacementID:%@, UnitID:%@", placementName ?: @"(unknown)", placementID, unitID]];
     }
     return self;
 }
@@ -52,8 +55,24 @@
         return;
     }
     
+    // Validate unitID at load time
+    if (!_unitID || _unitID.length == 0) {
+        NSString *placementContext = _placementName ? [NSString stringWithFormat:@" for placement '%@'", _placementName] : @"";
+        NSString *errorMessage = [NSString stringWithFormat:@"Mintegral unit ID is empty%@. "
+                                  "Make sure to configure the Mintegral unit ID in your CloudX dashboard under Ad Unit Settings > Mintegral.",
+                                  placementContext];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
+                                     description:errorMessage];
+        [self.logger error:error.localizedDescription];
+        
+        if ([self.delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
+            [self.delegate didFailToLoadWithRewarded:self error:error];
+        }
+        return;
+    }
+    
     _isLoading = YES;
-    [self.logger debug:[NSString stringWithFormat:@"Loading rewarded - PlacementID:%@, UnitID:%@", _placementID, _unitID]];
+    [self.logger debug:[NSString stringWithFormat:@"Loading rewarded - Placement: %@, PlacementID:%@, UnitID:%@", _placementName ?: @"(unknown)", _placementID, _unitID]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.isDestroyed) {

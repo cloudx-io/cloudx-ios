@@ -47,6 +47,7 @@
 
 - (instancetype)initWithBidPayload:(NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
+                     placementName:(nullable NSString *)placementName
                             bidID:(NSString *)bidID
                              type:(CLXNativeTemplate)type
                     viewController:(UIViewController *)viewController
@@ -55,6 +56,7 @@
     if (self) {
         _bidPayload = [bidPayload copy];
         _placementID = [placementID copy];  // Now nullable - validation in load()
+        _placementName = [placementName copy];  // For error messages
         _bidID = [bidID copy];
         _type = type;
         _viewController = viewController;
@@ -62,8 +64,8 @@
         _sdkVersion = FB_AD_SDK_VERSION;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMetaNative"];
         
-        [self.logger debug:[NSString stringWithFormat:@"Initialized for placement: %@ | bidPayload: %@", 
-                           placementID ?: @"(nil)", bidPayload ? @"YES" : @"NO"]];
+        [self.logger debug:[NSString stringWithFormat:@"Initialized for placement: %@ (%@) | bidPayload: %@", 
+                           placementName ?: @"(unknown)", placementID ?: @"(nil)", bidPayload ? @"YES" : @"NO"]];
         
         // Only create native ad if placementID is valid
         // Otherwise defer to load() for validation
@@ -95,8 +97,12 @@
 - (void)loadAd {
     // Validate placement ID at load time (deferred validation pattern)
     if (!_placementID || _placementID.length == 0) {
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                     description:@"[Meta] Invalid or missing placement ID for native ad"];
+        NSString *placementContext = _placementName ? [NSString stringWithFormat:@" for placement '%@'", _placementName] : @"";
+        NSString *errorMessage = [NSString stringWithFormat:@"Meta placement ID is empty%@. "
+                                  "Make sure to configure the Meta placement ID in your CloudX dashboard under Ad Unit Settings > Meta.",
+                                  placementContext];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
+                                     description:errorMessage];
         [self.logger error:error.localizedDescription];
         
         if ([self.delegate respondsToSelector:@selector(failToLoadWithNative:error:)]) {

@@ -112,6 +112,7 @@ static const NSTimeInterval kTestTimeout = 0.5;
                                                          adm:(NSString *)adm
                                              hasClosedButton:(BOOL)hasClosedButton
                                                       extras:(NSDictionary<NSString *, NSString *> *)extras
+                                               placementName:(nullable NSString *)placementName
                                                     delegate:(id<CLXAdapterBannerDelegate>)delegate {
     if (self.shouldReturnNil) {
         return nil;
@@ -308,6 +309,7 @@ static const NSTimeInterval kTestTimeout = 0.5;
                                                                                                                          adm:@"simulated-adm"
                                                                                                              hasClosedButton:NO
                                                                                                                       extras:@{}
+                                                                                                               placementName:@"test-placement"
                                                                                                                     delegate:self.banner];
     self.banner.currentLoadingBanner = mockAdapter; // Set up loading state
     [self.banner didLoadBanner:mockAdapter];
@@ -329,6 +331,7 @@ static const NSTimeInterval kTestTimeout = 0.5;
                                                                                                                          adm:@"prefetch-adm"
                                                                                                              hasClosedButton:NO
                                                                                                                       extras:@{}
+                                                                                                               placementName:@"test-placement"
                                                                                                                     delegate:self.banner];
     self.banner.currentLoadingBanner = mockAdapter; // Set up loading state
     [self.banner didLoadBanner:mockAdapter];

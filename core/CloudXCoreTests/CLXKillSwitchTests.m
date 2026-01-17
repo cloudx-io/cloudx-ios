@@ -328,12 +328,12 @@
     // Test SDK disabled error message
     NSError *sdkError = [CLXError errorWithCode:CLXErrorCodeSDKDisabled];
     XCTAssertNotNil(sdkError.localizedDescription, @"SDK disabled error should have description");
-    XCTAssertTrue([sdkError.localizedDescription containsString:@"kill switch"], @"Error message should mention kill switch");
+    XCTAssertTrue([sdkError.localizedDescription containsString:@"disabled"], @"Error message should mention disabled");
     
     // Test ads disabled error message  
     NSError *adsError = [CLXError errorWithCode:CLXErrorCodeAdsDisabled];
     XCTAssertNotNil(adsError.localizedDescription, @"Ads disabled error should have description");
-    XCTAssertTrue([adsError.localizedDescription containsString:@"kill switch"], @"Error message should mention kill switch");
+    XCTAssertTrue([adsError.localizedDescription containsString:@"disabled"], @"Error message should mention disabled");
 }
 
 #pragma mark - Publisher Ad Kill Switch Propagation Tests

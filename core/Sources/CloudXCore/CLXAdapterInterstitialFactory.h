@@ -22,12 +22,14 @@ NS_ASSUME_NONNULL_BEGIN
 ///   - bidId: bid id from bid response
 ///   - adm: ad markup with data for rendering
 ///   - extras: adapters extra info
+///   - placementName: CloudX placement name for error messaging (may be nil for legacy callers)
 ///   - delegate: delegate for the adapter
 /// - Returns: new instance of CLXAdapterInterstitial
 - (nullable id<CLXAdapterInterstitial>)createWithAdId:(NSString *)adId
                                                   bidId:(NSString *)bidId
                                                     adm:(NSString *)adm
                                                  extras:(NSDictionary<NSString *, NSString *> *)extras
+                                          placementName:(nullable NSString *)placementName
                                                delegate:(id<CLXAdapterInterstitialDelegate>)delegate;
 
 @end

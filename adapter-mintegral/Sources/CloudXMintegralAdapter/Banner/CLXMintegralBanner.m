@@ -9,6 +9,7 @@
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, assign) BOOL isDestroyed;
 @property (nonatomic, assign) CGSize bannerSize;
+@property (nonatomic, copy, nullable) NSString *placementName;
 @property (nonatomic, strong, nullable) MTGBannerAdView *mintegralBannerView;
 @end
 
@@ -16,6 +17,7 @@
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID
+                     placementName:(nullable NSString *)placementName
                             unitID:(NSString *)unitID
                               size:(CGSize)size
                              bidID:(NSString *)bidID
@@ -24,6 +26,7 @@
     if (self) {
         _bidPayload = [bidPayload copy];
         _placementID = [placementID copy];
+        _placementName = [placementName copy];
         _unitID = [unitID copy];
         _bidID = [bidID copy];
         _delegate = delegate;
@@ -36,8 +39,8 @@
         _timeout = NO;
         _bannerSize = size;
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID:%@, UnitID:%@, Size:%.0fx%.0f", 
-                           placementID, unitID, size.width, size.height]];
+        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@, PlacementID:%@, UnitID:%@, Size:%.0fx%.0f", 
+                           placementName ?: @"(unknown)", placementID, unitID, size.width, size.height]];
     }
     return self;
 }
@@ -79,8 +82,24 @@
         return;
     }
     
+    // Validate unitID at load time
+    if (!_unitID || _unitID.length == 0) {
+        NSString *placementContext = _placementName ? [NSString stringWithFormat:@" for placement '%@'", _placementName] : @"";
+        NSString *errorMessage = [NSString stringWithFormat:@"Mintegral unit ID is empty%@. "
+                                  "Make sure to configure the Mintegral unit ID in your CloudX dashboard under Ad Unit Settings > Mintegral.",
+                                  placementContext];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
+                                     description:errorMessage];
+        [self.logger error:error.localizedDescription];
+        
+        if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
+            [self.delegate failToLoadBanner:self error:error];
+        }
+        return;
+    }
+    
     _isLoading = YES;
-    [self.logger debug:[NSString stringWithFormat:@"Loading banner - PlacementID:%@, UnitID:%@", _placementID, _unitID]];
+    [self.logger debug:[NSString stringWithFormat:@"Loading banner - Placement: %@, PlacementID:%@, UnitID:%@", _placementName ?: @"(unknown)", _placementID, _unitID]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.isDestroyed) {

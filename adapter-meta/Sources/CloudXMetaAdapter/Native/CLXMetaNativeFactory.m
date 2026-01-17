@@ -52,9 +52,10 @@
                                                        bidId:(NSString *)bidId
                                                          adm:(NSString *)adm
                                                       extras:(NSDictionary<NSString *, NSString *> *)extras
+                                               placementName:(NSString *)placementName
                                                     delegate:(id<CLXAdapterNativeDelegate>)delegate {
     
-    [self.logger debug:[NSString stringWithFormat:@"Creating native for placement: %@ | bidPayload: %@", adId, adm ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating native for placement: %@ (%@) | bidPayload: %@", placementName ?: @"(unknown)", adId, adm ? @"YES" : @"NO"]];
 
     // Use shared base factory method to resolve Meta placement ID
     NSString *metaPlacementID = [CLXMetaBaseFactory resolveMetaPlacementID:extras 
@@ -71,6 +72,7 @@
     // Validation errors will be reported in load() via delegate callback
     CLXMetaNative *native = [[CLXMetaNative alloc] initWithBidPayload:adm
                                                           placementID:metaPlacementID  // May be nil
+                                                        placementName:placementName  // For error messages
                                                                 bidID:bidId
                                                                  type:type
                                                        viewController:viewController

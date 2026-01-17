@@ -33,6 +33,7 @@
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, assign) BOOL hasGrantedReward;
+@property (nonatomic, copy, nullable) NSString *placementName;
 
 @end
 
@@ -40,20 +41,22 @@
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
+                     placementName:(nullable NSString *)placementName
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterRewardedDelegate>)delegate {
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
         _placementID = [placementID copy];  // Now nullable - validation in load()
+        _placementName = [placementName copy];  // For error messages
         _bidID = [bidID copy];
         _delegate = delegate;
         _sdkVersion = [CLXMolocoInitializer sdkVersion];
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMolocoRewarded"];
         _hasGrantedReward = NO;
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %@, BidID: %@", 
-                           placementID ?: @"(nil)", bidID]];
+        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@ (%@), BidID: %@", 
+                           placementName ?: @"(unknown)", placementID ?: @"(nil)", bidID]];
         
         // Only create rewarded ad if placementID is valid
         // Otherwise defer to load() for validation
@@ -82,8 +85,12 @@
 - (void)load {
     // Validate placement ID at load time (deferred validation pattern)
     if (!_placementID || _placementID.length == 0) {
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                     description:@"[Moloco] Invalid or missing placement ID for rewarded ad"];
+        NSString *placementContext = _placementName ? [NSString stringWithFormat:@" for placement '%@'", _placementName] : @"";
+        NSString *errorMessage = [NSString stringWithFormat:@"Moloco placement ID is empty%@. "
+                                  "Make sure to configure the Moloco placement ID in your CloudX dashboard under Ad Unit Settings > Moloco.",
+                                  placementContext];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
+                                     description:errorMessage];
         [self.logger error:error.localizedDescription];
         
         if ([self.delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {

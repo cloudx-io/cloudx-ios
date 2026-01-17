@@ -21,6 +21,7 @@
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, strong, readwrite) NSString *bidID;
 @property (nonatomic, copy, readwrite) NSString *placementID;
+@property (nonatomic, copy, readwrite, nullable) NSString *placementName;
 @property (nonatomic, assign) BOOL isLoaded;
 @property (nonatomic, assign) BOOL isShowing;
 @property (nonatomic, assign) BOOL isDestroyed;
@@ -33,12 +34,14 @@
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
+                     placementName:(nullable NSString *)placementName
                              bidID:(NSString *)bidID
                           delegate:(nullable id<CLXAdapterInterstitialDelegate>)delegate {
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
         _placementID = [placementID copy];  // Nullable - validation in load()
+        _placementName = [placementName copy];  // For error messages
         _bidID = [bidID copy];
         _delegate = delegate;  // Nullable - validation in load()
         _logger = [[CLXLogger alloc] initWithCategory:@"VungleInterstitial"];
@@ -47,8 +50,8 @@
         _isShowing = NO;
         _isDestroyed = NO;
         
-        [_logger debug:[NSString stringWithFormat:@"Initialized Vungle interstitial - Placement: %@, BidID: %@, HasBidPayload: %@", 
-                          placementID ?: @"(nil)", bidID, bidPayload ? @"YES" : @"NO"]];
+        [_logger debug:[NSString stringWithFormat:@"Initialized Vungle interstitial - Placement: %@ (%@), BidID: %@, HasBidPayload: %@", 
+                          placementName ?: @"(unknown)", placementID ?: @"(nil)", bidID, bidPayload ? @"YES" : @"NO"]];
     }
     return self;
 }
@@ -72,8 +75,12 @@
 - (void)load {
     // Validate placement ID at load time
     if (!self.placementID || self.placementID.length == 0) {
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                     description:@"[Vungle] Invalid or missing placement ID for interstitial ad"];
+        NSString *placementContext = self.placementName ? [NSString stringWithFormat:@" for placement '%@'", self.placementName] : @"";
+        NSString *errorMessage = [NSString stringWithFormat:@"Vungle placement ID is empty%@. "
+                                  "Make sure to configure the Vungle placement ID in your CloudX dashboard under Ad Unit Settings > Vungle.",
+                                  placementContext];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
+                                     description:errorMessage];
         [self.logger error:error.localizedDescription];
         [self handleLoadFailure:error];
         return;
@@ -81,8 +88,9 @@
     
     // Validate delegate at load time
     if (!self.delegate) {
+        NSString *placementContext = self.placementName ? [NSString stringWithFormat:@" for placement '%@'", self.placementName] : @"";
         NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidConfiguration
-                                     description:@"[Vungle] Missing delegate for interstitial ad"];
+                                     description:[NSString stringWithFormat:@"[Vungle] Missing delegate%@", placementContext]];
         [self.logger error:error.localizedDescription];
         return;
     }

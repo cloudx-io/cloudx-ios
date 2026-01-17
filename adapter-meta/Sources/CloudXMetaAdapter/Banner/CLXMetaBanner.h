@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  * 
  * @param bidPayload Bid payload from server
  * @param placementID Meta placement ID (now nullable - validation deferred to load())
+ * @param placementName CloudX placement name for error messages (nullable)
  * @param bidID Bid identifier
  * @param type Banner type
  * @param viewController View controller for presentation
@@ -37,9 +38,11 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion As of v1.3.0, placementID can be nil. Validation occurs in load()
  *             and errors are reported via delegate callback.
  * @since 1.3.0 placementID parameter is now nullable
+ * @since 1.4.0 placementName parameter added for better error messages
  */
 - (instancetype)initWithBidPayload:(NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
+                     placementName:(nullable NSString *)placementName
                             bidID:(NSString *)bidID
                              type:(CLXBannerType)type
                     viewController:(UIViewController *)viewController

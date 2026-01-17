@@ -32,6 +32,7 @@
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, assign) long long placementID;
+@property (nonatomic, copy, nullable) NSString *placementName;
 @property (nonatomic, weak) UIViewController *viewController;
 @property (nonatomic, assign) CGSize bannerSize;  // Store for deferred creation
 @end
@@ -40,6 +41,7 @@
 
 - (instancetype)initWithBidPayload:(nullable NSData *)bidPayload
                        placementID:(long long)placementID
+                     placementName:(nullable NSString *)placementName
                              bidID:(NSString *)bidID
                               size:(CGSize)size
                     viewController:(UIViewController *)viewController
@@ -48,6 +50,7 @@
     if (self) {
         _bidPayload = bidPayload;
         _placementID = placementID;  // May be 0 (invalid) - validation in load()
+        _placementName = [placementName copy];  // For error messages
         _bidID = [bidID copy];
         _delegate = delegate;
         _viewController = viewController;
@@ -56,8 +59,8 @@
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXInMobiBanner"];
         _timeoutInterval = 30.0;
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %lld%@, BidID: %@, Size: %.0fx%.0f",
-                           placementID, (placementID == 0 ? @" (invalid)" : @""), bidID, size.width, size.height]];
+        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@ (%lld%@), BidID: %@, Size: %.0fx%.0f",
+                           placementName ?: @"(unknown)", placementID, (placementID == 0 ? @" - invalid" : @""), bidID, size.width, size.height]];
         
         // Banner creation is deferred to load() to ensure it happens on main thread
         // without using dispatch_sync which can cause deadlocks
@@ -84,8 +87,12 @@
 - (void)load {
     // Validate placement ID at load time (deferred validation pattern)
     if (_placementID == 0) {
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                     description:@"[InMobi] Invalid or missing placement ID for banner ad"];
+        NSString *placementContext = _placementName ? [NSString stringWithFormat:@" for placement '%@'", _placementName] : @"";
+        NSString *errorMessage = [NSString stringWithFormat:@"InMobi placement ID is empty%@. "
+                                  "Make sure to configure the InMobi placement ID in your CloudX dashboard under Ad Unit Settings > InMobi.",
+                                  placementContext];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
+                                     description:errorMessage];
         [self.logger error:error.localizedDescription];
         
         if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {

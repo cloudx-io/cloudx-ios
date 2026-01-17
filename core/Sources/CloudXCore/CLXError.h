@@ -108,7 +108,31 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     /// Invalid ad unit ID provided
     CLXErrorCodeInvalidAdUnitID = 507,
     /// Invalid bid response
-    CLXErrorCodeInvalidBidResponse = 508
+    CLXErrorCodeInvalidBidResponse = 508,
+    
+    // ADAPTER ERRORS (600-699)
+    /// Ad network adapter encountered an unexpected error
+    CLXErrorCodeAdapterUnexpectedError = 600,
+    /// Ad network adapter initialization failed
+    CLXErrorCodeAdapterInitializationError = 601,
+    /// Ad network adapter received invalid server parameters (e.g., missing placement ID)
+    CLXErrorCodeAdapterInvalidServerExtras = 602,
+    /// Ad network adapter failed to establish connection with ad server
+    CLXErrorCodeAdapterNoConnection = 603,
+    /// Ad network adapter could not fill the ad request - no inventory available
+    CLXErrorCodeAdapterNoFill = 604,
+    /// Ad network server returned an error response
+    CLXErrorCodeAdapterServerError = 605,
+    /// Ad network adapter request timed out
+    CLXErrorCodeAdapterTimeout = 606,
+    /// Ad network adapter is in an invalid state for loading ads
+    CLXErrorCodeAdapterInvalidLoadState = 607,
+    /// Ad network adapter has invalid or missing configuration
+    CLXErrorCodeAdapterInvalidConfiguration = 608,
+    
+    // GENERAL ERRORS (700-799)
+    /// An unexpected error occurred
+    CLXErrorCodeUnexpectedError = 700
 };
 
 /**

@@ -20,6 +20,7 @@
 @interface CLXVungleNative ()
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, copy, readwrite) NSString *placementID;
+@property (nonatomic, copy, readwrite, nullable) NSString *placementName;
 @property (nonatomic, copy, readwrite) NSString *bidID;
 @property (nonatomic, strong, readwrite, nullable) UIView *nativeView;
 @property (nonatomic, assign) BOOL isLoaded;
@@ -35,12 +36,14 @@
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID
+                     placementName:(nullable NSString *)placementName
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterNativeDelegate>)delegate {
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
         _placementID = [placementID copy];
+        _placementName = [placementName copy];
         _bidID = [bidID copy];
         _delegate = delegate;
         _logger = [[CLXLogger alloc] initWithCategory:@"VungleNative"];
@@ -50,8 +53,8 @@
         _isDestroyed = NO;
         _isRegistered = NO;
         
-        [_logger debug:[NSString stringWithFormat:@"Initialized Vungle native - Placement: %@, BidID: %@, HasBidPayload: %@", 
-                          placementID, bidID, bidPayload ? @"YES" : @"NO"]];
+        [_logger debug:[NSString stringWithFormat:@"Initialized Vungle native - Placement: %@ (%@), BidID: %@, HasBidPayload: %@", 
+                          placementName ?: @"(unknown)", placementID, bidID, bidPayload ? @"YES" : @"NO"]];
     }
     return self;
 }
@@ -96,8 +99,12 @@
 - (void)load {
     // Validate placement ID at load time
     if (!self.placementID || self.placementID.length == 0) {
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
-                                     description:@"[Vungle] Invalid or missing placement ID for native ad"];
+        NSString *placementContext = self.placementName ? [NSString stringWithFormat:@" for placement '%@'", self.placementName] : @"";
+        NSString *errorMessage = [NSString stringWithFormat:@"Vungle placement ID is empty%@. "
+                                  "Make sure to configure the Vungle placement ID in your CloudX dashboard under Ad Unit Settings > Vungle.",
+                                  placementContext];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
+                                     description:errorMessage];
         [self.logger error:error.localizedDescription];
         [self handleLoadFailure:error];
         return;
