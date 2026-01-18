@@ -257,10 +257,7 @@
     [self.tracker trySendingPendingMetrics];
     [self.tracker flushPendingOperations];
     
-    // Give a brief moment for any async operations (there shouldn't be any)
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-    
-    // Then - Bulk API should not be called
+    // Then - Bulk API should not be called (flushPendingOperations synchronizes internal queue)
     XCTAssertEqual(self.mockBulkApi.sendCallCount, 0, @"Should not call bulk API when no metrics");
 }
 
@@ -283,10 +280,7 @@
     [self.tracker trySendingPendingMetrics];
     [self.tracker flushPendingOperations];
     
-    // Give a brief moment for any async operations (there shouldn't be any)
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-    
-    // Then - Should not send (no endpoint)
+    // Then - Should not send (no endpoint) - flushPendingOperations synchronizes internal queue
     XCTAssertEqual(self.mockBulkApi.sendCallCount, 0, @"Should not send when no endpoint configured");
 }
 

@@ -4,8 +4,16 @@
 
 /**
  * @file CLXWinLossRetryBatchingTests.m
- * @brief Comprehensive tests for win/loss retry and batching logic
+ * @brief DISABLED - Integration tests that make real network calls
  * 
+ * ⚠️ QUARANTINED: These tests make real network calls to httpbin.org and have
+ * 22 sleep/wait patterns. They are integration tests, not unit tests, and cause
+ * CI flakiness.
+ * 
+ * TODO: Convert to proper unit tests using MockURLSession, or move to a
+ * separate integration test target that runs on a schedule (not on every PR).
+ * 
+ * Original description:
  * These tests verify that the win/loss system properly handles network failures,
  * caches failed events, and retries them with appropriate batching behavior.
  * This is critical for ensuring no revenue events are lost due to temporary
@@ -35,6 +43,9 @@ static NSString * const kTestAppKey = @"test-app-key-retry";
 
 - (void)setUp {
     [super setUp];
+    
+    // QUARANTINED: Skip all tests - these are integration tests making real network calls
+    XCTSkip(@"QUARANTINED: Integration tests with real network calls. Convert to unit tests with mocks.");
     
     // Wait a bit for any async operations from previous tests to complete
     [NSThread sleepForTimeInterval:0.5];

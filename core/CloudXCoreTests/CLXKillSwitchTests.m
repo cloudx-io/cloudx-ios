@@ -7,51 +7,11 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
+#import "Mocks/MockURLSession.h"
 
 // Private interface to access internal methods for testing
 @interface CLXSDKInitNetworkService (Testing)
 - (CLXSDKConfigResponse *)parseSDKConfigFromResponse:(NSDictionary *)response;
-@end
-
-// Mock data task that can be resumed
-@interface MockDataTask : NSObject
-@property (nonatomic, assign) BOOL resumed;
-- (void)resume;
-@end
-
-// Mock URL session for controlled responses
-@interface MockURLSession : NSURLSession
-@property (nonatomic, assign) NSInteger statusCode;
-@property (nonatomic, strong) NSDictionary *headers;
-@property (nonatomic, strong) NSData *responseData;
-@property (nonatomic, strong) NSError *responseError;
-@end
-
-@implementation MockURLSession
-
-- (NSURLSessionDataTask *)dataTaskWithRequest:(NSURLRequest *)request 
-                            completionHandler:(void (^)(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error))completionHandler {
-    
-    NSHTTPURLResponse *httpResponse = [[NSHTTPURLResponse alloc] 
-                                      initWithURL:request.URL 
-                                      statusCode:self.statusCode 
-                                      HTTPVersion:@"HTTP/1.1" 
-                                      headerFields:self.headers];
-    
-    // Call completion handler synchronously for deterministic test behavior
-    completionHandler(self.responseData, httpResponse, self.responseError);
-    
-    // Return a mock task - cast to satisfy return type
-    MockDataTask *mockTask = [[MockDataTask alloc] init];
-    return (NSURLSessionDataTask *)mockTask;
-}
-
-@end
-
-@implementation MockDataTask
-- (void)resume {
-    self.resumed = YES;
-}
 @end
 
 @interface CLXKillSwitchTests : XCTestCase
@@ -77,6 +37,14 @@
                       urlSession:self.mockSession];
 }
 
+- (void)tearDown {
+    [self.mockSession reset];
+    self.mockSession = nil;
+    self.sdkInitService = nil;
+    self.bidService = nil;
+    [super tearDown];
+}
+
 #pragma mark - SDK Initialization Kill Switch Tests
 
 /**
@@ -85,10 +53,7 @@
  */
 - (void)testSDKInitKillSwitch_SDK_DISABLED_ShouldReturnError105 {
     // Given: Server responds with HTTP 204 and SDK_DISABLED header
-    self.mockSession.statusCode = 204;
-    self.mockSession.headers = @{@"X-CloudX-Status": @"SDK_DISABLED"};
-    self.mockSession.responseData = nil;
-    self.mockSession.responseError = nil;
+    [self.mockSession enqueueResponseWithStatusCode:204 data:nil headers:@{@"X-CloudX-Status": @"SDK_DISABLED"}];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"SDK init kill switch"];
     
@@ -112,10 +77,7 @@
  */
 - (void)testSDKInit_HTTP204_NoKillSwitchHeader_ShouldNotTriggerKillSwitch {
     // Given: Server responds with HTTP 204 but no X-CloudX-Status header
-    self.mockSession.statusCode = 204;
-    self.mockSession.headers = @{}; // No kill switch header
-    self.mockSession.responseData = nil;
-    self.mockSession.responseError = nil;
+    [self.mockSession enqueueResponseWithStatusCode:204 data:nil headers:nil];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Normal 204 response"];
     
@@ -139,10 +101,8 @@
  */
 - (void)testSDKInit_HTTP200_WithSDKDisabledHeader_ShouldNotTriggerKillSwitch {
     // Given: Server responds with HTTP 200 and SDK_DISABLED header
-    self.mockSession.statusCode = 200;
-    self.mockSession.headers = @{@"X-CloudX-Status": @"SDK_DISABLED"};
-    self.mockSession.responseData = [@"{\"accountID\":\"test\"}" dataUsingEncoding:NSUTF8StringEncoding];
-    self.mockSession.responseError = nil;
+    NSData *responseData = [@"{\"accountID\":\"test\"}" dataUsingEncoding:NSUTF8StringEncoding];
+    [self.mockSession enqueueResponseWithStatusCode:200 data:responseData headers:@{@"X-CloudX-Status": @"SDK_DISABLED"}];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"HTTP 200 with kill switch header"];
     
@@ -176,10 +136,7 @@
     };
     
     // Configure mock response BEFORE starting the auction
-    self.mockSession.statusCode = 204;
-    self.mockSession.headers = @{@"X-CloudX-Status": @"ADS_DISABLED"};
-    self.mockSession.responseData = nil;
-    self.mockSession.responseError = nil;
+    [self.mockSession enqueueResponseWithStatusCode:204 data:nil headers:@{@"X-CloudX-Status": @"ADS_DISABLED"}];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Bid request kill switch"];
     
@@ -216,10 +173,7 @@
     };
     
     // Configure mock response BEFORE starting the auction
-    self.mockSession.statusCode = 204;
-    self.mockSession.headers = @{}; // No kill switch header
-    self.mockSession.responseData = nil;
-    self.mockSession.responseError = nil;
+    [self.mockSession enqueueResponseWithStatusCode:204 data:nil headers:nil];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Normal no-fill response"];
     
@@ -248,10 +202,7 @@
  */
 - (void)testKillSwitch_CaseSensitiveHeaders_ShouldNotTriggerWithWrongCase {
     // Given: Server responds with HTTP 204 and lowercase kill switch header
-    self.mockSession.statusCode = 204;
-    self.mockSession.headers = @{@"X-CloudX-Status": @"sdk_disabled"}; // lowercase
-    self.mockSession.responseData = nil;
-    self.mockSession.responseError = nil;
+    [self.mockSession enqueueResponseWithStatusCode:204 data:nil headers:@{@"X-CloudX-Status": @"sdk_disabled"}];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Case sensitive header test"];
     
@@ -274,10 +225,7 @@
  */
 - (void)testKillSwitch_UnknownHeaderValue_ShouldNotTrigger {
     // Given: Server responds with HTTP 204 and unknown header value
-    self.mockSession.statusCode = 204;
-    self.mockSession.headers = @{@"X-CloudX-Status": @"UNKNOWN_STATUS"};
-    self.mockSession.responseData = nil;
-    self.mockSession.responseError = nil;
+    [self.mockSession enqueueResponseWithStatusCode:204 data:nil headers:@{@"X-CloudX-Status": @"UNKNOWN_STATUS"}];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Unknown header value test"];
     
@@ -301,10 +249,7 @@
  */
 - (void)testKillSwitch_BothHeaderValues_ShouldBeRecognized {
     // Test SDK_DISABLED
-    self.mockSession.statusCode = 204;
-    self.mockSession.headers = @{@"X-CloudX-Status": @"SDK_DISABLED"};
-    self.mockSession.responseData = nil;
-    self.mockSession.responseError = nil;
+    [self.mockSession enqueueResponseWithStatusCode:204 data:nil headers:@{@"X-CloudX-Status": @"SDK_DISABLED"}];
     
     XCTestExpectation *sdkExpectation = [self expectationWithDescription:@"SDK_DISABLED test"];
     
