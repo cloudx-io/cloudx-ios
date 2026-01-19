@@ -97,9 +97,10 @@
     [self.resolver setConfig:testConfig];
     
     // Set up session data with known values
-    [self.resolver setSessionConstData:@"test-session-67890" 
-                            sdkVersion:@"1.0.0-test" 
-                            deviceType:@"phone" 
+    [self.resolver setSessionConstData:@"test-session-67890"
+                            sdkVersion:@"1.0.0-test"
+                         pluginVersion:nil
+                            deviceType:@"phone"
                            abTestGroup:@"control-group"
                              appBundle:@"com.cloudx.test"];
 }

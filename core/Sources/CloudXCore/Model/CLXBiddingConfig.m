@@ -1357,14 +1357,24 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
     if (!self.ext) {
         return nil;
     }
-    
+
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
-    if (self.ext.adapterExtras) {
-        NSMutableDictionary *cloudxExt = [NSMutableDictionary dictionary];
-        cloudxExt[@"adapter_extras"] = self.ext.adapterExtras;
-        cloudxExt[@"sdkReleaseVersion"] = [CLXSystemInformation shared].sdkVersion;
-        json[@"cloudx"] = [cloudxExt copy];
+
+    // Always include cloudx extension with SDK version info
+    NSMutableDictionary *cloudxExt = [NSMutableDictionary dictionary];
+    cloudxExt[@"sdkReleaseVersion"] = [CLXSystemInformation shared].sdkVersion;
+
+    // Add pluginVersion if set (matches Android: ext.cloudx.pluginVersion)
+    NSString *pluginVersion = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCorePluginVersionKey];
+    if (pluginVersion.length > 0) {
+        cloudxExt[@"pluginVersion"] = pluginVersion;
     }
+
+    if (self.ext.adapterExtras) {
+        cloudxExt[@"adapter_extras"] = self.ext.adapterExtras;
+    }
+    json[@"cloudx"] = [cloudxExt copy];
+
     if (self.ext.prebid) {
         json[@"prebid"] = [self convertPrebidDebugToJSON:self.ext.prebid];
     }

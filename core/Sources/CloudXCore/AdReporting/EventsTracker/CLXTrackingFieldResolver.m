@@ -19,6 +19,7 @@
 
 @property (nonatomic, copy) NSString *sessionId;
 @property (nonatomic, copy) NSString *sdkVersion;
+@property (nonatomic, copy, nullable) NSString *pluginVersion;
 @property (nonatomic, copy) NSString *deviceType;
 @property (nonatomic, copy) NSString *abTestGroup;
 @property (nonatomic, copy) NSString *appBundle;
@@ -112,16 +113,18 @@
 
 - (void)setSessionConstData:(NSString *)sessionId
                  sdkVersion:(NSString *)sdkVersion
+              pluginVersion:(nullable NSString *)pluginVersion
                  deviceType:(NSString *)deviceType
                 abTestGroup:(NSString *)abTestGroup
                   appBundle:(NSString *)appBundle {
     self.sessionId = sessionId;
     self.sdkVersion = sdkVersion;
+    self.pluginVersion = pluginVersion;
     self.deviceType = deviceType;
     self.abTestGroup = abTestGroup;
     self.appBundle = appBundle;
-    
-    [self.logger debug:[NSString stringWithFormat:@"Session constant data set - bundle: %@", appBundle ?: @"(none)"]];
+
+    [self.logger debug:[NSString stringWithFormat:@"Session constant data set - bundle: %@, pluginVersion: %@", appBundle ?: @"(none)", pluginVersion ?: @"(none)"]];
 }
 
 - (void)setHashedGeoIp:(nullable NSString *)hashedGeoIp {
@@ -203,6 +206,8 @@
         return self.sessionId;
     } else if ([field isEqualToString:@"sdk.releaseVersion"]) {
         return self.sdkVersion ?: CLXSDKVersion;
+    } else if ([field isEqualToString:@"sdk.pluginVersion"]) {
+        return self.pluginVersion; // Returns nil if not set (matches Android behavior)
     } else if ([field isEqualToString:@"sdk.deviceTypeName"]) {
         // Return string for analytics ("phone", "tablet", "unknown")
         return DeviceTypeToString([CLXSystemInformation shared].deviceType);

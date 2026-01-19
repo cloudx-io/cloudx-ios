@@ -63,6 +63,9 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXCoreTestModeKey @"CLXCore_testMode"
 #define kCLXCoreVisualDebuggingKey @"CLXCore_visualDebugging"
 
+// Plugin/wrapper identification
+#define kCLXCorePluginVersionKey @"CLXCore_pluginVersion"
+
 // Banner-specific additional keys
 #define kCLXBannerMetricsDictKey @"CLXBanner_metricsDict"
 #define kCLXBannerUserKeyValueKey @"CLXBanner_userKeyValue"

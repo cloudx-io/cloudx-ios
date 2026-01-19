@@ -168,6 +168,7 @@ static MockRillEventReporter *sharedInstance = nil;
 - (void)setConfig:(CLXSDKConfigResponse *)config;
 - (void)setSessionConstData:(NSString *)sessionId
                  sdkVersion:(NSString *)sdkVersion
+              pluginVersion:(nullable NSString *)pluginVersion
                  deviceType:(NSString *)deviceType
                 abTestGroup:(NSString *)abTestGroup
                   appBundle:(NSString *)appBundle;
@@ -241,6 +242,7 @@ static MockRillEventReporter *sharedInstance = nil;
     // Set session data with app bundle
     [self.resolver setSessionConstData:kTestSessionID
                             sdkVersion:@"1.0.0"
+                         pluginVersion:nil
                             deviceType:@"phone"
                            abTestGroup:@"RandomTest"
                              appBundle:@"cloudx.CloudXObjCRemotePods"];
@@ -845,6 +847,7 @@ static MockRillEventReporter *sharedInstance = nil;
     NSString *expectedBundle = @"com.cloudx.test.bundle";
     [self.resolver setSessionConstData:kTestSessionID
                             sdkVersion:@"1.0.0"
+                         pluginVersion:nil
                             deviceType:@"phone"
                            abTestGroup:@"RandomTest"
                              appBundle:expectedBundle];

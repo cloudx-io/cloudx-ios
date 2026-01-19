@@ -816,9 +816,90 @@
 - (void)testDeviceExtCxHwModel_ShouldBePresent {
     CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
     NSDictionary *json = [config json];
-    
+
     NSDictionary *deviceExt = json[@"device"][@"ext"][@"cx"];
     XCTAssertNotNil(deviceExt[@"hw_model"], @"device.ext.cx.hw_model should be present");
+}
+
+#pragma mark - ext.cloudx Tests (SDK Metadata)
+
+- (void)testExtCloudx_ShouldAlwaysBePresent {
+    // ext.cloudx should always be included, even without adapterExtras
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    NSDictionary *json = [config json];
+
+    NSDictionary *cloudx = json[@"ext"][@"cloudx"];
+    XCTAssertNotNil(cloudx, @"ext.cloudx should always be present for backend SDK metadata reliability");
+}
+
+- (void)testExtCloudx_ShouldContainSdkReleaseVersion {
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    NSDictionary *json = [config json];
+
+    NSDictionary *cloudx = json[@"ext"][@"cloudx"];
+    XCTAssertNotNil(cloudx[@"sdkReleaseVersion"], @"ext.cloudx.sdkReleaseVersion should be present");
+    XCTAssertTrue([cloudx[@"sdkReleaseVersion"] length] > 0, @"sdkReleaseVersion should not be empty");
+}
+
+- (void)testExtCloudx_SdkReleaseVersion_ShouldMatchSystemInformation {
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    NSDictionary *json = [config json];
+
+    NSDictionary *cloudx = json[@"ext"][@"cloudx"];
+    NSString *expectedVersion = [CLXSystemInformation shared].sdkVersion;
+    XCTAssertEqualObjects(cloudx[@"sdkReleaseVersion"], expectedVersion,
+                          @"ext.cloudx.sdkReleaseVersion should match CLXSystemInformation.sdkVersion");
+}
+
+- (void)testExtCloudx_PluginVersion_WhenSet_ShouldBeIncluded {
+    // Set plugin version (simulating Unity/React Native wrapper)
+    [[NSUserDefaults standardUserDefaults] setObject:@"unity-1.2.3" forKey:kCLXCorePluginVersionKey];
+
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    NSDictionary *json = [config json];
+
+    NSDictionary *cloudx = json[@"ext"][@"cloudx"];
+    XCTAssertEqualObjects(cloudx[@"pluginVersion"], @"unity-1.2.3",
+                          @"ext.cloudx.pluginVersion should match UserDefaults value");
+}
+
+- (void)testExtCloudx_PluginVersion_WhenNotSet_ShouldBeAbsent {
+    // Ensure plugin version is not set
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCorePluginVersionKey];
+
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    NSDictionary *json = [config json];
+
+    NSDictionary *cloudx = json[@"ext"][@"cloudx"];
+    XCTAssertNil(cloudx[@"pluginVersion"],
+                 @"ext.cloudx.pluginVersion should be absent when not set in UserDefaults");
+}
+
+- (void)testExtCloudx_PluginVersion_WhenEmpty_ShouldBeAbsent {
+    // Set empty plugin version
+    [[NSUserDefaults standardUserDefaults] setObject:@"" forKey:kCLXCorePluginVersionKey];
+
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    NSDictionary *json = [config json];
+
+    NSDictionary *cloudx = json[@"ext"][@"cloudx"];
+    XCTAssertNil(cloudx[@"pluginVersion"],
+                 @"ext.cloudx.pluginVersion should be absent when empty string");
+}
+
+- (void)testExtCloudx_ShouldBePresentForAllAdTypes {
+    // Verify ext.cloudx is present regardless of ad type (Android parity)
+    NSArray *adTypes = @[@(CLXAdTypeBanner), @(CLXAdTypeMrec), @(CLXAdTypeInterstitial), @(CLXAdTypeRewarded), @(CLXAdTypeNative)];
+
+    for (NSNumber *adTypeNum in adTypes) {
+        CLXAdType adType = [adTypeNum integerValue];
+        CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:adType];
+        NSDictionary *json = [config json];
+
+        NSDictionary *cloudx = json[@"ext"][@"cloudx"];
+        XCTAssertNotNil(cloudx, @"ext.cloudx should be present for ad type %ld", (long)adType);
+        XCTAssertNotNil(cloudx[@"sdkReleaseVersion"], @"sdkReleaseVersion should be present for ad type %ld", (long)adType);
+    }
 }
 
 @end

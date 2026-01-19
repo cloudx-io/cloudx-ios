@@ -74,6 +74,19 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
     NS_SWIFT_NAME(initializeSDK(appKey:completion:));
 
 /**
+ * Initialize the SDK with plugin version identification
+ * @param appKey The app key provided by CloudX
+ * @param pluginVersion Version string identifying the wrapper SDK (e.g., "flutter-1.2.0", "unity-2.3.1")
+ * @param completion A completion handler that will be called once the SDK is initialized
+ * @discussion Use this method when integrating the SDK through a plugin or wrapper framework.
+ * The pluginVersion helps with debugging and analytics for cross-platform integrations.
+ */
+- (void)initializeSDKWithAppKey:(NSString *)appKey
+                  pluginVersion:(nullable NSString *)pluginVersion
+                     completion:(nullable void (^)(BOOL success, CLXError * _Nullable error))completion
+    NS_SWIFT_NAME(initializeSDK(appKey:pluginVersion:completion:));
+
+/**
  * Set the hashed user ID for auction requests
  * @param hashedUserID The hashedUserID provided by CloudX
  */

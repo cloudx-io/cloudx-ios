@@ -47,12 +47,14 @@ NS_ASSUME_NONNULL_BEGIN
  * Sets session-level constant data
  * @param sessionId The session identifier
  * @param sdkVersion The SDK version string
+ * @param pluginVersion Optional version string identifying wrapper SDK (e.g., "flutter-1.2.0")
  * @param deviceType The device type string
  * @param abTestGroup The A/B test group name
  * @param appBundle The application bundle identifier
  */
 - (void)setSessionConstData:(NSString *)sessionId
                  sdkVersion:(NSString *)sdkVersion
+              pluginVersion:(nullable NSString *)pluginVersion
                  deviceType:(NSString *)deviceType
                 abTestGroup:(NSString *)abTestGroup
                   appBundle:(NSString *)appBundle;

@@ -20,6 +20,7 @@
 #import <CloudXCore/CLXMetricsType.h>
 #import <CloudXCore/CLXMetricsConfig.h>
 #import <CloudXCore/CLXSDKConfigEndpointObject.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 
 static NSString *const kAPIRequestKeyAppKey = @"appKey";
 static NSString *const kAPIRequestKeyLat = @"lat";
@@ -206,6 +207,8 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     request.ifa = idfa;
     request.ifv = idfv;
     request.sdkVersion = [CLXSystemInformation shared].sdkVersion;
+    // Get pluginVersion from UserDefaults (set during CloudXCore.initializeSDK:pluginVersion:completion:)
+    request.pluginVersion = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCorePluginVersionKey];
     request.dnt = [CLXSystemInformation shared].dnt;
     request.imp = @[]; // Empty array as in Swift
     request.id = [[NSUUID UUID] UUIDString];

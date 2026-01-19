@@ -98,6 +98,7 @@ NSString * const CLXSDKInitializedNotification = @"CLXSDKInitializedNotification
 @property (nonatomic, strong) CLXSDKConfigResponse *sdkConfig;
 @property (nonatomic, assign) BOOL isInitialized;
 @property (nonatomic, copy) NSString *appKey;
+@property (nonatomic, copy, nullable) NSString *pluginVersion;
 @property (nonatomic, strong) NSDictionary<NSString *, id> *adNetworkConfigs;
 @property (nonatomic, strong) NSDictionary<NSString *, id> *adPlacements;
 @property (nonatomic, strong) id adFactory;
@@ -194,6 +195,21 @@ static CloudXCore *_sharedInstance = nil;
     return [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                       auctionID:auctionID
                                                   testGroupName:_abTestName];
+}
+
+- (void)initializeSDKWithAppKey:(NSString *)appKey
+                  pluginVersion:(nullable NSString *)pluginVersion
+                     completion:(void (^)(BOOL, CLXError * _Nullable))completion {
+    _pluginVersion = [pluginVersion copy];
+
+    // Store pluginVersion in UserDefaults for access by bid request builder
+    if (pluginVersion) {
+        [[NSUserDefaults standardUserDefaults] setObject:pluginVersion forKey:kCLXCorePluginVersionKey];
+    } else {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCorePluginVersionKey];
+    }
+
+    [self initializeSDKWithAppKey:appKey completion:completion];
 }
 
 - (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL, CLXError * _Nullable))completion {

@@ -58,6 +58,10 @@
     json[@"ifa"] = self.ifa ?: @"";
     json[@"ifv"] = self.ifv ?: @"";
     json[@"sdkVersion"] = self.sdkVersion ?: @"";
+    // Only include pluginVersion if set (matches Android behavior)
+    if (self.pluginVersion) {
+        json[@"pluginVersion"] = self.pluginVersion;
+    }
     json[@"dnt"] = @(self.dnt);
     json[@"imp"] = impArray;
     json[@"id"] = self.id ?: @"";
