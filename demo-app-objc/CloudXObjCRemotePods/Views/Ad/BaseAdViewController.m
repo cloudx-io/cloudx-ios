@@ -82,8 +82,9 @@
         // Test mode is now server-controlled via deviceConfig
         // To enable test mode, whitelist your device IFA on the CloudX server dashboard
         // Check logs for: "Device IFA for test whitelisting: XXXX-XXXX-XXXX-XXXX"
-        
-        [[CloudXCore shared] initializeSDKWithAppKey:appKey completion:^(BOOL success, NSError * _Nullable error) {
+
+        CLXInitializationConfiguration *initConfig = [CLXInitializationConfiguration configurationWithAppKey:appKey];
+        [[CloudXCore shared] initializeWithConfiguration:initConfig completion:^(BOOL success, CLXError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (success) {
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"cloudXSDKInitialized" object:nil];

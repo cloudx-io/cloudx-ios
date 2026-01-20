@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CLXINITCFG0001000000000001 /* CLXInitializationConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = CLXINITCFG0001000000000002 /* CLXInitializationConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CLXINITCFG0002000000000001 /* CLXInitializationConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXINITCFG0002000000000002 /* CLXInitializationConfiguration.m */; };
 		CLXNEWTS0001000000000001 /* CLXRetryManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXNEWTS0001000000000002 /* CLXRetryManagerTests.m */; };
 		CLXNEWTS0002000000000001 /* CLXBaseNetworkServiceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXNEWTS0002000000000002 /* CLXBaseNetworkServiceTests.m */; };
 		CLXNEWTS0003000000000001 /* CLXRetryHelperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXNEWTS0003000000000002 /* CLXRetryHelperTests.m */; };
@@ -346,6 +348,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CLXINITCFG0001000000000002 /* CLXInitializationConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInitializationConfiguration.h; sourceTree = "<group>"; };
+		CLXINITCFG0002000000000002 /* CLXInitializationConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInitializationConfiguration.m; sourceTree = "<group>"; };
 		CLXNEWTS0001000000000002 /* CLXRetryManagerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXRetryManagerTests.m; sourceTree = "<group>"; };
 		CLXNEWTS0002000000000002 /* CLXBaseNetworkServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBaseNetworkServiceTests.m; sourceTree = "<group>"; };
 		CLXNEWTS0003000000000002 /* CLXRetryHelperTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXRetryHelperTests.m; sourceTree = "<group>"; };
@@ -1113,6 +1117,8 @@
 				19C724E12E2390810012CFC7 /* CloudXCore.modulemap */,
 				19C724E22E2390810012CFC7 /* CloudXCoreAPI.h */,
 				19C724E32E2390810012CFC7 /* CLXError.h */,
+				CLXINITCFG0001000000000002 /* CLXInitializationConfiguration.h */,
+				CLXINITCFG0002000000000002 /* CLXInitializationConfiguration.m */,
 				19D928BE2E63F44B00C84DAE /* CLXPrivacyService.h */,
 				19F75E452EA41EFB00E889C0 /* CLXEndpointResolver.h */,
 				19C724E42E2390810012CFC7 /* CLXAd.h */,
@@ -1281,6 +1287,7 @@
 				19C7255E2E2390810012CFC7 /* CLXDIContainer.h in Headers */,
 				19C7255F2E2390810012CFC7 /* CLXGeoLocationService.h in Headers */,
 				19C725602E2390810012CFC7 /* CLXError.h in Headers */,
+				CLXINITCFG0001000000000001 /* CLXInitializationConfiguration.h in Headers */,
 				19C725612E2390810012CFC7 /* NSString+CLXSemicolon.h in Headers */,
 				19C725622E2390810012CFC7 /* CLXSDKConfig.h in Headers */,
 				19C725632E2390810012CFC7 /* CLXBidderConfig.h in Headers */,
@@ -1540,6 +1547,7 @@
 				19C725B92E2390810012CFC7 /* CLXBidResponse.m in Sources */,
 				19C725BA2E2390810012CFC7 /* CLXAppSessionServiceImplementation.m in Sources */,
 				19D926C52E61103C00C84DAE /* CLXError.m in Sources */,
+				CLXINITCFG0002000000000001 /* CLXInitializationConfiguration.m in Sources */,
 				1979919A2E74921400EBA0A3 /* CLXConsentProvider.m in Sources */,
 				19C725BB2E2390810012CFC7 /* CLXNativeTemplate.m in Sources */,
 				19C725BC2E2390810012CFC7 /* CLXURLProvider.m in Sources */,

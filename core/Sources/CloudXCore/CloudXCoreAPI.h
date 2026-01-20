@@ -2,6 +2,7 @@
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
+#import <CloudXCore/CLXInitializationConfiguration.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -55,36 +56,29 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 @property (nonatomic, readonly) BOOL isInitialized;
 
 /**
- * Initialize the SDK to start serving ads
- * @param appKey The app key provided by CloudX
+ * Initialize the SDK with a configuration object
+ * @param configuration The initialization configuration
  * @param completion A completion handler that will be called once the SDK is initialized
- * @discussion Test mode is now server-controlled via deviceConfig.
- * 
- * To enable test mode for a device:
- * 1. Initialize the SDK and check logs for your device IFA
- * 2. Whitelist the IFA on the CloudX server dashboard
- * 3. The server will return deviceConfig.test = 1 for whitelisted devices
- * 
- * When test mode is enabled:
- * - Bid requests will include the test flag (OpenRTB spec)
- * - Adapter SDKs will be configured for test mode (e.g., Meta test ads)
- * - No real monetization will occur
+ * @discussion This is the preferred initialization method. Use CLXInitializationConfiguration
+ * to configure the SDK before initialization.
+ *
+ * Example:
+ * @code
+ * CLXInitializationConfiguration *config =
+ *     [CLXInitializationConfiguration configurationWithAppKey:@"your-app-key"
+ *         builderBlock:^(CLXInitializationConfigurationBuilder *builder) {
+ *             builder.pluginVersion = @"flutter-1.2.0";
+ *         }];
+ * [[CloudXCore shared] initializeWithConfiguration:config completion:^(BOOL success, CLXError *error) {
+ *     if (success) {
+ *         NSLog(@"SDK initialized successfully");
+ *     }
+ * }];
+ * @endcode
  */
-- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(nullable void (^)(BOOL success, CLXError * _Nullable error))completion
-    NS_SWIFT_NAME(initializeSDK(appKey:completion:));
-
-/**
- * Initialize the SDK with plugin version identification
- * @param appKey The app key provided by CloudX
- * @param pluginVersion Version string identifying the wrapper SDK (e.g., "flutter-1.2.0", "unity-2.3.1")
- * @param completion A completion handler that will be called once the SDK is initialized
- * @discussion Use this method when integrating the SDK through a plugin or wrapper framework.
- * The pluginVersion helps with debugging and analytics for cross-platform integrations.
- */
-- (void)initializeSDKWithAppKey:(NSString *)appKey
-                  pluginVersion:(nullable NSString *)pluginVersion
-                     completion:(nullable void (^)(BOOL success, CLXError * _Nullable error))completion
-    NS_SWIFT_NAME(initializeSDK(appKey:pluginVersion:completion:));
+- (void)initializeWithConfiguration:(CLXInitializationConfiguration *)configuration
+                         completion:(nullable void (^)(BOOL success, CLXError * _Nullable error))completion
+    NS_SWIFT_NAME(initialize(with:completion:));
 
 /**
  * Set the hashed user ID for auction requests

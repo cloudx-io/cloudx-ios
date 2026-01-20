@@ -113,9 +113,10 @@ class BaseAdViewController: UIViewController, AdStateManaging {
         // Test mode is now server-controlled via deviceConfig
         // To enable test mode, whitelist your device IFA on the CloudX server dashboard
         // Check logs for: "Device IFA for test whitelisting: XXXX-XXXX-XXXX-XXXX"
-        
+
+        let initConfig = CLXInitializationConfiguration.configuration(appKey: appKey)
         return await withCheckedContinuation { continuation in
-            cloudX.initializeSDK(appKey: appKey) { success, error in
+            cloudX.initialize(with: initConfig) { success, error in
                 if success {
                     print("✅ SDK Initialized")
                     NotificationCenter.default.post(name: .sdkInitialized, object: nil)

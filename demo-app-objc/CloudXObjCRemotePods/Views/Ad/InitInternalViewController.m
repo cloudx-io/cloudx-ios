@@ -276,10 +276,10 @@
     
     // Note: Test mode is now server-controlled via deviceConfig
     // Whitelist your device IFA on the CloudX dashboard to enable test mode
-    
+
     // Use standard CloudXCore initialization which will now use our environment override
-    [[CloudXCore shared] initializeSDKWithAppKey:config.appKey 
-                                      completion:^(BOOL success, NSError * _Nullable error) {
+    CLXInitializationConfiguration *initConfig = [CLXInitializationConfiguration configurationWithAppKey:config.appKey];
+    [[CloudXCore shared] initializeWithConfiguration:initConfig completion:^(BOOL success, CLXError * _Nullable error) {
         if (success) {
             [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ SDK initialized successfully with %@ environment", environmentName]];
             self.isSDKInitialized = YES;

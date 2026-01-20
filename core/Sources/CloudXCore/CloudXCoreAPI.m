@@ -197,23 +197,24 @@ static CloudXCore *_sharedInstance = nil;
                                                   testGroupName:_abTestName];
 }
 
-- (void)initializeSDKWithAppKey:(NSString *)appKey
-                  pluginVersion:(nullable NSString *)pluginVersion
-                     completion:(void (^)(BOOL, CLXError * _Nullable))completion {
-    _pluginVersion = [pluginVersion copy];
+- (void)initializeWithConfiguration:(CLXInitializationConfiguration *)configuration
+                         completion:(void (^)(BOOL, CLXError * _Nullable))completion {
+    _pluginVersion = [configuration.pluginVersion copy];
 
     // Store pluginVersion in UserDefaults for access by bid request builder
-    if (pluginVersion) {
-        [[NSUserDefaults standardUserDefaults] setObject:pluginVersion forKey:kCLXCorePluginVersionKey];
+    if (configuration.pluginVersion) {
+        [[NSUserDefaults standardUserDefaults] setObject:configuration.pluginVersion forKey:kCLXCorePluginVersionKey];
     } else {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCorePluginVersionKey];
     }
 
-    [self initializeSDKWithAppKey:appKey completion:completion];
+    [self _initializeWithAppKey:configuration.appKey completion:completion];
 }
 
-- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL, CLXError * _Nullable))completion {
-    [self.logger info:[NSString stringWithFormat:@"[CloudXCore] initializeSDKWithAppKey called with appKey: %@", appKey]];
+#pragma mark - Private Initialization
+
+- (void)_initializeWithAppKey:(NSString *)appKey completion:(void (^)(BOOL, CLXError * _Nullable))completion {
+    [self.logger info:[NSString stringWithFormat:@"[CloudXCore] initializeWithConfiguration called with appKey: %@", appKey]];
     
     // Note: Test mode is now server-controlled via deviceConfig
     // The test mode value will be set after receiving the server response

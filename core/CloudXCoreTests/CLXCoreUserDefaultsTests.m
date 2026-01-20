@@ -16,7 +16,6 @@
 #import "Mocks/CLXMockInitService.h"
 
 @interface CloudXCore (Testing)
-- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(BOOL success, CLXError *error))completion;
 - (void)setHashedUserID:(NSString *)hashedUserID;
 - (void)setUserKeyValue:(NSString *)key value:(NSString *)value;
 + (void)trackSDKError:(NSString *)error;

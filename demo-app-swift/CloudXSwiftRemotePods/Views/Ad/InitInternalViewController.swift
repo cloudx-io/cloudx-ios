@@ -237,9 +237,10 @@ class InitInternalViewController: BaseAdViewController {
         // Test mode is now server-controlled via deviceConfig
         // To enable test mode, whitelist your device IFA on the CloudX server dashboard
         // Check logs for: "Device IFA for test whitelisting: XXXX-XXXX-XXXX-XXXX"
-        
+
         // Use standard CloudXCore initialization which will now use our environment override
-        CloudXCore.shared.initializeSDK(appKey: config.appKey) { [weak self] success, error in
+        let initConfig = CLXInitializationConfiguration.configuration(appKey: config.appKey)
+        CloudXCore.shared.initialize(with: initConfig) { [weak self] success, error in
             if success {
                 DemoAppLogger.sharedInstance.logMessage("✅ SDK initialized successfully with \(environmentName) environment")
                 self?.isSDKInitialized = true

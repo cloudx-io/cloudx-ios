@@ -29,6 +29,7 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXAdType.h>
 
 // Configuration
+#import <CloudXCore/CLXInitializationConfiguration.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXPrivacyConsent.h>
 #import <CloudXCore/CLXConsentProvider.h>
