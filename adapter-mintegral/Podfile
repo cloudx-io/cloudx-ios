@@ -1,9 +1,10 @@
+# Podfile for CloudXMintegralAdapter development
+
 platform :ios, '15.0'
 use_frameworks! :linkage => :static
 
 target 'CloudXMintegralAdapter' do
   pod 'CloudXCore', :path => '../core'
-  # Mintegral SDK 8.x with bidding support
   pod 'MintegralAdSDK/BidBannerAd', '~> 8.0'
   pod 'MintegralAdSDK/BidNewInterstitialAd', '~> 8.0'
   pod 'MintegralAdSDK/BidRewardVideoAd', '~> 8.0'
@@ -17,4 +18,3 @@ post_install do |installer|
     end
   end
 end
-

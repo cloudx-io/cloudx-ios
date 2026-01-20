@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXMintegralAdapter'
-  s.version = '1.3.0'
+  s.version = '2.0.0'
   s.summary = 'CloudX Adapter for Mintegral iOS SDK'
   s.description = <<-DESC
     The CloudX Mintegral Adapter enables publishers to monetize their iOS applications 

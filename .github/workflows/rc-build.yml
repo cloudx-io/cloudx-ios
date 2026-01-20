@@ -20,7 +20,12 @@ name: Release Candidate Build & Publish
 #   - CloudXCore
 #   - CloudXMetaAdapter
 #   - CloudXVungleAdapter
+#   - CloudXInMobiAdapter
+#   - CloudXMintegralAdapter
 #   - CloudXRenderer
+#
+# NOT INCLUDED (not ready for public release):
+#   - CloudXMolocoAdapter
 #
 # GIT TAGS:
 #   NO git tags are created for RC builds.
@@ -99,6 +104,16 @@ jobs:
           ./scripts/update-version-constant.sh renderer "${{ steps.fullversion.outputs.full_version }}"
           echo "Updated CLXRendererVersion.m to: ${{ steps.fullversion.outputs.full_version }}"
       
+      - name: Update InMobi Adapter version constant
+        run: |
+          ./scripts/update-version-constant.sh inmobi "${{ steps.fullversion.outputs.full_version }}"
+          echo "Updated CLXInMobiAdapterVersion.m to: ${{ steps.fullversion.outputs.full_version }}"
+      
+      - name: Update Mintegral Adapter version constant
+        run: |
+          ./scripts/update-version-constant.sh mintegral "${{ steps.fullversion.outputs.full_version }}"
+          echo "Updated CLXMintegralAdapterVersion.m to: ${{ steps.fullversion.outputs.full_version }}"
+      
       # ========== VALIDATE PODSPECS ==========
       
       - name: Validate podspecs
@@ -128,6 +143,37 @@ jobs:
           cd renderer-cloudx
           ./build-xcframework.sh ${{ steps.fullversion.outputs.full_version }}
       
+      - name: Build InMobi Adapter xcframework
+        run: |
+          cd adapter-inmobi
+          ./build-xcframework.sh
+      
+      - name: Build Mintegral Adapter xcframework
+        run: |
+          cd adapter-mintegral
+          ./build-xcframework.sh
+      
+      # ========== PREPARE RC PODSPECS ==========
+      # Copy templates from rc-podspecs/ and update version/URL placeholders
+      
+      - name: Prepare RC Podspecs
+        run: |
+          VERSION="${{ steps.fullversion.outputs.full_version }}"
+          RELEASE_URL="https://github.com/cloudx-io/cloudx-ios-private/releases/download/${VERSION}"
+          
+          # Copy templates to build directory
+          mkdir -p build/rc-podspecs
+          cp rc-podspecs/*.podspec build/rc-podspecs/
+          
+          # Replace placeholders with actual values
+          for podspec in build/rc-podspecs/*.podspec; do
+            sed -i '' "s|VERSION_PLACEHOLDER|${VERSION}|g" "$podspec"
+            sed -i '' "s|RELEASE_URL_PLACEHOLDER|${RELEASE_URL}|g" "$podspec"
+          done
+          
+          echo "✅ Prepared RC podspecs with version: ${VERSION}"
+          ls -la build/rc-podspecs/
+      
       # ========== CREATE GITHUB RELEASE ==========
       
       - name: Create GitHub Release
@@ -148,6 +194,8 @@ jobs:
           - CloudXCore
           - CloudXMetaAdapter
           - CloudXVungleAdapter
+          - CloudXInMobiAdapter
+          - CloudXMintegralAdapter
           - CloudXRenderer
           
           ### ✅ Pre-Release Testing
@@ -158,8 +206,20 @@ jobs:
           - [ ] Banner ads load correctly
           - [ ] MREC ads load correctly
           - [ ] Interstitial ads display properly
+          - [ ] Rewarded ads display properly
           - [ ] SDK version reports correctly in requests
           - [ ] No crashes or memory leaks
+          
+          ### 🔧 Integration (use in Podfile)
+          \`\`\`ruby
+          # Point to RC podspecs from release assets
+          pod 'CloudXCore', :podspec => 'https://github.com/cloudx-io/cloudx-ios-private/releases/download/${{ steps.fullversion.outputs.full_version }}/CloudXCore.podspec'
+          pod 'CloudXMetaAdapter', :podspec => 'https://github.com/cloudx-io/cloudx-ios-private/releases/download/${{ steps.fullversion.outputs.full_version }}/CloudXMetaAdapter.podspec'
+          pod 'CloudXVungleAdapter', :podspec => 'https://github.com/cloudx-io/cloudx-ios-private/releases/download/${{ steps.fullversion.outputs.full_version }}/CloudXVungleAdapter.podspec'
+          pod 'CloudXInMobiAdapter', :podspec => 'https://github.com/cloudx-io/cloudx-ios-private/releases/download/${{ steps.fullversion.outputs.full_version }}/CloudXInMobiAdapter.podspec'
+          pod 'CloudXMintegralAdapter', :podspec => 'https://github.com/cloudx-io/cloudx-ios-private/releases/download/${{ steps.fullversion.outputs.full_version }}/CloudXMintegralAdapter.podspec'
+          pod 'CloudXRenderer', :podspec => 'https://github.com/cloudx-io/cloudx-ios-private/releases/download/${{ steps.fullversion.outputs.full_version }}/CloudXRenderer.podspec'
+          \`\`\`
           
           ### 🔗 Links
           - **Commit:** https://github.com/cloudx-io/cloudx-ios-private/commit/${{ github.sha }}
@@ -185,6 +245,21 @@ jobs:
           if [ -f renderer-cloudx/CloudXRenderer.xcframework.zip ]; then
             gh release upload "$RELEASE_TAG" renderer-cloudx/CloudXRenderer.xcframework.zip
           fi
+          if [ -f adapter-inmobi/CloudXInMobiAdapter.xcframework.zip ]; then
+            gh release upload "$RELEASE_TAG" adapter-inmobi/CloudXInMobiAdapter.xcframework.zip
+          fi
+          if [ -f adapter-mintegral/CloudXMintegralAdapter.xcframework.zip ]; then
+            gh release upload "$RELEASE_TAG" adapter-mintegral/CloudXMintegralAdapter.xcframework.zip
+          fi
+          
+          # Upload RC podspecs
+          for podspec in build/rc-podspecs/*.podspec; do
+            if [ -f "$podspec" ]; then
+              gh release upload "$RELEASE_TAG" "$podspec"
+            fi
+          done
+          
+          echo "✅ Uploaded all xcframeworks and podspecs"
       
       - name: Summary
         run: |
@@ -198,9 +273,19 @@ jobs:
           echo "- CloudXCore" >> $GITHUB_STEP_SUMMARY
           echo "- CloudXMetaAdapter" >> $GITHUB_STEP_SUMMARY
           echo "- CloudXVungleAdapter" >> $GITHUB_STEP_SUMMARY
+          echo "- CloudXInMobiAdapter" >> $GITHUB_STEP_SUMMARY
+          echo "- CloudXMintegralAdapter" >> $GITHUB_STEP_SUMMARY
           echo "- CloudXRenderer" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔧 Integration" >> $GITHUB_STEP_SUMMARY
+          echo "Add to your Podfile:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`ruby" >> $GITHUB_STEP_SUMMARY
+          echo "pod 'CloudXCore', :podspec => 'https://github.com/cloudx-io/cloudx-ios-private/releases/download/${{ steps.fullversion.outputs.full_version }}/CloudXCore.podspec'" >> $GITHUB_STEP_SUMMARY
+          echo "pod 'CloudXRenderer', :podspec => 'https://github.com/cloudx-io/cloudx-ios-private/releases/download/${{ steps.fullversion.outputs.full_version }}/CloudXRenderer.podspec'" >> $GITHUB_STEP_SUMMARY
+          echo "# Add adapters as needed..." >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "### ✅ Next Steps" >> $GITHUB_STEP_SUMMARY
-          echo "1. Test this RC build thoroughly" >> $GITHUB_STEP_SUMMARY
+          echo "1. Test this RC build thoroughly using the podspecs above" >> $GITHUB_STEP_SUMMARY
           echo "2. If all tests pass, merge to main (squash merge)" >> $GITHUB_STEP_SUMMARY
-          echo "3. Tag main with component tags" >> $GITHUB_STEP_SUMMARY
+          echo "3. Sync to public repo and push to CocoaPods Trunk" >> $GITHUB_STEP_SUMMARY

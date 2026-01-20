@@ -104,3 +104,11 @@ test-results/
 *.bak
 *.backup
 *.orig
+
+# Build artifacts - xcframeworks are distributed via releases, not committed
+unity-binaries/*.xcframework/
+unity-binaries/*.xcframework.zip
+
+# Generated/temporary files
+**/release_metadata.txt
+**/LLM_CONTINUATION_SUMMARY.md

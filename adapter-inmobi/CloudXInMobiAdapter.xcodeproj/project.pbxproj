@@ -26,11 +26,6 @@
 		A10000000000000C /* CLXInMobiInterstitial.h in Headers */ = {isa = PBXBuildFile; fileRef = A20000000000000C /* CLXInMobiInterstitial.h */; };
 		A10000000000000D /* CLXInMobiInterstitialFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000D /* CLXInMobiInterstitialFactory.m */; };
 		A10000000000000E /* CLXInMobiInterstitialFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A20000000000000E /* CLXInMobiInterstitialFactory.h */; };
-		/* Native */
-		A10000000000000F /* CLXInMobiNative.m in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000F /* CLXInMobiNative.m */; };
-		A100000000000010 /* CLXInMobiNative.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000010 /* CLXInMobiNative.h */; };
-		A100000000000011 /* CLXInMobiNativeFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000011 /* CLXInMobiNativeFactory.m */; };
-		A100000000000012 /* CLXInMobiNativeFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000012 /* CLXInMobiNativeFactory.h */; };
 		/* Rewarded */
 		A100000000000013 /* CLXInMobiRewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000013 /* CLXInMobiRewarded.m */; };
 		A100000000000014 /* CLXInMobiRewarded.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000014 /* CLXInMobiRewarded.h */; };
@@ -68,11 +63,6 @@
 		A20000000000000C /* CLXInMobiInterstitial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiInterstitial.h; sourceTree = "<group>"; };
 		A20000000000000D /* CLXInMobiInterstitialFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiInterstitialFactory.m; sourceTree = "<group>"; };
 		A20000000000000E /* CLXInMobiInterstitialFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiInterstitialFactory.h; sourceTree = "<group>"; };
-		/* Native */
-		A20000000000000F /* CLXInMobiNative.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiNative.m; sourceTree = "<group>"; };
-		A200000000000010 /* CLXInMobiNative.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiNative.h; sourceTree = "<group>"; };
-		A200000000000011 /* CLXInMobiNativeFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiNativeFactory.m; sourceTree = "<group>"; };
-		A200000000000012 /* CLXInMobiNativeFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiNativeFactory.h; sourceTree = "<group>"; };
 		/* Rewarded */
 		A200000000000013 /* CLXInMobiRewarded.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiRewarded.m; sourceTree = "<group>"; };
 		A200000000000014 /* CLXInMobiRewarded.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiRewarded.h; sourceTree = "<group>"; };
@@ -158,17 +148,6 @@
 			path = Interstitial;
 			sourceTree = "<group>";
 		};
-		A500000000000006 /* Native */ = {
-			isa = PBXGroup;
-			children = (
-				A200000000000010 /* CLXInMobiNative.h */,
-				A20000000000000F /* CLXInMobiNative.m */,
-				A200000000000012 /* CLXInMobiNativeFactory.h */,
-				A200000000000011 /* CLXInMobiNativeFactory.m */,
-			);
-			path = Native;
-			sourceTree = "<group>";
-		};
 		A500000000000007 /* Rewarded */ = {
 			isa = PBXGroup;
 			children = (
@@ -197,7 +176,6 @@
 				A500000000000003 /* BidTokenSource */,
 				A500000000000004 /* Initializers */,
 				A500000000000005 /* Interstitial */,
-				A500000000000006 /* Native */,
 				A500000000000007 /* Rewarded */,
 				A500000000000008 /* Utils */,
 				A200000000000019 /* CloudXInMobiAdapter.h */,
@@ -267,8 +245,6 @@
 				A10000000000000A /* CLXInMobiInitializer.h in Headers */,
 				A10000000000000C /* CLXInMobiInterstitial.h in Headers */,
 				A10000000000000E /* CLXInMobiInterstitialFactory.h in Headers */,
-				A100000000000010 /* CLXInMobiNative.h in Headers */,
-				A100000000000012 /* CLXInMobiNativeFactory.h in Headers */,
 				A100000000000014 /* CLXInMobiRewarded.h in Headers */,
 				A100000000000016 /* CLXInMobiRewardedFactory.h in Headers */,
 				A100000000000018 /* CLXInMobiErrorHandler.h in Headers */,
@@ -379,8 +355,6 @@
 				A100000000000009 /* CLXInMobiInitializer.m in Sources */,
 				A10000000000000B /* CLXInMobiInterstitial.m in Sources */,
 				A10000000000000D /* CLXInMobiInterstitialFactory.m in Sources */,
-				A10000000000000F /* CLXInMobiNative.m in Sources */,
-				A100000000000011 /* CLXInMobiNativeFactory.m in Sources */,
 				A100000000000013 /* CLXInMobiRewarded.m in Sources */,
 				A100000000000015 /* CLXInMobiRewardedFactory.m in Sources */,
 				A100000000000017 /* CLXInMobiErrorHandler.m in Sources */,

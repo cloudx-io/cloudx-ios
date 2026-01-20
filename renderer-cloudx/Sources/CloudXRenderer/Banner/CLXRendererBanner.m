@@ -17,7 +17,7 @@
 
 #import "CLXRendererBanner.h"
 #import "CLXWKScriptHelper.h"
-#import "CLXRendererVersion.h"
+#import "../CLXRendererVersion.h"
 #import <SafariServices/SafariServices.h>
 #import <CloudXCore/CLXLogger.h>
 

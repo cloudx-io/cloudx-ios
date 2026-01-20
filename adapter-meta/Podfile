@@ -10,7 +10,6 @@ target 'CloudXMetaAdapter' do
   # FBAudienceNetwork MUST remain as an external dependency per Meta's terms
   pod 'FBAudienceNetwork', '6.20.1'
   
-  # Use local CloudXCore from the monorepo during build
   pod 'CloudXCore', :path => '../core'
 
   target 'CloudXMetaAdapterTests' do

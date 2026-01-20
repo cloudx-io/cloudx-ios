@@ -13,7 +13,8 @@
 #import "CLXInMobiInterstitialFactory.h"
 #import "CLXInMobiRewardedFactory.h"
 #import "CLXInMobiBannerFactory.h"
-#import "CLXInMobiNativeFactory.h"
+// Native disabled - out of date and not supported yet
+// #import "CLXInMobiNativeFactory.h"
 
 // Conditional import for CloudXCore header
 #if __has_include(<CloudXCore/CloudXCore.h>)
@@ -43,7 +44,8 @@ __attribute__((visibility("default"))) void CloudXInMobiAdapterRegister(void) {
     [CLXInMobiInterstitialFactory class];
     [CLXInMobiRewardedFactory class];
     [CLXInMobiBannerFactory class];
-    [CLXInMobiNativeFactory class];
+    // Native disabled - out of date and not supported yet
+    // [CLXInMobiNativeFactory class];
     
     [registrationLogger debug:@"InMobi adapter classes loaded successfully"];
 }

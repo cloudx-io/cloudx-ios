@@ -7,7 +7,7 @@
 
 #import "CLXRendererRewarded.h"
 #import "CLXFullscreenStaticContainerViewController.h"
-#import "CLXRendererVersion.h"
+#import "../CLXRendererVersion.h"
 #import <CloudXCore/CLXLogger.h>
 
 @interface CLXRendererRewarded () <CLXFullscreenStaticContainerViewControllerDelegate>

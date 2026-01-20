@@ -1,64 +1,119 @@
 #!/bin/bash
-set -e
 
-FRAMEWORK_NAME="CloudXMintegralAdapter"
-BUILD_DIR="build"
-XCFRAMEWORK_PATH="${FRAMEWORK_NAME}.xcframework"
+# Build script for CloudXMintegralAdapter
+# Creates .xcframework for distribution
 
-echo "🧹 Cleaning previous builds..."
-rm -rf "${BUILD_DIR}"
-rm -rf "${XCFRAMEWORK_PATH}"
-rm -f "${XCFRAMEWORK_PATH}.zip"
+# Fix UTF-8 encoding issues for CocoaPods
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
 
-echo "📦 Installing CocoaPods dependencies..."
-pod install
+# Colors for pretty output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
-echo "🏗️  Building for iOS device (arm64)..."
+# Function to print status
+print_status() {
+    echo -e "${GREEN}✅ $1 ${NC}"
+}
+
+print_error() {
+    echo -e "${RED}❌ $1 ${NC}"
+    exit 1
+}
+
+# --- Step 1: Setup ---
+print_status "1. Setting up the environment..."
+pod install || print_error "Pod install failed."
+
+# --- Step 1.5: Setup Module Structure ---
+print_status "1.5. Setting up module structure..."
+FRAMEWORK_PATH="./CloudXMintegralAdapter.framework"
+mkdir -p "${FRAMEWORK_PATH}/Headers"
+mkdir -p "${FRAMEWORK_PATH}/Modules"
+
+# Copy umbrella header and module map to the framework
+cp "Sources/CloudXMintegralAdapter/CloudXMintegralAdapter.h" "${FRAMEWORK_PATH}/Headers/" || print_error "Failed to copy umbrella header"
+cp "Sources/CloudXMintegralAdapter/module.modulemap" "${FRAMEWORK_PATH}/Modules/" || print_error "Failed to copy module map"
+
+# --- Step 2: Build Static Framework for Device ---
+print_status "2. Building Static Framework for Device..."
 xcodebuild archive \
-  -workspace "${FRAMEWORK_NAME}.xcworkspace" \
-  -scheme "${FRAMEWORK_NAME}" \
+  -workspace CloudXMintegralAdapter.xcworkspace \
+  -scheme CloudXMintegralAdapter \
   -destination "generic/platform=iOS" \
-  -archivePath "${BUILD_DIR}/ios.xcarchive" \
-  -sdk iphoneos \
+  -archivePath ./build/static/ios_devices.xcarchive \
+  -configuration Release \
   SKIP_INSTALL=NO \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-  ENABLE_BITCODE=NO \
-  | tee xcodebuild-ios.log | xcpretty || cat xcodebuild-ios.log
+  CODE_SIGNING_ALLOWED=NO \
+  MACH_O_TYPE=staticlib \
+  IPHONEOS_DEPLOYMENT_TARGET=14.0 \
+  DEBUG_INFORMATION_FORMAT=dwarf \
+  DEPLOYMENT_POSTPROCESSING=YES \
+  STRIP_INSTALLED_PRODUCT=YES \
+  STRIP_STYLE=non-global \
+  COPY_PHASE_STRIP=YES \
+  HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMintegralAdapter $(SRCROOT)/Sources/CloudXMintegralAdapter/Base $(SRCROOT)/Sources/CloudXMintegralAdapter/Banner $(SRCROOT)/Sources/CloudXMintegralAdapter/Initializers $(SRCROOT)/Sources/CloudXMintegralAdapter/Interstitial $(SRCROOT)/Sources/CloudXMintegralAdapter/Rewarded $(SRCROOT)/Sources/CloudXMintegralAdapter/Utils' \
+  USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMintegralAdapter $(SRCROOT)/Sources/CloudXMintegralAdapter/Base $(SRCROOT)/Sources/CloudXMintegralAdapter/Banner $(SRCROOT)/Sources/CloudXMintegralAdapter/Initializers $(SRCROOT)/Sources/CloudXMintegralAdapter/Interstitial $(SRCROOT)/Sources/CloudXMintegralAdapter/Rewarded $(SRCROOT)/Sources/CloudXMintegralAdapter/Utils' 2>&1 | tee xcodebuild-ios.log || print_error "Failed to build static framework for device."
 
-echo "🏗️  Building for iOS Simulator (arm64 + x86_64)..."
+# --- Step 3: Build Static Framework for Simulator ---
+print_status "3. Building Static Framework for Simulator..."
 xcodebuild archive \
-  -workspace "${FRAMEWORK_NAME}.xcworkspace" \
-  -scheme "${FRAMEWORK_NAME}" \
+  -workspace CloudXMintegralAdapter.xcworkspace \
+  -scheme CloudXMintegralAdapter \
   -destination "generic/platform=iOS Simulator" \
-  -archivePath "${BUILD_DIR}/ios-sim.xcarchive" \
-  -sdk iphonesimulator \
+  -archivePath ./build/static/ios_simulator.xcarchive \
+  -configuration Release \
   SKIP_INSTALL=NO \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-  ENABLE_BITCODE=NO \
-  | tee xcodebuild-sim.log | xcpretty || cat xcodebuild-sim.log
+  CODE_SIGNING_ALLOWED=NO \
+  MACH_O_TYPE=staticlib \
+  IPHONEOS_DEPLOYMENT_TARGET=14.0 \
+  DEBUG_INFORMATION_FORMAT=dwarf \
+  DEPLOYMENT_POSTPROCESSING=YES \
+  STRIP_INSTALLED_PRODUCT=YES \
+  STRIP_STYLE=non-global \
+  COPY_PHASE_STRIP=YES \
+  HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMintegralAdapter $(SRCROOT)/Sources/CloudXMintegralAdapter/Base $(SRCROOT)/Sources/CloudXMintegralAdapter/Banner $(SRCROOT)/Sources/CloudXMintegralAdapter/Initializers $(SRCROOT)/Sources/CloudXMintegralAdapter/Interstitial $(SRCROOT)/Sources/CloudXMintegralAdapter/Rewarded $(SRCROOT)/Sources/CloudXMintegralAdapter/Utils' \
+  USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMintegralAdapter $(SRCROOT)/Sources/CloudXMintegralAdapter/Base $(SRCROOT)/Sources/CloudXMintegralAdapter/Banner $(SRCROOT)/Sources/CloudXMintegralAdapter/Initializers $(SRCROOT)/Sources/CloudXMintegralAdapter/Interstitial $(SRCROOT)/Sources/CloudXMintegralAdapter/Rewarded $(SRCROOT)/Sources/CloudXMintegralAdapter/Utils' 2>&1 | tee xcodebuild-sim.log || print_error "Failed to build static framework for simulator."
 
-echo "📦 Creating XCFramework..."
+# --- Step 4: Create .xcframework ---
+print_status "4. Creating .xcframework..."
+rm -rf ./CloudXMintegralAdapter.xcframework
 xcodebuild -create-xcframework \
-  -framework "${BUILD_DIR}/ios.xcarchive/Products/Library/Frameworks/${FRAMEWORK_NAME}.framework" \
-  -framework "${BUILD_DIR}/ios-sim.xcarchive/Products/Library/Frameworks/${FRAMEWORK_NAME}.framework" \
-  -output "${XCFRAMEWORK_PATH}"
+  -framework ./build/static/ios_devices.xcarchive/Products/Library/Frameworks/CloudXMintegralAdapter.framework \
+  -framework ./build/static/ios_simulator.xcarchive/Products/Library/Frameworks/CloudXMintegralAdapter.framework \
+  -output ./CloudXMintegralAdapter.xcframework || print_error "Failed to create .xcframework."
 
-echo "📝 Setting up module map in XCFramework..."
-for arch_dir in "${XCFRAMEWORK_PATH}"/*/; do
-    HEADERS_DIR="${arch_dir}Headers"
-    if [ -d "${HEADERS_DIR}" ]; then
-        cp "Sources/${FRAMEWORK_NAME}/module.modulemap" "${HEADERS_DIR}/"
-        echo "✅ Copied module.modulemap to ${HEADERS_DIR}"
-    fi
+# --- Step 5: Setup Module Map and Headers ---
+print_status "5. Setting up module map and headers..."
+for platform in ios-arm64 ios-arm64_x86_64-simulator; do
+    FRAMEWORK_PATH="./CloudXMintegralAdapter.xcframework/${platform}/CloudXMintegralAdapter.framework"
+    
+    # Create Modules directory if it doesn't exist
+    mkdir -p "${FRAMEWORK_PATH}/Modules"
+    
+    # Copy module map
+    cp "Sources/CloudXMintegralAdapter/module.modulemap" "${FRAMEWORK_PATH}/Modules/module.modulemap" || print_error "Failed to copy module map"
+    
+    # Ensure headers are in the right place
+    mkdir -p "${FRAMEWORK_PATH}/Headers"
+    cp "Sources/CloudXMintegralAdapter/CloudXMintegralAdapter.h" "${FRAMEWORK_PATH}/Headers/" || print_error "Failed to copy umbrella header"
+    
+    # Copy all public headers
+    find "Sources/CloudXMintegralAdapter" -name "*.h" -exec cp {} "${FRAMEWORK_PATH}/Headers/" \; || print_error "Failed to copy public headers"
 done
 
-echo "🗜️  Compressing XCFramework..."
-zip -r "${XCFRAMEWORK_PATH}.zip" "${XCFRAMEWORK_PATH}"
+# --- Step 6: Zip the xcframework ---
+print_status "6. Zipping the .xcframework..."
+zip -r CloudXMintegralAdapter.xcframework.zip CloudXMintegralAdapter.xcframework LICENSE || print_error "Failed to zip .xcframework."
 
-echo "✅ Build complete!"
-echo "📦 XCFramework: ${XCFRAMEWORK_PATH}"
-echo "📦 Zip: ${XCFRAMEWORK_PATH}.zip"
+# --- Step 7: Cleanup ---
+print_status "7. Cleaning up build artifacts..."
+rm -rf ./build || print_error "Failed to clean up build artifacts."
 
-CHECKSUM=$(swift package compute-checksum "${XCFRAMEWORK_PATH}.zip")
-echo "🔐 SwiftPM Checksum: ${CHECKSUM}"
-
+# --- Step 8: Complete ---
+print_status "🎉 Build completed successfully!"
+print_status "📦 Output:"
+echo " - CloudXMintegralAdapter.xcframework.zip"

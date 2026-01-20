@@ -24,13 +24,11 @@
 #import <CloudXInMobiAdapter/CLXInMobiBannerFactory.h>
 #import <CloudXInMobiAdapter/CLXInMobiInterstitialFactory.h>
 #import <CloudXInMobiAdapter/CLXInMobiRewardedFactory.h>
-#import <CloudXInMobiAdapter/CLXInMobiNativeFactory.h>
 #import <CloudXInMobiAdapter/CLXInMobiBidTokenSource.h>
 #else
 #import "Banner/CLXInMobiBannerFactory.h"
 #import "Interstitial/CLXInMobiInterstitialFactory.h"
 #import "Rewarded/CLXInMobiRewardedFactory.h"
-#import "Native/CLXInMobiNativeFactory.h"
 #import "BidTokenSource/CLXInMobiBidTokenSource.h"
 #endif
 

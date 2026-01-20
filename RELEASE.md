@@ -92,6 +92,7 @@ cd core && ./build-xcframework.sh X.Y.Z && cd ..
 cd adapter-meta && ./build-xcframework.sh && cd ..
 cd adapter-vungle && ./build-xcframework.sh && cd ..
 cd adapter-inmobi && ./build-xcframework.sh && cd ..
+cd adapter-mintegral && ./build-xcframework.sh && cd ..
 cd renderer-cloudx && ./build-xcframework.sh X.Y.Z && cd ..
 
 # 7. Commit and push release branch

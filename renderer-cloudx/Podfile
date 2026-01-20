@@ -6,7 +6,6 @@ target 'CloudXRenderer' do
   use_frameworks!
 
   # Pods for CloudXRenderer
-  # LOCAL development (monorepo)
   pod 'CloudXCore', :path => '../core'
 
   # REMOTE development
