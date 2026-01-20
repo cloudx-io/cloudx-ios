@@ -62,8 +62,6 @@
 		19656C1C2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 19656C1B2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19656C242E91CF3100BFA06E /* CLXBidLifecycleEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19656C232E91CF3100BFA06E /* CLXBidLifecycleEvent.m */; };
 		196B5A682EE9970A00262ECF /* CLXAdapterBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 196B5A672EE9970A00262ECF /* CLXAdapterBanner.m */; };
-		196B5A6C2EE9976600262ECF /* CLXAdapterErrorMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 196B5A6A2EE9976600262ECF /* CLXAdapterErrorMapper.m */; };
-		196B5EB62EEC460F00262ECF /* CLXAdapterErrorMapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 196B5EB32EEC460F00262ECF /* CLXAdapterErrorMapper.h */; };
 		196C04402ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C043A2ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m */; };
 		196C04412ECDBC1B0087146A /* CLXLoggerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C043C2ECDBC1B0087146A /* CLXLoggerTests.m */; };
 		196C04422ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 196C04392ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m */; };
@@ -407,8 +405,6 @@
 		19656C1B2E8F2FF700BFA06E /* CLXBidLifecycleEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXBidLifecycleEvent.h; sourceTree = "<group>"; };
 		19656C232E91CF3100BFA06E /* CLXBidLifecycleEvent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidLifecycleEvent.m; sourceTree = "<group>"; };
 		196B5A672EE9970A00262ECF /* CLXAdapterBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterBanner.m; sourceTree = "<group>"; };
-		196B5A6A2EE9976600262ECF /* CLXAdapterErrorMapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterErrorMapper.m; sourceTree = "<group>"; };
-		196B5EB32EEC460F00262ECF /* CLXAdapterErrorMapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAdapterErrorMapper.h; sourceTree = "<group>"; };
 		196C04392ECDBC1B0087146A /* CLXEventTrackerBulkApiTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXEventTrackerBulkApiTests.m; sourceTree = "<group>"; };
 		196C043A2ECDBC1B0087146A /* CLXKeyValueBidRequestInjectionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXKeyValueBidRequestInjectionTests.m; sourceTree = "<group>"; };
 		196C043B2ECDBC1B0087146A /* CLXKeyValueStateTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXKeyValueStateTests.m; sourceTree = "<group>"; };
@@ -872,7 +868,6 @@
 		19C7248D2E2390810012CFC7 /* Adapter */ = {
 			isa = PBXGroup;
 			children = (
-				196B5A6A2EE9976600262ECF /* CLXAdapterErrorMapper.m */,
 				19C7248B2E2390810012CFC7 /* CLXAdapterFactoryResolver.m */,
 				19C7248C2E2390810012CFC7 /* CLXAdNetworkFactories.m */,
 				196B5A672EE9970A00262ECF /* CLXAdapterBanner.m */,
@@ -1045,7 +1040,6 @@
 			children = (
 				194BC0C22EF3F7290008DB33 /* CLXUIApplicationProxy.h */,
 				194BBEC42EF195A10008DB33 /* CLXReward.h */,
-				196B5EB32EEC460F00262ECF /* CLXAdapterErrorMapper.h */,
 				19D8D2202EDA04C900817D1E /* CLXORTBConstants.h */,
 				CLXPLVALH0002000000000001 /* CLXPlacementValidator.h */,
 				19D8D4B72EDD7B0400817D1E /* Debug */,
@@ -1292,7 +1286,6 @@
 				19C725632E2390810012CFC7 /* CLXBidderConfig.h in Headers */,
 				19C725662E2390810012CFC7 /* CLXBidAdSource.h in Headers */,
 				19C725672E2390810012CFC7 /* CLXExponentialBackoffStrategy.h in Headers */,
-				196B5EB62EEC460F00262ECF /* CLXAdapterErrorMapper.h in Headers */,
 				19C725682E2390810012CFC7 /* CLXAdapterFactoryResolver.h in Headers */,
 				19C725692E2390810012CFC7 /* UIDevice+CLXIdentifier.h in Headers */,
 				19C7256A2E2390810012CFC7 /* CLXDestroyable.h in Headers */,
@@ -1618,7 +1611,6 @@
 				19C725EA2E2390810012CFC7 /* NSString+CLXSemicolon.m in Sources */,
 				19C725EB2E2390810012CFC7 /* CLXXorEncryption.m in Sources */,
 				19C725EC2E2390810012CFC7 /* CLXBannerAdView.m in Sources */,
-				196B5A6C2EE9976600262ECF /* CLXAdapterErrorMapper.m in Sources */,
 				CLXPLVALM0001000000000001 /* CLXPlacementValidator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
