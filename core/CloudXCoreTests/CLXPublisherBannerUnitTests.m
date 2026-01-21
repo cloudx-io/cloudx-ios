@@ -830,4 +830,69 @@ static const NSTimeInterval kTestTimeout = 2.0;
     XCTAssertTrue(mockDelegate.didCollapseCalled, @"didCollapseBanner should forward to delegate");
 }
 
+#pragma mark - Load After Destroy Error Callback Tests
+
+// Test that load() after destroy() triggers didFailToLoadAd callback
+- (void)testLoadAfterDestroyTriggersErrorCallback {
+    // Given: A delegate to capture callbacks
+    XCTestExpectation *callbackExpectation = [self expectationWithDescription:@"didFailToLoadAd callback"];
+    MockBannerDelegate *mockDelegate = [[MockBannerDelegate alloc] init];
+    mockDelegate.failToLoadCallback = ^{
+        [callbackExpectation fulfill];
+    };
+    self.banner.delegate = mockDelegate;
+    
+    // When: Banner is destroyed, then load is called
+    [self.banner destroy];
+    XCTAssertTrue(self.banner.forceStop, @"forceStop should be set after destroy");
+    
+    [self.banner load];
+    
+    // Then: didFailToLoadAd should be called with appropriate error
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    XCTAssertTrue(mockDelegate.failToLoadCalled, @"didFailToLoadAd should be called when loading after destroy");
+    XCTAssertNotNil(mockDelegate.lastError, @"Error should be provided");
+    XCTAssertEqual(mockDelegate.lastError.code, CLXErrorCodeLoadFailed, @"Error code should be CLXErrorCodeLoadFailed");
+    XCTAssertTrue([mockDelegate.lastError.localizedDescription containsString:@"destroy"], 
+                  @"Error message should mention destroy: %@", mockDelegate.lastError.localizedDescription);
+}
+
+// Test that load() after destroy() does not crash and returns immediately
+- (void)testLoadAfterDestroyDoesNotCrash {
+    // Given: A destroyed banner
+    [self.banner destroy];
+    XCTAssertTrue(self.banner.forceStop, @"forceStop should be set after destroy");
+    
+    // When/Then: Calling load should not crash
+    XCTAssertNoThrow([self.banner load], @"load() after destroy() should not crash");
+    
+    // And should not start loading
+    XCTAssertFalse(self.banner.isLoading, @"Should not be loading after destroy");
+}
+
+// Test that multiple loads after destroy all trigger callbacks
+- (void)testMultipleLoadsAfterDestroyTriggerCallbacks {
+    // Given: A delegate to capture callbacks
+    __block NSInteger callbackCount = 0;
+    XCTestExpectation *callbackExpectation = [self expectationWithDescription:@"Multiple didFailToLoadAd callbacks"];
+    callbackExpectation.expectedFulfillmentCount = 3;
+    
+    MockBannerDelegate *mockDelegate = [[MockBannerDelegate alloc] init];
+    mockDelegate.failToLoadCallback = ^{
+        callbackCount++;
+        [callbackExpectation fulfill];
+    };
+    self.banner.delegate = mockDelegate;
+    
+    // When: Banner is destroyed, then load is called multiple times
+    [self.banner destroy];
+    [self.banner load];
+    [self.banner load];
+    [self.banner load];
+    
+    // Then: Each load should trigger a callback
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    XCTAssertEqual(callbackCount, 3, @"Each load() after destroy() should trigger a callback");
+}
+
 @end

@@ -32,6 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Additional properties for expand/collapse tracking
 @property (nonatomic, strong, nullable) CLXAd *lastExpandedAd;
 @property (nonatomic, strong, nullable) CLXAd *lastCollapsedAd;
+// Callback blocks for async test expectations
+@property (nonatomic, copy, nullable) void (^failToLoadCallback)(void);
+@property (nonatomic, copy, nullable) void (^didLoadCallback)(void);
 @end
 
 // MARK: - Mock Banner Adapter
@@ -72,12 +75,18 @@ NS_ASSUME_NONNULL_END
 - (void)didLoadAd:(CLXAd *)ad {
     self.didLoadCalled = YES;
     self.lastAd = ad;
+    if (self.didLoadCallback) {
+        self.didLoadCallback();
+    }
 }
 
 - (void)didFailToLoadAd:(NSString *)placementName error:(NSError *)error {
     self.failToLoadCalled = YES;
     self.lastPlacementName = placementName;
     self.lastError = error;
+    if (self.failToLoadCallback) {
+        self.failToLoadCallback();
+    }
 }
 
 - (void)didClickAd:(CLXAd *)ad {

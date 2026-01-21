@@ -134,6 +134,7 @@ NS_ASSUME_NONNULL_BEGIN
         _successWin = NO;
         _loadNativeTimesCount = 0;
         _pendingLoadRequestCount = 0;
+        _delegate = delegate;
         
         // Initialize Analytics tracking service
         _rillTrackingService = [[CLXRillTrackingService alloc] initWithReportingService:reportingService];
@@ -208,7 +209,33 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - CloudXNative Protocol
 
+/// Checks if the native ad has been destroyed and triggers error callback if so.
+/// @return YES if destroyed (caller should return early), NO otherwise.
+- (BOOL)handleDestroyedStateError {
+    if (!self.forceStop) {
+        return NO;
+    }
+    
+    [self.logger debug:[NSString stringWithFormat:@"Native load stopped due to forceStop flag for placement: %@", self.placementID]];
+    // Trigger error callback - publishers expect a response to API calls
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
+            CLXError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
+                                          description:@"Cannot load ad after destroy() has been called. Create a new ad instance to load another ad."];
+            [self.logger logDelegateError:@"❌ Native didFailToLoadAd" error:error];
+            [self.delegate didFailToLoadAd:self.placementName error:error];
+        }
+    });
+    
+    return YES;
+}
+
 - (void)load {
+    // Check if destroyed - must be first to catch load-after-destroy scenario
+    if ([self handleDestroyedStateError]) {
+        return;
+    }
+    
     // Check for deferred error from create method
     if (self.deferredError) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -233,6 +260,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Internal method to actually perform the load operation
 - (void)performLoad {
+    // Defensive guard: forceStop is already handled in load(), but check again in case
+    // performLoad() is called directly (e.g., after SDK initialization notification)
+    if ([self handleDestroyedStateError]) {
+        return;
+    }
+    
     // Check if we need to complete deferred initialization (bidAdSource is nil)
     if (!self.bidAdSource && self.requestedPlacementName && [[CloudXCore shared] isInitialized]) {
         // SDK is now initialized - complete initialization with real placement config

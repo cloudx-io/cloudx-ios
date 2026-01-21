@@ -290,6 +290,18 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 #pragma mark - Public Methods
 
 - (void)load {
+    // Check if destroyed - must be first to catch load-after-destroy scenario
+    if (self.currentState == CLXFullscreenAdStateDESTROYED) {
+        [self.logger error:[NSString stringWithFormat:@"❌ [PublisherFullscreenAd] Ad destroyed, cannot load"]];
+        // Trigger error callback - publishers expect a response to API calls
+        dispatch_async(dispatch_get_main_queue(), ^{
+            CLXError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
+                                          description:@"Cannot load ad after destroy() has been called. Create a new ad instance to load another ad."];
+            [self notifyLoadFailure:error];
+        });
+        return;
+    }
+    
     // Check for deferred error from create method
     if (self.deferredError) {
         [self.logger error:[NSString stringWithFormat:@"Fullscreen ad creation failed with deferred error: %@", self.deferredError.localizedDescription]];
@@ -395,7 +407,16 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
             [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherFullscreenAd] Currently showing, ignoring load request", self.currentCorrelationId]];
             return;
         case CLXFullscreenAdStateDESTROYED:
+            // Defensive guard: DESTROYED state is already handled in load() at the top.
+            // This case handles edge scenarios where performLoad() is called directly
+            // (e.g., after SDK initialization notification when ad was destroyed while queued).
             [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherFullscreenAd] Ad destroyed, cannot load", self.currentCorrelationId]];
+            // Trigger error callback - publishers expect a response to API calls
+            dispatch_async(dispatch_get_main_queue(), ^{
+                CLXError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
+                                              description:@"Cannot load ad after destroy() has been called. Create a new ad instance to load another ad."];
+                [self notifyLoadFailure:error];
+            });
             return;
     }
     
