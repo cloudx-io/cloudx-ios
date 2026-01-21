@@ -62,6 +62,9 @@
 - (NSString *)cloudXErrorCodeName:(NSInteger)code {
     // Map CloudX error codes to human-readable names
     switch (code) {
+        // GENERAL ERRORS (0)
+        case 0: return @"Internal Error";
+
         // INITIALIZATION ERRORS (100-199)
         case 100: return @"Not Initialized";
         case 101: return @"Initialization In Progress";

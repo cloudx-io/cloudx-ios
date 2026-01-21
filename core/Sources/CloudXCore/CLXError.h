@@ -31,8 +31,8 @@ typedef NS_ENUM(NSInteger, CLXLossReason) {
  */
 typedef NS_ENUM(NSInteger, CLXErrorCode) {
     // GENERAL ERRORS (0-99)
-    /// Unknown or unspecified error
-    CLXErrorCodeUnknown = 0,
+    /// An internal error occurred
+    CLXErrorCodeInternalError = 0,
     
     // INITIALIZATION ERRORS (100-199)
     /// SDK failed to initialize
@@ -111,8 +111,8 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     CLXErrorCodeInvalidBidResponse = 508,
     
     // ADAPTER ERRORS (600-699)
-    /// Ad network adapter encountered an unexpected error
-    CLXErrorCodeAdapterUnexpectedError = 600,
+    /// Internal adapter error
+    CLXErrorCodeAdapterInternalError = 600,
     /// Ad network adapter initialization failed
     CLXErrorCodeAdapterInitializationError = 601,
     /// Ad network adapter received invalid server parameters (e.g., missing placement ID)
@@ -128,11 +128,7 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     /// Ad network adapter is in an invalid state for loading ads
     CLXErrorCodeAdapterInvalidLoadState = 607,
     /// Ad network adapter has invalid or missing configuration
-    CLXErrorCodeAdapterInvalidConfiguration = 608,
-    
-    // GENERAL ERRORS (700-799)
-    /// An unexpected error occurred
-    CLXErrorCodeUnexpectedError = 700
+    CLXErrorCodeAdapterInvalidConfiguration = 608
 };
 
 /**

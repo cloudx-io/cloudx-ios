@@ -96,7 +96,7 @@ static NSString * const kSDKVersion = @"8.0.3"; // Mintegral SDK version (update
             if (completion) completion(YES, nil);
             
         } @catch (NSException *exception) {
-            NSError *error = [CLXError errorWithCode:CLXErrorCodeUnknown
+            NSError *error = [CLXError errorWithCode:CLXErrorCodeInternalError
                                          description:exception.reason ?: @"Unknown initialization error"];
             [self.logger error:[NSString stringWithFormat:@"Mintegral initialization failed: %@", exception.reason]];
             if (completion) completion(NO, error);

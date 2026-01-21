@@ -224,8 +224,8 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
             return @"Invalid bid response received.";
             
         // ADAPTER ERRORS (600-699)
-        case CLXErrorCodeAdapterUnexpectedError:
-            return @"Ad network adapter encountered an unexpected error.";
+        case CLXErrorCodeAdapterInternalError:
+            return @"Internal adapter error.";
         case CLXErrorCodeAdapterInitializationError:
             return @"Ad network adapter initialization failed.";
         case CLXErrorCodeAdapterInvalidServerExtras:
@@ -242,13 +242,13 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
             return @"Ad network adapter is in an invalid state for loading ads.";
         case CLXErrorCodeAdapterInvalidConfiguration:
             return @"Ad network adapter has invalid or missing configuration.";
-            
-        // GENERAL ERRORS (700-799)
-        case CLXErrorCodeUnexpectedError:
-            return @"An unexpected error occurred.";
-            
+
+        // GENERAL ERRORS (0)
+        case CLXErrorCodeInternalError:
+            return @"Internal error.";
+
         default:
-            return @"An unknown error occurred.";
+            return @"Internal error.";
     }
 }
 

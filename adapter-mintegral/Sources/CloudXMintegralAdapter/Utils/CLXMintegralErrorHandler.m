@@ -24,7 +24,7 @@ static const NSInteger kMTGExceptionAppNotFound = -1302;                 // appI
                         context:(NSString *)context
                     placementID:(nullable NSString *)placementID {
     
-    CLXErrorCode cloudXCode = CLXErrorCodeUnknown;
+    CLXErrorCode cloudXCode = CLXErrorCodeInternalError;
     NSString *description = networkError.localizedDescription ?: @"Unknown error";
     BOOL shouldRetry = NO;
     
@@ -126,13 +126,13 @@ static const NSInteger kMTGExceptionAppNotFound = -1302;                 // appI
              errorCode == kMTGErrorCodeFailedDiskIO ||
              errorCode == kMTGErrorCodeSocketInvalidStatus ||
              errorCode == kMTGErrorCodeSocketInvalidContent) {
-        cloudXCode = CLXErrorCodeUnknown;
+        cloudXCode = CLXErrorCodeInternalError;
         description = [NSString stringWithFormat:@"Mintegral internal error: %ld", (long)errorCode];
         shouldRetry = NO;
     }
     // Default
     else {
-        cloudXCode = CLXErrorCodeUnknown;
+        cloudXCode = CLXErrorCodeInternalError;
         description = [NSString stringWithFormat:@"Unknown Mintegral error: %ld - %@", 
                       (long)errorCode, networkError.localizedDescription];
         shouldRetry = NO;

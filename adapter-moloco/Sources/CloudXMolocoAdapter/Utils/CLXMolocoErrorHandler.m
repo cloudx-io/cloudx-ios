@@ -21,7 +21,7 @@
                        context:(NSString *)context
                    placementID:(nullable NSString *)placementID {
     
-    CLXErrorCode cloudXCode = CLXErrorCodeUnknown;
+    CLXErrorCode cloudXCode = CLXErrorCodeInternalError;
     NSString *description = molocoError.localizedDescription ?: @"Unknown error";
     NSString *recoverySuggestion = nil;
     BOOL shouldRetry = NO;
@@ -79,7 +79,7 @@
             break;
             
         default:
-            cloudXCode = CLXErrorCodeUnknown;
+            cloudXCode = CLXErrorCodeInternalError;
             description = [NSString stringWithFormat:@"Moloco error: %@", molocoError.localizedDescription];
             break;
     }
