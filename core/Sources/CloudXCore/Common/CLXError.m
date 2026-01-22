@@ -150,8 +150,6 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
         // INITIALIZATION ERRORS (100-199)
         case CLXErrorCodeNotInitialized:
             return @"SDK not initialized. Please initialize the SDK before using it.";
-        case CLXErrorCodeInitializationInProgress:
-            return @"SDK initialization is already in progress.";
         case CLXErrorCodeNoAdaptersFound:
             return @"No ad network adapters found. Please ensure adapters are properly integrated.";
         case CLXErrorCodeInitializationTimeout:

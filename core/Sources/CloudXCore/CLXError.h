@@ -37,16 +37,14 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     // INITIALIZATION ERRORS (100-199)
     /// SDK failed to initialize
     CLXErrorCodeNotInitialized = 100,
-    /// SDK initialization is already in progress
-    CLXErrorCodeInitializationInProgress = 101,
     /// SDK initialized but no adapters were found
-    CLXErrorCodeNoAdaptersFound = 102,
+    CLXErrorCodeNoAdaptersFound = 101,
     /// SDK initialization timeout
-    CLXErrorCodeInitializationTimeout = 103,
+    CLXErrorCodeInitializationTimeout = 102,
     /// Invalid app key provided during initialization
-    CLXErrorCodeInvalidAppKey = 104,
+    CLXErrorCodeInvalidAppKey = 103,
     /// SDK disabled by kill switch
-    CLXErrorCodeSDKDisabled = 105,
+    CLXErrorCodeSDKDisabled = 104,
     
     // NETWORK ERRORS (200-299)
     /// Network connectivity issues
