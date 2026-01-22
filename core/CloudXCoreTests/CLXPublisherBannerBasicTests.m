@@ -190,7 +190,6 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
                                             suspendPreloadWhenInvisible:NO
                                                              delegate:self.mockDelegate
                                                            bannerType:CLXBannerTypeW320H50
-                                                 waterfallMaxBackOffTime:30.0
                                                             impModel:self.testImpModel
                                                          adFactories:@{}
                                                       bidTokenSources:@{}

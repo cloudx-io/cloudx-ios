@@ -38,7 +38,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @param rewardedCallbackUrl The rewarded callback URL
  * @param impModel The impression model (nil if SDK not initialized, will be created on load)
  * @param adFactories The ad network factories
- * @param waterfallMaxBackOffTime Maximum backoff time for waterfall
  * @param bidTokenSources Dictionary of bid token sources
  * @param bidRequestTimeout Bid request timeout
  * @param reportingService The reporting service
@@ -50,7 +49,6 @@ NS_ASSUME_NONNULL_BEGIN
               rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl
                          impModel:(nullable CLXConfigImpressionModel *)impModel
                       adFactories:(nullable CLXAdNetworkFactories *)adFactories
-         waterfallMaxBackOffTime:(nullable NSNumber *)waterfallMaxBackOffTime
                   bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                 reportingService:(id<CLXAdEventReporting>)reportingService

@@ -11,7 +11,6 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CLXConsentProvider.h>
-#import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXURLProvider.h>
 #import <CloudXCore/CLXBidNetworkService.h>
 #import <CloudXCore/CLXErrorReporter.h>
@@ -92,29 +91,6 @@
     XCTAssertEqualObjects(retrieved, extremeString, @"Should store and retrieve extreme length string");
 }
 
-#pragma mark - Settings Protection Tests
-
-- (void)testSettings_UserDefaultsAccess_HandlesInvalidTypes {
-    CLXSettings *settings = [CLXSettings sharedInstance];
-    
-    // Default value
-    BOOL retries1 = [settings shouldEnableBannerRetries];
-    XCTAssertFalse(retries1, @"Default should be NO");
-    
-    // Valid bool value - use the actual key from CLXUserDefaultsKeys.h
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"CLXCore_EnableBannerRetries"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    BOOL retries2 = [settings shouldEnableBannerRetries];
-    XCTAssertTrue(retries2, @"Should return YES when set to YES");
-    
-    // Invalid type - should not crash
-    [[NSUserDefaults standardUserDefaults] setObject:@"not_a_bool" forKey:@"CLXCore_EnableBannerRetries"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    BOOL retries3 = [settings shouldEnableBannerRetries];
-    // Value is undefined but should not crash
-    (void)retries3;
-}
-
 #pragma mark - URL Provider Protection Tests
 
 - (void)testURLProvider_URLConstruction_ReturnsExpectedValues {
@@ -139,11 +115,9 @@
 
 - (void)testProtectedOperations_Performance_ReasonableOverhead {
     [self measureBlock:^{
-        CLXSettings *settings = [CLXSettings sharedInstance];
         for (NSInteger i = 0; i < 1000; i++) {
             [self.gppProvider setGppString:[NSString stringWithFormat:@"test_%ld", (long)i]];
             (void)[self.gppProvider gppString];
-            (void)[settings shouldEnableBannerRetries];
             (void)[CLXURLProvider initApiUrl];
         }
     }];
@@ -154,20 +128,18 @@
 - (void)testProtectedOperations_ConcurrentAccess_NoRaceConditions {
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     queue.maxConcurrentOperationCount = 10;
-    
+
     XCTestExpectation *expectation = [self expectationWithDescription:@"Concurrent operations"];
-    
+
     __block NSInteger completedOperations = 0;
     NSInteger totalOperations = 100;
-    
+
     for (NSInteger i = 0; i < totalOperations; i++) {
         [queue addOperationWithBlock:^{
-            CLXSettings *settings = [CLXSettings sharedInstance];
             [self.gppProvider setGppString:[NSString stringWithFormat:@"concurrent_%ld", (long)i]];
             (void)[self.gppProvider gppString];
-            (void)[settings shouldEnableBannerRetries];
             (void)[CLXURLProvider initApiUrl];
-            
+
             @synchronized(self) {
                 completedOperations++;
                 if (completedOperations == totalOperations) {
@@ -176,7 +148,7 @@
             }
         }];
     }
-    
+
     [self waitForExpectations:@[expectation] timeout:10.0];
     XCTAssertEqual(completedOperations, totalOperations, @"All concurrent operations should complete");
 }

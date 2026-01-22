@@ -361,7 +361,6 @@ static const NSTimeInterval kTestTimeout = 0.5;
                                             suspendPreloadWhenInvisible:NO
                                                              delegate:self.mockDelegate
                                                            bannerType:CLXBannerTypeW320H50
-                                                 waterfallMaxBackOffTime:30.0
                                                             impModel:self.testImpModel
                                                          adFactories:@{kTestNetwork: self.mockFactory}
                                                       bidTokenSources:@{}

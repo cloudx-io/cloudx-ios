@@ -797,7 +797,6 @@ static CloudXCore *_sharedInstance = nil;
                                                    suspendPreloadWhenInvisible:NO
                                                                      delegate:delegate
                                                                    bannerType:CLXBannerTypeW320H50
-                                                       waterfallMaxBackOffTime:5.0
                                                                        impModel:impModel
                                                                     adFactories:_adNetworkFactories.banners
                                                                  bidTokenSources:_adNetworkFactories.bidTokenSources
@@ -876,7 +875,6 @@ static CloudXCore *_sharedInstance = nil;
                                                     suspendPreloadWhenInvisible:NO
                                                                      delegate:delegate
                                                                    bannerType:CLXBannerTypeMREC
-                                                       waterfallMaxBackOffTime:5.0
                                                                        impModel:impModel
                                                                     adFactories:_adNetworkFactories.banners
                                                                  bidTokenSources:_adNetworkFactories.bidTokenSources
@@ -952,7 +950,6 @@ static CloudXCore *_sharedInstance = nil;
                                                              rewardedCallbackUrl:nil
                                                                         impModel:impModel
                                                                      adFactories:_adNetworkFactories
-                                                        waterfallMaxBackOffTime:@10.0
                                                                  bidTokenSources:_adNetworkFactories.bidTokenSources
                                                               bidRequestTimeout:3.0
                                                                reportingService:_reportingService
@@ -1024,7 +1021,6 @@ static CloudXCore *_sharedInstance = nil;
                                                  rewardedCallbackUrl:nil
                                                             impModel:impModel
                                                          adFactories:_adNetworkFactories
-                                            waterfallMaxBackOffTime:@5.0
                                                      bidTokenSources:_adNetworkFactories.bidTokenSources
                                                   bidRequestTimeout:3.0
                                                    reportingService:_reportingService
@@ -1100,7 +1096,6 @@ static CloudXCore *_sharedInstance = nil;
                                                     suspendPreloadWhenInvisible:NO
                                                                      delegate:delegate
                                                                    nativeType:CLXNativeTemplateDefault
-                                                       waterfallMaxBackOffTime:5.0
                                                                     impModel:impModel
                                                                     adFactories:_adNetworkFactories.native
                                                                 bidTokenSources:_adNetworkFactories.bidTokenSources

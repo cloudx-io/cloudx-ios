@@ -21,11 +21,8 @@
 #import <CloudXCore/CLXBidLifecycleEvent.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
-#import <CloudXCore/CLXSettings.h>
-#import <CloudXCore/CLXRetryHelper.h>
 
 #import <CloudXCore/CLXBannerTimerService.h>
-#import <CloudXCore/CLXExponentialBackoffStrategy.h>
 #import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXAdEventReporting.h>
 #import <CloudXCore/CLXRillTrackingService.h>
@@ -65,7 +62,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) id<CLXAdapterNative> nativeOnScreen;
 @property (nonatomic, assign) NSTimeInterval refreshSeconds;
 @property (nonatomic, strong) CLXBannerTimerService *timerService;
-@property (nonatomic, strong) CLXExponentialBackoffStrategy *waterfallBackoffAlgorithm;
 @property (nonatomic, copy) NSString *placementID;
 @property (nonatomic, copy) NSString *placementName;
 @property (nonatomic, strong) id<CLXAdEventReporting> reportingService;
@@ -110,8 +106,7 @@ NS_ASSUME_NONNULL_BEGIN
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
                                delegate:(nullable id<CLXAdapterNativeDelegate>)delegate
                              nativeType:(CLXNativeTemplate)nativeType
-                   waterfallMaxBackOffTime:(NSTimeInterval)waterfallMaxBackOffTime
-                                  impModel:(nullable CLXConfigImpressionModel *)impModel
+                               impModel:(nullable CLXConfigImpressionModel *)impModel
                               adFactories:(NSDictionary<NSString *, id<CLXAdapterNativeFactory>> *)adFactories
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
@@ -149,10 +144,7 @@ NS_ASSUME_NONNULL_BEGIN
         _winLossTracker = [CLXWinLossTracker shared];
         
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXNative"];
-        
-        // Initialize waterfall backoff algorithm
-        _waterfallBackoffAlgorithm = [[CLXExponentialBackoffStrategy alloc] initWithInitialDelay:1.0 maxDelay:waterfallMaxBackOffTime];
-        
+
         // Initialize timer service
         _timerService = [[CLXBannerTimerService alloc] init];
         
@@ -386,19 +378,8 @@ NS_ASSUME_NONNULL_BEGIN
         
         if (error) {
             [strongSelf.logger error:[NSString stringWithFormat:@"[%@] Bid request failed: %@", strongSelf.currentCorrelationId, error.clx_fullErrorMessage]];
-            
-            // Implement waterfall backoff delay logic
-            NSError *backoffError;
-            NSTimeInterval delay = [strongSelf.waterfallBackoffAlgorithm nextDelayWithError:&backoffError];
-            if (backoffError) {
-                delay = 1.0; // Default delay if backoff fails
-            }
-            
-            [strongSelf.logger debug:[NSString stringWithFormat:@"Sleep for %f seconds", delay]];
-            
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [strongSelf requestNativeUpdate];
-            });
+            [strongSelf failToLoadWithNative:nil error:error];
+            return;
         } else {
             strongSelf.lastBidResponse = response;
             
@@ -411,8 +392,6 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  placementID:strongSelf.placementID
                                                                    loadCount:0];
             
-            // Reset waterfall backoff algorithm
-            [strongSelf.waterfallBackoffAlgorithm reset];
             strongSelf.loadNativeTimesCount += 1;
             
             // Handle bid response
@@ -442,45 +421,15 @@ NS_ASSUME_NONNULL_BEGIN
             [self loadAdItem:native];
         } else {
             [self.logger debug:@"No valid native created from bid for placement"];
-            // Early returns for cleaner code flow
-            if (!self.isLoading) {
-                [self.logger debug:@"[PublisherNative] Not retrying - isLoading=false"];
-                return;
-            }
-            
-            if (![CLXRetryHelper shouldRetryForAdType:CLXAdTypeNative 
-                                             settings:[CLXSettings sharedInstance] 
-                                               logger:self.logger 
-                                         failureBlock:^(NSError *error) {
-                self.isLoading = NO;
-                [self failToLoadWithNative:nil error:error];
-            }]) {
-                return;
-            }
-            
-            [self.logger debug:@"Retrying native request due to isLoading=true"];
-            [self requestNativeUpdate];
+            self.isLoading = NO;
+            CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidBidResponse description:@"No valid native created from bid response"];
+            [self failToLoadWithNative:nil error:error];
         }
     } else {
         [self.logger debug:@"No valid native created from bid for placement"];
-        // Early returns for cleaner code flow
-        if (!self.isLoading) {
-            [self.logger debug:@"[PublisherNative] Not retrying - isLoading=false"];
-            return;
-        }
-        
-        if (![CLXRetryHelper shouldRetryForAdType:CLXAdTypeNative 
-                                         settings:[CLXSettings sharedInstance] 
-                                           logger:self.logger 
-                                     failureBlock:^(NSError *error) {
-            self.isLoading = NO;
-            [self failToLoadWithNative:nil error:error];
-        }]) {
-            return;
-        }
-        
-        [self.logger debug:@"Retrying native request due to isLoading=true"];
-        [self requestNativeUpdate];
+        self.isLoading = NO;
+        CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidBidResponse description:@"No valid native created from bid response"];
+        [self failToLoadWithNative:nil error:error];
     }
 }
 
@@ -654,32 +603,7 @@ NS_ASSUME_NONNULL_BEGIN
     self.lastBidResponse = nil;
     self.currentBidResponse = nil;
     self.successWin = NO;
-    
-    NSError *backoffError;
-    NSTimeInterval delay = [self.waterfallBackoffAlgorithm nextDelayWithError:&backoffError];
-    if (backoffError) {
-        delay = 1.0;
-    }
-    
-    // Early return if retries are disabled
-    if (![CLXRetryHelper shouldRetryForAdType:CLXAdTypeNative 
-                                     settings:[CLXSettings sharedInstance] 
-                                       logger:self.logger 
-                                 failureBlock:nil]) {
-        return;
-    }
-    
-    __weak typeof(self) weakSelf = self;
-    if (delay == 0) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf requestNativeUpdate];
-        });
-    } else {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [weakSelf requestNativeUpdate];
-        });
-    }
-    
+
     // Call both old and new delegate methods for backward compatibility
     // Preserve the original error to maintain detailed server messages
     // Ensure we always have a valid CLXError for delegate (fallback if error is nil)

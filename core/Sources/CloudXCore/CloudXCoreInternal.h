@@ -107,11 +107,6 @@
 #import <CloudXCore/CLXGeoLocationService.h>
 #import <CloudXCore/CLXSKAdNetworkService.h>
 
-// Retry & Resilience
-#import <CloudXCore/CLXRetryHelper.h>
-#import <CloudXCore/CLXRetryManager.h>
-#import <CloudXCore/CLXExponentialBackoffStrategy.h>
-
 // State & Storage
 #import <CloudXCore/CLXKeyValueState.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>

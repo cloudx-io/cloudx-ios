@@ -46,7 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
               rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl
                          impModel:(nullable CLXConfigImpressionModel *)impModel
                       adFactories:(nullable CLXAdNetworkFactories *)adFactories
-         waterfallMaxBackOffTime:(nullable NSNumber *)waterfallMaxBackOffTime
                   bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                 reportingService:(id<CLXAdEventReporting>)reportingService
@@ -57,7 +56,6 @@ NS_ASSUME_NONNULL_BEGIN
                 rewardedCallbackUrl:rewardedCallbackUrl
                            impModel:impModel
                         adFactories:adFactories
-           waterfallMaxBackOffTime:waterfallMaxBackOffTime
                     bidTokenSources:bidTokenSources
                  bidRequestTimeout:bidRequestTimeout
                   reportingService:reportingService

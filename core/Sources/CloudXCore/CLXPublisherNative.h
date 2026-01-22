@@ -61,7 +61,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @param suspendPreloadWhenInvisible Whether to suspend preloading when not visible
  * @param delegate The delegate to receive events
  * @param nativeType The type of native ad template
- * @param waterfallMaxBackOffTime Maximum backoff time for waterfall
  * @param impModel The impression model (nil if SDK not initialized, will be created on load)
  * @param adFactories Dictionary of native ad factories
  * @param bidTokenSources Dictionary of bid token sources
@@ -76,8 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
                                delegate:(nullable id<CLXNativeDelegate, CLXAdapterNativeDelegate>)delegate
                              nativeType:(CLXNativeTemplate)nativeType
-                   waterfallMaxBackOffTime:(NSTimeInterval)waterfallMaxBackOffTime
-                                  impModel:(nullable CLXConfigImpressionModel *)impModel
+                               impModel:(nullable CLXConfigImpressionModel *)impModel
                               adFactories:(NSDictionary<NSString *, id<CLXAdapterNativeFactory>> *)adFactories
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout

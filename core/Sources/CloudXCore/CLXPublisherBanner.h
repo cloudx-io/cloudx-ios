@@ -98,7 +98,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @param suspendPreloadWhenInvisible Whether to suspend preloading when not visible
  * @param delegate The delegate to receive events
  * @param bannerType The type of banner
- * @param waterfallMaxBackOffTime Maximum backoff time for waterfall
  * @param impModel The impression model (nil if SDK not initialized, will be created on load)
  * @param adFactories Dictionary of banner ad factories (injected for testability, falls back to CloudXCore if empty)
  * @param bidTokenSources Dictionary of bid token sources (injected for testability, falls back to CloudXCore if empty)
@@ -115,8 +114,7 @@ NS_ASSUME_NONNULL_BEGIN
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
                                delegate:(nullable id<CLXBannerDelegate>)delegate
                              bannerType:(CLXBannerType)bannerType
-                   waterfallMaxBackOffTime:(NSTimeInterval)waterfallMaxBackOffTime
-                                  impModel:(nullable CLXConfigImpressionModel *)impModel
+                               impModel:(nullable CLXConfigImpressionModel *)impModel
                               adFactories:(NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *)adFactories
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout

@@ -109,7 +109,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                      suspendPreloadWhenInvisible:NO
                                                       delegate:delegate
                                                     bannerType:CLXBannerTypeW320H50
-                                          waterfallMaxBackOffTime:30.0
                                                      impModel:[[CLXConfigImpressionModel alloc] init]
                                                   adFactories:@{@"mock": [[CLXNullAdapterFactory alloc] init]}
                                                bidTokenSources:@{}
@@ -130,7 +129,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                      suspendPreloadWhenInvisible:NO
                                                      delegate:delegate
                                                    nativeType:CLXNativeTemplateSmall
-                                         waterfallMaxBackOffTime:30.0
                                                      impModel:[[CLXConfigImpressionModel alloc] init]
                                                   adFactories:@{}
                                               bidTokenSources:@{}
@@ -148,7 +146,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                                  rewardedCallbackUrl:nil
                                                             impModel:[[CLXConfigImpressionModel alloc] init]
                                                          adFactories:nil
-                                            waterfallMaxBackOffTime:nil
                                                      bidTokenSources:@{}
                                                   bidRequestTimeout:1.0
                                                    reportingService:nil
@@ -167,7 +164,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                         rewardedCallbackUrl:nil
                                                    impModel:[[CLXConfigImpressionModel alloc] init]
                                                 adFactories:nil
-                                    waterfallMaxBackOffTime:nil
                                             bidTokenSources:@{}
                                          bidRequestTimeout:1.0
                                           reportingService:nil

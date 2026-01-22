@@ -41,12 +41,6 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXCoreAIPromptKey @"CLXCore_aiPrompt"
 #define kCLXCoreUserKeywordsKey @"CLXCore_userKeywords"
 
-// Settings keys
-#define kCLXCoreEnableBannerRetriesKey @"CLXCore_EnableBannerRetries"
-#define kCLXCoreEnableInterstitialRetriesKey @"CLXCore_EnableInterstitialRetries"
-#define kCLXCoreEnableRewardedRetriesKey @"CLXCore_EnableRewardedRetries"
-#define kCLXCoreEnableNativeRetriesKey @"CLXCore_EnableNativeRetries"
-
 // Banner-specific keys
 #define kCLXCoreBannerAppKeyKey @"CLXCore_Banner_appKey"
 #define kCLXCoreBannerSessionIDKey @"CLXCore_Banner_sessionIDKey"

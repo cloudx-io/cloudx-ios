@@ -129,8 +129,7 @@ NS_ASSUME_NONNULL_BEGIN
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
                                delegate:(nullable id<CLXBannerDelegate>)delegate
                              bannerType:(CLXBannerType)bannerType
-                   waterfallMaxBackOffTime:(NSTimeInterval)waterfallMaxBackOffTime
-                                  impModel:(nullable CLXConfigImpressionModel *)impModel
+                               impModel:(nullable CLXConfigImpressionModel *)impModel
                               adFactories:(NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *)adFactories
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
@@ -193,7 +192,6 @@ NS_ASSUME_NONNULL_BEGIN
         NSString *logCategory = (bannerType == CLXBannerTypeMREC) ? @"CloudXMREC" : @"CloudXBanner";
         _logger = [[CLXLogger alloc] initWithCategory:logCategory];
         
-        // Initialize waterfall backoff algorithm
         // Initialize visibility and prefetch properties
         _isVisible = YES;
         _hasPendingRefresh = NO;

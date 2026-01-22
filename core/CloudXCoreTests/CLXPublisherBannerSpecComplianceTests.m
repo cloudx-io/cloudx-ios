@@ -331,7 +331,6 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
                                             suspendPreloadWhenInvisible:NO
                                                              delegate:self.specDelegate
                                                            bannerType:CLXBannerTypeW320H50
-                                                 waterfallMaxBackOffTime:30.0
                                                             impModel:self.testImpModel
                                                          adFactories:@{}
                                                       bidTokenSources:@{}
