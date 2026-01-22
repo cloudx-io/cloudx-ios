@@ -436,12 +436,18 @@ static CloudXCore *_sharedInstance = nil;
     
     [self.logger debug:[NSString stringWithFormat:@"Adapter resolution complete - Banners: %lu, Tokens: %lu, Placements: %lu", (unsigned long)_adNetworkFactories.banners.count, (unsigned long)_adNetworkFactories.bidTokenSources.count, (unsigned long)_adPlacements.count]];
     
-    // Process bidders
-    if (config.bidders && config.bidders.count > 0) {
-        [self.logger debug:[NSString stringWithFormat:@"Processing %lu bidders", (unsigned long)config.bidders.count]];
-    } else {
-        [self.logger debug:@"[CloudXCore] No bidders found in config"];
+    // Check if any networks are configured (skip in test mode)
+    BOOL isTestMode = NSClassFromString(@"XCTestCase") != nil;
+    if ((!config.bidders || config.bidders.count == 0) && !isTestMode) {
+        CLXError *error = [CLXError errorWithCode:CLXErrorCodeNoNetworksConfigured];
+        [self.logger error:[NSString stringWithFormat:@"SDK initialization failed: %@", error.localizedDescription]];
+        if (completion) {
+            completion(NO, error);
+        }
+        return;
     }
+
+    [self.logger debug:[NSString stringWithFormat:@"Processing %lu bidders", (unsigned long)config.bidders.count]];
     
     // Initialize network bidder adapters - BLOCKING until all complete
     NSDictionary *adNetworkInitializers = _adNetworkFactories.initializers;
@@ -549,13 +555,12 @@ static CloudXCore *_sharedInstance = nil;
     [container registerType:[CLXBidNetworkServiceClass class] instance:[[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:auctionEndpointUrl errorReporter:[CLXErrorReporter shared]]];
     [container resolveType:ServiceTypeSingleton class:[CLXAppSessionService class]];
     
-    // Check if adapters are empty (skip in test mode)
-    BOOL isTestMode = NSClassFromString(@"XCTestCase") != nil;
+    // Check if adapters are empty (skip in test mode - isTestMode already defined above)
     if (_adNetworkFactories.isEmpty && !isTestMode) {
-        [self.logger error:@"SDK initialization failed: No adapters were registered. At least one adapter is required to show ads."];
+        CLXError *error = [CLXError errorWithCode:CLXErrorCodeNoAdaptersFound];
+        [self.logger error:[NSString stringWithFormat:@"SDK initialization failed: %@", error.localizedDescription]];
         if (completion) {
-            completion(NO, [CLXError errorWithCode:CLXErrorCodeNotInitialized 
-                                      description:@"SDK initialization failed: No adapters were registered. At least one adapter framework (e.g., CloudXMetaAdapter etc) must be included in your project to show ads. Please ensure adapter frameworks are properly linked and loaded."]);
+            completion(NO, error);
         }
         return;
     }

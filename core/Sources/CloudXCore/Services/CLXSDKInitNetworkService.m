@@ -11,7 +11,6 @@
 #import <CloudXCore/CLXSystemInformation.h>
 #import <CloudXCore/UIDevice+CLXIdentifier.h>
 #import <CloudXCore/CLXURLProvider.h>
-#import <CloudXCore/CLXExponentialBackoffStrategy.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXDIContainer.h>
@@ -60,7 +59,6 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     if (self) {
         _endpoint = endpointPath;
         _logger = [[CLXLogger alloc] initWithCategory:@"SDKInitNetworkService"];
-        _backOffStrategy = [[CLXExponentialBackoffStrategy alloc] initWithInitialDelay:1 maxDelay:60 maxAttempts:5];
         [self.logger info:[NSString stringWithFormat:@"Initialized - endpoint: %@, baseURL: %@", _endpoint, self.baseURL]];
     }
     return self;
@@ -93,21 +91,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
  */
 - (void)tryInitSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable, NSError * _Nullable))completion {
     [self.logger debug:@"tryInitSDKWithAppKey called"];
-    
-    NSError *backoffError;
-    NSTimeInterval delay = [self.backOffStrategy nextDelayWithError:&backoffError];
-    if (backoffError) {
-        [self.logger error:@"Backoff strategy exhausted"];
-        [self.backOffStrategy reset];
-        if (completion) {
-            completion(nil, [CLXError errorWithCode:CLXErrorCodeInitializationTimeout 
-                                       description:@"SDK initialization timed out after multiple retry attempts. Please check your network connection and try again."]);
-        }
-        return;
-    }
-    
-    [self.logger debug:[NSString stringWithFormat:@"Attempt to init SDK with delay: %f", delay]];
-    
+
     [self.logger debug:@"Creating request"];
     CLXSDKConfigRequest *request = [self createRequest];
     [self.logger debug:[NSString stringWithFormat:@"Request created: %@", request]];
@@ -142,7 +126,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
                       requestBody:requestBodyData
                           headers:headers
                        maxRetries:1
-                           delay:delay
+                           delay:0
                           completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
             // Track SDK init network call latency
             NSTimeInterval sdkInitLatency = [[NSDate date] timeIntervalSinceDate:sdkInitStartTime] * 1000; // Convert to milliseconds

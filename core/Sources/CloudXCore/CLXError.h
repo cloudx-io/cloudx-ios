@@ -39,8 +39,8 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     CLXErrorCodeNotInitialized = 100,
     /// SDK initialized but no adapters were found
     CLXErrorCodeNoAdaptersFound = 101,
-    /// SDK initialization timeout
-    CLXErrorCodeInitializationTimeout = 102,
+    /// No ad networks configured for this app
+    CLXErrorCodeNoNetworksConfigured = 102,
     /// Invalid app key provided during initialization
     CLXErrorCodeInvalidAppKey = 103,
     /// SDK disabled by kill switch

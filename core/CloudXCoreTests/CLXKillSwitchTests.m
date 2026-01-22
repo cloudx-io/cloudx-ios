@@ -51,18 +51,18 @@
  * Test SDK initialization kill switch with SDK_DISABLED header
  * This simulates 0% traffic control where SDK initialization is completely disabled
  */
-- (void)testSDKInitKillSwitch_SDK_DISABLED_ShouldReturnError105 {
+- (void)testSDKInitKillSwitch_SDK_DISABLED_ShouldReturnError104 {
     // Given: Server responds with HTTP 204 and SDK_DISABLED header
     [self.mockSession enqueueResponseWithStatusCode:204 data:nil headers:@{@"X-CloudX-Status": @"SDK_DISABLED"}];
-    
+
     XCTestExpectation *expectation = [self expectationWithDescription:@"SDK init kill switch"];
-    
+
     // When: Initialize SDK
     [self.sdkInitService initializeSDKWithAppKey:@"test-app-key" completion:^(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error) {
-        // Then: Should fail with SDK disabled error (code 105)
+        // Then: Should fail with SDK disabled error (code 104)
         XCTAssertNil(config, @"Config should be nil when SDK is disabled");
         XCTAssertNotNil(error, @"Error should be present");
-        XCTAssertEqual(error.code, CLXErrorCodeSDKDisabled, @"Should return SDK disabled error code 105");
+        XCTAssertEqual(error.code, CLXErrorCodeSDKDisabled, @"Should return SDK disabled error code 104");
         XCTAssertEqualObjects(error.domain, CLXErrorDomain, @"Should use CloudX error domain");
         
         [expectation fulfill];
@@ -344,18 +344,18 @@
  * Test that both kill switch error codes (105 and 308) are handled correctly
  */
 - (void)testKillSwitchErrorCodes_ShouldBeRecognized {
-    // Error code 105 - SDK Disabled
-    NSError *error105 = [CLXError errorWithCode:CLXErrorCodeSDKDisabled];
-    XCTAssertEqual(error105.code, 105, @"SDK disabled should be code 105");
-    
-    // Error code 308 - Ads Disabled  
+    // Error code 104 - SDK Disabled
+    NSError *error104 = [CLXError errorWithCode:CLXErrorCodeSDKDisabled];
+    XCTAssertEqual(error104.code, 104, @"SDK disabled should be code 104");
+
+    // Error code 308 - Ads Disabled
     NSError *error308 = [CLXError errorWithCode:CLXErrorCodeAdsDisabled];
     XCTAssertEqual(error308.code, 308, @"Ads disabled should be code 308");
-    
+
     // Both should have kill switch in description
-    XCTAssertTrue([error105.localizedDescription containsString:@"kill switch"] ||
-                 [error105.localizedDescription containsString:@"disabled"],
-                 @"Error 105 description should mention disabled/kill switch");
+    XCTAssertTrue([error104.localizedDescription containsString:@"kill switch"] ||
+                 [error104.localizedDescription containsString:@"disabled"],
+                 @"Error 104 description should mention disabled/kill switch");
     XCTAssertTrue([error308.localizedDescription containsString:@"kill switch"] ||
                  [error308.localizedDescription containsString:@"disabled"],
                  @"Error 308 description should mention disabled/kill switch");

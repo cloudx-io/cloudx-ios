@@ -151,11 +151,11 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
         case CLXErrorCodeNotInitialized:
             return @"SDK not initialized. Please initialize the SDK before using it.";
         case CLXErrorCodeNoAdaptersFound:
-            return @"No ad network adapters found. Please ensure adapters are properly integrated.";
-        case CLXErrorCodeInitializationTimeout:
-            return @"SDK initialization timed out.";
+            return @"No ad adapters found. Add at least one adapter to show ads.";
+        case CLXErrorCodeNoNetworksConfigured:
+            return @"No ad networks configured for this app.";
         case CLXErrorCodeInvalidAppKey:
-            return @"Invalid app key provided. Please check your app key.";
+            return @"Invalid app key.";
         case CLXErrorCodeSDKDisabled:
             return @"SDK is disabled by server configuration.";
             
