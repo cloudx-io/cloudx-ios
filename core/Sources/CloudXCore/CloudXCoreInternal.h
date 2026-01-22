@@ -37,7 +37,6 @@
 // Initialization
 #import <CloudXCore/CLXInitService.h>
 #import <CloudXCore/CLXLiveInitService.h>
-#import <CloudXCore/CLXInitMetrics.h>
 #import <CloudXCore/CLXDIContainer.h>
 
 // Bidding
