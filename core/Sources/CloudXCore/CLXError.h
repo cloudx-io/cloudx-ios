@@ -47,14 +47,18 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     CLXErrorCodeSDKDisabled = 104,
     
     // NETWORK ERRORS (200-299)
-    /// Network connectivity issues
+    /// Network error
     CLXErrorCodeNetworkError = 200,
-    /// Network timeout occurred
+    /// Network request timed out
     CLXErrorCodeNetworkTimeout = 201,
-    /// Invalid server response
-    CLXErrorCodeInvalidResponse = 202,
-    /// Server returned an error
-    CLXErrorCodeServerError = 203,
+    /// Server error (5xx)
+    CLXErrorCodeServerError = 202,
+    /// Client error (4xx)
+    CLXErrorCodeClientError = 203,
+    /// Rate limited (429)
+    CLXErrorCodeTooManyRequests = 204,
+    /// Invalid or unparseable server response
+    CLXErrorCodeInvalidResponse = 205,
     
     // AD REQUEST/LOADING ERRORS (300-399)
     /// No ad fill available (no ads to show)
@@ -69,8 +73,6 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     CLXErrorCodeLoadFailed = 304,
     /// Ad content is invalid or corrupted
     CLXErrorCodeInvalidAd = 305,
-    /// Too many ad requests (rate limiting)
-    CLXErrorCodeTooManyRequests = 306,
     /// Ad request was cancelled
     CLXErrorCodeRequestCancelled = 307,
     /// Ads disabled by kill switch
@@ -163,6 +165,15 @@ extern NSString * const CLXErrorDomain;
  * @discussion Use this to preserve the root cause error chain for debugging
  */
 + (instancetype)errorWithCode:(CLXErrorCode)code description:(NSString *)description underlyingError:(nullable NSError *)underlyingError;
+
+/**
+ * Creates an error with the specified CloudX error code and underlying error, using default description
+ * @param code The CloudX error code
+ * @param underlyingError The original error that caused this error (optional)
+ * @return A new CLXError instance with default description for the error code
+ * @discussion Use this when you want consistent error messages across platforms
+ */
++ (instancetype)errorWithCode:(CLXErrorCode)code underlyingError:(nullable NSError *)underlyingError;
 
 /**
  * Converts an NSError to CLXError, preserving the original error code and type if already CLXError

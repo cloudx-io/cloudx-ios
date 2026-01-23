@@ -202,7 +202,16 @@
         // Handle request errors by returning early
         if (error) {
             if (completion) {
-                completion(nil, error, isKillSwitchEnabled);
+                // Convert NSURLError to CLXError to match Android SDK behavior
+                if ([error.domain isEqualToString:NSURLErrorDomain]) {
+                    CLXErrorCode code = (error.code == NSURLErrorTimedOut)
+                        ? CLXErrorCodeNetworkTimeout   // 201 - matches Android NETWORK_TIMEOUT
+                        : CLXErrorCodeNetworkError;    // 200 - matches Android NETWORK_ERROR
+                    CLXError *networkError = [CLXError errorWithCode:code underlyingError:error];
+                    completion(nil, networkError, isKillSwitchEnabled);
+                } else {
+                    completion(nil, error, isKillSwitchEnabled);
+                }
             }
             return;
         }

@@ -44,12 +44,23 @@
     // Simulate delay if specified
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.simulatedDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.shouldTimeout) {
-            NSError *timeoutError = [NSError errorWithDomain:NSURLErrorDomain 
-                                                        code:NSURLErrorTimedOut 
-                                                    userInfo:@{NSLocalizedDescriptionKey: @"Request timed out"}];
+            // Convert NSURLError to CLXError to match real implementation behavior
+            NSError *urlError = [NSError errorWithDomain:NSURLErrorDomain
+                                                    code:NSURLErrorTimedOut
+                                                userInfo:@{NSLocalizedDescriptionKey: @"Request timed out"}];
+            CLXError *timeoutError = [CLXError errorWithCode:CLXErrorCodeNetworkTimeout underlyingError:urlError];
             completion(nil, timeoutError, NO);
         } else if (self.simulatedError) {
-            completion(nil, self.simulatedError, NO);
+            // Convert NSURLError to CLXError to match real implementation behavior
+            if ([self.simulatedError.domain isEqualToString:NSURLErrorDomain]) {
+                CLXErrorCode code = (self.simulatedError.code == NSURLErrorTimedOut)
+                    ? CLXErrorCodeNetworkTimeout
+                    : CLXErrorCodeNetworkError;
+                CLXError *networkError = [CLXError errorWithCode:code underlyingError:self.simulatedError];
+                completion(nil, networkError, NO);
+            } else {
+                completion(nil, self.simulatedError, NO);
+            }
         } else {
             // Create mock HTTP response
             NSHTTPURLResponse *httpResponse = [[NSHTTPURLResponse alloc] 
@@ -170,7 +181,7 @@
                              completion:^(BOOL success, NSError * _Nullable error) {
         XCTAssertFalse(success, @"Should fail on timeout");
         XCTAssertNotNil(error, @"Should return timeout error");
-        XCTAssertEqual(error.code, NSURLErrorTimedOut, @"Should be timeout error");
+        XCTAssertEqual(error.code, CLXErrorCodeNetworkTimeout, @"Should be timeout error");
         [expectation fulfill];
     }];
     
@@ -195,7 +206,7 @@
                              completion:^(BOOL success, NSError * _Nullable error) {
         XCTAssertFalse(success, @"Should fail on network connectivity error");
         XCTAssertNotNil(error, @"Should return network error");
-        XCTAssertEqual(error.code, NSURLErrorNotConnectedToInternet, @"Should be connectivity error");
+        XCTAssertEqual(error.code, CLXErrorCodeNetworkError, @"Should be network error");
         [expectation fulfill];
     }];
     
@@ -220,7 +231,7 @@
                              completion:^(BOOL success, NSError * _Nullable error) {
         XCTAssertFalse(success, @"Should fail on DNS resolution error");
         XCTAssertNotNil(error, @"Should return DNS error");
-        XCTAssertEqual(error.code, NSURLErrorCannotFindHost, @"Should be DNS resolution error");
+        XCTAssertEqual(error.code, CLXErrorCodeNetworkError, @"Should be network error");
         [expectation fulfill];
     }];
     

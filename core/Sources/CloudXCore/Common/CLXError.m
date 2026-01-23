@@ -29,6 +29,10 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
     return [self errorWithCode:code userInfo:userInfo];
 }
 
++ (instancetype)errorWithCode:(CLXErrorCode)code underlyingError:(nullable NSError *)underlyingError {
+    return [self errorWithCode:code description:[self defaultDescriptionForCode:code] underlyingError:underlyingError];
+}
+
 + (instancetype)errorFromError:(NSError *)error withFallbackCode:(CLXErrorCode)fallbackCode {
     if (!error) {
         return nil;
@@ -55,51 +59,22 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
 + (instancetype)errorWithHTTPStatusCode:(NSInteger)httpStatusCode serverMessage:(NSString *)serverMessage {
     CLXErrorCode code;
     NSString *description;
-    
-    switch (httpStatusCode) {
-        case 400:
-            code = CLXErrorCodeInvalidRequest;
-            description = @"Bad Request - Invalid request parameters";
-            break;
-        case 401:
-            code = CLXErrorCodeInvalidAppKey;
-            description = @"Unauthorized - Invalid app key";
-            break;
-        case 403:
-            code = CLXErrorCodePermissionDenied;
-            description = @"Forbidden - Permission denied";
-            break;
-        case 404:
-            code = CLXErrorCodeNoFill;
-            description = @"Not Found - No ad fill available";
-            break;
-        case 408:
-            code = CLXErrorCodeNetworkTimeout;
-            description = @"Request Timeout";
-            break;
-        case 429:
-            code = CLXErrorCodeTooManyRequests;
-            description = @"Too Many Requests - Rate limited";
-            break;
-        case 500:
-        case 502:
-        case 503:
-        case 504:
-            code = CLXErrorCodeServerError;
-            description = [NSString stringWithFormat:@"Server Error - HTTP %ld", (long)httpStatusCode];
-            break;
-        default:
-            if (httpStatusCode >= 400 && httpStatusCode < 500) {
-                code = CLXErrorCodeInvalidRequest;
-                description = [NSString stringWithFormat:@"Client Error - HTTP %ld", (long)httpStatusCode];
-            } else if (httpStatusCode >= 500) {
-                code = CLXErrorCodeServerError;
-                description = [NSString stringWithFormat:@"Server Error - HTTP %ld", (long)httpStatusCode];
-            } else {
-                code = CLXErrorCodeNetworkError;
-                description = [NSString stringWithFormat:@"Network Error - HTTP %ld", (long)httpStatusCode];
-            }
-            break;
+
+    if (httpStatusCode == 401) {
+        code = CLXErrorCodeInvalidAppKey;
+        description = @"Unauthorized - Invalid app key";
+    } else if (httpStatusCode == 429) {
+        code = CLXErrorCodeTooManyRequests;
+        description = @"Too Many Requests - Rate limited";
+    } else if (httpStatusCode >= 500) {
+        code = CLXErrorCodeServerError;
+        description = [NSString stringWithFormat:@"Server Error - HTTP %ld", (long)httpStatusCode];
+    } else if (httpStatusCode >= 400) {
+        code = CLXErrorCodeClientError;
+        description = [NSString stringWithFormat:@"Client Error - HTTP %ld", (long)httpStatusCode];
+    } else {
+        code = CLXErrorCodeNetworkError;
+        description = [NSString stringWithFormat:@"Network Error - HTTP %ld", (long)httpStatusCode];
     }
     
     // Build userInfo dictionary with server message if available
@@ -161,13 +136,17 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
             
         // NETWORK ERRORS (200-299)
         case CLXErrorCodeNetworkError:
-            return @"Network error occurred. Please check your internet connection.";
+            return @"Network error.";
         case CLXErrorCodeNetworkTimeout:
             return @"Network request timed out.";
-        case CLXErrorCodeInvalidResponse:
-            return @"Invalid response received from server.";
         case CLXErrorCodeServerError:
-            return @"Server error occurred.";
+            return @"Server error (5xx).";
+        case CLXErrorCodeClientError:
+            return @"Client error (4xx).";
+        case CLXErrorCodeTooManyRequests:
+            return @"Rate limited (429).";
+        case CLXErrorCodeInvalidResponse:
+            return @"Invalid or unparseable server response.";
             
         // AD REQUEST/LOADING ERRORS (300-399)
         case CLXErrorCodeNoFill:
@@ -182,8 +161,6 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
             return @"Failed to load ad.";
         case CLXErrorCodeInvalidAd:
             return @"Ad content is invalid or corrupted.";
-        case CLXErrorCodeTooManyRequests:
-            return @"Too many ad requests. Please reduce request frequency.";
         case CLXErrorCodeRequestCancelled:
             return @"Ad request was cancelled.";
         case CLXErrorCodeAdsDisabled:
