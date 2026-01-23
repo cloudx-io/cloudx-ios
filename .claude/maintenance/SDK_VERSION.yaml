@@ -1,0 +1,253 @@
+# CloudX iOS SDK Version Tracking for Agent Documentation
+#
+# This file tracks which SDK version the agent documentation (in cloudx-sdk-agents repo) is synchronized with.
+#
+# Purpose:
+#   - Source of truth for what SDK version the agents document
+#   - Validated by CI to match CLXVersion.m
+#   - Lists all critical API signatures that agents depend on
+#   - Tracks which agent files reference which APIs
+#
+# When to update:
+#   1. After bumping SDK version in CLXVersion.m
+#   2. After running maintainer agent to sync agent docs
+#   3. After API changes that affect agent documentation
+#
+# Validation:
+#   - CI enforces: sdk_version must match CLXVersion.m
+#   - Prevents merging PRs with version drift
+#   - Run: ./scripts/validate_agent_apis.sh
+
+sdk_version: "1.2.0"
+agents_last_updated: "2025-11-14"
+verified_against_commit: "24ad68a"  # Release v1.2.0 - All SDK Components
+
+# Critical API signatures that agents depend on
+api_signatures:
+  initialization:
+    class: "CloudXCore"
+    method: "initializeSDKWithAppKey:completion:"
+    swift_name: "initializeSDK(appKey:completion:)"
+    signature: "- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(nullable void (^)(BOOL success, NSError * _Nullable error))completion"
+    parameters:
+      - "appKey: NSString * - The app key provided by CloudX"
+      - "completion: void (^)(BOOL success, NSError *error) - Completion handler called when initialization finishes"
+
+  banner:
+    factory: "createBannerWithPlacement:viewController:delegate:tmax:"
+    swift_name: "createBanner(placement:viewController:delegate:tmax:)"
+    return_type: "CLXBannerAdView * _Nullable"
+    delegate: "CLXBannerDelegate"
+    auto_load: true  # iOS banners auto-load, unlike Android which requires explicit .load()
+    callbacks:
+      - "bannerDidLoad:(CLXBannerAdView *)banner"
+      - "bannerDidFailToLoad:(CLXBannerAdView *)banner withError:(NSError *)error"
+      - "bannerDidDisplay:(CLXBannerAdView *)banner"
+      - "bannerDidClick:(CLXBannerAdView *)banner"
+      - "bannerDidDismiss:(CLXBannerAdView *)banner"
+
+  mrec:
+    factory: "createMRECWithPlacement:viewController:delegate:"
+    swift_name: "createMREC(placement:viewController:delegate:)"
+    return_type: "CLXBannerAdView * _Nullable"
+    delegate: "CLXBannerDelegate"
+    auto_load: true
+    note: "MREC uses same CLXBannerDelegate as banner"
+
+  interstitial:
+    factory: "createInterstitialWithPlacement:delegate:"
+    swift_name: "createInterstitial(placement:delegate:)"
+    return_type: "CLXInterstitial * _Nullable"
+    delegate: "CLXInterstitialDelegate"
+    auto_load: true
+    show_method: "showFromViewController:"
+    callbacks:
+      - "interstitialDidLoad:(CLXInterstitial *)interstitial"
+      - "interstitialDidFailToLoad:(CLXInterstitial *)interstitial withError:(NSError *)error"
+      - "interstitialDidDisplay:(CLXInterstitial *)interstitial"
+      - "interstitialDidClick:(CLXInterstitial *)interstitial"
+      - "interstitialDidDismiss:(CLXInterstitial *)interstitial"
+
+  rewarded:
+    factory: "createRewardedWithPlacement:delegate:"
+    swift_name: "createRewarded(placement:delegate:)"
+    return_type: "CLXRewarded * _Nullable"
+    delegate: "CLXRewardedDelegate"
+    auto_load: true
+    show_method: "showFromViewController:"
+    callbacks:
+      - "rewardedDidLoad:(CLXRewarded *)rewarded"
+      - "rewardedDidFailToLoad:(CLXRewarded *)rewarded withError:(NSError *)error"
+      - "rewardedDidDisplay:(CLXRewarded *)rewarded"
+      - "rewardedDidClick:(CLXRewarded *)rewarded"
+      - "rewardedDidDismiss:(CLXRewarded *)rewarded"
+      - "rewardedUserDidEarnReward:(CLXRewarded *)rewarded"
+
+  native:
+    factory: "createNativeAdWithPlacement:viewController:delegate:"
+    swift_name: "createNativeAd(placement:viewController:delegate:)"
+    return_type: "CLXNativeAdView * _Nullable"
+    delegate: "CLXNativeDelegate"
+    auto_load: true
+    callbacks:
+      - "nativeAdDidLoad:(CLXNativeAdView *)nativeAd"
+      - "nativeAdDidFailToLoad:(CLXNativeAdView *)nativeAd withError:(NSError *)error"
+      - "nativeAdDidDisplay:(CLXNativeAdView *)nativeAd"
+      - "nativeAdDidClick:(CLXNativeAdView *)nativeAd"
+
+  privacy:
+    note: "Privacy methods are class methods, not instance methods"
+    ccpa: "+ (void)setCCPAPrivacyString:(nullable NSString *)ccpaPrivacyString"
+    gdpr: "+ (void)setIsUserConsent:(BOOL)isUserConsent"
+    gdpr_note: "⚠️ GDPR is not yet supported by CloudX servers"
+    coppa: "+ (void)setIsAgeRestrictedUser:(BOOL)isAgeRestrictedUser"
+    coppa_note: "COPPA data clearing implemented but not in bid requests (server limitation)"
+    do_not_sell: "+ (void)setIsDoNotSell:(BOOL)isDoNotSell"
+
+  logging:
+    note: "Logging methods are class methods"
+    enable: "+ (void)setLoggingEnabled:(BOOL)enabled"
+    min_level: "+ (void)setMinLogLevel:(CLXLogLevel)minLogLevel"
+    emojis: "+ (void)setLoggingEmojisEnabled:(BOOL)enabled"
+    timestamps: "+ (void)setLoggingTimestampsEnabled:(BOOL)enabled"
+
+# Files that contain API references (must be updated when SDK changes)
+# Note: These paths refer to the cloudx-sdk-agents repository, not this repo
+agent_files:
+  - path: ".claude/agents/ios/cloudx-ios-integrator.md"
+    api_references:
+      - "CloudXCore.shared"
+      - "initializeSDKWithAppKey:completion:"
+      - "createBannerWithPlacement:viewController:delegate:tmax:"
+      - "createMRECWithPlacement:viewController:delegate:"
+      - "createInterstitialWithPlacement:delegate:"
+      - "createRewardedWithPlacement:delegate:"
+      - "createNativeAdWithPlacement:viewController:delegate:"
+      - "CLXBannerDelegate"
+      - "CLXInterstitialDelegate"
+      - "CLXRewardedDelegate"
+      - "CLXNativeDelegate"
+      - "showFromViewController:"
+
+  - path: ".claude/agents/ios/cloudx-ios-auditor.md"
+    api_references:
+      - "bannerDidFailToLoad:withError:"
+      - "interstitialDidFailToLoad:withError:"
+      - "rewardedDidFailToLoad:withError:"
+      - "NSError"
+
+  - path: ".claude/agents/ios/cloudx-ios-privacy-checker.md"
+    api_references:
+      - "setCCPAPrivacyString:"
+      - "setIsUserConsent:"
+      - "setIsAgeRestrictedUser:"
+      - "setIsDoNotSell:"
+
+  - path: "docs/ios/INTEGRATION_GUIDE.md"
+    api_references:
+      - "ALL"  # Comprehensive guide, references all APIs
+
+  - path: "docs/ios/ORCHESTRATION.md"
+    api_references:
+      - "ALL"  # Orchestration guide
+
+# Update checklist (what to do when SDK version changes)
+update_checklist:
+  - "Update sdk_version field above"
+  - "Run ./scripts/validate_agent_apis.sh"
+  - "Review git diff for public API changes"
+  - "Update agent files with new API names"
+  - "Update code examples in iOS integration docs"
+  - "Run agent validation tests"
+  - "Update agents_last_updated date"
+  - "Commit with message: 'Update iOS agents for SDK vX.X.X'"
+
+# Known breaking changes to watch for
+breaking_change_patterns:
+  - "Renamed classes (e.g., CLXBanner → CLXBannerAdView)"
+  - "Changed method signatures (parameters added/removed)"
+  - "Changed delegate callback signatures"
+  - "Removed deprecated APIs"
+  - "Changed return types (e.g., nullable vs non-nullable)"
+  - "Changed parameter order"
+  - "New required parameters"
+  - "Changed NS_SWIFT_NAME annotations"
+
+# iOS-specific considerations
+ios_specific:
+  packaging:
+    cocoapods: "pod 'CloudXCore', '~> 1.2.0'"
+    spm: ".package(url: \"https://github.com/cloudx-io/cloudx-ios\", from: \"1.2.0\")"
+
+  languages:
+    primary: "Objective-C"
+    swift_support: "via NS_SWIFT_NAME macros"
+    note: "Always provide examples in both Objective-C and Swift"
+
+  key_differences_from_android:
+    - "iOS ads auto-load (no explicit .load() call needed)"
+    - "iOS requires UIViewController for banner/native ad creation"
+    - "iOS uses delegate protocols instead of listener interfaces"
+    - "iOS privacy methods are class methods, not instance methods"
+    - "iOS interstitials/rewarded require showFromViewController: to display"
+    - "iOS uses nullable return types (_Nullable)"
+
+  common_patterns:
+    singleton: "CloudXCore.shared"
+    async_init: "completion: ^(BOOL success, NSError *error)"
+    delegates: "@protocol CLXBannerDelegate <NSObject>"
+    show_fullscreen: "[interstitial showFromViewController:self]"
+
+# Contact for SDK changes
+maintainer_contacts:
+  sdk_team: "mobile@cloudx.io"
+  agent_maintainer: "TBD"
+
+# Validation coverage (what we actually check)
+validation_coverage:
+  what_we_validate:
+    - "Class and protocol names exist in SDK"
+    - "Factory method names exist (createBanner, createInterstitial, etc.)"
+    - "Privacy API class method names correct"
+    - "Deprecated API patterns not in agent docs"
+    - "Delegate callback signatures match protocols"
+
+  what_we_dont_validate:
+    - "Method signatures (parameter count, types, order) - only smoke test"
+    - "Return types of methods"
+    - "All delegate callback signatures (only check critical ones)"
+    - "Code examples compile against SDK"
+    - "New SDK features are documented"
+    - "Removed SDK features cleaned from docs"
+    - "NS_SWIFT_NAME correctness"
+    - "Complete API coverage (only ~20% of public APIs checked)"
+
+  validation_level: "smoke_test"
+  # Options: smoke_test, integration_test, comprehensive
+  # Current: smoke_test - catches major breakage (renamed classes, removed methods)
+  # Future: comprehensive - validates signatures, compiles examples, checks coverage
+
+  known_risks:
+    - "SDK could add new ad formats - agents won't know"
+    - "Method parameters could change - agents show wrong signature"
+    - "New error codes added - agents can't help troubleshoot"
+    - "Breaking changes in minor versions - validation might not catch"
+    - "Swift API changes via NS_SWIFT_NAME not validated"
+
+  improvement_roadmap:
+    - issue: "TBD"
+      title: "Add code example compilation validation (both ObjC and Swift)"
+      priority: "P1"
+      effort: "High"
+    - issue: "TBD"
+      title: "Add API coverage validation (check all public APIs documented)"
+      priority: "P1"
+      effort: "Low"
+    - issue: "TBD"
+      title: "Add protocol signature validation"
+      priority: "P2"
+      effort: "Medium"
+    - issue: "TBD"
+      title: "Add Swift syntax validation"
+      priority: "P2"
+      effort: "Medium"
