@@ -345,7 +345,7 @@
         [expectation fulfill];
     });
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
     
     // Test passes if no crash - concurrent updates should work without corruption
 }
@@ -379,7 +379,7 @@
         [expectation fulfill];
     });
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
     
     // Test passes if no crash - concurrent read/write should work without corruption
 }

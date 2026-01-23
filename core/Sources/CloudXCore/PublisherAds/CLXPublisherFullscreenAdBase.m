@@ -20,6 +20,11 @@
 #import <CloudXCore/CLXBidLifecycleEvent.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
+#import <CloudXCore/CLXLossReasonMapper.h>
+#import <CloudXCore/CLXMetricsTrackerProtocol.h>
+#import <CloudXCore/CLXMetricsTrackerImpl.h>
+#import <CloudXCore/CLXMetricsType.h>
+#import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXBidAdSource.h>
 #import <CloudXCore/CLXBidResponse.h>
 #import <CloudXCore/CLXAppSessionService.h>
@@ -136,6 +141,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 // Requested placement name for deferred initialization
 @property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+
+// Adapter load timing
+@property (nonatomic, strong, nullable) NSDate *adapterLoadStartTime;
 
 @end
 
@@ -613,6 +621,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                                    placementID:self.placementID
                                                      loadCount:0];
     
+    // Track adapter load start time for latency metrics
+    self.adapterLoadStartTime = [NSDate date];
+    
     // Configure adapter delegate and initiate loading with timeout protection
     [self setupAdapterAndLoad:adapter];
 }
@@ -626,19 +637,25 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 }
 
 - (void)sendLossNotificationForFailedAd {
+    [self sendLossNotificationForFailedAdWithError:nil];
+}
+
+- (void)sendLossNotificationForFailedAdWithError:(nullable NSError *)error {
     if (self.lastBidResponse && self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
+        CLXLossReason lossReason = [CLXLossReasonMapper lossReasonFromError:error];
+        
         [self.winLossTracker setBidLoadResult:self.currentBidResponse.id 
                                        bidId:self.lastBidResponse.bid.id 
                                      success:NO 
-                                  lossReason:@(CLXLossReasonInternalError)];
+                                  lossReason:@(lossReason)];
         
         [self.winLossTracker sendEvent:self.currentBidResponse.id
                                   bidId:self.lastBidResponse.bid.id
                                   event:[CLXBidLifecycleEvent lossEvent]
-                             lossReason:@(CLXLossReasonInternalError)
+                             lossReason:@(lossReason)
                          winnerBidPrice:-1.0];
         
-        [self.logger debug:[NSString stringWithFormat:@"Sent LOSS event for failed ad type %ld, reason=InternalError", (long)[self adType]]];
+        [self.logger debug:[NSString stringWithFormat:@"Sent LOSS event for failed ad type %ld, reason=%ld", (long)[self adType], (long)lossReason]];
     } else {
         [self.logger debug:[NSString stringWithFormat:@"Missing data for ad type %ld loss notification: bidID=%@, auctionID=%@", 
                            (long)[self adType], self.lastBidResponse.bid.id ?: @"(nil)", self.currentBidResponse.id ?: @"(nil)"]];
@@ -739,6 +756,23 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 - (CLXAd *)createAdObject {
     return [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+}
+
+- (void)trackAdapterLoadLatencyWithError:(nullable NSError *)error {
+    if (self.adapterLoadStartTime) {
+        NSTimeInterval latencyMs = [[NSDate date] timeIntervalSinceDate:self.adapterLoadStartTime] * 1000;
+        
+        id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad 
+                                 latency:(NSInteger)latencyMs
+                                   error:error];
+        
+        [self.logger debug:[NSString stringWithFormat:@"Tracked adapter load latency: %.0fms%@", 
+                           latencyMs, error ? @" (failed)" : @""]];
+        
+        // Reset for next load
+        self.adapterLoadStartTime = nil;
+    }
 }
 
 @end

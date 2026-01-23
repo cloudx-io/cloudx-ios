@@ -23,7 +23,12 @@
 #import <CloudXCore/CLXBidLifecycleEvent.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
+#import <CloudXCore/CLXLossReasonMapper.h>
 #import <CloudXCore/CLXSettings.h>
+#import <CloudXCore/CLXMetricsTrackerProtocol.h>
+#import <CloudXCore/CLXMetricsTrackerImpl.h>
+#import <CloudXCore/CLXMetricsType.h>
+#import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXBannerTimerService.h>
 
 
@@ -649,6 +654,10 @@ NS_ASSUME_NONNULL_BEGIN
     [self.logger debug:[NSString stringWithFormat:@"Ad loaded with latency: %.1f ms", latency]];
     [self.appSessionService adLoadedWithPlacementID:self.placementID latency:latency];
     
+    // Track adapter load latency with metrics tracker
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:nil];
+    
     // SECOND PHASE - Winner has successfully loaded, now fire lurls for all losing bids
     // All remaining bids that could create banners but lost to this winner get LostToHigherBid
     [self fireLosingBidLurls];
@@ -759,24 +768,33 @@ NS_ASSUME_NONNULL_BEGIN
     [self.logger info:[NSString stringWithFormat:@"[%@] failToLoadBanner for placement: %@ - %@", self.currentCorrelationId, self.placementID, error.localizedDescription ?: @"Unknown error"]];
     
     [self.appSessionService adFailedToLoadWithPlacementID:self.placementID];
+    
+    // Track adapter load latency with metrics tracker (failure)
+    if (self.adLoadStartTime) {
+        NSTimeInterval latency = [[NSDate date] timeIntervalSinceDate:self.adLoadStartTime] * 1000;
+        id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:error];
+    }
 
     // Destroy the failed banner
     [banner destroy];
     
     // Send server-side loss notification for technical errors (replaces client-side LURL firing)
     if (self.lastBidResponse && self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
+        CLXLossReason lossReason = [CLXLossReasonMapper lossReasonFromError:error];
+        
         [self.winLossTracker setBidLoadResult:self.currentBidResponse.id 
                                        bidId:self.lastBidResponse.bid.id 
                                      success:NO 
-                                  lossReason:@(CLXLossReasonInternalError)];
+                                  lossReason:@(lossReason)];
         
         [self.winLossTracker sendEvent:self.currentBidResponse.id
                                   bidId:self.lastBidResponse.bid.id
                                   event:[CLXBidLifecycleEvent lossEvent]
-                             lossReason:@(CLXLossReasonInternalError)
+                             lossReason:@(lossReason)
                          winnerBidPrice:-1.0];
         
-        [self.logger debug:[NSString stringWithFormat:@"Sent LOSS event for failed winner rank=%ld, reason=InternalError", (long)self.lastBidResponse.bid.ext.cloudx.rank]];
+        [self.logger debug:[NSString stringWithFormat:@"Sent LOSS event for failed winner rank=%ld, reason=%ld", (long)self.lastBidResponse.bid.ext.cloudx.rank, (long)lossReason]];
     }
     
     // Reset state for next interval

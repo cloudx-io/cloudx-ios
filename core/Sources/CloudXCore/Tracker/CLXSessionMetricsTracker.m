@@ -41,6 +41,12 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
 @property (nonatomic, strong) NSMutableArray<NSNumber *> *formatCounts;  // Array of NSInteger
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> *placementCounts;
 
+// Time-to-first-ad tracking
+@property (nonatomic, assign) NSTimeInterval sdkInitTime;
+@property (nonatomic, assign) BOOL firstImpressionTracked;
+@property (nonatomic, assign) NSInteger timeToFirstAdMs;
+@property (nonatomic, copy, nullable) void (^timeToFirstAdCallback)(NSInteger);
+
 @end
 
 @implementation CLXSessionMetricsTracker
@@ -84,6 +90,11 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
         
         _placementCounts = [NSMutableDictionary dictionary];
         
+        // Time-to-first-ad tracking
+        _sdkInitTime = 0;
+        _firstImpressionTracked = NO;
+        _timeToFirstAdMs = -1;
+        
         [_logger debug:@"SessionMetricsTracker initialized"];
     }
     return self;
@@ -120,6 +131,26 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
         
         NSInteger currentPlacementCount = [self.placementCounts[placementName] integerValue];
         self.placementCounts[placementName] = @(currentPlacementCount + 1);
+        
+        // Track time-to-first-ad (only once per session after SDK init)
+        if (!self.firstImpressionTracked && self.sdkInitTime > 0) {
+            self.timeToFirstAdMs = (NSInteger)((now - self.sdkInitTime) * 1000);
+            self.firstImpressionTracked = YES;
+            
+            [self.logger info:[NSString stringWithFormat:
+                @"Time-to-first-ad: %ldms", (long)self.timeToFirstAdMs]];
+            
+            // Invoke callback if set (for metrics reporting)
+            // Dispatch async to avoid holding the queue during callback execution
+            // and prevent potential deadlock if callback accesses this tracker
+            void (^callback)(NSInteger) = self.timeToFirstAdCallback;
+            NSInteger ttfaMs = self.timeToFirstAdMs;
+            if (callback) {
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    callback(ttfaMs);
+                });
+            }
+        }
         
         [self.logger debug:[NSString stringWithFormat:
             @"Recorded impression - placement:'%@' format:%ld globalCount:%ld",
@@ -185,6 +216,36 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
     });
 }
 
+#pragma mark - Time-to-First-Ad Tracking
+
+- (void)recordSDKInitialization {
+    dispatch_sync(self.queue, ^{
+        if (self.sdkInitTime == 0) {
+            self.sdkInitTime = self.clockProvider();
+            [self.logger debug:[NSString stringWithFormat:@"SDK init recorded at %.2f", self.sdkInitTime]];
+        }
+    });
+}
+
+- (NSInteger)getTimeToFirstAdMs {
+    __block NSInteger result = -1;
+    dispatch_sync(self.queue, ^{
+        result = self.firstImpressionTracked ? self.timeToFirstAdMs : -1;
+    });
+    return result;
+}
+
+- (void)setTimeToFirstAdCallback:(void (^)(NSInteger))callback {
+    // Use dispatch_async to avoid potential deadlock if called from within the queue
+    // Setter doesn't need to block - fire-and-forget is appropriate here
+    void (^copiedCallback)(NSInteger) = [callback copy];
+    dispatch_async(self.queue, ^{
+        // Use ivar directly to avoid infinite recursion (this IS the setter)
+        _timeToFirstAdCallback = copiedCallback;
+        [self.logger debug:@"Time-to-first-ad callback configured"];
+    });
+}
+
 #pragma mark - Testing Support
 
 - (void)setClockProviderForTesting:(NSTimeInterval (^)(void))clockProvider {
@@ -240,6 +301,13 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
     [self.placementCounts removeAllObjects];
     self.sessionStartTime = 0;
     self.lastActivityTime = 0;
+    
+    // Reset time-to-first-ad tracking
+    // Note: We keep the callback - it persists across session resets
+    // The callback will fire again on the next session's first impression
+    self.sdkInitTime = 0;
+    self.firstImpressionTracked = NO;
+    self.timeToFirstAdMs = -1;
 }
 
 /**

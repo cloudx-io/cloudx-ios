@@ -45,6 +45,28 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)resetAll;
 
+/**
+ * Records SDK initialization timestamp.
+ * Called once during CloudXCore.initWithAppKey.
+ * Required for time-to-first-ad calculation.
+ */
+- (void)recordSDKInitialization;
+
+/**
+ * Returns time-to-first-ad in milliseconds, or -1 if not yet recorded.
+ * Value is only available after first impression in a session.
+ */
+- (NSInteger)getTimeToFirstAdMs;
+
+/**
+ * Sets the callback to be invoked when time-to-first-ad is calculated.
+ * The callback is invoked exactly once per session, on the first impression.
+ * Thread-safe: callback is invoked on an internal serial queue.
+ *
+ * @param callback Block that receives the time-to-first-ad value in milliseconds
+ */
+- (void)setTimeToFirstAdCallback:(void (^)(NSInteger timeToFirstAdMs))callback;
+
 @end
 
 /**
@@ -123,6 +145,34 @@ NS_ASSUME_NONNULL_BEGIN
  * Thread-safe: Uses serial dispatch queue for synchronization.
  */
 - (void)resetAll;
+
+#pragma mark - Time-to-First-Ad Tracking
+
+/**
+ * Records SDK initialization timestamp.
+ * Called once during CloudXCore.initWithAppKey.
+ * Required for time-to-first-ad calculation.
+ *
+ * Thread-safe: Uses serial dispatch queue for synchronization.
+ */
+- (void)recordSDKInitialization;
+
+/**
+ * Returns time-to-first-ad in milliseconds, or -1 if not yet recorded.
+ * Value is only available after first impression in a session.
+ *
+ * Thread-safe: Uses serial dispatch queue for synchronization.
+ */
+- (NSInteger)getTimeToFirstAdMs;
+
+/**
+ * Sets the callback to be invoked when time-to-first-ad is calculated.
+ * The callback is invoked exactly once per session, on the first impression.
+ * Thread-safe: callback is invoked on an internal serial queue.
+ *
+ * @param callback Block that receives the time-to-first-ad value in milliseconds
+ */
+- (void)setTimeToFirstAdCallback:(void (^)(NSInteger timeToFirstAdMs))callback;
 
 #pragma mark - Testing Support
 

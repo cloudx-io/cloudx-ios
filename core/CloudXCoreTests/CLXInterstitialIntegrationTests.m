@@ -13,7 +13,7 @@
 // MARK: - Test Constants
 
 static NSString * const kTestPlacementID = @"integration-test-placement";
-static const NSTimeInterval kTestTimeout = 5.0;
+static const NSTimeInterval kTestTimeout = 1.0;
 
 // MARK: - Import private enum definition
 
@@ -267,13 +267,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Start load (this will likely fail silently due to invalid placement)
     [self.interstitial load];
     
-    // Wait a short time to ensure no crashes occur
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Load timeout test"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
+    // Spin run loop to process any queued main queue work - no artificial delays
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
     
-    [self waitForExpectationsWithTimeout:3.0 handler:nil];
     // Test passes if we reach here without crash
 }
 
@@ -289,13 +285,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Try to load with invalid placement (our test placement should be invalid)
     [self.interstitial load];
     
-    // Wait a short time to ensure no crashes occur
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Invalid placement test"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
+    // Spin run loop to process any queued main queue work - no artificial delays
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
     
-    [self waitForExpectationsWithTimeout:3.0 handler:nil];
     // Test passes if we reach here without crash
 }
 

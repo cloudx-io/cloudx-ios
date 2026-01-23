@@ -47,6 +47,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)trackNetworkCall:(NSString *)networkType latency:(NSInteger)latencyMs;
 
 /**
+ * Track a network call with latency and optional error
+ * If error is a timeout error, also increments the timeout metric
+ * @param networkType The type of network call
+ * @param latencyMs The latency in milliseconds
+ * @param error Optional error if the network call failed
+ */
+- (void)trackNetworkCall:(NSString *)networkType latency:(NSInteger)latencyMs error:(nullable NSError *)error;
+
+/**
  * Try sending pending metrics
  * Matches Android's fun trySendingPendingMetrics()
  */

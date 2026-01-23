@@ -39,6 +39,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Loss notification
 - (void)sendLossNotificationForFailedAd;
+- (void)sendLossNotificationForFailedAdWithError:(nullable NSError *)error;
+
+// Adapter load latency tracking
+- (void)trackAdapterLoadLatencyWithError:(nullable NSError *)error;
 
 // Ad close handling
 - (void)handleAdClose;

@@ -53,8 +53,7 @@
 - (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable, NSError * _Nullable))completion {
     NSLog(@"🧪 [CLXMockInitService] Mock initializeSDKWithAppKey called - NO NETWORK REQUEST!");
     
-    // Simulate async behavior but keep it fast for unit tests
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_mockDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    void (^deliverResult)(void) = ^{
         if (self.shouldSucceed) {
             NSLog(@"🧪 [CLXMockInitService] Mock returning success - NO NETWORK REQUEST!");
             completion(self.mockConfig, nil);
@@ -62,7 +61,15 @@
             NSLog(@"🧪 [CLXMockInitService] Mock returning error - NO NETWORK REQUEST!");
             completion(nil, self.mockError);
         }
-    });
+    };
+    
+    if (self.synchronous) {
+        // Synchronous execution for fast unit tests
+        deliverResult();
+    } else {
+        // Async execution (simulates real network behavior)
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_mockDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), deliverResult);
+    }
 }
 
 @end

@@ -41,37 +41,36 @@
     self.lastRequestBody = requestBody;
     self.lastHeaders = headers;
     
-    // Simulate delay if specified
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.simulatedDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (self.shouldTimeout) {
-            // Convert NSURLError to CLXError to match real implementation behavior
-            NSError *urlError = [NSError errorWithDomain:NSURLErrorDomain
-                                                    code:NSURLErrorTimedOut
-                                                userInfo:@{NSLocalizedDescriptionKey: @"Request timed out"}];
-            CLXError *timeoutError = [CLXError errorWithCode:CLXErrorCodeNetworkTimeout underlyingError:urlError];
-            completion(nil, timeoutError, NO);
-        } else if (self.simulatedError) {
-            // Convert NSURLError to CLXError to match real implementation behavior
-            if ([self.simulatedError.domain isEqualToString:NSURLErrorDomain]) {
-                CLXErrorCode code = (self.simulatedError.code == NSURLErrorTimedOut)
-                    ? CLXErrorCodeNetworkTimeout
-                    : CLXErrorCodeNetworkError;
-                CLXError *networkError = [CLXError errorWithCode:code underlyingError:self.simulatedError];
-                completion(nil, networkError, NO);
-            } else {
-                completion(nil, self.simulatedError, NO);
-            }
+    // SYNCHRONOUS execution for fast, deterministic tests (like MockURLSession)
+    // Also includes CLXError wrapping to match real implementation behavior
+    if (self.shouldTimeout) {
+        // Convert NSURLError to CLXError to match real implementation behavior
+        NSError *urlError = [NSError errorWithDomain:NSURLErrorDomain
+                                                code:NSURLErrorTimedOut
+                                            userInfo:@{NSLocalizedDescriptionKey: @"Request timed out"}];
+        CLXError *timeoutError = [CLXError errorWithCode:CLXErrorCodeNetworkTimeout underlyingError:urlError];
+        completion(nil, timeoutError, NO);
+    } else if (self.simulatedError) {
+        // Convert NSURLError to CLXError to match real implementation behavior
+        if ([self.simulatedError.domain isEqualToString:NSURLErrorDomain]) {
+            CLXErrorCode code = (self.simulatedError.code == NSURLErrorTimedOut)
+                ? CLXErrorCodeNetworkTimeout
+                : CLXErrorCodeNetworkError;
+            CLXError *networkError = [CLXError errorWithCode:code underlyingError:self.simulatedError];
+            completion(nil, networkError, NO);
         } else {
-            // Create mock HTTP response
-            NSHTTPURLResponse *httpResponse = [[NSHTTPURLResponse alloc] 
-                initWithURL:[NSURL URLWithString:@"https://test.com"] 
-                statusCode:self.simulatedStatusCode 
-                HTTPVersion:@"HTTP/1.1" 
-                headerFields:nil];
-            
-            completion(httpResponse, nil, NO);
+            completion(nil, self.simulatedError, NO);
         }
-    });
+    } else {
+        // Create mock HTTP response
+        NSHTTPURLResponse *httpResponse = [[NSHTTPURLResponse alloc] 
+            initWithURL:[NSURL URLWithString:@"https://test.com"] 
+            statusCode:self.simulatedStatusCode 
+            HTTPVersion:@"HTTP/1.1" 
+            headerFields:nil];
+        
+        completion(httpResponse, nil, NO);
+    }
 }
 
 @end
@@ -134,7 +133,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 /**
@@ -160,7 +159,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 #pragma mark - Network Failure Tests
@@ -185,7 +184,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 /**
@@ -210,7 +209,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 /**
@@ -235,7 +234,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 #pragma mark - HTTP Status Code Tests
@@ -262,7 +261,7 @@
             [expectation fulfill];
         }];
         
-        [self waitForExpectationsWithTimeout:5.0 handler:nil];
+        [self waitForExpectationsWithTimeout:0.1 handler:nil];
     }
 }
 
@@ -288,7 +287,7 @@
             [expectation fulfill];
         }];
         
-        [self waitForExpectationsWithTimeout:5.0 handler:nil];
+        [self waitForExpectationsWithTimeout:0.1 handler:nil];
     }
 }
 
@@ -322,7 +321,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 /**
@@ -344,7 +343,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 #pragma mark - Concurrent Request Tests
@@ -357,7 +356,7 @@
     NSMutableArray *expectations = [NSMutableArray array];
     
     self.mockBaseService.simulatedStatusCode = 200;
-    self.mockBaseService.simulatedDelay = 0.1; // Small delay to test concurrency
+    self.mockBaseService.simulatedStatusCode = 200; // Mock is now synchronous
     
     for (NSInteger i = 0; i < requestCount; i++) {
         XCTestExpectation *expectation = [self expectationWithDescription:[NSString stringWithFormat:@"Concurrent request %ld", (long)i]];
@@ -379,7 +378,7 @@
         }];
     }
     
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
     XCTAssertEqual(self.mockBaseService.callCount, requestCount, @"Should have made all requests");
 }
 

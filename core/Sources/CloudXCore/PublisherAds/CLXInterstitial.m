@@ -139,6 +139,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
     [self.logger debug:[NSString stringWithFormat:@"didLoadWithInterstitial - Class: %@", NSStringFromClass([(NSObject *)interstitial class])]];
     
+    // Track adapter load latency (success)
+    [self trackAdapterLoadLatencyWithError:nil];
+    
     self.currentAdapter = interstitial;
     [self transitionToReadyState];
     
@@ -153,7 +156,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didFailToLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial error:(NSError *)error {
     [self.logger error:[NSString stringWithFormat:@"❌ didFailToLoadWithInterstitial (%@): %@", interstitial, error.localizedDescription]];
     
-    [self sendLossNotificationForFailedAd];
+    // Track adapter load latency (failure)
+    [self trackAdapterLoadLatencyWithError:error];
+    
+    [self sendLossNotificationForFailedAdWithError:error];
     self.currentAdapter = nil;
     [self transitionToIdleState];
     

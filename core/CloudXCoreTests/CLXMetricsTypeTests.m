@@ -15,6 +15,9 @@
     XCTAssertEqualObjects(CLXMetricsTypeNetworkSdkInit, @"network_call_sdk_init_req");
     XCTAssertEqualObjects(CLXMetricsTypeNetworkGeoApi, @"network_call_geo_req");
     XCTAssertEqualObjects(CLXMetricsTypeNetworkBidRequest, @"network_call_bid_req");
+    XCTAssertEqualObjects(CLXMetricsTypeNetworkTimeout, @"network_call_timeout");
+    XCTAssertEqualObjects(CLXMetricsTypeNetworkAdapterLoad, @"network_call_adapter_load");
+    XCTAssertEqualObjects(CLXMetricsTypeNetworkTimeToFirstAd, @"network_call_time_to_first_ad");
 }
 
 - (void)testMethodCallTypes {
@@ -36,6 +39,9 @@
     XCTAssertTrue([CLXMetricsType isNetworkCallType:CLXMetricsTypeNetworkSdkInit]);
     XCTAssertTrue([CLXMetricsType isNetworkCallType:CLXMetricsTypeNetworkGeoApi]);
     XCTAssertTrue([CLXMetricsType isNetworkCallType:CLXMetricsTypeNetworkBidRequest]);
+    XCTAssertTrue([CLXMetricsType isNetworkCallType:CLXMetricsTypeNetworkTimeout]);
+    XCTAssertTrue([CLXMetricsType isNetworkCallType:CLXMetricsTypeNetworkAdapterLoad]);
+    XCTAssertTrue([CLXMetricsType isNetworkCallType:CLXMetricsTypeNetworkTimeToFirstAd]);
     
     // Test method calls are not network calls
     XCTAssertFalse([CLXMetricsType isNetworkCallType:CLXMetricsTypeMethodSdkInit]);
@@ -73,10 +79,13 @@
     NSArray<NSString *> *networkTypes = [CLXMetricsType allNetworkCallTypes];
     
     XCTAssertNotNil(networkTypes);
-    XCTAssertEqual(networkTypes.count, 3);
+    XCTAssertEqual(networkTypes.count, 6);
     XCTAssertTrue([networkTypes containsObject:CLXMetricsTypeNetworkSdkInit]);
     XCTAssertTrue([networkTypes containsObject:CLXMetricsTypeNetworkGeoApi]);
     XCTAssertTrue([networkTypes containsObject:CLXMetricsTypeNetworkBidRequest]);
+    XCTAssertTrue([networkTypes containsObject:CLXMetricsTypeNetworkTimeout]);
+    XCTAssertTrue([networkTypes containsObject:CLXMetricsTypeNetworkAdapterLoad]);
+    XCTAssertTrue([networkTypes containsObject:CLXMetricsTypeNetworkTimeToFirstAd]);
 }
 
 - (void)testAllMethodCallTypes {
@@ -102,6 +111,9 @@
     XCTAssertTrue([CLXMetricsType isValidMetricType:CLXMetricsTypeNetworkSdkInit]);
     XCTAssertTrue([CLXMetricsType isValidMetricType:CLXMetricsTypeNetworkGeoApi]);
     XCTAssertTrue([CLXMetricsType isValidMetricType:CLXMetricsTypeNetworkBidRequest]);
+    XCTAssertTrue([CLXMetricsType isValidMetricType:CLXMetricsTypeNetworkTimeout]);
+    XCTAssertTrue([CLXMetricsType isValidMetricType:CLXMetricsTypeNetworkAdapterLoad]);
+    XCTAssertTrue([CLXMetricsType isValidMetricType:CLXMetricsTypeNetworkTimeToFirstAd]);
     
     // Test valid method types
     XCTAssertTrue([CLXMetricsType isValidMetricType:CLXMetricsTypeMethodSdkInit]);

@@ -188,6 +188,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didLoadWithRewarded:(id<CLXAdapterRewarded>)rewarded {
     [self.logger debug:@"Rewarded adapter loaded successfully"];
     
+    // Track adapter load latency (success)
+    [self trackAdapterLoadLatencyWithError:nil];
+    
     self.currentAdapter = rewarded;
     [self transitionToReadyState];
     
@@ -202,7 +205,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didFailToLoadWithRewarded:(id<CLXAdapterRewarded>)rewarded error:(NSError *)error {
     [self.logger error:[NSString stringWithFormat:@"❌ didFailToLoadWithRewarded (%@): %@", rewarded, error.localizedDescription]];
     
-    [self sendLossNotificationForFailedAd];
+    // Track adapter load latency (failure)
+    [self trackAdapterLoadLatencyWithError:error];
+    
+    [self sendLossNotificationForFailedAdWithError:error];
     self.currentAdapter = nil;
     [self transitionToIdleState];
     

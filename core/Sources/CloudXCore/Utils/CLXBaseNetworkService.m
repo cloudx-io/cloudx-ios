@@ -11,6 +11,44 @@
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXLogger.h>
 
+#pragma mark - CLXDispatchScheduler Implementation
+
+@implementation CLXDispatchScheduler
+
++ (instancetype)sharedInstance {
+    static CLXDispatchScheduler *instance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        instance = [[CLXDispatchScheduler alloc] init];
+    });
+    return instance;
+}
+
+- (void)scheduleAfterDelay:(NSTimeInterval)delay
+                   onQueue:(dispatch_queue_t)queue
+                     block:(dispatch_block_t)block {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), queue, block);
+}
+
+@end
+
+#pragma mark - CLXSynchronousScheduler Implementation
+
+@implementation CLXSynchronousScheduler
+
+- (void)scheduleAfterDelay:(NSTimeInterval)delay
+                   onQueue:(dispatch_queue_t)queue
+                     block:(dispatch_block_t)block {
+    // Execute immediately for fast, deterministic tests
+    if (block) {
+        block();
+    }
+}
+
+@end
+
+#pragma mark - CLXBaseNetworkService Implementation
+
 @interface CLXBaseNetworkService ()
 @property (nonatomic, strong) CLXLogger *logger;
 @end
@@ -22,12 +60,27 @@
  * @param baseURL The base URL for API requests
  * @param urlSession The URL session to use for network requests
  * @return An initialized instance of BaseNetworkService
+ * @note Uses CLXDispatchScheduler by default for production retry delays
  */
 - (instancetype)initWithBaseURL:(NSString *)baseURL urlSession:(NSURLSession *)urlSession {
+    return [self initWithBaseURL:baseURL urlSession:urlSession scheduler:[CLXDispatchScheduler sharedInstance]];
+}
+
+/**
+ * @brief Initializes the network service with base URL, session, and custom scheduler
+ * @param baseURL The base URL for API requests
+ * @param urlSession The URL session to use for network requests
+ * @param scheduler The scheduler to use for retry delays (use CLXSynchronousScheduler for tests)
+ * @return An initialized instance of BaseNetworkService
+ */
+- (instancetype)initWithBaseURL:(NSString *)baseURL 
+                     urlSession:(NSURLSession *)urlSession
+                      scheduler:(id<CLXScheduler>)scheduler {
     self = [super init];
     if (self) {
         _baseURL = [baseURL copy];
         _urlSession = urlSession;
+        _scheduler = scheduler;
         _logger = [[CLXLogger alloc] initWithCategory:@"BaseNetworkService"];
     }
     return self;
@@ -181,7 +234,9 @@
         if (shouldRetry && currentAttempt < maxRetries) {
             NSInteger nextAttempt = currentAttempt + 1;
             [self.logger verbose:[NSString stringWithFormat:@"Retrying request (attempt %ld) after %.1fs delay", (long)(nextAttempt + 1), retryDelay]];
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(retryDelay * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+            [self.scheduler scheduleAfterDelay:retryDelay 
+                                       onQueue:dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
+                                         block:^{
                 [self executeRequestWithEndpoint:endpoint
                                    urlParameters:urlParameters
                                      requestBody:requestBody
@@ -190,7 +245,7 @@
                                            delay:delay
                                    currentAttempt:nextAttempt
                                       completion:completion];
-            });
+            }];
             return;
         }
         

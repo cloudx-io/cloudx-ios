@@ -18,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXSDKConfigResponse *mockConfig;
 @property (nonatomic, assign) NSTimeInterval mockDelay;
 
+/** When YES, executes completion synchronously (no dispatch_after). Default: NO */
+@property (nonatomic, assign) BOOL synchronous;
+
 - (instancetype)initWithSuccess:(BOOL)shouldSucceed;
 - (instancetype)initWithError:(NSError *)error;
 - (instancetype)initWithConfig:(CLXSDKConfigResponse *)config;

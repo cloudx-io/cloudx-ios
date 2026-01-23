@@ -14,6 +14,7 @@
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXXorEncryption.h>
 #import <CloudXCore/CLXMetricsDebugger.h>
+#import <CloudXCore/CLXError.h>
 
 @interface CLXMetricsTrackerImpl ()
 @property (nonatomic, strong) CLXSQLiteDatabase *database;
@@ -135,6 +136,10 @@
 }
 
 - (void)trackNetworkCall:(NSString *)networkType latency:(NSInteger)latencyMs {
+    [self trackNetworkCall:networkType latency:latencyMs error:nil];
+}
+
+- (void)trackNetworkCall:(NSString *)networkType latency:(NSInteger)latencyMs error:(nullable NSError *)error {
     if (![CLXMetricsType isNetworkCallType:networkType]) {
         [self.logger error:[NSString stringWithFormat:@"Invalid network type: %@", networkType]];
         return;
@@ -150,12 +155,45 @@
             isCallMetricsEnabled = [self.metricsConfig isGeoNetworkCallsEnabled];
         } else if ([networkType isEqualToString:CLXMetricsTypeNetworkBidRequest]) {
             isCallMetricsEnabled = [self.metricsConfig isBidRequestNetworkCallsEnabled];
+        } else if ([networkType isEqualToString:CLXMetricsTypeNetworkTimeout] ||
+                   [networkType isEqualToString:CLXMetricsTypeNetworkAdapterLoad] ||
+                   [networkType isEqualToString:CLXMetricsTypeNetworkTimeToFirstAd]) {
+            // Timeout, adapter load, and time-to-first-ad metrics follow network calls enabled setting
+            isCallMetricsEnabled = YES;
         }
         
         if (isNetworkCallMetricsEnabled && isCallMetricsEnabled) {
             [self _trackMetric:networkType latency:latencyMs];
         }
+        
+        // If error is a timeout, also track the timeout metric
+        if (error && isNetworkCallMetricsEnabled && [self _isTimeoutError:error]) {
+            [self _trackMetric:CLXMetricsTypeNetworkTimeout latency:latencyMs];
+        }
     });
+}
+
+- (BOOL)_isTimeoutError:(NSError *)error {
+    if (!error) return NO;
+    
+    // Check NSURLError domain timeouts
+    if ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorTimedOut) {
+        return YES;
+    }
+    
+    // Check CloudX error codes for timeouts
+    if ([error.domain isEqualToString:CLXErrorDomain]) {
+        switch (error.code) {
+            case CLXErrorCodeNetworkTimeout:
+            case CLXErrorCodeLoadTimeout:
+            case CLXErrorCodeAdapterTimeout:
+                return YES;
+            default:
+                return NO;
+        }
+    }
+    
+    return NO;
 }
 
 - (void)trySendingPendingMetrics {

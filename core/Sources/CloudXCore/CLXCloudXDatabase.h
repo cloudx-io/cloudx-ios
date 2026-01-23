@@ -38,6 +38,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 /**
+ * Testing support: Override the shared instance with a test double
+ * @param testInstance The test instance to use, or nil to reset to default
+ * @note This should only be used in unit tests
+ */
++ (void)setSharedInstanceForTesting:(nullable CLXCloudXDatabase *)testInstance;
+
+/**
  * DAO instances for different data types
  * Following Dependency Inversion Principle with protocols
  */

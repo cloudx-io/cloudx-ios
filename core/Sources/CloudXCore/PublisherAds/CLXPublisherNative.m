@@ -21,6 +21,11 @@
 #import <CloudXCore/CLXBidLifecycleEvent.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
+#import <CloudXCore/CLXLossReasonMapper.h>
+#import <CloudXCore/CLXMetricsTrackerProtocol.h>
+#import <CloudXCore/CLXMetricsTrackerImpl.h>
+#import <CloudXCore/CLXMetricsType.h>
+#import <CloudXCore/CLXDIContainer.h>
 
 #import <CloudXCore/CLXBannerTimerService.h>
 #import <CloudXCore/CLXAppSessionService.h>
@@ -529,6 +534,10 @@ NS_ASSUME_NONNULL_BEGIN
     
     [self.appSessionService adLoadedWithPlacementID:self.placementID latency:latency];
     
+    // Track adapter load latency with metrics tracker
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:nil];
+    
     [self.previousNative setDelegate:nil];
     [self.previousNative destroy];
     [[self.previousNative nativeView] removeFromSuperview];
@@ -575,6 +584,13 @@ NS_ASSUME_NONNULL_BEGIN
     [self.logger error:[NSString stringWithFormat:@"Native fail to load %@", error.localizedDescription ?: @"unknown"]];
     [self.appSessionService adFailedToLoadWithPlacementID:self.placementID];
     
+    // Track adapter load latency with metrics tracker (failure)
+    if (self.adLoadStartTime) {
+        NSTimeInterval latency = [[NSDate date] timeIntervalSinceDate:self.adLoadStartTime] * 1000;
+        id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:error];
+    }
+    
     if (native && native.timeout) {
         [native destroy];
         return;
@@ -582,18 +598,20 @@ NS_ASSUME_NONNULL_BEGIN
     
     // Send server-side loss notification for technical errors
     if (self.lastBidResponse && self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
+        CLXLossReason lossReason = [CLXLossReasonMapper lossReasonFromError:error];
+        
         [self.winLossTracker setBidLoadResult:self.currentBidResponse.id 
                                        bidId:self.lastBidResponse.bid.id 
                                      success:NO 
-                                  lossReason:@(CLXLossReasonInternalError)];
+                                  lossReason:@(lossReason)];
         
         [self.winLossTracker sendEvent:self.currentBidResponse.id
                                   bidId:self.lastBidResponse.bid.id
                                   event:[CLXBidLifecycleEvent lossEvent]
-                             lossReason:@(CLXLossReasonInternalError)
+                             lossReason:@(lossReason)
                          winnerBidPrice:-1.0];
         
-        [self.logger debug:@"Sent LOSS event for failed native ad, reason=InternalError"];
+        [self.logger debug:[NSString stringWithFormat:@"Sent LOSS event for failed native ad, reason=%ld", (long)lossReason]];
     } else {
         [self.logger debug:[NSString stringWithFormat:@"Missing data for native loss notification: bidID=%@, auctionID=%@", 
                            self.lastBidResponse.bid.id ?: @"(nil)", self.currentBidResponse.id ?: @"(nil)"]];

@@ -23,17 +23,30 @@
 
 @end
 
+// Test instance storage (weak to allow deallocation)
+static CLXCloudXDatabase *_testInstance = nil;
+
 @implementation CLXCloudXDatabase
 
 #pragma mark - Singleton
 
 + (instancetype)sharedInstance {
+    // Return test instance if set (for unit testing)
+    if (_testInstance) {
+        return _testInstance;
+    }
+    
+    // Default production singleton
     static CLXCloudXDatabase *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[CLXCloudXDatabase alloc] initWithDatabaseName:CLXDatabaseName];
     });
     return sharedInstance;
+}
+
++ (void)setSharedInstanceForTesting:(nullable CLXCloudXDatabase *)testInstance {
+    _testInstance = testInstance;
 }
 
 #pragma mark - Initialization

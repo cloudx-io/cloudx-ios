@@ -12,6 +12,32 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ * @protocol CLXScheduler
+ * @brief Protocol for scheduling delayed execution
+ * @discussion Allows dependency injection of scheduling behavior for testability.
+ */
+@protocol CLXScheduler <NSObject>
+- (void)scheduleAfterDelay:(NSTimeInterval)delay
+                   onQueue:(dispatch_queue_t)queue
+                     block:(dispatch_block_t)block;
+@end
+
+/**
+ * @class CLXDispatchScheduler
+ * @brief Production scheduler using real dispatch_after
+ */
+@interface CLXDispatchScheduler : NSObject <CLXScheduler>
++ (instancetype)sharedInstance;
+@end
+
+/**
+ * @class CLXSynchronousScheduler  
+ * @brief Test scheduler that executes blocks immediately
+ */
+@interface CLXSynchronousScheduler : NSObject <CLXScheduler>
+@end
+
+/**
  * @class BaseNetworkService
  * @brief Base class for all network services in the SDK
  * @discussion This class provides common networking functionality including request execution,
@@ -25,13 +51,28 @@ NS_ASSUME_NONNULL_BEGIN
 /** The URL session used for network requests */
 @property (nonatomic, strong) NSURLSession *urlSession;
 
+/** The scheduler used for retry delays (injectable for testing) */
+@property (nonatomic, strong) id<CLXScheduler> scheduler;
+
 /**
  * @brief Initializes the network service with base URL and session
  * @param baseURL The base URL for API requests
  * @param urlSession The URL session to use for network requests
  * @return An initialized instance of BaseNetworkService
+ * @note Uses CLXDispatchScheduler by default for production retry delays
  */
 - (instancetype)initWithBaseURL:(NSString *)baseURL urlSession:(NSURLSession *)urlSession;
+
+/**
+ * @brief Initializes the network service with base URL, session, and custom scheduler
+ * @param baseURL The base URL for API requests
+ * @param urlSession The URL session to use for network requests
+ * @param scheduler The scheduler to use for retry delays (use CLXSynchronousScheduler for tests)
+ * @return An initialized instance of BaseNetworkService
+ */
+- (instancetype)initWithBaseURL:(NSString *)baseURL 
+                     urlSession:(NSURLSession *)urlSession
+                      scheduler:(id<CLXScheduler>)scheduler;
 
 /**
  * @brief Returns the headers required for API requests

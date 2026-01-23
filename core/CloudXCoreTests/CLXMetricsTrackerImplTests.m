@@ -200,11 +200,25 @@
     
     [self.tracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
     
-    // Allow async operations to complete
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Track completes"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
+    // Poll for async database write completion with retry logic
+    // Database writes should complete in milliseconds, but we poll to be deterministic
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Event stored"];
+    
+    __block int attempts = 0;
+    __block void (^checkEvent)(void);
+    checkEvent = ^{
+        attempts++;
+        CLXMetricsEvent *event = [self.dao getAllByMetric:CLXMetricsTypeMethodCreateBanner];
+        if (event != nil || attempts >= 10) {
+            [expectation fulfill];
+        } else {
+            // Poll every 50ms - database write should be fast
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), checkEvent);
+        }
+    };
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), checkEvent);
+    
+    // 10 attempts * 50ms = 500ms max wait, plus buffer for CI
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
     
     CLXMetricsEvent *event = [self.dao getAllByMetric:CLXMetricsTypeMethodCreateBanner];

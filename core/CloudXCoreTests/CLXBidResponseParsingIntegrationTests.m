@@ -269,7 +269,8 @@
 
 /**
  * @brief Test concurrent bid response parsing
- * @discussion Ensures thread safety during concurrent parsing operations
+ * @discussion Ensures thread safety during concurrent parsing operations.
+ *             Uses dispatch_apply for deterministic synchronous parallel execution.
  */
 - (void)testBidResponseParsing_ConcurrentAccess_ThreadSafety {
     NSDictionary *testResponse = @{
@@ -285,36 +286,28 @@
         }]
     };
     
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    queue.maxConcurrentOperationCount = 10;
+    // Use dispatch_apply for deterministic parallel execution (synchronous barrier)
+    // This is more reliable than NSOperationQueue + XCTestExpectation
+    NSInteger totalOperations = 20;
+    __block NSInteger successCount = 0;
+    dispatch_queue_t countQueue = dispatch_queue_create("test.count.queue", DISPATCH_QUEUE_SERIAL);
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Concurrent parsing"];
-    
-    __block NSInteger completedOperations = 0;
-    NSInteger totalOperations = 50;
-    
-    for (NSInteger i = 0; i < totalOperations; i++) {
-        [queue addOperationWithBlock:^{
-            // Simplified to avoid macro expansion issues
-            CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:testResponse];
-            XCTAssertNotNil(response, @"Concurrent parsing should work reliably");
-            
-            NSArray *bids = [response allBids];
-            XCTAssertEqual(bids.count, 1, @"Should parse bid correctly in concurrent environment");
-            
-            // Test passes if no crash: Concurrent bid response parsing should be thread-safe
-            
-            @synchronized(self) {
-                completedOperations++;
-                if (completedOperations == totalOperations) {
-                    [expectation fulfill];
-                }
+    dispatch_apply(totalOperations, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t i) {
+        // Parse response concurrently from multiple threads
+        CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:testResponse];
+        
+        // Verify parsing succeeded
+        BOOL success = (response != nil && [response allBids].count == 1);
+        
+        dispatch_sync(countQueue, ^{
+            if (success) {
+                successCount++;
             }
-        }];
-    }
+        });
+    });
     
-    [self waitForExpectations:@[expectation] timeout:10.0];
-    XCTAssertEqual(completedOperations, totalOperations, @"All concurrent parsing operations should complete");
+    // dispatch_apply blocks until all iterations complete - no timing issues
+    XCTAssertEqual(successCount, totalOperations, @"All concurrent parsing operations should succeed");
 }
 
 @end

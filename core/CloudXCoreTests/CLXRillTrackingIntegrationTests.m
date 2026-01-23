@@ -249,7 +249,7 @@
         [expectation fulfill];
     });
     
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
     [self waitForAsyncOperations];
     
     // Verify events were tracked (some events should exist, exact count not guaranteed due to async)
@@ -303,12 +303,11 @@
 #pragma mark - Helper Methods
 
 - (void)waitForAsyncOperations {
-    // Wait for async operations to complete
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Async operations"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    // NOTE: sendWithEncoded is SYNCHRONOUS (no dispatch_async), and tests don't set
+    // an endpoint so no network calls occur. This wait is only needed for operations
+    // that use dispatch_async (like processPendingEventsInBatch).
+    // Spin run loop once to process any pending main queue work.
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
 }
 
 @end

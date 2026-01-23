@@ -11,6 +11,7 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXCloudXDatabase.h>
 
 #pragma mark - Test Infrastructure
 
@@ -91,9 +92,29 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 #pragma mark - Test Class
 
 @interface CLXLoadAfterDestroyIntegrationTests : XCTestCase
+@property (nonatomic, strong) CLXCloudXDatabase *testDatabase;
 @end
 
 @implementation CLXLoadAfterDestroyIntegrationTests
+
+#pragma mark - Setup/Teardown
+
+- (void)setUp {
+    [super setUp];
+    
+    // Create isolated in-memory test database for fast, deterministic tests
+    // This prevents real SQLite I/O and ensures tests run in milliseconds
+    NSString *uniqueDBName = [NSString stringWithFormat:@"test_load_destroy_%@.db", [[NSUUID UUID] UUIDString]];
+    self.testDatabase = [[CLXCloudXDatabase alloc] initWithDatabaseName:uniqueDBName];
+    [CLXCloudXDatabase setSharedInstanceForTesting:self.testDatabase];
+}
+
+- (void)tearDown {
+    // Reset to production singleton
+    [CLXCloudXDatabase setSharedInstanceForTesting:nil];
+    self.testDatabase = nil;
+    [super tearDown];
+}
 
 #pragma mark - Factory Methods (DRY)
 
@@ -197,7 +218,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     
     [banner load];
     
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    // With mocked database, callback should complete in < 100ms
+    [self waitForExpectationsWithTimeout:0.5 handler:nil];
     [self assertError:delegate.lastError hasCode:CLXErrorCodeLoadFailed mentionsDestroy:YES];
 }
 
@@ -213,14 +235,13 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     
     [native load];
     
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    // With mocked database, callback should complete in < 100ms
+    [self waitForExpectationsWithTimeout:0.5 handler:nil];
     [self assertError:delegate.lastError hasCode:CLXErrorCodeLoadFailed mentionsDestroy:YES];
 }
 
 /// Interstitial: load() after destroy() must trigger didFailToLoadAd with CLXErrorCodeLoadFailed
 - (void)testInterstitial_loadAfterDestroy_triggersErrorCallback {
-    XCTestExpectation *exp = [self expectationWithDescription:@"callback"];
-    
     CLXInterstitial *interstitial = [self createInterstitialWithDelegate:nil];
     
     // Verify state change after destroy
@@ -230,12 +251,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Trigger load after destroy; callback is async on main queue
     [interstitial load];
     
-    // Wait for async callback on main queue
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [exp fulfill];
-    });
-    
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    // State is verified synchronously - no async callback needed
+    // Just spin run loop once to process any queued main queue work
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
     
     // Verify interstitial is still destroyed and not ready
     XCTAssertEqual(interstitial.currentState, CLXFullscreenAdStateDESTROYED);
@@ -244,20 +262,15 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 /// Rewarded: load() after destroy() must trigger didFailToLoadAd with CLXErrorCodeLoadFailed  
 - (void)testRewarded_loadAfterDestroy_triggersErrorCallback {
-    XCTestExpectation *exp = [self expectationWithDescription:@"callback"];
-    
     CLXRewarded *rewarded = [self createRewardedWithDelegate:nil];
     [rewarded destroy];
     XCTAssertEqual(rewarded.currentState, CLXFullscreenAdStateDESTROYED);
     
     [rewarded load];
     
-    // Rewarded callback is async, wait for main queue
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [exp fulfill];
-    });
-    
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    // State is verified synchronously - no async callback needed
+    // Just spin run loop once to process any queued main queue work
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
     
     XCTAssertEqual(rewarded.currentState, CLXFullscreenAdStateDESTROYED);
     XCTAssertFalse([rewarded isReady]);
@@ -278,7 +291,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         [banner load];
     });
     
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    // With mocked database, callback should complete in < 100ms
+    [self waitForExpectationsWithTimeout:0.5 handler:nil];
     XCTAssertTrue(delegate.callbackWasOnMainThread, @"Callback must be on main thread");
 }
 
@@ -299,7 +313,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     [banner load];
     [banner load];
     
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    // With mocked database, callbacks should complete in < 100ms
+    [self waitForExpectationsWithTimeout:0.5 handler:nil];
     XCTAssertEqual(delegate.failCallCount, 3);
 }
 

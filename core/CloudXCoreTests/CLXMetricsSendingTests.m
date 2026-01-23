@@ -116,7 +116,7 @@
     [self.tracker trySendingPendingMetrics];
     
     // Wait for async sending to complete
-    [self waitForExpectations:@[sendExpectation] timeout:5.0];
+    [self waitForExpectations:@[sendExpectation] timeout:1.0];
     
     // Then - Bulk API should have been called
     XCTAssertEqual(weakSelf.mockBulkApi.sendCallCount, 1, @"Bulk API should be called once");
@@ -143,7 +143,7 @@
     [self.tracker flushPendingOperations];
     [self.tracker trySendingPendingMetrics];
     
-    [self waitForExpectations:@[sendExpectation] timeout:5.0];
+    [self waitForExpectations:@[sendExpectation] timeout:1.0];
     
     // Then - Correct endpoint should be called
     XCTAssertEqual(weakSelf.mockBulkApi.calledEndpoints.count, 1, @"Should call one endpoint");
@@ -169,7 +169,7 @@
     [self.tracker flushPendingOperations];
     [self.tracker trySendingPendingMetrics];
     
-    [self waitForExpectations:@[sendExpectation] timeout:5.0];
+    [self waitForExpectations:@[sendExpectation] timeout:1.0];
     
     // Then - Event should have correct structure
     XCTAssertEqual(weakSelf.mockBulkApi.sentEvents.count, 1, @"Should have one event");
@@ -205,7 +205,7 @@
     
     // Send
     [self.tracker trySendingPendingMetrics];
-    [self waitForExpectations:@[sendExpectation] timeout:5.0];
+    [self waitForExpectations:@[sendExpectation] timeout:1.0];
     
     // Allow async deletion to complete
     [self.tracker flushPendingOperations];
@@ -238,7 +238,7 @@
     
     // Send (will fail)
     [self.tracker trySendingPendingMetrics];
-    [self waitForExpectations:@[sendExpectation] timeout:5.0];
+    [self waitForExpectations:@[sendExpectation] timeout:1.0];
     
     // Allow async to complete
     [self.tracker flushPendingOperations];
@@ -304,7 +304,7 @@
     [self.tracker flushPendingOperations];
     
     [self.tracker trySendingPendingMetrics];
-    [self waitForExpectations:@[sendExpectation] timeout:5.0];
+    [self waitForExpectations:@[sendExpectation] timeout:1.0];
     
     // Then - Should send one aggregated event, not three separate events
     XCTAssertEqual(weakSelf.mockBulkApi.sentEvents.count, 1, @"Should aggregate into single event");

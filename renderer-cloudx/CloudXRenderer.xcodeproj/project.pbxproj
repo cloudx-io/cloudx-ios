@@ -30,6 +30,7 @@
 		19D064982E30F5DB00B3B99C /* CLXDemoAdapterError.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D0645D2E30F5DB00B3B99C /* CLXDemoAdapterError.m */; };
 		19D064992E30F5DB00B3B99C /* CLXRendererBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064582E30F5DB00B3B99C /* CLXRendererBanner.m */; };
 		19D0649A2E30F5DB00B3B99C /* CLXRendererWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D0647A2E30F5DB00B3B99C /* CLXRendererWebView.m */; };
+		19D064C12E30F5DB00B3B99C /* CLXVASTParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064C02E30F5DB00B3B99C /* CLXVASTParser.m */; };
 		19D0649B2E30F5DB00B3B99C /* CLXRendererInterstitial.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D0646D2E30F5DB00B3B99C /* CLXRendererInterstitial.h */; };
 		19D0649C2E30F5DB00B3B99C /* CLXPerformanceManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064622E30F5DB00B3B99C /* CLXPerformanceManager.h */; };
 		19D0649D2E30F5DB00B3B99C /* CLXVASTParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064662E30F5DB00B3B99C /* CLXVASTParser.h */; };
@@ -83,6 +84,7 @@
 		19D064642E30F5DB00B3B99C /* CLXRendererError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXRendererError.h; sourceTree = "<group>"; };
 		19D064652E30F5DB00B3B99C /* CLXRendererError.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXRendererError.m; sourceTree = "<group>"; };
 		19D064662E30F5DB00B3B99C /* CLXVASTParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVASTParser.h; sourceTree = "<group>"; };
+		19D064C02E30F5DB00B3B99C /* CLXVASTParser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVASTParser.m; sourceTree = "<group>"; };
 		19D064672E30F5DB00B3B99C /* CLXViewabilityTracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXViewabilityTracker.h; sourceTree = "<group>"; };
 		19D064682E30F5DB00B3B99C /* CLXViewabilityTracker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXViewabilityTracker.m; sourceTree = "<group>"; };
 		19D0646A2E30F5DB00B3B99C /* CLXRendererInitializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXRendererInitializer.h; sourceTree = "<group>"; };
@@ -191,6 +193,7 @@
 				19D064642E30F5DB00B3B99C /* CLXRendererError.h */,
 				19D064652E30F5DB00B3B99C /* CLXRendererError.m */,
 				19D064662E30F5DB00B3B99C /* CLXVASTParser.h */,
+				19D064C02E30F5DB00B3B99C /* CLXVASTParser.m */,
 				19D064672E30F5DB00B3B99C /* CLXViewabilityTracker.h */,
 				19D064682E30F5DB00B3B99C /* CLXViewabilityTracker.m */,
 			);
@@ -525,6 +528,7 @@
 				19D064982E30F5DB00B3B99C /* CLXDemoAdapterError.m in Sources */,
 				19D064992E30F5DB00B3B99C /* CLXRendererBanner.m in Sources */,
 				19D0649A2E30F5DB00B3B99C /* CLXRendererWebView.m in Sources */,
+				19D064C12E30F5DB00B3B99C /* CLXVASTParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

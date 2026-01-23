@@ -12,11 +12,25 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Loss reasons following OpenRTB standard
  * See: OpenRTB 2.5+ specification for standard loss reason codes
+ * 
+ * Code ranges:
+ * 0-99: OpenRTB standard codes
+ * 100-199: OpenRTB standard codes (continued)
+ * 200+: SDK-specific extended codes for detailed no-bid categorization
  */
 typedef NS_ENUM(NSInteger, CLXLossReason) {
+    // OpenRTB Standard Codes
     CLXLossReasonBidWon = 0,              // Bid Won (OpenRTB: 0)
     CLXLossReasonInternalError = 1,       // Internal Error (OpenRTB: 1)
-    CLXLossReasonLostToHigherBid = 102    // Lost to Higher Bid (OpenRTB: 102)
+    CLXLossReasonLostToHigherBid = 102,   // Lost to Higher Bid (OpenRTB: 102)
+    
+    // Extended Codes (200+ for SDK-specific no-bid categorization)
+    CLXLossReasonCreativeBlocked = 200,   // Creative filtered/blocked by publisher
+    CLXLossReasonRateLimited = 201,       // Publisher rate limiting applied
+    CLXLossReasonNoFill = 202,            // No inventory available from demand
+    CLXLossReasonTimeout = 203,           // Request timed out before response
+    CLXLossReasonInvalidBid = 204,        // Malformed or invalid bid response
+    CLXLossReasonExpired = 205            // Bid expired before render opportunity
 };
 
 /**

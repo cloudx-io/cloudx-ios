@@ -68,7 +68,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 /**
@@ -92,7 +92,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 /**
@@ -116,7 +116,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 #pragma mark - Bid Request Kill Switch Tests
@@ -155,7 +155,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 /**
@@ -191,7 +191,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 #pragma mark - Edge Cases
@@ -216,7 +216,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 /**
@@ -240,7 +240,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 /**
@@ -258,7 +258,7 @@
         [sdkExpectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.1 handler:nil];
     
     // Test ADS_DISABLED (would need separate bid service test)
     // Note: This is conceptually tested in the bid request test above

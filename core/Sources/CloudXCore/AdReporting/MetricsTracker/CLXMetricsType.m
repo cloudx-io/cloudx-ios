@@ -8,6 +8,9 @@
 NSString * const CLXMetricsTypeNetworkSdkInit = @"network_call_sdk_init_req";
 NSString * const CLXMetricsTypeNetworkGeoApi = @"network_call_geo_req";
 NSString * const CLXMetricsTypeNetworkBidRequest = @"network_call_bid_req";
+NSString * const CLXMetricsTypeNetworkTimeout = @"network_call_timeout";
+NSString * const CLXMetricsTypeNetworkAdapterLoad = @"network_call_adapter_load";
+NSString * const CLXMetricsTypeNetworkTimeToFirstAd = @"network_call_time_to_first_ad";
 
 // Method call metrics types - matching Android exactly
 NSString * const CLXMetricsTypeMethodSdkInit = @"method_sdk_init";
@@ -38,7 +41,10 @@ NSString * const CLXMetricsTypeMethodBannerRefresh = @"method_banner_refresh";
         networkTypes = @[
             CLXMetricsTypeNetworkSdkInit,
             CLXMetricsTypeNetworkGeoApi,
-            CLXMetricsTypeNetworkBidRequest
+            CLXMetricsTypeNetworkBidRequest,
+            CLXMetricsTypeNetworkTimeout,
+            CLXMetricsTypeNetworkAdapterLoad,
+            CLXMetricsTypeNetworkTimeToFirstAd
         ];
     });
     return networkTypes;

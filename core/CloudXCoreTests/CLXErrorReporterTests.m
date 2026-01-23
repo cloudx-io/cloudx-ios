@@ -227,30 +227,37 @@
 
 /**
  * @brief Test singleton functionality under concurrent access
- * @discussion Ensures thread safety of singleton creation - smoke test
+ * @discussion Ensures thread safety of singleton creation using dispatch_apply
+ *             for deterministic synchronous parallel execution.
  */
 - (void)testSharedInstance_ThreadSafety {
-    // Smoke test for singleton thread safety - main success criterion is no crash
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Concurrent singleton access"];
-    dispatch_group_t group = dispatch_group_create();
-    
+    // Use dispatch_apply for deterministic parallel execution (synchronous barrier)
+    // This is more reliable than dispatch_group + XCTestExpectation
     NSInteger totalOperations = 20;
+    __block NSInteger successCount = 0;
+    __block CLXErrorReporter *firstInstance = nil;
+    dispatch_queue_t countQueue = dispatch_queue_create("test.count.queue", DISPATCH_QUEUE_SERIAL);
     
-    // Act - access singleton from multiple threads concurrently
-    for (int i = 0; i < totalOperations; i++) {
-        dispatch_group_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            CLXErrorReporter *instance = [CLXErrorReporter shared];
-            XCTAssertNotNil(instance, @"Singleton should never be nil");
+    dispatch_apply(totalOperations, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t i) {
+        // Access singleton concurrently from multiple threads
+        CLXErrorReporter *instance = [CLXErrorReporter shared];
+        
+        dispatch_sync(countQueue, ^{
+            if (instance != nil) {
+                successCount++;
+                if (firstInstance == nil) {
+                    firstInstance = instance;
+                }
+            }
         });
-    }
-    
-    dispatch_group_notify(group, dispatch_get_main_queue(), ^{
-        [expectation fulfill];
     });
     
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    // dispatch_apply blocks until all iterations complete - no timing issues
+    XCTAssertEqual(successCount, totalOperations, @"All concurrent singleton accesses should succeed");
+    XCTAssertNotNil(firstInstance, @"Singleton should not be nil");
     
-    // Test passes if no crash - singleton should be thread-safe
+    // Verify all accesses returned the same instance
+    XCTAssertEqual([CLXErrorReporter shared], firstInstance, @"Singleton should return same instance");
 }
 
 #pragma mark - Performance Tests

@@ -572,6 +572,16 @@ static CloudXCore *_sharedInstance = nil;
     // Mark as initialized
     _isInitialized = YES;
     
+    // Record SDK initialization timestamp for time-to-first-ad tracking
+    [[CLXSessionMetricsTracker sharedInstance] recordSDKInitialization];
+    
+    // Configure callback to send time-to-first-ad metric when first impression occurs
+    // This connects the SessionMetricsTracker to the MetricsTrackerImpl without tight coupling
+    id<CLXMetricsTrackerProtocol> ttfaMetricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    [[CLXSessionMetricsTracker sharedInstance] setTimeToFirstAdCallback:^(NSInteger timeToFirstAdMs) {
+        [ttfaMetricsTracker trackNetworkCall:CLXMetricsTypeNetworkTimeToFirstAd latency:timeToFirstAdMs];
+    }];
+    
     // Post internal notification for ad objects to resume queued operations
     [[NSNotificationCenter defaultCenter] postNotificationName:CLXSDKInitializedNotification object:nil];
     

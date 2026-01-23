@@ -15,8 +15,8 @@
  *
  * PRINCIPLES:
  * - Uses MockURLSession for SYNCHRONOUS response delivery (no real network)
- * - XCTestExpectation for async completion handlers
- * - NO arbitrary sleep/delay patterns
+ * - Uses CLXSynchronousScheduler for INSTANT retry execution (no waiting)
+ * - Tests are deterministic and fast (~0.001s each)
  */
 
 #import <XCTest/XCTest.h>
@@ -36,6 +36,7 @@
 @interface CLXBaseNetworkServiceTests : XCTestCase
 @property (nonatomic, strong) CLXBaseNetworkService *subject;
 @property (nonatomic, strong) MockURLSession *mockSession;
+@property (nonatomic, strong) CLXSynchronousScheduler *syncScheduler;
 @end
 
 @implementation CLXBaseNetworkServiceTests
@@ -45,12 +46,17 @@
 - (void)setUp {
     [super setUp];
     self.mockSession = [[MockURLSession alloc] init];
-    self.subject = [[CLXBaseNetworkService alloc] initWithBaseURL:@"https://test.cloudx.io" urlSession:self.mockSession];
+    self.syncScheduler = [[CLXSynchronousScheduler alloc] init];
+    // Inject synchronous scheduler for instant, deterministic tests
+    self.subject = [[CLXBaseNetworkService alloc] initWithBaseURL:@"https://test.cloudx.io" 
+                                                       urlSession:self.mockSession
+                                                        scheduler:self.syncScheduler];
 }
 
 - (void)tearDown {
     [self.mockSession reset];
     self.mockSession = nil;
+    self.syncScheduler = nil;
     self.subject = nil;
     [super tearDown];
 }
@@ -108,7 +114,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
     XCTAssertEqual(self.mockSession.callCount, 1, @"Should make exactly 1 request");
 }
 
@@ -127,7 +133,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
     XCTAssertEqual(self.mockSession.callCount, 1, @"200 should NOT trigger retry");
 }
 
@@ -147,7 +153,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
     XCTAssertEqual(self.mockSession.callCount, 1, @"201 should NOT trigger retry");
 }
 
@@ -170,7 +176,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
     XCTAssertEqual(self.mockSession.callCount, 1, @"400 should NOT trigger retry");
 }
 
@@ -190,7 +196,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
     XCTAssertEqual(self.mockSession.callCount, 1, @"401 should NOT trigger retry");
 }
 
@@ -210,7 +216,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
     XCTAssertEqual(self.mockSession.callCount, 1, @"404 should NOT trigger retry");
 }
 
@@ -235,7 +241,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1]; // Synchronous scheduler - no waiting needed
     XCTAssertEqual(self.mockSession.callCount, 2, @"500 should trigger retry");
 }
 
@@ -256,7 +262,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1]; // Synchronous scheduler - no waiting needed
     XCTAssertEqual(self.mockSession.callCount, 2, @"502 should trigger retry");
 }
 
@@ -277,7 +283,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1]; // Synchronous scheduler - no waiting needed
     XCTAssertEqual(self.mockSession.callCount, 2, @"503 should trigger retry");
 }
 
@@ -298,7 +304,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1]; // Synchronous scheduler - no waiting needed
     XCTAssertEqual(self.mockSession.callCount, 2, @"429 should trigger retry");
 }
 
@@ -324,7 +330,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1]; // Synchronous scheduler - no waiting needed
     XCTAssertEqual(self.mockSession.callCount, 3, @"Should make initial + 2 retries = 3 total");
 }
 
@@ -344,7 +350,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
     XCTAssertEqual(self.mockSession.callCount, 1, @"Should make only 1 request with 0 retries");
 }
 
@@ -367,7 +373,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1]; // Synchronous scheduler - no waiting needed
     XCTAssertEqual(self.mockSession.callCount, 2, @"Network timeout should trigger retry");
 }
 
@@ -388,7 +394,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1]; // Synchronous scheduler - no waiting needed
     XCTAssertEqual(self.mockSession.callCount, 2, @"Connection lost should trigger retry");
 }
 
@@ -494,7 +500,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
 }
 
 - (void)testKillSwitch_204WithSDK_DISABLED_DetectsKillSwitch {
@@ -514,7 +520,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
 }
 
 - (void)testKillSwitch_204WithoutHeader_NoKillSwitch {
@@ -533,7 +539,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
 }
 
 - (void)testKillSwitch_200WithHeader_NoKillSwitch {
@@ -554,7 +560,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
 }
 
 - (void)testKillSwitch_204WithOtherStatus_NoKillSwitch {
@@ -574,7 +580,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
 }
 
 #pragma mark - MARK: URL Construction Tests
@@ -594,7 +600,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
     
     NSURLRequest *lastRequest = self.mockSession.lastRequest;
     XCTAssertNotNil(lastRequest, @"Should capture request");
@@ -623,7 +629,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
     
     NSURLRequest *lastRequest = self.mockSession.lastRequest;
     XCTAssertEqualObjects(lastRequest.HTTPMethod, @"POST", @"Request with body should be POST");
@@ -645,7 +651,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
     
     NSURLRequest *lastRequest = self.mockSession.lastRequest;
     XCTAssertEqualObjects(lastRequest.HTTPMethod, @"GET", @"Request without body should be GET");
@@ -668,7 +674,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
     
     NSURLRequest *lastRequest = self.mockSession.lastRequest;
     XCTAssertEqualObjects(lastRequest.allHTTPHeaderFields[@"X-Custom-Header"], @"custom-value", @"Should include custom headers");
@@ -696,7 +702,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
 }
 
 - (void)testRequest_EmptyResponse_ReturnsNilWithNoError {
@@ -716,7 +722,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:0.1];
 }
 
 @end
