@@ -127,22 +127,48 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     // ADAPTER ERRORS (600-699)
     /// Internal adapter error
     CLXErrorCodeAdapterInternalError = 600,
-    /// Ad network adapter initialization failed
-    CLXErrorCodeAdapterInitializationError = 601,
-    /// Ad network adapter received invalid server parameters (e.g., missing placement ID)
-    CLXErrorCodeAdapterInvalidServerExtras = 602,
-    /// Ad network adapter failed to establish connection with ad server
-    CLXErrorCodeAdapterNoConnection = 603,
     /// Ad network adapter could not fill the ad request - no inventory available
-    CLXErrorCodeAdapterNoFill = 604,
-    /// Ad network server returned an error response
-    CLXErrorCodeAdapterServerError = 605,
-    /// Ad network adapter request timed out
-    CLXErrorCodeAdapterTimeout = 606,
+    CLXErrorCodeAdapterNoFill = 601,
     /// Ad network adapter is in an invalid state for loading ads
-    CLXErrorCodeAdapterInvalidLoadState = 607,
+    CLXErrorCodeAdapterInvalidLoadState = 602,
     /// Ad network adapter has invalid or missing configuration
-    CLXErrorCodeAdapterInvalidConfiguration = 608
+    CLXErrorCodeAdapterInvalidConfiguration = 603,
+    /// Ad network adapter received invalid server parameters (e.g., missing placement ID)
+    CLXErrorCodeAdapterInvalidServerExtras = 604,
+    /// Bad request to ad network
+    CLXErrorCodeAdapterBadRequest = 605,
+    /// Ad network adapter not initialized
+    CLXErrorCodeAdapterNotInitialized = 606,
+    /// Ad network adapter initialization failed
+    CLXErrorCodeAdapterInitializationError = 607,
+    /// Ad not ready to be shown
+    CLXErrorCodeAdapterAdNotReady = 608,
+    /// Adapter load timed out
+    CLXErrorCodeAdapterLoadTimeout = 609,
+    /// Ad network adapter request timed out
+    CLXErrorCodeAdapterTimeout = 610,
+    /// Ad network adapter failed to establish connection with ad server
+    CLXErrorCodeAdapterNoConnection = 611,
+    /// Ad network server returned an error response
+    CLXErrorCodeAdapterServerError = 612,
+    /// Bid token collection timed out
+    CLXErrorCodeAdapterBidTokenTimeout = 613,
+    /// Bid token collection not supported
+    CLXErrorCodeAdapterBidTokenNotSupported = 614,
+    /// WebView error in adapter
+    CLXErrorCodeAdapterWebViewError = 615,
+    /// Ad expired before being shown
+    CLXErrorCodeAdapterAdExpired = 616,
+    /// Ad frequency capped
+    CLXErrorCodeAdapterAdFrequencyCapped = 617,
+    /// Reward error in adapter
+    CLXErrorCodeAdapterRewardError = 618,
+    /// Missing required native ad assets
+    CLXErrorCodeAdapterMissingNativeAdAssets = 619,
+    /// Missing view controller required for ad display
+    CLXErrorCodeAdapterMissingViewController = 620,
+    /// Ad display failed
+    CLXErrorCodeAdapterDisplayFailed = 621
 };
 
 /**

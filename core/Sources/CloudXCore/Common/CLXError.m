@@ -200,23 +200,49 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
             
         // ADAPTER ERRORS (600-699)
         case CLXErrorCodeAdapterInternalError:
-            return @"Internal adapter error.";
-        case CLXErrorCodeAdapterInitializationError:
-            return @"Ad network adapter initialization failed.";
-        case CLXErrorCodeAdapterInvalidServerExtras:
-            return @"Ad network adapter received invalid server parameters.";
-        case CLXErrorCodeAdapterNoConnection:
-            return @"Ad network adapter failed to establish connection with ad server.";
+            return @"Internal error.";
         case CLXErrorCodeAdapterNoFill:
-            return @"Ad network adapter could not fill the ad request - no inventory available.";
-        case CLXErrorCodeAdapterServerError:
-            return @"Ad network server returned an error response.";
-        case CLXErrorCodeAdapterTimeout:
-            return @"Ad network adapter request timed out.";
+            return @"No fill.";
         case CLXErrorCodeAdapterInvalidLoadState:
-            return @"Ad network adapter is in an invalid state for loading ads.";
+            return @"Invalid load state.";
         case CLXErrorCodeAdapterInvalidConfiguration:
-            return @"Ad network adapter has invalid or missing configuration.";
+            return @"Invalid configuration.";
+        case CLXErrorCodeAdapterInvalidServerExtras:
+            return @"Invalid server parameters for adapter.";
+        case CLXErrorCodeAdapterBadRequest:
+            return @"Bad request.";
+        case CLXErrorCodeAdapterNotInitialized:
+            return @"Not initialized.";
+        case CLXErrorCodeAdapterInitializationError:
+            return @"Ad network SDK failed to initialize.";
+        case CLXErrorCodeAdapterAdNotReady:
+            return @"Ad not ready.";
+        case CLXErrorCodeAdapterLoadTimeout:
+            return @"Adapter load timed out.";
+        case CLXErrorCodeAdapterTimeout:
+            return @"Request timed out.";
+        case CLXErrorCodeAdapterNoConnection:
+            return @"No connection.";
+        case CLXErrorCodeAdapterServerError:
+            return @"Server error.";
+        case CLXErrorCodeAdapterBidTokenTimeout:
+            return @"Bid token collection timed out.";
+        case CLXErrorCodeAdapterBidTokenNotSupported:
+            return @"Bid token collection not supported.";
+        case CLXErrorCodeAdapterWebViewError:
+            return @"WebView error.";
+        case CLXErrorCodeAdapterAdExpired:
+            return @"Ad expired.";
+        case CLXErrorCodeAdapterAdFrequencyCapped:
+            return @"Ad frequency capped.";
+        case CLXErrorCodeAdapterRewardError:
+            return @"Reward error.";
+        case CLXErrorCodeAdapterMissingNativeAdAssets:
+            return @"Missing native ad assets.";
+        case CLXErrorCodeAdapterMissingViewController:
+            return @"Missing view controller.";
+        case CLXErrorCodeAdapterDisplayFailed:
+            return @"Ad display failed.";
 
         // GENERAL ERRORS (0)
         case CLXErrorCodeInternalError:
