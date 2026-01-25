@@ -323,6 +323,7 @@
 		CLXINITCFG0001000000000001 /* CLXInitializationConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = CLXINITCFG0001000000000002 /* CLXInitializationConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CLXINITCFG0002000000000001 /* CLXInitializationConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXINITCFG0002000000000002 /* CLXInitializationConfiguration.m */; };
 		CLXLAD0001000000000001 /* CLXLoadAfterDestroyIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXLAD0001000000000002 /* CLXLoadAfterDestroyIntegrationTests.m */; };
+		CLXSFR0001000000000001 /* CLXShowFailureReloadTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSFR0001000000000002 /* CLXShowFailureReloadTests.m */; };
 		CLXNEWMK0002000000000002 /* MockURLSession.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXNEWMK0002000000000003 /* MockURLSession.m */; };
 		CLXNEWTS0002000000000001 /* CLXBaseNetworkServiceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXNEWTS0002000000000002 /* CLXBaseNetworkServiceTests.m */; };
 		CLXNEWTS0004000000000001 /* CLXBiddingConfigDeviceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXNEWTS0004000000000002 /* CLXBiddingConfigDeviceTests.m */; };
@@ -665,6 +666,7 @@
 		CLXINITCFG0001000000000002 /* CLXInitializationConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInitializationConfiguration.h; sourceTree = "<group>"; };
 		CLXINITCFG0002000000000002 /* CLXInitializationConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInitializationConfiguration.m; sourceTree = "<group>"; };
 		CLXLAD0001000000000002 /* CLXLoadAfterDestroyIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXLoadAfterDestroyIntegrationTests.m; sourceTree = "<group>"; };
+		CLXSFR0001000000000002 /* CLXShowFailureReloadTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXShowFailureReloadTests.m; sourceTree = "<group>"; };
 		CLXNEWMK0002000000000001 /* MockURLSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MockURLSession.h; sourceTree = "<group>"; };
 		CLXNEWMK0002000000000003 /* MockURLSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MockURLSession.m; sourceTree = "<group>"; };
 		CLXNEWTS0002000000000002 /* CLXBaseNetworkServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBaseNetworkServiceTests.m; sourceTree = "<group>"; };
@@ -844,6 +846,7 @@
 				19D929C02E6644BB00C84DAE /* CLXPublisherBannerSpecComplianceTests.m */,
 				19D929C12E6644BB00C84DAE /* CLXPublisherBannerUnitTests.m */,
 				CLXLAD0001000000000002 /* CLXLoadAfterDestroyIntegrationTests.m */,
+				CLXSFR0001000000000002 /* CLXShowFailureReloadTests.m */,
 				19D92B3F2E690C2A00C84DAE /* CLXAdFormatDelegateCallbackTests.m */,
 				19D92B402E690C2A00C84DAE /* CLXDelegateCallbackTypeTests.m */,
 				19D928FD2E6403E000C84DAE /* CLXBiddingConfigPrivacyTests.m */,
@@ -1615,6 +1618,7 @@
 				1916B1CE2E7F0F6D00E49E3E /* CLXPublisherWinLossIntegrationTests.m in Sources */,
 				19D929C42E6644BB00C84DAE /* CLXPublisherBannerUnitTests.m in Sources */,
 				CLXLAD0001000000000001 /* CLXLoadAfterDestroyIntegrationTests.m in Sources */,
+				CLXSFR0001000000000001 /* CLXShowFailureReloadTests.m in Sources */,
 				194BC0BF2EF3F6520008DB33 /* CLXRewardedRewardLogicTests.m in Sources */,
 				194BC0C02EF3F6520008DB33 /* CLXRewardTests.m in Sources */,
 				194BC0C12EF3F6520008DB33 /* CLXBidLifecycleEventTests.m in Sources */,

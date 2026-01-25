@@ -33,11 +33,20 @@
     [[NSFileManager defaultManager] removeItemAtPath:self.testDatabasePath error:nil];
     
     self.database = [[CLXCloudXDatabase alloc] initWithDatabaseName:uniqueName];
+    
+    // CRITICAL: Set as shared instance for test isolation
+    // This ensures any code using [CLXCloudXDatabase sharedInstance] uses our test database
+    [CLXCloudXDatabase setSharedInstanceForTesting:self.database];
+    
     XCTAssertTrue([self.database openDatabase], @"Should open database successfully");
 }
 
 - (void)tearDown {
+    // Reset shared instance BEFORE closing to avoid any race conditions
+    [CLXCloudXDatabase setSharedInstanceForTesting:nil];
+    
     [self.database closeDatabase];
+    self.database = nil;
     [[NSFileManager defaultManager] removeItemAtPath:self.testDatabasePath error:nil];
     [super tearDown];
 }

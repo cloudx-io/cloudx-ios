@@ -205,6 +205,10 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)didFailToShowWithInterstitial:(id<CLXAdapterInterstitial>)interstitial error:(NSError *)error {
+    // Clear state BEFORE callback (enables immediate reload)
+    [self handleShowFailure];
+    self.currentAdapter = nil;
+    
     CLXError *clxError = [CLXError errorFromError:error withFallbackCode:CLXErrorCodeShowFailed];
     
     dispatch_async(dispatch_get_main_queue(), ^{

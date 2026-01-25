@@ -686,18 +686,17 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     [self.logger debug:@"State transitioned to IDLE"];
 }
 
-- (void)handleAdClose {
-    // Calculate display latency if we have impression time
-    if (self.impressionTime) {
-        NSTimeInterval latency = [[NSDate date] timeIntervalSinceDate:self.impressionTime] * 1000;
-        [self.appSessionService addCloseWithPlacementID:self.placementID latency:latency];
-    }
-    
-    // Mark close event received and cleanup
-    self.closeEventReceived = YES;
+#pragma mark - Private Cleanup Helpers
+
+/**
+ * Cleans up ad display state. Called when ad display ends (close or failure).
+ * Follows DRY principle - shared by handleAdClose and handleShowFailure.
+ */
+- (void)cleanupAdDisplayState {
+    // Invalidate close timer
     [self.closeTimer invalidate];
     
-    // Destroy the adapter
+    // Destroy the adapter (delegates to subclass via getCurrentAdapter)
     id currentAdapter = [self getCurrentAdapter];
     if (currentAdapter && [currentAdapter conformsToProtocol:@protocol(CLXDestroyable)]) {
         [(id<CLXDestroyable>)currentAdapter destroy];
@@ -705,6 +704,32 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     
     // Transition back to idle
     self.currentState = CLXFullscreenAdStateIDLE;
+}
+
+- (void)handleAdClose {
+    // Calculate display latency if we have impression time
+    if (self.impressionTime) {
+        NSTimeInterval latency = [[NSDate date] timeIntervalSinceDate:self.impressionTime] * 1000;
+        [self.appSessionService addCloseWithPlacementID:self.placementID latency:latency];
+    }
+    
+    // Mark close event received
+    self.closeEventReceived = YES;
+    
+    // Shared cleanup (DRY)
+    [self cleanupAdDisplayState];
+}
+
+/**
+ * Handles show failure cleanup. Clears state BEFORE callback to allow immediate reload.
+ * Fixes: Publishers can now call load() in didFailToDisplayAd callback.
+ */
+- (void)handleShowFailure {
+    // Clear presenting view controller reference (not needed for normal close)
+    self.presentingViewController = nil;
+    
+    // Shared cleanup (DRY)
+    [self cleanupAdDisplayState];
 }
 
 - (void)fireLoadSuccessEventForBidID:(NSString *)bidID price:(double)price {

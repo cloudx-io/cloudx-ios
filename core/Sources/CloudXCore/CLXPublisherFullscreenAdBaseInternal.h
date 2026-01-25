@@ -48,6 +48,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)handleAdClose;
 - (void)handleClickTracking;
 
+/**
+ * Cleans up state after show failure. Call before invoking didFailToDisplayAd callback.
+ * Enables publishers to immediately reload ads in the failure callback.
+ */
+- (void)handleShowFailure;
+
 // Access to private properties (read-only)
 @property (nonatomic, copy, readonly, nullable) NSString *placementName;
 @property (nonatomic, strong, readonly, nullable) CLXBidAdSourceResponse *lastBidResponse;
