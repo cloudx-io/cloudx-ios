@@ -279,8 +279,8 @@
 
     // Use standard CloudXCore initialization which will now use our environment override
     CLXInitializationConfiguration *initConfig = [CLXInitializationConfiguration configurationWithAppKey:config.appKey];
-    [[CloudXCore shared] initializeWithConfiguration:initConfig completion:^(BOOL success, CLXError * _Nullable error) {
-        if (success) {
+    [[CloudXCore shared] initializeWithConfiguration:initConfig completion:^(CLXSdkConfiguration * _Nullable sdkConfig, CLXError * _Nullable error) {
+        if (sdkConfig) {
             [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ SDK initialized successfully with %@ environment", environmentName]];
             self.isSDKInitialized = YES;
             [self updateStatusUIWithState:AdStateReady];
@@ -288,10 +288,10 @@
         } else {
             // Get detailed error description
             NSString *detailedError = error ? [error detailedDemoDescription] : @"Unknown error occurred";
-            
+
             // Add environment-specific context
             NSString *enhancedError = [NSString stringWithFormat:@"Environment: %@\n\n%@", environmentName, detailedError];
-            
+
             [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ SDK init failed: %@", detailedError]];
             [self updateStatusUIWithState:AdStateNoAd];
             [self showAlertWithTitle:@"SDK Initialization Failed" message:enhancedError];

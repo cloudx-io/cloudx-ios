@@ -84,8 +84,9 @@
         // Check logs for: "Device IFA for test whitelisting: XXXX-XXXX-XXXX-XXXX"
 
         CLXInitializationConfiguration *initConfig = [CLXInitializationConfiguration configurationWithAppKey:appKey];
-        [[CloudXCore shared] initializeWithConfiguration:initConfig completion:^(BOOL success, CLXError * _Nullable error) {
+        [[CloudXCore shared] initializeWithConfiguration:initConfig completion:^(CLXSdkConfiguration * _Nullable sdkConfig, CLXError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                BOOL success = (sdkConfig != nil);
                 if (success) {
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"cloudXSDKInitialized" object:nil];
                 }

@@ -1,4 +1,5 @@
 #import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXSdkConfiguration.h>
 #import <CloudXCore/CLXSystemInformation.h>
 #import <CloudXCore/CLXDebugOverlayManager.h>
 #import <CloudXCore/CLXError.h>
@@ -198,7 +199,7 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (void)initializeWithConfiguration:(CLXInitializationConfiguration *)configuration
-                         completion:(void (^)(BOOL, CLXError * _Nullable))completion {
+                         completion:(void (^)(CLXSdkConfiguration * _Nullable, CLXError * _Nullable))completion {
     _pluginVersion = [configuration.pluginVersion copy];
 
     // Store pluginVersion in UserDefaults for access by bid request builder
@@ -213,7 +214,7 @@ static CloudXCore *_sharedInstance = nil;
 
 #pragma mark - Private Initialization
 
-- (void)_initializeWithAppKey:(NSString *)appKey completion:(void (^)(BOOL, CLXError * _Nullable))completion {
+- (void)_initializeWithAppKey:(NSString *)appKey completion:(void (^)(CLXSdkConfiguration * _Nullable, CLXError * _Nullable))completion {
     [self.logger info:[NSString stringWithFormat:@"[CloudXCore] initializeWithConfiguration called with appKey: %@", appKey]];
     
     // Note: Test mode is now server-controlled via deviceConfig
@@ -228,7 +229,7 @@ static CloudXCore *_sharedInstance = nil;
         if (!appKey || appKey.length == 0) {
             [self.logger error:@"AppKey is nil or empty"];
             if (completion) {
-                completion(NO, [CLXError errorWithCode:CLXErrorCodeInvalidAppKey 
+                completion(nil, [CLXError errorWithCode:CLXErrorCodeInvalidAppKey 
                                           description:@"App key cannot be nil or empty. Please provide a valid app key."]);
             }
             return;
@@ -237,7 +238,7 @@ static CloudXCore *_sharedInstance = nil;
         if (_isInitialized) {
             [self.logger debug:@"[CloudXCore] SDK already initialized, returning early"];
             if (completion) {
-                completion(YES, nil);
+                completion([[CLXSdkConfiguration alloc] init], nil);
             }
             return;
         }
@@ -264,7 +265,7 @@ static CloudXCore *_sharedInstance = nil;
         if (!_initService) {
             [self.logger error:@"Failed to resolve InitService after fallback registration"];
             if (completion) {
-                completion(NO, [CLXError errorWithCode:CLXErrorCodeNotInitialized 
+                completion(nil, [CLXError errorWithCode:CLXErrorCodeNotInitialized 
                                           description:@"SDK initialization failed: Unable to initialize required services. Please try again or contact support."]);
             }
             return;
@@ -286,7 +287,7 @@ static CloudXCore *_sharedInstance = nil;
             if (completion) {
                 // Ensure we pass a CLXError to the completion handler
                 CLXError *clxError = [error isKindOfClass:[CLXError class]] ? (CLXError *)error : [CLXError errorWithCode:CLXErrorCodeNotInitialized description:error.localizedDescription underlyingError:error];
-                completion(NO, clxError);
+                completion(nil, clxError);
             }
             return;
         }
@@ -294,7 +295,7 @@ static CloudXCore *_sharedInstance = nil;
         if (!config) {
             [self.logger error:@"InitService returned nil config"];
             if (completion) {
-                completion(NO, [CLXError errorWithCode:CLXErrorCodeNotInitialized 
+                completion(nil, [CLXError errorWithCode:CLXErrorCodeNotInitialized 
                                           description:@"SDK initialization failed: No configuration received from server. Please check your app key and network connection."]);
             }
             return;
@@ -388,7 +389,7 @@ static CloudXCore *_sharedInstance = nil;
     }];
 }
 
-- (void)processSDKConfig:(CLXSDKConfigResponse *)config completion:(void (^)(BOOL, CLXError * _Nullable))completion {
+- (void)processSDKConfig:(CLXSDKConfigResponse *)config completion:(void (^)(CLXSdkConfiguration * _Nullable, CLXError * _Nullable))completion {
     [self.logger debug:[NSString stringWithFormat:@"Processing SDK config - Session: %@, Account: %@, Bidders: %lu", config.sessionID, config.accountID, (unsigned long)config.bidders.count]];
     
     _sdkConfig = config;
@@ -442,7 +443,7 @@ static CloudXCore *_sharedInstance = nil;
         CLXError *error = [CLXError errorWithCode:CLXErrorCodeNoNetworksConfigured];
         [self.logger error:[NSString stringWithFormat:@"SDK initialization failed: %@", error.localizedDescription]];
         if (completion) {
-            completion(NO, error);
+            completion(nil, error);
         }
         return;
     }
@@ -560,7 +561,7 @@ static CloudXCore *_sharedInstance = nil;
         CLXError *error = [CLXError errorWithCode:CLXErrorCodeNoAdaptersFound];
         [self.logger error:[NSString stringWithFormat:@"SDK initialization failed: %@", error.localizedDescription]];
         if (completion) {
-            completion(NO, error);
+            completion(nil, error);
         }
         return;
     }
@@ -618,7 +619,7 @@ static CloudXCore *_sharedInstance = nil;
     [[CLXDebugOverlayManager shared] showIfEnabled];
     
     if (completion) {
-        completion(YES, nil);
+        completion([[CLXSdkConfiguration alloc] init], nil);
     }
 }
 

@@ -3,6 +3,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXInitializationConfiguration.h>
+#import <CloudXCore/CLXSdkConfiguration.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -58,7 +59,9 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 /**
  * Initialize the SDK with a configuration object
  * @param configuration The initialization configuration
- * @param completion A completion handler that will be called once the SDK is initialized
+ * @param completion A completion handler called when initialization completes.
+ *                   On success, sdkConfiguration is non-nil and error is nil.
+ *                   On failure, sdkConfiguration is nil and error contains failure details.
  * @discussion This is the preferred initialization method. Use CLXInitializationConfiguration
  * to configure the SDK before initialization.
  *
@@ -69,15 +72,17 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  *         builderBlock:^(CLXInitializationConfigurationBuilder *builder) {
  *             builder.pluginVersion = @"flutter-1.2.0";
  *         }];
- * [[CloudXCore shared] initializeWithConfiguration:config completion:^(BOOL success, CLXError *error) {
- *     if (success) {
+ * [[CloudXCore shared] initializeWithConfiguration:config completion:^(CLXSdkConfiguration *sdkConfiguration, CLXError *error) {
+ *     if (sdkConfiguration) {
  *         NSLog(@"SDK initialized successfully");
+ *     } else {
+ *         NSLog(@"SDK initialization failed: %@", error.localizedDescription);
  *     }
  * }];
  * @endcode
  */
 - (void)initializeWithConfiguration:(CLXInitializationConfiguration *)configuration
-                         completion:(nullable void (^)(BOOL success, CLXError * _Nullable error))completion
+                         completion:(nullable void (^)(CLXSdkConfiguration * _Nullable sdkConfiguration, CLXError * _Nullable error))completion
     NS_SWIFT_NAME(initialize(with:completion:));
 
 /**

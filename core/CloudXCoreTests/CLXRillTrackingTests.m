@@ -409,16 +409,16 @@ static MockRillEventReporter *sharedInstance = nil;
     // When: Initialize SDK
     XCTestExpectation *expectation = [self expectationWithDescription:@"SDK Init"];
     CLXInitializationConfiguration *config = [CLXInitializationConfiguration configurationWithAppKey:kTestAppKey];
-    [[CloudXCore shared] initializeWithConfiguration:config completion:^(BOOL success, CLXError *error) {
-        if (success) {
+    [[CloudXCore shared] initializeWithConfiguration:config completion:^(CLXSdkConfiguration *sdkConfig, CLXError *error) {
+        if (sdkConfig) {
             // Replace the reporting service with our mock after initialization
             [[CloudXCore shared] setValue:self.mockReporter forKey:@"reportingService"];
-            
+
             // Manually trigger SDK init event (since we missed the original one)
-            [self.mockReporter rillTrackingWithActionString:@"sdkinitenc" 
-                                                 campaignId:kTestAccountID 
+            [self.mockReporter rillTrackingWithActionString:@"sdkinitenc"
+                                                 campaignId:kTestAccountID
                                               encodedString:@"test-encoded-payload"];
-            
+
             // Then: SDK init Rill event should fire
             [self assertRillEventFired:CLXRillEventTypeSDKInit withFields:26];
         }

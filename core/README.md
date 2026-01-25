@@ -34,8 +34,8 @@ pod install --repo-update
 CLXInitializationConfiguration *config =
     [CLXInitializationConfiguration configurationWithAppKey:@"your-app-key-here"];
 
-[[CloudXCore shared] initializeWithConfiguration:config completion:^(BOOL success, CLXError * _Nullable error) {
-    if (success) {
+[[CloudXCore shared] initializeWithConfiguration:config completion:^(CLXSdkConfiguration *sdkConfig, CLXError * _Nullable error) {
+    if (sdkConfig) {
         NSLog(@"CloudX SDK initialized successfully");
     } else {
         NSLog(@"Failed to initialize CloudX SDK: %@", error.localizedDescription);
@@ -49,8 +49,8 @@ import CloudXCore
 
 let config = CLXInitializationConfiguration.configuration(appKey: "your-app-key-here", builderBlock: nil)
 
-CloudXCore.shared.initialize(configuration: config) { success, error in
-    if success {
+CloudXCore.shared.initialize(with: config) { sdkConfig, error in
+    if sdkConfig != nil {
         print("CloudX SDK initialized successfully")
     } else {
         print("Failed to initialize CloudX SDK: \(error?.localizedDescription ?? "Unknown error")")
