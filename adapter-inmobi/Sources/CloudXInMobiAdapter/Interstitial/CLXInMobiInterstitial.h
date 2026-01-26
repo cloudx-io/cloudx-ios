@@ -63,11 +63,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSData *bidPayload;
 
 /**
- * Timeout interval for ad loading
- */
-@property (nonatomic, assign) NSTimeInterval timeoutInterval;
-
-/**
  * Initializes a new InMobi interstitial adapter
  * @param bidPayload The bid payload for programmatic ads (nil for waterfall)
  * @param placementID The InMobi placement ID

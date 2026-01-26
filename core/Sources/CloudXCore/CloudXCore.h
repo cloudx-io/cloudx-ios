@@ -81,6 +81,7 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXAdNetworkFactories.h>
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXAdapterFactoryResolver.h>
+#import <CloudXCore/CLXAdapterLoader.h>
 
 // Adapter Models
 #import <CloudXCore/CLXBidResponse.h>

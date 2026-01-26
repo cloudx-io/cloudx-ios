@@ -50,8 +50,7 @@
         _delegate = delegate;
         _sdkVersion = [CLXInMobiInitializer sdkVersion];
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXInMobiNative"];
-        _timeoutInterval = 30.0;
-        
+
         [self.logger debug:[NSString stringWithFormat:@"Init - PlacementID: %lld%@, BidID: %@", 
                            placementID, (placementID == 0 ? @" (invalid)" : @""), bidID]];
         

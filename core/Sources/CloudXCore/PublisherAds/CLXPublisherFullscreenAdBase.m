@@ -40,6 +40,7 @@
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXSDKConfig.h>
 #import "CLXUIApplicationProxy.h"
+#import <CloudXCore/CLXAdapterLoader.h>
 #import <objc/runtime.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -111,6 +112,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 @property (nonatomic, strong) id<CLXAdEventReporting> reportingService;
 @property (nonatomic, copy) NSString *placementID;
 @property (nonatomic, copy) NSString *placementName;
+@property (nonatomic, assign) int64_t adLoadTimeoutMs;
 @property (nonatomic, copy, nullable) NSString *rewardedCallbackUrl;
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, strong) CLXAppSessionService *appSessionService;
@@ -176,6 +178,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         _rewardedCallbackUrl = [rewardedCallbackUrl copy];
         _placementID = placement ? [placement.id copy] : nil;
         _placementName = placement ? [placement.name copy] : nil;
+        _adLoadTimeoutMs = (placement && placement.adLoadTimeoutMs > 0) ? placement.adLoadTimeoutMs : CLXDefaultAdLoadTimeoutMs;
         _reportingService = reportingService;
         _userID = [userID copy];
         _settings = settings;
@@ -339,7 +342,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
             [self.logger debug:[NSString stringWithFormat:@"Completing deferred initialization for: %@ (ID: %@)", self.requestedPlacementName, realPlacement.id]];
             _placementID = realPlacement.id;
             _placementName = realPlacement.name;
-            
+            _adLoadTimeoutMs = (realPlacement.adLoadTimeoutMs > 0) ? realPlacement.adLoadTimeoutMs : 10000;
+
             // Create impression model now that SDK is initialized (ensures app.id is populated)
             NSString *auctionID = [[NSUUID UUID] UUIDString];
             self.impModel = [[CloudXCore shared] createImpModelWithAuctionID:auctionID];
@@ -778,6 +782,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     [self.appSessionService addClickWithPlacementID:self.placementID];
     [self.rillTrackingService sendClickEvent];
 }
+
 
 - (CLXAd *)createAdObject {
     return [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];

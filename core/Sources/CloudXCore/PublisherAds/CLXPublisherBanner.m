@@ -10,6 +10,7 @@
 #import <CloudXCore/CLXPublisherBanner.h>
 
 #import <CloudXCore/CLXAdapterBanner.h>
+#import <CloudXCore/CLXAdapterLoader.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXAdapterBannerFactory.h>
 #import <CloudXCore/CLXBannerType.h>
@@ -626,14 +627,28 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)loadAdItem:(id<CLXAdapterBanner>)item {
     [self.logger info:[NSString stringWithFormat:@"Loading %@ for placement %@", NSStringFromClass([(NSObject *)item class]), self.placementID]];
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         item.timeout = NO;
-        item.delegate = self;  // Set delegate so adapter can call didShowBanner:
+        item.delegate = self;
         self.currentLoadingBanner = item;
         self.adLoadStartTime = [NSDate date];
-        [self.logger debug:@"Calling item.load()"];
-        [item load];
+
+        __weak typeof(self) weakSelf = self;
+        // Note: Banner includes forceStop check because banner can be destroyed mid-load
+        // (unlike fullscreen ads which complete their load cycle). This prevents timeout
+        // firing after the banner view has been deallocated/stopped.
+        [CLXAdapterLoader loadAdapter:item
+                            timeoutMs:self.placement.adLoadTimeoutMs ?: CLXDefaultAdLoadTimeoutMs
+                       isLoadingBlock:^BOOL{ return weakSelf.isLoading && !weakSelf.forceStop; }
+                            onTimeout:^(CLXError *error) {
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (strongSelf) {
+                item.timeout = YES;  // Flag for delegate callback to ignore
+                [strongSelf.logger error:error.localizedDescription];
+                [strongSelf failToLoadBanner:item error:error];
+            }
+        }];
     });
 }
 

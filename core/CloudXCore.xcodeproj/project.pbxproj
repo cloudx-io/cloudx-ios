@@ -316,6 +316,7 @@
 		19FF30F52EA6E6D50006F05A /* CLXSessionMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = 19FF30F02EA6E6D50006F05A /* CLXSessionMetrics.m */; };
 		19FF30F62EA6E6D50006F05A /* CLXSessionMetricsTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 19FF30F22EA6E6D50006F05A /* CLXSessionMetricsTracker.m */; };
 		19PRIVACY0002000000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 19PRIVACY0001000000000001 /* PrivacyInfo.xcprivacy */; };
+		87A7AFEA6107EE5AEC2E6161 /* CLXAdapterLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = FD3F150B4D80A1DA1031EDEB /* CLXAdapterLoader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BBCC8925685470E6FEABD98B /* CLXLossReasonMapper.h in Headers */ = {isa = PBXBuildFile; fileRef = BD3F90AE521A7F6C18C00B27 /* CLXLossReasonMapper.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		BE87E03BD32BEFB8CE4CC310 /* CLXLossReasonMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FE25D639309C9F445DC93FF /* CLXLossReasonMapper.m */; };
 		A29159BA773F7E820DD3C68D /* CLXSdkConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 99FA2AC5EECD9376EC954FC4 /* CLXSdkConfiguration.m */; };
@@ -330,6 +331,7 @@
 		CLXPLVALH0001000000000001 /* CLXPlacementValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = CLXPLVALH0002000000000001 /* CLXPlacementValidator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CLXPLVALM0001000000000001 /* CLXPlacementValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXPLVALM0002000000000001 /* CLXPlacementValidator.m */; };
 		CLXREVB293BBA699890468DB /* CLXAdRevenueDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = CLXREVCD23584C5C434B37AB /* CLXAdRevenueDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D7578637480434D163489DAF /* CLXAdapterLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = DB241498E65B2AA5899EB74E /* CLXAdapterLoader.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -675,6 +677,8 @@
 		CLXPLVALM0002000000000001 /* CLXPlacementValidator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPlacementValidator.m; sourceTree = "<group>"; };
 		CLXREVCD23584C5C434B37AB /* CLXAdRevenueDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAdRevenueDelegate.h; sourceTree = "<group>"; };
 		D3BD626817D65D02E7871508 /* CLXPublisherFullscreenAdBase.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXPublisherFullscreenAdBase.h; sourceTree = "<group>"; };
+		DB241498E65B2AA5899EB74E /* CLXAdapterLoader.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterLoader.m; sourceTree = "<group>"; };
+		FD3F150B4D80A1DA1031EDEB /* CLXAdapterLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXAdapterLoader.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -866,6 +870,8 @@
 				19C7248B2E2390810012CFC7 /* CLXAdapterFactoryResolver.m */,
 				19C7248C2E2390810012CFC7 /* CLXAdNetworkFactories.m */,
 				196B5A672EE9970A00262ECF /* CLXAdapterBanner.m */,
+				FD3F150B4D80A1DA1031EDEB /* CLXAdapterLoader.h */,
+				DB241498E65B2AA5899EB74E /* CLXAdapterLoader.m */,
 			);
 			path = Adapter;
 			sourceTree = "<group>";
@@ -1389,6 +1395,7 @@
 				19C725A72E2390810012CFC7 /* CLXLogger.h in Headers */,
 				19D8D4C42EDD7D3800817D1E /* CLXPublisherFullscreenAdBaseInternal.h in Headers */,
 				BBCC8925685470E6FEABD98B /* CLXLossReasonMapper.h in Headers */,
+				87A7AFEA6107EE5AEC2E6161 /* CLXAdapterLoader.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1600,6 +1607,7 @@
 				CLXPLVALM0001000000000001 /* CLXPlacementValidator.m in Sources */,
 				BE87E03BD32BEFB8CE4CC310 /* CLXLossReasonMapper.m in Sources */,
 				A29159BA773F7E820DD3C68D /* CLXSdkConfiguration.m in Sources */,
+				D7578637480434D163489DAF /* CLXAdapterLoader.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -28,7 +28,6 @@
 @property (nonatomic, assign) BOOL isLoaded;
 @property (nonatomic, assign) BOOL isShowing;
 @property (nonatomic, assign) BOOL isDestroyed;
-@property (nonatomic, strong, nullable) NSTimer *timeoutTimer;
 @end
 
 @implementation CLXVungleBanner
@@ -52,7 +51,6 @@
         _viewController = viewController;  // Now nullable - validation in load()
         _delegate = delegate;  // Now nullable - validation in load()
         _logger = [[CLXLogger alloc] initWithCategory:@"VungleBanner"];
-        _timeoutInterval = 30.0; // Default 30 second timeout
         _isLoaded = NO;
         _isShowing = NO;
         _isDestroyed = NO;
@@ -155,10 +153,7 @@
         self.vungleBannerView = [[VungleBannerView alloc] initWithPlacementId:self.placementID
                                                                 vungleAdSize:vungleAdSize];
         self.vungleBannerView.delegate = self;
-        
-        // Start timeout timer
-        [self startTimeoutTimer];
-        
+
         // Load the ad
         if (self.bidPayload) {
             [self.logger debug:@"Loading banner with bid payload"];
@@ -205,12 +200,9 @@
     if (self.isDestroyed) {
         return;
     }
-    
+
     [self.logger debug:@"Destroying banner adapter"];
     self.isDestroyed = YES;
-    
-    // Cancel timeout timer
-    [self cancelTimeoutTimer];
     
     // VungleBannerView is a UIView - must be cleaned up on main thread
     VungleBannerView *viewToDestroy = self.vungleBannerView;
@@ -236,8 +228,6 @@
 #pragma mark - VungleBannerViewDelegate
 
 - (void)bannerAdDidLoad:(VungleBannerView *)bannerView {
-    [self cancelTimeoutTimer];
-    
     if (self.isDestroyed) {
         [self.logger debug:@"Ignoring load callback - adapter destroyed"];
         return;
@@ -252,8 +242,6 @@
 }
 
 - (void)bannerAdDidFail:(VungleBannerView *)bannerView withError:(NSError *)error {
-    [self cancelTimeoutTimer];
-    
     if (self.isDestroyed) {
         [self.logger debug:@"Ignoring load failure callback - adapter destroyed"];
         return;
@@ -362,39 +350,6 @@
             [self.logger error:[NSString stringWithFormat:@"Unsupported banner type: %ld", (long)bannerType]];
             return nil;
     }
-}
-
-- (void)startTimeoutTimer {
-    [self cancelTimeoutTimer];
-    
-    if (self.timeoutInterval > 0) {
-        self.timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:self.timeoutInterval
-                                                             target:self
-                                                           selector:@selector(handleTimeout)
-                                                           userInfo:nil
-                                                            repeats:NO];
-    }
-}
-
-- (void)cancelTimeoutTimer {
-    if (self.timeoutTimer) {
-        [self.timeoutTimer invalidate];
-        self.timeoutTimer = nil;
-    }
-}
-
-- (void)handleTimeout {
-    if (self.isLoaded || self.isDestroyed) {
-        return;
-    }
-    
-    [self.logger error:[NSString stringWithFormat:@"Banner ad load timed out after %.1f seconds", self.timeoutInterval]];
-    self.timeout = YES;
-    
-    NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
-                                         code:CLXVungleAdapterErrorCodeTimeout
-                                      userInfo:nil];
-    [self handleLoadFailure:error];
 }
 
 - (void)handleLoadFailure:(NSError *)error {

@@ -45,11 +45,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
 
 /**
- * Timeout interval for ad loading
- */
-@property (nonatomic, assign) NSTimeInterval timeoutInterval;
-
-/**
  * Vungle placement ID for this ad
  */
 @property (nonatomic, copy, readonly) NSString *placementID;

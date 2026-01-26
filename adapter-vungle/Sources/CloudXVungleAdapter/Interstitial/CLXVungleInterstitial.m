@@ -25,7 +25,6 @@
 @property (nonatomic, assign) BOOL isLoaded;
 @property (nonatomic, assign) BOOL isShowing;
 @property (nonatomic, assign) BOOL isDestroyed;
-@property (nonatomic, strong, nullable) NSTimer *timeoutTimer;
 @end
 
 @implementation CLXVungleInterstitial
@@ -45,7 +44,6 @@
         _bidID = [bidID copy];
         _delegate = delegate;  // Nullable - validation in load()
         _logger = [[CLXLogger alloc] initWithCategory:@"VungleInterstitial"];
-        _timeoutInterval = 30.0; // Default 30 second timeout
         _isLoaded = NO;
         _isShowing = NO;
         _isDestroyed = NO;
@@ -119,10 +117,7 @@
     // Create Vungle interstitial
     self.interstitial = [[VungleInterstitial alloc] initWithPlacementId:self.placementID];
     self.interstitial.delegate = self;
-    
-    // Start timeout timer
-    [self startTimeoutTimer];
-    
+
     // Load the ad
     [self.logger debug:[NSString stringWithFormat:@"Loading %@ ad", self.bidPayload ? @"bidding" : @"waterfall"]];
     [self.interstitial load:self.bidPayload];
@@ -166,13 +161,10 @@
     if (self.isDestroyed) {
         return;
     }
-    
+
     [self.logger debug:@"Destroying interstitial adapter"];
     self.isDestroyed = YES;
-    
-    // Cancel timeout timer
-    [self cancelTimeoutTimer];
-    
+
     // Clear delegate and cleanup
     if (self.interstitial) {
         self.interstitial.delegate = nil;
@@ -187,8 +179,6 @@
 #pragma mark - VungleInterstitialDelegate
 
 - (void)interstitialAdDidLoad:(VungleInterstitial *)interstitial {
-    [self cancelTimeoutTimer];
-    
     if (self.isDestroyed) {
         [self.logger debug:@"Ignoring load callback - adapter destroyed"];
         return;
@@ -203,8 +193,6 @@
 }
 
 - (void)interstitialAdDidFailToLoad:(VungleInterstitial *)interstitial withError:(NSError *)error {
-    [self cancelTimeoutTimer];
-    
     if (self.isDestroyed) {
         [self.logger debug:@"Ignoring load failure callback - adapter destroyed"];
         return;
@@ -306,39 +294,6 @@
 }
 
 #pragma mark - Private Methods
-
-- (void)startTimeoutTimer {
-    [self cancelTimeoutTimer];
-    
-    if (self.timeoutInterval > 0) {
-        self.timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:self.timeoutInterval
-                                                             target:self
-                                                           selector:@selector(handleTimeout)
-                                                           userInfo:nil
-                                                            repeats:NO];
-    }
-}
-
-- (void)cancelTimeoutTimer {
-    if (self.timeoutTimer) {
-        [self.timeoutTimer invalidate];
-        self.timeoutTimer = nil;
-    }
-}
-
-- (void)handleTimeout {
-    if (self.isLoaded || self.isDestroyed) {
-        return;
-    }
-    
-    [self.logger error:[NSString stringWithFormat:@"Interstitial ad load timed out after %.1f seconds", self.timeoutInterval]];
-    self.timeout = YES;
-    
-    NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
-                                         code:CLXVungleAdapterErrorCodeTimeout
-                                     userInfo:nil];
-    [self handleLoadFailure:error];
-}
 
 - (void)handleLoadFailure:(NSError *)error {
     NSError *mappedError = [CLXVungleErrorHandler handleVungleError:error

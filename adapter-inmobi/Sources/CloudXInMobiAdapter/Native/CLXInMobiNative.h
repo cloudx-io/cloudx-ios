@@ -20,7 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly) NSString *bidID;
 @property (nonatomic, assign, readonly) long long placementID;
 @property (nonatomic, strong, nullable) NSData *bidPayload;
-@property (nonatomic, assign) NSTimeInterval timeoutInterval;
 
 /// The container view for the native ad
 @property (nonatomic, strong, readonly, nullable) UIView *nativeView;

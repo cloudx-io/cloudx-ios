@@ -54,6 +54,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)handleShowFailure;
 
+// Adapter timeout configuration
+- (int64_t)adLoadTimeoutMs;
+
 // Access to private properties (read-only)
 @property (nonatomic, copy, readonly, nullable) NSString *placementName;
 @property (nonatomic, strong, readonly, nullable) CLXBidAdSourceResponse *lastBidResponse;

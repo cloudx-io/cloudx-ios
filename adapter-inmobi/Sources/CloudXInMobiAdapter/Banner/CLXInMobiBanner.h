@@ -23,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) long long placementID;
 @property (nonatomic, copy, readonly, nullable) NSString *placementName;
 @property (nonatomic, strong, nullable) NSData *bidPayload;
-@property (nonatomic, assign) NSTimeInterval timeoutInterval;
 
 - (instancetype)initWithBidPayload:(nullable NSData *)bidPayload
                        placementID:(long long)placementID

@@ -12,6 +12,7 @@
 #import <CloudXCore/CLXAdapterInterstitial.h>
 #import <CloudXCore/CLXAdapterInterstitialFactory.h>
 #import <CloudXCore/CLXAdNetworkFactories.h>
+#import <CloudXCore/CLXAdapterLoader.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXAdType.h>
@@ -80,22 +81,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setupAdapterAndLoad:(id)adapter {
     self.currentAdapter = (id<CLXAdapterInterstitial>)adapter;
     self.currentAdapter.delegate = self;
-    
-    // Set up 30-second timeout for adapter loading
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(30.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (self.isLoading) {
-            [self.logger error:@"Interstitial load timeout after 30 seconds"];
-            [self transitionToIdleState];
-            
-            CLXError *timeoutError = [CLXError errorWithCode:CLXErrorCodeAdapterTimeout];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self notifyLoadFailure:timeoutError];
-            });
+
+    __weak typeof(self) weakSelf = self;
+    [CLXAdapterLoader loadAdapter:self.currentAdapter
+                        timeoutMs:[self adLoadTimeoutMs]
+                   isLoadingBlock:^BOOL{ return weakSelf.isLoading; }
+                        onTimeout:^(CLXError *error) {
+        // Note: onTimeout is already called on main queue from CLXAdapterLoader
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf) {
+            [strongSelf.logger error:error.localizedDescription];
+            [strongSelf transitionToIdleState];
+            [strongSelf notifyLoadFailure:error];
         }
-    });
-    
-    [self.currentAdapter load];
+    }];
 }
 
 - (void)showCurrentAdapterFromViewController:(UIViewController *)viewController {

@@ -60,11 +60,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *bidPayload;
 
 /**
- * Timeout interval for ad loading
- */
-@property (nonatomic, assign) NSTimeInterval timeoutInterval;
-
-/**
  * Initializes a new Vungle App Open adapter
  * @param bidPayload The bid payload for programmatic ads (nil for waterfall)
  * @param placementID The Vungle App Open placement ID (nullable - validation deferred to load())

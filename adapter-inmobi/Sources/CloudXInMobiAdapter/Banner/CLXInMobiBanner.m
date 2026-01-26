@@ -57,8 +57,7 @@
         _bannerSize = size;  // Store for deferred creation
         _sdkVersion = [CLXInMobiInitializer sdkVersion];
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXInMobiBanner"];
-        _timeoutInterval = 30.0;
-        
+
         [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@ (%lld%@), BidID: %@, Size: %.0fx%.0f",
                            placementName ?: @"(unknown)", placementID, (placementID == 0 ? @" - invalid" : @""), bidID, size.width, size.height]];
         
