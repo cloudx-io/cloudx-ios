@@ -97,7 +97,7 @@ static const NSInteger kMTGExceptionAppNotFound = -1302;                 // appI
     else if (errorCode == kMTGErrorCodeFailedToShow ||
              errorCode == kMTGErrorCodeFailedToShowCbp ||
              errorCode == kMTGErrorCodeFailedToPlay) {
-        cloudXCode = CLXErrorCodeShowFailed;
+        cloudXCode = CLXErrorCodeAdapterDisplayFailed;
         description = @"Mintegral ad show failed";
         shouldRetry = NO;
     }
