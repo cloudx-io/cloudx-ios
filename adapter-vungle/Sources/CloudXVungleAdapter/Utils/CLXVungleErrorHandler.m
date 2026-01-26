@@ -38,13 +38,11 @@ NSString * const CLXVungleAdapterErrorDomain = @"com.cloudx.adapter.vungle";
     // Map to CloudX error and add metadata
     NSError *mappedError = [self mapVungleError:error context:context];
     
-    // Add retry and rate limiting metadata
+    // Add metadata
     NSMutableDictionary *userInfo = [mappedError.userInfo mutableCopy] ?: [NSMutableDictionary dictionary];
     userInfo[@"original_error"] = error;
     userInfo[@"placement_id"] = placementID;
     userInfo[@"context"] = context;
-    userInfo[@"is_retryable"] = @([self isRetryableError:error]);
-    userInfo[@"suggested_delay"] = @([self suggestedDelayForError:error]);
     userInfo[@"timestamp"] = @([[NSDate date] timeIntervalSince1970]);
     
     return [NSError errorWithDomain:mappedError.domain
@@ -111,62 +109,6 @@ NSString * const CLXVungleAdapterErrorDomain = @"com.cloudx.adapter.vungle";
                            userInfo:userInfo];
 }
 
-+ (NSTimeInterval)suggestedDelayForError:(NSError *)error {
-    if (!error) {
-        return 0;
-    }
-    
-    // Check if this is a rate limiting error
-    if ([error.domain isEqualToString:CLXVungleAdapterErrorDomain]) {
-        switch (error.code) {
-            case CLXVungleAdapterErrorCodeNetworkError:
-                return 5.0; // 5 second delay for network errors
-                
-            case CLXVungleAdapterErrorCodeTimeout:
-                return 10.0; // 10 second delay for timeouts
-                
-            case CLXVungleAdapterErrorCodeNoFill:
-                return 30.0; // 30 second delay for no fill
-                
-            default:
-                return 0;
-        }
-    }
-    
-    // Check original Vungle error for rate limiting indicators
-    NSError *originalError = error.userInfo[@"original_error"];
-    if (originalError && [originalError.localizedDescription containsString:@"rate"]) {
-        return 60.0; // 1 minute delay for rate limiting
-    }
-    
-    return 0;
-}
-
-+ (BOOL)isRetryableError:(NSError *)error {
-    if (!error) {
-        return NO;
-    }
-    
-    if ([error.domain isEqualToString:CLXVungleAdapterErrorDomain]) {
-        switch (error.code) {
-            case CLXVungleAdapterErrorCodeNetworkError:
-            case CLXVungleAdapterErrorCodeTimeout:
-            case CLXVungleAdapterErrorCodeNoFill:
-                return YES;
-                
-            case CLXVungleAdapterErrorCodeInvalidConfiguration:
-            case CLXVungleAdapterErrorCodeInvalidPlacement:
-            case CLXVungleAdapterErrorCodeNotInitialized:
-                return NO;
-                
-            default:
-                return NO;
-        }
-    }
-    
-    return NO;
-}
-
 + (NSString *)descriptionForErrorCode:(NSInteger)errorCode {
     switch (errorCode) {
         case 10001:
@@ -192,46 +134,6 @@ NSString * const CLXVungleAdapterErrorDomain = @"com.cloudx.adapter.vungle";
         default:
             return [NSString stringWithFormat:@"Unknown Error - Vungle SDK error code %ld", (long)errorCode];
     }
-}
-
-+ (NSDictionary *)userFriendlyAlertInfoForError:(NSError *)error context:(NSString *)context {
-    NSString *title = @"Ad Unavailable";
-    NSString *message = @"Unable to load advertisement at this time. Please try again later.";
-    
-    if ([error.domain isEqualToString:CLXVungleAdapterErrorDomain]) {
-        switch (error.code) {
-            case CLXVungleAdapterErrorCodeNoFill:
-                title = @"No Ads Available";
-                message = @"No advertisements are currently available. Please try again later.";
-                break;
-                
-            case CLXVungleAdapterErrorCodeNetworkError:
-                title = @"Connection Error";
-                message = @"Unable to connect to the internet. Please check your connection and try again.";
-                break;
-                
-            case CLXVungleAdapterErrorCodeTimeout:
-                title = @"Request Timed Out";
-                message = @"The request took too long to complete. Please try again.";
-                break;
-                
-            case CLXVungleAdapterErrorCodeInvalidConfiguration:
-            case CLXVungleAdapterErrorCodeInvalidPlacement:
-                title = @"Configuration Error";
-                message = @"There's a configuration issue. Please contact support if this persists.";
-                break;
-                
-            default:
-                title = @"Ad Error";
-                message = @"An error occurred while loading the advertisement. Please try again.";
-                break;
-        }
-    }
-    
-    return @{
-        @"title": title,
-        @"message": message
-    };
 }
 
 @end

@@ -109,7 +109,6 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
     enhancedUserInfo[@"CLXMetaErrorDescription"] = errorDescription;
     enhancedUserInfo[@"CLXMetaContext"] = context;
     enhancedUserInfo[@"CLXMetaPlacementID"] = placementID ?: @"Unknown";
-    enhancedUserInfo[@"CLXMetaIsRetryable"] = @([self isRetryableError:error]);
     
     // Add ATT status information for all Meta errors (helps with debugging)
     NSString *attStatusDesc = [self currentATTStatusDescription];
@@ -135,7 +134,6 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
             
         case CLXMetaErrorCodeAdLoadTooFrequently:
             enhancedUserInfo[@"FacebookRateLimited"] = @YES;
-            enhancedUserInfo[@"SuggestedMinimumDelay"] = @([self suggestedDelayForError:error]);
             enhancedUserInfo[@"CLXMetaRecommendation"] = @"Wait 5+ seconds before retry";
             break;
             
@@ -187,10 +185,6 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
             break;
     }
     
-    // Add retry and delay metadata (no separate log needed - already in main error log)
-    BOOL isRetryable = [self isRetryableError:error];
-    NSTimeInterval suggestedDelay = [self suggestedDelayForError:error];
-    
     // Get user-friendly message for the error
     NSDictionary *alertInfo = [self userFriendlyAlertInfoForError:error context:context];
     NSString *userFriendlyMessage = alertInfo[@"message"];
@@ -206,50 +200,6 @@ typedef NS_ENUM(NSInteger, CLXMetaErrorCode) {
                                              userInfo:[enhancedUserInfo copy]];
     
     return enhancedError;
-}
-
-+ (NSTimeInterval)suggestedDelayForError:(NSError *)error {
-    switch (error.code) {
-        case CLXMetaErrorCodeAdLoadTooFrequently:
-            return 5.0; // Facebook recommends at least 5 seconds
-            
-        case CLXMetaErrorCodeNetworkError:
-        case CLXMetaErrorCodeServerError:
-            return 2.0; // Short delay for network/server issues
-            
-        case CLXMetaErrorCodeInternalError:
-            return 1.0; // Brief delay for internal errors
-            
-        default:
-            return 0.0; // No delay needed
-    }
-}
-
-+ (BOOL)isRetryableError:(NSError *)error {
-    switch (error.code) {
-        // Retryable errors - temporary issues that might resolve
-        case CLXMetaErrorCodeNetworkError:
-        case CLXMetaErrorCodeServerError:
-        case CLXMetaErrorCodeInternalError:
-        case CLXMetaErrorCodeAdLoadTooFrequently:
-            return YES;
-            
-        // Non-retryable errors - configuration or permanent issues
-        case CLXMetaErrorCodeNoFill:
-        case CLXMetaErrorCodeDisplayFormatMismatch:
-        case CLXMetaErrorCodeUnsupportedSDKVersion:
-        case CLXMetaErrorCodeNotAppAdminDeveloperOrTester:
-        case CLXMetaErrorCodeInvalidPlacement:
-        case CLXMetaErrorCodeInvalidBidToken:
-        case CLXMetaErrorCodeBidTokenNotFound:
-        case CLXMetaErrorCodeAdExpired:
-        case CLXMetaErrorCodeATTDenied:
-        case CLXMetaErrorCodeATTRestricted:
-            return NO;
-            
-        default:
-            return NO; // Conservative approach for unknown errors
-    }
 }
 
 + (NSString *)descriptionForErrorCode:(NSInteger)errorCode {
