@@ -76,7 +76,7 @@
             return CLXErrorCodeInvalidAdUnit;
             
         case 4:  // Timeout
-            return CLXErrorCodeLoadTimeout;
+            return CLXErrorCodeAdapterTimeout;
             
         case 10: // Native not ready
         case 7:  // Ad active

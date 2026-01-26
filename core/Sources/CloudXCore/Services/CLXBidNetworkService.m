@@ -154,7 +154,7 @@
     // Convert bidRequest dictionary to NSData
     // Validate bid request before JSON serialization
     if (!bidRequest) {
-        NSError *invalidRequestError = [CLXError errorWithCode:CLXErrorCodeInvalidRequest 
+        NSError *invalidRequestError = [CLXError errorWithCode:CLXErrorCodeInternalError 
                                                        userInfo:@{
                                                            NSLocalizedDescriptionKey: @"Bid request cannot be nil",
                                                            @"CLXCorrelationID": correlationId

@@ -100,7 +100,7 @@
     // Validate viewController at load time
     if (!self.viewController) {
         NSString *placementContext = self.placementName ? [NSString stringWithFormat:@" for placement '%@'", self.placementName] : @"";
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidConfiguration
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidConfiguration
                                      description:[NSString stringWithFormat:@"[Vungle] Missing viewController%@", placementContext]];
         [self.logger error:error.localizedDescription];
         [self handleLoadFailure:error];
@@ -110,7 +110,7 @@
     // Validate delegate at load time
     if (!self.delegate) {
         NSString *placementContext = self.placementName ? [NSString stringWithFormat:@" for placement '%@'", self.placementName] : @"";
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidConfiguration
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidConfiguration
                                      description:[NSString stringWithFormat:@"[Vungle] Missing delegate%@", placementContext]];
         [self.logger error:error.localizedDescription];
         // Cannot call handleLoadFailure without delegate, just log

@@ -64,7 +64,7 @@ static NSString * const kSDKVersion = @"8.0.3"; // Mintegral SDK version (update
     NSString *appKey = config.initializationData[@"appKey"];
     
     if (!appID || appID.length == 0 || !appKey || appKey.length == 0) {
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidConfiguration
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidConfiguration
                                      description:@"Missing Mintegral App ID or App Key"];
         [self.logger error:@"Failed to initialize Mintegral: missing App ID or App Key"];
         if (completion) completion(NO, error);

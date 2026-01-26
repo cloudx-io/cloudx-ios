@@ -75,54 +75,22 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     CLXErrorCodeInvalidResponse = 205,
     
     // AD REQUEST/LOADING ERRORS (300-399)
+    /// Ad unit not found or invalid
+    CLXErrorCodeInvalidAdUnit = 300,
+    /// Ads disabled for this ad unit
+    CLXErrorCodeAdsDisabled = 301,
     /// No ad fill available (no ads to show)
-    CLXErrorCodeNoFill = 300,
-    /// Invalid ad request parameters
-    CLXErrorCodeInvalidRequest = 301,
-    /// Invalid placement ID
-    CLXErrorCodeInvalidPlacement = 302,
-    /// Ad loading timeout
-    CLXErrorCodeLoadTimeout = 303,
+    CLXErrorCodeNoFill = 302,
     /// Ad failed to load for unknown reasons
     CLXErrorCodeLoadFailed = 304,
-    /// Ad content is invalid or corrupted
-    CLXErrorCodeInvalidAd = 305,
-    /// Ad request was cancelled
-    CLXErrorCodeRequestCancelled = 307,
-    /// Ads disabled by kill switch
-    CLXErrorCodeAdsDisabled = 308,
     
     // AD DISPLAY/SHOW ERRORS (400-499)
     /// Ad is not ready to be shown
     CLXErrorCodeAdNotReady = 400,
-    /// Ad has already been shown
-    CLXErrorCodeAdAlreadyShown = 401,
-    /// Ad has expired and cannot be shown
-    CLXErrorCodeAdExpired = 402,
-    /// View controller required for ad display is nil
-    CLXErrorCodeInvalidViewController = 403,
-    /// Ad failed to show for unknown reasons
-    CLXErrorCodeShowFailed = 404,
     
     // CONFIGURATION/SETUP ERRORS (500-599)
-    /// Invalid ad unit configuration
-    CLXErrorCodeInvalidAdUnit = 500,
-    /// Required permissions not granted
-    CLXErrorCodePermissionDenied = 501,
-    /// Ad format not supported
-    CLXErrorCodeUnsupportedAdFormat = 502,
-    /// Banner view is nil or invalid
-    CLXErrorCodeInvalidBannerView = 503,
     /// Native view is nil or invalid
-    CLXErrorCodeInvalidNativeView = 504,
-    /// No adapters registered (no adapter frameworks included in project)
-    CLXErrorCodeNoAdaptersRegistered = 505,
-    /// Invalid adapter configuration
-    CLXErrorCodeInvalidConfiguration = 506,
-    /// Invalid ad unit ID provided
-    CLXErrorCodeInvalidAdUnitID = 507,
-    /// Invalid bid response
-    CLXErrorCodeInvalidBidResponse = 508,
+    CLXErrorCodeInvalidNativeView = 500,
     
     // ADAPTER ERRORS (600-699)
     /// Internal adapter error

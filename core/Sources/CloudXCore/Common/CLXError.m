@@ -122,6 +122,10 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
 
 + (NSString *)defaultDescriptionForCode:(CLXErrorCode)code {
     switch (code) {
+        // GENERAL ERRORS (0)
+        case CLXErrorCodeInternalError:
+            return @"Internal error.";
+
         // INITIALIZATION ERRORS (100-199)
         case CLXErrorCodeNotInitialized:
             return @"SDK not initialized. Please initialize the SDK before using it.";
@@ -149,54 +153,22 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
             return @"Invalid or unparseable server response.";
             
         // AD REQUEST/LOADING ERRORS (300-399)
+        case CLXErrorCodeInvalidAdUnit:
+            return @"Ad unit not found. Check ad unit ID.";
+        case CLXErrorCodeAdsDisabled:
+            return @"Ads disabled for this ad unit.";
         case CLXErrorCodeNoFill:
-            return @"No ad available to display.";
-        case CLXErrorCodeInvalidRequest:
-            return @"Invalid ad request parameters.";
-        case CLXErrorCodeInvalidPlacement:
-            return @"Invalid placement ID. Please check your placement configuration.";
-        case CLXErrorCodeLoadTimeout:
-            return @"Ad loading timed out.";
+            return @"No ad available.";
         case CLXErrorCodeLoadFailed:
             return @"Failed to load ad.";
-        case CLXErrorCodeInvalidAd:
-            return @"Ad content is invalid or corrupted.";
-        case CLXErrorCodeRequestCancelled:
-            return @"Ad request was cancelled.";
-        case CLXErrorCodeAdsDisabled:
-            return @"Ads are disabled by server configuration.";
             
         // AD DISPLAY/SHOW ERRORS (400-499)
         case CLXErrorCodeAdNotReady:
             return @"Ad is not ready to be displayed.";
-        case CLXErrorCodeAdAlreadyShown:
-            return @"Ad has already been displayed.";
-        case CLXErrorCodeAdExpired:
-            return @"Ad has expired and cannot be displayed.";
-        case CLXErrorCodeInvalidViewController:
-            return @"Invalid view controller provided for ad display.";
-        case CLXErrorCodeShowFailed:
-            return @"Failed to display ad.";
             
         // CONFIGURATION/SETUP ERRORS (500-599)
-        case CLXErrorCodeInvalidAdUnit:
-            return @"Invalid ad unit configuration.";
-        case CLXErrorCodePermissionDenied:
-            return @"Required permissions not granted.";
-        case CLXErrorCodeUnsupportedAdFormat:
-            return @"Ad format not supported.";
-        case CLXErrorCodeInvalidBannerView:
-            return @"Banner view is nil or invalid.";
         case CLXErrorCodeInvalidNativeView:
             return @"Native view is nil or invalid.";
-        case CLXErrorCodeNoAdaptersRegistered:
-            return @"No ad network adapters registered. Please include adapter frameworks in your project.";
-        case CLXErrorCodeInvalidConfiguration:
-            return @"Invalid adapter configuration.";
-        case CLXErrorCodeInvalidAdUnitID:
-            return @"Invalid ad unit ID provided.";
-        case CLXErrorCodeInvalidBidResponse:
-            return @"Invalid bid response received.";
             
         // ADAPTER ERRORS (600-699)
         case CLXErrorCodeAdapterInternalError:
@@ -243,10 +215,6 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
             return @"Missing view controller.";
         case CLXErrorCodeAdapterDisplayFailed:
             return @"Ad display failed.";
-
-        // GENERAL ERRORS (0)
-        case CLXErrorCodeInternalError:
-            return @"Internal error.";
 
         default:
             return @"Internal error.";

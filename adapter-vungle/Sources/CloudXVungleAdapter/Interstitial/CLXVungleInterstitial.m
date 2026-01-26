@@ -89,7 +89,7 @@
     // Validate delegate at load time
     if (!self.delegate) {
         NSString *placementContext = self.placementName ? [NSString stringWithFormat:@" for placement '%@'", self.placementName] : @"";
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidConfiguration
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidConfiguration
                                      description:[NSString stringWithFormat:@"[Vungle] Missing delegate%@", placementContext]];
         [self.logger error:error.localizedDescription];
         return;

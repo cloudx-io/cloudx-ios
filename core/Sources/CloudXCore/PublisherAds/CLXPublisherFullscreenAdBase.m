@@ -387,7 +387,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                 ? [availablePlacements componentsJoinedByString:@", "] 
                 : @"none";
             [self.logger error:[NSString stringWithFormat:@"Placement '%@' not found. Available: [%@]", self.requestedPlacementName, availablePlacementsString]];
-            CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidPlacement 
+            CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnit 
                                           description:[NSString stringWithFormat:@"Placement '%@' not found in SDK configuration. Available placements: [%@].", 
                                                       self.requestedPlacementName, availablePlacementsString]];
             [self handleBidResponse:nil error:error];

@@ -159,7 +159,7 @@
 - (void)load {
     // Validate placement ID at load time (deferred validation pattern)
     if (_placementID == 0) {
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
                                      description:@"[InMobi] Invalid or missing placement ID for native ad"];
         [self.logger error:error.localizedDescription];
         

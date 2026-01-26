@@ -341,7 +341,7 @@
         if (error) {
             NSString *errorMessage = [NSString stringWithFormat:@"Validation failed: %@", 
                                     [errors componentsJoinedByString:@", "]];
-            *error = [CLXError errorWithCode:CLXErrorCodeInvalidRequest description:errorMessage];
+            *error = [CLXError errorWithCode:CLXErrorCodeInternalError description:errorMessage];
         }
         return NO;
     }

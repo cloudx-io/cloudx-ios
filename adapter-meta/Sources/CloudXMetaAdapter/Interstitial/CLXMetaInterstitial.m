@@ -187,16 +187,16 @@ NSString * const CLXMetaErrorDomain = @"CLXMetaErrorDomain";
         [self.logger error:@"Ad loaded but invalid"];
         _isLoading = NO;
         
-        // Create an error for invalid ad and call failure delegate
-        NSError *invalidAdError = [CLXError errorWithCode:CLXErrorCodeInvalidAd 
+        // Create an error for expired ad and call failure delegate
+        NSError *expiredAdError = [CLXError errorWithCode:CLXErrorCodeAdapterAdExpired
                                                       description:@"Interstitial ad loaded but is not valid"];
         
         if ([self.delegate respondsToSelector:@selector(didFailToLoadWithInterstitial:error:)]) {
-            [self.delegate didFailToLoadWithInterstitial:self error:invalidAdError];
+            [self.delegate didFailToLoadWithInterstitial:self error:expiredAdError];
         }
         return;
     }
-    
+
     // Reset loading state
     _isLoading = NO;
     

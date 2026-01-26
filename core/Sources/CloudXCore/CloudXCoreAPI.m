@@ -766,7 +766,7 @@ static CloudXCore *_sharedInstance = nil;
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
         [self.logger error:@"No adapters registered - error will be deferred to load()"];
-        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersRegistered
+        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersFound
                                     description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
     
@@ -844,7 +844,7 @@ static CloudXCore *_sharedInstance = nil;
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
         [self.logger error:@"No adapters registered - error will be deferred to load()"];
-        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersRegistered
+        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersFound
                                     description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
     
@@ -920,7 +920,7 @@ static CloudXCore *_sharedInstance = nil;
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
         [self.logger error:@"No adapters registered - error will be deferred to load()"];
-        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersRegistered
+        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersFound
                                     description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
     
@@ -991,7 +991,7 @@ static CloudXCore *_sharedInstance = nil;
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
         [self.logger error:@"No adapters registered - error will be deferred to load()"];
-        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersRegistered
+        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersFound
                                     description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
     
@@ -1064,7 +1064,7 @@ static CloudXCore *_sharedInstance = nil;
     // Check if adapters are registered
     if (_adNetworkFactories.isEmpty) {
         [self.logger error:@"No adapters registered - error will be deferred to load()"];
-        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersRegistered
+        deferredError = [CLXError errorWithCode:CLXErrorCodeNoAdaptersFound
                                     description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
 

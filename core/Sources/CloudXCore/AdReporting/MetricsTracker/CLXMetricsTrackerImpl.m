@@ -185,7 +185,6 @@
     if ([error.domain isEqualToString:CLXErrorDomain]) {
         switch (error.code) {
             case CLXErrorCodeNetworkTimeout:
-            case CLXErrorCodeLoadTimeout:
             case CLXErrorCodeAdapterTimeout:
                 return YES;
             default:

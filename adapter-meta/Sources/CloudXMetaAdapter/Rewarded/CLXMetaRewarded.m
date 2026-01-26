@@ -170,12 +170,12 @@
         [self.logger error:@"⚠️ Ad loaded but is not valid"];
         _isLoading = NO;
         
-        // Create an error for invalid ad and call failure delegate
-        NSError *invalidAdError = [CLXError errorWithCode:CLXErrorCodeInvalidAd 
+        // Create an error for expired ad and call failure delegate
+        NSError *expiredAdError = [CLXError errorWithCode:CLXErrorCodeAdapterAdExpired
                                                       description:@"Rewarded video ad loaded but is not valid"];
-        
+
         if ([self.delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
-            [self.delegate didFailToLoadWithRewarded:self error:invalidAdError];
+            [self.delegate didFailToLoadWithRewarded:self error:expiredAdError];
         }
         return;
     }

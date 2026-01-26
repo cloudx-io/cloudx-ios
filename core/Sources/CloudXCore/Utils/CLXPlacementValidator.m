@@ -115,7 +115,7 @@
                              placementName,
                              availablePlacementsString];
     
-    return [CLXError errorWithCode:CLXErrorCodeInvalidPlacement
+    return [CLXError errorWithCode:CLXErrorCodeInvalidAdUnit
                        description:description];
 }
 
@@ -131,7 +131,7 @@
                              expectedTypeString,
                              actualTypeString];
     
-    return [CLXError errorWithCode:CLXErrorCodeInvalidPlacement
+    return [CLXError errorWithCode:CLXErrorCodeInvalidAdUnit
                        description:description];
 }
 

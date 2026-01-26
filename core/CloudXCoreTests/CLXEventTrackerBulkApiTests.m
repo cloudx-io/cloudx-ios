@@ -43,7 +43,7 @@
         // Then - Should fail immediately with validation error (no network call)
         XCTAssertFalse(success);
         XCTAssertNotNil(error);
-        XCTAssertEqual(error.code, CLXErrorCodeInvalidRequest);
+        XCTAssertEqual(error.code, CLXErrorCodeInternalError);
         [expectation fulfill];
     }];
     
@@ -68,7 +68,7 @@
         // Then - Should fail immediately with validation error (no network call)
         XCTAssertFalse(success);
         XCTAssertNotNil(error);
-        XCTAssertEqual(error.code, CLXErrorCodeInvalidRequest);
+        XCTAssertEqual(error.code, CLXErrorCodeInternalError);
         [expectation fulfill];
     }];
     

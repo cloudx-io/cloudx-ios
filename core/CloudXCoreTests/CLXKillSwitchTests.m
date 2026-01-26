@@ -125,7 +125,7 @@
  * Test bid request kill switch with ADS_DISABLED header
  * This simulates traffic sampling where individual bid requests are disabled
  */
-- (void)testBidRequestKillSwitch_ADS_DISABLED_ShouldReturnError308 {
+- (void)testBidRequestKillSwitch_ADS_DISABLED_ShouldReturnError301 {
     // Given: Mock successful SDK initialization first
     NSDictionary *mockBidRequest = @{
         @"id": @"test-bid-123",
@@ -149,7 +149,7 @@
         XCTAssertNil(parsedResponse, @"Parsed response should be nil when ads are disabled");
         XCTAssertNil(rawJSON, @"Raw JSON should be nil when ads are disabled");
         XCTAssertNotNil(error, @"Error should be present");
-        XCTAssertEqual(error.code, CLXErrorCodeAdsDisabled, @"Should return ads disabled error code 308");
+        XCTAssertEqual(error.code, CLXErrorCodeAdsDisabled, @"Should return ads disabled error code 301");
         XCTAssertEqualObjects(error.domain, CLXErrorDomain, @"Should use CloudX error domain");
         
         [expectation fulfill];
@@ -285,17 +285,17 @@
 
 /**
  * Test that PublisherBanner fails immediately on kill switch error without continuing waterfall
- * This ensures error code 308 (AdsDisabled) is not converted to 300 (NoFill)
+ * This ensures error code 301 (AdsDisabled) is not converted to 302 (NoFill)
  */
 - (void)testPublisherBanner_KillSwitchError_ShouldFailImmediately {
     // This test verifies the fix for kill switch errors being converted to "waterfall exhausted"
-    // When PublisherBanner receives error 308, it should fail immediately, not continue waterfall
-    
-    NSError *killSwitchError = [CLXError errorWithCode:CLXErrorCodeAdsDisabled 
+    // When PublisherBanner receives error 301, it should fail immediately, not continue waterfall
+
+    NSError *killSwitchError = [CLXError errorWithCode:CLXErrorCodeAdsDisabled
                                             description:@"Ads disabled by kill switch"];
-    
-    XCTAssertEqual(killSwitchError.code, CLXErrorCodeAdsDisabled, 
-                  @"Kill switch error should be code 308");
+
+    XCTAssertEqual(killSwitchError.code, CLXErrorCodeAdsDisabled,
+                  @"Kill switch error should be code 301");
     XCTAssertEqualObjects(killSwitchError.domain, CLXErrorDomain,
                          @"Kill switch error should use CloudX domain");
     
@@ -341,24 +341,23 @@
 }
 
 /**
- * Test that both kill switch error codes (105 and 308) are handled correctly
+ * Test that both kill switch error codes (104 and 301) are handled correctly
  */
 - (void)testKillSwitchErrorCodes_ShouldBeRecognized {
     // Error code 104 - SDK Disabled
     NSError *error104 = [CLXError errorWithCode:CLXErrorCodeSDKDisabled];
     XCTAssertEqual(error104.code, 104, @"SDK disabled should be code 104");
 
-    // Error code 308 - Ads Disabled
-    NSError *error308 = [CLXError errorWithCode:CLXErrorCodeAdsDisabled];
-    XCTAssertEqual(error308.code, 308, @"Ads disabled should be code 308");
+    // Error code 301 - Ads Disabled
+    NSError *error301 = [CLXError errorWithCode:CLXErrorCodeAdsDisabled];
+    XCTAssertEqual(error301.code, 301, @"Ads disabled should be code 301");
 
-    // Both should have kill switch in description
+    // Both should have disabled in description
     XCTAssertTrue([error104.localizedDescription containsString:@"kill switch"] ||
                  [error104.localizedDescription containsString:@"disabled"],
                  @"Error 104 description should mention disabled/kill switch");
-    XCTAssertTrue([error308.localizedDescription containsString:@"kill switch"] ||
-                 [error308.localizedDescription containsString:@"disabled"],
-                 @"Error 308 description should mention disabled/kill switch");
+    XCTAssertTrue([error301.localizedDescription containsString:@"disabled"],
+                 @"Error 301 description should mention disabled");
 }
 
 @end

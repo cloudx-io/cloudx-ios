@@ -324,7 +324,7 @@ NS_ASSUME_NONNULL_BEGIN
                 NSString *availablePlacementsString = availablePlacements.count > 0 
                     ? [availablePlacements componentsJoinedByString:@", "] 
                     : @"none";
-                CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidPlacement 
+                CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnit 
                                               description:[NSString stringWithFormat:@"Placement '%@' not found in SDK configuration. Available placements: [%@].", 
                                                           self.requestedPlacementName, availablePlacementsString]];
                 [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" error:error];

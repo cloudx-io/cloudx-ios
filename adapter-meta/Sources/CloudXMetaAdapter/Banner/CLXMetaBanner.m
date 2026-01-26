@@ -181,11 +181,11 @@
     if (!adView.isAdValid) {
         [self.logger error:@"Ad loaded but invalid"];
         
-        NSError *invalidAdError = [CLXError errorWithCode:CLXErrorCodeInvalidAd 
+        NSError *expiredAdError = [CLXError errorWithCode:CLXErrorCodeAdapterAdExpired
                                               description:@"Banner ad loaded but is not valid"];
-        
+
         if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
-            [self.delegate failToLoadBanner:self error:invalidAdError];
+            [self.delegate failToLoadBanner:self error:expiredAdError];
         }
         return;
     }

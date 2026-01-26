@@ -30,7 +30,7 @@
     if (!endpointUrl || endpointUrl.length == 0) {
         [self.logger error:@"Endpoint URL is nil or empty"];
         if (completion) {
-            completion(NO, [CLXError errorWithCode:CLXErrorCodeInvalidRequest description:@"Endpoint URL is required"]);
+            completion(NO, [CLXError errorWithCode:CLXErrorCodeInternalError description:@"Endpoint URL is required"]);
         }
         return;
     }

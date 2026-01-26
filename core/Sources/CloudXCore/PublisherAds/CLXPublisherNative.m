@@ -296,7 +296,7 @@ NS_ASSUME_NONNULL_BEGIN
                 NSString *availablePlacementsString = availablePlacements.count > 0 
                     ? [availablePlacements componentsJoinedByString:@", "] 
                     : @"none";
-                CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidPlacement 
+                CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnit 
                                               description:[NSString stringWithFormat:@"Placement '%@' not found in SDK configuration. Available placements: [%@].", 
                                                           self.requestedPlacementName, availablePlacementsString]];
                 [self.logger logDelegateError:@"❌ Native didFailToLoadAd" error:error];
@@ -427,13 +427,13 @@ NS_ASSUME_NONNULL_BEGIN
         } else {
             [self.logger debug:@"No valid native created from bid for placement"];
             self.isLoading = NO;
-            CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidBidResponse description:@"No valid native created from bid response"];
+            CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidResponse description:@"No valid native created from bid response"];
             [self failToLoadWithNative:nil error:error];
         }
     } else {
         [self.logger debug:@"No valid native created from bid for placement"];
         self.isLoading = NO;
-        CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidBidResponse description:@"No valid native created from bid response"];
+        CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidResponse description:@"No valid native created from bid response"];
         [self failToLoadWithNative:nil error:error];
     }
 }

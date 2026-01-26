@@ -47,7 +47,7 @@
             break;
             
         case 1003: // Example: Invalid placement
-            cloudXCode = CLXErrorCodeInvalidAdUnitID;
+            cloudXCode = CLXErrorCodeAdapterInvalidServerExtras;
             description = @"Invalid placement ID";
             recoverySuggestion = @"Verify placement ID is correct";
             shouldRetry = NO;
@@ -67,7 +67,7 @@
             break;
             
         case 1006: // Example: Invalid configuration
-            cloudXCode = CLXErrorCodeInvalidConfiguration;
+            cloudXCode = CLXErrorCodeAdapterInvalidConfiguration;
             description = @"Invalid SDK configuration";
             shouldRetry = NO;
             break;

@@ -43,7 +43,7 @@ static const NSInteger kMTGExceptionAppNotFound = -1302;                 // appI
         errorCode == kMTGExceptionAppIdEmpty ||
         errorCode == kMTGExceptionAppNotFound ||
         errorCode == kMTGErrorCodeBannerSizeInvalid) {
-        cloudXCode = CLXErrorCodeInvalidConfiguration;
+        cloudXCode = CLXErrorCodeAdapterInvalidConfiguration;
         description = @"Invalid Mintegral configuration (App ID, Unit ID, or placement)";
         shouldRetry = NO;
     }
@@ -71,13 +71,13 @@ static const NSInteger kMTGExceptionAppNotFound = -1302;                 // appI
     // Timeout errors
     else if (errorCode == kMTGErrorCodeLoadAdsTimeOut ||
              errorCode == kMTGExceptionTimeout) {
-        cloudXCode = CLXErrorCodeLoadTimeout;
+        cloudXCode = CLXErrorCodeAdapterTimeout;
         description = @"Mintegral ad request timed out";
         shouldRetry = YES;
     }
     // Ad expired
     else if (errorCode == kMTGErrorCodeOfferExpired) {
-        cloudXCode = CLXErrorCodeAdExpired;
+        cloudXCode = CLXErrorCodeAdapterAdExpired;
         description = @"Mintegral ad offer expired";
         shouldRetry = YES;
     }
@@ -89,7 +89,7 @@ static const NSInteger kMTGExceptionAppNotFound = -1302;                 // appI
     }
     // Bid token errors
     else if (errorCode == KMTGErrorCodeEmptyBidToken) {
-        cloudXCode = CLXErrorCodeInvalidBidResponse;
+        cloudXCode = CLXErrorCodeAdapterInternalError;
         description = @"Empty or invalid bid token for Mintegral";
         shouldRetry = YES;
     }

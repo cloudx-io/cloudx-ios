@@ -39,7 +39,6 @@
 + (CLXLossReason)lossReasonFromErrorCode:(CLXErrorCode)errorCode {
     switch (errorCode) {
         // Timeout-related errors -> CLXLossReasonTimeout
-        case CLXErrorCodeLoadTimeout:
         case CLXErrorCodeNetworkTimeout:
         case CLXErrorCodeAdapterTimeout:
             return CLXLossReasonTimeout;
@@ -50,13 +49,11 @@
             return CLXLossReasonNoFill;
             
         // Invalid bid/ad errors -> CLXLossReasonInvalidBid
-        case CLXErrorCodeInvalidBidResponse:
-        case CLXErrorCodeInvalidAd:
         case CLXErrorCodeInvalidResponse:
             return CLXLossReasonInvalidBid;
             
         // Expired ad -> CLXLossReasonExpired
-        case CLXErrorCodeAdExpired:
+        case CLXErrorCodeAdapterAdExpired:
             return CLXLossReasonExpired;
             
         // Rate limiting -> CLXLossReasonRateLimited

@@ -87,7 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
             [self.logger error:@"Interstitial load timeout after 30 seconds"];
             [self transitionToIdleState];
             
-            CLXError *timeoutError = [CLXError errorWithCode:CLXErrorCodeLoadTimeout];
+            CLXError *timeoutError = [CLXError errorWithCode:CLXErrorCodeAdapterTimeout];
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self notifyLoadFailure:timeoutError];
@@ -208,9 +208,9 @@ NS_ASSUME_NONNULL_BEGIN
     // Clear state BEFORE callback (enables immediate reload)
     [self handleShowFailure];
     self.currentAdapter = nil;
-    
-    CLXError *clxError = [CLXError errorFromError:error withFallbackCode:CLXErrorCodeShowFailed];
-    
+
+    CLXError *clxError = [CLXError errorFromError:error withFallbackCode:CLXErrorCodeAdapterDisplayFailed];
+
     dispatch_async(dispatch_get_main_queue(), ^{
         [self notifyShowFailure:clxError];
     });

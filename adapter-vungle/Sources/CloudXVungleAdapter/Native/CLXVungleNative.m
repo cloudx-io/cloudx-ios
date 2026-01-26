@@ -112,7 +112,7 @@
     
     // Validate delegate at load time
     if (!self.delegate) {
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidConfiguration
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidConfiguration
                                      description:@"[Vungle] Missing delegate for native ad"];
         [self.logger error:error.localizedDescription];
         return;

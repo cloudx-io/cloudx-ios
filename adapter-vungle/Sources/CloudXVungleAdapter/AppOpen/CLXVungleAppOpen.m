@@ -72,7 +72,7 @@
 - (void)load {
     // Validate placement ID at load time
     if (!self.placementID || self.placementID.length == 0) {
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnitID
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
                                      description:@"[Vungle] Invalid or missing placement ID for app open ad"];
         [self.logger error:error.localizedDescription];
         [self handleLoadFailure:error];
@@ -81,7 +81,7 @@
     
     // Validate delegate at load time
     if (!self.delegate) {
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidConfiguration
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidConfiguration
                                      description:@"[Vungle] Missing delegate for app open ad"];
         [self.logger error:error.localizedDescription];
         return;

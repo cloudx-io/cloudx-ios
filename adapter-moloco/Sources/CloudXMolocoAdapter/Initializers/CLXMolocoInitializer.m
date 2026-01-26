@@ -119,7 +119,7 @@ static NSString * const kSDKVersion = @"1.0.0"; // Moloco SDK version
     // Extract account ID/API key from config
     NSString *appKey = config.initializationData[@"app_key"];
     if (!appKey || appKey.length == 0) {
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeInvalidConfiguration
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidConfiguration
                                      description:@"Missing Moloco app_key in configuration"];
         [[CLXMolocoInitializer logger] error:@"Failed to initialize: missing app_key"];
         if (completion) completion(NO, error);
