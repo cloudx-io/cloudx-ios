@@ -26,8 +26,7 @@ static const NSInteger kMTGExceptionAppNotFound = -1302;                 // appI
     
     CLXErrorCode cloudXCode = CLXErrorCodeInternalError;
     NSString *description = networkError.localizedDescription ?: @"Unknown error";
-    BOOL shouldRetry = NO;
-    
+
     [logger error:[NSString stringWithFormat:@"%@ error for placement %@: code=%ld, %@",
                    context, placementID ?: @"N/A", (long)networkError.code, description]];
     
@@ -45,7 +44,6 @@ static const NSInteger kMTGExceptionAppNotFound = -1302;                 // appI
         errorCode == kMTGErrorCodeBannerSizeInvalid) {
         cloudXCode = CLXErrorCodeAdapterInvalidConfiguration;
         description = @"Invalid Mintegral configuration (App ID, Unit ID, or placement)";
-        shouldRetry = NO;
     }
     // No fill errors
     else if (errorCode == kMTGErrorCodeNoAds ||
@@ -53,45 +51,38 @@ static const NSInteger kMTGExceptionAppNotFound = -1302;                 // appI
              errorCode == kMTGExceptionReturnEmpty) {
         cloudXCode = CLXErrorCodeNoFill;
         description = @"No fill for ad request from Mintegral";
-        shouldRetry = YES;
     }
     // Network errors
     else if (errorCode == kMTGErrorCodeConnectionLost ||
              errorCode == kMTGErrorCodeSocketIO) {
         cloudXCode = CLXErrorCodeNetworkError;
         description = @"Mintegral network connectivity issue";
-        shouldRetry = YES;
     }
     // Frequency cap
     else if (errorCode == kMTGErrorCodeDailyLimit) {
         cloudXCode = CLXErrorCodeTooManyRequests;
         description = @"Mintegral frequency cap reached";
-        shouldRetry = NO;
     }
     // Timeout errors
     else if (errorCode == kMTGErrorCodeLoadAdsTimeOut ||
              errorCode == kMTGExceptionTimeout) {
         cloudXCode = CLXErrorCodeAdapterTimeout;
         description = @"Mintegral ad request timed out";
-        shouldRetry = YES;
     }
     // Ad expired
     else if (errorCode == kMTGErrorCodeOfferExpired) {
         cloudXCode = CLXErrorCodeAdapterAdExpired;
         description = @"Mintegral ad offer expired";
-        shouldRetry = YES;
     }
     // Not initialized / network invalid
     else if (errorCode == kMTGExceptionNetworkInvalidate) {
         cloudXCode = CLXErrorCodeNotInitialized;
         description = @"Mintegral SDK not initialized or network invalid";
-        shouldRetry = NO;
     }
     // Bid token errors
     else if (errorCode == KMTGErrorCodeEmptyBidToken) {
         cloudXCode = CLXErrorCodeAdapterInternalError;
         description = @"Empty or invalid bid token for Mintegral";
-        shouldRetry = YES;
     }
     // Show failed
     else if (errorCode == kMTGErrorCodeFailedToShow ||
@@ -99,7 +90,6 @@ static const NSInteger kMTGExceptionAppNotFound = -1302;                 // appI
              errorCode == kMTGErrorCodeFailedToPlay) {
         cloudXCode = CLXErrorCodeAdapterDisplayFailed;
         description = @"Mintegral ad show failed";
-        shouldRetry = NO;
     }
     // Load failed (video/material/internal)
     else if (errorCode == kMTGErrorCodeFailedToLoad ||
@@ -115,7 +105,6 @@ static const NSInteger kMTGExceptionAppNotFound = -1302;                 // appI
              errorCode == kMTGErrorCodeRewardVideoFailedToSettingInvalid) {
         cloudXCode = CLXErrorCodeLoadFailed;
         description = @"Mintegral ad load failed";
-        shouldRetry = YES;
     }
     // Internal/unknown errors
     else if (errorCode == kMTGErrorCodeUnknownError ||
@@ -128,21 +117,18 @@ static const NSInteger kMTGExceptionAppNotFound = -1302;                 // appI
              errorCode == kMTGErrorCodeSocketInvalidContent) {
         cloudXCode = CLXErrorCodeInternalError;
         description = [NSString stringWithFormat:@"Mintegral internal error: %ld", (long)errorCode];
-        shouldRetry = NO;
     }
     // Default
     else {
         cloudXCode = CLXErrorCodeInternalError;
-        description = [NSString stringWithFormat:@"Unknown Mintegral error: %ld - %@", 
+        description = [NSString stringWithFormat:@"Unknown Mintegral error: %ld - %@",
                       (long)errorCode, networkError.localizedDescription];
-        shouldRetry = NO;
     }
     
     // Build user info with underlying error
     NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
     userInfo[NSLocalizedDescriptionKey] = description;
     userInfo[NSUnderlyingErrorKey] = networkError;
-    userInfo[@"ShouldRetry"] = @(shouldRetry);
     userInfo[@"MintegralErrorCode"] = @(errorCode);
     
     return [CLXError errorWithCode:cloudXCode userInfo:userInfo];
