@@ -206,27 +206,28 @@
         }
         
         // Determine if request should be retried based on error type
+        // Aligned with Android: retry on network errors (NOT timeouts), 5xx, 429, 408
         BOOL shouldRetry = NO;
         NSTimeInterval retryDelay = delay;
-        
-        // Check for network/timeout errors that warrant retry
-        BOOL isNetworkOrTimeoutError = (error != nil && (!httpResponse || [self isNetworkTimeoutError:error]));
-        if (isNetworkOrTimeoutError) {
-            [self.logger error:[NSString stringWithFormat:@"Network/timeout error - Error: %@, Attempt: %ld/%ld", error.localizedDescription, (long)(currentAttempt + 1), (long)(maxRetries + 1)]];
+
+        // Check for retryable network errors (NOT timeouts - aligned with Android)
+        BOOL isRetryableNetwork = (error != nil && [self isRetryableNetworkError:error]);
+        if (isRetryableNetwork) {
+            [self.logger error:[NSString stringWithFormat:@"Network error - Error: %@, Attempt: %ld/%ld", error.localizedDescription, (long)(currentAttempt + 1), (long)(maxRetries + 1)]];
             shouldRetry = YES;
-            retryDelay = 1.0; // V1 spec: 1-second delay for network errors
-        } else if (httpResponse && ((httpResponse.statusCode >= 500 && httpResponse.statusCode < 600) || httpResponse.statusCode == 429)) {
-            // Check for server errors (5xx) or rate limiting (429) that warrant retry
+            retryDelay = [self delayWithJitter:1.0]; // 1s base + jitter (aligned with Android)
+        } else if (httpResponse && ((httpResponse.statusCode >= 500 && httpResponse.statusCode < 600) || httpResponse.statusCode == 429 || httpResponse.statusCode == 408)) {
+            // Check for server errors (5xx), rate limiting (429), or request timeout (408) that warrant retry
             [self.logger error:[NSString stringWithFormat:@"Server error %ld - Attempt: %ld/%ld", (long)httpResponse.statusCode, (long)(currentAttempt + 1), (long)(maxRetries + 1)]];
             shouldRetry = YES;
-            
+
             if (httpResponse.statusCode == 429) {
-                // Parse Retry-After header for rate limiting
+                // Parse Retry-After header for rate limiting - use server-specified delay without jitter
                 NSString *retryAfterHeader = httpResponse.allHeaderFields[@"Retry-After"];
                 NSTimeInterval parsedDelay = [self parseRetryAfterHeader:retryAfterHeader];
-                retryDelay = parsedDelay > 0 ? parsedDelay : 1.0; // V1 spec: default 1s if missing
+                retryDelay = parsedDelay > 0 ? parsedDelay : [self delayWithJitter:1.0];
             } else {
-                retryDelay = 1.0; // V1 spec: 1-second delay for 5xx errors
+                retryDelay = [self delayWithJitter:1.0]; // 1s base + jitter (aligned with Android)
             }
         }
         
@@ -343,19 +344,33 @@
 #pragma mark - Private Helper Methods
 
 /**
- * @brief Determines if an error is a network/timeout error that should be retried
+ * @brief Determines if an error is a retryable network error
  * @param error The NSError to check
- * @return YES if this is a retryable network/timeout error
+ * @return YES if this is a retryable network error (NOT including timeouts - aligned with Android)
  */
-- (BOOL)isNetworkTimeoutError:(NSError *)error {
+- (BOOL)isRetryableNetworkError:(NSError *)error {
     if ([error.domain isEqualToString:NSURLErrorDomain]) {
-        return (error.code == NSURLErrorTimedOut ||
-                error.code == NSURLErrorCannotFindHost ||
+        // Don't retry on timeout (aligned with Android which throws immediately)
+        if (error.code == NSURLErrorTimedOut) {
+            return NO;
+        }
+        return (error.code == NSURLErrorCannotFindHost ||
                 error.code == NSURLErrorCannotConnectToHost ||
                 error.code == NSURLErrorNetworkConnectionLost ||
                 error.code == NSURLErrorNotConnectedToInternet);
     }
     return NO;
+}
+
+/**
+ * @brief Adds random jitter to a base delay to prevent thundering herd
+ * @param baseDelay The base delay in seconds
+ * @return Delay with jitter added (baseDelay + random 0-1 second, aligned with Android)
+ */
+- (NSTimeInterval)delayWithJitter:(NSTimeInterval)baseDelay {
+    // Add 0-1 second of random jitter (matches Android's default randomizationMs = 1000)
+    NSTimeInterval jitter = (NSTimeInterval)arc4random_uniform(1000) / 1000.0;
+    return baseDelay + jitter;
 }
 
 /**

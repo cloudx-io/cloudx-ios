@@ -8,7 +8,7 @@
  *
  * Tests:
  * - HTTP status code handling (2xx, 4xx, 5xx)
- * - Retry triggering on server errors (5xx, 429)
+ * - Retry triggering on server errors (5xx, 429, 408)
  * - Retry-After header parsing
  * - Kill switch detection via X-CloudX-Status header
  * - Network error handling
@@ -28,7 +28,8 @@
 
 @interface CLXBaseNetworkService (Testing)
 - (NSTimeInterval)parseRetryAfterHeader:(NSString *)retryAfterHeader;
-- (BOOL)isNetworkTimeoutError:(NSError *)error;
+- (BOOL)isRetryableNetworkError:(NSError *)error;
+- (NSTimeInterval)delayWithJitter:(NSTimeInterval)baseDelay;
 @end
 
 #pragma mark - CLXBaseNetworkServiceTests
@@ -289,10 +290,10 @@
 
 - (void)testRequest_429RateLimit_Retries {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Request completes"];
-    
+
     [self.mockSession enqueueResponseWithStatusCode:429 data:nil headers:nil];
     [self.mockSession enqueueResponseWithStatusCode:200 data:nil headers:nil];
-    
+
     [self.subject executeRequestWithEndpoint:@"/api/test"
                                urlParameters:nil
                                  requestBody:nil
@@ -303,9 +304,31 @@
         XCTAssertNil(error, @"Should succeed after retry");
         [expectation fulfill];
     }];
-    
+
     [self waitForExpectations:@[expectation] timeout:0.1]; // Synchronous scheduler - no waiting needed
     XCTAssertEqual(self.mockSession.callCount, 2, @"429 should trigger retry");
+}
+
+- (void)testRequest_408RequestTimeout_Retries {
+    // Aligned with Android: 408 Request Timeout triggers retry
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Request completes"];
+
+    [self.mockSession enqueueResponseWithStatusCode:408 data:nil headers:nil];
+    [self.mockSession enqueueResponseWithStatusCode:200 data:nil headers:nil];
+
+    [self.subject executeRequestWithEndpoint:@"/api/test"
+                               urlParameters:nil
+                                 requestBody:nil
+                                     headers:nil
+                                  maxRetries:2
+                                       delay:0.01
+                                  completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
+        XCTAssertNil(error, @"Should succeed after retry");
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:0.1]; // Synchronous scheduler - no waiting needed
+    XCTAssertEqual(self.mockSession.callCount, 2, @"408 should trigger retry (aligned with Android)");
 }
 
 #pragma mark - MARK: Retry Exhaustion Tests
@@ -356,12 +379,12 @@
 
 #pragma mark - MARK: Network Error Tests
 
-- (void)testRequest_NetworkTimeout_Retries {
+- (void)testRequest_NetworkTimeout_DoesNotRetry {
+    // Aligned with Android: timeout errors are NOT retried (thrown immediately)
     XCTestExpectation *expectation = [self expectationWithDescription:@"Request completes"];
-    
+
     [self.mockSession enqueueError:[self createNetworkTimeoutError]];
-    [self.mockSession enqueueResponseWithStatusCode:200 data:nil headers:nil];
-    
+
     [self.subject executeRequestWithEndpoint:@"/api/test"
                                urlParameters:nil
                                  requestBody:nil
@@ -369,12 +392,13 @@
                                   maxRetries:2
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
-        XCTAssertNil(error, @"Should succeed after retry");
+        XCTAssertNotNil(error, @"Should return timeout error immediately");
+        XCTAssertEqual(error.code, CLXErrorCodeNetworkTimeout, @"Should be timeout error code");
         [expectation fulfill];
     }];
-    
-    [self waitForExpectations:@[expectation] timeout:0.1]; // Synchronous scheduler - no waiting needed
-    XCTAssertEqual(self.mockSession.callCount, 2, @"Network timeout should trigger retry");
+
+    [self waitForExpectations:@[expectation] timeout:0.1];
+    XCTAssertEqual(self.mockSession.callCount, 1, @"Network timeout should NOT trigger retry (aligned with Android)");
 }
 
 - (void)testRequest_ConnectionLost_Retries {
@@ -436,48 +460,82 @@
     XCTAssertEqual(delay, 0.0, @"Negative value should return 0");
 }
 
-#pragma mark - MARK: isNetworkTimeoutError Tests
+#pragma mark - MARK: isRetryableNetworkError Tests
 
-- (void)testIsNetworkTimeoutError_NSURLErrorTimedOut_ReturnsYES {
+- (void)testIsRetryableNetworkError_NSURLErrorTimedOut_ReturnsNO {
+    // Aligned with Android: timeout errors are NOT retryable
     NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorTimedOut userInfo:nil];
-    BOOL result = [self.subject isNetworkTimeoutError:error];
-    XCTAssertTrue(result, @"NSURLErrorTimedOut should be network timeout");
+    BOOL result = [self.subject isRetryableNetworkError:error];
+    XCTAssertFalse(result, @"NSURLErrorTimedOut should NOT be retryable (aligned with Android)");
 }
 
-- (void)testIsNetworkTimeoutError_NSURLErrorCannotFindHost_ReturnsYES {
+- (void)testIsRetryableNetworkError_NSURLErrorCannotFindHost_ReturnsYES {
     NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotFindHost userInfo:nil];
-    BOOL result = [self.subject isNetworkTimeoutError:error];
-    XCTAssertTrue(result, @"NSURLErrorCannotFindHost should be network timeout");
+    BOOL result = [self.subject isRetryableNetworkError:error];
+    XCTAssertTrue(result, @"NSURLErrorCannotFindHost should be retryable");
 }
 
-- (void)testIsNetworkTimeoutError_NSURLErrorCannotConnectToHost_ReturnsYES {
+- (void)testIsRetryableNetworkError_NSURLErrorCannotConnectToHost_ReturnsYES {
     NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotConnectToHost userInfo:nil];
-    BOOL result = [self.subject isNetworkTimeoutError:error];
-    XCTAssertTrue(result, @"NSURLErrorCannotConnectToHost should be network timeout");
+    BOOL result = [self.subject isRetryableNetworkError:error];
+    XCTAssertTrue(result, @"NSURLErrorCannotConnectToHost should be retryable");
 }
 
-- (void)testIsNetworkTimeoutError_NSURLErrorNetworkConnectionLost_ReturnsYES {
+- (void)testIsRetryableNetworkError_NSURLErrorNetworkConnectionLost_ReturnsYES {
     NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorNetworkConnectionLost userInfo:nil];
-    BOOL result = [self.subject isNetworkTimeoutError:error];
-    XCTAssertTrue(result, @"NSURLErrorNetworkConnectionLost should be network timeout");
+    BOOL result = [self.subject isRetryableNetworkError:error];
+    XCTAssertTrue(result, @"NSURLErrorNetworkConnectionLost should be retryable");
 }
 
-- (void)testIsNetworkTimeoutError_NSURLErrorNotConnectedToInternet_ReturnsYES {
+- (void)testIsRetryableNetworkError_NSURLErrorNotConnectedToInternet_ReturnsYES {
     NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorNotConnectedToInternet userInfo:nil];
-    BOOL result = [self.subject isNetworkTimeoutError:error];
-    XCTAssertTrue(result, @"NSURLErrorNotConnectedToInternet should be network timeout");
+    BOOL result = [self.subject isRetryableNetworkError:error];
+    XCTAssertTrue(result, @"NSURLErrorNotConnectedToInternet should be retryable");
 }
 
-- (void)testIsNetworkTimeoutError_NSURLErrorBadURL_ReturnsNO {
+- (void)testIsRetryableNetworkError_NSURLErrorBadURL_ReturnsNO {
     NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorBadURL userInfo:nil];
-    BOOL result = [self.subject isNetworkTimeoutError:error];
-    XCTAssertFalse(result, @"NSURLErrorBadURL should NOT be network timeout");
+    BOOL result = [self.subject isRetryableNetworkError:error];
+    XCTAssertFalse(result, @"NSURLErrorBadURL should NOT be retryable");
 }
 
-- (void)testIsNetworkTimeoutError_OtherDomain_ReturnsNO {
+- (void)testIsRetryableNetworkError_OtherDomain_ReturnsNO {
     NSError *error = [NSError errorWithDomain:@"com.other.domain" code:123 userInfo:nil];
-    BOOL result = [self.subject isNetworkTimeoutError:error];
-    XCTAssertFalse(result, @"Other domain should NOT be network timeout");
+    BOOL result = [self.subject isRetryableNetworkError:error];
+    XCTAssertFalse(result, @"Other domain should NOT be retryable");
+}
+
+#pragma mark - MARK: Jitter Tests (Aligned with Android)
+
+- (void)testDelayWithJitter_ReturnsValueInExpectedRange {
+    // Aligned with Android: jitter adds 0-1 second to base delay
+    // Run multiple times to verify randomness stays in bounds
+    for (int i = 0; i < 100; i++) {
+        NSTimeInterval result = [self.subject delayWithJitter:1.0];
+        XCTAssertGreaterThanOrEqual(result, 1.0, @"Delay should be >= base delay");
+        XCTAssertLessThan(result, 2.0, @"Delay should be < base + 1 second jitter");
+    }
+}
+
+- (void)testDelayWithJitter_ZeroBaseDelay_ReturnsJitterOnly {
+    for (int i = 0; i < 100; i++) {
+        NSTimeInterval result = [self.subject delayWithJitter:0.0];
+        XCTAssertGreaterThanOrEqual(result, 0.0, @"Delay should be >= 0");
+        XCTAssertLessThan(result, 1.0, @"Delay should be < 1 second (jitter only)");
+    }
+}
+
+- (void)testDelayWithJitter_HasRandomness {
+    // Verify that jitter actually varies (not always the same value)
+    NSMutableSet *uniqueValues = [NSMutableSet set];
+    for (int i = 0; i < 20; i++) {
+        NSTimeInterval result = [self.subject delayWithJitter:1.0];
+        // Round to milliseconds to detect variation
+        NSInteger ms = (NSInteger)(result * 1000);
+        [uniqueValues addObject:@(ms)];
+    }
+    // With 1000 possible values and 20 samples, we should have multiple unique values
+    XCTAssertGreaterThan(uniqueValues.count, 1, @"Jitter should produce varying delays");
 }
 
 #pragma mark - MARK: Kill Switch Detection Tests
