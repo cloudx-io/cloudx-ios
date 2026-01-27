@@ -40,9 +40,9 @@
     XCTAssertNotNil(completionHandler, @"Hybrid completion handler should be assignable");
     
     // Verify the network service responds to the selector with expected signature
-    SEL selector = @selector(startAuctionWithBidRequest:appKey:correlationId:completion:);
-    XCTAssertTrue([self.networkService respondsToSelector:selector], 
-                  @"Network service should respond to startAuctionWithBidRequest:appKey:correlationId:completion:");
+    SEL selector = @selector(startAuctionWithBidRequest:appKey:timeout:correlationId:completion:);
+    XCTAssertTrue([self.networkService respondsToSelector:selector],
+                  @"Network service should respond to startAuctionWithBidRequest:appKey:timeout:correlationId:completion:");
 }
 
 /**

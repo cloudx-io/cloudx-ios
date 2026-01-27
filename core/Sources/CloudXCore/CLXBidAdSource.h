@@ -96,7 +96,7 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
  * @param adType Type of ad
  * @param bidTokenSources Dictionary of bid token sources by adapter name
  * @param nativeAdRequirements Native ad requirements (optional)
- * @param tmax Timeout for bid requests (optional)
+ * @param bidRequestTimeout Timeout in seconds for HTTP request and OpenRTB tmax (0 = use session default)
  * @param reportingService Reporting service for events
  * @param createBidAd Block to create bid ads
  * @return Initialized bid ad source
@@ -109,7 +109,7 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
                         adType:(NSInteger)adType
                 bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
          nativeAdRequirements:(nullable id)nativeAdRequirements
-                          tmax:(nullable NSNumber *)tmax
+            bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                reportingService:(id<CLXAdEventReporting>)reportingService
                    createBidAd:(id (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network))createBidAd;
 

@@ -118,7 +118,8 @@
                                            urlParameters:nil
                                              requestBody:jsonData
                                                  headers:headers
-                                              maxRetries:1
+                                                 timeout:0  // Use session default (30s)
+                                              maxRetries:3  // Match Android retry behavior
                                                    delay:1.0
                                               completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
         

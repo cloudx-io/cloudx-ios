@@ -91,7 +91,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, strong, nullable) CLXBidResponse *currentBidResponse;
 @property (nonatomic, strong, nullable) id nativeAdRequirements;
-@property (nonatomic, strong, nullable) NSNumber *tmax;
+@property (nonatomic, assign) NSTimeInterval bidRequestTimeout;
 @property (nonatomic, assign) double latency;
 @property (nonatomic, strong) id<CLXBidNetworkService> bidNetworkService;
 @property (nonatomic, strong) CLXAppSessionService *appSessionService;
@@ -111,7 +111,7 @@ NS_ASSUME_NONNULL_BEGIN
                         adType:(NSInteger)adType
                 bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
          nativeAdRequirements:(nullable id)nativeAdRequirements
-                          tmax:(nullable NSNumber *)tmax
+            bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                reportingService:(id<CLXAdEventReporting>)reportingService
                    createBidAd:(id (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network))createBidAd {
     self = [super init];
@@ -124,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
         _adType = adType;
         _bidTokenSources = [bidTokenSources copy];
         _nativeAdRequirements = nativeAdRequirements;
-        _tmax = tmax;
+        _bidRequestTimeout = bidRequestTimeout;
         _createBidAd = [createBidAd copy];
         _reportingService = reportingService;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXBidAdSource"];
@@ -204,7 +204,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                       userID:self.userID ?: @""
                                                 adapterInfo:networkNameTokenDict
                                        nativeAdRequirements:self.nativeAdRequirements
-                                                        tmax:self.tmax
+                                                        tmax:self.bidRequestTimeout > 0 ? @((NSInteger)(self.bidRequestTimeout * 1000)) : nil
                                                     impModel:impModel
                                                 correlationId:correlationId
                                                   completion:^(id _Nullable bidRequest, NSError * _Nullable error) {
@@ -261,9 +261,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     [self.logger debug:[NSString stringWithFormat:@"[%@] [CLXBidAdSource] Starting auction with AppKey: %@", correlationId, currentAppKey]];
     
+    // Use bidRequestTimeout for HTTP timeout, 0 = session default
+    NSTimeInterval timeout = self.bidRequestTimeout;
+
     __weak typeof(self) weakSelf = self;
     [self.bidNetworkService startAuctionWithBidRequest:bidRequest
                                                  appKey:currentAppKey
+                                                timeout:timeout
                                           correlationId:correlationId
                                              completion:^(CLXBidResponse * _Nullable response, NSDictionary * _Nullable rawJSON, NSError * _Nullable error) {
         __strong typeof(weakSelf) strongSelf = weakSelf;

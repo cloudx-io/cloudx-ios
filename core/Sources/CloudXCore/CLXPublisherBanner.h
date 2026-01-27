@@ -101,10 +101,9 @@ NS_ASSUME_NONNULL_BEGIN
  * @param impModel The impression model (nil if SDK not initialized, will be created on load)
  * @param adFactories Dictionary of banner ad factories (injected for testability, falls back to CloudXCore if empty)
  * @param bidTokenSources Dictionary of bid token sources (injected for testability, falls back to CloudXCore if empty)
- * @param bidRequestTimeout Bid request timeout
+ * @param bidRequestTimeout Timeout in seconds for bid requests (0 = use session default)
  * @param reportingService The reporting service
  * @param settings The settings instance for configuration (injected for testability)
- * @param tmax Maximum timeout value
  * @return Initialized PublisherBanner instance
  */
 - (instancetype)initWithViewController:(UIViewController *)viewController
@@ -119,8 +118,7 @@ NS_ASSUME_NONNULL_BEGIN
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                          reportingService:(id<CLXAdEventReporting>)reportingService
-                              settings:(CLXSettings *)settings
-                                     tmax:(nullable NSNumber *)tmax;
+                              settings:(CLXSettings *)settings;
 
 /**
  * Starts auto-refresh for the banner.

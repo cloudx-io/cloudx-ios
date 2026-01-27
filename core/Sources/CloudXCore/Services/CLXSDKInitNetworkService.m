@@ -125,6 +125,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
                      urlParameters:nil
                       requestBody:requestBodyData
                           headers:headers
+                          timeout:0  // Use session default (30s)
                        maxRetries:1
                            delay:0
                           completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {

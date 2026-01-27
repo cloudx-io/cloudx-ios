@@ -198,9 +198,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                       bidTokenSources:testBidTokenSources
                                                   bidRequestTimeout:kTestTimeout
                                                    reportingService:self.mockReportingService
-                                                            settings:self.testSettings
-                                                               tmax:@30
-];
+                                                            settings:self.testSettings];
 }
 
 - (void)tearDown {
@@ -245,9 +243,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                                            bidTokenSources:testBidTokenSources
                                                                        bidRequestTimeout:kTestTimeout
                                                                         reportingService:self.mockReportingService
-                                                                                 settings:self.testSettings
-                                                                                    tmax:@30
-];
+                                                                                 settings:self.testSettings];
     
     XCTAssertEqual(customBanner.refreshSeconds, customInterval, @"Refresh interval should match custom placement config");
     [customBanner destroy];
@@ -549,8 +545,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                                                    bidTokenSources:@{}
                                                                                bidRequestTimeout:kTestTimeout
                                                                                 reportingService:self.mockReportingService
-                                                                                         settings:self.testSettings
-                                                                                            tmax:@30];
+                                                                                         settings:self.testSettings];
     
     XCTAssertNotNil(emptyFactoriesBanner, @"Banner should initialize even with empty factories");
     XCTAssertEqual(emptyFactoriesBanner.bannerType, CLXBannerTypeW320H50, @"Banner type should be set correctly");
@@ -572,8 +567,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                                              bidTokenSources:@{}
                                                                          bidRequestTimeout:kTestTimeout
                                                                           reportingService:self.mockReportingService
-                                                                                   settings:self.testSettings
-                                                                                      tmax:@30];
+                                                                                   settings:self.testSettings];
     
     XCTAssertNotNil(deferredBanner, @"Banner should initialize with nil placement for deferred init");
     XCTAssertEqual(deferredBanner.bannerType, CLXBannerTypeW320H50, @"Banner type should be set correctly");
@@ -622,8 +616,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                                              bidTokenSources:@{}
                                                                          bidRequestTimeout:kTestTimeout
                                                                           reportingService:self.mockReportingService
-                                                                                   settings:self.testSettings
-                                                                                      tmax:@30];
+                                                                                   settings:self.testSettings];
     
     // Set requestedPlacementName via private category (as CloudXCoreAPI does)
     deferredBanner.requestedPlacementName = @"test-placement";

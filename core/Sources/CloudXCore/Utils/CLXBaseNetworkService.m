@@ -102,6 +102,7 @@
  * @param urlParameters Dictionary of URL parameters
  * @param requestBody The request body data
  * @param headers Dictionary of request headers
+ * @param timeout Request timeout in seconds (0 = use session default of 30s)
  * @param maxRetries Maximum number of retry attempts
  * @param delay Delay between retry attempts in seconds
  * @param completion Completion handler called with the response or error
@@ -110,6 +111,7 @@
                     urlParameters:(nullable NSDictionary *)urlParameters
                      requestBody:(nullable NSData *)requestBody
                          headers:(nullable NSDictionary *)headers
+                         timeout:(NSTimeInterval)timeout
                       maxRetries:(NSInteger)maxRetries
                           delay:(NSTimeInterval)delay
                      completion:(void (^)(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled))completion {
@@ -117,6 +119,7 @@
                       urlParameters:urlParameters
                         requestBody:requestBody
                             headers:headers
+                            timeout:timeout
                          maxRetries:maxRetries
                              delay:delay
                       currentAttempt:0
@@ -125,18 +128,19 @@
 
 /**
  * @brief Executes HTTP request with retry logic and kill switch detection
- * 
+ *
  * This method handles the complete request lifecycle:
  * 1. URL construction with parameters
- * 2. HTTP request execution 
+ * 2. HTTP request execution
  * 3. Retry logic for network/server errors
  * 4. Kill switch detection via X-CloudX-Status header
  * 5. Response parsing and error handling
- * 
+ *
  * @param endpoint The API endpoint to call
  * @param urlParameters Dictionary of URL parameters
  * @param requestBody The request body data
  * @param headers Dictionary of request headers
+ * @param timeout Request timeout in seconds (0 = use session default of 30s)
  * @param maxRetries Maximum number of retry attempts
  * @param delay Delay between retry attempts in seconds
  * @param currentAttempt Current attempt number (0 = initial request)
@@ -146,6 +150,7 @@
                     urlParameters:(nullable NSDictionary *)urlParameters
                      requestBody:(nullable NSData *)requestBody
                          headers:(nullable NSDictionary *)headers
+                         timeout:(NSTimeInterval)timeout
                       maxRetries:(NSInteger)maxRetries
                           delay:(NSTimeInterval)delay
                     currentAttempt:(NSInteger)currentAttempt
@@ -176,11 +181,16 @@
     
     [self.logger verbose:[NSString stringWithFormat:@"Final URL: %@", components.URL]];
     
-    // Configure HTTP request with method, body, and headers
+    // Configure HTTP request with method, body, headers, and timeout
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:components.URL];
     request.HTTPMethod = requestBody ? @"POST" : @"GET";
     request.HTTPBody = requestBody;
-    
+
+    // Set per-request timeout if specified (0 = use session default of 30s)
+    if (timeout > 0) {
+        request.timeoutInterval = timeout;
+    }
+
     NSMutableDictionary *requestHeaders = [[self headers] mutableCopy];
     [requestHeaders addEntriesFromDictionary:headers ?: @{}];
     request.allHTTPHeaderFields = requestHeaders;
@@ -235,13 +245,14 @@
         if (shouldRetry && currentAttempt < maxRetries) {
             NSInteger nextAttempt = currentAttempt + 1;
             [self.logger verbose:[NSString stringWithFormat:@"Retrying request (attempt %ld) after %.1fs delay", (long)(nextAttempt + 1), retryDelay]];
-            [self.scheduler scheduleAfterDelay:retryDelay 
+            [self.scheduler scheduleAfterDelay:retryDelay
                                        onQueue:dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
                                          block:^{
                 [self executeRequestWithEndpoint:endpoint
                                    urlParameters:urlParameters
                                      requestBody:requestBody
                                          headers:headers
+                                         timeout:timeout
                                       maxRetries:maxRetries
                                            delay:delay
                                    currentAttempt:nextAttempt

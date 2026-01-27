@@ -195,9 +195,7 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
                                                       bidTokenSources:@{}
                                                   bidRequestTimeout:5.0
                                                    reportingService:nil
-                                                            settings:self.testSettings
-                                                               tmax:@30
-];
+                                                            settings:self.testSettings];
 }
 
 - (void)tearDown {

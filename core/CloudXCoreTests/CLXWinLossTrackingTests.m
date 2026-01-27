@@ -112,7 +112,7 @@ static const NSInteger kTestRank3 = 3;
         adType:1 // Banner
         bidTokenSources:@{}
         nativeAdRequirements:nil
-        tmax:@(5000)
+        bidRequestTimeout:5.0
         reportingService:nil  // Uses CLXWinLossTracker.shared
         createBidAd:createBlock];
 }

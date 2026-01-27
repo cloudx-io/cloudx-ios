@@ -141,8 +141,9 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"Bid request kill switch"];
     
     // When: Start auction with kill switch response
-    [self.bidService startAuctionWithBidRequest:mockBidRequest 
+    [self.bidService startAuctionWithBidRequest:mockBidRequest
                                          appKey:@"test-app-key"
+                                        timeout:0
                                   correlationId:[[NSUUID UUID] UUIDString]
                                      completion:^(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error) {
         // Then: Should fail with ads disabled error
@@ -178,8 +179,9 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"Normal no-fill response"];
     
     // When: Start auction with normal 204 response
-    [self.bidService startAuctionWithBidRequest:mockBidRequest 
+    [self.bidService startAuctionWithBidRequest:mockBidRequest
                                          appKey:@"test-app-key"
+                                        timeout:0
                                   correlationId:[[NSUUID UUID] UUIDString]
                                      completion:^(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error) {
         // Then: Should not trigger kill switch

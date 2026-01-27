@@ -33,6 +33,7 @@
                      urlParameters:(nullable NSDictionary *)urlParameters
                        requestBody:(nullable NSData *)requestBody
                            headers:(nullable NSDictionary *)headers
+                           timeout:(NSTimeInterval)timeout
                         maxRetries:(NSInteger)maxRetries
                              delay:(NSTimeInterval)delay
                         completion:(void (^)(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled))completion {

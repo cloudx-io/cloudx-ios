@@ -135,8 +135,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                                bidTokenSources:@{}
                                                bidRequestTimeout:1.0
                                                 reportingService:nil
-                                                        settings:[[CLXSettings alloc] init]
-                                                            tmax:@30];
+                                                        settings:[[CLXSettings alloc] init]];
 }
 
 - (CLXPublisherNative *)createNativeWithDelegate:(CLXTestDelegate *)delegate {

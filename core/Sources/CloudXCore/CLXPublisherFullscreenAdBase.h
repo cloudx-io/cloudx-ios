@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param impModel The impression model (nil if SDK not initialized, will be created on load)
  * @param adFactories The ad network factories
  * @param bidTokenSources Dictionary of bid token sources
- * @param bidRequestTimeout Bid request timeout
+ * @param bidRequestTimeout Timeout in seconds for bid requests (0 = use session default)
  * @param reportingService The reporting service
  * @param settings The settings instance
  */

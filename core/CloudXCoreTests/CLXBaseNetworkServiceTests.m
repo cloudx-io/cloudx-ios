@@ -104,6 +104,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:2
                                        delay:1.0
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -128,6 +129,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:5
                                        delay:1.0
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -147,6 +149,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:5
                                        delay:1.0
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -169,6 +172,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:5
                                        delay:1.0
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -190,6 +194,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:5
                                        delay:1.0
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -210,6 +215,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:5
                                        delay:1.0
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -234,6 +240,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:2
                                        delay:0.01 // Very short delay for testing
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -256,6 +263,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:2
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -277,6 +285,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:2
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -298,6 +307,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:2
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -320,6 +330,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:2
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -345,6 +356,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:2 // Initial + 2 retries = 3 total
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -366,6 +378,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:0 // No retries
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -389,6 +402,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:2
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -411,6 +425,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:2
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -550,6 +565,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:0
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -571,6 +587,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:0
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -590,6 +607,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:0
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -611,6 +629,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:0
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -631,6 +650,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:0
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -652,6 +672,7 @@
                                urlParameters:@{@"key": @"value", @"foo": @"bar"}
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:0
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -681,6 +702,7 @@
                                urlParameters:nil
                                  requestBody:body
                                      headers:nil
+                                     timeout:0
                                   maxRetries:0
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -703,6 +725,7 @@
                                urlParameters:nil
                                  requestBody:nil // No body
                                      headers:nil
+                                     timeout:0
                                   maxRetries:0
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -726,14 +749,15 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:customHeaders
+                                     timeout:0
                                   maxRetries:0
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
         [expectation fulfill];
     }];
-    
+
     [self waitForExpectations:@[expectation] timeout:0.1];
-    
+
     NSURLRequest *lastRequest = self.mockSession.lastRequest;
     XCTAssertEqualObjects(lastRequest.allHTTPHeaderFields[@"X-Custom-Header"], @"custom-value", @"Should include custom headers");
     XCTAssertEqualObjects(lastRequest.allHTTPHeaderFields[@"Authorization"], @"Bearer token123", @"Should include custom headers");
@@ -752,6 +776,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:0
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {
@@ -772,6 +797,7 @@
                                urlParameters:nil
                                  requestBody:nil
                                      headers:nil
+                                     timeout:0
                                   maxRetries:0
                                        delay:0.01
                                   completion:^(id response, NSError *error, BOOL isKillSwitchEnabled) {

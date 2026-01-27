@@ -163,11 +163,7 @@ NS_ASSUME_NONNULL_BEGIN
         // Only create bidAdSource if placement is available (defer if SDK not initialized)
         if (placement) {
             __weak typeof(self) weakSelf = self;
-            
-            // Calculate TMAX from placement configuration (convert milliseconds to seconds)
-            // Use nil to match Swift version behavior (no timeout)
-            NSNumber *tmax = nil;
-            
+
             _bidAdSource = [[CLXBidAdSource alloc] initWithUserID:userID
                                                    placementID:_placementID
                                                         dealID:placement.dealId
@@ -176,7 +172,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         adType:CLXAdTypeNative
                                                 bidTokenSources:bidTokenSources
                                          nativeAdRequirements:[CLXNativeTemplateHelper nativeAdRequirementsForTemplate:nativeType]
-                                                          tmax:tmax
+                                            bidRequestTimeout:placement.bidRequestTimeoutSeconds
                                                reportingService:_reportingService
                                                    createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
                 __strong typeof(weakSelf) strongSelf = weakSelf;
@@ -323,8 +319,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Helper method to create bid ad source for a placement
 - (CLXBidAdSource *)createBidAdSourceForPlacement:(CLXSDKConfigPlacement *)placement {
-    NSNumber *tmax = nil;
-    
     __weak typeof(self) weakSelf = self;
     return [[CLXBidAdSource alloc] initWithUserID:@""
                                       placementID:placement.id
@@ -334,7 +328,7 @@ NS_ASSUME_NONNULL_BEGIN
                                            adType:CLXAdTypeNative
                                    bidTokenSources:self.bidTokenSources
                             nativeAdRequirements:[CLXNativeTemplateHelper nativeAdRequirementsForTemplate:CLXNativeTemplateDefault]
-                                             tmax:tmax
+                                bidRequestTimeout:placement.bidRequestTimeoutSeconds
                                   reportingService:self.reportingService
                                       createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
         __strong typeof(weakSelf) strongSelf = weakSelf;

@@ -147,6 +147,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 // Adapter load timing
 @property (nonatomic, strong, nullable) NSDate *adapterLoadStartTime;
 
+// Timeout configuration
+@property (nonatomic, assign) NSTimeInterval bidRequestTimeout;
+
 @end
 
 @implementation CLXPublisherFullscreenAdBase
@@ -167,12 +170,12 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     if (self) {
         // Set up logging for this fullscreen ad instance
         _logger = [[CLXLogger alloc] initWithCategory:@"FullscreenAd"];
-        
+
         [self.logger debug:[NSString stringWithFormat:@"Initializing fullscreen ad - Placement: %@, Type: %ld", placement.id ?: @"(deferred)", (long)[self adType]]];
-        
+
         // Start in idle state, ready to load ads
         _currentState = CLXFullscreenAdStateIDLE;
-        
+
         // Configure instance properties
         _adFactories = adFactories;
         _rewardedCallbackUrl = [rewardedCallbackUrl copy];
@@ -183,6 +186,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         _userID = [userID copy];
         _settings = settings;
         _impModel = impModel;
+        _bidRequestTimeout = bidRequestTimeout;
         
         // Set force close timeout based on ad type
         // See constant definitions above for detailed rationale
@@ -216,7 +220,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         // Configure bid source for ad request management (only if placement available)
         if (placement) {
             BOOL hasCloseButton = placement.hasCloseButton ?: NO;
-            
+
             __weak typeof(self) weakSelf = self;
             _bidAdSource = [[CLXBidAdSource alloc] initWithUserID:userID
                                                    placementID:_placementID
@@ -226,14 +230,14 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                                         adType:[self adType]
                                                 bidTokenSources:bidTokenSources
                                          nativeAdRequirements:nil
-                                                          tmax:nil
+                                            bidRequestTimeout:_bidRequestTimeout
                                                reportingService:_reportingService
                                                    createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
                 __strong typeof(weakSelf) strongSelf = weakSelf;
                 if (!strongSelf) {
                     return nil;
                 }
-                
+
                 return [strongSelf createAdapterWithAdId:adId
                                                    bidId:bidId
                                                      adm:adm
@@ -343,6 +347,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
             _placementID = realPlacement.id;
             _placementName = realPlacement.name;
             _adLoadTimeoutMs = (realPlacement.adLoadTimeoutMs > 0) ? realPlacement.adLoadTimeoutMs : 10000;
+            _bidRequestTimeout = realPlacement.bidRequestTimeoutSeconds;
 
             // Create impression model now that SDK is initialized (ensures app.id is populated)
             NSString *auctionID = [[NSUUID UUID] UUIDString];
@@ -356,7 +361,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
             // Create bid source now
             BOOL hasCloseButton = realPlacement.hasCloseButton ?: NO;
             NSDictionary<NSString *, id<CLXBidTokenSource>> *bidTokenSources = self.adFactories.bidTokenSources;
-            
+
             __weak typeof(self) weakSelf = self;
             self.bidAdSource = [[CLXBidAdSource alloc] initWithUserID:self.userID
                                                           placementID:_placementID
@@ -366,14 +371,14 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                                                adType:[self adType]
                                                        bidTokenSources:bidTokenSources
                                                 nativeAdRequirements:nil
-                                                                 tmax:nil
+                                                    bidRequestTimeout:self.bidRequestTimeout
                                                       reportingService:self.reportingService
                                                           createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
                 __strong typeof(weakSelf) strongSelf = weakSelf;
                 if (!strongSelf) {
                     return nil;
                 }
-                
+
                 return [strongSelf createAdapterWithAdId:adId
                                                    bidId:bidId
                                                      adm:adm

@@ -21,6 +21,7 @@ typedef NS_ENUM(NSInteger, SDKConfigAdType) {
 @property (nonatomic, copy) NSString *id;
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, assign) int64_t bidResponseTimeoutMs;
+@property (nonatomic, readonly) NSTimeInterval bidRequestTimeoutSeconds;  // Derived from bidResponseTimeoutMs
 @property (nonatomic, assign) int64_t adLoadTimeoutMs;
 @property (nonatomic, assign) int64_t bannerRefreshRateMs;
 @property (nonatomic, assign) SDKConfigAdType type;

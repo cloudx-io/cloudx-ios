@@ -336,9 +336,7 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
                                                       bidTokenSources:@{}
                                                   bidRequestTimeout:kSpecTestTimeout
                                                    reportingService:[[SpecMockReportingService alloc] init]
-                                                            settings:self.testSettings
-                                                               tmax:@30
-];
+                                                            settings:self.testSettings];
 }
 
 - (void)tearDown {

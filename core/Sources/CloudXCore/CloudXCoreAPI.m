@@ -811,10 +811,9 @@ static CloudXCore *_sharedInstance = nil;
                                                                        impModel:impModel
                                                                     adFactories:_adNetworkFactories.banners
                                                                  bidTokenSources:_adNetworkFactories.bidTokenSources
-                                                              bidRequestTimeout:3.0
+                                                              bidRequestTimeout:placementConfig.bidRequestTimeoutSeconds
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
-                                                                          tmax:nil
                                                               ];
     
     // Set deferred error if validation failed (via private category)
@@ -889,10 +888,9 @@ static CloudXCore *_sharedInstance = nil;
                                                                        impModel:impModel
                                                                     adFactories:_adNetworkFactories.banners
                                                                  bidTokenSources:_adNetworkFactories.bidTokenSources
-                                                              bidRequestTimeout:3.0
+                                                              bidRequestTimeout:placementConfig.bidRequestTimeoutSeconds
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
-                                                                           tmax:nil
                                                               ];
     
     // Set deferred error if validation failed (via private category)
@@ -962,7 +960,7 @@ static CloudXCore *_sharedInstance = nil;
                                                                         impModel:impModel
                                                                      adFactories:_adNetworkFactories
                                                                  bidTokenSources:_adNetworkFactories.bidTokenSources
-                                                              bidRequestTimeout:3.0
+                                                              bidRequestTimeout:placementConfig.bidRequestTimeoutSeconds
                                                                reportingService:_reportingService
                                                                        settings:[CLXSettings sharedInstance]];
     
@@ -1033,7 +1031,7 @@ static CloudXCore *_sharedInstance = nil;
                                                             impModel:impModel
                                                          adFactories:_adNetworkFactories
                                                      bidTokenSources:_adNetworkFactories.bidTokenSources
-                                                  bidRequestTimeout:3.0
+                                                  bidRequestTimeout:placementConfig.bidRequestTimeoutSeconds
                                                    reportingService:_reportingService
                                                            settings:[CLXSettings sharedInstance]];
     
@@ -1110,7 +1108,7 @@ static CloudXCore *_sharedInstance = nil;
                                                                     impModel:impModel
                                                                     adFactories:_adNetworkFactories.native
                                                                 bidTokenSources:_adNetworkFactories.bidTokenSources
-                                                              bidRequestTimeout:3.0
+                                                              bidRequestTimeout:placementConfig.bidRequestTimeoutSeconds
                                                               reportingService:_reportingService];
     
     // Set deferred error if validation failed (via private category)

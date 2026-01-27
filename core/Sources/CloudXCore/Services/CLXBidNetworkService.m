@@ -106,7 +106,8 @@
 
 - (void)startAuctionWithBidRequest:(NSDictionary *)bidRequest
                             appKey:(NSString *)appKey
-                      correlationId:(NSString *)correlationId
+                           timeout:(NSTimeInterval)timeout
+                     correlationId:(NSString *)correlationId
                         completion:(void (^)(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error))completion {
     [self.logger debug:[NSString stringWithFormat:@"[%@] [BidNetworkService] Starting auction request - AppKey: %@", correlationId, appKey]];
     
@@ -187,6 +188,7 @@
                                          urlParameters:nil
                                           requestBody:requestBodyData
                                               headers:headers
+                                              timeout:timeout
                                            maxRetries:1
                                                delay:1.0
                                           completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {

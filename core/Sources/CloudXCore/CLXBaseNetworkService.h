@@ -86,6 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param urlParameters Dictionary of URL parameters
  * @param requestBody The request body data
  * @param headers Dictionary of request headers
+ * @param timeout Request timeout in seconds (0 = use session default of 30s)
  * @param maxRetries Maximum number of retry attempts
  * @param delay Delay between retry attempts in seconds
  * @param completion Completion handler called with the response or error
@@ -94,6 +95,7 @@ NS_ASSUME_NONNULL_BEGIN
                     urlParameters:(nullable NSDictionary *)urlParameters
                      requestBody:(nullable NSData *)requestBody
                          headers:(nullable NSDictionary *)headers
+                         timeout:(NSTimeInterval)timeout
                       maxRetries:(NSInteger)maxRetries
                           delay:(NSTimeInterval)delay
                      completion:(void (^)(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled))completion;

@@ -101,7 +101,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger impressionIndexEnd;
 @property (nonatomic, strong, nullable) CLXSDKConfigPlacement *placement;
 @property (nonatomic, strong, nullable) CLXConfigImpressionModel *impModel;
-@property (nonatomic, strong, nullable) NSNumber *tmax;
+@property (nonatomic, assign) NSTimeInterval bidRequestTimeout;
 @property (nonatomic, copy, nullable) NSString *requestedPlacementName; // Stored for deferred initialization
 
 // Store the last bid request error to preserve detailed server messages
@@ -140,12 +140,11 @@ NS_ASSUME_NONNULL_BEGIN
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                          reportingService:(id<CLXAdEventReporting>)reportingService
-                              settings:(CLXSettings *)settings
-                                     tmax:(nullable NSNumber *)tmax {
+                              settings:(CLXSettings *)settings {
     self = [super init];
     if (self) {
         _settings = settings;
-        _tmax = tmax;
+        _bidRequestTimeout = bidRequestTimeout;
         _suspendPreloadWhenInvisible = suspendPreloadWhenInvisible;
         _delegate = delegate;
         _bannerType = bannerType;
@@ -540,7 +539,7 @@ NS_ASSUME_NONNULL_BEGIN
                                             adType:adType
                                    bidTokenSources:bidTokenSources
                             nativeAdRequirements:nil
-                                              tmax:self.tmax
+                                bidRequestTimeout:placement.bidRequestTimeoutSeconds
                                   reportingService:self.reportingService
                                        createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
         __strong typeof(weakSelf) strongSelf = weakSelf;

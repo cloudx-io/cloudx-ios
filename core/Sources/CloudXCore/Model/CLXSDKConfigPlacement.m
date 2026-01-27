@@ -31,10 +31,14 @@
 }
 
 - (NSString *)ilrdDescription {
-    return [NSString stringWithFormat:@"SDKConfigPlacement(id=%@, name=%@, type=%ld)", 
-            self.id ?: @"nil", 
-            self.name ?: @"nil", 
+    return [NSString stringWithFormat:@"SDKConfigPlacement(id=%@, name=%@, type=%ld)",
+            self.id ?: @"nil",
+            self.name ?: @"nil",
             (long)self.type];
+}
+
+- (NSTimeInterval)bidRequestTimeoutSeconds {
+    return self.bidResponseTimeoutMs > 0 ? self.bidResponseTimeoutMs / 1000.0 : 0;
 }
 
 @end 
