@@ -73,6 +73,8 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     CLXErrorCodeTooManyRequests = 204,
     /// Invalid or unparseable server response
     CLXErrorCodeInvalidResponse = 205,
+    /// No network connectivity
+    CLXErrorCodeNoConnection = 206,
     
     // AD REQUEST/LOADING ERRORS (300-399)
     /// Ad unit not found or invalid
@@ -85,8 +87,10 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     CLXErrorCodeLoadFailed = 304,
     
     // AD DISPLAY/SHOW ERRORS (400-499)
-    /// Ad is not ready to be shown
+    /// Ad not ready
     CLXErrorCodeAdNotReady = 400,
+    /// Ad already showing
+    CLXErrorCodeAdAlreadyShowing = 401,
     
     // CONFIGURATION/SETUP ERRORS (500-599)
     /// Native view is nil or invalid

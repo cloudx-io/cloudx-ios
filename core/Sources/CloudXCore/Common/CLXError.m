@@ -151,7 +151,9 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
             return @"Rate limited (429).";
         case CLXErrorCodeInvalidResponse:
             return @"Invalid or unparseable server response.";
-            
+        case CLXErrorCodeNoConnection:
+            return @"No network connectivity.";
+
         // AD REQUEST/LOADING ERRORS (300-399)
         case CLXErrorCodeInvalidAdUnit:
             return @"Ad unit not found. Check ad unit ID.";
@@ -164,8 +166,10 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
             
         // AD DISPLAY/SHOW ERRORS (400-499)
         case CLXErrorCodeAdNotReady:
-            return @"Ad is not ready to be displayed.";
-            
+            return @"Ad not ready.";
+        case CLXErrorCodeAdAlreadyShowing:
+            return @"Ad already showing.";
+
         // CONFIGURATION/SETUP ERRORS (500-599)
         case CLXErrorCodeInvalidNativeView:
             return @"Native view is nil or invalid.";
