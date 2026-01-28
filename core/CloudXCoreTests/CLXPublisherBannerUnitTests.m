@@ -374,6 +374,27 @@ static const NSTimeInterval kTestTimeout = 2.0;
     XCTAssertEqualObjects(self.mockDelegate.lastError.domain, CLXErrorDomain, @"Error domain should be CLXErrorDomain");
 }
 
+// Test single bid failure surfaces specific error (CLXErrorCodeLoadFailed) rather than generic NO_FILL
+- (void)testSingleBidFailureSurfacesSpecificError {
+    NSString *specificErrorMessage = @"Bid 'test-bid': adm is empty or nil";
+    NSError *singleBidError = [NSError errorWithDomain:@"CLXBidAdSource" 
+                                                  code:CLXBidAdSourceErrorAdapterCreationFailed 
+                                              userInfo:@{NSLocalizedDescriptionKey: specificErrorMessage}];
+    
+    // Set the lastBidError to simulate single bid failure from CLXBidAdSource
+    [self.banner setValue:singleBidError forKey:@"lastBidError"];
+    
+    // Call continueBannerChain which handles the error mapping
+    [self.banner continueBannerChain];
+    
+    XCTAssertTrue(self.mockDelegate.failToLoadCalled, @"Delegate should be notified of failure");
+    // Single bid failure should map to CLXErrorCodeLoadFailed (not generic NO_FILL)
+    XCTAssertEqual(self.mockDelegate.lastError.code, CLXErrorCodeLoadFailed, 
+                   @"Single bid failure should surface CLXErrorCodeLoadFailed, not generic NO_FILL");
+    XCTAssertTrue([self.mockDelegate.lastError.localizedDescription containsString:@"adm is empty"], 
+                  @"Specific error message should be preserved");
+}
+
 #pragma mark - Timer and Refresh Tests
 
 // Test timer starts after successful banner load

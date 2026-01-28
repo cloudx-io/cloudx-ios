@@ -244,6 +244,83 @@ static const NSInteger kTestRank3 = 3;
 }
 
 /**
+ * Test that single bid failure returns specific error code (CLXBidAdSourceErrorAdapterCreationFailed)
+ * rather than generic NO_FILL. This allows publishers to see specific error messages.
+ */
+- (void)testWaterfallBidFailure_SingleBid_ShouldReturnSpecificErrorCode {
+    // Given: A single bid that will fail to create an adapter
+    CLXBidResponseBid *failingBid = [self createBidWithId:kTestBidID1 lurl:kTestLURL1 nurl:nil rank:kTestRank1 price:kTestPrice];
+    [[CLXWinLossTracker shared] addBid:kTestAuctionID bid:failingBid];
+    
+    CLXBidAdSource *bidAdSource = [self createTestBidAdSourceWithCreateBlock:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
+        return nil; // Simulate adapter creation failure
+    }];
+    
+    // When: Waterfall tries this single bid
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Waterfall completion"];
+    __block NSError *capturedError = nil;
+    [bidAdSource tryNextBidInWaterfall:@[failingBid]
+                              bidIndex:0
+                             auctionID:kTestAuctionID
+                            bidRequest:@{@"test": @"data"}
+                         correlationId:@"test-correlation-id"
+                        failureReasons:[NSMutableArray array]
+                            completion:^(CLXBidAdSourceResponse *response, NSError *error) {
+        capturedError = error;
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    
+    // Then: Error should be CLXBidAdSourceErrorAdapterCreationFailed (not CLXBidAdSourceErrorNoBid)
+    XCTAssertNotNil(capturedError, @"Error should be present for failed bid");
+    XCTAssertEqual(capturedError.code, CLXBidAdSourceErrorAdapterCreationFailed, 
+                   @"Single bid failure should return CLXBidAdSourceErrorAdapterCreationFailed, not generic NO_FILL");
+    XCTAssertTrue([capturedError.localizedDescription length] > 0, 
+                  @"Error should contain specific failure message");
+}
+
+/**
+ * Test that multiple bid failures return generic NO_FILL error code (CLXBidAdSourceErrorNoBid)
+ */
+- (void)testWaterfallBidFailure_MultipleBids_ShouldReturnGenericNoFillErrorCode {
+    // Given: Multiple bids that will all fail
+    NSArray<CLXBidResponseBid *> *failingBids = @[
+        [self createBidWithId:kTestBidID1 lurl:kTestLURL1 nurl:nil rank:kTestRank1 price:kTestPrice],
+        [self createBidWithId:kTestBidID2 lurl:kTestLURL2 nurl:nil rank:kTestRank2 price:kTestPrice * 0.8]
+    ];
+    
+    for (CLXBidResponseBid *bid in failingBids) {
+        [[CLXWinLossTracker shared] addBid:kTestAuctionID bid:bid];
+    }
+    
+    CLXBidAdSource *bidAdSource = [self createTestBidAdSourceWithCreateBlock:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
+        return nil; // All bids fail
+    }];
+    
+    // When: Waterfall tries all bids
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Waterfall completion"];
+    __block NSError *capturedError = nil;
+    [bidAdSource tryNextBidInWaterfall:failingBids
+                              bidIndex:0
+                             auctionID:kTestAuctionID
+                            bidRequest:@{@"test": @"data"}
+                         correlationId:@"test-correlation-id"
+                        failureReasons:[NSMutableArray array]
+                            completion:^(CLXBidAdSourceResponse *response, NSError *error) {
+        capturedError = error;
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    
+    // Then: Error should be CLXBidAdSourceErrorNoBid (generic NO_FILL for multiple bids)
+    XCTAssertNotNil(capturedError, @"Error should be present when all bids fail");
+    XCTAssertEqual(capturedError.code, CLXBidAdSourceErrorNoBid, 
+                   @"Multiple bid failures should return CLXBidAdSourceErrorNoBid (generic NO_FILL)");
+}
+
+/**
  * Test that when multiple bids fail during waterfall, all send loss notifications
  */
 - (void)testWaterfallBidFailure_MultipleBids_ShouldFireAllLossNotifications {

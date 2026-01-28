@@ -26,7 +26,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Error types for bid ad source operations
  */
 typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
-    CLXBidAdSourceErrorNoBid = 0
+    /// Generic no-fill error when multiple bids fail
+    CLXBidAdSourceErrorNoBid = 0,
+    /// Specific error when a single bid's adapter fails to create
+    /// Used to surface more detailed error information when there's only one bid
+    CLXBidAdSourceErrorAdapterCreationFailed = 1
 };
 
 /**

@@ -401,15 +401,33 @@ NS_ASSUME_NONNULL_BEGIN
                    completion:(void (^)(CLXBidAdSourceResponse * _Nullable, NSError * _Nullable))completion {
     
     if (bidIndex >= sortedBids.count) {
-        // Build detailed error message with all failure reasons
-        NSString *failureSummary = [self buildWaterfallFailureSummary:failureReasons bidCount:sortedBids.count];
-        [self.logger error:[NSString stringWithFormat:@"[%@] Waterfall exhausted: %@", correlationId, failureSummary]];
-        if (completion) {
-            NSDictionary *userInfo = @{
-                NSLocalizedDescriptionKey: failureSummary,
-                @"CLXBidFailureReasons": failureReasons ?: @[]
-            };
-            completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:CLXBidAdSourceErrorNoBid userInfo:userInfo]);
+        // All bids failed - return specific error for single bid, generic NO_FILL for multiple
+        // This matches Android behavior: surface specific adapter errors when there's only one bid
+        NSUInteger bidCount = sortedBids.count;
+        
+        if (bidCount == 1 && failureReasons.count > 0) {
+            // Single bid failure - surface the specific error rather than generic NO_FILL
+            NSString *specificError = failureReasons.firstObject;
+            [self.logger error:[NSString stringWithFormat:@"[%@] Single bid failed: %@", correlationId, specificError]];
+            if (completion) {
+                NSDictionary *userInfo = @{
+                    NSLocalizedDescriptionKey: specificError,
+                    @"CLXBidFailureReasons": failureReasons
+                };
+                // Use a more specific error code for single bid failures
+                completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:CLXBidAdSourceErrorAdapterCreationFailed userInfo:userInfo]);
+            }
+        } else {
+            // Multiple bids failed - return generic NO_FILL with combined failure summary
+            NSString *failureSummary = [self buildWaterfallFailureSummary:failureReasons bidCount:bidCount];
+            [self.logger error:[NSString stringWithFormat:@"[%@] Waterfall exhausted: %@", correlationId, failureSummary]];
+            if (completion) {
+                NSDictionary *userInfo = @{
+                    NSLocalizedDescriptionKey: failureSummary,
+                    @"CLXBidFailureReasons": failureReasons ?: @[]
+                };
+                completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:CLXBidAdSourceErrorNoBid userInfo:userInfo]);
+            }
         }
         return;
     }

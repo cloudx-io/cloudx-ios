@@ -498,9 +498,19 @@ NS_ASSUME_NONNULL_BEGIN
         // Preserve original error if available, otherwise create no-fill error
         NSError *errorToReport;
         if (self.lastBidError) {
-            // Preserve the original error code and detailed message
+            // Preserve the detailed message from the bid error
             NSString *message = self.lastBidError.clx_fullErrorMessage;
-            errorToReport = [CLXError errorWithCode:self.lastBidError.code description:message];
+            
+            // Map CLXBidAdSourceError to appropriate CLXErrorCode
+            // Single bid failures (CLXBidAdSourceErrorAdapterCreationFailed) get CLXErrorCodeLoadFailed
+            // to surface specific error details rather than generic NO_FILL
+            CLXErrorCode errorCode;
+            if (self.lastBidError.code == CLXBidAdSourceErrorAdapterCreationFailed) {
+                errorCode = CLXErrorCodeLoadFailed;
+            } else {
+                errorCode = CLXErrorCodeNoFill;
+            }
+            errorToReport = [CLXError errorWithCode:errorCode description:message];
         } else {
             // No error but no response either - genuine no fill
             errorToReport = [CLXError errorWithCode:CLXErrorCodeNoFill description:@"No ad available - waterfall exhausted"];
