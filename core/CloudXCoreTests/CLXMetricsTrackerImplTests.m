@@ -38,11 +38,11 @@
     self.dao = [[CLXMetricsEventDao alloc] initWithDatabase:self.testDatabase];
     self.mockBulkApi = [[CLXMockBulkApi alloc] init];
     
+    // Create tracker with database and mock bulk API
+    // Note: PayloadBuilder is optional for basic smoke tests - the tracker
+    // handles nil payloadBuilder gracefully for testing core functionality
     self.tracker = [[CLXMetricsTrackerImpl alloc] initWithDatabase:self.testDatabase
                                                            bulkApi:self.mockBulkApi];
-    [self.tracker setBasicDataWithSessionId:@"test-session"
-                                  accountId:@"test-account"
-                                basePayload:@"test-payload"];
 }
 
 - (void)tearDown {
@@ -192,10 +192,10 @@
 
 #pragma mark - Basic Data Tests
 
-- (void)testSessionIdIsStoredInEvents {
-    [self.tracker setBasicDataWithSessionId:@"unique-session-xyz"
-                                  accountId:@"test-account"
-                                basePayload:@"test-payload"];
+- (void)testMetricEventIsStoredInDatabase {
+    // SMOKE TEST: Verify that tracked metrics are stored in the database
+    // Note: SessionId is now managed internally by the tracker (empty string by default)
+    // The PayloadBuilder architecture handles session data for actual SDK usage
     [self.tracker startWithConfig:[self createEnabledConfig]];
     
     [self.tracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
@@ -205,24 +205,31 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"Event stored"];
     
     __block int attempts = 0;
+    __block __weak typeof(self) weakSelf = self;
     __block void (^checkEvent)(void);
-    checkEvent = ^{
+    __block void (^checkEventStrong)(void);
+    checkEventStrong = ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
         attempts++;
-        CLXMetricsEvent *event = [self.dao getAllByMetric:CLXMetricsTypeMethodCreateBanner];
+        CLXMetricsEvent *event = [strongSelf.dao getAllByMetric:CLXMetricsTypeMethodCreateBanner];
         if (event != nil || attempts >= 10) {
             [expectation fulfill];
         } else {
             // Poll every 50ms - database write should be fast
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), checkEvent);
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), checkEventStrong);
         }
     };
+    checkEvent = checkEventStrong;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), checkEvent);
     
     // 10 attempts * 50ms = 500ms max wait, plus buffer for CI
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
     
     CLXMetricsEvent *event = [self.dao getAllByMetric:CLXMetricsTypeMethodCreateBanner];
-    XCTAssertEqualObjects(event.sessionId, @"unique-session-xyz", @"Session ID should be stored");
+    XCTAssertNotNil(event, @"Metric event should be stored in database");
+    XCTAssertEqualObjects(event.metricName, CLXMetricsTypeMethodCreateBanner, @"Metric name should match");
 }
 
 @end

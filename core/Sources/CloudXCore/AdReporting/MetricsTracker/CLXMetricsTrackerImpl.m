@@ -9,6 +9,8 @@
 #import "CLXMetricsType.h"
 #import "CLXEventTrackerBulkApi.h"
 #import "CLXEventAM.h"
+#import "CLXEventType.h"
+#import "CLXPayloadBuilder.h"
 #import <CloudXCore/CLXSQLiteDatabase.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXSDKConfig.h>
@@ -26,8 +28,7 @@
 @property (nonatomic, copy, nullable) NSString *endpoint;
 @property (nonatomic, strong, nullable) NSTimer *sendTimer;
 @property (nonatomic, copy) NSString *sessionId;
-@property (nonatomic, copy) NSString *basePayload;
-@property (nonatomic, copy) NSString *accountId;
+@property (nonatomic, strong) CLXPayloadBuilder *payloadBuilder;
 @property (nonatomic, strong) dispatch_queue_t metricsQueue;
 @end
 
@@ -40,11 +41,23 @@
 
 - (instancetype)initWithDatabase:(CLXSQLiteDatabase *)database {
     id<CLXEventTrackerBulkApi> bulkApi = [[CLXEventTrackerBulkApiImpl alloc] initWithTimeoutMillis:10000];
-    return [self initWithDatabase:database bulkApi:bulkApi];
+    return [self initWithDatabase:database bulkApi:bulkApi payloadBuilder:nil];
 }
 
 - (instancetype)initWithDatabase:(CLXSQLiteDatabase *)database
                          bulkApi:(id<CLXEventTrackerBulkApi>)bulkApi {
+    return [self initWithDatabase:database bulkApi:bulkApi payloadBuilder:nil];
+}
+
+- (instancetype)initWithPayloadBuilder:(CLXPayloadBuilder *)payloadBuilder {
+    CLXSQLiteDatabase *database = [[CLXSQLiteDatabase alloc] initWithDatabaseName:@"cloudx_metrics"];
+    id<CLXEventTrackerBulkApi> bulkApi = [[CLXEventTrackerBulkApiImpl alloc] initWithTimeoutMillis:10000];
+    return [self initWithDatabase:database bulkApi:bulkApi payloadBuilder:payloadBuilder];
+}
+
+- (instancetype)initWithDatabase:(CLXSQLiteDatabase *)database
+                         bulkApi:(id<CLXEventTrackerBulkApi>)bulkApi
+                  payloadBuilder:(nullable CLXPayloadBuilder *)payloadBuilder {
     self = [super init];
     if (self) {
         _database = database;
@@ -53,8 +66,7 @@
         _bulkApi = bulkApi;
         _sendIntervalSeconds = 60;
         _sessionId = @"";
-        _basePayload = @"";
-        _accountId = @"";
+        _payloadBuilder = payloadBuilder;
         
         // Create serial queue for thread safety
         _metricsQueue = dispatch_queue_create("com.cloudx.metrics", DISPATCH_QUEUE_SERIAL);
@@ -85,8 +97,8 @@
             return;
         }
         
-        // Use impressionTrackerURL for metrics
-        NSString *metricsURL = config.impressionTrackerURL ?: config.metricsEndpointURL;
+        // Use impressionTrackerURL for metrics with /bulk suffix
+        NSString *metricsURL = config.impressionTrackerURL;
         if (metricsURL && metricsURL.length > 0) {
             self.endpoint = [NSString stringWithFormat:@"%@/bulk", metricsURL];
         } else {
@@ -98,6 +110,7 @@
         // Log config summary
         BOOL sdkApiEnabled = [self.metricsConfig isSdkApiCallsEnabled];
         BOOL networkEnabled = [self.metricsConfig isNetworkCallsEnabled];
+        
         [self.logger info:[NSString stringWithFormat:@"📊 Metrics ENABLED (sdk_api=%@, network=%@, interval=%lds, endpoint=%@)",
                           sdkApiEnabled ? @"Y" : @"N",
                           networkEnabled ? @"Y" : @"N",
@@ -108,16 +121,6 @@
     });
 }
 
-- (void)setBasicDataWithSessionId:(NSString *)sessionId 
-                        accountId:(NSString *)accountId 
-                      basePayload:(NSString *)basePayload {
-    dispatch_async(self.metricsQueue, ^{
-        self.sessionId = [sessionId copy] ?: @"";
-        self.accountId = [accountId copy] ?: @"";
-        self.basePayload = [basePayload copy] ?: @"";
-    });
-}
-
 - (void)trackMethodCall:(NSString *)methodType {
     if (![CLXMetricsType isMethodCallType:methodType]) {
         [self.logger error:[NSString stringWithFormat:@"Invalid method type: %@", methodType]];
@@ -125,12 +128,9 @@
     }
     
     dispatch_async(self.metricsQueue, ^{
-        // Check if SDK API calls are enabled
-        BOOL isMethodCallMetricsEnabled = [self.metricsConfig isSdkApiCallsEnabled];
-        if (!isMethodCallMetricsEnabled) {
+        if (![self.metricsConfig isSdkApiCallsEnabled]) {
             return;
         }
-        
         [self _trackMetric:methodType latency:0];
     });
 }
@@ -312,6 +312,8 @@
         CLXEventAM *event = [self _buildEventFromMetric:metric];
         if (event) {
             [events addObject:event];
+        } else {
+            [self.logger error:[NSString stringWithFormat:@"Failed to build event for metric: %@", metric.metricName]];
         }
     }
     
@@ -319,7 +321,7 @@
         return;
     }
     
-    [self.logger info:[NSString stringWithFormat:@"📤 Sending %lu metrics events...", (unsigned long)events.count]];
+    [self.logger info:[NSString stringWithFormat:@"Sending %lu metrics events to endpoint", (unsigned long)events.count]];
     
     // Send via bulk API - use weak self to avoid retain cycles
     __weak typeof(self) weakSelf = self;
@@ -328,15 +330,16 @@
         if (!strongSelf) return;
         
         if (success) {
-            [strongSelf.logger info:[NSString stringWithFormat:@"✅ Successfully sent %lu metrics events", (unsigned long)events.count]];
-            // Delete successfully sent metrics - strongSelf is still valid in this scope
+            [strongSelf.logger info:[NSString stringWithFormat:@"Successfully sent %lu metrics events", (unsigned long)events.count]];
+            
+            // Delete successfully sent metrics
             dispatch_async(strongSelf.metricsQueue, ^{
                 for (CLXMetricsEvent *metric in metrics) {
                     [strongSelf.metricsDao deleteById:metric.eventId];
                 }
             });
         } else {
-            [strongSelf.logger warn:[NSString stringWithFormat:@"❌ Failed to send metrics: %@", error.localizedDescription ?: @"Unknown error"]];
+            [strongSelf.logger warn:[NSString stringWithFormat:@"Failed to send metrics: %@", error.localizedDescription ?: @"Unknown error"]];
         }
     }];
 }
@@ -347,32 +350,37 @@
         return nil;
     }
     
-    if (!self.accountId || self.accountId.length == 0) {
+    if (!self.payloadBuilder) {
+        [self.logger error:@"Cannot build event - payloadBuilder is nil"];
+        return nil;
+    }
+    
+    NSString *accountId = self.payloadBuilder.accountId;
+    if (!accountId || accountId.length == 0) {
         [self.logger error:@"Cannot build event - accountId is nil or empty"];
         return nil;
     }
     
-    // Build payload matching Android format: basePayload;metricName;counter/totalLatency
+    // Build payload using PayloadBuilder (matching Android architecture)
+    // PayloadBuilder handles {eventId} placeholder replacement internally
     NSString *metricDetail = [NSString stringWithFormat:@"%ld/%ld", (long)metric.counter, (long)metric.totalLatency];
-    NSString *payload = [NSString stringWithFormat:@"%@;%@;%@", 
-                        self.basePayload ?: @"", 
-                        metric.metricName ?: @"", 
-                        metricDetail];
+    NSString *auctionId = metric.auctionId ?: [[NSUUID UUID] UUIDString];
     
-    // Replace {eventId} placeholder with actual event ID (handle nil auctionId)
-    NSString *auctionId = metric.auctionId ?: @"unknown";
-    payload = [payload stringByReplacingOccurrencesOfString:@"{eventId}" withString:auctionId];
+    NSString *payload = [self.payloadBuilder buildMetricPayloadWithEventId:auctionId
+                                                                metricName:metric.metricName ?: @""
+                                                              metricDetail:metricDetail];
     
     // Generate XOR encryption data matching Android exactly
-    NSData *secret = [CLXXorEncryption generateXorSecret:self.accountId];
-    NSString *campaignId = [CLXXorEncryption generateCampaignIdBase64:self.accountId];
+    NSData *secret = [CLXXorEncryption generateXorSecret:accountId];
+    NSString *campaignId = [CLXXorEncryption generateCampaignIdBase64:accountId];
     NSString *impressionId = [CLXXorEncryption encrypt:payload secret:secret];
     
+    // Use CLXEventTypePathSDKMetrics constant to match Android's EventType.SDK_METRICS.pathSegment
     return [[CLXEventAM alloc] initWithImpression:impressionId
                                        campaignId:campaignId
                                        eventValue:@"N/A"
-                                        eventName:@"SDK_METRICS"
-                                             type:@"SDK_METRICS"];
+                                        eventName:CLXEventTypePathSDKMetrics
+                                             type:CLXEventTypePathSDKMetrics];
 }
 
 #pragma mark - Debug Methods
@@ -384,11 +392,12 @@
     [CLXMetricsDebugger printAllMetrics:self.metricsDao];
     
     // Additional debug info specific to this tracker instance
+    NSString *accountId = self.payloadBuilder.accountId;
     [self.logger info:@"🔍 TRACKER INSTANCE DEBUG"];
     [self.logger info:@"========================="];
     [self.logger info:[NSString stringWithFormat:@"Session ID: %@", self.sessionId ?: @"(nil)"]];
-    [self.logger info:[NSString stringWithFormat:@"👤 Account ID: %@", self.accountId ?: @"(nil)"]];
-    [self.logger info:[NSString stringWithFormat:@"Base Payload Length: %lu chars", (unsigned long)(self.basePayload ? self.basePayload.length : 0)]];
+    [self.logger info:[NSString stringWithFormat:@"👤 Account ID: %@", accountId ?: @"(nil)"]];
+    [self.logger info:[NSString stringWithFormat:@"PayloadBuilder: %@", self.payloadBuilder ? @"configured" : @"(nil)"]];
     [self.logger info:[NSString stringWithFormat:@"⏰ Send Timer: %@", self.sendTimer ? @"Active" : @"Inactive"]];
     
     // Performance report
@@ -396,8 +405,8 @@
     [self.logger info:perfReport];
     
     // Encryption test
-    if (self.accountId && self.accountId.length > 0) {
-        NSString *encryptionTest = [CLXMetricsDebugger testEncryption:self.accountId];
+    if (accountId && accountId.length > 0) {
+        NSString *encryptionTest = [CLXMetricsDebugger testEncryption:accountId];
         [self.logger info:encryptionTest];
     }
 }

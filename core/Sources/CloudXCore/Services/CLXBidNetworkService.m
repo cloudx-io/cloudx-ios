@@ -192,10 +192,12 @@
                                            maxRetries:1
                                                delay:1.0
                                           completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
-        // Track bid request latency
+        // Track bid request latency (nil-safe like Android's optional chaining)
         NSTimeInterval bidRequestLatency = [[NSDate date] timeIntervalSinceDate:bidRequestStartTime] * 1000; // Convert to milliseconds
         id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkBidRequest latency:(NSInteger)bidRequestLatency];
+        if (metricsTracker) {
+            [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkBidRequest latency:(NSInteger)bidRequestLatency];
+        }
         
         [self.logger debug:[NSString stringWithFormat:@"[%@] [BidNetworkService] Network request completion called (%.0fms)", correlationId, bidRequestLatency]];
         

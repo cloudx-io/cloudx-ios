@@ -59,7 +59,6 @@
             @"default": @"https://au.cloudx.io/openrtb2/auction"
         },
         @"impressionTrackerURL": @"https://tracker.cloudx.io/impression",
-        @"metricsEndpointURL": @"https://metrics.cloudx.io/sdk",
         @"tracking": @[@"bid.w", @"bid.h"],
         @"bidders": @[],
         @"placements": @[]

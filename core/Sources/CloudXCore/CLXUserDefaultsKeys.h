@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXCoreMetricsDictKey @"CLXCore_metricsDict"
 #define kCLXCoreMetricsUrlKey @"CLXCore_metricsUrl"
 #define kCLXCoreImpressionTrackerUrlKey @"CLXCore_impressionTrackerUrl"
+#define kCLXCoreGeoLatencyMsKey @"CLXCore_geoLatencyMs"
 
 // Additional configuration keys
 #define kCLXCoreBundleConfigKey @"CLXCore_bundle_config"

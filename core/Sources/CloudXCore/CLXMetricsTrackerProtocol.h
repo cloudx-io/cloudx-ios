@@ -27,14 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)startWithConfig:(CLXSDKConfig *)config;
 
 /**
- * Set basic data for metrics tracking
- * Matches Android's fun setBasicData(sessionId: String, accountId: String, basePayload: String)
- */
-- (void)setBasicDataWithSessionId:(NSString *)sessionId 
-                        accountId:(NSString *)accountId 
-                      basePayload:(NSString *)basePayload;
-
-/**
  * Track a method call
  * Matches Android's fun trackMethodCall(type: MetricsType.Method)
  */

@@ -1,6 +1,7 @@
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXSdkConfiguration.h>
 #import <CloudXCore/CLXSystemInformation.h>
+#import <CloudXCore/CLXVersion.h>
 #import <CloudXCore/CLXDebugOverlayManager.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXInitService.h>
@@ -11,6 +12,7 @@
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXMetricsTrackerProtocol.h>
 #import <CloudXCore/CLXMetricsType.h>
+#import <CloudXCore/CLXPayloadBuilder.h>
 #import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXErrorReporter.h>
 #import <CloudXCore/CLXBidNetworkService.h>
@@ -138,9 +140,11 @@ static CloudXCore *_sharedInstance = nil;
     @synchronized([CLXDIContainer class]) {
         // Register core dependencies that other services depend on
         // Check-then-register pattern is now thread-safe within the synchronized block
-        if (![container resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]]) {
-            [container registerType:[CLXMetricsTrackerImpl class] instance:[[CLXMetricsTrackerImpl alloc] init]];
-        }
+        
+        // NOTE: CLXMetricsTrackerImpl is NOT registered here (matching Android architecture)
+        // It's created and registered in _handleInitResponse: AFTER we have all config
+        // (accountId, metricsConfig, payloadBuilder, etc.)
+        // This prevents the issue where an unconfigured tracker silently drops metrics.
         
         if (![container resolveType:ServiceTypeSingleton class:[CLXLiveInitService class]]) {
             [container registerType:[CLXLiveInitService class] instance:[[CLXLiveInitService alloc] init]];
@@ -218,9 +222,8 @@ static CloudXCore *_sharedInstance = nil;
     // Note: Test mode is now server-controlled via deviceConfig
     // The test mode value will be set after receiving the server response
     
-    // Track SDK initialization method call
-    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSdkInit];
+    // NOTE: SDK init method tracking moved to _handleInitResponse: AFTER metrics tracker is configured
+    // (Matching Android architecture - metrics tracker doesn't exist until SDK init succeeds)
     
     // Thread-safe initialization check and setup
     @synchronized(self) {
@@ -364,13 +367,15 @@ static CloudXCore *_sharedInstance = nil;
         
         NSString* encodedString = [CLXRillImpressionInitService createDataStringWithRillImpressionModel:model];
         
+        // Store encodedString BEFORE processSDKConfig so metrics tracker can use it as basePayload
+        // This is the server-driven tracking payload that contains all fields ClickHouse expects
+        [[NSUserDefaults standardUserDefaults] setObject:encodedString forKey:kCLXCoreEncodedStringKey];
+        
         [self.logger info:@"InitService returned config, processing"];
         [self processSDKConfig:config completion:completion];
         
         NSString *accountId = impModel.accountID;
         NSString *payload = encodedString;
-        
-        [[NSUserDefaults standardUserDefaults] setObject:encodedString forKey:kCLXCoreEncodedStringKey];
         
         NSData *secret = [CLXXorEncryption generateXorSecret: accountId];
         NSString *campaignId = [CLXXorEncryption generateCampaignIdBase64: accountId];
@@ -496,30 +501,63 @@ static CloudXCore *_sharedInstance = nil;
     // Store app key, account ID, and URLs from SDK response
     [[NSUserDefaults standardUserDefaults] setValue:_appKey forKey:kCLXCoreAppKeyKey];
     [[NSUserDefaults standardUserDefaults] setValue:config.accountID forKey:kCLXCoreAccountIDKey];
-    [[NSUserDefaults standardUserDefaults] setValue:config.metricsEndpointURL forKey:kCLXCoreMetricsUrlKey];
     
-    // Store impression tracker URL for Analytics tracking
+    // Store impression tracker URL for metrics and analytics tracking
     if (config.impressionTrackerURL) {
+        [[NSUserDefaults standardUserDefaults] setValue:config.impressionTrackerURL forKey:kCLXCoreMetricsUrlKey];
         [[NSUserDefaults standardUserDefaults] setValue:config.impressionTrackerURL forKey:kCLXCoreImpressionTrackerUrlKey];
     }
     
-    // Initialize and start metrics tracker with proper configuration
-    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    if (metricsTracker) {
-        // Create SDK config for metrics tracker
-        CLXSDKConfig *sdkConfig = [[CLXSDKConfig alloc] init];
-        sdkConfig.impressionTrackerURL = config.impressionTrackerURL;
-        sdkConfig.metricsEndpointURL = config.metricsEndpointURL;
-        sdkConfig.metricsConfig = config.metricsConfig;
-        
-        [metricsTracker startWithConfig:sdkConfig];
-        [metricsTracker setBasicDataWithSessionId:config.sessionID ?: [[NSUUID UUID] UUIDString]
-                                        accountId:config.accountID ?: @""
-                                      basePayload:@"ios_sdk"];
-        
-        [self.logger info:@"Metrics tracker initialized and started"];
-    } else {
-        [self.logger error:@"Failed to resolve metrics tracker from DI container"];
+    // Initialize and start metrics tracker with PayloadBuilder (matching Android architecture)
+    // PayloadBuilder centralizes payload construction with {eventId} placeholder replacement
+    
+    // Set session constant data BEFORE creating PayloadBuilder so appBundle is included in payload
+    NSString *appBundle = [[NSBundle mainBundle] bundleIdentifier] ?: @"";
+    NSString *pluginVersion = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCorePluginVersionKey];
+    [[CLXTrackingFieldResolver shared] setSessionConstData:config.sessionID ?: @""
+                                                sdkVersion:CLXSDKVersion
+                                             pluginVersion:pluginVersion
+                                                deviceType:DeviceTypeToString([CLXSystemInformation shared].deviceType)
+                                               abTestGroup:_abTestName ?: @""
+                                                 appBundle:appBundle];
+    
+    CLXPayloadBuilder *payloadBuilder = [CLXPayloadBuilder createWithAccountId:config.accountID ?: @""
+                                                         trackingFieldResolver:[CLXTrackingFieldResolver shared]];
+    
+    CLXMetricsTrackerImpl *metricsTracker = [[CLXMetricsTrackerImpl alloc] initWithPayloadBuilder:payloadBuilder];
+    
+    // Register the metrics tracker in DI container for other components to access
+    [[CLXDIContainer shared] registerType:[CLXMetricsTrackerImpl class] instance:metricsTracker];
+    
+    // Create SDK config for metrics tracker
+    CLXSDKConfig *sdkConfig = [[CLXSDKConfig alloc] init];
+    sdkConfig.impressionTrackerURL = config.impressionTrackerURL;
+    sdkConfig.metricsConfig = config.metricsConfig;
+    
+    [metricsTracker startWithConfig:sdkConfig];
+    [self.logger info:@"Metrics tracker initialized with PayloadBuilder"];
+    
+    // Track SDK init method call NOW that the tracker is configured (matching Android)
+    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSdkInit];
+    
+    // Track SDK init network call latency
+    // The latency was measured in CLXSDKInitNetworkService and stored in the config response
+    if (config.sdkInitLatencyMs > 0) {
+        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkSdkInit latency:config.sdkInitLatencyMs];
+        [self.logger debug:[NSString stringWithFormat:@"Tracked SDK init network latency: %ldms", (long)config.sdkInitLatencyMs]];
+    }
+    
+    // Track geo API network call latency
+    // The latency was stored in UserDefaults by CLXAdReportingNetworkService
+    // Note: We check objectForKey: first because integerForKey: returns 0 both when
+    // the key doesn't exist AND when the actual value is 0ms (simulator geo lookup)
+    NSNumber *storedGeoLatency = [[NSUserDefaults standardUserDefaults] objectForKey:kCLXCoreGeoLatencyMsKey];
+    if (storedGeoLatency != nil) {
+        NSInteger geoLatencyMs = [storedGeoLatency integerValue];
+        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkGeoApi latency:geoLatencyMs];
+        [self.logger debug:[NSString stringWithFormat:@"Tracked deferred geo API latency: %ldms", (long)geoLatencyMs]];
+        // Clear the stored value so it's not tracked again on subsequent SDK inits
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreGeoLatencyMsKey];
     }
     
     // NEW: Reset session metrics on SDK initialization (iOS feature parity with Android)
@@ -531,7 +569,6 @@ static CloudXCore *_sharedInstance = nil;
     [endpointResolver resolveFromConfig:config];
     
     NSString *auctionEndpointUrl = endpointResolver.auctionEndpoint;
-    NSString *metricsEndpointURL = config.metricsEndpointURL ?: @"";
     
     // Validate endpoints
     if (auctionEndpointUrl.length == 0) {
@@ -540,8 +577,9 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger info:[NSString stringWithFormat:@"Auction endpoint resolved: %@", auctionEndpointUrl]];
     }
     
-    if (!config.metricsEndpointURL) {
-        [self.logger debug:@"[CloudXCore] SDK init missing metricsEndpointURL - SDK performance metrics disabled"];
+    // Metrics use impressionTrackerURL with /bulk suffix
+    if (!config.impressionTrackerURL) {
+        [self.logger debug:@"[CloudXCore] No impressionTrackerURL available - SDK performance metrics will be stored locally only"];
     }
     
     if (endpointResolver.testGroupName.length > 0) {
@@ -576,7 +614,10 @@ static CloudXCore *_sharedInstance = nil;
     // This connects the SessionMetricsTracker to the MetricsTrackerImpl without tight coupling
     id<CLXMetricsTrackerProtocol> ttfaMetricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [[CLXSessionMetricsTracker sharedInstance] setTimeToFirstAdCallback:^(NSInteger timeToFirstAdMs) {
-        [ttfaMetricsTracker trackNetworkCall:CLXMetricsTypeNetworkTimeToFirstAd latency:timeToFirstAdMs];
+        // Nil-safe like Android's optional chaining
+        if (ttfaMetricsTracker) {
+            [ttfaMetricsTracker trackNetworkCall:CLXMetricsTypeNetworkTimeToFirstAd latency:timeToFirstAdMs];
+        }
     }];
     
     // Post internal notification for ad objects to resume queued operations
@@ -679,9 +720,11 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (void)setHashedUserID:(NSString *)hashedUserID {
-    // Track hashed user ID method call
+    // Track hashed user ID method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetHashedUserId];
+    if (metricsTracker) {
+        [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetHashedUserId];
+    }
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
     if ([metricsDict.allKeys containsObject:@"method_set_hashed_user_id"]) {
@@ -723,8 +766,11 @@ static CloudXCore *_sharedInstance = nil;
         return;
     }
     
+    // Nil-safe like Android's optional chaining
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetUserKeyValues];
+    if (metricsTracker) {
+        [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetUserKeyValues];
+    }
     
     [[CLXKeyValueState shared] setUserKeyValue:key value:value];
     [self.logger info:[NSString stringWithFormat:@"User key-value pair set: %@ = %@", key, value]];
@@ -736,8 +782,11 @@ static CloudXCore *_sharedInstance = nil;
         return;
     }
     
+    // Nil-safe like Android's optional chaining
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetAppKeyValues];
+    if (metricsTracker) {
+        [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetAppKeyValues];
+    }
     
     [[CLXKeyValueState shared] setAppKeyValue:key value:value];
     [self.logger info:[NSString stringWithFormat:@"App key-value pair set: %@ = %@", key, value]];
@@ -751,9 +800,11 @@ static CloudXCore *_sharedInstance = nil;
 - (CLXBannerAdView *)createBannerWithPlacement:(NSString *)placement
                                     viewController:(UIViewController *)viewController
                                          delegate:(id<CLXBannerDelegate>)delegate {
-    // Track banner creation method call
+    // Track banner creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
+    if (metricsTracker) {
+        [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
+    }
     [self.logger debug:[NSString stringWithFormat:@"Creating banner for placement: %@", placement]];
     
     // v1.3.0: Defer validation errors to load() - always return non-nil
@@ -829,9 +880,11 @@ static CloudXCore *_sharedInstance = nil;
 - (CLXBannerAdView *)createMRECWithPlacement:(NSString *)placement
                                  viewController:(UIViewController *)viewController
                                       delegate:(id<CLXBannerDelegate>)delegate {
-    // Track MREC creation method call
+    // Track MREC creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateMrec];
+    if (metricsTracker) {
+        [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateMrec];
+    }
     
     // v1.3.0: Defer validation errors to load() - always return non-nil
     CLXError *deferredError = nil;
@@ -904,9 +957,11 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (CLXInterstitial *)createInterstitialWithPlacement:(NSString *)placement {
-    // Track interstitial creation method call
+    // Track interstitial creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateInterstitial];
+    if (metricsTracker) {
+        [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateInterstitial];
+    }
     
     // v1.3.0: Defer validation errors to load() - always return non-nil
     CLXError *deferredError = nil;
@@ -975,9 +1030,11 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (CLXRewarded *)createRewardedWithPlacement:(NSString *)placement {
-    // Track rewarded creation method call
+    // Track rewarded creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateRewarded];
+    if (metricsTracker) {
+        [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateRewarded];
+    }
     
     // v1.3.0: Defer validation errors to load() - always return non-nil
     CLXError *deferredError = nil;
@@ -1046,9 +1103,11 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (CLXNativeAdView *)createNativeAdWithPlacement:(NSString *)placement viewController:(UIViewController *)viewController delegate:(id)delegate {
-    // Track native creation method call
+    // Track native creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateNative];
+    if (metricsTracker) {
+        [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateNative];
+    }
     
     [self.logger debug:[NSString stringWithFormat:@"Creating native ad for placement: %@", placement]];
 

@@ -517,9 +517,12 @@ NS_ASSUME_NONNULL_BEGIN
         latency = [[NSDate date] timeIntervalSinceDate:self.adLoadStartTime] * 1000;
     }
 
+
     // Track adapter load latency with metrics tracker
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:nil];
+    if (metricsTracker) {
+        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:nil];
+    }
     
     [self.previousNative setDelegate:nil];
     [self.previousNative destroy];
@@ -566,11 +569,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)failToLoadWithNative:(nullable id<CLXAdapterNative>)native error:(nullable NSError *)error {
     [self.logger error:[NSString stringWithFormat:@"Native fail to load %@", error.localizedDescription ?: @"unknown"]];
 
+
     // Track adapter load latency with metrics tracker (failure)
     if (self.adLoadStartTime) {
         NSTimeInterval latency = [[NSDate date] timeIntervalSinceDate:self.adLoadStartTime] * 1000;
         id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:error];
+        if (metricsTracker) {
+            [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:error];
+        }
     }
     
     if (native && native.timeout) {

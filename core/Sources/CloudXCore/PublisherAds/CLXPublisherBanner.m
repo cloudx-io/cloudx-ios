@@ -433,17 +433,11 @@ NS_ASSUME_NONNULL_BEGIN
                                                              placementID:storedImpressionId
                                                                loadCount:0];
         
-        NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreBannerMetricsDictKey];
-        NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
-        if ([metricsDict.allKeys containsObject:@"method_banner_refresh"]) {
-            NSString *value = metricsDict[@"method_banner_refresh"];
-            int number = [value intValue];
-            int new = number + 1;
-            metricsDict[@"method_banner_refresh"] = [NSString stringWithFormat:@"%d", new];
-        } else {
-            metricsDict[@"method_banner_refresh"] = @"1";
+        // Track banner refresh metric via MetricsTracker (matching Android's BannerManager.kt)
+        id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+        if (metricsTracker) {
+            [metricsTracker trackMethodCall:CLXMetricsTypeMethodBannerRefresh];
         }
-        [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreBannerMetricsDictKey];
         
         // Continue banner chain
         [strongSelf continueBannerChain];
@@ -668,7 +662,9 @@ NS_ASSUME_NONNULL_BEGIN
 
     // Track adapter load latency with metrics tracker
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:nil];
+    if (metricsTracker) {
+        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:nil];
+    }
     
     // SECOND PHASE - Winner has successfully loaded, now fire lurls for all losing bids
     // All remaining bids that could create banners but lost to this winner get LostToHigherBid
@@ -779,11 +775,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)failToLoadBanner:(nullable id<CLXAdapterBanner>)banner error:(nullable NSError *)error {
     [self.logger info:[NSString stringWithFormat:@"[%@] failToLoadBanner for placement: %@ - %@", self.currentCorrelationId, self.placementID, error.localizedDescription ?: @"Unknown error"]];
 
+
     // Track adapter load latency with metrics tracker (failure)
     if (self.adLoadStartTime) {
         NSTimeInterval latency = [[NSDate date] timeIntervalSinceDate:self.adLoadStartTime] * 1000;
         id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:error];
+        if (metricsTracker) {
+            [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:error];
+        }
     }
 
     // Destroy the failed banner

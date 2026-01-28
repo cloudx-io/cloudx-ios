@@ -4,8 +4,8 @@
  * This service manages multiple tracking systems:
  * 
  * 1. SDK PERFORMANCE METRICS:
- *    - metricsEndpointURL: Tracks SDK performance and session data
- *    - Method: metricsTrackingWithActionString
+ *    - impressionTrackerURL with /bulk suffix: Tracks SDK performance and session data
+ *    - Method: CLXMetricsTrackerImpl (sends bulk metrics)
  *    - Status: Active, separate from Rill analytics
  *    - Data: Encrypted SDK metrics, session info
  *
@@ -36,9 +36,30 @@
 @interface CLXAdReportingNetworkService ()
 @property (nonatomic, strong) CLXBaseNetworkService *baseNetworkService;
 @property (nonatomic, strong) CLXLogger *logger;
+- (void)_trackGeoLatency:(NSInteger)latencyMs source:(NSString *)source;
 @end
 
 @implementation CLXAdReportingNetworkService
+
+#pragma mark - Private Helpers
+
+/**
+ * Tracks geo API latency, attempting immediate tracking via MetricsTracker if available,
+ * falling back to UserDefaults storage for later tracking by CloudXCoreAPI.
+ */
+- (void)_trackGeoLatency:(NSInteger)latencyMs source:(NSString *)source {
+    CLXMetricsTrackerImpl *metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    if (metricsTracker) {
+        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkGeoApi latency:latencyMs];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] Tracked geo latency: %ldms", source, (long)latencyMs]];
+    } else {
+        [[NSUserDefaults standardUserDefaults] setInteger:latencyMs forKey:kCLXCoreGeoLatencyMsKey];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self.logger debug:[NSString stringWithFormat:@"[%@] Stored geo latency: %ldms (will track after MetricsTracker init)", source, (long)latencyMs]];
+    }
+}
+
+#pragma mark - Initialization
 
 - (instancetype)initWithBaseURL:(NSURL *)baseURL urlSession:(NSURLSession *)urlSession {
     self = [super init];
@@ -74,6 +95,8 @@
     //         This code is completely stripped from production builds at compile time.
     // ==================================================================================
     #if TARGET_IPHONE_SIMULATOR
+    NSDate *simulatorGeoStartTime = [NSDate date];
+    
     [self.logger debug:@"[Simulator] CloudFront blocks simulator IPs - using device locale for geo data"];
     
     // Get actual country from device's locale settings
@@ -123,7 +146,11 @@
     
     [self.logger debug:[NSString stringWithFormat:@"[Simulator] Geo data set from locale: %@ - Region: %@", finalCountryISO3, regionCode]];
     
-    // Skip network call for simulator
+    // Track geo latency (uses helper method for DRY)
+    NSTimeInterval simulatorGeoLatency = [[NSDate date] timeIntervalSinceDate:simulatorGeoStartTime] * 1000;
+    [self _trackGeoLatency:(NSInteger)simulatorGeoLatency source:@"Simulator"];
+    
+    // Skip actual network call for simulator
     return;
     #endif
     // ==================================================================================
@@ -141,10 +168,9 @@
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
                                             completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        // Track geo API network call latency
-        NSTimeInterval geoRequestLatency = [[NSDate date] timeIntervalSinceDate:geoRequestStartTime] * 1000; // Convert to milliseconds
-        id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkGeoApi latency:(NSInteger)geoRequestLatency];
+        // Track geo API network call latency (uses helper method for DRY)
+        NSTimeInterval geoRequestLatency = [[NSDate date] timeIntervalSinceDate:geoRequestStartTime] * 1000;
+        [self _trackGeoLatency:(NSInteger)geoRequestLatency source:@"GeoAPI"];
         
         if (error) {
             [self.logger error:[NSString stringWithFormat:@"CloudX: geoHeaders error: %@", error]];

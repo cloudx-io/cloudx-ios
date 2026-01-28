@@ -129,10 +129,8 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
                        maxRetries:1
                            delay:0
                           completion:^(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled) {
-            // Track SDK init network call latency
+            // Calculate SDK init network latency (will be stored in response for later tracking)
             NSTimeInterval sdkInitLatency = [[NSDate date] timeIntervalSinceDate:sdkInitStartTime] * 1000; // Convert to milliseconds
-            id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-            [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkSdkInit latency:(NSInteger)sdkInitLatency];
             
             [self.logger debug:@"[SDKInitNetworkService] Network request completion called"];
             
@@ -160,6 +158,11 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
                     }
                     return;
                 }
+                
+                // Store SDK init network latency in response for later tracking
+                // (tracked in CloudXCoreAPI after MetricsTracker is initialized, matching Android)
+                config.sdkInitLatencyMs = (NSInteger)sdkInitLatency;
+                [self.logger debug:[NSString stringWithFormat:@"SDK init network latency: %ldms", (long)config.sdkInitLatencyMs]];
                 
                 if (completion) {
                     completion(config, nil);
@@ -271,7 +274,6 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     
     // Parse tracking URLs
     config.impressionTrackerURL = response[@"impressionTrackerURL"];
-    config.metricsEndpointURL = response[@"metricsEndpointURL"];
     config.winLossNotificationURL = response[@"winLossNotificationURL"];
     
     // Parse metrics configuration from server response

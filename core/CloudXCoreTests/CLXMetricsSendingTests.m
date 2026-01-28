@@ -12,12 +12,15 @@
 #import <CloudXCore/CLXMetricsTrackerImpl.h>
 #import <CloudXCore/CLXMetricsConfig.h>
 #import <CloudXCore/CLXMetricsType.h>
+#import <CloudXCore/CLXEventType.h>
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXSQLiteDatabase.h>
 #import <CloudXCore/CLXMetricsEventDao.h>
 #import <CloudXCore/CLXMetricsEvent.h>
 #import <CloudXCore/CLXEventAM.h>
+#import <CloudXCore/CLXPayloadBuilder.h>
 #import "Helper/CLXMockBulkApi.h"
+#import "Helper/CLXPayloadBuilder+Testing.h"
 
 /**
  * Category to expose private testing method for flushing pending operations.
@@ -31,6 +34,7 @@
 @property (nonatomic, strong) CLXMetricsEventDao *dao;
 @property (nonatomic, strong) CLXMockBulkApi *mockBulkApi;
 @property (nonatomic, strong) CLXMetricsTrackerImpl *tracker;
+@property (nonatomic, strong) CLXPayloadBuilder *testPayloadBuilder;
 @property (nonatomic, copy) NSString *uniqueDBName;
 @end
 
@@ -49,15 +53,16 @@
     self.dao = [[CLXMetricsEventDao alloc] initWithDatabase:self.testDatabase];
     self.mockBulkApi = [[CLXMockBulkApi alloc] init];
     
-    // Create tracker with mock bulk API
-    self.tracker = [[CLXMetricsTrackerImpl alloc] initWithDatabase:self.testDatabase
-                                                           bulkApi:self.mockBulkApi];
-    [self.tracker setBasicDataWithSessionId:@"test-session-123"
-                                  accountId:@"test-account-456"
-                                basePayload:@"ios_sdk"];
+    // Create test PayloadBuilder with {eventId} placeholder for proper event generation
+    // The base payload includes device info and the placeholder that gets replaced per-event
+    NSString *testBasePayload = @"sessionId=test-session&appId=com.test.app&eventId={eventId}&deviceModel=iPhone&os=iOS&osv=17.0";
+    self.testPayloadBuilder = [CLXPayloadBuilder testBuilderWithAccountId:@"test-account-id"
+                                                              basePayload:testBasePayload];
     
-    // Flush to ensure setBasicData completes before tests start
-    [self.tracker flushPendingOperations];
+    // Create tracker with mock bulk API and test PayloadBuilder
+    self.tracker = [[CLXMetricsTrackerImpl alloc] initWithDatabase:self.testDatabase
+                                                           bulkApi:self.mockBulkApi
+                                                    payloadBuilder:self.testPayloadBuilder];
     
     // Reset mock to ensure clean state
     [self.mockBulkApi reset];
@@ -73,6 +78,7 @@
     self.testDatabase = nil;
     self.dao = nil;
     self.mockBulkApi = nil;
+    self.testPayloadBuilder = nil;
     
     [super tearDown];
 }
@@ -185,8 +191,8 @@
     XCTAssertNotNil(event, @"Event should not be nil");
     XCTAssertNotNil(event.impression, @"Event should have impression");
     XCTAssertNotNil(event.campaignId, @"Event should have campaignId");
-    XCTAssertEqualObjects(event.eventName, @"SDK_METRICS", @"Event name should be SDK_METRICS");
-    XCTAssertEqualObjects(event.type, @"SDK_METRICS", @"Event type should be SDK_METRICS");
+    XCTAssertEqualObjects(event.eventName, CLXEventTypePathSDKMetrics, @"Event name must match Android EventType.SDK_METRICS.pathSegment");
+    XCTAssertEqualObjects(event.type, CLXEventTypePathSDKMetrics, @"Event type must match Android EventType.SDK_METRICS.pathSegment");
 }
 
 - (void)testMetricsDeletedAfterSuccessfulSend {
@@ -276,7 +282,7 @@
     sdkAPICalls.enabled = @YES;
     metricsConfig.sdkAPICalls = sdkAPICalls;
     sdkConfig.metricsConfig = metricsConfig;
-    // No impressionTrackerURL or metricsEndpointURL
+    // No impressionTrackerURL configured
     
     [self.tracker startWithConfig:sdkConfig];
     [self.tracker flushPendingOperations];
@@ -315,6 +321,105 @@
     
     // Then - Should send one aggregated event, not three separate events
     XCTAssertEqual(weakSelf.mockBulkApi.sentEvents.count, 1, @"Should aggregate into single event");
+}
+
+#pragma mark - Android Parity Tests
+
+/**
+ * CRITICAL: This test documents the expected format for metrics events.
+ * 
+ * The metrics implementation MUST match Android exactly for server compatibility.
+ * These values are what the server/ClickHouse expects:
+ * 
+ * Android EventType.SDK_METRICS uses:
+ *   - eventName: "sdkmetricenc" (NOT "SDK_METRICS")
+ *   - type: "sdkmetricenc" (NOT "SDK_METRICS")
+ *   - basePayload: Server-driven tracking template (NOT hardcoded "ios_sdk")
+ * 
+ * If this test fails, metrics will NOT appear in ClickHouse!
+ */
+- (void)testMetricsEventFormat_MustMatchAndroidForServerCompatibility {
+    // Create expectation for async send completion
+    XCTestExpectation *sendExpectation = [self expectationWithDescription:@"Send should complete"];
+    
+    __weak typeof(self) weakSelf = self;
+    self.mockBulkApi.onSendCalled = ^{
+        [sendExpectation fulfill];
+    };
+    
+    // Given - Tracker with enabled config
+    [self.tracker startWithConfig:[self createEnabledConfig]];
+    [self.tracker flushPendingOperations];
+    
+    // When - Track a metric
+    [self.tracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
+    [self.tracker flushPendingOperations];
+    [self.tracker trySendingPendingMetrics];
+    
+    [self waitForExpectations:@[sendExpectation] timeout:5.0];
+    
+    // Then - Event format MUST match Android's EventType.SDK_METRICS.pathSegment
+    CLXEventAM *event = weakSelf.mockBulkApi.sentEvents.firstObject;
+    XCTAssertNotNil(event, @"Event should exist");
+    
+    // CRITICAL: These values are what Android sends and what the server expects
+    // If you change these, metrics will NOT appear in ClickHouse!
+    // Using CLXEventTypePathSDKMetrics constant ensures compile-time safety
+    XCTAssertEqualObjects(event.eventName, CLXEventTypePathSDKMetrics, 
+        @"eventName MUST match CLXEventTypePathSDKMetrics (Android EventType.SDK_METRICS.pathSegment)");
+    XCTAssertEqualObjects(event.type, CLXEventTypePathSDKMetrics, 
+        @"type MUST match CLXEventTypePathSDKMetrics (Android EventType.SDK_METRICS.pathSegment)");
+    
+    // Verify encrypted payload exists
+    XCTAssertNotNil(event.impression, @"impression (encrypted payload) must exist");
+    XCTAssertGreaterThan(event.impression.length, 0, @"impression must not be empty");
+    
+    // Verify campaignId exists (Base64 encoded account ID)
+    XCTAssertNotNil(event.campaignId, @"campaignId must exist");
+    XCTAssertGreaterThan(event.campaignId.length, 0, @"campaignId must not be empty");
+}
+
+/**
+ * Documents the expected JSON structure sent to the bulk endpoint.
+ * Must match Android's EventBulkRequestToJson format for server compatibility.
+ */
+- (void)testMetricsEventJSON_StructureMustMatchServerExpectations {
+    // Create expectation for async send completion
+    XCTestExpectation *sendExpectation = [self expectationWithDescription:@"Send should complete"];
+    
+    __weak typeof(self) weakSelf = self;
+    self.mockBulkApi.onSendCalled = ^{
+        [sendExpectation fulfill];
+    };
+    
+    // Given - Tracker with enabled config
+    [self.tracker startWithConfig:[self createEnabledConfig]];
+    [self.tracker flushPendingOperations];
+    
+    // When - Track a metric
+    [self.tracker trackMethodCall:CLXMetricsTypeMethodSdkInit];
+    [self.tracker flushPendingOperations];
+    [self.tracker trySendingPendingMetrics];
+    
+    [self waitForExpectations:@[sendExpectation] timeout:5.0];
+    
+    // Then - Verify JSON structure has required fields
+    CLXEventAM *event = weakSelf.mockBulkApi.sentEvents.firstObject;
+    NSDictionary *json = [event toDictionary];
+    
+    // These 4 fields are EXACTLY what Android sends - no more, no less
+    // Order: eventName, campaignId, type, impression (matching Android EventBulkRequestToJson)
+    XCTAssertNotNil(json[@"eventName"], @"JSON must have 'eventName' field");
+    XCTAssertNotNil(json[@"campaignId"], @"JSON must have 'campaignId' field");
+    XCTAssertNotNil(json[@"type"], @"JSON must have 'type' field");
+    XCTAssertNotNil(json[@"impression"], @"JSON must have 'impression' field");
+    
+    // CRITICAL: eventValue must NOT be in JSON - Android doesn't include it
+    // We removed it from toDictionary to match Android's EventBulkRequestToJson format
+    XCTAssertNil(json[@"eventValue"], @"eventValue must NOT be in JSON - Android doesn't include this field");
+    
+    // Verify we have exactly 4 fields (Android parity)
+    XCTAssertEqual(json.count, 4, @"JSON must have exactly 4 fields to match Android format");
 }
 
 @end

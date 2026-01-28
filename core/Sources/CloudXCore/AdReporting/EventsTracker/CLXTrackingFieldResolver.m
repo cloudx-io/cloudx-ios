@@ -92,8 +92,8 @@
     self.configDataMap = [configDict copy];
     
     [self.logger debug:[NSString stringWithFormat:@"Config set with %lu tracking fields, %lu placements", 
-                        (unsigned long)self.tracking.count,
-                        (unsigned long)(config.placements ? config.placements.count : 0)]];
+                       (unsigned long)self.tracking.count,
+                       (unsigned long)(config.placements ? config.placements.count : 0)]];
 }
 
 - (void)setRequestData:(NSString *)auctionId bidRequestJSON:(NSDictionary *)bidRequestJSON {
@@ -257,6 +257,9 @@
         NSString *ifa = [self resolveNestedField:requestData path:@"device.ifa"];
         [self.logger debug:[NSString stringWithFormat:@"Using device IFA: %@", ifa ? @"(present)" : @"(none)"]];
         return ifa;
+    } else if ([field isEqualToString:@"sdk.testGroupName"]) {
+        // A/B test group name
+        return self.abTestGroup;
     } else {
         // Check auction-specific SDK parameters
         NSMutableDictionary *auctionSdkMap = self.sdkMap[auctionId];

@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXSQLiteDatabase;
 @class CLXLogger;
 @class CLXMetricsConfig;
+@class CLXPayloadBuilder;
 
 /**
  * Metrics tracker implementation
@@ -25,6 +26,14 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXMetricsTrackerImpl : NSObject <CLXMetricsTrackerProtocol>
 
 - (instancetype)init;
+
+/**
+ * Designated initializer with PayloadBuilder injection.
+ * Matches Android's MetricsTrackerImpl constructor pattern.
+ *
+ * @param payloadBuilder The payload builder for constructing metric payloads
+ */
+- (instancetype)initWithPayloadBuilder:(CLXPayloadBuilder *)payloadBuilder;
 
 /**
  * For dependency injection and testing (database only)
@@ -37,6 +46,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithDatabase:(CLXSQLiteDatabase *)database
                          bulkApi:(id<CLXEventTrackerBulkApi>)bulkApi;
+
+/**
+ * For full dependency injection and testing (database + bulk API + payload builder)
+ */
+- (instancetype)initWithDatabase:(CLXSQLiteDatabase *)database
+                         bulkApi:(id<CLXEventTrackerBulkApi>)bulkApi
+                  payloadBuilder:(nullable CLXPayloadBuilder *)payloadBuilder;
 
 @end
 

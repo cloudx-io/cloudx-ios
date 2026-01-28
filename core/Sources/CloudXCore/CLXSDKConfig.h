@@ -44,7 +44,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
 @property (nonatomic, copy, nullable) NSString *organizationID;
 @property (nonatomic, copy, nullable) NSString *impressionTrackerURL;
-@property (nonatomic, copy, nullable) NSString *metricsEndpointURL;
 @property (nonatomic, strong, nullable) CLXMetricsConfig *metricsConfig;
 @property (nonatomic, strong, nullable) NSArray<NSString *> *tracking;
 
@@ -72,7 +71,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Response structure
 @interface CLXSDKConfigResponse : NSObject
-@property (nonatomic, copy, nullable) NSString *metricsEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sessionID;
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
 @property (nonatomic, copy, nullable) NSString *geoDataEndpointURL;
@@ -93,6 +91,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXMetricsConfig *metricsConfig;
 /// Device-specific configuration from server (test mode, debug logging)
 @property (nonatomic, strong, nullable) CLXSDKConfigDeviceConfig *deviceConfig;
+
+/// SDK init network call latency in milliseconds (for metrics tracking)
+/// This is measured in CLXSDKInitNetworkService and tracked after MetricsTracker is initialized
+@property (nonatomic, assign) NSInteger sdkInitLatencyMs;
 
 - (instancetype)init;
 @end

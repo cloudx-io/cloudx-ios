@@ -5,6 +5,7 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CLXEventTrackerBulkApi.h>
 #import <CloudXCore/CLXEventAM.h>
+#import <CloudXCore/CLXEventType.h>
 #import <CloudXCore/CLXError.h>
 
 @interface CLXEventTrackerBulkApiTests : XCTestCase
@@ -26,12 +27,12 @@
 #pragma mark - Input Validation Tests (No Network)
 
 - (void)testSendWithNilEndpoint {
-    // Given
+    // Given - Use CLXEventType constants for type safety
     CLXEventAM *event = [[CLXEventAM alloc] initWithImpression:@"test"
                                                     campaignId:@"test"
                                                     eventValue:@"N/A"
-                                                     eventName:@"SDK_METRICS"
-                                                          type:@"SDK_METRICS"];
+                                                     eventName:CLXEventTypePathSDKMetrics
+                                                          type:CLXEventTypePathSDKMetrics];
     NSArray *items = @[event];
     
     // When
@@ -51,12 +52,12 @@
 }
 
 - (void)testSendWithEmptyEndpoint {
-    // Given
+    // Given - Use CLXEventType constants for type safety
     CLXEventAM *event = [[CLXEventAM alloc] initWithImpression:@"test"
                                                     campaignId:@"test"
                                                     eventValue:@"N/A"
-                                                     eventName:@"SDK_METRICS"
-                                                          type:@"SDK_METRICS"];
+                                                     eventName:CLXEventTypePathSDKMetrics
+                                                          type:CLXEventTypePathSDKMetrics];
     NSArray *items = @[event];
     
     // When

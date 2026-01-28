@@ -775,10 +775,13 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     if (self.adapterLoadStartTime) {
         NSTimeInterval latencyMs = [[NSDate date] timeIntervalSinceDate:self.adapterLoadStartTime] * 1000;
         
+        // Nil-safe tracking (matching Android's optional chaining)
         id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad 
-                                 latency:(NSInteger)latencyMs
-                                   error:error];
+        if (metricsTracker) {
+            [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad 
+                                     latency:(NSInteger)latencyMs
+                                       error:error];
+        }
         
         [self.logger debug:[NSString stringWithFormat:@"Tracked adapter load latency: %.0fms%@", 
                            latencyMs, error ? @" (failed)" : @""]];
