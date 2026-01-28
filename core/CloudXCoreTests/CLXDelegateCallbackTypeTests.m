@@ -86,26 +86,26 @@
     // Create mock CLXBidResponseBid with proper structure
     CLXBidResponseBid *mockBid = [[CLXBidResponseBid alloc] init];
     mockBid.adid = @"ext_123";  // This maps to externalPlacementId
-    mockBid.price = 1.25;       // This maps to revenue
-    
-    // Create the extension structure for bidder info
+
+    // Create the extension structure for bidder info and revenue
     CLXBidResponseCloudX *cloudxExt = [[CLXBidResponseCloudX alloc] init];
     cloudxExt.adapterExtras = @{@"bidder": @"test_bidder"};
-    
+    cloudxExt.revenue = 1.25;  // Revenue from ext.cloudx.revenue
+
     CLXBidResponseExt *ext = [[CLXBidResponseExt alloc] init];
     ext.cloudx = cloudxExt;
-    
+
     mockBid.ext = ext;
-    
+
     CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"placement_123"];
-    
+
     XCTAssertNotNil(ad, @"Factory method should create CLXAd object");
     XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"Factory method should return CLXAd instance");
     XCTAssertEqualObjects(ad.placementName, @"placement_123", @"Placement name should use placementId as fallback");
     XCTAssertEqualObjects(ad.placementId, @"placement_123", @"Placement ID should be set from parameter");
     XCTAssertEqualObjects(ad.bidder, @"test_bidder", @"Bidder should be extracted from bid");
     XCTAssertEqualObjects(ad.externalPlacementId, @"ext_123", @"External placement ID should be extracted from bid");
-    XCTAssertEqualObjects(ad.revenue, @1.25, @"Revenue should be extracted from bid");
+    XCTAssertEqualObjects(ad.revenue, @1.25, @"Revenue should be extracted from ext.cloudx.revenue");
 }
 
 // Test that CLXAd initializer creates proper objects

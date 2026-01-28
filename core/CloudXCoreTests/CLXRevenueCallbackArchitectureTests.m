@@ -37,14 +37,15 @@
     mockBid.ext.prebid = [[CLXBidResponsePrebid alloc] init];
     mockBid.ext.prebid.meta = [[CLXBidResponseCloudXMeta alloc] init];
     mockBid.ext.prebid.meta.adaptercode = @"google";
-    mockBid.price = 2.50;
-    
+    mockBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
+    mockBid.ext.cloudx.revenue = 2.50;
+
     CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"test-placement"];
-    
+
     XCTAssertNotNil(ad, @"CLXAd should be created with valid prebid bidder");
     XCTAssertEqualObjects(ad.bidder, @"google", @"Bidder should be extracted from prebid.meta.adaptercode");
     XCTAssertEqualObjects(ad.placementId, @"test-placement", @"Placement ID should be set correctly");
-    XCTAssertEqual([ad.revenue doubleValue], 2.50, @"Revenue should match bid price");
+    XCTAssertEqual([ad.revenue doubleValue], 2.50, @"Revenue should match ext.cloudx.revenue");
 }
 
 // Test CLXAd factory method with CloudX fallback bidder
@@ -54,13 +55,13 @@
     mockBid.ext = [[CLXBidResponseExt alloc] init];
     mockBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
     mockBid.ext.cloudx.adapterExtras = @{@"bidder": @"meta"};
-    mockBid.price = 1.75;
-    
+    mockBid.ext.cloudx.revenue = 1.75;
+
     CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"fallback-placement"];
-    
+
     XCTAssertNotNil(ad, @"CLXAd should be created with CloudX fallback bidder");
     XCTAssertEqualObjects(ad.bidder, @"meta", @"Bidder should be extracted from cloudx.adapterExtras");
-    XCTAssertEqual([ad.revenue doubleValue], 1.75, @"Revenue should match bid price");
+    XCTAssertEqual([ad.revenue doubleValue], 1.75, @"Revenue should match ext.cloudx.revenue");
 }
 
 // Test CLXAd factory method prioritizes prebid over CloudX
@@ -68,20 +69,19 @@
     // Create a mock bid with both prebid and CloudX bidder information
     CLXBidResponseBid *mockBid = [[CLXBidResponseBid alloc] init];
     mockBid.ext = [[CLXBidResponseExt alloc] init];
-    
+
     // Set prebid bidder (should be prioritized)
     mockBid.ext.prebid = [[CLXBidResponsePrebid alloc] init];
     mockBid.ext.prebid.meta = [[CLXBidResponseCloudXMeta alloc] init];
     mockBid.ext.prebid.meta.adaptercode = @"prebid-bidder";
-    
-    // Set CloudX bidder (should be ignored)
+
+    // Set CloudX extension with revenue and bidder (bidder should be ignored)
     mockBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
     mockBid.ext.cloudx.adapterExtras = @{@"bidder": @"cloudx-bidder"};
-    
-    mockBid.price = 4.00;
-    
+    mockBid.ext.cloudx.revenue = 4.00;
+
     CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"priority-test"];
-    
+
     XCTAssertNotNil(ad, @"CLXAd should be created");
     XCTAssertEqualObjects(ad.bidder, @"prebid-bidder", @"Should prioritize prebid bidder over CloudX bidder");
 }
@@ -96,11 +96,12 @@
 - (void)testCLXAdFactoryMethodWithNoBidderInfo {
     // Create a mock bid with no bidder information
     CLXBidResponseBid *mockBid = [[CLXBidResponseBid alloc] init];
-    mockBid.ext = [[CLXBidResponseExt alloc] init]; // No prebid or cloudx info
-    mockBid.price = 1.50;
-    
+    mockBid.ext = [[CLXBidResponseExt alloc] init];
+    mockBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
+    mockBid.ext.cloudx.revenue = 1.50;
+
     CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"no-bidder-test"];
-    
+
     XCTAssertNil(ad, @"CLXAd should be nil when no bidder information is available");
 }
 

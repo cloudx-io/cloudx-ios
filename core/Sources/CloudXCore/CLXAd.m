@@ -55,7 +55,10 @@
     if ([bid isKindOfClass:[CLXBidResponseBid class]]) {
         CLXBidResponseBid *bidResponse = (CLXBidResponseBid *)bid;
         
-        revenue = @(bidResponse.price); // Use price as revenue
+        // Revenue from ext.cloudx.revenue
+        if (bidResponse.ext && bidResponse.ext.cloudx) {
+            revenue = @(bidResponse.ext.cloudx.revenue);
+        }
         
         // Extract external placement ID with fallback chain
         // Priority: adid (OpenRTB standard) > adapter_extras placement_id > crid > bid ID

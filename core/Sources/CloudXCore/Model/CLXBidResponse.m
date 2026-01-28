@@ -161,6 +161,7 @@ static void initializeLogger() {
         if (self.ext.cloudx) {
             NSMutableDictionary *cloudDict = [NSMutableDictionary dictionary];
             cloudDict[@"rank"] = @(self.ext.cloudx.rank);
+            cloudDict[@"revenue"] = @(self.ext.cloudx.revenue);
             cloudDict[@"test"] = @(self.ext.cloudx.test);
             if (self.ext.cloudx.adapterExtras) cloudDict[@"adapterExtras"] = self.ext.cloudx.adapterExtras;
             extDict[@"cloudx"] = cloudDict;
@@ -658,23 +659,32 @@ static void initializeLogger() {
     if (![dictionary isKindOfClass:[NSDictionary class]]) {
         return nil;
     }
-    //_logger = [[CLXLogger alloc] initWithCategory:@"WinLossFieldResolver"];
     CLXBidResponseCloudX *cloudx = [[CLXBidResponseCloudX alloc] init];
-    // Parse rank with NSNull safety
+
+    // Parse rank
     id rankValue = dictionary[@"rank"];
     if (rankValue && ![rankValue isKindOfClass:[NSNull class]]) {
         cloudx.rank = [rankValue integerValue];
     }
+
+    // Parse revenue
+    id revenueValue = dictionary[@"revenue"];
+    if (revenueValue && ![revenueValue isKindOfClass:[NSNull class]]) {
+        cloudx.revenue = [revenueValue doubleValue];
+    }
+
+    // Parse test
     id testValue = dictionary[@"test"];
     if (testValue && ![testValue isKindOfClass:[NSNull class]]) {
         cloudx.test = [testValue integerValue];
     }
+
     // Parse adapterExtras
     NSDictionary *adapterExtrasDict = dictionary[@"adapter_extras"];
     if ([adapterExtrasDict isKindOfClass:[NSDictionary class]]) {
         cloudx.adapterExtras = adapterExtrasDict;
     }
-    
+
     return cloudx;
 }
 

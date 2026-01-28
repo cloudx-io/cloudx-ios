@@ -143,8 +143,9 @@
     mockBid.ext.prebid = [[CLXBidResponsePrebid alloc] init];
     mockBid.ext.prebid.meta = [[CLXBidResponseCloudXMeta alloc] init];
     mockBid.ext.prebid.meta.adaptercode = @"test-bidder";
-    mockBid.price = 1.50;
-    
+    mockBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
+    mockBid.ext.cloudx.revenue = 1.50;
+
     CLXAd *adWithValidBid = [CLXAd adFromBid:mockBid placementId:@"test-placement"];
     XCTAssertNotNil(adWithValidBid, @"CLXAd factory method should create valid CLXAd object");
     XCTAssertEqualObjects(adWithValidBid.placementId, @"test-placement", @"CLXAd should have correct placement ID");

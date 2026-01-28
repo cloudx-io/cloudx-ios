@@ -30,10 +30,11 @@
     malformedBid.ext = [[CLXBidResponseExt alloc] init];
     malformedBid.ext.prebid = [[CLXBidResponsePrebid alloc] init];
     malformedBid.ext.prebid.meta = nil; // This should cause creation to fail
-    malformedBid.price = 1.50;
-    
+    malformedBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
+    malformedBid.ext.cloudx.revenue = 1.50;
+
     CLXAd *ad = [CLXAd adFromBid:malformedBid placementId:@"malformed-test"];
-    
+
     XCTAssertNil(ad, @"CLXAd should be nil with malformed bid structure");
 }
 
@@ -45,28 +46,30 @@
     emptyBidderBid.ext.prebid = [[CLXBidResponsePrebid alloc] init];
     emptyBidderBid.ext.prebid.meta = [[CLXBidResponseCloudXMeta alloc] init];
     emptyBidderBid.ext.prebid.meta.adaptercode = @""; // Empty string
-    emptyBidderBid.price = 1.50;
-    
+    emptyBidderBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
+    emptyBidderBid.ext.cloudx.revenue = 1.50;
+
     CLXAd *ad = [CLXAd adFromBid:emptyBidderBid placementId:@"empty-bidder-test"];
-    
+
     XCTAssertNil(ad, @"CLXAd should be nil when bidder is empty string");
 }
 
-// Test CLXAd creation with zero price (should still work)
-- (void)testCLXAdCreationWithZeroPrice {
-    // Create bid with zero price
-    CLXBidResponseBid *zeroPriceBid = [[CLXBidResponseBid alloc] init];
-    zeroPriceBid.ext = [[CLXBidResponseExt alloc] init];
-    zeroPriceBid.ext.prebid = [[CLXBidResponsePrebid alloc] init];
-    zeroPriceBid.ext.prebid.meta = [[CLXBidResponseCloudXMeta alloc] init];
-    zeroPriceBid.ext.prebid.meta.adaptercode = @"zero-price-bidder";
-    zeroPriceBid.price = 0.0;
-    
-    CLXAd *ad = [CLXAd adFromBid:zeroPriceBid placementId:@"zero-price-test"];
-    
-    XCTAssertNotNil(ad, @"CLXAd should be created even with zero price");
+// Test CLXAd creation with zero revenue (should still work)
+- (void)testCLXAdCreationWithZeroRevenue {
+    // Create bid with zero revenue
+    CLXBidResponseBid *zeroRevenueBid = [[CLXBidResponseBid alloc] init];
+    zeroRevenueBid.ext = [[CLXBidResponseExt alloc] init];
+    zeroRevenueBid.ext.prebid = [[CLXBidResponsePrebid alloc] init];
+    zeroRevenueBid.ext.prebid.meta = [[CLXBidResponseCloudXMeta alloc] init];
+    zeroRevenueBid.ext.prebid.meta.adaptercode = @"zero-revenue-bidder";
+    zeroRevenueBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
+    zeroRevenueBid.ext.cloudx.revenue = 0.0;
+
+    CLXAd *ad = [CLXAd adFromBid:zeroRevenueBid placementId:@"zero-revenue-test"];
+
+    XCTAssertNotNil(ad, @"CLXAd should be created even with zero revenue");
     XCTAssertEqual([ad.revenue doubleValue], 0.0, @"Revenue should be zero");
-    XCTAssertEqualObjects(ad.bidder, @"zero-price-bidder", @"Bidder should still be extracted");
+    XCTAssertEqualObjects(ad.bidder, @"zero-revenue-bidder", @"Bidder should still be extracted");
 }
 
 // Test CLXAd creation with nil placement ID (should still work)
@@ -77,10 +80,11 @@
     validBid.ext.prebid = [[CLXBidResponsePrebid alloc] init];
     validBid.ext.prebid.meta = [[CLXBidResponseCloudXMeta alloc] init];
     validBid.ext.prebid.meta.adaptercode = @"test-bidder";
-    validBid.price = 1.50;
-    
+    validBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
+    validBid.ext.cloudx.revenue = 1.50;
+
     CLXAd *ad = [CLXAd adFromBid:validBid placementId:nil];
-    
+
     XCTAssertNotNil(ad, @"CLXAd should be created even with nil placement ID");
     XCTAssertNil(ad.placementId, @"Placement ID should be nil");
     XCTAssertEqualObjects(ad.bidder, @"test-bidder", @"Bidder should still be extracted");
