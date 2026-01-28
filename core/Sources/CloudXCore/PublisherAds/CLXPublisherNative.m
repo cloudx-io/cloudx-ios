@@ -28,7 +28,6 @@
 #import <CloudXCore/CLXDIContainer.h>
 
 #import <CloudXCore/CLXBannerTimerService.h>
-#import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXAdEventReporting.h>
 #import <CloudXCore/CLXRillTrackingService.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
@@ -77,7 +76,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger loadNativeTimesCount;
 @property (nonatomic, strong) CLXSDKConfigPlacement *placement;
 @property (nonatomic, strong, nullable) NSDate *adLoadStartTime;
-@property (nonatomic, strong) CLXAppSessionService *appSessionService;
 
 // Analytics tracking service for analytics events
 @property (nonatomic, strong) CLXRillTrackingService *rillTrackingService;
@@ -152,14 +150,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         // Initialize timer service
         _timerService = [[CLXBannerTimerService alloc] init];
-        
-        // Initialize app session service (singleton)
-        NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey] ?: @"";
-        NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
-        _appSessionService = [[CLXAppSessionService alloc] initWithSessionID:sessionID
-                                                                                 appKey:appKey
-                                                                                    url:[[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @""];
-        
+
         // Only create bidAdSource if placement is available (defer if SDK not initialized)
         if (placement) {
             __weak typeof(self) weakSelf = self;
@@ -525,9 +516,7 @@ NS_ASSUME_NONNULL_BEGIN
     if (self.adLoadStartTime) {
         latency = [[NSDate date] timeIntervalSinceDate:self.adLoadStartTime] * 1000;
     }
-    
-    [self.appSessionService adLoadedWithPlacementID:self.placementID latency:latency];
-    
+
     // Track adapter load latency with metrics tracker
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:nil];
@@ -576,8 +565,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)failToLoadWithNative:(nullable id<CLXAdapterNative>)native error:(nullable NSError *)error {
     [self.logger error:[NSString stringWithFormat:@"Native fail to load %@", error.localizedDescription ?: @"unknown"]];
-    [self.appSessionService adFailedToLoadWithPlacementID:self.placementID];
-    
+
     // Track adapter load latency with metrics tracker (failure)
     if (self.adLoadStartTime) {
         NSTimeInterval latency = [[NSDate date] timeIntervalSinceDate:self.adLoadStartTime] * 1000;
@@ -643,14 +631,6 @@ NS_ASSUME_NONNULL_BEGIN
     // Report impression if we have a bid response
     if (self.lastBidResponse) {
         [self.logger debug:[NSString stringWithFormat:@"Reporting impression for bidID=%@", self.lastBidResponse.bidID]];
-        
-        // Legacy impression tracking removed - now handled by Analytics
-        
-        // Add spend to app session service
-        [self.appSessionService addSpendWithPlacementID:self.placementID spend:self.lastBidResponse.price];
-        
-        // Add impression to app session service
-        [self.appSessionService addImpressionWithPlacementID:self.placementID];
     }
     
     if ([self.delegate respondsToSelector:@selector(didShowWithNative:)]) {
@@ -662,9 +642,6 @@ NS_ASSUME_NONNULL_BEGIN
     [self.logger debug:[NSString stringWithFormat:@"Native impression %@", self.placementID]];
     
     if (self.lastBidResponse) {
-        [self.appSessionService addSpendWithPlacementID:self.placementID spend:self.lastBidResponse.price];
-        [self.appSessionService addImpressionWithPlacementID:self.placementID];
-        
         // Send Analytics tracking impression event
         [self.rillTrackingService sendImpressionEvent];
         
@@ -699,7 +676,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)clickWithNative:(id<CLXAdapterNative>)native {
-    [self.appSessionService addClickWithPlacementID:self.placementID];
     [self.rillTrackingService sendClickEvent];
     
     // Show click confirmed feedback - stops pending animation and shows green border

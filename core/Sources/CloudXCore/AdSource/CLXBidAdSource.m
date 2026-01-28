@@ -22,8 +22,6 @@
 
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBidNetworkService.h>
-#import <CloudXCore/CLXAppSessionService.h>
-#import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXBiddingConfig.h>
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXBidResponse.h>
@@ -94,7 +92,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSTimeInterval bidRequestTimeout;
 @property (nonatomic, assign) double latency;
 @property (nonatomic, strong) id<CLXBidNetworkService> bidNetworkService;
-@property (nonatomic, strong) CLXAppSessionService *appSessionService;
 @property (nonatomic, strong) id<CLXAdEventReporting> reportingService;
 @property (nonatomic, strong) id<CLXWinLossTracking> winLossTracker;
 @property (nonatomic, copy, nullable) NSString *currentCorrelationId;
@@ -136,15 +133,6 @@ NS_ASSUME_NONNULL_BEGIN
         
         // Initialize win/loss tracker
         _winLossTracker = [CLXWinLossTracker shared];
-        
-        // Get app key from UserDefaults (matching Swift SDK behavior)
-        NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey] ?: @"";
-        NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
-        // Use metrics URL from SDK response (stored in user defaults)
-        NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @"";
-        _appSessionService = [[CLXAppSessionService alloc] initWithSessionID:sessionID
-                                                                                  appKey:appKey
-                                                                                     url:metricsURL];
     }
     return self;
 }
@@ -448,11 +436,9 @@ NS_ASSUME_NONNULL_BEGIN
         
         if (testAd != nil) {
             // SUCCESS - This bid can be created (but not yet confirmed as loaded)
-            [self.logger debug:[NSString stringWithFormat:@"[%@] Waterfall success with bid %ld: rank=%ld, id=%@", 
+            [self.logger debug:[NSString stringWithFormat:@"[%@] Waterfall success with bid %ld: rank=%ld, id=%@",
                               correlationId, (long)bidIndex + 1, (long)currentBid.ext.cloudx.rank, currentBid.id]];
-            
-            [self.appSessionService bidLoadedWithPlacementID:currentBid.id latency:self.latency];
-            
+
             // NOTE: Don't fire lurls here - wait until winner actually loads successfully
             // This prevents premature lurl firing for bids that might still be needed as fallbacks
             [self.logger debug:[NSString stringWithFormat:@"[%@] Deferring lurl firing until winner loads successfully", correlationId]];

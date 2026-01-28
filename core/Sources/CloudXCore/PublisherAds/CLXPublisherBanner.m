@@ -33,7 +33,6 @@
 #import <CloudXCore/CLXBannerTimerService.h>
 
 
-#import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXBidAdSource.h>
 #import <CloudXCore/CLXAdEventReporting.h>
 #import <CloudXCore/CLXDestroyable.h>
@@ -109,7 +108,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSDate *adLoadStartTime;
 // Analytics tracking service for analytics events
 @property (nonatomic, strong) CLXRillTrackingService *rillTrackingService;
-@property (nonatomic, strong) CLXAppSessionService *appSessionService;
 @property (nonatomic, strong) id<CLXWinLossTracking> winLossTracker;
 
 // Queued load request handling (for SDK init race condition)
@@ -205,16 +203,7 @@ NS_ASSUME_NONNULL_BEGIN
         
         // Initialize timer service
         _timerService = [[CLXBannerTimerService alloc] init];
-        
-        // Initialize app session service (singleton)
-        NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreBannerAppKeyKey] ?: @"";
-        NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreBannerSessionIDKey] ?: @"";
-        // Use metrics URL from SDK response (stored in user defaults)
-        NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @"";
-        _appSessionService = [[CLXAppSessionService alloc] initWithSessionID:sessionID
-                                                                                 appKey:appKey
-                                                                                    url:metricsURL];
-        
+
         // Initialize bid ad source only if placement is available
         if (placement) {
             _bidAdSource = [self createBidAdSourceForPlacement:placement];
@@ -676,8 +665,7 @@ NS_ASSUME_NONNULL_BEGIN
         latency = [[NSDate date] timeIntervalSinceDate:self.adLoadStartTime] * 1000;
     }
     [self.logger debug:[NSString stringWithFormat:@"Ad loaded with latency: %.1f ms", latency]];
-    [self.appSessionService adLoadedWithPlacementID:self.placementID latency:latency];
-    
+
     // Track adapter load latency with metrics tracker
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkAdapterLoad latency:(NSInteger)latency error:nil];
@@ -790,9 +778,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)failToLoadBanner:(nullable id<CLXAdapterBanner>)banner error:(nullable NSError *)error {
     [self.logger info:[NSString stringWithFormat:@"[%@] failToLoadBanner for placement: %@ - %@", self.currentCorrelationId, self.placementID, error.localizedDescription ?: @"Unknown error"]];
-    
-    [self.appSessionService adFailedToLoadWithPlacementID:self.placementID];
-    
+
     // Track adapter load latency with metrics tracker (failure)
     if (self.adLoadStartTime) {
         NSTimeInterval latency = [[NSDate date] timeIntervalSinceDate:self.adLoadStartTime] * 1000;
@@ -869,9 +855,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     if (self.lastBidResponse) {
         [self.logger debug:[NSString stringWithFormat:@"Reporting impression for bidID=%@", self.lastBidResponse.bidID]];
-        [self.appSessionService addImpressionWithPlacementID:self.placementID];
-        [self.appSessionService addSpendWithPlacementID:self.placementID spend:self.lastBidResponse.price];
-        
+
         // Fire RENDER_SUCCESS lifecycle event (burl) on impression
         if (self.lastBidResponse.bidID && self.currentBidResponse && self.currentBidResponse.id) {
             [self.logger debug:[NSString stringWithFormat:@"Firing RENDER_SUCCESS event (burl) on impression for bidID=%@", self.lastBidResponse.bidID]];
@@ -902,7 +886,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)clickBanner:(id<CLXAdapterBanner>)banner {
-    [self.appSessionService addClickWithPlacementID:self.placementID];
     [self.rillTrackingService sendClickEvent];
     
     // Show click confirmed feedback - stops pending animation and shows green border
@@ -919,7 +902,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)closedByUserActionBanner:(id<CLXAdapterBanner>)banner {
     [self.logger debug:[NSString stringWithFormat:@"closedByUserAction delegate called for placement: %@", self.placementID]];
-    [self.appSessionService addCloseWithPlacementID:self.placementID latency:1.0];
 }
 
 - (void)didExpandBanner:(id<CLXAdapterBanner>)banner {

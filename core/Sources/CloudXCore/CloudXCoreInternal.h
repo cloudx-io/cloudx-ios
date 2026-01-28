@@ -72,14 +72,8 @@
 // Session Management
 #import <CloudXCore/CLXSession.h>
 #import <CloudXCore/CLXSessionDaoImpl.h>
-#import <CloudXCore/CLXAppSession.h>
-#import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXSessionMetrics.h>
 #import <CloudXCore/CLXSessionMetricsTracker.h>
-#import <CloudXCore/CLXSessionMetric.h>
-#import <CloudXCore/CLXSessionMetricType.h>
-#import <CloudXCore/CLXSessionMetricSpend.h>
-#import <CloudXCore/CLXSessionMetricPerformance.h>
 
 // Database
 #import <CloudXCore/CLXDatabaseProtocol.h>

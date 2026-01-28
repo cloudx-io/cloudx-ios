@@ -20,7 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXTimeService;
 @class CLXSystemInformation;
 @class CLXCloudXPrivacy;
-@class CLXAppSessionModel;
 @class CLXSettings;
 
 // Forward declarations for nested types

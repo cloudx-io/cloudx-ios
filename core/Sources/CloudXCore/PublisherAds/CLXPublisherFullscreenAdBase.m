@@ -27,7 +27,6 @@
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXBidAdSource.h>
 #import <CloudXCore/CLXBidResponse.h>
-#import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXAdEventReporting.h>
 #import <CloudXCore/CLXDestroyable.h>
 #import <CloudXCore/CLXSettings.h>
@@ -115,7 +114,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 @property (nonatomic, assign) int64_t adLoadTimeoutMs;
 @property (nonatomic, copy, nullable) NSString *rewardedCallbackUrl;
 @property (nonatomic, strong) CLXLogger *logger;
-@property (nonatomic, strong) CLXAppSessionService *appSessionService;
 @property (nonatomic, strong, nullable) CLXBidAdSource *bidAdSource;
 @property (nonatomic, strong) CLXSettings *settings;
 
@@ -208,15 +206,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         
         // Initialize win/loss tracker
         _winLossTracker = [CLXWinLossTracker shared];
-        
-        // Set up session tracking for metrics collection
-        NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey] ?: @"";
-        NSString *sessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey] ?: @"";
-        NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @"";
-        _appSessionService = [[CLXAppSessionService alloc] initWithSessionID:sessionID
-                                                                       appKey:appKey
-                                                                          url:metricsURL];
-        
+
         // Configure bid source for ad request management (only if placement available)
         if (placement) {
             BOOL hasCloseButton = placement.hasCloseButton ?: NO;
@@ -638,11 +628,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 }
 
 - (void)applyMetrics {
-    id currentAdapter = [self getCurrentAdapter];
-    if (currentAdapter && [currentAdapter respondsToSelector:@selector(price)]) {
-        double price = [currentAdapter price];
-        [self.appSessionService addSpendWithPlacementID:self.placementID spend:price];
-    }
+    // Metrics tracking removed - CLXAppSessionService was write-only dead code
 }
 
 - (void)sendLossNotificationForFailedAd {
@@ -716,12 +702,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 }
 
 - (void)handleAdClose {
-    // Calculate display latency if we have impression time
-    if (self.impressionTime) {
-        NSTimeInterval latency = [[NSDate date] timeIntervalSinceDate:self.impressionTime] * 1000;
-        [self.appSessionService addCloseWithPlacementID:self.placementID latency:latency];
-    }
-    
     // Mark close event received
     self.closeEventReceived = YES;
     
@@ -763,7 +743,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     [self applyMetrics];
     
     [[CLXSessionMetricsTracker sharedInstance] recordImpressionForPlacement:self.placementName adType:adType];
-    [self.appSessionService addImpressionWithPlacementID:self.placementID];
     [self.rillTrackingService sendImpressionEvent];
     
     CLXBidResponseBid *winningBid = [self.currentBidResponse findBidWithID:bidID];
@@ -784,7 +763,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 - (void)handleClickTracking {
     [self.logger debug:@"Clicked on ad"];
-    [self.appSessionService addClickWithPlacementID:self.placementID];
     [self.rillTrackingService sendClickEvent];
 }
 

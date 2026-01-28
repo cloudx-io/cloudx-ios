@@ -13,7 +13,6 @@
 #import <CloudXCore/CLXMetricsType.h>
 #import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXErrorReporter.h>
-#import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXBidNetworkService.h>
 #import <CloudXCore/CLXAdEventReporter.h>
 #import <CloudXCore/CLXAdapterFactoryResolver.h>
@@ -109,7 +108,6 @@ NSString * const CLXSDKInitializedNotification = @"CLXSDKInitializedNotification
 @property (nonatomic, copy) NSString *abTestName;
 @property (nonatomic, copy) NSString *defaultAuctionURL;
 @property (nonatomic, strong) CLXGeoLocationService *geoLocationService;
-@property (nonatomic, strong) CLXAppSessionService *appSessionService;
 @property (nonatomic, strong) CLXBidNetworkServiceClass *bidNetworkService;
 @property (nonatomic, strong) CLXAdNetworkFactories *adNetworkFactories;
 @property (nonatomic, strong) NSMutableSet<NSString *> *readyAdapters;
@@ -550,11 +548,9 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger debug:[NSString stringWithFormat:@"[CloudXCore] A/B Test Group: %@", endpointResolver.testGroupName]];
     }
     
-    // Register services in DI container 
-        CLXDIContainer *container = [CLXDIContainer shared];
-    [container registerType:[CLXAppSessionService class] instance:[[CLXAppSessionService alloc] initWithSessionID:config.sessionID ?: @"" appKey:_appKey url:metricsEndpointURL]];
+    // Register services in DI container
+    CLXDIContainer *container = [CLXDIContainer shared];
     [container registerType:[CLXBidNetworkServiceClass class] instance:[[CLXBidNetworkServiceClass alloc] initWithAuctionEndpointUrl:auctionEndpointUrl errorReporter:[CLXErrorReporter shared]]];
-    [container resolveType:ServiceTypeSingleton class:[CLXAppSessionService class]];
     
     // Check if adapters are empty (skip in test mode - isTestMode already defined above)
     if (_adNetworkFactories.isEmpty && !isTestMode) {
@@ -1341,10 +1337,9 @@ static BOOL _visualDebuggingEnabled = NO;
     _abTestName = nil;
     _defaultAuctionURL = nil;
     _geoLocationService = nil;
-    _appSessionService = nil;
     _bidNetworkService = nil;
     _adNetworkFactories = nil;
-    
+
     [self.logger info:@"SDK deinitialized successfully"];
 }
 
@@ -1363,7 +1358,6 @@ static BOOL _visualDebuggingEnabled = NO;
     _abTestName = @"RandomTest";
     _defaultAuctionURL = @"";
     _geoLocationService = nil;
-    _appSessionService = nil;
     _bidNetworkService = nil;
     _adNetworkFactories = nil;
     [_readyAdapters removeAllObjects];
