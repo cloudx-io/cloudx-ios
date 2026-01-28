@@ -8,7 +8,6 @@
  * 
  * Single database with multiple specialized tables:
  * - metrics_event_table: Metrics tracking (matches Android MetricsEvent)
- * - cached_tracking_events_table: Rill event tracking (matches Android CachedTrackingEvents)
  * - session_table: App session management
  * - performance_metrics_table: Placement performance tracking
  * 
@@ -22,7 +21,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol CLXMetricsEventDao;
-@protocol CLXRillEventDao;
 @protocol CLXSessionDao;
 @protocol CLXPerformanceDao;
 
@@ -49,7 +47,6 @@ NS_ASSUME_NONNULL_BEGIN
  * Following Dependency Inversion Principle with protocols
  */
 @property (nonatomic, strong, readonly) id<CLXMetricsEventDao> metricsDao;
-@property (nonatomic, strong, readonly) id<CLXRillEventDao> rillEventDao;
 @property (nonatomic, strong, readonly) id<CLXSessionDao> sessionDao;
 @property (nonatomic, strong, readonly) id<CLXPerformanceDao> performanceDao;
 

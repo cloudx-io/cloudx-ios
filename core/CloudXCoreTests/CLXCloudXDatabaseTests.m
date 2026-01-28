@@ -5,7 +5,6 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CLXCloudXDatabase.h>
 #import <CloudXCore/CLXDaoProtocols.h>
-#import <CloudXCore/CLXRillEvent.h>
 #import <CloudXCore/CLXMetricsEvent.h>
 #import <CloudXCore/CLXSession.h>
 #import <CloudXCore/CLXPerformanceMetric.h>
@@ -56,48 +55,14 @@
 - (void)testDatabaseInitialization {
     XCTAssertNotNil(self.database, @"Database should be initialized");
     XCTAssertNotNil(self.database.metricsDao, @"Metrics DAO should be initialized");
-    XCTAssertNotNil(self.database.rillEventDao, @"Rill event DAO should be initialized");
     XCTAssertNotNil(self.database.sessionDao, @"Session DAO should be initialized");
     XCTAssertNotNil(self.database.performanceDao, @"Performance DAO should be initialized");
 }
 
 - (void)testSchemaCreation {
     XCTAssertTrue([self.database tableExists:@"metrics_event_table"], @"Metrics table should exist");
-    XCTAssertTrue([self.database tableExists:@"cached_tracking_events_table"], @"Rill events table should exist");
     XCTAssertTrue([self.database tableExists:@"session_table"], @"Session table should exist");
     XCTAssertTrue([self.database tableExists:@"performance_metrics_table"], @"Performance metrics table should exist");
-}
-
-#pragma mark - Rill Event DAO Tests
-
-- (void)testRillEventInsertion {
-    CLXRillEvent *event = [CLXRillEvent impressionEventWithSessionId:@"test_session" 
-                                                          campaignId:@"test_campaign" 
-                                                             payload:@"test_payload"];
-    
-    BOOL success = [self.database.rillEventDao insertRillEvent:event];
-    XCTAssertTrue(success, @"Should insert Rill event successfully");
-    
-    CLXRillEvent *retrieved = [self.database.rillEventDao findRillEventById:event.eventId];
-    XCTAssertNotNil(retrieved, @"Should retrieve inserted event");
-    XCTAssertEqualObjects(retrieved.campaignId, @"test_campaign", @"Campaign ID should match");
-    XCTAssertEqualObjects(retrieved.eventName, @"impression", @"Event name should match");
-}
-
-- (void)testRillEventBatchInsertion {
-    NSMutableArray *events = [NSMutableArray array];
-    for (int i = 0; i < 10; i++) {
-        CLXRillEvent *event = [CLXRillEvent clickEventWithSessionId:@"test_session" 
-                                                         campaignId:[NSString stringWithFormat:@"campaign_%d", i]
-                                                            payload:@"test_payload"];
-        [events addObject:event];
-    }
-    
-    BOOL success = [self.database.rillEventDao insertRillEventBatch:events];
-    XCTAssertTrue(success, @"Should insert batch successfully");
-    
-    NSArray *pending = [self.database.rillEventDao findPendingRillEvents];
-    XCTAssertEqual(pending.count, 10, @"Should have 10 pending events");
 }
 
 #pragma mark - Metrics Event DAO Tests
@@ -211,50 +176,6 @@
     NSDictionary *summary = [self.database.performanceDao getPerformanceSummaryForPlacement:placementId];
     XCTAssertNotNil(summary, @"Should have performance summary");
     XCTAssertEqual([summary[@"totalImpressions"] integerValue], 6, @"Summary should show 6 impressions");
-}
-
-#pragma mark - Transaction Tests
-
-- (void)testTransactionRollback {
-    BOOL transactionResult = [self.database executeInTransactionWithResult:^BOOL{
-        CLXRillEvent *event = [CLXRillEvent impressionEventWithSessionId:@"test_session" 
-                                                              campaignId:@"test_campaign" 
-                                                                 payload:@"test_payload"];
-        
-        BOOL insertSuccess = [self.database.rillEventDao insertRillEvent:event];
-        XCTAssertTrue(insertSuccess, @"Insert should succeed within transaction");
-        
-        // Force transaction failure by returning NO
-        return NO;
-    }];
-    
-    XCTAssertFalse(transactionResult, @"Transaction should have failed");
-    
-    // Verify rollback
-    NSArray *events = [self.database.rillEventDao findPendingRillEvents];
-    XCTAssertEqual(events.count, 0, @"Should have no events after rollback");
-}
-
-#pragma mark - Performance Tests
-
-- (void)testBulkInsertPerformance {
-    NSMutableArray *events = [NSMutableArray array];
-    for (int i = 0; i < 1000; i++) {
-        CLXRillEvent *event = [CLXRillEvent impressionEventWithSessionId:@"test_session" 
-                                                              campaignId:[NSString stringWithFormat:@"campaign_%d", i]
-                                                                 payload:@"test_payload"];
-        [events addObject:event];
-    }
-    
-    NSDate *startTime = [NSDate date];
-    BOOL success = [self.database.rillEventDao insertRillEventBatch:events];
-    NSTimeInterval duration = [[NSDate date] timeIntervalSinceDate:startTime];
-    
-    XCTAssertTrue(success, @"Bulk insert should succeed");
-    XCTAssertLessThan(duration, 30.0, @"Bulk insert should complete within 30 seconds");
-    
-    NSArray *retrieved = [self.database.rillEventDao findPendingRillEvents];
-    XCTAssertEqual(retrieved.count, 1000, @"Should retrieve all inserted events");
 }
 
 @end

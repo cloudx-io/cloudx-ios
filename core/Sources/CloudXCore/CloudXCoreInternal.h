@@ -47,7 +47,6 @@
 
 // Tracking Services
 #import <CloudXCore/CLXRillTrackingService.h>
-#import <CloudXCore/CLXRillTrackingServiceV2.h>
 #import <CloudXCore/CLXRillImpressionModel.h>
 #import <CloudXCore/CLXRillImpressionDefaultModel.h>
 #import <CloudXCore/CLXRillImpressionProperties.h>
@@ -82,11 +81,6 @@
 #import <CloudXCore/CLXCloudXDatabase.h>
 #import <CloudXCore/CLXDaoProtocols.h>
 #import <CloudXCore/CLXBaseDao.h>
-
-// Rill Events
-#import <CloudXCore/CLXRillEvent.h>
-#import <CloudXCore/CLXRillEventDaoImpl.h>
-#import <CloudXCore/CLXBaseEvent.h>
 
 // Performance
 #import <CloudXCore/CLXPerformanceMetric.h>

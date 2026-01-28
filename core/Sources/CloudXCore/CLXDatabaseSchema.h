@@ -24,7 +24,6 @@ extern NSString * const CLXDatabaseName;
  * Table Names (matching Android exactly)
  */
 extern NSString * const CLXMetricsEventTableName;
-extern NSString * const CLXCachedTrackingEventsTableName;
 extern NSString * const CLXSessionTableName;
 extern NSString * const CLXPerformanceMetricsTableName;
 
@@ -39,12 +38,6 @@ extern NSString * const CLXPerformanceMetricsTableName;
  * Fields: id, metricName, counter, totalLatency, sessionId, auctionId
  */
 + (NSString *)createMetricsEventTableSQL;
-
-/**
- * Cached Tracking Events Table (matches Android CachedTrackingEvents)
- * Fields: id, encoded, campaignId, eventValue, eventName, type
- */
-+ (NSString *)createCachedTrackingEventsTableSQL;
 
 /**
  * Session Table (replaces Core Data CLXAppSessionModel)

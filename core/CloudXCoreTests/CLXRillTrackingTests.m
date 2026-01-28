@@ -34,7 +34,15 @@ static NSString * const kTestAuctionID = @"test-auction-456";
 static NSString * const kTestBidID = @"test-bid-789";
 static NSString * const kTestPlacementID = @"test-placement-abc";
 
-// Event types are now defined in CLXRillTrackingServiceV2.h
+// Event types for testing (mirroring production event types)
+typedef NS_ENUM(NSInteger, CLXRillEventType) {
+    CLXRillEventTypeSDKInit = 0,
+    CLXRillEventTypeClick = 1,
+    CLXRillEventTypeImpression = 2,
+    CLXRillEventTypeBidRequest = 3,
+    CLXRillEventTypeSDKError = 4,
+    CLXRillEventTypeSDKMetrics = 5
+};
 
 // Ad types for testing
 typedef NS_ENUM(NSInteger, CLXTestAdType) {

@@ -10,14 +10,12 @@
 
 // DAO Implementations
 #import "CLXMetricsEventDaoImpl.h"
-#import "CLXRillEventDaoImpl.h"
 #import "CLXSessionDaoImpl.h"
 #import "CLXPerformanceDaoImpl.h"
 
 @interface CLXCloudXDatabase ()
 
 @property (nonatomic, strong) id<CLXMetricsEventDao> metricsDao;
-@property (nonatomic, strong) id<CLXRillEventDao> rillEventDao;
 @property (nonatomic, strong) id<CLXSessionDao> sessionDao;
 @property (nonatomic, strong) id<CLXPerformanceDao> performanceDao;
 
@@ -61,7 +59,6 @@ static CLXCloudXDatabase *_testInstance = nil;
 - (void)initializeDAOs {
     // Initialize DAO implementations with dependency injection
     self.metricsDao = [[CLXMetricsEventDaoImpl alloc] initWithDatabase:self];
-    self.rillEventDao = [[CLXRillEventDaoImpl alloc] initWithDatabase:self];
     self.sessionDao = [[CLXSessionDaoImpl alloc] initWithDatabase:self];
     self.performanceDao = [[CLXPerformanceDaoImpl alloc] initWithDatabase:self];
 }
@@ -91,7 +88,6 @@ static CLXCloudXDatabase *_testInstance = nil;
         // Create all tables
         NSArray *createTableStatements = @[
             [CLXDatabaseSchema createMetricsEventTableSQL],
-            [CLXDatabaseSchema createCachedTrackingEventsTableSQL],
             [CLXDatabaseSchema createSessionTableSQL],
             [CLXDatabaseSchema createPerformanceMetricsTableSQL]
         ];
@@ -263,10 +259,6 @@ static CLXCloudXDatabase *_testInstance = nil;
 
 - (id<CLXMetricsEventDao>)metricsDao {
     return _metricsDao;
-}
-
-- (id<CLXRillEventDao>)rillEventDao {
-    return _rillEventDao;
 }
 
 - (id<CLXSessionDao>)sessionDao {

@@ -10,7 +10,6 @@ NSString * const CLXDatabaseName = @"cloudx.db";
 
 // Table Names (matching Android exactly)
 NSString * const CLXMetricsEventTableName = @"metrics_event_table";
-NSString * const CLXCachedTrackingEventsTableName = @"cached_tracking_events_table";
 NSString * const CLXSessionTableName = @"session_table";
 NSString * const CLXPerformanceMetricsTableName = @"performance_metrics_table";
 
@@ -26,22 +25,6 @@ NSString * const CLXPerformanceMetricsTableName = @"performance_metrics_table";
            @"auctionId TEXT NOT NULL, "
            @"created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')), "
            @"updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))"
-           @")";
-}
-
-+ (NSString *)createCachedTrackingEventsTableSQL {
-    return @"CREATE TABLE IF NOT EXISTS cached_tracking_events_table ("
-           @"id TEXT PRIMARY KEY NOT NULL, "
-           @"encoded TEXT NOT NULL, "
-           @"campaignId TEXT NOT NULL, "
-           @"eventValue TEXT NOT NULL, "
-           @"eventName TEXT NOT NULL, "
-           @"type TEXT NOT NULL, "
-           @"created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')), "
-           @"updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')), "
-           @"retry_count INTEGER NOT NULL DEFAULT 0, "
-           @"last_retry_at INTEGER, "
-           @"status TEXT NOT NULL DEFAULT 'pending'"
            @")";
 }
 
@@ -88,28 +71,19 @@ NSString * const CLXPerformanceMetricsTableName = @"performance_metrics_table";
         @"CREATE INDEX IF NOT EXISTS idx_metrics_auction_id ON metrics_event_table(auctionId)",
         @"CREATE INDEX IF NOT EXISTS idx_metrics_name ON metrics_event_table(metricName)",
         @"CREATE INDEX IF NOT EXISTS idx_metrics_created_at ON metrics_event_table(created_at)",
-        
-        // Cached Tracking Events Indexes
-        @"CREATE INDEX IF NOT EXISTS idx_tracking_campaign_id ON cached_tracking_events_table(campaignId)",
-        @"CREATE INDEX IF NOT EXISTS idx_tracking_event_name ON cached_tracking_events_table(eventName)",
-        @"CREATE INDEX IF NOT EXISTS idx_tracking_type ON cached_tracking_events_table(type)",
-        @"CREATE INDEX IF NOT EXISTS idx_tracking_status ON cached_tracking_events_table(status)",
-        @"CREATE INDEX IF NOT EXISTS idx_tracking_created_at ON cached_tracking_events_table(created_at)",
-        @"CREATE INDEX IF NOT EXISTS idx_tracking_retry_count ON cached_tracking_events_table(retry_count)",
-        
+
         // Session Indexes
         @"CREATE INDEX IF NOT EXISTS idx_session_session_id ON session_table(sessionId)",
         @"CREATE INDEX IF NOT EXISTS idx_session_app_key ON session_table(appKey)",
         @"CREATE INDEX IF NOT EXISTS idx_session_start_time ON session_table(startTime)",
-        
+
         // Performance Metrics Indexes
         @"CREATE INDEX IF NOT EXISTS idx_performance_placement_id ON performance_metrics_table(placementId)",
         @"CREATE INDEX IF NOT EXISTS idx_performance_session_id ON performance_metrics_table(sessionId)",
         @"CREATE INDEX IF NOT EXISTS idx_performance_timestamp ON performance_metrics_table(timestamp)",
-        
+
         // Composite Indexes for Common Queries
         @"CREATE INDEX IF NOT EXISTS idx_metrics_session_name ON metrics_event_table(sessionId, metricName)",
-        @"CREATE INDEX IF NOT EXISTS idx_tracking_campaign_type ON cached_tracking_events_table(campaignId, type)",
         @"CREATE INDEX IF NOT EXISTS idx_performance_placement_session ON performance_metrics_table(placementId, sessionId)"
     ];
 }
