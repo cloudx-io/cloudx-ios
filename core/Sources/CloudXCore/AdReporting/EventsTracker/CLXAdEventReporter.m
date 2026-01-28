@@ -20,7 +20,7 @@
         NSString *fallbackURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey] ?: @"";
         NSString *endpointString = endpoint.length > 0 ? endpoint : fallbackURL;
         NSURL *endpointURL = [NSURL URLWithString:endpointString];
-        NSURLSession *urlSession = [NSURLSession cloudxSessionWithIdentifier:@"event"];
+        NSURLSession *urlSession = [NSURLSession cloudxSession];
         _reportNetworkService = [[CLXAdReportingNetworkService alloc] initWithBaseURL:endpointURL urlSession:urlSession];
         _logger = [[CLXLogger alloc] initWithCategory:@"LiveAdEventReporter"];
     }

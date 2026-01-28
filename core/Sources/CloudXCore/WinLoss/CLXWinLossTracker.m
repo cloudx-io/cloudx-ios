@@ -128,9 +128,9 @@ static id<CLXWinLossTracking> _testInstance = nil;
         
         // Create table synchronously since we fixed the deadlock issues in CLXSQLiteDatabase
         [self createWinLossTableIfNeeded];
-        
+
         // Initialize network service with placeholder URL (will be updated when endpoint is set)
-        NSURLSession *urlSession = [NSURLSession cloudxSessionWithIdentifier:@"winloss"];
+        NSURLSession *urlSession = [NSURLSession cloudxSession];
         _networkService = [[CLXWinLossNetworkService alloc] initWithBaseURL:@"" urlSession:urlSession];
     }
     return self;
@@ -147,7 +147,7 @@ static id<CLXWinLossTracking> _testInstance = nil;
     
     // Recreate network service with new endpoint
     if (endpointUrl) {
-        NSURLSession *urlSession = [NSURLSession cloudxSessionWithIdentifier:@"winloss"];
+        NSURLSession *urlSession = [NSURLSession cloudxSession];
         self.networkService = [[CLXWinLossNetworkService alloc] initWithBaseURL:endpointUrl urlSession:urlSession];
     }
 }

@@ -29,7 +29,7 @@
         _logger = [[CLXLogger alloc] initWithCategory:@"InitService.m"];
         
         NSURL *initApiURL = [CLXURLProvider initApiUrl];
-        NSURLSession *cloudxSession = [NSURLSession cloudxSessionWithIdentifier:@"init"];
+        NSURLSession *cloudxSession = [NSURLSession cloudxSession];
         _networkInitService = [[CLXSDKInitNetworkService alloc] initWithBaseURL:initApiURL.absoluteString
                                                                  urlSession:cloudxSession];
         

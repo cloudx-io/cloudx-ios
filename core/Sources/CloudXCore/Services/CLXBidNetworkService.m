@@ -40,7 +40,7 @@
 - (instancetype)initWithAuctionEndpointUrl:(NSString *)auctionEndpointUrl
                             errorReporter:(nullable CLXErrorReporter *)errorReporter {
     // Use default URLSession
-    NSURLSession *urlSession = [NSURLSession cloudxSessionWithIdentifier:@"auction"];
+    NSURLSession *urlSession = [NSURLSession cloudxSession];
     return [self initWithAuctionEndpointUrl:auctionEndpointUrl 
                              errorReporter:errorReporter 
                                 urlSession:urlSession];

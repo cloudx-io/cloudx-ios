@@ -27,7 +27,7 @@
     [self.logger info:[NSString stringWithFormat:@"🚀 [LiveInitService+Internal] initializeSDKWithAppKey called with custom URL - AppKey: %@, URL: %@", appKey, customInitURL]];
     
     // Create a temporary network service with the custom URL
-    NSURLSession *cloudxSession = [NSURLSession cloudxSessionWithIdentifier:@"init-internal"];
+    NSURLSession *cloudxSession = [NSURLSession cloudxSession];
     CLXSDKInitNetworkService *customNetworkService = [[CLXSDKInitNetworkService alloc] 
         initWithBaseURL:customInitURL 
         urlSession:cloudxSession];
