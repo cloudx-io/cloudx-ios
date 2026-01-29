@@ -20,7 +20,7 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 
 @class CLXBannerAdView;
 @class CLXSDKConfigResponse;
-@class CLXSDKConfigPlacement;
+@class CLXSDKConfigAdUnit;
 @class CLXInterstitial;
 @class CLXRewarded;
 
@@ -237,7 +237,7 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  * @return Placement configuration or nil if not found
  * @discussion Internal API used by ad objects to look up placement configuration after SDK initialization
  */
-- (nullable CLXSDKConfigPlacement *)placementConfigForName:(NSString *)placementName;
+- (nullable CLXSDKConfigAdUnit *)placementConfigForName:(NSString *)placementName;
 
 /**
  * Get all available placement names from the SDK configuration

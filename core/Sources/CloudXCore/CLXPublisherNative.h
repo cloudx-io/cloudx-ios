@@ -14,7 +14,7 @@
 #import <CloudXCore/CLXAdapterNative.h>
 #import <CloudXCore/CLXAdapterNativeFactory.h>
 #import <CloudXCore/CLXNativeTemplate.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXNativeAdView.h>
 #import <CloudXCore/CLXAdRevenueDelegate.h>
@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return Initialized CLXPublisherNative instance
  */
 - (instancetype)initWithViewController:(UIViewController *)viewController
-                             placement:(nullable CLXSDKConfigPlacement *)placement
+                             placement:(nullable CLXSDKConfigAdUnit *)placement
                                 userID:(NSString *)userID
                            publisherID:(NSString *)publisherID
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible

@@ -119,7 +119,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 #pragma mark - Factory Methods (DRY)
 
 - (CLXPublisherBanner *)createBannerWithDelegate:(CLXTestDelegate *)delegate {
-    CLXSDKConfigPlacement *placement = [[CLXSDKConfigPlacement alloc] init];
+    CLXSDKConfigAdUnit *placement = [[CLXSDKConfigAdUnit alloc] init];
     placement.id = @"test-placement";
     placement.bannerRefreshRateMs = 30000;
     
@@ -139,7 +139,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 }
 
 - (CLXPublisherNative *)createNativeWithDelegate:(CLXTestDelegate *)delegate {
-    CLXSDKConfigPlacement *placement = [[CLXSDKConfigPlacement alloc] init];
+    CLXSDKConfigAdUnit *placement = [[CLXSDKConfigAdUnit alloc] init];
     placement.id = @"test-native";
     
     return [[CLXPublisherNative alloc] initWithViewController:[[UIViewController alloc] init]
@@ -157,7 +157,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 }
 
 - (CLXInterstitial *)createInterstitialWithDelegate:(id<CLXInterstitialDelegate>)delegate {
-    CLXSDKConfigPlacement *placement = [[CLXSDKConfigPlacement alloc] init];
+    CLXSDKConfigAdUnit *placement = [[CLXSDKConfigAdUnit alloc] init];
     placement.id = @"test-interstitial";
     
     CLXInterstitial *ad = [[CLXInterstitial alloc] initWithPlacement:placement
@@ -175,7 +175,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 }
 
 - (CLXRewarded *)createRewardedWithDelegate:(id<CLXRewardedDelegate>)delegate {
-    CLXSDKConfigPlacement *placement = [[CLXSDKConfigPlacement alloc] init];
+    CLXSDKConfigAdUnit *placement = [[CLXSDKConfigAdUnit alloc] init];
     placement.id = @"test-rewarded";
     
     CLXRewarded *ad = [[CLXRewarded alloc] initWithPlacement:placement

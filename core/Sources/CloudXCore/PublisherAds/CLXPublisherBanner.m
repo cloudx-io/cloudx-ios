@@ -14,7 +14,7 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXAdapterBannerFactory.h>
 #import <CloudXCore/CLXBannerType.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXAdType.h>
@@ -98,7 +98,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *placementSuffix;
 @property (nonatomic, assign) NSInteger impressionIndexStart;
 @property (nonatomic, assign) NSInteger impressionIndexEnd;
-@property (nonatomic, strong, nullable) CLXSDKConfigPlacement *placement;
+@property (nonatomic, strong, nullable) CLXSDKConfigAdUnit *placement;
 @property (nonatomic, strong, nullable) CLXConfigImpressionModel *impModel;
 @property (nonatomic, assign) NSTimeInterval bidRequestTimeout;
 @property (nonatomic, copy, nullable) NSString *requestedPlacementName; // Stored for deferred initialization
@@ -127,7 +127,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Initialization
 
 - (instancetype)initWithViewController:(UIViewController *)viewController
-                             placement:(nullable CLXSDKConfigPlacement *)placement
+                             placement:(nullable CLXSDKConfigAdUnit *)placement
                                 userID:(NSString *)userID
                            publisherID:(NSString *)publisherID
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
@@ -279,7 +279,7 @@ NS_ASSUME_NONNULL_BEGIN
     // Check if we need to complete deferred initialization (bidAdSource is nil)
     if (!self.bidAdSource && self.requestedPlacementName && [[CloudXCore shared] isInitialized]) {
         // SDK is now initialized - complete initialization with real placement config
-        CLXSDKConfigPlacement *realPlacement = [[CloudXCore shared] placementConfigForName:self.requestedPlacementName];
+        CLXSDKConfigAdUnit *realPlacement = [[CloudXCore shared] placementConfigForName:self.requestedPlacementName];
         if (realPlacement) {
             [self.logger debug:[NSString stringWithFormat:@"Completing deferred initialization for: %@ (ID: %@)", self.requestedPlacementName, realPlacement.id]];
             
@@ -503,7 +503,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (CLXBidAdSource *)createBidAdSourceForPlacement:(CLXSDKConfigPlacement *)placement {
+- (CLXBidAdSource *)createBidAdSourceForPlacement:(CLXSDKConfigAdUnit *)placement {
     BOOL hasCloseButton = placement.hasCloseButton ?: NO;
     NSInteger adType = (self.bannerType == CLXBannerTypeW320H50) ? CLXAdTypeBanner : CLXAdTypeMrec;
     

@@ -14,7 +14,7 @@
 #import <CloudXCore/CLXBannerAdView.h>
 #import <CloudXCore/CLXAdapterBannerFactory.h>
 #import <CloudXCore/CLXBannerType.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXBannerDelegate.h>
@@ -107,7 +107,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return Initialized PublisherBanner instance
  */
 - (instancetype)initWithViewController:(UIViewController *)viewController
-                             placement:(nullable CLXSDKConfigPlacement *)placement
+                             placement:(nullable CLXSDKConfigAdUnit *)placement
                                 userID:(NSString *)userID
                            publisherID:(NSString *)publisherID
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible

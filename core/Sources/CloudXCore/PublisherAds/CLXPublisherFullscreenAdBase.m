@@ -13,7 +13,7 @@
 #import <CloudXCore/CLXAdapterRewarded.h>
 #import <CloudXCore/CLXAdapterInterstitialFactory.h>
 #import <CloudXCore/CLXAdapterRewardedFactory.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXAdNetworkFactories.h>
 #import <CloudXCore/CLXWinLossTracker.h>
@@ -154,7 +154,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 #pragma mark - Initialization
 
-- (instancetype)initWithPlacement:(nullable CLXSDKConfigPlacement *)placement
+- (instancetype)initWithPlacement:(nullable CLXSDKConfigAdUnit *)placement
                       publisherID:(NSString *)publisherID
                            userID:(nullable NSString *)userID
               rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl
@@ -331,7 +331,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Check if we need to complete deferred initialization (bidAdSource is nil)
     if (!self.bidAdSource && self.requestedPlacementName && [[CloudXCore shared] isInitialized]) {
         // SDK is now initialized - complete initialization with real placement config
-        CLXSDKConfigPlacement *realPlacement = [[CloudXCore shared] placementConfigForName:self.requestedPlacementName];
+        CLXSDKConfigAdUnit *realPlacement = [[CloudXCore shared] placementConfigForName:self.requestedPlacementName];
         if (realPlacement) {
             [self.logger debug:[NSString stringWithFormat:@"Completing deferred initialization for: %@ (ID: %@)", self.requestedPlacementName, realPlacement.id]];
             _placementID = realPlacement.id;

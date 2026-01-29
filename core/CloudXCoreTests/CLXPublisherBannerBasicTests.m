@@ -159,7 +159,7 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
 @property (nonatomic, strong) CLXPublisherBanner *banner;
 @property (nonatomic, strong) BasicMockDelegate *mockDelegate;
 @property (nonatomic, strong) UIViewController *testViewController;
-@property (nonatomic, strong) CLXSDKConfigPlacement *testPlacement;
+@property (nonatomic, strong) CLXSDKConfigAdUnit *testPlacement;
 @property (nonatomic, strong) CLXConfigImpressionModel *testImpModel;
 @property (nonatomic, strong) CLXSettings *testSettings;
 @end
@@ -174,7 +174,7 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
     self.mockDelegate = [[BasicMockDelegate alloc] init];
     
     // Create test placement
-    self.testPlacement = [[CLXSDKConfigPlacement alloc] init];
+    self.testPlacement = [[CLXSDKConfigAdUnit alloc] init];
     self.testPlacement.id = kBasicTestPlacementID;
     self.testPlacement.bannerRefreshRateMs = (int64_t)(kBasicRefreshInterval * 1000);
     

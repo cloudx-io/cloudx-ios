@@ -30,7 +30,7 @@
     config.accountID = @"TEST_ACCOUNT";
     config.sessionID = @"TEST_SESSION";
     config.bidders = bidders;
-    config.placements = @[];
+    config.adUnits = @[];
     return config;
 }
 

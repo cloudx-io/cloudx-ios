@@ -11,7 +11,7 @@
 #import <CloudXCore/CLXFullscreenAd.h>
 #import <CloudXCore/CLXAdEventReporting.h>
 
-@class CLXSDKConfigPlacement;
+@class CLXSDKConfigAdUnit;
 @class CLXAdNetworkFactories;
 @class CLXSettings;
 @class CLXConfigImpressionModel;
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param reportingService The reporting service
  * @param settings The settings instance
  */
-- (instancetype)initWithPlacement:(nullable CLXSDKConfigPlacement *)placement
+- (instancetype)initWithPlacement:(nullable CLXSDKConfigAdUnit *)placement
                       publisherID:(NSString *)publisherID
                            userID:(nullable NSString *)userID
               rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl

@@ -43,8 +43,8 @@
     CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"test-placement"];
 
     XCTAssertNotNil(ad, @"CLXAd should be created with valid prebid bidder");
-    XCTAssertEqualObjects(ad.bidder, @"google", @"Bidder should be extracted from prebid.meta.adaptercode");
-    XCTAssertEqualObjects(ad.placementId, @"test-placement", @"Placement ID should be set correctly");
+    XCTAssertEqualObjects(ad.networkName, @"google", @"Network name should be extracted from prebid.meta.adaptercode");
+    XCTAssertEqualObjects(ad.adUnitId, @"test-placement", @"Ad unit ID should be set correctly");
     XCTAssertEqual([ad.revenue doubleValue], 2.50, @"Revenue should match ext.cloudx.revenue");
 }
 
@@ -60,7 +60,7 @@
     CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"fallback-placement"];
 
     XCTAssertNotNil(ad, @"CLXAd should be created with CloudX fallback bidder");
-    XCTAssertEqualObjects(ad.bidder, @"meta", @"Bidder should be extracted from cloudx.adapterExtras");
+    XCTAssertEqualObjects(ad.networkName, @"meta", @"Network name should be extracted from cloudx.adapterExtras");
     XCTAssertEqual([ad.revenue doubleValue], 1.75, @"Revenue should match ext.cloudx.revenue");
 }
 
@@ -83,7 +83,7 @@
     CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"priority-test"];
 
     XCTAssertNotNil(ad, @"CLXAd should be created");
-    XCTAssertEqualObjects(ad.bidder, @"prebid-bidder", @"Should prioritize prebid bidder over CloudX bidder");
+    XCTAssertEqualObjects(ad.networkName, @"prebid-bidder", @"Should prioritize prebid network over CloudX network");
 }
 
 // Test CLXAd factory method fails with nil bid

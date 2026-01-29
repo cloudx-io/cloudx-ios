@@ -101,57 +101,63 @@
 
     XCTAssertNotNil(ad, @"Factory method should create CLXAd object");
     XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"Factory method should return CLXAd instance");
-    XCTAssertEqualObjects(ad.placementName, @"placement_123", @"Placement name should use placementId as fallback");
-    XCTAssertEqualObjects(ad.placementId, @"placement_123", @"Placement ID should be set from parameter");
-    XCTAssertEqualObjects(ad.bidder, @"test_bidder", @"Bidder should be extracted from bid");
-    XCTAssertEqualObjects(ad.externalPlacementId, @"ext_123", @"External placement ID should be extracted from bid");
+    XCTAssertEqualObjects(ad.adUnitName, @"placement_123", @"Ad unit name should use adUnitId as fallback");
+    XCTAssertEqualObjects(ad.adUnitId, @"placement_123", @"Ad unit ID should be set from parameter");
+    XCTAssertEqualObjects(ad.networkName, @"test_bidder", @"Network name should be extracted from bid");
+    XCTAssertEqualObjects(ad.networkPlacement, @"ext_123", @"Network placement should be extracted from bid");
     XCTAssertEqualObjects(ad.revenue, @1.25, @"Revenue should be extracted from ext.cloudx.revenue");
 }
 
 // Test that CLXAd initializer creates proper objects
 - (void)testCLXAdInitializerCreatesValidObjects {
-    CLXAd *ad = [[CLXAd alloc] initWithPlacementName:@"test_name"
-                                         placementId:@"test_id"
-                                              bidder:@"test_bidder"
-                                 externalPlacementId:@"ext_id"
-                                             revenue:@2.50];
+    CLXAd *ad = [[CLXAd alloc] initWithAdUnitName:@"test_name"
+                                         adUnitId:@"test_id"
+                                      networkName:@"test_bidder"
+                                 networkPlacement:@"ext_id"
+                                          revenue:@2.50];
     
     XCTAssertNotNil(ad, @"Initializer should create CLXAd object");
     XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"Initializer should return CLXAd instance");
-    XCTAssertEqualObjects(ad.placementName, @"test_name", @"Placement name should be set");
-    XCTAssertEqualObjects(ad.placementId, @"test_id", @"Placement ID should be set");
-    XCTAssertEqualObjects(ad.bidder, @"test_bidder", @"Bidder should be set");
-    XCTAssertEqualObjects(ad.externalPlacementId, @"ext_id", @"External placement ID should be set");
+    XCTAssertEqualObjects(ad.adUnitName, @"test_name", @"Ad unit name should be set");
+    XCTAssertEqualObjects(ad.adUnitId, @"test_id", @"Ad unit ID should be set");
+    XCTAssertEqualObjects(ad.networkName, @"test_bidder", @"Network name should be set");
+    XCTAssertEqualObjects(ad.networkPlacement, @"ext_id", @"Network placement should be set");
     XCTAssertEqualObjects(ad.revenue, @2.50, @"Revenue should be set");
 }
 
 // Test that CLXAd properties are readonly and properly typed
 - (void)testCLXAdPropertiesAreReadonlyAndTyped {
-    CLXAd *ad = [[CLXAd alloc] initWithPlacementName:@"test"
-                                         placementId:@"test"
-                                              bidder:@"test"
-                                 externalPlacementId:@"test"
-                                             revenue:@1.0];
+    CLXAd *ad = [[CLXAd alloc] initWithAdUnitName:@"test"
+                                         adUnitId:@"test"
+                                      networkName:@"test"
+                                 networkPlacement:@"test"
+                                          revenue:@1.0];
     
-    // Verify all properties exist and are of correct type
-    XCTAssertTrue([ad respondsToSelector:@selector(placementName)], @"CLXAd should have placementName property");
-    XCTAssertTrue([ad respondsToSelector:@selector(placementId)], @"CLXAd should have placementId property");
-    XCTAssertTrue([ad respondsToSelector:@selector(bidder)], @"CLXAd should have bidder property");
-    XCTAssertTrue([ad respondsToSelector:@selector(externalPlacementId)], @"CLXAd should have externalPlacementId property");
+    // Verify all properties exist and are of correct type (new names)
+    XCTAssertTrue([ad respondsToSelector:@selector(adUnitName)], @"CLXAd should have adUnitName property");
+    XCTAssertTrue([ad respondsToSelector:@selector(adUnitId)], @"CLXAd should have adUnitId property");
+    XCTAssertTrue([ad respondsToSelector:@selector(networkName)], @"CLXAd should have networkName property");
+    XCTAssertTrue([ad respondsToSelector:@selector(networkPlacement)], @"CLXAd should have networkPlacement property");
     XCTAssertTrue([ad respondsToSelector:@selector(revenue)], @"CLXAd should have revenue property");
     
+    // Verify deprecated properties still work (backward compatibility)
+    XCTAssertTrue([ad respondsToSelector:@selector(placementName)], @"CLXAd should have deprecated placementName property");
+    XCTAssertTrue([ad respondsToSelector:@selector(placementId)], @"CLXAd should have deprecated placementId property");
+    XCTAssertTrue([ad respondsToSelector:@selector(bidder)], @"CLXAd should have deprecated bidder property");
+    XCTAssertTrue([ad respondsToSelector:@selector(externalPlacementId)], @"CLXAd should have deprecated externalPlacementId property");
+    
     // Verify properties return correct types
-    if (ad.placementName) {
-        XCTAssertTrue([ad.placementName isKindOfClass:[NSString class]], @"placementName should be NSString");
+    if (ad.adUnitName) {
+        XCTAssertTrue([ad.adUnitName isKindOfClass:[NSString class]], @"adUnitName should be NSString");
     }
-    if (ad.placementId) {
-        XCTAssertTrue([ad.placementId isKindOfClass:[NSString class]], @"placementId should be NSString");
+    if (ad.adUnitId) {
+        XCTAssertTrue([ad.adUnitId isKindOfClass:[NSString class]], @"adUnitId should be NSString");
     }
-    if (ad.bidder) {
-        XCTAssertTrue([ad.bidder isKindOfClass:[NSString class]], @"bidder should be NSString");
+    if (ad.networkName) {
+        XCTAssertTrue([ad.networkName isKindOfClass:[NSString class]], @"networkName should be NSString");
     }
-    if (ad.externalPlacementId) {
-        XCTAssertTrue([ad.externalPlacementId isKindOfClass:[NSString class]], @"externalPlacementId should be NSString");
+    if (ad.networkPlacement) {
+        XCTAssertTrue([ad.networkPlacement isKindOfClass:[NSString class]], @"networkPlacement should be NSString");
     }
     if (ad.revenue) {
         XCTAssertTrue([ad.revenue isKindOfClass:[NSNumber class]], @"revenue should be NSNumber");
@@ -164,11 +170,11 @@
     // This test ensures compile-time type safety
     
     // Create a test CLXAd
-    CLXAd *testAd = [[CLXAd alloc] initWithPlacementName:@"test"
-                                             placementId:@"test"
-                                                  bidder:@"test"
-                                     externalPlacementId:@"test"
-                                                 revenue:@1.0];
+    CLXAd *testAd = [[CLXAd alloc] initWithAdUnitName:@"test"
+                                             adUnitId:@"test"
+                                          networkName:@"test"
+                                     networkPlacement:@"test"
+                                              revenue:@1.0];
     
     NSError *testError = [NSError errorWithDomain:@"test" code:1 userInfo:nil];
     

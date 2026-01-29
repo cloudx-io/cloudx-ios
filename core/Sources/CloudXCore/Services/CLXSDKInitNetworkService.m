@@ -305,10 +305,18 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     config.bidders = [self parseBiddersFromArray:biddersArray error:outError];
     if (!config.bidders) return nil;
 
-    NSArray *placementsArray = [self requiredArray:@"placements" from:response error:outError];
-    if (!placementsArray) return nil;
-    config.placements = [self parsePlacementsFromArray:placementsArray error:outError];
-    if (!config.placements) return nil;
+    // Read from "adUnits" (new schema) OR "placements" (legacy server) for backward compatibility
+    NSArray *placementsArray = response[@"adUnits"];
+    if (!placementsArray || ![placementsArray isKindOfClass:[NSArray class]]) {
+        placementsArray = response[@"placements"];
+    }
+    if (!placementsArray || ![placementsArray isKindOfClass:[NSArray class]]) {
+        if (outError) *outError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse
+                                    description:@"Required field 'adUnits' (or 'placements') is missing or not an array"];
+        return nil;
+    }
+    config.adUnits = [self parsePlacementsFromArray:placementsArray error:outError];
+    if (!config.adUnits) return nil;
 
     // ═══════════════════════════════════════════════════════════════════════════
     // 4. Tracking & Geo
@@ -332,7 +340,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     config.deviceConfig = [self parseDeviceConfigFromDictionary:response[@"deviceConfig"]];
 
     [self.logger info:[NSString stringWithFormat:@"SDK config parsed - Account: %@, Session: %@, Bidders: %lu, Placements: %lu",
-                      config.accountID, config.sessionID, (unsigned long)config.bidders.count, (unsigned long)config.placements.count]];
+                      config.accountID, config.sessionID, (unsigned long)config.bidders.count, (unsigned long)config.adUnits.count]];
     return config;
 }
 
@@ -373,7 +381,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
 
 #pragma mark - Parsing: Placements (matches Android toAdUnits)
 
-- (nullable NSArray<CLXSDKConfigPlacement *> *)parsePlacementsFromArray:(NSArray *)array error:(NSError **)outError {
+- (nullable NSArray<CLXSDKConfigAdUnit *> *)parsePlacementsFromArray:(NSArray *)array error:(NSError **)outError {
     NSMutableArray *placements = [NSMutableArray array];
     for (NSUInteger i = 0; i < array.count; i++) {
         id item = array[i];
@@ -404,7 +412,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
             return nil;
         }
 
-        CLXSDKConfigPlacement *placement = [[CLXSDKConfigPlacement alloc] init];
+        CLXSDKConfigAdUnit *placement = [[CLXSDKConfigAdUnit alloc] init];
         placement.id = placementId;
         placement.name = name;
         placement.type = [self parseAdTypeFromString:typeString];

@@ -82,7 +82,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         updateStatusUI(state: .loading)
 
         let placement = placementName
-        DemoAppLogger.sharedInstance.logMessage("📍 [RewardedInterstitial] Using placement: \(placement)")
+        DemoAppLogger.sharedInstance.logMessage("📍 [RewardedInterstitial] Using ad unit: \(placement)")
         
         // Create rewarded interstitial with comprehensive logging
         DemoAppLogger.sharedInstance.logMessage("📱 [RewardedInterstitial] Calling createRewarded...")
@@ -95,7 +95,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
             DemoAppLogger.sharedInstance.logMessage("🔄 [RewardedInterstitial] Loading rewarded interstitial ad instance...")
             rewardedInterstitialAd.load()
         } else {
-            DemoAppLogger.sharedInstance.logMessage("❌ [RewardedInterstitial] Failed to create rewarded interstitial with placement: \(placement)")
+            DemoAppLogger.sharedInstance.logMessage("❌ [RewardedInterstitial] Failed to create rewarded interstitial with ad unit: \(placement)")
             isLoading = false
             updateStatusUI(state: .noAd)
             showAlert(title: "Error", message: "Failed to create rewarded interstitial ad.")
@@ -142,7 +142,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
     
     func didFailToLoadAd(_ placementName: String, error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
-        DemoAppLogger.sharedInstance.logMessage("❌ RewardedInterstitial failed to load for placement '\(placementName)' - Error: \(error.localizedDescription)")
+        DemoAppLogger.sharedInstance.logMessage("❌ RewardedInterstitial failed to load for ad unit '\(placementName)' - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: .noAd)
         

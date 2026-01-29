@@ -12,7 +12,7 @@
         _sessionID = nil;
         _accountID = nil;
         _bidders = nil;
-        _placements = nil;
+        _adUnits = nil;
         _auctionEndpointURL = nil;
     }
     return self;
@@ -26,7 +26,7 @@
         _sessionID = nil;
         _accountID = nil;
         _bidders = nil;
-        _placements = nil;
+        _adUnits = nil;
         _auctionEndpointURL = nil;
     }
     return self;
@@ -90,7 +90,7 @@
 
         // 3. Core Config (required)
         _bidders = @[];
-        _placements = @[];
+        _adUnits = @[];
 
         // 4. Tracking & Geo (required)
         _tracking = @[];

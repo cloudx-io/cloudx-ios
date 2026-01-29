@@ -6,7 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXError.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The validated placement if validation succeeded, nil otherwise
  */
-@property (nonatomic, readonly, nullable) CLXSDKConfigPlacement *placement;
+@property (nonatomic, readonly, nullable) CLXSDKConfigAdUnit *placement;
 
 /**
  * The error if validation failed, nil otherwise
@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) BOOL isSuccess;
 
-+ (instancetype)successWithPlacement:(CLXSDKConfigPlacement *)placement;
++ (instancetype)successWithPlacement:(CLXSDKConfigAdUnit *)placement;
 + (instancetype)failureWithError:(CLXError *)error;
 
 @end
@@ -48,48 +48,48 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Validates that an interstitial placement exists and has the correct type.
  * @param placementName The name of the placement to validate
- * @param placements Dictionary of available placements (name -> CLXSDKConfigPlacement)
+ * @param placements Dictionary of available placements (name -> CLXSDKConfigAdUnit)
  * @return Validation result with placement or detailed error
  */
 + (CLXPlacementValidationResult *)validateInterstitialPlacement:(NSString *)placementName
-                                                     placements:(NSDictionary<NSString *, CLXSDKConfigPlacement *> *)placements;
+                                                     placements:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)placements;
 
 /**
  * Validates that a rewarded placement exists and has the correct type.
  * @param placementName The name of the placement to validate
- * @param placements Dictionary of available placements (name -> CLXSDKConfigPlacement)
+ * @param placements Dictionary of available placements (name -> CLXSDKConfigAdUnit)
  * @return Validation result with placement or detailed error
  */
 + (CLXPlacementValidationResult *)validateRewardedPlacement:(NSString *)placementName
-                                                 placements:(NSDictionary<NSString *, CLXSDKConfigPlacement *> *)placements;
+                                                 placements:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)placements;
 
 /**
  * Validates that a banner placement exists and has the correct type.
  * @param placementName The name of the placement to validate
- * @param placements Dictionary of available placements (name -> CLXSDKConfigPlacement)
+ * @param placements Dictionary of available placements (name -> CLXSDKConfigAdUnit)
  * @return Validation result with placement or detailed error
  */
 + (CLXPlacementValidationResult *)validateBannerPlacement:(NSString *)placementName
-                                               placements:(NSDictionary<NSString *, CLXSDKConfigPlacement *> *)placements;
+                                               placements:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)placements;
 
 /**
  * Validates that an MREC placement exists and has the correct type.
  * @param placementName The name of the placement to validate
- * @param placements Dictionary of available placements (name -> CLXSDKConfigPlacement)
+ * @param placements Dictionary of available placements (name -> CLXSDKConfigAdUnit)
  * @return Validation result with placement or detailed error
  */
 + (CLXPlacementValidationResult *)validateMRECPlacement:(NSString *)placementName
-                                             placements:(NSDictionary<NSString *, CLXSDKConfigPlacement *> *)placements;
+                                             placements:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)placements;
 
 /**
  * Validates that a native placement exists. Native ads don't have a specific type in the config,
  * so this only validates existence.
  * @param placementName The name of the placement to validate
- * @param placements Dictionary of available placements (name -> CLXSDKConfigPlacement)
+ * @param placements Dictionary of available placements (name -> CLXSDKConfigAdUnit)
  * @return Validation result with placement or detailed error
  */
 + (CLXPlacementValidationResult *)validateNativePlacement:(NSString *)placementName
-                                               placements:(NSDictionary<NSString *, CLXSDKConfigPlacement *> *)placements;
+                                               placements:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)placements;
 
 /**
  * Returns a human-readable string for the ad type.

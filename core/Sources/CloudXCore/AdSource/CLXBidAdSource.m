@@ -10,7 +10,7 @@
 #import <CloudXCore/CLXBidAdSource.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXBidTokenSource.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXAdNetworkFactories.h>
 #import <CloudXCore/CLXError.h>

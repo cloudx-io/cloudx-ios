@@ -47,7 +47,7 @@
         @"winLossNotificationURL": @"https://winloss.test.com",
         @"geoDataEndpointURL": @"https://geo.test.com/data",
         @"bidders": @[],
-        @"placements": @[],
+        @"adUnits": @[],
         @"tracking": @[],
         @"geoHeaders": @[],
         @"winLossNotificationPayloadConfig": @{}

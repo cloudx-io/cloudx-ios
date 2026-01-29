@@ -62,7 +62,7 @@
 #import <CloudXCore/CLXRillImpressionModel.h>
 #import <CloudXCore/CLXRillImpressionInitService.h>
 #import <CloudXCore/NSString+CLXSemicolon.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXPublisherBanner.h>
 #import <CloudXCore/CLXPublisherNative.h>
 #import <CloudXCore/CLXRewarded.h>
@@ -704,7 +704,7 @@ static CloudXCore *_sharedInstance = nil;
  * @param placementName The placement name
  * @return Placement configuration or nil if not found
  */
-- (CLXSDKConfigPlacement *)placementConfigForName:(NSString *)placementName {
+- (CLXSDKConfigAdUnit *)placementConfigForName:(NSString *)placementName {
     return _adPlacements[placementName];
 }
 
@@ -818,7 +818,7 @@ static CloudXCore *_sharedInstance = nil;
     }
     
     // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigPlacement *placementConfig = nil;
+    CLXSDKConfigAdUnit *placementConfig = nil;
     if (_isInitialized && !deferredError) {
         // SDK is initialized - validate placement with detailed error messages
         CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateBannerPlacement:placement
@@ -897,7 +897,7 @@ static CloudXCore *_sharedInstance = nil;
     }
     
     // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigPlacement *placementConfig = nil;
+    CLXSDKConfigAdUnit *placementConfig = nil;
     if (_isInitialized && !deferredError) {
         // SDK is initialized - validate placement with detailed error messages
         CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateMRECPlacement:placement
@@ -974,7 +974,7 @@ static CloudXCore *_sharedInstance = nil;
     }
     
     // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigPlacement *placementConfig = nil;
+    CLXSDKConfigAdUnit *placementConfig = nil;
     if (_isInitialized && !deferredError) {
         // SDK is initialized - validate placement with detailed error messages
         CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateInterstitialPlacement:placement
@@ -1047,7 +1047,7 @@ static CloudXCore *_sharedInstance = nil;
     }
     
     // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigPlacement *placementConfig = nil;
+    CLXSDKConfigAdUnit *placementConfig = nil;
     if (_isInitialized && !deferredError) {
         // SDK is initialized - validate placement with detailed error messages
         CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateRewardedPlacement:placement
@@ -1122,7 +1122,7 @@ static CloudXCore *_sharedInstance = nil;
     }
 
     // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigPlacement *placementConfig = nil;
+    CLXSDKConfigAdUnit *placementConfig = nil;
     if (_isInitialized && !deferredError) {
         // SDK is initialized - validate placement with detailed error messages
         // Note: Native ads don't have a specific type in config, so we only validate existence
@@ -1198,8 +1198,8 @@ static CloudXCore *_sharedInstance = nil;
 
 - (void)filterConfig {
     NSMutableDictionary *placementsDict = [NSMutableDictionary dictionary];
-    if (_sdkConfig.placements && _sdkConfig.placements.count > 0) {
-        for (CLXSDKConfigPlacement *placement in _sdkConfig.placements) {
+    if (_sdkConfig.adUnits && _sdkConfig.adUnits.count > 0) {
+        for (CLXSDKConfigAdUnit *placement in _sdkConfig.adUnits) {
             placementsDict[placement.name] = placement; // Use name as key like Swift SDK
         }
     }

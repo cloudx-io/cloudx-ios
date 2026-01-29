@@ -300,7 +300,7 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
 @property (nonatomic, strong) SpecComplianceDelegate *specDelegate;
 @property (nonatomic, strong) PreciseTimingMockFactory *timingFactory;
 @property (nonatomic, strong) UIViewController *testViewController;
-@property (nonatomic, strong) CLXSDKConfigPlacement *testPlacement;
+@property (nonatomic, strong) CLXSDKConfigAdUnit *testPlacement;
 @property (nonatomic, strong) CLXConfigImpressionModel *testImpModel;
 @property (nonatomic, strong) CLXSettings *testSettings;
 @end
@@ -316,7 +316,7 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
     self.timingFactory = [[PreciseTimingMockFactory alloc] init];
     
     // Create test placement with precise refresh interval
-    self.testPlacement = [[CLXSDKConfigPlacement alloc] init];
+    self.testPlacement = [[CLXSDKConfigAdUnit alloc] init];
     self.testPlacement.id = kSpecTestPlacementID;
     self.testPlacement.bannerRefreshRateMs = (int64_t)(kSpecRefreshInterval * 1000);
     

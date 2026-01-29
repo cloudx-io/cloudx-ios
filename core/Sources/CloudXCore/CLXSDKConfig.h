@@ -2,7 +2,7 @@
 #import <CloudXCore/CLXNativeTemplate.h>
 #import <CloudXCore/CLXSDKConfigRequest.h>
 #import <CloudXCore/CLXSDKConfigBidder.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXSDKConfigRequest;
 @class CLXMetricsConfig;
 @class CLXSDKConfigBidder;
-@class CLXSDKConfigPlacement;
+@class CLXSDKConfigAdUnit;
 
 // Forward declarations for classes defined in this file
 @class CLXSDKConfigResponse;
@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *sessionID;
 @property (nonatomic, copy, nullable) NSString *accountID;
 @property (nonatomic, copy, nullable) NSArray<CLXSDKConfigBidder *> *bidders;
-@property (nonatomic, copy, nullable) NSArray<CLXSDKConfigPlacement *> *placements;
+@property (nonatomic, copy, nullable) NSArray<CLXSDKConfigAdUnit *> *adUnits;
 @property (nonatomic, strong, nullable) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
 @property (nonatomic, copy, nullable) NSString *organizationID;
 @property (nonatomic, copy, nullable) NSString *impressionTrackerURL;
@@ -92,7 +92,7 @@ NS_ASSUME_NONNULL_BEGIN
 // 3. Core Config (required)
 // ═══════════════════════════════════════════════════════════════════════════
 @property (nonatomic, strong) NSArray<CLXSDKConfigBidder *> *bidders;
-@property (nonatomic, strong) NSArray<CLXSDKConfigPlacement *> *placements;
+@property (nonatomic, strong) NSArray<CLXSDKConfigAdUnit *> *adUnits;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 4. Tracking & Geo (required)

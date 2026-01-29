@@ -154,7 +154,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
 @property (nonatomic, strong) MockBannerDelegate *mockDelegate;
 @property (nonatomic, strong) MockBannerFactory *mockFactory;
 @property (nonatomic, strong) UIViewController *testViewController;
-@property (nonatomic, strong) CLXSDKConfigPlacement *testPlacement;
+@property (nonatomic, strong) CLXSDKConfigAdUnit *testPlacement;
 @property (nonatomic, strong) CLXConfigImpressionModel *testImpModel;
 @property (nonatomic, strong) CLXSettings *testSettings;
 @property (nonatomic, strong) MockReportingService *mockReportingService;
@@ -172,7 +172,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
     self.mockReportingService = [[MockReportingService alloc] init];
     
     // Create test placement with refresh interval
-    self.testPlacement = [[CLXSDKConfigPlacement alloc] init];
+    self.testPlacement = [[CLXSDKConfigAdUnit alloc] init];
     self.testPlacement.id = kTestPlacementID;
     self.testPlacement.bannerRefreshRateMs = (int64_t)(kTestRefreshInterval * 1000);
     

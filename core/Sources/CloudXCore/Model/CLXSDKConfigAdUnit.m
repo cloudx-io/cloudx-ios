@@ -3,9 +3,9 @@
 // CloudXCore
 //
 
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 
-@implementation CLXSDKConfigPlacement
+@implementation CLXSDKConfigAdUnit
 
 - (instancetype)init {
     self = [super init];

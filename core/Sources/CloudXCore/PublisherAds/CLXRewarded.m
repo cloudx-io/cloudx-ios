@@ -20,7 +20,7 @@
 #import <CloudXCore/CLXDebugOverlayManager.h>
 #import <CloudXCore/CLXReward.h>
 #import <CloudXCore/CLXBidLifecycleEvent.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXBidTokenSource.h>
@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Initialization
 
-- (instancetype)initWithPlacement:(nullable CLXSDKConfigPlacement *)placement
+- (instancetype)initWithPlacement:(nullable CLXSDKConfigAdUnit *)placement
                       publisherID:(NSString *)publisherID
                            userID:(nullable NSString *)userID
               rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl

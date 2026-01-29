@@ -69,7 +69,7 @@
 
     XCTAssertNotNil(ad, @"CLXAd should be created even with zero revenue");
     XCTAssertEqual([ad.revenue doubleValue], 0.0, @"Revenue should be zero");
-    XCTAssertEqualObjects(ad.bidder, @"zero-revenue-bidder", @"Bidder should still be extracted");
+    XCTAssertEqualObjects(ad.networkName, @"zero-revenue-bidder", @"Network name should still be extracted");
 }
 
 // Test CLXAd creation with nil placement ID (should still work)
@@ -85,9 +85,9 @@
 
     CLXAd *ad = [CLXAd adFromBid:validBid placementId:nil];
 
-    XCTAssertNotNil(ad, @"CLXAd should be created even with nil placement ID");
-    XCTAssertNil(ad.placementId, @"Placement ID should be nil");
-    XCTAssertEqualObjects(ad.bidder, @"test-bidder", @"Bidder should still be extracted");
+    XCTAssertNotNil(ad, @"CLXAd should be created even with nil ad unit ID");
+    XCTAssertNil(ad.adUnitId, @"Ad unit ID should be nil");
+    XCTAssertEqualObjects(ad.networkName, @"test-bidder", @"Network name should still be extracted");
 }
 
 @end

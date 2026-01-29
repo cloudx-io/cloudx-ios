@@ -18,7 +18,7 @@
 #import <CloudXCore/CLXCloudXDatabase.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXAdapterInterstitial.h>
 #import <CloudXCore/CLXAdEventReporter.h>
 
@@ -125,7 +125,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 #pragma mark - Factory (Null Dependencies = No Side Effects)
 
 - (CLXInterstitial *)createInterstitialWithNullDependencies {
-    CLXSDKConfigPlacement *placement = [[CLXSDKConfigPlacement alloc] init];
+    CLXSDKConfigAdUnit *placement = [[CLXSDKConfigAdUnit alloc] init];
     placement.id = @"test-placement";
     
     // ALL external dependencies are nil or minimal mocks

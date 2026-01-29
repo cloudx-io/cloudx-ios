@@ -1,6 +1,6 @@
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 #import <CloudXCore/CLXSDKConfig.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXSystemInformation.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXPrivacyService.h>
@@ -67,14 +67,14 @@
     if (config.organizationID) configDict[@"organizationID"] = config.organizationID;
     if (config.sessionID) configDict[@"sessionID"] = config.sessionID;
     
-    // Store placements data as an array to support array lookup syntax like config.placements[id=...]
-    if (config.placements && config.placements.count > 0) {
+    // Store placements data as an array to support array lookup syntax like config.adUnits[id=...]
+    if (config.adUnits && config.adUnits.count > 0) {
         NSMutableArray *placementsArray = [NSMutableArray array];
-        [self.logger debug:[NSString stringWithFormat:@"Processing %lu placements from config", (unsigned long)config.placements.count]];
-        for (id placementObj in config.placements) {
-            // Verify it's a CLXSDKConfigPlacement object
-            if ([placementObj isKindOfClass:[CLXSDKConfigPlacement class]]) {
-                CLXSDKConfigPlacement *placement = (CLXSDKConfigPlacement *)placementObj;
+        [self.logger debug:[NSString stringWithFormat:@"Processing %lu placements from config", (unsigned long)config.adUnits.count]];
+        for (id placementObj in config.adUnits) {
+            // Verify it's a CLXSDKConfigAdUnit object
+            if ([placementObj isKindOfClass:[CLXSDKConfigAdUnit class]]) {
+                CLXSDKConfigAdUnit *placement = (CLXSDKConfigAdUnit *)placementObj;
                 NSMutableDictionary *placementData = [NSMutableDictionary dictionary];
                 if (placement.id) placementData[@"id"] = placement.id;
                 if (placement.name) placementData[@"name"] = placement.name;
@@ -85,7 +85,7 @@
                 [self.logger debug:[NSString stringWithFormat:@"Skipping placement - unexpected type: %@", NSStringFromClass([placementObj class])]];
             }
         }
-        configDict[@"placements"] = placementsArray;
+        configDict[@"adUnits"] = placementsArray;
         [self.logger debug:[NSString stringWithFormat:@"Total placements stored: %lu", (unsigned long)placementsArray.count]];
     }
     
@@ -93,7 +93,7 @@
     
     [self.logger debug:[NSString stringWithFormat:@"Config set with %lu tracking fields, %lu placements", 
                        (unsigned long)self.tracking.count,
-                       (unsigned long)(config.placements ? config.placements.count : 0)]];
+                       (unsigned long)(config.adUnits ? config.adUnits.count : 0)]];
 }
 
 - (void)setRequestData:(NSString *)auctionId bidRequestJSON:(NSDictionary *)bidRequestJSON {

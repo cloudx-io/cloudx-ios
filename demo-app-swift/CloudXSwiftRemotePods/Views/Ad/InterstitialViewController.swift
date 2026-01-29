@@ -195,7 +195,7 @@ extension InterstitialViewController: CLXInterstitialDelegate, CLXAdRevenueDeleg
     
     func didFailToLoadAd(_ placementName: String, error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
-        DemoAppLogger.sharedInstance.logMessage("❌ Interstitial failed to load for placement '\(placementName)' - Error: \(error.localizedDescription)")
+        DemoAppLogger.sharedInstance.logMessage("❌ Interstitial failed to load for ad unit '\(placementName)' - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: AdState.noAd)
         

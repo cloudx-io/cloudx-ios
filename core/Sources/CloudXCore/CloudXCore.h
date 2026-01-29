@@ -34,7 +34,7 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXPrivacyConsent.h>
 #import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXSDKConfig.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXBiddingConfig.h>
 
 // Ad Base

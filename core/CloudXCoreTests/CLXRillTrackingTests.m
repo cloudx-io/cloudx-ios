@@ -10,7 +10,7 @@
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXSDKConfig.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXLiveInitService.h>
@@ -147,9 +147,9 @@ static MockRillEventReporter *sharedInstance = nil;
             @"sdk.sessionId",
             @"bidRequest.device.ifa",
             @"config.testGroupName",
-            @"config.placements[id=${bidRequest.imp.tagid}].name",
+            @"config.adUnits[id=${bidRequest.imp.tagid}].name",
             @"bidRequest.device.geo.country",
-            @"config.placements[id=${bidRequest.imp.tagid}].externalId",
+            @"config.adUnits[id=${bidRequest.imp.tagid}].externalId",
             @"bidResponse.ext.cloudx.auction.participants[rank=${bid.ext.cloudx.rank}].round",
             @"bidResponse.ext.cloudx.auction.participants[rank=${bid.ext.cloudx.rank}].lineItemId"
         ];
@@ -889,14 +889,14 @@ static MockRillEventReporter *sharedInstance = nil;
     NSString *testPlacementID = @"placement-id-12345";
     NSString *testPlacementName = @"Banner_Home_Screen";
     
-    // Create actual CLXSDKConfigPlacement object
-    CLXSDKConfigPlacement *placement = [[CLXSDKConfigPlacement alloc] init];
+    // Create actual CLXSDKConfigAdUnit object
+    CLXSDKConfigAdUnit *placement = [[CLXSDKConfigAdUnit alloc] init];
     [placement setValue:testPlacementID forKey:@"id"];
     [placement setValue:testPlacementName forKey:@"name"];
     [placement setValue:@"ext-placement-abc" forKey:@"dealId"];
     
     // Set placements array
-    [configWithPlacements setValue:@[placement] forKey:@"placements"];
+    [configWithPlacements setValue:@[placement] forKey:@"adUnits"];
     
     [self.resolver setConfig:configWithPlacements];
     
@@ -907,10 +907,10 @@ static MockRillEventReporter *sharedInstance = nil;
     };
     [self.resolver setRequestData:kTestAuctionID bidRequestJSON:testBidRequest];
     
-    // When: Resolve config.placements[id=${bidRequest.imp.tagid}].name field
+    // When: Resolve config.adUnits[id=${bidRequest.imp.tagid}].name field
     // This should resolve to the placement NAME, not the placement ID
     id resolvedName = [self.resolver resolveField:kTestAuctionID 
-                                            field:@"config.placements[id=${bidRequest.imp.tagid}].name"];
+                                            field:@"config.adUnits[id=${bidRequest.imp.tagid}].name"];
     
     // Then: Should resolve to placement name, not placement ID
     XCTAssertNotNil(resolvedName, @"Placement name should resolve to a value");

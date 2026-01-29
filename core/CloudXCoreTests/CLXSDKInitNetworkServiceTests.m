@@ -46,7 +46,7 @@
         @"bidders": @[
             @{@"networkName": @"admob", @"initData": @{}}
         ],
-        @"placements": @[
+        @"adUnits": @[
             @{@"id": @"placement-1", @"name": @"test-banner", @"type": @"banner"}
         ],
         // 4. Tracking & Geo
@@ -274,7 +274,7 @@
 - (void)testParseSDKConfig_MissingPlacements_ShouldReturnError205 {
     // Given: Response missing placements
     NSMutableDictionary *response = [self validResponse];
-    [response removeObjectForKey:@"placements"];
+    [response removeObjectForKey:@"adUnits"];
 
     // When: Parse SDK config
     NSError *error = nil;
@@ -284,7 +284,7 @@
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
     XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
-    XCTAssertTrue([error.localizedDescription containsString:@"placements"], @"Error should mention placements");
+    XCTAssertTrue([error.localizedDescription containsString:@"adUnits"], @"Error should mention placements");
 }
 
 /**
@@ -293,7 +293,7 @@
 - (void)testParseSDKConfig_MissingIdInPlacement_ShouldReturnError205 {
     // Given: Response with placement missing id
     NSMutableDictionary *response = [self validResponse];
-    response[@"placements"] = @[@{@"name": @"test", @"type": @"banner"}];  // Missing id
+    response[@"adUnits"] = @[@{@"name": @"test", @"type": @"banner"}];  // Missing id
 
     // When: Parse SDK config
     NSError *error = nil;
@@ -312,7 +312,7 @@
 - (void)testParseSDKConfig_MissingNameInPlacement_ShouldReturnError205 {
     // Given: Response with placement missing name
     NSMutableDictionary *response = [self validResponse];
-    response[@"placements"] = @[@{@"id": @"test-id", @"type": @"banner"}];  // Missing name
+    response[@"adUnits"] = @[@{@"id": @"test-id", @"type": @"banner"}];  // Missing name
 
     // When: Parse SDK config
     NSError *error = nil;
@@ -331,7 +331,7 @@
 - (void)testParseSDKConfig_MissingTypeInPlacement_ShouldReturnError205 {
     // Given: Response with placement missing type
     NSMutableDictionary *response = [self validResponse];
-    response[@"placements"] = @[@{@"id": @"test-id", @"name": @"test"}];  // Missing type
+    response[@"adUnits"] = @[@{@"id": @"test-id", @"name": @"test"}];  // Missing type
 
     // When: Parse SDK config
     NSError *error = nil;
@@ -564,7 +564,7 @@
 - (void)testParseSDKConfig_RewardedPlacement_ShouldParseRewardFields {
     // Given: SDK init response with rewarded placement containing reward config
     NSMutableDictionary *response = [self validResponse];
-    response[@"placements"] = @[
+    response[@"adUnits"] = @[
         @{
             @"id": @"um9Ek08ScJBWuzSMTyW3b",
             @"name": @"demo-rewarded-1",
@@ -584,9 +584,9 @@
     // Then: Should parse placement with reward fields
     XCTAssertNotNil(config, @"Config should be parsed");
     XCTAssertNil(error, @"Error should be nil");
-    XCTAssertEqual(config.placements.count, 1, @"Should have 1 placement");
+    XCTAssertEqual(config.adUnits.count, 1, @"Should have 1 placement");
 
-    CLXSDKConfigPlacement *placement = config.placements.firstObject;
+    CLXSDKConfigAdUnit *placement = config.adUnits.firstObject;
     XCTAssertEqualObjects(placement.id, @"um9Ek08ScJBWuzSMTyW3b", @"Should parse placement ID");
     XCTAssertEqualObjects(placement.name, @"demo-rewarded-1", @"Should parse placement name");
     XCTAssertEqual(placement.type, SDKConfigAdTypeRewarded, @"Should parse placement type as rewarded");
@@ -605,7 +605,7 @@
 - (void)testParseSDKConfig_RewardedPlacementWithoutRewardConfig_ShouldUseDefaults {
     // Given: SDK init response with rewarded placement but no reward config
     NSMutableDictionary *response = [self validResponse];
-    response[@"placements"] = @[
+    response[@"adUnits"] = @[
         @{
             @"id": @"test-rewarded-id",
             @"name": @"test-rewarded",
@@ -621,9 +621,9 @@
     // Then: Should use default values for missing reward fields
     XCTAssertNotNil(config, @"Config should be parsed");
     XCTAssertNil(error, @"Error should be nil");
-    XCTAssertEqual(config.placements.count, 1, @"Should have 1 placement");
+    XCTAssertEqual(config.adUnits.count, 1, @"Should have 1 placement");
 
-    CLXSDKConfigPlacement *placement = config.placements.firstObject;
+    CLXSDKConfigAdUnit *placement = config.adUnits.firstObject;
     XCTAssertEqual(placement.type, SDKConfigAdTypeRewarded, @"Should parse placement type as rewarded");
     XCTAssertEqual(placement.rewardAmount, 0, @"Default rewardAmount should be 0");
     XCTAssertNil(placement.rewardCurrency, @"Default rewardCurrency should be nil");
@@ -636,7 +636,7 @@
 - (void)testParseSDKConfig_NonRewardedPlacement_ShouldNotHaveRewardFields {
     // Given: SDK init response with interstitial placement
     NSMutableDictionary *response = [self validResponse];
-    response[@"placements"] = @[
+    response[@"adUnits"] = @[
         @{
             @"id": @"test-interstitial-id",
             @"name": @"test-interstitial",
@@ -651,9 +651,9 @@
     // Then: Should have default/empty reward values (not applicable for non-rewarded)
     XCTAssertNotNil(config, @"Config should be parsed");
     XCTAssertNil(error, @"Error should be nil");
-    XCTAssertEqual(config.placements.count, 1, @"Should have 1 placement");
+    XCTAssertEqual(config.adUnits.count, 1, @"Should have 1 placement");
 
-    CLXSDKConfigPlacement *placement = config.placements.firstObject;
+    CLXSDKConfigAdUnit *placement = config.adUnits.firstObject;
     XCTAssertEqual(placement.type, SDKConfigAdTypeInterstitial, @"Should parse placement type as interstitial");
     XCTAssertEqual(placement.rewardAmount, 0, @"Non-rewarded placement should have rewardAmount 0");
     XCTAssertNil(placement.rewardCurrency, @"Non-rewarded placement should have nil rewardCurrency");
@@ -666,7 +666,7 @@
 - (void)testParseSDKConfig_MultiplePlacements_ShouldParseAllWithRewardFields {
     // Given: SDK init response with multiple placement types
     NSMutableDictionary *response = [self validResponse];
-    response[@"placements"] = @[
+    response[@"adUnits"] = @[
         @{
             @"id": @"banner-id",
             @"name": @"demo-banner",
@@ -693,11 +693,11 @@
     // Then: Should parse all placements correctly
     XCTAssertNotNil(config, @"Config should be parsed");
     XCTAssertNil(error, @"Error should be nil");
-    XCTAssertEqual(config.placements.count, 3, @"Should have 3 placements");
+    XCTAssertEqual(config.adUnits.count, 3, @"Should have 3 placements");
 
     // Find rewarded placement
-    CLXSDKConfigPlacement *rewardedPlacement = nil;
-    for (CLXSDKConfigPlacement *p in config.placements) {
+    CLXSDKConfigAdUnit *rewardedPlacement = nil;
+    for (CLXSDKConfigAdUnit *p in config.adUnits) {
         if (p.type == SDKConfigAdTypeRewarded) {
             rewardedPlacement = p;
             break;

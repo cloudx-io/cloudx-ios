@@ -123,7 +123,7 @@
 		19C725712E2390810012CFC7 /* CLXConfigImpressionModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C7250E2E2390810012CFC7 /* CLXConfigImpressionModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C725742E2390810012CFC7 /* CLXBannerDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C724FC2E2390810012CFC7 /* CLXBannerDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C725762E2390810012CFC7 /* CLXAdapterNativeFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C724EB2E2390810012CFC7 /* CLXAdapterNativeFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		19C725772E2390810012CFC7 /* CLXSDKConfigPlacement.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C725322E2390810012CFC7 /* CLXSDKConfigPlacement.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		19C725772E2390810012CFC7 /* CLXSDKConfigAdUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C725322E2390810012CFC7 /* CLXSDKConfigAdUnit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C725782E2390810012CFC7 /* CLXSKAdNetworkService.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C7253B2E2390810012CFC7 /* CLXSKAdNetworkService.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C725792E2390810012CFC7 /* CLXInterstitialDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C7251A2E2390810012CFC7 /* CLXInterstitialDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19C7257A2E2390810012CFC7 /* CLXBidNetworkService.h in Headers */ = {isa = PBXBuildFile; fileRef = 19C725052E2390810012CFC7 /* CLXBidNetworkService.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -185,7 +185,7 @@
 		19C725CA2E2390810012CFC7 /* CLXSDKInitNetworkService.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724D32E2390810012CFC7 /* CLXSDKInitNetworkService.m */; };
 		19C725CB2E2390810012CFC7 /* CLXRillImpressionDefaultModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724A42E2390810012CFC7 /* CLXRillImpressionDefaultModel.m */; };
 		19C725CC2E2390810012CFC7 /* CLXNativeAdView.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724C22E2390810012CFC7 /* CLXNativeAdView.m */; };
-		19C725CD2E2390810012CFC7 /* CLXSDKConfigPlacement.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724BD2E2390810012CFC7 /* CLXSDKConfigPlacement.m */; };
+		19C725CD2E2390810012CFC7 /* CLXSDKConfigAdUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724BD2E2390810012CFC7 /* CLXSDKConfigAdUnit.m */; };
 		19C725D02E2390810012CFC7 /* CLXConfigImpressionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724A32E2390810012CFC7 /* CLXConfigImpressionModel.m */; };
 		19C725D22E2390810012CFC7 /* CLXBidNetworkService.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724CA2E2390810012CFC7 /* CLXBidNetworkService.m */; };
 		19C725D32E2390810012CFC7 /* URLSession+CLX.m in Sources */ = {isa = PBXBuildFile; fileRef = 19C724DC2E2390810012CFC7 /* URLSession+CLX.m */; };
@@ -441,7 +441,7 @@
 		19C724BA2E2390810012CFC7 /* CLXSDKConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSDKConfig.m; sourceTree = "<group>"; };
 		19C724BB2E2390810012CFC7 /* CLXSDKConfigBidder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSDKConfigBidder.m; sourceTree = "<group>"; };
 		19C724BC2E2390810012CFC7 /* CLXSDKConfigEndpointObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSDKConfigEndpointObject.m; sourceTree = "<group>"; };
-		19C724BD2E2390810012CFC7 /* CLXSDKConfigPlacement.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSDKConfigPlacement.m; sourceTree = "<group>"; };
+		19C724BD2E2390810012CFC7 /* CLXSDKConfigAdUnit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSDKConfigAdUnit.m; sourceTree = "<group>"; };
 		19C724BE2E2390810012CFC7 /* CLXSDKConfigRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSDKConfigRequest.m; sourceTree = "<group>"; };
 		19C724C12E2390810012CFC7 /* CLXBannerAdView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBannerAdView.m; sourceTree = "<group>"; };
 		19C724C22E2390810012CFC7 /* CLXNativeAdView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXNativeAdView.m; sourceTree = "<group>"; };
@@ -524,7 +524,7 @@
 		19C7252F2E2390810012CFC7 /* CLXSDKConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSDKConfig.h; sourceTree = "<group>"; };
 		19C725302E2390810012CFC7 /* CLXSDKConfigBidder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSDKConfigBidder.h; sourceTree = "<group>"; };
 		19C725312E2390810012CFC7 /* CLXSDKConfigEndpointObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSDKConfigEndpointObject.h; sourceTree = "<group>"; };
-		19C725322E2390810012CFC7 /* CLXSDKConfigPlacement.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSDKConfigPlacement.h; sourceTree = "<group>"; };
+		19C725322E2390810012CFC7 /* CLXSDKConfigAdUnit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSDKConfigAdUnit.h; sourceTree = "<group>"; };
 		19C725332E2390810012CFC7 /* CLXSDKConfigRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSDKConfigRequest.h; sourceTree = "<group>"; };
 		19C725342E2390810012CFC7 /* CLXSDKInitNetworkService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSDKInitNetworkService.h; sourceTree = "<group>"; };
 		19C7253B2E2390810012CFC7 /* CLXSKAdNetworkService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSKAdNetworkService.h; sourceTree = "<group>"; };
@@ -936,7 +936,7 @@
 				19C724BA2E2390810012CFC7 /* CLXSDKConfig.m */,
 				19C724BB2E2390810012CFC7 /* CLXSDKConfigBidder.m */,
 				19C724BC2E2390810012CFC7 /* CLXSDKConfigEndpointObject.m */,
-				19C724BD2E2390810012CFC7 /* CLXSDKConfigPlacement.m */,
+				19C724BD2E2390810012CFC7 /* CLXSDKConfigAdUnit.m */,
 				19C724BE2E2390810012CFC7 /* CLXSDKConfigRequest.m */,
 			);
 			path = Model;
@@ -1132,7 +1132,7 @@
 				19C7252F2E2390810012CFC7 /* CLXSDKConfig.h */,
 				19C725302E2390810012CFC7 /* CLXSDKConfigBidder.h */,
 				19C725312E2390810012CFC7 /* CLXSDKConfigEndpointObject.h */,
-				19C725322E2390810012CFC7 /* CLXSDKConfigPlacement.h */,
+				19C725322E2390810012CFC7 /* CLXSDKConfigAdUnit.h */,
 				19C725332E2390810012CFC7 /* CLXSDKConfigRequest.h */,
 				19C725342E2390810012CFC7 /* CLXSDKInitNetworkService.h */,
 				19FF30EF2EA6E6D50006F05A /* CLXSessionMetrics.h */,
@@ -1248,7 +1248,7 @@
 				19C725712E2390810012CFC7 /* CLXConfigImpressionModel.h in Headers */,
 				19C725742E2390810012CFC7 /* CLXBannerDelegate.h in Headers */,
 				19C725762E2390810012CFC7 /* CLXAdapterNativeFactory.h in Headers */,
-				19C725772E2390810012CFC7 /* CLXSDKConfigPlacement.h in Headers */,
+				19C725772E2390810012CFC7 /* CLXSDKConfigAdUnit.h in Headers */,
 				19C725782E2390810012CFC7 /* CLXSKAdNetworkService.h in Headers */,
 				19C725792E2390810012CFC7 /* CLXInterstitialDelegate.h in Headers */,
 				19C7257C2E2390810012CFC7 /* CLXNativeAdView.h in Headers */,
@@ -1506,7 +1506,7 @@
 				19C725CB2E2390810012CFC7 /* CLXRillImpressionDefaultModel.m in Sources */,
 				19EC254A2EACB45F005C8EF6 /* CLXVersion.m in Sources */,
 				19C725CC2E2390810012CFC7 /* CLXNativeAdView.m in Sources */,
-				19C725CD2E2390810012CFC7 /* CLXSDKConfigPlacement.m in Sources */,
+				19C725CD2E2390810012CFC7 /* CLXSDKConfigAdUnit.m in Sources */,
 				19C725D02E2390810012CFC7 /* CLXConfigImpressionModel.m in Sources */,
 				19F75E4A2EA41F1C00E889C0 /* CLXEndpointResolver.m in Sources */,
 				19C725D22E2390810012CFC7 /* CLXBidNetworkService.m in Sources */,

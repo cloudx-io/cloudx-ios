@@ -11,13 +11,13 @@
 #pragma mark - CLXPlacementValidationResult
 
 @interface CLXPlacementValidationResult ()
-@property (nonatomic, readwrite, nullable) CLXSDKConfigPlacement *placement;
+@property (nonatomic, readwrite, nullable) CLXSDKConfigAdUnit *placement;
 @property (nonatomic, readwrite, nullable) CLXError *error;
 @end
 
 @implementation CLXPlacementValidationResult
 
-+ (instancetype)successWithPlacement:(CLXSDKConfigPlacement *)placement {
++ (instancetype)successWithPlacement:(CLXSDKConfigAdUnit *)placement {
     CLXPlacementValidationResult *result = [[CLXPlacementValidationResult alloc] init];
     result.placement = placement;
     return result;
@@ -40,37 +40,37 @@
 @implementation CLXPlacementValidator
 
 + (CLXPlacementValidationResult *)validateInterstitialPlacement:(NSString *)placementName
-                                                     placements:(NSDictionary<NSString *, CLXSDKConfigPlacement *> *)placements {
+                                                     placements:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)placements {
     return [self validatePlacement:placementName
                         placements:placements
                    expectedAdType:SDKConfigAdTypeInterstitial];
 }
 
 + (CLXPlacementValidationResult *)validateRewardedPlacement:(NSString *)placementName
-                                                 placements:(NSDictionary<NSString *, CLXSDKConfigPlacement *> *)placements {
+                                                 placements:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)placements {
     return [self validatePlacement:placementName
                         placements:placements
                    expectedAdType:SDKConfigAdTypeRewarded];
 }
 
 + (CLXPlacementValidationResult *)validateBannerPlacement:(NSString *)placementName
-                                               placements:(NSDictionary<NSString *, CLXSDKConfigPlacement *> *)placements {
+                                               placements:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)placements {
     return [self validatePlacement:placementName
                         placements:placements
                    expectedAdType:SDKConfigAdTypeBanner];
 }
 
 + (CLXPlacementValidationResult *)validateMRECPlacement:(NSString *)placementName
-                                             placements:(NSDictionary<NSString *, CLXSDKConfigPlacement *> *)placements {
+                                             placements:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)placements {
     return [self validatePlacement:placementName
                         placements:placements
                    expectedAdType:SDKConfigAdTypeMrec];
 }
 
 + (CLXPlacementValidationResult *)validateNativePlacement:(NSString *)placementName
-                                               placements:(NSDictionary<NSString *, CLXSDKConfigPlacement *> *)placements {
+                                               placements:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)placements {
     // Native ads don't have a specific type - just validate existence
-    CLXSDKConfigPlacement *foundPlacement = placements[placementName];
+    CLXSDKConfigAdUnit *foundPlacement = placements[placementName];
     
     if (!foundPlacement) {
         CLXError *error = [self createPlacementNotFoundError:placementName
@@ -84,9 +84,9 @@
 #pragma mark - Private Methods
 
 + (CLXPlacementValidationResult *)validatePlacement:(NSString *)placementName
-                                         placements:(NSDictionary<NSString *, CLXSDKConfigPlacement *> *)placements
+                                         placements:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)placements
                                     expectedAdType:(SDKConfigAdType)expectedAdType {
-    CLXSDKConfigPlacement *foundPlacement = placements[placementName];
+    CLXSDKConfigAdUnit *foundPlacement = placements[placementName];
     
     // Check if placement exists
     if (!foundPlacement) {
@@ -107,7 +107,7 @@
 }
 
 + (CLXError *)createPlacementNotFoundError:(NSString *)placementName
-                                placements:(NSDictionary<NSString *, CLXSDKConfigPlacement *> *)placements {
+                                placements:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)placements {
     NSString *availablePlacementsString = [self formatAvailablePlacements:placements];
     
     NSString *description = [NSString stringWithFormat:
@@ -120,7 +120,7 @@
 }
 
 + (CLXError *)createWrongAdTypeError:(NSString *)placementName
-                      foundPlacement:(CLXSDKConfigPlacement *)foundPlacement
+                      foundPlacement:(CLXSDKConfigAdUnit *)foundPlacement
                       expectedAdType:(SDKConfigAdType)expectedAdType {
     NSString *expectedTypeString = [self stringForAdType:expectedAdType];
     NSString *actualTypeString = [self stringForAdType:foundPlacement.type];
@@ -135,7 +135,7 @@
                        description:description];
 }
 
-+ (NSString *)formatAvailablePlacements:(NSDictionary<NSString *, CLXSDKConfigPlacement *> *)placements {
++ (NSString *)formatAvailablePlacements:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)placements {
     if (!placements || placements.count == 0) {
         return @"none";
     }

@@ -16,7 +16,7 @@ typedef NS_ENUM(NSInteger, SDKConfigAdType) {
     SDKConfigAdTypeUnknown
 };
 
-@interface CLXSDKConfigPlacement : NSObject
+@interface CLXSDKConfigAdUnit : NSObject
 
 @property (nonatomic, copy) NSString *id;
 @property (nonatomic, copy) NSString *name;

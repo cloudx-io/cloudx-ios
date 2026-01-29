@@ -13,7 +13,7 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXAdapterNativeFactory.h>
 #import <CloudXCore/CLXNativeTemplate.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXBidAdSource.h>
@@ -74,7 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL forceStop;
 @property (nonatomic, assign) BOOL successWin;
 @property (nonatomic, assign) NSInteger loadNativeTimesCount;
-@property (nonatomic, strong) CLXSDKConfigPlacement *placement;
+@property (nonatomic, strong) CLXSDKConfigAdUnit *placement;
 @property (nonatomic, strong, nullable) NSDate *adLoadStartTime;
 
 // Analytics tracking service for analytics events
@@ -103,7 +103,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Initialization
 
 - (instancetype)initWithViewController:(UIViewController *)viewController
-                             placement:(nullable CLXSDKConfigPlacement *)placement
+                             placement:(nullable CLXSDKConfigAdUnit *)placement
                                 userID:(NSString *)userID
                            publisherID:(NSString *)publisherID
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
@@ -253,7 +253,7 @@ NS_ASSUME_NONNULL_BEGIN
     // Check if we need to complete deferred initialization (bidAdSource is nil)
     if (!self.bidAdSource && self.requestedPlacementName && [[CloudXCore shared] isInitialized]) {
         // SDK is now initialized - complete initialization with real placement config
-        CLXSDKConfigPlacement *realPlacement = [[CloudXCore shared] placementConfigForName:self.requestedPlacementName];
+        CLXSDKConfigAdUnit *realPlacement = [[CloudXCore shared] placementConfigForName:self.requestedPlacementName];
         if (realPlacement) {
             [self.logger debug:[NSString stringWithFormat:@"Completing deferred initialization for: %@ (ID: %@)", self.requestedPlacementName, realPlacement.id]];
             
@@ -309,7 +309,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 // Helper method to create bid ad source for a placement
-- (CLXBidAdSource *)createBidAdSourceForPlacement:(CLXSDKConfigPlacement *)placement {
+- (CLXBidAdSource *)createBidAdSourceForPlacement:(CLXSDKConfigAdUnit *)placement {
     __weak typeof(self) weakSelf = self;
     return [[CLXBidAdSource alloc] initWithUserID:@""
                                       placementID:placement.id

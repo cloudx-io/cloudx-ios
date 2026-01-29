@@ -76,18 +76,18 @@ class DemoAppLogger {
         
         var details = " - Ad Details:"
         
-        // Placement Name
+        // Ad Unit Name
         if let placementName = ad.placementName {
-            details += "\n  📍 Placement: \(placementName)"
+            details += "\n  📍 Ad Unit: \(placementName)"
         } else {
-            details += "\n  📍 Placement: (null)"
+            details += "\n  📍 Ad Unit: (null)"
         }
         
-        // Placement ID
+        // Ad Unit ID
         if let placementId = ad.placementId {
-            details += "\n  🆔 Placement ID: \(placementId)"
+            details += "\n  🆔 Ad Unit ID: \(placementId)"
         } else {
-            details += "\n  🆔 Placement ID: (null)"
+            details += "\n  🆔 Ad Unit ID: (null)"
         }
         
         // Bidder/Network

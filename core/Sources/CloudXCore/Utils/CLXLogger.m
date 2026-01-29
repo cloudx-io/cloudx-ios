@@ -206,16 +206,16 @@ static BOOL _globalTimestampsEnabled = NO;
     
     if (ad) {
         [message appendString:@"\n  📍 Placement: "];
-        [message appendString:ad.placementName ?: @"(null)"];
+        [message appendString:ad.adUnitName ?: @"(null)"];
         
         [message appendString:@"\n  🆔 Placement ID: "];
-        [message appendString:ad.placementId ?: @"(null)"];
+        [message appendString:ad.adUnitId ?: @"(null)"];
         
         [message appendString:@"\n  🏢 Bidder: "];
-        [message appendString:ad.bidder ?: @"(null)"];
+        [message appendString:ad.networkName ?: @"(null)"];
         
         [message appendString:@"\n  🔗 External ID: "];
-        [message appendString:ad.externalPlacementId ?: @"(null)"];
+        [message appendString:ad.networkPlacement ?: @"(null)"];
         
         [message appendString:@"\n  💰 Revenue: "];
         if (ad.revenue) {

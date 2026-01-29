@@ -21,7 +21,7 @@
 #import <CloudXCore/CLXInterstitial.h>
 #import <CloudXCore/CLXRewarded.h>
 #import <CloudXCore/CLXSDKConfig.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <objc/runtime.h>
 
 // Test category to expose private properties for verification

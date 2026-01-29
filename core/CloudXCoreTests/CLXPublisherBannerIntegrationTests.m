@@ -290,7 +290,7 @@ static const NSTimeInterval kTestTimeout = 0.5;
 @property (nonatomic, strong) IntegrationMockBannerDelegate *mockDelegate;
 @property (nonatomic, strong) IntegrationMockBannerFactory *mockFactory;
 @property (nonatomic, strong) UIViewController *testViewController;
-@property (nonatomic, strong) CLXSDKConfigPlacement *testPlacement;
+@property (nonatomic, strong) CLXSDKConfigAdUnit *testPlacement;
 @property (nonatomic, strong) CLXConfigImpressionModel *testImpModel;
 @property (nonatomic, strong) CLXSettings *testSettings;
 @end
@@ -346,7 +346,7 @@ static const NSTimeInterval kTestTimeout = 0.5;
     self.mockFactory = [[IntegrationMockBannerFactory alloc] init];
     
     // Create test placement with short refresh interval for testing
-    self.testPlacement = [[CLXSDKConfigPlacement alloc] init];
+    self.testPlacement = [[CLXSDKConfigAdUnit alloc] init];
     self.testPlacement.id = kTestPlacementID;
     self.testPlacement.bannerRefreshRateMs = (int64_t)(kShortRefreshInterval * 1000);
     
