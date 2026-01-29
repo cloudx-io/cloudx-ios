@@ -180,6 +180,25 @@ xcodebuild -create-xcframework \
   -output "$OUTPUT_XCFRAMEWORK"
 print_success "DYNAMIC XCFramework created: $OUTPUT_XCFRAMEWORK"
 
+# Remove DebugSymbolsPath entries from Info.plist
+# xcodebuild -create-xcframework adds these entries even without -debug-symbols flag
+# when it detects dSYMs in the archive. We strip them since dSYMs are distributed privately.
+print_step "🔧 Removing DebugSymbolsPath from Info.plist..."
+PLIST_PATH="$OUTPUT_XCFRAMEWORK/Info.plist"
+if [ -f "$PLIST_PATH" ]; then
+    # Use plutil to convert to XML, remove DebugSymbolsPath entries, then convert back
+    plutil -convert xml1 "$PLIST_PATH"
+    
+    # Remove all DebugSymbolsPath entries using sed
+    # This handles the pattern: <key>DebugSymbolsPath</key>\n\t\t\t<string>dSYMs</string>
+    sed -i '' '/<key>DebugSymbolsPath<\/key>/,/<string>.*<\/string>/d' "$PLIST_PATH"
+    
+    plutil -convert binary1 "$PLIST_PATH"
+    print_success "DebugSymbolsPath entries removed from Info.plist"
+else
+    print_warning "Info.plist not found at $PLIST_PATH"
+fi
+
 # Archive dSYMs for private distribution (crash symbolication)
 print_step "📦 Archiving dSYMs for private distribution..."
 DSYM_DIR="./build/dSYMs"
