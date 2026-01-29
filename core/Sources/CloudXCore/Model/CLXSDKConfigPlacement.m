@@ -12,7 +12,7 @@
     if (self) {
         _id = @"";
         _name = @"";
-        _bidResponseTimeoutMs = 3000;
+        _bidResponseTimeoutMs = 10000;  // Match Android default
         _adLoadTimeoutMs = 10000;
         _bannerRefreshRateMs = 30000;
         _type = SDKConfigAdTypeUnknown;

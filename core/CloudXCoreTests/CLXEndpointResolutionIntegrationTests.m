@@ -18,7 +18,7 @@
 #import <CloudXCore/CloudXCore.h>
 
 @interface CLXSDKInitNetworkService (Testing)
-- (CLXSDKConfigResponse *)parseSDKConfigFromResponse:(NSDictionary *)response;
+- (nullable CLXSDKConfigResponse *)parseSDKConfigFromResponse:(NSDictionary *)response error:(NSError **)outError;
 @end
 
 @interface CLXEndpointResolutionIntegrationTests : XCTestCase
@@ -34,6 +34,23 @@
     [super tearDown];
 }
 
+- (NSMutableDictionary *)validSDKInitResponse {
+    return [@{
+        @"accountID": @"test-account",
+        @"sessionID": @"test-session",
+        @"appID": @"test-app",
+        @"auctionEndpointURL": @"https://au.cloudx.io/openrtb2/auction",
+        @"impressionTrackerURL": @"https://tracker.test.com/impression",
+        @"winLossNotificationURL": @"https://winloss.test.com",
+        @"geoDataEndpointURL": @"https://geo.test.com/data",
+        @"bidders": @[],
+        @"placements": @[],
+        @"tracking": @[],
+        @"geoHeaders": @[],
+        @"winLossNotificationPayloadConfig": @{}
+    } mutableCopy];
+}
+
 #pragma mark - Integration Tests: SDK Init to Endpoint Resolution
 
 /**
@@ -42,41 +59,36 @@
  */
 - (void)testIntegration_SDKInitWithLambdaEndpoint_EndToEnd {
     // Given: Real SDK init response with lambda endpoint in A/B test variant
-    NSDictionary *sdkInitResponse = @{
-        @"accountID": @"test-account",
-        @"organizationID": @"test-org",
-        @"sessionID": @"test-session-12345",
-        @"appID": @"test-app",
-        @"geoDataEndpointURL": @"https://geo.cloudx.io/data",
-        @"auctionEndpointURL": @{
-            @"test": @[
-                @{
-                    @"name": @"variant-0",
-                    @"value": @"https://cloudx-proxy-production.jim-02b.workers.dev/openrtb2/auction?mode=enrichAndProxy&proxyto=https://au.cloudx.io/openrtb2/auction",
-                    @"ratio": @1.0
-                }
-            ],
-            @"default": @"https://au.cloudx.io/openrtb2/auction"
-        },
-        @"impressionTrackerURL": @"https://tracker.cloudx.io/impression",
-        @"tracking": @[@"bid.w", @"bid.h"],
-        @"bidders": @[],
-        @"placements": @[]
+    NSMutableDictionary *sdkInitResponse = [self validSDKInitResponse];
+    sdkInitResponse[@"organizationID"] = @"test-org";
+    sdkInitResponse[@"sessionID"] = @"test-session-12345";
+    sdkInitResponse[@"geoDataEndpointURL"] = @"https://geo.cloudx.io/data";
+    sdkInitResponse[@"auctionEndpointURL"] = @{
+        @"test": @[
+            @{
+                @"name": @"variant-0",
+                @"value": @"https://cloudx-proxy-production.jim-02b.workers.dev/openrtb2/auction?mode=enrichAndProxy&proxyto=https://au.cloudx.io/openrtb2/auction",
+                @"ratio": @1.0
+            }
+        ],
+        @"default": @"https://au.cloudx.io/openrtb2/auction"
     };
-    
+    sdkInitResponse[@"impressionTrackerURL"] = @"https://tracker.cloudx.io/impression";
+    sdkInitResponse[@"tracking"] = @[@"bid.w", @"bid.h"];
+
     // When: Parse SDK config
     CLXSDKInitNetworkService *networkService = [[CLXSDKInitNetworkService alloc] init];
-    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse];
-    
+    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse error:nil];
+
     // Then: Config should be fully parsed
     XCTAssertNotNil(config, @"Config should be parsed");
     XCTAssertEqualObjects(config.accountID, @"test-account", @"Should parse account ID");
     XCTAssertEqualObjects(config.sessionID, @"test-session-12345", @"Should parse session ID");
-    
+
     // When: Resolve endpoints
     CLXEndpointResolver *resolver = [[CLXEndpointResolver alloc] init];
     [resolver resolveFromConfig:config];
-    
+
     // Then: Should resolve to lambda endpoint
     XCTAssertTrue([resolver.auctionEndpoint containsString:@"cloudx-proxy-production"],
                  @"Should resolve to lambda endpoint");
@@ -91,21 +103,16 @@
  */
 - (void)testIntegration_LegacyStringFormat_BackwardsCompatibility {
     // Given: SDK init response with legacy string format (no A/B testing)
-    NSDictionary *sdkInitResponse = @{
-        @"accountID": @"test-account",
-        @"sessionID": @"test-session",
-        @"auctionEndpointURL": @"https://au.cloudx.io/openrtb2/auction",
-        @"bidders": @[],
-        @"placements": @[]
-    };
-    
+    NSMutableDictionary *sdkInitResponse = [self validSDKInitResponse];
+    // auctionEndpointURL is already a simple string in validSDKInitResponse
+
     // When: Parse and resolve
     CLXSDKInitNetworkService *networkService = [[CLXSDKInitNetworkService alloc] init];
-    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse];
-    
+    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse error:nil];
+
     CLXEndpointResolver *resolver = [[CLXEndpointResolver alloc] init];
     [resolver resolveFromConfig:config];
-    
+
     // Then: Should use string values directly
     XCTAssertEqualObjects(resolver.auctionEndpoint, @"https://au.cloudx.io/openrtb2/auction",
                          @"Should use legacy string format");
@@ -118,50 +125,45 @@
  */
 - (void)testIntegration_ABTestingWithMultipleVariants_TrafficSplit {
     // Given: SDK init response with 50/50 traffic split
-    NSDictionary *sdkInitResponse = @{
-        @"accountID": @"test-account",
-        @"sessionID": @"test-session",
-        @"auctionEndpointURL": @{
-            @"test": @[
-                @{
-                    @"name": @"control",
-                    @"value": @"https://au.cloudx.io/openrtb2/auction",
-                    @"ratio": @0.5
-                },
-                @{
-                    @"name": @"lambda-canary",
-                    @"value": @"https://lambda-canary.workers.dev/auction",
-                    @"ratio": @0.5
-                }
-            ],
-            @"default": @"https://au.cloudx.io/openrtb2/auction"
-        },
-        @"bidders": @[],
-        @"placements": @[]
+    NSMutableDictionary *sdkInitResponse = [self validSDKInitResponse];
+    sdkInitResponse[@"auctionEndpointURL"] = @{
+        @"test": @[
+            @{
+                @"name": @"control",
+                @"value": @"https://au.cloudx.io/openrtb2/auction",
+                @"ratio": @0.5
+            },
+            @{
+                @"name": @"lambda-canary",
+                @"value": @"https://lambda-canary.workers.dev/auction",
+                @"ratio": @0.5
+            }
+        ],
+        @"default": @"https://au.cloudx.io/openrtb2/auction"
     };
-    
+
     // When: Parse config
     CLXSDKInitNetworkService *networkService = [[CLXSDKInitNetworkService alloc] init];
-    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse];
-    
+    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse error:nil];
+
     // Then: Parse should succeed
     XCTAssertNotNil(config, @"Config should be parsed");
     XCTAssertNotNil(config.auctionEndpointURL, @"Auction endpoint should exist");
-    
+
     // When: Resolve with random value in control group (< 0.5)
     CLXEndpointResolver *resolver1 = [[CLXEndpointResolver alloc] init];
     [resolver1 resolveFromConfig:config randomValue:0.3];
-    
+
     // Then: Should select control
     XCTAssertEqualObjects(resolver1.auctionEndpoint, @"https://au.cloudx.io/openrtb2/auction",
                          @"Should select control group with random < 0.5");
     XCTAssertEqualObjects(resolver1.testGroupName, @"control",
                          @"Should set control test group name");
-    
+
     // When: Resolve with random value in lambda group (> 0.5)
     CLXEndpointResolver *resolver2 = [[CLXEndpointResolver alloc] init];
     [resolver2 resolveFromConfig:config randomValue:0.8];
-    
+
     // Then: Should select lambda (second variant in list, but only first is ever selected)
     // Note: With current logic, only the first variant in test array is considered
     XCTAssertEqualObjects(resolver2.auctionEndpoint, @"https://au.cloudx.io/openrtb2/auction",
@@ -175,24 +177,19 @@
  */
 - (void)testIntegration_MalformedABTestConfig_FallbackToDefaults {
     // Given: SDK init response with malformed test array
-    NSDictionary *sdkInitResponse = @{
-        @"accountID": @"test-account",
-        @"sessionID": @"test-session",
-        @"auctionEndpointURL": @{
-            @"test": @[@"invalid-format"],  // Invalid: should be dictionary
-            @"default": @"https://au.cloudx.io/openrtb2/auction"
-        },
-        @"bidders": @[],
-        @"placements": @[]
+    NSMutableDictionary *sdkInitResponse = [self validSDKInitResponse];
+    sdkInitResponse[@"auctionEndpointURL"] = @{
+        @"test": @[@"invalid-format"],  // Invalid: should be dictionary
+        @"default": @"https://au.cloudx.io/openrtb2/auction"
     };
-    
+
     // When: Parse and resolve
     CLXSDKInitNetworkService *networkService = [[CLXSDKInitNetworkService alloc] init];
-    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse];
-    
+    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse error:nil];
+
     CLXEndpointResolver *resolver = [[CLXEndpointResolver alloc] init];
     [resolver resolveFromConfig:config];
-    
+
     // Then: Should fallback to default endpoint
     XCTAssertEqualObjects(resolver.auctionEndpoint, @"https://au.cloudx.io/openrtb2/auction",
                          @"Should fallback to default with malformed test config");
@@ -205,30 +202,25 @@
  */
 - (void)testIntegration_EmptyTestVariantValue_ShouldUseDefault {
     // Given: SDK init response with empty variant value
-    NSDictionary *sdkInitResponse = @{
-        @"accountID": @"test-account",
-        @"sessionID": @"test-session",
-        @"auctionEndpointURL": @{
-            @"test": @[
-                @{
-                    @"name": @"broken-variant",
-                    @"value": @"",  // Empty value
-                    @"ratio": @1.0
-                }
-            ],
-            @"default": @"https://au.cloudx.io/openrtb2/auction"
-        },
-        @"bidders": @[],
-        @"placements": @[]
+    NSMutableDictionary *sdkInitResponse = [self validSDKInitResponse];
+    sdkInitResponse[@"auctionEndpointURL"] = @{
+        @"test": @[
+            @{
+                @"name": @"broken-variant",
+                @"value": @"",  // Empty value
+                @"ratio": @1.0
+            }
+        ],
+        @"default": @"https://au.cloudx.io/openrtb2/auction"
     };
-    
+
     // When: Parse and resolve
     CLXSDKInitNetworkService *networkService = [[CLXSDKInitNetworkService alloc] init];
-    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse];
-    
+    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse error:nil];
+
     CLXEndpointResolver *resolver = [[CLXEndpointResolver alloc] init];
     [resolver resolveFromConfig:config];
-    
+
     // Then: Should use default (empty variants filtered out)
     XCTAssertEqualObjects(resolver.auctionEndpoint, @"https://au.cloudx.io/openrtb2/auction",
                          @"Should use default when variant value is empty");
@@ -239,31 +231,26 @@
  */
 - (void)testIntegration_MissingRatioInTestVariant_ShouldHandle {
     // Given: SDK init response with missing ratio
-    NSDictionary *sdkInitResponse = @{
-        @"accountID": @"test-account",
-        @"sessionID": @"test-session",
-        @"auctionEndpointURL": @{
-            @"test": @[
-                @{
-                    @"name": @"no-ratio-variant",
-                    @"value": @"https://lambda.workers.dev/auction"
-                    // Missing ratio field
-                }
-            ],
-            @"default": @"https://au.cloudx.io/openrtb2/auction"
-        },
-        @"bidders": @[],
-        @"placements": @[]
+    NSMutableDictionary *sdkInitResponse = [self validSDKInitResponse];
+    sdkInitResponse[@"auctionEndpointURL"] = @{
+        @"test": @[
+            @{
+                @"name": @"no-ratio-variant",
+                @"value": @"https://lambda.workers.dev/auction"
+                // Missing ratio field
+            }
+        ],
+        @"default": @"https://au.cloudx.io/openrtb2/auction"
     };
-    
+
     // When: Parse config
     CLXSDKInitNetworkService *networkService = [[CLXSDKInitNetworkService alloc] init];
-    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse];
-    
+    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse error:nil];
+
     // Then: Should parse with ratio defaulting to 0.0
     id value = [config.auctionEndpointURL value];
     XCTAssertTrue([value isKindOfClass:[CLXSDKConfigEndpointObject class]], @"Should parse as object");
-    
+
     CLXSDKConfigEndpointObject *obj = (CLXSDKConfigEndpointObject *)value;
     XCTAssertNotNil(obj.test, @"Should have test array");
     XCTAssertEqual(obj.test.firstObject.ratio, 0.0, @"Missing ratio should default to 0.0");
@@ -274,22 +261,17 @@
  */
 - (void)testIntegration_GeoEndpoint_NoABTesting {
     // Given: SDK init response with geo endpoint
-    NSDictionary *sdkInitResponse = @{
-        @"accountID": @"test-account",
-        @"sessionID": @"test-session",
-        @"geoDataEndpointURL": @"https://geo.cloudx.io/v2/data",
-        @"auctionEndpointURL": @{@"default": @"https://au.cloudx.io/openrtb2/auction"},
-        @"bidders": @[],
-        @"placements": @[]
-    };
-    
+    NSMutableDictionary *sdkInitResponse = [self validSDKInitResponse];
+    sdkInitResponse[@"geoDataEndpointURL"] = @"https://geo.cloudx.io/v2/data";
+    sdkInitResponse[@"auctionEndpointURL"] = @{@"default": @"https://au.cloudx.io/openrtb2/auction"};
+
     // When: Parse and resolve
     CLXSDKInitNetworkService *networkService = [[CLXSDKInitNetworkService alloc] init];
-    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse];
-    
+    CLXSDKConfigResponse *config = [networkService parseSDKConfigFromResponse:sdkInitResponse error:nil];
+
     CLXEndpointResolver *resolver = [[CLXEndpointResolver alloc] init];
     [resolver resolveFromConfig:config];
-    
+
     // Then: Geo endpoint should be directly assigned (no A/B testing)
     XCTAssertEqualObjects(resolver.geoEndpoint, @"https://geo.cloudx.io/v2/data",
                          @"Geo endpoint should be directly assigned without A/B testing");

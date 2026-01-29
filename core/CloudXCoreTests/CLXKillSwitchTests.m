@@ -11,7 +11,7 @@
 
 // Private interface to access internal methods for testing
 @interface CLXSDKInitNetworkService (Testing)
-- (CLXSDKConfigResponse *)parseSDKConfigFromResponse:(NSDictionary *)response;
+- (nullable CLXSDKConfigResponse *)parseSDKConfigFromResponse:(NSDictionary *)response error:(NSError **)outError;
 @end
 
 @interface CLXKillSwitchTests : XCTestCase

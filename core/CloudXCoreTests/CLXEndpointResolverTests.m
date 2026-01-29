@@ -17,7 +17,7 @@
 
 // Private interface to access parseEndpointObject for testing
 @interface CLXSDKInitNetworkService (Testing)
-- (CLXSDKConfigResponse *)parseSDKConfigFromResponse:(NSDictionary *)response;
+- (nullable CLXSDKConfigResponse *)parseSDKConfigFromResponse:(NSDictionary *)response error:(NSError **)outError;
 - (CLXSDKConfigEndpointObject *)parseEndpointObject:(NSDictionary *)endpointDict;
 @end
 
@@ -37,6 +37,23 @@
     [super tearDown];
 }
 
+- (NSMutableDictionary *)validSDKInitResponse {
+    return [@{
+        @"accountID": @"test-account",
+        @"sessionID": @"test-session",
+        @"appID": @"test-app",
+        @"auctionEndpointURL": @"https://au.cloudx.io/openrtb2/auction",
+        @"impressionTrackerURL": @"https://tracker.test.com/impression",
+        @"winLossNotificationURL": @"https://winloss.test.com",
+        @"geoDataEndpointURL": @"https://geo.test.com/data",
+        @"bidders": @[],
+        @"placements": @[],
+        @"tracking": @[],
+        @"geoHeaders": @[],
+        @"winLossNotificationPayloadConfig": @{}
+    } mutableCopy];
+}
+
 #pragma mark - Endpoint Parsing Tests
 
 /**
@@ -44,15 +61,12 @@
  */
 - (void)testParseEndpoint_SimpleString_AuctionEndpoint {
     // Given: SDK response with simple string auction endpoint
-    NSDictionary *response = @{
-        @"accountID": @"test-account",
-        @"sessionID": @"test-session",
-        @"auctionEndpointURL": @"https://au.cloudx.io/openrtb2/auction"
-    };
-    
+    NSMutableDictionary *response = [self validSDKInitResponse];
+    // auctionEndpointURL is already a simple string in validSDKInitResponse
+
     // When: Parse SDK config
-    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response];
-    
+    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response error:nil];
+
     // Then: Should parse as simple string
     XCTAssertNotNil(config.auctionEndpointURL, @"Auction endpoint should be parsed");
     id value = [config.auctionEndpointURL value];
@@ -65,22 +79,19 @@
  */
 - (void)testParseEndpoint_ObjectWithDefaultOnly {
     // Given: SDK response with object format, default only
-    NSDictionary *response = @{
-        @"accountID": @"test-account",
-        @"sessionID": @"test-session",
-        @"auctionEndpointURL": @{
-            @"default": @"https://au.cloudx.io/openrtb2/auction"
-        }
+    NSMutableDictionary *response = [self validSDKInitResponse];
+    response[@"auctionEndpointURL"] = @{
+        @"default": @"https://au.cloudx.io/openrtb2/auction"
     };
-    
+
     // When: Parse SDK config
-    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response];
-    
+    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response error:nil];
+
     // Then: Should parse as endpoint object
     XCTAssertNotNil(config.auctionEndpointURL, @"Auction endpoint should be parsed");
     id value = [config.auctionEndpointURL value];
     XCTAssertTrue([value isKindOfClass:[CLXSDKConfigEndpointObject class]], @"Should be endpoint object");
-    
+
     CLXSDKConfigEndpointObject *obj = (CLXSDKConfigEndpointObject *)value;
     XCTAssertEqualObjects(obj.defaultKey, @"https://au.cloudx.io/openrtb2/auction", @"Should have default URL");
     XCTAssertNil(obj.test, @"Should have no test variants");
@@ -91,34 +102,31 @@
  */
 - (void)testParseEndpoint_ObjectWithABTestVariants {
     // Given: SDK response with lambda endpoint in test array (production scenario)
-    NSDictionary *response = @{
-        @"accountID": @"test-account",
-        @"sessionID": @"test-session",
-        @"auctionEndpointURL": @{
-            @"test": @[
-                @{
-                    @"name": @"variant-0",
-                    @"value": @"https://cloudx-proxy-production.workers.dev/openrtb2/auction?mode=enrichAndProxy&proxyto=https://au.cloudx.io/openrtb2/auction",
-                    @"ratio": @1.0
-                }
-            ],
-            @"default": @"https://au.cloudx.io/openrtb2/auction"
-        }
+    NSMutableDictionary *response = [self validSDKInitResponse];
+    response[@"auctionEndpointURL"] = @{
+        @"test": @[
+            @{
+                @"name": @"variant-0",
+                @"value": @"https://cloudx-proxy-production.workers.dev/openrtb2/auction?mode=enrichAndProxy&proxyto=https://au.cloudx.io/openrtb2/auction",
+                @"ratio": @1.0
+            }
+        ],
+        @"default": @"https://au.cloudx.io/openrtb2/auction"
     };
-    
+
     // When: Parse SDK config
-    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response];
-    
+    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response error:nil];
+
     // Then: Should parse test variants
     XCTAssertNotNil(config.auctionEndpointURL, @"Auction endpoint should be parsed");
     id value = [config.auctionEndpointURL value];
     XCTAssertTrue([value isKindOfClass:[CLXSDKConfigEndpointObject class]], @"Should be endpoint object");
-    
+
     CLXSDKConfigEndpointObject *obj = (CLXSDKConfigEndpointObject *)value;
     XCTAssertEqualObjects(obj.defaultKey, @"https://au.cloudx.io/openrtb2/auction", @"Should have default URL");
     XCTAssertNotNil(obj.test, @"Should have test variants");
     XCTAssertEqual(obj.test.count, 1, @"Should have 1 test variant");
-    
+
     CLXSDKConfigEndpointValue *variant = obj.test.firstObject;
     XCTAssertEqualObjects(variant.name, @"variant-0", @"Should have variant name");
     XCTAssertTrue([variant.value containsString:@"cloudx-proxy-production.workers.dev"], @"Should have lambda URL");
@@ -130,38 +138,35 @@
  */
 - (void)testParseEndpoint_MultipleABTestVariants {
     // Given: SDK response with multiple test variants
-    NSDictionary *response = @{
-        @"accountID": @"test-account",
-        @"sessionID": @"test-session",
-        @"auctionEndpointURL": @{
-            @"test": @[
-                @{
-                    @"name": @"control",
-                    @"value": @"https://au.cloudx.io/openrtb2/auction",
-                    @"ratio": @0.5
-                },
-                @{
-                    @"name": @"lambda-v1",
-                    @"value": @"https://lambda-v1.workers.dev/auction",
-                    @"ratio": @0.3
-                },
-                @{
-                    @"name": @"lambda-v2",
-                    @"value": @"https://lambda-v2.workers.dev/auction",
-                    @"ratio": @0.2
-                }
-            ],
-            @"default": @"https://au.cloudx.io/openrtb2/auction"
-        }
+    NSMutableDictionary *response = [self validSDKInitResponse];
+    response[@"auctionEndpointURL"] = @{
+        @"test": @[
+            @{
+                @"name": @"control",
+                @"value": @"https://au.cloudx.io/openrtb2/auction",
+                @"ratio": @0.5
+            },
+            @{
+                @"name": @"lambda-v1",
+                @"value": @"https://lambda-v1.workers.dev/auction",
+                @"ratio": @0.3
+            },
+            @{
+                @"name": @"lambda-v2",
+                @"value": @"https://lambda-v2.workers.dev/auction",
+                @"ratio": @0.2
+            }
+        ],
+        @"default": @"https://au.cloudx.io/openrtb2/auction"
     };
-    
+
     // When: Parse SDK config
-    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response];
-    
+    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response error:nil];
+
     // Then: Should parse all test variants
     id value = [config.auctionEndpointURL value];
     CLXSDKConfigEndpointObject *obj = (CLXSDKConfigEndpointObject *)value;
-    
+
     XCTAssertEqual(obj.test.count, 3, @"Should have 3 test variants");
     XCTAssertEqualObjects(obj.test[0].name, @"control", @"First variant should be control");
     XCTAssertEqual(obj.test[0].ratio, 0.5, @"Control should have 0.5 ratio");

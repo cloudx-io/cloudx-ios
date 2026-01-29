@@ -77,10 +77,25 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _placements = [NSArray array];
-        _bidders = [NSArray array];
-        _seatbid = [NSArray array];
-        _tracking = nil;  // Leave as nil until explicitly set from server response
+        // 1. Identity (required)
+        _accountID = @"";
+        _sessionID = @"";
+        _appID = @"";
+
+        // 2. Endpoints (required)
+        _auctionEndpointURL = [[CLXSDKConfigEndpointQuantumValue alloc] init];
+        _impressionTrackerURL = @"";
+        _winLossNotificationURL = @"";
+        _geoDataEndpointURL = @"";
+
+        // 3. Core Config (required)
+        _bidders = @[];
+        _placements = @[];
+
+        // 4. Tracking & Geo (required)
+        _tracking = @[];
+        _geoHeaders = @[];
+        _winLossNotificationPayloadConfig = @{};
     }
     return self;
 }

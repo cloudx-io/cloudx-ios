@@ -71,29 +71,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Response structure
 @interface CLXSDKConfigResponse : NSObject
-@property (nonatomic, copy, nullable) NSString *sessionID;
-@property (nonatomic, strong, nullable) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
-@property (nonatomic, copy, nullable) NSString *geoDataEndpointURL;
-@property (nonatomic, strong, nullable) NSArray<CLXSDKConfigPlacement *> *placements;
-@property (nonatomic, strong, nullable) NSArray<CLXSDKConfigBidder *> *bidders;
-@property (nonatomic, strong, nullable) NSArray<CLXSDKConfigSeatBid *> *seatbid;
-@property (nonatomic, copy, nullable) NSArray<CLXSDKConfigGeoBid *> *geoHeaders;
-@property (nonatomic, copy, nullable) NSString *cur;
-@property (nonatomic, copy, nullable) NSString *id;
-@property (nonatomic, copy, nullable) NSString *bidid;
-@property (nonatomic, copy, nullable) NSString *impressionTrackerURL;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 1. Identity (required)
+// ═══════════════════════════════════════════════════════════════════════════
+@property (nonatomic, copy) NSString *accountID;
+@property (nonatomic, copy) NSString *sessionID;
+@property (nonatomic, copy) NSString *appID;
 @property (nonatomic, copy, nullable) NSString *organizationID;
-@property (nonatomic, copy, nullable) NSString *accountID;
-@property (nonatomic, copy, nullable) NSString *appID;
-@property (nonatomic, strong, nullable) NSArray<NSString *> *tracking;
-@property (nonatomic, copy, nullable) NSString *winLossNotificationURL;
-@property (nonatomic, strong, nullable) NSDictionary<NSString *, NSString *> *winLossNotificationPayloadConfig;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 2. Endpoints (required)
+// ═══════════════════════════════════════════════════════════════════════════
+@property (nonatomic, strong) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
+@property (nonatomic, copy) NSString *impressionTrackerURL;
+@property (nonatomic, copy) NSString *winLossNotificationURL;
+@property (nonatomic, copy) NSString *geoDataEndpointURL;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 3. Core Config (required)
+// ═══════════════════════════════════════════════════════════════════════════
+@property (nonatomic, strong) NSArray<CLXSDKConfigBidder *> *bidders;
+@property (nonatomic, strong) NSArray<CLXSDKConfigPlacement *> *placements;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 4. Tracking & Geo (required)
+// ═══════════════════════════════════════════════════════════════════════════
+@property (nonatomic, strong) NSArray<NSString *> *tracking;
+@property (nonatomic, copy) NSArray<CLXSDKConfigGeoBid *> *geoHeaders;
+@property (nonatomic, strong) NSDictionary<NSString *, NSString *> *winLossNotificationPayloadConfig;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 5. Optional Config
+// ═══════════════════════════════════════════════════════════════════════════
 @property (nonatomic, strong, nullable) CLXMetricsConfig *metricsConfig;
-/// Device-specific configuration from server (test mode, debug logging)
 @property (nonatomic, strong, nullable) CLXSDKConfigDeviceConfig *deviceConfig;
 
 /// SDK init network call latency in milliseconds (for metrics tracking)
-/// This is measured in CLXSDKInitNetworkService and tracked after MetricsTracker is initialized
 @property (nonatomic, assign) NSInteger sdkInitLatencyMs;
 
 - (instancetype)init;
