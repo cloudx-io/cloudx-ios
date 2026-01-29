@@ -2,31 +2,13 @@
 //  CLXMetaInitializer.m
 //  CloudXMetaAdapter
 //
-//  Created by CLX on 2024-02-14.
-//
 
 #if __has_include(<CloudXMetaAdapter/CLXMetaInitializer.h>)
 #import <CloudXMetaAdapter/CLXMetaInitializer.h>
 #else
 #import "CLXMetaInitializer.h"
 #endif
-#import <CloudXCore/CLXLogger.h>
-#import <CloudXCore/CLXAdTrackingService.h>
-#import <CloudXCore/CLXSettings.h>
-#import <CloudXCore/CLXPrivacyService.h>
 
-// Import CloudXCore for both SPM and CocoaPods
-#if __has_include(<CloudXCore/CloudXCore.h>)
-#import <CloudXCore/CloudXCore.h>
-#else
-@import CloudXCore;
-#endif
-
-#import <FBAudienceNetwork/FBAudienceNetwork.h>
-#import <AppTrackingTransparency/AppTrackingTransparency.h>
-#import <AdSupport/AdSupport.h>
-
-// Import other internal headers for registration
 #if __has_include(<CloudXMetaAdapter/CLXMetaBannerFactory.h>)
 #import <CloudXMetaAdapter/CLXMetaBannerFactory.h>
 #else
@@ -45,27 +27,34 @@
 #import "CLXMetaRewardedFactory.h"
 #endif
 
-#if __has_include(<CloudXMetaAdapter/CLXMetaNativeFactory.h>)
-#import <CloudXMetaAdapter/CLXMetaNativeFactory.h>
-#else
-#import "CLXMetaNativeFactory.h"
-#endif
-
 #if __has_include(<CloudXMetaAdapter/CLXMetaBidTokenSource.h>)
 #import <CloudXMetaAdapter/CLXMetaBidTokenSource.h>
 #else
 #import "CLXMetaBidTokenSource.h"
 #endif
 
+#import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXAdTrackingService.h>
+#import <CloudXCore/CLXError.h>
+#import <CloudXCore/CLXVersion.h>
+#import <FBAudienceNetwork/FBAudienceNetwork.h>
+
+#if __has_include(<CloudXMetaAdapter/CLXMetaAdapterVersion.h>)
+#import <CloudXMetaAdapter/CLXMetaAdapterVersion.h>
+#else
+#import "CLXMetaAdapterVersion.h"
+#endif
+#import <AppTrackingTransparency/AppTrackingTransparency.h>
+#import <AdSupport/AdSupport.h>
+
 @interface CLXMetaInitializer ()
 @property (nonatomic, strong) CLXLogger *logger;
-@property (nonatomic, assign) BOOL initialized;
-
-// Private class method for internal logging
 + (CLXLogger *)logger;
 @end
 
 @implementation CLXMetaInitializer
+
+static BOOL CLXMetaSDKInitialized = NO;
 
 + (CLXLogger *)logger {
     static CLXLogger *logger = nil;
@@ -76,11 +65,8 @@
     return logger;
 }
 
-static BOOL isInitialized = NO;
-static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SDK version
-
 + (BOOL)isInitialized {
-    return isInitialized;
+    return CLXMetaSDKInitialized;
 }
 
 + (instancetype)createInstance {
@@ -88,7 +74,7 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
 }
 
 + (NSString *)sdkVersion {
-    return kSDKVersion;
+    return FB_AD_SDK_VERSION;
 }
 
 - (instancetype)init {
@@ -103,129 +89,84 @@ static NSString * const kSDKVersion = @"6.16.0"; // Facebook Audience Network SD
     return @"meta";
 }
 
-- (void)initializeWithConfig:(nullable CLXBidderConfig *)config 
+- (void)initializeWithConfig:(nullable CLXBidderConfig *)config
                     testMode:(BOOL)testMode
                   completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
-    [[CLXMetaInitializer logger] debug:@"Initializing Meta Audience Network adapter"];
-    
-    // Configure production settings (always needed)
-    [self configureAdvertiserTrackingEnabled];
-    
-    // Apply test mode from server deviceConfig (passed from CloudXCore)
-    [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"Setting Meta test mode: %@", testMode ? @"YES" : @"NO"]];
-    [self configureTestSettings:testMode];
-    
-    // Initialize Meta FAN SDK with placement IDs
-    [self initializeMetaSDKWithConfig:config];
-    
-    isInitialized = YES;
-    
-    [[CLXMetaInitializer logger] info:@"Meta adapter initialization completed"];
-    
-    if (completion) {
-        completion(YES, nil);
+
+    if (CLXMetaSDKInitialized) {
+        [[CLXMetaInitializer logger] debug:@"Meta SDK already initialized"];
+        if (completion) {
+            completion(YES, nil);
+        }
+        return;
     }
+
+    [self configureAdvertiserTrackingEnabled];
+    [self configureTestSettings:testMode];
+
+    [[CLXMetaInitializer logger] debug:@"Initializing Meta Audience Network"];
+    [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"Test mode: %@", testMode ? @"YES" : @"NO"]];
+
+    NSArray<NSString *> *placementIDs = [self extractPlacementIDsFromConfig:config];
+    [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"Initializing with placements: %@", placementIDs]];
+
+    void (^facebookCompletionHandler)(FBAdInitResults *results) = ^(FBAdInitResults *initResult) {
+        if ([initResult isSuccess]) {
+            [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"Meta SDK initialized: %@", initResult.message ?: @"OK"]];
+            CLXMetaSDKInitialized = YES;
+            if (completion) {
+                completion(YES, nil);
+            }
+        } else {
+            [[CLXMetaInitializer logger] error:[NSString stringWithFormat:@"Meta SDK init failed: %@", initResult.message ?: @"Unknown error"]];
+            CLXError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInitializationError
+                                          description:initResult.message ?: @"Meta SDK initialization failed"];
+            if (completion) {
+                completion(NO, error);
+            }
+        }
+    };
+
+    // Format: CLOUDX_{CoreSDKVersion}:{AdapterVersion}
+    NSString *mediationIdentifier = [NSString stringWithFormat:@"CLOUDX_%@:%@", CLXSDKVersion, CLXMetaAdapterVersion];
+    FBAdInitSettings *initSettings = [[FBAdInitSettings alloc] initWithPlacementIDs:placementIDs mediationService:mediationIdentifier];
+    [FBAudienceNetworkAds initializeWithSettings:initSettings completionHandler:facebookCompletionHandler];
 }
 
 #pragma mark - Private Methods
 
-- (void)initializeMetaSDKWithConfig:(nullable CLXBidderConfig *)config {
-    // Extract placement IDs from config if available
-    NSMutableArray<NSString *> *placementIDs = [NSMutableArray array];
-    
+- (NSArray<NSString *> *)extractPlacementIDsFromConfig:(nullable CLXBidderConfig *)config {
     if (config && config.initializationData) {
         NSArray *configPlacementIDs = config.initializationData[@"placementIds"];
         if ([configPlacementIDs isKindOfClass:[NSArray class]] && configPlacementIDs.count > 0) {
-            [placementIDs addObjectsFromArray:configPlacementIDs];
-            [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Found bidder init data: %@ | Added %lu placement IDs", 
-                                               config.initializationData, (unsigned long)placementIDs.count]];
-        } else {
-            [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Found bidder init data: %@ | No valid placement IDs array", config.initializationData]];
+            return configPlacementIDs;
         }
     }
-    
-    // Initialize Meta FAN SDK with placement IDs like MAX does
-    if (placementIDs.count > 0) {
-        [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"Initializing Meta FAN SDK with %lu placement IDs: %@", (unsigned long)placementIDs.count, [placementIDs componentsJoinedByString:@", "]]];
-        
-        void (^facebookCompletionHandler)(FBAdInitResults *results) = ^(FBAdInitResults *initResult) {
-            [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"%@ Meta FAN SDK initialization %@: %@", 
-                                               [initResult isSuccess] ? @"✅" : @"⚠️",
-                                               [initResult isSuccess] ? @"successful" : @"completed with issues",
-                                               initResult.message ?: @"No message"]];
-        };
-        
-        // Init FAN SDK with placement IDs for improved performance
-        NSString *mediationIdentifier = [NSString stringWithFormat:@"CLOUDX_%@", kSDKVersion];
-        FBAdInitSettings *initSettings = [[FBAdInitSettings alloc] initWithPlacementIDs:placementIDs mediationService:mediationIdentifier];
-        [FBAudienceNetworkAds initializeWithSettings:initSettings completionHandler:facebookCompletionHandler];
-    } else {
-        [[CLXMetaInitializer logger] debug:@"No placement IDs available - using default Meta FAN SDK initialization"];
-        
-        // Still need to initialize Meta FAN SDK even without placement IDs
-        void (^facebookCompletionHandler)(FBAdInitResults *results) = ^(FBAdInitResults *initResult) {
-            [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"%@ Meta FAN SDK default initialization %@: %@", 
-                                               [initResult isSuccess] ? @"✅" : @"⚠️",
-                                               [initResult isSuccess] ? @"successful" : @"completed with issues",
-                                               initResult.message ?: @"No message"]];
-        };
-        
-        // Initialize without placement IDs - Meta SDK will work with individual ad requests
-        NSString *mediationIdentifier = [NSString stringWithFormat:@"CLOUDX_%@", kSDKVersion];
-        FBAdInitSettings *initSettings = [[FBAdInitSettings alloc] initWithPlacementIDs:@[] mediationService:mediationIdentifier];
-        [FBAudienceNetworkAds initializeWithSettings:initSettings completionHandler:facebookCompletionHandler];
-    }
+    return @[];
 }
 
 - (void)configureAdvertiserTrackingEnabled {
-    // Use CloudX core's tracking service for consistency
     BOOL idfaAllowed = [CLXAdTrackingService isIDFAAccessAllowed];
-    
-    // Set Meta's ATE flag based on CloudX tracking service result
     [FBAdSettings setAdvertiserTrackingEnabled:idfaAllowed];
-    
-    [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"ATE flag set to %@ - Based on CloudX tracking service", 
-                                      idfaAllowed ? @"YES" : @"NO"]];
+    [[CLXMetaInitializer logger] info:[NSString stringWithFormat:@"ATE: %@", idfaAllowed ? @"YES" : @"NO"]];
 }
 
-/**
- * Configures Meta test settings based on server deviceConfig
- * 
- * Test mode is now controlled via server deviceConfig:
- * - Whitelist your device IFA on the CloudX dashboard
- * - The server will return deviceConfig.test != 0 for whitelisted devices
- *
- * When enabled:
- * - Registers the current device as a test device to receive test ads
- * - Sets Meta logging level for debugging
- *
- * Note: iOS Meta SDK uses addTestDevice: to enable test mode (unlike Android's setTestMode)
- *
- * @param enable Whether test mode should be enabled
- */
+// Test mode controlled via server deviceConfig (whitelist device IFA on CloudX dashboard).
+// iOS uses addTestDevice: (unlike Android's setTestMode).
 - (void)configureTestSettings:(BOOL)enable {
     if (enable) {
-        // Dynamically get current device's test hash and register for test ads
         NSString *deviceHash = [FBAdSettings testDeviceHash];
         if (deviceHash && deviceHash.length > 0) {
             [FBAdSettings addTestDevice:deviceHash];
-            [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Test device registered: %@", deviceHash]];
-        } else {
-            [[CLXMetaInitializer logger] debug:@"Unable to retrieve device test hash"];
+            [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Test device: %@", deviceHash]];
         }
-        
-        // Set logging level for better debugging during development
         [FBAdSettings setLogLevel:FBAdLogLevelLog];
     } else {
-        // Clear test devices for production mode
         [FBAdSettings clearTestDevices];
     }
-    
-    // Check and log test mode status
+
     BOOL isTestMode = [FBAdSettings isTestMode];
-    [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Meta test mode: %@ (requested: %@)", 
-                                       isTestMode ? @"enabled" : @"disabled",
-                                       enable ? @"YES" : @"NO"]];
+    [[CLXMetaInitializer logger] debug:[NSString stringWithFormat:@"Meta test mode: %@", isTestMode ? @"enabled" : @"disabled"]];
 }
 
 @end 

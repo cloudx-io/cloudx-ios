@@ -2,41 +2,32 @@
 //  CLXMetaRewarded.m
 //  CloudXMetaAdapter
 //
-//  Created by CLX on 2024-02-14.
-//
 
 #if __has_include(<CloudXMetaAdapter/CLXMetaRewarded.h>)
 #import <CloudXMetaAdapter/CLXMetaRewarded.h>
 #else
 #import "CLXMetaRewarded.h"
 #endif
-#import <CloudXCore/CLXLogger.h>
-#import <CloudXCore/CLXError.h>
 
-#if __has_include(<CloudXMetaAdapter/CLXMetaInitializer.h>)
-#import <CloudXMetaAdapter/CLXMetaInitializer.h>
-#else
-#import "CLXMetaInitializer.h"
-#endif
-
-// Import centralized error handler
 #if __has_include(<CloudXMetaAdapter/CLXMetaErrorHandler.h>)
 #import <CloudXMetaAdapter/CLXMetaErrorHandler.h>
 #else
-#import "../Utils/CLXMetaErrorHandler.h"
+#import "CLXMetaErrorHandler.h"
 #endif
 
-// Import CloudXCore for both SPM and CocoaPods
-#if __has_include(<CloudXCore/CloudXCore.h>)
-#import <CloudXCore/CloudXCore.h>
-#else
-@import CloudXCore;
-#endif
+#import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXError.h>
 
 @interface CLXMetaRewarded ()
 
-@property (nonatomic, strong) UIViewController *viewController;
+@property (nonatomic, strong) FBRewardedVideoAd *rewarded;
+@property (nonatomic, copy) NSString *bidPayload;
+@property (nonatomic, copy) NSString *bidID;
+@property (nonatomic, copy, nullable) NSString *placementID;
+@property (nonatomic, copy, nullable) NSString *placementName;
 @property (nonatomic, strong) CLXLogger *logger;
+@property (nonatomic, assign) BOOL isLoading;
+@property (nonatomic, assign) BOOL grantedReward;
 
 @end
 
@@ -45,23 +36,21 @@
 - (instancetype)initWithBidPayload:(NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                      placementName:(nullable NSString *)placementName
-                            bidID:(NSString *)bidID
+                             bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterRewardedDelegate>)delegate {
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
-        _placementID = [placementID copy];  // Now nullable - validation in load()
-        _placementName = [placementName copy];  // For error messages
+        _placementID = [placementID copy];
+        _placementName = [placementName copy];
         _bidID = [bidID copy];
         _delegate = delegate;
         _sdkVersion = FB_AD_SDK_VERSION;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMetaRewarded"];
-        
-        [self.logger debug:[NSString stringWithFormat:@"Initialized for placement: %@ (%@) | bidPayload: %@", 
-                           placementName ?: @"(unknown)", placementID ?: @"(nil)", bidPayload ? @"YES" : @"NO"]];
-        
-        // Only create rewarded ad if placementID is valid
-        // Otherwise defer to load() for validation
+
+        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@ (%@), BidID: %@",
+                           placementName ?: @"(unknown)", placementID ?: @"(nil)", bidID]];
+
         if (placementID && placementID.length > 0) {
             _rewarded = [[FBRewardedVideoAd alloc] initWithPlacementID:placementID];
             _rewarded.delegate = self;
@@ -80,48 +69,41 @@
 }
 
 - (void)load {
-    // Validate placement ID at load time (deferred validation pattern)
     if (!_placementID || _placementID.length == 0) {
         NSString *placementContext = _placementName ? [NSString stringWithFormat:@" for placement '%@'", _placementName] : @"";
         NSString *errorMessage = [NSString stringWithFormat:@"Meta placement ID is empty%@. "
-                                  "Make sure to configure the Meta placement ID in your CloudX dashboard under Ad Unit Settings > Meta.",
+                                  "Configure the Meta placement ID in CloudX dashboard under Ad Unit Settings > Meta.",
                                   placementContext];
         NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
                                      description:errorMessage];
         [self.logger error:error.localizedDescription];
-        
+
         if ([self.delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
             [self.delegate didFailToLoadWithRewarded:self error:error];
         }
         return;
     }
-    
-    // Create rewarded ad now if not already created (deferred from init)
+
     if (!_rewarded) {
         _rewarded = [[FBRewardedVideoAd alloc] initWithPlacementID:_placementID];
         _rewarded.delegate = self;
-        [self.logger debug:@"Created rewarded ad with validated placement ID"];
     }
-    
-    // Prevent concurrent loading attempts
+
     if (_isLoading) {
-        [self.logger debug:@"Load already in progress, ignoring duplicate request"];
         return;
     }
-    
+
     _isLoading = YES;
-    [self.logger debug:[NSString stringWithFormat:@"Loading ad for placement: %@ | bidPayload: %@", _placementID, self.bidPayload ? @"YES" : @"NO"]];
-    
-    // Ensure Meta SDK calls happen on main thread
+    [self.logger debug:[NSString stringWithFormat:@"Loading rewarded - Placement: %@", _placementID]];
+
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         typeof(self) strongSelf = weakSelf;
         if (!strongSelf) return;
-        
+
         if (strongSelf.bidPayload) {
             [strongSelf.rewarded loadAdWithBidPayload:strongSelf.bidPayload];
         } else {
-            // For auto play video ads, it's recommended to load the ad at least 30 seconds before it is shown
             [strongSelf.rewarded loadAd];
         }
     });
@@ -131,137 +113,98 @@
     [self load];
 }
 
-// Server-side reward validation support (per Meta official docs)
 - (void)setRewardDataWithUserID:(NSString *)userID withCurrency:(NSString *)currency {
     if (_rewarded) {
         [_rewarded setRewardDataWithUserID:userID withCurrency:currency];
-        [self.logger debug:[NSString stringWithFormat:@"Reward data set for user: %@ | currency: %@", userID, currency]];
-    } else {
-        [self.logger error:@"Cannot set reward data - rewarded ad not initialized"];
     }
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
-    // Check if rewarded video ad is valid before showing (per Meta official guidelines)
-    if (!_rewarded || !_rewarded.isAdValid) {
-        [self.logger error:[NSString stringWithFormat:@"Cannot show ad - rewarded exists: %@ | isValid: %@", _rewarded ? @"YES" : @"NO", _rewarded.isAdValid ? @"YES" : @"NO"]];
-        
-        // Create an error for show failure and call failure delegate
-        NSError *showError = [CLXError errorWithCode:CLXErrorCodeAdNotReady 
-                                                description:@"Cannot show rewarded video - ad not ready or not valid"];
-        
+    if (![self isReady]) {
+        [self.logger error:@"Unable to show rewarded - ad is not valid, marking as expired"];
+        NSError *showError = [CLXError errorWithCode:CLXErrorCodeAdapterAdExpired
+                                         description:@"Ad expired"];
         [self.delegate didFailToShowWithRewarded:self error:showError];
         return;
     }
-    
-    [self.logger info:@"Showing rewarded video ad"];
+
+    [self.logger info:@"Showing rewarded"];
     [_rewarded showAdFromRootViewController:viewController];
 }
 
 - (void)destroy {
-    self.rewarded = nil;
+    [self.logger debug:@"Destroying rewarded"];
+
+    if (self.rewarded) {
+        self.rewarded.delegate = nil;
+        self.rewarded = nil;
+    }
+
+    self.delegate = nil;
+    _isLoading = NO;
 }
 
 #pragma mark - FBRewardedVideoAdDelegate
 
 - (void)rewardedVideoAdDidLoad:(FBRewardedVideoAd *)rewardedVideoAd {
-    // Check if ad is valid before proceeding (per Meta official guidelines)
-    if (!rewardedVideoAd.isAdValid) {
-        [self.logger error:@"⚠️ Ad loaded but is not valid"];
-        _isLoading = NO;
-        
-        // Create an error for expired ad and call failure delegate
-        NSError *expiredAdError = [CLXError errorWithCode:CLXErrorCodeAdapterAdExpired
-                                                      description:@"Rewarded video ad loaded but is not valid"];
-
-        if ([self.delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
-            [self.delegate didFailToLoadWithRewarded:self error:expiredAdError];
-        }
-        return;
-    }
-    
-    [self.logger info:@"✅ Rewarded video ad loaded successfully"];
-    
-    // Reset loading state
+    [self.logger info:@"Rewarded video ad loaded"];
     _isLoading = NO;
-    
+
     if ([self.delegate respondsToSelector:@selector(didLoadWithRewarded:)]) {
         [self.delegate didLoadWithRewarded:self];
     }
 }
 
 - (void)rewardedVideoAd:(FBRewardedVideoAd *)rewardedVideoAd didFailWithError:(NSError *)error {
-    // Use centralized error handler for comprehensive logging and error enhancement
-    NSError *enhancedError = [CLXMetaErrorHandler handleMetaError:error
-                                                       withLogger:self.logger
-                                                          context:@"Rewarded"
-                                                      placementID:self.placementID];
-    
-    // Reset loading state
+    [self.logger error:[NSString stringWithFormat:@"Rewarded load failed: %@", error.localizedDescription]];
+    CLXError *clxError = [CLXMetaErrorHandler toCloudXError:error];
     _isLoading = NO;
-    
+
     if ([self.delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
-        [self.delegate didFailToLoadWithRewarded:self error:enhancedError];
+        [self.delegate didFailToLoadWithRewarded:self error:clxError];
     }
 }
 
 - (void)rewardedVideoAdDidClick:(FBRewardedVideoAd *)rewardedVideoAd {
-    [self.logger info:@"👆 Rewarded video ad clicked"];
-    
+    [self.logger info:@"Rewarded clicked"];
+
     if ([self.delegate respondsToSelector:@selector(clickWithRewarded:)]) {
         [self.delegate clickWithRewarded:self];
     }
 }
 
 - (void)rewardedVideoAdDidClose:(FBRewardedVideoAd *)rewardedVideoAd {
-    [self.logger info:@"Rewarded video ad closed"];
-    
+    [self.logger info:@"Rewarded closed"];
+
+    if (self.grantedReward) {
+        if ([self.delegate respondsToSelector:@selector(userRewardWithRewarded:)]) {
+            [self.delegate userRewardWithRewarded:self];
+        }
+    }
+
     if ([self.delegate respondsToSelector:@selector(didCloseWithRewarded:)]) {
         [self.delegate didCloseWithRewarded:self];
     }
 }
 
 - (void)rewardedVideoAdWillClose:(FBRewardedVideoAd *)rewardedVideoAd {
-    [self.logger info:@"Rewarded video ad will close"];
-    // Consider to add code here to resume your app's flow
+    [self.logger info:@"Rewarded will close"];
 }
 
 - (void)rewardedVideoAdVideoComplete:(FBRewardedVideoAd *)rewardedVideoAd {
-    [self.logger info:@"🎁 Rewarded video completed - reward earned"];
-    
-    // NOTE: This callback fires for client-side reward validation.
-    // If server-side validation is enabled, rewards should only be granted
-    // via rewardedVideoAdServerRewardDidSucceed callback instead.
-    // For now, we'll trigger the reward since most publishers use client-side validation.
-    
-    if ([self.delegate respondsToSelector:@selector(userRewardWithRewarded:)]) {
-        [self.delegate userRewardWithRewarded:self];
-        [self.logger info:@"User reward granted via client-side validation"];
-    }
+    [self.logger info:@"Rewarded video completed"];
+    self.grantedReward = YES;
 }
 
-// Missing delegate methods from official Meta implementation
 - (void)rewardedVideoAdWillLogImpression:(FBRewardedVideoAd *)rewardedVideoAd {
-    [self.logger info:@"Rewarded video impression logged"];
-    
-    // Forward to CloudX delegate if it supports impression tracking
+    [self.logger info:@"Rewarded impression"];
+
+    if ([self.delegate respondsToSelector:@selector(didShowWithRewarded:)]) {
+        [self.delegate didShowWithRewarded:self];
+    }
+
     if ([self.delegate respondsToSelector:@selector(impressionWithRewarded:)]) {
         [self.delegate impressionWithRewarded:self];
-    }
-}
-
-- (void)rewardedVideoAdServerRewardDidFail:(FBRewardedVideoAd *)rewardedVideoAd {
-    [self.logger error:@"Server reward validation failed - no reward granted | Server-side validation failed, letting server handle reward validation via S2S callbacks if needed"];
-}
-
-- (void)rewardedVideoAdServerRewardDidSucceed:(FBRewardedVideoAd *)rewardedVideoAd {
-    [self.logger info:@"Server reward validation succeeded"];
-    
-    // Following standard approach: Always grant reward when server validation passes
-    // This mirrors industry standard behavior where rewards are granted after successful validation
-    if ([self.delegate respondsToSelector:@selector(userRewardWithRewarded:)]) {
-        [self.delegate userRewardWithRewarded:self];
-        [self.logger info:@"User reward granted after server validation success"];
     }
 }
 

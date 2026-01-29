@@ -2,11 +2,7 @@
 //  CLXMetaRewardedFactory.m
 //  CloudXMetaAdapter
 //
-//  Created by CLX on 2024-02-14.
-//
 
-// Conditional import for internal headers to support both SPM and CocoaPods/Xcode.
-// SPM requires angle brackets with module name, CocoaPods/Xcode supports quotes.
 #if __has_include(<CloudXMetaAdapter/CLXMetaRewardedFactory.h>)
 #import <CloudXMetaAdapter/CLXMetaRewardedFactory.h>
 #else
@@ -19,10 +15,10 @@
 #import "CLXMetaRewarded.h"
 #endif
 
-#if __has_include(<CloudXMetaAdapter/CLXMetaBaseFactory.h>)
-#import <CloudXMetaAdapter/CLXMetaBaseFactory.h>
+#if __has_include(<CloudXMetaAdapter/CLXMetaUtils.h>)
+#import <CloudXMetaAdapter/CLXMetaUtils.h>
 #else
-#import "CLXMetaBaseFactory.h"
+#import "CLXMetaUtils.h"
 #endif
 
 #import <CloudXCore/CLXLogger.h>
@@ -42,38 +38,32 @@
 }
 
 + (instancetype)createInstance {
-    CLXMetaRewardedFactory *instance = [[CLXMetaRewardedFactory alloc] init];
-    return instance;
+    return [[CLXMetaRewardedFactory alloc] init];
 }
 
 - (nullable id<CLXAdapterRewarded>)createWithAdId:(NSString *)adId
-                                               bidId:(NSString *)bidId
-                                                 adm:(NSString *)adm
-                                              extras:(NSDictionary<NSString *, NSString *> *)extras
-                                       placementName:(NSString *)placementName
-                                            delegate:(id<CLXAdapterRewardedDelegate>)delegate {
-    
-    [self.logger debug:[NSString stringWithFormat:@"Creating rewarded for placement: %@ (%@) | bidPayload: %@", placementName ?: @"(unknown)", adId, adm ? @"YES" : @"NO"]];
-    
-    // Use shared base factory method to resolve Meta placement ID
-    NSString *metaPlacementID = [CLXMetaBaseFactory resolveMetaPlacementID:extras 
-                                                              fallbackAdId:adId 
-                                                                    logger:self.logger];
-    
-    // v1.3.0: No longer return nil for validation errors
-    // Validation now happens in load() with proper error callbacks
+                                            bidId:(NSString *)bidId
+                                              adm:(NSString *)adm
+                                           extras:(NSDictionary<NSString *, NSString *> *)extras
+                                    placementName:(NSString *)placementName
+                                         delegate:(id<CLXAdapterRewardedDelegate>)delegate {
+
+    [self.logger debug:[NSString stringWithFormat:@"Creating rewarded for placement: %@ (%@)", placementName ?: @"(unknown)", adId]];
+
+    NSString *metaPlacementID = [CLXMetaUtils resolveMetaPlacementID:extras
+                                                         fallbackAdId:adId
+                                                               logger:self.logger];
+
     if (!metaPlacementID || metaPlacementID.length == 0) {
         [self.logger error:@"Invalid placement ID - validation will be deferred to load()"];
     }
-    
-    // ALWAYS create and return adapter (even with invalid placementID)
-    // Validation errors will be reported in load() via delegate callback
+
     CLXMetaRewarded *rewarded = [[CLXMetaRewarded alloc] initWithBidPayload:adm
-                                                                 placementID:metaPlacementID  // May be nil
-                                                               placementName:placementName  // For error messages
+                                                                placementID:metaPlacementID
+                                                              placementName:placementName
                                                                       bidID:bidId
                                                                    delegate:delegate];
-    
+
     return rewarded;
 }
 

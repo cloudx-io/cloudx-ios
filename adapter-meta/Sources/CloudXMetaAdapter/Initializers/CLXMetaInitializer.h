@@ -2,11 +2,8 @@
 //  CLXMetaInitializer.h
 //  CloudXMetaAdapter
 //
-//  Created by CLX on 2024-02-14.
-//
-#import <CloudXCore/CloudXCore.h>
 
-@class CLXSettings;
+#import <CloudXCore/CloudXCore.h>
 
 @interface CLXMetaInitializer : NSObject <CLXAdNetworkInitializer>
 

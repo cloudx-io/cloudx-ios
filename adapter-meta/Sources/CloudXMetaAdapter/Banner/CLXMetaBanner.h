@@ -2,51 +2,26 @@
 //  CLXMetaBanner.h
 //  CloudXMetaAdapter
 //
-//  Created by CLX on 2024-02-14.
-//
 
 #import <Foundation/Foundation.h>
 #import <FBAudienceNetwork/FBAudienceNetwork.h>
-
 #import <CloudXCore/CloudXCore.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-// NOTE: FBAdViewDelegate conformance moved to separate CLXMetaBannerAdViewDelegate class
-// to avoid NSProxy crashes with Meta SDK 6.21.0+
 @interface CLXMetaBanner : NSObject <CLXAdapterBanner, CLXDestroyable>
 
 @property (nonatomic, weak, nullable) id<CLXAdapterBannerDelegate> delegate;
-@property (nonatomic, assign) BOOL timeout;
-@property (nonatomic, strong, nullable) FBAdView *bannerView;
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
-@property (nonatomic, assign, readonly) BOOL isFlexibleSize;
-@property (nonatomic, assign) NSTimeInterval timeoutInterval;
+@property (nonatomic, assign) BOOL timeout;
 
-/**
- * Initialize Meta banner adapter
- * 
- * @param bidPayload Bid payload from server
- * @param placementID Meta placement ID (now nullable - validation deferred to load())
- * @param placementName CloudX placement name for error messages (nullable)
- * @param bidID Bid identifier
- * @param type Banner type
- * @param viewController View controller for presentation
- * @param delegate Adapter delegate for callbacks
- * @return Initialized adapter instance
- *
- * @discussion As of v1.3.0, placementID can be nil. Validation occurs in load()
- *             and errors are reported via delegate callback.
- * @since 1.3.0 placementID parameter is now nullable
- * @since 1.4.0 placementName parameter added for better error messages
- */
 - (instancetype)initWithBidPayload:(NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                      placementName:(nullable NSString *)placementName
-                            bidID:(NSString *)bidID
-                             type:(CLXBannerType)type
+                             bidID:(NSString *)bidID
+                              type:(CLXBannerType)type
                     viewController:(UIViewController *)viewController
-                         delegate:(id<CLXAdapterBannerDelegate>)delegate;
+                          delegate:(id<CLXAdapterBannerDelegate>)delegate;
 
 @end
 

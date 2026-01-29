@@ -2,10 +2,7 @@
 //  CLXMetaBidTokenSource.m
 //  CloudXMetaAdapter
 //
-//  Created by CLX on 2024-12-19.
-//
 
-// Conditional import for internal headers to support both SPM and CocoaPods/Xcode.
 #if __has_include(<CloudXMetaAdapter/CLXMetaBidTokenSource.h>)
 #import <CloudXMetaAdapter/CLXMetaBidTokenSource.h>
 #else
@@ -14,9 +11,7 @@
 
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
-#import <CloudXCore/CLXSettings.h>
 #import <FBAudienceNetwork/FBAudienceNetwork.h>
-#import <AdSupport/AdSupport.h>
 
 @interface CLXMetaBidTokenSource ()
 @property (nonatomic, strong) CLXLogger *logger;
@@ -34,7 +29,6 @@
 }
 
 + (instancetype)createInstance {
-    // Return shared instance for consistent token generation
     return [self sharedInstance];
 }
 
@@ -50,59 +44,43 @@
 
 - (void)getTokenWithCompletion:(void (^)(NSDictionary<NSString *, NSString *> * _Nullable token, NSError * _Nullable error))completion {
     [self.logger debug:@"Getting Meta bidder token"];
-    
+
     // IMPORTANT: Must use background queue, NOT main queue.
-    // [FBAdSettings bidderToken] is a blocking call that:
-    // 1. Acquires an internal lock in the Facebook SDK
-    // 2. Makes IPC calls to fetch device identifiers
-    // When another SDK concurrently calls bidderToken and holds the lock,
-    // this can take several seconds. Calling on main thread causes UI freeze/ANR.
+    // [FBAdSettings bidderToken] is a blocking call that acquires an internal lock.
+    // When another SDK concurrently holds the lock, this can take several seconds.
+    // Calling on main thread causes UI freeze/ANR.
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         typeof(self) strongSelf = weakSelf;
         if (!strongSelf) {
             if (completion) {
-                NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
+                NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInternalError
                                              description:@"Bid token source was deallocated"];
                 completion(nil, error);
             }
             return;
         }
-        
+
         @try {
-            // Get Meta bidder token - this is required for every bid request
             NSString *bidderToken = [FBAdSettings bidderToken];
-            NSString *idfa = [[CLXSettings sharedInstance] getIFA];
-            [strongSelf.logger debug:[NSString stringWithFormat:@"Meta bidder token: %@ | IDFA from CLXSettings: %@", 
-                                     bidderToken ? @"[RECEIVED]" : @"[NIL]", idfa ? @"[AVAILABLE]" : @"[NIL]"]];
-            
-            // Create token dictionary with Meta-specific data
-            NSMutableDictionary<NSString *, NSString *> *tokenDict = [NSMutableDictionary dictionary];
-            
+            [strongSelf.logger debug:[NSString stringWithFormat:@"Meta bidder token: %@",
+                                     bidderToken ? @"[RECEIVED]" : @"[NIL]"]];
+
+            NSDictionary<NSString *, NSString *> *tokenDict = nil;
             if (bidderToken && bidderToken.length > 0) {
-                tokenDict[@"bidder_token"] = bidderToken;
+                tokenDict = @{@"bidder_token": bidderToken};
             }
-            
-            if (idfa && idfa.length > 0) {
-                tokenDict[@"device_ifa"] = idfa;
-                [strongSelf.logger debug:[NSString stringWithFormat:@"Using centralized IFA in device_ifa: %@", idfa]];
-            }
-            
-            // Add network identifier
-            tokenDict[@"network"] = @"audienceNetwork";
-            
-            [strongSelf.logger debug:[NSString stringWithFormat:@"Token created with %lu keys", (unsigned long)tokenDict.count]];
-            
+
             if (completion) {
-                completion([tokenDict copy], nil);
+                completion(tokenDict, nil);
             }
-            
+
         } @catch (NSException *exception) {
             [strongSelf.logger error:[NSString stringWithFormat:@"Exception getting token: %@", exception.reason]];
-            
-            NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
-                                         description:exception.reason ?: @"Unknown exception occurred while getting bid token"];
-            
+
+            NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInternalError
+                                         description:exception.reason ?: @"Unknown exception"];
+
             if (completion) {
                 completion(nil, error);
             }
