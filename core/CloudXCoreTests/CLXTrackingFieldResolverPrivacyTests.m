@@ -95,12 +95,12 @@
     CLXSDKConfigResponse *testConfig = [[CLXSDKConfigResponse alloc] init];
     testConfig.tracking = @[@"sdk.ifa", @"sdk.sessionId"];
     [self.resolver setConfig:testConfig];
-    
-    // Set up session data with known values
+
     [self.resolver setSessionConstData:@"test-session-67890"
                             sdkVersion:@"1.0.0-test"
                          pluginVersion:nil
-                            deviceType:@"phone"
+                        deviceTypeName:@"phone"
+                        deviceTypeCode:1
                            abTestGroup:@"control-group"
                              appBundle:@"com.cloudx.test"];
 }

@@ -514,10 +514,12 @@ static CloudXCore *_sharedInstance = nil;
     // Set session constant data BEFORE creating PayloadBuilder so appBundle is included in payload
     NSString *appBundle = [[NSBundle mainBundle] bundleIdentifier] ?: @"";
     NSString *pluginVersion = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCorePluginVersionKey];
+    DeviceType deviceType = [CLXSystemInformation shared].deviceType;
     [[CLXTrackingFieldResolver shared] setSessionConstData:config.sessionID ?: @""
                                                 sdkVersion:CLXSDKVersion
                                              pluginVersion:pluginVersion
-                                                deviceType:DeviceTypeToString([CLXSystemInformation shared].deviceType)
+                                            deviceTypeName:DeviceTypeToString(deviceType)
+                                            deviceTypeCode:(NSInteger)deviceType
                                                abTestGroup:_abTestName ?: @""
                                                  appBundle:appBundle];
     

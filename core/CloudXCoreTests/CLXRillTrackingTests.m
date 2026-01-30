@@ -125,31 +125,31 @@ static MockRillEventReporter *sharedInstance = nil;
         self.accountID = kTestAccountID;
         self.sessionID = kTestSessionID;
         
-        // Use the tracking configuration from the user's init response
+        // Use the tracking configuration matching new_config_response.txt
         self.testTracking = @[
             @"bid.ext.prebid.meta.adaptercode",
             @"bid.w",
             @"bid.h",
             @"bid.dealid",
-            @"bid.creativeId",
+            @"bid.crid",  // Changed from bid.creativeId
             @"bid.price",
             @"sdk.responseTimeMillis",
             @"sdk.releaseVersion",
             @"bidRequest.id",
             @"config.accountID",
             @"config.organizationID",
-            @"bidRequest.app.bundle",
+            @"sdk.app.bundle",  // Changed from bidRequest.app.bundle
             @"bidRequest.imp.tagid",
             @"bidRequest.device.model",
-            @"sdk.deviceType",
+            @"sdk.deviceTypeName",  // Changed from sdk.deviceType
             @"bidRequest.device.os",
             @"bidRequest.device.osv",
             @"sdk.sessionId",
-            @"bidRequest.device.ifa",
-            @"config.testGroupName",
-            @"config.adUnits[id=${bidRequest.imp.tagid}].name",
+            @"sdk.ifa",  // Changed from bidRequest.device.ifa
+            @"sdk.testGroupName",  // Changed from config.testGroupName
+            @"config.adUnits[id=${bidRequest.imp.tagid}].name",  // Changed from config.placements
             @"bidRequest.device.geo.country",
-            @"config.adUnits[id=${bidRequest.imp.tagid}].externalId",
+            @"bid.ext.cloudx.test",  // Added
             @"bidResponse.ext.cloudx.auction.participants[rank=${bid.ext.cloudx.rank}].round",
             @"bidResponse.ext.cloudx.auction.participants[rank=${bid.ext.cloudx.rank}].lineItemId"
         ];
@@ -174,16 +174,22 @@ static MockRillEventReporter *sharedInstance = nil;
 
 @interface CLXTrackingFieldResolver (Testing)
 - (void)setConfig:(CLXSDKConfigResponse *)config;
+- (void)setConfigJSON:(NSDictionary *)configJSON;
 - (void)setSessionConstData:(NSString *)sessionId
                  sdkVersion:(NSString *)sdkVersion
               pluginVersion:(nullable NSString *)pluginVersion
-                 deviceType:(NSString *)deviceType
+             deviceTypeName:(NSString *)deviceTypeName
+             deviceTypeCode:(NSInteger)deviceTypeCode
                 abTestGroup:(NSString *)abTestGroup
                   appBundle:(NSString *)appBundle;
-- (void)setRequestData:(NSString *)auctionId bidRequestJSON:(NSDictionary *)bidRequestJSON;
-- (void)setResponseData:(NSString *)auctionId bidResponseJSON:(NSDictionary *)bidResponseJSON;
-- (void)saveLoadedBid:(NSString *)auctionId bidId:(NSString *)bidId;
-- (NSString *)buildPayload:(NSString *)auctionId;
+- (void)setRequestData:(NSString *)auctionId bidRequestJSON:(NSDictionary *)json;
+- (void)setResponseData:(NSString *)auctionId bidResponseJSON:(NSDictionary *)json;
+- (nullable NSString *)buildPayload:(NSString *)auctionId bidId:(nullable NSString *)bidId;
+- (nullable NSString *)buildPayload:(NSString *)auctionId;
+- (nullable id)resolveField:(NSString *)auctionId field:(NSString *)field bidId:(nullable NSString *)bidId;
+// Legacy helpers for test compatibility
+- (nullable id)resolveBidField:(NSString *)auctionId field:(NSString *)field;
+- (nullable id)resolveBidRequestField:(NSString *)auctionId field:(NSString *)field;
 - (nullable id)resolveSdkField:(NSString *)auctionId field:(NSString *)field;
 @end
 
@@ -251,7 +257,8 @@ static MockRillEventReporter *sharedInstance = nil;
     [self.resolver setSessionConstData:kTestSessionID
                             sdkVersion:@"1.0.0"
                          pluginVersion:nil
-                            deviceType:@"phone"
+                        deviceTypeName:@"phone"
+                        deviceTypeCode:1
                            abTestGroup:@"RandomTest"
                              appBundle:@"cloudx.CloudXObjCRemotePods"];
     
@@ -312,7 +319,6 @@ static MockRillEventReporter *sharedInstance = nil;
     };
     
     [self.resolver setResponseData:kTestAuctionID bidResponseJSON:testBidResponse];
-    [self.resolver saveLoadedBid:kTestAuctionID bidId:kTestBidID];
 }
 
 // Creates a test CLXConfigImpressionModel
@@ -807,14 +813,14 @@ static MockRillEventReporter *sharedInstance = nil;
 - (void)testBidderFieldResolution_ShouldUseDirectJSONAccess {
     // Given: Test data with Meta bidder
     [self setupTestData];
-    
-    // When: Build payload with bidder field resolution
-    NSString *payload = [self.resolver buildPayload:kTestAuctionID];
-    
+
+    // When: Build payload with bidder field resolution (passing bidId for bid.* fields)
+    NSString *payload = [self.resolver buildPayload:kTestAuctionID bidId:kTestBidID];
+
     // Then: Should start with "meta" (first field in tracking config)
     XCTAssertNotNil(payload, @"Payload should not be nil");
     XCTAssertTrue([payload hasPrefix:@"meta;"], @"Payload should start with 'meta;' from direct JSON access");
-    
+
     // Verify no corruption occurred (old bug would show "ext.premeta.adaptercode")
     XCTAssertFalse([payload containsString:@"premeta"], @"Should not contain corrupted 'premeta' string");
     XCTAssertFalse([payload containsString:@"ext.premeta.adaptercode"], @"Should not contain corrupted path");
@@ -824,25 +830,25 @@ static MockRillEventReporter *sharedInstance = nil;
 - (void)testServerDrivenPayload_ShouldContainAllConfiguredFields {
     // Given: Resolver is set up with test data
     [self setupTestData]; // Ensure test data is set up
-    
-    // When: Build payload
-    NSString *payload = [self.resolver buildPayload:kTestAuctionID];
-    
-    // Then: Payload should contain all 26 fields
+
+    // When: Build payload (passing bidId for bid.* fields)
+    NSString *payload = [self.resolver buildPayload:kTestAuctionID bidId:kTestBidID];
+
+    // Then: Payload should contain all 25 fields
     XCTAssertNotNil(payload, @"Payload should not be nil");
-    
+
     if (payload.length > 0) {
         NSArray *fields = [payload componentsSeparatedByString:@";"];
         XCTAssertEqual(fields.count, 25, @"Payload should have 25 fields, got %lu", (unsigned long)fields.count);
-        
+
         // Verify some key fields are populated (check if they exist in the payload)
         // Note: The exact format depends on server configuration
         XCTAssertTrue(payload.length > 0, @"Payload should not be empty");
         XCTAssertTrue([payload containsString:kTestAccountID], @"Should contain account ID");
-        
+
         // Verify bidder field is correctly resolved (should be "meta" from test data)
         XCTAssertTrue([payload hasPrefix:@"meta;"], @"Payload should start with bidder 'meta;'");
-        
+
         // Log the payload for debugging
         NSLog(@"Generated payload: %@", payload);
     } else {
@@ -850,77 +856,69 @@ static MockRillEventReporter *sharedInstance = nil;
     }
 }
 
-// Test sdk.appBundle field resolution in Rill tracking payload
+// Test sdk.app.bundle field resolution in Rill tracking payload
 - (void)testSDKAppBundleField_ShouldResolveToActualBundleIdentifier {
     // Given: Resolver is set up with session data including app bundle
     NSString *expectedBundle = @"com.cloudx.test.bundle";
     [self.resolver setSessionConstData:kTestSessionID
                             sdkVersion:@"1.0.0"
                          pluginVersion:nil
-                            deviceType:@"phone"
+                        deviceTypeName:@"phone"
+                        deviceTypeCode:1
                            abTestGroup:@"RandomTest"
                              appBundle:expectedBundle];
-    
-    // When: Resolve sdk.appBundle field (camelCase format)
-    id resolvedBundle = [self.resolver resolveSdkField:kTestAuctionID field:@"sdk.appBundle"];
-    
+
+    // When: Resolve sdk.app.bundle field (dotted format - this is what server uses)
+    id resolvedBundle = [self.resolver resolveSdkField:kTestAuctionID field:@"sdk.app.bundle"];
+
     // Then: Should return the actual app bundle identifier
-    XCTAssertNotNil(resolvedBundle, @"sdk.appBundle should resolve to a value");
-    XCTAssertEqualObjects(resolvedBundle, expectedBundle, @"sdk.appBundle should match the app's bundle identifier");
-    XCTAssertFalse([resolvedBundle isEqualToString:@""], @"sdk.appBundle should not be empty");
-    
-    // When: Resolve sdk.app.bundle field (dotted format - server uses this)
-    id resolvedBundleDotted = [self.resolver resolveSdkField:kTestAuctionID field:@"sdk.app.bundle"];
-    
-    // Then: Should also return the actual app bundle identifier
-    XCTAssertNotNil(resolvedBundleDotted, @"sdk.app.bundle should resolve to a value");
-    XCTAssertEqualObjects(resolvedBundleDotted, expectedBundle, @"sdk.app.bundle should match the app's bundle identifier");
-    XCTAssertEqualObjects(resolvedBundle, resolvedBundleDotted, @"Both formats should resolve to the same value");
+    XCTAssertNotNil(resolvedBundle, @"sdk.app.bundle should resolve to a value");
+    XCTAssertEqualObjects(resolvedBundle, expectedBundle, @"sdk.app.bundle should match the app's bundle identifier");
+    XCTAssertFalse([resolvedBundle isEqualToString:@""], @"sdk.app.bundle should not be empty");
 }
 
 // Test placement name resolution does not duplicate placement ID
 - (void)testPlacementNameField_ShouldResolveToNameNotID {
-    // Given: SDK config with placement configuration
-    MockSDKConfigResponse *configWithPlacements = [[MockSDKConfigResponse alloc] init];
-    configWithPlacements.accountID = kTestAccountID;
-    configWithPlacements.sessionID = kTestSessionID;
-    
-    // Create a placement with distinct ID and name
+    // Given: SDK config with adUnits configuration (using raw JSON like production)
     NSString *testPlacementID = @"placement-id-12345";
     NSString *testPlacementName = @"Banner_Home_Screen";
-    
-    // Create actual CLXSDKConfigAdUnit object
-    CLXSDKConfigAdUnit *placement = [[CLXSDKConfigAdUnit alloc] init];
-    [placement setValue:testPlacementID forKey:@"id"];
-    [placement setValue:testPlacementName forKey:@"name"];
-    [placement setValue:@"ext-placement-abc" forKey:@"dealId"];
-    
-    // Set placements array
-    [configWithPlacements setValue:@[placement] forKey:@"adUnits"];
-    
-    [self.resolver setConfig:configWithPlacements];
-    
+
+    // Set up config with raw JSON containing adUnits (matching new_config_response.txt structure)
+    NSDictionary *configJSON = @{
+        @"accountID": kTestAccountID,
+        @"sessionID": kTestSessionID,
+        @"adUnits": @[
+            @{
+                @"id": testPlacementID,
+                @"name": testPlacementName,
+                @"type": @"BANNER"
+            }
+        ]
+    };
+    [self.resolver setConfigJSON:configJSON];
+
     // Set up bid request with placement ID
     NSDictionary *testBidRequest = @{
         @"id": kTestAuctionID,
         @"imp": @[@{@"tagid": testPlacementID}]
     };
     [self.resolver setRequestData:kTestAuctionID bidRequestJSON:testBidRequest];
-    
+
     // When: Resolve config.adUnits[id=${bidRequest.imp.tagid}].name field
     // This should resolve to the placement NAME, not the placement ID
-    id resolvedName = [self.resolver resolveField:kTestAuctionID 
-                                            field:@"config.adUnits[id=${bidRequest.imp.tagid}].name"];
-    
+    id resolvedName = [self.resolver resolveField:kTestAuctionID
+                                            field:@"config.adUnits[id=${bidRequest.imp.tagid}].name"
+                                            bidId:nil];
+
     // Then: Should resolve to placement name, not placement ID
     XCTAssertNotNil(resolvedName, @"Placement name should resolve to a value");
     XCTAssertEqualObjects(resolvedName, testPlacementName, @"Should resolve to placement name");
     XCTAssertFalse([resolvedName isEqualToString:testPlacementID], @"Placement name should NOT be the same as placement ID");
-    
+
     // And: Verify placement ID field resolves correctly to the ID
     id resolvedID = [self.resolver resolveBidRequestField:kTestAuctionID field:@"bidRequest.imp.tagid"];
     XCTAssertEqualObjects(resolvedID, testPlacementID, @"Placement ID should resolve to the ID");
-    
+
     // Verify they are different values
     XCTAssertFalse([resolvedName isEqual:resolvedID], @"Placement name and ID should be different values");
 }
@@ -1021,12 +1019,13 @@ static MockRillEventReporter *sharedInstance = nil;
 }
 
 /**
- * Test deal ID extraction from debug data in Rill tracking
- * Validates that deal ID is properly extracted from real-world bid response structure
+ * Test deal ID extraction from bid object (dynamic JSON path resolution)
+ * After Android parity refactor, dealId is read directly from bid.dealid path
+ * Debug data extraction was removed to match Android behavior
  */
 - (void)testDealIdExtractionFromDebugData_ShouldIncludeInRillPayload {
-    // Given: Bid response with deal ID only in debug data (like real Meta responses)
-    NSDictionary *testBidResponseWithDebugDeal = @{
+    // Given: Bid response with deal ID in the bid object (standard ORTB location)
+    NSDictionary *testBidResponseWithDeal = @{
         @"id": kTestAuctionID,
         @"seatbid": @[@{
             @"bid": @[@{
@@ -1034,8 +1033,8 @@ static MockRillEventReporter *sharedInstance = nil;
                 @"price": @99.99,
                 @"w": @320,
                 @"h": @250,
-                // No dealid field in bid object
-                @"creativeId": @"test-creative-456",
+                @"dealid": @"cloudx-usd-YJRQzEHC",  // Deal ID in standard ORTB location
+                @"crid": @"test-creative-456",
                 @"ext": @{
                     @"prebid": @{
                         @"meta": @{
@@ -1043,7 +1042,8 @@ static MockRillEventReporter *sharedInstance = nil;
                         }
                     },
                     @"cloudx": @{
-                        @"rank": @1
+                        @"rank": @1,
+                        @"test": @NO
                     }
                 }
             }]
@@ -1057,50 +1057,23 @@ static MockRillEventReporter *sharedInstance = nil;
                         @"lineItemId": @"li_test123"
                     }]
                 }
-            },
-            @"debug": @{
-                @"rounds": @{
-                    @"1": @{
-                        @"resolvedrequest": @{
-                            @"imp": @[@{
-                                @"id": @"test-imp-id",
-                                @"ext": @{
-                                    @"prebid": @{
-                                        @"bidder": @{
-                                            @"meta": @{
-                                                @"line_items": @[@{
-                                                    @"id": @"test-line-item-123",
-                                                    @"deal": @{
-                                                        @"id": @"cloudx-usd-YJRQzEHC",
-                                                        @"wseat": @[@"meta"]
-                                                    }
-                                                }]
-                                            }
-                                        }
-                                    }
-                                }
-                            }]
-                        }
-                    }
-                }
             }
         }
     };
-    
-    [self.resolver setResponseData:kTestAuctionID bidResponseJSON:testBidResponseWithDebugDeal];
-    [self.resolver saveLoadedBid:kTestAuctionID bidId:kTestBidID];
-    
+
+    [self.resolver setResponseData:kTestAuctionID bidResponseJSON:testBidResponseWithDeal];
+
     // When: Resolve bid.dealid field
     id dealId = [self.resolver resolveBidField:kTestAuctionID field:@"bid.dealid"];
-    
-    // Then: Should extract deal ID from debug data
-    XCTAssertNotNil(dealId, @"Deal ID should be extracted from debug data");
-    XCTAssertEqualObjects(dealId, @"cloudx-usd-YJRQzEHC", @"Should return correct deal ID from debug data");
-    
+
+    // Then: Should extract deal ID from bid object via dynamic JSON path
+    XCTAssertNotNil(dealId, @"Deal ID should be extracted from bid object");
+    XCTAssertEqualObjects(dealId, @"cloudx-usd-YJRQzEHC", @"Should return correct deal ID");
+
     // And: When building Rill payload, deal ID should be included
-    NSString *payload = [self.resolver buildPayload:kTestAuctionID];
+    NSString *payload = [self.resolver buildPayload:kTestAuctionID bidId:kTestBidID];
     XCTAssertNotNil(payload, @"Payload should be built successfully");
-    
+
     // Parse payload to verify deal ID is in correct position (4th field)
     NSArray *payloadFields = [payload componentsSeparatedByString:@";"];
     XCTAssertTrue(payloadFields.count >= 4, @"Payload should have at least 4 fields");
@@ -1166,7 +1139,6 @@ static MockRillEventReporter *sharedInstance = nil;
     
     [self.resolver setResponseData:kTestAuctionID bidResponseJSON:testBidResponseWithCountry];
     [self.resolver setRequestData:kTestAuctionID bidRequestJSON:testBidRequest];
-    [self.resolver saveLoadedBid:kTestAuctionID bidId:kTestBidID];
     
     // When: Resolve bidRequest.device.geo.country field
     // Note: This uses internal method for testing - in production this is resolved via buildPayload

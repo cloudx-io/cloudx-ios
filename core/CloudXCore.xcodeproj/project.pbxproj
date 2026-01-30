@@ -82,7 +82,6 @@
 		197994812E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197994802E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m */; };
 		197994822E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1979947F2E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m */; };
 		197994842E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197994832E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m */; };
-		197994862E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 197994852E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m */; };
 		197995002E7DD79800EBA0A3 /* CLXWinLossTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 197994FE2E7DD79800EBA0A3 /* CLXWinLossTracker.m */; };
 		197995012E7DD79800EBA0A3 /* CLXAuctionBidManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 197994F82E7DD79800EBA0A3 /* CLXAuctionBidManager.m */; };
 		197995022E7DD79800EBA0A3 /* CLXWinLossFieldResolver.m in Sources */ = {isa = PBXBuildFile; fileRef = 197994FA2E7DD79800EBA0A3 /* CLXWinLossFieldResolver.m */; };
@@ -408,7 +407,6 @@
 		1979947F2E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidNetworkServiceHybridTests.m; sourceTree = "<group>"; };
 		197994802E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXTrackingFieldResolverBidDimensionTests.m; sourceTree = "<group>"; };
 		197994832E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSDKInitNetworkServiceTests.m; sourceTree = "<group>"; };
-		197994852E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXTrackingFieldResolverArrayLookupTests.m; sourceTree = "<group>"; };
 		197994F82E7DD79800EBA0A3 /* CLXAuctionBidManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAuctionBidManager.m; sourceTree = "<group>"; };
 		197994FA2E7DD79800EBA0A3 /* CLXWinLossFieldResolver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXWinLossFieldResolver.m; sourceTree = "<group>"; };
 		197994FC2E7DD79800EBA0A3 /* CLXWinLossNetworkService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXWinLossNetworkService.m; sourceTree = "<group>"; };
@@ -788,7 +786,6 @@
 				1916B16E2E7E061B00E49E3E /* CLXWinLossFieldResolverTests.m */,
 				1916B16F2E7E061B00E49E3E /* CLXWinLossNetworkServiceTests.m */,
 				1916B0FA2E7DF2EF00E49E3E /* CLXWinLossTrackingTests.m */,
-				197994852E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m */,
 				197994832E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m */,
 				1979947F2E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m */,
 				197994802E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m */,
@@ -1621,7 +1618,6 @@
 				19F8532A2E8A9C90002619F1 /* CLXMetricsCleanupTests.m in Sources */,
 				1916B26D2E819FD400E49E3E /* CLXMetricsConfigTests.m in Sources */,
 				1916B1722E7E061B00E49E3E /* CLXWinLossFieldResolverTests.m in Sources */,
-				197994862E7B61C200EBA0A3 /* CLXTrackingFieldResolverArrayLookupTests.m in Sources */,
 				197994822E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m in Sources */,
 				197991A82E74B0D600EBA0A3 /* CLXPrivacyConsentTests.m in Sources */,
 				19D8D2232EDA068200817D1E /* CLXBiddingConfigORTBFieldsTests.m in Sources */,

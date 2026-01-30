@@ -106,6 +106,8 @@ NS_ASSUME_NONNULL_BEGIN
 // ═══════════════════════════════════════════════════════════════════════════
 @property (nonatomic, strong, nullable) CLXMetricsConfig *metricsConfig;
 @property (nonatomic, strong, nullable) CLXSDKConfigDeviceConfig *deviceConfig;
+/// Raw JSON response for dynamic field resolution (used by TrackingFieldResolver)
+@property (nonatomic, strong, nullable) NSDictionary *rawJSON;
 
 /// SDK init network call latency in milliseconds (for metrics tracking)
 @property (nonatomic, assign) NSInteger sdkInitLatencyMs;

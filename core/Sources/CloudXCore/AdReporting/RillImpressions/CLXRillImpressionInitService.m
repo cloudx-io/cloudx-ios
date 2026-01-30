@@ -48,14 +48,10 @@
     [resolver setSessionConstData:rillImpressionModel.impModel.sessionID ?: @""
                        sdkVersion:CLXSDKVersion
                     pluginVersion:pluginVersion
-                       deviceType:DeviceTypeToString([CLXSystemInformation shared].deviceType)
+                   deviceTypeName:DeviceTypeToString([CLXSystemInformation shared].deviceType)
+                   deviceTypeCode:[CLXSystemInformation shared].deviceType
                       abTestGroup:rillImpressionModel.impModel.testGroupName ?: @""
                         appBundle:appBundle];
-    
-    // Set bid response data if available
-    if (rillImpressionModel.lastBidResponse && rillImpressionModel.lastBidResponse.bid) {
-        [resolver saveLoadedBid:auctionId bidId:rillImpressionModel.lastBidResponse.bid.id ?: @""];
-    }
     
     //Set server config
     if (rillImpressionModel.impModel.sdkConfig) {
@@ -63,9 +59,9 @@
     } else {
         [logger warn:@"[SDK_CONFIG_DEBUG] No SDK config available in impression model"];
     }
-    
-    // Build payload using server-driven fields
-    NSString *serverDrivenPayload = [resolver buildPayload:auctionId];
+
+    NSString *bidId = rillImpressionModel.lastBidResponse.bid.id;
+    NSString *serverDrivenPayload = [resolver buildPayload:auctionId bidId:bidId];
     if (serverDrivenPayload && serverDrivenPayload.length > 0) {
         [logger debug:@"Using server-driven tracking payload"];
         [logger debug:[NSString stringWithFormat:@"Raw payload before encryption: %@", serverDrivenPayload]];

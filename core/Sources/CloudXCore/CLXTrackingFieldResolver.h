@@ -3,11 +3,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class CLXSDKConfigResponse;
-@class CLXBidAdSourceResponse;
+
+// Public constant (matches Android companion object)
+extern NSString * const SDK_PARAM_RESPONSE_IN_MILLIS;
 
 /**
  * iOS equivalent of Android's TrackingFieldResolver
- * Provides server-driven, dynamic field resolution for Rill tracking payloads
+ * Provides server-driven, dynamic field resolution for tracking payloads
  */
 @interface CLXTrackingFieldResolver : NSObject
 
@@ -16,73 +18,81 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)shared;
 
+#pragma mark - Config Setup
+
+/**
+ * Sets the SDK configuration from raw JSON for dynamic field resolution
+ * This is the preferred method - stores raw JSON and traverses dynamically
+ * @param configJSON The raw config JSON dictionary from server
+ */
+- (void)setConfigJSON:(NSDictionary *)configJSON;
+
 /**
  * Sets the SDK configuration containing server-driven tracking field list
  * @param config The SDK config response from server
+ * @note If config.rawJSON is available, it will be used for dynamic field resolution
  */
 - (void)setConfig:(CLXSDKConfigResponse *)config;
 
-/**
- * Stores bid request JSON data for field resolution
- * @param auctionId The auction identifier
- * @param bidRequestJSON The raw bid request JSON dictionary
- */
-- (void)setRequestData:(NSString *)auctionId bidRequestJSON:(NSDictionary *)bidRequestJSON;
+#pragma mark - Data Methods (matches Android)
 
 /**
- * Stores bid response JSON data for field resolution
- * @param auctionId The auction identifier
- * @param bidResponseJSON The raw bid response JSON dictionary
+ * Matches Android: setRequestData(auctionId: String, json: JSONObject)
  */
-- (void)setResponseData:(NSString *)auctionId bidResponseJSON:(NSDictionary *)bidResponseJSON;
+- (void)setRequestData:(NSString *)auctionId bidRequestJSON:(NSDictionary *)json;
 
 /**
- * Sets the winning bid ID for an auction
- * @param auctionId The auction identifier
- * @param bidId The winning bid identifier
+ * Matches Android: setResponseData(auctionId: String, json: JSONObject)
  */
-- (void)saveLoadedBid:(NSString *)auctionId bidId:(NSString *)bidId;
+- (void)setResponseData:(NSString *)auctionId bidResponseJSON:(NSDictionary *)json;
+
+/**
+ * Matches Android: setSdkParam(auctionId: String, key: String, value: String)
+ */
+- (void)setSdkParam:(NSString *)auctionId key:(NSString *)key value:(NSString *)value;
 
 /**
  * Sets session-level constant data
- * @param sessionId The session identifier
- * @param sdkVersion The SDK version string
- * @param pluginVersion Optional version string identifying wrapper SDK (e.g., "flutter-1.2.0")
- * @param deviceType The device type string
- * @param abTestGroup The A/B test group name
- * @param appBundle The application bundle identifier
+ * iOS-specific: Android receives these in constructor
  */
 - (void)setSessionConstData:(NSString *)sessionId
                  sdkVersion:(NSString *)sdkVersion
               pluginVersion:(nullable NSString *)pluginVersion
-                 deviceType:(NSString *)deviceType
+             deviceTypeName:(NSString *)deviceTypeName
+             deviceTypeCode:(NSInteger)deviceTypeCode
                 abTestGroup:(NSString *)abTestGroup
                   appBundle:(NSString *)appBundle;
 
 /**
  * Sets the hashed geo IP for privacy-safe tracking
- * @param hashedGeoIp The hashed geo IP string
  */
 - (void)setHashedGeoIp:(nullable NSString *)hashedGeoIp;
 
-/**
- * Builds the complete tracking payload using server-driven field list
- * @param auctionId The auction identifier
- * @return The semicolon-separated payload string, or nil if no tracking config
- */
-- (nullable NSString *)buildPayload:(NSString *)auctionId;
+#pragma mark - Payload Building (matches Android)
 
 /**
- * Resolves a single field value for win/loss tracking
- * @param fieldPath The field path to resolve
- * @param auctionId The auction identifier
- * @return The resolved field value, or nil if not found
+ * Matches Android: buildPayload(auctionId: String, bidId: String? = null): String
+ */
+- (nullable NSString *)buildPayload:(NSString *)auctionId bidId:(nullable NSString *)bidId;
+- (nullable NSString *)buildPayload:(NSString *)auctionId;
+
+#pragma mark - Field Resolution (matches Android)
+
+/**
+ * Matches Android: resolveField(auctionId: String, field: String, bidId: String? = null): Any?
+ */
+- (nullable id)resolveField:(NSString *)auctionId field:(NSString *)field bidId:(nullable NSString *)bidId;
+- (nullable id)resolveField:(NSString *)auctionId field:(NSString *)field;
+
+/**
+ * Alternative signature for WinLossFieldResolver compatibility
  */
 - (nullable id)resolveField:(NSString *)fieldPath forAuction:(NSString *)auctionId;
 
+#pragma mark - Utility Methods
+
 /**
  * Gets the account ID for encryption
- * @return The account ID, or nil if not set
  */
 - (nullable NSString *)getAccountId;
 

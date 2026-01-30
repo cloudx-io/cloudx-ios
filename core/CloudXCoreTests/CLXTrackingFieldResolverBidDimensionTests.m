@@ -5,6 +5,19 @@
 //  Created by CloudX on 2025-09-17.
 //
 
+// TODO: [2026-01-28] Removed iOS-specific fallback tests to match Android implementation.
+// If iOS bid responses have issues (missing w/h, creativeId→crid mapping, dealid in debug data),
+// we may need to add these features back. Removed tests:
+// - testBidWidth_ShouldFallbackToBidRequestFormat
+// - testBidHeight_ShouldResolveFromBidRequestFormat
+// - testBidCreativeId_ShouldMapToCridField
+// - testBidDealId_ShouldExtractFromDebugData
+//
+// Also deleted: CLXTrackingFieldResolverArrayLookupTests.m
+// - Tested internal methods (resolveArrayLookup, resolveConditionValue, valuesAreEqual) that were removed
+// - Tested placeholder expansion in array filters like ${bid.ext.cloudx.rank}
+// - May need to verify array lookup still works if issues arise
+
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
 
@@ -57,7 +70,6 @@
     };
     
     [self.resolver setResponseData:self.testAuctionId bidResponseJSON:bidResponse];
-    [self.resolver saveLoadedBid:self.testAuctionId bidId:self.testBidId];
     
     // When: Resolve bidder field using direct JSON access
     id bidder = [self.resolver resolveBidField:self.testAuctionId field:@"bid.ext.prebid.meta.adaptercode"];
@@ -93,8 +105,7 @@
         };
         
         [self.resolver setResponseData:self.testAuctionId bidResponseJSON:bidResponse];
-        [self.resolver saveLoadedBid:self.testAuctionId bidId:self.testBidId];
-        
+            
         // When: Resolve bidder field
         id bidder = [self.resolver resolveBidField:self.testAuctionId field:@"bid.ext.prebid.meta.adaptercode"];
         
@@ -123,7 +134,6 @@
     };
     
     [self.resolver setResponseData:self.testAuctionId bidResponseJSON:bidResponse];
-    [self.resolver saveLoadedBid:self.testAuctionId bidId:self.testBidId];
     
     // When: Resolve bid.w field
     id width = [self.resolver resolveBidField:self.testAuctionId field:@"bid.w"];
@@ -133,116 +143,7 @@
     XCTAssertEqualObjects(width, @320, @"Should return 320 from bid response");
 }
 
-/**
- * Test bid.w field resolution from bid request when not in bid response
- * Validates our fix for Meta's -1 width issue
- */
-- (void)testBidWidth_ShouldFallbackToBidRequestFormat {
-    // Given: Bid request with banner format dimensions
-    NSDictionary *bidRequest = @{
-        @"imp": @[@{
-            @"id": self.testImpId,
-            @"banner": @{
-                @"format": @[@{
-                    @"w": @320,
-                    @"h": @50
-                }]
-            }
-        }]
-    };
-    
-    // And: Bid response with winning bid (no w/h fields)
-    NSDictionary *bidResponse = @{
-        @"seatbid": @[@{
-            @"bid": @[@{
-                @"id": self.testBidId,
-                @"impid": self.testImpId,
-                @"price": @99.99
-            }]
-        }]
-    };
-    
-    [self.resolver setRequestData:self.testAuctionId bidRequestJSON:bidRequest];
-    [self.resolver setResponseData:self.testAuctionId bidResponseJSON:bidResponse];
-    [self.resolver saveLoadedBid:self.testAuctionId bidId:self.testBidId];
-    
-    // When: Resolve bid.w field
-    id width = [self.resolver resolveBidField:self.testAuctionId field:@"bid.w"];
-    
-    // Then: Should return width from bid request format
-    XCTAssertNotNil(width, @"Width should be resolved");
-    XCTAssertEqualObjects(width, @320, @"Should return 320 from bid request format");
-}
-
-/**
- * Test bid.h field resolution from bid request dimensions
- */
-- (void)testBidHeight_ShouldResolveFromBidRequestFormat {
-    // Given: Bid request with banner format dimensions
-    NSDictionary *bidRequest = @{
-        @"imp": @[@{
-            @"id": self.testImpId,
-            @"banner": @{
-                @"format": @[@{
-                    @"w": @320,
-                    @"h": @50
-                }]
-            }
-        }]
-    };
-    
-    // And: Bid response with winning bid
-    NSDictionary *bidResponse = @{
-        @"seatbid": @[@{
-            @"bid": @[@{
-                @"id": self.testBidId,
-                @"impid": self.testImpId,
-                @"price": @99.99
-            }]
-        }]
-    };
-    
-    [self.resolver setRequestData:self.testAuctionId bidRequestJSON:bidRequest];
-    [self.resolver setResponseData:self.testAuctionId bidResponseJSON:bidResponse];
-    [self.resolver saveLoadedBid:self.testAuctionId bidId:self.testBidId];
-    
-    // When: Resolve bid.h field
-    id height = [self.resolver resolveBidField:self.testAuctionId field:@"bid.h"];
-    
-    // Then: Should return height from bid request format
-    XCTAssertNotNil(height, @"Height should be resolved");
-    XCTAssertEqualObjects(height, @50, @"Should return 50 from bid request format");
-}
-
 #pragma mark - OpenRTB Field Mapping Tests
-
-/**
- * Test bid.creativeId maps to crid field
- * Validates our OpenRTB field mapping fix
- */
-- (void)testBidCreativeId_ShouldMapToCridField {
-    // Given: Bid response with crid field (OpenRTB standard)
-    NSDictionary *bidResponse = @{
-        @"seatbid": @[@{
-            @"bid": @[@{
-                @"id": self.testBidId,
-                @"impid": self.testImpId,
-                @"crid": @"creative-123",
-                @"price": @99.99
-            }]
-        }]
-    };
-    
-    [self.resolver setResponseData:self.testAuctionId bidResponseJSON:bidResponse];
-    [self.resolver saveLoadedBid:self.testAuctionId bidId:self.testBidId];
-    
-    // When: Resolve bid.creativeId field
-    id creativeId = [self.resolver resolveBidField:self.testAuctionId field:@"bid.creativeId"];
-    
-    // Then: Should return value from crid field
-    XCTAssertNotNil(creativeId, @"Creative ID should be resolved");
-    XCTAssertEqualObjects(creativeId, @"creative-123", @"Should map bid.creativeId to crid field");
-}
 
 /**
  * Test bid.dealid returns nil when field doesn't exist
@@ -261,70 +162,12 @@
     };
     
     [self.resolver setResponseData:self.testAuctionId bidResponseJSON:bidResponse];
-    [self.resolver saveLoadedBid:self.testAuctionId bidId:self.testBidId];
     
     // When: Resolve bid.dealid field
     id dealId = [self.resolver resolveBidField:self.testAuctionId field:@"bid.dealid"];
     
     // Then: Should return nil gracefully
     XCTAssertNil(dealId, @"Deal ID should be nil when field doesn't exist");
-}
-
-/**
- * Test bid.dealid extraction from debug data
- * Validates fallback to resolved request debug data when dealid not in bid object
- */
-- (void)testBidDealId_ShouldExtractFromDebugData {
-    // Given: Bid response with deal ID in debug data structure (like real Meta responses)
-    NSDictionary *bidResponse = @{
-        @"id": self.testAuctionId,
-        @"seatbid": @[@{
-            @"bid": @[@{
-                @"id": self.testBidId,
-                @"impid": self.testImpId,
-                @"price": @99.99
-                // No dealid field in bid object
-            }]
-        }],
-        @"ext": @{
-            @"debug": @{
-                @"rounds": @{
-                    @"1": @{
-                        @"resolvedrequest": @{
-                            @"imp": @[@{
-                                @"id": self.testImpId,
-                                @"ext": @{
-                                    @"prebid": @{
-                                        @"bidder": @{
-                                            @"meta": @{
-                                                @"line_items": @[@{
-                                                    @"id": @"test-line-item-123",
-                                                    @"deal": @{
-                                                        @"id": @"cloudx-usd-YJRQzEHC",
-                                                        @"wseat": @[@"meta"]
-                                                    }
-                                                }]
-                                            }
-                                        }
-                                    }
-                                }
-                            }]
-                        }
-                    }
-                }
-            }
-        }
-    };
-    
-    [self.resolver setResponseData:self.testAuctionId bidResponseJSON:bidResponse];
-    [self.resolver saveLoadedBid:self.testAuctionId bidId:self.testBidId];
-    
-    // When: Resolve bid.dealid field
-    id dealId = [self.resolver resolveBidField:self.testAuctionId field:@"bid.dealid"];
-    
-    // Then: Should extract deal ID from debug data
-    XCTAssertNotNil(dealId, @"Deal ID should be extracted from debug data");
-    XCTAssertEqualObjects(dealId, @"cloudx-usd-YJRQzEHC", @"Should return correct deal ID from debug data");
 }
 
 /**
@@ -374,7 +217,6 @@
     };
     
     [self.resolver setResponseData:self.testAuctionId bidResponseJSON:bidResponse];
-    [self.resolver saveLoadedBid:self.testAuctionId bidId:self.testBidId];
     
     // When: Resolve bid.dealid field
     id dealId = [self.resolver resolveBidField:self.testAuctionId field:@"bid.dealid"];
@@ -412,7 +254,6 @@
     
     [self.resolver setRequestData:self.testAuctionId bidRequestJSON:bidRequest];
     [self.resolver setResponseData:self.testAuctionId bidResponseJSON:bidResponse];
-    [self.resolver saveLoadedBid:self.testAuctionId bidId:self.testBidId];
     
     // When: Try to resolve dimensions
     id width = [self.resolver resolveBidField:self.testAuctionId field:@"bid.w"];
@@ -449,7 +290,6 @@
     
     [self.resolver setRequestData:self.testAuctionId bidRequestJSON:bidRequest];
     [self.resolver setResponseData:self.testAuctionId bidResponseJSON:bidResponse];
-    [self.resolver saveLoadedBid:self.testAuctionId bidId:self.testBidId];
     
     // When: Try to resolve dimensions
     id width = [self.resolver resolveBidField:self.testAuctionId field:@"bid.w"];

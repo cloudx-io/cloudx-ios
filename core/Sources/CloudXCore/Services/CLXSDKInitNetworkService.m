@@ -265,6 +265,9 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     [self.logger info:[NSString stringWithFormat:@"[SDK_INIT_RESPONSE] Full response: %@", response]];
 
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
+    
+    // Store raw JSON for dynamic field resolution in TrackingFieldResolver
+    config.rawJSON = response;
 
     // ═══════════════════════════════════════════════════════════════════════════
     // 1. Identity
