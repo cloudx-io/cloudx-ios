@@ -9,11 +9,11 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "v#{s.version}-meta" }
   
   s.ios.deployment_target = '15.0'
-  s.vendored_frameworks = 'adapter-meta/CloudXMetaAdapter.xcframework'
+  s.vendored_frameworks = 'CloudXMetaAdapter.xcframework'
   
   # Dependencies
   s.dependency 'CloudXCore', '1.3.0'
-  s.dependency 'FBAudienceNetwork', '~> 6.20.1'
+  s.dependency 'FBAudienceNetwork', '~> 6.21.0'
   
   s.frameworks = ['AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit']
   s.weak_frameworks = ['Combine', 'CryptoKit', 'SafariServices', 'SwiftUI', 'WebKit']
