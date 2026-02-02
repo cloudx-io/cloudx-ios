@@ -42,27 +42,17 @@
         return;
     }
     
-    // Convert items to JSON array with URL encoding
+    // Build JSON payload from event items
+    // CLXEventAM.toDictionary handles all serialization including URL-encoding of Base64 fields
     NSMutableArray *jsonArray = [NSMutableArray arrayWithCapacity:items.count];
     for (CLXEventAM *item in items) {
-        NSDictionary *itemDict = [item toDictionary];
-        
-        // URL-encode campaignId and impression
-        NSString *encodedCampaignId = [self _urlEncode:itemDict[@"campaignId"]];
-        NSString *encodedImpression = [self _urlEncode:itemDict[@"impression"]];
-        
-        NSMutableDictionary *encodedDict = [itemDict mutableCopy];
-        encodedDict[@"campaignId"] = encodedCampaignId ?: itemDict[@"campaignId"];
-        encodedDict[@"impression"] = encodedImpression ?: itemDict[@"impression"];
-        
-        [jsonArray addObject:encodedDict];
+        [jsonArray addObject:[item toDictionary]];
     }
     
-    // Wrap in "items" object
     NSDictionary *requestPayload = @{@"items": jsonArray};
     
     NSError *jsonError;
-    NSData *requestBody = [NSJSONSerialization dataWithJSONObject:requestPayload options:NSJSONWritingPrettyPrinted error:&jsonError];
+    NSData *requestBody = [NSJSONSerialization dataWithJSONObject:requestPayload options:0 error:&jsonError];
     if (jsonError) {
         [self.logger error:[NSString stringWithFormat:@"JSON serialization failed: %@", jsonError.localizedDescription]];
         if (completion) {
@@ -116,21 +106,6 @@
     }];
     
     [task resume];
-}
-
-- (NSString *)_urlEncode:(NSString *)string {
-    if (!string) {
-        return nil;
-    }
-    
-    // Create character set that matches RFC 1738 (application/x-www-form-urlencoded)
-    NSMutableCharacterSet *allowedCharacters = [[NSCharacterSet alphanumericCharacterSet] mutableCopy];
-    [allowedCharacters addCharactersInString:@"-_.*"];
-    
-    // Percent encode everything else (including = which becomes %3D)
-    NSString *encoded = [string stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacters];
-    
-    return encoded;
 }
 
 @end

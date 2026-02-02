@@ -650,8 +650,6 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger success:@"SDK initialization completed successfully"];
     }
     
-    [self startTimer];
-    
     // Show visual debugging overlay if enabled (testMode OR visualDebugging flag)
     // This must be called after SDK init because the overlay manager is lazy-loaded
     // and won't have received the NSUserDefaultsDidChangeNotification from earlier
@@ -743,23 +741,6 @@ static CloudXCore *_sharedInstance = nil;
     [[CLXKeyValueState shared] setHashedUserId:hashedUserID];
     
     [self.logger info:@"Hashed user ID stored successfully"];
-}
-
-- (void)startTimer {
-    [NSTimer scheduledTimerWithTimeInterval:10.0   // every 1 second
-                                     target:self
-                                   selector:@selector(timerFired:)
-                                   userInfo:nil
-                                    repeats:YES];
-}
-
-// Method called by the timer
-- (void)timerFired:(NSTimer *)timer {
-    [self.logger debug:@"⏰ [CloudXCore] Timer fired - sending analytics"];
-    
-    //Send Analytics
-    [self.reportingService metricsTrackingWithActionString:@"sdkmetricenc"];
-    
 }
 
 - (void)setUserKeyValue:(NSString *)key value:(NSString *)value {

@@ -6,33 +6,55 @@
 #import <CloudXCore/CLXEventAM.h>
 #import <CloudXCore/CLXEventType.h>
 
+// Test constants - deterministic values for reproducible tests
+static NSString * const kTestImpression = @"encrypted_impression_data";
+static NSString * const kTestCampaignId = @"campaign_123";
+static NSString * const kTestEventValue = @"N/A";
+static NSString * const kTestEventName = @"SDK_METRICS";
+static NSString * const kTestType = @"SDK_METRICS";
+
+// Base64 test data containing all special characters that require URL encoding
+static NSString * const kBase64WithSpecialChars = @"abc+def/ghi==";
+
+// Marker for double URL encoding - %25 is the URL-encoded form of %
+static NSString * const kDoubleEncodingMarker = @"%25";
+
 @interface CLXEventAMTests : XCTestCase
 @end
 
 @implementation CLXEventAMTests
 
+#pragma mark - Factory Methods
+
+- (CLXEventAM *)createDefaultTestEvent {
+    return [[CLXEventAM alloc] initWithImpression:kTestImpression
+                                       campaignId:kTestCampaignId
+                                       eventValue:kTestEventValue
+                                        eventName:kTestEventName
+                                             type:kTestType];
+}
+
+- (CLXEventAM *)createEventWithImpression:(NSString *)impression campaignId:(NSString *)campaignId {
+    return [[CLXEventAM alloc] initWithImpression:impression
+                                       campaignId:campaignId
+                                       eventValue:kTestEventValue
+                                        eventName:kTestEventName
+                                             type:kTestType];
+}
+
+#pragma mark - Initialization Tests
+
 - (void)testEventAMInitialization {
-    // Given - Use CLXEventType constants for type safety
-    NSString *impression = @"encrypted_impression_data";
-    NSString *campaignId = @"campaign_123";
-    NSString *eventValue = @"N/A";
-    NSString *eventName = CLXEventTypePathSDKMetrics;
-    NSString *type = CLXEventTypePathSDKMetrics;
-    
     // When
-    CLXEventAM *event = [[CLXEventAM alloc] initWithImpression:impression
-                                                    campaignId:campaignId
-                                                    eventValue:eventValue
-                                                     eventName:eventName
-                                                          type:type];
+    CLXEventAM *event = [self createDefaultTestEvent];
     
     // Then
     XCTAssertNotNil(event);
-    XCTAssertEqualObjects(event.impression, impression);
-    XCTAssertEqualObjects(event.campaignId, campaignId);
-    XCTAssertEqualObjects(event.eventValue, eventValue);
-    XCTAssertEqualObjects(event.eventName, eventName);
-    XCTAssertEqualObjects(event.type, type);
+    XCTAssertEqualObjects(event.impression, kTestImpression);
+    XCTAssertEqualObjects(event.campaignId, kTestCampaignId);
+    XCTAssertEqualObjects(event.eventValue, kTestEventValue);
+    XCTAssertEqualObjects(event.eventName, kTestEventName);
+    XCTAssertEqualObjects(event.type, kTestType);
 }
 
 /**
@@ -204,6 +226,30 @@
         @"Alphanumeric characters should not be encoded");
     XCTAssertEqualObjects(dictionary[@"campaignId"], alphanumericBase64,
         @"Alphanumeric characters should not be encoded");
+}
+
+#pragma mark - Base64 URL Encoding Tests
+
+- (void)testToDictionary_WithBase64SpecialCharacters_ShouldNotDoubleEncode {
+    // Given - Base64 data containing +, /, and = characters that require URL encoding
+    CLXEventAM *event = [self createEventWithImpression:kBase64WithSpecialChars
+                                             campaignId:kBase64WithSpecialChars];
+    
+    // When
+    NSDictionary *dictionary = [event toDictionary];
+    
+    // Then - Verify no double encoding
+    // Double encoding produces %25 (the URL-encoded form of %)
+    // e.g., %2B would become %252B if encoded twice
+    NSString *impression = dictionary[@"impression"];
+    NSString *campaignId = dictionary[@"campaignId"];
+    
+    XCTAssertNotNil(impression, @"impression should not be nil");
+    XCTAssertNotNil(campaignId, @"campaignId should not be nil");
+    XCTAssertFalse([impression containsString:kDoubleEncodingMarker],
+                   @"Double encoding detected in impression - found %%25 marker in: %@", impression);
+    XCTAssertFalse([campaignId containsString:kDoubleEncodingMarker],
+                   @"Double encoding detected in campaignId - found %%25 marker in: %@", campaignId);
 }
 
 @end
