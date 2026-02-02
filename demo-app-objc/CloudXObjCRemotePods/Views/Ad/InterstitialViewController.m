@@ -139,7 +139,9 @@
     }
     
     if (self.interstitialAd.isReady) {
-        [self.interstitialAd showFromViewController:self];
+        [self.interstitialAd showFromViewController:self
+                                          placement:@"demo_interstitial"
+                                         customData:@"level:5,coins:100"];
     } else {
         [self showAlertWithTitle:@"Error" message:@"Interstitial is not ready. Please try loading again."];
     }

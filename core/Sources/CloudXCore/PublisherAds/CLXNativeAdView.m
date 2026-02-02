@@ -1,4 +1,5 @@
 #import <CloudXCore/CLXNativeAdView.h>
+#import <CloudXCore/CLXAdFormat.h>
 
 #import <CloudXCore/CLXNative.h>
 #import <CloudXCore/CLXNativeTemplate.h>
@@ -207,7 +208,11 @@ static void initializeLogger() {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
             CLXPublisherNative *publisherNative = (CLXPublisherNative *)self.native;
-            CLXAd *delegateAd = [CLXAd adFromBid:publisherNative.lastBidResponse.bid placementId:publisherNative.placementID placementName:publisherNative.placementName];
+            CLXAd *delegateAd = [CLXAd adFromBid:publisherNative.lastBidResponse.bid
+                                     placementId:publisherNative.placementID
+                                   placementName:publisherNative.placementName
+                                        adFormat:CLXAdFormatNative
+                                       placement:nil];
             [self.delegate didLoadAd:delegateAd];
         }
     });
@@ -254,7 +259,13 @@ static void initializeLogger() {
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
-            [self.delegate didClickAd:[CLXAd adFromBid:((CLXPublisherNative *)self.native).lastBidResponse.bid placementId:((CLXPublisherNative *)self.native).placementID placementName:((CLXPublisherNative *)self.native).placementName]];
+            CLXPublisherNative *publisherNative = (CLXPublisherNative *)self.native;
+            CLXAd *clickAd = [CLXAd adFromBid:publisherNative.lastBidResponse.bid
+                                  placementId:publisherNative.placementID
+                                placementName:publisherNative.placementName
+                                     adFormat:CLXAdFormatNative
+                                    placement:nil];
+            [self.delegate didClickAd:clickAd];
         }
     });
 }

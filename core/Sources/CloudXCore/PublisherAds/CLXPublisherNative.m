@@ -33,6 +33,7 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXAdType.h>
+#import <CloudXCore/CLXAdFormat.h>
 #import <CloudXCore/CLXDebugOverlayManager.h>
 #import <CloudXCore/CLXDebugClickFeedback.h>
 #import <CloudXCore/CloudXCoreAPI.h>
@@ -555,7 +556,11 @@ NS_ASSUME_NONNULL_BEGIN
         [self.delegate didLoadWithNative:native];
     }
     if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
-        CLXAd *delegateAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        CLXAd *delegateAd = [CLXAd adFromBid:self.lastBidResponse.bid
+                                 placementId:self.placementID
+                               placementName:self.placementName
+                                    adFormat:CLXAdFormatNative
+                                   placement:nil];
         [self.logger logDelegateCallback:@"✅ Native didLoadAd" ad:delegateAd];
         [self.delegate didLoadAd:delegateAd];
     }
@@ -662,9 +667,13 @@ NS_ASSUME_NONNULL_BEGIN
                             winnerBidPrice:self.lastBidResponse.price];
             
             [self.logger debug:@"[PublisherNative] RENDER_SUCCESS event (burl) fired"];
-            
+
             // Trigger revenue callback immediately (no longer depends on NURL network call)
-            CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+            CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid
+                                   placementId:self.placementID
+                                 placementName:self.placementName
+                                      adFormat:CLXAdFormatNative
+                                     placement:nil];
             if (self.revenueDelegate && [self.revenueDelegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self.revenueDelegate didPayRevenueForAd:adObject];
@@ -694,7 +703,11 @@ NS_ASSUME_NONNULL_BEGIN
         [self.delegate clickWithNative:native];
     }
     if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
-        CLXAd *clickAd = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        CLXAd *clickAd = [CLXAd adFromBid:self.lastBidResponse.bid
+                              placementId:self.placementID
+                            placementName:self.placementName
+                                 adFormat:CLXAdFormatNative
+                                placement:nil];
         [self.logger logDelegateCallback:@"👆 Native didClickAd" ad:clickAd];
         [self.delegate didClickAd:clickAd];
     }

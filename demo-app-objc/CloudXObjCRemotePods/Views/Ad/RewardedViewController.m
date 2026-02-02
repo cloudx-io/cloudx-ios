@@ -187,7 +187,9 @@
     if (self.rewardedAd && self.rewardedAd.isReady) {
         NSLog(@"👀 [RewardedViewController] Ad ready, showing immediately...");
         NSLog(@"📊 [RewardedViewController] Calling showFromViewController on: %@", self.rewardedAd);
-        [self.rewardedAd showFromViewController:self];
+        [self.rewardedAd showFromViewController:self
+                                      placement:@"demo_rewarded"
+                                     customData:@"level:10,gems:50"];
         return;
     }
     

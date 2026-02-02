@@ -184,6 +184,8 @@
                                                       viewController:self
                                                           delegate:self];
     self.bannerAd.revenueDelegate = self;
+    self.bannerAd.placement = @"demo_banner";
+    self.bannerAd.customData = @"screen:home,position:bottom";
 
     if (!self.bannerAd) {
         [self showAlertWithTitle:@"Error" message:@"Failed to create banner."];

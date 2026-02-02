@@ -8,6 +8,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXAdFormat.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -51,6 +52,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, nullable) NSNumber *revenue;
 
+/**
+ * The ad format type (banner, mrec, interstitial, rewarded, native)
+ */
+@property (nonatomic, readonly) CLXAdFormat adFormat;
+
+/**
+ * The placement identifier set by the publisher at show time (fullscreen) or load time (banner)
+ */
+@property (nonatomic, readonly, nullable) NSString *placement;
+
 #pragma mark - Additional Properties (iOS-specific)
 
 /**
@@ -90,7 +101,9 @@ NS_ASSUME_NONNULL_BEGIN
                           adUnitId:(nullable NSString *)adUnitId
                        networkName:(nullable NSString *)networkName
                   networkPlacement:(nullable NSString *)networkPlacement
-                           revenue:(nullable NSNumber *)revenue;
+                           revenue:(nullable NSNumber *)revenue
+                          adFormat:(CLXAdFormat)adFormat
+                         placement:(nullable NSString *)placement;
 
 /**
  * @deprecated Use initWithAdUnitName:adUnitId:networkName:networkPlacement:revenue: instead
@@ -104,12 +117,19 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Factory method to create CLXAd from bid response data
  */
-+ (instancetype)adFromBid:(id)bid placementId:(NSString *)placementId;
++ (instancetype)adFromBid:(id)bid
+              placementId:(NSString *)placementId
+                 adFormat:(CLXAdFormat)adFormat
+                placement:(nullable NSString *)placement;
 
 /**
  * Factory method to create CLXAd from bid response data with original placement name
  */
-+ (instancetype)adFromBid:(id)bid placementId:(NSString *)placementId placementName:(NSString *)placementName;
++ (instancetype)adFromBid:(id)bid
+              placementId:(NSString *)placementId
+            placementName:(NSString *)placementName
+                 adFormat:(CLXAdFormat)adFormat
+                placement:(nullable NSString *)placement;
 
 @end
 

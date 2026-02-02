@@ -35,6 +35,7 @@
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXAdType.h>
 #import <CloudXCore/CLXAd.h>
+#import <CloudXCore/CLXAdFormat.h>
 #import <CloudXCore/CloudXCoreAPI.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXSDKConfig.h>
@@ -147,6 +148,10 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 // Timeout configuration
 @property (nonatomic, assign) NSTimeInterval bidRequestTimeout;
+
+// Publisher-provided placement and customData (set at show time)
+@property (nonatomic, copy, nullable) NSString *publisherPlacement;
+@property (nonatomic, copy, nullable) NSString *publisherCustomData;
 
 @end
 
@@ -452,28 +457,34 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     }
 }
 
-- (void)showFromViewController:(UIViewController *)viewController {
-    [self.logger debug:[NSString stringWithFormat:@"showFromViewController called - Ready: %d, State: %ld", self.isReady, (long)self.currentState]];
-    
+- (void)showFromViewController:(UIViewController *)viewController
+                     placement:(nullable NSString *)placement
+                    customData:(nullable NSString *)customData {
+    [self.logger debug:[NSString stringWithFormat:@"showFromViewController called - Ready: %d, State: %ld, Placement: %@, CustomData: %@", self.isReady, (long)self.currentState, placement, customData]];
+
+    // Store publisher-provided placement and customData for use in CLXAd creation
+    self.publisherPlacement = placement;
+    self.publisherCustomData = customData;
+
     // Verify ad is ready before attempting to show
     if (self.currentState != CLXFullscreenAdStateREADY) {
         [self.logger error:[NSString stringWithFormat:@"Cannot show ad - invalid state: %ld", (long)self.currentState]];
         CLXError *error = [CLXError errorWithCode:CLXErrorCodeAdNotReady];
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
             [self notifyShowFailure:error];
         });
         return;
     }
-    
+
     // Transition to showing state
     self.currentState = CLXFullscreenAdStateSHOWING;
     [self.logger debug:@"State transitioned to SHOWING"];
-    
+
     // Set up display state
     self.closeEventReceived = NO;
     self.presentingViewController = viewController;
-    
+
     // Set up force close timer
     self.closeTimer = [NSTimer scheduledTimerWithTimeInterval:self.forceCloseEventDelay
                                                        repeats:NO
@@ -486,9 +497,13 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         }
         [self.closeTimer invalidate];
     }];
-    
+
     // Display the loaded ad using the appropriate adapter
     [self showCurrentAdapterFromViewController:viewController];
+}
+
+- (void)showFromViewController:(UIViewController *)viewController {
+    [self showFromViewController:viewController placement:nil customData:nil];
 }
 
 #pragma mark - Abstract Methods (must be overridden)
@@ -768,7 +783,14 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 
 - (CLXAd *)createAdObject {
-    return [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+    // Determine ad format based on ad type
+    CLXAdFormat adFormat = ([self adType] == CLXAdTypeRewarded) ? CLXAdFormatRewarded : CLXAdFormatInterstitial;
+
+    return [CLXAd adFromBid:self.lastBidResponse.bid
+                placementId:self.placementID
+              placementName:self.placementName
+                   adFormat:adFormat
+                  placement:self.publisherPlacement];
 }
 
 - (void)trackAdapterLoadLatencyWithError:(nullable NSError *)error {

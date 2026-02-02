@@ -13,6 +13,8 @@
 @property (nonatomic, readwrite, nullable) NSString *networkName;
 @property (nonatomic, readwrite, nullable) NSString *networkPlacement;
 @property (nonatomic, readwrite, nullable) NSNumber *revenue;
+@property (nonatomic, readwrite) CLXAdFormat adFormat;
+@property (nonatomic, readwrite, nullable) NSString *placement;
 
 @end
 
@@ -42,7 +44,9 @@
                           adUnitId:(nullable NSString *)adUnitId
                        networkName:(nullable NSString *)networkName
                   networkPlacement:(nullable NSString *)networkPlacement
-                           revenue:(nullable NSNumber *)revenue {
+                           revenue:(nullable NSNumber *)revenue
+                          adFormat:(CLXAdFormat)adFormat
+                         placement:(nullable NSString *)placement {
     self = [super init];
     if (self) {
         _adUnitName = adUnitName;
@@ -50,6 +54,8 @@
         _networkName = networkName;
         _networkPlacement = networkPlacement;
         _revenue = revenue;
+        _adFormat = adFormat;
+        _placement = placement;
     }
     return self;
 }
@@ -64,7 +70,9 @@
                            adUnitId:placementId
                         networkName:bidder
                    networkPlacement:externalPlacementId
-                            revenue:revenue];
+                            revenue:revenue
+                           adFormat:CLXAdFormatBanner
+                          placement:nil];
 }
 
 - (instancetype)init {
@@ -72,14 +80,23 @@
                            adUnitId:nil
                         networkName:nil
                    networkPlacement:nil
-                            revenue:nil];
+                            revenue:nil
+                           adFormat:CLXAdFormatBanner
+                          placement:nil];
 }
 
-+ (instancetype)adFromBid:(id)bid placementId:(NSString *)placementId {
-    return [self adFromBid:bid placementId:placementId placementName:nil];
++ (instancetype)adFromBid:(id)bid
+              placementId:(NSString *)placementId
+                 adFormat:(CLXAdFormat)adFormat
+                placement:(nullable NSString *)placement {
+    return [self adFromBid:bid placementId:placementId placementName:nil adFormat:adFormat placement:placement];
 }
 
-+ (instancetype)adFromBid:(id)bid placementId:(NSString *)placementId placementName:(NSString *)placementName {
++ (instancetype)adFromBid:(id)bid
+              placementId:(NSString *)placementId
+            placementName:(NSString *)placementName
+                 adFormat:(CLXAdFormat)adFormat
+                placement:(nullable NSString *)placement {
     // Extract data from bid response using available properties
     NSString *resolvedAdUnitName = nil;
     NSString *networkName = nil;
@@ -132,7 +149,9 @@
                                        adUnitId:placementId
                                     networkName:networkName
                                networkPlacement:networkPlacement
-                                        revenue:revenue];
+                                        revenue:revenue
+                                       adFormat:adFormat
+                                      placement:placement];
     }
     
     // Return nil if we don't have valid bid data or required fields

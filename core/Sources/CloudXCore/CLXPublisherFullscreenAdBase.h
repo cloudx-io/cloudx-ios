@@ -62,6 +62,15 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Shows the fullscreen ad from the provided view controller.
  * @param viewController The view controller from which to show the ad
+ * @param placement Optional placement identifier for tracking
+ * @param customData Optional custom data for tracking (e.g., "level:5,coins:100")
+ */
+- (void)showFromViewController:(UIViewController *)viewController
+                     placement:(nullable NSString *)placement
+                    customData:(nullable NSString *)customData;
+
+/**
+ * Convenience method - shows the ad without placement/customData.
  */
 - (void)showFromViewController:(UIViewController *)viewController;
 

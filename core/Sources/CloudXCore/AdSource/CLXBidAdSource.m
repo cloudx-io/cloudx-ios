@@ -16,6 +16,8 @@
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXAdEventReporter.h>
 #import <CloudXCore/CLXAd.h>
+#import <CloudXCore/CLXAdFormat.h>
+#import <CloudXCore/CLXAdType.h>
 #import <CloudXCore/CLXWinLossTracker.h>
 #import <CloudXCore/CLXBidLifecycleEvent.h>
 #import <CloudXCore/CloudXCore.h>
@@ -28,6 +30,26 @@
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+#pragma mark - Utilities
+
+static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
+    switch (adType) {
+        case CLXAdTypeBanner:
+            return CLXAdFormatBanner;
+        case CLXAdTypeMrec:
+            return CLXAdFormatMREC;
+        case CLXAdTypeInterstitial:
+            return CLXAdFormatInterstitial;
+        case CLXAdTypeRewarded:
+            return CLXAdFormatRewarded;
+        case CLXAdTypeNative:
+            return CLXAdFormatNative;
+    }
+    return CLXAdFormatBanner;
+}
+
+#pragma mark - CLXBidAdSourceResponse
 
 @interface CLXBidAdSourceResponse ()
 
@@ -497,8 +519,13 @@ NS_ASSUME_NONNULL_BEGIN
         networkName = @"cloudXRenderer";
     }
     
+    CLXAdFormat adFormat = CLXAdFormatFromAdType(self.adType);
+
     // Create CLXAd from bid response data
-    CLXAd *clxAd = [CLXAd adFromBid:bid placementId:self.placementID];
+    CLXAd *clxAd = [CLXAd adFromBid:bid
+                        placementId:self.placementID
+                           adFormat:adFormat
+                          placement:nil];
 
     return [[CLXBidAdSourceResponse alloc] initWithPrice:bid.price
                                             auctionId:auctionID

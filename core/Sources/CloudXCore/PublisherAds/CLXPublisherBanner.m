@@ -18,6 +18,7 @@
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXAdType.h>
+#import <CloudXCore/CLXAdFormat.h>
 
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXWinLossTracker.h>
@@ -727,7 +728,12 @@ NS_ASSUME_NONNULL_BEGIN
 
     // Call the publisher delegate immediately upon successful load (industry standard)
     if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
-        CLXAd *ad = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        CLXAdFormat adFormat = (self.bannerType == CLXBannerTypeMREC) ? CLXAdFormatMREC : CLXAdFormatBanner;
+        CLXAd *ad = [CLXAd adFromBid:self.lastBidResponse.bid
+                         placementId:self.placementID
+                       placementName:self.placementName
+                            adFormat:adFormat
+                           placement:nil];
         [self.logger logDelegateCallback:@"✅ Banner didLoadAd" ad:ad];
         [self.delegate didLoadAd:ad];
     }
@@ -866,9 +872,14 @@ NS_ASSUME_NONNULL_BEGIN
                             winnerBidPrice:self.lastBidResponse.price];
             
             [self.logger debug:@"RENDER_SUCCESS event (burl) fired"];
-            
+
             // Trigger revenue callback immediately (no longer depends on NURL network call)
-            CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+            CLXAdFormat adFormat = (self.bannerType == CLXBannerTypeMREC) ? CLXAdFormatMREC : CLXAdFormatBanner;
+            CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid
+                                   placementId:self.placementID
+                                 placementName:self.placementName
+                                      adFormat:adFormat
+                                     placement:nil];
             if (self.revenueDelegate && [self.revenueDelegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self.revenueDelegate didPayRevenueForAd:adObject];
@@ -893,7 +904,12 @@ NS_ASSUME_NONNULL_BEGIN
     }
     
     if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
-        CLXAd *ad = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        CLXAdFormat adFormat = (self.bannerType == CLXBannerTypeMREC) ? CLXAdFormatMREC : CLXAdFormatBanner;
+        CLXAd *ad = [CLXAd adFromBid:self.lastBidResponse.bid
+                         placementId:self.placementID
+                       placementName:self.placementName
+                            adFormat:adFormat
+                           placement:nil];
         [self.logger logDelegateCallback:@"👆 Banner didClickAd" ad:ad];
         [self.delegate didClickAd:ad];
     }
@@ -906,7 +922,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didExpandBanner:(id<CLXAdapterBanner>)banner {
     [self.logger debug:[NSString stringWithFormat:@"didExpandBanner delegate called for placement: %@", self.placementID]];
     if ([self.delegate respondsToSelector:@selector(didExpandAd:)]) {
-        CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        CLXAdFormat adFormat = (self.bannerType == CLXBannerTypeMREC) ? CLXAdFormatMREC : CLXAdFormatBanner;
+        CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid
+                               placementId:self.placementID
+                             placementName:self.placementName
+                                  adFormat:adFormat
+                                 placement:nil];
         [self.delegate didExpandAd:adObject];
     }
 }
@@ -914,7 +935,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didCollapseBanner:(id<CLXAdapterBanner>)banner {
     [self.logger debug:[NSString stringWithFormat:@"didCollapseBanner delegate called for placement: %@", self.placementID]];
     if ([self.delegate respondsToSelector:@selector(didCollapseAd:)]) {
-        CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid placementId:self.placementID placementName:self.placementName];
+        CLXAdFormat adFormat = (self.bannerType == CLXBannerTypeMREC) ? CLXAdFormatMREC : CLXAdFormatBanner;
+        CLXAd *adObject = [CLXAd adFromBid:self.lastBidResponse.bid
+                               placementId:self.placementID
+                             placementName:self.placementName
+                                  adFormat:adFormat
+                                 placement:nil];
         [self.delegate didCollapseAd:adObject];
     }
 }

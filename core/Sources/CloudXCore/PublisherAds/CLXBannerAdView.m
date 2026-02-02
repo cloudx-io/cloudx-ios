@@ -11,6 +11,7 @@
 #import <CloudXCore/CLXBanner.h>
 #import <CloudXCore/CLXBannerDelegate.h>
 #import <CloudXCore/CLXBannerType.h>
+#import <CloudXCore/CLXAdFormat.h>
 #import <CloudXCore/CLXAdapterBanner.h>
 #import <CloudXCore/CLXPublisherBanner.h>
 #import <CloudXCore/CLXLogger.h>
@@ -301,9 +302,12 @@ static void initializeLogger() {
     // Create and store the ad object for use in other delegate methods
     if ([self.banner isKindOfClass:[CLXPublisherBanner class]]) {
         CLXPublisherBanner *publisherBanner = (CLXPublisherBanner *)self.banner;
-        _ad = [CLXAd adFromBid:publisherBanner.lastBidResponse.bid 
-                    placementId:publisherBanner.placementID 
-                   placementName:publisherBanner.placementName];
+        CLXAdFormat adFormat = (self.adFormat == CLXBannerTypeMREC) ? CLXAdFormatMREC : CLXAdFormatBanner;
+        _ad = [CLXAd adFromBid:publisherBanner.lastBidResponse.bid
+                   placementId:publisherBanner.placementID
+                 placementName:publisherBanner.placementName
+                      adFormat:adFormat
+                     placement:self.placement];
     }
     
     // Only manipulate the view hierarchy if we're actually in the view hierarchy

@@ -57,12 +57,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * The placement identifier for this banner ad view.
- * 
+ *
  * Note: This is currently a stub implementation for MAX SDK compatibility.
  * The value can be set but is not yet used in reporting or analytics.
  * Contact CloudX support if you need this functionality enabled.
  */
 @property (nonatomic, copy, nullable) NSString *placement;
+
+/**
+ * Custom data for tracking (e.g., "level:5,coins:100").
+ */
+@property (nonatomic, copy, nullable) NSString *customData;
 
 /**
  * Initializes a new CLXBannerAdView with the given banner, type, and delegate.
