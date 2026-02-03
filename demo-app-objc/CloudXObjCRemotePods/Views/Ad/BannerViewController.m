@@ -3,7 +3,6 @@
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
 #import "UserDefaultsSettings.h"
-#import "GPPScenarioPickerView.h"
 #import "NSError+DemoDescription.h"
 
 @interface BannerViewController ()
@@ -13,7 +12,6 @@
 @property (nonatomic, strong) UIButton *autoRefreshButton;
 @property (nonatomic, assign) BOOL autoRefreshEnabled;
 @property (nonatomic, strong) UserDefaultsSettings *settings;
-@property (nonatomic, strong) GPPScenarioPickerView *gppScenarioPicker;
 @end
 
 @implementation BannerViewController
@@ -67,31 +65,6 @@
     buttonStack.alignment = UIStackViewAlignmentCenter;
     buttonStack.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:buttonStack];
-    
-    // GPP Scenario Picker - Encapsulated Test Component
-    //
-    // PURPOSE: Provides a self-contained UI for selecting and applying GPP privacy test scenarios.
-    // This component handles ALL GPP test logic internally, keeping BannerViewController clean.
-    //
-    // USAGE:
-    // 1. Simply instantiate and add to view hierarchy (no configuration needed)
-    // 2. Component self-manages: button creation, alert presentation, privacy SDK calls
-    // 3. Zero code footprint in parent - follows DRY principle
-    //
-    // FEATURES:
-    // - Privacy test scenarios (CCPA, GPP, ATT, regional variations)
-    // - Action sheet picker with full scenario names and descriptions
-    // - Automatic CloudXCore privacy SDK integration
-    // - Console logging for test verification
-    //
-    // TESTING COVERAGE:
-    // - CCPA Consent/Opt-Out
-    // - ATT (iOS App Tracking Transparency) - Must be manually enabled/disabled in iOS Settings
-    // - GPP regional (US-CA, US-National, EU)
-    //
-    self.gppScenarioPicker = [[GPPScenarioPickerView alloc] init];
-    self.gppScenarioPicker.translatesAutoresizingMaskIntoConstraints = NO;
-    [buttonStack addArrangedSubview:self.gppScenarioPicker];
     
     // Load Banner button
     UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];

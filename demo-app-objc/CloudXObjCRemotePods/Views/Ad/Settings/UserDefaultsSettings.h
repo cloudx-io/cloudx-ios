@@ -17,10 +17,7 @@
 @property (nonatomic, copy) NSString *rewardedPlacement;
 @property (nonatomic, copy) NSString *nativeSmallPlacement;
 @property (nonatomic, copy) NSString *nativeMediumPlacement;
-@property (nonatomic, copy) NSString *consentString;
-@property (nonatomic, copy) NSString *usPrivacyString;
 @property (nonatomic, copy) NSString *hashedUserId;
-@property (nonatomic, assign) BOOL userTargeting;
 
 /// When enabled, the full bid response JSON is printed to the console for QA inspection.
 /// This is a demo app-only feature and is NOT exposed in the SDK or public logs.

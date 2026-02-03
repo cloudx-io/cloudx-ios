@@ -27,10 +27,6 @@
     [CloudXCore setLoggingEmojisEnabled:YES];
     [CloudXCore setLoggingTimestampsEnabled:YES];
     
-    // Auto-clear all privacy test settings on every launch
-    // This ensures clean state for testing and prevents GPP settings from persisting
-    [self clearAllPrivacyTestSettings];
-    
     // Enable bid response swizzling if the QA toggle was previously enabled
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DemoApp.PrintBidResponse"]) {
         [CLXBidResponseSwizzler enableSwizzling];
@@ -46,30 +42,6 @@
     [self.window makeKeyAndVisible];
     
     return YES;
-}
-
-- (void)clearAllPrivacyTestSettings {
-    // Clear all IAB standard privacy settings to ensure clean state
-    // This prevents GPP and other privacy scenarios from persisting across app launches
-    // CloudX SDK reads from these IAB standard UserDefaults keys automatically
-    
-    // Clear IAB GPP UserDefaults
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_HDR_GppString"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_GppSID"];
-    
-    // Clear IAB TCF UserDefaults (GDPR)
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_TCString"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_gdprApplies"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_PurposeConsents"];
-    
-    // Clear IAB US Privacy UserDefaults (CCPA)
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABUSPrivacy_String"];
-    
-    // Also clear any environment overrides
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CLXDemoEnvironment"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    [[DemoAppLogger sharedInstance] logMessage:@"✅ Auto-cleared all privacy test settings on app launch"];
 }
 
 - (void)requestAppTrackingTransparencyPermission {

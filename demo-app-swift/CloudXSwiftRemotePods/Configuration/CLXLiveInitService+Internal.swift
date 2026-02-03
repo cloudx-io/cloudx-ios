@@ -39,7 +39,7 @@ extension CLXLiveInitService {
         print("🚀 [LiveInitService+Internal] initializeSDKWithAppKey called with custom URL - AppKey: \(appKey), URL: \(customInitURL)")
         
         // Create a temporary network service with the custom URL
-        let cloudxSession = URLSession.cloudxSession(withIdentifier: "init-internal")
+        let cloudxSession = URLSession.cloudx()
         let networkService = CLXSDKInitNetworkService(baseURL: customInitURL, urlSession: cloudxSession)
         
         networkService.initializeSDK(withAppKey: appKey) { config, error in

@@ -1,9 +1,10 @@
 import Foundation
 
 enum CLXDemoEnvironment: Int {
-    case dev = 0
-    case staging = 1
-    case production = 2
+    case local = 0
+    case dev = 1
+    case staging = 2
+    case production = 3
 }
 
 class CLXDemoConfig {
@@ -53,6 +54,20 @@ class CLXDemoConfigManager {
     }
     
     private init() {
+        // Local Configuration (localhost testing)
+        let localConfig = CLXDemoConfig(
+            appKey: "E5RotGdN8i7hWhkax1e1o",
+            hashedUserId: "test-user-123",
+            baseURL: "http://localhost:8090/sdk",
+            bannerPlacement: "banner",
+            mrecPlacement: "mrec",
+            interstitialPlacement: "interstitial",
+            nativePlacement: "-",
+            nativeBannerPlacement: "-",
+            rewardedPlacement: "rewarded",
+            rewardedInterstitialPlacement: "rewarded"
+        )
+        
         // Staging Configuration
         let stagingConfig = CLXDemoConfig(
             appKey: "YG7zqD4RoWwMcGnp3XvNK",
@@ -96,6 +111,7 @@ class CLXDemoConfigManager {
         )
         
         self.configurations = [
+            .local: localConfig,
             .dev: devConfig,
             .staging: stagingConfig,
             .production: prodConfig
@@ -112,6 +128,8 @@ class CLXDemoConfigManager {
     
     func environmentName(_ environment: CLXDemoEnvironment) -> String {
         switch environment {
+        case .local:
+            return "Local"
         case .dev:
             return "Development"
         case .staging:
@@ -135,5 +153,28 @@ class CLXDemoConfigManager {
         #else
         return false
         #endif
+    }
+    
+    func enhancedErrorMessage(for environment: CLXDemoEnvironment, originalError: String) -> String {
+        let isDebug = isDebugBuild
+        let buildScheme = buildSchemeName
+        let envName = environmentName(environment)
+        
+        if originalError.contains("Unauthorized") ||
+           originalError.contains("Invalid app key") ||
+           originalError.contains("malformed App Key") {
+            
+            if environment == .production && isDebug {
+                return "Production init failed: Build scheme is set to '\(buildScheme)' but trying to use Production environment. Please switch to Release build scheme for Production, or use Dev/Staging environments with Debug builds.\n\nOriginal error: \(originalError)"
+            }
+            
+            if environment != .production && !isDebug {
+                return "\(envName) init failed: Build scheme is set to '\(buildScheme)' but trying to use \(envName) environment. Debug environments (Dev/Staging) require Debug build scheme, or switch to Production environment with Release builds.\n\nOriginal error: \(originalError)"
+            }
+            
+            return "\(envName) init failed with error: \(originalError)\n\nCurrent build scheme: \(buildScheme)\nEnvironment: \(envName)"
+        }
+        
+        return originalError
     }
 }

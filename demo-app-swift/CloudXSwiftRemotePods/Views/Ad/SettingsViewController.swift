@@ -39,6 +39,7 @@ class CLXTextField: UITextField {
 class SettingsViewController: UITableViewController, UITextFieldDelegate {
     
     private let settings = UserDefaultsSettings.shared
+    private weak var hashedUserIdTextField: UITextField?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,16 +48,15 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 5 // SDK, Placement, Privacy, Logging, QA Tools
+        return 4 // SDK, Placement, Logging, QA Tools
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 0: return 2 // SDK Settings
+        case 0: return 3 // SDK Settings: App Key, Init URL, Hashed User ID
         case 1: return 4 // Placement Settings
-        case 2: return 5 // Privacy: Consent, US Privacy, GPP String, GPP SID, User Targeting
-        case 3: return 4 // Logging: Enable, Emojis, Timestamps, Level
-        case 4: return 1 // QA Tools: Print Bid Response
+        case 2: return 4 // Logging: Enable, Emojis, Timestamps, Level
+        case 3: return 1 // QA Tools: Print Bid Response
         default: return 0
         }
     }
@@ -65,18 +65,17 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         switch section {
         case 0: return "SDK Settings"
         case 1: return "Placement Settings"
-        case 2: return "Privacy"
-        case 3: return "Logging Controls 🪵"
-        case 4: return "🔍 QA Tools"
+        case 2: return "Logging Controls 🪵"
+        case 3: return "🔍 QA Tools"
         default: return nil
         }
     }
     
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        if section == 3 {
+        if section == 2 {
             return "V=Verbose (all logs), D=Debug (dev logs), I=Info (key events), W=Warn (issues), E=Error (failures only). Toggle emojis to test plain text mode for log aggregation systems."
         }
-        if section == 4 {
+        if section == 3 {
             return "When enabled, the full bid response JSON from the server is printed to the Xcode console. This is for QA/internal testing only."
         }
         return nil
@@ -93,12 +92,30 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
 
         switch indexPath.section {
         case 0: // SDK
-            if indexPath.row == 0 {
+            switch indexPath.row {
+            case 0:
                 cell.textLabel?.text = "App Key"
                 textField.text = settings.appKey
-            } else {
+            case 1:
                 cell.textLabel?.text = "Init URL"
                 textField.text = settings.SDKinitURL
+            case 2:
+                cell.textLabel?.text = "Hashed User ID"
+                textField.text = settings.hashedUserId
+                
+                // Store reference to this text field
+                hashedUserIdTextField = textField
+                
+                // Add a small "Apply" button to the right of the text field
+                let applyButton = UIButton(type: .system)
+                applyButton.setTitle("Apply", for: .normal)
+                applyButton.frame = CGRect(x: 0, y: 0, width: 55, height: 30)
+                applyButton.addTarget(self, action: #selector(applyHashedUserId(_:)), for: .touchUpInside)
+                cell.accessoryView = applyButton
+                
+                // Adjust text field frame to make room for the button
+                textField.frame = CGRect(x: 150, y: 7, width: cell.contentView.bounds.size.width - 220, height: 30)
+            default: break
             }
         case 1: // Placement
             switch indexPath.row {
@@ -116,32 +133,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
                 textField.text = settings.rewardedPlacement
             default: break
             }
-        case 2: // Privacy
-            switch indexPath.row {
-            case 0: 
-                cell.textLabel?.text = "Consent String"
-                textField.text = settings.consentString
-            case 1: 
-                cell.textLabel?.text = "US Privacy String"
-                textField.text = settings.usPrivacyString
-            case 2:
-                cell.textLabel?.text = "GPP String"
-                textField.text = settings.gppString
-                textField.placeholder = "IABGPP_HDR_GppString"
-            case 3:
-                cell.textLabel?.text = "GPP SID"
-                textField.text = settings.gppSid
-                textField.placeholder = "e.g., 2_7_8"
-            case 4:
-                cell.textLabel?.text = "User Targeting"
-                let toggle = UISwitch()
-                toggle.isOn = settings.userTargeting
-                toggle.addTarget(self, action: #selector(userTargetingSwitchChanged(_:)), for: .valueChanged)
-                cell.accessoryView = toggle
-                textField.removeFromSuperview()
-            default: break
-            }
-        case 3: // Logging
+        case 2: // Logging
             textField.removeFromSuperview() // We'll use switches for all logging controls
             switch indexPath.row {
             case 0:
@@ -149,7 +141,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
                 let toggle = UISwitch()
                 // Read from UserDefaults, default is YES (enabled)
                 toggle.isOn = !UserDefaults.standard.bool(forKey: "LoggingDisabled")
-                toggle.tag = 300
+                toggle.tag = 200
                 toggle.addTarget(self, action: #selector(loggingToggleChanged(_:)), for: .valueChanged)
                 cell.accessoryView = toggle
             case 1:
@@ -157,7 +149,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
                 let toggle = UISwitch()
                 // Default is YES, store override in UserDefaults
                 toggle.isOn = !UserDefaults.standard.bool(forKey: "LoggingEmojisDisabled")
-                toggle.tag = 301
+                toggle.tag = 201
                 toggle.addTarget(self, action: #selector(loggingToggleChanged(_:)), for: .valueChanged)
                 cell.accessoryView = toggle
             case 2:
@@ -165,7 +157,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
                 let toggle = UISwitch()
                 // Default is NO, store override in UserDefaults
                 toggle.isOn = UserDefaults.standard.bool(forKey: "LoggingTimestampsEnabled")
-                toggle.tag = 302
+                toggle.tag = 202
                 toggle.addTarget(self, action: #selector(loggingToggleChanged(_:)), for: .valueChanged)
                 cell.accessoryView = toggle
             case 3:
@@ -178,14 +170,14 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
                 cell.accessoryView = levelControl
             default: break
             }
-        case 4: // QA Tools
+        case 3: // QA Tools
             textField.removeFromSuperview()
             switch indexPath.row {
             case 0:
                 cell.textLabel?.text = "Print Full Bid Response"
                 let toggle = UISwitch()
                 toggle.isOn = settings.printBidResponse
-                toggle.tag = 400
+                toggle.tag = 300
                 toggle.addTarget(self, action: #selector(printBidResponseToggleChanged(_:)), for: .valueChanged)
                 cell.accessoryView = toggle
             default: break
@@ -196,19 +188,19 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
     }
     
     @objc private func loggingToggleChanged(_ sender: UISwitch) {
-        if sender.tag == 300 {
+        if sender.tag == 200 {
             // Logging Enabled/Disabled (using CLXLogLevelNone to disable)
             CloudXCore.setMinLogLevel(sender.isOn ? .verbose : .none)
             UserDefaults.standard.set(!sender.isOn, forKey: "LoggingDisabled")
             UserDefaults.standard.synchronize()
             print("🪵 Logging \(sender.isOn ? "ENABLED" : "DISABLED")")
-        } else if sender.tag == 301 {
+        } else if sender.tag == 201 {
             // Emojis Enabled/Disabled
             CloudXCore.setLoggingEmojisEnabled(sender.isOn)
             UserDefaults.standard.set(!sender.isOn, forKey: "LoggingEmojisDisabled")
             UserDefaults.standard.synchronize()
             print("🪵 Emojis \(sender.isOn ? "ENABLED" : "DISABLED")")
-        } else if sender.tag == 302 {
+        } else if sender.tag == 202 {
             // Timestamps Enabled/Disabled
             CloudXCore.setLoggingTimestampsEnabled(sender.isOn)
             UserDefaults.standard.set(sender.isOn, forKey: "LoggingTimestampsEnabled")
@@ -225,8 +217,28 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         print("🪵 Log level set to: \(levelNames[sender.selectedSegmentIndex])")
     }
     
-    @objc private func userTargetingSwitchChanged(_ sender: UISwitch) {
-        settings.userTargeting = sender.isOn
+    @objc private func applyHashedUserId(_ sender: UIButton) {
+        // Get the current text from the stored text field reference
+        let hashedUserId = hashedUserIdTextField?.text
+        
+        // Save it to settings and apply to SDK (allow empty/nil to clear)
+        settings.hashedUserId = hashedUserId
+        CloudXCore.shared.setHashedUserID(hashedUserId ?? "")
+        
+        // Dismiss keyboard if it's showing
+        hashedUserIdTextField?.resignFirstResponder()
+        
+        // Show confirmation alert
+        let message: String
+        if let hashedUserId = hashedUserId, !hashedUserId.isEmpty {
+            message = "Hashed User ID updated to:\n\(hashedUserId)"
+        } else {
+            message = "Hashed User ID cleared"
+        }
+        
+        let alert = UIAlertController(title: "Applied", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
     
     // MARK: - QA Tools
@@ -246,33 +258,10 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         let tag = textField.tag
         if tag == 0 { settings.appKey = textField.text ?? "" }
         else if tag == 1 { settings.SDKinitURL = textField.text ?? "" }
+        else if tag == 2 { settings.hashedUserId = textField.text }
         else if tag == 10 { settings.bannerPlacement = textField.text ?? "" }
         else if tag == 11 { settings.mrecPlacement = textField.text ?? "" }
         else if tag == 12 { settings.interstitialPlacement = textField.text ?? "" }
         else if tag == 13 { settings.rewardedPlacement = textField.text ?? "" }
-        else if tag == 20 { settings.consentString = textField.text ?? "" }
-        else if tag == 21 { settings.usPrivacyString = textField.text ?? "" }
-        else if tag == 22 { 
-            settings.gppString = textField.text ?? ""
-            // Also write to IAB standard UserDefaults key
-            if let gppString = textField.text, !gppString.isEmpty {
-                UserDefaults.standard.set(gppString, forKey: "IABGPP_HDR_GppString")
-            } else {
-                UserDefaults.standard.removeObject(forKey: "IABGPP_HDR_GppString")
-            }
-            UserDefaults.standard.synchronize()
-            print("🔐 GPP String set: \(textField.text ?? "(cleared)")")
-        }
-        else if tag == 23 { 
-            settings.gppSid = textField.text ?? ""
-            // Also write to IAB standard UserDefaults key
-            if let gppSid = textField.text, !gppSid.isEmpty {
-                UserDefaults.standard.set(gppSid, forKey: "IABGPP_GppSID")
-            } else {
-                UserDefaults.standard.removeObject(forKey: "IABGPP_GppSID")
-            }
-            UserDefaults.standard.synchronize()
-            print("🔐 GPP SID set: \(textField.text ?? "(cleared)")")
-        }
     }
 }

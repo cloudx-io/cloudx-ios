@@ -5,6 +5,7 @@ class InitInternalViewController: BaseAdViewController {
     
     private var isSDKInitialized: Bool = false
     private var buttonStackView: UIStackView!
+    private var localButton: UIButton!
     private var devButton: UIButton!
     private var stagingButton: UIButton!
     private var prodButton: UIButton!
@@ -46,6 +47,10 @@ class InitInternalViewController: BaseAdViewController {
     
     private func setupEnvironmentButtons() {
         // Create buttons
+        localButton = createButton(withTitle: "Init Local", 
+                                 action: #selector(initializeWithLocalEnvironment),
+                                 environment: .local)
+        
         devButton = createButton(withTitle: "Init Dev", 
                                 action: #selector(initializeWithDevEnvironment),
                                 environment: .dev)
@@ -58,8 +63,8 @@ class InitInternalViewController: BaseAdViewController {
                                 action: #selector(initializeWithProductionEnvironment),
                                 environment: .production)
         
-        // Create stack view for buttons - Staging at top, Dev in middle, Production at bottom
-        buttonStackView = UIStackView(arrangedSubviews: [stagingButton, devButton, prodButton])
+        // Create stack view for buttons - Local at top, then Staging, Dev, Production at bottom
+        buttonStackView = UIStackView(arrangedSubviews: [localButton, stagingButton, devButton, prodButton])
         buttonStackView.axis = .vertical
         buttonStackView.spacing = 16
         buttonStackView.alignment = .fill
@@ -72,6 +77,8 @@ class InitInternalViewController: BaseAdViewController {
         NSLayoutConstraint.activate([
             buttonStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             buttonStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            localButton.widthAnchor.constraint(equalToConstant: 200),
+            localButton.heightAnchor.constraint(equalToConstant: 44),
             stagingButton.widthAnchor.constraint(equalToConstant: 200),
             stagingButton.heightAnchor.constraint(equalToConstant: 44),
             devButton.widthAnchor.constraint(equalToConstant: 200),
@@ -100,6 +107,9 @@ class InitInternalViewController: BaseAdViewController {
     
     private func color(for environment: CLXDemoEnvironment) -> UIColor {
         switch environment {
+        case .local:
+            // Orange for local development
+            return .systemOrange
         case .dev:
             return .systemBlue
         case .staging:
@@ -112,7 +122,7 @@ class InitInternalViewController: BaseAdViewController {
     }
     
     private func updateButtonStates() {
-        let buttons = [devButton, stagingButton, prodButton]
+        let buttons = [localButton, devButton, stagingButton, prodButton]
         
         for button in buttons {
             guard let button = button else { continue }
@@ -179,6 +189,10 @@ class InitInternalViewController: BaseAdViewController {
         }
     }
     
+    @objc private func initializeWithLocalEnvironment() {
+        initializeWithEnvironment(.local)
+    }
+    
     @objc private func initializeWithDevEnvironment() {
         initializeWithEnvironment(.dev)
     }
@@ -216,6 +230,8 @@ class InitInternalViewController: BaseAdViewController {
         // This controls which server (dev/staging/production) the SDK connects to
         let environmentKey: String
         switch environment {
+        case .local:
+            environmentKey = "local"
         case .dev:
             environmentKey = "dev"
         case .staging:
@@ -240,8 +256,8 @@ class InitInternalViewController: BaseAdViewController {
 
         // Use standard CloudXCore initialization which will now use our environment override
         let initConfig = CLXInitializationConfiguration.configuration(appKey: config.appKey)
-        CloudXCore.shared.initialize(with: initConfig) { [weak self] success, error in
-            if success {
+        CloudXCore.shared.initialize(with: initConfig) { [weak self] sdkConfig, error in
+            if sdkConfig != nil {
                 DemoAppLogger.sharedInstance.logMessage("✅ SDK initialized successfully with \(environmentName) environment")
                 self?.isSDKInitialized = true
                 self?.updateStatusUI(state: .ready)

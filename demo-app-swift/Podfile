@@ -9,6 +9,8 @@ target 'CloudXSwiftRemotePods' do
   pod 'CloudXMetaAdapter', :path => '../adapter-meta'
   pod 'CloudXRenderer', :path => '../renderer-cloudx'
   pod 'CloudXVungleAdapter', :path => '../adapter-vungle'
+  pod 'CloudXInMobiAdapter', :path => '../adapter-inmobi'
+  pod 'AppLovinSDK'
 
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths
@@ -20,4 +22,3 @@ target 'CloudXSwiftRemotePods' do
   end
 
 end
-  pod 'AppLovinSDK'

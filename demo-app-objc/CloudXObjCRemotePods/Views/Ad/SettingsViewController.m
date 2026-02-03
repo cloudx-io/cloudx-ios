@@ -59,16 +59,15 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 5; // SDK, Placement, Privacy, Logging, QA Tools
+    return 4; // SDK, Placement, Logging, QA Tools
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
-        case 0: return 2; // SDK Settings
+        case 0: return 3; // SDK Settings: App Key, Init URL, Hashed User ID
         case 1: return 4; // Placement Settings
-        case 2: return 3; // Privacy: Consent, US Privacy, User Targeting
-        case 3: return 4; // Logging: Enable, Emojis, Timestamps, Level
-        case 4: return 1; // QA Tools: Print Bid Response
+        case 2: return 4; // Logging: Enable, Emojis, Timestamps, Level
+        case 3: return 1; // QA Tools: Print Bid Response
         default: return 0;
     }
 }
@@ -77,18 +76,17 @@
     switch (section) {
         case 0: return @"SDK Settings";
         case 1: return @"Placement Settings";
-        case 2: return @"Privacy";
-        case 3: return @"Logging Controls 🪵";
-        case 4: return @"🔍 QA Tools";
+        case 2: return @"Logging Controls 🪵";
+        case 3: return @"🔍 QA Tools";
         default: return nil;
     }
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    if (section == 3) {
+    if (section == 2) {
         return @"V=Verbose (all logs), D=Debug (dev logs), I=Info (key events), W=Warn (issues), E=Error (failures only). Toggle emojis to test plain text mode for log aggregation systems.";
     }
-    if (section == 4) {
+    if (section == 3) {
         return @"When enabled, the full bid response JSON from the server is printed to the Xcode console. This is for QA/internal testing only.";
     }
     return nil;
@@ -105,25 +103,16 @@
 
     switch (indexPath.section) {
         case 0: // SDK
-            if (indexPath.row == 0) {
-                cell.textLabel.text = @"App Key";
-                textField.text = self.settings.appKey;
-            } else {
-                cell.textLabel.text = @"Init URL";
-                textField.text = self.settings.SDKinitURL;
-            }
-            break;
-        case 1: // Placement
             switch (indexPath.row) {
-                case 0: cell.textLabel.text = @"Banner"; textField.text = self.settings.bannerPlacement; break;
-                case 1: cell.textLabel.text = @"MREC"; textField.text = self.settings.mrecPlacement; break;
-                case 2: cell.textLabel.text = @"Interstitial"; textField.text = self.settings.interstitialPlacement; break;
-                case 3: cell.textLabel.text = @"Rewarded"; textField.text = self.settings.rewardedPlacement; break;
-            }
-            break;
-        case 2: // Privacy
-            switch (indexPath.row) {
-                case 0: {
+                case 0:
+                    cell.textLabel.text = @"App Key";
+                    textField.text = self.settings.appKey;
+                    break;
+                case 1:
+                    cell.textLabel.text = @"Init URL";
+                    textField.text = self.settings.SDKinitURL;
+                    break;
+                case 2: {
                     cell.textLabel.text = @"Hashed User ID";
                     textField.text = self.settings.hashedUserId;
                     
@@ -141,20 +130,17 @@
                     textField.frame = CGRectMake(150, 7, cell.contentView.bounds.size.width - 220, 30);
                     break;
                 }
-                case 1: cell.textLabel.text = @"Consent String"; textField.text = self.settings.consentString; break;
-                case 2: cell.textLabel.text = @"US Privacy String"; textField.text = self.settings.usPrivacyString; break;
-                case 3: {
-                    cell.textLabel.text = @"User Targeting";
-                    UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectZero];
-                    toggle.on = self.settings.userTargeting;
-                    [toggle addTarget:self action:@selector(userTargetingSwitchChanged:) forControlEvents:UIControlEventValueChanged];
-                    cell.accessoryView = toggle;
-                    [textField removeFromSuperview];
-                    break;
-                }
             }
             break;
-        case 3: // Logging
+        case 1: // Placement
+            switch (indexPath.row) {
+                case 0: cell.textLabel.text = @"Banner"; textField.text = self.settings.bannerPlacement; break;
+                case 1: cell.textLabel.text = @"MREC"; textField.text = self.settings.mrecPlacement; break;
+                case 2: cell.textLabel.text = @"Interstitial"; textField.text = self.settings.interstitialPlacement; break;
+                case 3: cell.textLabel.text = @"Rewarded"; textField.text = self.settings.rewardedPlacement; break;
+            }
+            break;
+        case 2: // Logging
             [textField removeFromSuperview]; // We'll use switches for all logging controls
             switch (indexPath.row) {
                 case 0: {
@@ -162,7 +148,7 @@
                     UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectZero];
                     // Read from UserDefaults, default is YES (enabled)
                     toggle.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"LoggingDisabled"];
-                    toggle.tag = 300;
+                    toggle.tag = 200;
                     [toggle addTarget:self action:@selector(loggingToggleChanged:) forControlEvents:UIControlEventValueChanged];
                     cell.accessoryView = toggle;
                     break;
@@ -172,7 +158,7 @@
                     UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectZero];
                     // Default is YES, store override in UserDefaults
                     toggle.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"LoggingEmojisDisabled"];
-                    toggle.tag = 301;
+                    toggle.tag = 201;
                     [toggle addTarget:self action:@selector(loggingToggleChanged:) forControlEvents:UIControlEventValueChanged];
                     cell.accessoryView = toggle;
                     break;
@@ -182,7 +168,7 @@
                     UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectZero];
                     // Default is NO, store override in UserDefaults
                     toggle.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"LoggingTimestampsEnabled"];
-                    toggle.tag = 302;
+                    toggle.tag = 202;
                     [toggle addTarget:self action:@selector(loggingToggleChanged:) forControlEvents:UIControlEventValueChanged];
                     cell.accessoryView = toggle;
                     break;
@@ -199,14 +185,14 @@
                 }
             }
             break;
-        case 4: // QA Tools
+        case 3: // QA Tools
             [textField removeFromSuperview];
             switch (indexPath.row) {
                 case 0: {
                     cell.textLabel.text = @"Print Full Bid Response";
                     UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectZero];
                     toggle.on = self.settings.printBidResponse;
-                    toggle.tag = 400;
+                    toggle.tag = 300;
                     [toggle addTarget:self action:@selector(printBidResponseToggleChanged:) forControlEvents:UIControlEventValueChanged];
                     cell.accessoryView = toggle;
                     break;
@@ -243,24 +229,20 @@
     [self presentViewController:alert animated:YES completion:nil];
 }
 
-- (void)userTargetingSwitchChanged:(UISwitch *)sender {
-    self.settings.userTargeting = sender.isOn;
-}
-
 - (void)loggingToggleChanged:(UISwitch *)sender {
-    if (sender.tag == 300) {
+    if (sender.tag == 200) {
         // Logging Enabled/Disabled (using CLXLogLevelNone to disable)
         [CloudXCore setMinLogLevel:sender.isOn ? CLXLogLevelVerbose : CLXLogLevelNone];
         [[NSUserDefaults standardUserDefaults] setBool:!sender.isOn forKey:@"LoggingDisabled"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         NSLog(@"🪵 Logging %@", sender.isOn ? @"ENABLED" : @"DISABLED");
-    } else if (sender.tag == 301) {
+    } else if (sender.tag == 201) {
         // Emojis Enabled/Disabled
         [CloudXCore setLoggingEmojisEnabled:sender.isOn];
         [[NSUserDefaults standardUserDefaults] setBool:!sender.isOn forKey:@"LoggingEmojisDisabled"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         NSLog(@"🪵 Emojis %@", sender.isOn ? @"ENABLED" : @"DISABLED");
-    } else if (sender.tag == 302) {
+    } else if (sender.tag == 202) {
         // Timestamps Enabled/Disabled
         [CloudXCore setLoggingTimestampsEnabled:sender.isOn];
         [[NSUserDefaults standardUserDefaults] setBool:sender.isOn forKey:@"LoggingTimestampsEnabled"];
@@ -294,12 +276,11 @@
     NSInteger tag = textField.tag;
     if (tag == 0) self.settings.appKey = textField.text;
     else if (tag == 1) self.settings.SDKinitURL = textField.text;
+    else if (tag == 2) self.settings.hashedUserId = textField.text;
     else if (tag == 10) self.settings.bannerPlacement = textField.text;
     else if (tag == 11) self.settings.mrecPlacement = textField.text;
     else if (tag == 12) self.settings.interstitialPlacement = textField.text;
     else if (tag == 13) self.settings.rewardedPlacement = textField.text;
-    else if (tag == 20) self.settings.consentString = textField.text;
-    else if (tag == 21) self.settings.usPrivacyString = textField.text;
 }
 
 @end

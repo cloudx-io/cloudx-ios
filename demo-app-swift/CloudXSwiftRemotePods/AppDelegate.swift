@@ -49,10 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Enable verbose logging for demo app
         CloudXCore.setMinLogLevel(.verbose)
         CloudXCore.setLoggingEmojisEnabled(true)
-        
-        // Auto-clear all privacy test settings on every launch
-        // This ensures clean state for testing and prevents GPP settings from persisting
-        clearAllPrivacyTestSettings()
+        CloudXCore.setLoggingTimestampsEnabled(true)
         
         // Enable bid response swizzling if the QA toggle was previously enabled
         if UserDefaults.standard.bool(forKey: "DemoApp.PrintBidResponse") {
@@ -64,30 +61,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         requestAppTrackingTransparencyPermission()
         
         return true
-    }
-    
-    private func clearAllPrivacyTestSettings() {
-        // Clear all IAB standard privacy settings to ensure clean state
-        // This prevents GPP and other privacy scenarios from persisting across app launches
-        // CloudX SDK reads from these IAB standard UserDefaults keys automatically
-        
-        // Clear IAB GPP UserDefaults
-        UserDefaults.standard.removeObject(forKey: "IABGPP_HDR_GppString")
-        UserDefaults.standard.removeObject(forKey: "IABGPP_GppSID")
-        
-        // Clear IAB TCF UserDefaults (GDPR)
-        UserDefaults.standard.removeObject(forKey: "IABTCF_TCString")
-        UserDefaults.standard.removeObject(forKey: "IABTCF_gdprApplies")
-        UserDefaults.standard.removeObject(forKey: "IABTCF_PurposeConsents")
-        
-        // Clear IAB US Privacy UserDefaults (CCPA)
-        UserDefaults.standard.removeObject(forKey: "IABUSPrivacy_String")
-        
-        // Also clear any environment overrides
-        UserDefaults.standard.removeObject(forKey: "CLXDemoEnvironment")
-        UserDefaults.standard.synchronize()
-        
-        DemoAppLogger.sharedInstance.logMessage("✅ Auto-cleared all privacy test settings on app launch")
     }
     
     private func requestAppTrackingTransparencyPermission() {

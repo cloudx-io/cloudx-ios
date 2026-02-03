@@ -117,7 +117,7 @@
     }
     
     // InMobi SDK 11.x uses IMNativeViewDataBuilder for view registration
-    IMNativeViewDataBuilder *builder = [[IMNativeViewDataBuilder alloc] initWithParentView:containerView];
+    IMNativeViewDataBuilder *builder = [[IMNativeViewDataBuilder alloc] initWithAdParentView:containerView];
     
     if (titleView) {
         [builder setTitleView:titleView];

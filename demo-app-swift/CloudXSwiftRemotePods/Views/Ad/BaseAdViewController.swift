@@ -116,8 +116,8 @@ class BaseAdViewController: UIViewController, AdStateManaging {
 
         let initConfig = CLXInitializationConfiguration.configuration(appKey: appKey)
         return await withCheckedContinuation { continuation in
-            cloudX.initialize(with: initConfig) { success, error in
-                if success {
+            cloudX.initialize(with: initConfig) { sdkConfig, error in
+                if sdkConfig != nil {
                     print("✅ SDK Initialized")
                     NotificationCenter.default.post(name: .sdkInitialized, object: nil)
                 } else {

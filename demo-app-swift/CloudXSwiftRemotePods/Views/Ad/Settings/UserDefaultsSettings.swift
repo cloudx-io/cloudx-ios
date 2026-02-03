@@ -19,11 +19,17 @@ class UserDefaultsSettings: NSObject {
     var rewardedPlacement: String = ""
     var nativeSmallPlacement: String = ""
     var nativeMediumPlacement: String = ""
-    var consentString: String = ""
-    var usPrivacyString: String = ""
-    var gppString: String = ""
-    var gppSid: String = ""
-    var userTargeting: Bool = false
+    
+    /// Hashed User ID for SDK initialization (persisted to UserDefaults)
+    var hashedUserId: String? {
+        get {
+            return UserDefaults.standard.string(forKey: "DemoApp.HashedUserId")
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "DemoApp.HashedUserId")
+            UserDefaults.standard.synchronize()
+        }
+    }
     
     /// When enabled, the full bid response JSON is printed to the console for QA inspection.
     /// This is a demo app-only feature and is NOT exposed in the SDK or public logs.
