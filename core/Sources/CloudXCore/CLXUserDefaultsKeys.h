@@ -40,7 +40,6 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXCoreRawGeoHeadersKey @"CLXCore_rawGeoHeaders"
 #define kCLXCoreIFAConfigKey @"CLXCore_ifa_config"
 #define kCLXCoreAIPromptKey @"CLXCore_aiPrompt"
-#define kCLXCoreUserKeywordsKey @"CLXCore_userKeywords"
 
 // Banner-specific keys
 #define kCLXCoreBannerAppKeyKey @"CLXCore_Banner_appKey"

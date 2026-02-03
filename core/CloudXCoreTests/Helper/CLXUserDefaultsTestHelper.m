@@ -60,7 +60,6 @@
         kCLXCoreGeoHeadersKey,
         kCLXCoreIFAConfigKey,
         kCLXCoreAIPromptKey,
-        kCLXCoreUserKeywordsKey,
         kCLXCoreBannerAppKeyKey,
         kCLXCoreBannerSessionIDKey,
         kCLXCoreBannerMetricsDictKey,

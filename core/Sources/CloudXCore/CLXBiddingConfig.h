@@ -215,7 +215,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // MARK: - User
 @interface CLXBiddingConfigUser : NSObject
-@property (nonatomic, copy, nullable) NSString *keywords;
 @property (nonatomic, strong, nullable) CLXBiddingConfigUserExt *ext;
 /// ORTB 2.5: Gender ("M" = male, "F" = female, "O" = other). Set via KV API.
 @property (nonatomic, copy, nullable) NSString *gender;

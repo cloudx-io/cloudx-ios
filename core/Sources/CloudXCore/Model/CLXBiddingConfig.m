@@ -505,7 +505,6 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         // Create user
         NSString *hashedUserId = [[CLXKeyValueState shared] hashedUserId];
         NSString *aiPrompt = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAIPromptKey];
-        NSString *userKeywords = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreUserKeywordsKey];
         
         // Only create eids if publisher explicitly provided hashed user ID
         NSArray<CLXBiddingConfigUserExtEids *> *eids = nil;
@@ -531,7 +530,6 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         userExt.eids = eids;
         
         CLXBiddingConfigUser *user = [[CLXBiddingConfigUser alloc] init];
-        user.keywords = userKeywords.length > 0 ? userKeywords : nil;
         user.ext = userExt;
         
         // ORTB 2.5: User demographics from KV API
@@ -1204,12 +1202,9 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
     if (!self.user) {
         return nil;
     }
-    
+
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
-    if (self.user.keywords) {
-        json[@"keywords"] = self.user.keywords;
-    }
-    
+
     // ORTB 2.5: User demographics (set via KV API)
     if (self.user.gender && self.user.gender.length > 0) {
         json[@"gender"] = self.user.gender;
