@@ -64,6 +64,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly) CLXLogger *logger;
 @property (nonatomic, strong, readonly) id<CLXWinLossTracking> winLossTracker;
 
+// Internal state properties (not part of public API)
+@property (nonatomic, readonly) BOOL isLoading;
+
 @end
 
 NS_ASSUME_NONNULL_END

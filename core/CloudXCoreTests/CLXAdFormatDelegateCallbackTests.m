@@ -129,11 +129,11 @@
     // This replaces the old getClxAdForDelegateCallback helper methods
     
     // Verify CLXAd class has the factory method
-    XCTAssertTrue([CLXAd respondsToSelector:@selector(adFromBid:placementId:)], 
-                  @"CLXAd should have adFromBid:placementId: factory method");
-    
+    XCTAssertTrue([CLXAd respondsToSelector:@selector(adFromBid:placementId:adFormat:placement:)],
+                  @"CLXAd should have adFromBid:placementId:adFormat:placement: factory method");
+
     // Test that we can create a CLXAd object with nil bid (should return nil)
-    CLXAd *adWithNilBid = [CLXAd adFromBid:nil placementId:@"test-placement"];
+    CLXAd *adWithNilBid = [CLXAd adFromBid:nil placementId:@"test-placement" adFormat:CLXAdFormatInterstitial placement:nil];
     XCTAssertNil(adWithNilBid, @"CLXAd factory method should return nil for nil bid");
     
     // Test that we can create a CLXAd object with valid bid data
@@ -146,21 +146,23 @@
     mockBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
     mockBid.ext.cloudx.revenue = 1.50;
 
-    CLXAd *adWithValidBid = [CLXAd adFromBid:mockBid placementId:@"test-placement"];
+    CLXAd *adWithValidBid = [CLXAd adFromBid:mockBid placementId:@"test-placement" adFormat:CLXAdFormatInterstitial placement:nil];
     XCTAssertNotNil(adWithValidBid, @"CLXAd factory method should create valid CLXAd object");
-    XCTAssertEqualObjects(adWithValidBid.placementId, @"test-placement", @"CLXAd should have correct placement ID");
-    XCTAssertEqualObjects(adWithValidBid.bidder, @"test-bidder", @"CLXAd should have correct bidder");
+    XCTAssertEqualObjects(adWithValidBid.adUnitId, @"test-placement", @"CLXAd should have correct ad unit ID");
+    XCTAssertEqualObjects(adWithValidBid.networkName, @"test-bidder", @"CLXAd should have correct network name");
     XCTAssertEqual([adWithValidBid.revenue doubleValue], 1.50, @"CLXAd should have correct revenue");
 }
 
 // Test that all delegate method signatures are consistent across ad formats
 - (void)testAllAdFormatDelegateSignaturesAreConsistent {
     // Create test CLXAd and error objects
-    CLXAd *testAd = [[CLXAd alloc] initWithPlacementName:@"test"
-                                             placementId:@"test"
-                                                  bidder:@"test"
-                                     externalPlacementId:@"test"
-                                                 revenue:@1.0];
+    CLXAd *testAd = [[CLXAd alloc] initWithAdUnitName:@"test"
+                                              adUnitId:@"test"
+                                           networkName:@"test"
+                                      networkPlacement:@"test"
+                                               revenue:@1.0
+                                              adFormat:CLXAdFormatInterstitial
+                                             placement:nil];
     NSError *testError = [NSError errorWithDomain:@"test" code:1 userInfo:nil];
     
     // Clear previous callbacks
@@ -223,11 +225,13 @@
     // Test that failure scenarios across all ad formats properly call delegate methods
     
     // Create test data
-    CLXAd *testAd = [[CLXAd alloc] initWithPlacementName:@"test-failure"
-                                             placementId:@"test-failure-id"
-                                                  bidder:@"test-bidder"
-                                     externalPlacementId:@"test-external"
-                                                 revenue:@2.50];
+    CLXAd *testAd = [[CLXAd alloc] initWithAdUnitName:@"test-failure"
+                                              adUnitId:@"test-failure-id"
+                                           networkName:@"test-bidder"
+                                      networkPlacement:@"test-external"
+                                               revenue:@2.50
+                                              adFormat:CLXAdFormatInterstitial
+                                             placement:nil];
     NSError *testError = [NSError errorWithDomain:@"CLXTestError" code:1001 userInfo:@{NSLocalizedDescriptionKey: @"Test failure"}];
     
     // Clear tracking
@@ -257,11 +261,13 @@
     // all have consistent failure callback behavior for publisher integration
     
     NSError *testError = [NSError errorWithDomain:@"CLXTestError" code:1002 userInfo:@{NSLocalizedDescriptionKey: @"Consistent failure test"}];
-    CLXAd *testAd = [[CLXAd alloc] initWithPlacementName:@"consistency-test"
-                                             placementId:@"consistency-id"
-                                                  bidder:@"test-bidder"
-                                     externalPlacementId:@"test-external"
-                                                 revenue:@1.75];
+    CLXAd *testAd = [[CLXAd alloc] initWithAdUnitName:@"consistency-test"
+                                              adUnitId:@"consistency-id"
+                                           networkName:@"test-bidder"
+                                      networkPlacement:@"test-external"
+                                               revenue:@1.75
+                                              adFormat:CLXAdFormatInterstitial
+                                             placement:nil];
     
     // Clear tracking
     [self.receivedCallbacks removeAllObjects];

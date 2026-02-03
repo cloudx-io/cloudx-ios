@@ -16,8 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
  * This protocol is used by interstitial and rewarded ads which need isReady
  * to determine when show() can be called.
  *
- * Note: Banners do not use this protocol - they have their own CLXBanner protocol
- * without isReady/isLoading/isDestroyed, matching Android SDK patterns.
+ * Note: Load state is communicated via delegate callbacks, matching the Android SDK.
  */
 @protocol CLXFullscreenAd <NSObject>
 
@@ -25,16 +24,6 @@ NS_ASSUME_NONNULL_BEGIN
  * Indicates whether the ad is ready to be displayed.
  */
 @property (nonatomic, readonly) BOOL isReady;
-
-/**
- * Indicates whether the ad is currently loading.
- */
-@property (nonatomic, readonly) BOOL isLoading;
-
-/**
- * Indicates whether the ad has been destroyed and can no longer be used.
- */
-@property (nonatomic, readonly) BOOL isDestroyed;
 
 /**
  * Loads the ad. This method initiates the ad loading process.

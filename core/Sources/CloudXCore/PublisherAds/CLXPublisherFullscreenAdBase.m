@@ -260,10 +260,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     return self.currentState == CLXFullscreenAdStateLOADING;
 }
 
-- (BOOL)isDestroyed {
-    return self.currentState == CLXFullscreenAdStateDESTROYED;
-}
-
 - (void)destroy {
     [self.logger debug:[NSString stringWithFormat:@"Destroying fullscreen ad for placement: %@", self.placementID]];
     

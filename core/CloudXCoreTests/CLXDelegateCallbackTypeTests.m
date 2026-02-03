@@ -97,7 +97,7 @@
 
     mockBid.ext = ext;
 
-    CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"placement_123"];
+    CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"placement_123" adFormat:CLXAdFormatInterstitial placement:nil];
 
     XCTAssertNotNil(ad, @"Factory method should create CLXAd object");
     XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"Factory method should return CLXAd instance");
@@ -114,8 +114,10 @@
                                          adUnitId:@"test_id"
                                       networkName:@"test_bidder"
                                  networkPlacement:@"ext_id"
-                                          revenue:@2.50];
-    
+                                          revenue:@2.50
+                                         adFormat:CLXAdFormatInterstitial
+                                        placement:nil];
+
     XCTAssertNotNil(ad, @"Initializer should create CLXAd object");
     XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"Initializer should return CLXAd instance");
     XCTAssertEqualObjects(ad.adUnitName, @"test_name", @"Ad unit name should be set");
@@ -131,7 +133,9 @@
                                          adUnitId:@"test"
                                       networkName:@"test"
                                  networkPlacement:@"test"
-                                          revenue:@1.0];
+                                          revenue:@1.0
+                                         adFormat:CLXAdFormatInterstitial
+                                        placement:nil];
     
     // Verify all properties exist and are of correct type (new names)
     XCTAssertTrue([ad respondsToSelector:@selector(adUnitName)], @"CLXAd should have adUnitName property");
@@ -174,7 +178,9 @@
                                              adUnitId:@"test"
                                           networkName:@"test"
                                      networkPlacement:@"test"
-                                              revenue:@1.0];
+                                              revenue:@1.0
+                                             adFormat:CLXAdFormatInterstitial
+                                            placement:nil];
     
     NSError *testError = [NSError errorWithDomain:@"test" code:1 userInfo:nil];
     

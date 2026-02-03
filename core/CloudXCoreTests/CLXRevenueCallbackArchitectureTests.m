@@ -28,9 +28,9 @@
 // Test CLXAd factory method exists and works with valid data
 - (void)testCLXAdFactoryMethodWithValidData {
     // Test that the CLXAd factory method exists
-    XCTAssertTrue([CLXAd respondsToSelector:@selector(adFromBid:placementId:)], 
-                  @"CLXAd should have adFromBid:placementId: factory method");
-    
+    XCTAssertTrue([CLXAd respondsToSelector:@selector(adFromBid:placementId:adFormat:placement:)],
+                  @"CLXAd should have adFromBid:placementId:adFormat:placement: factory method");
+
     // Create a mock bid with valid prebid bidder information
     CLXBidResponseBid *mockBid = [[CLXBidResponseBid alloc] init];
     mockBid.ext = [[CLXBidResponseExt alloc] init];
@@ -40,7 +40,7 @@
     mockBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
     mockBid.ext.cloudx.revenue = 2.50;
 
-    CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"test-placement"];
+    CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"test-placement" adFormat:CLXAdFormatInterstitial placement:nil];
 
     XCTAssertNotNil(ad, @"CLXAd should be created with valid prebid bidder");
     XCTAssertEqualObjects(ad.networkName, @"google", @"Network name should be extracted from prebid.meta.adaptercode");
@@ -57,7 +57,7 @@
     mockBid.ext.cloudx.adapterExtras = @{@"bidder": @"meta"};
     mockBid.ext.cloudx.revenue = 1.75;
 
-    CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"fallback-placement"];
+    CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"fallback-placement" adFormat:CLXAdFormatInterstitial placement:nil];
 
     XCTAssertNotNil(ad, @"CLXAd should be created with CloudX fallback bidder");
     XCTAssertEqualObjects(ad.networkName, @"meta", @"Network name should be extracted from cloudx.adapterExtras");
@@ -80,7 +80,7 @@
     mockBid.ext.cloudx.adapterExtras = @{@"bidder": @"cloudx-bidder"};
     mockBid.ext.cloudx.revenue = 4.00;
 
-    CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"priority-test"];
+    CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"priority-test" adFormat:CLXAdFormatInterstitial placement:nil];
 
     XCTAssertNotNil(ad, @"CLXAd should be created");
     XCTAssertEqualObjects(ad.networkName, @"prebid-bidder", @"Should prioritize prebid network over CloudX network");
@@ -88,7 +88,7 @@
 
 // Test CLXAd factory method fails with nil bid
 - (void)testCLXAdFactoryMethodWithNilBid {
-    CLXAd *ad = [CLXAd adFromBid:nil placementId:@"test-placement"];
+    CLXAd *ad = [CLXAd adFromBid:nil placementId:@"test-placement" adFormat:CLXAdFormatInterstitial placement:nil];
     XCTAssertNil(ad, @"CLXAd should be nil when bid is nil");
 }
 
@@ -100,7 +100,7 @@
     mockBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
     mockBid.ext.cloudx.revenue = 1.50;
 
-    CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"no-bidder-test"];
+    CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"no-bidder-test" adFormat:CLXAdFormatInterstitial placement:nil];
 
     XCTAssertNil(ad, @"CLXAd should be nil when no bidder information is available");
 }

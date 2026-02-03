@@ -6,10 +6,9 @@
  * @file CLXBanner.h
  * @brief Banner ad protocol
  *
- * Note: Unlike fullscreen ads (interstitial/rewarded), banners do not expose
- * isReady or isLoading properties. This matches Android SDK behavior and
- * industry standards (AppLovin MAX). Banner load state is communicated via
- * delegate callbacks. isDestroyed is provided to check if the banner is still valid.
+ * Note: Banners do not expose isReady. Load state is communicated via delegate
+ * callbacks, matching the Android SDK. isDestroyed is provided to check if the
+ * banner is still valid.
  */
 
 #import <UIKit/UIKit.h>
