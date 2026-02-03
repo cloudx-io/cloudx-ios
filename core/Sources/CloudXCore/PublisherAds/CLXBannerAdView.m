@@ -57,7 +57,7 @@ static void initializeLogger() {
 
 @implementation CLXBannerAdView
 
-- (instancetype)initWithBanner:(id<CLXBanner>)banner type:(CLXBannerType)type delegate:(id<CLXBannerDelegate>)delegate {
+- (instancetype)initWithBanner:(id<CLXBanner>)banner type:(CLXBannerType)type {
     CGSize size = CGSizeZero;
     switch (type) {
         case CLXBannerTypeMREC:
@@ -71,7 +71,6 @@ static void initializeLogger() {
     self = [super initWithFrame:CGRectMake(0, 0, size.width, size.height)];
     if (self) {
         _banner = banner;
-        _delegate = delegate;
         _adFormat = type;
         _suspendPreloadWhenInvisible = YES;
         self.userInteractionEnabled = YES;

@@ -51,9 +51,8 @@
     self.mockBanner.placementID = @"unit-test-placement-456";
     
     // When: Creating CLXBannerAdView
-    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner 
-                                                           type:CLXBannerTypeW320H50 
-                                                       delegate:self.mockDelegate];
+    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner
+                                                           type:CLXBannerTypeW320H50];
     
     // Then: adUnitIdentifier should be populated from banner's placementID
     XCTAssertEqualObjects(self.bannerAdView.adUnitIdentifier, @"unit-test-placement-456", 
@@ -63,25 +62,22 @@
 // Test adFormat property is set correctly during initialization
 - (void)testAdFormatPropertyPopulation {
     // Test W320H50 format
-    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner 
-                                                           type:CLXBannerTypeW320H50 
-                                                       delegate:self.mockDelegate];
+    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner
+                                                           type:CLXBannerTypeW320H50];
     XCTAssertEqual(self.bannerAdView.adFormat, CLXBannerTypeW320H50, 
                   @"adFormat should match initialization parameter");
     
     // Test MREC format
-    CLXBannerAdView *mrecBanner = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner 
-                                                                     type:CLXBannerTypeMREC 
-                                                                 delegate:self.mockDelegate];
+    CLXBannerAdView *mrecBanner = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner
+                                                                     type:CLXBannerTypeMREC];
     XCTAssertEqual(mrecBanner.adFormat, CLXBannerTypeMREC, 
                   @"adFormat should match MREC initialization parameter");
 }
 
 // Test placement property getter and setter
 - (void)testPlacementPropertyGetterSetter {
-    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner 
-                                                           type:CLXBannerTypeW320H50 
-                                                       delegate:self.mockDelegate];
+    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner
+                                                           type:CLXBannerTypeW320H50];
     
     // Initially should be nil
     XCTAssertNil(self.bannerAdView.placement, @"placement should initially be nil");
@@ -100,9 +96,8 @@
 
 // Test startAutoRefresh delegates to underlying banner
 - (void)testStartAutoRefreshDelegation {
-    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner 
-                                                           type:CLXBannerTypeW320H50 
-                                                       delegate:self.mockDelegate];
+    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner
+                                                           type:CLXBannerTypeW320H50];
     
     // When: Calling startAutoRefresh
     [self.bannerAdView startAutoRefresh];
@@ -114,9 +109,8 @@
 
 // Test stopAutoRefresh delegates to underlying banner
 - (void)testStopAutoRefreshDelegation {
-    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner 
-                                                           type:CLXBannerTypeW320H50 
-                                                       delegate:self.mockDelegate];
+    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner
+                                                           type:CLXBannerTypeW320H50];
     
     // When: Calling stopAutoRefresh
     [self.bannerAdView stopAutoRefresh];
@@ -130,9 +124,9 @@
 
 // Test didExpandAd delegate forwarding
 - (void)testDidExpandAdDelegateForwarding {
-    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner 
-                                                           type:CLXBannerTypeW320H50 
-                                                       delegate:self.mockDelegate];
+    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner
+                                                           type:CLXBannerTypeW320H50];
+    self.bannerAdView.delegate = self.mockDelegate;
     
     // Given: A test ad object
     CLXAd *testAd = [[CLXAd alloc] initWithPlacementName:@"test" 
@@ -153,9 +147,9 @@
 
 // Test didCollapseAd delegate forwarding
 - (void)testDidCollapseAdDelegateForwarding {
-    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner 
-                                                           type:CLXBannerTypeW320H50 
-                                                       delegate:self.mockDelegate];
+    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner
+                                                           type:CLXBannerTypeW320H50];
+    self.bannerAdView.delegate = self.mockDelegate;
     
     // Given: A test ad object
     CLXAd *testAd = [[CLXAd alloc] initWithPlacementName:@"test" 
@@ -182,9 +176,9 @@
     MockPublisherBanner *nonSupportingBanner = [[MockPublisherBanner alloc] init];
     nonSupportingBanner.placementID = @"non-supporting-test";
     
-    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:(id<CLXBanner>)nonSupportingBanner 
-                                                           type:CLXBannerTypeW320H50 
-                                                       delegate:self.mockDelegate];
+    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:(id<CLXBanner>)nonSupportingBanner
+                                                           type:CLXBannerTypeW320H50];
+    self.bannerAdView.delegate = self.mockDelegate;
     
     // When/Then: Should not crash when calling auto-refresh methods on non-CLXPublisherBanner
     XCTAssertNoThrow([self.bannerAdView startAutoRefresh], 
@@ -198,9 +192,9 @@
     // Given: A delegate that doesn't implement expand/collapse methods
     NSObject *nonSupportingDelegate = [[NSObject alloc] init];
     
-    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner 
-                                                           type:CLXBannerTypeW320H50 
-                                                       delegate:nonSupportingDelegate];
+    self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner
+                                                           type:CLXBannerTypeW320H50];
+    self.bannerAdView.delegate = (id<CLXBannerDelegate>)nonSupportingDelegate;
     
     CLXAd *testAd = [[CLXAd alloc] initWithPlacementName:@"test" 
                                              placementId:@"test-id" 

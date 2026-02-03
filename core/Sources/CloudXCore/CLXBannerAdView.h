@@ -70,16 +70,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *customData;
 
 /**
- * Initializes a new CLXBannerAdView with the given banner, type, and delegate.
+ * Initializes a new CLXBannerAdView with the given banner and type.
  * The frame of the view is set based on the size of the banner type.
  * @param banner The banner instance
  * @param type The banner type
- * @param delegate The delegate to receive events
  * @return Initialized banner ad view
+ * @discussion Set the delegate property after initialization to receive events
  */
-- (instancetype)initWithBanner:(id<CLXBanner>)banner 
-                         type:(CLXBannerType)type 
-                     delegate:(nullable id<CLXBannerDelegate>)delegate;
+- (instancetype)initWithBanner:(id<CLXBanner>)banner
+                         type:(CLXBannerType)type;
 
 /**
  * Starts banner loading process.

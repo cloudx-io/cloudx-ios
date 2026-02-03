@@ -112,7 +112,8 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         if !settings.mrecPlacement.isEmpty {
             placement = settings.mrecPlacement
         }
-        mrecAd = CloudXCore.shared.createMREC(placement: placement, viewController: self, delegate: self)
+        mrecAd = CloudXCore.shared.createMREC(placement: placement, viewController: self)
+        mrecAd?.delegate = self
         mrecAd?.revenueDelegate = self
 
         guard let mrecAd = mrecAd else {
@@ -182,9 +183,9 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
 
         let placement = placementName
         mrecAd = CloudXCore.shared.createMREC(placement: placement,
-                                            viewController: self,
-                                            delegate: self)
-        
+                                            viewController: self)
+        mrecAd?.delegate = self
+
         if let mrecAd = mrecAd {
             mrecAd.load()
         } else {

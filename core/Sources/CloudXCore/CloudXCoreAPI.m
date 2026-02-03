@@ -781,8 +781,7 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (CLXBannerAdView *)createBannerWithPlacement:(NSString *)placement
-                                    viewController:(UIViewController *)viewController
-                                         delegate:(id<CLXBannerDelegate>)delegate {
+                                    viewController:(UIViewController *)viewController {
     // Track banner creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     if (metricsTracker) {
@@ -836,7 +835,7 @@ static CloudXCore *_sharedInstance = nil;
                                                                         userID:@""
                                                                    publisherID:@""
                                                    suspendPreloadWhenInvisible:NO
-                                                                     delegate:delegate
+                                                                     delegate:nil
                                                                    bannerType:CLXBannerTypeW320H50
                                                                        impModel:impModel
                                                                     adFactories:_adNetworkFactories.banners
@@ -845,24 +844,23 @@ static CloudXCore *_sharedInstance = nil;
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
                                                               ];
-    
+
     // Set deferred error if validation failed (via private category)
     if (deferredError) {
         banner.deferredError = deferredError;
     }
-    
+
     // If SDK not initialized, store the requested placement name for deferred lookup
     if (!placementConfig) {
         banner.requestedPlacementName = placement;
     }
-    
+
     // ALWAYS return non-nil
-    return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeW320H50 delegate:delegate];
+    return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeW320H50];
 }
 
 - (CLXBannerAdView *)createMRECWithPlacement:(NSString *)placement
-                                 viewController:(UIViewController *)viewController
-                                      delegate:(id<CLXBannerDelegate>)delegate {
+                                 viewController:(UIViewController *)viewController {
     // Track MREC creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     if (metricsTracker) {
@@ -915,7 +913,7 @@ static CloudXCore *_sharedInstance = nil;
                                                                         userID:@""
                                                                    publisherID:@""
                                                     suspendPreloadWhenInvisible:NO
-                                                                     delegate:delegate
+                                                                     delegate:nil
                                                                    bannerType:CLXBannerTypeMREC
                                                                        impModel:impModel
                                                                     adFactories:_adNetworkFactories.banners
@@ -924,19 +922,19 @@ static CloudXCore *_sharedInstance = nil;
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
                                                               ];
-    
+
     // Set deferred error if validation failed (via private category)
     if (deferredError) {
         banner.deferredError = deferredError;
     }
-    
+
     // If SDK not initialized, store the requested placement name for deferred lookup
     if (!placementConfig) {
         banner.requestedPlacementName = placement;
     }
-    
+
     // ALWAYS return non-nil
-    return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeMREC delegate:delegate];
+    return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeMREC];
 }
 
 - (CLXInterstitial *)createInterstitialWithPlacement:(NSString *)placement {

@@ -122,25 +122,23 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  * Create a banner ad
  * @param placement The placement name. This should match the placement name in the CloudX dashboard
  * @param viewController The view controller in which the ad will be displayed
- * @param delegate The delegate to receive ad events
  * @return A CLXBannerAdView object
+ * @discussion Set the delegate property on the returned object to receive ad events
  */
 - (nullable CLXBannerAdView *)createBannerWithPlacement:(NSString *)placement
                                            viewController:(UIViewController *)viewController
-                                                 delegate:(nullable id<CLXBannerDelegate>)delegate
-    NS_SWIFT_NAME(createBanner(placement:viewController:delegate:));
+    NS_SWIFT_NAME(createBanner(placement:viewController:));
 
 /**
  * Create a MREC ad
  * @param placement The placement name. This should match the placement name in the CloudX dashboard
  * @param viewController The view controller in which the ad will be displayed
- * @param delegate The delegate to receive ad events
  * @return A CLXBannerAdView object
+ * @discussion Set the delegate property on the returned object to receive ad events
  */
 - (nullable CLXBannerAdView *)createMRECWithPlacement:(NSString *)placement
                                           viewController:(UIViewController *)viewController
-                                                delegate:(nullable id<CLXBannerDelegate>)delegate
-    NS_SWIFT_NAME(createMREC(placement:viewController:delegate:));
+    NS_SWIFT_NAME(createMREC(placement:viewController:));
 
 /**
  * Create an interstitial ad

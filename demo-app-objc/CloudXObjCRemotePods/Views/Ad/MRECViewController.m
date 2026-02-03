@@ -120,7 +120,8 @@
     if (_settings.mrecPlacement.length > 0) {
         placement = _settings.mrecPlacement;
     }
-    self.mrecAd = [[CloudXCore shared] createMRECWithPlacement:placement viewController:self delegate:self];
+    self.mrecAd = [[CloudXCore shared] createMRECWithPlacement:placement viewController:self];
+    self.mrecAd.delegate = self;
     self.mrecAd.revenueDelegate = self;
     self.mrecAd.placement = @"demo_mrec";
     self.mrecAd.customData = @"screen:detail,section:sidebar";
@@ -240,8 +241,8 @@
 
     NSString *placement = [self placementName];
     self.mrecAd = [[CloudXCore shared] createMRECWithPlacement:placement
-                                                 viewController:self
-                                                      delegate:self];
+                                                 viewController:self];
+    self.mrecAd.delegate = self;
     self.mrecAd.revenueDelegate = self;
 
     if (self.mrecAd) {

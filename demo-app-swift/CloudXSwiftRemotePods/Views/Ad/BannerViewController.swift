@@ -108,10 +108,10 @@ class BannerViewController: BaseAdViewController {
         
         // Create banner ad with placement from config
         let placement = CLXDemoConfigManager.sharedManager.currentConfig.bannerPlacement
-        bannerAd = cloudX.createBanner(placement: placement, 
-                                      viewController: self, 
-                                      delegate: self)
-        
+        bannerAd = cloudX.createBanner(placement: placement,
+                                      viewController: self)
+        bannerAd?.delegate = self
+
         if bannerAd == nil {
             DemoAppLogger.sharedInstance.logMessage("❌ Failed to create Banner ad instance")
             showAlert(title: "Error", message: "Failed to create Banner ad instance")
