@@ -212,15 +212,6 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  */
 + (void)setLoggingTimestampsEnabled:(BOOL)enabled;
 
-#pragma mark - SDK Lifecycle
-
-/**
- * Deinitialize the SDK and clean up resources
- * @discussion Tears down the SDK, releases resources, and resets the initialization state.
- * After calling this, you can reinitialize the SDK if needed.
- */
-- (void)deinitialize;
-
 #pragma mark - Adapter Readiness (Internal)
 
 /**

@@ -39,7 +39,7 @@
 }
 
 - (void)tearDown {
-    [[CloudXCore shared] deinitialize];
+    [[CloudXCore shared] resetForTesting];
     [[CLXDIContainer shared] reset];
     [super tearDown];
 }

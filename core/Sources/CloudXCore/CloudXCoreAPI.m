@@ -1364,27 +1364,6 @@ static BOOL _visualDebuggingEnabled = NO;
     return [bidRequestJSON copy];
 }
 
-- (void)deinitialize {
-    [self.logger info:@"Deinitializing SDK"];
-    
-    // Reset initialization state
-    _isInitialized = NO;
-    _appKey = nil;
-    _sdkConfig = nil;
-    _adNetworkConfigs = nil;
-    _adPlacements = nil;
-    _adFactory = nil;
-    _reportingService = nil;
-    _abTestValue = 0.0;
-    _abTestName = nil;
-    _defaultAuctionURL = nil;
-    _geoLocationService = nil;
-    _bidNetworkService = nil;
-    _adNetworkFactories = nil;
-
-    [self.logger info:@"SDK deinitialized successfully"];
-}
-
 #pragma mark - Testing Support
 
 - (void)resetForTesting {
