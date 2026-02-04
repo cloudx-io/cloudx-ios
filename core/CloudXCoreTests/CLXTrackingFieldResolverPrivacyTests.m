@@ -141,14 +141,14 @@
     // For testing, we verify the logic works correctly
     XCTAssertNotNil(resolvedIFA, @"IFA resolution should return a value");
     
-    // If ATT is not authorized in the test environment, it will return session ID
+    // If ATT is not authorized in the test environment, it will return zeroed IFA
     // If ATT is authorized, it will return the real IFA
     if ([resolvedIFA isEqual:expectedIFA]) {
         // ATT authorized case - got real IFA
         XCTAssertEqualObjects(resolvedIFA, expectedIFA, @"Should return real IFA when privacy allows and ATT authorized");
     } else {
-        // ATT not authorized case - should get session ID fallback
-        XCTAssertEqualObjects(resolvedIFA, @"test-session-67890", @"Should return session ID when ATT not authorized");
+        // ATT not authorized case - should get zeroed IFA (privacy protection)
+        XCTAssertEqualObjects(resolvedIFA, @"00000000-0000-0000-0000-000000000000", @"Should return zeroed IFA when ATT not authorized");
     }
     
     // ADDITIONAL TEST: Verify full payload generation works
@@ -162,10 +162,10 @@
 }
 
 // Test privacy blocks personal data - comprehensive validation of fallback behavior
-- (void)testPrivacyBlocksPersonalData_ShouldReturnSessionIdFallback {
+- (void)testPrivacyBlocksPersonalData_ShouldReturnZeroedIFA {
     // GIVEN: CCPA opt-out applies (strict privacy blocking)
     NSString *originalIFA = @"AEBE52E7-03EE-455A-B3C4-E57283966239";
-    NSString *expectedSessionId = @"test-session-67890";
+    NSString *expectedZeroedIFA = @"00000000-0000-0000-0000-000000000000";
     
     // Set up US user for CCPA
     [self setupUSUser];
@@ -189,30 +189,30 @@
     
     [self.resolver setRequestData:self.testAuctionId bidRequestJSON:testBidRequest];
     
-    // THEN: Payload should contain session ID, NOT the real IFA
+    // THEN: Payload should contain zeroed IFA, NOT the real IFA
     NSString *payload = [self.resolver buildPayload:self.testAuctionId];
     
     XCTAssertNotNil(payload, @"Payload must be generated even when privacy blocks IFA");
-    XCTAssertTrue([payload containsString:expectedSessionId], 
-                  @"Payload should contain session ID '%@' when privacy blocks IFA. Actual payload: %@", 
-                  expectedSessionId, payload);
+    XCTAssertTrue([payload containsString:expectedZeroedIFA], 
+                  @"Payload should contain zeroed IFA '%@' when privacy blocks IFA. Actual payload: %@", 
+                  expectedZeroedIFA, payload);
     XCTAssertFalse([payload containsString:originalIFA], 
                    @"Payload should NOT contain real IFA '%@' when privacy blocks it. Actual payload: %@", 
                    originalIFA, payload);
     
-    // ADDITIONAL VALIDATION: Verify session ID is properly formatted in payload
+    // ADDITIONAL VALIDATION: Verify zeroed IFA is properly formatted in payload
     NSArray *payloadComponents = [payload componentsSeparatedByString:@";"];
-    BOOL foundSessionComponent = NO;
+    BOOL foundZeroedIFAComponent = NO;
     for (NSString *component in payloadComponents) {
-        if ([component containsString:expectedSessionId]) {
-            foundSessionComponent = YES;
+        if ([component containsString:expectedZeroedIFA]) {
+            foundZeroedIFAComponent = YES;
             // Verify it's not just a substring but a proper component
-            XCTAssertTrue(component.length >= expectedSessionId.length, 
-                         @"Session ID component should be properly formatted: %@", component);
+            XCTAssertTrue(component.length >= expectedZeroedIFA.length, 
+                         @"Zeroed IFA component should be properly formatted: %@", component);
             break;
         }
     }
-    XCTAssertTrue(foundSessionComponent, @"Session ID should be found as a distinct component in payload: %@", payload);
+    XCTAssertTrue(foundZeroedIFAComponent, @"Zeroed IFA should be found as a distinct component in payload: %@", payload);
 }
 
 // Test DNT flag behavior - when device DNT is true, should use hashed fallbacks or session ID
@@ -249,13 +249,13 @@
     XCTAssertFalse([resolvedIFA isEqual:originalIFA], 
                    @"Should not return real IFA when DNT is enabled. Got: %@", resolvedIFA);
     
-    // Should return either hashed user ID, hashed geo IP, or session ID as fallback
+    // Should return either hashed user ID, hashed geo IP, or zeroed IFA as fallback
     BOOL isValidFallback = [resolvedIFA isEqual:hashedUserId] || 
                           [resolvedIFA isEqual:hashedGeoIp] || 
-                          [resolvedIFA isEqual:@"test-session-67890"];
+                          [resolvedIFA isEqual:@"00000000-0000-0000-0000-000000000000"];
     
     XCTAssertTrue(isValidFallback, 
-                  @"Should return valid privacy fallback (hashed user ID, hashed geo IP, or session ID). Got: %@", 
+                  @"Should return valid privacy fallback (hashed user ID, hashed geo IP, or zeroed IFA). Got: %@", 
                   resolvedIFA);
     
     // ADDITIONAL TEST: Verify full payload generation works
@@ -284,10 +284,10 @@
     [self.resolver setRequestData:self.testAuctionId bidRequestJSON:testBidRequest];
     NSString *payload = [self.resolver buildPayload:self.testAuctionId];
     
-    // THEN: Should still generate payload with session ID as ultimate fallback
+    // THEN: Should still generate payload with zeroed IFA as privacy fallback
     XCTAssertNotNil(payload, @"Payload should be generated even without explicit fallbacks");
-    XCTAssertTrue([payload containsString:@"test-session-67890"], 
-                  @"Should fall back to session ID when no other fallbacks available. Payload: %@", payload);
+    XCTAssertTrue([payload containsString:@"00000000-0000-0000-0000-000000000000"], 
+                  @"Should use zeroed IFA when privacy requires clearing personal data. Payload: %@", payload);
 }
 
 @end

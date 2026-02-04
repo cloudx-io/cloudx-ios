@@ -345,9 +345,12 @@ static NSString * const SDK_PARAM_CUSTOM_DATA = @"sdk.customData";
 #pragma mark - Private Methods
 
 // Matches Android: handleIfaField(auctionId: String): String?
+// Returns zeroed IFA when privacy requires clearing personal data (GDPR, ATT not authorized, etc.)
+static NSString * const kZeroedIFA = @"00000000-0000-0000-0000-000000000000";
+
 - (nullable NSString *)handleIfaField:(NSString *)auctionId {
     if ([[CLXPrivacyService sharedInstance] shouldClearPersonalData]) {
-        return self.sessionId;
+        return kZeroedIFA;
     }
 
     NSNumber *dnt = self.requestDataMap[auctionId][@"device"][@"dnt"];

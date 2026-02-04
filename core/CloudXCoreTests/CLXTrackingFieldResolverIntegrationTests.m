@@ -197,10 +197,10 @@
     XCTAssertEqualObjects(values[15], @"iOS", @"bidRequest.device.os");
     XCTAssertEqualObjects(values[16], @"17.1", @"bidRequest.device.osv");
     XCTAssertEqualObjects(values[17], @"oAhk3JzG7YtaoE027xaKI", @"sdk.sessionId");
-    // sdk.ifa returns sessionId when privacy service blocks personal data (can't mock in unit test)
+    // sdk.ifa returns zeroed IFA when privacy service blocks personal data (can't mock in unit test)
     XCTAssertTrue([values[18] isEqualToString:@"test-ifa-456"] ||
-                  [values[18] isEqualToString:@"oAhk3JzG7YtaoE027xaKI"],
-                  @"sdk.ifa should be IFA or sessionId fallback");
+                  [values[18] isEqualToString:@"00000000-0000-0000-0000-000000000000"],
+                  @"sdk.ifa should be IFA or zeroed IFA fallback");
     XCTAssertEqualObjects(values[19], @"", @"sdk.testGroupName (empty)");
     XCTAssertEqualObjects(values[20], @"DSTestPlacement", @"config.adUnits[id=${bidRequest.imp.tagid}].name");
     XCTAssertEqualObjects(values[21], @"USA", @"bidRequest.device.geo.country");
@@ -874,7 +874,7 @@
     // When
     id result = [self.resolver resolveField:auctionId field:@"sdk.ifa" bidId:nil];
 
-    // Then - returns nil or sessionId fallback depending on privacy settings
+    // Then - returns nil or zeroed IFA fallback depending on privacy settings
     // Can't assert specific value due to privacy service behavior in tests
     XCTAssertTrue(result == nil || [result isKindOfClass:[NSString class]]);
 }
@@ -1360,10 +1360,10 @@
     XCTAssertEqualObjects(values[15], @"iOS", @"bidRequest.device.os");
     XCTAssertEqualObjects(values[16], @"17.2", @"bidRequest.device.osv");
     XCTAssertEqualObjects(values[17], @"session-prod-123", @"sdk.sessionId");
-    // sdk.ifa returns sessionId when privacy blocks personal data
+    // sdk.ifa returns zeroed IFA when privacy blocks personal data
     XCTAssertTrue([values[18] isEqualToString:@"device-ifa-abc"] ||
-                  [values[18] isEqualToString:@"session-prod-123"],
-                  @"sdk.ifa should be IFA or sessionId fallback");
+                  [values[18] isEqualToString:@"00000000-0000-0000-0000-000000000000"],
+                  @"sdk.ifa should be IFA or zeroed IFA fallback");
     XCTAssertEqualObjects(values[19], @"", @"sdk.testGroupName (empty)");
     XCTAssertEqualObjects(values[20], @"inmobi-interstitial", @"config.adUnits[id=${bidRequest.imp.tagid}].name");
     XCTAssertEqualObjects(values[21], @"US", @"bidRequest.device.geo.country");
