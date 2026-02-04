@@ -49,6 +49,7 @@
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXDebugOverlayManager.h>
 #import <CloudXCore/CLXDebugClickFeedback.h>
+#import <CloudXCore/CLXTrackingFieldResolver.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -115,6 +116,10 @@ NS_ASSUME_NONNULL_BEGIN
 // Injected factories for testability (falls back to CloudXCore if empty)
 @property (nonatomic, strong) NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *adFactories;
 @property (nonatomic, strong) NSDictionary<NSString *, id<CLXBidTokenSource>> *bidTokenSources;
+
+// Publisher-provided placement and customData (set before load)
+@property (nonatomic, copy, nullable) NSString *publisherPlacement;
+@property (nonatomic, copy, nullable) NSString *publisherCustomData;
 
 @end
 
@@ -428,7 +433,19 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 impModel:strongSelf.impModel
                                                              placementID:storedImpressionId
                                                                loadCount:0];
-        
+
+        // Wire placement/customData to tracking resolver
+        NSString *auctionId = strongSelf.currentBidResponse.id;
+        if (auctionId) {
+            CLXTrackingFieldResolver *resolver = [CLXTrackingFieldResolver shared];
+            if (strongSelf.publisherPlacement) {
+                [resolver setSdkParam:auctionId key:@"sdk.placement" value:strongSelf.publisherPlacement];
+            }
+            if (strongSelf.publisherCustomData) {
+                [resolver setSdkParam:auctionId key:@"sdk.customData" value:strongSelf.publisherCustomData];
+            }
+        }
+
         // Track banner refresh metric via MetricsTracker (matching Android's BannerManager.kt)
         id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
         if (metricsTracker) {
@@ -623,7 +640,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.adLoadStartTime = [NSDate date];
 
         __weak typeof(self) weakSelf = self;
-        // Note: Banner includes forceStop check because banner can be destroyed mid-load
+         // Note: Banner includes forceStop check because banner can be destroyed mid-load
         // (unlike fullscreen ads which complete their load cycle). This prevents timeout
         // firing after the banner view has been deallocated/stopped.
         [CLXAdapterLoader loadAdapter:item
@@ -728,7 +745,7 @@ NS_ASSUME_NONNULL_BEGIN
                          placementId:self.placementID
                        placementName:self.placementName
                             adFormat:adFormat
-                           placement:nil];
+                           placement:self.publisherPlacement];
         [self.logger logDelegateCallback:@"✅ Banner didLoadAd" ad:ad];
         [self.delegate didLoadAd:ad];
     }
@@ -874,7 +891,7 @@ NS_ASSUME_NONNULL_BEGIN
                                    placementId:self.placementID
                                  placementName:self.placementName
                                       adFormat:adFormat
-                                     placement:nil];
+                                     placement:self.publisherPlacement];
             if (self.revenueDelegate && [self.revenueDelegate respondsToSelector:@selector(didPayRevenueForAd:)]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self.revenueDelegate didPayRevenueForAd:adObject];
@@ -904,7 +921,7 @@ NS_ASSUME_NONNULL_BEGIN
                          placementId:self.placementID
                        placementName:self.placementName
                             adFormat:adFormat
-                           placement:nil];
+                           placement:self.publisherPlacement];
         [self.logger logDelegateCallback:@"👆 Banner didClickAd" ad:ad];
         [self.delegate didClickAd:ad];
     }
@@ -922,7 +939,7 @@ NS_ASSUME_NONNULL_BEGIN
                                placementId:self.placementID
                              placementName:self.placementName
                                   adFormat:adFormat
-                                 placement:nil];
+                                 placement:self.publisherPlacement];
         [self.delegate didExpandAd:adObject];
     }
 }
@@ -935,7 +952,7 @@ NS_ASSUME_NONNULL_BEGIN
                                placementId:self.placementID
                              placementName:self.placementName
                                   adFormat:adFormat
-                                 placement:nil];
+                                 placement:self.publisherPlacement];
         [self.delegate didCollapseAd:adObject];
     }
 }

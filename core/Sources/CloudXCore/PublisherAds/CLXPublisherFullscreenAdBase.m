@@ -42,6 +42,7 @@
 #import <CloudXCore/CLXSDKConfig.h>
 #import "CLXUIApplicationProxy.h"
 #import <CloudXCore/CLXAdapterLoader.h>
+#import <CloudXCore/CLXTrackingFieldResolver.h>
 #import <objc/runtime.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -457,6 +458,18 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Store publisher-provided placement and customData for use in CLXAd creation
     self.publisherPlacement = placement;
     self.publisherCustomData = customData;
+
+    // Wire placement/customData to tracking resolver
+    NSString *auctionId = self.currentBidResponse.id;
+    if (auctionId) {
+        CLXTrackingFieldResolver *resolver = [CLXTrackingFieldResolver shared];
+        if (placement) {
+            [resolver setSdkParam:auctionId key:@"sdk.placement" value:placement];
+        }
+        if (customData) {
+            [resolver setSdkParam:auctionId key:@"sdk.customData" value:customData];
+        }
+    }
 
     // Verify ad is ready before attempting to show
     if (self.currentState != CLXFullscreenAdStateREADY) {

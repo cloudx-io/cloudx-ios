@@ -222,7 +222,10 @@ static NSString * const SDK_PARAM_IFA = @"sdk.ifa";
     NSMutableArray<NSString *> *values = [NSMutableArray array];
     for (NSString *field in self.tracking) {
         id resolvedValue = [self resolveField:auctionId field:field bidId:bidId];
-        [values addObject:resolvedValue ? [resolvedValue description] : @""];
+        // Escape semicolons in resolved values before joining (customData may contain ';')
+        NSString *stringValue = resolvedValue ? [resolvedValue description] : @"";
+        NSString *escapedValue = [stringValue stringByReplacingOccurrencesOfString:@";" withString:@"%3B"];
+        [values addObject:escapedValue];
     }
 
     return [values componentsJoinedByString:@";"];

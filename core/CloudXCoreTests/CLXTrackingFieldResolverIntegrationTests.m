@@ -879,6 +879,225 @@
     XCTAssertTrue(result == nil || [result isKindOfClass:[NSString class]]);
 }
 
+#pragma mark - Semicolon Escaping Tests (PR #333 placement/customData support)
+
+/**
+ * Tests that semicolons in SDK param values are escaped to %3B.
+ * This is critical for customData which may contain semicolons that would
+ * otherwise break the semicolon-delimited payload format.
+ */
+- (void)testBuildPayload_EscapesSemicolonsInSdkParamValues {
+    // Given - SDK param with semicolons (e.g. customData like "level:1;coins:500")
+    NSString *auctionId = @"auction-semicolon-escape";
+    NSDictionary *configJSON = @{
+        @"tracking": @[@"sdk.sessionId", @"sdk.customData"]
+    };
+    [self.resolver setConfigJSON:configJSON];
+    [self.resolver setSessionConstData:@"sess-escape-test"
+                            sdkVersion:@"1.0"
+                         pluginVersion:nil
+                        deviceTypeName:@"phone"
+                        deviceTypeCode:4
+                           abTestGroup:@""
+                             appBundle:@"com.test"];
+
+    // Set customData containing semicolons
+    [self.resolver setSdkParam:auctionId key:@"sdk.customData" value:@"level:1;coins:500;difficulty:hard"];
+
+    // When
+    NSString *payload = [self.resolver buildPayload:auctionId bidId:nil];
+
+    // Then - semicolons in value are escaped to %3B
+    XCTAssertEqualObjects(payload, @"sess-escape-test;level:1%3Bcoins:500%3Bdifficulty:hard",
+                          @"Semicolons in customData should be escaped to %%3B");
+}
+
+/**
+ * Tests that semicolons in resolved bid field values are also escaped.
+ */
+- (void)testBuildPayload_EscapesSemicolonsInBidFieldValues {
+    // Given - bid field with semicolons (e.g. dealid containing semicolons)
+    NSString *auctionId = @"auction-bid-semicolon";
+    NSString *bidId = @"bid-semicolon";
+
+    NSDictionary *configJSON = @{
+        @"tracking": @[@"bid.dealid", @"sdk.sessionId"]
+    };
+    [self.resolver setConfigJSON:configJSON];
+    [self.resolver setSessionConstData:@"sess-1"
+                            sdkVersion:@"1.0"
+                         pluginVersion:nil
+                        deviceTypeName:@"phone"
+                        deviceTypeCode:4
+                           abTestGroup:@""
+                             appBundle:@"com.test"];
+
+    NSDictionary *bidResponseJSON = @{
+        @"seatbid": @[@{
+            @"bid": @[@{
+                @"id": bidId,
+                @"dealid": @"deal;with;semicolons"  // Deal ID with semicolons
+            }]
+        }]
+    };
+    [self.resolver setResponseData:auctionId bidResponseJSON:bidResponseJSON];
+
+    // When
+    NSString *payload = [self.resolver buildPayload:auctionId bidId:bidId];
+
+    // Then - semicolons in dealid are escaped
+    XCTAssertEqualObjects(payload, @"deal%3Bwith%3Bsemicolons;sess-1",
+                          @"Semicolons in bid fields should be escaped to %%3B");
+}
+
+/**
+ * Tests that values without semicolons are unaffected by escaping.
+ */
+- (void)testBuildPayload_DoesNotModifyValuesWithoutSemicolons {
+    // Given - normal values without semicolons
+    NSString *auctionId = @"auction-no-semicolons";
+    NSDictionary *configJSON = @{
+        @"tracking": @[@"sdk.sessionId", @"sdk.placement", @"sdk.customData"]
+    };
+    [self.resolver setConfigJSON:configJSON];
+    [self.resolver setSessionConstData:@"session123"
+                            sdkVersion:@"1.0"
+                         pluginVersion:nil
+                        deviceTypeName:@"phone"
+                        deviceTypeCode:4
+                           abTestGroup:@""
+                             appBundle:@"com.test"];
+
+    [self.resolver setSdkParam:auctionId key:@"sdk.placement" value:@"home_banner"];
+    [self.resolver setSdkParam:auctionId key:@"sdk.customData" value:@"user_level=5"];
+
+    // When
+    NSString *payload = [self.resolver buildPayload:auctionId bidId:nil];
+
+    // Then - values unchanged
+    XCTAssertEqualObjects(payload, @"session123;home_banner;user_level=5",
+                          @"Values without semicolons should be unchanged");
+}
+
+#pragma mark - SDK Placement and CustomData Tests (PR #333)
+
+/**
+ * Tests that sdk.placement resolves from sdkMap when set via setSdkParam.
+ */
+- (void)testResolveField_SdkPlacement_ResolvesFromSdkMap {
+    // Given
+    NSString *auctionId = @"auction-placement";
+    [self.resolver setSdkParam:auctionId key:@"sdk.placement" value:@"game_over_screen"];
+
+    // When
+    id result = [self.resolver resolveField:auctionId field:@"sdk.placement" bidId:nil];
+
+    // Then
+    XCTAssertEqualObjects(result, @"game_over_screen", @"sdk.placement should resolve from sdkMap");
+}
+
+/**
+ * Tests that sdk.customData resolves from sdkMap when set via setSdkParam.
+ */
+- (void)testResolveField_SdkCustomData_ResolvesFromSdkMap {
+    // Given
+    NSString *auctionId = @"auction-customdata";
+    [self.resolver setSdkParam:auctionId key:@"sdk.customData" value:@"coins:100,gems:50"];
+
+    // When
+    id result = [self.resolver resolveField:auctionId field:@"sdk.customData" bidId:nil];
+
+    // Then
+    XCTAssertEqualObjects(result, @"coins:100,gems:50", @"sdk.customData should resolve from sdkMap");
+}
+
+/**
+ * Tests that sdk.placement and sdk.customData return nil when not set.
+ */
+- (void)testResolveField_SdkPlacementAndCustomData_ReturnsNilWhenNotSet {
+    // Given - no sdk params set
+    NSString *auctionId = @"auction-no-params";
+
+    // When
+    id placementResult = [self.resolver resolveField:auctionId field:@"sdk.placement" bidId:nil];
+    id customDataResult = [self.resolver resolveField:auctionId field:@"sdk.customData" bidId:nil];
+
+    // Then - returns nil for unset params
+    XCTAssertNil(placementResult, @"sdk.placement should be nil when not set");
+    XCTAssertNil(customDataResult, @"sdk.customData should be nil when not set");
+}
+
+/**
+ * Tests that sdk.placement and sdk.customData are auction-scoped (different auctions have different values).
+ */
+- (void)testSdkParam_AreAuctionScoped {
+    // Given - set different values for different auctions
+    NSString *auctionId1 = @"auction-1";
+    NSString *auctionId2 = @"auction-2";
+
+    [self.resolver setSdkParam:auctionId1 key:@"sdk.placement" value:@"screen_a"];
+    [self.resolver setSdkParam:auctionId2 key:@"sdk.placement" value:@"screen_b"];
+
+    // When
+    id result1 = [self.resolver resolveField:auctionId1 field:@"sdk.placement" bidId:nil];
+    id result2 = [self.resolver resolveField:auctionId2 field:@"sdk.placement" bidId:nil];
+
+    // Then - each auction has its own value
+    XCTAssertEqualObjects(result1, @"screen_a", @"Auction 1 should have its own placement");
+    XCTAssertEqualObjects(result2, @"screen_b", @"Auction 2 should have its own placement");
+}
+
+/**
+ * Integration test: Verifies sdk.placement and sdk.customData appear correctly in full payload.
+ */
+- (void)testBuildPayload_IncludesSdkPlacementAndCustomData {
+    // Given - production-like tracking config with placement and customData
+    NSString *auctionId = @"auction-full-payload";
+    NSString *bidId = @"bid-full";
+
+    NSDictionary *configJSON = @{
+        @"tracking": @[
+            @"bid.price",
+            @"sdk.sessionId",
+            @"sdk.placement",
+            @"sdk.customData"
+        ]
+    };
+    [self.resolver setConfigJSON:configJSON];
+    [self.resolver setSessionConstData:@"session-xyz"
+                            sdkVersion:@"1.0"
+                         pluginVersion:nil
+                        deviceTypeName:@"phone"
+                        deviceTypeCode:4
+                           abTestGroup:@""
+                             appBundle:@"com.test"];
+
+    NSDictionary *bidResponseJSON = @{
+        @"seatbid": @[@{
+            @"bid": @[@{
+                @"id": bidId,
+                @"price": @2.5
+            }]
+        }]
+    };
+    [self.resolver setResponseData:auctionId bidResponseJSON:bidResponseJSON];
+
+    // Set placement and customData (as the SDK would do at show/load time)
+    [self.resolver setSdkParam:auctionId key:@"sdk.placement" value:@"level_complete"];
+    [self.resolver setSdkParam:auctionId key:@"sdk.customData" value:@"score:1000"];
+
+    // When
+    NSString *payload = [self.resolver buildPayload:auctionId bidId:bidId];
+
+    // Then
+    NSArray *values = [payload componentsSeparatedByString:@";"];
+    XCTAssertEqual(values.count, 4, @"Should have 4 values");
+    XCTAssertEqualObjects(values[0], @"2.5", @"bid.price");
+    XCTAssertEqualObjects(values[1], @"session-xyz", @"sdk.sessionId");
+    XCTAssertEqualObjects(values[2], @"level_complete", @"sdk.placement");
+    XCTAssertEqualObjects(values[3], @"score:1000", @"sdk.customData");
+}
+
 #pragma mark - Config adUnits Array Lookup with Placeholder Tests
 
 /**

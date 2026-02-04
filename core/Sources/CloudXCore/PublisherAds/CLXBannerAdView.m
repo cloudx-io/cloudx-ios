@@ -37,6 +37,12 @@
 @property (nonatomic, weak, nullable, readonly) UIViewController *viewController;
 @end
 
+// Category to expose placement/customData setters for tracking
+@interface CLXPublisherBanner (CLXBannerTracking)
+@property (nonatomic, copy, nullable) NSString *publisherPlacement;
+@property (nonatomic, copy, nullable) NSString *publisherCustomData;
+@end
+
 @interface CLXBannerAdView () <CLXAdapterBannerDelegate, UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) id<CLXBanner> banner;
@@ -262,6 +268,12 @@ static void initializeLogger() {
 }
 
 - (void)load {
+    // Pass placement/customData to underlying banner before loading
+    if ([self.banner isKindOfClass:[CLXPublisherBanner class]]) {
+        CLXPublisherBanner *publisherBanner = (CLXPublisherBanner *)self.banner;
+        publisherBanner.publisherPlacement = self.placement;
+        publisherBanner.publisherCustomData = self.customData;
+    }
     // Delegate to the underlying banner since CLXAd is a data object
     [self.banner load];
 }
