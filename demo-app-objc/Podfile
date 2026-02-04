@@ -3,12 +3,12 @@ platform :ios, '15.0'
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
-  # CloudX SDK - Local binary testing
-  pod 'CloudXCore', :path => '../binaries-test/core'
-  pod 'CloudXMetaAdapter', :path => '../binaries-test/adapter-meta'
-  pod 'CloudXVungleAdapter', :path => '../binaries-test/adapter-vungle'
-  pod 'CloudXInMobiAdapter', :path => '../binaries-test/adapter-inmobi'
-  pod 'CloudXRenderer', :path => '../binaries-test/renderer-cloudx'
+  # CloudX SDK - Source development
+  pod 'CloudXCore', :path => '../core'
+  pod 'CloudXMetaAdapter', :path => '../adapter-meta'
+  pod 'CloudXVungleAdapter', :path => '../adapter-vungle'
+  pod 'CloudXInMobiAdapter', :path => '../adapter-inmobi'
+  pod 'CloudXRenderer', :path => '../renderer-cloudx'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths

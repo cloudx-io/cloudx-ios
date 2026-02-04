@@ -315,20 +315,35 @@ git push origin release/vX.Y.Z
 
 **Only proceed after Phase 4 testing is successful!**
 
-**⚠️ CRITICAL: Follow these steps IN ORDER. Do not skip ahead to private repo steps before completing public repo steps!**
+#### Pre-Merge Checklist (CRITICAL)
 
-**Checklist (in order):**
-1. [ ] **PUBLIC REPO FIRST:** Merge PR, tag, create GitHub releases with xcframeworks
-2. [ ] **PRIVATE REPO:** Merge release → develop (regular merge)
-3. [ ] **PRIVATE REPO:** Merge release → main (SQUASH merge)
-4. [ ] **PRIVATE REPO:** Sync main back to develop (prevents future conflicts)
-5. [ ] **PRIVATE REPO:** Tag main, create dSYM release (INTERNAL only)
+**⚠️ Before merging any release PRs, verify:**
 
----
+- [ ] Release branch is up-to-date with develop (no missing commits)
+- [ ] All API changes in develop are present in the release branch
+- [ ] The xcframeworks were built from the LATEST release branch code
+- [ ] Demo apps successfully tested with the built xcframeworks
 
-#### Step 1: Merge PUBLIC Repo PR and Create Releases
+**To check if release branch is current with develop:**
+```bash
+# List commits in develop that are NOT in release branch
+git log release/X.Y.Z..origin/develop --oneline
 
-**Complete this ENTIRE step before moving to Step 2!**
+# If this shows commits, the release branch is STALE!
+# You MUST rebase or merge develop into the release branch before proceeding.
+```
+
+**If release branch is stale:**
+```bash
+git checkout release/X.Y.Z
+git merge origin/develop
+# Resolve any conflicts (keep develop's newer code!)
+git push origin release/X.Y.Z
+
+# IMPORTANT: Rebuild xcframeworks after updating the release branch!
+```
+
+#### Step 1: Merge PUBLIC Repo PR
 
 ```bash
 # Go to GitHub and merge cloudx-ios PR to main
@@ -355,8 +370,6 @@ gh release create vX.Y.Z-renderer --title "CloudXRenderer X.Y.Z" renderer-cloudx
 
 #### Step 2: Merge PRIVATE Repo PRs
 
-**⚠️ Only proceed after Step 1 (PUBLIC repo) is fully complete!**
-
 ```bash
 # Go to GitHub:
 # 1. Merge release/X.Y.Z → develop (regular merge)
@@ -374,6 +387,7 @@ cd cloudx-ios-private
 git checkout develop
 git pull origin develop
 git merge main -m "Sync release X.Y.Z from main"
+# STOP! If there are conflicts, read the WARNING below before resolving!
 git push origin develop
 ```
 
@@ -381,6 +395,48 @@ git push origin develop
 - Squash merge creates a NEW commit that Git doesn't recognize as related to the original commits
 - Without this sync, the next release branch (created from develop) won't have main's history
 - This causes merge conflicts when trying to merge future releases to main
+
+---
+
+### ⚠️ CRITICAL WARNING: Merge Conflict Resolution
+
+**🚨 NEVER use `git checkout --theirs .` when syncing main back to develop!**
+
+If you encounter merge conflicts during the `git merge main` step:
+
+1. **UNDERSTAND THE SITUATION**: During this sync, `develop` contains the latest work, and `main` contains the squashed release. If the release branch was stale (missing recent develop changes), `main` may have OLDER code.
+
+2. **RESOLVE CONFLICTS CAREFULLY**:
+   - `--ours` = develop's version (usually the NEWER code with latest features)
+   - `--theirs` = main's version (may be OLDER if release branch was stale)
+   
+3. **FOR EACH CONFLICT**, ask yourself:
+   - "Does develop have newer features/APIs that should be preserved?"
+   - "Was main's squash commit based on a fully up-to-date release branch?"
+
+4. **VERIFY AFTER MERGE**: Always verify the API matches the released xcframeworks:
+   ```bash
+   # Check that critical API methods are correct
+   grep -A2 "createBannerWith\|createInterstitialWith\|createRewardedWith" \
+     core/Sources/CloudXCore/CloudXCoreAPI.h
+   
+   # Compare with public repo's released headers
+   diff core/Sources/CloudXCore/CloudXCoreAPI.h \
+     ../cloudx-ios/core/CloudXCore.xcframework/ios-arm64/CloudXCore.framework/Headers/CloudXCoreAPI.h
+   ```
+
+**What can go wrong:**
+- Using `git checkout --theirs .` blindly can OVERWRITE newer develop code with older main code
+- This happened in release 2.0.0: the `adUnitId` API migration was accidentally reverted because `--theirs` was used, and main's squash was based on a stale release branch
+- The private repo's source code became out of sync with the publicly released xcframeworks
+
+**If you make this mistake:**
+1. Create a backup branch: `git branch backup/develop-before-fix`
+2. Find the last good commit on develop (before the bad merge)
+3. Create a fix branch and restore files: `git checkout <good-commit> -- .`
+4. Create a PR to fix develop (force push may be blocked by branch protection)
+
+---
 
 #### Step 4: Tag PRIVATE Repo Main and Create dSYM Release
 
@@ -757,6 +813,9 @@ pod trunk me
 5. **Update ALL CHANGELOGs** - Internal (cloudx-ios-private), public (cloudx-ios), AND docs (docs/ios/changelog.mdx)
 6. **Test demo apps BEFORE merging PRs** - Verify xcframeworks work
 7. **Push to CocoaPods Trunk** - Required for public `pod install`
+8. **Verify release branch is current with develop** - Stale release branches cause API reversions
+9. **Never use `git checkout --theirs .` when syncing main→develop** - This can overwrite newer develop code
+10. **Always verify APIs match released xcframeworks after merges** - Source and binaries must stay in sync
 
 ### Framework Type Rules (CRITICAL)
 
@@ -892,6 +951,38 @@ pod repo update
 # Check if pod is available
 pod search CloudXCore
 ```
+
+### Source Code Out of Sync with Released Binaries
+
+**Symptoms:**
+- Private repo source code has different API than released xcframeworks
+- Public headers in xcframework don't match private repo headers
+- CHANGELOG examples don't match actual API
+
+**How this happens:**
+1. A stale release branch (missing develop commits) is merged to main
+2. When syncing main back to develop, conflicts are resolved incorrectly (using `--theirs`)
+3. Newer develop code gets overwritten with older main code
+
+**How to verify:**
+```bash
+# Compare private source to public released headers
+diff core/Sources/CloudXCore/CloudXCoreAPI.h \
+  ../cloudx-ios/core/CloudXCore.xcframework/ios-arm64/CloudXCore.framework/Headers/CloudXCoreAPI.h
+```
+
+**How to fix:**
+1. Find the last good commit on develop (before the bad sync merge)
+2. Create a backup: `git branch backup/develop-broken`
+3. Create a fix branch from current develop
+4. Restore files to the good state: `git checkout <good-commit> -- .`
+5. Commit and create PR to develop
+6. After merging, you may need to fix main via another release cycle
+
+**Prevention:**
+- Always check if release branch is current with develop before merging to main
+- Never blindly use `git checkout --theirs .` during conflict resolution
+- Always verify API after any merge operation
 
 ### dSYM Issues
 
