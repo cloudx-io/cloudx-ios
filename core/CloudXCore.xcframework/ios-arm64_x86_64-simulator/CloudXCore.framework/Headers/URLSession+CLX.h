@@ -4,7 +4,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSURLSession (CloudX)
 
-+ (NSURLSession *)cloudxSessionWithIdentifier:(NSString *)identifier;
++ (NSURLSession *)cloudxSession;
 
 @end
 

@@ -8,15 +8,16 @@
  */
 
 #import <UIKit/UIKit.h>
-#import <CloudXCore/CLXAdFormat.h>
+#import <CloudXCore/CLXFullscreenAd.h>
 #import <CloudXCore/CLXAdEventReporting.h>
 
-@class CLXSDKConfigPlacement;
+@class CLXSDKConfigAdUnit;
 @class CLXAdNetworkFactories;
 @class CLXSettings;
 @class CLXConfigImpressionModel;
 @class CLXBidAdSourceResponse;
 @class CLXAd;
+@class CLXError;
 @protocol CLXBidTokenSource;
 @protocol CLXAdapterInterstitial;
 @protocol CLXAdapterRewarded;
@@ -27,29 +28,27 @@ NS_ASSUME_NONNULL_BEGIN
  * Base class containing all shared logic for fullscreen ads.
  * Subclasses must implement abstract methods to specialize behavior for interstitial vs rewarded.
  */
-@interface CLXPublisherFullscreenAdBase : NSObject <CLXAdFormat>
+@interface CLXPublisherFullscreenAdBase : NSObject <CLXFullscreenAd>
 
 /**
  * Initializes a fullscreen ad with the given parameters.
- * @param placement The placement configuration (nil if SDK not initialized, will be resolved on load)
+ * @param adUnit The ad unit configuration (nil if SDK not initialized, will be resolved on load)
  * @param publisherID The publisher ID
  * @param userID The user ID
  * @param rewardedCallbackUrl The rewarded callback URL
  * @param impModel The impression model (nil if SDK not initialized, will be created on load)
  * @param adFactories The ad network factories
- * @param waterfallMaxBackOffTime Maximum backoff time for waterfall
  * @param bidTokenSources Dictionary of bid token sources
- * @param bidRequestTimeout Bid request timeout
+ * @param bidRequestTimeout Timeout in seconds for bid requests (0 = use session default)
  * @param reportingService The reporting service
  * @param settings The settings instance
  */
-- (instancetype)initWithPlacement:(nullable CLXSDKConfigPlacement *)placement
+- (instancetype)initWithAdUnit:(nullable CLXSDKConfigAdUnit *)adUnit
                       publisherID:(NSString *)publisherID
                            userID:(nullable NSString *)userID
               rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl
                          impModel:(nullable CLXConfigImpressionModel *)impModel
                       adFactories:(nullable CLXAdNetworkFactories *)adFactories
-         waterfallMaxBackOffTime:(nullable NSNumber *)waterfallMaxBackOffTime
                   bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                 reportingService:(id<CLXAdEventReporting>)reportingService
@@ -63,6 +62,15 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Shows the fullscreen ad from the provided view controller.
  * @param viewController The view controller from which to show the ad
+ * @param placement Optional placement identifier for tracking
+ * @param customData Optional custom data for tracking (e.g., "level:5,coins:100")
+ */
+- (void)showFromViewController:(UIViewController *)viewController
+                     placement:(nullable NSString *)placement
+                    customData:(nullable NSString *)customData;
+
+/**
+ * Convenience method - shows the ad without placement/customData.
  */
 - (void)showFromViewController:(UIViewController *)viewController;
 
@@ -107,12 +115,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Notifies the delegate of load failure.
  */
-- (void)notifyLoadFailure:(NSError *)error NS_REQUIRES_SUPER;
+- (void)notifyLoadFailure:(CLXError *)error NS_REQUIRES_SUPER;
 
 /**
  * Notifies the delegate of show failure.
  */
-- (void)notifyShowFailure:(NSError *)error NS_REQUIRES_SUPER;
+- (void)notifyShowFailure:(CLXError *)error NS_REQUIRES_SUPER;
 
 /**
  * Notifies the delegate that the ad was force closed by timeout.

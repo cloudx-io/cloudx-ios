@@ -4,7 +4,7 @@
 
 /**
  * @file CLXBidLifecycleEvent.h
- * @brief Defines the lifecycle events for bid tracking (BID_RECEIVED, LOAD_SUCCESS, RENDER_SUCCESS, LOSS)
+ * @brief Defines the lifecycle events for bid tracking (LOAD_SUCCESS, RENDER_SUCCESS, LOSS, REWARD)
  *
  * Each lifecycle event has an associated notification type and URL type (lurl, nurl, burl)
  * that determines which URL to fire and what payload to send.
@@ -14,30 +14,59 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#pragma mark - Notification Type Constants
+
+/** Notification type for successful bid load */
+extern NSString * const CLXNotificationTypeLoadSuccess;
+/** Notification type for successful render/impression */
+extern NSString * const CLXNotificationTypeRenderSuccess;
+/** Notification type for bid loss */
+extern NSString * const CLXNotificationTypeLoss;
+/** Notification type for rewarded ad completion */
+extern NSString * const CLXNotificationTypeRewardEarned;
+
+#pragma mark - URL Type Constants
+
+/** Notification URL - fired on load success */
+extern NSString * const CLXURLTypeNurl;
+/** Billing URL - fired on render success and reward */
+extern NSString * const CLXURLTypeBurl;
+/** Loss URL - fired on bid loss */
+extern NSString * const CLXURLTypeLurl;
+
+#pragma mark - Event Types
+
 /**
  * Bid lifecycle event types (matches Android implementation)
  */
 typedef NS_ENUM(NSInteger, CLXBidLifecycleEventType) {
     /**
      * Bid successfully loaded
-     * notificationType: "loadSuccess"
-     * urlType: "nurl" (notification URL)
+     * notificationType: CLXNotificationTypeLoadSuccess
+     * urlType: CLXURLTypeNurl
      */
     CLXBidLifecycleEventTypeLoadSuccess,
     
     /**
      * Bid successfully rendered (impression tracked)
-     * notificationType: "renderSuccess"
-     * urlType: "burl" (billing URL)
+     * notificationType: CLXNotificationTypeRenderSuccess
+     * urlType: CLXURLTypeBurl
      */
     CLXBidLifecycleEventTypeRenderSuccess,
     
     /**
      * Bid lost in auction or failed to load
-     * notificationType: "loss"
-     * urlType: "lurl" (loss URL)
+     * notificationType: CLXNotificationTypeLoss
+     * urlType: CLXURLTypeLurl
      */
-    CLXBidLifecycleEventTypeLoss
+    CLXBidLifecycleEventTypeLoss,
+    
+    /**
+     * User completed rewarded ad and earned reward
+     * notificationType: CLXNotificationTypeRewardEarned
+     * urlType: CLXURLTypeBurl
+     */
+    CLXBidLifecycleEventTypeReward
 };
 
 /**
@@ -74,6 +103,11 @@ typedef NS_ENUM(NSInteger, CLXBidLifecycleEventType) {
  * Factory method for LOSS event
  */
 + (instancetype)lossEvent;
+
+/**
+ * Factory method for REWARD event (user completed rewarded ad)
+ */
++ (instancetype)rewardEvent;
 
 /**
  * Designated initializer

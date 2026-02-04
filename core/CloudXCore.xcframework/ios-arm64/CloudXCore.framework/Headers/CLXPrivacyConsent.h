@@ -46,30 +46,21 @@ typedef NS_ENUM(NSInteger, CLXGppTarget) {
 /**
  * @brief TCF Purpose 1 consent (Store and/or access information on a device)
  * @discussion YES=consent granted, NO=consent denied, nil=not collected
+ * @note Required for basic SDK operation - storing device identifiers
  */
 @property (nonatomic, strong, nullable) NSNumber *purpose1;
 
 /**
  * @brief TCF Purpose 2 consent (Select basic ads)
  * @discussion YES=consent granted, NO=consent denied, nil=not collected
+ * @note Required for serving contextual (non-personalized) ads
  */
 @property (nonatomic, strong, nullable) NSNumber *purpose2;
 
 /**
- * @brief TCF Purpose 3 consent (Create a personalised ads profile)
- * @discussion YES=consent granted, NO=consent denied, nil=not collected
- */
-@property (nonatomic, strong, nullable) NSNumber *purpose3;
-
-/**
- * @brief TCF Purpose 4 consent (Select personalised ads)
- * @discussion YES=consent granted, NO=consent denied, nil=not collected
- */
-@property (nonatomic, strong, nullable) NSNumber *purpose4;
-
-/**
- * @brief TCF Vendor consent for CloudX
+ * @brief TCF Vendor consent for CloudX (Vendor ID 1510)
  * @discussion YES=vendor consent granted, NO=denied, nil=not collected
+ * @note CloudX must have vendor consent to process any user data
  */
 @property (nonatomic, strong, nullable) NSNumber *vendorConsent;
 
@@ -78,7 +69,8 @@ typedef NS_ENUM(NSInteger, CLXGppTarget) {
  * @return YES if any opt-out or denial is active
  * @discussion Core business logic for privacy compliance. Returns YES if:
  *             - CCPA: saleOptOut == 1 OR sharingOptOut == 1
- *             - GDPR: Any purpose (1-4) explicitly false OR vendorConsent explicitly false
+ *             - CCPA: Data is truncated/malformed (saleOptOut == nil when all GDPR fields nil)
+ *             - GDPR: Purpose 1 OR Purpose 2 explicitly false OR vendorConsent explicitly false
  *             Note: nil values are treated as consent granted (lenient interpretation)
  */
 - (BOOL)requiresPiiRemoval;
@@ -96,15 +88,12 @@ typedef NS_ENUM(NSInteger, CLXGppTarget) {
  * @brief Initializes consent object with TCF purpose and vendor consent
  * @param purpose1 Purpose 1 consent (store/access device info)
  * @param purpose2 Purpose 2 consent (select basic ads)
- * @param purpose3 Purpose 3 consent (create personalized ads profile)
- * @param purpose4 Purpose 4 consent (select personalized ads)
- * @param vendorConsent Vendor consent for CloudX
+ * @param vendorConsent Vendor consent for CloudX (Vendor ID 1510)
  * @return Initialized consent object for GDPR/TCF
+ * @note CloudX only requires purposes 1 and 2 per IAB GVL registration.
  */
 - (instancetype)initWithPurpose1:(nullable NSNumber *)purpose1
                         purpose2:(nullable NSNumber *)purpose2
-                        purpose3:(nullable NSNumber *)purpose3
-                        purpose4:(nullable NSNumber *)purpose4
                    vendorConsent:(nullable NSNumber *)vendorConsent;
 
 @end

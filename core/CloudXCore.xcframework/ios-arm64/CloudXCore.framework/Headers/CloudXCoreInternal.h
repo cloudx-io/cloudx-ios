@@ -13,6 +13,10 @@
 #import <Foundation/Foundation.h>
 #import <CloudXCore/CloudXCoreAPI.h>
 
+// Forward declarations for internal types
+@class CLXAdNetworkFactories;
+@class CLXConfigImpressionModel;
+
 // =============================================================================
 // MARK: - Internal Implementation Headers
 // =============================================================================
@@ -23,13 +27,20 @@
 #import <CloudXCore/CLXPublisherBanner.h>
 #import <CloudXCore/CLXPublisherNative.h>
 
+// Native (internal - not exposed in public API)
+#import <CloudXCore/CLXNative.h>
+#import <CloudXCore/CLXNativeDelegate.h>
+#import <CloudXCore/CLXNativeAdView.h>
+#import <CloudXCore/CLXNativeTemplate.h>
+#import <CloudXCore/CLXAdapterNative.h>
+#import <CloudXCore/CLXAdapterNativeFactory.h>
+
 // SDK Configuration (internal)
 #import <CloudXCore/CLXSDKConfigEndpointObject.h>
 
 // Initialization
 #import <CloudXCore/CLXInitService.h>
 #import <CloudXCore/CLXLiveInitService.h>
-#import <CloudXCore/CLXInitMetrics.h>
 #import <CloudXCore/CLXDIContainer.h>
 
 // Bidding
@@ -40,7 +51,6 @@
 
 // Tracking Services
 #import <CloudXCore/CLXRillTrackingService.h>
-#import <CloudXCore/CLXRillTrackingServiceV2.h>
 #import <CloudXCore/CLXRillImpressionModel.h>
 #import <CloudXCore/CLXRillImpressionDefaultModel.h>
 #import <CloudXCore/CLXRillImpressionProperties.h>
@@ -51,30 +61,24 @@
 #import <CloudXCore/CLXAdReportingNetworkService.h>
 
 // Metrics & Events
-#import <CloudXCore/CLXMetricsTracker.h>
 #import <CloudXCore/CLXMetricsTrackerImpl.h>
 #import <CloudXCore/CLXMetricsTrackerProtocol.h>
+#import <CloudXCore/CLXPayloadBuilder.h>
 #import <CloudXCore/CLXMetricsEvent.h>
 #import <CloudXCore/CLXMetricsEventDao.h>
 #import <CloudXCore/CLXMetricsEventDaoImpl.h>
-#import <CloudXCore/CLXMetricsNetworkService.h>
 #import <CloudXCore/CLXMetricsConfig.h>
 #import <CloudXCore/CLXMetricsDebugger.h>
 #import <CloudXCore/CLXMetricsType.h>
+#import <CloudXCore/CLXEventType.h>
 #import <CloudXCore/CLXEventAM.h>
 #import <CloudXCore/CLXEventTrackerBulkApi.h>
 
 // Session Management
 #import <CloudXCore/CLXSession.h>
 #import <CloudXCore/CLXSessionDaoImpl.h>
-#import <CloudXCore/CLXAppSession.h>
-#import <CloudXCore/CLXAppSessionService.h>
 #import <CloudXCore/CLXSessionMetrics.h>
 #import <CloudXCore/CLXSessionMetricsTracker.h>
-#import <CloudXCore/CLXSessionMetric.h>
-#import <CloudXCore/CLXSessionMetricType.h>
-#import <CloudXCore/CLXSessionMetricSpend.h>
-#import <CloudXCore/CLXSessionMetricPerformance.h>
 
 // Database
 #import <CloudXCore/CLXDatabaseProtocol.h>
@@ -83,11 +87,6 @@
 #import <CloudXCore/CLXCloudXDatabase.h>
 #import <CloudXCore/CLXDaoProtocols.h>
 #import <CloudXCore/CLXBaseDao.h>
-
-// Rill Events
-#import <CloudXCore/CLXRillEvent.h>
-#import <CloudXCore/CLXRillEventDaoImpl.h>
-#import <CloudXCore/CLXBaseEvent.h>
 
 // Performance
 #import <CloudXCore/CLXPerformanceMetric.h>
@@ -101,11 +100,6 @@
 #import <CloudXCore/CLXReachabilityService.h>
 #import <CloudXCore/CLXGeoLocationService.h>
 #import <CloudXCore/CLXSKAdNetworkService.h>
-
-// Retry & Resilience
-#import <CloudXCore/CLXRetryHelper.h>
-#import <CloudXCore/CLXRetryManager.h>
-#import <CloudXCore/CLXExponentialBackoffStrategy.h>
 
 // State & Storage
 #import <CloudXCore/CLXKeyValueState.h>
@@ -124,7 +118,6 @@
 
 // Categories
 #import <CloudXCore/NSString+CLXSemicolon.h>
-#import <CloudXCore/NSDictionary+DynamicPath.h>
 #import <CloudXCore/UIDevice+CLXIdentifier.h>
 #import <CloudXCore/URLSession+CLX.h>
 
@@ -133,7 +126,26 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Internal extension of CloudXCore for SDK-internal use only
  */
+@class CLXAdNetworkFactories;
+@class CLXConfigImpressionModel;
+
 @interface CloudXCore (Internal)
+
+/**
+ * Check if a specific adapter has completed initialization
+ * @param adapterName The name of the adapter (e.g., "meta", "vungle")
+ * @return YES if the adapter is ready, NO otherwise
+ * @discussion Internal API used by bid request logic to avoid race conditions during SDK initialization
+ */
+- (BOOL)isAdapterReady:(NSString *)adapterName;
+
+/**
+ * Create an impression model for tracking
+ * @param auctionID The auction ID for the impression
+ * @return Impression model or nil if creation fails
+ * @discussion Internal API used by ad objects for impression tracking
+ */
+- (nullable CLXConfigImpressionModel *)createImpModelWithAuctionID:(NSString *)auctionID;
 
 /**
  * Track SDK errors for analytics reporting
@@ -141,6 +153,57 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion Internal method used by CLXErrorReporter - not part of public API
  */
 + (void)trackSDKError:(NSError *)error;
+
+#pragma mark - Ad Unit Configuration (Internal)
+
+/**
+ * Get ad unit configuration by ID
+ * @param adUnitId The ad unit ID to look up (e.g., "um9Ek08ScJBWuzSMTyW3b")
+ * @return The ad unit configuration or nil if not found
+ * @discussion Internal method for looking up ad unit configs - not part of public API
+ */
+- (nullable CLXSDKConfigAdUnit *)adUnitConfigForId:(NSString *)adUnitId;
+
+/**
+ * Get all available ad unit IDs
+ * @return Array of ad unit IDs, or empty array if SDK not initialized
+ * @discussion Internal method for error messaging - not part of public API
+ */
+- (NSArray<NSString *> *)availableAdUnitIds;
+
+#pragma mark - Internal SDK Properties and Methods
+
+/**
+ * Ad network factories for creating adapter instances
+ * @discussion Internal property for adapter creation - not part of public API
+ */
+@property (nonatomic, strong, readonly) CLXAdNetworkFactories *adNetworkFactories;
+
+#pragma mark - Native Ads (Internal - not part of public API)
+
+/**
+ * Create a native ad (internal use only)
+ * @param adUnitId The ad unit identifier
+ * @param viewController The view controller for presentation
+ * @param delegate The delegate to receive ad events
+ * @return A CLXNativeAdView object or nil if ad unit is invalid
+ * @discussion This API is internal and not exposed publicly. For adapter and testing use only.
+ */
+- (nullable CLXNativeAdView *)createNativeAdWithAdUnitId:(NSString *)adUnitId
+                                          viewController:(UIViewController *)viewController
+                                                delegate:(nullable id<CLXNativeDelegate>)delegate;
+
+/**
+ * Create a native banner ad (internal use only)
+ * @param adUnitId The ad unit identifier
+ * @param viewController The view controller for presentation
+ * @param delegate The delegate to receive ad events
+ * @return A CLXNativeAdView object or nil if ad unit is invalid
+ * @discussion This API is internal and not exposed publicly. For adapter and testing use only.
+ */
+- (nullable CLXNativeAdView *)createNativeBannerWithAdUnitId:(NSString *)adUnitId
+                                              viewController:(UIViewController *)viewController
+                                                    delegate:(nullable id<CLXNativeDelegate>)delegate;
 
 @end
 

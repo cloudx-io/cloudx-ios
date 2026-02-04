@@ -43,23 +43,23 @@ NS_ASSUME_NONNULL_BEGIN
             context:(nullable NSDictionary<NSString *, NSString *> *)context;
 
 /**
- * Reports an exception with placement context
+ * Reports an exception with ad unit context
  * @param exception The exception that was caught
- * @param placementID The placement ID where the exception occurred
+ * @param adUnitId The ad unit ID where the exception occurred
  * @param context Optional additional context information
  */
 - (void)reportException:(NSException *)exception 
-            placementID:(nullable NSString *)placementID
+               adUnitId:(nullable NSString *)adUnitId
                 context:(nullable NSDictionary<NSString *, NSString *> *)context;
 
 /**
- * Reports an error with placement context
+ * Reports an error with ad unit context
  * @param error The error that occurred
- * @param placementID The placement ID where the error occurred
+ * @param adUnitId The ad unit ID where the error occurred
  * @param context Optional additional context information
  */
 - (void)reportError:(NSError *)error 
-        placementID:(nullable NSString *)placementID
+           adUnitId:(nullable NSString *)adUnitId
             context:(nullable NSDictionary<NSString *, NSString *> *)context;
 
 #if DEBUG

@@ -24,7 +24,6 @@ extern NSString * const CLXDatabaseName;
  * Table Names (matching Android exactly)
  */
 extern NSString * const CLXMetricsEventTableName;
-extern NSString * const CLXCachedTrackingEventsTableName;
 extern NSString * const CLXSessionTableName;
 extern NSString * const CLXPerformanceMetricsTableName;
 
@@ -41,12 +40,6 @@ extern NSString * const CLXPerformanceMetricsTableName;
 + (NSString *)createMetricsEventTableSQL;
 
 /**
- * Cached Tracking Events Table (matches Android CachedTrackingEvents)
- * Fields: id, encoded, campaignId, eventValue, eventName, type
- */
-+ (NSString *)createCachedTrackingEventsTableSQL;
-
-/**
  * Session Table (replaces Core Data CLXAppSessionModel)
  * Fields: id, sessionId, appKey, startTime, endTime, duration, url
  */
@@ -54,7 +47,7 @@ extern NSString * const CLXPerformanceMetricsTableName;
 
 /**
  * Performance Metrics Table (replaces Core Data CLXPerformanceMetricModel)
- * Fields: id, placementId, sessionId, clickCount, impressionCount, closeCount, 
+ * Fields: id, adUnitId, sessionId, clickCount, impressionCount, closeCount, 
  *         loadLatency, bidResponseCount, timestamp
  */
 + (NSString *)createPerformanceMetricsTableSQL;

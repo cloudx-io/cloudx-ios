@@ -9,13 +9,15 @@
 
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXNative.h>
+#import <CloudXCore/CLXNativeDelegate.h>
 #import <CloudXCore/CLXAdapterNative.h>
 #import <CloudXCore/CLXAdapterNativeFactory.h>
 #import <CloudXCore/CLXNativeTemplate.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXNativeAdView.h>
-
+#import <CloudXCore/CLXAdRevenueDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -39,6 +41,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak, nullable) id<CLXNativeDelegate, CLXAdapterNativeDelegate> delegate;
 
 /**
+ * Delegate for revenue events (impression-level revenue data).
+ */
+@property (nonatomic, weak, nullable) id<CLXAdRevenueDelegate> revenueDelegate;
+
+/**
  * The type of native ad template.
  */
 @property (nonatomic, readonly) CLXNativeTemplate nativeType;
@@ -48,13 +55,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Initializes a new CLXPublisherNative with the given parameters.
  * @param viewController The view controller where the native ad will be displayed
- * @param placement The placement configuration (nil if SDK not initialized, will be resolved on load)
+ * @param adUnit The ad unit configuration (nil if SDK not initialized, will be resolved on load)
  * @param userID The user ID
  * @param publisherID The publisher ID
  * @param suspendPreloadWhenInvisible Whether to suspend preloading when not visible
  * @param delegate The delegate to receive events
  * @param nativeType The type of native ad template
- * @param waterfallMaxBackOffTime Maximum backoff time for waterfall
  * @param impModel The impression model (nil if SDK not initialized, will be created on load)
  * @param adFactories Dictionary of native ad factories
  * @param bidTokenSources Dictionary of bid token sources
@@ -63,14 +69,13 @@ NS_ASSUME_NONNULL_BEGIN
  * @return Initialized CLXPublisherNative instance
  */
 - (instancetype)initWithViewController:(UIViewController *)viewController
-                             placement:(nullable CLXSDKConfigPlacement *)placement
+                             adUnit:(nullable CLXSDKConfigAdUnit *)adUnit
                                 userID:(NSString *)userID
                            publisherID:(NSString *)publisherID
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
                                delegate:(nullable id<CLXNativeDelegate, CLXAdapterNativeDelegate>)delegate
                              nativeType:(CLXNativeTemplate)nativeType
-                   waterfallMaxBackOffTime:(NSTimeInterval)waterfallMaxBackOffTime
-                                  impModel:(nullable CLXConfigImpressionModel *)impModel
+                               impModel:(nullable CLXConfigImpressionModel *)impModel
                               adFactories:(NSDictionary<NSString *, id<CLXAdapterNativeFactory>> *)adFactories
                            bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout

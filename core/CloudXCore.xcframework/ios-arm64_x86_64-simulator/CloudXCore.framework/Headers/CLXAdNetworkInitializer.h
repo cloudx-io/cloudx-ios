@@ -22,8 +22,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// CloudX SDK call this method to initialize the ad network SDK.
 /// - Parameter config: configuration for the ad network SDK such as app id, ad unit id
+/// - Parameter testMode: whether test mode is enabled (from server deviceConfig)
 /// - Returns: true if the initialization was successful, false otherwise
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config 
+                    testMode:(BOOL)testMode
                   completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
 
 @end

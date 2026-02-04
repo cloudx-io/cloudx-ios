@@ -76,9 +76,18 @@ NS_ASSUME_NONNULL_BEGIN
 /// - Parameter rewarded: the rewarded that was expired
 - (void)expiredWithRewarded:(id<CLXAdapterRewarded>)rewarded;
 
-/// Called when the adapter has rewarded the user.
+/// Called when the adapter has rewarded the user (deprecated - use userRewardWithRewarded:amount:label: instead)
 /// - Parameter rewarded: the rewarded that was rewarded
 - (void)userRewardWithRewarded:(id<CLXAdapterRewarded>)rewarded;
+
+@optional
+
+/// Called when the adapter has rewarded the user with reward details.
+/// - Parameters:
+///   - rewarded: the rewarded adapter that triggered the reward
+///   - amount: the reward amount from the ad network (0 if not provided)
+///   - label: the reward label/currency from the ad network (nil if not provided)
+- (void)userRewardWithRewarded:(id<CLXAdapterRewarded>)rewarded amount:(NSInteger)amount label:(nullable NSString *)label;
 
 @end
 

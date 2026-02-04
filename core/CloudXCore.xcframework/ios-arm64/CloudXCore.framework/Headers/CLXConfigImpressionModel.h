@@ -18,9 +18,6 @@ extern NSString * const CLXConfigImpressionModelDefaultTestGroupName;
 @property (nonatomic, readonly, copy) NSString *accountID;
 @property (nonatomic, readonly, strong, nullable) CLXSDKConfigResponse *sdkConfig;
 @property (nonatomic, readonly, copy) NSString *testGroupName;
-@property (nonatomic, readonly, copy, nullable) NSString *appKeyValues;
-@property (nonatomic, readonly, copy, nullable) NSString *eids;
-@property (nonatomic, readonly, copy, nullable) NSString *userKeyValues;
 
 /**
  * Creates a CLXConfigImpressionModel from SDK configuration response
@@ -38,20 +35,6 @@ extern NSString * const CLXConfigImpressionModelDefaultTestGroupName;
  * @return Test impression model instance with default values
  */
 - (instancetype)init;
-
-/**
- * Legacy initializer - deprecated, use initWithSDKConfig:auctionID:testGroupName: instead
- */
-- (instancetype)initWithSessionID:(NSString *)sessionID
-                        auctionID:(NSString *)auctionID
-             impressionTrackerURL:(NSString *)impressionTrackerURL
-                   organizationID:(NSString *)organizationID
-                        accountID:(NSString *)accountID
-                        sdkConfig:(nullable CLXSDKConfigResponse *)sdkConfig
-                    testGroupName:(NSString *)testGroupName
-                     appKeyValues:(NSString *)appKeyValues
-                             eids:(NSString *)eids
-                    userKeyValues:(NSString *)userKeyValues __deprecated_msg("Use initWithSDKConfig:auctionID:testGroupName: instead");
 
 @end
 

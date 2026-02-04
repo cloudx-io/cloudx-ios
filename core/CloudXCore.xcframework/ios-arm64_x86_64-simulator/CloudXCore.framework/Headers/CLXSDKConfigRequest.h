@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *ifa;
 @property (nonatomic, copy) NSString *ifv;
 @property (nonatomic, copy) NSString *sdkVersion;
+@property (nonatomic, copy, nullable) NSString *pluginVersion;
 @property (nonatomic, assign) BOOL dnt;
 @property (nonatomic, strong) NSArray<CLXSDKConfigRequestImp *> *imp;
 @property (nonatomic, copy) NSString *id;

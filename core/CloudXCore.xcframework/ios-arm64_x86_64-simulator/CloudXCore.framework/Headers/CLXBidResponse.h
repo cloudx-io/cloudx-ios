@@ -62,6 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
 // MARK: - CloudX Extension
 @interface CLXBidResponseCloudX : NSObject
 @property (nonatomic, assign) NSInteger rank;
+@property (nonatomic, assign) double revenue;
 @property (nonatomic, strong, nullable) NSDictionary<NSString *, NSString *> *adapterExtras;
 @property (nonatomic, assign) NSInteger test;
 

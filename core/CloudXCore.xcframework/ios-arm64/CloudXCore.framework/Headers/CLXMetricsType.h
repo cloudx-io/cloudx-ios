@@ -18,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString * const CLXMetricsTypeNetworkSdkInit;      // "network_call_sdk_init_req"
 extern NSString * const CLXMetricsTypeNetworkGeoApi;       // "network_call_geo_req"
 extern NSString * const CLXMetricsTypeNetworkBidRequest;   // "network_call_bid_req"
+extern NSString * const CLXMetricsTypeNetworkTimeout;      // "network_call_timeout"
+extern NSString * const CLXMetricsTypeNetworkAdapterLoad;  // "network_call_adapter_load"
+extern NSString * const CLXMetricsTypeNetworkTimeToFirstAd; // "network_call_time_to_first_ad"
 
 /**
  * Method call metrics types

@@ -4,7 +4,7 @@
 
 /**
  * @file CLXPerformanceDaoImpl.h
- * @brief Performance DAO implementation for placement-level metrics
+ * @brief Performance DAO implementation for ad unit-level metrics
  * 
  * Provides SQLite persistence for performance tracking with aggregation capabilities
  */

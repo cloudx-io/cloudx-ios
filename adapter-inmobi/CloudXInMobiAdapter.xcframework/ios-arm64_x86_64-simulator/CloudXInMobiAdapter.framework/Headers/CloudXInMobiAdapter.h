@@ -38,10 +38,6 @@ __attribute__((visibility("default"))) void CloudXInMobiAdapterRegister(void);
 #import "CLXInMobiRewarded.h"
 #import "CLXInMobiRewardedFactory.h"
 
-// Public headers - Native
-#import "CLXInMobiNative.h"
-#import "CLXInMobiNativeFactory.h"
-
 // Public headers - Base & Utils
 #import "CLXInMobiBaseFactory.h"
 

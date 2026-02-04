@@ -20,18 +20,13 @@ __attribute__((visibility("default"))) void CloudXMetaAdapterRegister(void);
 @interface CloudXMetaAdapter : NSObject
 @end
 
-// Public headers
 #import "CLXMetaBanner.h"
 #import "CLXMetaBannerFactory.h"
 #import "CLXMetaInterstitial.h"
 #import "CLXMetaInterstitialFactory.h"
-#import "CLXMetaNative.h"
-#import "CLXMetaNativeFactory.h"
 #import "CLXMetaRewarded.h"
 #import "CLXMetaRewardedFactory.h"
 #import "CLXMetaInitializer.h"
 #import "CLXMetaBidTokenSource.h"
-#import "CLXMetaBaseFactory.h"
-
-// Add other public headers here, for example:
-// #import "SomePublicHeader.h" 
+#import "CLXMetaUtils.h"
+#import "CLXMetaAdapterVersion.h"

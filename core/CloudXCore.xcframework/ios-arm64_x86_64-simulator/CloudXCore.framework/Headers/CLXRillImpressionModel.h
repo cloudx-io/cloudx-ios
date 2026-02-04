@@ -10,13 +10,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, strong) CLXConfigImpressionModel *impModel;
 @property (nonatomic, readonly, copy) NSString *adapterName;
 @property (nonatomic, readonly) NSInteger loadBannerTimesCount;
-@property (nonatomic, readonly, copy) NSString *placementID;
+@property (nonatomic, readonly, copy) NSString *adUnitId;
 
 - (instancetype)initWithLastBidResponse:(nullable CLXBidAdSourceResponse *)lastBidResponse
                                impModel:(CLXConfigImpressionModel *)impModel
                             adapterName:(NSString *)adapterName
                    loadBannerTimesCount:(NSInteger)loadBannerTimesCount
-                            placementID:(NSString *)placementID;
+                               adUnitId:(NSString *)adUnitId;
 
 @end
 

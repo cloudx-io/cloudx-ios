@@ -8,25 +8,28 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CLXAdDelegate.h>
+#import <CloudXCore/CLXFullscreenAdDelegate.h>
 
-@class CLXRewardedInterstitial;
+@class CLXReward;
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
  * @protocol CLXRewardedDelegate
  * @brief Delegate protocol for rewarded ad events
- * 
- * Extends BaseAdDelegate with rewarded-specific callbacks.
+ *
+ * Extends CLXFullscreenAdDelegate with rewarded-specific callbacks.
+ * Mirrors AppLovin MAX SDK's MARewardedAdDelegate pattern.
  */
-@protocol CLXRewardedDelegate <CLXAdDelegate>
+@protocol CLXRewardedDelegate <CLXFullscreenAdDelegate>
 
 /**
- * Called when user is rewarded.
- * @param ad ad that was rewarded
+ * The SDK invokes this method when a user should be granted a reward.
+ *
+ * @param ad     Ad for which the user earned the reward.
+ * @param reward The reward to be granted to the user (contains amount and label/currency).
  */
-- (void)userRewarded:(CLXAd *)ad NS_SWIFT_NAME(userRewarded(_:));
+- (void)didRewardUserForAd:(CLXAd *)ad withReward:(CLXReward *)reward NS_SWIFT_NAME(didRewardUser(for:with:));
 
 @end
 

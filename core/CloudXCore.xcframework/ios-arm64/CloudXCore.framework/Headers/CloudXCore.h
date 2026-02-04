@@ -29,16 +29,20 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXAdType.h>
 
 // Configuration
+#import <CloudXCore/CLXInitializationConfiguration.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXPrivacyConsent.h>
 #import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXSDKConfig.h>
-#import <CloudXCore/CLXSDKConfigPlacement.h>
+#import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXBiddingConfig.h>
 
 // Ad Base
 #import <CloudXCore/CLXAd.h>
+#import <CloudXCore/CLXAdFormat.h>
 #import <CloudXCore/CLXAdDelegate.h>
+#import <CloudXCore/CLXFullscreenAdDelegate.h>
+#import <CloudXCore/CLXAdRevenueDelegate.h>
 #import <CloudXCore/CLXDestroyable.h>
 
 // Banner
@@ -54,12 +58,7 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 // Rewarded
 #import <CloudXCore/CLXRewarded.h>
 #import <CloudXCore/CLXRewardedDelegate.h>
-
-// Native
-#import <CloudXCore/CLXNative.h>
-#import <CloudXCore/CLXNativeDelegate.h>
-#import <CloudXCore/CLXNativeAdView.h>
-#import <CloudXCore/CLXNativeTemplate.h>
+#import <CloudXCore/CLXReward.h>
 
 // Debug UI
 #import <CloudXCore/CLXDebugOverlayManager.h>
@@ -75,8 +74,6 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 // Adapter Protocols
 #import <CloudXCore/CLXAdapterBanner.h>
 #import <CloudXCore/CLXAdapterBannerFactory.h>
-#import <CloudXCore/CLXAdapterNative.h>
-#import <CloudXCore/CLXAdapterNativeFactory.h>
 #import <CloudXCore/CLXAdapterRewarded.h>
 #import <CloudXCore/CLXAdapterRewardedFactory.h>
 #import <CloudXCore/CLXAdapterInterstitial.h>
@@ -85,12 +82,13 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXAdNetworkFactories.h>
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXAdapterFactoryResolver.h>
+#import <CloudXCore/CLXAdapterLoader.h>
 
 // Adapter Models
 #import <CloudXCore/CLXBidResponse.h>
 #import <CloudXCore/CLXBidderConfig.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
-#import <CloudXCore/CLXAdFormat.h>
+#import <CloudXCore/CLXFullscreenAd.h>
 
 // Adapter Services
 #import <CloudXCore/CLXAdTrackingService.h>
@@ -103,6 +101,7 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXSystemInformation.h>
 #import <CloudXCore/CLXORTBConstants.h>
+#import <CloudXCore/CLXAdUnitValidator.h>
 
 // =============================================================================
 // MARK: - INTERNAL (transitively imported for module compatibility)

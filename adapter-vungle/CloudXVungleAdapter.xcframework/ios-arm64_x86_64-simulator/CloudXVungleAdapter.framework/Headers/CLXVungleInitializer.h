@@ -53,9 +53,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Initializes the Vungle SDK with the provided configuration
  * @param config The bidder configuration containing App ID and other settings
+ * @param testMode Whether test mode is enabled (from server deviceConfig)
  * @param completion Completion block called with success/failure result
  */
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config 
+                    testMode:(BOOL)testMode
                   completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
 
 @end

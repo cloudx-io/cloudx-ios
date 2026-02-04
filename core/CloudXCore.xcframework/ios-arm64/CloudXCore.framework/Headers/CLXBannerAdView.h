@@ -11,6 +11,7 @@
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXBannerType.h>
 #import <CloudXCore/CLXBannerDelegate.h>
+#import <CloudXCore/CLXAdRevenueDelegate.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -29,16 +30,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly) CLXAd *ad;
 
 /**
- * A weak reference to the object that implements CLXBannerDelegate protocol. 
+ * A weak reference to the object that implements CLXBannerDelegate protocol.
  * This object will receive events related to the banner ad.
  */
 @property (nonatomic, weak, nullable) id<CLXBannerDelegate> delegate;
 
 /**
- * A boolean indicating whether the ad is loaded and ready to be shown.
- * Delegates to the underlying ad instance.
+ * Delegate that receives revenue events for the banner ad.
  */
-@property (nonatomic, assign, readonly) BOOL isReady;
+@property (nonatomic, weak, nullable) id<CLXAdRevenueDelegate> revenueDelegate;
 
 /**
  * A boolean indicating whether to suspend preloading the ad when it's not visible.
@@ -46,9 +46,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL suspendPreloadWhenInvisible;
 
 /**
- * The ad unit identifier for this banner ad view.
+ * The ad unit ID for this banner ad view.
  */
-@property (nonatomic, copy, readonly) NSString *adUnitIdentifier;
+@property (nonatomic, copy, readonly) NSString *adUnitId;
 
 /**
  * The ad format for this banner ad view.
@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * The placement identifier for this banner ad view.
- * 
+ *
  * Note: This is currently a stub implementation for MAX SDK compatibility.
  * The value can be set but is not yet used in reporting or analytics.
  * Contact CloudX support if you need this functionality enabled.
@@ -65,16 +65,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *placement;
 
 /**
- * Initializes a new CLXBannerAdView with the given banner, type, and delegate.
+ * Custom data for tracking (e.g., "level:5,coins:100").
+ */
+@property (nonatomic, copy, nullable) NSString *customData;
+
+/**
+ * Initializes a new CLXBannerAdView with the given banner and type.
  * The frame of the view is set based on the size of the banner type.
  * @param banner The banner instance
  * @param type The banner type
- * @param delegate The delegate to receive events
  * @return Initialized banner ad view
+ * @discussion Set the delegate property after initialization to receive events
  */
-- (instancetype)initWithBanner:(id<CLXBanner>)banner 
-                         type:(CLXBannerType)type 
-                     delegate:(nullable id<CLXBannerDelegate>)delegate;
+- (instancetype)initWithBanner:(id<CLXBanner>)banner
+                         type:(CLXBannerType)type;
 
 /**
  * Starts banner loading process.

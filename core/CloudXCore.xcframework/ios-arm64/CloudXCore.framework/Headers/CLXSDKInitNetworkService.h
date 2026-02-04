@@ -11,7 +11,6 @@
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBaseNetworkService.h>
-#import <CloudXCore/CLXExponentialBackoffStrategy.h>
 #import <CloudXCore/CLXSDKConfigRequest.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -26,9 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Logger instance for tracking initialization process */
 @property (nonatomic, strong) CLXLogger *logger;
-
-/** Strategy for handling retry attempts with exponential backoff */
-@property (nonatomic, strong) CLXExponentialBackoffStrategy *backOffStrategy;
 
 /**
  * @brief Initializes the network service with base URL and session

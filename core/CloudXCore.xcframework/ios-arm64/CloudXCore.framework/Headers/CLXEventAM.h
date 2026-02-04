@@ -19,9 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSString *impression;    // XOR encrypted payload
 @property (nonatomic, copy) NSString *campaignId;    // Base64 campaign ID
-@property (nonatomic, copy) NSString *eventValue;    // "N/A" for metrics
-@property (nonatomic, copy) NSString *eventName;     // "SDK_METRICS"
-@property (nonatomic, copy) NSString *type;          // "SDK_METRICS"
+@property (nonatomic, copy) NSString *eventValue;    // Event-specific value (e.g., "N/A" for metrics, "impression" for ad events)
+@property (nonatomic, copy) NSString *eventName;     // Event type (e.g., "sdkmetricenc" for metrics - must match Android EventType)
+@property (nonatomic, copy) NSString *type;          // Event type (e.g., "sdkmetricenc" for metrics - must match Android EventType)
 
 - (instancetype)initWithImpression:(NSString *)impression
                          campaignId:(NSString *)campaignId

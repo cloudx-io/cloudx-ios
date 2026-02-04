@@ -44,7 +44,7 @@ typedef NS_ENUM(NSInteger, CLXVungleAdapterErrorCode) {
  * @param logger The logger instance to use for logging
  * @param context Additional context (e.g., "Banner", "Interstitial", "Rewarded", "Native")
  * @param placementID The placement ID where the error occurred
- * @return Enhanced NSError with additional metadata for rate limiting and retry logic
+ * @return Enhanced NSError with additional metadata
  */
 + (NSError *)handleVungleError:(NSError *)error
                     withLogger:(CLXLogger *)logger
@@ -60,33 +60,11 @@ typedef NS_ENUM(NSInteger, CLXVungleAdapterErrorCode) {
 + (NSError *)mapVungleError:(NSError *)vungleError context:(NSString *)context;
 
 /**
- * Checks if the error indicates rate limiting and returns suggested delay
- * @param error The NSError from Vungle SDK
- * @return Suggested delay in seconds, or 0 if no delay needed
- */
-+ (NSTimeInterval)suggestedDelayForError:(NSError *)error;
-
-/**
- * Checks if the error is retryable (network issues, server errors)
- * @param error The NSError from Vungle SDK
- * @return YES if the error suggests retrying might succeed
- */
-+ (BOOL)isRetryableError:(NSError *)error;
-
-/**
  * Gets a human-readable description of the error code
  * @param errorCode The Vungle SDK error code
  * @return Descriptive string explaining the error
  */
 + (NSString *)descriptionForErrorCode:(NSInteger)errorCode;
-
-/**
- * Gets user-friendly alert title and message for displaying to end users
- * @param error The NSError from Vungle SDK or CloudX system
- * @param context Additional context (e.g., "Banner", "Interstitial", "Rewarded", "Native")
- * @return Dictionary with @"title" and @"message" keys for user-friendly display
- */
-+ (NSDictionary *)userFriendlyAlertInfoForError:(NSError *)error context:(NSString *)context;
 
 @end
 

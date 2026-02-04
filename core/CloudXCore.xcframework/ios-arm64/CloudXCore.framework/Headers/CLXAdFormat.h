@@ -4,7 +4,7 @@
 
 /**
  * @file CLXAdFormat.h
- * @brief Common protocol for all ad formats with shared lifecycle methods
+ * @brief Ad format types for public API parity with Android CloudXAdFormat
  */
 
 #import <Foundation/Foundation.h>
@@ -12,37 +12,15 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Common protocol for all ad formats that defines shared lifecycle methods.
- * This protocol provides the basic interface that all ad types (banner, interstitial, rewarded, native) implement.
+ * Ad format types representing the different ad formats supported by CloudX SDK.
+ * This enum provides public API parity with Android's CloudXAdFormat.
  */
-@protocol CLXAdFormat <NSObject>
-
-/**
- * Indicates whether the ad is ready to be displayed.
- */
-@property (nonatomic, readonly) BOOL isReady;
-
-/**
- * Indicates whether the ad is currently loading.
- */
-@property (nonatomic, readonly) BOOL isLoading;
-
-/**
- * Indicates whether the ad has been destroyed and can no longer be used.
- */
-@property (nonatomic, readonly) BOOL isDestroyed;
-
-/**
- * Loads the ad. This method initiates the ad loading process.
- */
-- (void)load;
-
-/**
- * Destroys the ad and cleans up all associated resources.
- * After calling this method, the ad instance should not be used.
- */
-- (void)destroy;
-
-@end
+typedef NS_ENUM(NSInteger, CLXAdFormat) {
+    CLXAdFormatBanner = 0,
+    CLXAdFormatMREC = 1,
+    CLXAdFormatInterstitial = 2,
+    CLXAdFormatRewarded = 3,
+    CLXAdFormatNative = 4,
+};
 
 NS_ASSUME_NONNULL_END
