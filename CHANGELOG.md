@@ -14,6 +14,7 @@ This release introduces a new initialization API with `CLXInitializationConfigur
 ### Added
 - **New initialization API** with `CLXInitializationConfiguration` builder pattern
 - `CLXSdkConfiguration` returned in initialization completion callback
+- **InMobi adapter** for InMobi SDK mediation
 - `CLXAd.networkPlacement` property for network-specific placement ID
 - `CLXAd.adFormat` property for the ad format type
 - `setPlacement:` and `setCustomData:` methods on `CLXBannerAdView` for tracking
@@ -34,7 +35,6 @@ This release introduces a new initialization API with `CLXInitializationConfigur
 ### Changed
 - Meta Audience Network SDK updated from 6.20.1 to 6.21.0
 - Vungle SDK updated from 7.4.0 to 7.6.0
-- InMobi SDK updated from 10.8 to 11.1
 
 ### Fixed
 - All `load` and `show` calls now guarantee callbacks on the main thread
