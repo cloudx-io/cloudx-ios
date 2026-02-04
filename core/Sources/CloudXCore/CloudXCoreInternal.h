@@ -132,11 +132,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CloudXCore (Internal)
 
 /**
- * The ad network factories for creating adapter instances
- */
-@property (nonatomic, strong, readonly) CLXAdNetworkFactories *adNetworkFactories;
-
-/**
  * Check if a specific adapter has completed initialization
  * @param adapterName The name of the adapter (e.g., "meta", "vungle")
  * @return YES if the adapter is ready, NO otherwise
@@ -198,14 +193,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion Internal property for adapter creation - not part of public API
  */
 @property (nonatomic, strong, readonly) CLXAdNetworkFactories *adNetworkFactories;
-
-/**
- * Create impression model for tracking
- * @param auctionID The auction identifier
- * @return Impression model or nil if not available
- * @discussion Internal method for impression tracking - not part of public API
- */
-- (nullable CLXConfigImpressionModel *)createImpModelWithAuctionID:(NSString *)auctionID;
 
 #pragma mark - Native Ads (Internal - not part of public API)
 
