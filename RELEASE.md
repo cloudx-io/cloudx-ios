@@ -315,7 +315,20 @@ git push origin release/vX.Y.Z
 
 **Only proceed after Phase 4 testing is successful!**
 
-#### Step 1: Merge PUBLIC Repo PR
+**⚠️ CRITICAL: Follow these steps IN ORDER. Do not skip ahead to private repo steps before completing public repo steps!**
+
+**Checklist (in order):**
+1. [ ] **PUBLIC REPO FIRST:** Merge PR, tag, create GitHub releases with xcframeworks
+2. [ ] **PRIVATE REPO:** Merge release → develop (regular merge)
+3. [ ] **PRIVATE REPO:** Merge release → main (SQUASH merge)
+4. [ ] **PRIVATE REPO:** Sync main back to develop (prevents future conflicts)
+5. [ ] **PRIVATE REPO:** Tag main, create dSYM release (INTERNAL only)
+
+---
+
+#### Step 1: Merge PUBLIC Repo PR and Create Releases
+
+**Complete this ENTIRE step before moving to Step 2!**
 
 ```bash
 # Go to GitHub and merge cloudx-ios PR to main
@@ -341,6 +354,8 @@ gh release create vX.Y.Z-renderer --title "CloudXRenderer X.Y.Z" renderer-cloudx
 ```
 
 #### Step 2: Merge PRIVATE Repo PRs
+
+**⚠️ Only proceed after Step 1 (PUBLIC repo) is fully complete!**
 
 ```bash
 # Go to GitHub:
