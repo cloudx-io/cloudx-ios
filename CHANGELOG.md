@@ -32,7 +32,9 @@ This release introduces a new initialization API with `CLXInitializationConfigur
 - Removed native ad support (`createNativeAdWithPlacement:viewController:delegate:`)
 
 ### Changed
-- Meta Audience Network SDK updated from 6.17.0 to 6.21.0
+- Meta Audience Network SDK updated from 6.20.1 to 6.21.0
+- Vungle SDK updated from 7.4.0 to 7.6.0
+- InMobi SDK updated from 10.8 to 11.1
 
 ### Fixed
 - All `load` and `show` calls now guarantee callbacks on the main thread
