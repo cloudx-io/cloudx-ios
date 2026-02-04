@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.0] - 2026-02-04
+
+This release introduces a new initialization API with `CLXInitializationConfiguration` and renames several `CLXAd` properties to align with the Android SDK. Update your initialization code and any code accessing ad metadata properties.
+
+### Added
+- **New initialization API** with `CLXInitializationConfiguration` builder pattern
+- `CLXSdkConfiguration` returned in initialization completion callback
+- `CLXAd.networkPlacement` property for network-specific placement ID
+- `CLXAd.adFormat` property for the ad format type
+- `setPlacement:` and `setCustomData:` methods on `CLXBannerAdView` for tracking
+- `show:placement:customData:` overloads on fullscreen ads for tracking
+- `revenueDelegate` property on `CLXBannerAdView` for ad revenue callbacks
+
+### Breaking Changes
+- Replaced `initializeSDKWithAppKey:testMode:completion:` with `initializeWithConfiguration:completion:`
+- Initialization completion now returns `CLXSdkConfiguration` instead of `BOOL success`
+- Renamed `CLXAd.placementId` to `adUnitId`
+- Renamed `CLXAd.placementName` to `adUnitName`
+- Renamed `CLXAd.bidder` to `networkName`
+- Renamed `CLXAd.externalPlacementId` to `networkPlacement`
+- Removed `testMode` parameter - test mode is now server-controlled via the CloudX dashboard
+- Removed deprecated privacy methods (`setCCPAPrivacyString:`, `setIsUserConsent:`, `setIsDoNotSell:`) - privacy is now handled automatically via GPP/TCF
+- Removed native ad support (`createNativeAdWithPlacement:viewController:delegate:`)
+
+### Changed
+- Meta Audience Network SDK updated from 6.17.0 to 6.21.0
+
+### Fixed
+- All `load` and `show` calls now guarantee callbacks on the main thread
+- Ad reload now works correctly in `onAdHidden` and `onAdDisplayFailed` callbacks
+
+---
+
 ## [1.3.0] - 2025-12-14
 
 ### Added
@@ -92,16 +125,18 @@ end
 
 ```objc
 // Initialize SDK
-[[CloudXCore shared] initializeSDKWithAppKey:@"YOUR_APP_KEY"
-                                    testMode:NO
-                                  completion:^(BOOL success, CLXError *error) {
-    if (success) {
+CLXInitializationConfiguration *config =
+    [CLXInitializationConfiguration configurationWithAppKey:@"YOUR_APP_KEY"
+        builderBlock:nil];
+[[CloudXCore shared] initializeWithConfiguration:config
+                                      completion:^(CLXSdkConfiguration *sdkConfig, CLXError *error) {
+    if (sdkConfig) {
         NSLog(@"CloudX SDK initialized!");
     }
 }];
 
 // Create and load a banner ad
-CLXBannerAdView *banner = [[CloudXCore shared] createBannerWithPlacement:@"PLACEMENT_ID"
+CLXBannerAdView *banner = [[CloudXCore shared] createBannerWithPlacement:@"AD_UNIT_ID"
                                                            viewController:self
                                                                  delegate:self];
 [self.view addSubview:banner];
