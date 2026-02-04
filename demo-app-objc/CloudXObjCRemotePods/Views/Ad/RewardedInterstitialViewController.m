@@ -138,7 +138,7 @@
 #pragma mark - CLXRewardedInterstitialDelegate
 
 - (void)didLoadAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"✅ RewardedInterstitial didLoadWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"✅ RewardedInterstitial didLoadAd" ad:ad];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
 }
@@ -157,11 +157,12 @@
 }
 
 - (void)didDisplayAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 RewardedInterstitial didShowWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 RewardedInterstitial didDisplayAd" ad:ad];
 }
 
 - (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ RewardedInterstitial failToShowWithAd - Error: %@", error.localizedDescription]];
+    NSString *errorInfo = error ? [NSString stringWithFormat:@" - Error: %@", error.localizedDescription] : @"";
+    [[DemoAppLogger sharedInstance] logAdEvent:[NSString stringWithFormat:@"❌ RewardedInterstitial didFailToDisplayAd%@", errorInfo] ad:ad];
     [self updateStatusUIWithState:AdStateNoAd];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -173,18 +174,18 @@
 }
 
 - (void)didHideAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🔚 RewardedInterstitial didHideWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 RewardedInterstitial didHideAd" ad:ad];
     self.rewardedInterstitialAd = nil;
     // Don't auto-load - user must press Load Rewarded Interstitial button
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
 - (void)didClickAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 RewardedInterstitial didClickWithAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👆 RewardedInterstitial didClickAd" ad:ad];
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 RewardedInterstitial revenuePaid - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 RewardedInterstitial didPayRevenueForAd" ad:ad];
 }
 
 - (void)didRewardUserForAd:(CLXAd *)ad withReward:(CLXReward *)reward {

@@ -89,7 +89,14 @@ class DemoAppLogger {
         } else {
             details += "\n  🆔 Ad Unit ID: (null)"
         }
-        
+
+        // Placement (publisher-provided)
+        if let placement = ad.placement {
+            details += "\n  📌 Placement: \(placement)"
+        } else {
+            details += "\n  📌 Placement: (null)"
+        }
+
         // Network Name
         if let networkName = ad.networkName {
             details += "\n  🏢 Network: \(networkName)"

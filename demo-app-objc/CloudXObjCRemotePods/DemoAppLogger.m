@@ -110,7 +110,14 @@
     } else {
         [details appendString:@"\n  🆔 Ad Unit ID: (null)"];
     }
-    
+
+    // Placement (publisher-provided)
+    if (ad.placement) {
+        [details appendFormat:@"\n  📌 Placement: %@", ad.placement];
+    } else {
+        [details appendString:@"\n  📌 Placement: (null)"];
+    }
+
     // Network Name
     if (ad.networkName) {
         [details appendFormat:@"\n  🏢 Network: %@", ad.networkName];

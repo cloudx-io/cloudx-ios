@@ -267,13 +267,27 @@ static void initializeLogger() {
     self.banner.suspendPreloadWhenInvisible = suspendPreloadWhenInvisible;
 }
 
-- (void)load {
-    // Pass placement/customData to underlying banner before loading
+- (void)setPlacement:(NSString *)placement {
+    _placement = [placement copy];
+    
+    // Keep underlying banner in sync for delegate callbacks
     if ([self.banner isKindOfClass:[CLXPublisherBanner class]]) {
         CLXPublisherBanner *publisherBanner = (CLXPublisherBanner *)self.banner;
-        publisherBanner.publisherPlacement = self.placement;
-        publisherBanner.publisherCustomData = self.customData;
+        publisherBanner.publisherPlacement = _placement;
     }
+}
+
+- (void)setCustomData:(NSString *)customData {
+    _customData = [customData copy];
+    
+    // Keep underlying banner in sync for delegate callbacks
+    if ([self.banner isKindOfClass:[CLXPublisherBanner class]]) {
+        CLXPublisherBanner *publisherBanner = (CLXPublisherBanner *)self.banner;
+        publisherBanner.publisherCustomData = _customData;
+    }
+}
+
+- (void)load {
     // Delegate to the underlying banner since CLXAd is a data object
     [self.banner load];
 }
