@@ -76,11 +76,25 @@ class DemoAppLogger {
         
         var details = " - Ad Details:"
         
+        // Ad Unit Name
+        if let adUnitName = ad.adUnitName {
+            details += "\n  📍 Ad Unit: \(adUnitName)"
+        } else {
+            details += "\n  📍 Ad Unit: (null)"
+        }
+        
         // Ad Unit ID
         if let adUnitId = ad.adUnitId {
-            details += "\n  📍 Ad Unit ID: \(adUnitId)"
+            details += "\n  🆔 Ad Unit ID: \(adUnitId)"
         } else {
-            details += "\n  📍 Ad Unit ID: (null)"
+            details += "\n  🆔 Ad Unit ID: (null)"
+        }
+        
+        // Placement (publisher-provided)
+        if let placement = ad.placement {
+            details += "\n  📌 Placement: \(placement)"
+        } else {
+            details += "\n  📌 Placement: (null)"
         }
         
         // Network Name

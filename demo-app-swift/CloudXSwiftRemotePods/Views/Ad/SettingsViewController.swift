@@ -53,7 +53,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
         case 0: return 2 // SDK Settings
-        case 1: return 6 // Ad Unit Settings
+        case 1: return 4 // Ad Unit Settings (Banner, MREC, Interstitial, Rewarded)
         case 2: return 3 // Privacy
         case 3: return 4 // Logging: Enable, Emojis, Timestamps, Level
         default: return 0
@@ -109,12 +109,6 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
             case 3: 
                 cell.textLabel?.text = "Rewarded"
                 textField.text = settings.rewardedAdUnitId
-            case 4: 
-                cell.textLabel?.text = "Native Small"
-                textField.text = settings.nativeSmallAdUnitId
-            case 5: 
-                cell.textLabel?.text = "Native Medium"
-                textField.text = settings.nativeMediumAdUnitId
             default: break
             }
         case 2: // Privacy
@@ -178,8 +172,8 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
     
     @objc private func loggingToggleChanged(_ sender: UISwitch) {
         if sender.tag == 300 {
-            // Logging Enabled/Disabled
-            CloudXCore.setLoggingEnabled(sender.isOn)
+            // Logging Enabled/Disabled - use setMinLogLevel instead of deprecated setLoggingEnabled
+            CloudXCore.setMinLogLevel(sender.isOn ? .verbose : .none)
             UserDefaults.standard.set(!sender.isOn, forKey: "LoggingDisabled")
             UserDefaults.standard.synchronize()
             print("🪵 Logging \(sender.isOn ? "ENABLED" : "DISABLED")")
@@ -218,8 +212,6 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         else if tag == 11 { settings.mrecAdUnitId = textField.text ?? "" }
         else if tag == 12 { settings.interstitialAdUnitId = textField.text ?? "" }
         else if tag == 13 { settings.rewardedAdUnitId = textField.text ?? "" }
-        else if tag == 14 { settings.nativeSmallAdUnitId = textField.text ?? "" }
-        else if tag == 15 { settings.nativeMediumAdUnitId = textField.text ?? "" }
         else if tag == 20 { settings.consentString = textField.text ?? "" }
         else if tag == 21 { settings.usPrivacyString = textField.text ?? "" }
     }
