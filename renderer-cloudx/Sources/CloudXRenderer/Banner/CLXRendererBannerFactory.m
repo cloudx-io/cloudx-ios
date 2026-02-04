@@ -54,6 +54,7 @@
  * @param adm Ad markup string (HTML/JavaScript content)
  * @param hasClosedButton Whether to show close button for expandable ads
  * @param extras Additional configuration parameters
+ * @param adUnitName CloudX ad unit name for error messaging (may be nil)
  * @param delegate Banner delegate for event callbacks
  * @return Configured CLXRendererBanner instance or nil if creation fails
  */
@@ -64,9 +65,11 @@
                                                        adm:(NSString *)adm
                                               hasClosedButton:(BOOL)hasClosedButton
                                                      extras:(NSDictionary<NSString *, NSString *> *)extras
+                                                adUnitName:(nullable NSString *)adUnitName
                                                    delegate:(id<CLXAdapterBannerDelegate>)delegate {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXRendererBannerFactory"];
-    [logger debug:[NSString stringWithFormat:@"Creating banner - Type: %ld, Markup: %lu chars, CloseBtn: %@", (long)type, (unsigned long)(adm ? adm.length : 0), hasClosedButton ? @"YES" : @"NO"]];
+    [logger debug:[NSString stringWithFormat:@"Creating banner - Ad Unit: %@ (%@), BidID: %@, Type: %ld, Markup: %lu chars, CloseBtn: %@", 
+                  adUnitName ?: @"(unknown)", adId, bidId, (long)type, (unsigned long)(adm ? adm.length : 0), hasClosedButton ? @"YES" : @"NO"]];
     
     // Validate required parameters
     if (!viewController) {
