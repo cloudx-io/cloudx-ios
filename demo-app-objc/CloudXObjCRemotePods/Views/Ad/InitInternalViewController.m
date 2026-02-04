@@ -72,13 +72,12 @@
         [[CloudXCore shared] setHashedUserID:config.hashedUserId];
     }
     
-    // Use standard CloudXCore initialization
-    // Demo app - use testMode:YES for test ads
-    [[CloudXCore shared] initializeSDKWithAppKey:config.appKey 
-                                testMode:YES
-                                completion:^(BOOL success, CLXError * _Nullable error) {
+    // Use standard CloudXCore initialization with configuration object
+    CLXInitializationConfiguration *initConfig = [CLXInitializationConfiguration configurationWithAppKey:config.appKey];
+    [[CloudXCore shared] initializeWithConfiguration:initConfig 
+                                          completion:^(CLXSdkConfiguration * _Nullable sdkConfig, CLXError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (success) {
+            if (sdkConfig) {
                 [[DemoAppLogger sharedInstance] logMessage:@"✅ SDK initialized successfully"];
                 self.isSDKInitialized = YES;
                 [self updateStatusUIWithState:AdStateReady];

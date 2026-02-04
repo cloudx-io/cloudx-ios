@@ -108,11 +108,13 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
     private func createAndAddMRECToView() {
         guard mrecAd == nil else { return }
         
-        var placement = placementName
-        if !settings.mrecPlacement.isEmpty {
-            placement = settings.mrecPlacement
+        var adUnitId = self.adUnitId
+        if !settings.mrecAdUnitId.isEmpty {
+            adUnitId = settings.mrecAdUnitId
         }
-        mrecAd = CloudXCore.shared.createMREC(placement: placement, viewController: self, delegate: self)
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId, viewController: self)
+        mrecAd?.delegate = self
+        mrecAd?.revenueDelegate = self
         
         guard let mrecAd = mrecAd else {
             showAlert(title: "Error", message: "Failed to create MREC.")
@@ -166,8 +168,8 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         }
     }
     
-    private var placementName: String {
-        return CLXDemoConfigManager.sharedManager.currentConfig.mrecPlacement
+    private var adUnitId: String {
+        return CLXDemoConfigManager.sharedManager.currentConfig.mrecAdUnitId
     }
     
     private func loadMREC() {
@@ -179,10 +181,11 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         isLoading = true
         updateStatusUI(state: .loading)
 
-        let placement = placementName
-        mrecAd = CloudXCore.shared.createMREC(placement: placement,
-                                            viewController: self,
-                                            delegate: self)
+        let adUnitId = self.adUnitId
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId,
+                                            viewController: self)
+        mrecAd?.delegate = self
+        mrecAd?.revenueDelegate = self
         
         if let mrecAd = mrecAd {
             mrecAd.load()
@@ -203,8 +206,8 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         // Don't auto-show - user must press Show MREC button
     }
     
-    func didFailToLoadAd(error: CLXError) {
-        DemoAppLogger.sharedInstance.logMessage("❌ MREC failed to load - Error: \(error.localizedDescription)")
+    func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
+        DemoAppLogger.sharedInstance.logMessage("❌ MREC failed to load (\(adUnitId)) - Error: \(error.localizedDescription)")
         isLoading = false
         
         DispatchQueue.main.async { [weak self] in

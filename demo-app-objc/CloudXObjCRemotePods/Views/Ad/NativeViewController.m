@@ -80,8 +80,8 @@
     [self resetAdState];
 }
 
-- (NSString *)placementName {
-    return [[CLXDemoConfigManager sharedManager] currentConfig].nativePlacement;
+- (NSString *)adUnitId {
+    return [[CLXDemoConfigManager sharedManager] currentConfig].nativeAdUnitId;
 }
 
 - (void)loadNativeAd {
@@ -108,8 +108,8 @@
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
 
-    NSString *placement = [self placementName];
-    self.nativeAd = [[CloudXCore shared] createNativeAdWithPlacement:placement
+    NSString *adUnitId = [self adUnitId];
+    self.nativeAd = [[CloudXCore shared] createNativeAdWithAdUnitId:adUnitId
                                                       viewController:self
                                                             delegate:self];
     
@@ -170,8 +170,8 @@
     // Don't auto-show - user must press Show Native button
 }
 
-- (void)didFailToLoadAdWithError:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Native failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
+- (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Native failed to load (%@) - Error: %@", adUnitId, error ? error.localizedDescription : @"Unknown error"]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeAd = nil;

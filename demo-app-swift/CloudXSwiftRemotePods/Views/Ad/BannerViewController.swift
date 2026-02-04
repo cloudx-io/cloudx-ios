@@ -105,13 +105,12 @@ class BannerViewController: BaseAdViewController {
         
         DemoAppLogger.sharedInstance.logMessage("📱 Creating new banner ad instance...")
         
-        // Create banner ad with placement from config
-        let placement = CLXDemoConfigManager.sharedManager.currentConfig.bannerPlacement
-        bannerAd = cloudX.createBanner(placement: placement, 
-                                      viewController: self, 
-                                      delegate: self)
+        // Create banner ad with adUnitId from config
+        let adUnitId = CLXDemoConfigManager.sharedManager.currentConfig.bannerAdUnitId
+        bannerAd = cloudX.createBanner(adUnitId: adUnitId, viewController: self)
+        bannerAd?.delegate = self
+        bannerAd?.revenueDelegate = self
         
-        // SDK now always returns non-nil - validation errors deferred to load() callback
         DemoAppLogger.sharedInstance.logMessage("✅ Banner ad instance created successfully")
         
         // Add banner to view hierarchy immediately
@@ -162,8 +161,8 @@ extension BannerViewController: CLXBannerDelegate {
         updateStatusUI(state: .ready)
     }
     
-    func didFailToLoadAd(error: CLXError) {
-        DemoAppLogger.sharedInstance.logMessage("❌ Banner failed to load - Error: \(error.localizedDescription)")
+    func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
+        DemoAppLogger.sharedInstance.logMessage("❌ Banner failed to load (\(adUnitId)) - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: .noAd)
         bannerAd = nil

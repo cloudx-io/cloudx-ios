@@ -117,8 +117,8 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (NSString *)placementName {
-    return [[CLXDemoConfigManager sharedManager] currentConfig].bannerPlacement;
+- (NSString *)adUnitId {
+    return [[CLXDemoConfigManager sharedManager] currentConfig].bannerAdUnitId;
 }
 
 - (void)loadBannerAd {
@@ -144,20 +144,17 @@
 - (void)createAndAddBannerToView {
     if (self.bannerAd) return;
     
-    // Always preserve the original human-readable placement name for display purposes
-    NSString *originalPlacementName = [self placementName];
-    
-    // Use settings placement ID for SDK call if provided, otherwise use original name
-    NSString *placement = originalPlacementName;
-    if (_settings.bannerPlacement.length > 0) {
-        placement = _settings.bannerPlacement;
+    // Get ad unit ID from config, with settings override if provided
+    NSString *adUnitId = [self adUnitId];
+    if (_settings.bannerAdUnitId.length > 0) {
+        adUnitId = _settings.bannerAdUnitId;
     }
     
-    self.bannerAd = [[CloudXCore shared] createBannerWithPlacement:placement
-                                                      viewController:self
-                                                          delegate:self];
+    self.bannerAd = [[CloudXCore shared] createBannerWithAdUnitId:adUnitId
+                                                      viewController:self];
+    self.bannerAd.delegate = self;
+    self.bannerAd.revenueDelegate = self;
     
-    // SDK now always returns non-nil - validation errors deferred to load() callback
     // Add banner to view hierarchy immediately
     [self addBannerToViewHierarchy];
 }
@@ -242,8 +239,8 @@
     // Don't auto-show - user must press Show Banner button
 }
 
-- (void)didFailToLoadAdWithError:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
+- (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failed to load (%@) - Error: %@", adUnitId, error ? error.localizedDescription : @"Unknown error"]];
     
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];

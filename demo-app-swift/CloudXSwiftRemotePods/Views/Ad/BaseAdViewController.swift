@@ -90,10 +90,11 @@ class BaseAdViewController: UIViewController, AdStateManaging {
         }
 
         return await withCheckedContinuation { continuation in
-            // Demo app - use testMode: true for test ads
-            cloudX.initializeSDK(appKey: appKey, testMode: true) { success, error in
-                if success {
-                    print("✅ SDK Initialized: \(success)")
+            // Use standard CloudXCore initialization with configuration object
+            let initConfig = CLXInitializationConfiguration.configuration(appKey: appKey)
+            cloudX.initialize(with: initConfig) { sdkConfig, error in
+                if sdkConfig != nil {
+                    print("✅ SDK Initialized successfully")
                     NotificationCenter.default.post(name: .sdkInitialized, object: nil)
                 } else {
                     print("❌ SDK Init Failed: \(error?.localizedDescription ?? "Unknown error")")

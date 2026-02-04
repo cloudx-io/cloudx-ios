@@ -71,8 +71,8 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (NSString *)placementName {
-    return [[CLXDemoConfigManager sharedManager] currentConfig].rewardedPlacement;
+- (NSString *)adUnitId {
+    return [[CLXDemoConfigManager sharedManager] currentConfig].rewardedAdUnitId;
 }
 
 - (void)loadRewardedAd {
@@ -102,23 +102,24 @@
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
 
-    NSString *placement = [self placementName];
-    if (_settings.rewardedPlacement.length > 0) {
-        placement = _settings.rewardedPlacement;
+    NSString *adUnitId = [self adUnitId];
+    if (_settings.rewardedAdUnitId.length > 0) {
+        adUnitId = _settings.rewardedAdUnitId;
     }
-    NSLog(@"[RewardedViewController] Using placement: %@", placement);
+    NSLog(@"[RewardedViewController] Using adUnitId: %@", adUnitId);
     
     // Create rewarded with comprehensive logging
-    NSLog(@"[RewardedViewController] Calling createRewardedWithPlacement: %@", placement);
-    self.rewardedAd = [[CloudXCore shared] createRewardedWithPlacement:placement];
+    NSLog(@"[RewardedViewController] Calling createRewardedWithAdUnitId: %@", adUnitId);
+    self.rewardedAd = [[CloudXCore shared] createRewardedWithAdUnitId:adUnitId];
     self.rewardedAd.delegate = self;
+    self.rewardedAd.revenueDelegate = self;
     
     if (self.rewardedAd) {
         NSLog(@"[RewardedViewController] ✅ Rewarded ad instance created successfully: %@", self.rewardedAd);
         NSLog(@"[RewardedViewController] Loading rewarded ad instance...");
         [self.rewardedAd load];
     } else {
-        NSLog(@"[RewardedViewController] ❌ Failed to create rewarded with placement: %@", placement);
+        NSLog(@"[RewardedViewController] ❌ Failed to create rewarded with adUnitId: %@", adUnitId);
         self.isLoading = NO;
         [self updateStatusUIWithState:AdStateNoAd];
         [self showAlertWithTitle:@"Error" message:@"Failed to create rewarded ad."];
@@ -132,16 +133,17 @@
 
 - (void)createRewardedAd {
     if (self.rewardedAd) return;
-    NSString *placement = [self placementName];
-    NSLog(@"[RewardedViewController] Creating new Rewarded ad instance with placement: %@", placement);
+    NSString *adUnitId = [self adUnitId];
+    NSLog(@"[RewardedViewController] Creating new Rewarded ad instance with adUnitId: %@", adUnitId);
     // SDK config debugging removed to avoid undeclared selector warnings
-    self.rewardedAd = [[CloudXCore shared] createRewardedWithPlacement:placement];
+    self.rewardedAd = [[CloudXCore shared] createRewardedWithAdUnitId:adUnitId];
     self.rewardedAd.delegate = self;
+    self.rewardedAd.revenueDelegate = self;
     if (self.rewardedAd) {
         NSLog(@"✅ Rewarded ad instance created successfully: %@", self.rewardedAd);
         [self startPollingReadyState];
     } else {
-        NSLog(@"❌ Failed to create rewarded ad instance for placement: %@", placement);
+        NSLog(@"❌ Failed to create rewarded ad instance for adUnitId: %@", adUnitId);
     }
 }
 
@@ -218,8 +220,8 @@
     // Do NOT show the ad here!
 }
 
-- (void)didFailToLoadAdWithError:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failed to load - Error: %@", error.localizedDescription]];
+- (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failed to load (%@) - Error: %@", adUnitId, error.localizedDescription]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     

@@ -76,8 +76,8 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
         resetAdState()
     }
     
-    private var placementName: String {
-        return CLXDemoConfigManager.sharedManager.currentConfig.nativePlacement
+    private var adUnitId: String {
+        return CLXDemoConfigManager.sharedManager.currentConfig.nativeAdUnitId
     }
     
     @objc private func loadNativeAd() {
@@ -104,8 +104,8 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
         isLoading = true
         updateStatusUI(state: .loading)
 
-        let placement = placementName
-        nativeAd = CloudXCore.shared.createNativeAd(placement: placement,
+        let adUnitId = self.adUnitId
+        nativeAd = CloudXCore.shared.createNativeAd(adUnitId: adUnitId,
                                                    viewController: self,
                                                    delegate: self)
         
@@ -164,8 +164,8 @@ class NativeViewController: BaseAdViewController, CLXNativeDelegate {
         // Don't auto-show - user must press Show Native button
     }
     
-    func didFailToLoadAd(error: CLXError) {
-        DemoAppLogger.sharedInstance.logMessage("❌ Native failed to load - Error: \(error.localizedDescription)")
+    func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
+        DemoAppLogger.sharedInstance.logMessage("❌ Native failed to load (\(adUnitId)) - Error: \(error.localizedDescription)")
         
         DispatchQueue.main.async { [weak self] in
             self?.nativeAd = nil

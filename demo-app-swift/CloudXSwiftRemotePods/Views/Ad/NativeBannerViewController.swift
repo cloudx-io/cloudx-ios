@@ -75,8 +75,8 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
         NotificationCenter.default.removeObserver(self)
     }
     
-    private var placementName: String {
-        return CLXDemoConfigManager.sharedManager.currentConfig.nativeBannerPlacement
+    private var adUnitId: String {
+        return CLXDemoConfigManager.sharedManager.currentConfig.nativeBannerAdUnitId
     }
     
     @objc private func loadNativeBannerAd() {
@@ -106,13 +106,13 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
         isLoading = true
         updateStatusUI(state: .loading)
 
-        var placement = placementName
-        if !settings.nativeMediumPlacement.isEmpty {
-            placement = settings.nativeMediumPlacement
+        var adUnitId = self.adUnitId
+        if !settings.nativeMediumAdUnitId.isEmpty {
+            adUnitId = settings.nativeMediumAdUnitId
         }
-        print("[NativeBannerViewController] LOG: Using placement: '\(placement)'")
+        print("[NativeBannerViewController] LOG: Using adUnitId: '\(adUnitId)'")
         
-        nativeBannerAd = CloudXCore.shared.createNativeAd(placement: placement,
+        nativeBannerAd = CloudXCore.shared.createNativeAd(adUnitId: adUnitId,
                                                          viewController: self,
                                                          delegate: self)
         
@@ -121,7 +121,7 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
             print("[NativeBannerViewController] LOG: Loading native banner ad instance...")
             nativeBannerAd.load()
         } else {
-            print("[NativeBannerViewController] LOG: ❌ Failed to create native banner with placement: '\(placement)'")
+            print("[NativeBannerViewController] LOG: ❌ Failed to create native banner with adUnitId: '\(adUnitId)'")
             isLoading = false
             updateStatusUI(state: .noAd)
             showAlert(title: "Error", message: "Failed to create native banner ad.")
@@ -172,8 +172,8 @@ class NativeBannerViewController: BaseAdViewController, CLXNativeDelegate {
         }
     }
     
-    func didFailToLoadAd(error: CLXError) {
-        DemoAppLogger.sharedInstance.logMessage("❌ NativeBanner failed to load - Error: \(error.localizedDescription)")
+    func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
+        DemoAppLogger.sharedInstance.logMessage("❌ NativeBanner failed to load (\(adUnitId)) - Error: \(error.localizedDescription)")
         
         DispatchQueue.main.async { [weak self] in
             self?.nativeBannerAd = nil

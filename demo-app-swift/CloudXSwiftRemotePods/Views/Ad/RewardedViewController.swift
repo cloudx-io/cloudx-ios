@@ -68,8 +68,8 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
         NotificationCenter.default.removeObserver(self)
     }
     
-    private var placementName: String {
-        return CLXDemoConfigManager.sharedManager.currentConfig.rewardedPlacement
+    private var adUnitId: String {
+        return CLXDemoConfigManager.sharedManager.currentConfig.rewardedAdUnitId
     }
     
     @objc private func loadRewardedAd() {
@@ -98,23 +98,24 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
         isLoading = true
         updateStatusUI(state: .loading)
 
-        var placement = placementName
-        if !settings.rewardedPlacement.isEmpty {
-            placement = settings.rewardedPlacement
+        var adUnitId = self.adUnitId
+        if !settings.rewardedAdUnitId.isEmpty {
+            adUnitId = settings.rewardedAdUnitId
         }
-        DemoAppLogger.sharedInstance.logMessage("📍 [Rewarded] Using placement: \(placement)")
+        DemoAppLogger.sharedInstance.logMessage("📍 [Rewarded] Using adUnitId: \(adUnitId)")
         
         // Create rewarded with comprehensive logging
         DemoAppLogger.sharedInstance.logMessage("📱 [Rewarded] Calling createRewarded...")
-        rewardedAd = CloudXCore.shared.createRewarded(placement: placement)
+        rewardedAd = CloudXCore.shared.createRewarded(adUnitId: adUnitId)
         rewardedAd?.delegate = self
+        rewardedAd?.revenueDelegate = self
         
         if let rewardedAd = rewardedAd {
             DemoAppLogger.sharedInstance.logMessage("✅ [Rewarded] Rewarded ad instance created successfully")
             DemoAppLogger.sharedInstance.logMessage("🔄 [Rewarded] Loading rewarded ad instance...")
             rewardedAd.load()
         } else {
-            DemoAppLogger.sharedInstance.logMessage("❌ [Rewarded] Failed to create rewarded with placement: \(placement)")
+            DemoAppLogger.sharedInstance.logMessage("❌ [Rewarded] Failed to create rewarded with adUnitId: \(adUnitId)")
             isLoading = false
             updateStatusUI(state: .noAd)
             showAlert(title: "Error", message: "Failed to create rewarded ad.")
@@ -159,8 +160,8 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate {
         updateStatusUI(state: .ready)
     }
     
-    func didFailToLoadAd(error: CLXError) {
-        DemoAppLogger.sharedInstance.logMessage("❌ Rewarded failed to load - Error: \(error.localizedDescription)")
+    func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
+        DemoAppLogger.sharedInstance.logMessage("❌ Rewarded failed to load (\(adUnitId)) - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: .noAd)
         

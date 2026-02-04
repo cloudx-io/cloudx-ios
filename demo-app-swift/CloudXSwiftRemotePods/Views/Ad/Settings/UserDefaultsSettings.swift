@@ -13,12 +13,12 @@ class UserDefaultsSettings: NSObject {
     
     var appKey: String = ""
     var SDKinitURL: String = ""
-    var bannerPlacement: String = ""
-    var mrecPlacement: String = ""
-    var interstitialPlacement: String = ""
-    var rewardedPlacement: String = ""
-    var nativeSmallPlacement: String = ""
-    var nativeMediumPlacement: String = ""
+    var bannerAdUnitId: String = ""
+    var mrecAdUnitId: String = ""
+    var interstitialAdUnitId: String = ""
+    var rewardedAdUnitId: String = ""
+    var nativeSmallAdUnitId: String = ""
+    var nativeMediumAdUnitId: String = ""
     var consentString: String = ""
     var usPrivacyString: String = ""
     var userTargeting: Bool = false

@@ -84,15 +84,15 @@ class InterstitialViewController: BaseAdViewController {
         isLoading = true
         updateStatusUI(state: AdState.loading)
 
-        // Get placement from config manager (with settings override if provided)
-        let originalPlacementName = CLXDemoConfigManager.sharedManager.currentConfig.interstitialPlacement
-        var placement = originalPlacementName
-        if !settings.interstitialPlacement.isEmpty {
-            placement = settings.interstitialPlacement
+        // Get adUnitId from config manager (with settings override if provided)
+        var adUnitId = CLXDemoConfigManager.sharedManager.currentConfig.interstitialAdUnitId
+        if !settings.interstitialAdUnitId.isEmpty {
+            adUnitId = settings.interstitialAdUnitId
         }
         
-        interstitialAd = cloudX.createInterstitial(placement: placement)
+        interstitialAd = cloudX.createInterstitial(adUnitId: adUnitId)
         interstitialAd?.delegate = self
+        interstitialAd?.revenueDelegate = self
         
         if let interstitialAd = interstitialAd {
             interstitialAd.load()
@@ -192,8 +192,8 @@ extension InterstitialViewController: CLXInterstitialDelegate {
         // Don't auto-show - wait for user to press Show Interstitial button
     }
     
-    func didFailToLoadAd(error: CLXError) {
-        DemoAppLogger.sharedInstance.logMessage("❌ Interstitial failed to load - Error: \(error.localizedDescription)")
+    func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
+        DemoAppLogger.sharedInstance.logMessage("❌ Interstitial failed to load (\(adUnitId)) - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: AdState.noAd)
         

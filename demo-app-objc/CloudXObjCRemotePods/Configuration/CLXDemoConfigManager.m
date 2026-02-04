@@ -4,25 +4,25 @@
 
 - (instancetype)initWithAppKey:(NSString *)appKey
                  hashedUserId:(NSString *)hashedUserId
-               bannerPlacement:(NSString *)bannerPlacement
-                 mrecPlacement:(NSString *)mrecPlacement
-         interstitialPlacement:(NSString *)interstitialPlacement
-               nativePlacement:(NSString *)nativePlacement
-         nativeBannerPlacement:(NSString *)nativeBannerPlacement
-             rewardedPlacement:(NSString *)rewardedPlacement
-   rewardedInterstitialPlacement:(NSString *)rewardedInterstitialPlacement {
+               bannerAdUnitId:(NSString *)bannerAdUnitId
+                 mrecAdUnitId:(NSString *)mrecAdUnitId
+         interstitialAdUnitId:(NSString *)interstitialAdUnitId
+               nativeAdUnitId:(NSString *)nativeAdUnitId
+         nativeBannerAdUnitId:(NSString *)nativeBannerAdUnitId
+             rewardedAdUnitId:(NSString *)rewardedAdUnitId
+   rewardedInterstitialAdUnitId:(NSString *)rewardedInterstitialAdUnitId {
     
     self = [super init];
     if (self) {
         _appKey = [appKey copy];
         _hashedUserId = [hashedUserId copy];
-        _bannerPlacement = [bannerPlacement copy];
-        _mrecPlacement = [mrecPlacement copy];
-        _interstitialPlacement = [interstitialPlacement copy];
-        _nativePlacement = [nativePlacement copy];
-        _nativeBannerPlacement = [nativeBannerPlacement copy];
-        _rewardedPlacement = [rewardedPlacement copy];
-        _rewardedInterstitialPlacement = [rewardedInterstitialPlacement copy];
+        _bannerAdUnitId = [bannerAdUnitId copy];
+        _mrecAdUnitId = [mrecAdUnitId copy];
+        _interstitialAdUnitId = [interstitialAdUnitId copy];
+        _nativeAdUnitId = [nativeAdUnitId copy];
+        _nativeBannerAdUnitId = [nativeBannerAdUnitId copy];
+        _rewardedAdUnitId = [rewardedAdUnitId copy];
+        _rewardedInterstitialAdUnitId = [rewardedInterstitialAdUnitId copy];
     }
     return self;
 }
@@ -47,13 +47,13 @@
         _currentConfig = [[CLXDemoConfig alloc]
             initWithAppKey:@"ihtOXvp3X9JlMQ5p0_RYL"
             hashedUserId:@"test-user-123"
-            bannerPlacement:@"demo-banner-1"
-            mrecPlacement:@"demo-mrec-1"
-            interstitialPlacement:@"demo-interstitial-1"
-            nativePlacement:@"-"
-            nativeBannerPlacement:@"-"
-            rewardedPlacement:@"-"
-            rewardedInterstitialPlacement:@"-"];
+            bannerAdUnitId:@"demo-banner-1"
+            mrecAdUnitId:@"demo-mrec-1"
+            interstitialAdUnitId:@"demo-interstitial-1"
+            nativeAdUnitId:@"-"
+            nativeBannerAdUnitId:@"-"
+            rewardedAdUnitId:@"-"
+            rewardedInterstitialAdUnitId:@"-"];
     }
     return self;
 }

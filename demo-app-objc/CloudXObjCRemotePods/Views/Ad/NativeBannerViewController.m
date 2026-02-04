@@ -81,8 +81,8 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (NSString *)placementName {
-    return [[CLXDemoConfigManager sharedManager] currentConfig].nativeBannerPlacement;
+- (NSString *)adUnitId {
+    return [[CLXDemoConfigManager sharedManager] currentConfig].nativeBannerAdUnitId;
 }
 
 - (void)loadNativeBannerAd {
@@ -112,13 +112,13 @@
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
 
-    NSString *placement = [self placementName];
-    if (_settings.nativeMediumPlacement.length > 0) {
-        placement = _settings.nativeMediumPlacement;
+    NSString *adUnitId = [self adUnitId];
+    if (_settings.nativeMediumAdUnitId.length > 0) {
+        adUnitId = _settings.nativeMediumAdUnitId;
     }
-    NSLog(@"[NativeBannerViewController] LOG: Using placement: '%@'", placement);
+    NSLog(@"[NativeBannerViewController] LOG: Using adUnitId: '%@'", adUnitId);
     
-    self.nativeBannerAd = [[CloudXCore shared] createNativeAdWithPlacement:placement
+    self.nativeBannerAd = [[CloudXCore shared] createNativeAdWithAdUnitId:adUnitId
                                                             viewController:self
                                                                   delegate:self];
     
@@ -127,7 +127,7 @@
         NSLog(@"[NativeBannerViewController] LOG: Loading native banner ad instance...");
         [self.nativeBannerAd load];
     } else {
-        NSLog(@"[NativeBannerViewController] LOG: ❌ Failed to create native banner with placement: '%@'", placement);
+        NSLog(@"[NativeBannerViewController] LOG: ❌ Failed to create native banner with adUnitId: '%@'", adUnitId);
         self.isLoading = NO;
         [self updateStatusUIWithState:AdStateNoAd];
         [self showAlertWithTitle:@"Error" message:@"Failed to create native banner ad."];
@@ -180,8 +180,8 @@
     });
 }
 
-- (void)didFailToLoadAdWithError:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ NativeBanner failed to load - Error: %@", error.localizedDescription]];
+- (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ NativeBanner failed to load (%@) - Error: %@", adUnitId, error.localizedDescription]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.nativeBannerAd = nil;

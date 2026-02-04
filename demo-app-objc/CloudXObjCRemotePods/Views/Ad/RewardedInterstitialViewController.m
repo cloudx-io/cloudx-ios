@@ -69,8 +69,8 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (NSString *)placementName {
-    return [[CLXDemoConfigManager sharedManager] currentConfig].rewardedInterstitialPlacement;
+- (NSString *)adUnitId {
+    return [[CLXDemoConfigManager sharedManager] currentConfig].rewardedInterstitialAdUnitId;
 }
 
 - (void)loadRewardedInterstitial {
@@ -85,20 +85,21 @@
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
 
-    NSString *placement = [self placementName];
-    NSLog(@"[RewardedInterstitialViewController] Using placement: %@", placement);
+    NSString *adUnitId = [self adUnitId];
+    NSLog(@"[RewardedInterstitialViewController] Using adUnitId: %@", adUnitId);
     
     // Create rewarded interstitial with comprehensive logging
-    NSLog(@"[RewardedInterstitialViewController] Calling createRewardedWithPlacement: %@", placement);
-    self.rewardedInterstitialAd = [[CloudXCore shared] createRewardedWithPlacement:placement];
+    NSLog(@"[RewardedInterstitialViewController] Calling createRewardedWithAdUnitId: %@", adUnitId);
+    self.rewardedInterstitialAd = [[CloudXCore shared] createRewardedWithAdUnitId:adUnitId];
     self.rewardedInterstitialAd.delegate = self;
+    self.rewardedInterstitialAd.revenueDelegate = self;
     
     if (self.rewardedInterstitialAd) {
         NSLog(@"[RewardedInterstitialViewController] ✅ Rewarded interstitial ad instance created successfully: %@", self.rewardedInterstitialAd);
         NSLog(@"[RewardedInterstitialViewController] Loading rewarded interstitial ad instance...");
         [self.rewardedInterstitialAd load];
     } else {
-        NSLog(@"[RewardedInterstitialViewController] ❌ Failed to create rewarded interstitial with placement: %@", placement);
+        NSLog(@"[RewardedInterstitialViewController] ❌ Failed to create rewarded interstitial with adUnitId: %@", adUnitId);
         self.isLoading = NO;
         [self updateStatusUIWithState:AdStateNoAd];
         [self showAlertWithTitle:@"Error" message:@"Failed to create rewarded interstitial ad."];
@@ -139,8 +140,8 @@
     [self updateStatusUIWithState:AdStateReady];
 }
 
-- (void)didFailToLoadAdWithError:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ RewardedInterstitial failed to load - Error: %@", error.localizedDescription]];
+- (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ RewardedInterstitial failed to load (%@) - Error: %@", adUnitId, error.localizedDescription]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     
