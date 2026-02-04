@@ -3,11 +3,11 @@ platform :ios, '15.0'
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore', '~> 2.0.0'
-  pod 'CloudXMetaAdapter', '~> 2.0.0'
-  pod 'CloudXRenderer', '~> 2.0.0'
-  pod 'CloudXVungleAdapter', '~> 2.0.0'
-  pod 'CloudXInMobiAdapter', '~> 2.0.0'
+  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v2.0.0-core'
+  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v2.0.0-meta'
+  pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v2.0.0-renderer'
+  pod 'CloudXVungleAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v2.0.0-vungle'
+  pod 'CloudXInMobiAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v2.0.0-inmobi'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths

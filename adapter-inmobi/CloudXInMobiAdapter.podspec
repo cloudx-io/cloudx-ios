@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "v#{s.version}-inmobi" }
   
   s.ios.deployment_target = '15.0'
-  s.vendored_frameworks = 'adapter-inmobi/CloudXInMobiAdapter.xcframework'
+  s.vendored_frameworks = 'CloudXInMobiAdapter.xcframework'
   
   # Dependencies
   s.dependency 'CloudXCore', '2.0.0'
