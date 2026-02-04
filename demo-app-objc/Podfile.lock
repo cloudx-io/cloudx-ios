@@ -16,11 +16,11 @@ PODS:
   - VungleAds (7.4.5)
 
 DEPENDENCIES:
-  - CloudXCore (from `../core`)
-  - CloudXInMobiAdapter (from `../adapter-inmobi`)
-  - CloudXMetaAdapter (from `../adapter-meta`)
-  - CloudXRenderer (from `../renderer-cloudx`)
-  - CloudXVungleAdapter (from `../adapter-vungle`)
+  - CloudXCore (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-core/core/CloudXCore.podspec`)
+  - CloudXInMobiAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-inmobi/adapter-inmobi/CloudXInMobiAdapter.podspec`)
+  - CloudXMetaAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-meta/adapter-meta/CloudXMetaAdapter.podspec`)
+  - CloudXRenderer (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-renderer/renderer-cloudx/CloudXRenderer.podspec`)
+  - CloudXVungleAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-vungle/adapter-vungle/CloudXVungleAdapter.podspec`)
 
 SPEC REPOS:
   trunk:
@@ -30,26 +30,26 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   CloudXCore:
-    :path: "../core"
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-core/core/CloudXCore.podspec
   CloudXInMobiAdapter:
-    :path: "../adapter-inmobi"
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-inmobi/adapter-inmobi/CloudXInMobiAdapter.podspec
   CloudXMetaAdapter:
-    :path: "../adapter-meta"
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-meta/adapter-meta/CloudXMetaAdapter.podspec
   CloudXRenderer:
-    :path: "../renderer-cloudx"
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-renderer/renderer-cloudx/CloudXRenderer.podspec
   CloudXVungleAdapter:
-    :path: "../adapter-vungle"
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-vungle/adapter-vungle/CloudXVungleAdapter.podspec
 
 SPEC CHECKSUMS:
-  CloudXCore: b3e21142e0a6d1312d35ba7b65f8c491ac4226f8
-  CloudXInMobiAdapter: 689bd9f1d2125ba3ababf1589888dc73ef613aa0
-  CloudXMetaAdapter: 70d0795640614cc8784799a88952dafc5841d759
-  CloudXRenderer: 08d01462f3ea80c9d108d84b42a21e6a19796936
-  CloudXVungleAdapter: 6773665c47027378526af8875b16af994b37c875
+  CloudXCore: 8bc77679534947db464b8a18cad099ae2a0ec659
+  CloudXInMobiAdapter: c047f1724dfc485a6af95f238703a6b2c0174573
+  CloudXMetaAdapter: bbdea2b154fc7f865f2de94f85f50d1f611b06a2
+  CloudXRenderer: 09eee3dd54fbf8ac4ad18d90a7458ec57af0a04e
+  CloudXVungleAdapter: 34c2e747a95c17d1c1d726c30f4ca1820838a3fc
   FBAudienceNetwork: 08e86d63a05b3a5a59414af12e4af8d756943c80
   InMobiSDK: 3772de19a4fa048225857e78d8a466dda0a004a8
   VungleAds: 1da221690dd1a8710d0b6a4c7aeac14cb12d31ab
 
-PODFILE CHECKSUM: ab233dd6bcd2f7c8a6187940c748087fa8029427
+PODFILE CHECKSUM: a071a3c6fa787e6052b52f4d9a6c47b001c7f4f4
 
 COCOAPODS: 1.16.2

@@ -3,11 +3,11 @@ platform :ios, '15.0'
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v2.0.0-core'
-  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v2.0.0-meta'
-  pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v2.0.0-renderer'
-  pod 'CloudXVungleAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v2.0.0-vungle'
-  pod 'CloudXInMobiAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v2.0.0-inmobi'
+  pod 'CloudXCore', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-core/core/CloudXCore.podspec'
+  pod 'CloudXMetaAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-meta/adapter-meta/CloudXMetaAdapter.podspec'
+  pod 'CloudXRenderer', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-renderer/renderer-cloudx/CloudXRenderer.podspec'
+  pod 'CloudXVungleAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-vungle/adapter-vungle/CloudXVungleAdapter.podspec'
+  pod 'CloudXInMobiAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-inmobi/adapter-inmobi/CloudXInMobiAdapter.podspec'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths
