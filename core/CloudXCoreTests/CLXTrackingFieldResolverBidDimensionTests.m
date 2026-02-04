@@ -25,6 +25,17 @@
 @interface CLXTrackingFieldResolver (BidDimensionTesting)
 - (nullable id)resolveBidDimensionField:(NSString *)auctionId field:(NSString *)field impid:(NSString *)impid;
 - (nullable id)resolveBidField:(NSString *)auctionId field:(NSString *)field;
+- (void)setConfigJSON:(NSDictionary *)configJSON;
+- (void)setSessionConstData:(NSString *)sessionId
+                 sdkVersion:(NSString *)sdkVersion
+              pluginVersion:(nullable NSString *)pluginVersion
+             deviceTypeName:(NSString *)deviceTypeName
+             deviceTypeCode:(NSInteger)deviceTypeCode
+                abTestGroup:(NSString *)abTestGroup
+                  appBundle:(NSString *)appBundle;
+- (void)setSdkParam:(NSString *)auctionId key:(NSString *)key value:(NSString *)value;
+- (nullable NSString *)buildPayload:(NSString *)auctionId bidId:(nullable NSString *)bidId;
+- (nullable id)resolveField:(NSString *)auctionId field:(NSString *)field bidId:(nullable NSString *)bidId;
 @end
 
 @interface CLXTrackingFieldResolverBidDimensionTests : XCTestCase
@@ -296,6 +307,100 @@
     
     // Then: Should handle gracefully
     XCTAssertNil(width, @"Width should be nil with empty format array");
+}
+
+#pragma mark - Base64 Encoding Tests (sdk.placement and sdk.customData)
+
+/**
+ * Tests that sdk.placement is Base64 encoded when resolved.
+ * Backend expects these fields encoded since they can contain delimiters.
+ */
+- (void)testResolveField_SdkPlacement_IsBase64Encoded {
+    // Given
+    NSString *rawValue = @"game_over_screen";
+    [self.resolver setSdkParam:self.testAuctionId key:@"sdk.placement" value:rawValue];
+
+    // When
+    id result = [self.resolver resolveField:self.testAuctionId field:@"sdk.placement" bidId:nil];
+
+    // Then - value should be Base64 encoded
+    NSString *expectedBase64 = [[rawValue dataUsingEncoding:NSUTF8StringEncoding] base64EncodedStringWithOptions:0];
+    XCTAssertEqualObjects(result, expectedBase64, @"sdk.placement should be Base64 encoded");
+    XCTAssertNotEqualObjects(result, rawValue, @"sdk.placement should NOT be raw value");
+}
+
+/**
+ * Tests that sdk.customData is Base64 encoded when resolved.
+ */
+- (void)testResolveField_SdkCustomData_IsBase64Encoded {
+    // Given
+    NSString *rawValue = @"coins:100,gems:50";
+    [self.resolver setSdkParam:self.testAuctionId key:@"sdk.customData" value:rawValue];
+
+    // When
+    id result = [self.resolver resolveField:self.testAuctionId field:@"sdk.customData" bidId:nil];
+
+    // Then - value should be Base64 encoded
+    NSString *expectedBase64 = [[rawValue dataUsingEncoding:NSUTF8StringEncoding] base64EncodedStringWithOptions:0];
+    XCTAssertEqualObjects(result, expectedBase64, @"sdk.customData should be Base64 encoded");
+}
+
+/**
+ * Tests that customData with semicolons is safely Base64 encoded.
+ * This is the key fix - semicolons would break the payload format without encoding.
+ */
+- (void)testBuildPayload_CustomDataWithSemicolons_IsBase64Encoded {
+    // Given - SDK param with semicolons (the delimiter used in payloads)
+    NSDictionary *configJSON = @{
+        @"tracking": @[@"sdk.sessionId", @"sdk.customData"]
+    };
+    [self.resolver setConfigJSON:configJSON];
+    [self.resolver setSessionConstData:@"sess-123"
+                            sdkVersion:@"1.0"
+                         pluginVersion:nil
+                        deviceTypeName:@"phone"
+                        deviceTypeCode:4
+                           abTestGroup:@""
+                             appBundle:@"com.test"];
+
+    NSString *customDataWithSemicolons = @"level:1;coins:500;difficulty:hard";
+    [self.resolver setSdkParam:self.testAuctionId key:@"sdk.customData" value:customDataWithSemicolons];
+
+    // When
+    NSString *payload = [self.resolver buildPayload:self.testAuctionId bidId:nil];
+
+    // Then - customData is Base64 encoded, payload has exactly 2 semicolon-separated values
+    NSArray *values = [payload componentsSeparatedByString:@";"];
+    XCTAssertEqual(values.count, 2, @"Should have exactly 2 values (sessionId and base64-encoded customData)");
+    XCTAssertEqualObjects(values[0], @"sess-123", @"First value should be sessionId");
+
+    // Verify second value is Base64 encoded customData
+    NSString *expectedBase64 = [[customDataWithSemicolons dataUsingEncoding:NSUTF8StringEncoding] base64EncodedStringWithOptions:0];
+    XCTAssertEqualObjects(values[1], expectedBase64, @"customData should be Base64 encoded");
+}
+
+/**
+ * Tests that other SDK fields are NOT Base64 encoded (only placement and customData).
+ */
+- (void)testResolveField_OtherSdkFields_NotBase64Encoded {
+    // Given
+    [self.resolver setSessionConstData:@"session-abc"
+                            sdkVersion:@"2.0.0"
+                         pluginVersion:nil
+                        deviceTypeName:@"tablet"
+                        deviceTypeCode:5
+                           abTestGroup:@"test-group"
+                             appBundle:@"com.app"];
+
+    // When
+    id sessionId = [self.resolver resolveField:self.testAuctionId field:@"sdk.sessionId" bidId:nil];
+    id sdkVersion = [self.resolver resolveField:self.testAuctionId field:@"sdk.releaseVersion" bidId:nil];
+    id deviceType = [self.resolver resolveField:self.testAuctionId field:@"sdk.deviceTypeName" bidId:nil];
+
+    // Then - these should NOT be Base64 encoded
+    XCTAssertEqualObjects(sessionId, @"session-abc", @"sdk.sessionId should NOT be encoded");
+    XCTAssertEqualObjects(sdkVersion, @"2.0.0", @"sdk.releaseVersion should NOT be encoded");
+    XCTAssertEqualObjects(deviceType, @"tablet", @"sdk.deviceTypeName should NOT be encoded");
 }
 
 @end

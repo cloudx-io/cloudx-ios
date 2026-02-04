@@ -22,6 +22,8 @@ static NSString * const SDK_PARAM_DEVICE_TYPE_CODE = @"sdk.deviceTypeCode";
 static NSString * const SDK_PARAM_SESSION_ID = @"sdk.sessionId";
 static NSString * const SDK_PARAM_ABTEST_GROUP = @"sdk.testGroupName";
 static NSString * const SDK_PARAM_IFA = @"sdk.ifa";
+static NSString * const SDK_PARAM_PLACEMENT = @"sdk.placement";
+static NSString * const SDK_PARAM_CUSTOM_DATA = @"sdk.customData";
 
 #pragma mark - NSDictionary Category (matches Android extension function)
 
@@ -312,6 +314,15 @@ static NSString * const SDK_PARAM_IFA = @"sdk.ifa";
         if ([field isEqualToString:SDK_PARAM_DEVICE_TYPE_CODE]) return @(self.deviceTypeCode);
         if ([field isEqualToString:SDK_PARAM_IFA]) return [self handleIfaField:auctionId];
         if ([field isEqualToString:SDK_PARAM_ABTEST_GROUP]) return self.abTestGroup;
+        // Base64 encode placement and customData (backend expects encoded values)
+        if ([field isEqualToString:SDK_PARAM_PLACEMENT] || [field isEqualToString:SDK_PARAM_CUSTOM_DATA]) {
+            NSString *value = self.sdkMap[auctionId][field];
+            if (value) {
+                NSData *data = [value dataUsingEncoding:NSUTF8StringEncoding];
+                return [data base64EncodedStringWithOptions:0];
+            }
+            return nil;
+        }
         return self.sdkMap[auctionId][field];  // Fallback to sdkMap
     }
 
