@@ -168,7 +168,9 @@ static MockRillEventReporter *sharedInstance = nil;
 
 // Categories to expose private methods for testing
 @interface CLXRillTrackingService (Testing)
-@property (nonatomic, strong) NSString *encodedString;
+@property (nonatomic, strong) NSString *auctionId;
+@property (nonatomic, strong) NSString *bidId;
+@property (nonatomic, strong) NSString *accountId;
 @property (nonatomic, strong) NSString *campaignId;
 @end
 
@@ -923,30 +925,35 @@ static MockRillEventReporter *sharedInstance = nil;
     XCTAssertFalse([resolvedName isEqual:resolvedID], @"Placement name and ID should be different values");
 }
 
-// Test that payload is properly encrypted and encoded
+// Test that tracking is properly configured for event-time payload building
 - (void)testPayloadEncryption_ShouldProduceValidEncodedString {
     // Given: A Rill tracking service with test data
-    CLXRillTrackingService *trackingService = [[CLXRillTrackingService alloc] 
+    CLXRillTrackingService *trackingService = [[CLXRillTrackingService alloc]
                                                initWithReportingService:self.mockReporter];
-    
+
     CLXConfigImpressionModel *impModel = [self createTestImpressionModel];
     CLXBidAdSourceResponse *bidResponse = [self createTestBidResponse];
-    
-    // When: Set up tracking (which creates encrypted payload)
+
+    // When: Set up tracking (stores auctionId, bidId, accountId for event-time payload building)
     BOOL success = [trackingService setupTrackingDataFromBidResponse:bidResponse
                                                             impModel:impModel
                                                          adUnitId:kTestPlacementID
                                                            loadCount:0];
-    
-    // Then: Encrypted payload should be created
+
+    // Then: Tracking data should be configured
     XCTAssertTrue(success, @"Tracking setup should succeed");
-    
-    // Verify encoded string is created
-    NSString *encodedString = [trackingService valueForKey:@"encodedString"];
-    XCTAssertNotNil(encodedString, @"Encoded string should be created");
-    XCTAssertTrue(encodedString.length > 0, @"Encoded string should not be empty");
-    
-    // Verify campaign ID is created
+
+    // Verify auctionId is stored (payloads are now built at event time)
+    NSString *auctionId = [trackingService valueForKey:@"auctionId"];
+    XCTAssertNotNil(auctionId, @"Auction ID should be stored");
+    XCTAssertTrue(auctionId.length > 0, @"Auction ID should not be empty");
+
+    // Verify accountId is stored (needed for encryption at event time)
+    NSString *accountId = [trackingService valueForKey:@"accountId"];
+    XCTAssertNotNil(accountId, @"Account ID should be stored");
+    XCTAssertTrue(accountId.length > 0, @"Account ID should not be empty");
+
+    // Verify campaign ID is created (computed once at setup)
     NSString *campaignId = [trackingService valueForKey:@"campaignId"];
     XCTAssertNotNil(campaignId, @"Campaign ID should be created");
     XCTAssertTrue(campaignId.length > 0, @"Campaign ID should not be empty");
@@ -1004,18 +1011,69 @@ static MockRillEventReporter *sharedInstance = nil;
 // Test error handling when tracking data is incomplete
 - (void)testIncompleteTrackingData_ShouldHandleGracefully {
     // Given: Tracking service with incomplete data
-    CLXRillTrackingService *trackingService = [[CLXRillTrackingService alloc] 
+    CLXRillTrackingService *trackingService = [[CLXRillTrackingService alloc]
                                                initWithReportingService:self.mockReporter];
-    
+
     // When: Try to set up tracking with nil data
     BOOL success = [trackingService setupTrackingDataFromBidResponse:nil
                                                             impModel:self.mockImpModel
                                                          adUnitId:nil
                                                            loadCount:0];
-    
+
     // Then: Should handle gracefully without crashing
     XCTAssertFalse(success, @"Should return NO for incomplete data");
     XCTAssertEqual(self.mockReporter.firedRillEvents.count, 0, @"No events should fire with incomplete data");
+}
+
+/**
+ * Test that placement and customData set at show time are included in impression/click events.
+ * This is the key fix - payloads are now built at event time, not load time.
+ */
+- (void)testPlacementAndCustomData_ShouldBeIncludedInImpressionWhenSetAfterLoad {
+    // Given: Config with sdk.placement and sdk.customData in tracking fields
+    MockSDKConfigResponse *configWithPlacement = [[MockSDKConfigResponse alloc] init];
+    configWithPlacement.testTracking = @[
+        @"config.accountID",
+        @"sdk.sessionId",
+        @"sdk.placement",
+        @"sdk.customData"
+    ];
+    [self.resolver setConfig:configWithPlacement];
+
+    // And: A tracking service set up at LOAD time (placement/customData NOT set yet)
+    CLXRillTrackingService *trackingService = [[CLXRillTrackingService alloc]
+                                               initWithReportingService:self.mockReporter];
+
+    CLXConfigImpressionModel *impModel = [self createTestImpressionModel];
+    CLXBidAdSourceResponse *bidResponse = [self createTestBidResponse];
+
+    [trackingService setupTrackingDataFromBidResponse:bidResponse
+                                             impModel:impModel
+                                          adUnitId:kTestPlacementID
+                                            loadCount:0];
+
+    // When: Placement and customData are set at SHOW time (simulating showFromViewController:placement:customData:)
+    [self.resolver setSdkParam:kTestAuctionID key:@"sdk.placement" value:@"test_placement"];
+    [self.resolver setSdkParam:kTestAuctionID key:@"sdk.customData" value:@"key:value"];
+
+    // And: Impression event is sent
+    [MockRillEventReporter reset];
+    [trackingService sendImpressionEvent];
+
+    // Then: The impression payload should contain placement and customData (Base64 encoded)
+    XCTAssertEqual(self.mockReporter.firedActionStrings.count, 1, @"Should fire one impression event");
+    XCTAssertEqualObjects(self.mockReporter.firedActionStrings[0], @"sdkimpenc", @"Should be impression event");
+
+    // Verify by building payload directly and checking contents
+    NSString *payload = [self.resolver buildPayload:kTestAuctionID bidId:kTestBidID];
+    XCTAssertNotNil(payload, @"Payload should be built");
+
+    // sdk.placement and sdk.customData should be Base64 encoded
+    NSString *expectedPlacementBase64 = [[[@"test_placement" dataUsingEncoding:NSUTF8StringEncoding] base64EncodedStringWithOptions:0] copy];
+    NSString *expectedCustomDataBase64 = [[[@"key:value" dataUsingEncoding:NSUTF8StringEncoding] base64EncodedStringWithOptions:0] copy];
+
+    XCTAssertTrue([payload containsString:expectedPlacementBase64], @"Payload should contain Base64-encoded placement");
+    XCTAssertTrue([payload containsString:expectedCustomDataBase64], @"Payload should contain Base64-encoded customData");
 }
 
 /**
