@@ -41,10 +41,10 @@ EXTERNAL SOURCES:
     :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-vungle/adapter-vungle/CloudXVungleAdapter.podspec
 
 SPEC CHECKSUMS:
-  CloudXCore: 8bc77679534947db464b8a18cad099ae2a0ec659
+  CloudXCore: b3e21142e0a6d1312d35ba7b65f8c491ac4226f8
   CloudXInMobiAdapter: 689bd9f1d2125ba3ababf1589888dc73ef613aa0
-  CloudXMetaAdapter: bbdea2b154fc7f865f2de94f85f50d1f611b06a2
-  CloudXRenderer: 09eee3dd54fbf8ac4ad18d90a7458ec57af0a04e
+  CloudXMetaAdapter: 70d0795640614cc8784799a88952dafc5841d759
+  CloudXRenderer: 08d01462f3ea80c9d108d84b42a21e6a19796936
   CloudXVungleAdapter: 6773665c47027378526af8875b16af994b37c875
   FBAudienceNetwork: 08e86d63a05b3a5a59414af12e4af8d756943c80
   InMobiSDK: 3772de19a4fa048225857e78d8a466dda0a004a8
