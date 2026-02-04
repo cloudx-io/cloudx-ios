@@ -56,9 +56,17 @@
 }
 
 - (void)setupConfigurations {
+    // ==========================================================================
+    // IMPORTANT: Ad unit identifiers must be the CloudX ad unit ID (not name)
+    // The SDK now uses ad unit IDs for lookup (matching Android SDK behavior).
+    // Get IDs from: CloudX dashboard or server config response's adUnits[].id
+    // Example ID format: "um9Ek08ScJBWuzSMTyW3b" (not "demo-banner-1")
+    // ==========================================================================
+
     // Local Configuration (localhost testing - bundle: cloudx.CloudXObjCRemotePods)
     // App key from database (SELECT app_key FROM apps WHERE bundle_id = 'cloudx.CloudXObjCRemotePods')
     // Note: app_key != id. The YAML config shows id, but SDK needs the actual app_key column value
+    // TODO: Replace ad unit names with actual IDs from local server config
     CLXDemoConfig *localConfig = [[CLXDemoConfig alloc]
         initWithAppKey:@"E5RotGdN8i7hWhkax1e1o"
         hashedUserId:@"test-user-123"
@@ -70,8 +78,9 @@
         nativeBannerPlacement:@"-"
         rewardedPlacement:@"rewarded"
         rewardedInterstitialPlacement:@"rewarded"];
-    
+
     // Staging Configuration (MetaTestApp-9-22-25 - bundle: cloudx.CloudXObjCRemotePods)
+    // TODO: Replace ad unit names with actual IDs from staging server config
     CLXDemoConfig *stagingConfig = [[CLXDemoConfig alloc]
         initWithAppKey:@"A7ovaBRCcAL8lapKtoZmm"
         hashedUserId:@"test-user-123"
@@ -83,8 +92,9 @@
         nativeBannerPlacement:@"-"
         rewardedPlacement:@"-"
         rewardedInterstitialPlacement:@"-"];
-    
+
     // Dev Configuration (Test app - bundle: cloudx.CloudXObjCRemotePods)
+    // TODO: Replace ad unit names with actual IDs from dev server config
     CLXDemoConfig *devConfig = [[CLXDemoConfig alloc]
         initWithAppKey:@"E-B3dlMk92hcrUT-9xmMu"
         hashedUserId:@"test-user-123"
@@ -96,19 +106,19 @@
         nativeBannerPlacement:@"-"
         rewardedPlacement:@"objc-demo-rewarded"
         rewardedInterstitialPlacement:@"objc-demo-rewarded"];
-    
+
     // Production Configuration (Blocky app - io.cloudx.Blocky)
-    CLXDemoConfig *prodConfig = [[CLXDemoConfig alloc] 
+    CLXDemoConfig *prodConfig = [[CLXDemoConfig alloc]
         initWithAppKey:@"ihtOXvp3X9JlMQ5p0_RYL"
         hashedUserId:@"prod-user-123"
         baseURL:@"https://pro.cloudx.io/sdk"
-        bannerPlacement:@"demo-banner-1"
-        mrecPlacement:@"demo-mrec-1"
-        interstitialPlacement:@"demo-interstitial-1"
-        nativePlacement:@"demo-native-1"
-        nativeBannerPlacement:@"demo-native-banner-1"
-        rewardedPlacement:@"demo-rewarded-1"
-        rewardedInterstitialPlacement:@"demo-rewarded-interstitial-1"];
+        bannerPlacement:@"LyPxKhBFiUCd1xMLYQhGc"
+        mrecPlacement:@"EWaeXDSmKYbs220gM5hTv"
+        interstitialPlacement:@"txZ7NmISq-MsuPH0ULKbD"
+        nativePlacement:@"Q33RbPmBH-wix45Mu6--Z"
+        nativeBannerPlacement:@"-"
+        rewardedPlacement:@"-"
+        rewardedInterstitialPlacement:@"-"];
     
     _configurations = @{
         @(CLXDemoEnvironmentLocal): localConfig,

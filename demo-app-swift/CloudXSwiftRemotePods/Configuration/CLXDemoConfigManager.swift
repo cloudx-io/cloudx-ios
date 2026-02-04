@@ -54,7 +54,15 @@ class CLXDemoConfigManager {
     }
     
     private init() {
+        // ==========================================================================
+        // IMPORTANT: Ad unit identifiers must be the CloudX ad unit ID (not name)
+        // The SDK now uses ad unit IDs for lookup (matching Android SDK behavior).
+        // Get IDs from: CloudX dashboard or server config response's adUnits[].id
+        // Example ID format: "um9Ek08ScJBWuzSMTyW3b" (not "demo-banner-1")
+        // ==========================================================================
+
         // Local Configuration (localhost testing)
+        // TODO: Replace ad unit names with actual IDs from local server config
         let localConfig = CLXDemoConfig(
             appKey: "E5RotGdN8i7hWhkax1e1o",
             hashedUserId: "test-user-123",
@@ -67,8 +75,9 @@ class CLXDemoConfigManager {
             rewardedPlacement: "rewarded",
             rewardedInterstitialPlacement: "rewarded"
         )
-        
+
         // Staging Configuration
+        // TODO: Replace ad unit names with actual IDs from staging server config
         let stagingConfig = CLXDemoConfig(
             appKey: "YG7zqD4RoWwMcGnp3XvNK",
             hashedUserId: "test-user-123-staging",
@@ -81,8 +90,9 @@ class CLXDemoConfigManager {
             rewardedPlacement: "-",
             rewardedInterstitialPlacement: "-"
         )
-        
+
         // Dev Configuration (Test app)
+        // TODO: Replace ad unit names with actual IDs from dev server config
         let devConfig = CLXDemoConfig(
             appKey: "E-B3dlMk92hcrUT-9xmMu",
             hashedUserId: "test-user-123",
@@ -95,16 +105,16 @@ class CLXDemoConfigManager {
             rewardedPlacement: "objc-demo-rewarded",
             rewardedInterstitialPlacement: "objc-demo-rewarded"
         )
-        
+
         // Production Configuration
         let prodConfig = CLXDemoConfig(
             appKey: "xcQftcBSUmqzuv1LfET2o",
             hashedUserId: "test-user-123",
             baseURL: "https://pro.cloudx.io/sdk",
-            bannerPlacement: "swift-demo-banner-1",
-            mrecPlacement: "swift-demo-mrec-1",
-            interstitialPlacement: "swift-demo-interstitial-1",
-            nativePlacement: "-",
+            bannerPlacement: "LyPxKhBFiUCd1xMLYQhGc",
+            mrecPlacement: "EWaeXDSmKYbs220gM5hTv",
+            interstitialPlacement: "txZ7NmISq-MsuPH0ULKbD",
+            nativePlacement: "Q33RbPmBH-wix45Mu6--Z",
             nativeBannerPlacement: "-",
             rewardedPlacement: "-",
             rewardedInterstitialPlacement: "-"

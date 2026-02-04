@@ -329,7 +329,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Check if we need to complete deferred initialization (bidAdSource is nil)
     if (!self.bidAdSource && self.requestedAdUnitId && [[CloudXCore shared] isInitialized]) {
         // SDK is now initialized - complete initialization with real ad unit config
-        CLXSDKConfigAdUnit *realAdUnit = [[CloudXCore shared] adUnitConfigForName:self.requestedAdUnitId];
+        CLXSDKConfigAdUnit *realAdUnit = [[CloudXCore shared] adUnitConfigForId:self.requestedAdUnitId];
         if (realAdUnit) {
             [self.logger debug:[NSString stringWithFormat:@"Completing deferred initialization for: %@ (ID: %@)", self.requestedAdUnitId, realAdUnit.id]];
             _adUnitId = realAdUnit.id;
@@ -379,7 +379,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
             self.requestedAdUnitId = nil;
         } else {
             // Provide detailed error message with available ad units (mirrors Android AdUnitValidator)
-            NSArray<NSString *> *availableAdUnits = [[CloudXCore shared] availableAdUnitNames];
+            NSArray<NSString *> *availableAdUnits = [[CloudXCore shared] availableAdUnitIds];
             NSString *availableAdUnitsString = availableAdUnits.count > 0 
                 ? [availableAdUnits componentsJoinedByString:@", "] 
                 : @"none";

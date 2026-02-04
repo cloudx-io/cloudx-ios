@@ -700,19 +700,19 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 /**
- * Look up ad unit configuration by name
- * @param adUnitName The ad unit name
+ * Look up ad unit configuration by ID
+ * @param adUnitId The ad unit ID (e.g., "um9Ek08ScJBWuzSMTyW3b")
  * @return Ad unit configuration or nil if not found
  */
-- (CLXSDKConfigAdUnit *)adUnitConfigForName:(NSString *)adUnitName {
-    return _adUnits[adUnitName];
+- (CLXSDKConfigAdUnit *)adUnitConfigForId:(NSString *)adUnitId {
+    return _adUnits[adUnitId];
 }
 
 /**
- * Get all available ad unit names from the SDK configuration
- * @return Array of ad unit names, or empty array if SDK not initialized or no ad units configured
+ * Get all available ad unit IDs from the SDK configuration
+ * @return Array of ad unit IDs, or empty array if SDK not initialized or no ad units configured
  */
-- (NSArray<NSString *> *)availableAdUnitNames {
+- (NSArray<NSString *> *)availableAdUnitIds {
     if (!_adUnits || _adUnits.count == 0) {
         return @[];
     }
@@ -813,7 +813,7 @@ static CloudXCore *_sharedInstance = nil;
         }
     } else if (!_isInitialized) {
         // SDK not initialized yet - try to get ad unit (may be nil)
-        adUnitConfig = [self adUnitConfigForName:adUnitId];
+        adUnitConfig = [self adUnitConfigForId:adUnitId];
     }
     
     // Defer ad unit config and impression model creation if SDK not ready
@@ -891,7 +891,7 @@ static CloudXCore *_sharedInstance = nil;
         }
     } else if (!_isInitialized) {
         // SDK not initialized yet - try to get ad unit (may be nil)
-        adUnitConfig = [self adUnitConfigForName:adUnitId];
+        adUnitConfig = [self adUnitConfigForId:adUnitId];
     }
     
     // Defer ad unit config and impression model creation if SDK not ready
@@ -968,7 +968,7 @@ static CloudXCore *_sharedInstance = nil;
         }
     } else if (!_isInitialized) {
         // SDK not initialized yet - try to get ad unit (may be nil)
-        adUnitConfig = [self adUnitConfigForName:adUnitId];
+        adUnitConfig = [self adUnitConfigForId:adUnitId];
     }
     
     // Defer ad unit config and impression model creation if SDK not ready
@@ -1041,7 +1041,7 @@ static CloudXCore *_sharedInstance = nil;
         }
     } else if (!_isInitialized) {
         // SDK not initialized yet - try to get ad unit (may be nil)
-        adUnitConfig = [self adUnitConfigForName:adUnitId];
+        adUnitConfig = [self adUnitConfigForId:adUnitId];
     }
     
     // Defer ad unit config and impression model creation if SDK not ready
@@ -1117,7 +1117,7 @@ static CloudXCore *_sharedInstance = nil;
         }
     } else if (!_isInitialized) {
         // SDK not initialized yet - try to get ad unit (may be nil)
-        adUnitConfig = [self adUnitConfigForName:adUnitId];
+        adUnitConfig = [self adUnitConfigForId:adUnitId];
     }
     
     // Defer ad unit config and impression model creation if SDK not ready
@@ -1181,7 +1181,7 @@ static CloudXCore *_sharedInstance = nil;
     NSMutableDictionary *adUnitsDict = [NSMutableDictionary dictionary];
     if (_sdkConfig.adUnits && _sdkConfig.adUnits.count > 0) {
         for (CLXSDKConfigAdUnit *adUnit in _sdkConfig.adUnits) {
-            adUnitsDict[adUnit.name] = adUnit; // Use name as key like Swift SDK
+            adUnitsDict[adUnit.id] = adUnit; // Use id as key to match Android SDK
         }
     }
     _adUnits = [adUnitsDict copy];

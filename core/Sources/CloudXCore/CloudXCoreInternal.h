@@ -140,21 +140,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isAdapterReady:(NSString *)adapterName;
 
 /**
- * Look up placement configuration by name
- * @param placementName The placement name
- * @return Placement configuration or nil if not found
- * @discussion Internal API used by ad objects to look up placement configuration after SDK initialization
- */
-- (nullable CLXSDKConfigAdUnit *)placementConfigForName:(NSString *)placementName;
-
-/**
- * Get all available placement names from the SDK configuration
- * @return Array of placement names, or empty array if SDK not initialized or no placements configured
- * @discussion Internal API used for detailed error messages when placement validation fails
- */
-- (NSArray<NSString *> *)availablePlacementNames;
-
-/**
  * Create an impression model for tracking
  * @param auctionID The auction ID for the impression
  * @return Impression model or nil if creation fails
@@ -172,19 +157,19 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Ad Unit Configuration (Internal)
 
 /**
- * Get ad unit configuration by name
- * @param adUnitName The ad unit name to look up
+ * Get ad unit configuration by ID
+ * @param adUnitId The ad unit ID to look up (e.g., "um9Ek08ScJBWuzSMTyW3b")
  * @return The ad unit configuration or nil if not found
  * @discussion Internal method for looking up ad unit configs - not part of public API
  */
-- (nullable CLXSDKConfigAdUnit *)adUnitConfigForName:(NSString *)adUnitName;
+- (nullable CLXSDKConfigAdUnit *)adUnitConfigForId:(NSString *)adUnitId;
 
 /**
- * Get all available ad unit names
- * @return Array of ad unit names, or empty array if SDK not initialized
+ * Get all available ad unit IDs
+ * @return Array of ad unit IDs, or empty array if SDK not initialized
  * @discussion Internal method for error messaging - not part of public API
  */
-- (NSArray<NSString *> *)availableAdUnitNames;
+- (NSArray<NSString *> *)availableAdUnitIds;
 
 #pragma mark - Internal SDK Properties and Methods
 
