@@ -25,7 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)startAuctionWithBidRequest:(id)bidRequest
                             appKey:(NSString *)appKey
-                      correlationId:(NSString *)correlationId
+                           timeout:(NSTimeInterval)timeout
+                     correlationId:(NSString *)correlationId
                         completion:(void (^)(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error))completion;
 
 @end

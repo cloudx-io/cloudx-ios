@@ -1,7 +1,7 @@
 import UIKit
 import CloudXCore
 
-class MRECViewController: BaseAdViewController, CLXBannerDelegate {
+class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueDelegate {
     
     private var mrecAd: CLXBannerAdView?
     private var autoRefreshButton: UIButton!
@@ -108,11 +108,15 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
     private func createAndAddMRECToView() {
         guard mrecAd == nil else { return }
         
-        var placement = placementName
-        if !settings.mrecPlacement.isEmpty {
-            placement = settings.mrecPlacement
+        var adUnitId = self.adUnitId
+        if !settings.mrecAdUnitId.isEmpty {
+            adUnitId = settings.mrecAdUnitId
         }
-        mrecAd = CloudXCore.shared.createMREC(placement: placement, viewController: self, delegate: self)
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId, viewController: self)
+        mrecAd?.delegate = self
+        mrecAd?.revenueDelegate = self
+        mrecAd?.placement = "demo_mrec"
+        mrecAd?.customData = "screen:detail,section:sidebar"
         
         guard let mrecAd = mrecAd else {
             showAlert(title: "Error", message: "Failed to create MREC.")
@@ -166,8 +170,8 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         }
     }
     
-    private var placementName: String {
-        return CLXDemoConfigManager.sharedManager.currentConfig.mrecPlacement
+    private var adUnitId: String {
+        return CLXDemoConfigManager.sharedManager.currentConfig.mrecAdUnitId
     }
     
     private func loadMREC() {
@@ -179,10 +183,11 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         isLoading = true
         updateStatusUI(state: .loading)
 
-        let placement = placementName
-        mrecAd = CloudXCore.shared.createMREC(placement: placement,
-                                            viewController: self,
-                                            delegate: self)
+        let adUnitId = self.adUnitId
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId,
+                                            viewController: self)
+        mrecAd?.delegate = self
+        mrecAd?.revenueDelegate = self
         
         if let mrecAd = mrecAd {
             mrecAd.load()
@@ -203,40 +208,19 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate {
         // Don't auto-show - user must press Show MREC button
     }
     
-    func didFailToLoadAd(error: CLXError) {
-        DemoAppLogger.sharedInstance.logMessage("❌ MREC failed to load - Error: \(error.localizedDescription)")
+    func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
+        DemoAppLogger.sharedInstance.logMessage("❌ MREC failed to load (\(adUnitId)) - Error: \(error.localizedDescription)")
         isLoading = false
+        updateStatusUI(state: .noAd)
         
         DispatchQueue.main.async { [weak self] in
             let errorMessage = error.localizedDescription
             self?.showAlert(title: "MREC Error", message: errorMessage)
         }
-    }
-    
-    func didDisplay(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👀 MREC didDisplayAd", ad: ad)
-    }
-    
-    func didFailToDisplay(_ ad: CLXAd, error: CLXError) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ MREC didFailToDisplayAd", ad: ad)
-        
-        DispatchQueue.main.async { [weak self] in
-            let errorMessage = error.localizedDescription
-            self?.showAlert(title: "MREC Error", message: errorMessage)
-        }
-    }
-    
-    func didHide(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🔚 MREC didHideAd", ad: ad)
-        mrecAd = nil
     }
     
     func didClick(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👆 MREC didClickAd", ad: ad)
-    }
-    
-    func didRecordImpression(for ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ MREC didRecordImpression", ad: ad)
     }
     
     func didPayRevenue(for ad: CLXAd) {

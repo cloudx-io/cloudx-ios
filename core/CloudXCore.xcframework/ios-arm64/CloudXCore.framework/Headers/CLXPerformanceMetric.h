@@ -6,7 +6,7 @@
  * @file CLXPerformanceMetric.h
  * @brief Performance metric model replacing Core Data CLXPerformanceMetricModel
  * 
- * SQLite-compatible performance tracking with placement-level metrics
+ * SQLite-compatible performance tracking with ad unit-level metrics
  */
 
 #import <Foundation/Foundation.h>
@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Performance-specific properties
  */
-@property (nonatomic, strong) NSString *placementId;
+@property (nonatomic, strong) NSString *adUnitId;
 @property (nonatomic, assign) NSInteger clickCount;
 @property (nonatomic, assign) NSInteger impressionCount;
 @property (nonatomic, assign) NSInteger closeCount;
@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Initialization
  */
-- (instancetype)initWithPlacementId:(NSString *)placementId sessionId:(NSString *)sessionId;
+- (instancetype)initWithAdUnitId:(NSString *)adUnitId sessionId:(NSString *)sessionId;
 
 /**
  * Metric operations
@@ -71,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Factory methods
  */
-+ (instancetype)metricForPlacement:(NSString *)placementId sessionId:(NSString *)sessionId;
++ (instancetype)metricForAdUnit:(NSString *)adUnitId sessionId:(NSString *)sessionId;
 
 /**
  * Database support

@@ -84,15 +84,15 @@ class InterstitialViewController: BaseAdViewController {
         isLoading = true
         updateStatusUI(state: AdState.loading)
 
-        // Get placement from config manager (with settings override if provided)
-        let originalPlacementName = CLXDemoConfigManager.sharedManager.currentConfig.interstitialPlacement
-        var placement = originalPlacementName
-        if !settings.interstitialPlacement.isEmpty {
-            placement = settings.interstitialPlacement
+        // Get adUnitId from config manager (with settings override if provided)
+        var adUnitId = CLXDemoConfigManager.sharedManager.currentConfig.interstitialAdUnitId
+        if !settings.interstitialAdUnitId.isEmpty {
+            adUnitId = settings.interstitialAdUnitId
         }
         
-        interstitialAd = cloudX.createInterstitial(placement: placement)
+        interstitialAd = cloudX.createInterstitial(adUnitId: adUnitId)
         interstitialAd?.delegate = self
+        interstitialAd?.revenueDelegate = self
         
         if let interstitialAd = interstitialAd {
             interstitialAd.load()
@@ -170,7 +170,7 @@ class InterstitialViewController: BaseAdViewController {
         }
         
         if interstitialAd.isReady {
-            interstitialAd.show(from: self)
+            interstitialAd.show(from: self, placement: "demo_interstitial", customData: "level:5,coins:100")
         } else {
             showAlert(title: "Error", message: "Interstitial is not ready. Please try loading again.")
         }
@@ -184,7 +184,7 @@ class InterstitialViewController: BaseAdViewController {
     }
 }
 
-extension InterstitialViewController: CLXInterstitialDelegate {
+extension InterstitialViewController: CLXInterstitialDelegate, CLXAdRevenueDelegate {
     func didLoad(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("✅ Interstitial didLoadAd", ad: ad)
         isLoading = false
@@ -192,8 +192,8 @@ extension InterstitialViewController: CLXInterstitialDelegate {
         // Don't auto-show - wait for user to press Show Interstitial button
     }
     
-    func didFailToLoadAd(error: CLXError) {
-        DemoAppLogger.sharedInstance.logMessage("❌ Interstitial failed to load - Error: \(error.localizedDescription)")
+    func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
+        DemoAppLogger.sharedInstance.logMessage("❌ Interstitial failed to load (\(adUnitId)) - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: AdState.noAd)
         
@@ -231,10 +231,6 @@ extension InterstitialViewController: CLXInterstitialDelegate {
     
     func didClick(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👆 Interstitial didClickAd", ad: ad)
-    }
-    
-    func didRecordImpression(for ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ Interstitial didRecordImpression", ad: ad)
     }
     
     func didPayRevenue(for ad: CLXAd) {

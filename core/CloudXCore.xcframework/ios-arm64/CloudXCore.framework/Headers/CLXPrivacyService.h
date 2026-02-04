@@ -51,18 +51,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSNumber *)ccpaApplies;
 
 /**
- * @brief Gets the hashed user ID for privacy-safe tracking
- * @return The hashed user ID if available, nil otherwise
- */
-- (nullable NSString *)hashedUserId;
-
-/**
- * @brief Sets the hashed user ID
- * @param hashedUserId The hashed user ID to store
- */
-- (void)setHashedUserId:(nullable NSString *)hashedUserId;
-
-/**
  * @brief Gets the hashed geo IP for privacy-safe tracking
  * @return The hashed geo IP if available, nil otherwise
  */
@@ -73,27 +61,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @param hashedGeoIp The hashed geo IP to store
  */
 - (void)setHashedGeoIp:(nullable NSString *)hashedGeoIp;
-
-/**
- * @brief Sets the CCPA privacy string
- * @param ccpaPrivacyString The CCPA privacy string (e.g., "1YNN")
- * @discussion CCPA (California Consumer Privacy Act) compliance string
- */
-- (void)setCCPAPrivacyString:(nullable NSString *)ccpaPrivacyString;
-
-/**
- * @brief Sets whether the user has given consent (GDPR)
- * @param hasUserConsent YES if user has given consent, NO otherwise, nil to clear
- * @discussion ⚠️ GDPR is not yet supported by CloudX servers. Please contact CloudX if you need GDPR support. CCPA is fully supported.
- */
-- (void)setHasUserConsent:(nullable NSNumber *)hasUserConsent;
-
-/**
- * @brief Sets the "do not sell" preference (CCPA)
- * @param doNotSell YES to opt-out of data selling, NO otherwise, nil to clear
- * @discussion CCPA "do not sell my personal information" flag - converts to CCPA privacy string format
- */
-- (void)setDoNotSell:(nullable NSNumber *)doNotSell;
 
 #pragma mark - GPP Methods
 

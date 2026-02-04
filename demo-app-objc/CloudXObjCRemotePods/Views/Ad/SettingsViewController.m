@@ -57,13 +57,13 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 4; // SDK, Placement, Privacy, Logging
+    return 4; // SDK, Ad Units, Privacy, Logging
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
         case 0: return 2; // SDK Settings
-        case 1: return 6; // Placement Settings
+        case 1: return 4; // Ad Unit Settings (Banner, MREC, Interstitial, Rewarded)
         case 2: return 3; // Privacy: Consent, US Privacy, User Targeting
         case 3: return 4; // Logging: Enable, Emojis, Timestamps, Level
         default: return 0;
@@ -73,7 +73,7 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     switch (section) {
         case 0: return @"SDK Settings";
-        case 1: return @"Placement Settings";
+        case 1: return @"Ad Unit Settings";
         case 2: return @"Privacy";
         case 3: return @"Logging Controls 🪵";
         default: return nil;
@@ -106,14 +106,12 @@
                 textField.text = self.settings.SDKinitURL;
             }
             break;
-        case 1: // Placement
+        case 1: // Ad Units
             switch (indexPath.row) {
-                case 0: cell.textLabel.text = @"Banner"; textField.text = self.settings.bannerPlacement; break;
-                case 1: cell.textLabel.text = @"MREC"; textField.text = self.settings.mrecPlacement; break;
-                case 2: cell.textLabel.text = @"Interstitial"; textField.text = self.settings.interstitialPlacement; break;
-                case 3: cell.textLabel.text = @"Rewarded"; textField.text = self.settings.rewardedPlacement; break;
-                case 4: cell.textLabel.text = @"Native Small"; textField.text = self.settings.nativeSmallPlacement; break;
-                case 5: cell.textLabel.text = @"Native Medium"; textField.text = self.settings.nativeMediumPlacement; break;
+                case 0: cell.textLabel.text = @"Banner"; textField.text = self.settings.bannerAdUnitId; break;
+                case 1: cell.textLabel.text = @"MREC"; textField.text = self.settings.mrecAdUnitId; break;
+                case 2: cell.textLabel.text = @"Interstitial"; textField.text = self.settings.interstitialAdUnitId; break;
+                case 3: cell.textLabel.text = @"Rewarded"; textField.text = self.settings.rewardedAdUnitId; break;
             }
             break;
         case 2: // Privacy
@@ -186,8 +184,15 @@
 
 - (void)loggingToggleChanged:(UISwitch *)sender {
     if (sender.tag == 300) {
-        // Logging Enabled/Disabled
-        [CloudXCore setLoggingEnabled:sender.isOn];
+        // Logging Enabled/Disabled - use setMinLogLevel: with CLXLogLevelNone to disable
+        if (sender.isOn) {
+            // Re-enable with previously saved level, defaulting to Info
+            NSInteger savedLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"LoggingLevel"];
+            [CloudXCore setMinLogLevel:(savedLevel > 0 ? savedLevel : CLXLogLevelInfo)];
+        } else {
+            // Disable all logging
+            [CloudXCore setMinLogLevel:CLXLogLevelNone];
+        }
         [[NSUserDefaults standardUserDefaults] setBool:!sender.isOn forKey:@"LoggingDisabled"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         NSLog(@"🪵 Logging %@", sender.isOn ? @"ENABLED" : @"DISABLED");
@@ -218,12 +223,10 @@
     NSInteger tag = textField.tag;
     if (tag == 0) self.settings.appKey = textField.text;
     else if (tag == 1) self.settings.SDKinitURL = textField.text;
-    else if (tag == 10) self.settings.bannerPlacement = textField.text;
-    else if (tag == 11) self.settings.mrecPlacement = textField.text;
-    else if (tag == 12) self.settings.interstitialPlacement = textField.text;
-    else if (tag == 13) self.settings.rewardedPlacement = textField.text;
-    else if (tag == 14) self.settings.nativeSmallPlacement = textField.text;
-    else if (tag == 15) self.settings.nativeMediumPlacement = textField.text;
+    else if (tag == 10) self.settings.bannerAdUnitId = textField.text;
+    else if (tag == 11) self.settings.mrecAdUnitId = textField.text;
+    else if (tag == 12) self.settings.interstitialAdUnitId = textField.text;
+    else if (tag == 13) self.settings.rewardedAdUnitId = textField.text;
     else if (tag == 20) self.settings.consentString = textField.text;
     else if (tag == 21) self.settings.usPrivacyString = textField.text;
 }

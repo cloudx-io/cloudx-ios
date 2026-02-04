@@ -2,7 +2,7 @@
 // CLXError.h
 // CloudXCore
 //
-// Industry-standard error codes following AppLovin MAX, Google Mobile Ads, and Unity Ads patterns
+// Industry-standard error codes following common ad SDK patterns
 //
 
 #import <Foundation/Foundation.h>
@@ -12,103 +12,135 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Loss reasons following OpenRTB standard
  * See: OpenRTB 2.5+ specification for standard loss reason codes
+ * 
+ * Code ranges:
+ * 0-99: OpenRTB standard codes
+ * 100-199: OpenRTB standard codes (continued)
+ * 200+: SDK-specific extended codes for detailed no-bid categorization
  */
 typedef NS_ENUM(NSInteger, CLXLossReason) {
+    // OpenRTB Standard Codes
     CLXLossReasonBidWon = 0,              // Bid Won (OpenRTB: 0)
     CLXLossReasonInternalError = 1,       // Internal Error (OpenRTB: 1)
-    CLXLossReasonLostToHigherBid = 102    // Lost to Higher Bid (OpenRTB: 102)
+    CLXLossReasonLostToHigherBid = 102,   // Lost to Higher Bid (OpenRTB: 102)
+    
+    // Extended Codes (200+ for SDK-specific no-bid categorization)
+    CLXLossReasonCreativeBlocked = 200,   // Creative filtered/blocked by publisher
+    CLXLossReasonRateLimited = 201,       // Publisher rate limiting applied
+    CLXLossReasonNoFill = 202,            // No inventory available from demand
+    CLXLossReasonTimeout = 203,           // Request timed out before response
+    CLXLossReasonInvalidBid = 204,        // Malformed or invalid bid response
+    CLXLossReasonExpired = 205            // Bid expired before render opportunity
 };
 
 /**
  * CloudX SDK error codes - following industry standards
- * 
+ *
  * Error code ranges:
- * 100-199: SDK initialization errors
- * 200-299: Network and connectivity errors  
+ * 100-199: Network and connectivity errors
+ * 200-299: SDK initialization errors
  * 300-399: Ad request and loading errors
  * 400-499: Ad display and presentation errors
  * 500-599: Configuration and setup errors
  */
 typedef NS_ENUM(NSInteger, CLXErrorCode) {
     // GENERAL ERRORS (0-99)
-    /// Unknown or unspecified error
-    CLXErrorCodeUnknown = 0,
-    
-    // INITIALIZATION ERRORS (100-199)
+    /// An internal error occurred
+    CLXErrorCodeInternalError = 0,
+
+    // NETWORK ERRORS (100-199)
+    /// Network error
+    CLXErrorCodeNetworkError = 100,
+    /// Network request timed out
+    CLXErrorCodeNetworkTimeout = 101,
+    /// Server error (5xx)
+    CLXErrorCodeServerError = 102,
+    /// Client error (4xx)
+    CLXErrorCodeClientError = 103,
+    /// Rate limited (429)
+    CLXErrorCodeTooManyRequests = 104,
+    /// Invalid or unparseable server response
+    CLXErrorCodeInvalidResponse = 105,
+    /// No network connectivity
+    CLXErrorCodeNoConnection = 106,
+
+    // INITIALIZATION ERRORS (200-299)
     /// SDK failed to initialize
-    CLXErrorCodeNotInitialized = 100,
-    /// SDK initialization is already in progress
-    CLXErrorCodeInitializationInProgress = 101,
+    CLXErrorCodeNotInitialized = 200,
     /// SDK initialized but no adapters were found
-    CLXErrorCodeNoAdaptersFound = 102,
-    /// SDK initialization timeout
-    CLXErrorCodeInitializationTimeout = 103,
+    CLXErrorCodeNoAdaptersFound = 201,
+    /// No ad networks configured for this app
+    CLXErrorCodeNoNetworksConfigured = 202,
     /// Invalid app key provided during initialization
-    CLXErrorCodeInvalidAppKey = 104,
+    CLXErrorCodeInvalidAppKey = 203,
     /// SDK disabled by kill switch
-    CLXErrorCodeSDKDisabled = 105,
-    
-    // NETWORK ERRORS (200-299)
-    /// Network connectivity issues
-    CLXErrorCodeNetworkError = 200,
-    /// Network timeout occurred
-    CLXErrorCodeNetworkTimeout = 201,
-    /// Invalid server response
-    CLXErrorCodeInvalidResponse = 202,
-    /// Server returned an error
-    CLXErrorCodeServerError = 203,
+    CLXErrorCodeSDKDisabled = 204,
     
     // AD REQUEST/LOADING ERRORS (300-399)
+    /// Ad unit not found or invalid
+    CLXErrorCodeInvalidAdUnit = 300,
+    /// Ads disabled for this ad unit
+    CLXErrorCodeAdsDisabled = 301,
     /// No ad fill available (no ads to show)
-    CLXErrorCodeNoFill = 300,
-    /// Invalid ad request parameters
-    CLXErrorCodeInvalidRequest = 301,
-    /// Invalid placement ID
-    CLXErrorCodeInvalidPlacement = 302,
-    /// Ad loading timeout
-    CLXErrorCodeLoadTimeout = 303,
+    CLXErrorCodeNoFill = 302,
     /// Ad failed to load for unknown reasons
     CLXErrorCodeLoadFailed = 304,
-    /// Ad content is invalid or corrupted
-    CLXErrorCodeInvalidAd = 305,
-    /// Too many ad requests (rate limiting)
-    CLXErrorCodeTooManyRequests = 306,
-    /// Ad request was cancelled
-    CLXErrorCodeRequestCancelled = 307,
-    /// Ads disabled by kill switch
-    CLXErrorCodeAdsDisabled = 308,
     
     // AD DISPLAY/SHOW ERRORS (400-499)
-    /// Ad is not ready to be shown
+    /// Ad not ready
     CLXErrorCodeAdNotReady = 400,
-    /// Ad has already been shown
-    CLXErrorCodeAdAlreadyShown = 401,
-    /// Ad has expired and cannot be shown
-    CLXErrorCodeAdExpired = 402,
-    /// View controller required for ad display is nil
-    CLXErrorCodeInvalidViewController = 403,
-    /// Ad failed to show for unknown reasons
-    CLXErrorCodeShowFailed = 404,
+    /// Ad already showing
+    CLXErrorCodeAdAlreadyShowing = 401,
     
     // CONFIGURATION/SETUP ERRORS (500-599)
-    /// Invalid ad unit configuration
-    CLXErrorCodeInvalidAdUnit = 500,
-    /// Required permissions not granted
-    CLXErrorCodePermissionDenied = 501,
-    /// Ad format not supported
-    CLXErrorCodeUnsupportedAdFormat = 502,
-    /// Banner view is nil or invalid
-    CLXErrorCodeInvalidBannerView = 503,
     /// Native view is nil or invalid
-    CLXErrorCodeInvalidNativeView = 504,
-    /// No adapters registered (no adapter frameworks included in project)
-    CLXErrorCodeNoAdaptersRegistered = 505,
-    /// Invalid adapter configuration
-    CLXErrorCodeInvalidConfiguration = 506,
-    /// Invalid ad unit ID provided
-    CLXErrorCodeInvalidAdUnitID = 507,
-    /// Invalid bid response
-    CLXErrorCodeInvalidBidResponse = 508
+    CLXErrorCodeInvalidNativeView = 500,
+    
+    // ADAPTER ERRORS (600-699)
+    /// Internal adapter error
+    CLXErrorCodeAdapterInternalError = 600,
+    /// Ad network adapter could not fill the ad request - no inventory available
+    CLXErrorCodeAdapterNoFill = 601,
+    /// Ad network adapter is in an invalid state for loading ads
+    CLXErrorCodeAdapterInvalidLoadState = 602,
+    /// Ad network adapter has invalid or missing configuration
+    CLXErrorCodeAdapterInvalidConfiguration = 603,
+    /// Ad network adapter received invalid server parameters (e.g., missing placement ID)
+    CLXErrorCodeAdapterInvalidServerExtras = 604,
+    /// Bad request to ad network
+    CLXErrorCodeAdapterBadRequest = 605,
+    /// Ad network adapter not initialized
+    CLXErrorCodeAdapterNotInitialized = 606,
+    /// Ad network adapter initialization failed
+    CLXErrorCodeAdapterInitializationError = 607,
+    /// Ad not ready to be shown
+    CLXErrorCodeAdapterAdNotReady = 608,
+    /// Adapter load timed out
+    CLXErrorCodeAdapterLoadTimeout = 609,
+    /// Ad network adapter request timed out
+    CLXErrorCodeAdapterTimeout = 610,
+    /// Ad network adapter failed to establish connection with ad server
+    CLXErrorCodeAdapterNoConnection = 611,
+    /// Ad network server returned an error response
+    CLXErrorCodeAdapterServerError = 612,
+    /// Bid token collection timed out
+    CLXErrorCodeAdapterBidTokenTimeout = 613,
+    /// Bid token collection not supported
+    CLXErrorCodeAdapterBidTokenNotSupported = 614,
+    /// WebView error in adapter
+    CLXErrorCodeAdapterWebViewError = 615,
+    /// Ad expired before being shown
+    CLXErrorCodeAdapterAdExpired = 616,
+    /// Ad frequency capped
+    CLXErrorCodeAdapterAdFrequencyCapped = 617,
+    /// Reward error in adapter
+    CLXErrorCodeAdapterRewardError = 618,
+    /// Missing required native ad assets
+    CLXErrorCodeAdapterMissingNativeAdAssets = 619,
+    /// Missing view controller required for ad display
+    CLXErrorCodeAdapterMissingViewController = 620,
+    /// Ad display failed
+    CLXErrorCodeAdapterDisplayFailed = 621
 };
 
 /**
@@ -145,6 +177,26 @@ extern NSString * const CLXErrorDomain;
  * @discussion Use this to preserve the root cause error chain for debugging
  */
 + (instancetype)errorWithCode:(CLXErrorCode)code description:(NSString *)description underlyingError:(nullable NSError *)underlyingError;
+
+/**
+ * Creates an error with the specified CloudX error code and underlying error, using default description
+ * @param code The CloudX error code
+ * @param underlyingError The original error that caused this error (optional)
+ * @return A new CLXError instance with default description for the error code
+ * @discussion Use this when you want consistent error messages across platforms
+ */
++ (instancetype)errorWithCode:(CLXErrorCode)code underlyingError:(nullable NSError *)underlyingError;
+
+/**
+ * Converts an NSError to CLXError, preserving the original error code and type if already CLXError
+ * @param error The error to convert (may be NSError or CLXError)
+ * @param fallbackCode The CLXErrorCode to use for description fallback (not for the error code itself)
+ * @return A CLXError instance (original if already CLXError, wrapped otherwise), or nil if error is nil
+ * @discussion Use this helper method to safely convert adapter/external errors to CLXError
+ *             while maintaining type consistency. The original error code is preserved.
+ *             Follows DRY principle - centralizes error conversion logic.
+ */
++ (nullable instancetype)errorFromError:(nullable NSError *)error withFallbackCode:(CLXErrorCode)fallbackCode;
 
 /**
  * Creates an error with appropriate CloudX error code based on HTTP status code

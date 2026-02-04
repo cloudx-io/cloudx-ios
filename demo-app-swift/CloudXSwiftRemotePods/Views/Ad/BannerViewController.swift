@@ -105,13 +105,14 @@ class BannerViewController: BaseAdViewController {
         
         DemoAppLogger.sharedInstance.logMessage("📱 Creating new banner ad instance...")
         
-        // Create banner ad with placement from config
-        let placement = CLXDemoConfigManager.sharedManager.currentConfig.bannerPlacement
-        bannerAd = cloudX.createBanner(placement: placement, 
-                                      viewController: self, 
-                                      delegate: self)
+        // Create banner ad with adUnitId from config
+        let adUnitId = CLXDemoConfigManager.sharedManager.currentConfig.bannerAdUnitId
+        bannerAd = cloudX.createBanner(adUnitId: adUnitId, viewController: self)
+        bannerAd?.delegate = self
+        bannerAd?.revenueDelegate = self
+        bannerAd?.placement = "demo_banner"
+        bannerAd?.customData = "screen:home,position:bottom"
         
-        // SDK now always returns non-nil - validation errors deferred to load() callback
         DemoAppLogger.sharedInstance.logMessage("✅ Banner ad instance created successfully")
         
         // Add banner to view hierarchy immediately
@@ -155,50 +156,27 @@ class BannerViewController: BaseAdViewController {
     }
 }
 
-extension BannerViewController: CLXBannerDelegate {
+extension BannerViewController: CLXBannerDelegate, CLXAdRevenueDelegate {
     func didLoad(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("✅ Banner didLoadAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .ready)
     }
     
-    func didFailToLoadAd(error: CLXError) {
-        DemoAppLogger.sharedInstance.logMessage("❌ Banner failed to load - Error: \(error.localizedDescription)")
+    func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
+        DemoAppLogger.sharedInstance.logMessage("❌ Banner failed to load (\(adUnitId)) - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: .noAd)
         bannerAd = nil
         
         DispatchQueue.main.async { [weak self] in
-            let errorMessage = error.detailedDemoDescription
+            let errorMessage = (error as NSError).detailedDemoDescription
             self?.showAlert(title: "Banner Ad Load Failed", message: errorMessage)
         }
     }
     
-    func didDisplay(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👀 Banner didDisplayAd", ad: ad)
-    }
-    
-    func didFailToDisplay(_ ad: CLXAd, error: CLXError) {
-        DemoAppLogger.sharedInstance.logAdEvent("❌ Banner didFailToDisplayAd", ad: ad)
-        bannerAd = nil
-        
-        DispatchQueue.main.async { [weak self] in
-            let errorMessage = error.detailedDemoDescription
-            self?.showAlert(title: "Banner Ad Display Failed", message: errorMessage)
-        }
-    }
-    
-    func didHide(_ ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("🔚 Banner didHideAd", ad: ad)
-        bannerAd = nil
-    }
-    
     func didClick(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("👆 Banner didClickAd", ad: ad)
-    }
-    
-    func didRecordImpression(for ad: CLXAd) {
-        DemoAppLogger.sharedInstance.logAdEvent("👁️ Banner didRecordImpression", ad: ad)
     }
     
     func didPayRevenue(for ad: CLXAd) {

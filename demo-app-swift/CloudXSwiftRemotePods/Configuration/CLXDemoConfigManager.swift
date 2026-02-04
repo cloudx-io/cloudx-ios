@@ -3,33 +3,33 @@ import Foundation
 class CLXDemoConfig {
     let appKey: String
     let hashedUserId: String
-    let bannerPlacement: String
-    let mrecPlacement: String
-    let interstitialPlacement: String
-    let nativePlacement: String
-    let nativeBannerPlacement: String
-    let rewardedPlacement: String
-    let rewardedInterstitialPlacement: String
+    let bannerAdUnitId: String
+    let mrecAdUnitId: String
+    let interstitialAdUnitId: String
+    let nativeAdUnitId: String
+    let nativeBannerAdUnitId: String
+    let rewardedAdUnitId: String
+    let rewardedInterstitialAdUnitId: String
     
     init(appKey: String,
          hashedUserId: String,
-         bannerPlacement: String,
-         mrecPlacement: String,
-         interstitialPlacement: String,
-         nativePlacement: String,
-         nativeBannerPlacement: String,
-         rewardedPlacement: String,
-         rewardedInterstitialPlacement: String) {
+         bannerAdUnitId: String,
+         mrecAdUnitId: String,
+         interstitialAdUnitId: String,
+         nativeAdUnitId: String,
+         nativeBannerAdUnitId: String,
+         rewardedAdUnitId: String,
+         rewardedInterstitialAdUnitId: String) {
         
         self.appKey = appKey
         self.hashedUserId = hashedUserId
-        self.bannerPlacement = bannerPlacement
-        self.mrecPlacement = mrecPlacement
-        self.interstitialPlacement = interstitialPlacement
-        self.nativePlacement = nativePlacement
-        self.nativeBannerPlacement = nativeBannerPlacement
-        self.rewardedPlacement = rewardedPlacement
-        self.rewardedInterstitialPlacement = rewardedInterstitialPlacement
+        self.bannerAdUnitId = bannerAdUnitId
+        self.mrecAdUnitId = mrecAdUnitId
+        self.interstitialAdUnitId = interstitialAdUnitId
+        self.nativeAdUnitId = nativeAdUnitId
+        self.nativeBannerAdUnitId = nativeBannerAdUnitId
+        self.rewardedAdUnitId = rewardedAdUnitId
+        self.rewardedInterstitialAdUnitId = rewardedInterstitialAdUnitId
     }
 }
 
@@ -44,13 +44,13 @@ class CLXDemoConfigManager {
         self.currentConfig = CLXDemoConfig(
             appKey: "xcQftcBSUmqzuv1LfET2o",
             hashedUserId: "test-user-123",
-            bannerPlacement: "swift-demo-banner-1",
-            mrecPlacement: "swift-demo-mrec-1",
-            interstitialPlacement: "swift-demo-interstitial-1",
-            nativePlacement: "-",
-            nativeBannerPlacement: "-",
-            rewardedPlacement: "-",
-            rewardedInterstitialPlacement: "-"
+            bannerAdUnitId: "Ce5-ltAX5zFz5QJ3TzEjY",
+            mrecAdUnitId: "xMLHNFIkwieu2SLyeD0sQ",
+            interstitialAdUnitId: "rkw0ncj6mSphKtmnl8Cw_",
+            nativeAdUnitId: "-",
+            nativeBannerAdUnitId: "-",
+            rewardedAdUnitId: "WJje0XGqL5n56Sa8dlt8L",
+            rewardedInterstitialAdUnitId: "-"
         )
     }
 }

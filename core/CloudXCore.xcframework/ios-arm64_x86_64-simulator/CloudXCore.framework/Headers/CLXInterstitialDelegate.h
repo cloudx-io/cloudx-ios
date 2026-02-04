@@ -8,7 +8,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CLXAdDelegate.h>
+#import <CloudXCore/CLXFullscreenAdDelegate.h>
 
 @class CLXInterstitial;
 
@@ -17,10 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @protocol CLXInterstitialDelegate
  * @brief Delegate protocol for interstitial ad events
- * 
- * Extends BaseAdDelegate with interstitial-specific callbacks.
+ *
+ * Extends CLXFullscreenAdDelegate with interstitial-specific callbacks.
  */
-@protocol CLXInterstitialDelegate <CLXAdDelegate>
+@protocol CLXInterstitialDelegate <CLXFullscreenAdDelegate>
 
 @end
 

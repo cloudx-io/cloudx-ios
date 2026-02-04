@@ -73,8 +73,8 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (NSString *)placementName {
-    return [[CLXDemoConfigManager sharedManager] currentConfig].interstitialPlacement;
+- (NSString *)adUnitId {
+    return [[CLXDemoConfigManager sharedManager] currentConfig].interstitialAdUnitId;
 }
 
 - (void)loadInterstitialAd {
@@ -101,19 +101,15 @@
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
 
-    // Always preserve the original human-readable placement name for display purposes
-    NSString *originalPlacementName = [self placementName];
-    
-    // Use settings placement ID for SDK call if provided, otherwise use original name
-    NSString *placement = originalPlacementName;
-    if (_settings.interstitialPlacement.length > 0) {
-        placement = _settings.interstitialPlacement;
+    // Get ad unit ID from config, with settings override if provided
+    NSString *adUnitId = [self adUnitId];
+    if (_settings.interstitialAdUnitId.length > 0) {
+        adUnitId = _settings.interstitialAdUnitId;
     }
     
-    self.interstitialAd = [[CloudXCore shared] createInterstitialWithPlacement:placement];
+    self.interstitialAd = [[CloudXCore shared] createInterstitialWithAdUnitId:adUnitId];
     self.interstitialAd.delegate = self;
-    
-    // Note: The interstitial ad will internally preserve the original placement name through our CLXAd factory method updates
+    self.interstitialAd.revenueDelegate = self;
     
     if (self.interstitialAd) {
         [self.interstitialAd load];
@@ -138,7 +134,9 @@
     }
     
     if (self.interstitialAd.isReady) {
-        [self.interstitialAd showFromViewController:self];
+        [self.interstitialAd showFromViewController:self
+                                          placement:@"demo_interstitial"
+                                         customData:@"level:5,coins:100"];
     } else {
         [self showAlertWithTitle:@"Error" message:@"Interstitial is not ready. Please try loading again."];
     }
@@ -159,8 +157,8 @@
     [self updateStatusUIWithState:AdStateReady];
 }
 
-- (void)didFailToLoadAdWithError:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Interstitial failed to load - Error: %@", error ? error.localizedDescription : @"Unknown error"]];
+- (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Interstitial failed to load (%@) - Error: %@", adUnitId, error ? error.localizedDescription : @"Unknown error"]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -198,10 +196,6 @@
 
 - (void)didClickAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Interstitial didClickAd" ad:ad];
-}
-
-- (void)didRecordImpressionForAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Interstitial didRecordImpressionForAd" ad:ad];
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {

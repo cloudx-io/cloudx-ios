@@ -9,7 +9,6 @@
  * Separate protocols for different data access concerns:
  * - CLXBaseDao: Common CRUD operations
  * - CLXMetricsEventDao: Metrics-specific operations
- * - CLXRillEventDao: Rill event-specific operations
  * - CLXSessionDao: Session management operations
  * - CLXPerformanceDao: Performance metrics operations
  */
@@ -19,7 +18,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class CLXMetricsEvent;
-@class CLXRillEvent;
 @class CLXSession;
 @class CLXPerformanceMetric;
 
@@ -66,36 +64,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Rill Event DAO protocol
- * Handles cached_tracking_events_table operations matching Android CachedTrackingEventDao
- */
-@protocol CLXRillEventDao <CLXBaseDao>
-
-- (BOOL)insertRillEvent:(CLXRillEvent *)event;
-- (BOOL)insertRillEventBatch:(NSArray<CLXRillEvent *> *)events;
-- (nullable CLXRillEvent *)findRillEventById:(NSString *)eventId;
-- (NSArray<CLXRillEvent *> *)findRillEventsByCampaignId:(NSString *)campaignId;
-- (NSArray<CLXRillEvent *> *)findRillEventsByEventName:(NSString *)eventName;
-- (NSArray<CLXRillEvent *> *)findRillEventsByType:(NSString *)type;
-- (NSArray<CLXRillEvent *> *)findRillEventsByStatus:(NSString *)status;
-
-// Retry management
-- (NSArray<CLXRillEvent *> *)findPendingRillEvents;
-- (NSArray<CLXRillEvent *> *)findFailedRillEventsForRetry;
-- (BOOL)updateRillEventStatus:(NSString *)eventId status:(NSString *)status;
-- (BOOL)incrementRetryCount:(NSString *)eventId;
-
-// Batch processing
-- (NSArray<CLXRillEvent *> *)findRillEventsForBatch:(NSInteger)batchSize;
-- (BOOL)markRillEventsAsProcessed:(NSArray<NSString *> *)eventIds;
-
-// Cleanup operations
-- (BOOL)deleteRillEventsOlderThan:(NSTimeInterval)timestamp;
-- (BOOL)deleteProcessedRillEvents;
-
-@end
-
-/**
  * Session DAO protocol
  * Handles session_table operations replacing Core Data CLXAppSessionModel
  */
@@ -130,22 +98,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)insertPerformanceMetric:(CLXPerformanceMetric *)metric;
 - (BOOL)insertPerformanceMetricBatch:(NSArray<CLXPerformanceMetric *> *)metrics;
-- (NSArray<CLXPerformanceMetric *> *)findPerformanceMetricsByPlacementId:(NSString *)placementId;
+- (NSArray<CLXPerformanceMetric *> *)findPerformanceMetricsByAdUnitId:(NSString *)adUnitId;
 - (NSArray<CLXPerformanceMetric *> *)findPerformanceMetricsBySessionId:(NSString *)sessionId;
-- (nullable CLXPerformanceMetric *)findPerformanceMetricByPlacementId:(NSString *)placementId sessionId:(NSString *)sessionId;
-- (CLXPerformanceMetric *)findOrCreatePerformanceMetricForPlacementId:(NSString *)placementId sessionId:(NSString *)sessionId;
+- (nullable CLXPerformanceMetric *)findPerformanceMetricByAdUnitId:(NSString *)adUnitId sessionId:(NSString *)sessionId;
+- (CLXPerformanceMetric *)findOrCreatePerformanceMetricForAdUnitId:(NSString *)adUnitId sessionId:(NSString *)sessionId;
 
 // Aggregation operations
-- (NSInteger)getTotalClicksForPlacement:(NSString *)placementId;
-- (NSInteger)getTotalImpressionsForPlacement:(NSString *)placementId;
-- (NSInteger)getTotalClosesForPlacement:(NSString *)placementId;
-- (NSTimeInterval)getAverageLoadLatencyForPlacement:(NSString *)placementId;
-- (NSInteger)getTotalBidResponsesForPlacement:(NSString *)placementId;
+- (NSInteger)getTotalClicksForAdUnit:(NSString *)adUnitId;
+- (NSInteger)getTotalImpressionsForAdUnit:(NSString *)adUnitId;
+- (NSInteger)getTotalClosesForAdUnit:(NSString *)adUnitId;
+- (NSTimeInterval)getAverageLoadLatencyForAdUnit:(NSString *)adUnitId;
+- (NSInteger)getTotalBidResponsesForAdUnit:(NSString *)adUnitId;
 
 // Performance analytics
-- (NSDictionary<NSString *, NSNumber *> *)getPerformanceSummaryForPlacement:(NSString *)placementId;
+- (NSDictionary<NSString *, NSNumber *> *)getPerformanceSummaryForAdUnit:(NSString *)adUnitId;
 - (NSDictionary<NSString *, NSNumber *> *)getPerformanceSummaryForSession:(NSString *)sessionId;
-- (NSArray<CLXPerformanceMetric *> *)findTopPerformingPlacements:(NSInteger)limit;
+- (NSArray<CLXPerformanceMetric *> *)findTopPerformingAdUnits:(NSInteger)limit;
 
 // Cleanup operations
 - (BOOL)deletePerformanceMetricsOlderThan:(NSTimeInterval)timestamp;

@@ -27,14 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)startWithConfig:(CLXSDKConfig *)config;
 
 /**
- * Set basic data for metrics tracking
- * Matches Android's fun setBasicData(sessionId: String, accountId: String, basePayload: String)
- */
-- (void)setBasicDataWithSessionId:(NSString *)sessionId 
-                        accountId:(NSString *)accountId 
-                      basePayload:(NSString *)basePayload;
-
-/**
  * Track a method call
  * Matches Android's fun trackMethodCall(type: MetricsType.Method)
  */
@@ -45,6 +37,15 @@ NS_ASSUME_NONNULL_BEGIN
  * Matches Android's fun trackNetworkCall(type: MetricsType.Network, latency: Long)
  */
 - (void)trackNetworkCall:(NSString *)networkType latency:(NSInteger)latencyMs;
+
+/**
+ * Track a network call with latency and optional error
+ * If error is a timeout error, also increments the timeout metric
+ * @param networkType The type of network call
+ * @param latencyMs The latency in milliseconds
+ * @param error Optional error if the network call failed
+ */
+- (void)trackNetworkCall:(NSString *)networkType latency:(NSInteger)latencyMs error:(nullable NSError *)error;
 
 /**
  * Try sending pending metrics

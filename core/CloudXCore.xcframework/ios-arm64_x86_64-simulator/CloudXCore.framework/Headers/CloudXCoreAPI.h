@@ -2,6 +2,8 @@
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
+#import <CloudXCore/CLXInitializationConfiguration.h>
+#import <CloudXCore/CLXSdkConfiguration.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,12 +17,10 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 @protocol CLXBannerDelegate;
 @protocol CLXInterstitialDelegate;
 @protocol CLXRewardedDelegate;
-@protocol CLXNativeDelegate;
 
 @class CLXBannerAdView;
-@class CLXNativeAdView;
 @class CLXSDKConfigResponse;
-@class CLXSDKConfigPlacement;
+@class CLXSDKConfigAdUnit;
 @class CLXInterstitial;
 @class CLXRewarded;
 
@@ -57,24 +57,46 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 @property (nonatomic, readonly) BOOL isInitialized;
 
 /**
- * Initialize the SDK to start serving ads
- * @param appKey The app key provided by CloudX
- * @param testMode YES to enable test mode (test ads, no billing), NO for production (default: NO)
- * @param completion A completion handler that will be called once the SDK is initialized
- * @discussion When testMode is YES:
- * - Bid requests will include test=1 flag (OpenRTB spec)
- * - Adapter SDKs will be configured for test mode (e.g., Meta test ads)
- * - No real monetization will occur
- * 
- * Use testMode:YES during development and QA testing.
- * Use testMode:NO for production (real ads with actual billing).
- * The host app has full control over the testMode setting.
- * 
- * In Swift, you can omit testMode to use the default value (false):
- * CloudXCore.shared.initializeSDK(appKey: "key") { success, error in ... }
+ * Initialize the SDK with a configuration object
+ * @param configuration The initialization configuration
+ * @param completion A completion handler called when initialization completes.
+ *                   On success, sdkConfiguration is non-nil and error is nil.
+ *                   On failure, sdkConfiguration is nil and error contains failure details.
+ * @discussion This is the preferred initialization method. Use CLXInitializationConfiguration
+ * to configure the SDK before initialization.
+ *
+ * Example:
+ * @code
+ * CLXInitializationConfiguration *config =
+ *     [CLXInitializationConfiguration configurationWithAppKey:@"your-app-key"
+ *         builderBlock:^(CLXInitializationConfigurationBuilder *builder) {
+ *             builder.pluginVersion = @"flutter-1.2.0";
+ *         }];
+ * [[CloudXCore shared] initializeWithConfiguration:config completion:^(CLXSdkConfiguration *sdkConfiguration, CLXError *error) {
+ *     if (sdkConfiguration) {
+ *         NSLog(@"SDK initialized successfully");
+ *     } else {
+ *         NSLog(@"SDK initialization failed: %@", error.localizedDescription);
+ *     }
+ * }];
+ * @endcode
  */
-- (void)initializeSDKWithAppKey:(NSString *)appKey testMode:(BOOL)testMode completion:(nullable void (^)(BOOL success, CLXError * _Nullable error))completion
-    NS_SWIFT_NAME(initializeSDK(appKey:testMode:completion:));
+- (void)initializeWithConfiguration:(CLXInitializationConfiguration *)configuration
+                         completion:(nullable void (^)(CLXSdkConfiguration * _Nullable sdkConfiguration, CLXError * _Nullable error))completion
+    NS_SWIFT_NAME(initialize(with:completion:));
+
+/**
+ * Initialize the SDK with plugin version identification
+ * @param appKey The app key provided by CloudX
+ * @param pluginVersion Version string identifying the wrapper SDK (e.g., "flutter-1.2.0", "unity-2.3.1")
+ * @param completion A completion handler that will be called once the SDK is initialized
+ * @discussion Use this method when integrating the SDK through a plugin or wrapper framework.
+ * The pluginVersion helps with debugging and analytics for cross-platform integrations.
+ */
+- (void)initializeSDKWithAppKey:(NSString *)appKey
+                  pluginVersion:(nullable NSString *)pluginVersion
+                     completion:(nullable void (^)(BOOL success, CLXError * _Nullable error))completion
+    NS_SWIFT_NAME(initializeSDK(appKey:pluginVersion:completion:));
 
 /**
  * Set the hashed user ID for auction requests
@@ -82,30 +104,6 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  */
 - (void)setHashedUserID:(NSString *)hashedUserID
     NS_SWIFT_NAME(setHashedUserID(_:));
-
-/**
- * Set a hashed key-value pair for auction requests
- * @param key The key provided by CloudX
- * @param value The value provided by CloudX
- */
-- (void)setHashedKeyValue:(NSString *)key value:(NSString *)value
-    NS_SWIFT_NAME(setHashedKeyValue(key:value:));
-
-/**
- * Set multiple key-value pairs for auction requests
- * @param userDictionary The dictionary of key-value pairs provided by CloudX
- */
-- (void)setKeyValueDictionary:(NSDictionary<NSString *, NSString *> *)userDictionary
-    NS_SWIFT_NAME(setKeyValueDictionary(_:));
-
-/**
- * Set a bidder-specific key-value pair for auction requests
- * @param bidder The bidder name
- * @param key The key provided by CloudX
- * @param value The value provided by CloudX
- */
-- (void)setBidderKeyValue:(NSString *)bidder key:(NSString *)key value:(NSString *)value
-    NS_SWIFT_NAME(setBidderKeyValue(bidder:key:value:));
 
 /**
  * Set a user-level key-value pair for targeting
@@ -135,79 +133,43 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 
 /**
  * Create a banner ad
- * @param placement The placement name. This should match the placement name in the CloudX dashboard
+ * @param adUnitId The ad unit ID. This should match the ad unit name in the CloudX dashboard
  * @param viewController The view controller in which the ad will be displayed
- * @param delegate The delegate to receive ad events
  * @return A CLXBannerAdView object
+ * @discussion Set the delegate property on the returned object to receive ad events
  */
-- (nullable CLXBannerAdView *)createBannerWithPlacement:(NSString *)placement
-                                           viewController:(UIViewController *)viewController
-                                                 delegate:(nullable id<CLXBannerDelegate>)delegate
-    NS_SWIFT_NAME(createBanner(placement:viewController:delegate:));
+- (nullable CLXBannerAdView *)createBannerWithAdUnitId:(NSString *)adUnitId
+                                          viewController:(UIViewController *)viewController
+    NS_SWIFT_NAME(createBanner(adUnitId:viewController:));
 
 /**
  * Create a MREC ad
- * @param placement The placement name. This should match the placement name in the CloudX dashboard
+ * @param adUnitId The ad unit ID. This should match the ad unit name in the CloudX dashboard
  * @param viewController The view controller in which the ad will be displayed
- * @param delegate The delegate to receive ad events
  * @return A CLXBannerAdView object
+ * @discussion Set the delegate property on the returned object to receive ad events
  */
-- (nullable CLXBannerAdView *)createMRECWithPlacement:(NSString *)placement
-                                          viewController:(UIViewController *)viewController
-                                                delegate:(nullable id<CLXBannerDelegate>)delegate
-    NS_SWIFT_NAME(createMREC(placement:viewController:delegate:));
+- (nullable CLXBannerAdView *)createMRECWithAdUnitId:(NSString *)adUnitId
+                                         viewController:(UIViewController *)viewController
+    NS_SWIFT_NAME(createMREC(adUnitId:viewController:));
 
 /**
  * Create an interstitial ad
- * @param placement The placement name. This should match the placement name in the CloudX dashboard
+ * @param adUnitId The ad unit ID. This should match the ad unit name in the CloudX dashboard
  * @return A CLXInterstitial object
  * @discussion Set the delegate property on the returned object to receive ad events
  */
-- (nullable CLXInterstitial *)createInterstitialWithPlacement:(NSString *)placement
-    NS_SWIFT_NAME(createInterstitial(placement:));
+- (nullable CLXInterstitial *)createInterstitialWithAdUnitId:(NSString *)adUnitId
+    NS_SWIFT_NAME(createInterstitial(adUnitId:));
 
 /**
  * Create a rewarded ad
- * @param placement The placement name. This should match the placement name in the CloudX dashboard
+ * @param adUnitId The ad unit ID. This should match the ad unit name in the CloudX dashboard
  * @return A CLXRewarded object
  * @discussion Set the delegate property on the returned object to receive ad events
  */
-- (nullable CLXRewarded *)createRewardedWithPlacement:(NSString *)placement
-    NS_SWIFT_NAME(createRewarded(placement:));
-
-/**
- * Create a native ad
- * @param placement The placement name. This should match the placement name in the CloudX dashboard
- * @param viewController The view controller in which the ad will be displayed
- * @param delegate The delegate to receive ad events
- * @return A CLXNativeAdView object
- */
-- (nullable CLXNativeAdView *)createNativeAdWithPlacement:(NSString *)placement
-                                              viewController:(UIViewController *)viewController
-                                                    delegate:(nullable id<CLXNativeDelegate>)delegate
-    NS_SWIFT_NAME(createNativeAd(placement:viewController:delegate:));
-
-#pragma mark - Privacy Settings
-
-/**
- * Set CCPA privacy string
- * @param ccpaPrivacyString The CCPA privacy string (e.g., "1YNN")
- */
-+ (void)setCCPAPrivacyString:(nullable NSString *)ccpaPrivacyString;
-
-/**
- * Set whether user has given consent (GDPR)
- * @param isUserConsent YES if user has given consent, NO otherwise
- * @discussion ⚠️ GDPR is not yet supported by CloudX servers. Please contact CloudX if you need GDPR support. CCPA is fully supported.
- */
-+ (void)setIsUserConsent:(BOOL)isUserConsent;
-
-/**
- * Set "do not sell" preference (CCPA)
- * @param isDoNotSell YES to opt-out of data selling, NO otherwise
- * @discussion CCPA "do not sell my personal information" flag - converts to CCPA privacy string format
- */
-+ (void)setIsDoNotSell:(BOOL)isDoNotSell;
+- (nullable CLXRewarded *)createRewardedWithAdUnitId:(NSString *)adUnitId
+    NS_SWIFT_NAME(createRewarded(adUnitId:));
 
 #pragma mark - Visual Debugging
 
@@ -240,18 +202,10 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 #pragma mark - Logging Control
 
 /**
- * Enable or disable SDK logging
- * @param enabled YES to enable logging, NO to disable
- * @discussion Controls verbose logging output from the SDK. Disabled by default in production.
- * Call this method early in your app lifecycle, before SDK initialization, to see all logs.
- */
-+ (void)setLoggingEnabled:(BOOL)enabled;
-
-/**
  * Set minimum log level for SDK logging
- * @param minLogLevel The minimum log level (CLXLogLevelVerbose, CLXLogLevelDebug, CLXLogLevelInfo, CLXLogLevelWarn, CLXLogLevelError)
+ * @param minLogLevel The minimum log level (CLXLogLevelVerbose, CLXLogLevelDebug, CLXLogLevelInfo, CLXLogLevelWarn, CLXLogLevelError, CLXLogLevelNone)
  * @discussion Controls which log messages are displayed. Only logs at or above this level will be shown.
- * Call this method early in your app lifecycle, before SDK initialization.
+ * Use CLXLogLevelNone to disable all logging. Call this method early in your app lifecycle.
  */
 + (void)setMinLogLevel:(CLXLogLevel)minLogLevel;
 
@@ -268,33 +222,6 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  * @discussion Timestamps are formatted as HH:mm:ss.SSS and appear after [CloudX]. Useful for debugging timing issues.
  */
 + (void)setLoggingTimestampsEnabled:(BOOL)enabled;
-
-#pragma mark - SDK Lifecycle
-
-/**
- * Deinitialize the SDK and clean up resources
- * @discussion Tears down the SDK, releases resources, and resets the initialization state.
- * After calling this, you can reinitialize the SDK if needed.
- */
-- (void)deinitialize;
-
-#pragma mark - Adapter Readiness (Internal)
-
-/**
- * Check if a specific adapter has completed initialization
- * @param adapterName The name of the adapter (e.g., "meta", "vungle")
- * @return YES if the adapter is ready, NO otherwise
- * @discussion Internal API used by bid request logic to avoid race conditions during SDK initialization
- */
-- (BOOL)isAdapterReady:(NSString *)adapterName;
-
-/**
- * Look up placement configuration by name
- * @param placementName The placement name
- * @return Placement configuration or nil if not found
- * @discussion Internal API used by ad objects to look up placement configuration after SDK initialization
- */
-- (nullable CLXSDKConfigPlacement *)placementConfigForName:(NSString *)placementName;
 
 @end
 

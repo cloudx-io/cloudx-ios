@@ -6,23 +6,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy, readonly) NSString *appKey;
 @property (nonatomic, copy, readonly) NSString *hashedUserId;
-@property (nonatomic, copy, readonly) NSString *bannerPlacement;
-@property (nonatomic, copy, readonly) NSString *mrecPlacement;
-@property (nonatomic, copy, readonly) NSString *interstitialPlacement;
-@property (nonatomic, copy, readonly) NSString *nativePlacement;
-@property (nonatomic, copy, readonly) NSString *nativeBannerPlacement;
-@property (nonatomic, copy, readonly) NSString *rewardedPlacement;
-@property (nonatomic, copy, readonly) NSString *rewardedInterstitialPlacement;
+@property (nonatomic, copy, readonly) NSString *bannerAdUnitId;
+@property (nonatomic, copy, readonly) NSString *mrecAdUnitId;
+@property (nonatomic, copy, readonly) NSString *interstitialAdUnitId;
+@property (nonatomic, copy, readonly) NSString *nativeAdUnitId;
+@property (nonatomic, copy, readonly) NSString *nativeBannerAdUnitId;
+@property (nonatomic, copy, readonly) NSString *rewardedAdUnitId;
+@property (nonatomic, copy, readonly) NSString *rewardedInterstitialAdUnitId;
 
 - (instancetype)initWithAppKey:(NSString *)appKey
                  hashedUserId:(NSString *)hashedUserId
-               bannerPlacement:(NSString *)bannerPlacement
-                 mrecPlacement:(NSString *)mrecPlacement
-         interstitialPlacement:(NSString *)interstitialPlacement
-               nativePlacement:(NSString *)nativePlacement
-         nativeBannerPlacement:(NSString *)nativeBannerPlacement
-             rewardedPlacement:(NSString *)rewardedPlacement
-   rewardedInterstitialPlacement:(NSString *)rewardedInterstitialPlacement;
+               bannerAdUnitId:(NSString *)bannerAdUnitId
+                 mrecAdUnitId:(NSString *)mrecAdUnitId
+         interstitialAdUnitId:(NSString *)interstitialAdUnitId
+               nativeAdUnitId:(NSString *)nativeAdUnitId
+         nativeBannerAdUnitId:(NSString *)nativeBannerAdUnitId
+             rewardedAdUnitId:(NSString *)rewardedAdUnitId
+   rewardedInterstitialAdUnitId:(NSString *)rewardedInterstitialAdUnitId;
 
 @end
 

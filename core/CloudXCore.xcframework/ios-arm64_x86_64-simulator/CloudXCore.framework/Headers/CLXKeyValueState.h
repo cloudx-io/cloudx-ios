@@ -5,13 +5,11 @@
 /**
  * @file CLXKeyValueState.h
  * @brief In-memory state manager for publisher-provided key-value pairs
- * @details Manages user and app-level key-value pairs that can be injected
- * into bid requests at server-configured paths.
+ * @details Manages user and app-level key-value pairs that are injected
+ * into bid requests at hardcoded paths (user.ext.data, app.ext.data).
  */
 
 #import <Foundation/Foundation.h>
-
-@class CLXSDKConfigKeyValueObject;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -43,11 +41,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @brief Hashed user ID
  */
 @property (nonatomic, copy, nullable) NSString *hashedUserId;
-
-/**
- * @brief Key-value paths configuration from server
- */
-@property (nonatomic, strong, nullable) CLXSDKConfigKeyValueObject *keyValuePaths;
 
 /**
  * @brief Set a user-level key-value pair

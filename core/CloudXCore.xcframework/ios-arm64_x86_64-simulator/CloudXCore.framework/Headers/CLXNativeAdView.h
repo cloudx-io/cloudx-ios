@@ -11,6 +11,7 @@
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXNativeDelegate.h>
 #import <CloudXCore/CLXAdapterNative.h>
+#import <CloudXCore/CLXAdRevenueDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -25,6 +26,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Delegate for the native ad view to notify about ad events.
  */
 @property (nonatomic, weak, nullable) id<CLXNativeDelegate> delegate;
+
+/**
+ * Delegate that receives revenue events for the native ad.
+ */
+@property (nonatomic, weak, nullable) id<CLXAdRevenueDelegate> revenueDelegate;
 
 /**
  * Flag to indicate if the native ad is ready to be shown.

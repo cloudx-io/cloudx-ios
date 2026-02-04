@@ -68,6 +68,26 @@ class BaseAdViewController: UIViewController, AdStateManaging {
         updateStatusUI(state: .noAd)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Clear logs when switching between different ad formats (tabs)
+        let currentAdFormat = String(describing: type(of: self))
+        
+        if let lastFormat = BaseAdViewController.lastAdFormat, lastFormat != currentAdFormat {
+            // Switching between different ad formats - clear logs for clean slate
+            DemoAppLogger.sharedInstance.clearLogs()
+            DemoAppLogger.sharedInstance.logMessage("[\(currentAdFormat)] Switched from \(lastFormat) - logs cleared")
+        }
+        // No log for same format - keep it clean
+        
+        // Remember current ad format for next time (session only)
+        BaseAdViewController.lastAdFormat = currentAdFormat
+    }
+    
+    // Static variable to track last ad format across all instances
+    private static var lastAdFormat: String?
+    
     func showAlert(title: String, message: String) {
         DispatchQueue.main.async {
             let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -90,10 +110,11 @@ class BaseAdViewController: UIViewController, AdStateManaging {
         }
 
         return await withCheckedContinuation { continuation in
-            // Demo app - use testMode: true for test ads
-            cloudX.initializeSDK(appKey: appKey, testMode: true) { success, error in
-                if success {
-                    print("✅ SDK Initialized: \(success)")
+            // Use standard CloudXCore initialization with configuration object
+            let initConfig = CLXInitializationConfiguration.configuration(appKey: appKey)
+            cloudX.initialize(with: initConfig) { sdkConfig, error in
+                if sdkConfig != nil {
+                    print("✅ SDK Initialized successfully")
                     NotificationCenter.default.post(name: .sdkInitialized, object: nil)
                 } else {
                     print("❌ SDK Init Failed: \(error?.localizedDescription ?? "Unknown error")")

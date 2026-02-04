@@ -24,22 +24,14 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXCoreSessionIDKey @"CLXCore_sessionIDKey"
 #define kCLXCoreAccountIDKey @"CLXCore_accId_config"
 #define kCLXCoreEncodedStringKey @"CLXCore_encodedString"
+/// Persistent install UUID for source.ext.cx.install_id (generated once per app install)
+#define kCLXCoreInstallIDKey @"CLXCore_installID"
 
 // Metrics and analytics keys
 #define kCLXCoreMetricsDictKey @"CLXCore_metricsDict"
 #define kCLXCoreMetricsUrlKey @"CLXCore_metricsUrl"
 #define kCLXCoreImpressionTrackerUrlKey @"CLXCore_impressionTrackerUrl"
-
-// User data keys
-#define kCLXCoreUserKeyValueKey @"CLXCore_userKeyValue"
-#define kCLXCoreHashedUserIDKey @"CLXCore_hashedUserID"
-#define kCLXCoreHashedKeyKey @"CLXCore_hashedKey"
-#define kCLXCoreHashedValueKey @"CLXCore_hashedValue"
-
-// Bidder data keys
-#define kCLXCoreUserBidderKey @"CLXCore_userBidder"
-#define kCLXCoreUserBidderKeyKey @"CLXCore_userBidderKey"
-#define kCLXCoreUserBidderValueKey @"CLXCore_userBidderValue"
+#define kCLXCoreGeoLatencyMsKey @"CLXCore_geoLatencyMs"
 
 // Additional configuration keys
 #define kCLXCoreBundleConfigKey @"CLXCore_bundle_config"
@@ -48,13 +40,6 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXCoreRawGeoHeadersKey @"CLXCore_rawGeoHeaders"
 #define kCLXCoreIFAConfigKey @"CLXCore_ifa_config"
 #define kCLXCoreAIPromptKey @"CLXCore_aiPrompt"
-#define kCLXCoreUserKeywordsKey @"CLXCore_userKeywords"
-
-// Settings keys
-#define kCLXCoreEnableBannerRetriesKey @"CLXCore_EnableBannerRetries"
-#define kCLXCoreEnableInterstitialRetriesKey @"CLXCore_EnableInterstitialRetries"
-#define kCLXCoreEnableRewardedRetriesKey @"CLXCore_EnableRewardedRetries"
-#define kCLXCoreEnableNativeRetriesKey @"CLXCore_EnableNativeRetries"
 
 // Banner-specific keys
 #define kCLXCoreBannerAppKeyKey @"CLXCore_Banner_appKey"
@@ -71,6 +56,9 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXCoreCampaignIdKey @"CLXCore_campaignId"
 #define kCLXCoreTestModeKey @"CLXCore_testMode"
 #define kCLXCoreVisualDebuggingKey @"CLXCore_visualDebugging"
+
+// Plugin/wrapper identification
+#define kCLXCorePluginVersionKey @"CLXCore_pluginVersion"
 
 // Banner-specific additional keys
 #define kCLXBannerMetricsDictKey @"CLXBanner_metricsDict"
@@ -89,7 +77,6 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXPrivacyGDPRConsentKey @"IABTCF_TCString"
 #define kCLXPrivacyCCPAPrivacyKey @"IABUSPrivacy_String"
 #define kCLXPrivacyGDPRAppliesKey @"IABTCF_gdprApplies"
-#define kCLXPrivacyHashedUserIdKey @"CLXPrivacy_hashedUserID"
 #define kCLXPrivacyHashedGeoIpKey @"CLXPrivacyHashedGeoIp"
 
 

@@ -9,7 +9,7 @@
 
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXAd.h>
-#import <CloudXCore/CLXAdFormat.h>
+#import <CloudXCore/CLXFullscreenAd.h>
 #import <CloudXCore/CLXNativeTemplate.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
  * CloudXNative is a protocol for native ads in the CloudX SDK.
  * Defines native-specific properties and functionality.
  */
-@protocol CLXNative <CLXAdFormat>
+@protocol CLXNative <CLXFullscreenAd>
 
 /**
  * Flag to indicate whether to suspend preloading when the ad is not visible.

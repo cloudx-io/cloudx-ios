@@ -97,32 +97,39 @@
     
     NSMutableString *details = [NSMutableString stringWithString:@" - Ad Details:"];
     
-    // Placement Name
-    if (ad.placementName) {
-        [details appendFormat:@"\n  📍 Placement: %@", ad.placementName];
+    // Ad Unit Name
+    if (ad.adUnitName) {
+        [details appendFormat:@"\n  📍 Ad Unit: %@", ad.adUnitName];
     } else {
-        [details appendString:@"\n  📍 Placement: (null)"];
+        [details appendString:@"\n  📍 Ad Unit: (null)"];
     }
     
-    // Placement ID
-    if (ad.placementId) {
-        [details appendFormat:@"\n  🆔 Placement ID: %@", ad.placementId];
+    // Ad Unit ID
+    if (ad.adUnitId) {
+        [details appendFormat:@"\n  🆔 Ad Unit ID: %@", ad.adUnitId];
     } else {
-        [details appendString:@"\n  🆔 Placement ID: (null)"];
+        [details appendString:@"\n  🆔 Ad Unit ID: (null)"];
+    }
+
+    // Placement (publisher-provided)
+    if (ad.placement) {
+        [details appendFormat:@"\n  📌 Placement: %@", ad.placement];
+    } else {
+        [details appendString:@"\n  📌 Placement: (null)"];
+    }
+
+    // Network Name
+    if (ad.networkName) {
+        [details appendFormat:@"\n  🏢 Network: %@", ad.networkName];
+    } else {
+        [details appendString:@"\n  🏢 Network: (null)"];
     }
     
-    // Bidder/Network
-    if (ad.bidder) {
-        [details appendFormat:@"\n  🏢 Bidder: %@", ad.bidder];
+    // Network Placement
+    if (ad.networkPlacement) {
+        [details appendFormat:@"\n  🔗 Network Placement: %@", ad.networkPlacement];
     } else {
-        [details appendString:@"\n  🏢 Bidder: (null)"];
-    }
-    
-    // External Placement ID
-    if (ad.externalPlacementId) {
-        [details appendFormat:@"\n  🔗 External ID: %@", ad.externalPlacementId];
-    } else {
-        [details appendString:@"\n  🔗 External ID: (null)"];
+        [details appendString:@"\n  🔗 Network Placement: (null)"];
     }
     
     // Revenue

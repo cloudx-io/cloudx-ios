@@ -8,9 +8,8 @@
  * 
  * Single database with multiple specialized tables:
  * - metrics_event_table: Metrics tracking (matches Android MetricsEvent)
- * - cached_tracking_events_table: Rill event tracking (matches Android CachedTrackingEvents)
  * - session_table: App session management
- * - performance_metrics_table: Placement performance tracking
+ * - performance_metrics_table: Ad unit performance tracking
  * 
  * Follows SOLID principles with protocol-based DAO pattern
  */
@@ -22,7 +21,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol CLXMetricsEventDao;
-@protocol CLXRillEventDao;
 @protocol CLXSessionDao;
 @protocol CLXPerformanceDao;
 
@@ -38,11 +36,17 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 /**
+ * Testing support: Override the shared instance with a test double
+ * @param testInstance The test instance to use, or nil to reset to default
+ * @note This should only be used in unit tests
+ */
++ (void)setSharedInstanceForTesting:(nullable CLXCloudXDatabase *)testInstance;
+
+/**
  * DAO instances for different data types
  * Following Dependency Inversion Principle with protocols
  */
 @property (nonatomic, strong, readonly) id<CLXMetricsEventDao> metricsDao;
-@property (nonatomic, strong, readonly) id<CLXRillEventDao> rillEventDao;
 @property (nonatomic, strong, readonly) id<CLXSessionDao> sessionDao;
 @property (nonatomic, strong, readonly) id<CLXPerformanceDao> performanceDao;
 

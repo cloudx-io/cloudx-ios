@@ -72,11 +72,12 @@ class InitViewController: BaseAdViewController {
             CloudXCore.shared.setHashedUserID(config.hashedUserId)
         }
         
-        // Demo app - use testMode: true for test ads
-        CloudXCore.shared.initializeSDK(appKey: config.appKey, testMode: true) { [weak self] success, error in
+        // Use standard CloudXCore initialization with configuration object
+        let initConfig = CLXInitializationConfiguration.configuration(appKey: config.appKey)
+        CloudXCore.shared.initialize(with: initConfig) { [weak self] sdkConfig, error in
             guard let self = self else { return }
             
-            if success {
+            if sdkConfig != nil {
                 DemoAppLogger.sharedInstance.logMessage("SDK initialized successfully")
                 self.isSDKInitialized = true
                 self.updateStatusUI(state: .ready)

@@ -53,25 +53,33 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) long long placementID;
 
 /**
+ * CloudX ad unit name for error messages and logging.
+ *
+ * This is separate from `placementID` because:
+ * - `placementID` is InMobi's internal numeric identifier used by their SDK
+ * - `adUnitName` is CloudX's human-readable identifier shown in error messages,
+ *   logs, and delegate callbacks to help publishers identify which ad unit failed
+ */
+@property (nonatomic, copy, readonly, nullable) NSString *adUnitName;
+
+/**
  * Bid payload for programmatic ads (nil for waterfall)
  */
 @property (nonatomic, strong, nullable) NSData *bidPayload;
 
 /**
- * Timeout interval for ad loading
- */
-@property (nonatomic, assign) NSTimeInterval timeoutInterval;
-
-/**
  * Initializes a new InMobi interstitial adapter
  * @param bidPayload The bid payload for programmatic ads (nil for waterfall)
  * @param placementID The InMobi placement ID
+ * @param adUnitName The CloudX placement name for error messages (nullable)
  * @param bidID The CloudX bid ID
  * @param delegate The CloudX adapter delegate
  * @return Initialized interstitial adapter
+ * @since 1.4.0 adUnitName parameter added for better error messages
  */
 - (instancetype)initWithBidPayload:(nullable NSData *)bidPayload
                        placementID:(long long)placementID
+                     adUnitName:(nullable NSString *)adUnitName
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterInterstitialDelegate>)delegate;
 

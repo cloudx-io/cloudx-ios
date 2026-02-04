@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXRenderer'
-  s.version = '1.3.0'
+  s.version = '2.0.0'
   s.summary          = 'CloudX Renderer Framework - Dynamic Framework'
   s.description      = 'Rendering engine for CloudX iOS SDK - binary distribution as dynamic framework'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -12,20 +12,20 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'renderer-cloudx/CloudXRenderer.xcframework'
   
   # Dependencies
-  s.dependency 'CloudXCore', '1.3.0'
+  s.dependency 'CloudXCore', '2.0.0'
   
   s.frameworks = ['Foundation', 'UIKit', 'WebKit', 'AVFoundation', 'AVKit']
   s.weak_frameworks = ['SafariServices']
   
   s.requires_arc = true
   
-  # Dynamic framework - requires sandboxing to be disabled
+  # Static framework with -ObjC for OMSDK categories (mirrors AppLovin setup)
   s.pod_target_xcconfig = {
-    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
+    'OTHER_LDFLAGS' => '-ObjC'
   }
   
   s.user_target_xcconfig = {
-    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
+    'OTHER_LDFLAGS' => '-ObjC'
   }
   
   s.swift_versions = ['5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9', '6.0', '6.1', '6.2']

@@ -73,7 +73,7 @@ extension NSError {
         // AD REQUEST/LOADING ERRORS (300-399)
         case 300: return "No Fill"
         case 301: return "Invalid Request"
-        case 302: return "Invalid Placement"
+        case 302: return "Invalid Ad Unit"
         case 303: return "Load Timeout"
         case 304: return "Load Failed"
         case 305: return "Invalid Ad"

@@ -13,81 +13,25 @@ import AdSupport
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
-    @objc var window: UIWindow? {
-        // Fallback window for Meta SDK compatibility
-        // In scene-based apps, the actual window is managed by SceneDelegate
-        // but some SDKs still expect AppDelegate to have a window property
-        if #available(iOS 13.0, *) {
-            // Try to get the key window from active scene
-            for scene in UIApplication.shared.connectedScenes {
-                guard let windowScene = scene as? UIWindowScene else { continue }
-                if windowScene.activationState == .foregroundActive {
-                    for window in windowScene.windows {
-                        if window.isKeyWindow {
-                            return window
-                        }
-                    }
-                }
-            }
-            // If no key window found, return the first available window
-            for scene in UIApplication.shared.connectedScenes {
-                guard let windowScene = scene as? UIWindowScene else { continue }
-                if !windowScene.windows.isEmpty {
-                    return windowScene.windows.first
-                }
-            }
-        }
-        
-        // Final fallback - create a basic window if none exists
-        let fallbackWindow = UIWindow(frame: UIScreen.main.bounds)
-        return fallbackWindow
-    }
+    var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
         // Enable verbose logging for demo app
-        CloudXCore.setLoggingEnabled(true)
         CloudXCore.setMinLogLevel(.verbose)
         CloudXCore.setLoggingEmojisEnabled(true)
-        
-        // DEMO APP ONLY: Force test mode for all bid requests
-        // This internal flag ensures test=1 is always set in bid requests for demo app
-        // regardless of build configuration (simulator/device, debug/release)
-        UserDefaults.standard.set(true, forKey: "CLXCore_Internal_ForceTestMode")
-        
-        // DEMO APP ONLY: Enable Meta test mode for release builds
-        // This ensures Meta SDK registers device as test device and serves test ads
-        UserDefaults.standard.set(true, forKey: "CLXMetaTestModeEnabled")
-        
-        UserDefaults.standard.synchronize()
-        
-        // Auto-clear all privacy test settings on every launch
-        // This ensures clean state for testing and prevents GPP settings from persisting
-        clearAllPrivacyTestSettings()
+        CloudXCore.setLoggingTimestampsEnabled(true)
         
         // Request App Tracking Transparency permission
         requestAppTrackingTransparencyPermission()
         
+        // Set up window with AdDemoTabViewController (the real UI)
+        self.window = UIWindow(frame: UIScreen.main.bounds)
+        self.window?.rootViewController = AdDemoTabViewController()
+        self.window?.makeKeyAndVisible()
+        
         return true
-    }
-    
-    private func clearAllPrivacyTestSettings() {
-        // Clear all CloudXCore privacy test settings to ensure clean state
-        // This prevents GPP and other privacy scenarios from persisting across app launches
-        CloudXCore.setIsUserConsent(true)
-        CloudXCore.setIsDoNotSell(false)
-        CloudXCore.setCCPAPrivacyString(nil)
-        
-        // Clear IAB GPP UserDefaults (CloudX reads from these internally)
-        UserDefaults.standard.removeObject(forKey: "IABGPP_HDR_GppString")
-        UserDefaults.standard.removeObject(forKey: "IABGPP_GppSID")
-        
-        // Also clear any environment overrides
-        UserDefaults.standard.removeObject(forKey: "CLXDemoEnvironment")
-        UserDefaults.standard.synchronize()
-        
-        DemoAppLogger.sharedInstance.logMessage("✅ Auto-cleared all privacy test settings on app launch")
     }
     
     private func requestAppTrackingTransparencyPermission() {
@@ -111,21 +55,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
-
-    // MARK: UISceneSession Lifecycle
-
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        // Called when a new scene session is being created.
-        // Use this method to select a configuration to create the new scene with.
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
-    }
-
-    func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
-        // Called when the user discards a scene session.
-        // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
-        // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
-    }
-
-
 }
-

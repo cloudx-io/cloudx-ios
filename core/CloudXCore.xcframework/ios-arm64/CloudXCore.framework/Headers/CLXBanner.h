@@ -3,25 +3,28 @@
  */
 
 /**
- * @file CloudXBanner.h
+ * @file CLXBanner.h
  * @brief Banner ad protocol
+ *
+ * Note: Banners do not expose isReady. Load state is communicated via delegate
+ * callbacks, matching the Android SDK. isDestroyed is provided to check if the
+ * banner is still valid.
  */
 
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXAd.h>
-#import <CloudXCore/CLXAdFormat.h>
 #import <CloudXCore/CLXBannerType.h>
 #import <CloudXCore/CLXBannerDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol CLXAdapterBannerDelegate;
-
 /**
- * CloudXBanner is a protocol for banner ads in the CloudX SDK.
+ * CLXBanner is a protocol for banner ads in the CloudX SDK.
  * Defines banner-specific properties and functionality.
+ *
+ * Banners are separate from fullscreen ads and do not share a common protocol.
  */
-@protocol CLXBanner <CLXAdFormat>
+@protocol CLXBanner <NSObject>
 
 /**
  * Flag to indicate whether to suspend preloading when the ad is not visible.
@@ -37,6 +40,31 @@ NS_ASSUME_NONNULL_BEGIN
  * The type of banner ad.
  */
 @property (nonatomic, readonly) CLXBannerType bannerType;
+
+/**
+ * Loads the banner ad.
+ */
+- (void)load;
+
+/**
+ * Destroys the banner ad and releases resources.
+ */
+- (void)destroy;
+
+/**
+ * Starts auto-refresh for the banner ad.
+ */
+- (void)startAutoRefresh;
+
+/**
+ * Stops auto-refresh for the banner ad.
+ */
+- (void)stopAutoRefresh;
+
+/**
+ * Indicates whether the banner ad has been destroyed and can no longer be used.
+ */
+@property (nonatomic, readonly) BOOL isDestroyed;
 
 @end
 
