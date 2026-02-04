@@ -122,7 +122,46 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Internal extension of CloudXCore for SDK-internal use only
  */
+@class CLXAdNetworkFactories;
+@class CLXConfigImpressionModel;
+
 @interface CloudXCore (Internal)
+
+/**
+ * The ad network factories for creating adapter instances
+ */
+@property (nonatomic, strong, readonly) CLXAdNetworkFactories *adNetworkFactories;
+
+/**
+ * Check if a specific adapter has completed initialization
+ * @param adapterName The name of the adapter (e.g., "meta", "vungle")
+ * @return YES if the adapter is ready, NO otherwise
+ * @discussion Internal API used by bid request logic to avoid race conditions during SDK initialization
+ */
+- (BOOL)isAdapterReady:(NSString *)adapterName;
+
+/**
+ * Look up placement configuration by name
+ * @param placementName The placement name
+ * @return Placement configuration or nil if not found
+ * @discussion Internal API used by ad objects to look up placement configuration after SDK initialization
+ */
+- (nullable CLXSDKConfigAdUnit *)placementConfigForName:(NSString *)placementName;
+
+/**
+ * Get all available placement names from the SDK configuration
+ * @return Array of placement names, or empty array if SDK not initialized or no placements configured
+ * @discussion Internal API used for detailed error messages when placement validation fails
+ */
+- (NSArray<NSString *> *)availablePlacementNames;
+
+/**
+ * Create an impression model for tracking
+ * @param auctionID The auction ID for the impression
+ * @return Impression model or nil if creation fails
+ * @discussion Internal API used by ad objects for impression tracking
+ */
+- (nullable CLXConfigImpressionModel *)createImpModelWithAuctionID:(NSString *)auctionID;
 
 /**
  * Track SDK errors for analytics reporting

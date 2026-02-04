@@ -44,18 +44,13 @@
 
 #import <CloudXCore/CLXXorEncryption.h>
 #import <CloudXCore/CloudXCoreAPI.h>
+#import <CloudXCore/CloudXCoreInternal.h>
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXDebugOverlayManager.h>
 #import <CloudXCore/CLXDebugClickFeedback.h>
 
 NS_ASSUME_NONNULL_BEGIN
-
-// Private category to access internal SDK methods (framework-internal only, not exposed in public API)
-@interface CloudXCore (Internal)
-@property (nonatomic, strong, readonly) CLXAdNetworkFactories *adNetworkFactories;
-- (nullable CLXConfigImpressionModel *)createImpModelWithAuctionID:(NSString *)auctionID;
-@end
 
 @interface CLXPublisherBanner () <CLXAdapterBannerDelegate>
 

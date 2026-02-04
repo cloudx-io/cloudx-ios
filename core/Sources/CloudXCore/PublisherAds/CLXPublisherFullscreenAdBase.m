@@ -37,6 +37,7 @@
 #import <CloudXCore/CLXAd.h>
 #import <CloudXCore/CLXAdFormat.h>
 #import <CloudXCore/CloudXCoreAPI.h>
+#import <CloudXCore/CloudXCoreInternal.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXSDKConfig.h>
 #import "CLXUIApplicationProxy.h"
@@ -81,11 +82,6 @@ static const NSTimeInterval kCLXForceCloseTimeoutRewarded = 120.0;
 ///   - Typically shorter video content
 ///   - User didn't opt-in for extended experience
 static const NSTimeInterval kCLXForceCloseTimeoutInterstitial = 90.0;
-
-// Private category to access internal SDK methods (framework-internal only, not exposed in public API)
-@interface CloudXCore (Internal)
-- (nullable CLXConfigImpressionModel *)createImpModelWithAuctionID:(NSString *)auctionID;
-@end
 
 /**
  * Ad state enumeration defining the lifecycle states of fullscreen ads

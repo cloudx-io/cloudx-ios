@@ -210,31 +210,6 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  */
 + (void)setLoggingTimestampsEnabled:(BOOL)enabled;
 
-#pragma mark - Adapter Readiness (Internal)
-
-/**
- * Check if a specific adapter has completed initialization
- * @param adapterName The name of the adapter (e.g., "meta", "vungle")
- * @return YES if the adapter is ready, NO otherwise
- * @discussion Internal API used by bid request logic to avoid race conditions during SDK initialization
- */
-- (BOOL)isAdapterReady:(NSString *)adapterName;
-
-/**
- * Look up placement configuration by name
- * @param placementName The placement name
- * @return Placement configuration or nil if not found
- * @discussion Internal API used by ad objects to look up placement configuration after SDK initialization
- */
-- (nullable CLXSDKConfigAdUnit *)placementConfigForName:(NSString *)placementName;
-
-/**
- * Get all available placement names from the SDK configuration
- * @return Array of placement names, or empty array if SDK not initialized or no placements configured
- * @discussion Internal API used for detailed error messages when placement validation fails
- */
-- (NSArray<NSString *> *)availablePlacementNames;
-
 @end
 
 NS_ASSUME_NONNULL_END
