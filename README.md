@@ -28,19 +28,16 @@ pod install
 import CloudXCore
 
 // 1. Initialize (in AppDelegate)
-// testMode: false = production, true = test ads
-CloudXCore.shared.initializeSDK(appKey: "YOUR_APP_KEY", testMode: false) { success, error in
-    print(success ? "Ready!" : "Error: \(error!)")
+let config = CLXInitializationConfiguration.configuration(appKey: "YOUR_APP_KEY")
+CloudXCore.shared.initialize(with: config) { sdkConfig, error in
+    print(sdkConfig != nil ? "Ready!" : "Error: \(error!)")
 }
 
 // 2. Create banner ad (in ViewController)
-let banner = CloudXCore.shared.createBanner(
-    withPlacement: "YOUR_PLACEMENT_ID",
-    viewController: self,
-    delegate: self,
-    tmax: 10.0
-)
-view.addSubview(banner)
+let banner = CloudXCore.shared.createBanner(adUnitId: "YOUR_AD_UNIT_ID", viewController: self)
+banner?.delegate = self
+view.addSubview(banner!)
+banner?.load()
 ```
 
 **That's it.** You're monetizing.
@@ -90,13 +87,13 @@ Load any ad format in 3 lines:
 
 ```swift
 // Banner (320×50)
-let banner = CloudXCore.shared.createBanner(withPlacement: "...", viewController: self, delegate: self)
+let banner = CloudXCore.shared.createBanner(adUnitId: "...", viewController: self)
 
 // Interstitial
-let interstitial = CloudXCore.shared.createInterstitial(withPlacement: "...", viewController: self, delegate: self)
+let interstitial = CloudXCore.shared.createInterstitial(adUnitId: "...")
 
 // Rewarded
-let rewarded = CloudXCore.shared.createRewarded(withPlacement: "...", viewController: self, delegate: self)
+let rewarded = CloudXCore.shared.createRewarded(adUnitId: "...")
 ```
 
 **[→ See complete examples in the Quickstart Guide](https://docs.cloudx.io/ios/quickstart)**
