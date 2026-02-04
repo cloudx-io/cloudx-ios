@@ -44,12 +44,12 @@ class CLXDemoConfigManager {
         self.currentConfig = CLXDemoConfig(
             appKey: "xcQftcBSUmqzuv1LfET2o",
             hashedUserId: "test-user-123",
-            bannerAdUnitId: "swift-demo-banner-1",
-            mrecAdUnitId: "swift-demo-mrec-1",
-            interstitialAdUnitId: "swift-demo-interstitial-1",
+            bannerAdUnitId: "Ce5-ltAX5zFz5QJ3TzEjY",
+            mrecAdUnitId: "xMLHNFIkwieu2SLyeD0sQ",
+            interstitialAdUnitId: "rkw0ncj6mSphKtmnl8Cw_",
             nativeAdUnitId: "-",
             nativeBannerAdUnitId: "-",
-            rewardedAdUnitId: "-",
+            rewardedAdUnitId: "WJje0XGqL5n56Sa8dlt8L",
             rewardedInterstitialAdUnitId: "-"
         )
     }

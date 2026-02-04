@@ -76,32 +76,25 @@ class DemoAppLogger {
         
         var details = " - Ad Details:"
         
-        // Placement Name
-        if let placementName = ad.placementName {
-            details += "\n  📍 Placement: \(placementName)"
+        // Ad Unit ID
+        if let adUnitId = ad.adUnitId {
+            details += "\n  📍 Ad Unit ID: \(adUnitId)"
         } else {
-            details += "\n  📍 Placement: (null)"
+            details += "\n  📍 Ad Unit ID: (null)"
         }
         
-        // Placement ID
-        if let placementId = ad.placementId {
-            details += "\n  🆔 Placement ID: \(placementId)"
+        // Network Name
+        if let networkName = ad.networkName {
+            details += "\n  🏢 Network: \(networkName)"
         } else {
-            details += "\n  🆔 Placement ID: (null)"
+            details += "\n  🏢 Network: (null)"
         }
         
-        // Bidder/Network
-        if let bidder = ad.bidder {
-            details += "\n  🏢 Bidder: \(bidder)"
+        // Network Placement
+        if let networkPlacement = ad.networkPlacement {
+            details += "\n  🔗 Network Placement: \(networkPlacement)"
         } else {
-            details += "\n  🏢 Bidder: (null)"
-        }
-        
-        // External Placement ID
-        if let externalPlacementId = ad.externalPlacementId {
-            details += "\n  🔗 External ID: \(externalPlacementId)"
-        } else {
-            details += "\n  🔗 External ID: (null)"
+            details += "\n  🔗 Network Placement: (null)"
         }
         
         // Revenue

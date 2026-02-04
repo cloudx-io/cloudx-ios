@@ -43,17 +43,17 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        // Production Configuration (MetaTestApp - bundle: cloudx.CloudXObjCRemotePods)
+        // Production Configuration (ObjCDemoApp - bundle: cloudx.CloudXObjCRemotePods)
         _currentConfig = [[CLXDemoConfig alloc]
             initWithAppKey:@"ihtOXvp3X9JlMQ5p0_RYL"
             hashedUserId:@"test-user-123"
-            bannerAdUnitId:@"demo-banner-1"
-            mrecAdUnitId:@"demo-mrec-1"
-            interstitialAdUnitId:@"demo-interstitial-1"
-            nativeAdUnitId:@"-"
-            nativeBannerAdUnitId:@"-"
-            rewardedAdUnitId:@"-"
-            rewardedInterstitialAdUnitId:@"-"];
+            bannerAdUnitId:@"LyPxKhBFiUCd1xMLYQhGc"
+            mrecAdUnitId:@"EWaeXDSmKYbs220gM5hTv"
+            interstitialAdUnitId:@"txZ7NmISq-MsuPH0ULKbD"
+            nativeAdUnitId:@"Q33RbPmBH-wix45Mu6--Z"
+            nativeBannerAdUnitId:@"-2_Lw2b4QTlu7x6tKZ6Ww"
+            rewardedAdUnitId:@"um9Ek08ScJBWuzSMTyW3b"
+            rewardedInterstitialAdUnitId:@"I-JRnXEQc2bG5dm1EWoZ6"];
     }
     return self;
 }
