@@ -367,8 +367,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *sess_id;
 /// Session time in milliseconds
 @property (nonatomic, strong, nullable) NSNumber *sess_time;
-/// Placement ID from publisher configuration
-@property (nonatomic, copy, nullable) NSString *placement_id;
+/// Ad Unit ID from publisher configuration
+@property (nonatomic, copy, nullable) NSString *ad_unit_id;
 @end
 
 /// SKAdNetwork request object per IAB SKAN spec

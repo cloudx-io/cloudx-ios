@@ -112,44 +112,44 @@
                     @"Exception reporting with nil context should be handled gracefully");
 }
 
-#pragma mark - Placement ID Tests
+#pragma mark - Ad Unit ID Tests
 
 /**
- * @brief Test exception reporting with placement ID
- * @discussion Verifies placement ID is properly passed through the reporting chain
+ * @brief Test exception reporting with ad unit ID
+ * @discussion Verifies ad unit ID is properly passed through the reporting chain
  */
-- (void)testReportException_WithPlacementID_Success {
+- (void)testReportException_WithAdUnitID_Success {
     // Arrange
     NSException *testException = [NSException exceptionWithName:@"TestException"
-                                                        reason:@"Test with placement ID"
+                                                        reason:@"Test with ad unit ID"
                                                       userInfo:nil];
-    NSString *placementID = @"test_placement_123";
-    NSDictionary *context = @{@"operation": @"placement_test"};
+    NSString *adUnitId = @"test_adunit_123";
+    NSDictionary *context = @{@"operation": @"adunit_test"};
     
     // Act & Assert - Should not crash
     XCTAssertNoThrow([self.errorReporter reportException:testException 
-                                             placementID:placementID 
+                                             adUnitId:adUnitId 
                                                  context:context],
-                    @"Exception reporting with placement ID should not throw");
+                    @"Exception reporting with ad unit ID should not throw");
 }
 
 /**
- * @brief Test error reporting with placement ID
- * @discussion Verifies placement ID is properly passed through the reporting chain
+ * @brief Test error reporting with ad unit ID
+ * @discussion Verifies ad unit ID is properly passed through the reporting chain
  */
-- (void)testReportError_WithPlacementID_Success {
+- (void)testReportError_WithAdUnitID_Success {
     // Arrange
     NSError *testError = [NSError errorWithDomain:@"TestDomain"
                                              code:2001
-                                         userInfo:@{NSLocalizedDescriptionKey: @"Test with placement ID"}];
-    NSString *placementID = @"test_placement_456";
-    NSDictionary *context = @{@"operation": @"placement_test"};
+                                         userInfo:@{NSLocalizedDescriptionKey: @"Test with ad unit ID"}];
+    NSString *adUnitId = @"test_adunit_456";
+    NSDictionary *context = @{@"operation": @"adunit_test"};
     
     // Act & Assert - Should not crash
     XCTAssertNoThrow([self.errorReporter reportError:testError 
-                                         placementID:placementID 
+                                         adUnitId:adUnitId 
                                              context:context],
-                    @"Error reporting with placement ID should not throw");
+                    @"Error reporting with ad unit ID should not throw");
 }
 
 #pragma mark - Edge Case Tests

@@ -15,8 +15,8 @@
 // Category to expose internal properties of CLXPublisherNative
 @interface CLXPublisherNative (CLXNativeAdViewAccess)
 @property (nonatomic, strong, nullable, readonly) CLXBidAdSourceResponse *lastBidResponse;
-@property (nonatomic, copy, readonly) NSString *placementID;
-@property (nonatomic, copy, readonly) NSString *placementName;
+@property (nonatomic, copy, readonly) NSString *adUnitId;
+@property (nonatomic, copy, readonly) NSString *adUnitName;
 @end
 
 @interface CLXNativeAdView () <UIGestureRecognizerDelegate> {
@@ -187,7 +187,7 @@ static void initializeLogger() {
             if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
                 CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidNativeView
                                                description:@"Native view is nil"];
-                [self.delegate didFailToLoadAd:((CLXPublisherNative *)self.native).placementName error:error];
+                [self.delegate didFailToLoadAd:((CLXPublisherNative *)self.native).adUnitName error:error];
             }
         });
         return;
@@ -209,8 +209,8 @@ static void initializeLogger() {
         if ([self.delegate respondsToSelector:@selector(didLoadAd:)]) {
             CLXPublisherNative *publisherNative = (CLXPublisherNative *)self.native;
             CLXAd *delegateAd = [CLXAd adFromBid:publisherNative.lastBidResponse.bid
-                                     placementId:publisherNative.placementID
-                                   placementName:publisherNative.placementName
+                                        adUnitId:publisherNative.adUnitId
+                                      adUnitName:publisherNative.adUnitName
                                         adFormat:CLXAdFormatNative
                                        placement:nil];
             [self.delegate didLoadAd:delegateAd];
@@ -229,7 +229,7 @@ static void initializeLogger() {
             if (!clxError) {
                 clxError = [CLXError errorWithCode:CLXErrorCodeLoadFailed];
             }
-            [self.delegate didFailToLoadAd:((CLXPublisherNative *)self.native).placementName error:clxError];
+            [self.delegate didFailToLoadAd:((CLXPublisherNative *)self.native).adUnitName error:clxError];
         }
     });
 }
@@ -261,8 +261,8 @@ static void initializeLogger() {
         if ([self.delegate respondsToSelector:@selector(didClickAd:)]) {
             CLXPublisherNative *publisherNative = (CLXPublisherNative *)self.native;
             CLXAd *clickAd = [CLXAd adFromBid:publisherNative.lastBidResponse.bid
-                                  placementId:publisherNative.placementID
-                                placementName:publisherNative.placementName
+                                     adUnitId:publisherNative.adUnitId
+                                   adUnitName:publisherNative.adUnitName
                                      adFormat:CLXAdFormatNative
                                     placement:nil];
             [self.delegate didClickAd:clickAd];

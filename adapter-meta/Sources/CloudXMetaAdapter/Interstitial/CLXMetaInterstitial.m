@@ -24,7 +24,8 @@
 @property (nonatomic, copy) NSString *bidPayload;
 @property (nonatomic, copy) NSString *bidID;
 @property (nonatomic, copy, nullable) NSString *placementID;
-@property (nonatomic, copy, nullable) NSString *placementName;
+/// CloudX ad unit name for error messages (separate from Meta's placementID)
+@property (nonatomic, copy, nullable) NSString *adUnitName;
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, assign) BOOL isLoading;
 
@@ -34,21 +35,21 @@
 
 - (instancetype)initWithBidPayload:(NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
-                     placementName:(nullable NSString *)placementName
+                     adUnitName:(nullable NSString *)adUnitName
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
         _placementID = [placementID copy];
-        _placementName = [placementName copy];
+        _adUnitName = [adUnitName copy];
         _bidID = [bidID copy];
         _delegate = delegate;
         _sdkVersion = FB_AD_SDK_VERSION;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMetaInterstitial"];
 
         [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@ (%@), BidID: %@",
-                           placementName ?: @"(unknown)", placementID ?: @"(nil)", bidID]];
+                           adUnitName ?: @"(unknown)", placementID ?: @"(nil)", bidID]];
 
         if (placementID && placementID.length > 0) {
             _interstitial = [[FBInterstitialAd alloc] initWithPlacementID:placementID];
@@ -68,10 +69,10 @@
 
 - (void)load {
     if (!_placementID || _placementID.length == 0) {
-        NSString *placementContext = _placementName ? [NSString stringWithFormat:@" for placement '%@'", _placementName] : @"";
+        NSString *adUnitContext = _adUnitName ? [NSString stringWithFormat:@" for ad unit '%@'", _adUnitName] : @"";
         NSString *errorMessage = [NSString stringWithFormat:@"Meta placement ID is empty%@. "
                                   "Configure the Meta placement ID in CloudX dashboard under Ad Unit Settings > Meta.",
-                                  placementContext];
+                                  adUnitContext];
         NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
                                      description:errorMessage];
         [self.logger error:error.localizedDescription];

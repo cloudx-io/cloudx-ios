@@ -312,8 +312,8 @@
 		CLXNEWMK0002000000000002 /* MockURLSession.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXNEWMK0002000000000003 /* MockURLSession.m */; };
 		CLXNEWTS0002000000000001 /* CLXBaseNetworkServiceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXNEWTS0002000000000002 /* CLXBaseNetworkServiceTests.m */; };
 		CLXNEWTS0004000000000001 /* CLXBiddingConfigDeviceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXNEWTS0004000000000002 /* CLXBiddingConfigDeviceTests.m */; };
-		CLXPLVALH0001000000000001 /* CLXPlacementValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = CLXPLVALH0002000000000001 /* CLXPlacementValidator.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CLXPLVALM0001000000000001 /* CLXPlacementValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXPLVALM0002000000000001 /* CLXPlacementValidator.m */; };
+		CLXPLVALH0001000000000001 /* CLXAdUnitValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = CLXPLVALH0002000000000001 /* CLXAdUnitValidator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CLXPLVALM0001000000000001 /* CLXAdUnitValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXPLVALM0002000000000001 /* CLXAdUnitValidator.m */; };
 		CLXREVB293BBA699890468DB /* CLXAdRevenueDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = CLXREVCD23584C5C434B37AB /* CLXAdRevenueDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CLXSFR0001000000000001 /* CLXShowFailureReloadTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSFR0001000000000002 /* CLXShowFailureReloadTests.m */; };
 		D7578637480434D163489DAF /* CLXAdapterLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = DB241498E65B2AA5899EB74E /* CLXAdapterLoader.m */; };
@@ -640,8 +640,8 @@
 		CLXNEWMK0002000000000003 /* MockURLSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MockURLSession.m; sourceTree = "<group>"; };
 		CLXNEWTS0002000000000002 /* CLXBaseNetworkServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBaseNetworkServiceTests.m; sourceTree = "<group>"; };
 		CLXNEWTS0004000000000002 /* CLXBiddingConfigDeviceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBiddingConfigDeviceTests.m; sourceTree = "<group>"; };
-		CLXPLVALH0002000000000001 /* CLXPlacementValidator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPlacementValidator.h; sourceTree = "<group>"; };
-		CLXPLVALM0002000000000001 /* CLXPlacementValidator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPlacementValidator.m; sourceTree = "<group>"; };
+		CLXPLVALH0002000000000001 /* CLXAdUnitValidator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAdUnitValidator.h; sourceTree = "<group>"; };
+		CLXPLVALM0002000000000001 /* CLXAdUnitValidator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdUnitValidator.m; sourceTree = "<group>"; };
 		CLXREVCD23584C5C434B37AB /* CLXAdRevenueDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAdRevenueDelegate.h; sourceTree = "<group>"; };
 		CLXSFR0001000000000002 /* CLXShowFailureReloadTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXShowFailureReloadTests.m; sourceTree = "<group>"; };
 		D3BD626817D65D02E7871508 /* CLXPublisherFullscreenAdBase.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXPublisherFullscreenAdBase.h; sourceTree = "<group>"; };
@@ -988,7 +988,7 @@
 				19C724DB2E2390810012CFC7 /* UIDevice+CLXIdentifier.m */,
 				19C724DC2E2390810012CFC7 /* URLSession+CLX.m */,
 				19F75E492EA41F1C00E889C0 /* CLXEndpointResolver.m */,
-				CLXPLVALM0002000000000001 /* CLXPlacementValidator.m */,
+				CLXPLVALM0002000000000001 /* CLXAdUnitValidator.m */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -999,7 +999,7 @@
 				194BC0C22EF3F7290008DB33 /* CLXUIApplicationProxy.h */,
 				194BBEC42EF195A10008DB33 /* CLXReward.h */,
 				19D8D2202EDA04C900817D1E /* CLXORTBConstants.h */,
-				CLXPLVALH0002000000000001 /* CLXPlacementValidator.h */,
+				CLXPLVALH0002000000000001 /* CLXAdUnitValidator.h */,
 				19D8D4B72EDD7B0400817D1E /* Debug */,
 				19D8D4072EDAFC8000817D1E /* CLXLogEntry.h */,
 				19D8D4082EDAFC8000817D1E /* CLXLogStore.h */,
@@ -1335,7 +1335,7 @@
 				194BC0C32EF3F7290008DB33 /* CLXUIApplicationProxy.h in Headers */,
 				19F592E42E9836CD00C6E11D /* CLXKeyValueState.h in Headers */,
 				19D8D2212EDA04C900817D1E /* CLXORTBConstants.h in Headers */,
-				CLXPLVALH0001000000000001 /* CLXPlacementValidator.h in Headers */,
+				CLXPLVALH0001000000000001 /* CLXAdUnitValidator.h in Headers */,
 				19C7257A2E2390810012CFC7 /* CLXBidNetworkService.h in Headers */,
 				194BBEC52EF195A10008DB33 /* CLXReward.h in Headers */,
 				19D92CA22E6E099C00C84DAE /* CLXUserDefaultsKeys.h in Headers */,
@@ -1546,7 +1546,7 @@
 				19C725EA2E2390810012CFC7 /* NSString+CLXSemicolon.m in Sources */,
 				19C725EB2E2390810012CFC7 /* CLXXorEncryption.m in Sources */,
 				19C725EC2E2390810012CFC7 /* CLXBannerAdView.m in Sources */,
-				CLXPLVALM0001000000000001 /* CLXPlacementValidator.m in Sources */,
+				CLXPLVALM0001000000000001 /* CLXAdUnitValidator.m in Sources */,
 				BE87E03BD32BEFB8CE4CC310 /* CLXLossReasonMapper.m in Sources */,
 				A29159BA773F7E820DD3C68D /* CLXSdkConfiguration.m in Sources */,
 				D7578637480434D163489DAF /* CLXAdapterLoader.m in Sources */,

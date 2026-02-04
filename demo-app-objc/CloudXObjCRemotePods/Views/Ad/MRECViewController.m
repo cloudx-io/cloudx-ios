@@ -120,7 +120,7 @@
     if (_settings.mrecPlacement.length > 0) {
         placement = _settings.mrecPlacement;
     }
-    self.mrecAd = [[CloudXCore shared] createMRECWithPlacement:placement viewController:self];
+    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:placement viewController:self];
     self.mrecAd.delegate = self;
     self.mrecAd.revenueDelegate = self;
     self.mrecAd.placement = @"demo_mrec";
@@ -188,10 +188,11 @@
     // Don't auto-show - user must press Show MREC button
 }
 
-- (void)didFailToLoadAd:(NSString *)placementName error:(CLXError *)error {
+- (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
     // No ad object exists on failure, so use logMessage instead of logAdEvent
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ MREC failed to load (%@) - Error: %@", placementName, error ? error.localizedDescription : @"Unknown error"]];
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ MREC failed to load (%@) - Error: %@", adUnitId, error ? error.localizedDescription : @"Unknown error"]];
     self.isLoading = NO;
+    [self updateStatusUIWithState:AdStateNoAd];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
@@ -240,8 +241,8 @@
     [self updateStatusUIWithState:AdStateLoading];
 
     NSString *placement = [self placementName];
-    self.mrecAd = [[CloudXCore shared] createMRECWithPlacement:placement
-                                                 viewController:self];
+    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:placement
+                                                viewController:self];
     self.mrecAd.delegate = self;
     self.mrecAd.revenueDelegate = self;
 

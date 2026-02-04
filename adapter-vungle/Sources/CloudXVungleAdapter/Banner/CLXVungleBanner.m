@@ -20,7 +20,7 @@
 @interface CLXVungleBanner ()
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, copy, readwrite) NSString *placementID;
-@property (nonatomic, copy, readwrite, nullable) NSString *placementName;
+@property (nonatomic, copy, readwrite, nullable) NSString *adUnitName;
 @property (nonatomic, copy, readwrite) NSString *bidID;
 @property (nonatomic, assign, readwrite) CLXBannerType bannerType;
 @property (nonatomic, weak, readwrite) UIViewController *viewController;
@@ -36,7 +36,7 @@
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
-                     placementName:(nullable NSString *)placementName
+                     adUnitName:(nullable NSString *)adUnitName
                              bidID:(NSString *)bidID
                               type:(CLXBannerType)type
                     viewController:(UIViewController *)viewController
@@ -45,7 +45,7 @@
     if (self) {
         _bidPayload = [bidPayload copy];
         _placementID = [placementID copy];  // Now nullable - validation in load()
-        _placementName = [placementName copy];  // For error messages
+        _adUnitName = [adUnitName copy];  // For error messages
         _bidID = [bidID copy];
         _bannerType = type;
         _viewController = viewController;  // Now nullable - validation in load()
@@ -56,7 +56,7 @@
         _isDestroyed = NO;
         
         [_logger debug:[NSString stringWithFormat:@"Initialized Vungle banner - Placement: %@ (%@), BidID: %@, Type: %ld, HasBidPayload: %@", 
-                          placementName ?: @"(unknown)", placementID ?: @"(nil)", bidID, (long)type, bidPayload ? @"YES" : @"NO"]];
+                          adUnitName ?: @"(unknown)", placementID ?: @"(nil)", bidID, (long)type, bidPayload ? @"YES" : @"NO"]];
     }
     return self;
 }
@@ -84,10 +84,10 @@
 - (void)load {
     // Validate placement ID at load time (deferred validation pattern)
     if (!self.placementID || self.placementID.length == 0) {
-        NSString *placementContext = self.placementName ? [NSString stringWithFormat:@" for placement '%@'", self.placementName] : @"";
+        NSString *adUnitContext = self.adUnitName ? [NSString stringWithFormat:@" for ad unit '%@'", self.adUnitName] : @"";
         NSString *errorMessage = [NSString stringWithFormat:@"Vungle placement ID is empty%@. "
                                   "Make sure to configure the Vungle placement ID in your CloudX dashboard under Ad Unit Settings > Vungle.",
-                                  placementContext];
+                                  adUnitContext];
         NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
                                      description:errorMessage];
         [self.logger error:error.localizedDescription];
@@ -97,9 +97,9 @@
     
     // Validate viewController at load time
     if (!self.viewController) {
-        NSString *placementContext = self.placementName ? [NSString stringWithFormat:@" for placement '%@'", self.placementName] : @"";
+        NSString *adUnitContext = self.adUnitName ? [NSString stringWithFormat:@" for ad unit '%@'", self.adUnitName] : @"";
         NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidConfiguration
-                                     description:[NSString stringWithFormat:@"[Vungle] Missing viewController%@", placementContext]];
+                                     description:[NSString stringWithFormat:@"[Vungle] Missing viewController%@", adUnitContext]];
         [self.logger error:error.localizedDescription];
         [self handleLoadFailure:error];
         return;
@@ -107,9 +107,9 @@
     
     // Validate delegate at load time
     if (!self.delegate) {
-        NSString *placementContext = self.placementName ? [NSString stringWithFormat:@" for placement '%@'", self.placementName] : @"";
+        NSString *adUnitContext = self.adUnitName ? [NSString stringWithFormat:@" for ad unit '%@'", self.adUnitName] : @"";
         NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidConfiguration
-                                     description:[NSString stringWithFormat:@"[Vungle] Missing delegate%@", placementContext]];
+                                     description:[NSString stringWithFormat:@"[Vungle] Missing delegate%@", adUnitContext]];
         [self.logger error:error.localizedDescription];
         // Cannot call handleLoadFailure without delegate, just log
         return;

@@ -33,7 +33,7 @@
 @property (nonatomic, strong, nullable, readonly) id<CLXAdapterBanner> bannerOnScreen;
 @property (nonatomic, strong, nullable, readonly) id<CLXAdapterBanner> prefetchedBanner;
 @property (nonatomic, strong, nullable, readonly) CLXBidAdSourceResponse *lastBidResponse;
-@property (nonatomic, copy, readonly) NSString *placementName;
+@property (nonatomic, copy, readonly) NSString *adUnitName;
 @property (nonatomic, weak, nullable, readonly) UIViewController *viewController;
 @end
 
@@ -47,7 +47,7 @@
 
 @property (nonatomic, strong) id<CLXBanner> banner;
 @property (nonatomic, strong, readwrite) CLXAd *ad;
-@property (nonatomic, copy, readwrite) NSString *adUnitIdentifier;
+@property (nonatomic, copy, readwrite) NSString *adUnitId;
 @property (nonatomic, assign, readwrite) CLXBannerType adFormat;
 @property (nonatomic, strong) UIGestureRecognizer *debugTapGesture;
 @property (nonatomic, weak) UIView *currentBannerView;  // Track the actual third-party SDK view
@@ -87,9 +87,9 @@ static void initializeLogger() {
             _ad = (CLXAd *)banner;
         }
         
-        // Extract adUnitIdentifier from banner if it's a CLXPublisherBanner
-        if ([banner respondsToSelector:@selector(placementID)]) {
-            _adUnitIdentifier = [(CLXPublisherBanner *)banner placementID];
+        // Extract adUnitId from banner if it's a CLXPublisherBanner
+        if ([banner respondsToSelector:@selector(adUnitId)]) {
+            _adUnitId = [(CLXPublisherBanner *)banner adUnitId];
         }
         
         _banner.delegate = self;
@@ -315,8 +315,8 @@ static void initializeLogger() {
         CLXPublisherBanner *publisherBanner = (CLXPublisherBanner *)self.banner;
         CLXAdFormat adFormat = (self.adFormat == CLXBannerTypeMREC) ? CLXAdFormatMREC : CLXAdFormatBanner;
         _ad = [CLXAd adFromBid:publisherBanner.lastBidResponse.bid
-                   placementId:publisherBanner.placementID
-                 placementName:publisherBanner.placementName
+                      adUnitId:publisherBanner.adUnitId
+                    adUnitName:publisherBanner.adUnitName
                       adFormat:adFormat
                      placement:self.placement];
     }
@@ -386,7 +386,7 @@ static void initializeLogger() {
         if (!clxError) {
             clxError = [CLXError errorWithCode:CLXErrorCodeLoadFailed];
         }
-        [self.delegate didFailToLoadAd:self.placement error:clxError];
+        [self.delegate didFailToLoadAd:self.adUnitId error:clxError];
     }
 }
 
@@ -477,7 +477,7 @@ static void initializeLogger() {
     }
 }
 
-- (void)didFailToLoadAd:(NSString *)placementName error:(NSError *)error {
+- (void)didFailToLoadAd:(NSString *)adUnitId error:(NSError *)error {
     // Flash debug button if testMode is enabled
     [[CLXDebugOverlayManager shared] flashError];
 
@@ -503,7 +503,7 @@ static void initializeLogger() {
         if (!clxError) {
             clxError = [CLXError errorWithCode:CLXErrorCodeLoadFailed];
         }
-        [self.delegate didFailToLoadAd:placementName error:clxError];
+        [self.delegate didFailToLoadAd:adUnitId error:clxError];
     }
 }
 

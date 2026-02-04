@@ -20,24 +20,6 @@
 
 @implementation CLXAd
 
-#pragma mark - Deprecated Property Accessors (forward to new names)
-
-- (NSString *)placementName {
-    return self.adUnitName;
-}
-
-- (NSString *)placementId {
-    return self.adUnitId;
-}
-
-- (NSString *)bidder {
-    return self.networkName;
-}
-
-- (NSString *)externalPlacementId {
-    return self.networkPlacement;
-}
-
 #pragma mark - Initializers
 
 - (instancetype)initWithAdUnitName:(nullable NSString *)adUnitName
@@ -60,21 +42,6 @@
     return self;
 }
 
-// Deprecated initializer - forwards to new initializer
-- (instancetype)initWithPlacementName:(nullable NSString *)placementName
-                          placementId:(nullable NSString *)placementId
-                               bidder:(nullable NSString *)bidder
-                  externalPlacementId:(nullable NSString *)externalPlacementId
-                              revenue:(nullable NSNumber *)revenue {
-    return [self initWithAdUnitName:placementName
-                           adUnitId:placementId
-                        networkName:bidder
-                   networkPlacement:externalPlacementId
-                            revenue:revenue
-                           adFormat:CLXAdFormatBanner
-                          placement:nil];
-}
-
 - (instancetype)init {
     return [self initWithAdUnitName:nil
                            adUnitId:nil
@@ -86,15 +53,15 @@
 }
 
 + (instancetype)adFromBid:(id)bid
-              placementId:(NSString *)placementId
+                 adUnitId:(NSString *)adUnitId
                  adFormat:(CLXAdFormat)adFormat
                 placement:(nullable NSString *)placement {
-    return [self adFromBid:bid placementId:placementId placementName:nil adFormat:adFormat placement:placement];
+    return [self adFromBid:bid adUnitId:adUnitId adUnitName:nil adFormat:adFormat placement:placement];
 }
 
 + (instancetype)adFromBid:(id)bid
-              placementId:(NSString *)placementId
-            placementName:(NSString *)placementName
+                 adUnitId:(NSString *)adUnitId
+               adUnitName:(NSString *)adUnitName
                  adFormat:(CLXAdFormat)adFormat
                 placement:(nullable NSString *)placement {
     // Extract data from bid response using available properties
@@ -133,20 +100,20 @@
             networkName = bidResponse.ext.cloudx.adapterExtras[@"bidder"] ?: bidResponse.ext.cloudx.adapterExtras[@"adapter"];
         }
         
-        // Use provided placement name if available, otherwise try adapter extras, then fall back to placement ID
-        if (placementName && placementName.length > 0) {
-            resolvedAdUnitName = placementName;
+        // Use provided ad unit name if available, otherwise try adapter extras, then fall back to ad unit ID
+        if (adUnitName && adUnitName.length > 0) {
+            resolvedAdUnitName = adUnitName;
         } else if (bidResponse.ext && bidResponse.ext.cloudx && bidResponse.ext.cloudx.adapterExtras) {
-            resolvedAdUnitName = bidResponse.ext.cloudx.adapterExtras[@"placementName"] ?: placementId;
+            resolvedAdUnitName = bidResponse.ext.cloudx.adapterExtras[@"adUnitName"] ?: @"";
         } else {
-            resolvedAdUnitName = placementId;
+            resolvedAdUnitName = @"";
         }
     }
 
     // Only create CLXAd if we have valid bid data AND required fields
     if ([bid isKindOfClass:[CLXBidResponseBid class]] && networkName && networkName.length > 0 && revenue) {
         return [[self alloc] initWithAdUnitName:resolvedAdUnitName
-                                       adUnitId:placementId
+                                       adUnitId:adUnitId
                                     networkName:networkName
                                networkPlacement:networkPlacement
                                         revenue:revenue

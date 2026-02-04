@@ -129,11 +129,11 @@
     // This replaces the old getClxAdForDelegateCallback helper methods
     
     // Verify CLXAd class has the factory method
-    XCTAssertTrue([CLXAd respondsToSelector:@selector(adFromBid:placementId:adFormat:placement:)],
-                  @"CLXAd should have adFromBid:placementId:adFormat:placement: factory method");
+    XCTAssertTrue([CLXAd respondsToSelector:@selector(adFromBid:adUnitId:adFormat:placement:)],
+                  @"CLXAd should have adFromBid:adUnitId:adFormat:placement: factory method");
 
     // Test that we can create a CLXAd object with nil bid (should return nil)
-    CLXAd *adWithNilBid = [CLXAd adFromBid:nil placementId:@"test-placement" adFormat:CLXAdFormatInterstitial placement:nil];
+    CLXAd *adWithNilBid = [CLXAd adFromBid:nil adUnitId:@"test-placement" adFormat:CLXAdFormatInterstitial placement:nil];
     XCTAssertNil(adWithNilBid, @"CLXAd factory method should return nil for nil bid");
     
     // Test that we can create a CLXAd object with valid bid data
@@ -146,7 +146,7 @@
     mockBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
     mockBid.ext.cloudx.revenue = 1.50;
 
-    CLXAd *adWithValidBid = [CLXAd adFromBid:mockBid placementId:@"test-placement" adFormat:CLXAdFormatInterstitial placement:nil];
+    CLXAd *adWithValidBid = [CLXAd adFromBid:mockBid adUnitId:@"test-placement" adFormat:CLXAdFormatInterstitial placement:nil];
     XCTAssertNotNil(adWithValidBid, @"CLXAd factory method should create valid CLXAd object");
     XCTAssertEqualObjects(adWithValidBid.adUnitId, @"test-placement", @"CLXAd should have correct ad unit ID");
     XCTAssertEqualObjects(adWithValidBid.networkName, @"test-bidder", @"CLXAd should have correct network name");

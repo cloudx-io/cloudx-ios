@@ -8,14 +8,14 @@
                                impModel:(CLXConfigImpressionModel *)impModel
                             adapterName:(NSString *)adapterName
                    loadBannerTimesCount:(NSInteger)loadBannerTimesCount
-                            placementID:(NSString *)placementID {
+                               adUnitId:(NSString *)adUnitId {
     self = [super init];
     if (self) {
         _lastBidResponse = lastBidResponse;
         _impModel = impModel;
         _adapterName = [adapterName copy];
         _loadBannerTimesCount = loadBannerTimesCount;
-        _placementID = [placementID copy];
+        _adUnitId = [adUnitId copy];
     }
     return self;
 }

@@ -112,3 +112,6 @@ unity-binaries/*.xcframework.zip
 # Generated/temporary files
 **/release_metadata.txt
 **/LLM_CONTINUATION_SUMMARY.md
+
+# Test results
+*.xcresult

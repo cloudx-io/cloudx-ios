@@ -294,8 +294,8 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
                 break;
         }
         
-        // Set placement_id from storedImpressionId (this is the placement identifier)
-        impExtCx.placement_id = storedImpressionId;
+        // Set ad_unit_id from storedImpressionId (this is the CloudX ad unit identifier)
+        impExtCx.ad_unit_id = storedImpressionId;
         
         // Generate session UUID for this request
         impExtCx.sess_id = [[NSUUID UUID] UUIDString];
@@ -968,8 +968,8 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         if (ext.cx.sess_time) {
             cxJson[@"sess_time"] = ext.cx.sess_time;
         }
-        if (ext.cx.placement_id) {
-            cxJson[@"placement_id"] = ext.cx.placement_id;
+        if (ext.cx.ad_unit_id) {
+            cxJson[@"ad_unit_id"] = ext.cx.ad_unit_id;
         }
         if (cxJson.count > 0) {
             json[@"cx"] = [cxJson copy];

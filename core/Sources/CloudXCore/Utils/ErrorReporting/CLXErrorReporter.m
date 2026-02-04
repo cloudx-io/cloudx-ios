@@ -42,16 +42,16 @@
 
 - (void)reportException:(NSException *)exception 
                 context:(nullable NSDictionary<NSString *, NSString *> *)context {
-    [self reportException:exception placementID:nil context:context];
+    [self reportException:exception adUnitId:nil context:context];
 }
 
 - (void)reportError:(NSError *)error 
             context:(nullable NSDictionary<NSString *, NSString *> *)context {
-    [self reportError:error placementID:nil context:context];
+    [self reportError:error adUnitId:nil context:context];
 }
 
 - (void)reportException:(NSException *)exception 
-            placementID:(nullable NSString *)placementID
+               adUnitId:(nullable NSString *)adUnitId
                 context:(nullable NSDictionary<NSString *, NSString *> *)context {
     
     @try {
@@ -60,17 +60,17 @@
             return;
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"Reporting exception: %@ (placement: %@)", 
-                          exception.name ?: @"unknown", placementID ?: @"global"]];
+        [self.logger debug:[NSString stringWithFormat:@"Reporting exception: %@ (adUnit: %@)", 
+                          exception.name ?: @"unknown", adUnitId ?: @"global"]];
         
         // Create NSError from NSException for Analytics tracking
         NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
         userInfo[NSLocalizedDescriptionKey] = exception.reason ?: @"Unknown exception";
         userInfo[@"exception_name"] = exception.name ?: @"UnknownException";
         
-        // Add placement and context info
-        if (placementID) {
-            userInfo[@"placement_id"] = placementID;
+        // Add ad unit and context info
+        if (adUnitId) {
+            userInfo[@"ad_unit_id"] = adUnitId;
         }
         if (context) {
             for (NSString *key in context.allKeys) {
@@ -92,7 +92,7 @@
 }
 
 - (void)reportError:(NSError *)error 
-        placementID:(nullable NSString *)placementID
+           adUnitId:(nullable NSString *)adUnitId
             context:(nullable NSDictionary<NSString *, NSString *> *)context {
     
     @try {
@@ -101,15 +101,15 @@
             return;
         }
         
-        [self.logger debug:[NSString stringWithFormat:@"Reporting error: %@ (placement: %@)", 
-                          error.localizedDescription ?: @"unknown", placementID ?: @"global"]];
+        [self.logger debug:[NSString stringWithFormat:@"Reporting error: %@ (adUnit: %@)", 
+                          error.localizedDescription ?: @"unknown", adUnitId ?: @"global"]];
         
-        // Enhance error with placement and context info for Analytics tracking
+        // Enhance error with ad unit and context info for Analytics tracking
         NSMutableDictionary *enhancedUserInfo = [NSMutableDictionary dictionaryWithDictionary:error.userInfo ?: @{}];
         
-        // Add placement and context info
-        if (placementID) {
-            enhancedUserInfo[@"placement_id"] = placementID;
+        // Add ad unit and context info
+        if (adUnitId) {
+            enhancedUserInfo[@"ad_unit_id"] = adUnitId;
         }
         if (context) {
             for (NSString *key in context.allKeys) {

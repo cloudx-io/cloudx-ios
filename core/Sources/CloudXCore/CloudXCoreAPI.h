@@ -120,43 +120,43 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 
 /**
  * Create a banner ad
- * @param placement The placement name. This should match the placement name in the CloudX dashboard
+ * @param adUnitId The ad unit ID. This should match the ad unit name in the CloudX dashboard
  * @param viewController The view controller in which the ad will be displayed
  * @return A CLXBannerAdView object
  * @discussion Set the delegate property on the returned object to receive ad events
  */
-- (nullable CLXBannerAdView *)createBannerWithPlacement:(NSString *)placement
-                                           viewController:(UIViewController *)viewController
-    NS_SWIFT_NAME(createBanner(placement:viewController:));
+- (nullable CLXBannerAdView *)createBannerWithAdUnitId:(NSString *)adUnitId
+                                          viewController:(UIViewController *)viewController
+    NS_SWIFT_NAME(createBanner(adUnitId:viewController:));
 
 /**
  * Create a MREC ad
- * @param placement The placement name. This should match the placement name in the CloudX dashboard
+ * @param adUnitId The ad unit ID. This should match the ad unit name in the CloudX dashboard
  * @param viewController The view controller in which the ad will be displayed
  * @return A CLXBannerAdView object
  * @discussion Set the delegate property on the returned object to receive ad events
  */
-- (nullable CLXBannerAdView *)createMRECWithPlacement:(NSString *)placement
-                                          viewController:(UIViewController *)viewController
-    NS_SWIFT_NAME(createMREC(placement:viewController:));
+- (nullable CLXBannerAdView *)createMRECWithAdUnitId:(NSString *)adUnitId
+                                         viewController:(UIViewController *)viewController
+    NS_SWIFT_NAME(createMREC(adUnitId:viewController:));
 
 /**
  * Create an interstitial ad
- * @param placement The placement name. This should match the placement name in the CloudX dashboard
+ * @param adUnitId The ad unit ID. This should match the ad unit name in the CloudX dashboard
  * @return A CLXInterstitial object
  * @discussion Set the delegate property on the returned object to receive ad events
  */
-- (nullable CLXInterstitial *)createInterstitialWithPlacement:(NSString *)placement
-    NS_SWIFT_NAME(createInterstitial(placement:));
+- (nullable CLXInterstitial *)createInterstitialWithAdUnitId:(NSString *)adUnitId
+    NS_SWIFT_NAME(createInterstitial(adUnitId:));
 
 /**
  * Create a rewarded ad
- * @param placement The placement name. This should match the placement name in the CloudX dashboard
+ * @param adUnitId The ad unit ID. This should match the ad unit name in the CloudX dashboard
  * @return A CLXRewarded object
  * @discussion Set the delegate property on the returned object to receive ad events
  */
-- (nullable CLXRewarded *)createRewardedWithPlacement:(NSString *)placement
-    NS_SWIFT_NAME(createRewarded(placement:));
+- (nullable CLXRewarded *)createRewardedWithAdUnitId:(NSString *)adUnitId
+    NS_SWIFT_NAME(createRewarded(adUnitId:));
 
 #pragma mark - Visual Debugging
 

@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           adm:(NSString *)adm
                                               hasClosedButton:(BOOL)hasClosedButton
                                                        extras:(NSDictionary<NSString *, NSString *> *)extras
-                                                placementName:(NSString *)placementName
+                                                   adUnitName:(NSString *)adUnitName
                                                      delegate:(id<CLXAdapterBannerDelegate>)delegate;
 
 @end

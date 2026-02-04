@@ -86,7 +86,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         
         // Create rewarded interstitial with comprehensive logging
         DemoAppLogger.sharedInstance.logMessage("📱 [RewardedInterstitial] Calling createRewarded...")
-        rewardedInterstitialAd = CloudXCore.shared.createRewarded(placement: placement)
+        rewardedInterstitialAd = CloudXCore.shared.createRewarded(adUnitId: placement)
         rewardedInterstitialAd?.delegate = self
         rewardedInterstitialAd?.revenueDelegate = self
         
@@ -140,9 +140,9 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         updateStatusUI(state: .ready)
     }
     
-    func didFailToLoadAd(_ placementName: String, error: CLXError) {
+    func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
-        DemoAppLogger.sharedInstance.logMessage("❌ RewardedInterstitial failed to load for ad unit '\(placementName)' - Error: \(error.localizedDescription)")
+        DemoAppLogger.sharedInstance.logMessage("❌ RewardedInterstitial failed to load for ad unit '\(adUnitId)' - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: .noAd)
         
@@ -171,7 +171,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
     func didHide(_ ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("🔚 RewardedInterstitial didHideAd", ad: ad)
         rewardedInterstitialAd = nil
-        loadRewardedInterstitial()
+        // Don't auto-load - user must press Load Rewarded Interstitial button
         updateStatusUI(state: .noAd)
     }
     

@@ -129,7 +129,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     placement.id = @"test-placement";
     
     // ALL external dependencies are nil or minimal mocks
-    return [[CLXInterstitial alloc] initWithPlacement:placement
+    return [[CLXInterstitial alloc] initWithAdUnit:placement
                                           publisherID:@"test"
                                                userID:@"test"
                                   rewardedCallbackUrl:nil

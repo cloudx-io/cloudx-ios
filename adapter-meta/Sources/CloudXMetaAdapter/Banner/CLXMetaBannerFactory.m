@@ -48,10 +48,10 @@
                                                       adm:(NSString *)adm
                                           hasClosedButton:(BOOL)hasClosedButton
                                                    extras:(NSDictionary<NSString *, NSString *> *)extras
-                                            placementName:(NSString *)placementName
+                                              adUnitName:(NSString *)adUnitName
                                                  delegate:(id<CLXAdapterBannerDelegate>)delegate {
 
-    [self.logger debug:[NSString stringWithFormat:@"Creating banner for placement: %@ (%@)", placementName ?: @"(unknown)", adId]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating banner for ad unit: %@ (%@)", adUnitName ?: @"(unknown)", adId]];
 
     NSString *metaPlacementID = [CLXMetaUtils resolveMetaPlacementID:extras
                                                          fallbackAdId:adId
@@ -63,7 +63,7 @@
 
     CLXMetaBanner *banner = [[CLXMetaBanner alloc] initWithBidPayload:adm
                                                           placementID:metaPlacementID
-                                                        placementName:placementName
+                                                        adUnitName:adUnitName
                                                                 bidID:bidId
                                                                  type:type
                                                        viewController:viewController

@@ -47,12 +47,12 @@
                                               bidId:(NSString *)bidId
                                                 adm:(NSString *)adm
                                              extras:(NSDictionary<NSString *, NSString *> *)extras
-                                      placementName:(NSString *)placementName
+                                       adUnitName:(NSString *)adUnitName
                                            delegate:(id<CLXAdapterRewardedDelegate>)delegate {
     
     // Extract placement ID from extras (server provides this in adapter_extras)
     NSString *placementIdString = extras[@"placement_id"];
-    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating rewarded - Placement: %@ (%@), BidID: %@, PlacementID: %@", placementName ?: @"(unknown)", adId, bidId, placementIdString]];
+    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating rewarded - Ad Unit: %@ (%@), BidID: %@, PlacementID: %@", adUnitName ?: @"(unknown)", adId, bidId, placementIdString]];
     
     long long inmobiPlacementID = [self.baseFactory extractPlacementID:placementIdString];
     
@@ -71,7 +71,7 @@
     // Validation errors will be reported in load() via delegate callback
     CLXInMobiRewarded *rewarded = [[CLXInMobiRewarded alloc] initWithBidPayload:bidPayloadData
                                                                      placementID:inmobiPlacementID  // May be 0 (invalid)
-                                                                   placementName:placementName
+                                                                   adUnitName:adUnitName
                                                                            bidID:bidId
                                                                         delegate:delegate];
     

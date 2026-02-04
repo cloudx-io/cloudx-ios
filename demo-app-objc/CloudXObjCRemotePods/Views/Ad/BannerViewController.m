@@ -153,8 +153,8 @@
         placement = _settings.bannerPlacement;
     }
     
-    self.bannerAd = [[CloudXCore shared] createBannerWithPlacement:placement
-                                                      viewController:self];
+    self.bannerAd = [[CloudXCore shared] createBannerWithAdUnitId:placement
+                                                     viewController:self];
     self.bannerAd.delegate = self;
     self.bannerAd.revenueDelegate = self;
     self.bannerAd.placement = @"demo_banner";
@@ -249,9 +249,9 @@
     // Don't auto-show - user must press Show Banner button
 }
 
-- (void)didFailToLoadAd:(NSString *)placementName error:(CLXError *)error {
+- (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
     // No ad object exists on failure, so use logMessage instead of logAdEvent
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failed to load (%@) - Error: %@", placementName, error ? error.localizedDescription : @"Unknown error"]];
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failed to load (%@) - Error: %@", adUnitId, error ? error.localizedDescription : @"Unknown error"]];
     
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];

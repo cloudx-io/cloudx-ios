@@ -8,6 +8,7 @@
 @interface RewardedViewController ()
 @property (nonatomic, strong) CLXRewarded *rewardedAd;
 @property (nonatomic, strong) UserDefaultsSettings *settings;
+@property (nonatomic, strong) UIButton *rewardedLoadButton;
 @end
 
 @implementation RewardedViewController
@@ -25,15 +26,15 @@
     [self.view addSubview:buttonStack];
     
     // Load Rewarded button
-    UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [loadButton setTitle:@"Load Rewarded" forState:UIControlStateNormal];
-    [loadButton addTarget:self action:@selector(loadRewardedAd) forControlEvents:UIControlEventTouchUpInside];
-    loadButton.backgroundColor = [UIColor systemGreenColor];
-    [loadButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    loadButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
-    loadButton.layer.cornerRadius = 8;
-    loadButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [buttonStack addArrangedSubview:loadButton];
+    self.rewardedLoadButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [self.rewardedLoadButton setTitle:@"Load Rewarded" forState:UIControlStateNormal];
+    [self.rewardedLoadButton addTarget:self action:@selector(loadRewardedAd) forControlEvents:UIControlEventTouchUpInside];
+    self.rewardedLoadButton.backgroundColor = [UIColor systemGreenColor];
+    [self.rewardedLoadButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    self.rewardedLoadButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    self.rewardedLoadButton.layer.cornerRadius = 8;
+    self.rewardedLoadButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:self.rewardedLoadButton];
     
     // Show Rewarded button
     UIButton *showButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -49,9 +50,9 @@
     // Button constraints
     [NSLayoutConstraint activateConstraints:@[
         [buttonStack.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
-        [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
-        [loadButton.widthAnchor constraintEqualToConstant:200],
-        [loadButton.heightAnchor constraintEqualToConstant:44],
+        [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:220],
+        [self.rewardedLoadButton.widthAnchor constraintEqualToConstant:200],
+        [self.rewardedLoadButton.heightAnchor constraintEqualToConstant:44],
         [showButton.widthAnchor constraintEqualToConstant:200],
         [showButton.heightAnchor constraintEqualToConstant:44]
     ]];
@@ -109,11 +110,10 @@
     NSLog(@"[RewardedViewController] Using placement: %@", placement);
     
     // Create rewarded with comprehensive logging
-    NSLog(@"[RewardedViewController] Calling createRewardedWithPlacement: %@", placement);
-    self.rewardedAd = [[CloudXCore shared] createRewardedWithPlacement:placement];
+    NSLog(@"[RewardedViewController] Calling createRewardedWithAdUnitId: %@", placement);
+    self.rewardedAd = [[CloudXCore shared] createRewardedWithAdUnitId:placement];
     self.rewardedAd.delegate = self;
-    self.rewardedAd.revenueDelegate = self;
-
+    
     if (self.rewardedAd) {
         NSLog(@"[RewardedViewController] ✅ Rewarded ad instance created successfully: %@", self.rewardedAd);
         NSLog(@"[RewardedViewController] Loading rewarded ad instance...");
@@ -136,9 +136,8 @@
     NSString *placement = [self placementName];
     NSLog(@"[RewardedViewController] Creating new Rewarded ad instance with placement: %@", placement);
     // SDK config debugging removed to avoid undeclared selector warnings
-    self.rewardedAd = [[CloudXCore shared] createRewardedWithPlacement:placement];
+    self.rewardedAd = [[CloudXCore shared] createRewardedWithAdUnitId:placement];
     self.rewardedAd.delegate = self;
-    self.rewardedAd.revenueDelegate = self;
     if (self.rewardedAd) {
         NSLog(@"✅ Rewarded ad instance created successfully: %@", self.rewardedAd);
         [self startPollingReadyState];
@@ -187,9 +186,7 @@
     if (self.rewardedAd && self.rewardedAd.isReady) {
         NSLog(@"👀 [RewardedViewController] Ad ready, showing immediately...");
         NSLog(@"📊 [RewardedViewController] Calling showFromViewController on: %@", self.rewardedAd);
-        [self.rewardedAd showFromViewController:self
-                                      placement:@"demo_rewarded"
-                                     customData:@"level:10,gems:50"];
+        [self.rewardedAd showFromViewController:self];
         return;
     }
     
@@ -219,11 +216,12 @@
     [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Rewarded didLoadAd" ad:ad];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
+    
     // Do NOT show the ad here!
 }
 
-- (void)didFailToLoadAd:(NSString *)placementName error:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failed to load (%@) - Error: %@", placementName, error.localizedDescription]];
+- (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Rewarded failed to load (%@) - Error: %@", adUnitId, error.localizedDescription]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -260,6 +258,10 @@
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Rewarded didClickAd" ad:ad];
 }
 
+- (void)didRecordImpressionForAd:(CLXAd *)ad {
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👁️ Rewarded didRecordImpressionForAd" ad:ad];
+}
+
 - (void)didPayRevenueForAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Rewarded didPayRevenueForAd" ad:ad];
 }
@@ -271,6 +273,12 @@
         NSString *message = [NSString stringWithFormat:@"You earned %ld %@!", (long)reward.amount, reward.label];
         [self showAlertWithTitle:@"Reward Earned! 🎉" message:message];
     });
+}
+
+#pragma mark - Test Mode Overrides
+
+- (void)resetLoadButton {
+    [self.rewardedLoadButton setTitle:@"Load Rewarded" forState:UIControlStateNormal];
 }
 
 @end 

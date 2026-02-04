@@ -98,22 +98,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)insertPerformanceMetric:(CLXPerformanceMetric *)metric;
 - (BOOL)insertPerformanceMetricBatch:(NSArray<CLXPerformanceMetric *> *)metrics;
-- (NSArray<CLXPerformanceMetric *> *)findPerformanceMetricsByPlacementId:(NSString *)placementId;
+- (NSArray<CLXPerformanceMetric *> *)findPerformanceMetricsByAdUnitId:(NSString *)adUnitId;
 - (NSArray<CLXPerformanceMetric *> *)findPerformanceMetricsBySessionId:(NSString *)sessionId;
-- (nullable CLXPerformanceMetric *)findPerformanceMetricByPlacementId:(NSString *)placementId sessionId:(NSString *)sessionId;
-- (CLXPerformanceMetric *)findOrCreatePerformanceMetricForPlacementId:(NSString *)placementId sessionId:(NSString *)sessionId;
+- (nullable CLXPerformanceMetric *)findPerformanceMetricByAdUnitId:(NSString *)adUnitId sessionId:(NSString *)sessionId;
+- (CLXPerformanceMetric *)findOrCreatePerformanceMetricForAdUnitId:(NSString *)adUnitId sessionId:(NSString *)sessionId;
 
 // Aggregation operations
-- (NSInteger)getTotalClicksForPlacement:(NSString *)placementId;
-- (NSInteger)getTotalImpressionsForPlacement:(NSString *)placementId;
-- (NSInteger)getTotalClosesForPlacement:(NSString *)placementId;
-- (NSTimeInterval)getAverageLoadLatencyForPlacement:(NSString *)placementId;
-- (NSInteger)getTotalBidResponsesForPlacement:(NSString *)placementId;
+- (NSInteger)getTotalClicksForAdUnit:(NSString *)adUnitId;
+- (NSInteger)getTotalImpressionsForAdUnit:(NSString *)adUnitId;
+- (NSInteger)getTotalClosesForAdUnit:(NSString *)adUnitId;
+- (NSTimeInterval)getAverageLoadLatencyForAdUnit:(NSString *)adUnitId;
+- (NSInteger)getTotalBidResponsesForAdUnit:(NSString *)adUnitId;
 
 // Performance analytics
-- (NSDictionary<NSString *, NSNumber *> *)getPerformanceSummaryForPlacement:(NSString *)placementId;
+- (NSDictionary<NSString *, NSNumber *> *)getPerformanceSummaryForAdUnit:(NSString *)adUnitId;
 - (NSDictionary<NSString *, NSNumber *> *)getPerformanceSummaryForSession:(NSString *)sessionId;
-- (NSArray<CLXPerformanceMetric *> *)findTopPerformingPlacements:(NSInteger)limit;
+- (NSArray<CLXPerformanceMetric *> *)findTopPerformingAdUnits:(NSInteger)limit;
 
 // Cleanup operations
 - (BOOL)deletePerformanceMetricsOlderThan:(NSTimeInterval)timestamp;

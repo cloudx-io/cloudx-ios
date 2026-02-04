@@ -133,7 +133,7 @@
     BOOL sessionSuccess = [self.database.sessionDao insertSession:session];
     XCTAssertTrue(sessionSuccess, @"Should insert session successfully");
     
-    CLXPerformanceMetric *metric = [CLXPerformanceMetric metricForPlacement:@"test_placement" 
+    CLXPerformanceMetric *metric = [CLXPerformanceMetric metricForAdUnit:@"test_placement" 
                                                                    sessionId:@"test_session"];
     [metric incrementImpressions];
     [metric incrementClicks];
@@ -141,7 +141,7 @@
     BOOL success = [self.database.performanceDao insertPerformanceMetric:metric];
     XCTAssertTrue(success, @"Should insert performance metric successfully");
     
-    NSArray *metrics = [self.database.performanceDao findPerformanceMetricsByPlacementId:@"test_placement"];
+    NSArray *metrics = [self.database.performanceDao findPerformanceMetricsByAdUnitId:@"test_placement"];
     XCTAssertEqual(metrics.count, 1, @"Should have one metric");
     
     CLXPerformanceMetric *retrieved = metrics.firstObject;
@@ -156,24 +156,24 @@
     BOOL sessionSuccess = [self.database.sessionDao insertSession:session];
     XCTAssertTrue(sessionSuccess, @"Should insert session successfully");
     
-    NSString *placementId = @"test_placement";
+    NSString *adUnitId = @"test_placement";
     
     // Insert multiple performance metrics
     for (int i = 0; i < 3; i++) {
-        CLXPerformanceMetric *metric = [CLXPerformanceMetric metricForPlacement:placementId 
+        CLXPerformanceMetric *metric = [CLXPerformanceMetric metricForAdUnit:adUnitId 
                                                                        sessionId:@"test_session"];
         [metric incrementImpressionsBy:2];
         [metric incrementClicksBy:1];
         [self.database.performanceDao insertPerformanceMetric:metric];
     }
     
-    NSInteger totalImpressions = [self.database.performanceDao getTotalImpressionsForPlacement:placementId];
-    NSInteger totalClicks = [self.database.performanceDao getTotalClicksForPlacement:placementId];
+    NSInteger totalImpressions = [self.database.performanceDao getTotalImpressionsForAdUnit:adUnitId];
+    NSInteger totalClicks = [self.database.performanceDao getTotalClicksForAdUnit:adUnitId];
     
     XCTAssertEqual(totalImpressions, 6, @"Total impressions should be 6");
     XCTAssertEqual(totalClicks, 3, @"Total clicks should be 3");
     
-    NSDictionary *summary = [self.database.performanceDao getPerformanceSummaryForPlacement:placementId];
+    NSDictionary *summary = [self.database.performanceDao getPerformanceSummaryForAdUnit:adUnitId];
     XCTAssertNotNil(summary, @"Should have performance summary");
     XCTAssertEqual([summary[@"totalImpressions"] integerValue], 6, @"Summary should show 6 impressions");
 }

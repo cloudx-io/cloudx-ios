@@ -92,7 +92,7 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
 /**
  * Initialize a new bid ad source
  * @param userID User identifier
- * @param placementID Placement identifier
+ * @param adUnitId Ad unit identifier
  * @param dealID Deal identifier (optional)
  * @param hasCloseButton Whether the ad has a close button
  * @param publisherID Publisher identifier
@@ -105,7 +105,7 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
  * @return Initialized bid ad source
  */
 - (instancetype)initWithUserID:(nullable NSString *)userID
-                   placementID:(NSString *)placementID
+                      adUnitId:(NSString *)adUnitId
                         dealID:(nullable NSString *)dealID
                  hasCloseButton:(BOOL)hasCloseButton
                    publisherID:(NSString *)publisherID

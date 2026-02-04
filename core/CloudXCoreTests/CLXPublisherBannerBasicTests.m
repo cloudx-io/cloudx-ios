@@ -184,7 +184,7 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
     
     // Create banner with minimal setup
     self.banner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
-                                                           placement:self.testPlacement
+                                                           adUnit:self.testPlacement
                                                               userID:kBasicTestUserID
                                                          publisherID:kBasicTestPublisherID
                                             suspendPreloadWhenInvisible:NO

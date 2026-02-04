@@ -66,7 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
  * protecting users from truly stuck ads.
  *
  * 🔧 PUBLISHER CONFIGURABILITY CANDIDATE:
- *    These values could potentially be configurable via server-side placement settings
+ *    These values could potentially be configurable via server-side ad unit settings
  *    if publishers need different timeout behaviors for their specific use cases.
  */
 
@@ -107,8 +107,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 @property (nonatomic, strong, nullable) CLXAdNetworkFactories *adFactories;
 @property (nonatomic, copy, nullable) NSString *userID;
 @property (nonatomic, strong) id<CLXAdEventReporting> reportingService;
-@property (nonatomic, copy) NSString *placementID;
-@property (nonatomic, copy) NSString *placementName;
+@property (nonatomic, copy) NSString *adUnitId;
+@property (nonatomic, copy) NSString *adUnitName;
 @property (nonatomic, assign) int64_t adLoadTimeoutMs;
 @property (nonatomic, copy, nullable) NSString *rewardedCallbackUrl;
 @property (nonatomic, strong) CLXLogger *logger;
@@ -137,8 +137,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 // Deferred error (set during create if validation fails)
 @property (nonatomic, strong, nullable) CLXError *deferredError;
 
-// Requested placement name for deferred initialization
-@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+// Requested ad unit ID for deferred initialization
+@property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
 
 // Adapter load timing
 @property (nonatomic, strong, nullable) NSDate *adapterLoadStartTime;
@@ -156,7 +156,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 #pragma mark - Initialization
 
-- (instancetype)initWithPlacement:(nullable CLXSDKConfigAdUnit *)placement
+- (instancetype)initWithAdUnit:(nullable CLXSDKConfigAdUnit *)adUnit
                       publisherID:(NSString *)publisherID
                            userID:(nullable NSString *)userID
               rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl
@@ -171,7 +171,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         // Set up logging for this fullscreen ad instance
         _logger = [[CLXLogger alloc] initWithCategory:@"FullscreenAd"];
 
-        [self.logger debug:[NSString stringWithFormat:@"Initializing fullscreen ad - Placement: %@, Type: %ld", placement.id ?: @"(deferred)", (long)[self adType]]];
+        [self.logger debug:[NSString stringWithFormat:@"Initializing fullscreen ad - AdUnit: %@, Type: %ld", adUnit.id ?: @"(deferred)", (long)[self adType]]];
 
         // Start in idle state, ready to load ads
         _currentState = CLXFullscreenAdStateIDLE;
@@ -179,9 +179,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         // Configure instance properties
         _adFactories = adFactories;
         _rewardedCallbackUrl = [rewardedCallbackUrl copy];
-        _placementID = placement ? [placement.id copy] : nil;
-        _placementName = placement ? [placement.name copy] : nil;
-        _adLoadTimeoutMs = (placement && placement.adLoadTimeoutMs > 0) ? placement.adLoadTimeoutMs : CLXDefaultAdLoadTimeoutMs;
+        _adUnitId = adUnit ? [adUnit.id copy] : nil;
+        _adUnitName = adUnit ? [adUnit.name copy] : nil;
+        _adLoadTimeoutMs = (adUnit && adUnit.adLoadTimeoutMs > 0) ? adUnit.adLoadTimeoutMs : CLXDefaultAdLoadTimeoutMs;
         _reportingService = reportingService;
         _userID = [userID copy];
         _settings = settings;
@@ -209,14 +209,14 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         // Initialize win/loss tracker
         _winLossTracker = [CLXWinLossTracker shared];
 
-        // Configure bid source for ad request management (only if placement available)
-        if (placement) {
-            BOOL hasCloseButton = placement.hasCloseButton ?: NO;
+        // Configure bid source for ad request management (only if ad unit available)
+        if (adUnit) {
+            BOOL hasCloseButton = adUnit.hasCloseButton ?: NO;
 
             __weak typeof(self) weakSelf = self;
             _bidAdSource = [[CLXBidAdSource alloc] initWithUserID:userID
-                                                   placementID:_placementID
-                                                        dealID:placement.dealId
+                                                   adUnitId:_adUnitId
+                                                        dealID:adUnit.dealId
                                                  hasCloseButton:hasCloseButton
                                                    publisherID:publisherID
                                                         adType:[self adType]
@@ -237,7 +237,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                                     burl:burl
                                                  network:network];
             }];
-            [self.logger debug:[NSString stringWithFormat:@"Initialized fullscreen ad in IDLE state for placement: %@", _placementID]];
+            [self.logger debug:[NSString stringWithFormat:@"Initialized fullscreen ad in IDLE state for ad unit: %@", _adUnitId]];
         } else {
             // SDK not initialized - bid source will be created in performLoad
             _bidAdSource = nil;
@@ -258,7 +258,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 }
 
 - (void)destroy {
-    [self.logger debug:[NSString stringWithFormat:@"Destroying fullscreen ad for placement: %@", self.placementID]];
+    [self.logger debug:[NSString stringWithFormat:@"Destroying fullscreen ad for ad unit: %@", self.adUnitId]];
     
     // Remove notification observer
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"CLXSDKInitializedNotification" object:nil];
@@ -274,7 +274,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 }
 
 - (void)dealloc {
-    [self.logger debug:[NSString stringWithFormat:@"Deallocating fullscreen ad for placement: %@", _placementID]];
+    [self.logger debug:[NSString stringWithFormat:@"Deallocating fullscreen ad for ad unit: %@", _adUnitId]];
     
     // CRITICAL: Remove notification observer to prevent crashes if ad deallocated without destroy
     [[NSNotificationCenter defaultCenter] removeObserver:self name:CLXSDKInitializedNotification object:nil];
@@ -316,7 +316,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Check if SDK is initialized
     if (![[CloudXCore shared] isInitialized]) {
         self.pendingLoadRequestCount++;
-        [self.logger info:[NSString stringWithFormat:@"SDK not yet initialized, queuing load request #%lu for placement: %@", (unsigned long)self.pendingLoadRequestCount, self.requestedPlacementName ?: self.placementID]];
+        [self.logger info:[NSString stringWithFormat:@"SDK not yet initialized, queuing load request #%lu for ad unit: %@", (unsigned long)self.pendingLoadRequestCount, self.requestedAdUnitId ?: self.adUnitId]];
         return;
     }
     
@@ -327,15 +327,15 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 // Internal method to actually perform the load operation
 - (void)performLoad {
     // Check if we need to complete deferred initialization (bidAdSource is nil)
-    if (!self.bidAdSource && self.requestedPlacementName && [[CloudXCore shared] isInitialized]) {
-        // SDK is now initialized - complete initialization with real placement config
-        CLXSDKConfigAdUnit *realPlacement = [[CloudXCore shared] placementConfigForName:self.requestedPlacementName];
-        if (realPlacement) {
-            [self.logger debug:[NSString stringWithFormat:@"Completing deferred initialization for: %@ (ID: %@)", self.requestedPlacementName, realPlacement.id]];
-            _placementID = realPlacement.id;
-            _placementName = realPlacement.name;
-            _adLoadTimeoutMs = (realPlacement.adLoadTimeoutMs > 0) ? realPlacement.adLoadTimeoutMs : 10000;
-            _bidRequestTimeout = realPlacement.bidRequestTimeoutSeconds;
+    if (!self.bidAdSource && self.requestedAdUnitId && [[CloudXCore shared] isInitialized]) {
+        // SDK is now initialized - complete initialization with real ad unit config
+        CLXSDKConfigAdUnit *realAdUnit = [[CloudXCore shared] adUnitConfigForName:self.requestedAdUnitId];
+        if (realAdUnit) {
+            [self.logger debug:[NSString stringWithFormat:@"Completing deferred initialization for: %@ (ID: %@)", self.requestedAdUnitId, realAdUnit.id]];
+            _adUnitId = realAdUnit.id;
+            _adUnitName = realAdUnit.name;
+            _adLoadTimeoutMs = (realAdUnit.adLoadTimeoutMs > 0) ? realAdUnit.adLoadTimeoutMs : 10000;
+            _bidRequestTimeout = realAdUnit.bidRequestTimeoutSeconds;
 
             // Create impression model now that SDK is initialized (ensures app.id is populated)
             NSString *auctionID = [[NSUUID UUID] UUIDString];
@@ -347,13 +347,13 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
             }
             
             // Create bid source now
-            BOOL hasCloseButton = realPlacement.hasCloseButton ?: NO;
+            BOOL hasCloseButton = realAdUnit.hasCloseButton ?: NO;
             NSDictionary<NSString *, id<CLXBidTokenSource>> *bidTokenSources = self.adFactories.bidTokenSources;
 
             __weak typeof(self) weakSelf = self;
             self.bidAdSource = [[CLXBidAdSource alloc] initWithUserID:self.userID
-                                                          placementID:_placementID
-                                                               dealID:realPlacement.dealId
+                                                          adUnitId:_adUnitId
+                                                               dealID:realAdUnit.dealId
                                                         hasCloseButton:hasCloseButton
                                                           publisherID:@""
                                                                adType:[self adType]
@@ -375,18 +375,18 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                                  network:network];
             }];
             
-            // Clear the requested placement name since initialization is complete
-            self.requestedPlacementName = nil;
+            // Clear the requested ad unit ID since initialization is complete
+            self.requestedAdUnitId = nil;
         } else {
-            // Provide detailed error message with available placements (mirrors Android PlacementValidator)
-            NSArray<NSString *> *availablePlacements = [[CloudXCore shared] availablePlacementNames];
-            NSString *availablePlacementsString = availablePlacements.count > 0 
-                ? [availablePlacements componentsJoinedByString:@", "] 
+            // Provide detailed error message with available ad units (mirrors Android AdUnitValidator)
+            NSArray<NSString *> *availableAdUnits = [[CloudXCore shared] availableAdUnitNames];
+            NSString *availableAdUnitsString = availableAdUnits.count > 0 
+                ? [availableAdUnits componentsJoinedByString:@", "] 
                 : @"none";
-            [self.logger error:[NSString stringWithFormat:@"Placement '%@' not found. Available: [%@]", self.requestedPlacementName, availablePlacementsString]];
+            [self.logger error:[NSString stringWithFormat:@"Ad unit '%@' not found. Available: [%@]", self.requestedAdUnitId, availableAdUnitsString]];
             CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnit 
-                                          description:[NSString stringWithFormat:@"Placement '%@' not found in SDK configuration. Available placements: [%@].", 
-                                                      self.requestedPlacementName, availablePlacementsString]];
+                                          description:[NSString stringWithFormat:@"Ad unit '%@' not found in SDK configuration. Available ad units: [%@].", 
+                                                      self.requestedAdUnitId, availableAdUnitsString]];
             [self handleBidResponse:nil error:error];
             return;
         }
@@ -395,7 +395,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Generate correlation ID for this ad load request
     self.currentCorrelationId = [[NSUUID UUID] UUIDString];
     
-    [self.logger info:[NSString stringWithFormat:@"[%@] 🎬 [PublisherFullscreenAd] Ad load started - Placement: %@, Type: %ld", self.currentCorrelationId, _placementID, (long)[self adType]]];
+    [self.logger info:[NSString stringWithFormat:@"[%@] 🎬 [PublisherFullscreenAd] Ad load started - Ad Unit: %@, Type: %ld", self.currentCorrelationId, _adUnitId, (long)[self adType]]];
     
     // Check current state to determine if loading is allowed
     switch (self.currentState) {
@@ -429,8 +429,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     [self.logger debug:[NSString stringWithFormat:@"[%@] State transitioned to LOADING", self.currentCorrelationId]];
     
     // Initiate bid request for ad content
-    [self.bidAdSource requestBidWithAdUnitID:self.placementID
-                           storedImpressionId:self.placementID
+    [self.bidAdSource requestBidWithAdUnitID:self.adUnitId
+                           storedImpressionId:self.adUnitId
                                     impModel:self.impModel
                                    successWin:NO
                                 correlationId:self.currentCorrelationId
@@ -443,7 +443,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)handleSDKInitialized:(NSNotification *)notification {
     NSUInteger queuedRequests = self.pendingLoadRequestCount;
     if (queuedRequests > 0) {
-        [self.logger info:[NSString stringWithFormat:@"SDK initialized, executing %lu queued load request(s) for placement: %@", (unsigned long)queuedRequests, self.placementID]];
+        [self.logger info:[NSString stringWithFormat:@"SDK initialized, executing %lu queued load request(s) for ad unit: %@", (unsigned long)queuedRequests, self.adUnitId]];
         self.pendingLoadRequestCount = 0;
         // Execute load once (multiple load() calls for same ad are redundant)
         [self performLoad];
@@ -637,7 +637,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Set up Analytics tracking data
     [self.rillTrackingService setupTrackingDataFromBidResponse:response
                                                       impModel:self.impModel
-                                                   placementID:self.placementID
+                                                   adUnitId:self.adUnitId
                                                      loadCount:0];
     
     // Track adapter load start time for latency metrics
@@ -762,7 +762,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     self.impressionTime = [NSDate date];
     [self applyMetrics];
     
-    [[CLXSessionMetricsTracker sharedInstance] recordImpressionForPlacement:self.placementName adType:adType];
+    [[CLXSessionMetricsTracker sharedInstance] recordImpressionForAdUnit:self.adUnitName adType:adType];
     [self.rillTrackingService sendImpressionEvent];
     
     CLXBidResponseBid *winningBid = [self.currentBidResponse findBidWithID:bidID];
@@ -792,8 +792,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     CLXAdFormat adFormat = ([self adType] == CLXAdTypeRewarded) ? CLXAdFormatRewarded : CLXAdFormatInterstitial;
 
     return [CLXAd adFromBid:self.lastBidResponse.bid
-                placementId:self.placementID
-              placementName:self.placementName
+                adUnitId:self.adUnitId
+              adUnitName:self.adUnitName
                    adFormat:adFormat
                   placement:self.publisherPlacement];
 }

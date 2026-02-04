@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Default adapter load timeout in milliseconds (10 seconds).
- * Used when placement.adLoadTimeoutMs is not set or invalid.
+ * Used when adUnit.adLoadTimeoutMs is not set or invalid.
  * Matches Android SDK default.
  */
 extern const int64_t CLXDefaultAdLoadTimeoutMs;
@@ -31,7 +31,7 @@ extern const int64_t CLXDefaultAdLoadTimeoutMs;
  * Load adapter with server-configured timeout.
  *
  * @param adapter Adapter instance with -load method
- * @param timeoutMs Timeout from placement.adLoadTimeoutMs (default 10000 if <= 0)
+ * @param timeoutMs Timeout from adUnit.adLoadTimeoutMs (default 10000 if <= 0)
  * @param isLoadingBlock Returns YES if still loading (for timeout check)
  * @param onTimeout Called if timeout fires while still loading, with pre-built error
  *

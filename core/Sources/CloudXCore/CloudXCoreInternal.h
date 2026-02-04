@@ -13,6 +13,10 @@
 #import <Foundation/Foundation.h>
 #import <CloudXCore/CloudXCoreAPI.h>
 
+// Forward declarations for internal types
+@class CLXAdNetworkFactories;
+@class CLXConfigImpressionModel;
+
 // =============================================================================
 // MARK: - Internal Implementation Headers
 // =============================================================================
@@ -170,31 +174,64 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)trackSDKError:(NSError *)error;
 
+#pragma mark - Ad Unit Configuration (Internal)
+
+/**
+ * Get ad unit configuration by name
+ * @param adUnitName The ad unit name to look up
+ * @return The ad unit configuration or nil if not found
+ * @discussion Internal method for looking up ad unit configs - not part of public API
+ */
+- (nullable CLXSDKConfigAdUnit *)adUnitConfigForName:(NSString *)adUnitName;
+
+/**
+ * Get all available ad unit names
+ * @return Array of ad unit names, or empty array if SDK not initialized
+ * @discussion Internal method for error messaging - not part of public API
+ */
+- (NSArray<NSString *> *)availableAdUnitNames;
+
+#pragma mark - Internal SDK Properties and Methods
+
+/**
+ * Ad network factories for creating adapter instances
+ * @discussion Internal property for adapter creation - not part of public API
+ */
+@property (nonatomic, strong, readonly) CLXAdNetworkFactories *adNetworkFactories;
+
+/**
+ * Create impression model for tracking
+ * @param auctionID The auction identifier
+ * @return Impression model or nil if not available
+ * @discussion Internal method for impression tracking - not part of public API
+ */
+- (nullable CLXConfigImpressionModel *)createImpModelWithAuctionID:(NSString *)auctionID;
+
 #pragma mark - Native Ads (Internal - not part of public API)
 
 /**
  * Create a native ad (internal use only)
- * @param placement The placement name
+ * @param adUnitId The ad unit identifier
  * @param viewController The view controller for presentation
  * @param delegate The delegate to receive ad events
- * @return A CLXNativeAdView object or nil if placement is invalid
+ * @return A CLXNativeAdView object or nil if ad unit is invalid
  * @discussion This API is internal and not exposed publicly. For adapter and testing use only.
  */
-- (nullable CLXNativeAdView *)createNativeAdWithPlacement:(NSString *)placement
-                                           viewController:(UIViewController *)viewController
-                                                 delegate:(nullable id<CLXNativeDelegate>)delegate;
+- (nullable CLXNativeAdView *)createNativeAdWithAdUnitId:(NSString *)adUnitId
+                                          viewController:(UIViewController *)viewController
+                                                delegate:(nullable id<CLXNativeDelegate>)delegate;
 
 /**
  * Create a native banner ad (internal use only)
- * @param placement The placement name
+ * @param adUnitId The ad unit identifier
  * @param viewController The view controller for presentation
  * @param delegate The delegate to receive ad events
- * @return A CLXNativeAdView object or nil if placement is invalid
+ * @return A CLXNativeAdView object or nil if ad unit is invalid
  * @discussion This API is internal and not exposed publicly. For adapter and testing use only.
  */
-- (nullable CLXNativeAdView *)createNativeBannerWithPlacement:(NSString *)placement
-                                               viewController:(UIViewController *)viewController
-                                                     delegate:(nullable id<CLXNativeDelegate>)delegate;
+- (nullable CLXNativeAdView *)createNativeBannerWithAdUnitId:(NSString *)adUnitId
+                                              viewController:(UIViewController *)viewController
+                                                    delegate:(nullable id<CLXNativeDelegate>)delegate;
 
 @end
 

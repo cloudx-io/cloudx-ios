@@ -45,10 +45,10 @@
                                                 bidId:(NSString *)bidId
                                                   adm:(NSString *)adm
                                                extras:(NSDictionary<NSString *, NSString *> *)extras
-                                        placementName:(NSString *)placementName
+                                         adUnitName:(NSString *)adUnitName
                                              delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
 
-    [self.logger debug:[NSString stringWithFormat:@"Creating interstitial for placement: %@ (%@)", placementName ?: @"(unknown)", adId]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating interstitial for ad unit: %@ (%@)", adUnitName ?: @"(unknown)", adId]];
 
     NSString *metaPlacementID = [CLXMetaUtils resolveMetaPlacementID:extras
                                                          fallbackAdId:adId
@@ -60,7 +60,7 @@
 
     CLXMetaInterstitial *interstitial = [[CLXMetaInterstitial alloc] initWithBidPayload:adm
                                                                             placementID:metaPlacementID
-                                                                          placementName:placementName
+                                                                          adUnitName:adUnitName
                                                                                   bidID:bidId
                                                                                delegate:delegate];
 

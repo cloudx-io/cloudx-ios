@@ -22,15 +22,15 @@ NS_ASSUME_NONNULL_BEGIN
 ///   - bidId: bid id from bid response
 ///   - adm: ad markup with data for rendering
 ///   - extras: adapters extra info
-///   - placementName: CloudX placement name for error messaging (may be nil for legacy callers)
+///   - adUnitName: CloudX ad unit name for error messaging (may be nil for legacy callers)
 ///   - delegate: delegate for the adapter
 /// - Returns: new instance of CloudXAdapterRewarded
 - (nullable id<CLXAdapterRewarded>)createWithAdId:(NSString *)adId
-                                              bidId:(NSString *)bidId
-                                                adm:(NSString *)adm
-                                             extras:(NSDictionary<NSString *, NSString *> *)extras
-                                      placementName:(nullable NSString *)placementName
-                                           delegate:(id<CLXAdapterRewardedDelegate>)delegate;
+                                             bidId:(NSString *)bidId
+                                               adm:(NSString *)adm
+                                            extras:(NSDictionary<NSString *, NSString *> *)extras
+                                     adUnitName:(nullable NSString *)adUnitName
+                                          delegate:(id<CLXAdapterRewardedDelegate>)delegate;
 
 @end
 

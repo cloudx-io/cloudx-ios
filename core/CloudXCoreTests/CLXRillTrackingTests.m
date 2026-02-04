@@ -456,7 +456,7 @@ static MockRillEventReporter *sharedInstance = nil;
     // Set up tracking data
     [trackingService setupTrackingDataFromBidResponse:bidResponse
                                              impModel:impModel
-                                          placementID:kTestPlacementID
+                                          adUnitId:kTestPlacementID
                                             loadCount:0];
     
     // When: Fire bid request event
@@ -478,7 +478,7 @@ static MockRillEventReporter *sharedInstance = nil;
     // Set up tracking data
     BOOL setupSuccess = [trackingService setupTrackingDataFromBidResponse:bidResponse
                                                                  impModel:impModel
-                                                              placementID:kTestPlacementID
+                                                              adUnitId:kTestPlacementID
                                                                 loadCount:0];
     XCTAssertTrue(setupSuccess, @"Tracking setup should succeed");
     
@@ -501,7 +501,7 @@ static MockRillEventReporter *sharedInstance = nil;
     // Set up tracking data
     [trackingService setupTrackingDataFromBidResponse:bidResponse
                                              impModel:impModel
-                                          placementID:kTestPlacementID
+                                          adUnitId:kTestPlacementID
                                             loadCount:0];
     
     // When: Fire click event
@@ -542,7 +542,7 @@ static MockRillEventReporter *sharedInstance = nil;
     // Set up tracking data
     [trackingService setupTrackingDataFromBidResponse:bidResponse
                                              impModel:impModel
-                                          placementID:kTestPlacementID
+                                          adUnitId:kTestPlacementID
                                             loadCount:0];
     
     // When: Fire impression event
@@ -571,7 +571,7 @@ static MockRillEventReporter *sharedInstance = nil;
     // Set up tracking data
     [trackingService setupTrackingDataFromBidResponse:bidResponse
                                              impModel:impModel
-                                          placementID:kTestPlacementID
+                                          adUnitId:kTestPlacementID
                                             loadCount:0];
     
     // When: Fire impression event
@@ -592,7 +592,7 @@ static MockRillEventReporter *sharedInstance = nil;
     
     [trackingService setupTrackingDataFromBidResponse:bidResponse
                                              impModel:impModel
-                                          placementID:kTestPlacementID
+                                          adUnitId:kTestPlacementID
                                             loadCount:0];
     
     // When: Fire click event
@@ -615,7 +615,7 @@ static MockRillEventReporter *sharedInstance = nil;
     
     [trackingService setupTrackingDataFromBidResponse:bidResponse
                                              impModel:impModel
-                                          placementID:kTestPlacementID
+                                          adUnitId:kTestPlacementID
                                             loadCount:0];
     
     // When: Fire impression event
@@ -636,7 +636,7 @@ static MockRillEventReporter *sharedInstance = nil;
     
     [trackingService setupTrackingDataFromBidResponse:bidResponse
                                              impModel:impModel
-                                          placementID:kTestPlacementID
+                                          adUnitId:kTestPlacementID
                                             loadCount:0];
     
     // When: Fire click event
@@ -659,7 +659,7 @@ static MockRillEventReporter *sharedInstance = nil;
     
     [trackingService setupTrackingDataFromBidResponse:bidResponse
                                              impModel:impModel
-                                          placementID:kTestPlacementID
+                                          adUnitId:kTestPlacementID
                                             loadCount:0];
     
     // When: Fire impression event
@@ -680,7 +680,7 @@ static MockRillEventReporter *sharedInstance = nil;
     
     [trackingService setupTrackingDataFromBidResponse:bidResponse
                                              impModel:impModel
-                                          placementID:kTestPlacementID
+                                          adUnitId:kTestPlacementID
                                             loadCount:0];
     
     // When: Fire click event
@@ -730,7 +730,7 @@ static MockRillEventReporter *sharedInstance = nil;
     
     // When: Report exception via CLXErrorReporter
     [[CLXErrorReporter shared] reportException:testException 
-                                   placementID:kTestPlacementID 
+                                   adUnitId:kTestPlacementID 
                                        context:@{@"operation": @"test_error_reporting"}];
     
     // Then: Should fire Rill SDK error event
@@ -774,7 +774,7 @@ static MockRillEventReporter *sharedInstance = nil;
     
     // When: Report error via CLXErrorReporter
     [[CLXErrorReporter shared] reportError:testError 
-                               placementID:kTestPlacementID 
+                               adUnitId:kTestPlacementID 
                                    context:@{@"operation": @"test_error_reporting"}];
     
     // Then: Should fire Rill SDK error event
@@ -935,7 +935,7 @@ static MockRillEventReporter *sharedInstance = nil;
     // When: Set up tracking (which creates encrypted payload)
     BOOL success = [trackingService setupTrackingDataFromBidResponse:bidResponse
                                                             impModel:impModel
-                                                         placementID:kTestPlacementID
+                                                         adUnitId:kTestPlacementID
                                                            loadCount:0];
     
     // Then: Encrypted payload should be created
@@ -973,7 +973,7 @@ static MockRillEventReporter *sharedInstance = nil;
     // When: Execute complete flow
     [trackingService setupTrackingDataFromBidResponse:bidResponse
                                              impModel:impModel
-                                          placementID:kTestPlacementID
+                                          adUnitId:kTestPlacementID
                                             loadCount:0]; // Fires bid request
     
     [trackingService sendImpressionEvent]; // Fires impression
@@ -1010,7 +1010,7 @@ static MockRillEventReporter *sharedInstance = nil;
     // When: Try to set up tracking with nil data
     BOOL success = [trackingService setupTrackingDataFromBidResponse:nil
                                                             impModel:self.mockImpModel
-                                                         placementID:nil
+                                                         adUnitId:nil
                                                            loadCount:0];
     
     // Then: Should handle gracefully without crashing

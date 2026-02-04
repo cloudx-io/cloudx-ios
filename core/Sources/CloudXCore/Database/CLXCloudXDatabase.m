@@ -84,6 +84,23 @@ static CLXCloudXDatabase *_testInstance = nil;
 - (BOOL)initializeSchema {
     __block BOOL success = YES;
     
+    // Check current database version first
+    NSInteger currentVersion = [self getDatabaseVersion];
+    
+    if (currentVersion == CLXDatabaseCurrentVersion) {
+        // Already at current version, nothing to do
+        [self.logger debug:@"Database schema already at current version"];
+        return YES;
+    }
+    
+    if (currentVersion > 0 && currentVersion < CLXDatabaseCurrentVersion) {
+        // Existing database needs migration
+        [self.logger info:[NSString stringWithFormat:@"Database needs migration from version %ld to %ld", 
+                          (long)currentVersion, (long)CLXDatabaseCurrentVersion]];
+        return [self migrateFromVersion:currentVersion toVersion:CLXDatabaseCurrentVersion];
+    }
+    
+    // New database (version 0) - create tables
     [self executeInTransaction:^{
         // Create all tables
         NSArray *createTableStatements = @[

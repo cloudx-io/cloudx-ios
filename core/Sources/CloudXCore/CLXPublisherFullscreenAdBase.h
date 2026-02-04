@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Initializes a fullscreen ad with the given parameters.
- * @param placement The placement configuration (nil if SDK not initialized, will be resolved on load)
+ * @param adUnit The ad unit configuration (nil if SDK not initialized, will be resolved on load)
  * @param publisherID The publisher ID
  * @param userID The user ID
  * @param rewardedCallbackUrl The rewarded callback URL
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param reportingService The reporting service
  * @param settings The settings instance
  */
-- (instancetype)initWithPlacement:(nullable CLXSDKConfigAdUnit *)placement
+- (instancetype)initWithAdUnit:(nullable CLXSDKConfigAdUnit *)adUnit
                       publisherID:(NSString *)publisherID
                            userID:(nullable NSString *)userID
               rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl

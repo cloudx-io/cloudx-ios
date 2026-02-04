@@ -110,7 +110,7 @@
         placement = _settings.interstitialPlacement;
     }
     
-    self.interstitialAd = [[CloudXCore shared] createInterstitialWithPlacement:placement];
+    self.interstitialAd = [[CloudXCore shared] createInterstitialWithAdUnitId:placement];
     self.interstitialAd.delegate = self;
     self.interstitialAd.revenueDelegate = self;
 
@@ -162,9 +162,9 @@
     [self updateStatusUIWithState:AdStateReady];
 }
 
-- (void)didFailToLoadAd:(NSString *)placementName error:(CLXError *)error {
+- (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
     // No ad object exists on failure, so use logMessage instead of logAdEvent
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Interstitial failed to load (%@) - Error: %@", placementName, error ? error.localizedDescription : @"Unknown error"]];
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Interstitial failed to load (%@) - Error: %@", adUnitId, error ? error.localizedDescription : @"Unknown error"]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     

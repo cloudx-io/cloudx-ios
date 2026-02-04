@@ -308,17 +308,13 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     config.bidders = [self parseBiddersFromArray:biddersArray error:outError];
     if (!config.bidders) return nil;
 
-    // Read from "adUnits" (new schema) OR "placements" (legacy server) for backward compatibility
-    NSArray *placementsArray = response[@"adUnits"];
-    if (!placementsArray || ![placementsArray isKindOfClass:[NSArray class]]) {
-        placementsArray = response[@"placements"];
-    }
-    if (!placementsArray || ![placementsArray isKindOfClass:[NSArray class]]) {
+    NSArray *adUnitsArray = response[@"adUnits"];
+    if (!adUnitsArray || ![adUnitsArray isKindOfClass:[NSArray class]]) {
         if (outError) *outError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse
-                                    description:@"Required field 'adUnits' (or 'placements') is missing or not an array"];
+                                    description:@"Required field 'adUnits' is missing or not an array"];
         return nil;
     }
-    config.adUnits = [self parsePlacementsFromArray:placementsArray error:outError];
+    config.adUnits = [self parseAdUnitsFromArray:adUnitsArray error:outError];
     if (!config.adUnits) return nil;
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -342,7 +338,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     config.metricsConfig = [self parseMetricsConfigFromArray:response[@"metrics"]];
     config.deviceConfig = [self parseDeviceConfigFromDictionary:response[@"deviceConfig"]];
 
-    [self.logger info:[NSString stringWithFormat:@"SDK config parsed - Account: %@, Session: %@, Bidders: %lu, Placements: %lu",
+    [self.logger info:[NSString stringWithFormat:@"SDK config parsed - Account: %@, Session: %@, Bidders: %lu, AdUnits: %lu",
                       config.accountID, config.sessionID, (unsigned long)config.bidders.count, (unsigned long)config.adUnits.count]];
     return config;
 }
@@ -382,70 +378,70 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     return [bidders copy];
 }
 
-#pragma mark - Parsing: Placements (matches Android toAdUnits)
+#pragma mark - Parsing: Ad Units
 
-- (nullable NSArray<CLXSDKConfigAdUnit *> *)parsePlacementsFromArray:(NSArray *)array error:(NSError **)outError {
-    NSMutableArray *placements = [NSMutableArray array];
+- (nullable NSArray<CLXSDKConfigAdUnit *> *)parseAdUnitsFromArray:(NSArray *)array error:(NSError **)outError {
+    NSMutableArray *adUnits = [NSMutableArray array];
     for (NSUInteger i = 0; i < array.count; i++) {
         id item = array[i];
         if (![item isKindOfClass:[NSDictionary class]]) {
             if (outError) *outError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse
-                                        description:[NSString stringWithFormat:@"placements[%lu] is not an object", (unsigned long)i]];
+                                        description:[NSString stringWithFormat:@"adUnits[%lu] is not an object", (unsigned long)i]];
             return nil;
         }
         NSDictionary *dict = (NSDictionary *)item;
 
         // Required fields
-        NSString *placementId = [self requiredString:@"id" from:dict error:outError];
-        if (!placementId) {
+        NSString *adUnitId = [self requiredString:@"id" from:dict error:outError];
+        if (!adUnitId) {
             if (outError) *outError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse
-                                        description:[NSString stringWithFormat:@"placements[%lu].id is missing or empty", (unsigned long)i]];
+                                        description:[NSString stringWithFormat:@"adUnits[%lu].id is missing or empty", (unsigned long)i]];
             return nil;
         }
         NSString *name = [self requiredString:@"name" from:dict error:outError];
         if (!name) {
             if (outError) *outError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse
-                                        description:[NSString stringWithFormat:@"placements[%lu].name is missing or empty", (unsigned long)i]];
+                                        description:[NSString stringWithFormat:@"adUnits[%lu].name is missing or empty", (unsigned long)i]];
             return nil;
         }
         NSString *typeString = [self requiredString:@"type" from:dict error:outError];
         if (!typeString) {
             if (outError) *outError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse
-                                        description:[NSString stringWithFormat:@"placements[%lu].type is missing or empty", (unsigned long)i]];
+                                        description:[NSString stringWithFormat:@"adUnits[%lu].type is missing or empty", (unsigned long)i]];
             return nil;
         }
 
-        CLXSDKConfigAdUnit *placement = [[CLXSDKConfigAdUnit alloc] init];
-        placement.id = placementId;
-        placement.name = name;
-        placement.type = [self parseAdTypeFromString:typeString];
+        CLXSDKConfigAdUnit *adUnit = [[CLXSDKConfigAdUnit alloc] init];
+        adUnit.id = adUnitId;
+        adUnit.name = name;
+        adUnit.type = [self parseAdTypeFromString:typeString];
 
         // Optional fields - only override defaults if present (matches Android optInt)
         if (dict[@"bidResponseTimeoutMs"]) {
-            placement.bidResponseTimeoutMs = [dict[@"bidResponseTimeoutMs"] integerValue];
+            adUnit.bidResponseTimeoutMs = [dict[@"bidResponseTimeoutMs"] integerValue];
         }
         if (dict[@"adLoadTimeoutMs"]) {
-            placement.adLoadTimeoutMs = [dict[@"adLoadTimeoutMs"] integerValue];
+            adUnit.adLoadTimeoutMs = [dict[@"adLoadTimeoutMs"] integerValue];
         }
         if (dict[@"bannerRefreshRateMs"]) {
-            placement.bannerRefreshRateMs = [dict[@"bannerRefreshRateMs"] integerValue];
+            adUnit.bannerRefreshRateMs = [dict[@"bannerRefreshRateMs"] integerValue];
         }
         if (dict[@"hasCloseButton"]) {
-            placement.hasCloseButton = [dict[@"hasCloseButton"] boolValue];
+            adUnit.hasCloseButton = [dict[@"hasCloseButton"] boolValue];
         }
         if (dict[@"rewardAmount"]) {
-            placement.rewardAmount = [dict[@"rewardAmount"] integerValue];
+            adUnit.rewardAmount = [dict[@"rewardAmount"] integerValue];
         }
         if (dict[@"rewardCurrency"]) {
-            placement.rewardCurrency = dict[@"rewardCurrency"];
+            adUnit.rewardCurrency = dict[@"rewardCurrency"];
         }
         if (dict[@"rewardCallbackUrl"]) {
-            placement.rewardCallbackUrl = dict[@"rewardCallbackUrl"];
+            adUnit.rewardCallbackUrl = dict[@"rewardCallbackUrl"];
         }
 
-        [placements addObject:placement];
+        [adUnits addObject:adUnit];
     }
-    return [placements copy];
+    return [adUnits copy];
 }
 
 - (SDKConfigAdType)parseAdTypeFromString:(NSString *)typeString {

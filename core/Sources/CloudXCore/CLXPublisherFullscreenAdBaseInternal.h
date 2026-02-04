@@ -58,7 +58,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (int64_t)adLoadTimeoutMs;
 
 // Access to private properties (read-only)
-@property (nonatomic, copy, readonly, nullable) NSString *placementName;
+@property (nonatomic, copy, readonly, nullable) NSString *adUnitId;
+@property (nonatomic, copy, readonly, nullable) NSString *adUnitName;
 @property (nonatomic, strong, readonly, nullable) CLXBidAdSourceResponse *lastBidResponse;
 @property (nonatomic, strong, readonly, nullable) CLXBidResponse *currentBidResponse;
 @property (nonatomic, strong, readonly) CLXLogger *logger;

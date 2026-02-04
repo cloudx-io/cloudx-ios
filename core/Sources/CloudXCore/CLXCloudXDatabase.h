@@ -9,7 +9,7 @@
  * Single database with multiple specialized tables:
  * - metrics_event_table: Metrics tracking (matches Android MetricsEvent)
  * - session_table: App session management
- * - performance_metrics_table: Placement performance tracking
+ * - performance_metrics_table: Ad unit performance tracking
  * 
  * Follows SOLID principles with protocol-based DAO pattern
  */

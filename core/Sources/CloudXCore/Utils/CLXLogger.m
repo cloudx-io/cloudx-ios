@@ -205,10 +205,10 @@ static BOOL _globalTimestampsEnabled = NO;
     NSMutableString *message = [NSMutableString stringWithString:callbackName];
     
     if (ad) {
-        [message appendString:@"\n  📍 Placement: "];
+        [message appendString:@"\n  📍 Ad Unit: "];
         [message appendString:ad.adUnitName ?: @"(null)"];
         
-        [message appendString:@"\n  🆔 Placement ID: "];
+        [message appendString:@"\n  🆔 Ad Unit ID: "];
         [message appendString:ad.adUnitId ?: @"(null)"];
         
         [message appendString:@"\n  🏢 Bidder: "];

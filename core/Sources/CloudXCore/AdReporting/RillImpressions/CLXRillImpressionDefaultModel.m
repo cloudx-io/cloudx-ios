@@ -34,7 +34,7 @@
     [resultString appendString:[(self.accountId ? self.accountId : @"") clx_semicolon]];
     [resultString appendString:[(self.organizationId ? self.organizationId : @"") clx_semicolon]];
     [resultString appendString:[(self.applicationId ? self.applicationId : @"") clx_semicolon]];
-    [resultString appendString:[(self.placementId ? self.placementId : @"") clx_semicolon]];
+    [resultString appendString:[(self.adUnitId ? self.adUnitId : @"") clx_semicolon]];
     [resultString appendString:[(self.deviceName ? self.deviceName : @"") clx_semicolon]];
     [resultString appendString:[(self.deviceType ? self.deviceType : @"") clx_semicolon]];
     [resultString appendString:[(self.osName ? self.osName : @"") clx_semicolon]];

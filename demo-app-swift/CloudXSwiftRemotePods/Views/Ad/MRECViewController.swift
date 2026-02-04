@@ -112,7 +112,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         if !settings.mrecPlacement.isEmpty {
             placement = settings.mrecPlacement
         }
-        mrecAd = CloudXCore.shared.createMREC(placement: placement, viewController: self)
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: placement, viewController: self)
         mrecAd?.delegate = self
         mrecAd?.revenueDelegate = self
 
@@ -182,10 +182,10 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         updateStatusUI(state: .loading)
 
         let placement = placementName
-        mrecAd = CloudXCore.shared.createMREC(placement: placement,
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: placement,
                                             viewController: self)
         mrecAd?.delegate = self
-
+        
         if let mrecAd = mrecAd {
             mrecAd.load()
         } else {
@@ -205,10 +205,11 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         // Don't auto-show - user must press Show MREC button
     }
     
-    func didFailToLoadAd(_ placementName: String, error: CLXError) {
+    func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
-        DemoAppLogger.sharedInstance.logMessage("❌ MREC failed to load for ad unit '\(placementName)' - Error: \(error.localizedDescription)")
+        DemoAppLogger.sharedInstance.logMessage("❌ MREC failed to load for ad unit '\(adUnitId)' - Error: \(error.localizedDescription)")
         isLoading = false
+        updateStatusUI(state: .noAd)
         
         DispatchQueue.main.async { [weak self] in
             let errorMessage = error.localizedDescription

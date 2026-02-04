@@ -43,7 +43,7 @@
 
 - (BOOL)setupTrackingDataFromBidResponse:(CLXBidAdSourceResponse *)bidResponse
                                 impModel:(CLXConfigImpressionModel *)impModel
-                             placementID:(NSString *)placementID
+                                adUnitId:(NSString *)adUnitId
                                loadCount:(NSInteger)loadCount {
     if (!bidResponse || !impModel) {
         [self.logger debug:@"Missing bid response or impression model for Analytics tracking"];
@@ -61,7 +61,7 @@
                                                                                    impModel:impModel 
                                                                                 adapterName:bidResponse.networkName 
                                                                       loadBannerTimesCount:loadCount 
-                                                                                placementID:placementID];
+                                                                                   adUnitId:adUnitId];
     
     // Build tracking payload string
     NSString *payloadString = [CLXRillImpressionInitService createDataStringWithRillImpressionModel:model];

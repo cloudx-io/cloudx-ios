@@ -28,10 +28,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Called when ad fails to load with error.
- * @param placementName The placement name that failed to load
+ * @param adUnitId The ad unit ID that failed to load
  * @param error The CLXError containing error code, message, and optional underlying error
  */
-- (void)didFailToLoadAd:(NSString *)placementName error:(CLXError *)error NS_SWIFT_NAME(didFailToLoadAd(_:error:));
+- (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error NS_SWIFT_NAME(didFailToLoadAd(_:error:));
 
 /**
  * Called when ad is clicked.

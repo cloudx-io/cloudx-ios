@@ -28,7 +28,7 @@
                                              adm:(NSString *)adm
                                  hasClosedButton:(BOOL)hasClosedButton
                                           extras:(NSDictionary<NSString *, NSString *> *)extras
-                                   placementName:(NSString *)placementName
+                                      adUnitName:(NSString *)adUnitName
                                         delegate:(id<CLXAdapterBannerDelegate>)delegate {
     return nil; // Never reached if forceStop check works
 }
@@ -124,7 +124,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     placement.bannerRefreshRateMs = 30000;
     
     return [[CLXPublisherBanner alloc] initWithViewController:[[UIViewController alloc] init]
-                                                    placement:placement
+                                                    adUnit:placement
                                                        userID:@"test"
                                                   publisherID:@"test"
                                      suspendPreloadWhenInvisible:NO
@@ -143,7 +143,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     placement.id = @"test-native";
     
     return [[CLXPublisherNative alloc] initWithViewController:[[UIViewController alloc] init]
-                                                    placement:placement
+                                                    adUnit:placement
                                                        userID:@"test"
                                                   publisherID:@"test"
                                      suspendPreloadWhenInvisible:NO
@@ -160,7 +160,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     CLXSDKConfigAdUnit *placement = [[CLXSDKConfigAdUnit alloc] init];
     placement.id = @"test-interstitial";
     
-    CLXInterstitial *ad = [[CLXInterstitial alloc] initWithPlacement:placement
+    CLXInterstitial *ad = [[CLXInterstitial alloc] initWithAdUnit:placement
                                                          publisherID:@"test"
                                                               userID:@"test"
                                                  rewardedCallbackUrl:nil
@@ -178,7 +178,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     CLXSDKConfigAdUnit *placement = [[CLXSDKConfigAdUnit alloc] init];
     placement.id = @"test-rewarded";
     
-    CLXRewarded *ad = [[CLXRewarded alloc] initWithPlacement:placement
+    CLXRewarded *ad = [[CLXRewarded alloc] initWithAdUnit:placement
                                                 publisherID:@"test"
                                                      userID:@"test"
                                         rewardedCallbackUrl:nil

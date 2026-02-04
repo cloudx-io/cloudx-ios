@@ -56,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 // MARK: - Mock Publisher Banner
 
 @interface MockPublisherBanner : NSObject <CLXBanner>
-@property (nonatomic, copy) NSString *placementID;
+@property (nonatomic, copy) NSString *adUnitId;
 @property (nonatomic, weak) id<CLXBannerDelegate> delegate;
 @property (nonatomic, assign) BOOL startAutoRefreshCalled;
 @property (nonatomic, assign) BOOL stopAutoRefreshCalled;

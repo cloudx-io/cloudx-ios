@@ -66,31 +66,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * The human-readable ad unit name (e.g., "demo-mrec-1")
- * Note: Not present in Android CloudXAd interface, but useful for logging
  */
 @property (nonatomic, readonly, nullable) NSString *adUnitName;
-
-#pragma mark - Deprecated Properties (use new names above)
-
-/**
- * @deprecated Use `adUnitName` instead
- */
-@property (nonatomic, readonly, nullable) NSString *placementName __attribute__((deprecated("Use adUnitName instead")));
-
-/**
- * @deprecated Use `adUnitId` instead
- */
-@property (nonatomic, readonly, nullable) NSString *placementId __attribute__((deprecated("Use adUnitId instead")));
-
-/**
- * @deprecated Use `networkName` instead
- */
-@property (nonatomic, readonly, nullable) NSString *bidder __attribute__((deprecated("Use networkName instead")));
-
-/**
- * @deprecated Use `networkPlacement` instead
- */
-@property (nonatomic, readonly, nullable) NSString *externalPlacementId __attribute__((deprecated("Use networkPlacement instead")));
 
 #pragma mark - Initializers
 
@@ -106,28 +83,19 @@ NS_ASSUME_NONNULL_BEGIN
                          placement:(nullable NSString *)placement;
 
 /**
- * @deprecated Use initWithAdUnitName:adUnitId:networkName:networkPlacement:revenue: instead
- */
-- (instancetype)initWithPlacementName:(nullable NSString *)placementName
-                          placementId:(nullable NSString *)placementId
-                               bidder:(nullable NSString *)bidder
-                  externalPlacementId:(nullable NSString *)externalPlacementId
-                              revenue:(nullable NSNumber *)revenue __attribute__((deprecated("Use initWithAdUnitName:adUnitId:networkName:networkPlacement:revenue: instead")));
-
-/**
  * Factory method to create CLXAd from bid response data
  */
 + (instancetype)adFromBid:(id)bid
-              placementId:(NSString *)placementId
+                 adUnitId:(NSString *)adUnitId
                  adFormat:(CLXAdFormat)adFormat
                 placement:(nullable NSString *)placement;
 
 /**
- * Factory method to create CLXAd from bid response data with original placement name
+ * Factory method to create CLXAd from bid response data with original ad unit name
  */
 + (instancetype)adFromBid:(id)bid
-              placementId:(NSString *)placementId
-            placementName:(NSString *)placementName
+                 adUnitId:(NSString *)adUnitId
+               adUnitName:(NSString *)adUnitName
                  adFormat:(CLXAdFormat)adFormat
                 placement:(nullable NSString *)placement;
 

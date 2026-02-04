@@ -105,7 +105,7 @@ static const NSInteger kTestRank3 = 3;
 - (CLXBidAdSource *)createTestBidAdSourceWithCreateBlock:(id (^)(NSString *, NSString *, NSString *, NSDictionary *, NSString *, BOOL, NSString *))createBlock {
     return [[CLXBidAdSource alloc] 
         initWithUserID:kTestUserID
-        placementID:kTestPlacementID
+        adUnitId:kTestPlacementID
         dealID:nil
         hasCloseButton:NO
         publisherID:kTestPublisherID

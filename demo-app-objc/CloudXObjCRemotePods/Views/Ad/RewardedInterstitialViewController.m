@@ -93,8 +93,8 @@
     NSLog(@"[RewardedInterstitialViewController] Using placement: %@", placement);
     
     // Create rewarded interstitial with comprehensive logging
-    NSLog(@"[RewardedInterstitialViewController] Calling createRewardedWithPlacement: %@", placement);
-    self.rewardedInterstitialAd = [[CloudXCore shared] createRewardedWithPlacement:placement];
+    NSLog(@"[RewardedInterstitialViewController] Calling createRewardedWithAdUnitId: %@", placement);
+    self.rewardedInterstitialAd = [[CloudXCore shared] createRewardedWithAdUnitId:placement];
     self.rewardedInterstitialAd.delegate = self;
     self.rewardedInterstitialAd.revenueDelegate = self;
 
@@ -143,8 +143,8 @@
     [self updateStatusUIWithState:AdStateReady];
 }
 
-- (void)didFailToLoadAd:(NSString *)placementName error:(CLXError *)error {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ RewardedInterstitial failed to load (%@) - Error: %@", placementName, error.localizedDescription]];
+- (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
+    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ RewardedInterstitial failed to load (%@) - Error: %@", adUnitId, error.localizedDescription]];
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateNoAd];
     
@@ -187,10 +187,11 @@
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"💰 RewardedInterstitial revenuePaid - Ad: %@", ad]];
 }
 
-- (void)userRewarded:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"🎁 RewardedInterstitial userRewarded - Ad: %@", ad]];
+- (void)didRewardUserForAd:(CLXAd *)ad withReward:(CLXReward *)reward {
+    NSString *logMessage = [NSString stringWithFormat:@"🎁 RewardedInterstitial didRewardUser - Amount: %ld %@", (long)reward.amount, reward.label];
+    [[DemoAppLogger sharedInstance] logAdEvent:logMessage ad:ad];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self showAlertWithTitle:@"Reward" message:@"User has earned a reward from interstitial!"];
+        [self showAlertWithTitle:@"Reward" message:[NSString stringWithFormat:@"User earned %ld %@!", (long)reward.amount, reward.label]];
     });
 }
 

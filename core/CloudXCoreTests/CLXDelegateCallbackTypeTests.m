@@ -97,7 +97,7 @@
 
     mockBid.ext = ext;
 
-    CLXAd *ad = [CLXAd adFromBid:mockBid placementId:@"placement_123" adFormat:CLXAdFormatInterstitial placement:nil];
+    CLXAd *ad = [CLXAd adFromBid:mockBid adUnitId:@"placement_123" adFormat:CLXAdFormatInterstitial placement:nil];
 
     XCTAssertNotNil(ad, @"Factory method should create CLXAd object");
     XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"Factory method should return CLXAd instance");
@@ -144,11 +144,8 @@
     XCTAssertTrue([ad respondsToSelector:@selector(networkPlacement)], @"CLXAd should have networkPlacement property");
     XCTAssertTrue([ad respondsToSelector:@selector(revenue)], @"CLXAd should have revenue property");
     
-    // Verify deprecated properties still work (backward compatibility)
-    XCTAssertTrue([ad respondsToSelector:@selector(placementName)], @"CLXAd should have deprecated placementName property");
-    XCTAssertTrue([ad respondsToSelector:@selector(placementId)], @"CLXAd should have deprecated placementId property");
-    XCTAssertTrue([ad respondsToSelector:@selector(bidder)], @"CLXAd should have deprecated bidder property");
-    XCTAssertTrue([ad respondsToSelector:@selector(externalPlacementId)], @"CLXAd should have deprecated externalPlacementId property");
+    // Note: Deprecated property aliases (placementName, placementId, bidder, externalPlacementId) 
+    // have been removed as part of the placement → adUnit migration
     
     // Verify properties return correct types
     if (ad.adUnitName) {

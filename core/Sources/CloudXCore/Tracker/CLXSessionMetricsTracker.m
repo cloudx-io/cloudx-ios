@@ -39,7 +39,7 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
 @property (nonatomic, assign) NSTimeInterval lastActivityTime;
 @property (nonatomic, assign) NSInteger globalCount;
 @property (nonatomic, strong) NSMutableArray<NSNumber *> *formatCounts;  // Array of NSInteger
-@property (nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> *placementCounts;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> *adUnitCounts;
 
 // Time-to-first-ad tracking
 @property (nonatomic, assign) NSTimeInterval sdkInitTime;
@@ -88,7 +88,7 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
             [_formatCounts addObject:@0];
         }
         
-        _placementCounts = [NSMutableDictionary dictionary];
+        _adUnitCounts = [NSMutableDictionary dictionary];
         
         // Time-to-first-ad tracking
         _sdkInitTime = 0;
@@ -102,10 +102,10 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
 
 #pragma mark - Public API (CLXSessionMetricsTrackerProtocol)
 
-- (void)recordImpressionForPlacement:(NSString *)placementName adType:(NSInteger)adType {
+- (void)recordImpressionForAdUnit:(NSString *)adUnitName adType:(NSInteger)adType {
     // Validate input (fail fast)
-    if (!placementName || placementName.length == 0) {
-        [self.logger debug:@"recordImpression called with nil/empty placementName - ignoring"];
+    if (!adUnitName || adUnitName.length == 0) {
+        [self.logger debug:@"recordImpression called with nil/empty adUnitName - ignoring"];
         return;
     }
     
@@ -129,8 +129,8 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
         NSInteger currentFormatCount = [self.formatCounts[format] integerValue];
         self.formatCounts[format] = @(currentFormatCount + 1);
         
-        NSInteger currentPlacementCount = [self.placementCounts[placementName] integerValue];
-        self.placementCounts[placementName] = @(currentPlacementCount + 1);
+        NSInteger currentAdUnitCount = [self.adUnitCounts[adUnitName] integerValue];
+        self.adUnitCounts[adUnitName] = @(currentAdUnitCount + 1);
         
         // Track time-to-first-ad (only once per session after SDK init)
         if (!self.firstImpressionTracked && self.sdkInitTime > 0) {
@@ -153,8 +153,8 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
         }
         
         [self.logger debug:[NSString stringWithFormat:
-            @"Recorded impression - placement:'%@' format:%ld globalCount:%ld",
-            placementName, (long)format, (long)self.globalCount]];
+            @"Recorded impression - adUnit:'%@' format:%ld globalCount:%ld",
+            adUnitName, (long)format, (long)self.globalCount]];
     });
 }
 
@@ -186,26 +186,26 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
     return metrics;
 }
 
-- (NSInteger)getPlacementDepthForPlacement:(NSString *)placementName {
-    if (!placementName) {
+- (NSInteger)getAdUnitDepthForAdUnit:(NSString *)adUnitName {
+    if (!adUnitName) {
         return 0;
     }
     
     __block NSInteger depth = 0;
     dispatch_sync(self.queue, ^{
-        depth = [self.placementCounts[placementName] integerValue];
+        depth = [self.adUnitCounts[adUnitName] integerValue];
     });
     return depth;
 }
 
-- (void)resetPlacement:(NSString *)placementName {
-    if (!placementName) {
+- (void)resetAdUnit:(NSString *)adUnitName {
+    if (!adUnitName) {
         return;
     }
     
     dispatch_sync(self.queue, ^{
-        [self.placementCounts removeObjectForKey:placementName];
-        [self.logger info:[NSString stringWithFormat:@"Reset placement: %@", placementName]];
+        [self.adUnitCounts removeObjectForKey:adUnitName];
+        [self.logger info:[NSString stringWithFormat:@"Reset ad unit: %@", adUnitName]];
     });
 }
 
@@ -298,7 +298,7 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
         self.formatCounts[i] = @0;
     }
     
-    [self.placementCounts removeAllObjects];
+    [self.adUnitCounts removeAllObjects];
     self.sessionStartTime = 0;
     self.lastActivityTime = 0;
     
@@ -348,11 +348,11 @@ typedef NS_ENUM(NSInteger, CLXSessionAdFormat) {
     __block NSString *desc = nil;
     dispatch_sync(self.queue, ^{
         desc = [NSString stringWithFormat:
-                @"<CLXSessionMetricsTracker: globalCount=%ld, sessionStart=%.2f, lastActivity=%.2f, placements=%lu>",
+                @"<CLXSessionMetricsTracker: globalCount=%ld, sessionStart=%.2f, lastActivity=%.2f, adUnits=%lu>",
                 (long)self.globalCount,
                 self.sessionStartTime,
                 self.lastActivityTime,
-                (unsigned long)self.placementCounts.count];
+                (unsigned long)self.adUnitCounts.count];
     });
     return desc;
 }

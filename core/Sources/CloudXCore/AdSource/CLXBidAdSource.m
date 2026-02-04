@@ -104,7 +104,7 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
 @property (nonatomic, copy) NSDictionary<NSString *, id<CLXBidTokenSource>> *bidTokenSources;
 @property (nonatomic, copy) id (^createBidAd)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network);
 @property (nonatomic, copy, nullable) NSString *userID;
-@property (nonatomic, copy) NSString *placementID;
+@property (nonatomic, copy) NSString *adUnitId;
 @property (nonatomic, copy, nullable) NSString *dealID;
 @property (nonatomic, assign) BOOL hasCloseButton;
 @property (nonatomic, assign) NSInteger adType;
@@ -123,7 +123,7 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
 @implementation CLXBidAdSource
 
 - (instancetype)initWithUserID:(nullable NSString *)userID
-                   placementID:(NSString *)placementID
+                      adUnitId:(NSString *)adUnitId
                         dealID:(nullable NSString *)dealID
                  hasCloseButton:(BOOL)hasCloseButton
                    publisherID:(NSString *)publisherID
@@ -136,7 +136,7 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
     self = [super init];
     if (self) {
         _userID = [userID copy];
-        _placementID = [placementID copy];
+        _adUnitId = [adUnitId copy];
         _dealID = [dealID copy];
         _hasCloseButton = hasCloseButton;
         _publisherID = [publisherID copy];
@@ -184,7 +184,7 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
         }
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"[%@] Auction started - AdUnit: %@, Placement: %@, AdType: %ld", correlationId, adUnitID, self.placementID, (long)self.adType]];
+    [self.logger debug:[NSString stringWithFormat:@"[%@] Auction started - AdUnit: %@, AdUnitId: %@, AdType: %ld", correlationId, adUnitID, self.adUnitId, (long)self.adType]];
     
     NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
     NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
@@ -523,7 +523,7 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
 
     // Create CLXAd from bid response data
     CLXAd *clxAd = [CLXAd adFromBid:bid
-                        placementId:self.placementID
+                           adUnitId:self.adUnitId
                            adFormat:adFormat
                           placement:nil];
 

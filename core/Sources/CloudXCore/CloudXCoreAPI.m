@@ -28,7 +28,7 @@
 #import <CloudXCore/CLXWinLossTracker.h>
 #import <CloudXCore/CLXKeyValueState.h>
 #import <CloudXCore/CLXEndpointResolver.h>
-#import <CloudXCore/CLXPlacementValidator.h>
+#import <CloudXCore/CLXAdUnitValidator.h>
 
 // Adapter Protocols
 #import <CloudXCore/CLXAdapterNative.h>
@@ -75,21 +75,21 @@
 // These properties are declared in CLXPublisherBanner.m's class extension
 @interface CLXPublisherBanner (DeferredInit)
 @property (nonatomic, strong, nullable) CLXError *deferredError;
-@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+@property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
 @end
 
 // Private category to expose deferred initialization properties for fullscreen ads
 // These properties are declared in CLXPublisherFullscreenAdBase.m's class extension
 @interface CLXPublisherFullscreenAdBase (DeferredInit)
 @property (nonatomic, strong, nullable) CLXError *deferredError;
-@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+@property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
 @end
 
 // Private category to expose deferred initialization properties for native ads
 // These properties are declared in CLXPublisherNative.m's class extension
 @interface CLXPublisherNative (DeferredInit)
 @property (nonatomic, strong, nullable) CLXError *deferredError;
-@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+@property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
 @end
 
 // Internal notification name for SDK initialization completion (exported in header)
@@ -102,7 +102,7 @@ NSString * const CLXSDKInitializedNotification = @"CLXSDKInitializedNotification
 @property (nonatomic, copy) NSString *appKey;
 @property (nonatomic, copy, nullable) NSString *pluginVersion;
 @property (nonatomic, strong) NSDictionary<NSString *, id> *adNetworkConfigs;
-@property (nonatomic, strong) NSDictionary<NSString *, id> *adPlacements;
+@property (nonatomic, strong) NSDictionary<NSString *, CLXSDKConfigAdUnit *> *adUnits;
 @property (nonatomic, strong) id adFactory;
 @property (nonatomic, strong) id reportingService;
 @property (nonatomic, strong) CLXLogger *logger;
@@ -363,7 +363,7 @@ static CloudXCore *_sharedInstance = nil;
         [[CLXTrackingFieldResolver shared] setRequestData:auctionID bidRequestJSON:sdkInitBidRequest];
         [self.logger debug:[NSString stringWithFormat:@"Created bid request for SDK init tracking - Auction ID: %@", auctionID]];
         
-        CLXRillImpressionModel *model = [[CLXRillImpressionModel alloc] initWithLastBidResponse:nil impModel:impModel adapterName:@"" loadBannerTimesCount:0 placementID:@""];
+        CLXRillImpressionModel *model = [[CLXRillImpressionModel alloc] initWithLastBidResponse:nil impModel:impModel adapterName:@"" loadBannerTimesCount:0 adUnitId:@""];
         
         NSString* encodedString = [CLXRillImpressionInitService createDataStringWithRillImpressionModel:model];
         
@@ -438,7 +438,7 @@ static CloudXCore *_sharedInstance = nil;
     // Filter config (like Swift SDK does)
     [self filterConfig];
     
-    [self.logger debug:[NSString stringWithFormat:@"Adapter resolution complete - Banners: %lu, Tokens: %lu, Placements: %lu", (unsigned long)_adNetworkFactories.banners.count, (unsigned long)_adNetworkFactories.bidTokenSources.count, (unsigned long)_adPlacements.count]];
+    [self.logger debug:[NSString stringWithFormat:@"Adapter resolution complete - Banners: %lu, Tokens: %lu, AdUnits: %lu", (unsigned long)_adNetworkFactories.banners.count, (unsigned long)_adNetworkFactories.bidTokenSources.count, (unsigned long)_adUnits.count]];
     
     // Check if any networks are configured (skip in test mode)
     BOOL isTestMode = NSClassFromString(@"XCTestCase") != nil;
@@ -700,23 +700,23 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 /**
- * Look up placement configuration by name
- * @param placementName The placement name
- * @return Placement configuration or nil if not found
+ * Look up ad unit configuration by name
+ * @param adUnitName The ad unit name
+ * @return Ad unit configuration or nil if not found
  */
-- (CLXSDKConfigAdUnit *)placementConfigForName:(NSString *)placementName {
-    return _adPlacements[placementName];
+- (CLXSDKConfigAdUnit *)adUnitConfigForName:(NSString *)adUnitName {
+    return _adUnits[adUnitName];
 }
 
 /**
- * Get all available placement names from the SDK configuration
- * @return Array of placement names, or empty array if SDK not initialized or no placements configured
+ * Get all available ad unit names from the SDK configuration
+ * @return Array of ad unit names, or empty array if SDK not initialized or no ad units configured
  */
-- (NSArray<NSString *> *)availablePlacementNames {
-    if (!_adPlacements || _adPlacements.count == 0) {
+- (NSArray<NSString *> *)availableAdUnitNames {
+    if (!_adUnits || _adUnits.count == 0) {
         return @[];
     }
-    return [[_adPlacements allKeys] sortedArrayUsingSelector:@selector(compare:)];
+    return [[_adUnits allKeys] sortedArrayUsingSelector:@selector(compare:)];
 }
 
 - (void)setHashedUserID:(NSString *)hashedUserID {
@@ -780,14 +780,14 @@ static CloudXCore *_sharedInstance = nil;
     [self.logger info:@"All key-value pairs cleared"];
 }
 
-- (CLXBannerAdView *)createBannerWithPlacement:(NSString *)placement
-                                    viewController:(UIViewController *)viewController {
+- (CLXBannerAdView *)createBannerWithAdUnitId:(NSString *)adUnitId
+                                   viewController:(UIViewController *)viewController {
     // Track banner creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     if (metricsTracker) {
         [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateBanner];
     }
-    [self.logger debug:[NSString stringWithFormat:@"Creating banner for placement: %@", placement]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating banner for ad unit: %@", adUnitId]];
     
     // v1.3.0: Defer validation errors to load() - always return non-nil
     CLXError *deferredError = nil;
@@ -799,39 +799,39 @@ static CloudXCore *_sharedInstance = nil;
                                     description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
     
-    // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigAdUnit *placementConfig = nil;
+    // Get ad unit from config (may be nil if SDK not initialized yet)
+    CLXSDKConfigAdUnit *adUnitConfig = nil;
     if (_isInitialized && !deferredError) {
-        // SDK is initialized - validate placement with detailed error messages
-        CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateBannerPlacement:placement
-                                                                                             placements:_adPlacements];
+        // SDK is initialized - validate ad unit with detailed error messages
+        CLXAdUnitValidationResult *validationResult = [CLXAdUnitValidator validateBannerAdUnit:adUnitId
+                                                                                       adUnits:_adUnits];
         if (validationResult.isSuccess) {
-            placementConfig = validationResult.placement;
+            adUnitConfig = validationResult.adUnit;
         } else {
-            [self.logger error:[NSString stringWithFormat:@"Placement validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
+            [self.logger error:[NSString stringWithFormat:@"Ad unit validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
             deferredError = validationResult.error;
         }
     } else if (!_isInitialized) {
-        // SDK not initialized yet - try to get placement (may be nil)
-        placementConfig = [self placementConfigForName:placement];
+        // SDK not initialized yet - try to get ad unit (may be nil)
+        adUnitConfig = [self adUnitConfigForName:adUnitId];
     }
     
-    // Defer placement config and impression model creation if SDK not ready
+    // Defer ad unit config and impression model creation if SDK not ready
     CLXConfigImpressionModel *impModel = nil;
-    if (placementConfig && _sdkConfig) {
+    if (adUnitConfig && _sdkConfig) {
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else if (!placementConfig && !_isInitialized) {
+    } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
-        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring banner initialization for placement: %@", placement]];
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring banner initialization for ad unit: %@", adUnitId]];
     }
     
     // ALWAYS create banner (errors deferred to load())
     CLXPublisherBanner *banner = [[CLXPublisherBanner alloc] initWithViewController:viewController
-                                                                     placement:placementConfig
+                                                                     adUnit:adUnitConfig
                                                                         userID:@""
                                                                    publisherID:@""
                                                    suspendPreloadWhenInvisible:NO
@@ -840,7 +840,7 @@ static CloudXCore *_sharedInstance = nil;
                                                                        impModel:impModel
                                                                     adFactories:_adNetworkFactories.banners
                                                                  bidTokenSources:_adNetworkFactories.bidTokenSources
-                                                              bidRequestTimeout:placementConfig.bidRequestTimeoutSeconds
+                                                              bidRequestTimeout:adUnitConfig.bidRequestTimeoutSeconds
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
                                                               ];
@@ -849,18 +849,18 @@ static CloudXCore *_sharedInstance = nil;
     if (deferredError) {
         banner.deferredError = deferredError;
     }
-
-    // If SDK not initialized, store the requested placement name for deferred lookup
-    if (!placementConfig) {
-        banner.requestedPlacementName = placement;
+    
+    // If SDK not initialized, store the requested ad unit name for deferred lookup
+    if (!adUnitConfig) {
+        banner.requestedAdUnitId = adUnitId;
     }
 
     // ALWAYS return non-nil
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeW320H50];
 }
 
-- (CLXBannerAdView *)createMRECWithPlacement:(NSString *)placement
-                                 viewController:(UIViewController *)viewController {
+- (CLXBannerAdView *)createMRECWithAdUnitId:(NSString *)adUnitId
+                                viewController:(UIViewController *)viewController {
     // Track MREC creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     if (metricsTracker) {
@@ -877,39 +877,39 @@ static CloudXCore *_sharedInstance = nil;
                                     description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
     
-    // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigAdUnit *placementConfig = nil;
+    // Get ad unit from config (may be nil if SDK not initialized yet)
+    CLXSDKConfigAdUnit *adUnitConfig = nil;
     if (_isInitialized && !deferredError) {
-        // SDK is initialized - validate placement with detailed error messages
-        CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateMRECPlacement:placement
-                                                                                           placements:_adPlacements];
+        // SDK is initialized - validate ad unit with detailed error messages
+        CLXAdUnitValidationResult *validationResult = [CLXAdUnitValidator validateMRECAdUnit:adUnitId
+                                                                                     adUnits:_adUnits];
         if (validationResult.isSuccess) {
-            placementConfig = validationResult.placement;
+            adUnitConfig = validationResult.adUnit;
         } else {
-            [self.logger error:[NSString stringWithFormat:@"Placement validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
+            [self.logger error:[NSString stringWithFormat:@"Ad unit validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
             deferredError = validationResult.error;
         }
     } else if (!_isInitialized) {
-        // SDK not initialized yet - try to get placement (may be nil)
-        placementConfig = [self placementConfigForName:placement];
+        // SDK not initialized yet - try to get ad unit (may be nil)
+        adUnitConfig = [self adUnitConfigForName:adUnitId];
     }
     
-    // Defer placement config and impression model creation if SDK not ready
+    // Defer ad unit config and impression model creation if SDK not ready
     CLXConfigImpressionModel *impModel = nil;
-    if (placementConfig && _sdkConfig) {
+    if (adUnitConfig && _sdkConfig) {
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else if (!placementConfig && !_isInitialized) {
+    } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
-        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring MREC initialization for placement: %@", placement]];
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring MREC initialization for ad unit: %@", adUnitId]];
     }
     
     // ALWAYS create banner (errors deferred to load())
     CLXPublisherBanner *banner = [[CLXPublisherBanner alloc] initWithViewController:viewController
-                                                                     placement:placementConfig
+                                                                     adUnit:adUnitConfig
                                                                         userID:@""
                                                                    publisherID:@""
                                                     suspendPreloadWhenInvisible:NO
@@ -918,7 +918,7 @@ static CloudXCore *_sharedInstance = nil;
                                                                        impModel:impModel
                                                                     adFactories:_adNetworkFactories.banners
                                                                  bidTokenSources:_adNetworkFactories.bidTokenSources
-                                                              bidRequestTimeout:placementConfig.bidRequestTimeoutSeconds
+                                                              bidRequestTimeout:adUnitConfig.bidRequestTimeoutSeconds
                                                               reportingService:_reportingService
                                                                       settings:[CLXSettings sharedInstance]
                                                               ];
@@ -927,17 +927,17 @@ static CloudXCore *_sharedInstance = nil;
     if (deferredError) {
         banner.deferredError = deferredError;
     }
-
-    // If SDK not initialized, store the requested placement name for deferred lookup
-    if (!placementConfig) {
-        banner.requestedPlacementName = placement;
+    
+    // If SDK not initialized, store the requested ad unit name for deferred lookup
+    if (!adUnitConfig) {
+        banner.requestedAdUnitId = adUnitId;
     }
 
     // ALWAYS return non-nil
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeMREC];
 }
 
-- (CLXInterstitial *)createInterstitialWithPlacement:(NSString *)placement {
+- (CLXInterstitial *)createInterstitialWithAdUnitId:(NSString *)adUnitId {
     // Track interstitial creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     if (metricsTracker) {
@@ -954,45 +954,45 @@ static CloudXCore *_sharedInstance = nil;
                                     description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
     
-    // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigAdUnit *placementConfig = nil;
+    // Get ad unit from config (may be nil if SDK not initialized yet)
+    CLXSDKConfigAdUnit *adUnitConfig = nil;
     if (_isInitialized && !deferredError) {
-        // SDK is initialized - validate placement with detailed error messages
-        CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateInterstitialPlacement:placement
-                                                                                                   placements:_adPlacements];
+        // SDK is initialized - validate ad unit with detailed error messages
+        CLXAdUnitValidationResult *validationResult = [CLXAdUnitValidator validateInterstitialAdUnit:adUnitId
+                                                                                             adUnits:_adUnits];
         if (validationResult.isSuccess) {
-            placementConfig = validationResult.placement;
+            adUnitConfig = validationResult.adUnit;
         } else {
-            [self.logger error:[NSString stringWithFormat:@"Placement validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
+            [self.logger error:[NSString stringWithFormat:@"Ad unit validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
             deferredError = validationResult.error;
         }
     } else if (!_isInitialized) {
-        // SDK not initialized yet - try to get placement (may be nil)
-        placementConfig = [self placementConfigForName:placement];
+        // SDK not initialized yet - try to get ad unit (may be nil)
+        adUnitConfig = [self adUnitConfigForName:adUnitId];
     }
     
-    // Defer placement config and impression model creation if SDK not ready
+    // Defer ad unit config and impression model creation if SDK not ready
     CLXConfigImpressionModel *impModel = nil;
-    if (placementConfig && _sdkConfig) {
+    if (adUnitConfig && _sdkConfig) {
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else if (!placementConfig && !_isInitialized) {
+    } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
-        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring interstitial initialization for placement: %@", placement]];
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring interstitial initialization for ad unit: %@", adUnitId]];
     }
     
     // ALWAYS create interstitial (errors deferred to load())
-    CLXInterstitial *interstitial = [[CLXInterstitial alloc] initWithPlacement:placementConfig
+    CLXInterstitial *interstitial = [[CLXInterstitial alloc] initWithAdUnit:adUnitConfig
                                                                      publisherID:@""
                                                                           userID:@""
                                                              rewardedCallbackUrl:nil
                                                                         impModel:impModel
                                                                      adFactories:_adNetworkFactories
                                                                  bidTokenSources:_adNetworkFactories.bidTokenSources
-                                                              bidRequestTimeout:placementConfig.bidRequestTimeoutSeconds
+                                                              bidRequestTimeout:adUnitConfig.bidRequestTimeoutSeconds
                                                                reportingService:_reportingService
                                                                        settings:[CLXSettings sharedInstance]];
     
@@ -1001,16 +1001,16 @@ static CloudXCore *_sharedInstance = nil;
         interstitial.deferredError = deferredError;
     }
     
-    // If SDK not initialized, store the requested placement name for deferred lookup
-    if (!placementConfig) {
-        interstitial.requestedPlacementName = placement;
+    // If SDK not initialized, store the requested ad unit name for deferred lookup
+    if (!adUnitConfig) {
+        interstitial.requestedAdUnitId = adUnitId;
     }
     
     // ALWAYS return non-nil
     return interstitial;
 }
 
-- (CLXRewarded *)createRewardedWithPlacement:(NSString *)placement {
+- (CLXRewarded *)createRewardedWithAdUnitId:(NSString *)adUnitId {
     // Track rewarded creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     if (metricsTracker) {
@@ -1027,45 +1027,45 @@ static CloudXCore *_sharedInstance = nil;
                                     description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
     
-    // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigAdUnit *placementConfig = nil;
+    // Get ad unit from config (may be nil if SDK not initialized yet)
+    CLXSDKConfigAdUnit *adUnitConfig = nil;
     if (_isInitialized && !deferredError) {
-        // SDK is initialized - validate placement with detailed error messages
-        CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateRewardedPlacement:placement
-                                                                                               placements:_adPlacements];
+        // SDK is initialized - validate ad unit with detailed error messages
+        CLXAdUnitValidationResult *validationResult = [CLXAdUnitValidator validateRewardedAdUnit:adUnitId
+                                                                                         adUnits:_adUnits];
         if (validationResult.isSuccess) {
-            placementConfig = validationResult.placement;
+            adUnitConfig = validationResult.adUnit;
         } else {
-            [self.logger error:[NSString stringWithFormat:@"Placement validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
+            [self.logger error:[NSString stringWithFormat:@"Ad unit validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
             deferredError = validationResult.error;
         }
     } else if (!_isInitialized) {
-        // SDK not initialized yet - try to get placement (may be nil)
-        placementConfig = [self placementConfigForName:placement];
+        // SDK not initialized yet - try to get ad unit (may be nil)
+        adUnitConfig = [self adUnitConfigForName:adUnitId];
     }
     
-    // Defer placement config and impression model creation if SDK not ready
+    // Defer ad unit config and impression model creation if SDK not ready
     CLXConfigImpressionModel *impModel = nil;
-    if (placementConfig && _sdkConfig) {
+    if (adUnitConfig && _sdkConfig) {
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else if (!placementConfig && !_isInitialized) {
+    } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
-        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring rewarded initialization for placement: %@", placement]];
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring rewarded initialization for ad unit: %@", adUnitId]];
     }
     
     // ALWAYS create rewarded (errors deferred to load())
-    CLXRewarded *rewarded = [[CLXRewarded alloc] initWithPlacement:placementConfig
+    CLXRewarded *rewarded = [[CLXRewarded alloc] initWithAdUnit:adUnitConfig
                                                          publisherID:@""
                                                               userID:@""
                                                  rewardedCallbackUrl:nil
                                                             impModel:impModel
                                                          adFactories:_adNetworkFactories
                                                      bidTokenSources:_adNetworkFactories.bidTokenSources
-                                                  bidRequestTimeout:placementConfig.bidRequestTimeoutSeconds
+                                                  bidRequestTimeout:adUnitConfig.bidRequestTimeoutSeconds
                                                    reportingService:_reportingService
                                                            settings:[CLXSettings sharedInstance]];
     
@@ -1074,23 +1074,23 @@ static CloudXCore *_sharedInstance = nil;
         rewarded.deferredError = deferredError;
     }
     
-    // If SDK not initialized, store the requested placement name for deferred lookup
-    if (!placementConfig) {
-        rewarded.requestedPlacementName = placement;
+    // If SDK not initialized, store the requested ad unit name for deferred lookup
+    if (!adUnitConfig) {
+        rewarded.requestedAdUnitId = adUnitId;
     }
     
     // ALWAYS return non-nil
     return rewarded;
 }
 
-- (CLXNativeAdView *)createNativeAdWithPlacement:(NSString *)placement viewController:(UIViewController *)viewController delegate:(id)delegate {
+- (CLXNativeAdView *)createNativeAdWithAdUnitId:(NSString *)adUnitId viewController:(UIViewController *)viewController delegate:(id)delegate {
     // Track native creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     if (metricsTracker) {
         [metricsTracker trackMethodCall:CLXMetricsTypeMethodCreateNative];
     }
     
-    [self.logger debug:[NSString stringWithFormat:@"Creating native ad for placement: %@", placement]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating native ad for adUnit: %@", adUnitId]];
 
     // v1.3.0: Defer validation errors to load() - always return non-nil
     CLXError *deferredError = nil;
@@ -1102,40 +1102,40 @@ static CloudXCore *_sharedInstance = nil;
                                     description:@"No adapters registered. At least one adapter framework must be included in your project to show ads."];
     }
 
-    // Get placement from config (may be nil if SDK not initialized yet)
-    CLXSDKConfigAdUnit *placementConfig = nil;
+    // Get ad unit from config (may be nil if SDK not initialized yet)
+    CLXSDKConfigAdUnit *adUnitConfig = nil;
     if (_isInitialized && !deferredError) {
-        // SDK is initialized - validate placement with detailed error messages
+        // SDK is initialized - validate ad unit with detailed error messages
         // Note: Native ads don't have a specific type in config, so we only validate existence
-        CLXPlacementValidationResult *validationResult = [CLXPlacementValidator validateNativePlacement:placement
-                                                                                             placements:_adPlacements];
+        CLXAdUnitValidationResult *validationResult = [CLXAdUnitValidator validateNativeAdUnit:adUnitId
+                                                                                       adUnits:_adUnits];
         if (validationResult.isSuccess) {
-            placementConfig = validationResult.placement;
+            adUnitConfig = validationResult.adUnit;
         } else {
-            [self.logger error:[NSString stringWithFormat:@"Placement validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
+            [self.logger error:[NSString stringWithFormat:@"Ad unit validation failed - error will be deferred to load(): %@", validationResult.error.localizedDescription]];
             deferredError = validationResult.error;
         }
     } else if (!_isInitialized) {
-        // SDK not initialized yet - try to get placement (may be nil)
-        placementConfig = [self placementConfigForName:placement];
+        // SDK not initialized yet - try to get ad unit (may be nil)
+        adUnitConfig = [self adUnitConfigForName:adUnitId];
     }
     
-    // Defer placement config and impression model creation if SDK not ready
+    // Defer ad unit config and impression model creation if SDK not ready
     CLXConfigImpressionModel *impModel = nil;
-    if (placementConfig && _sdkConfig) {
+    if (adUnitConfig && _sdkConfig) {
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
                                                               auctionID:auctionID
                                                           testGroupName:_abTestName];
-    } else if (!placementConfig && !_isInitialized) {
+    } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
-        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring native initialization for placement: %@", placement]];
+        [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring native initialization for ad unit: %@", adUnitId]];
     }
     
     // ALWAYS create native (errors deferred to load())
     CLXPublisherNative *native = [[CLXPublisherNative alloc] initWithViewController:viewController
-                                                                     placement:placementConfig
+                                                                     adUnit:adUnitConfig
                                                                         userID:@""
                                                                    publisherID:@""
                                                     suspendPreloadWhenInvisible:NO
@@ -1144,7 +1144,7 @@ static CloudXCore *_sharedInstance = nil;
                                                                     impModel:impModel
                                                                     adFactories:_adNetworkFactories.native
                                                                 bidTokenSources:_adNetworkFactories.bidTokenSources
-                                                              bidRequestTimeout:placementConfig.bidRequestTimeoutSeconds
+                                                              bidRequestTimeout:adUnitConfig.bidRequestTimeoutSeconds
                                                               reportingService:_reportingService];
     
     // Set deferred error if validation failed (via private category)
@@ -1152,13 +1152,13 @@ static CloudXCore *_sharedInstance = nil;
         native.deferredError = deferredError;
     }
     
-    // If SDK not initialized, store the requested placement name for deferred lookup
-    if (!placementConfig) {
-        native.requestedPlacementName = placement;
+    // If SDK not initialized, store the requested ad unit name for deferred lookup
+    if (!adUnitConfig) {
+        native.requestedAdUnitId = adUnitId;
     }
     
-    // Use default template if placementConfig is nil (deferred init case)
-    CLXNativeTemplate nativeTemplate = placementConfig ? placementConfig.nativeTemplate : CLXNativeTemplateDefault;
+    // Use default template if adUnitConfig is nil (deferred init case)
+    CLXNativeTemplate nativeTemplate = adUnitConfig ? adUnitConfig.nativeTemplate : CLXNativeTemplateDefault;
     
     // ALWAYS return non-nil
     return [[CLXNativeAdView alloc] initWithNative:native type:nativeTemplate delegate:delegate];
@@ -1178,13 +1178,13 @@ static CloudXCore *_sharedInstance = nil;
 }
 
 - (void)filterConfig {
-    NSMutableDictionary *placementsDict = [NSMutableDictionary dictionary];
+    NSMutableDictionary *adUnitsDict = [NSMutableDictionary dictionary];
     if (_sdkConfig.adUnits && _sdkConfig.adUnits.count > 0) {
-        for (CLXSDKConfigAdUnit *placement in _sdkConfig.adUnits) {
-            placementsDict[placement.name] = placement; // Use name as key like Swift SDK
+        for (CLXSDKConfigAdUnit *adUnit in _sdkConfig.adUnits) {
+            adUnitsDict[adUnit.name] = adUnit; // Use name as key like Swift SDK
         }
     }
-    _adPlacements = [placementsDict copy];
+    _adUnits = [adUnitsDict copy];
     
     // Also populate ad network configs dictionary
     NSMutableDictionary *configsDict = [NSMutableDictionary dictionary];
@@ -1370,7 +1370,7 @@ static BOOL _visualDebuggingEnabled = NO;
     _appKey = nil;
     _sdkConfig = nil;
     _adNetworkConfigs = nil;
-    _adPlacements = nil;
+    _adUnits = nil;
     _adFactory = nil;
     _reportingService = nil;
     _abTestValue = (double)arc4random() / UINT32_MAX;

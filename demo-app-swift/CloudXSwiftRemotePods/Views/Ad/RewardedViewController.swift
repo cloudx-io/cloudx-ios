@@ -106,7 +106,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
         
         // Create rewarded with comprehensive logging
         DemoAppLogger.sharedInstance.logMessage("📱 [Rewarded] Calling createRewarded...")
-        rewardedAd = CloudXCore.shared.createRewarded(placement: placement)
+        rewardedAd = CloudXCore.shared.createRewarded(adUnitId: placement)
         rewardedAd?.delegate = self
         rewardedAd?.revenueDelegate = self
 
@@ -160,9 +160,9 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
         updateStatusUI(state: .ready)
     }
     
-    func didFailToLoadAd(_ placementName: String, error: CLXError) {
+    func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
-        DemoAppLogger.sharedInstance.logMessage("❌ Rewarded failed to load for ad unit '\(placementName)' - Error: \(error.localizedDescription)")
+        DemoAppLogger.sharedInstance.logMessage("❌ Rewarded failed to load for ad unit '\(adUnitId)' - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: .noAd)
         

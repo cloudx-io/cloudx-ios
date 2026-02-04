@@ -33,13 +33,13 @@ NS_ASSUME_NONNULL_BEGIN
  * Sets up Rill tracking data and sends bid request event
  * @param bidResponse The bid response containing ad data
  * @param impModel The impression model containing account information
- * @param placementID The placement identifier
+ * @param adUnitId The ad unit identifier
  * @param loadCount The load attempt count
  * @return YES if setup was successful, NO otherwise
  */
 - (BOOL)setupTrackingDataFromBidResponse:(CLXBidAdSourceResponse *)bidResponse
                                 impModel:(CLXConfigImpressionModel *)impModel
-                             placementID:(NSString *)placementID
+                                adUnitId:(NSString *)adUnitId
                                loadCount:(NSInteger)loadCount;
 
 /**

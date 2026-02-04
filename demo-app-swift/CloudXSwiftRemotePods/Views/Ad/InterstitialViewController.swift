@@ -91,7 +91,7 @@ class InterstitialViewController: BaseAdViewController {
             placement = settings.interstitialPlacement
         }
         
-        interstitialAd = cloudX.createInterstitial(placement: placement)
+        interstitialAd = cloudX.createInterstitial(adUnitId: placement)
         interstitialAd?.delegate = self
         interstitialAd?.revenueDelegate = self
         
@@ -193,9 +193,9 @@ extension InterstitialViewController: CLXInterstitialDelegate, CLXAdRevenueDeleg
         // Don't auto-show - wait for user to press Show Interstitial button
     }
     
-    func didFailToLoadAd(_ placementName: String, error: CLXError) {
+    func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
         // No ad object exists on failure, so use logMessage instead of logAdEvent
-        DemoAppLogger.sharedInstance.logMessage("❌ Interstitial failed to load for ad unit '\(placementName)' - Error: \(error.localizedDescription)")
+        DemoAppLogger.sharedInstance.logMessage("❌ Interstitial failed to load for ad unit '\(adUnitId)' - Error: \(error.localizedDescription)")
         isLoading = false
         updateStatusUI(state: AdState.noAd)
         

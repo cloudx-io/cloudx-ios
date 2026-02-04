@@ -20,10 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Records an impression for session depth tracking.
  *
- * @param placementName The placement identifier
+ * @param adUnitName The ad unit identifier
  * @param adType The ad format type
  */
-- (void)recordImpressionForPlacement:(NSString *)placementName adType:(NSInteger)adType;
+- (void)recordImpressionForAdUnit:(NSString *)adUnitName adType:(NSInteger)adType;
 
 /**
  * Returns current session metrics snapshot.
@@ -31,14 +31,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (CLXSessionMetrics *)getMetrics;
 
 /**
- * Returns impression count for specific placement in current session.
+ * Returns impression count for specific ad unit in current session.
  */
-- (NSInteger)getPlacementDepthForPlacement:(NSString *)placementName;
+- (NSInteger)getAdUnitDepthForAdUnit:(NSString *)adUnitName;
 
 /**
- * Resets counters for a specific placement.
+ * Resets counters for a specific ad unit.
  */
-- (void)resetPlacement:(NSString *)placementName;
+- (void)resetAdUnit:(NSString *)adUnitName;
 
 /**
  * Resets all session state.
@@ -70,7 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Tracks session metrics for impression frequency across global, format, and placement scopes.
+ * Tracks session metrics for impression frequency across global, format, and ad unit scopes.
  * Metrics reset after 30 minutes of inactivity or an explicit reset call.
  *
  * Thread-safe singleton implementation using serial dispatch queue.
@@ -103,10 +103,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Thread-safe: Uses serial dispatch queue for synchronization.
  *
- * @param placementName The placement identifier (must not be nil/empty)
+ * @param adUnitName The ad unit identifier (must not be nil/empty)
  * @param adType The ad format type (see CLXAdType enum)
  */
-- (void)recordImpressionForPlacement:(NSString *)placementName adType:(NSInteger)adType;
+- (void)recordImpressionForAdUnit:(NSString *)adUnitName adType:(NSInteger)adType;
 
 /**
  * Returns current session metrics snapshot.
@@ -119,24 +119,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (CLXSessionMetrics *)getMetrics;
 
 /**
- * Returns impression count for specific placement in current session.
+ * Returns impression count for specific ad unit in current session.
  *
  * Thread-safe: Uses serial dispatch queue for synchronization.
  *
- * @param placementName The placement identifier
- * @return Impression count (0 if placement not tracked)
+ * @param adUnitName The ad unit identifier
+ * @return Impression count (0 if ad unit not tracked)
  */
-- (NSInteger)getPlacementDepthForPlacement:(NSString *)placementName;
+- (NSInteger)getAdUnitDepthForAdUnit:(NSString *)adUnitName;
 
 /**
- * Resets counters for a specific placement.
+ * Resets counters for a specific ad unit.
  * Used when ad view is destroyed (optional - see design notes in implementation plan).
  *
  * Thread-safe: Uses serial dispatch queue for synchronization.
  *
- * @param placementName The placement identifier to reset
+ * @param adUnitName The ad unit identifier to reset
  */
-- (void)resetPlacement:(NSString *)placementName;
+- (void)resetAdUnit:(NSString *)adUnitName;
 
 /**
  * Resets all session state.

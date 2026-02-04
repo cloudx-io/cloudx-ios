@@ -13,7 +13,7 @@
 
 // Test category to expose private properties for testing
 @interface CLXBannerAdView (Testing)
-@property (nonatomic, copy, readwrite) NSString *adUnitIdentifier;
+@property (nonatomic, copy, readwrite) NSString *adUnitId;
 @property (nonatomic, assign, readwrite) CLXBannerType adFormat;
 @end
 
@@ -32,7 +32,7 @@
 - (void)setUp {
     [super setUp];
     self.mockBanner = [[MockPublisherBanner alloc] init];
-    self.mockBanner.placementID = @"test-placement-123";
+    self.mockBanner.adUnitId = @"test-placement-123";
     self.mockDelegate = [[MockBannerDelegate alloc] init];
 }
 
@@ -45,18 +45,18 @@
 
 // MARK: - Property Population Tests
 
-// Test adUnitIdentifier property is populated from underlying banner
-- (void)testAdUnitIdentifierPropertyPopulation {
-    // Given: A banner with a placement ID
-    self.mockBanner.placementID = @"unit-test-placement-456";
+// Test adUnitId property is populated from underlying banner
+- (void)testAdUnitIdPropertyPopulation {
+    // Given: A banner with an ad unit ID
+    self.mockBanner.adUnitId = @"unit-test-placement-456";
     
     // When: Creating CLXBannerAdView
     self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:self.mockBanner
                                                            type:CLXBannerTypeW320H50];
     
-    // Then: adUnitIdentifier should be populated from banner's placementID
-    XCTAssertEqualObjects(self.bannerAdView.adUnitIdentifier, @"unit-test-placement-456", 
-                         @"adUnitIdentifier should be extracted from banner placementID");
+    // Then: adUnitId should be populated from banner's adUnitId
+    XCTAssertEqualObjects(self.bannerAdView.adUnitId, @"unit-test-placement-456", 
+                         @"adUnitId should be extracted from banner adUnitId");
 }
 
 // Test adFormat property is set correctly during initialization
@@ -129,11 +129,13 @@
     self.bannerAdView.delegate = self.mockDelegate;
     
     // Given: A test ad object
-    CLXAd *testAd = [[CLXAd alloc] initWithPlacementName:@"test" 
-                                             placementId:@"test-id" 
-                                                  bidder:@"test-bidder" 
-                                     externalPlacementId:@"ext-id" 
-                                                 revenue:@(1.50)];
+    CLXAd *testAd = [[CLXAd alloc] initWithAdUnitName:@"test" 
+                                             adUnitId:@"test-id" 
+                                          networkName:@"test-bidder" 
+                                     networkPlacement:@"ext-id" 
+                                              revenue:@(1.50)
+                                             adFormat:CLXAdFormatBanner
+                                            placement:nil];
     
     // When: CLXBannerAdView receives didExpandAd callback
     [self.bannerAdView didExpandAd:testAd];
@@ -152,11 +154,13 @@
     self.bannerAdView.delegate = self.mockDelegate;
     
     // Given: A test ad object
-    CLXAd *testAd = [[CLXAd alloc] initWithPlacementName:@"test" 
-                                             placementId:@"test-id" 
-                                                  bidder:@"test-bidder" 
-                                     externalPlacementId:@"ext-id" 
-                                                 revenue:@(2.25)];
+    CLXAd *testAd = [[CLXAd alloc] initWithAdUnitName:@"test" 
+                                             adUnitId:@"test-id" 
+                                          networkName:@"test-bidder" 
+                                     networkPlacement:@"ext-id" 
+                                              revenue:@(2.25)
+                                             adFormat:CLXAdFormatBanner
+                                            placement:nil];
     
     // When: CLXBannerAdView receives didCollapseAd callback
     [self.bannerAdView didCollapseAd:testAd];
@@ -174,7 +178,7 @@
 - (void)testAutoRefreshWithNonSupportingBanner {
     // Given: A banner that doesn't respond to auto-refresh methods (but conforms to CLXBanner)
     MockPublisherBanner *nonSupportingBanner = [[MockPublisherBanner alloc] init];
-    nonSupportingBanner.placementID = @"non-supporting-test";
+    nonSupportingBanner.adUnitId = @"non-supporting-test";
     
     self.bannerAdView = [[CLXBannerAdView alloc] initWithBanner:(id<CLXBanner>)nonSupportingBanner
                                                            type:CLXBannerTypeW320H50];
@@ -196,11 +200,13 @@
                                                            type:CLXBannerTypeW320H50];
     self.bannerAdView.delegate = (id<CLXBannerDelegate>)nonSupportingDelegate;
     
-    CLXAd *testAd = [[CLXAd alloc] initWithPlacementName:@"test" 
-                                             placementId:@"test-id" 
-                                                  bidder:@"test-bidder" 
-                                     externalPlacementId:@"ext-id" 
-                                                 revenue:@(1.00)];
+    CLXAd *testAd = [[CLXAd alloc] initWithAdUnitName:@"test" 
+                                             adUnitId:@"test-id" 
+                                          networkName:@"test-bidder" 
+                                     networkPlacement:@"ext-id" 
+                                              revenue:@(1.00)
+                                             adFormat:CLXAdFormatBanner
+                                            placement:nil];
     
     // When/Then: Should not crash when forwarding to non-supporting delegate
     XCTAssertNoThrow([self.bannerAdView didExpandAd:testAd], 

@@ -8,9 +8,9 @@
 
 #pragma mark - Initialization
 
-- (instancetype)initWithPlacementId:(NSString *)placementId sessionId:(NSString *)sessionId {
+- (instancetype)initWithAdUnitId:(NSString *)adUnitId sessionId:(NSString *)sessionId {
     if (self = [super initWithSessionId:sessionId]) {
-        _placementId = [placementId copy];
+        _adUnitId = [adUnitId copy];
         _clickCount = 0;
         _impressionCount = 0;
         _closeCount = 0;
@@ -126,7 +126,7 @@
 
 - (NSDictionary *)performanceSummary {
     return @{
-        @"placementId": self.placementId ?: @"",
+        @"adUnitId": self.adUnitId ?: @"",
         @"clickCount": @(self.clickCount),
         @"impressionCount": @(self.impressionCount),
         @"closeCount": @(self.closeCount),
@@ -140,14 +140,14 @@
 
 #pragma mark - Factory Methods
 
-+ (instancetype)metricForPlacement:(NSString *)placementId sessionId:(NSString *)sessionId {
-    return [[CLXPerformanceMetric alloc] initWithPlacementId:placementId sessionId:sessionId];
++ (instancetype)metricForAdUnit:(NSString *)adUnitId sessionId:(NSString *)sessionId {
+    return [[CLXPerformanceMetric alloc] initWithAdUnitId:adUnitId sessionId:sessionId];
 }
 
 #pragma mark - Database Support
 
 + (NSArray<NSString *> *)sqlColumnNames {
-    return @[@"id", @"placementId", @"sessionId", @"clickCount", @"impressionCount", @"closeCount", @"loadLatency", @"bidResponseCount", @"adLoadCount", @"adLoadLatency", @"bidRequestLatency", @"failToLoadAdCount", @"closeLatency", @"timestamp", @"created_at", @"updated_at"];
+    return @[@"id", @"adUnitId", @"sessionId", @"clickCount", @"impressionCount", @"closeCount", @"loadLatency", @"bidResponseCount", @"adLoadCount", @"adLoadLatency", @"bidRequestLatency", @"failToLoadAdCount", @"closeLatency", @"timestamp", @"created_at", @"updated_at"];
 }
 
 + (NSString *)sqlTableName {
@@ -157,7 +157,7 @@
 - (NSArray *)sqlInsertValues {
     return @[
         self.eventId ?: @"",
-        self.placementId ?: @"",
+        self.adUnitId ?: @"",
         self.sessionId ?: @"",
         @(self.clickCount),
         @(self.impressionCount),
@@ -178,8 +178,8 @@
 - (void)updateFromSQLRow:(NSDictionary *)row {
     [super updateFromSQLRow:row];
     
-    if (row[@"placementId"]) {
-        _placementId = [row[@"placementId"] copy];
+    if (row[@"adUnitId"]) {
+        _adUnitId = [row[@"adUnitId"] copy];
     }
     if (row[@"clickCount"]) {
         _clickCount = [row[@"clickCount"] integerValue];
@@ -217,7 +217,7 @@
 
 - (NSDictionary *)toDictionary {
     NSMutableDictionary *dict = [[super toDictionary] mutableCopy];
-    dict[@"placementId"] = self.placementId ?: @"";
+    dict[@"adUnitId"] = self.adUnitId ?: @"";
     dict[@"clickCount"] = @(self.clickCount);
     dict[@"impressionCount"] = @(self.impressionCount);
     dict[@"closeCount"] = @(self.closeCount);
@@ -232,14 +232,15 @@
 }
 
 + (instancetype)fromDictionary:(NSDictionary *)dictionary {
-    NSString *placementId = dictionary[@"placementId"];
+    // Support both new "adUnitId" and legacy "placementId" keys for backward compatibility
+    NSString *adUnitId = dictionary[@"adUnitId"] ?: dictionary[@"placementId"];
     NSString *sessionId = dictionary[@"sessionId"];
     
-    if (!placementId || !sessionId) {
+    if (!adUnitId || !sessionId) {
         return nil;
     }
     
-    CLXPerformanceMetric *metric = [[CLXPerformanceMetric alloc] initWithPlacementId:placementId sessionId:sessionId];
+    CLXPerformanceMetric *metric = [[CLXPerformanceMetric alloc] initWithAdUnitId:adUnitId sessionId:sessionId];
     
     if (dictionary[@"clickCount"]) {
         metric.clickCount = [dictionary[@"clickCount"] integerValue];
@@ -289,8 +290,8 @@
 - (NSArray<NSString *> *)validationErrors {
     NSMutableArray *errors = [[super validationErrors] mutableCopy];
     
-    if (!self.placementId || self.placementId.length == 0) {
-        [errors addObject:@"Placement ID is required"];
+    if (!self.adUnitId || self.adUnitId.length == 0) {
+        [errors addObject:@"Ad unit ID is required"];
     }
     
     if (self.clickCount < 0) {
@@ -320,7 +321,7 @@
 
 - (void)encodeWithCoder:(NSCoder *)coder {
     [super encodeWithCoder:coder];
-    [coder encodeObject:self.placementId forKey:@"placementId"];
+    [coder encodeObject:self.adUnitId forKey:@"adUnitId"];
     [coder encodeInteger:self.clickCount forKey:@"clickCount"];
     [coder encodeInteger:self.impressionCount forKey:@"impressionCount"];
     [coder encodeInteger:self.closeCount forKey:@"closeCount"];
@@ -330,7 +331,14 @@
 
 - (instancetype)initWithCoder:(NSCoder *)coder {
     if (self = [super initWithCoder:coder]) {
-        _placementId = [coder decodeObjectOfClass:[NSString class] forKey:@"placementId"];
+        // 2.0.0 Migration: Try new key first, fall back to legacy key for users 
+        // upgrading from SDK versions < 2.0.0 that used "placementId" key.
+        // This prevents crashes when decoding archived data from older SDK versions.
+        // The legacy fallback can be removed in a future major version (e.g., 3.0.0).
+        _adUnitId = [coder decodeObjectOfClass:[NSString class] forKey:@"adUnitId"];
+        if (!_adUnitId) {
+            _adUnitId = [coder decodeObjectOfClass:[NSString class] forKey:@"placementId"];
+        }
         _clickCount = [coder decodeIntegerForKey:@"clickCount"];
         _impressionCount = [coder decodeIntegerForKey:@"impressionCount"];
         _closeCount = [coder decodeIntegerForKey:@"closeCount"];
@@ -343,8 +351,8 @@
 #pragma mark - NSObject Override
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<%@: %p> placementId=%@ impressions=%ld clicks=%ld CTR=%.2f%%",
-            NSStringFromClass([self class]), self, self.placementId, 
+    return [NSString stringWithFormat:@"<%@: %p> adUnitId=%@ impressions=%ld clicks=%ld CTR=%.2f%%",
+            NSStringFromClass([self class]), self, self.adUnitId, 
             (long)self.impressionCount, (long)self.clickCount, [self clickThroughRate] * 100];
 }
 

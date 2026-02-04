@@ -8,14 +8,14 @@
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, assign) BOOL isDestroyed;
-@property (nonatomic, copy, nullable) NSString *placementName;
+@property (nonatomic, copy, nullable) NSString *adUnitName;
 @end
 
 @implementation CLXMintegralInterstitial
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID
-                     placementName:(nullable NSString *)placementName
+                     adUnitName:(nullable NSString *)adUnitName
                             unitID:(NSString *)unitID
                              bidID:(NSString *)bidID
                           delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
@@ -23,7 +23,7 @@
     if (self) {
         _bidPayload = [bidPayload copy];
         _placementID = [placementID copy];
-        _placementName = [placementName copy];
+        _adUnitName = [adUnitName copy];
         _unitID = [unitID copy];
         _bidID = [bidID copy];
         _delegate = delegate;
@@ -33,7 +33,7 @@
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMintegralInterstitial"];
         _isDestroyed = NO;
         
-        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@, PlacementID:%@, UnitID:%@", placementName ?: @"(unknown)", placementID, unitID]];
+        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@, PlacementID:%@, UnitID:%@", adUnitName ?: @"(unknown)", placementID, unitID]];
     }
     return self;
 }
@@ -51,10 +51,10 @@
     
     // Validate unitID at load time
     if (!_unitID || _unitID.length == 0) {
-        NSString *placementContext = _placementName ? [NSString stringWithFormat:@" for placement '%@'", _placementName] : @"";
+        NSString *adUnitContext = _adUnitName ? [NSString stringWithFormat:@" for ad unit '%@'", _adUnitName] : @"";
         NSString *errorMessage = [NSString stringWithFormat:@"Mintegral unit ID is empty%@. "
                                   "Make sure to configure the Mintegral unit ID in your CloudX dashboard under Ad Unit Settings > Mintegral.",
-                                  placementContext];
+                                  adUnitContext];
         NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
                                      description:errorMessage];
         [self.logger error:error.localizedDescription];
@@ -66,7 +66,7 @@
     }
     
     _isLoading = YES;
-    [self.logger debug:[NSString stringWithFormat:@"Loading interstitial - Placement: %@, PlacementID:%@, UnitID:%@", _placementName ?: @"(unknown)", _placementID, _unitID]];
+    [self.logger debug:[NSString stringWithFormat:@"Loading interstitial - Placement: %@, PlacementID:%@, UnitID:%@", _adUnitName ?: @"(unknown)", _placementID, _unitID]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.isDestroyed) {

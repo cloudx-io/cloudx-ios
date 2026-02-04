@@ -39,7 +39,7 @@
                                             bidId:(NSString *)bidId
                                               adm:(NSString *)adm
                                            extras:(NSDictionary<NSString *, NSString *> *)extras
-                                    placementName:(NSString *)placementName
+                                     adUnitName:(NSString *)adUnitName
                                          delegate:(id<CLXAdapterRewardedDelegate>)delegate {
     
     CLXLogger *logger = [[self class] logger];
@@ -75,14 +75,14 @@
                                                               placementId:placementId
                                                                    extras:extras];
     
-    [logger info:[NSString stringWithFormat:@"Creating Vungle rewarded adapter - Placement: %@ (%@), BidID: %@, HasBidPayload: %@",
-                    placementName ?: @"(unknown)", placementId, bidId, bidPayload ? @"YES" : @"NO"]
+    [logger info:[NSString stringWithFormat:@"Creating Vungle rewarded adapter - Ad Unit: %@ (%@), BidID: %@, HasBidPayload: %@",
+                    adUnitName ?: @"(unknown)", placementId, bidId, bidPayload ? @"YES" : @"NO"]
            ];
     
     // ALWAYS create and return adapter
     CLXVungleRewarded *adapter = [[CLXVungleRewarded alloc] initWithBidPayload:bidPayload
                                                                    placementID:placementId  // May be nil
-                                                                 placementName:placementName  // For error messages
+                                                                 adUnitName:adUnitName  // For error messages
                                                                          bidID:bidId
                                                                       delegate:delegate];  // May be nil
     

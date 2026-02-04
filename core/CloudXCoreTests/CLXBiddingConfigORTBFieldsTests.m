@@ -783,12 +783,12 @@
     XCTAssertEqualObjects(interstitialExt[@"format"], @"interstitial", @"imp.ext.cx.format should be 'interstitial'");
 }
 
-- (void)testImpExtCxPlacementId_ShouldBeSet {
+- (void)testImpExtCxAdUnitId_ShouldBeSet {
     CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeRewarded];
     NSDictionary *json = [config json];
     
     NSDictionary *cxExt = json[@"imp"][0][@"ext"][@"cx"];
-    XCTAssertNotNil(cxExt[@"placement_id"], @"imp.ext.cx.placement_id should be present");
+    XCTAssertNotNil(cxExt[@"ad_unit_id"], @"imp.ext.cx.ad_unit_id should be present");
 }
 
 - (void)testImpExtCxSessId_ShouldBeUUID {

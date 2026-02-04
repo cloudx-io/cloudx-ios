@@ -85,14 +85,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly, nullable) id<CLXAdapterBanner> prefetchedBanner;
 
 /**
- * The placement ID for this banner.
+ * The ad unit ID for this banner.
  */
-@property (nonatomic, copy, readonly) NSString *placementID;
+@property (nonatomic, copy, readonly) NSString *adUnitId;
 
 /**
  * Initializes a new PublisherBanner with the given parameters.
  * @param viewController The view controller where the banner will be displayed
- * @param placement The placement configuration (nil if SDK not initialized, will be resolved on load)
+ * @param adUnit The ad unit configuration (nil if SDK not initialized, will be resolved on load)
  * @param userID The user ID
  * @param publisherID The publisher ID
  * @param suspendPreloadWhenInvisible Whether to suspend preloading when not visible
@@ -107,7 +107,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return Initialized PublisherBanner instance
  */
 - (instancetype)initWithViewController:(UIViewController *)viewController
-                             placement:(nullable CLXSDKConfigAdUnit *)placement
+                             adUnit:(nullable CLXSDKConfigAdUnit *)adUnit
                                 userID:(NSString *)userID
                            publisherID:(NSString *)publisherID
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
@@ -122,7 +122,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Starts auto-refresh for the banner.
- * Auto-refresh will continue based on the placement configuration until stopped.
+ * Auto-refresh will continue based on the ad unit configuration until stopped.
  */
 - (void)startAutoRefresh;
 

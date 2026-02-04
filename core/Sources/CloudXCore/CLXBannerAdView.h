@@ -46,9 +46,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL suspendPreloadWhenInvisible;
 
 /**
- * The ad unit identifier for this banner ad view.
+ * The ad unit ID for this banner ad view.
  */
-@property (nonatomic, copy, readonly) NSString *adUnitIdentifier;
+@property (nonatomic, copy, readonly) NSString *adUnitId;
 
 /**
  * The ad format for this banner ad view.

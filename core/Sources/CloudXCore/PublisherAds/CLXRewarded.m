@@ -31,9 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, nullable) id<CLXAdapterRewarded> currentAdapter;
 
-// Reward configuration from placement
-@property (nonatomic, assign) NSInteger placementRewardAmount;
-@property (nonatomic, copy, nullable) NSString *placementRewardCurrency;
+// Reward configuration from ad unit
+@property (nonatomic, assign) NSInteger adUnitRewardAmount;
+@property (nonatomic, copy, nullable) NSString *adUnitRewardCurrency;
 
 @end
 
@@ -41,36 +41,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Initialization
 
-- (instancetype)initWithPlacement:(nullable CLXSDKConfigAdUnit *)placement
-                      publisherID:(NSString *)publisherID
-                           userID:(nullable NSString *)userID
-              rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl
-                         impModel:(nullable CLXConfigImpressionModel *)impModel
-                      adFactories:(nullable CLXAdNetworkFactories *)adFactories
-                  bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
-               bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
-                reportingService:(id<CLXAdEventReporting>)reportingService
-                        settings:(CLXSettings *)settings {
-    self = [super initWithPlacement:placement
-                        publisherID:publisherID
-                             userID:userID
-                rewardedCallbackUrl:rewardedCallbackUrl
-                           impModel:impModel
-                        adFactories:adFactories
-                    bidTokenSources:bidTokenSources
-                 bidRequestTimeout:bidRequestTimeout
-                  reportingService:reportingService
-                          settings:settings];
+- (instancetype)initWithAdUnit:(nullable CLXSDKConfigAdUnit *)adUnit
+                   publisherID:(NSString *)publisherID
+                        userID:(nullable NSString *)userID
+           rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl
+                      impModel:(nullable CLXConfigImpressionModel *)impModel
+                   adFactories:(nullable CLXAdNetworkFactories *)adFactories
+               bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
+            bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
+             reportingService:(id<CLXAdEventReporting>)reportingService
+                     settings:(CLXSettings *)settings {
+    self = [super initWithAdUnit:adUnit
+                     publisherID:publisherID
+                          userID:userID
+             rewardedCallbackUrl:rewardedCallbackUrl
+                        impModel:impModel
+                     adFactories:adFactories
+                 bidTokenSources:bidTokenSources
+              bidRequestTimeout:bidRequestTimeout
+               reportingService:reportingService
+                       settings:settings];
     
     if (self) {
-        // Capture reward configuration from placement
-        if (placement) {
-            _placementRewardAmount = placement.rewardAmount;
-            _placementRewardCurrency = [placement.rewardCurrency copy];
+        // Capture reward configuration from ad unit
+        if (adUnit) {
+            _adUnitRewardAmount = adUnit.rewardAmount;
+            _adUnitRewardCurrency = [adUnit.rewardCurrency copy];
             
             CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXRewarded"];
-            [logger debug:[NSString stringWithFormat:@"Reward config from placement: amount=%ld, currency=%@", 
-                          (long)_placementRewardAmount, _placementRewardCurrency ?: @"(nil)"]];
+            [logger debug:[NSString stringWithFormat:@"Reward config from ad unit: amount=%ld, currency=%@", 
+                          (long)_adUnitRewardAmount, _adUnitRewardCurrency ?: @"(nil)"]];
         }
     }
     return self;
@@ -110,7 +110,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          bidId:bidId
                                                             adm:adm
                                                         extras:adapterExtras
-                                                  placementName:self.placementName
+                                                  adUnitName:self.adUnitName
                                                       delegate:self];
     
     if (!rewarded) {
@@ -162,7 +162,7 @@ NS_ASSUME_NONNULL_BEGIN
     [[CLXDebugOverlayManager shared] flashError];
     if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
         [self.logger logDelegateError:@"❌ Rewarded didFailToLoadAd" error:error];
-        [self.delegate didFailToLoadAd:self.placementName error:error];
+        [self.delegate didFailToLoadAd:self.adUnitId error:error];
     }
 }
 
@@ -265,7 +265,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)userRewardWithRewarded:(id<CLXAdapterRewarded>)rewarded {
-    // Default to placement-configured reward values
+    // Default to ad unit-configured reward values
     [self userRewardWithRewarded:rewarded amount:0 label:nil];
 }
 
@@ -276,10 +276,10 @@ NS_ASSUME_NONNULL_BEGIN
     dispatch_async(dispatch_get_main_queue(), ^{
         CLXAd *ad = [self createAdObject];
         
-        // Determine final reward values: adapter values override placement values if provided
-        // If adapter provides non-zero amount, use it; otherwise fall back to placement config
-        NSInteger finalAmount = (amount > 0) ? amount : self.placementRewardAmount;
-        NSString *finalLabel = (label.length > 0) ? label : self.placementRewardCurrency;
+        // Determine final reward values: adapter values override ad unit values if provided
+        // If adapter provides non-zero amount, use it; otherwise fall back to ad unit config
+        NSInteger finalAmount = (amount > 0) ? amount : self.adUnitRewardAmount;
+        NSString *finalLabel = (label.length > 0) ? label : self.adUnitRewardCurrency;
         
         // Create reward object
         CLXReward *reward;

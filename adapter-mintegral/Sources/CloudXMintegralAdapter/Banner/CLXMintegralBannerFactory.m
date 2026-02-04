@@ -22,11 +22,11 @@
                                                       adm:(NSString *)adm
                                           hasClosedButton:(BOOL)hasClosedButton
                                                    extras:(NSDictionary<NSString *, NSString *> *)extras
-                                            placementName:(NSString *)placementName
+                                              adUnitName:(NSString *)adUnitName
                                                  delegate:(id<CLXAdapterBannerDelegate>)delegate {
     
-    [self.logger debug:[NSString stringWithFormat:@"[BannerFactory] Creating banner - Placement: %@ (%@), bidId:'%@', type:%ld",
-                        placementName ?: @"(unknown)", adId ?: @"(nil)", bidId ?: @"(nil)", (long)type]];
+    [self.logger debug:[NSString stringWithFormat:@"[BannerFactory] Creating banner - Ad Unit: %@ (%@), bidId:'%@', type:%ld",
+                        adUnitName ?: @"(unknown)", adId ?: @"(nil)", bidId ?: @"(nil)", (long)type]];
     
     // Extract IDs using shared utility
     CLXMintegralIDResult *ids = [CLXMintegralIDExtractor extractIDsFromExtras:extras
@@ -54,14 +54,14 @@
     // Use adm as bidPayload (nil-safe: messaging nil returns 0)
     NSString *bidPayload = adm.length > 0 ? adm : nil;
     
-    [self.logger debug:[NSString stringWithFormat:@"[BannerFactory] Creating Mintegral banner - Placement: %@, placementID:%@, unitID:%@, size:%.0fx%.0f, hasBidPayload:%@",
-                        placementName ?: @"(unknown)", ids.placementID, ids.unitID, bannerSize.width, bannerSize.height, bidPayload ? @"YES" : @"NO"]];
+    [self.logger debug:[NSString stringWithFormat:@"[BannerFactory] Creating Mintegral banner - Ad Unit: %@, placementID:%@, unitID:%@, size:%.0fx%.0f, hasBidPayload:%@",
+                        adUnitName ?: @"(unknown)", ids.placementID, ids.unitID, bannerSize.width, bannerSize.height, bidPayload ? @"YES" : @"NO"]];
     
     // Always create and return adapter (even with invalid parameters)
     // Validation errors will be reported in load() via delegate callback
     CLXMintegralBanner *banner = [[CLXMintegralBanner alloc] initWithBidPayload:bidPayload
                                                                     placementID:ids.placementID
-                                                                  placementName:placementName
+                                                                  adUnitName:adUnitName
                                                                          unitID:ids.unitID
                                                                            size:bannerSize
                                                                           bidID:ids.bidID ?: @""

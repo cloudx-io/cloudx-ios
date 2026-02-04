@@ -28,19 +28,19 @@
 @interface CLXPublisherBanner (TestVerification)
 @property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
 @property (nonatomic, strong, nullable) NSError *deferredError;
-@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+@property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
 @end
 
 @interface CLXPublisherFullscreenAdBase (TestVerification)
 @property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
 @property (nonatomic, strong, nullable) NSError *deferredError;
-@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+@property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
 @end
 
 @interface CLXPublisherNative (TestVerification)
 @property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
 @property (nonatomic, strong, nullable) NSError *deferredError;
-@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+@property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
 @end
 
 @interface CLXSDKInitQueueTests : XCTestCase
@@ -220,30 +220,30 @@
 #pragma mark - Deferred Initialization Tests
 
 /**
- * Verifies that requestedPlacementName property exists on banner for deferred initialization.
+ * Verifies that requestedAdUnitId property exists on banner for deferred initialization.
  */
 - (void)testDeferredInit_BannerHasRequestedPlacementNameProperty {
-    XCTAssertTrue([CLXPublisherBanner instancesRespondToSelector:@selector(requestedPlacementName)],
-                  @"CLXPublisherBanner should have requestedPlacementName property for deferred initialization");
+    XCTAssertTrue([CLXPublisherBanner instancesRespondToSelector:@selector(requestedAdUnitId)],
+                  @"CLXPublisherBanner should have requestedAdUnitId property for deferred initialization");
 }
 
 /**
- * Verifies that requestedPlacementName property exists on fullscreen ads for deferred initialization.
+ * Verifies that requestedAdUnitId property exists on fullscreen ads for deferred initialization.
  */
 - (void)testDeferredInit_FullscreenAdHasRequestedPlacementNameProperty {
-    XCTAssertTrue([CLXInterstitial instancesRespondToSelector:@selector(requestedPlacementName)],
-                  @"CLXInterstitial should have requestedPlacementName property for deferred initialization");
+    XCTAssertTrue([CLXInterstitial instancesRespondToSelector:@selector(requestedAdUnitId)],
+                  @"CLXInterstitial should have requestedAdUnitId property for deferred initialization");
     
-    XCTAssertTrue([CLXRewarded instancesRespondToSelector:@selector(requestedPlacementName)],
-                  @"CLXRewarded should have requestedPlacementName property for deferred initialization");
+    XCTAssertTrue([CLXRewarded instancesRespondToSelector:@selector(requestedAdUnitId)],
+                  @"CLXRewarded should have requestedAdUnitId property for deferred initialization");
 }
 
 /**
- * Verifies that requestedPlacementName property exists on native ads for deferred initialization.
+ * Verifies that requestedAdUnitId property exists on native ads for deferred initialization.
  */
 - (void)testDeferredInit_NativeAdHasRequestedPlacementNameProperty {
-    XCTAssertTrue([CLXPublisherNative instancesRespondToSelector:@selector(requestedPlacementName)],
-                  @"CLXPublisherNative should have requestedPlacementName property for deferred initialization");
+    XCTAssertTrue([CLXPublisherNative instancesRespondToSelector:@selector(requestedAdUnitId)],
+                  @"CLXPublisherNative should have requestedAdUnitId property for deferred initialization");
 }
 
 /**
@@ -261,7 +261,7 @@
  * 1. placement is nil
  * 2. impModel is nil
  * 3. bidAdSource is nil (banner/native) / created with nil placement data (fullscreen)
- * 4. requestedPlacementName is set via private category by CloudXCoreAPI
+ * 4. requestedAdUnitId is set via private category by CloudXCoreAPI
  *
  * When load() is called before SDK init:
  * 1. pendingLoadRequestCount is incremented
@@ -269,11 +269,11 @@
  *
  * When SDK init completes (via CLXSDKInitializedNotification):
  * 1. performLoad is called
- * 2. Real placement config is looked up using requestedPlacementName
+ * 2. Real placement config is looked up using requestedAdUnitId
  * 3. Placement properties are populated (placementID, dealID, etc.)
  * 4. impModel is created with proper appID
  * 5. bidAdSource is created with real placement data
- * 6. requestedPlacementName is cleared
+ * 6. requestedAdUnitId is cleared
  * 7. Bid request proceeds with all correct data
  */
 - (void)testDocumentation_DeferredInitializationFlow {
@@ -366,7 +366,7 @@
  */
 - (void)testBehavior_HybridDependencyInjectionParametersExist {
     // Verify the init method with injection parameters exists
-    SEL initSelector = @selector(initWithViewController:placement:userID:publisherID:suspendPreloadWhenInvisible:delegate:bannerType:impModel:adFactories:bidTokenSources:bidRequestTimeout:reportingService:settings:);
+    SEL initSelector = @selector(initWithViewController:adUnit:userID:publisherID:suspendPreloadWhenInvisible:delegate:bannerType:impModel:adFactories:bidTokenSources:bidRequestTimeout:reportingService:settings:);
 
     XCTAssertTrue([CLXPublisherBanner instancesRespondToSelector:initSelector],
                   @"Banner should have init method with adFactories and bidTokenSources for hybrid DI");

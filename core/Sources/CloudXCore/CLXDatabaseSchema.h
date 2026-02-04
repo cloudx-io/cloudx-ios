@@ -47,7 +47,7 @@ extern NSString * const CLXPerformanceMetricsTableName;
 
 /**
  * Performance Metrics Table (replaces Core Data CLXPerformanceMetricModel)
- * Fields: id, placementId, sessionId, clickCount, impressionCount, closeCount, 
+ * Fields: id, adUnitId, sessionId, clickCount, impressionCount, closeCount, 
  *         loadLatency, bidResponseCount, timestamp
  */
 + (NSString *)createPerformanceMetricsTableSQL;

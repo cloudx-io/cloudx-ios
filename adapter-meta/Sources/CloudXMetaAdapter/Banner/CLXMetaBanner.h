@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithBidPayload:(NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
-                     placementName:(nullable NSString *)placementName
+                     adUnitName:(nullable NSString *)adUnitName
                              bidID:(NSString *)bidID
                               type:(CLXBannerType)type
                     viewController:(UIViewController *)viewController

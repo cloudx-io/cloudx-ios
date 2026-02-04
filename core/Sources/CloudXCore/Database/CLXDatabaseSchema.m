@@ -5,7 +5,8 @@
 #import "CLXDatabaseSchema.h"
 
 // Database Configuration
-const NSInteger CLXDatabaseCurrentVersion = 2;
+// Version 3: Renamed placementId -> adUnitId in performance_metrics_table (2.0.0 terminology migration)
+const NSInteger CLXDatabaseCurrentVersion = 3;
 NSString * const CLXDatabaseName = @"cloudx.db";
 
 // Table Names (matching Android exactly)
@@ -45,7 +46,7 @@ NSString * const CLXPerformanceMetricsTableName = @"performance_metrics_table";
 + (NSString *)createPerformanceMetricsTableSQL {
     return @"CREATE TABLE IF NOT EXISTS performance_metrics_table ("
            @"id TEXT PRIMARY KEY NOT NULL, "
-           @"placementId TEXT NOT NULL, "
+           @"adUnitId TEXT NOT NULL, "
            @"sessionId TEXT NOT NULL, "
            @"clickCount INTEGER NOT NULL DEFAULT 0, "
            @"impressionCount INTEGER NOT NULL DEFAULT 0, "
@@ -77,14 +78,14 @@ NSString * const CLXPerformanceMetricsTableName = @"performance_metrics_table";
         @"CREATE INDEX IF NOT EXISTS idx_session_app_key ON session_table(appKey)",
         @"CREATE INDEX IF NOT EXISTS idx_session_start_time ON session_table(startTime)",
 
-        // Performance Metrics Indexes
-        @"CREATE INDEX IF NOT EXISTS idx_performance_placement_id ON performance_metrics_table(placementId)",
+        // Performance Metrics Indexes (2.0.0: renamed placementId -> adUnitId)
+        @"CREATE INDEX IF NOT EXISTS idx_performance_ad_unit_id ON performance_metrics_table(adUnitId)",
         @"CREATE INDEX IF NOT EXISTS idx_performance_session_id ON performance_metrics_table(sessionId)",
         @"CREATE INDEX IF NOT EXISTS idx_performance_timestamp ON performance_metrics_table(timestamp)",
 
         // Composite Indexes for Common Queries
         @"CREATE INDEX IF NOT EXISTS idx_metrics_session_name ON metrics_event_table(sessionId, metricName)",
-        @"CREATE INDEX IF NOT EXISTS idx_performance_placement_session ON performance_metrics_table(placementId, sessionId)"
+        @"CREATE INDEX IF NOT EXISTS idx_performance_ad_unit_session ON performance_metrics_table(adUnitId, sessionId)"
     ];
 }
 
@@ -99,6 +100,18 @@ NSString * const CLXPerformanceMetricsTableName = @"performance_metrics_table";
             @"ALTER TABLE performance_metrics_table ADD COLUMN bidRequestLatency REAL NOT NULL DEFAULT 0.0",
             @"ALTER TABLE performance_metrics_table ADD COLUMN failToLoadAdCount INTEGER NOT NULL DEFAULT 0",
             @"ALTER TABLE performance_metrics_table ADD COLUMN closeLatency REAL NOT NULL DEFAULT 0.0"
+        ]];
+    }
+    
+    // Migration v3: Add adUnitId column (2.0.0 terminology migration)
+    // Strategy: Add new column, leave old placementId column unused. Simpler and safer than
+    // DROP/CREATE since SQLite < 3.25 (iOS 12) doesn't support RENAME COLUMN or DROP COLUMN.
+    // Old placementId column remains but is ignored - new SDK code writes to adUnitId only.
+    if (fromVersion < 3 && toVersion >= 3) {
+        [migrations addObjectsFromArray:@[
+            @"ALTER TABLE performance_metrics_table ADD COLUMN adUnitId TEXT",
+            @"CREATE INDEX IF NOT EXISTS idx_performance_ad_unit_id ON performance_metrics_table(adUnitId)",
+            @"CREATE INDEX IF NOT EXISTS idx_performance_ad_unit_session ON performance_metrics_table(adUnitId, sessionId)"
         ]];
     }
     

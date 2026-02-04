@@ -61,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  bidId:bidId
                                                                    adm:adm
                                                                 extras:adapterExtras
-                                                         placementName:self.placementName
+                                                         adUnitName:self.adUnitName
                                                               delegate:self];
     
     if (!interstitial) {
@@ -113,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
     [[CLXDebugOverlayManager shared] flashError];
     if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
         [self.logger logDelegateError:@"❌ Interstitial didFailToLoadAd" error:error];
-        [self.delegate didFailToLoadAd:self.placementName error:error];
+        [self.delegate didFailToLoadAd:self.adUnitId error:error];
     }
 }
 

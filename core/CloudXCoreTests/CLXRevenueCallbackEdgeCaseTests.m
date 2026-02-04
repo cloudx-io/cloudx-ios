@@ -33,7 +33,7 @@
     malformedBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
     malformedBid.ext.cloudx.revenue = 1.50;
 
-    CLXAd *ad = [CLXAd adFromBid:malformedBid placementId:@"malformed-test" adFormat:CLXAdFormatInterstitial placement:nil];
+    CLXAd *ad = [CLXAd adFromBid:malformedBid adUnitId:@"malformed-test" adFormat:CLXAdFormatInterstitial placement:nil];
 
     XCTAssertNil(ad, @"CLXAd should be nil with malformed bid structure");
 }
@@ -49,7 +49,7 @@
     emptyBidderBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
     emptyBidderBid.ext.cloudx.revenue = 1.50;
 
-    CLXAd *ad = [CLXAd adFromBid:emptyBidderBid placementId:@"empty-bidder-test" adFormat:CLXAdFormatInterstitial placement:nil];
+    CLXAd *ad = [CLXAd adFromBid:emptyBidderBid adUnitId:@"empty-bidder-test" adFormat:CLXAdFormatInterstitial placement:nil];
 
     XCTAssertNil(ad, @"CLXAd should be nil when bidder is empty string");
 }
@@ -65,7 +65,7 @@
     zeroRevenueBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
     zeroRevenueBid.ext.cloudx.revenue = 0.0;
 
-    CLXAd *ad = [CLXAd adFromBid:zeroRevenueBid placementId:@"zero-revenue-test" adFormat:CLXAdFormatInterstitial placement:nil];
+    CLXAd *ad = [CLXAd adFromBid:zeroRevenueBid adUnitId:@"zero-revenue-test" adFormat:CLXAdFormatInterstitial placement:nil];
 
     XCTAssertNotNil(ad, @"CLXAd should be created even with zero revenue");
     XCTAssertEqual([ad.revenue doubleValue], 0.0, @"Revenue should be zero");
@@ -83,7 +83,7 @@
     validBid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
     validBid.ext.cloudx.revenue = 1.50;
 
-    CLXAd *ad = [CLXAd adFromBid:validBid placementId:nil adFormat:CLXAdFormatInterstitial placement:nil];
+    CLXAd *ad = [CLXAd adFromBid:validBid adUnitId:nil adFormat:CLXAdFormatInterstitial placement:nil];
 
     XCTAssertNotNil(ad, @"CLXAd should be created even with nil ad unit ID");
     XCTAssertNil(ad.adUnitId, @"Ad unit ID should be nil");

@@ -47,11 +47,11 @@
                                                 bidId:(NSString *)bidId
                                                   adm:(NSString *)adm
                                                extras:(NSDictionary<NSString *, NSString *> *)extras
-                                        placementName:(NSString *)placementName
+                                         adUnitName:(NSString *)adUnitName
                                              delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
 
-    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating interstitial - Placement: %@ (%@), BidID: %@",
-                                    placementName ?: @"(unknown)", adId, bidId]];
+    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating interstitial - Ad Unit: %@ (%@), BidID: %@",
+                                    adUnitName ?: @"(unknown)", adId, bidId]];
 
     // Extract InMobi placement ID from extras
     NSString *placementId = extras[@"placement_id"];
@@ -75,7 +75,7 @@
     // Validation errors will be reported in load() via delegate callback
     CLXInMobiInterstitial *interstitial = [[CLXInMobiInterstitial alloc] initWithBidPayload:bidPayloadData
                                                                                  placementID:inmobiPlacementID  // May be 0 (invalid)
-                                                                               placementName:placementName
+                                                                               adUnitName:adUnitName
                                                                                        bidID:bidId
                                                                                     delegate:delegate];
 

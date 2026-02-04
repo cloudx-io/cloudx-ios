@@ -50,7 +50,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
 // Deferred initialization properties
 @property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
 @property (nonatomic, strong, nullable) NSError *deferredError;
-@property (nonatomic, copy, nullable) NSString *requestedPlacementName;
+@property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
 
 // Expose private methods for testing
 - (void)setVisible:(BOOL)visible;
@@ -105,7 +105,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                          adm:(NSString *)adm
                                              hasClosedButton:(BOOL)hasClosedButton
                                                       extras:(NSDictionary<NSString *, NSString *> *)extras
-                                               placementName:(nullable NSString *)placementName
+                                               adUnitName:(nullable NSString *)adUnitName
                                                     delegate:(id<CLXAdapterBannerDelegate>)delegate {
     if (self.shouldReturnNil) {
         return nil;
@@ -187,7 +187,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
     NSDictionary<NSString *, id<CLXBidTokenSource>> *testBidTokenSources = @{};
     
     self.banner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
-                                                           placement:self.testPlacement
+                                                           adUnit:self.testPlacement
                                                               userID:kTestUserID
                                                          publisherID:kTestPublisherID
                                             suspendPreloadWhenInvisible:NO
@@ -232,7 +232,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
     NSDictionary<NSString *, id<CLXBidTokenSource>> *testBidTokenSources = @{};
     
     CLXPublisherBanner *customBanner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
-                                                                                placement:self.testPlacement
+                                                                                adUnit:self.testPlacement
                                                                                    userID:kTestUserID
                                                                               publisherID:kTestPublisherID
                                                                  suspendPreloadWhenInvisible:NO
@@ -555,7 +555,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
 - (void)testBannerInitializesWithEmptyInjectedFactories {
     // Create banner with empty factories (simulates deferred init scenario)
     CLXPublisherBanner *emptyFactoriesBanner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
-                                                                                        placement:self.testPlacement
+                                                                                        adUnit:self.testPlacement
                                                                                            userID:kTestUserID
                                                                                       publisherID:kTestPublisherID
                                                                          suspendPreloadWhenInvisible:NO
@@ -577,7 +577,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
 - (void)testBannerInitializesWithNilPlacement {
     // Create banner with nil placement (simulates SDK not initialized scenario)
     CLXPublisherBanner *deferredBanner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
-                                                                                  placement:nil
+                                                                                  adUnit:nil
                                                                                      userID:kTestUserID
                                                                                 publisherID:kTestPublisherID
                                                                    suspendPreloadWhenInvisible:NO
@@ -622,11 +622,11 @@ static const NSTimeInterval kTestTimeout = 2.0;
     XCTAssertEqual(self.banner.pendingLoadRequestCount, 0, @"Initial pending count should be 0");
 }
 
-// Test that requestedPlacementName can be set for deferred initialization
+// Test that requestedAdUnitId can be set for deferred initialization
 - (void)testRequestedPlacementNameCanBeSetForDeferredInit {
     // Create banner with nil placement
     CLXPublisherBanner *deferredBanner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
-                                                                                  placement:nil
+                                                                                  adUnit:nil
                                                                                      userID:kTestUserID
                                                                                 publisherID:kTestPublisherID
                                                                    suspendPreloadWhenInvisible:NO
@@ -639,11 +639,11 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                                           reportingService:self.mockReportingService
                                                                                    settings:self.testSettings];
     
-    // Set requestedPlacementName via private category (as CloudXCoreAPI does)
-    deferredBanner.requestedPlacementName = @"test-placement";
+    // Set requestedAdUnitId via private category (as CloudXCoreAPI does)
+    deferredBanner.requestedAdUnitId = @"test-placement";
     
-    XCTAssertEqualObjects(deferredBanner.requestedPlacementName, @"test-placement", 
-                          @"requestedPlacementName should be stored for deferred initialization");
+    XCTAssertEqualObjects(deferredBanner.requestedAdUnitId, @"test-placement", 
+                          @"requestedAdUnitId should be stored for deferred initialization");
     
     [deferredBanner destroy];
 }

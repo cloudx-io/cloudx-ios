@@ -53,7 +53,7 @@
 - (void)testIntegration_ResolvesAllProductionTrackingFields {
     // Given - setup with realistic production data
     NSString *auctionId = @"prod-auction-123";
-    NSString *placementId = @"duWzvnasECVFML-K5CnQJ";  // From new_config_response.txt
+    NSString *adUnitId = @"duWzvnasECVFML-K5CnQJ";  // From new_config_response.txt
     NSString *bidId = @"bid-456";
 
     // Production tracking fields (from new_config_response.txt, excluding sdk.placement and sdk.customData)
@@ -92,7 +92,7 @@
         @"organizationID": @"CLDX1",
         @"tracking": trackingFields,
         @"adUnits": @[
-            @{@"id": placementId, @"name": @"DSTestPlacement", @"type": @"BANNER"}
+            @{@"id": adUnitId, @"name": @"DSTestPlacement", @"type": @"BANNER"}
         ]
     };
 
@@ -111,7 +111,7 @@
     NSDictionary *bidRequestJSON = @{
         @"id": auctionId,
         @"imp": @[@{
-            @"tagid": placementId,
+            @"tagid": adUnitId,
             @"banner": @{@"w": @320, @"h": @50}
         }],
         @"device": @{
@@ -191,7 +191,7 @@
     XCTAssertEqualObjects(values[9], @"acc_id_CLDX1", @"config.accountID");
     XCTAssertEqualObjects(values[10], @"CLDX1", @"config.organizationID");
     XCTAssertEqualObjects(values[11], @"com.example.app", @"sdk.app.bundle");
-    XCTAssertEqualObjects(values[12], placementId, @"bidRequest.imp.tagid");
+    XCTAssertEqualObjects(values[12], adUnitId, @"bidRequest.imp.tagid");
     XCTAssertEqualObjects(values[13], @"iPhone14,2", @"bidRequest.device.model");
     XCTAssertEqualObjects(values[14], @"phone", @"sdk.deviceTypeName");
     XCTAssertEqualObjects(values[15], @"iOS", @"bidRequest.device.os");
@@ -1107,14 +1107,14 @@
 - (void)testConfigAdUnits_ResolvesNameWithPlaceholder {
     // Given
     NSString *auctionId = @"auction-adunits";
-    NSString *placementId = @"placement-abc-123";
+    NSString *adUnitId = @"placement-abc-123";
 
     // Config with adUnits array
     NSDictionary *configJSON = @{
         @"tracking": @[@"config.adUnits[id=${bidRequest.imp.tagid}].name"],
         @"adUnits": @[
             @{@"id": @"other-placement", @"name": @"Other Banner", @"externalId": @"ext-other"},
-            @{@"id": placementId, @"name": @"Main Banner", @"externalId": @"ext-main-123"},
+            @{@"id": adUnitId, @"name": @"Main Banner", @"externalId": @"ext-main-123"},
             @{@"id": @"another-one", @"name": @"Another", @"externalId": @"ext-another"}
         ]
     };
@@ -1122,7 +1122,7 @@
 
     // Bid request with tagid matching one of the adUnits
     NSDictionary *bidRequestJSON = @{
-        @"imp": @[@{@"tagid": placementId}]
+        @"imp": @[@{@"tagid": adUnitId}]
     };
     [self.resolver setRequestData:auctionId bidRequestJSON:bidRequestJSON];
 
@@ -1141,20 +1141,20 @@
 - (void)testConfigAdUnits_ResolvesTypeWithPlaceholder {
     // Given
     NSString *auctionId = @"auction-adunits-type";
-    NSString *placementId = @"_4yh_aeAtBrcFLCOKwePX";  // From new_config_response.txt
+    NSString *adUnitId = @"_4yh_aeAtBrcFLCOKwePX";  // From new_config_response.txt
 
     NSDictionary *configJSON = @{
         @"tracking": @[@"config.adUnits[id=${bidRequest.imp.tagid}].type"],
         @"adUnits": @[
             @{@"id": @"first", @"name": @"First", @"type": @"BANNER"},
-            @{@"id": placementId, @"name": @"mintegral-interstitial", @"type": @"INTERSTITIAL"},
+            @{@"id": adUnitId, @"name": @"mintegral-interstitial", @"type": @"INTERSTITIAL"},
             @{@"id": @"last", @"name": @"Last", @"type": @"REWARDED"}
         ]
     };
     [self.resolver setConfigJSON:configJSON];
 
     NSDictionary *bidRequestJSON = @{
-        @"imp": @[@{@"tagid": placementId}]
+        @"imp": @[@{@"tagid": adUnitId}]
     };
     [self.resolver setRequestData:auctionId bidRequestJSON:bidRequestJSON];
 
@@ -1173,20 +1173,20 @@
 - (void)testConfigAdUnits_ResolvesExternalIdWithPlaceholder {
     // Given
     NSString *auctionId = @"auction-adunits-extid";
-    NSString *placementId = @"placement-xyz-789";
+    NSString *adUnitId = @"placement-xyz-789";
 
     NSDictionary *configJSON = @{
         @"tracking": @[@"config.adUnits[id=${bidRequest.imp.tagid}].externalId"],
         @"adUnits": @[
             @{@"id": @"first", @"name": @"First", @"externalId": @"ext-first"},
-            @{@"id": placementId, @"name": @"Target", @"externalId": @"ext-target-789"},
+            @{@"id": adUnitId, @"name": @"Target", @"externalId": @"ext-target-789"},
             @{@"id": @"last", @"name": @"Last", @"externalId": @"ext-last"}
         ]
     };
     [self.resolver setConfigJSON:configJSON];
 
     NSDictionary *bidRequestJSON = @{
-        @"imp": @[@{@"tagid": placementId}]
+        @"imp": @[@{@"tagid": adUnitId}]
     };
     [self.resolver setRequestData:auctionId bidRequestJSON:bidRequestJSON];
 
@@ -1233,7 +1233,7 @@
  */
 - (void)testIntegration_AllProductionXPaths {
     NSString *auctionId = @"prod-full-test";
-    NSString *placementId = @"B4twyt3IrKYZzH2o1dAww";  // From new_config_response.txt
+    NSString *adUnitId = @"B4twyt3IrKYZzH2o1dAww";  // From new_config_response.txt
     NSString *bidId = @"winning-bid-1";
 
     // Config matching new_config_response.txt structure
@@ -1242,7 +1242,7 @@
         @"organizationID": @"CLDX1",
         @"adUnits": @[
             @{
-                @"id": placementId,
+                @"id": adUnitId,
                 @"name": @"inmobi-interstitial",
                 @"type": @"INTERSTITIAL",
                 @"bidResponseTimeoutMs": @1000,
@@ -1291,7 +1291,7 @@
     // Bid request
     NSDictionary *bidRequestJSON = @{
         @"id": auctionId,
-        @"imp": @[@{@"tagid": placementId}],
+        @"imp": @[@{@"tagid": adUnitId}],
         @"device": @{
             @"ifa": @"device-ifa-abc",
             @"model": @"iPhone15,2",
@@ -1354,7 +1354,7 @@
     XCTAssertEqualObjects(values[9], @"acc_id_CLDX1", @"config.accountID");
     XCTAssertEqualObjects(values[10], @"CLDX1", @"config.organizationID");
     XCTAssertEqualObjects(values[11], @"com.app.bundle", @"sdk.app.bundle");
-    XCTAssertEqualObjects(values[12], placementId, @"bidRequest.imp.tagid");
+    XCTAssertEqualObjects(values[12], adUnitId, @"bidRequest.imp.tagid");
     XCTAssertEqualObjects(values[13], @"iPhone15,2", @"bidRequest.device.model");
     XCTAssertEqualObjects(values[14], @"phone", @"sdk.deviceTypeName");
     XCTAssertEqualObjects(values[15], @"iOS", @"bidRequest.device.os");

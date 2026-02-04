@@ -46,10 +46,10 @@
                                            bidPayload:(nullable NSString *)bidPayload
                                                 bidID:(NSString *)bidID
                                           adapterExtras:(nullable NSDictionary<NSString *, NSString *> *)adapterExtras
-                                        placementName:(nullable NSString *)placementName
+                                        adUnitName:(nullable NSString *)adUnitName
                                              delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
     
-    [self.logger debug:[NSString stringWithFormat:@"Creating interstitial - Placement: %@ (%@), BidID: %@", placementName ?: @"(unknown)", adId, bidID]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating interstitial - Placement: %@ (%@), BidID: %@", adUnitName ?: @"(unknown)", adId, bidID]];
     
     // Resolve placement ID
     NSString *placementID = [CLXMolocoBaseFactory resolveMolocoPlacementID:adapterExtras 
@@ -67,7 +67,7 @@
     CLXMolocoInterstitial *interstitial = 
         [[CLXMolocoInterstitial alloc] initWithBidPayload:bidPayload
                                               placementID:placementID  // May be nil
-                                            placementName:placementName
+                                            adUnitName:adUnitName
                                                     bidID:bidID
                                                  delegate:delegate];
     

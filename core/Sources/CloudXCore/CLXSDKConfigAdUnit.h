@@ -1,5 +1,5 @@
 //
-// SDKConfigPlacement.h
+// CLXSDKConfigAdUnit.h
 // CloudXCore
 //
 

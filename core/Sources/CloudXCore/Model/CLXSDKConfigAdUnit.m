@@ -1,5 +1,5 @@
 //
-// SDKConfigPlacement.m
+// CLXSDKConfigAdUnit.m
 // CloudXCore
 //
 
@@ -31,7 +31,7 @@
 }
 
 - (NSString *)ilrdDescription {
-    return [NSString stringWithFormat:@"SDKConfigPlacement(id=%@, name=%@, type=%ld)",
+    return [NSString stringWithFormat:@"CLXSDKConfigAdUnit(id=%@, name=%@, type=%ld)",
             self.id ?: @"nil",
             self.name ?: @"nil",
             (long)self.type];

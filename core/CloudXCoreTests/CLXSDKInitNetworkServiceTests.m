@@ -303,7 +303,7 @@
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
     XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
-    XCTAssertTrue([error.localizedDescription containsString:@"placements[0].id"], @"Error should mention placement id");
+    XCTAssertTrue([error.localizedDescription containsString:@"adUnits[0].id"], @"Error should mention ad unit id");
 }
 
 /**
@@ -322,7 +322,7 @@
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
     XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
-    XCTAssertTrue([error.localizedDescription containsString:@"placements[0].name"], @"Error should mention placement name");
+    XCTAssertTrue([error.localizedDescription containsString:@"adUnits[0].name"], @"Error should mention ad unit name");
 }
 
 /**
@@ -341,7 +341,7 @@
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
     XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
-    XCTAssertTrue([error.localizedDescription containsString:@"placements[0].type"], @"Error should mention placement type");
+    XCTAssertTrue([error.localizedDescription containsString:@"adUnits[0].type"], @"Error should mention ad unit type");
 }
 
 /**

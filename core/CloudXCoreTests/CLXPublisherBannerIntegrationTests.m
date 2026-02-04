@@ -355,7 +355,7 @@ static const NSTimeInterval kTestTimeout = 0.5;
     self.testSettings = [[CLXSettings alloc] init];
     
     self.banner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
-                                                           placement:self.testPlacement
+                                                           adUnit:self.testPlacement
                                                               userID:kTestUserID
                                                          publisherID:kTestPublisherID
                                             suspendPreloadWhenInvisible:NO
