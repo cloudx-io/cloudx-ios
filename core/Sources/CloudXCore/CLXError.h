@@ -35,10 +35,10 @@ typedef NS_ENUM(NSInteger, CLXLossReason) {
 
 /**
  * CloudX SDK error codes - following industry standards
- * 
+ *
  * Error code ranges:
- * 100-199: SDK initialization errors
- * 200-299: Network and connectivity errors  
+ * 100-199: Network and connectivity errors
+ * 200-299: SDK initialization errors
  * 300-399: Ad request and loading errors
  * 400-499: Ad display and presentation errors
  * 500-599: Configuration and setup errors
@@ -47,34 +47,34 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     // GENERAL ERRORS (0-99)
     /// An internal error occurred
     CLXErrorCodeInternalError = 0,
-    
-    // INITIALIZATION ERRORS (100-199)
-    /// SDK failed to initialize
-    CLXErrorCodeNotInitialized = 100,
-    /// SDK initialized but no adapters were found
-    CLXErrorCodeNoAdaptersFound = 101,
-    /// No ad networks configured for this app
-    CLXErrorCodeNoNetworksConfigured = 102,
-    /// Invalid app key provided during initialization
-    CLXErrorCodeInvalidAppKey = 103,
-    /// SDK disabled by kill switch
-    CLXErrorCodeSDKDisabled = 104,
-    
-    // NETWORK ERRORS (200-299)
+
+    // NETWORK ERRORS (100-199)
     /// Network error
-    CLXErrorCodeNetworkError = 200,
+    CLXErrorCodeNetworkError = 100,
     /// Network request timed out
-    CLXErrorCodeNetworkTimeout = 201,
+    CLXErrorCodeNetworkTimeout = 101,
     /// Server error (5xx)
-    CLXErrorCodeServerError = 202,
+    CLXErrorCodeServerError = 102,
     /// Client error (4xx)
-    CLXErrorCodeClientError = 203,
+    CLXErrorCodeClientError = 103,
     /// Rate limited (429)
-    CLXErrorCodeTooManyRequests = 204,
+    CLXErrorCodeTooManyRequests = 104,
     /// Invalid or unparseable server response
-    CLXErrorCodeInvalidResponse = 205,
+    CLXErrorCodeInvalidResponse = 105,
     /// No network connectivity
-    CLXErrorCodeNoConnection = 206,
+    CLXErrorCodeNoConnection = 106,
+
+    // INITIALIZATION ERRORS (200-299)
+    /// SDK failed to initialize
+    CLXErrorCodeNotInitialized = 200,
+    /// SDK initialized but no adapters were found
+    CLXErrorCodeNoAdaptersFound = 201,
+    /// No ad networks configured for this app
+    CLXErrorCodeNoNetworksConfigured = 202,
+    /// Invalid app key provided during initialization
+    CLXErrorCodeInvalidAppKey = 203,
+    /// SDK disabled by kill switch
+    CLXErrorCodeSDKDisabled = 204,
     
     // AD REQUEST/LOADING ERRORS (300-399)
     /// Ad unit not found or invalid

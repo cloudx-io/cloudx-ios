@@ -126,19 +126,7 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
         case CLXErrorCodeInternalError:
             return @"Internal error.";
 
-        // INITIALIZATION ERRORS (100-199)
-        case CLXErrorCodeNotInitialized:
-            return @"SDK not initialized. Please initialize the SDK before using it.";
-        case CLXErrorCodeNoAdaptersFound:
-            return @"No ad adapters found. Add at least one adapter to show ads.";
-        case CLXErrorCodeNoNetworksConfigured:
-            return @"No ad networks configured for this app.";
-        case CLXErrorCodeInvalidAppKey:
-            return @"Invalid app key.";
-        case CLXErrorCodeSDKDisabled:
-            return @"SDK is disabled by server configuration.";
-            
-        // NETWORK ERRORS (200-299)
+        // NETWORK ERRORS (100-199)
         case CLXErrorCodeNetworkError:
             return @"Network error.";
         case CLXErrorCodeNetworkTimeout:
@@ -153,6 +141,18 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
             return @"Invalid or unparseable server response.";
         case CLXErrorCodeNoConnection:
             return @"No network connectivity.";
+
+        // INITIALIZATION ERRORS (200-299)
+        case CLXErrorCodeNotInitialized:
+            return @"SDK not initialized.";
+        case CLXErrorCodeNoAdaptersFound:
+            return @"No ad adapters found. Add at least one adapter to show ads.";
+        case CLXErrorCodeNoNetworksConfigured:
+            return @"No ad networks configured for this app.";
+        case CLXErrorCodeInvalidAppKey:
+            return @"Invalid app key.";
+        case CLXErrorCodeSDKDisabled:
+            return @"SDK is disabled by server configuration.";
 
         // AD REQUEST/LOADING ERRORS (300-399)
         case CLXErrorCodeInvalidAdUnit:
