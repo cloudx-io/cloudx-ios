@@ -107,7 +107,7 @@
         rewardedPlacement:@"objc-demo-rewarded"
         rewardedInterstitialPlacement:@"objc-demo-rewarded"];
 
-    // Production Configuration (Blocky app - io.cloudx.Blocky)
+    // Production Configuration (ObjCDemoApp - cloudx.CloudXObjCRemotePods)
     CLXDemoConfig *prodConfig = [[CLXDemoConfig alloc]
         initWithAppKey:@"ihtOXvp3X9JlMQ5p0_RYL"
         hashedUserId:@"prod-user-123"
@@ -117,8 +117,8 @@
         interstitialPlacement:@"txZ7NmISq-MsuPH0ULKbD"
         nativePlacement:@"Q33RbPmBH-wix45Mu6--Z"
         nativeBannerPlacement:@"-"
-        rewardedPlacement:@"-"
-        rewardedInterstitialPlacement:@"-"];
+        rewardedPlacement:@"um9Ek08ScJBWuzSMTyW3b"
+        rewardedInterstitialPlacement:@"I-JRnXEQc2bG5dm1EWoZ6"];
     
     _configurations = @{
         @(CLXDemoEnvironmentLocal): localConfig,
