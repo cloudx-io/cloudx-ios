@@ -74,15 +74,13 @@
 - (void)showFromViewController:(UIViewController *)viewController {
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXRendererInterstitial"];
     [logger debug:@"[SHOW] CLXRendererInterstitial show() method called"];
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.containerViewController) {
             [viewController presentViewController:self.containerViewController animated:YES completion:nil];
             [self didShow];
-            
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self impression];
-            });
+            // Impression is triggered by CLXViewabilityTracker when IAB threshold is met
+            // (50% visible for 1 second), not by a fixed timer
             [logger info:@"Ad presentation initiated successfully"];
         } else {
             [logger error:@"FAILED to show ad: containerViewController is NIL"];
