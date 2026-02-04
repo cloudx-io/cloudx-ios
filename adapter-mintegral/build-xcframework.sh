@@ -86,6 +86,10 @@ xcodebuild -create-xcframework \
   -framework ./build/static/ios_simulator.xcarchive/Products/Library/Frameworks/CloudXMintegralAdapter.framework \
   -output ./CloudXMintegralAdapter.xcframework || print_error "Failed to create .xcframework."
 
+# --- Step 4.5: Convert Info.plist to XML for CocoaPods compatibility ---
+print_status "4.5. Converting Info.plist to XML format..."
+plutil -convert xml1 ./CloudXMintegralAdapter.xcframework/Info.plist || print_error "Failed to convert Info.plist"
+
 # --- Step 5: Setup Module Map and Headers ---
 print_status "5. Setting up module map and headers..."
 for platform in ios-arm64 ios-arm64_x86_64-simulator; do

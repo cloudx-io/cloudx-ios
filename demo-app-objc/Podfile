@@ -1,27 +1,20 @@
-# Uncomment the next line to define a global platform for your project
 platform :ios, '15.0'
 
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
-  # CloudX SDK - RC 2.0.0 Testing (source from cloudx-ios-private-temp on release/2.0.0 branch)
-  # Same setup as Blocky app (paths adjusted for relative location within cloudx-ios-private-temp)
-  pod 'CloudXCore', :path => '../core'
-  pod 'CloudXMetaAdapter', :path => '../adapter-meta'
-  pod 'CloudXVungleAdapter', :path => '../adapter-vungle'
-  pod 'CloudXInMobiAdapter', :path => '../adapter-inmobi'
-  pod 'CloudXRenderer', :path => '../renderer-cloudx'
-  
-  # Mintegral adapter - not ready for release yet (dashboard configuration pending)
-  # pod 'CloudXMintegralAdapter', :path => '../adapter-mintegral'
+  # CloudX SDK - Local binary testing
+  pod 'CloudXCore', :path => '../binaries-test/core'
+  pod 'CloudXMetaAdapter', :path => '../binaries-test/adapter-meta'
+  pod 'CloudXVungleAdapter', :path => '../binaries-test/adapter-vungle'
+  pod 'CloudXInMobiAdapter', :path => '../binaries-test/adapter-inmobi'
+  pod 'CloudXRenderer', :path => '../binaries-test/renderer-cloudx'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths
-    # Pods for testing
   end
 
   target 'CloudXObjCRemotePodsUITests' do
-    # Pods for testing
   end
 
 end

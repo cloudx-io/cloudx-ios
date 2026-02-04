@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXCore'
-  s.version = '2.0.0'
+  s.version = '2.0.0-rc'
   s.summary          = 'CloudX Core Framework'
   s.description      = 'Core framework for CloudX functionality - local development version'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -18,9 +18,12 @@ Pod::Spec.new do |s|
   s.framework = 'Foundation'
   s.frameworks = 'SafariServices'
   
-  # Configure for source-based distribution with proper header search paths
+  # Configure for source-based distribution
+  # DEFINES_MODULE=NO prevents CocoaPods from generating a conflicting umbrella header
+  # The adapters import CloudXCore headers directly, not via module imports
   s.pod_target_xcconfig = {
     'CLANG_ENABLE_MODULES' => 'YES',
+    'DEFINES_MODULE' => 'NO',
     'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
   }
   s.user_target_xcconfig = {

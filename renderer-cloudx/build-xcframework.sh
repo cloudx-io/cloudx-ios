@@ -154,6 +154,11 @@ xcodebuild -create-xcframework \
   -output "$OUTPUT_XCFRAMEWORK"
 print_success "STATIC XCFramework created: $OUTPUT_XCFRAMEWORK"
 
+# Convert Info.plist to XML for CocoaPods compatibility
+print_step "🔧 Converting Info.plist to XML format..."
+plutil -convert xml1 "$OUTPUT_XCFRAMEWORK/Info.plist"
+print_success "Info.plist converted to XML (CocoaPods compatible)"
+
 # Upload dSYMs to Sentry
 if [ "$SKIP_SENTRY" = false ]; then
     print_step "🕵️  Uploading dSYMs to Sentry..."

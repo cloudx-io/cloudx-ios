@@ -1,3 +1,18 @@
+<!--
+================================================================================
+PUBLIC RELEASE PROCESS
+================================================================================
+Purpose: Release CloudX iOS SDK to the PUBLIC cloudx-ios repository
+Target:  cloudx-io/cloudx-ios (binary distribution via CocoaPods Trunk)
+Audience: External developers integrating CloudX SDK
+
+This document is used by Claude to execute public releases. Follow these steps
+to build xcframeworks, publish to the public repo, and push to CocoaPods Trunk.
+
+For INTERNAL testing releases, see: INTERNAL_RELEASE.md
+================================================================================
+-->
+
 # CloudX iOS SDK Release Process
 
 This document describes the complete release process for the CloudX iOS SDK.

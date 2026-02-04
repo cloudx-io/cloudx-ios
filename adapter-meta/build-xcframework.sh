@@ -52,7 +52,8 @@ xcodebuild archive \
   STRIP_STYLE=non-global \
   COPY_PHASE_STRIP=YES \
   HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMetaAdapter $(SRCROOT)/Sources/CloudXMetaAdapter/Base $(SRCROOT)/Sources/CloudXMetaAdapter/Banner $(SRCROOT)/Sources/CloudXMetaAdapter/Initializers $(SRCROOT)/Sources/CloudXMetaAdapter/Interstitial $(SRCROOT)/Sources/CloudXMetaAdapter/Native $(SRCROOT)/Sources/CloudXMetaAdapter/Rewarded $(SRCROOT)/Sources/CloudXMetaAdapter/Utils' \
-  USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMetaAdapter $(SRCROOT)/Sources/CloudXMetaAdapter/Base $(SRCROOT)/Sources/CloudXMetaAdapter/Banner $(SRCROOT)/Sources/CloudXMetaAdapter/Initializers $(SRCROOT)/Sources/CloudXMetaAdapter/Interstitial $(SRCROOT)/Sources/CloudXMetaAdapter/Native $(SRCROOT)/Sources/CloudXMetaAdapter/Rewarded $(SRCROOT)/Sources/CloudXMetaAdapter/Utils' 2>&1 | tee xcodebuild-ios.log || print_error "Failed to build static framework for device."
+  USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMetaAdapter $(SRCROOT)/Sources/CloudXMetaAdapter/Base $(SRCROOT)/Sources/CloudXMetaAdapter/Banner $(SRCROOT)/Sources/CloudXMetaAdapter/Initializers $(SRCROOT)/Sources/CloudXMetaAdapter/Interstitial $(SRCROOT)/Sources/CloudXMetaAdapter/Native $(SRCROOT)/Sources/CloudXMetaAdapter/Rewarded $(SRCROOT)/Sources/CloudXMetaAdapter/Utils' \
+  CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES=YES 2>&1 | tee xcodebuild-ios.log || print_error "Failed to build static framework for device."
 
 # --- Step 3: Build Static Framework for Simulator ---
 print_status "3. Building Static Framework for Simulator..."
@@ -73,7 +74,8 @@ xcodebuild archive \
   STRIP_STYLE=non-global \
   COPY_PHASE_STRIP=YES \
   HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMetaAdapter $(SRCROOT)/Sources/CloudXMetaAdapter/Base $(SRCROOT)/Sources/CloudXMetaAdapter/Banner $(SRCROOT)/Sources/CloudXMetaAdapter/Initializers $(SRCROOT)/Sources/CloudXMetaAdapter/Interstitial $(SRCROOT)/Sources/CloudXMetaAdapter/Native $(SRCROOT)/Sources/CloudXMetaAdapter/Rewarded $(SRCROOT)/Sources/CloudXMetaAdapter/Utils' \
-  USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMetaAdapter $(SRCROOT)/Sources/CloudXMetaAdapter/Base $(SRCROOT)/Sources/CloudXMetaAdapter/Banner $(SRCROOT)/Sources/CloudXMetaAdapter/Initializers $(SRCROOT)/Sources/CloudXMetaAdapter/Interstitial $(SRCROOT)/Sources/CloudXMetaAdapter/Native $(SRCROOT)/Sources/CloudXMetaAdapter/Rewarded $(SRCROOT)/Sources/CloudXMetaAdapter/Utils' 2>&1 | tee xcodebuild-sim.log || print_error "Failed to build static framework for simulator."
+  USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMetaAdapter $(SRCROOT)/Sources/CloudXMetaAdapter/Base $(SRCROOT)/Sources/CloudXMetaAdapter/Banner $(SRCROOT)/Sources/CloudXMetaAdapter/Initializers $(SRCROOT)/Sources/CloudXMetaAdapter/Interstitial $(SRCROOT)/Sources/CloudXMetaAdapter/Native $(SRCROOT)/Sources/CloudXMetaAdapter/Rewarded $(SRCROOT)/Sources/CloudXMetaAdapter/Utils' \
+  CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES=YES 2>&1 | tee xcodebuild-sim.log || print_error "Failed to build static framework for simulator."
 
 # --- Step 4: Create .xcframework ---
 print_status "4. Creating .xcframework..."
@@ -82,6 +84,10 @@ xcodebuild -create-xcframework \
   -framework ./build/static/ios_devices.xcarchive/Products/Library/Frameworks/CloudXMetaAdapter.framework \
   -framework ./build/static/ios_simulator.xcarchive/Products/Library/Frameworks/CloudXMetaAdapter.framework \
   -output ./CloudXMetaAdapter.xcframework || print_error "Failed to create .xcframework."
+
+# --- Step 4.5: Convert Info.plist to XML for CocoaPods compatibility ---
+print_status "4.5. Converting Info.plist to XML format..."
+plutil -convert xml1 ./CloudXMetaAdapter.xcframework/Info.plist || print_error "Failed to convert Info.plist"
 
 # --- Step 5: Setup Module Map and Headers ---
 print_status "5. Setting up module map and headers..."

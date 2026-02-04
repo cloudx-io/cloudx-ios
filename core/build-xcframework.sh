@@ -193,8 +193,8 @@ if [ -f "$PLIST_PATH" ]; then
     # This handles the pattern: <key>DebugSymbolsPath</key>\n\t\t\t<string>dSYMs</string>
     sed -i '' '/<key>DebugSymbolsPath<\/key>/,/<string>.*<\/string>/d' "$PLIST_PATH"
     
-    plutil -convert binary1 "$PLIST_PATH"
-    print_success "DebugSymbolsPath entries removed from Info.plist"
+    # Keep as XML format for CocoaPods compatibility (CocoaPods can't parse binary plists)
+    print_success "DebugSymbolsPath entries removed from Info.plist (kept as XML for CocoaPods)"
 else
     print_warning "Info.plist not found at $PLIST_PATH"
 fi

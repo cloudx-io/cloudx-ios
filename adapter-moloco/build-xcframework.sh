@@ -43,6 +43,9 @@ xcodebuild -create-xcframework \
   -framework "${BUILD_DIR}/ios-sim.xcarchive/Products/Library/Frameworks/${FRAMEWORK_NAME}.framework" \
   -output "${XCFRAMEWORK_PATH}"
 
+echo "🔧 Converting Info.plist to XML for CocoaPods compatibility..."
+plutil -convert xml1 "${XCFRAMEWORK_PATH}/Info.plist"
+
 echo "📝 Setting up module map in XCFramework..."
 for arch_dir in "${XCFRAMEWORK_PATH}"/*/; do
     HEADERS_DIR="${arch_dir}Headers"
