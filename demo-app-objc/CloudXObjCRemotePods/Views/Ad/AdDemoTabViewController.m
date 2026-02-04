@@ -4,9 +4,6 @@
 #import "InterstitialViewController.h"
 #import "RewardedViewController.h"
 #import "MRECViewController.h"
-#import "NativeViewController.h"
-#import "NativeBannerViewController.h"
-#import "RewardedInterstitialViewController.h"
 #import "SettingsViewController.h"
 #import "KeyValueDemoViewController.h"
 
@@ -31,32 +28,20 @@
     MRECViewController *mrecVC = [[MRECViewController alloc] init];
     mrecVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"MREC" image:[UIImage systemImageNamed:@"rectangle.3.group"] tag:4];
     
-    NativeViewController *nativeVC = [[NativeViewController alloc] init];
-    nativeVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Native" image:[UIImage systemImageNamed:@"doc"] tag:5];
-    
-    NativeBannerViewController *nativeBannerVC = [[NativeBannerViewController alloc] init];
-    nativeBannerVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Native Banner" image:[UIImage systemImageNamed:@"doc.badge.plus"] tag:6];
-    
-    RewardedInterstitialViewController *rewardedInterstitialVC = [[RewardedInterstitialViewController alloc] init];
-    rewardedInterstitialVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Reward Inter" image:[UIImage systemImageNamed:@"star.square"] tag:7];
-    
     KeyValueDemoViewController *keyValueVC = [[KeyValueDemoViewController alloc] init];
-    keyValueVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Key-Values" image:[UIImage systemImageNamed:@"key.fill"] tag:9];
+    keyValueVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Key-Values" image:[UIImage systemImageNamed:@"key.fill"] tag:5];
     
     SettingsViewController *settinsVC = [[SettingsViewController alloc] init];
-    settinsVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:[UIImage systemImageNamed:@"gearshape"] tag:10];
+    settinsVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:[UIImage systemImageNamed:@"gearshape"] tag:6];
 
     
-    // Set view controllers - Additional VCs appear in "More" section
+    // Set view controllers
     self.viewControllers = @[
         [[UINavigationController alloc] initWithRootViewController:initInternalVC],
         [[UINavigationController alloc] initWithRootViewController:bannerVC],
         [[UINavigationController alloc] initWithRootViewController:interstitialVC],
         [[UINavigationController alloc] initWithRootViewController:rewardedVC],
         [[UINavigationController alloc] initWithRootViewController:mrecVC],
-        [[UINavigationController alloc] initWithRootViewController:nativeVC],
-        [[UINavigationController alloc] initWithRootViewController:nativeBannerVC],
-        [[UINavigationController alloc] initWithRootViewController:rewardedInterstitialVC],
         [[UINavigationController alloc] initWithRootViewController:keyValueVC],
         [[UINavigationController alloc] initWithRootViewController:settinsVC]
     ];

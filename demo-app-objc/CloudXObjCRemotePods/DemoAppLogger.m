@@ -97,13 +97,27 @@
     
     NSMutableString *details = [NSMutableString stringWithString:@" - Ad Details:"];
     
-    // Ad Unit ID
-    if (ad.adUnitId) {
-        [details appendFormat:@"\n  📍 Ad Unit ID: %@", ad.adUnitId];
+    // Ad Unit Name
+    if (ad.adUnitName) {
+        [details appendFormat:@"\n  📍 Ad Unit: %@", ad.adUnitName];
     } else {
-        [details appendString:@"\n  📍 Ad Unit ID: (null)"];
+        [details appendString:@"\n  📍 Ad Unit: (null)"];
     }
     
+    // Ad Unit ID
+    if (ad.adUnitId) {
+        [details appendFormat:@"\n  🆔 Ad Unit ID: %@", ad.adUnitId];
+    } else {
+        [details appendString:@"\n  🆔 Ad Unit ID: (null)"];
+    }
+
+    // Placement (publisher-provided)
+    if (ad.placement) {
+        [details appendFormat:@"\n  📌 Placement: %@", ad.placement];
+    } else {
+        [details appendString:@"\n  📌 Placement: (null)"];
+    }
+
     // Network Name
     if (ad.networkName) {
         [details appendFormat:@"\n  🏢 Network: %@", ad.networkName];

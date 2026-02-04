@@ -123,6 +123,8 @@
     self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:adUnitId viewController:self];
     self.mrecAd.delegate = self;
     self.mrecAd.revenueDelegate = self;
+    self.mrecAd.placement = @"demo_mrec";
+    self.mrecAd.customData = @"screen:detail,section:sidebar";
     
     if (!self.mrecAd) {
         [self showAlertWithTitle:@"Error" message:@"Failed to create MREC."];
@@ -263,6 +265,8 @@
                                                  viewController:self];
     self.mrecAd.delegate = self;
     self.mrecAd.revenueDelegate = self;
+    self.mrecAd.placement = @"demo_mrec";
+    self.mrecAd.customData = @"screen:detail,section:sidebar";
     
     if (self.mrecAd) {
         [self.mrecAd load];

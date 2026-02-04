@@ -154,6 +154,8 @@
                                                       viewController:self];
     self.bannerAd.delegate = self;
     self.bannerAd.revenueDelegate = self;
+    self.bannerAd.placement = @"demo_banner";
+    self.bannerAd.customData = @"screen:home,position:bottom";
     
     // Add banner to view hierarchy immediately
     [self addBannerToViewHierarchy];

@@ -63,7 +63,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
         case 0: return 2; // SDK Settings
-        case 1: return 6; // Ad Unit Settings
+        case 1: return 4; // Ad Unit Settings (Banner, MREC, Interstitial, Rewarded)
         case 2: return 3; // Privacy: Consent, US Privacy, User Targeting
         case 3: return 4; // Logging: Enable, Emojis, Timestamps, Level
         default: return 0;
@@ -112,8 +112,6 @@
                 case 1: cell.textLabel.text = @"MREC"; textField.text = self.settings.mrecAdUnitId; break;
                 case 2: cell.textLabel.text = @"Interstitial"; textField.text = self.settings.interstitialAdUnitId; break;
                 case 3: cell.textLabel.text = @"Rewarded"; textField.text = self.settings.rewardedAdUnitId; break;
-                case 4: cell.textLabel.text = @"Native Small"; textField.text = self.settings.nativeSmallAdUnitId; break;
-                case 5: cell.textLabel.text = @"Native Medium"; textField.text = self.settings.nativeMediumAdUnitId; break;
             }
             break;
         case 2: // Privacy
@@ -186,8 +184,15 @@
 
 - (void)loggingToggleChanged:(UISwitch *)sender {
     if (sender.tag == 300) {
-        // Logging Enabled/Disabled
-        [CloudXCore setLoggingEnabled:sender.isOn];
+        // Logging Enabled/Disabled - use setMinLogLevel: with CLXLogLevelNone to disable
+        if (sender.isOn) {
+            // Re-enable with previously saved level, defaulting to Info
+            NSInteger savedLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"LoggingLevel"];
+            [CloudXCore setMinLogLevel:(savedLevel > 0 ? savedLevel : CLXLogLevelInfo)];
+        } else {
+            // Disable all logging
+            [CloudXCore setMinLogLevel:CLXLogLevelNone];
+        }
         [[NSUserDefaults standardUserDefaults] setBool:!sender.isOn forKey:@"LoggingDisabled"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         NSLog(@"🪵 Logging %@", sender.isOn ? @"ENABLED" : @"DISABLED");
@@ -222,8 +227,6 @@
     else if (tag == 11) self.settings.mrecAdUnitId = textField.text;
     else if (tag == 12) self.settings.interstitialAdUnitId = textField.text;
     else if (tag == 13) self.settings.rewardedAdUnitId = textField.text;
-    else if (tag == 14) self.settings.nativeSmallAdUnitId = textField.text;
-    else if (tag == 15) self.settings.nativeMediumAdUnitId = textField.text;
     else if (tag == 20) self.settings.consentString = textField.text;
     else if (tag == 21) self.settings.usPrivacyString = textField.text;
 }
