@@ -404,9 +404,13 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         case CLXFullscreenAdStateLOADING:
             [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherFullscreenAd] Already loading, ignoring load request", self.currentCorrelationId]];
             return;
-        case CLXFullscreenAdStateREADY:
-            [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherFullscreenAd] Already loaded, ignoring load request", self.currentCorrelationId]];
+        case CLXFullscreenAdStateREADY: {
+            [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherFullscreenAd] Already loaded, invoking success callback", self.currentCorrelationId]];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self notifyLoadSuccess];
+            });
             return;
+        }
         case CLXFullscreenAdStateSHOWING:
             [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherFullscreenAd] Currently showing, ignoring load request", self.currentCorrelationId]];
             return;
