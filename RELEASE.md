@@ -19,7 +19,11 @@ This document describes the complete release process for the CloudX iOS SDK.
 
 ## Overview
 
-The CloudX iOS SDK uses a **Gitflow** branching strategy with two repositories:
+The CloudX iOS SDK uses a **trunk-based** branching strategy with two repositories:
+
+- **`main`** is the default branch for both repositories
+- All feature branches are created from `main` and merged back into `main`
+- No release branches are needed - releases are tagged directly on `main`
 
 | Repository | Purpose | Contains |
 |------------|---------|----------|
@@ -68,16 +72,16 @@ atos -o CloudXCore-ios.dSYM/Contents/Resources/DWARF/CloudXCore \
 
 ## Release Process
 
-### Phase 1: Prepare Release Branch (Private Repo)
+### Phase 1: Prepare Release (Private Repo)
 
 ```bash
-# 1. Checkout and update develop
+# 1. Checkout and update main
 cd cloudx-ios-private
-git checkout develop
-git pull origin develop
+git checkout main
+git pull origin main
 
-# 2. Create release branch
-git checkout -b release/X.Y.Z
+# 2. Create a feature branch for the release
+git checkout -b release-X.Y.Z
 
 # 3. Update version constants (ALL components!)
 ./scripts/update-version-constant.sh core "X.Y.Z"
@@ -99,7 +103,7 @@ sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" renderer-cloudx/CloudXRendere
 
 # 5. Update ALL CHANGELOGs with release notes:
 #    - cloudx-ios-private/CHANGELOG.md (internal)
-#    - cloudx-ios/CHANGELOG.md (public - copy from internal after Phase 3)
+#    - cloudx-ios/CHANGELOG.md (public - copy from internal after Phase 2)
 #    - docs/ios/changelog.mdx (public docs - add version entry)
 
 # 6. Build xcframeworks
@@ -110,72 +114,68 @@ cd adapter-inmobi && ./build-xcframework.sh && cd ..
 cd adapter-mintegral && ./build-xcframework.sh && cd ..
 cd renderer-cloudx && ./build-xcframework.sh X.Y.Z && cd ..
 
-# 7. Commit and push release branch
+# 7. Commit and push
 git add -A
 git commit -m "Prepare release X.Y.Z"
-git push origin release/X.Y.Z
+git push origin release-X.Y.Z
+
+# 8. Create PR to main
+gh pr create --base main --head release-X.Y.Z --title "Release X.Y.Z"
 ```
 
-### Phase 2: Create Private Repo PRs (DO NOT MERGE YET)
-
-Create two PRs on GitHub but **DO NOT MERGE** until testing is complete:
-
-```bash
-gh pr create --base develop --head release/X.Y.Z --title "Release X.Y.Z → develop"
-gh pr create --base main --head release/X.Y.Z --title "Release X.Y.Z"
-```
-
-### Phase 3: Release to Public Repo (For Testing)
+### Phase 2: Release to Public Repo (For Testing)
 
 ```bash
 cd cloudx-ios
 
-# 1. Create release branch from main
+# 1. Checkout and update main
 git checkout main
 git pull origin main
-git checkout -b release/vX.Y.Z
 
-# 2. Copy xcframeworks from private repo
+# 2. Create a feature branch for the release
+git checkout -b release-X.Y.Z
+
+# 3. Copy xcframeworks from private repo
 cp ../cloudx-ios-private/core/CloudXCore.xcframework.zip core/
 cp ../cloudx-ios-private/adapter-meta/CloudXMetaAdapter.xcframework.zip adapter-meta/
 cp ../cloudx-ios-private/adapter-vungle/CloudXVungleAdapter.xcframework.zip adapter-vungle/
 cp ../cloudx-ios-private/adapter-inmobi/CloudXInMobiAdapter.xcframework.zip adapter-inmobi/
 cp ../cloudx-ios-private/renderer-cloudx/CloudXRenderer.xcframework.zip renderer-cloudx/
 
-# 3. Unzip xcframeworks
+# 4. Unzip xcframeworks
 cd core && rm -rf CloudXCore.xcframework && unzip -o CloudXCore.xcframework.zip && cd ..
 cd adapter-meta && rm -rf CloudXMetaAdapter.xcframework && unzip -o CloudXMetaAdapter.xcframework.zip && cd ..
 cd adapter-vungle && rm -rf CloudXVungleAdapter.xcframework && unzip -o CloudXVungleAdapter.xcframework.zip && cd ..
 cd adapter-inmobi && rm -rf CloudXInMobiAdapter.xcframework && unzip -o CloudXInMobiAdapter.xcframework.zip && cd ..
 cd renderer-cloudx && rm -rf CloudXRenderer.xcframework && unzip -o CloudXRenderer.xcframework.zip && cd ..
 
-# 4. Update podspecs (located alongside xcframeworks in subdirectories)
+# 5. Update podspecs (located alongside xcframeworks in subdirectories)
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" core/CloudXCore.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-meta/CloudXMetaAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-vungle/CloudXVungleAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-inmobi/CloudXInMobiAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" renderer-cloudx/CloudXRenderer.podspec
 
-# 5. Update dependency versions in adapter podspecs
+# 6. Update dependency versions in adapter podspecs
 sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" adapter-meta/CloudXMetaAdapter.podspec
 sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" adapter-vungle/CloudXVungleAdapter.podspec
 sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" adapter-inmobi/CloudXInMobiAdapter.podspec
 sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" renderer-cloudx/CloudXRenderer.podspec
 
-# 6. Commit and push release branch
+# 7. Commit and push
 git add -A
 git commit -m "Release X.Y.Z"
-git push origin release/vX.Y.Z
+git push origin release-X.Y.Z
 
-# 7. Create PR (DO NOT MERGE YET)
-gh pr create --base main --head release/vX.Y.Z --title "Release X.Y.Z"
+# 8. Create PR to main
+gh pr create --base main --head release-X.Y.Z --title "Release X.Y.Z"
 ```
 
-### Phase 4: Test Demo Apps (CRITICAL - DO BEFORE MERGING)
+### Phase 3: Test Demo Apps (CRITICAL - DO BEFORE MERGING)
 
 **⚠️ DO NOT MERGE ANY PRs UNTIL TESTING IS COMPLETE**
 
-#### Step 1: Test BOTH Demo Apps from Release Branch
+#### Step 1: Test BOTH Demo Apps from Feature Branch
 
 Test **both** the Objective-C and Swift demo apps with temporary branch URLs:
 
@@ -183,18 +183,18 @@ Test **both** the Objective-C and Swift demo apps with temporary branch URLs:
 ```bash
 cd cloudx-ios/demo-app-objc
 
-# Temporarily update Podfile to test from release branch
+# Temporarily update Podfile to test from feature branch
 cat > Podfile << 'EOF'
 platform :ios, '15.0'
 
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release/vX.Y.Z'
-  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release/vX.Y.Z'
-  pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release/vX.Y.Z'
-  pod 'CloudXVungleAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release/vX.Y.Z'
-  pod 'CloudXInMobiAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release/vX.Y.Z'
+  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
+  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
+  pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
+  pod 'CloudXVungleAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
+  pod 'CloudXInMobiAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths
@@ -219,11 +219,11 @@ platform :ios, '15.0'
 target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release/vX.Y.Z'
-  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release/vX.Y.Z'
-  pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release/vX.Y.Z'
-  pod 'CloudXVungleAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release/vX.Y.Z'
-  pod 'CloudXInMobiAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release/vX.Y.Z'
+  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
+  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
+  pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
+  pod 'CloudXVungleAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
+  pod 'CloudXInMobiAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
 
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths
@@ -306,42 +306,14 @@ EOF
 cd cloudx-ios
 git add demo-app-objc/Podfile demo-app-swift/Podfile
 git commit -m "chore: Update demo apps for X.Y.Z release"
-git push origin release/vX.Y.Z
+git push origin release-X.Y.Z
 ```
 
-**Note:** The version specifier Podfiles won't work until after CocoaPods Trunk push (Phase 6). This is intentional - the demo apps should show the production installation method.
+**Note:** The version specifier Podfiles won't work until after CocoaPods Trunk push (Phase 5). This is intentional - the demo apps should show the production installation method.
 
-### Phase 5: Merge PRs and Tag (After Testing Passes)
+### Phase 4: Merge PRs and Tag (After Testing Passes)
 
-**Only proceed after Phase 4 testing is successful!**
-
-#### Pre-Merge Checklist (CRITICAL)
-
-**⚠️ Before merging any release PRs, verify:**
-
-- [ ] Release branch is up-to-date with develop (no missing commits)
-- [ ] All API changes in develop are present in the release branch
-- [ ] The xcframeworks were built from the LATEST release branch code
-- [ ] Demo apps successfully tested with the built xcframeworks
-
-**To check if release branch is current with develop:**
-```bash
-# List commits in develop that are NOT in release branch
-git log release/X.Y.Z..origin/develop --oneline
-
-# If this shows commits, the release branch is STALE!
-# You MUST rebase or merge develop into the release branch before proceeding.
-```
-
-**If release branch is stale:**
-```bash
-git checkout release/X.Y.Z
-git merge origin/develop
-# Resolve any conflicts (keep develop's newer code!)
-git push origin release/X.Y.Z
-
-# IMPORTANT: Rebuild xcframeworks after updating the release branch!
-```
+**Only proceed after Phase 3 testing is successful!**
 
 #### Step 1: Merge PUBLIC Repo PR
 
@@ -368,77 +340,13 @@ gh release create vX.Y.Z-inmobi --title "CloudXInMobiAdapter X.Y.Z" adapter-inmo
 gh release create vX.Y.Z-renderer --title "CloudXRenderer X.Y.Z" renderer-cloudx/CloudXRenderer.xcframework.zip
 ```
 
-#### Step 2: Merge PRIVATE Repo PRs
+#### Step 2: Merge PRIVATE Repo PR
 
 ```bash
-# Go to GitHub:
-# 1. Merge release/X.Y.Z → develop (regular merge)
-# 2. Merge release/X.Y.Z → main (SQUASH merge)
+# Go to GitHub and merge cloudx-ios-private PR to main
 ```
 
-#### Step 3: Sync Main Back to Develop (CRITICAL)
-
-**⚠️ This step prevents merge conflicts in future releases!**
-
-After squash merging to main, sync the squashed commit back to develop:
-
-```bash
-cd cloudx-ios-private
-git checkout develop
-git pull origin develop
-git merge main -m "Sync release X.Y.Z from main"
-# STOP! If there are conflicts, read the WARNING below before resolving!
-git push origin develop
-```
-
-**Why is this necessary?**
-- Squash merge creates a NEW commit that Git doesn't recognize as related to the original commits
-- Without this sync, the next release branch (created from develop) won't have main's history
-- This causes merge conflicts when trying to merge future releases to main
-
----
-
-### ⚠️ CRITICAL WARNING: Merge Conflict Resolution
-
-**🚨 NEVER use `git checkout --theirs .` when syncing main back to develop!**
-
-If you encounter merge conflicts during the `git merge main` step:
-
-1. **UNDERSTAND THE SITUATION**: During this sync, `develop` contains the latest work, and `main` contains the squashed release. If the release branch was stale (missing recent develop changes), `main` may have OLDER code.
-
-2. **RESOLVE CONFLICTS CAREFULLY**:
-   - `--ours` = develop's version (usually the NEWER code with latest features)
-   - `--theirs` = main's version (may be OLDER if release branch was stale)
-   
-3. **FOR EACH CONFLICT**, ask yourself:
-   - "Does develop have newer features/APIs that should be preserved?"
-   - "Was main's squash commit based on a fully up-to-date release branch?"
-
-4. **VERIFY AFTER MERGE**: Always verify the API matches the released xcframeworks:
-   ```bash
-   # Check that critical API methods are correct
-   grep -A2 "createBannerWith\|createInterstitialWith\|createRewardedWith" \
-     core/Sources/CloudXCore/CloudXCoreAPI.h
-   
-   # Compare with public repo's released headers
-   diff core/Sources/CloudXCore/CloudXCoreAPI.h \
-     ../cloudx-ios/core/CloudXCore.xcframework/ios-arm64/CloudXCore.framework/Headers/CloudXCoreAPI.h
-   ```
-
-**What can go wrong:**
-- Using `git checkout --theirs .` blindly can OVERWRITE newer develop code with older main code
-- This happened in release 2.0.0: the `adUnitId` API migration was accidentally reverted because `--theirs` was used, and main's squash was based on a stale release branch
-- The private repo's source code became out of sync with the publicly released xcframeworks
-
-**If you make this mistake:**
-1. Create a backup branch: `git branch backup/develop-before-fix`
-2. Find the last good commit on develop (before the bad merge)
-3. Create a fix branch and restore files: `git checkout <good-commit> -- .`
-4. Create a PR to fix develop (force push may be blocked by branch protection)
-
----
-
-#### Step 4: Tag PRIVATE Repo Main and Create dSYM Release
+#### Step 3: Tag PRIVATE Repo Main and Create dSYM Release
 
 ```bash
 cd cloudx-ios-private
@@ -453,7 +361,7 @@ git tag vX.Y.Z-renderer
 git push origin vX.Y.Z-core vX.Y.Z-meta vX.Y.Z-vungle vX.Y.Z-inmobi vX.Y.Z-renderer
 ```
 
-#### Step 5: Upload dSYMs to PRIVATE Release (CloudXCore Only)
+#### Step 4: Upload dSYMs to PRIVATE Release (CloudXCore Only)
 
 **⚠️ CRITICAL: dSYMs must stay in the PRIVATE repo - never upload to public repo!**
 
@@ -487,31 +395,7 @@ echo "🔗 https://github.com/cloudx-io/cloudx-ios-private/releases/tag/vX.Y.Z-c
 
 ---
 
-### First Release Bootstrap (One-Time Only)
-
-If this is your **first release** and main has diverged significantly from develop, you may encounter merge conflicts. To bootstrap:
-
-**Option A: Temporarily disable branch protection**
-1. Go to GitHub → Settings → Branches → main → Edit
-2. Disable "Require pull request before merging"
-3. Force push:
-   ```bash
-   git checkout main
-   git reset --hard release/X.Y.Z
-   git push origin main --force
-   ```
-4. Re-enable branch protection
-
-**Option B: Use GitHub's web UI to resolve conflicts**
-1. In the PR, click "Resolve conflicts"
-2. For each file, accept the incoming (release branch) version
-3. Mark as resolved and merge
-
-After bootstrapping, future releases will merge cleanly as long as you perform Step 3 (sync main → develop) after each release.
-
----
-
-### Phase 6: Push to CocoaPods Trunk (Required for `pod install` to work)
+### Phase 5: Push to CocoaPods Trunk (Required for `pod install` to work)
 
 **⚠️ CRITICAL: This step is required for third-party developers to install via `pod 'CloudXCore'`**
 
@@ -630,21 +514,31 @@ When a beta adapter is ready for production:
 1. Update the adapter's release workflow to include `pod trunk push`
 2. Remove the `--prerelease` flag from `gh release create`
 3. Remove BETA warnings from README and podspec
-4. Add the adapter to the Phase 6 trunk push commands above
+4. Add the adapter to the Phase 5 trunk push commands above
 5. Update the Components table to show ✅ Published
 
 ---
 
-### Phase 7: Update Cross-Platform SDKs
+### Phase 6: Update Cross-Platform SDKs
 
-After the iOS SDK is released and verified, update the wrapper SDKs:
+After the iOS SDK is released and verified, update the wrapper SDKs. Each SDK follows the same pattern:
+1. Create a release branch from main
+2. Update dependencies and version
+3. Test the demo app
+4. Create PR to main
+5. After PR is merged, tag and publish
 
 #### Flutter SDK (`cloudx-flutter`)
 
 ```bash
 cd cloudx-flutter
 
-# 1. Update iOS dependency version in podspec
+# 1. Create release branch
+git checkout main
+git pull origin main
+git checkout -b release-X.Y.Z
+
+# 2. Update iOS dependency version in podspec
 # Edit ios/cloudx_flutter.podspec:
 #   s.dependency 'CloudXCore', '~> X.Y.Z'
 #   s.dependency 'CloudXMetaAdapter', '~> X.Y.Z'
@@ -652,25 +546,34 @@ cd cloudx-flutter
 #   s.dependency 'CloudXVungleAdapter', '~> X.Y.Z'
 #   s.dependency 'CloudXInMobiAdapter', '~> X.Y.Z'
 
-# 2. Update pubspec.yaml version
+# 3. Update pubspec.yaml version
 # Edit pubspec.yaml:
 #   version: X.Y.Z
 
-# 3. Update CHANGELOG.md
+# 4. Update CHANGELOG.md
 
-# 4. Test the Flutter demo app
+# 5. Test the Flutter demo app
 cd example
 flutter pub get
 cd ios && pod install && cd ..
 flutter run
+cd ..
 
-# 5. Commit and create release
+# 6. Commit and push release branch
 git add -A
 git commit -m "Release X.Y.Z - Update iOS SDK dependency"
-git tag vX.Y.Z
-git push origin main --tags
+git push origin release-X.Y.Z
 
-# 6. Publish to pub.dev (if applicable)
+# 7. Create PR to main
+gh pr create --base main --head release-X.Y.Z --title "Release X.Y.Z"
+
+# 8. After PR is merged, tag and publish
+git checkout main
+git pull origin main
+git tag vX.Y.Z
+git push origin vX.Y.Z
+
+# 9. Publish to pub.dev (if applicable)
 flutter pub publish
 ```
 
@@ -679,7 +582,12 @@ flutter pub publish
 ```bash
 cd cloudx-react-native
 
-# 1. Update iOS dependency version in podspec
+# 1. Create release branch
+git checkout main
+git pull origin main
+git checkout -b release-X.Y.Z
+
+# 2. Update iOS dependency version in podspec
 # Edit cloudx-react-native.podspec:
 #   s.dependency 'CloudXCore', '~> X.Y.Z'
 #   s.dependency 'CloudXMetaAdapter', '~> X.Y.Z'
@@ -687,26 +595,81 @@ cd cloudx-react-native
 #   s.dependency 'CloudXVungleAdapter', '~> X.Y.Z'
 #   s.dependency 'CloudXInMobiAdapter', '~> X.Y.Z'
 
-# 2. Update package.json version
+# 3. Update package.json version
 # Edit package.json:
 #   "version": "X.Y.Z"
 
-# 3. Update CHANGELOG.md
+# 4. Update CHANGELOG.md
 
-# 4. Test the React Native demo app
+# 5. Test the React Native demo app
 cd example
 npm install
 cd ios && pod install && cd ..
 npx react-native run-ios
+cd ..
 
-# 5. Commit and create release
+# 6. Commit and push release branch
 git add -A
 git commit -m "Release X.Y.Z - Update iOS SDK dependency"
-git tag vX.Y.Z
-git push origin main --tags
+git push origin release-X.Y.Z
 
-# 6. Publish to npm
+# 7. Create PR to main
+gh pr create --base main --head release-X.Y.Z --title "Release X.Y.Z"
+
+# 8. After PR is merged, tag and publish
+git checkout main
+git pull origin main
+git tag vX.Y.Z
+git push origin vX.Y.Z
+
+# 9. Publish to npm
 npm publish
+```
+
+#### Unity SDK (`cloudx-unity-private`)
+
+```bash
+cd cloudx-unity-private
+
+# 1. Create release branch
+git checkout main
+git pull origin main
+git checkout -b release-X.Y.Z
+
+# 2. Update iOS dependency version
+# Edit the iOS plugin podspec or dependency file to reference:
+#   CloudXCore ~> X.Y.Z
+#   CloudXMetaAdapter ~> X.Y.Z
+#   CloudXRenderer ~> X.Y.Z
+#   CloudXVungleAdapter ~> X.Y.Z
+#   CloudXInMobiAdapter ~> X.Y.Z
+
+# 3. Update package version (package.json or equivalent)
+
+# 4. Update CHANGELOG.md
+
+# 5. Test the Unity demo project
+# - Open Unity project
+# - Build for iOS
+# - Run on device/simulator
+# - Verify SDK initializes and ads load
+
+# 6. Commit and push release branch
+git add -A
+git commit -m "Release X.Y.Z - Update iOS SDK dependency"
+git push origin release-X.Y.Z
+
+# 7. Create PR to main
+gh pr create --base main --head release-X.Y.Z --title "Release X.Y.Z"
+
+# 8. After PR is merged, tag
+git checkout main
+git pull origin main
+git tag vX.Y.Z
+git push origin vX.Y.Z
+
+# 9. Publish Unity package (if applicable)
+# Follow Unity package publishing process
 ```
 
 **Cross-Platform Test Checklist:**
@@ -714,18 +677,20 @@ npm publish
 - [ ] Flutter SDK initializes and loads ads
 - [ ] React Native demo app builds and runs
 - [ ] React Native SDK initializes and loads ads
+- [ ] Unity demo project builds for iOS
+- [ ] Unity SDK initializes and loads ads
 
-### Phase 8: Cleanup
+### Phase 7: Cleanup
 
 ```bash
-# Delete release branches
+# Delete feature branches (optional - can be done via GitHub PR merge settings)
 cd cloudx-ios-private
-git branch -d release/X.Y.Z
-git push origin --delete release/X.Y.Z
+git branch -d release-X.Y.Z
+git push origin --delete release-X.Y.Z
 
 cd ../cloudx-ios
-git branch -d release/vX.Y.Z
-git push origin --delete release/vX.Y.Z
+git branch -d release-X.Y.Z
+git push origin --delete release-X.Y.Z
 ```
 
 ---
@@ -737,8 +702,8 @@ git push origin --delete release/vX.Y.Z
 | File | Repository | When to Update |
 |------|------------|----------------|
 | `CHANGELOG.md` | cloudx-ios-private | Phase 1 (prepare release) |
-| `CHANGELOG.md` | cloudx-ios | Phase 3 (copy from internal) |
-| `ios/changelog.mdx` | docs | Phase 3 (add version entry) |
+| `CHANGELOG.md` | cloudx-ios | Phase 2 (copy from internal) |
+| `ios/changelog.mdx` | docs | Phase 2 (add version entry) |
 
 **Format:** Follow [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format with sections for Added, Changed, Fixed, Removed.
 
@@ -806,16 +771,11 @@ pod trunk me
 
 ### General Release Rules
 
-1. **Never push directly to main or develop** - Always use PRs
-2. **Never push source code to public repo** - Binary distribution only
-3. **Always squash merge to main** - Clean release history
-4. **Tag main after squash merge** - Component-specific tags
-5. **Update ALL CHANGELOGs** - Internal (cloudx-ios-private), public (cloudx-ios), AND docs (docs/ios/changelog.mdx)
-6. **Test demo apps BEFORE merging PRs** - Verify xcframeworks work
-7. **Push to CocoaPods Trunk** - Required for public `pod install`
-8. **Verify release branch is current with develop** - Stale release branches cause API reversions
-9. **Never use `git checkout --theirs .` when syncing main→develop** - This can overwrite newer develop code
-10. **Always verify APIs match released xcframeworks after merges** - Source and binaries must stay in sync
+1. **Never push source code to public repo** - Binary distribution only
+2. **Tag main after merge** - Component-specific tags
+3. **Update ALL CHANGELOGs** - Internal (cloudx-ios-private), public (cloudx-ios), AND docs (docs/ios/changelog.mdx)
+4. **Test demo apps BEFORE merging PRs** - Verify xcframeworks work
+5. **Push to CocoaPods Trunk** - Required for public `pod install`
 
 ### Framework Type Rules (CRITICAL)
 
@@ -951,38 +911,6 @@ pod repo update
 # Check if pod is available
 pod search CloudXCore
 ```
-
-### Source Code Out of Sync with Released Binaries
-
-**Symptoms:**
-- Private repo source code has different API than released xcframeworks
-- Public headers in xcframework don't match private repo headers
-- CHANGELOG examples don't match actual API
-
-**How this happens:**
-1. A stale release branch (missing develop commits) is merged to main
-2. When syncing main back to develop, conflicts are resolved incorrectly (using `--theirs`)
-3. Newer develop code gets overwritten with older main code
-
-**How to verify:**
-```bash
-# Compare private source to public released headers
-diff core/Sources/CloudXCore/CloudXCoreAPI.h \
-  ../cloudx-ios/core/CloudXCore.xcframework/ios-arm64/CloudXCore.framework/Headers/CloudXCoreAPI.h
-```
-
-**How to fix:**
-1. Find the last good commit on develop (before the bad sync merge)
-2. Create a backup: `git branch backup/develop-broken`
-3. Create a fix branch from current develop
-4. Restore files to the good state: `git checkout <good-commit> -- .`
-5. Commit and create PR to develop
-6. After merging, you may need to fix main via another release cycle
-
-**Prevention:**
-- Always check if release branch is current with develop before merging to main
-- Never blindly use `git checkout --theirs .` during conflict resolution
-- Always verify API after any merge operation
 
 ### dSYM Issues
 
