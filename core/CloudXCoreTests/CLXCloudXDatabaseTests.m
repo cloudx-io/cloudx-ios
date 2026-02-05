@@ -7,7 +7,6 @@
 #import <CloudXCore/CLXDaoProtocols.h>
 #import <CloudXCore/CLXMetricsEvent.h>
 #import <CloudXCore/CLXSession.h>
-#import <CloudXCore/CLXPerformanceMetric.h>
 
 @interface CLXCloudXDatabaseTests : XCTestCase
 
@@ -56,13 +55,11 @@
     XCTAssertNotNil(self.database, @"Database should be initialized");
     XCTAssertNotNil(self.database.metricsDao, @"Metrics DAO should be initialized");
     XCTAssertNotNil(self.database.sessionDao, @"Session DAO should be initialized");
-    XCTAssertNotNil(self.database.performanceDao, @"Performance DAO should be initialized");
 }
 
 - (void)testSchemaCreation {
     XCTAssertTrue([self.database tableExists:@"metrics_event_table"], @"Metrics table should exist");
     XCTAssertTrue([self.database tableExists:@"session_table"], @"Session table should exist");
-    XCTAssertTrue([self.database tableExists:@"performance_metrics_table"], @"Performance metrics table should exist");
 }
 
 #pragma mark - Metrics Event DAO Tests
@@ -122,60 +119,6 @@
     CLXSession *current = [self.database.sessionDao findCurrentSession];
     XCTAssertNotNil(current, @"Should find current session");
     XCTAssertEqualObjects(current.sessionId, session1.sessionId, @"Should return active session");
-}
-
-#pragma mark - Performance DAO Tests
-
-- (void)testPerformanceMetricInsertion {
-    // First create a session that the performance metric can reference
-    CLXSession *session = [CLXSession currentSessionWithAppKey:@"test_app"];
-    session.sessionId = @"test_session"; // Override to use predictable ID
-    BOOL sessionSuccess = [self.database.sessionDao insertSession:session];
-    XCTAssertTrue(sessionSuccess, @"Should insert session successfully");
-    
-    CLXPerformanceMetric *metric = [CLXPerformanceMetric metricForAdUnit:@"test_placement" 
-                                                                   sessionId:@"test_session"];
-    [metric incrementImpressions];
-    [metric incrementClicks];
-    
-    BOOL success = [self.database.performanceDao insertPerformanceMetric:metric];
-    XCTAssertTrue(success, @"Should insert performance metric successfully");
-    
-    NSArray *metrics = [self.database.performanceDao findPerformanceMetricsByAdUnitId:@"test_placement"];
-    XCTAssertEqual(metrics.count, 1, @"Should have one metric");
-    
-    CLXPerformanceMetric *retrieved = metrics.firstObject;
-    XCTAssertEqual(retrieved.impressionCount, 1, @"Should have 1 impression");
-    XCTAssertEqual(retrieved.clickCount, 1, @"Should have 1 click");
-}
-
-- (void)testPerformanceAggregation {
-    // First create a session that the performance metrics can reference
-    CLXSession *session = [CLXSession currentSessionWithAppKey:@"test_app"];
-    session.sessionId = @"test_session"; // Override to use predictable ID
-    BOOL sessionSuccess = [self.database.sessionDao insertSession:session];
-    XCTAssertTrue(sessionSuccess, @"Should insert session successfully");
-    
-    NSString *adUnitId = @"test_placement";
-    
-    // Insert multiple performance metrics
-    for (int i = 0; i < 3; i++) {
-        CLXPerformanceMetric *metric = [CLXPerformanceMetric metricForAdUnit:adUnitId 
-                                                                       sessionId:@"test_session"];
-        [metric incrementImpressionsBy:2];
-        [metric incrementClicksBy:1];
-        [self.database.performanceDao insertPerformanceMetric:metric];
-    }
-    
-    NSInteger totalImpressions = [self.database.performanceDao getTotalImpressionsForAdUnit:adUnitId];
-    NSInteger totalClicks = [self.database.performanceDao getTotalClicksForAdUnit:adUnitId];
-    
-    XCTAssertEqual(totalImpressions, 6, @"Total impressions should be 6");
-    XCTAssertEqual(totalClicks, 3, @"Total clicks should be 3");
-    
-    NSDictionary *summary = [self.database.performanceDao getPerformanceSummaryForAdUnit:adUnitId];
-    XCTAssertNotNil(summary, @"Should have performance summary");
-    XCTAssertEqual([summary[@"totalImpressions"] integerValue], 6, @"Summary should show 6 impressions");
 }
 
 @end

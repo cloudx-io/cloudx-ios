@@ -88,10 +88,6 @@
 #import <CloudXCore/CLXDaoProtocols.h>
 #import <CloudXCore/CLXBaseDao.h>
 
-// Performance
-#import <CloudXCore/CLXPerformanceMetric.h>
-#import <CloudXCore/CLXPerformanceDaoImpl.h>
-
 // Network Services
 #import <CloudXCore/CLXBaseNetworkService.h>
 #import <CloudXCore/CLXSDKInitNetworkService.h>

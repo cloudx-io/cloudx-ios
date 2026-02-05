@@ -271,7 +271,6 @@
 		19F75E7E2EA420CF00E889C0 /* CLXEndpointResolverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F75E7C2EA420CF00E889C0 /* CLXEndpointResolverTests.m */; };
 		19F853282E899B90002619F1 /* CLXCloudXDatabaseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F853252E899B90002619F1 /* CLXCloudXDatabaseTests.m */; };
 		19F8532A2E8A9C90002619F1 /* CLXMetricsCleanupTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F853292E8A9C90002619F1 /* CLXMetricsCleanupTests.m */; };
-		19F853352E899BB5002619F1 /* CLXPerformanceMetric.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F853302E899BB5002619F1 /* CLXPerformanceMetric.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19F853362E899BB5002619F1 /* CLXBaseEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F853292E899BB5002619F1 /* CLXBaseEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19F853372E899BB5002619F1 /* CLXDatabaseSchema.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F8532D2E899BB5002619F1 /* CLXDatabaseSchema.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19F8533A2E899BB5002619F1 /* CLXCloudXDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F8532A2E899BB5002619F1 /* CLXCloudXDatabase.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -279,17 +278,14 @@
 		19F8533C2E899BB5002619F1 /* CLXDatabaseProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F8532C2E899BB5002619F1 /* CLXDatabaseProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19F8533D2E899BB5002619F1 /* CLXSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F853332E899BB5002619F1 /* CLXSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19F8533E2E899BB5002619F1 /* CLXSessionDaoImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F853342E899BB5002619F1 /* CLXSessionDaoImpl.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		19F8533F2E899BB5002619F1 /* CLXPerformanceDaoImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F8532F2E899BB5002619F1 /* CLXPerformanceDaoImpl.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19F853452E899BC8002619F1 /* CLXMetricsEventDaoImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F853422E899BC8002619F1 /* CLXMetricsEventDaoImpl.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19F853462E899BC8002619F1 /* CLXBaseDao.h in Headers */ = {isa = PBXBuildFile; fileRef = 19F853412E899BC8002619F1 /* CLXBaseDao.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		19F853582E899BD2002619F1 /* CLXBaseDao.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F853492E899BD2002619F1 /* CLXBaseDao.m */; };
-		19F8535A2E899BD2002619F1 /* CLXPerformanceMetric.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F853512E899BD2002619F1 /* CLXPerformanceMetric.m */; };
 		19F8535B2E899BD2002619F1 /* CLXSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F853562E899BD2002619F1 /* CLXSession.m */; };
 		19F8535C2E899BD2002619F1 /* CLXSessionDaoImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F853572E899BD2002619F1 /* CLXSessionDaoImpl.m */; };
 		19F8535E2E899BD2002619F1 /* CLXBaseEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F8534A2E899BD2002619F1 /* CLXBaseEvent.m */; };
 		19F853602E899BD2002619F1 /* CLXCloudXDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F8534B2E899BD2002619F1 /* CLXCloudXDatabase.m */; };
 		19F853612E899BD2002619F1 /* CLXMetricsEventDaoImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F8534F2E899BD2002619F1 /* CLXMetricsEventDaoImpl.m */; };
-		19F853622E899BD2002619F1 /* CLXPerformanceDaoImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F853502E899BD2002619F1 /* CLXPerformanceDaoImpl.m */; };
 		19F853632E899BD2002619F1 /* CLXDatabaseSchema.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F8534C2E899BD2002619F1 /* CLXDatabaseSchema.m */; };
 		19F853662E899BD2002619F1 /* CLXMetricsEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F8534E2E899BD2002619F1 /* CLXMetricsEvent.m */; };
 		19FF30F32EA6E6D50006F05A /* CLXSessionMetrics.h in Headers */ = {isa = PBXBuildFile; fileRef = 19FF30EF2EA6E6D50006F05A /* CLXSessionMetrics.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -605,8 +601,6 @@
 		19F8532B2E899BB5002619F1 /* CLXDaoProtocols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXDaoProtocols.h; sourceTree = "<group>"; };
 		19F8532C2E899BB5002619F1 /* CLXDatabaseProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXDatabaseProtocol.h; sourceTree = "<group>"; };
 		19F8532D2E899BB5002619F1 /* CLXDatabaseSchema.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXDatabaseSchema.h; sourceTree = "<group>"; };
-		19F8532F2E899BB5002619F1 /* CLXPerformanceDaoImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPerformanceDaoImpl.h; sourceTree = "<group>"; };
-		19F853302E899BB5002619F1 /* CLXPerformanceMetric.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPerformanceMetric.h; sourceTree = "<group>"; };
 		19F853332E899BB5002619F1 /* CLXSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSession.h; sourceTree = "<group>"; };
 		19F853342E899BB5002619F1 /* CLXSessionDaoImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSessionDaoImpl.h; sourceTree = "<group>"; };
 		19F853412E899BC8002619F1 /* CLXBaseDao.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXBaseDao.h; sourceTree = "<group>"; };
@@ -617,8 +611,6 @@
 		19F8534C2E899BD2002619F1 /* CLXDatabaseSchema.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXDatabaseSchema.m; sourceTree = "<group>"; };
 		19F8534E2E899BD2002619F1 /* CLXMetricsEvent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsEvent.m; sourceTree = "<group>"; };
 		19F8534F2E899BD2002619F1 /* CLXMetricsEventDaoImpl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetricsEventDaoImpl.m; sourceTree = "<group>"; };
-		19F853502E899BD2002619F1 /* CLXPerformanceDaoImpl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPerformanceDaoImpl.m; sourceTree = "<group>"; };
-		19F853512E899BD2002619F1 /* CLXPerformanceMetric.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPerformanceMetric.m; sourceTree = "<group>"; };
 		19F853562E899BD2002619F1 /* CLXSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSession.m; sourceTree = "<group>"; };
 		19F853572E899BD2002619F1 /* CLXSessionDaoImpl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionDaoImpl.m; sourceTree = "<group>"; };
 		19FF30EF2EA6E6D50006F05A /* CLXSessionMetrics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSessionMetrics.h; sourceTree = "<group>"; };
@@ -690,8 +682,6 @@
 				19F8534C2E899BD2002619F1 /* CLXDatabaseSchema.m */,
 				19F8534E2E899BD2002619F1 /* CLXMetricsEvent.m */,
 				19F8534F2E899BD2002619F1 /* CLXMetricsEventDaoImpl.m */,
-				19F853502E899BD2002619F1 /* CLXPerformanceDaoImpl.m */,
-				19F853512E899BD2002619F1 /* CLXPerformanceMetric.m */,
 				19F853562E899BD2002619F1 /* CLXSession.m */,
 				19F853572E899BD2002619F1 /* CLXSessionDaoImpl.m */,
 				1916B1672E7DF8ED00E49E3E /* CLXSQLiteDatabase.m */,
@@ -1019,8 +1009,6 @@
 				19F8532B2E899BB5002619F1 /* CLXDaoProtocols.h */,
 				19F8532C2E899BB5002619F1 /* CLXDatabaseProtocol.h */,
 				19F8532D2E899BB5002619F1 /* CLXDatabaseSchema.h */,
-				19F8532F2E899BB5002619F1 /* CLXPerformanceDaoImpl.h */,
-				19F853302E899BB5002619F1 /* CLXPerformanceMetric.h */,
 				19F853332E899BB5002619F1 /* CLXSession.h */,
 				19F853342E899BB5002619F1 /* CLXSessionDaoImpl.h */,
 				1916B23D2E819DC600E49E3E /* CLXEventAM.h */,
@@ -1297,7 +1285,6 @@
 				1916B25A2E819DC600E49E3E /* CLXMetricsEvent.h in Headers */,
 				19F853452E899BC8002619F1 /* CLXMetricsEventDaoImpl.h in Headers */,
 				19F853462E899BC8002619F1 /* CLXBaseDao.h in Headers */,
-				19F853352E899BB5002619F1 /* CLXPerformanceMetric.h in Headers */,
 				19F853362E899BB5002619F1 /* CLXBaseEvent.h in Headers */,
 				19F853372E899BB5002619F1 /* CLXDatabaseSchema.h in Headers */,
 				19F8533A2E899BB5002619F1 /* CLXCloudXDatabase.h in Headers */,
@@ -1305,7 +1292,6 @@
 				19F8533C2E899BB5002619F1 /* CLXDatabaseProtocol.h in Headers */,
 				19F8533D2E899BB5002619F1 /* CLXSession.h in Headers */,
 				19F8533E2E899BB5002619F1 /* CLXSessionDaoImpl.h in Headers */,
-				19F8533F2E899BB5002619F1 /* CLXPerformanceDaoImpl.h in Headers */,
 				1916B25B2E819DC600E49E3E /* CLXMetricsDebugger.h in Headers */,
 				1916B25C2E819DC600E49E3E /* CLXMetricsEventDao.h in Headers */,
 				1916B25D2E819DC600E49E3E /* CLXMetricsTrackerProtocol.h in Headers */,
@@ -1513,13 +1499,11 @@
 				19C725D52E2390810012CFC7 /* CloudXCoreAPI.m in Sources */,
 				19C725D62E2390810012CFC7 /* CLXGeoLocationService.m in Sources */,
 				19F853582E899BD2002619F1 /* CLXBaseDao.m in Sources */,
-				19F8535A2E899BD2002619F1 /* CLXPerformanceMetric.m in Sources */,
 				19F8535B2E899BD2002619F1 /* CLXSession.m in Sources */,
 				19F8535C2E899BD2002619F1 /* CLXSessionDaoImpl.m in Sources */,
 				19F8535E2E899BD2002619F1 /* CLXBaseEvent.m in Sources */,
 				19F853602E899BD2002619F1 /* CLXCloudXDatabase.m in Sources */,
 				19F853612E899BD2002619F1 /* CLXMetricsEventDaoImpl.m in Sources */,
-				19F853622E899BD2002619F1 /* CLXPerformanceDaoImpl.m in Sources */,
 				194BB9EB2EEEE0AF0008DB33 /* CLXUIApplicationProxy.m in Sources */,
 				19F853632E899BD2002619F1 /* CLXDatabaseSchema.m in Sources */,
 				19F853662E899BD2002619F1 /* CLXMetricsEvent.m in Sources */,

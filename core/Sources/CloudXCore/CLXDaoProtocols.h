@@ -5,12 +5,11 @@
 /**
  * @file CLXDaoProtocols.h
  * @brief DAO protocol hierarchy following Interface Segregation Principle
- * 
+ *
  * Separate protocols for different data access concerns:
  * - CLXBaseDao: Common CRUD operations
  * - CLXMetricsEventDao: Metrics-specific operations
  * - CLXSessionDao: Session management operations
- * - CLXPerformanceDao: Performance metrics operations
  */
 
 #import <Foundation/Foundation.h>
@@ -19,7 +18,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class CLXMetricsEvent;
 @class CLXSession;
-@class CLXPerformanceMetric;
 
 /**
  * Base DAO protocol with common CRUD operations
@@ -87,37 +85,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Cleanup operations
 - (BOOL)deleteSessionsOlderThan:(NSTimeInterval)timestamp;
-
-@end
-
-/**
- * Performance DAO protocol
- * Handles performance_metrics_table operations replacing Core Data CLXPerformanceMetricModel
- */
-@protocol CLXPerformanceDao <CLXBaseDao>
-
-- (BOOL)insertPerformanceMetric:(CLXPerformanceMetric *)metric;
-- (BOOL)insertPerformanceMetricBatch:(NSArray<CLXPerformanceMetric *> *)metrics;
-- (NSArray<CLXPerformanceMetric *> *)findPerformanceMetricsByAdUnitId:(NSString *)adUnitId;
-- (NSArray<CLXPerformanceMetric *> *)findPerformanceMetricsBySessionId:(NSString *)sessionId;
-- (nullable CLXPerformanceMetric *)findPerformanceMetricByAdUnitId:(NSString *)adUnitId sessionId:(NSString *)sessionId;
-- (CLXPerformanceMetric *)findOrCreatePerformanceMetricForAdUnitId:(NSString *)adUnitId sessionId:(NSString *)sessionId;
-
-// Aggregation operations
-- (NSInteger)getTotalClicksForAdUnit:(NSString *)adUnitId;
-- (NSInteger)getTotalImpressionsForAdUnit:(NSString *)adUnitId;
-- (NSInteger)getTotalClosesForAdUnit:(NSString *)adUnitId;
-- (NSTimeInterval)getAverageLoadLatencyForAdUnit:(NSString *)adUnitId;
-- (NSInteger)getTotalBidResponsesForAdUnit:(NSString *)adUnitId;
-
-// Performance analytics
-- (NSDictionary<NSString *, NSNumber *> *)getPerformanceSummaryForAdUnit:(NSString *)adUnitId;
-- (NSDictionary<NSString *, NSNumber *> *)getPerformanceSummaryForSession:(NSString *)sessionId;
-- (NSArray<CLXPerformanceMetric *> *)findTopPerformingAdUnits:(NSInteger)limit;
-
-// Cleanup operations
-- (BOOL)deletePerformanceMetricsOlderThan:(NSTimeInterval)timestamp;
-- (BOOL)deletePerformanceMetricsBySessionId:(NSString *)sessionId;
 
 @end
 

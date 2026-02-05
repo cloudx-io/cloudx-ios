@@ -5,12 +5,11 @@
 /**
  * @file CLXCloudXDatabase.h
  * @brief Unified CloudX database matching Android CloudXDb architecture
- * 
+ *
  * Single database with multiple specialized tables:
  * - metrics_event_table: Metrics tracking (matches Android MetricsEvent)
  * - session_table: App session management
- * - performance_metrics_table: Ad unit performance tracking
- * 
+ *
  * Follows SOLID principles with protocol-based DAO pattern
  */
 
@@ -22,7 +21,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol CLXMetricsEventDao;
 @protocol CLXSessionDao;
-@protocol CLXPerformanceDao;
 
 /**
  * Unified CloudX database providing centralized data persistence
@@ -48,7 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, strong, readonly) id<CLXMetricsEventDao> metricsDao;
 @property (nonatomic, strong, readonly) id<CLXSessionDao> sessionDao;
-@property (nonatomic, strong, readonly) id<CLXPerformanceDao> performanceDao;
 
 /**
  * Database initialization and schema management

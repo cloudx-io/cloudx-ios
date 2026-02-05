@@ -25,7 +25,6 @@ extern NSString * const CLXDatabaseName;
  */
 extern NSString * const CLXMetricsEventTableName;
 extern NSString * const CLXSessionTableName;
-extern NSString * const CLXPerformanceMetricsTableName;
 
 /**
  * Schema Creation SQL
@@ -44,13 +43,6 @@ extern NSString * const CLXPerformanceMetricsTableName;
  * Fields: id, sessionId, appKey, startTime, endTime, duration, url
  */
 + (NSString *)createSessionTableSQL;
-
-/**
- * Performance Metrics Table (replaces Core Data CLXPerformanceMetricModel)
- * Fields: id, adUnitId, sessionId, clickCount, impressionCount, closeCount, 
- *         loadLatency, bidResponseCount, timestamp
- */
-+ (NSString *)createPerformanceMetricsTableSQL;
 
 /**
  * Index Creation for Performance Optimization

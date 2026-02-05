@@ -11,13 +11,11 @@
 // DAO Implementations
 #import "CLXMetricsEventDaoImpl.h"
 #import "CLXSessionDaoImpl.h"
-#import "CLXPerformanceDaoImpl.h"
 
 @interface CLXCloudXDatabase ()
 
 @property (nonatomic, strong) id<CLXMetricsEventDao> metricsDao;
 @property (nonatomic, strong) id<CLXSessionDao> sessionDao;
-@property (nonatomic, strong) id<CLXPerformanceDao> performanceDao;
 
 @end
 
@@ -60,7 +58,6 @@ static CLXCloudXDatabase *_testInstance = nil;
     // Initialize DAO implementations with dependency injection
     self.metricsDao = [[CLXMetricsEventDaoImpl alloc] initWithDatabase:self];
     self.sessionDao = [[CLXSessionDaoImpl alloc] initWithDatabase:self];
-    self.performanceDao = [[CLXPerformanceDaoImpl alloc] initWithDatabase:self];
 }
 
 #pragma mark - Database Lifecycle
@@ -105,8 +102,7 @@ static CLXCloudXDatabase *_testInstance = nil;
         // Create all tables
         NSArray *createTableStatements = @[
             [CLXDatabaseSchema createMetricsEventTableSQL],
-            [CLXDatabaseSchema createSessionTableSQL],
-            [CLXDatabaseSchema createPerformanceMetricsTableSQL]
+            [CLXDatabaseSchema createSessionTableSQL]
         ];
         
         for (NSString *sql in createTableStatements) {
@@ -280,10 +276,6 @@ static CLXCloudXDatabase *_testInstance = nil;
 
 - (id<CLXSessionDao>)sessionDao {
     return _sessionDao;
-}
-
-- (id<CLXPerformanceDao>)performanceDao {
-    return _performanceDao;
 }
 
 @end
