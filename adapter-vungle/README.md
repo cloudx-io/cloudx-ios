@@ -2,7 +2,11 @@
 
 Vungle (Liftoff) adapter for CloudX iOS SDK.
 
-Requires iOS 12.0+ and Xcode 16.0+.
+## Requirements
+
+- iOS 15.0+
+- Xcode 16.0+
+- Swift 6.0+
 
 ## Installation
 
@@ -20,7 +24,7 @@ pod install --repo-update
 
 1. Download `CloudXVungleAdapter-v{version}.xcframework.zip` from [Releases](https://github.com/cloudx-io/cloudx-ios/releases)
 2. Unzip and drag `CloudXVungleAdapter.xcframework` into your Xcode project
-3. Add VungleAds SDK 7.4.0+ manually
+3. Add VungleAds SDK 7.6.0+ manually
 
 ## Info.plist Configuration
 
