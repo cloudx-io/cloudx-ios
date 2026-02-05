@@ -11,7 +11,6 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
-#import <CloudXCore/CLXCloudXDatabase.h>
 
 #pragma mark - Test Infrastructure
 
@@ -92,7 +91,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 #pragma mark - Test Class
 
 @interface CLXLoadAfterDestroyIntegrationTests : XCTestCase
-@property (nonatomic, strong) CLXCloudXDatabase *testDatabase;
 @end
 
 @implementation CLXLoadAfterDestroyIntegrationTests
@@ -101,18 +99,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 - (void)setUp {
     [super setUp];
-    
-    // Create isolated in-memory test database for fast, deterministic tests
-    // This prevents real SQLite I/O and ensures tests run in milliseconds
-    NSString *uniqueDBName = [NSString stringWithFormat:@"test_load_destroy_%@.db", [[NSUUID UUID] UUIDString]];
-    self.testDatabase = [[CLXCloudXDatabase alloc] initWithDatabaseName:uniqueDBName];
-    [CLXCloudXDatabase setSharedInstanceForTesting:self.testDatabase];
 }
 
 - (void)tearDown {
-    // Reset to production singleton
-    [CLXCloudXDatabase setSharedInstanceForTesting:nil];
-    self.testDatabase = nil;
     [super tearDown];
 }
 

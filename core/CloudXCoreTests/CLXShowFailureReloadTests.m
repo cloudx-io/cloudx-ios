@@ -15,7 +15,6 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
-#import <CloudXCore/CLXCloudXDatabase.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXSDKConfigAdUnit.h>
@@ -94,7 +93,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 @interface CLXShowFailureReloadTests : XCTestCase
 @property (nonatomic, strong) CLXNullReporter *nullReporter;
 @property (nonatomic, strong) CLXMockInterstitialAdapter *mockAdapter;
-@property (nonatomic, strong) CLXCloudXDatabase *mockDatabase;
 @end
 
 @implementation CLXShowFailureReloadTests
@@ -103,10 +101,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 
 - (void)setUp {
     [super setUp];
-    // In-memory database: no disk I/O, unique per test, auto-cleaned
-    NSString *uniqueName = [NSString stringWithFormat:@"test_%@.db", [[NSUUID UUID] UUIDString]];
-    self.mockDatabase = [[CLXCloudXDatabase alloc] initWithDatabaseName:uniqueName];
-    [CLXCloudXDatabase setSharedInstanceForTesting:self.mockDatabase];
     // Null reporter: conforms to protocol, does nothing
     self.nullReporter = [[CLXNullReporter alloc] init];
     // Mock adapter: conforms to protocol, does nothing
@@ -114,9 +108,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 }
 
 - (void)tearDown {
-    // Reset to production singleton (nil = use real)
-    [CLXCloudXDatabase setSharedInstanceForTesting:nil];
-    self.mockDatabase = nil;
     self.nullReporter = nil;
     self.mockAdapter = nil;
     [super tearDown];
