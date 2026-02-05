@@ -1,25 +1,26 @@
-name: CloudXCore Unit Tests
+# CI: Build and Test
+#
+# Quality gate for all code changes. Runs on pushes to important branches
+# and on all pull requests targeting those branches.
+
+name: CI
 
 on:
   push:
     branches:
       - main
-      - develop
-    paths:
-      - 'core/**'
-      - '.github/workflows/core-tests.yml'
+      - 'release/**'
+      - 'hotfix/**'
   pull_request:
     branches:
       - main
-      - develop
-    paths:
-      - 'core/**'
-      - '.github/workflows/core-tests.yml'
+      - 'release/**'
+      - 'hotfix/**'
   workflow_dispatch:
 
 jobs:
   test:
-    name: Run CloudXCore Unit Tests
+    name: Build and Test
     runs-on: macos-latest
     timeout-minutes: 20
 
@@ -32,7 +33,6 @@ jobs:
       - name: Find available iPhone simulator
         id: simulator
         run: |
-          # Get the first available iPhone (not iPad, not SE) simulator
           SIMULATOR=$(xcrun simctl list devices available | grep "iPhone [0-9]" | grep -v "SE" | head -1 | sed 's/^[[:space:]]*//' | cut -d'(' -f1 | sed 's/[[:space:]]*$//')
           echo "Found simulator: $SIMULATOR"
           echo "name=$SIMULATOR" >> $GITHUB_OUTPUT
@@ -41,7 +41,6 @@ jobs:
         working-directory: core
         run: |
           set -o pipefail
-          echo "Using simulator: ${{ steps.simulator.outputs.name }}"
           xcodebuild test \
             -project CloudXCore.xcodeproj \
             -scheme CloudXCore \
