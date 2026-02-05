@@ -93,7 +93,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"accountID"], @"Error should mention accountID");
 }
 
@@ -112,7 +112,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"sessionID"], @"Error should mention sessionID");
 }
 
@@ -131,7 +131,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"appID"], @"Error should mention appID");
 }
 
@@ -150,7 +150,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"auctionEndpointURL"], @"Error should mention auctionEndpointURL");
 }
 
@@ -169,7 +169,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"impressionTrackerURL"], @"Error should mention impressionTrackerURL");
 }
 
@@ -188,7 +188,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"winLossNotificationURL"], @"Error should mention winLossNotificationURL");
 }
 
@@ -207,7 +207,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"geoDataEndpointURL"], @"Error should mention geoDataEndpointURL");
 }
 
@@ -226,7 +226,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"bidders"], @"Error should mention bidders");
 }
 
@@ -245,7 +245,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"networkName"], @"Error should mention networkName");
 }
 
@@ -264,7 +264,7 @@
     // Then: Should fail with error 205 (matches Android which requires initData)
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"initData"], @"Error should mention initData");
 }
 
@@ -283,7 +283,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"adUnits"], @"Error should mention placements");
 }
 
@@ -302,7 +302,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"adUnits[0].id"], @"Error should mention ad unit id");
 }
 
@@ -321,7 +321,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"adUnits[0].name"], @"Error should mention ad unit name");
 }
 
@@ -340,7 +340,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"adUnits[0].type"], @"Error should mention ad unit type");
 }
 
@@ -359,7 +359,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"tracking"], @"Error should mention tracking");
 }
 
@@ -378,7 +378,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"geoHeaders"], @"Error should mention geoHeaders");
 }
 
@@ -441,7 +441,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"winLossNotificationPayloadConfig"], @"Error should mention winLossNotificationPayloadConfig");
 }
 
@@ -460,7 +460,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"auctionEndpointURL.default"], @"Error should mention auctionEndpointURL.default");
 }
 
@@ -479,7 +479,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
     XCTAssertTrue([error.localizedDescription containsString:@"accountID"], @"Error should mention accountID");
 }
 
@@ -495,7 +495,7 @@
     // Then: Should fail with error 205
     XCTAssertNil(config, @"Config should be nil");
     XCTAssertNotNil(error, @"Error should not be nil");
-    XCTAssertEqual(error.code, 205, @"Error code should be 205 (CLXErrorCodeInvalidResponse)");
+    XCTAssertEqual(error.code, CLXErrorCodeInvalidResponse, @"Error code should be CLXErrorCodeInvalidResponse (105)");
 }
 
 #pragma mark - Tracking Array Parsing Tests
