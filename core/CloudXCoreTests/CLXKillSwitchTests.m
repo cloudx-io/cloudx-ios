@@ -348,7 +348,7 @@
 - (void)testKillSwitchErrorCodes_ShouldBeRecognized {
     // Error code 104 - SDK Disabled
     NSError *error104 = [CLXError errorWithCode:CLXErrorCodeSDKDisabled];
-    XCTAssertEqual(error104.code, 104, @"SDK disabled should be code 104");
+    XCTAssertEqual(error104.code, CLXErrorCodeSDKDisabled, @"SDK disabled should be code 204");
 
     // Error code 301 - Ads Disabled
     NSError *error301 = [CLXError errorWithCode:CLXErrorCodeAdsDisabled];

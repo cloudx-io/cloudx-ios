@@ -101,7 +101,7 @@
 
     XCTAssertNotNil(ad, @"Factory method should create CLXAd object");
     XCTAssertTrue([ad isKindOfClass:[CLXAd class]], @"Factory method should return CLXAd instance");
-    XCTAssertEqualObjects(ad.adUnitName, @"placement_123", @"Ad unit name should use adUnitId as fallback");
+    XCTAssertEqualObjects(ad.adUnitName, @"", @"Ad unit name should be empty when not provided and no adapterExtras adUnitName");
     XCTAssertEqualObjects(ad.adUnitId, @"placement_123", @"Ad unit ID should be set from parameter");
     XCTAssertEqualObjects(ad.networkName, @"test_bidder", @"Network name should be extracted from bid");
     XCTAssertEqualObjects(ad.networkPlacement, @"ext_123", @"Network placement should be extracted from bid");
