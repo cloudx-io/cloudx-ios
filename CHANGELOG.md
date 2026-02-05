@@ -9,18 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+*No unreleased changes*
+
+---
+
+## [2.0.0] - 2026-02-04
+
+This release replaces placement names with **Ad Unit IDs** from the CloudX dashboard. Update your `createBannerWithAdUnitId:`, `createMRECWithAdUnitId:`, `createInterstitialWithAdUnitId:`, and `createRewardedWithAdUnitId:` calls to use the ad unit ID instead of a placement name.
+
+### Added
+- Rewarded ads with `createRewardedWithAdUnitId:delegate:` and `CLXRewardedDelegate`
+- InMobi adapter (SDK 11.1) with support for banner, MREC, interstitial, and rewarded ads
+- `CLXAd.networkPlacement` property for network-specific placement ID
+
 ### Breaking Changes
-- **Test mode is now server-controlled** - Removed `testMode` parameter from `initializeSDKWithAppKey:completion:`
-  - To enable test mode, whitelist your device IFA on the CloudX server dashboard
-  - The SDK now logs the device IFA at INFO level during initialization for easy copy/paste
-  - Server returns `deviceConfig.test` value which is passed through to bid requests
+- Renamed `placement` parameter to `adUnitId` in `createBannerWithAdUnitId:`, `createMRECWithAdUnitId:`, `createInterstitialWithAdUnitId:`, `createRewardedWithAdUnitId:`
+- Renamed `CLXAd.placement` to `adUnitId`
+- Renamed `CLXAd.bidderName` to `networkName`
+- Renamed `CLXErrorCodeInvalidPlacement` to `CLXErrorCodeInvalidAdUnit`
+- Changed `bannerAdView:didFailWithError:` to include ad unit ID in error
+- Removed `testMode` parameter from `initializeSDKWithAppKey:completion:` - test mode is now server-controlled via dashboard
 
 ### Changed
-- **Device config parsing** - SDK now parses `deviceConfig` from server init response:
-  - `test`: Integer value passed to bid requests (0 = production, non-zero = test mode)
-  - `debug`: Boolean to enable verbose logging remotely
-- **Adapter initializer protocol** - Added `testMode:` parameter to `CLXAdNetworkInitializer` protocol
-- **Meta adapter** - Now uses server-controlled test mode instead of client-side flag
+- Meta Audience Network SDK updated from 6.17.0 to 6.21.0
+- Vungle SDK updated from 7.4.2 to 7.6.0
+
+### Fixed
+- Fixed IFA (Identifier for Advertisers) collection
+- Fixed country/geo-targeting data collection
 
 ---
 
@@ -28,12 +44,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Banner Refresh Retry** - Banners now automatically retry loading after failure when hidden
-- **Mintegral Adapter v8.0** - Updated Mintegral adapter 
-- **InMobi Native Impression Callbacks** - Added missing native ad impression tracking
 
 ### Fixed
 - **App Extension Compatibility** - SDK now works correctly in App Extensions (no UIApplication calls)
-- **InMobi Fullscreen Ads** - Fixed stuck fullscreen ads issue
 - **Rewarded Delegate Callbacks** - Fixed callback ordering bug
 - **Symbol Collisions** - All category methods now prefixed with `clx_` to prevent conflicts
 
@@ -57,76 +70,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🚀 First Official Release
 
-The **CloudX iOS SDK** is a comprehensive mobile advertising solution that provides programmatic advertising capabilities for iOS applications.
-
-### Features
-
-#### Ad Formats
-- **Banner Ads** (320×50) - Standard banner advertisements
-- **MREC Ads** (300×250) - Medium rectangle advertisements  
-- **Interstitial Ads** - Full-screen advertisements
-
-#### Core Capabilities
-- **Server-Side Header Bidding** - Real-time programmatic auction with multiple demand sources
-- **Unified Auction** - Single SDK manages bidding across all integrated demand partners
-- **Privacy Compliance** - Built-in support for GDPR, CCPA, and App Tracking Transparency (ATT)
-- **Comprehensive Analytics** - Session tracking, impression metrics, and revenue reporting
-
-#### Developer Experience
-- **Simple Integration** - Initialize once, create ads with a single method call
-- **Delegate-Based Callbacks** - Clear lifecycle events for ad loading, display, and errors
-- **Test Mode** - Built-in test mode for development and QA
-- **Flexible Logging** - Configurable log verbosity for debugging
-
-#### Architecture
-- **Static XCFramework Distribution** - Fast app launch times, no dSYM warnings
-- **Modular Adapter System** - Add only the demand partners you need
-- **iOS 15.0+** - Modern iOS support with Swift and Objective-C compatibility
-
-### Components
-
-| Component | Description |
-|-----------|-------------|
-| **CloudXCore** | Core SDK with programmatic advertising engine |
-| **CloudXMetaAdapter** | Meta Audience Network integration |
-| **CloudXVungleAdapter** | Vungle/Liftoff integration with header bidding |
-| **CloudXRenderer** | Creative rendering engine for CloudX demand |
-
-### Installation
-
-```ruby
-# Podfile
-platform :ios, '15.0'
-
-target 'YourApp' do
-  use_frameworks! :linkage => :static
-  
-  pod 'CloudXCore'
-  pod 'CloudXMetaAdapter'      # Optional
-  pod 'CloudXVungleAdapter'    # Optional
-  pod 'CloudXRenderer'         # For CloudX demand
-end
-```
-
-### Quick Start
-
-```objc
-// Initialize SDK
-[[CloudXCore shared] initializeSDKWithAppKey:@"YOUR_APP_KEY"
-                                  completion:^(BOOL success, CLXError *error) {
-    if (success) {
-        NSLog(@"CloudX SDK initialized!");
-    }
-}];
-
-// Create and load a banner ad
-CLXBannerAdView *banner = [[CloudXCore shared] createBannerWithPlacement:@"PLACEMENT_ID"
-                                                           viewController:self
-                                                                 delegate:self];
-[self.view addSubview:banner];
-[banner load];
-```
-
-### Documentation
-
-For complete documentation, visit [docs.cloudx.io/ios](https://docs.cloudx.io/ios/installation)
+Initial release of the CloudX iOS SDK with support for banner, MREC, and interstitial ads.
