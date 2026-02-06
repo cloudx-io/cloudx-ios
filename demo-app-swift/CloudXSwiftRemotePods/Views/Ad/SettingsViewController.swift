@@ -48,13 +48,13 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 4 // SDK, Placement, Logging, QA Tools
+        return 4 // SDK, Ad Unit, Logging, QA Tools
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
         case 0: return 3 // SDK Settings: App Key, Init URL, Hashed User ID
-        case 1: return 4 // Placement Settings
+        case 1: return 4 // Ad Unit Settings
         case 2: return 4 // Logging: Enable, Emojis, Timestamps, Level
         case 3: return 1 // QA Tools: Print Bid Response
         default: return 0
@@ -64,7 +64,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
         case 0: return "SDK Settings"
-        case 1: return "Placement Settings"
+        case 1: return "Ad Unit Settings"
         case 2: return "Logging Controls 🪵"
         case 3: return "🔍 QA Tools"
         default: return nil
@@ -117,20 +117,20 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
                 textField.frame = CGRect(x: 150, y: 7, width: cell.contentView.bounds.size.width - 220, height: 30)
             default: break
             }
-        case 1: // Placement
+        case 1: // Ad Unit
             switch indexPath.row {
-            case 0: 
+            case 0:
                 cell.textLabel?.text = "Banner"
-                textField.text = settings.bannerPlacement
-            case 1: 
+                textField.text = settings.bannerAdUnitId
+            case 1:
                 cell.textLabel?.text = "MREC"
-                textField.text = settings.mrecPlacement
-            case 2: 
+                textField.text = settings.mrecAdUnitId
+            case 2:
                 cell.textLabel?.text = "Interstitial"
-                textField.text = settings.interstitialPlacement
+                textField.text = settings.interstitialAdUnitId
             case 3:
                 cell.textLabel?.text = "Rewarded"
-                textField.text = settings.rewardedPlacement
+                textField.text = settings.rewardedAdUnitId
             default: break
             }
         case 2: // Logging
@@ -259,9 +259,9 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         if tag == 0 { settings.appKey = textField.text ?? "" }
         else if tag == 1 { settings.SDKinitURL = textField.text ?? "" }
         else if tag == 2 { settings.hashedUserId = textField.text }
-        else if tag == 10 { settings.bannerPlacement = textField.text ?? "" }
-        else if tag == 11 { settings.mrecPlacement = textField.text ?? "" }
-        else if tag == 12 { settings.interstitialPlacement = textField.text ?? "" }
-        else if tag == 13 { settings.rewardedPlacement = textField.text ?? "" }
+        else if tag == 10 { settings.bannerAdUnitId = textField.text ?? "" }
+        else if tag == 11 { settings.mrecAdUnitId = textField.text ?? "" }
+        else if tag == 12 { settings.interstitialAdUnitId = textField.text ?? "" }
+        else if tag == 13 { settings.rewardedAdUnitId = textField.text ?? "" }
     }
 }

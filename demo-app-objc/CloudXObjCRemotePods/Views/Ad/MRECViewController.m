@@ -116,11 +116,11 @@
 - (void)createAndAddMRECToView {
     if (self.mrecAd) return;
     
-    NSString *placement = [self placementName];
-    if (_settings.mrecPlacement.length > 0) {
-        placement = _settings.mrecPlacement;
+    NSString *adUnitId = [self adUnitId];
+    if (_settings.mrecAdUnitId.length > 0) {
+        adUnitId = _settings.mrecAdUnitId;
     }
-    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:placement viewController:self];
+    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:adUnitId viewController:self];
     self.mrecAd.delegate = self;
     self.mrecAd.revenueDelegate = self;
     self.mrecAd.placement = @"demo_mrec";
@@ -227,8 +227,8 @@
     });
 }
 
-- (NSString *)placementName {
-    return [[CLXDemoConfigManager sharedManager] currentConfig].mrecPlacement;
+- (NSString *)adUnitId {
+    return [[CLXDemoConfigManager sharedManager] currentConfig].mrecAdUnitId;
 }
 
 - (void)loadMREC {
@@ -240,8 +240,8 @@
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
 
-    NSString *placement = [self placementName];
-    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:placement
+    NSString *adUnitId = [self adUnitId];
+    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:adUnitId
                                                 viewController:self];
     self.mrecAd.delegate = self;
     self.mrecAd.revenueDelegate = self;

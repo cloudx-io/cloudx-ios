@@ -84,14 +84,14 @@ class InterstitialViewController: BaseAdViewController {
         isLoading = true
         updateStatusUI(state: AdState.loading)
 
-        // Get placement from config manager (with settings override if provided)
-        let originalPlacementName = CLXDemoConfigManager.sharedManager.currentConfig.interstitialPlacement
-        var placement = originalPlacementName
-        if !settings.interstitialPlacement.isEmpty {
-            placement = settings.interstitialPlacement
+        // Get ad unit ID from config manager (with settings override if provided)
+        let originalAdUnitId = CLXDemoConfigManager.sharedManager.currentConfig.interstitialAdUnitId
+        var adUnitId = originalAdUnitId
+        if !settings.interstitialAdUnitId.isEmpty {
+            adUnitId = settings.interstitialAdUnitId
         }
-        
-        interstitialAd = cloudX.createInterstitial(adUnitId: placement)
+
+        interstitialAd = cloudX.createInterstitial(adUnitId: adUnitId)
         interstitialAd?.delegate = self
         interstitialAd?.revenueDelegate = self
         

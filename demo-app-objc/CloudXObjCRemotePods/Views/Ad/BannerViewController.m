@@ -117,8 +117,8 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (NSString *)placementName {
-    return [[CLXDemoConfigManager sharedManager] currentConfig].bannerPlacement;
+- (NSString *)adUnitId {
+    return [[CLXDemoConfigManager sharedManager] currentConfig].bannerAdUnitId;
 }
 
 - (void)loadBannerAd {
@@ -144,16 +144,16 @@
 - (void)createAndAddBannerToView {
     if (self.bannerAd) return;
     
-    // Always preserve the original human-readable placement name for display purposes
-    NSString *originalPlacementName = [self placementName];
-    
-    // Use settings placement ID for SDK call if provided, otherwise use original name
-    NSString *placement = originalPlacementName;
-    if (_settings.bannerPlacement.length > 0) {
-        placement = _settings.bannerPlacement;
+    // Always preserve the original ad unit ID for display purposes
+    NSString *originalAdUnitId = [self adUnitId];
+
+    // Use settings ad unit ID for SDK call if provided, otherwise use original
+    NSString *adUnitId = originalAdUnitId;
+    if (_settings.bannerAdUnitId.length > 0) {
+        adUnitId = _settings.bannerAdUnitId;
     }
     
-    self.bannerAd = [[CloudXCore shared] createBannerWithAdUnitId:placement
+    self.bannerAd = [[CloudXCore shared] createBannerWithAdUnitId:adUnitId
                                                      viewController:self];
     self.bannerAd.delegate = self;
     self.bannerAd.revenueDelegate = self;

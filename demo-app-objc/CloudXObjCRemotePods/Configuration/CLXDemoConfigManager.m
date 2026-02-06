@@ -5,26 +5,26 @@
 - (instancetype)initWithAppKey:(NSString *)appKey
                  hashedUserId:(NSString *)hashedUserId
                       baseURL:(NSString *)baseURL
-               bannerPlacement:(NSString *)bannerPlacement
-                 mrecPlacement:(NSString *)mrecPlacement
-         interstitialPlacement:(NSString *)interstitialPlacement
-               nativePlacement:(NSString *)nativePlacement
-         nativeBannerPlacement:(NSString *)nativeBannerPlacement
-             rewardedPlacement:(NSString *)rewardedPlacement
-   rewardedInterstitialPlacement:(NSString *)rewardedInterstitialPlacement {
-    
+               bannerAdUnitId:(NSString *)bannerAdUnitId
+                 mrecAdUnitId:(NSString *)mrecAdUnitId
+         interstitialAdUnitId:(NSString *)interstitialAdUnitId
+               nativeAdUnitId:(NSString *)nativeAdUnitId
+         nativeBannerAdUnitId:(NSString *)nativeBannerAdUnitId
+             rewardedAdUnitId:(NSString *)rewardedAdUnitId
+   rewardedInterstitialAdUnitId:(NSString *)rewardedInterstitialAdUnitId {
+
     self = [super init];
     if (self) {
         _appKey = [appKey copy];
         _hashedUserId = [hashedUserId copy];
         _baseURL = [baseURL copy];
-        _bannerPlacement = [bannerPlacement copy];
-        _mrecPlacement = [mrecPlacement copy];
-        _interstitialPlacement = [interstitialPlacement copy];
-        _nativePlacement = [nativePlacement copy];
-        _nativeBannerPlacement = [nativeBannerPlacement copy];
-        _rewardedPlacement = [rewardedPlacement copy];
-        _rewardedInterstitialPlacement = [rewardedInterstitialPlacement copy];
+        _bannerAdUnitId = [bannerAdUnitId copy];
+        _mrecAdUnitId = [mrecAdUnitId copy];
+        _interstitialAdUnitId = [interstitialAdUnitId copy];
+        _nativeAdUnitId = [nativeAdUnitId copy];
+        _nativeBannerAdUnitId = [nativeBannerAdUnitId copy];
+        _rewardedAdUnitId = [rewardedAdUnitId copy];
+        _rewardedInterstitialAdUnitId = [rewardedInterstitialAdUnitId copy];
     }
     return self;
 }
@@ -71,13 +71,13 @@
         initWithAppKey:@"E5RotGdN8i7hWhkax1e1o"
         hashedUserId:@"test-user-123"
         baseURL:@"http://localhost:8090/sdk"
-        bannerPlacement:@"banner"
-        mrecPlacement:@"mrec"
-        interstitialPlacement:@"interstitial"
-        nativePlacement:@"-"
-        nativeBannerPlacement:@"-"
-        rewardedPlacement:@"rewarded"
-        rewardedInterstitialPlacement:@"rewarded"];
+        bannerAdUnitId:@"banner"
+        mrecAdUnitId:@"mrec"
+        interstitialAdUnitId:@"interstitial"
+        nativeAdUnitId:@"-"
+        nativeBannerAdUnitId:@"-"
+        rewardedAdUnitId:@"rewarded"
+        rewardedInterstitialAdUnitId:@"rewarded"];
 
     // Staging Configuration (MetaTestApp-9-22-25 - bundle: cloudx.CloudXObjCRemotePods)
     // TODO: Replace ad unit names with actual IDs from staging server config
@@ -85,13 +85,13 @@
         initWithAppKey:@"A7ovaBRCcAL8lapKtoZmm"
         hashedUserId:@"test-user-123"
         baseURL:@"https://pro-stage.cloudx.io/sdk"
-        bannerPlacement:@"objcDemo-banner-1"
-        mrecPlacement:@"objcDemo-mrec-1"
-        interstitialPlacement:@"objcDemo-interstitial-1"
-        nativePlacement:@"-"
-        nativeBannerPlacement:@"-"
-        rewardedPlacement:@"-"
-        rewardedInterstitialPlacement:@"-"];
+        bannerAdUnitId:@"objcDemo-banner-1"
+        mrecAdUnitId:@"objcDemo-mrec-1"
+        interstitialAdUnitId:@"objcDemo-interstitial-1"
+        nativeAdUnitId:@"-"
+        nativeBannerAdUnitId:@"-"
+        rewardedAdUnitId:@"-"
+        rewardedInterstitialAdUnitId:@"-"];
 
     // Dev Configuration (Test app - bundle: cloudx.CloudXObjCRemotePods)
     // TODO: Replace ad unit names with actual IDs from dev server config
@@ -99,26 +99,26 @@
         initWithAppKey:@"E-B3dlMk92hcrUT-9xmMu"
         hashedUserId:@"test-user-123"
         baseURL:@"https://provisioning-dev.cloudx.io/sdk"
-        bannerPlacement:@"placement_1"
-        mrecPlacement:@"place_2"
-        interstitialPlacement:@"interstitial_home_entry"
-        nativePlacement:@"-"
-        nativeBannerPlacement:@"-"
-        rewardedPlacement:@"objc-demo-rewarded"
-        rewardedInterstitialPlacement:@"objc-demo-rewarded"];
+        bannerAdUnitId:@"placement_1"
+        mrecAdUnitId:@"place_2"
+        interstitialAdUnitId:@"interstitial_home_entry"
+        nativeAdUnitId:@"-"
+        nativeBannerAdUnitId:@"-"
+        rewardedAdUnitId:@"objc-demo-rewarded"
+        rewardedInterstitialAdUnitId:@"objc-demo-rewarded"];
 
     // Production Configuration (ObjCDemoApp - cloudx.CloudXObjCRemotePods)
     CLXDemoConfig *prodConfig = [[CLXDemoConfig alloc]
         initWithAppKey:@"ihtOXvp3X9JlMQ5p0_RYL"
         hashedUserId:@"prod-user-123"
         baseURL:@"https://pro.cloudx.io/sdk"
-        bannerPlacement:@"LyPxKhBFiUCd1xMLYQhGc"
-        mrecPlacement:@"EWaeXDSmKYbs220gM5hTv"
-        interstitialPlacement:@"txZ7NmISq-MsuPH0ULKbD"
-        nativePlacement:@"Q33RbPmBH-wix45Mu6--Z"
-        nativeBannerPlacement:@"-"
-        rewardedPlacement:@"um9Ek08ScJBWuzSMTyW3b"
-        rewardedInterstitialPlacement:@"I-JRnXEQc2bG5dm1EWoZ6"];
+        bannerAdUnitId:@"LyPxKhBFiUCd1xMLYQhGc"
+        mrecAdUnitId:@"EWaeXDSmKYbs220gM5hTv"
+        interstitialAdUnitId:@"txZ7NmISq-MsuPH0ULKbD"
+        nativeAdUnitId:@"Q33RbPmBH-wix45Mu6--Z"
+        nativeBannerAdUnitId:@"-"
+        rewardedAdUnitId:@"um9Ek08ScJBWuzSMTyW3b"
+        rewardedInterstitialAdUnitId:@"I-JRnXEQc2bG5dm1EWoZ6"];
     
     _configurations = @{
         @(CLXDemoEnvironmentLocal): localConfig,

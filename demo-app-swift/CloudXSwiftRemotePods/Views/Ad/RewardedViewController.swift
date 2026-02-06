@@ -68,8 +68,8 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
         NotificationCenter.default.removeObserver(self)
     }
     
-    private var placementName: String {
-        return CLXDemoConfigManager.sharedManager.currentConfig.rewardedPlacement
+    private var adUnitId: String {
+        return CLXDemoConfigManager.sharedManager.currentConfig.rewardedAdUnitId
     }
     
     @objc private func loadRewardedAd() {
@@ -98,15 +98,15 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
         isLoading = true
         updateStatusUI(state: .loading)
 
-        var placement = placementName
-        if !settings.rewardedPlacement.isEmpty {
-            placement = settings.rewardedPlacement
+        var adUnitId = self.adUnitId
+        if !settings.rewardedAdUnitId.isEmpty {
+            adUnitId = settings.rewardedAdUnitId
         }
-        DemoAppLogger.sharedInstance.logMessage("📍 [Rewarded] Using ad unit: \(placement)")
+        DemoAppLogger.sharedInstance.logMessage("📍 [Rewarded] Using ad unit: \(adUnitId)")
         
         // Create rewarded with comprehensive logging
         DemoAppLogger.sharedInstance.logMessage("📱 [Rewarded] Calling createRewarded...")
-        rewardedAd = CloudXCore.shared.createRewarded(adUnitId: placement)
+        rewardedAd = CloudXCore.shared.createRewarded(adUnitId: adUnitId)
         rewardedAd?.delegate = self
         rewardedAd?.revenueDelegate = self
 
@@ -115,7 +115,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
             DemoAppLogger.sharedInstance.logMessage("🔄 [Rewarded] Loading rewarded ad instance...")
             rewardedAd.load()
         } else {
-            DemoAppLogger.sharedInstance.logMessage("❌ [Rewarded] Failed to create rewarded with ad unit: \(placement)")
+            DemoAppLogger.sharedInstance.logMessage("❌ [Rewarded] Failed to create rewarded with ad unit: \(adUnitId)")
             isLoading = false
             updateStatusUI(state: .noAd)
             showAlert(title: "Error", message: "Failed to create rewarded ad.")

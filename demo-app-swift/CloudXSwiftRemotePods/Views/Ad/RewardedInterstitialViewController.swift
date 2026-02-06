@@ -65,8 +65,8 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         NotificationCenter.default.removeObserver(self)
     }
     
-    private var placementName: String {
-        return CLXDemoConfigManager.sharedManager.currentConfig.rewardedInterstitialPlacement
+    private var adUnitId: String {
+        return CLXDemoConfigManager.sharedManager.currentConfig.rewardedInterstitialAdUnitId
     }
     
     private func loadRewardedInterstitial() {
@@ -81,12 +81,12 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
         isLoading = true
         updateStatusUI(state: .loading)
 
-        let placement = placementName
-        DemoAppLogger.sharedInstance.logMessage("📍 [RewardedInterstitial] Using ad unit: \(placement)")
+        let adUnitId = self.adUnitId
+        DemoAppLogger.sharedInstance.logMessage("📍 [RewardedInterstitial] Using ad unit: \(adUnitId)")
         
         // Create rewarded interstitial with comprehensive logging
         DemoAppLogger.sharedInstance.logMessage("📱 [RewardedInterstitial] Calling createRewarded...")
-        rewardedInterstitialAd = CloudXCore.shared.createRewarded(adUnitId: placement)
+        rewardedInterstitialAd = CloudXCore.shared.createRewarded(adUnitId: adUnitId)
         rewardedInterstitialAd?.delegate = self
         rewardedInterstitialAd?.revenueDelegate = self
         
@@ -95,7 +95,7 @@ class RewardedInterstitialViewController: BaseAdViewController, CLXRewardedDeleg
             DemoAppLogger.sharedInstance.logMessage("🔄 [RewardedInterstitial] Loading rewarded interstitial ad instance...")
             rewardedInterstitialAd.load()
         } else {
-            DemoAppLogger.sharedInstance.logMessage("❌ [RewardedInterstitial] Failed to create rewarded interstitial with ad unit: \(placement)")
+            DemoAppLogger.sharedInstance.logMessage("❌ [RewardedInterstitial] Failed to create rewarded interstitial with ad unit: \(adUnitId)")
             isLoading = false
             updateStatusUI(state: .noAd)
             showAlert(title: "Error", message: "Failed to create rewarded interstitial ad.")

@@ -106,9 +106,9 @@ class BannerViewController: BaseAdViewController {
         
         DemoAppLogger.sharedInstance.logMessage("📱 Creating new banner ad instance...")
         
-        // Create banner ad with placement from config
-        let placement = CLXDemoConfigManager.sharedManager.currentConfig.bannerPlacement
-        bannerAd = cloudX.createBanner(adUnitId: placement, 
+        // Create banner ad with ad unit ID from config
+        let adUnitId = CLXDemoConfigManager.sharedManager.currentConfig.bannerAdUnitId
+        bannerAd = cloudX.createBanner(adUnitId: adUnitId,
                                       viewController: self)
         
         if bannerAd == nil {

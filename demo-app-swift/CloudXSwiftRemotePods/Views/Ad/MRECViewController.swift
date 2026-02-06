@@ -108,11 +108,11 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
     private func createAndAddMRECToView() {
         guard mrecAd == nil else { return }
         
-        var placement = placementName
-        if !settings.mrecPlacement.isEmpty {
-            placement = settings.mrecPlacement
+        var adUnitId = self.adUnitId
+        if !settings.mrecAdUnitId.isEmpty {
+            adUnitId = settings.mrecAdUnitId
         }
-        mrecAd = CloudXCore.shared.createMREC(adUnitId: placement, viewController: self)
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId, viewController: self)
         mrecAd?.delegate = self
         mrecAd?.revenueDelegate = self
 
@@ -168,8 +168,8 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         }
     }
     
-    private var placementName: String {
-        return CLXDemoConfigManager.sharedManager.currentConfig.mrecPlacement
+    private var adUnitId: String {
+        return CLXDemoConfigManager.sharedManager.currentConfig.mrecAdUnitId
     }
     
     private func loadMREC() {
@@ -181,8 +181,8 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         isLoading = true
         updateStatusUI(state: .loading)
 
-        let placement = placementName
-        mrecAd = CloudXCore.shared.createMREC(adUnitId: placement,
+        let adUnitId = self.adUnitId
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId,
                                             viewController: self)
         mrecAd?.delegate = self
         

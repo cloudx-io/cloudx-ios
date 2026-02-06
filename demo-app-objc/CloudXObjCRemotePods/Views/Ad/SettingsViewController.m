@@ -59,13 +59,13 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 4; // SDK, Placement, Logging, QA Tools
+    return 4; // SDK, Ad Unit, Logging, QA Tools
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
         case 0: return 3; // SDK Settings: App Key, Init URL, Hashed User ID
-        case 1: return 4; // Placement Settings
+        case 1: return 4; // Ad Unit Settings
         case 2: return 4; // Logging: Enable, Emojis, Timestamps, Level
         case 3: return 1; // QA Tools: Print Bid Response
         default: return 0;
@@ -75,7 +75,7 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     switch (section) {
         case 0: return @"SDK Settings";
-        case 1: return @"Placement Settings";
+        case 1: return @"Ad Unit Settings";
         case 2: return @"Logging Controls 🪵";
         case 3: return @"🔍 QA Tools";
         default: return nil;
@@ -132,12 +132,12 @@
                 }
             }
             break;
-        case 1: // Placement
+        case 1: // Ad Unit
             switch (indexPath.row) {
-                case 0: cell.textLabel.text = @"Banner"; textField.text = self.settings.bannerPlacement; break;
-                case 1: cell.textLabel.text = @"MREC"; textField.text = self.settings.mrecPlacement; break;
-                case 2: cell.textLabel.text = @"Interstitial"; textField.text = self.settings.interstitialPlacement; break;
-                case 3: cell.textLabel.text = @"Rewarded"; textField.text = self.settings.rewardedPlacement; break;
+                case 0: cell.textLabel.text = @"Banner"; textField.text = self.settings.bannerAdUnitId; break;
+                case 1: cell.textLabel.text = @"MREC"; textField.text = self.settings.mrecAdUnitId; break;
+                case 2: cell.textLabel.text = @"Interstitial"; textField.text = self.settings.interstitialAdUnitId; break;
+                case 3: cell.textLabel.text = @"Rewarded"; textField.text = self.settings.rewardedAdUnitId; break;
             }
             break;
         case 2: // Logging
@@ -277,10 +277,10 @@
     if (tag == 0) self.settings.appKey = textField.text;
     else if (tag == 1) self.settings.SDKinitURL = textField.text;
     else if (tag == 2) self.settings.hashedUserId = textField.text;
-    else if (tag == 10) self.settings.bannerPlacement = textField.text;
-    else if (tag == 11) self.settings.mrecPlacement = textField.text;
-    else if (tag == 12) self.settings.interstitialPlacement = textField.text;
-    else if (tag == 13) self.settings.rewardedPlacement = textField.text;
+    else if (tag == 10) self.settings.bannerAdUnitId = textField.text;
+    else if (tag == 11) self.settings.mrecAdUnitId = textField.text;
+    else if (tag == 12) self.settings.interstitialAdUnitId = textField.text;
+    else if (tag == 13) self.settings.rewardedAdUnitId = textField.text;
 }
 
 @end

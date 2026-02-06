@@ -68,8 +68,8 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (NSString *)placementName {
-    return [[CLXDemoConfigManager sharedManager] currentConfig].rewardedInterstitialPlacement;
+- (NSString *)adUnitId {
+    return [[CLXDemoConfigManager sharedManager] currentConfig].rewardedInterstitialAdUnitId;
 }
 
 - (void)loadRewardedInterstitialAd {
@@ -89,12 +89,12 @@
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
 
-    NSString *placement = [self placementName];
-    NSLog(@"[RewardedInterstitialViewController] Using placement: %@", placement);
-    
+    NSString *adUnitId = [self adUnitId];
+    NSLog(@"[RewardedInterstitialViewController] Using ad unit: %@", adUnitId);
+
     // Create rewarded interstitial with comprehensive logging
-    NSLog(@"[RewardedInterstitialViewController] Calling createRewardedWithAdUnitId: %@", placement);
-    self.rewardedInterstitialAd = [[CloudXCore shared] createRewardedWithAdUnitId:placement];
+    NSLog(@"[RewardedInterstitialViewController] Calling createRewardedWithAdUnitId: %@", adUnitId);
+    self.rewardedInterstitialAd = [[CloudXCore shared] createRewardedWithAdUnitId:adUnitId];
     self.rewardedInterstitialAd.delegate = self;
     self.rewardedInterstitialAd.revenueDelegate = self;
 
@@ -103,7 +103,7 @@
         NSLog(@"[RewardedInterstitialViewController] Loading rewarded interstitial ad instance...");
         [self.rewardedInterstitialAd load];
     } else {
-        NSLog(@"[RewardedInterstitialViewController] ❌ Failed to create rewarded interstitial with placement: %@", placement);
+        NSLog(@"[RewardedInterstitialViewController] ❌ Failed to create rewarded interstitial with ad unit: %@", adUnitId);
         self.isLoading = NO;
         [self updateStatusUIWithState:AdStateNoAd];
         [self showAlertWithTitle:@"Error" message:@"Failed to create rewarded interstitial ad."];

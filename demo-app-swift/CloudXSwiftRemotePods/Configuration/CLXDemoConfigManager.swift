@@ -11,35 +11,35 @@ class CLXDemoConfig {
     let appKey: String
     let hashedUserId: String
     let baseURL: String
-    let bannerPlacement: String
-    let mrecPlacement: String
-    let interstitialPlacement: String
-    let nativePlacement: String
-    let nativeBannerPlacement: String
-    let rewardedPlacement: String
-    let rewardedInterstitialPlacement: String
+    let bannerAdUnitId: String
+    let mrecAdUnitId: String
+    let interstitialAdUnitId: String
+    let nativeAdUnitId: String
+    let nativeBannerAdUnitId: String
+    let rewardedAdUnitId: String
+    let rewardedInterstitialAdUnitId: String
     
     init(appKey: String,
          hashedUserId: String,
          baseURL: String,
-         bannerPlacement: String,
-         mrecPlacement: String,
-         interstitialPlacement: String,
-         nativePlacement: String,
-         nativeBannerPlacement: String,
-         rewardedPlacement: String,
-         rewardedInterstitialPlacement: String) {
+         bannerAdUnitId: String,
+         mrecAdUnitId: String,
+         interstitialAdUnitId: String,
+         nativeAdUnitId: String,
+         nativeBannerAdUnitId: String,
+         rewardedAdUnitId: String,
+         rewardedInterstitialAdUnitId: String) {
         
         self.appKey = appKey
         self.hashedUserId = hashedUserId
         self.baseURL = baseURL
-        self.bannerPlacement = bannerPlacement
-        self.mrecPlacement = mrecPlacement
-        self.interstitialPlacement = interstitialPlacement
-        self.nativePlacement = nativePlacement
-        self.nativeBannerPlacement = nativeBannerPlacement
-        self.rewardedPlacement = rewardedPlacement
-        self.rewardedInterstitialPlacement = rewardedInterstitialPlacement
+        self.bannerAdUnitId = bannerAdUnitId
+        self.mrecAdUnitId = mrecAdUnitId
+        self.interstitialAdUnitId = interstitialAdUnitId
+        self.nativeAdUnitId = nativeAdUnitId
+        self.nativeBannerAdUnitId = nativeBannerAdUnitId
+        self.rewardedAdUnitId = rewardedAdUnitId
+        self.rewardedInterstitialAdUnitId = rewardedInterstitialAdUnitId
     }
 }
 
@@ -67,13 +67,13 @@ class CLXDemoConfigManager {
             appKey: "E5RotGdN8i7hWhkax1e1o",
             hashedUserId: "test-user-123",
             baseURL: "http://localhost:8090/sdk",
-            bannerPlacement: "banner",
-            mrecPlacement: "mrec",
-            interstitialPlacement: "interstitial",
-            nativePlacement: "-",
-            nativeBannerPlacement: "-",
-            rewardedPlacement: "rewarded",
-            rewardedInterstitialPlacement: "rewarded"
+            bannerAdUnitId: "banner",
+            mrecAdUnitId: "mrec",
+            interstitialAdUnitId: "interstitial",
+            nativeAdUnitId: "-",
+            nativeBannerAdUnitId: "-",
+            rewardedAdUnitId: "rewarded",
+            rewardedInterstitialAdUnitId: "rewarded"
         )
 
         // Staging Configuration
@@ -82,13 +82,13 @@ class CLXDemoConfigManager {
             appKey: "YG7zqD4RoWwMcGnp3XvNK",
             hashedUserId: "test-user-123-staging",
             baseURL: "https://pro-stage.cloudx.io/sdk",
-            bannerPlacement: "swift-demo-banner-1",
-            mrecPlacement: "swift-demo-mrec-1",
-            interstitialPlacement: "swift-demo-interstitial-1",
-            nativePlacement: "-",
-            nativeBannerPlacement: "-",
-            rewardedPlacement: "-",
-            rewardedInterstitialPlacement: "-"
+            bannerAdUnitId: "swift-demo-banner-1",
+            mrecAdUnitId: "swift-demo-mrec-1",
+            interstitialAdUnitId: "swift-demo-interstitial-1",
+            nativeAdUnitId: "-",
+            nativeBannerAdUnitId: "-",
+            rewardedAdUnitId: "-",
+            rewardedInterstitialAdUnitId: "-"
         )
 
         // Dev Configuration (Test app)
@@ -97,13 +97,13 @@ class CLXDemoConfigManager {
             appKey: "E-B3dlMk92hcrUT-9xmMu",
             hashedUserId: "test-user-123",
             baseURL: "https://provisioning-dev.cloudx.io/sdk",
-            bannerPlacement: "placement_1",
-            mrecPlacement: "place_2",
-            interstitialPlacement: "interstitial_home_entry",
-            nativePlacement: "-",
-            nativeBannerPlacement: "-",
-            rewardedPlacement: "objc-demo-rewarded",
-            rewardedInterstitialPlacement: "objc-demo-rewarded"
+            bannerAdUnitId: "placement_1",
+            mrecAdUnitId: "place_2",
+            interstitialAdUnitId: "interstitial_home_entry",
+            nativeAdUnitId: "-",
+            nativeBannerAdUnitId: "-",
+            rewardedAdUnitId: "objc-demo-rewarded",
+            rewardedInterstitialAdUnitId: "objc-demo-rewarded"
         )
 
         // Production Configuration
@@ -111,13 +111,13 @@ class CLXDemoConfigManager {
             appKey: "xcQftcBSUmqzuv1LfET2o",
             hashedUserId: "test-user-123",
             baseURL: "https://pro.cloudx.io/sdk",
-            bannerPlacement: "LyPxKhBFiUCd1xMLYQhGc",
-            mrecPlacement: "EWaeXDSmKYbs220gM5hTv",
-            interstitialPlacement: "txZ7NmISq-MsuPH0ULKbD",
-            nativePlacement: "Q33RbPmBH-wix45Mu6--Z",
-            nativeBannerPlacement: "-",
-            rewardedPlacement: "-",
-            rewardedInterstitialPlacement: "-"
+            bannerAdUnitId: "LyPxKhBFiUCd1xMLYQhGc",
+            mrecAdUnitId: "EWaeXDSmKYbs220gM5hTv",
+            interstitialAdUnitId: "txZ7NmISq-MsuPH0ULKbD",
+            nativeAdUnitId: "Q33RbPmBH-wix45Mu6--Z",
+            nativeBannerAdUnitId: "-",
+            rewardedAdUnitId: "-",
+            rewardedInterstitialAdUnitId: "-"
         )
         
         self.configurations = [
