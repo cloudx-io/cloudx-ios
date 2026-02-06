@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "cloudx-ios",
     platforms: [
-        .iOS(.v14)
+        .iOS(.v13)
     ],
     products: [
         .library(

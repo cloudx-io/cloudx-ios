@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.author           = { 'CloudX' => 'support@cloudx.io' }
   s.source           = { :http => 'https://github.com/cloudx-io/cloudx-ios-private/releases/download/2.0.0-rc.47%2B89a05d4/CloudXCore.xcframework.zip' }
   
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'CloudXCore.xcframework'
   
   s.frameworks = ['Foundation', 'SafariServices', 'UIKit', 'CoreLocation', 'WebKit', 'CoreData']

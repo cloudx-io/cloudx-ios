@@ -4,12 +4,12 @@
 
 ## Installation
 
-Requires iOS 14.0+ and Xcode 12.0+.
+Requires iOS 13.0+ and Xcode 12.0+.
 
 ### CocoaPods
 
 ```ruby
-platform :ios, '14.0'
+platform :ios, '13.0'
 
 target 'YourApp' do
   use_frameworks!

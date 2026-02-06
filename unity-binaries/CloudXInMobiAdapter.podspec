@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.author           = { 'CloudX' => 'support@cloudx.io' }
   s.source           = { :git => '', :tag => s.version.to_s }
   
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'CloudXInMobiAdapter.xcframework'
   
   # Dependencies - CloudXCore version is set to RC version via placeholder

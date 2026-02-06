@@ -237,7 +237,7 @@ echo ""
 # Step 11: Update demo app Podfiles
 echo "📝 Step 11: Updating demo app Podfiles..."
 cat > demo-app-objc/Podfile << 'EOF'
-platform :ios, '14.0'
+platform :ios, '13.0'
 
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static

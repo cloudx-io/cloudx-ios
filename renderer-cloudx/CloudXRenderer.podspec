@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
   s.license = { :type => 'Business Source License 1.1', :file => 'LICENSE' }
   s.authors = { 'CloudX' => 'support@cloudx.com' }
-  s.platform = :ios, '15.0'
+  s.platform = :ios, '13.0'
   s.module_name = 'CloudXRenderer'
   
   # Local development - no git source needed

@@ -185,7 +185,7 @@ cd cloudx-ios/demo-app-objc
 
 # Temporarily update Podfile to test from feature branch
 cat > Podfile << 'EOF'
-platform :ios, '15.0'
+platform :ios, '13.0'
 
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
@@ -214,7 +214,7 @@ open CloudXObjCRemotePods.xcworkspace
 cd cloudx-ios/demo-app-swift
 
 cat > Podfile << 'EOF'
-platform :ios, '15.0'
+platform :ios, '13.0'
 
 target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static
@@ -256,7 +256,7 @@ After testing passes, update **both** demo app Podfiles to use version specifier
 cd cloudx-ios/demo-app-objc
 
 cat > Podfile << 'EOF'
-platform :ios, '15.0'
+platform :ios, '13.0'
 
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
@@ -281,7 +281,7 @@ EOF
 cd cloudx-ios/demo-app-swift
 
 cat > Podfile << 'EOF'
-platform :ios, '15.0'
+platform :ios, '13.0'
 
 target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static

@@ -2,14 +2,14 @@
 
 [![CocoaPods](https://img.shields.io/cocoapods/v/CloudXCore.svg)](https://cocoapods.org/pods/CloudXCore)
 
-Requires iOS 14.0+.
+Requires iOS 13.0+.
 
 ## Installation
 
 ### CocoaPods
 
 ```ruby
-platform :ios, '14.0'
+platform :ios, '13.0'
 
 target 'YourApp' do
   use_frameworks!

@@ -107,16 +107,17 @@ class CLXDemoConfigManager {
         )
 
         // Production Configuration
+        // Swift Demo App (mg-Mubf3Ssa0MYdsgs2y6) - bundle: cloudx.CloudXSwiftRemotePods
         let prodConfig = CLXDemoConfig(
             appKey: "xcQftcBSUmqzuv1LfET2o",
             hashedUserId: "test-user-123",
             baseURL: "https://pro.cloudx.io/sdk",
-            bannerAdUnitId: "LyPxKhBFiUCd1xMLYQhGc",
-            mrecAdUnitId: "EWaeXDSmKYbs220gM5hTv",
-            interstitialAdUnitId: "txZ7NmISq-MsuPH0ULKbD",
-            nativeAdUnitId: "Q33RbPmBH-wix45Mu6--Z",
+            bannerAdUnitId: "Ce5-ltAX5zFz5QJ3TzEjY",       // swift-demo-banner-1
+            mrecAdUnitId: "xMLHNFIkwieu2SLyeD0sQ",         // swift-demo-mrec-1
+            interstitialAdUnitId: "rkw0ncj6mSphKtmnl8Cw_",  // swift-demo-interstitial-1
+            nativeAdUnitId: "-",
             nativeBannerAdUnitId: "-",
-            rewardedAdUnitId: "-",
+            rewardedAdUnitId: "WJje0XGqL5n56Sa8dlt8L",      // swift-demo-rewarded-1
             rewardedInterstitialAdUnitId: "-"
         )
         

@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   # Local development - no git source needed
   s.source           = { :path => '.' }
   
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '13.0'
   
   # Source files for local development - relative to this podspec location
   s.source_files = 'Sources/CloudXCore/**/*.{h,m}'
@@ -19,11 +19,9 @@ Pod::Spec.new do |s|
   s.frameworks = 'SafariServices'
   
   # Configure for source-based distribution
-  # DEFINES_MODULE=NO prevents CocoaPods from generating a conflicting umbrella header
-  # The adapters import CloudXCore headers directly, not via module imports
   s.pod_target_xcconfig = {
     'CLANG_ENABLE_MODULES' => 'YES',
-    'DEFINES_MODULE' => 'NO',
+    'DEFINES_MODULE' => 'YES',
     'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
   }
   s.user_target_xcconfig = {

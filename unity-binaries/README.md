@@ -23,7 +23,7 @@ After exporting your Unity project to Xcode, copy this entire `unity-binaries/` 
 Add the following to your Podfile:
 
 ```ruby
-platform :ios, '15.0'
+platform :ios, '13.0'
 
 target 'Unity-iPhone' do
   use_frameworks! :linkage => :static

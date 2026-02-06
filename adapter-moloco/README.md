@@ -2,7 +2,7 @@
 
 Moloco adapter for CloudX iOS SDK.
 
-Requires iOS 14.0+ and Xcode 14.0+.
+Requires iOS 13.0+ and Xcode 14.0+.
 
 ## Installation
 

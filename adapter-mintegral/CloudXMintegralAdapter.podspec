@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
   s.authors = { 'CloudX' => 'support@cloudx.com' }
   s.source = { :path => '.' }
 
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '13.0'
   
   # Local distribution uses source files
   s.source_files = 'Sources/CloudXMintegralAdapter/**/*.{h,m}'

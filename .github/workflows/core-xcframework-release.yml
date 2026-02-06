@@ -162,7 +162,7 @@ jobs:
           let package = Package(
               name: "CloudXCore",
               platforms: [
-                  .iOS(.v14)
+                  .iOS(.v13)
               ],
               products: [
                   .library(
@@ -197,7 +197,7 @@ jobs:
               :http => 'https://github.com/cloudx-io/cloudx-ios/releases/download/TAG_PLACEHOLDER/CloudXCore.xcframework.zip'
             }
             
-            s.ios.deployment_target = '14.0'
+            s.ios.deployment_target = '13.0'
             s.vendored_frameworks = 'CloudXCore.xcframework'
             
             s.framework = 'Foundation'
@@ -270,7 +270,7 @@ jobs:
           
           ## Requirements
           
-          - iOS 14.0+
+          - iOS 13.0+
           - Xcode 15.3+
           - Swift 5.9+
           EOF

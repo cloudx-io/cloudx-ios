@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D42DA69D84CE35A42829D25 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B9D9200F10B80C4CB3A996A /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */; };
-		1DC6EB2774F1AE0F00381291 /* Pods_CloudXSwiftRemotePods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E5B3D8C01B197B7E22CDD24F /* Pods_CloudXSwiftRemotePods.framework */; };
-		EE32CC7E02BFEF47B534BDF6 /* Pods_CloudXSwiftRemotePodsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F07E2DD597B4B49ACD8C363 /* Pods_CloudXSwiftRemotePodsTests.framework */; };
+		04BAEDD13449D55330805007 /* Pods_CloudXSwiftRemotePodsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ED8116F20839B28C93B8FEF /* Pods_CloudXSwiftRemotePodsTests.framework */; };
+		9DE269B08D83BA4DFFA2948C /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16888823BCA1A37AEA193DE1 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */; };
+		ED8329D247EA6AF1547B91A0 /* Pods_CloudXSwiftRemotePods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F9C84641D11F987AC5044E8 /* Pods_CloudXSwiftRemotePods.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,18 +30,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0B9D9200F10B80C4CB3A996A /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		0F40A848F2925EB524BADAC1 /* Pods-CloudXSwiftRemotePodsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePodsTests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePodsTests/Pods-CloudXSwiftRemotePodsTests.debug.xcconfig"; sourceTree = "<group>"; };
-		1917BCDE38ECEECE4237054E /* Pods-CloudXSwiftRemotePodsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePodsTests.release.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePodsTests/Pods-CloudXSwiftRemotePodsTests.release.xcconfig"; sourceTree = "<group>"; };
+		16888823BCA1A37AEA193DE1 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		195FD5962DE3C7FF0026F997 /* CloudXSwiftRemotePods.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CloudXSwiftRemotePods.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		195FD5AC2DE3C8000026F997 /* CloudXSwiftRemotePodsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXSwiftRemotePodsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		195FD5B62DE3C8000026F997 /* CloudXSwiftRemotePodsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXSwiftRemotePodsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		248B5C5EFA2B9863D2EB05AD /* Pods-CloudXSwiftRemotePods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods.release.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods.release.xcconfig"; sourceTree = "<group>"; };
-		277FC88C6CF1AD307FFEBBF4 /* Pods-CloudXSwiftRemotePods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods.debug.xcconfig"; sourceTree = "<group>"; };
-		3976EB4F4BF62B6D5539BE6A /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig"; sourceTree = "<group>"; };
-		7F07E2DD597B4B49ACD8C363 /* Pods_CloudXSwiftRemotePodsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePodsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B86BF64856422458B376B338 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig"; sourceTree = "<group>"; };
-		E5B3D8C01B197B7E22CDD24F /* Pods_CloudXSwiftRemotePods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		431D39269251EAB954F35032 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig"; sourceTree = "<group>"; };
+		4ED8116F20839B28C93B8FEF /* Pods_CloudXSwiftRemotePodsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePodsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		599A02EA2C10670FA4F3956C /* Pods-CloudXSwiftRemotePods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods.release.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods.release.xcconfig"; sourceTree = "<group>"; };
+		5F922BB1AB0B2215573A3955 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		6F9C84641D11F987AC5044E8 /* Pods_CloudXSwiftRemotePods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7F1D5B2927D8F7C528332A2 /* Pods-CloudXSwiftRemotePods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods.debug.xcconfig"; sourceTree = "<group>"; };
+		BD14A40FB76B284333E1A18A /* Pods-CloudXSwiftRemotePodsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePodsTests.release.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePodsTests/Pods-CloudXSwiftRemotePodsTests.release.xcconfig"; sourceTree = "<group>"; };
+		E6560F0A4690E043529D4790 /* Pods-CloudXSwiftRemotePodsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePodsTests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePodsTests/Pods-CloudXSwiftRemotePodsTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -65,11 +65,15 @@
 		};
 		195FD5AF2DE3C8000026F997 /* CloudXSwiftRemotePodsTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = CloudXSwiftRemotePodsTests;
 			sourceTree = "<group>";
 		};
 		195FD5B92DE3C8000026F997 /* CloudXSwiftRemotePodsUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = CloudXSwiftRemotePodsUITests;
 			sourceTree = "<group>";
 		};
@@ -80,7 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1DC6EB2774F1AE0F00381291 /* Pods_CloudXSwiftRemotePods.framework in Frameworks */,
+				ED8329D247EA6AF1547B91A0 /* Pods_CloudXSwiftRemotePods.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,7 +92,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EE32CC7E02BFEF47B534BDF6 /* Pods_CloudXSwiftRemotePodsTests.framework in Frameworks */,
+				04BAEDD13449D55330805007 /* Pods_CloudXSwiftRemotePodsTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,7 +100,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1D42DA69D84CE35A42829D25 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework in Frameworks */,
+				9DE269B08D83BA4DFFA2948C /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,7 +115,7 @@
 				195FD5B92DE3C8000026F997 /* CloudXSwiftRemotePodsUITests */,
 				195FD5972DE3C7FF0026F997 /* Products */,
 				E1698230A3F518F2A8E30456 /* Pods */,
-				8EDD72DBEC76DD27B7AE44DD /* Frameworks */,
+				268BA537D5A1567044308043 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -125,12 +129,12 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		8EDD72DBEC76DD27B7AE44DD /* Frameworks */ = {
+		268BA537D5A1567044308043 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				E5B3D8C01B197B7E22CDD24F /* Pods_CloudXSwiftRemotePods.framework */,
-				0B9D9200F10B80C4CB3A996A /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */,
-				7F07E2DD597B4B49ACD8C363 /* Pods_CloudXSwiftRemotePodsTests.framework */,
+				6F9C84641D11F987AC5044E8 /* Pods_CloudXSwiftRemotePods.framework */,
+				16888823BCA1A37AEA193DE1 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */,
+				4ED8116F20839B28C93B8FEF /* Pods_CloudXSwiftRemotePodsTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -138,12 +142,12 @@
 		E1698230A3F518F2A8E30456 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				277FC88C6CF1AD307FFEBBF4 /* Pods-CloudXSwiftRemotePods.debug.xcconfig */,
-				248B5C5EFA2B9863D2EB05AD /* Pods-CloudXSwiftRemotePods.release.xcconfig */,
-				B86BF64856422458B376B338 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig */,
-				3976EB4F4BF62B6D5539BE6A /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig */,
-				0F40A848F2925EB524BADAC1 /* Pods-CloudXSwiftRemotePodsTests.debug.xcconfig */,
-				1917BCDE38ECEECE4237054E /* Pods-CloudXSwiftRemotePodsTests.release.xcconfig */,
+				A7F1D5B2927D8F7C528332A2 /* Pods-CloudXSwiftRemotePods.debug.xcconfig */,
+				599A02EA2C10670FA4F3956C /* Pods-CloudXSwiftRemotePods.release.xcconfig */,
+				5F922BB1AB0B2215573A3955 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig */,
+				431D39269251EAB954F35032 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig */,
+				E6560F0A4690E043529D4790 /* Pods-CloudXSwiftRemotePodsTests.debug.xcconfig */,
+				BD14A40FB76B284333E1A18A /* Pods-CloudXSwiftRemotePodsTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -155,12 +159,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 195FD5BF2DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXSwiftRemotePods" */;
 			buildPhases = (
-				D56A65E0BEA71578ED6BA2EC /* [CP] Check Pods Manifest.lock */,
+				15D964051A222F1A42D8C208 /* [CP] Check Pods Manifest.lock */,
 				195FD5922DE3C7FF0026F997 /* Sources */,
 				195FD5932DE3C7FF0026F997 /* Frameworks */,
 				195FD5942DE3C7FF0026F997 /* Resources */,
-				FB16E2065D3FEF9739C80C6E /* [CP] Copy Pods Resources */,
-				3BE2AB97C29CF10196346D8F /* [CP] Embed Pods Frameworks */,
+				3FA80EC0A36A57F7E9EDF124 /* [CP] Embed Pods Frameworks */,
+				86D78F399B86A475F7906799 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -178,7 +182,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 195FD5C42DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXSwiftRemotePodsTests" */;
 			buildPhases = (
-				35917AB919BB5C01AD695857 /* [CP] Check Pods Manifest.lock */,
+				CBF5C4E47CEDAA542B6DD472 /* [CP] Check Pods Manifest.lock */,
 				195FD5A82DE3C8000026F997 /* Sources */,
 				195FD5A92DE3C8000026F997 /* Frameworks */,
 				195FD5AA2DE3C8000026F997 /* Resources */,
@@ -200,12 +204,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 195FD5C72DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXSwiftRemotePodsUITests" */;
 			buildPhases = (
-				297A8366BAE951DB838CB4B8 /* [CP] Check Pods Manifest.lock */,
+				43F0D695A7654B7F52739EEC /* [CP] Check Pods Manifest.lock */,
 				195FD5B22DE3C8000026F997 /* Sources */,
 				195FD5B32DE3C8000026F997 /* Frameworks */,
 				195FD5B42DE3C8000026F997 /* Resources */,
-				4A45775B4D2988EA825A2578 /* [CP] Copy Pods Resources */,
-				D90FFF5712EFD84F6199E23E /* [CP] Embed Pods Frameworks */,
+				3CDC5E66F7ACE1E217AC32CD /* [CP] Embed Pods Frameworks */,
+				4E189D269143C80EDA3825DF /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -289,85 +293,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		297A8366BAE951DB838CB4B8 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		35917AB919BB5C01AD695857 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-CloudXSwiftRemotePodsTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		3BE2AB97C29CF10196346D8F /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		4A45775B4D2988EA825A2578 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D56A65E0BEA71578ED6BA2EC /* [CP] Check Pods Manifest.lock */ = {
+		15D964051A222F1A42D8C208 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -389,7 +315,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D90FFF5712EFD84F6199E23E /* [CP] Embed Pods Frameworks */ = {
+		3CDC5E66F7ACE1E217AC32CD /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -406,7 +332,63 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		FB16E2065D3FEF9739C80C6E /* [CP] Copy Pods Resources */ = {
+		3FA80EC0A36A57F7E9EDF124 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		43F0D695A7654B7F52739EEC /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4E189D269143C80EDA3825DF /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		86D78F399B86A475F7906799 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -421,6 +403,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CBF5C4E47CEDAA542B6DD472 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXSwiftRemotePodsTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -465,7 +469,7 @@
 /* Begin XCBuildConfiguration section */
 		195FD5C02DE3C8000026F997 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 277FC88C6CF1AD307FFEBBF4 /* Pods-CloudXSwiftRemotePods.debug.xcconfig */;
+			baseConfigurationReference = A7F1D5B2927D8F7C528332A2 /* Pods-CloudXSwiftRemotePods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -496,7 +500,7 @@
 		};
 		195FD5C12DE3C8000026F997 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 248B5C5EFA2B9863D2EB05AD /* Pods-CloudXSwiftRemotePods.release.xcconfig */;
+			baseConfigurationReference = 599A02EA2C10670FA4F3956C /* Pods-CloudXSwiftRemotePods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -577,7 +581,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -634,7 +638,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -646,14 +650,14 @@
 		};
 		195FD5C52DE3C8000026F997 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0F40A848F2925EB524BADAC1 /* Pods-CloudXSwiftRemotePodsTests.debug.xcconfig */;
+			baseConfigurationReference = E6560F0A4690E043529D4790 /* Pods-CloudXSwiftRemotePodsTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.10;
 				PRODUCT_BUNDLE_IDENTIFIER = "cloudx.CloudXSwiftRemotePodsTests${DEVELOPMENT_TEAM}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -666,14 +670,14 @@
 		};
 		195FD5C62DE3C8000026F997 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1917BCDE38ECEECE4237054E /* Pods-CloudXSwiftRemotePodsTests.release.xcconfig */;
+			baseConfigurationReference = BD14A40FB76B284333E1A18A /* Pods-CloudXSwiftRemotePodsTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.10;
 				PRODUCT_BUNDLE_IDENTIFIER = "cloudx.CloudXSwiftRemotePodsTests${DEVELOPMENT_TEAM}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -686,7 +690,7 @@
 		};
 		195FD5C82DE3C8000026F997 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B86BF64856422458B376B338 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig */;
+			baseConfigurationReference = 5F922BB1AB0B2215573A3955 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -704,7 +708,7 @@
 		};
 		195FD5C92DE3C8000026F997 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3976EB4F4BF62B6D5539BE6A /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig */;
+			baseConfigurationReference = 431D39269251EAB954F35032 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

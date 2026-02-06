@@ -4,9 +4,9 @@ Vungle (Liftoff) adapter for CloudX iOS SDK.
 
 ## Requirements
 
-- iOS 15.0+
-- Xcode 16.0+
-- Swift 6.0+
+- iOS 13.0+
+- Xcode 14.0+
+- Swift 5.9+
 
 ## Installation
 

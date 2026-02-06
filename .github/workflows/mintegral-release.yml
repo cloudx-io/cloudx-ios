@@ -123,7 +123,7 @@ jobs:
           
           ## Requirements
           
-          - iOS 15.0+
+          - iOS 13.0+
           - Mintegral SDK 8.0+
           - CloudXCore (matching version)
           

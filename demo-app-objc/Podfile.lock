@@ -41,15 +41,15 @@ EXTERNAL SOURCES:
     :path: "../adapter-vungle"
 
 SPEC CHECKSUMS:
-  CloudXCore: 0df8cb3a72fdc76776db6b8b44a002e03624f4e5
-  CloudXInMobiAdapter: c9ae502369442d30f366e308804f633d9ca6019b
-  CloudXMetaAdapter: 9633b997a63e255f3508348f5e1dcb11b92f9048
-  CloudXRenderer: 69e949464baa3ca50aa6270bed1fe62f085e3727
-  CloudXVungleAdapter: d0516d7fb4a23b19be78320e84fc166ddf601523
+  CloudXCore: d3f0b3885b95c879a36bcea5d51557ec6a064bec
+  CloudXInMobiAdapter: e64eba8d6f162b035904c1470a62966332bda4c2
+  CloudXMetaAdapter: b2eec0e744c306d6e698e5a04f979a1d22c0c014
+  CloudXRenderer: 2f79c99a1fb20052d60ed8c5418f304d643eb564
+  CloudXVungleAdapter: ed387dadd3b282fae50848b91de58d3d3826a16f
   FBAudienceNetwork: f4ab9e073ab98c884dbdb5ffe7c861272b380bc2
   InMobiSDK: 4642fb34a961980ab94a1ac460c6e16e113498e6
   VungleAds: 40e87d1eaba17ac818b0f94461fd8ed21ad768dc
 
-PODFILE CHECKSUM: 5e57678851fadf8c242986c2ac42fe3d51614e3d
+PODFILE CHECKSUM: bb916ad1b37855b65cd474073f34cc61f2c30ef0
 
 COCOAPODS: 1.16.2

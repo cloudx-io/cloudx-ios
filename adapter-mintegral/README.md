@@ -6,7 +6,7 @@
 
 Mintegral adapter for CloudX iOS SDK with header bidding support.
 
-Requires iOS 15.0+ and Xcode 16.0+.
+Requires iOS 13.0+ and Xcode 14.0+.
 
 ## Status
 

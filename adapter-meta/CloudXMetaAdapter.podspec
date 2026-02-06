@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   # Local development - no git source needed
   s.source = { :path => '.' }
   
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '13.0'
   
   # LOCAL DEVELOPMENT: Build from source files
   s.source_files = 'Sources/CloudXMetaAdapter/**/*.{h,m}'

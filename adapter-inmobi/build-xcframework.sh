@@ -45,7 +45,7 @@ xcodebuild archive \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
   CODE_SIGNING_ALLOWED=NO \
   MACH_O_TYPE=staticlib \
-  IPHONEOS_DEPLOYMENT_TARGET=14.0 \
+  IPHONEOS_DEPLOYMENT_TARGET=13.0 \
   HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXInMobiAdapter $(SRCROOT)/Sources/CloudXInMobiAdapter/Base $(SRCROOT)/Sources/CloudXInMobiAdapter/Banner $(SRCROOT)/Sources/CloudXInMobiAdapter/BidTokenSource $(SRCROOT)/Sources/CloudXInMobiAdapter/Initializers $(SRCROOT)/Sources/CloudXInMobiAdapter/Interstitial $(SRCROOT)/Sources/CloudXInMobiAdapter/Native $(SRCROOT)/Sources/CloudXInMobiAdapter/Rewarded $(SRCROOT)/Sources/CloudXInMobiAdapter/Utils' \
   USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXInMobiAdapter $(SRCROOT)/Sources/CloudXInMobiAdapter/Base $(SRCROOT)/Sources/CloudXInMobiAdapter/Banner $(SRCROOT)/Sources/CloudXInMobiAdapter/BidTokenSource $(SRCROOT)/Sources/CloudXInMobiAdapter/Initializers $(SRCROOT)/Sources/CloudXInMobiAdapter/Interstitial $(SRCROOT)/Sources/CloudXInMobiAdapter/Native $(SRCROOT)/Sources/CloudXInMobiAdapter/Rewarded $(SRCROOT)/Sources/CloudXInMobiAdapter/Utils' \
   CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES=YES 2>&1 | tee xcodebuild-ios.log || print_error "Failed to build static framework for device."
@@ -62,7 +62,7 @@ xcodebuild archive \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
   CODE_SIGNING_ALLOWED=NO \
   MACH_O_TYPE=staticlib \
-  IPHONEOS_DEPLOYMENT_TARGET=14.0 \
+  IPHONEOS_DEPLOYMENT_TARGET=13.0 \
   HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXInMobiAdapter $(SRCROOT)/Sources/CloudXInMobiAdapter/Base $(SRCROOT)/Sources/CloudXInMobiAdapter/Banner $(SRCROOT)/Sources/CloudXInMobiAdapter/BidTokenSource $(SRCROOT)/Sources/CloudXInMobiAdapter/Initializers $(SRCROOT)/Sources/CloudXInMobiAdapter/Interstitial $(SRCROOT)/Sources/CloudXInMobiAdapter/Native $(SRCROOT)/Sources/CloudXInMobiAdapter/Rewarded $(SRCROOT)/Sources/CloudXInMobiAdapter/Utils' \
   USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXInMobiAdapter $(SRCROOT)/Sources/CloudXInMobiAdapter/Base $(SRCROOT)/Sources/CloudXInMobiAdapter/Banner $(SRCROOT)/Sources/CloudXInMobiAdapter/BidTokenSource $(SRCROOT)/Sources/CloudXInMobiAdapter/Initializers $(SRCROOT)/Sources/CloudXInMobiAdapter/Interstitial $(SRCROOT)/Sources/CloudXInMobiAdapter/Native $(SRCROOT)/Sources/CloudXInMobiAdapter/Rewarded $(SRCROOT)/Sources/CloudXInMobiAdapter/Utils' \
   CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES=YES 2>&1 | tee xcodebuild-sim.log || print_error "Failed to build static framework for simulator."

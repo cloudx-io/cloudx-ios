@@ -119,7 +119,7 @@ Pod::Spec.new do |s|
   s.author           = { 'CloudX' => 'support@cloudx.io' }
   s.source           = { :path => '.' }
   
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'CloudXCore.xcframework'
   
   s.frameworks = ['Foundation', 'SafariServices', 'UIKit', 'CoreLocation', 'WebKit', 'CoreData']
@@ -143,7 +143,7 @@ Pod::Spec.new do |s|
   s.author           = { 'CloudX' => 'support@cloudx.io' }
   s.source           = { :path => '.' }
   
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'CloudXMetaAdapter.xcframework'
   
   s.dependency 'CloudXCore', '$VERSION'
@@ -165,7 +165,7 @@ Pod::Spec.new do |s|
   s.author           = { 'CloudX' => 'support@cloudx.io' }
   s.source           = { :path => '.' }
   
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'CloudXVungleAdapter.xcframework'
   
   s.dependency 'CloudXCore', '$VERSION'
@@ -187,7 +187,7 @@ Pod::Spec.new do |s|
   s.author           = { 'CloudX' => 'support@cloudx.io' }
   s.source           = { :path => '.' }
   
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'CloudXInMobiAdapter.xcframework'
   
   s.dependency 'CloudXCore', '$VERSION'
@@ -209,7 +209,7 @@ Pod::Spec.new do |s|
   s.author           = { 'CloudX' => 'support@cloudx.io' }
   s.source           = { :path => '.' }
   
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'CloudXMintegralAdapter.xcframework'
   
   s.dependency 'CloudXCore', '$VERSION'
@@ -234,7 +234,7 @@ Pod::Spec.new do |s|
   s.author           = { 'CloudX' => 'support@cloudx.io' }
   s.source           = { :path => '.' }
   
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'CloudXRenderer.xcframework'
   
   s.dependency 'CloudXCore', '$VERSION'
@@ -264,7 +264,7 @@ cd cloudx-ios-private/demo-app-objc
 
 # Update Podfile to use local binaries
 cat > Podfile << 'EOF'
-platform :ios, '15.0'
+platform :ios, '13.0'
 
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
@@ -379,7 +379,7 @@ cat > "$UNITY_REPO/Assets/CloudX/Editor/CloudXPodfile.txt" << EOF
 # Version: $VERSION
 # Generated: $(date)
 
-platform :ios, '15.0'
+platform :ios, '13.0'
 
 target 'UnityFramework' do
   use_frameworks! :linkage => :static
@@ -541,7 +541,7 @@ To revert to source-based development:
 cd cloudx-ios-private/demo-app-objc
 
 cat > Podfile << 'EOF'
-platform :ios, '15.0'
+platform :ios, '13.0'
 
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
