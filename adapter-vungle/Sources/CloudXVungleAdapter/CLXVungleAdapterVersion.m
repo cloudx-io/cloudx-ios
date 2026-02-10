@@ -9,5 +9,5 @@
 
 #import "CLXVungleAdapterVersion.h"
 
-NSString * const CLXVungleAdapterVersion = @"2.0.0-rc";
+NSString * const CLXVungleAdapterVersion = @"2.1.0-beta";
 
