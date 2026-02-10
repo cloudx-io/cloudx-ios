@@ -22,7 +22,6 @@ xcodebuild archive \
   -sdk iphoneos \
   SKIP_INSTALL=NO \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-  ENABLE_BITCODE=NO \
   | tee xcodebuild-ios.log | xcpretty || cat xcodebuild-ios.log
 
 echo "🏗️  Building for iOS Simulator (arm64 + x86_64)..."
@@ -34,7 +33,6 @@ xcodebuild archive \
   -sdk iphonesimulator \
   SKIP_INSTALL=NO \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-  ENABLE_BITCODE=NO \
   | tee xcodebuild-sim.log | xcpretty || cat xcodebuild-sim.log
 
 echo "📦 Creating XCFramework..."

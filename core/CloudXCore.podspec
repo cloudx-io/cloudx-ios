@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXCore'
-  s.version = '2.0.0-rc'
+  s.version = '2.1.0-beta'
   s.summary          = 'CloudX Core Framework'
   s.description      = 'Core framework for CloudX functionality - local development version'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -22,7 +22,8 @@ Pod::Spec.new do |s|
   s.pod_target_xcconfig = {
     'CLANG_ENABLE_MODULES' => 'YES',
     'DEFINES_MODULE' => 'YES',
-    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
+    'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO',
+    'SKIP_INSTALL' => 'YES'
   }
   s.user_target_xcconfig = {
     'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO'
