@@ -236,7 +236,7 @@
 }
 
 - (void)didDisplayAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👀 Rewarded didDisplayAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Rewarded didDisplayAd" ad:ad];
 }
 
 - (void)didFailToDisplayAd:(CLXAd *)ad error:(CLXError *)error {
@@ -257,7 +257,7 @@
 }
 
 - (void)didClickAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"👆 Rewarded didClickAd - Ad: %@", ad]];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Rewarded didClickAd" ad:ad];
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {

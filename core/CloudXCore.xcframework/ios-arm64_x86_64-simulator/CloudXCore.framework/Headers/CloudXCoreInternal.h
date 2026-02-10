@@ -66,7 +66,6 @@
 #import <CloudXCore/CLXPayloadBuilder.h>
 #import <CloudXCore/CLXMetricsEvent.h>
 #import <CloudXCore/CLXMetricsEventDao.h>
-#import <CloudXCore/CLXMetricsEventDaoImpl.h>
 #import <CloudXCore/CLXMetricsConfig.h>
 #import <CloudXCore/CLXMetricsDebugger.h>
 #import <CloudXCore/CLXMetricsType.h>
@@ -74,23 +73,12 @@
 #import <CloudXCore/CLXEventAM.h>
 #import <CloudXCore/CLXEventTrackerBulkApi.h>
 
-// Session Management
-#import <CloudXCore/CLXSession.h>
-#import <CloudXCore/CLXSessionDaoImpl.h>
+// Session Management (in-memory tracking, no database)
 #import <CloudXCore/CLXSessionMetrics.h>
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 
 // Database
-#import <CloudXCore/CLXDatabaseProtocol.h>
-#import <CloudXCore/CLXDatabaseSchema.h>
 #import <CloudXCore/CLXSQLiteDatabase.h>
-#import <CloudXCore/CLXCloudXDatabase.h>
-#import <CloudXCore/CLXDaoProtocols.h>
-#import <CloudXCore/CLXBaseDao.h>
-
-// Performance
-#import <CloudXCore/CLXPerformanceMetric.h>
-#import <CloudXCore/CLXPerformanceDaoImpl.h>
 
 // Network Services
 #import <CloudXCore/CLXBaseNetworkService.h>
