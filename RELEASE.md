@@ -74,53 +74,53 @@ atos -o CloudXCore-ios.dSYM/Contents/Resources/DWARF/CloudXCore \
 
 ### Phase 1: Prepare Release (Private Repo)
 
+**Note:** Changes are committed directly to `main` in the private repo (no release branch needed).
+The public repo uses a release branch for testing before merge (see Phase 2).
+
 ```bash
 # 1. Checkout and update main
 cd cloudx-ios-private
 git checkout main
 git pull origin main
 
-# 2. Create a feature branch for the release
-git checkout -b release-X.Y.Z
-
-# 3. Update version constants (ALL components!)
+# 2. Update version constants (only components being released)
 ./scripts/update-version-constant.sh core "X.Y.Z"
 ./scripts/update-version-constant.sh meta "X.Y.Z"
 ./scripts/update-version-constant.sh vungle "X.Y.Z"
 ./scripts/update-version-constant.sh inmobi "X.Y.Z"
-./scripts/update-version-constant.sh mintegral "X.Y.Z"
-./scripts/update-version-constant.sh moloco "X.Y.Z"
 ./scripts/update-version-constant.sh renderer "X.Y.Z"
+# Also update mintegral/moloco if releasing those:
+# ./scripts/update-version-constant.sh mintegral "X.Y.Z"
+# ./scripts/update-version-constant.sh moloco "X.Y.Z"
 
-# 4. Update podspec versions (ALL components!)
+# 3. Update podspec versions (only components being released)
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" core/CloudXCore.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-meta/CloudXMetaAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-vungle/CloudXVungleAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-inmobi/CloudXInMobiAdapter.podspec
-sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-mintegral/CloudXMintegralAdapter.podspec
-sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-moloco/CloudXMolocoAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" renderer-cloudx/CloudXRenderer.podspec
+# Also update mintegral/moloco if releasing those:
+# sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-mintegral/CloudXMintegralAdapter.podspec
+# sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-moloco/CloudXMolocoAdapter.podspec
 
-# 5. Update ALL CHANGELOGs with release notes:
+# 4. Update ALL CHANGELOGs with release notes:
 #    - cloudx-ios-private/CHANGELOG.md (internal)
 #    - cloudx-ios/CHANGELOG.md (public - copy from internal after Phase 2)
 #    - docs/ios/changelog.mdx (public docs - add version entry)
 
-# 6. Build xcframeworks
+# 5. Build xcframeworks
 cd core && ./build-xcframework.sh X.Y.Z && cd ..
+cd renderer-cloudx && ./build-xcframework.sh X.Y.Z && cd ..
 cd adapter-meta && ./build-xcframework.sh && cd ..
 cd adapter-vungle && ./build-xcframework.sh && cd ..
 cd adapter-inmobi && ./build-xcframework.sh && cd ..
-cd adapter-mintegral && ./build-xcframework.sh && cd ..
-cd renderer-cloudx && ./build-xcframework.sh X.Y.Z && cd ..
+# Also build mintegral if releasing:
+# cd adapter-mintegral && ./build-xcframework.sh && cd ..
 
-# 7. Commit and push
+# 6. Commit and push directly to main
 git add -A
 git commit -m "Prepare release X.Y.Z"
-git push origin release-X.Y.Z
-
-# 8. Create PR to main
-gh pr create --base main --head release-X.Y.Z --title "Release X.Y.Z"
+git push origin main
 ```
 
 ### Phase 2: Release to Public Repo (For Testing)
@@ -340,13 +340,9 @@ gh release create vX.Y.Z-inmobi --title "CloudXInMobiAdapter X.Y.Z" adapter-inmo
 gh release create vX.Y.Z-renderer --title "CloudXRenderer X.Y.Z" renderer-cloudx/CloudXRenderer.xcframework.zip
 ```
 
-#### Step 2: Merge PRIVATE Repo PR
+#### Step 2: Tag PRIVATE Repo Main and Create dSYM Release
 
-```bash
-# Go to GitHub and merge cloudx-ios-private PR to main
-```
-
-#### Step 3: Tag PRIVATE Repo Main and Create dSYM Release
+**Note:** No PR to merge for the private repo -- changes were committed directly to main in Phase 1.
 
 ```bash
 cd cloudx-ios-private
@@ -683,12 +679,8 @@ git push origin vX.Y.Z
 ### Phase 7: Cleanup
 
 ```bash
-# Delete feature branches (optional - can be done via GitHub PR merge settings)
-cd cloudx-ios-private
-git branch -d release-X.Y.Z
-git push origin --delete release-X.Y.Z
-
-cd ../cloudx-ios
+# Delete release branch from public repo (optional - can be done via GitHub PR merge settings)
+cd cloudx-ios
 git branch -d release-X.Y.Z
 git push origin --delete release-X.Y.Z
 ```
