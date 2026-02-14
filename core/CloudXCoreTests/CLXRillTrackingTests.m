@@ -1044,7 +1044,11 @@ static MockRillEventReporter *sharedInstance = nil;
     CLXRillTrackingService *trackingService = [[CLXRillTrackingService alloc]
                                                initWithReportingService:self.mockReporter];
 
-    CLXConfigImpressionModel *impModel = [self createTestImpressionModel];
+    // IMPORTANT: Use configWithPlacement so setupTrackingDataFromBidResponse doesn't overwrite it
+    CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc]
+                                          initWithSDKConfig:configWithPlacement
+                                                  auctionID:kTestAuctionID
+                                              testGroupName:@"test-group"];
     CLXBidAdSourceResponse *bidResponse = [self createTestBidResponse];
 
     [trackingService setupTrackingDataFromBidResponse:bidResponse

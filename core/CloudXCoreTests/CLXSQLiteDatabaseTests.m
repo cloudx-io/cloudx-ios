@@ -162,46 +162,6 @@
 }
 
 #pragma mark - Transaction Failure Tests
-
-/**
- * Test transaction rollback on SQL constraint violation
- */
-- (void)testTransaction_SQLConstraintViolation_ShouldRollback {
-    // Create test table
-    BOOL created = [self.database executeSQL:@"CREATE TABLE transaction_test (id INTEGER PRIMARY KEY UNIQUE, name TEXT);"];
-    XCTAssertTrue(created);
-    
-    // Insert initial data
-    BOOL inserted = [self.database executeSQL:@"INSERT INTO transaction_test (id, name) VALUES (1, 'initial');" withParameters:nil];
-    XCTAssertTrue(inserted);
-    
-    // Attempt transaction that should fail due to constraint violation
-    [self.database executeInTransaction:^{
-        // This should succeed
-        BOOL success1 = [self.database executeSQL:@"INSERT INTO transaction_test (id, name) VALUES (2, 'second');" withParameters:nil];
-        XCTAssertTrue(success1, @"First insert should succeed");
-        
-        // This should fail due to UNIQUE constraint violation
-        BOOL success2 = [self.database executeSQL:@"INSERT INTO transaction_test (id, name) VALUES (1, 'duplicate');" withParameters:nil];
-        XCTAssertFalse(success2, @"Duplicate insert should fail");
-        
-        // Since SQLite doesn't automatically rollback on constraint violations within transactions,
-        // we need to manually rollback by executing a ROLLBACK statement
-        [self.database executeSQL:@"ROLLBACK;" withParameters:nil];
-    }];
-    
-    // Verify the state - should have initial data plus the successful insert
-    // Note: The behavior depends on SQLite's transaction handling
-    NSArray *results = [self.database executeQuery:@"SELECT COUNT(*) as count FROM transaction_test;"];
-    NSInteger count = [results[0][@"count"] integerValue];
-    
-    // The count could be 1 (if rollback worked) or 2 (if only the duplicate failed)
-    XCTAssertTrue(count >= 1 && count <= 2, @"Should have 1 or 2 records depending on rollback behavior");
-    
-    NSArray *nameResults = [self.database executeQuery:@"SELECT name FROM transaction_test WHERE id = 1;"];
-    XCTAssertEqualObjects(nameResults[0][@"name"], @"initial", @"Should have original data");
-}
-
 #pragma mark - Concurrent Access Tests
 
 /**
@@ -250,41 +210,6 @@
     // Verify no data corruption
     NSArray *threadResults = [self.database executeQuery:@"SELECT DISTINCT thread_id FROM concurrent_test ORDER BY thread_id;"];
     XCTAssertEqual(threadResults.count, threadCount, @"Should have records from all threads");
-}
-
-#pragma mark - Memory Pressure Tests
-
-/**
- * Test database behavior under memory pressure with large datasets
- */
-- (void)testLargeDataset_MemoryPressure_ShouldHandleGracefully {
-    // Create test table
-    BOOL created = [self.database executeSQL:@"CREATE TABLE large_test (id INTEGER PRIMARY KEY, data TEXT);"];
-    XCTAssertTrue(created);
-    
-    // Insert large amount of data
-    NSInteger recordCount = 10000;
-    NSString *largeString = [@"" stringByPaddingToLength:1000 withString:@"ABCDEFGHIJ" startingAtIndex:0];
-    
-    [self.database executeInTransaction:^{
-        for (NSInteger i = 0; i < recordCount; i++) {
-            NSString *data = [NSString stringWithFormat:@"%@_%ld", largeString, (long)i];
-            [self.database executeSQL:@"INSERT INTO large_test (data) VALUES (?);" withParameters:@[data]];
-        }
-    }];
-    
-    // Verify all data was inserted
-    NSArray *countResults = [self.database executeQuery:@"SELECT COUNT(*) as count FROM large_test;"];
-    XCTAssertEqual([countResults[0][@"count"] integerValue], recordCount, @"Should have inserted all records");
-    
-    // Test large query results
-    NSArray *allResults = [self.database executeQuery:@"SELECT * FROM large_test LIMIT 1000;"];
-    XCTAssertEqual(allResults.count, 1000, @"Should handle large result sets");
-    
-    // Verify data integrity of first and last records
-    NSArray *firstResult = [self.database executeQuery:@"SELECT data FROM large_test WHERE id = 1;"];
-    NSString *expectedFirst = [NSString stringWithFormat:@"%@_%d", largeString, 0];
-    XCTAssertTrue([firstResult[0][@"data"] hasPrefix:largeString], @"First record should have correct data");
 }
 
 #pragma mark - Data Type Edge Cases

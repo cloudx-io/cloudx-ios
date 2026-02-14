@@ -15,7 +15,6 @@
 - (BOOL)_openDatabase;
 - (BOOL)_executeSQL:(NSString *)sql withParameters:(nullable NSArray *)parameters;
 - (NSArray<NSDictionary *> *)_executeQuery:(NSString *)sql withParameters:(nullable NSArray *)parameters;
-- (void)_executeInTransaction:(void (^)(void))block;
 - (id)_dispatchSyncIfNeeded:(id (^)(void))block;
 @end
 
@@ -174,52 +173,6 @@
     
     sqlite3_finalize(statement);
     return [results copy];
-}
-
-#pragma mark - Transaction Support
-
-- (void)executeInTransaction:(void (^)(void))block {
-    [self _dispatchSyncIfNeeded:^id{
-        [self _executeInTransaction:block];
-        return nil;
-    }];
-}
-
-- (BOOL)executeInTransactionWithResult:(BOOL (^)(void))block {
-    return [[self _dispatchSyncIfNeeded:^id{
-        return @([self _executeInTransactionWithResult:block]);
-    }] boolValue];
-}
-
-- (void)_executeInTransaction:(void (^)(void))block {
-    [self _executeSQL:@"BEGIN TRANSACTION;" withParameters:@[]];
-    
-    @try {
-        block();
-        [self _executeSQL:@"COMMIT;" withParameters:@[]];
-    } @catch (NSException *exception) {
-        [self _executeSQL:@"ROLLBACK;" withParameters:@[]];
-        [self.logger error:[NSString stringWithFormat:@"Transaction rolled back due to exception: %@", exception]];
-        @throw exception;
-    }
-}
-
-- (BOOL)_executeInTransactionWithResult:(BOOL (^)(void))block {
-    [self _executeSQL:@"BEGIN TRANSACTION;" withParameters:@[]];
-    
-    @try {
-        BOOL result = block();
-        if (result) {
-            [self _executeSQL:@"COMMIT;" withParameters:@[]];
-        } else {
-            [self _executeSQL:@"ROLLBACK;" withParameters:@[]];
-        }
-        return result;
-    } @catch (NSException *exception) {
-        [self _executeSQL:@"ROLLBACK;" withParameters:@[]];
-        [self.logger error:[NSString stringWithFormat:@"Transaction rolled back due to exception: %@", exception]];
-        @throw exception;
-    }
 }
 
 #pragma mark - Utility Methods

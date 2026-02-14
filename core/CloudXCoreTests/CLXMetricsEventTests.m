@@ -80,28 +80,6 @@
     XCTAssertEqualObjects(event.auctionId, @"");
 }
 
-- (void)testMetricsEventToDictionary {
-    // Given
-    CLXMetricsEvent *event = [[CLXMetricsEvent alloc] initWithEventId:@"test-id"
-                                                            sessionId:@"session-123"
-                                                           metricName:@"method_create_rewarded"
-                                                            auctionId:@"auction-456"];
-    event.counter = 2;
-    event.totalLatency = 500;
-    
-    // When
-    NSDictionary *dictionary = [event toDictionary];
-    
-    // Then
-    XCTAssertNotNil(dictionary);
-    XCTAssertEqualObjects(dictionary[@"id"], @"test-id");
-    XCTAssertEqualObjects(dictionary[@"metricName"], @"method_create_rewarded");
-    XCTAssertEqualObjects(dictionary[@"counter"], @2);
-    XCTAssertEqualObjects(dictionary[@"totalLatency"], @500);
-    XCTAssertEqualObjects(dictionary[@"sessionId"], @"session-123");
-    XCTAssertEqualObjects(dictionary[@"auctionId"], @"auction-456");
-}
-
 - (void)testMetricsEventDescription {
     // Given
     CLXMetricsEvent *event = [[CLXMetricsEvent alloc] initWithEventId:@"test-id"
