@@ -252,7 +252,7 @@
 }
 
 - (void)showLogsModal {
-    LogsModalViewController *logsModal = [[LogsModalViewController alloc] initWithTitle:@"Logs"];
+    LogsModalViewController *logsModal = [[LogsModalViewController alloc] initWithTitle:@"Demo App Logs"];
     logsModal.modalPresentationStyle = UIModalPresentationPageSheet;
     
     [self presentViewController:logsModal animated:YES completion:nil];

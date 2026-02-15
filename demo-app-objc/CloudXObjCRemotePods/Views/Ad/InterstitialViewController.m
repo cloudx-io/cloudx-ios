@@ -199,7 +199,7 @@
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Interstitial didPayRevenueForAd" ad:ad];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Interstitial didPayRevenue" ad:ad];
 }
 
 @end 

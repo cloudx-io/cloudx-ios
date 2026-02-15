@@ -203,7 +203,7 @@
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 MREC didPayRevenueForAd" ad:ad];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 MREC didPayRevenue" ad:ad];
 }
 
 // Banner-specific delegate methods (MREC is a banner type)

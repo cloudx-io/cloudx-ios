@@ -259,7 +259,7 @@
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Banner didPayRevenueForAd" ad:ad];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Banner didPayRevenue" ad:ad];
 }
 
 // NEW MAX SDK Compatibility Delegate Methods

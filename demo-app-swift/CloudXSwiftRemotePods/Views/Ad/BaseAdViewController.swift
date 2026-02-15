@@ -114,10 +114,8 @@ class BaseAdViewController: UIViewController, AdStateManaging {
             let initConfig = CLXInitializationConfiguration.configuration(appKey: appKey)
             cloudX.initialize(with: initConfig) { sdkConfig, error in
                 if sdkConfig != nil {
-                    print("✅ SDK Initialized successfully")
                     NotificationCenter.default.post(name: .sdkInitialized, object: nil)
                 } else {
-                    print("❌ SDK Init Failed: \(error?.localizedDescription ?? "Unknown error")")
                     self.showAlert(title: "SDK Init Failed", message: error?.localizedDescription ?? "Unknown error")
                 }
                 continuation.resume()
