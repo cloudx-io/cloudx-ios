@@ -195,19 +195,16 @@
         }
         [[NSUserDefaults standardUserDefaults] setBool:!sender.isOn forKey:@"LoggingDisabled"];
         [[NSUserDefaults standardUserDefaults] synchronize];
-        NSLog(@"🪵 Logging %@", sender.isOn ? @"ENABLED" : @"DISABLED");
     } else if (sender.tag == 301) {
         // Emojis Enabled/Disabled
         [CloudXCore setLoggingEmojisEnabled:sender.isOn];
         [[NSUserDefaults standardUserDefaults] setBool:!sender.isOn forKey:@"LoggingEmojisDisabled"];
         [[NSUserDefaults standardUserDefaults] synchronize];
-        NSLog(@"🪵 Emojis %@", sender.isOn ? @"ENABLED" : @"DISABLED");
     } else if (sender.tag == 302) {
         // Timestamps Enabled/Disabled
         [CloudXCore setLoggingTimestampsEnabled:sender.isOn];
         [[NSUserDefaults standardUserDefaults] setBool:sender.isOn forKey:@"LoggingTimestampsEnabled"];
         [[NSUserDefaults standardUserDefaults] synchronize];
-        NSLog(@"🪵 Timestamps %@", sender.isOn ? @"ENABLED" : @"DISABLED");
     }
 }
 
@@ -215,8 +212,6 @@
     // 0=Verbose, 1=Debug, 2=Info, 3=Warn, 4=Error
     [CloudXCore setMinLogLevel:sender.selectedSegmentIndex];
     [[NSUserDefaults standardUserDefaults] setInteger:sender.selectedSegmentIndex forKey:@"LoggingLevel"];
-    NSArray *levelNames = @[@"VERBOSE", @"DEBUG", @"INFO", @"WARN", @"ERROR"];
-    NSLog(@"🪵 Log level set to: %@", levelNames[sender.selectedSegmentIndex]);
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {

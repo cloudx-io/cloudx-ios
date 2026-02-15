@@ -3,11 +3,11 @@ platform :ios, '15.0'
 target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-core/core/CloudXCore.podspec'
-  pod 'CloudXMetaAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-meta/adapter-meta/CloudXMetaAdapter.podspec'
-  pod 'CloudXRenderer', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-renderer/renderer-cloudx/CloudXRenderer.podspec'
-  pod 'CloudXVungleAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-vungle/adapter-vungle/CloudXVungleAdapter.podspec'
-  pod 'CloudXInMobiAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-inmobi/adapter-inmobi/CloudXInMobiAdapter.podspec'
+  pod 'CloudXCore', '2.1.0-beta'
+  pod 'CloudXMetaAdapter', '2.1.0-beta'
+  pod 'CloudXRenderer', '2.1.0-beta'
+  pod 'CloudXVungleAdapter', '2.1.0-beta'
+  pod 'CloudXInMobiAdapter', '2.1.0-beta'
 
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths

@@ -176,19 +176,16 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
             CloudXCore.setMinLogLevel(sender.isOn ? .verbose : .none)
             UserDefaults.standard.set(!sender.isOn, forKey: "LoggingDisabled")
             UserDefaults.standard.synchronize()
-            print("🪵 Logging \(sender.isOn ? "ENABLED" : "DISABLED")")
         } else if sender.tag == 301 {
             // Emojis Enabled/Disabled
             CloudXCore.setLoggingEmojisEnabled(sender.isOn)
             UserDefaults.standard.set(!sender.isOn, forKey: "LoggingEmojisDisabled")
             UserDefaults.standard.synchronize()
-            print("🪵 Emojis \(sender.isOn ? "ENABLED" : "DISABLED")")
         } else if sender.tag == 302 {
             // Timestamps Enabled/Disabled
             CloudXCore.setLoggingTimestampsEnabled(sender.isOn)
             UserDefaults.standard.set(sender.isOn, forKey: "LoggingTimestampsEnabled")
             UserDefaults.standard.synchronize()
-            print("🪵 Timestamps \(sender.isOn ? "ENABLED" : "DISABLED")")
         }
     }
     
@@ -196,8 +193,6 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         // 0=Verbose, 1=Debug, 2=Info, 3=Warn, 4=Error
         CloudXCore.setMinLogLevel(CLXLogLevel(rawValue: sender.selectedSegmentIndex) ?? .info)
         UserDefaults.standard.set(sender.selectedSegmentIndex, forKey: "LoggingLevel")
-        let levelNames = ["VERBOSE", "DEBUG", "INFO", "WARN", "ERROR"]
-        print("🪵 Log level set to: \(levelNames[sender.selectedSegmentIndex])")
     }
     
     @objc private func userTargetingSwitchChanged(_ sender: UISwitch) {

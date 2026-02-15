@@ -103,8 +103,6 @@ class BannerViewController: BaseAdViewController {
     private func createAndAddBannerToView() {
         guard bannerAd == nil else { return }
         
-        DemoAppLogger.sharedInstance.logMessage("📱 Creating new banner ad instance...")
-        
         // Create banner ad with adUnitId from config
         let adUnitId = CLXDemoConfigManager.sharedManager.currentConfig.bannerAdUnitId
         bannerAd = cloudX.createBanner(adUnitId: adUnitId, viewController: self)
@@ -112,8 +110,6 @@ class BannerViewController: BaseAdViewController {
         bannerAd?.revenueDelegate = self
         bannerAd?.placement = "demo_banner"
         bannerAd?.customData = "screen:home,position:bottom"
-        
-        DemoAppLogger.sharedInstance.logMessage("✅ Banner ad instance created successfully")
         
         // Add banner to view hierarchy immediately
         addBannerToViewHierarchy()

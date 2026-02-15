@@ -1,55 +1,48 @@
 PODS:
-  - CloudXCore (2.0.0)
-  - CloudXInMobiAdapter (2.0.0):
-    - CloudXCore (= 2.0.0)
+  - CloudXCore (2.1.0-beta)
+  - CloudXInMobiAdapter (2.1.0-beta):
+    - CloudXCore (= 2.1.0-beta)
     - InMobiSDK (~> 11.1)
-  - CloudXMetaAdapter (2.0.0):
-    - CloudXCore (= 2.0.0)
+  - CloudXMetaAdapter (2.1.0-beta):
+    - CloudXCore (= 2.1.0-beta)
     - FBAudienceNetwork (~> 6.21.0)
-  - CloudXRenderer (2.0.0):
-    - CloudXCore (= 2.0.0)
-  - CloudXVungleAdapter (2.0.0):
-    - CloudXCore (= 2.0.0)
+  - CloudXRenderer (2.1.0-beta):
+    - CloudXCore (= 2.1.0-beta)
+  - CloudXVungleAdapter (2.1.0-beta):
+    - CloudXCore (= 2.1.0-beta)
     - VungleAds (~> 7.6.0)
   - FBAudienceNetwork (6.21.0)
   - InMobiSDK (11.1.1)
   - VungleAds (7.6.3)
 
 DEPENDENCIES:
-  - CloudXCore (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-core/core/CloudXCore.podspec`)
-  - CloudXInMobiAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-inmobi/adapter-inmobi/CloudXInMobiAdapter.podspec`)
-  - CloudXMetaAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-meta/adapter-meta/CloudXMetaAdapter.podspec`)
-  - CloudXRenderer (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-renderer/renderer-cloudx/CloudXRenderer.podspec`)
-  - CloudXVungleAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-vungle/adapter-vungle/CloudXVungleAdapter.podspec`)
+  - CloudXCore (= 2.1.0-beta)
+  - CloudXInMobiAdapter (= 2.1.0-beta)
+  - CloudXMetaAdapter (= 2.1.0-beta)
+  - CloudXRenderer (= 2.1.0-beta)
+  - CloudXVungleAdapter (= 2.1.0-beta)
 
 SPEC REPOS:
   trunk:
+    - CloudXCore
+    - CloudXInMobiAdapter
+    - CloudXMetaAdapter
+    - CloudXRenderer
+    - CloudXVungleAdapter
     - FBAudienceNetwork
     - InMobiSDK
     - VungleAds
 
-EXTERNAL SOURCES:
-  CloudXCore:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-core/core/CloudXCore.podspec
-  CloudXInMobiAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-inmobi/adapter-inmobi/CloudXInMobiAdapter.podspec
-  CloudXMetaAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-meta/adapter-meta/CloudXMetaAdapter.podspec
-  CloudXRenderer:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-renderer/renderer-cloudx/CloudXRenderer.podspec
-  CloudXVungleAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.0.0-vungle/adapter-vungle/CloudXVungleAdapter.podspec
-
 SPEC CHECKSUMS:
-  CloudXCore: b3e21142e0a6d1312d35ba7b65f8c491ac4226f8
-  CloudXInMobiAdapter: e3f058b2d04363161ea9d8dbf8de48b80c142876
-  CloudXMetaAdapter: 7628dc7d2bbc89b5391369e7f89ead29ab54c07e
-  CloudXRenderer: 08d01462f3ea80c9d108d84b42a21e6a19796936
-  CloudXVungleAdapter: 33afc9da22e669ebe8545f36b68ab8c08c1134e8
+  CloudXCore: 47c378aa695ef74738295dc07403e050a95f259c
+  CloudXInMobiAdapter: 55ac2cbfd0ecb9417d8d9c3b7082fc45092c36de
+  CloudXMetaAdapter: 4fea43870002b7df57178bc70a98a7362e948da2
+  CloudXRenderer: e19a1e17e5f97cf5938be5f61749d27cc88776f0
+  CloudXVungleAdapter: 007ea48145bb4818a8624e1de0b4efb5bc6b822c
   FBAudienceNetwork: f4ab9e073ab98c884dbdb5ffe7c861272b380bc2
   InMobiSDK: 4642fb34a961980ab94a1ac460c6e16e113498e6
   VungleAds: 40e87d1eaba17ac818b0f94461fd8ed21ad768dc
 
-PODFILE CHECKSUM: a071a3c6fa787e6052b52f4d9a6c47b001c7f4f4
+PODFILE CHECKSUM: aa5660ae234078e6baa493b830af1a68162a8c3f
 
 COCOAPODS: 1.16.2

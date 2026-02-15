@@ -33,7 +33,7 @@
 - (void)setupInitializationButton {
     // Create initialization button
     self.initializationButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [self.initializationButton setTitle:@"Initialize SDK" forState:UIControlStateNormal];
+    [self.initializationButton setTitle:@"Init SDK" forState:UIControlStateNormal];
     [self.initializationButton addTarget:self action:@selector(initializeSDK) forControlEvents:UIControlEventTouchUpInside];
     
     // Style the button
