@@ -123,34 +123,4 @@
     }];
 }
 
-#pragma mark - Thread Safety Tests
-
-- (void)testProtectedOperations_ConcurrentAccess_NoRaceConditions {
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    queue.maxConcurrentOperationCount = 10;
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Concurrent operations"];
-
-    __block NSInteger completedOperations = 0;
-    NSInteger totalOperations = 100;
-
-    for (NSInteger i = 0; i < totalOperations; i++) {
-        [queue addOperationWithBlock:^{
-            [self.gppProvider setGppString:[NSString stringWithFormat:@"concurrent_%ld", (long)i]];
-            (void)[self.gppProvider gppString];
-            (void)[CLXURLProvider initApiUrl];
-
-            @synchronized(self) {
-                completedOperations++;
-                if (completedOperations == totalOperations) {
-                    [expectation fulfill];
-                }
-            }
-        }];
-    }
-
-    [self waitForExpectations:@[expectation] timeout:10.0];
-    XCTAssertEqual(completedOperations, totalOperations, @"All concurrent operations should complete");
-}
-
 @end

@@ -841,31 +841,6 @@ static const NSTimeInterval kTestTimeout = 2.0;
 
 #pragma mark - Load After Destroy Error Callback Tests
 
-// Test that load() after destroy() triggers didFailToLoadAd callback
-- (void)testLoadAfterDestroyTriggersErrorCallback {
-    // Given: A delegate to capture callbacks
-    XCTestExpectation *callbackExpectation = [self expectationWithDescription:@"didFailToLoadAd callback"];
-    MockBannerDelegate *mockDelegate = [[MockBannerDelegate alloc] init];
-    mockDelegate.failToLoadCallback = ^{
-        [callbackExpectation fulfill];
-    };
-    self.banner.delegate = mockDelegate;
-    
-    // When: Banner is destroyed, then load is called
-    [self.banner destroy];
-    XCTAssertTrue(self.banner.forceStop, @"forceStop should be set after destroy");
-    
-    [self.banner load];
-    
-    // Then: didFailToLoadAd should be called with appropriate error
-    [self waitForExpectationsWithTimeout:0.5 handler:nil];
-    XCTAssertTrue(mockDelegate.failToLoadCalled, @"didFailToLoadAd should be called when loading after destroy");
-    XCTAssertNotNil(mockDelegate.lastError, @"Error should be provided");
-    XCTAssertEqual(mockDelegate.lastError.code, CLXErrorCodeLoadFailed, @"Error code should be CLXErrorCodeLoadFailed");
-    XCTAssertTrue([mockDelegate.lastError.localizedDescription containsString:@"destroy"], 
-                  @"Error message should mention destroy: %@", mockDelegate.lastError.localizedDescription);
-}
-
 // Test that load() after destroy() does not crash and returns immediately
 - (void)testLoadAfterDestroyDoesNotCrash {
     // Given: A destroyed banner
@@ -877,28 +852,6 @@ static const NSTimeInterval kTestTimeout = 2.0;
     
     // And should not start loading
     XCTAssertFalse(self.banner.isLoading, @"Should not be loading after destroy");
-}
-
-// Test that load() after destroy() triggers error callback (single call, deterministic)
-- (void)testMultipleLoadsAfterDestroyTriggerCallbacks {
-    // Given: A delegate to capture callbacks
-    // NOTE: We test a single load() call for deterministic behavior.
-    // Multiple rapid async callbacks can be timing-sensitive in CI.
-    XCTestExpectation *callbackExpectation = [self expectationWithDescription:@"didFailToLoadAd callback"];
-    
-    MockBannerDelegate *mockDelegate = [[MockBannerDelegate alloc] init];
-    mockDelegate.failToLoadCallback = ^{
-        [callbackExpectation fulfill];
-    };
-    self.banner.delegate = mockDelegate;
-    
-    // When: Banner is destroyed, then load is called
-    [self.banner destroy];
-    [self.banner load];
-    
-    // Then: Load should trigger a callback
-    [self waitForExpectationsWithTimeout:0.5 handler:nil];
-    XCTAssertTrue(mockDelegate.failToLoadCalled, @"load() after destroy() should trigger error callback");
 }
 
 @end

@@ -3,9 +3,9 @@
  */
 
 /**
- * @file CLXBidResponseParsingIntegrationTests.m
- * @brief Integration tests for bid response parsing with malformed data scenarios
- * @details Tests real-world JSON parsing failures and exception handling in bid responses
+ * @file CLXBidResponseParsingUnitTests.m
+ * @brief Deterministic unit tests for bid response parsing with malformed data scenarios
+ * @details Tests JSON parsing failures and exception handling in bid responses (no async)
  */
 
 #import <XCTest/XCTest.h>
@@ -13,11 +13,11 @@
 #import <CloudXCore/CLXErrorReporter.h>
 #import "Helper/CLXUserDefaultsTestHelper.h"
 
-@interface CLXBidResponseParsingIntegrationTests : XCTestCase
+@interface CLXBidResponseParsingUnitTests : XCTestCase
 @property (nonatomic, strong) CLXErrorReporter *errorReporter;
 @end
 
-@implementation CLXBidResponseParsingIntegrationTests
+@implementation CLXBidResponseParsingUnitTests
 
 - (void)setUp {
     [super setUp];

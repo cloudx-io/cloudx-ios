@@ -3,14 +3,13 @@
  */
 
 /**
- * @file CLXEndpointResolutionIntegrationTests.m
- * @brief Integration tests for end-to-end endpoint resolution with A/B testing
- * @details Tests the complete flow from SDK init response parsing to endpoint resolution
+ * @file CLXEndpointResolutionUnitTests.m
+ * @brief Deterministic unit tests for endpoint resolution with A/B testing
+ * @details Tests synchronous SDK init response parsing to endpoint resolution (no async)
  * 
  * Test Coverage:
- * - Full SDK init with lambda endpoint configuration
- * - A/B testing integration with CloudXCore initialization
- * - Endpoint resolution affecting bid requests
+ * - SDK init config parsing with lambda endpoint configuration
+ * - A/B testing endpoint resolution logic
  * - Backwards compatibility with legacy string format
  */
 
@@ -21,10 +20,10 @@
 - (nullable CLXSDKConfigResponse *)parseSDKConfigFromResponse:(NSDictionary *)response error:(NSError **)outError;
 @end
 
-@interface CLXEndpointResolutionIntegrationTests : XCTestCase
+@interface CLXEndpointResolutionUnitTests : XCTestCase
 @end
 
-@implementation CLXEndpointResolutionIntegrationTests
+@implementation CLXEndpointResolutionUnitTests
 
 - (void)setUp {
     [super setUp];
