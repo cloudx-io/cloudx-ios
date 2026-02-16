@@ -95,12 +95,8 @@
 
 - (void)testURLProvider_URLConstruction_ReturnsExpectedValues {
     NSURL *initUrl = [CLXURLProvider initApiUrl];
-    NSString *auctionUrl = [CLXURLProvider auctionApiUrl];
-    NSString *metricsUrl = [CLXURLProvider metricsApiUrl];
-    
+
     XCTAssertNotNil(initUrl, @"Init API URL should be valid");
-    XCTAssertNil(auctionUrl, @"Auction API URL should be nil (deprecated - comes from SDK response)");
-    XCTAssertNil(metricsUrl, @"Metrics API URL should be nil (deprecated - comes from SDK response)");
 }
 
 #pragma mark - Bid Network Service Tests

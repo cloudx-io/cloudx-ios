@@ -17,9 +17,6 @@ static NSString *const kDevInitURL = @"https://provisioning-dev.cloudx.io/sdk";
 static NSString *const kStagingInitURL = @"https://pro-stage.cloudx.io/sdk";
 static NSString *const kProductionInitURL = @"https://pro.cloudx.io/sdk";
 
-// MARK: - User Defaults Key (Internal use only)
-static NSString *const kEnvironmentKey = @"CLXEnvironment";
-
 // MARK: - Internal Override Key (for CloudX internal testing only)
 static NSString *const kInternalEnvironmentOverrideKey = @"CLXCore_Internal_EnvironmentOverride";
 
@@ -27,18 +24,6 @@ static NSString *const kInternalEnvironmentOverrideKey = @"CLXCore_Internal_Envi
 
 + (NSURL *)initApiUrl {
     return [NSURL URLWithString:[self initializationURL]];
-}
-
-+ (NSString *)auctionApiUrl {
-    // Auction URLs now come from SDK response only
-    [[CLXLogger shared] info:@"[CLXURLProvider] auctionApiUrl is deprecated - URLs come from SDK response"];
-    return nil;
-}
-
-+ (NSString *)metricsApiUrl {
-    // Metrics URLs now come from SDK response only
-    [[CLXLogger shared] info:@"[CLXURLProvider] metricsApiUrl is deprecated - URLs come from SDK response"];
-    return nil;
 }
 
 // MARK: - Private Helper Methods
