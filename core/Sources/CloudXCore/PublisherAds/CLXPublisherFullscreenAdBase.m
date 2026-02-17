@@ -224,7 +224,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                          nativeAdRequirements:nil
                                             bidRequestTimeout:_bidRequestTimeout
                                                reportingService:_reportingService
-                                                   createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
+                                                   createBidAd:^id _Nullable(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString * _Nullable burl, BOOL hasCloseButton, NSString *network, NSError * _Nullable * _Nullable error) {
                 __strong typeof(weakSelf) strongSelf = weakSelf;
                 if (!strongSelf) {
                     return nil;
@@ -235,7 +235,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                                      adm:adm
                                            adapterExtras:adapterExtras
                                                     burl:burl
-                                                 network:network];
+                                                 network:network
+                                                   error:error];
             }];
             [self.logger debug:[NSString stringWithFormat:@"Initialized fullscreen ad in IDLE state for ad unit: %@", _adUnitId]];
         } else {
@@ -361,7 +362,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                                 nativeAdRequirements:nil
                                                     bidRequestTimeout:self.bidRequestTimeout
                                                       reportingService:self.reportingService
-                                                          createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
+                                                          createBidAd:^id _Nullable(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString * _Nullable burl, BOOL hasCloseButton, NSString *network, NSError * _Nullable * _Nullable error) {
                 __strong typeof(weakSelf) strongSelf = weakSelf;
                 if (!strongSelf) {
                     return nil;
@@ -372,7 +373,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                                      adm:adm
                                            adapterExtras:adapterExtras
                                                     burl:burl
-                                                 network:network];
+                                                 network:network
+                                                   error:error];
             }];
             
             // Clear the requested ad unit ID since initialization is complete
@@ -528,7 +530,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                  adm:(NSString *)adm
                        adapterExtras:(NSDictionary<NSString *, NSString *> *)adapterExtras
                                 burl:(nullable NSString *)burl
-                             network:(NSString *)network {
+                             network:(NSString *)network
+                               error:(NSError * _Nullable *)outError {
     [NSException raise:NSInternalInconsistencyException 
                 format:@"Subclass must override %@", NSStringFromSelector(_cmd)];
     return nil;
@@ -626,11 +629,13 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Create adapter instance from bid response
     [self.logger debug:[NSString stringWithFormat:@"createBidAd - AdID: %@, BidID: %@, Network: %@", response.bid.adid, response.bidID, response.networkName]];
     
-    id adapter = response.createBidAd();
+    NSError *creationError = nil;
+    id adapter = response.createBidAd(&creationError);
     if (!adapter) {
-        [self.logger error:@"Failed to create adapter from bid response"];
+        NSString *errorDescription = creationError.localizedDescription ?: @"Failed to create adapter";
+        [self.logger error:[NSString stringWithFormat:@"Failed to create adapter from bid response: %@", errorDescription]];
         [self handleBidResponse:nil error:[CLXError errorWithCode:CLXErrorCodeLoadFailed 
-                                                      description:@"Failed to create adapter"]];
+                                                      description:errorDescription]];
         return;
     }
     

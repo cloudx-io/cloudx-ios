@@ -46,7 +46,7 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
 @property (nonatomic, copy, readonly) NSString *networkName;
 @property (nonatomic, strong, readonly) CLXBidResponseBid *bid;
 @property (nonatomic, strong, readonly) CLXBiddingConfigRequest *bidRequest;
-@property (nonatomic, copy, readonly) id (^createBidAd)(void);
+@property (nonatomic, copy, readonly) id _Nullable (^createBidAd)(NSError * _Nullable * _Nullable);
 @property (nonatomic, strong, readonly, nullable) CLXAd *clxAd;
 
 - (instancetype)initWithPrice:(double)price
@@ -59,7 +59,7 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
                    bidRequest:(CLXBiddingConfigRequest *)bidRequest
                   networkName:(NSString *)networkName
                        clxAd:(nullable CLXAd *)clxAd
-                  createBidAd:(id (^)(void))createBidAd;
+                  createBidAd:(id _Nullable (^)(NSError * _Nullable * _Nullable error))createBidAd;
 
 @end
 
@@ -114,7 +114,7 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
          nativeAdRequirements:(nullable id)nativeAdRequirements
             bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                reportingService:(id<CLXAdEventReporting>)reportingService
-                   createBidAd:(id (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network))createBidAd;
+                   createBidAd:(id _Nullable (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString * _Nullable burl, BOOL hasCloseButton, NSString *network, NSError * _Nullable * _Nullable error))createBidAd;
 
 @end
 

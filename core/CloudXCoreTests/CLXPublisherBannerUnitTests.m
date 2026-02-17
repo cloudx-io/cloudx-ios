@@ -66,7 +66,8 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                 adapterExtras:(NSDictionary<NSString *, NSString *> *)adapterExtras
                                                          burl:(NSString *)burl
                                                hasClosedButton:(BOOL)hasClosedButton
-                                                       network:(NSString *)network;
+                                                       network:(NSString *)network
+                                                         error:(NSError * _Nullable *)outError;
 
 // Expose delegate methods for testing
 - (void)didLoadBanner:(id<CLXAdapterBanner>)banner;
@@ -515,7 +516,8 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                                     adapterExtras:@{}
                                                                              burl:nil
                                                                    hasClosedButton:NO
-                                                                           network:kTestNetwork];
+                                                                           network:kTestNetwork
+                                                                             error:NULL];
     
     XCTAssertNotNil(createdBanner, @"Should create banner with valid network");
     XCTAssertEqual(createdBanner, self.mockFactory.mockAdapter, @"Should return mock adapter");
@@ -529,7 +531,8 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                                     adapterExtras:@{}
                                                                              burl:nil
                                                                    hasClosedButton:NO
-                                                                           network:@"invalid-network"];
+                                                                           network:@"invalid-network"
+                                                                             error:NULL];
     
     XCTAssertNil(createdBanner, @"Should return nil for invalid network");
 }
@@ -544,7 +547,8 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                                     adapterExtras:@{}
                                                                              burl:nil
                                                                    hasClosedButton:NO
-                                                                           network:kTestNetwork];
+                                                                           network:kTestNetwork
+                                                                             error:NULL];
     
     XCTAssertNil(createdBanner, @"Should return nil when factory returns nil");
 }
@@ -606,7 +610,8 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                                     adapterExtras:@{}
                                                                              burl:nil
                                                                    hasClosedButton:NO
-                                                                           network:kTestNetwork];
+                                                                           network:kTestNetwork
+                                                                             error:NULL];
     
     // Should get our mock adapter, not something from CloudXCore
     XCTAssertEqual(createdBanner, self.mockFactory.mockAdapter, 

@@ -1,14 +1,14 @@
 PODS:
-  - CloudXCore (2.0.0-rc)
-  - CloudXInMobiAdapter (2.0.0-rc):
+  - CloudXCore (2.1.0-beta)
+  - CloudXInMobiAdapter (2.1.0-beta):
     - CloudXCore
     - InMobiSDK (~> 11.1)
-  - CloudXMetaAdapter (2.0.0-rc):
+  - CloudXMetaAdapter (2.1.0-beta):
     - CloudXCore
     - FBAudienceNetwork (~> 6.21.0)
-  - CloudXRenderer (2.0.0-rc):
+  - CloudXRenderer (2.1.0-beta):
     - CloudXCore
-  - CloudXVungleAdapter (2.0.0-rc):
+  - CloudXVungleAdapter (2.1.0-beta):
     - CloudXCore
     - VungleAds (~> 7.6.0)
   - FBAudienceNetwork (6.21.0)
@@ -41,11 +41,11 @@ EXTERNAL SOURCES:
     :path: "../adapter-vungle"
 
 SPEC CHECKSUMS:
-  CloudXCore: d3f0b3885b95c879a36bcea5d51557ec6a064bec
-  CloudXInMobiAdapter: e64eba8d6f162b035904c1470a62966332bda4c2
-  CloudXMetaAdapter: b2eec0e744c306d6e698e5a04f979a1d22c0c014
-  CloudXRenderer: 2f79c99a1fb20052d60ed8c5418f304d643eb564
-  CloudXVungleAdapter: ed387dadd3b282fae50848b91de58d3d3826a16f
+  CloudXCore: 1bf7a46e9a97a80e57443d8ff2db8bdab264068b
+  CloudXInMobiAdapter: 2054d5ae9f475d370c42318ce3ac2a10b67bdf24
+  CloudXMetaAdapter: 8f9a047a900c2553479ef6a31496fb4c84bd81d0
+  CloudXRenderer: 0453846e6b72b70b81eb596ffb12b257de86a197
+  CloudXVungleAdapter: a4a731f3d9c5441fb484316148408262f8be5c10
   FBAudienceNetwork: f4ab9e073ab98c884dbdb5ffe7c861272b380bc2
   InMobiSDK: 4642fb34a961980ab94a1ac460c6e16e113498e6
   VungleAds: 40e87d1eaba17ac818b0f94461fd8ed21ad768dc

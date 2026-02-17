@@ -40,18 +40,21 @@ NS_ASSUME_NONNULL_BEGIN
                                  adm:(NSString *)adm
                        adapterExtras:(NSDictionary<NSString *, NSString *> *)adapterExtras
                                 burl:(nullable NSString *)burl
-                             network:(NSString *)network {
+                             network:(NSString *)network
+                               error:(NSError * _Nullable *)outError {
     [self.logger debug:[NSString stringWithFormat:@"Creating interstitial: AdID=%@, BidID=%@, Network=%@, ADM=%lu chars", adId, bidId, network, (unsigned long)adm.length]];
     
     CLXAdNetworkFactories *factories = [self valueForKey:@"adFactories"];
     if (!factories) {
         [self.logger error:@"❌ adFactories is nil!"];
+        [CLXError setError:outError code:CLXErrorCodeLoadFailed description:@"adFactories is nil - SDK may not be initialized"];
         return nil;
     }
     
     id<CLXAdapterInterstitialFactory> factory = factories.interstitials[network];
     if (!factory) {
         [self.logger error:[NSString stringWithFormat:@"❌ No factory found for network: %@ (Available: %@)", network, [factories.interstitials allKeys]]];
+        [CLXError setError:outError code:CLXErrorCodeLoadFailed description:[NSString stringWithFormat:@"No interstitial factory found for network: %@ (Available: %@)", network, [factories.interstitials allKeys]]];
         return nil;
     }
     
@@ -66,6 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     if (!interstitial) {
         [self.logger error:@"❌ Factory returned nil interstitial"];
+        [CLXError setError:outError code:CLXErrorCodeLoadFailed description:[NSString stringWithFormat:@"Interstitial factory returned nil for network: %@", network]];
         return nil;
     }
     

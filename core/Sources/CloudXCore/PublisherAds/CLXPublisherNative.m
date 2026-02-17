@@ -161,7 +161,7 @@ NS_ASSUME_NONNULL_BEGIN
                                          nativeAdRequirements:[CLXNativeTemplateHelper nativeAdRequirementsForTemplate:nativeType]
                                             bidRequestTimeout:adUnit.bidRequestTimeoutSeconds
                                                reportingService:_reportingService
-                                                   createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
+                                                   createBidAd:^id _Nullable(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString * _Nullable burl, BOOL hasCloseButton, NSString *network, NSError * _Nullable * _Nullable error) {
                 __strong typeof(weakSelf) strongSelf = weakSelf;
                 if (!strongSelf) return nil;
                 return [strongSelf createNativeInstanceWithAdId:adId
@@ -169,7 +169,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                              adm:adm
                                                    adapterExtras:adapterExtras
                                                             burl:burl
-                                                          network:network];
+                                                          network:network
+                                                            error:error];
             }];
             
             [_logger debug:[NSString stringWithFormat:@"Initialized CLXPublisherNative for ad unit: %@", _adUnitId]];
@@ -317,7 +318,7 @@ NS_ASSUME_NONNULL_BEGIN
                             nativeAdRequirements:[CLXNativeTemplateHelper nativeAdRequirementsForTemplate:CLXNativeTemplateDefault]
                                 bidRequestTimeout:adUnit.bidRequestTimeoutSeconds
                                   reportingService:self.reportingService
-                                      createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
+                                      createBidAd:^id _Nullable(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString * _Nullable burl, BOOL hasCloseButton, NSString *network, NSError * _Nullable * _Nullable error) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         if (!strongSelf) return nil;
         return [strongSelf createNativeInstanceWithAdId:adId
@@ -325,7 +326,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                      adm:adm
                                            adapterExtras:adapterExtras
                                                     burl:burl
-                                                  network:network];
+                                                  network:network
+                                                    error:error];
     }];
 }
 
@@ -400,15 +402,17 @@ NS_ASSUME_NONNULL_BEGIN
     
     // Implement actual native creation from bid response
     if (self.lastBidResponse && self.lastBidResponse.createBidAd) {
-        id bidItem = self.lastBidResponse.createBidAd();
+        NSError *creationError = nil;
+        id bidItem = self.lastBidResponse.createBidAd(&creationError);
         if ([bidItem conformsToProtocol:@protocol(CLXAdapterNative)]) {
         id<CLXAdapterNative> native = (id<CLXAdapterNative>)bidItem;
             [self.logger debug:[NSString stringWithFormat:@"Successfully created native from bid for ad unit: %@", self.adUnitId]];
             [self loadAdItem:native];
         } else {
-            [self.logger debug:@"No valid native created from bid for ad unit"];
+            NSString *errorDescription = creationError.localizedDescription ?: @"No valid native created from bid response";
+            [self.logger debug:[NSString stringWithFormat:@"Native creation failed for ad unit: %@", errorDescription]];
             self.isLoading = NO;
-            CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidResponse description:@"No valid native created from bid response"];
+            CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidResponse description:errorDescription];
             [self failToLoadWithNative:nil error:error];
         }
     } else {
@@ -424,17 +428,20 @@ NS_ASSUME_NONNULL_BEGIN
                                                              adm:(NSString *)adm
                                                    adapterExtras:(NSDictionary<NSString *, NSString *> *)adapterExtras
                                                             burl:(nullable NSString *)burl
-                                                          network:(NSString *)network {
+                                                          network:(NSString *)network
+                                                            error:(NSError * _Nullable *)outError {
     [self.logger debug:[NSString stringWithFormat:@"Creating native instance - AdID: %@, BidID: %@, Network: %@", adId, bidId, network]];
     
     id<CLXAdapterNativeFactory> factory = self.adFactories[network];
     if (!factory) {
         [self.logger error:[NSString stringWithFormat:@"No factory found for network: %@", network]];
+        [CLXError setError:outError code:CLXErrorCodeLoadFailed description:[NSString stringWithFormat:@"No native factory found for network: %@", network]];
         return nil;
     }
     
     if (!self.viewController) {
         [self.logger error:@"No view controller available for native creation"];
+        [CLXError setError:outError code:CLXErrorCodeLoadFailed description:@"No view controller available for native creation"];
         return nil;
     }
     
@@ -449,6 +456,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     if (!creativeNative) {
         [self.logger error:[NSString stringWithFormat:@"Factory failed to create native for network: %@", network]];
+        [CLXError setError:outError code:CLXErrorCodeLoadFailed description:[NSString stringWithFormat:@"Native factory returned nil for network: %@", network]];
         return nil;
     }
     

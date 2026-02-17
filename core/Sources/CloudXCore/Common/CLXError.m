@@ -33,6 +33,12 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
     return [self errorWithCode:code description:[self defaultDescriptionForCode:code] underlyingError:underlyingError];
 }
 
++ (void)setError:(NSError * __autoreleasing _Nullable * _Nullable)outError code:(CLXErrorCode)code description:(NSString *)description {
+    if (outError) {
+        *outError = [self errorWithCode:code description:description];
+    }
+}
+
 + (instancetype)errorFromError:(NSError *)error withFallbackCode:(CLXErrorCode)fallbackCode {
     if (!error) {
         return nil;

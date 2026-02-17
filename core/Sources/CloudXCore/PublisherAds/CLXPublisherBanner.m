@@ -468,7 +468,8 @@ NS_ASSUME_NONNULL_BEGIN
     // Implement actual banner creation from bid response
     if (self.lastBidResponse && self.lastBidResponse.createBidAd) {
         [self.logger debug:@"Calling createBidAd function..."];
-        id bidItem = self.lastBidResponse.createBidAd();
+        NSError *creationError = nil;
+        id bidItem = self.lastBidResponse.createBidAd(&creationError);
 
         if ([bidItem conformsToProtocol:@protocol(CLXAdapterBanner)]) {
             id<CLXAdapterBanner> banner = (id<CLXAdapterBanner>)bidItem;
@@ -482,9 +483,16 @@ NS_ASSUME_NONNULL_BEGIN
         } else {
             [self.logger error:[NSString stringWithFormat:@"Bid item creation failed - Item: %@, ConformsToProtocol: %d", bidItem, bidItem ? [bidItem conformsToProtocol:@protocol(CLXAdapterBanner)] : NO]];
             
-            // Treat as technical error - create appropriate error and handle per spec
+            NSString *errorDescription;
+            if (creationError) {
+                errorDescription = creationError.localizedDescription;
+            } else if (bidItem) {
+                errorDescription = [NSString stringWithFormat:@"Returned object (%@) does not conform to CLXAdapterBanner protocol", NSStringFromClass([bidItem class])];
+            } else {
+                errorDescription = @"Banner adapter creation returned nil without error";
+            }
             NSError *technicalError = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
-                                                   description:@"Banner adapter creation failed"];
+                                                   description:errorDescription];
             
             [self failToLoadBanner:nil error:technicalError];
         }
@@ -547,7 +555,7 @@ NS_ASSUME_NONNULL_BEGIN
                             nativeAdRequirements:nil
                                 bidRequestTimeout:adUnit.bidRequestTimeoutSeconds
                                   reportingService:self.reportingService
-                                       createBidAd:^id(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network) {
+                                       createBidAd:^id _Nullable(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString * _Nullable burl, BOOL hasCloseButton, NSString *network, NSError * _Nullable * _Nullable error) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         if (!strongSelf) return nil;
         return [strongSelf createBannerInstanceWithAdId:adId
@@ -556,7 +564,8 @@ NS_ASSUME_NONNULL_BEGIN
                                            adapterExtras:adapterExtras
                                                     burl:burl
                                           hasClosedButton:hasCloseButton
-                                                  network:network];
+                                                  network:network
+                                                    error:error];
     }];
 }
 
@@ -566,7 +575,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                     adapterExtras:(NSDictionary<NSString *, NSString *> *)adapterExtras
                                                              burl:(nullable NSString *)burl
                                                    hasClosedButton:(BOOL)hasClosedButton
-                                                           network:(NSString *)network {
+                                                           network:(NSString *)network
+                                                             error:(NSError * _Nullable *)outError {
     [self.logger debug:[NSString stringWithFormat:@"Creating banner instance - AdID: %@, BidID: %@, Network: %@", adId, bidId, network]];
     
     // Use injected adFactories if populated (for testability), otherwise fetch from CloudXCore
@@ -577,11 +587,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     if (!factory) {
         [self.logger error:[NSString stringWithFormat:@"No factory found for network: %@", network]];
+        [CLXError setError:outError code:CLXErrorCodeLoadFailed description:[NSString stringWithFormat:@"No banner factory found for network: %@", network]];
         return nil;
     }
     
     if (!self.viewController) {
         [self.logger error:@"No view controller available for banner creation"];
+        [CLXError setError:outError code:CLXErrorCodeLoadFailed description:@"No view controller available for banner creation"];
         return nil;
     }
     
@@ -597,6 +609,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     if (!creativeBanner) {
         [self.logger error:[NSString stringWithFormat:@"Factory failed to create banner for network: %@", network]];
+        [CLXError setError:outError code:CLXErrorCodeLoadFailed description:[NSString stringWithFormat:@"Banner factory returned nil for network: %@", network]];
         return nil;
     }
     

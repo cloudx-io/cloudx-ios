@@ -83,6 +83,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Creates an adapter instance from the bid response data.
+ * @param outError On failure, populated with the reason creation failed
  * @return The created adapter, or nil if creation fails
  */
 - (nullable id)createAdapterWithAdId:(NSString *)adId
@@ -90,7 +91,8 @@ NS_ASSUME_NONNULL_BEGIN
                                  adm:(NSString *)adm
                        adapterExtras:(NSDictionary<NSString *, NSString *> *)adapterExtras
                                 burl:(nullable NSString *)burl
-                             network:(NSString *)network NS_REQUIRES_SUPER;
+                             network:(NSString *)network
+                               error:(NSError * _Nullable *)outError NS_REQUIRES_SUPER;
 
 /**
  * Returns the current adapter for metrics and display.

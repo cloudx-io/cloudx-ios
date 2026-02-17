@@ -62,7 +62,7 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
 @property (nonatomic, copy, readwrite) NSString *networkName;
 @property (nonatomic, strong, readwrite) CLXBidResponseBid *bid;
 @property (nonatomic, strong, readwrite) CLXBiddingConfigRequest *bidRequest;
-@property (nonatomic, copy, readwrite) id (^createBidAd)(void);
+@property (nonatomic, copy, readwrite) id _Nullable (^createBidAd)(NSError * _Nullable * _Nullable);
 
 @end
 
@@ -78,7 +78,7 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
                    bidRequest:(NSDictionary *)bidRequest
                   networkName:(NSString *)networkName
                        clxAd:(nullable CLXAd *)clxAd
-                  createBidAd:(id (^)(void))createBidAd {
+                  createBidAd:(id _Nullable (^)(NSError * _Nullable * _Nullable error))createBidAd {
     self = [super init];
     if (self) {
         _price = price;
@@ -102,7 +102,7 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
 
 @property (nonatomic, copy) NSString *publisherID;
 @property (nonatomic, copy) NSDictionary<NSString *, id<CLXBidTokenSource>> *bidTokenSources;
-@property (nonatomic, copy) id (^createBidAd)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network);
+@property (nonatomic, copy) id _Nullable (^createBidAd)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString * _Nullable burl, BOOL hasCloseButton, NSString *network, NSError * _Nullable * _Nullable error);
 @property (nonatomic, copy, nullable) NSString *userID;
 @property (nonatomic, copy) NSString *adUnitId;
 @property (nonatomic, copy, nullable) NSString *dealID;
@@ -132,7 +132,7 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
          nativeAdRequirements:(nullable id)nativeAdRequirements
             bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                reportingService:(id<CLXAdEventReporting>)reportingService
-                   createBidAd:(id (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString *burl, BOOL hasCloseButton, NSString *network))createBidAd {
+                   createBidAd:(id _Nullable (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString * _Nullable burl, BOOL hasCloseButton, NSString *network, NSError * _Nullable * _Nullable error))createBidAd {
     self = [super init];
     if (self) {
         _userID = [userID copy];
@@ -421,10 +421,8 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
             [self.logger error:[NSString stringWithFormat:@"[%@] Single bid failed: %@", correlationId, specificError]];
             if (completion) {
                 NSDictionary *userInfo = @{
-                    NSLocalizedDescriptionKey: specificError,
-                    @"CLXBidFailureReasons": failureReasons
+                    NSLocalizedDescriptionKey: specificError
                 };
-                // Use a more specific error code for single bid failures
                 completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:CLXBidAdSourceErrorAdapterCreationFailed userInfo:userInfo]);
             }
         } else {
@@ -433,8 +431,7 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
             [self.logger error:[NSString stringWithFormat:@"[%@] Waterfall exhausted: %@", correlationId, failureSummary]];
             if (completion) {
                 NSDictionary *userInfo = @{
-                    NSLocalizedDescriptionKey: failureSummary,
-                    @"CLXBidFailureReasons": failureReasons ?: @[]
+                    NSLocalizedDescriptionKey: failureSummary
                 };
                 completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:CLXBidAdSourceErrorNoBid userInfo:userInfo]);
             }
@@ -453,8 +450,9 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
                                                                               bidRequest:bidRequest];
     
     // Test if this bid can create a valid ad
+    NSError *creationError = nil;
     if (bidAdSourceResponse && bidAdSourceResponse.createBidAd) {
-        id testAd = bidAdSourceResponse.createBidAd();
+        id testAd = bidAdSourceResponse.createBidAd(&creationError);
         
         if (testAd != nil) {
             // SUCCESS - This bid can be created (but not yet confirmed as loaded)
@@ -475,8 +473,9 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
     // FIRST FILTERING PHASE - This bid is completely discarded because it couldn't create a banner instance
     // We know it definitely can't show an ad, so send loss notification immediately with TechnicalError
     
-    // Build diagnostic failure reason for this bid
-    NSString *failureReason = [self diagnoseCreationFailure:currentBid bidIndex:bidIndex];
+    // Use real error description if available, fall back to diagnostic guess
+    NSString *failureReason = creationError.localizedDescription
+        ?: [self diagnoseCreationFailure:currentBid bidIndex:bidIndex];
     [failureReasons addObject:failureReason];
     
     [self.logger debug:[NSString stringWithFormat:@"[%@] Bid %ld failed: %@", 
@@ -537,12 +536,12 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
                                            bidRequest:bidRequest
                                           networkName:networkName
                                                clxAd:clxAd
-                                          createBidAd:^id{
+                                          createBidAd:^id _Nullable(NSError * _Nullable * _Nullable error) {
         NSString *correlationId = self.currentCorrelationId ?: @"unknown";
         [self.logger debug:[NSString stringWithFormat:@"[%@] createBidAd block called", correlationId]];
         if (self.createBidAd) {
             [self.logger debug:[NSString stringWithFormat:@"[%@] Calling original createBidAd function...", correlationId]];
-            id result = self.createBidAd(bid.adid ?: @"", bid.id ?: @"", bid.adm ?: @"", bid.ext.cloudx.adapterExtras ?: @{}, bid.burl, self.hasCloseButton, networkName);
+            id result = self.createBidAd(bid.adid ?: @"", bid.id ?: @"", bid.adm ?: @"", bid.ext.cloudx.adapterExtras ?: @{}, bid.burl, self.hasCloseButton, networkName, error);
             [self.logger debug:[NSString stringWithFormat:@"[%@] createBidAd result: %@", correlationId, result]];
             return result;
         } else {

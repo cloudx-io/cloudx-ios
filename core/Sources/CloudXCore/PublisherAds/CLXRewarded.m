@@ -87,12 +87,14 @@ NS_ASSUME_NONNULL_BEGIN
                                  adm:(NSString *)adm
                        adapterExtras:(NSDictionary<NSString *, NSString *> *)adapterExtras
                                 burl:(nullable NSString *)burl
-                             network:(NSString *)network {
+                             network:(NSString *)network
+                               error:(NSError * _Nullable *)outError {
     [self.logger debug:[NSString stringWithFormat:@"Creating rewarded: AdID=%@, BidID=%@, Network=%@", adId, bidId, network]];
     
     CLXAdNetworkFactories *factories = [self valueForKey:@"adFactories"];
     if (!factories) {
         [self.logger error:@"❌ adFactories is nil!"];
+        [CLXError setError:outError code:CLXErrorCodeLoadFailed description:@"adFactories is nil - SDK may not be initialized"];
         return nil;
     }
     
@@ -101,6 +103,7 @@ NS_ASSUME_NONNULL_BEGIN
     id<CLXAdapterRewardedFactory> factory = factories.rewardedInterstitials[network];
     if (!factory) {
         [self.logger error:[NSString stringWithFormat:@"❌ No rewarded factory found for network: %@ (Available: %@)", network, [factories.rewardedInterstitials allKeys]]];
+        [CLXError setError:outError code:CLXErrorCodeLoadFailed description:[NSString stringWithFormat:@"No rewarded factory found for network: %@ (Available: %@)", network, [factories.rewardedInterstitials allKeys]]];
         return nil;
     }
     
@@ -115,6 +118,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     if (!rewarded) {
         [self.logger error:@"❌ Factory returned nil rewarded"];
+        [CLXError setError:outError code:CLXErrorCodeLoadFailed description:[NSString stringWithFormat:@"Rewarded factory returned nil for network: %@", network]];
         return nil;
     }
     
