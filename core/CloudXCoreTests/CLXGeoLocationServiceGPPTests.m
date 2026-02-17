@@ -8,22 +8,26 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
-#import "CLXUserDefaultsTestHelper.h"
 
 @interface CLXGeoLocationServiceGPPTests : XCTestCase
 @property (nonatomic, strong) CLXGeoLocationService *geoService;
+@property (nonatomic, strong) NSUserDefaults *testDefaults;
+@property (nonatomic, copy) NSString *testSuiteName;
 @end
 
 @implementation CLXGeoLocationServiceGPPTests
 
 - (void)setUp {
     [super setUp];
-    self.geoService = [CLXGeoLocationService shared];
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    self.testSuiteName = [NSString stringWithFormat:@"CLXGeoLocationServiceGPPTests-%@", [[NSUUID UUID] UUIDString]];
+    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
+    self.geoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
 }
 
 - (void)tearDown {
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    [self.testDefaults removePersistentDomainForName:self.testSuiteName];
+    self.testDefaults = nil;
+    self.geoService = nil;
     [super tearDown];
 }
 
@@ -103,7 +107,7 @@
 // Test missing geo headers handling
 - (void)testMissingGeoHeadersHandling {
     // Clear geo headers
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreRawGeoHeadersKey];
+    [self.testDefaults removeObjectForKey:kCLXCoreRawGeoHeadersKey];
     
     // Should default to non-US user when no geo data
     XCTAssertFalse([self.geoService isUSUser], @"Should default to non-US user when no geo headers");
@@ -278,14 +282,11 @@
 
 - (void)setGeoHeaders:(NSDictionary *)headers {
     if (headers) {
-        [[NSUserDefaults standardUserDefaults] setObject:headers forKey:kCLXCoreRawGeoHeadersKey];
+        [self.testDefaults setObject:headers forKey:kCLXCoreRawGeoHeadersKey];
     } else {
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreRawGeoHeadersKey];
+        [self.testDefaults removeObjectForKey:kCLXCoreRawGeoHeadersKey];
     }
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    // Force UserDefaults to flush to disk and re-read
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults synchronize];
 }
 
 @end

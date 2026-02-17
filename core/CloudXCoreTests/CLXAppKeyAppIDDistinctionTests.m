@@ -11,6 +11,8 @@
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXPrivacyService.h>
+#import <CloudXCore/CLXConsentProvider.h>
+#import <CloudXCore/CLXGeoLocationService.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 
 @interface CLXAppKeyAppIDDistinctionTests : XCTestCase
@@ -18,12 +20,17 @@
 @property (nonatomic, strong) CLXConfigImpressionModel *mockImpModel;
 @property (nonatomic, strong) CLXSettings *mockSettings;
 @property (nonatomic, strong) CLXPrivacyService *mockPrivacyService;
+@property (nonatomic, strong) NSUserDefaults *testDefaults;
+@property (nonatomic, copy) NSString *testSuiteName;
 @end
 
 @implementation CLXAppKeyAppIDDistinctionTests
 
 - (void)setUp {
     [super setUp];
+    
+    self.testSuiteName = [[NSUUID UUID] UUIDString];
+    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
     
     // Create mock SDK config with appID
     self.mockSDKConfig = [[CLXSDKConfigResponse alloc] init];
@@ -36,19 +43,24 @@
                                                                   auctionID:@"test-auction"
                                                               testGroupName:@"test-group"];
     
-    // Create mock settings and privacy service
+    // Create isolated privacy service
+    CLXConsentProvider *isolatedProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil
+                                                                               userDefaults:self.testDefaults];
+    CLXGeoLocationService *isolatedGeoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
+    self.mockPrivacyService = [[CLXPrivacyService alloc] initWithUserDefaults:self.testDefaults
+                                                             consentProvider:isolatedProvider
+                                                          geoLocationService:isolatedGeoService];
     self.mockSettings = [CLXSettings sharedInstance];
-    self.mockPrivacyService = [CLXPrivacyService sharedInstance];
     
     // Set up UserDefaults with appKey
-    [[NSUserDefaults standardUserDefaults] setObject:@"9o_9omGptuyS2n5wV0QJu" forKey:kCLXCoreAppKeyKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"9o_9omGptuyS2n5wV0QJu" forKey:kCLXCoreAppKeyKey];
+    [self.testDefaults synchronize];
 }
 
 - (void)tearDown {
-    // Clean up UserDefaults
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreAppKeyKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults removePersistentDomainForName:self.testSuiteName];
+    self.testDefaults = nil;
+    self.testSuiteName = nil;
     [super tearDown];
 }
 
@@ -116,7 +128,7 @@
 
 - (void)testBearerTokenUsesAppKey {
     // Verify that the appKey is available in UserDefaults
-    NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
+    NSString *appKey = [self.testDefaults stringForKey:kCLXCoreAppKeyKey];
     XCTAssertEqualObjects(appKey, @"9o_9omGptuyS2n5wV0QJu", 
                          @"AppKey should be available for bearer token");
     
@@ -287,7 +299,7 @@
 
 - (void)testAppKeyAndAppIDAreDifferent {
     // Verify that appKey and appID are different values
-    NSString *appKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
+    NSString *appKey = [self.testDefaults stringForKey:kCLXCoreAppKeyKey];
     NSString *appID = self.mockSDKConfig.appID;
     
     XCTAssertNotEqualObjects(appKey, appID, 

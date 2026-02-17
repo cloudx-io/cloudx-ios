@@ -20,6 +20,8 @@
 @interface CLXPrivacyService ()
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, strong) NSUserDefaults *userDefaults;
+@property (nonatomic, strong, readwrite) CLXConsentProvider *consentProvider;
+@property (nonatomic, strong) CLXGeoLocationService *geoLocationService;
 @end
 
 // Internal methods category - these are NOT in the public header
@@ -36,16 +38,28 @@
     static CLXPrivacyService *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedInstance = [[self alloc] init];
+        sharedInstance = [[self alloc] initWithUserDefaults:[NSUserDefaults standardUserDefaults]
+                                           consentProvider:[CLXConsentProvider sharedInstance]
+                                        geoLocationService:[CLXGeoLocationService shared]];
     });
     return sharedInstance;
 }
 
 - (instancetype)init {
+    return [self initWithUserDefaults:[NSUserDefaults standardUserDefaults]
+                      consentProvider:[CLXConsentProvider sharedInstance]
+                   geoLocationService:[CLXGeoLocationService shared]];
+}
+
+- (instancetype)initWithUserDefaults:(NSUserDefaults *)userDefaults
+                     consentProvider:(CLXConsentProvider *)consentProvider
+                  geoLocationService:(CLXGeoLocationService *)geoLocationService {
     self = [super init];
     if (self) {
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXPrivacyService"];
-        _userDefaults = [NSUserDefaults standardUserDefaults];
+        _userDefaults = userDefaults;
+        _consentProvider = consentProvider;
+        _geoLocationService = geoLocationService;
     }
     return self;
 }
@@ -62,7 +76,7 @@
 }
 
 - (BOOL)shouldClearPersonalDataForCompliance {
-    CLXGeoLocationService *geoService = [CLXGeoLocationService shared];
+    CLXGeoLocationService *geoService = self.geoLocationService;
     
     // EU users: Check GDPR consent
     if ([geoService isEUUser]) {
@@ -71,7 +85,7 @@
     
     // US users: GPP consent evaluation based on geography
     if ([geoService isUSUser]) {
-        CLXConsentProvider *gppProvider = [CLXConsentProvider sharedInstance];
+        CLXConsentProvider *gppProvider = self.consentProvider;
         NSArray<NSNumber *> *gppSids = [gppProvider gppSid];
         
         CLXPrivacyConsent *gppConsent = nil;
@@ -118,7 +132,7 @@
 }
 
 - (BOOL)shouldClearPersonalDataForGDPR {
-    CLXConsentProvider *gppProvider = [CLXConsentProvider sharedInstance];
+    CLXConsentProvider *gppProvider = self.consentProvider;
     
     // Priority 1: Check GPP Section 2 (EU TCF via GPP - new IAB standard)
     NSArray<NSNumber *> *gppSid = [gppProvider gppSid];
@@ -195,7 +209,7 @@
 #pragma mark - Public CCPA Methods (Server Supported)
 
 - (nullable NSString *)ccpaPrivacyString {
-    NSString *ccpa = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXPrivacyCCPAPrivacyKey];
+    NSString *ccpa = [self.userDefaults stringForKey:kCLXPrivacyCCPAPrivacyKey];
     [self.logger verbose:[NSString stringWithFormat:@"CCPA privacy: %@", ccpa ?: @"(none)"]];
     return ccpa;
 }
@@ -217,7 +231,7 @@
 - (nullable NSString *)gdprConsentString {
     // INTERNAL ONLY: GDPR support not yet implemented on server
     // Including GDPR data in bid requests will cause 502 errors
-    NSString *consent = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXPrivacyGDPRConsentKey];
+    NSString *consent = [self.userDefaults stringForKey:kCLXPrivacyGDPRConsentKey];
     [self.logger debug:[NSString stringWithFormat:@"GDPR consent (INTERNAL): %@", consent ?: @"(none)"]];
     return consent;
 }
@@ -241,7 +255,7 @@
 }
 
 - (nullable NSString *)hashedGeoIp {
-    NSString *hashedGeoIp = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXPrivacyHashedGeoIpKey];
+    NSString *hashedGeoIp = [self.userDefaults stringForKey:kCLXPrivacyHashedGeoIpKey];
     [self.logger debug:[NSString stringWithFormat:@"Hashed geo IP: %@", hashedGeoIp ? @"(present)" : @"(none)"]];
     return hashedGeoIp;
 }
@@ -249,23 +263,23 @@
 - (void)setHashedGeoIp:(nullable NSString *)hashedGeoIp {
     [self.logger debug:[NSString stringWithFormat:@"Setting hashed geo IP: %@", hashedGeoIp ? @"(present)" : @"(none)"]];
     if (hashedGeoIp) {
-        [[NSUserDefaults standardUserDefaults] setObject:hashedGeoIp forKey:kCLXPrivacyHashedGeoIpKey];
+        [self.userDefaults setObject:hashedGeoIp forKey:kCLXPrivacyHashedGeoIpKey];
     } else {
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
+        [self.userDefaults removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
     }
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.userDefaults synchronize];
 }
 
 #pragma mark - GPP Methods
 
 - (nullable NSString *)gppString {
-    NSString *gppString = [[CLXConsentProvider sharedInstance] gppString];
+    NSString *gppString = [self.consentProvider gppString];
     [self.logger verbose:[NSString stringWithFormat:@"GPP string: %@", gppString ?: @"(none)"]];
     return gppString;
 }
 
 - (nullable NSArray<NSNumber *> *)gppSid {
-    NSArray<NSNumber *> *gppSid = [[CLXConsentProvider sharedInstance] gppSid];
+    NSArray<NSNumber *> *gppSid = [self.consentProvider gppSid];
     [self.logger debug:[NSString stringWithFormat:@"GPP SID: %@", gppSid ?: @"(none)"]];
     return gppSid;
 }
@@ -273,7 +287,7 @@
 #pragma mark - Publisher GPP API
 
 - (void)setGppString:(NSString *)gppString {
-    [[CLXConsentProvider sharedInstance] setGppString:gppString];
+    [self.consentProvider setGppString:gppString];
     if (gppString) {
         [self.logger info:[NSString stringWithFormat:@"GPP string set: %@", gppString]];
     } else {
@@ -282,7 +296,7 @@
 }
 
 - (void)setGppSid:(NSArray<NSNumber *> *)gppSid {
-    [[CLXConsentProvider sharedInstance] setGppSid:gppSid];
+    [self.consentProvider setGppSid:gppSid];
     if (gppSid && gppSid.count > 0) {
         [self.logger info:[NSString stringWithFormat:@"GPP SID set: %@", gppSid]];
     } else {

@@ -6,6 +6,7 @@
 @interface CLXGeoLocationService () <CLLocationManagerDelegate>
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, strong) CLXLogger *logger;
+@property (nonatomic, strong) NSUserDefaults *userDefaults;
 @end
 
 @implementation CLXGeoLocationService
@@ -14,17 +15,22 @@
     static CLXGeoLocationService *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedInstance = [[self alloc] init];
+        sharedInstance = [[self alloc] initWithUserDefaults:[NSUserDefaults standardUserDefaults]];
     });
     return sharedInstance;
 }
 
 - (instancetype)init {
+    return [self initWithUserDefaults:[NSUserDefaults standardUserDefaults]];
+}
+
+- (instancetype)initWithUserDefaults:(NSUserDefaults *)userDefaults {
     self = [super init];
     if (self) {
         _locationManager = [[CLLocationManager alloc] init];
         _locationManager.delegate = self;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXGeoLocationService"];
+        _userDefaults = userDefaults;
     }
     return self;
 }
@@ -71,7 +77,7 @@
 - (nullable NSDictionary<NSString *, NSString *> *)geoHeaders {
     @try {
         // Return raw CloudFront headers for privacy checks (US/CA detection)
-        NSDictionary *rawHeaders = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreRawGeoHeadersKey];
+        NSDictionary *rawHeaders = [self.userDefaults dictionaryForKey:kCLXCoreRawGeoHeadersKey];
         return rawHeaders;
     } @catch (NSException *exception) {
         [self.logger error:[NSString stringWithFormat:@"Failed to read raw geo headers: %@", exception.reason]];
@@ -82,7 +88,7 @@
 - (nullable NSDictionary<NSString *, NSString *> *)processedGeoData {
     @try {
         // Return processed geo data for bid request population (city, zip, region, metro)
-        NSDictionary *processedData = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreProcessedGeoDataKey];
+        NSDictionary *processedData = [self.userDefaults dictionaryForKey:kCLXCoreProcessedGeoDataKey];
         return processedData;
     } @catch (NSException *exception) {
         [self.logger error:[NSString stringWithFormat:@"Failed to read processed geo data: %@", exception.reason]];

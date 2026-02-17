@@ -22,6 +22,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)shared;
 
 /**
+ * Initializes the geo location service with a specified UserDefaults instance.
+ * @param userDefaults The UserDefaults instance to use for storing and retrieving geo data.
+ * @return An initialized CLXGeoLocationService instance.
+ */
+- (instancetype)initWithUserDefaults:(NSUserDefaults *)userDefaults;
+
+/**
  * Gets raw geo headers from UserDefaults for privacy compliance
  * @return Dictionary of raw CloudFront headers if available, nil otherwise
  * @discussion Used for determining user geography for privacy regulations (US/CA checks)

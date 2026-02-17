@@ -21,7 +21,7 @@
         NSString *endpointString = endpoint.length > 0 ? endpoint : fallbackURL;
         NSURL *endpointURL = [NSURL URLWithString:endpointString];
         NSURLSession *urlSession = [NSURLSession cloudxSession];
-        _reportNetworkService = [[CLXAdReportingNetworkService alloc] initWithBaseURL:endpointURL urlSession:urlSession];
+        _reportNetworkService = [[CLXAdReportingNetworkService alloc] initWithBaseURL:endpointURL urlSession:urlSession userDefaults:[NSUserDefaults standardUserDefaults]];
         _logger = [[CLXLogger alloc] initWithCategory:@"LiveAdEventReporter"];
     }
     return self;

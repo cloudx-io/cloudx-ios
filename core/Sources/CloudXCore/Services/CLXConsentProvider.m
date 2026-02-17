@@ -77,20 +77,22 @@ static NSUInteger const kTCFVendorConsentOffset = 230;      // Vendor consent se
     static CLXConsentProvider *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedInstance = [[self alloc] initWithErrorReporter:[CLXErrorReporter shared]];
+        sharedInstance = [[self alloc] initWithErrorReporter:[CLXErrorReporter shared]
+                                                    userDefaults:[NSUserDefaults standardUserDefaults]];
     });
     return sharedInstance;
 }
 
 - (instancetype)init {
-    return [self initWithErrorReporter:nil];
+    return [self initWithErrorReporter:nil userDefaults:[NSUserDefaults standardUserDefaults]];
 }
 
-- (instancetype)initWithErrorReporter:(nullable CLXErrorReporter *)errorReporter {
+- (instancetype)initWithErrorReporter:(nullable CLXErrorReporter *)errorReporter
+                         userDefaults:(NSUserDefaults *)userDefaults {
     self = [super init];
     if (self) {
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXConsentProvider"];
-        _userDefaults = [NSUserDefaults standardUserDefaults];
+        _userDefaults = userDefaults;
         _errorReporter = errorReporter;
     }
     return self;

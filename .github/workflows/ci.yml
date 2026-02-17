@@ -37,7 +37,7 @@ jobs:
           echo "Found simulator: $SIMULATOR"
           echo "name=$SIMULATOR" >> $GITHUB_OUTPUT
 
-      - name: Run unit tests
+      - name: Run unit tests (parallel)
         working-directory: core
         run: |
           set -o pipefail
@@ -45,6 +45,7 @@ jobs:
             -project CloudXCore.xcodeproj \
             -scheme CloudXCore \
             -destination 'platform=iOS Simulator,name=${{ steps.simulator.outputs.name }}' \
+            -parallel-testing-enabled YES \
             -resultBundlePath TestResults.xcresult \
             -quiet \
             CODE_SIGNING_ALLOWED=NO

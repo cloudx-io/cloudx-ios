@@ -122,6 +122,7 @@ static NSString * const SDK_PARAM_CUSTOM_DATA = @"sdk.customData";
 // iOS-specific
 @property (nonatomic, copy) NSString *accountId;
 @property (nonatomic, strong) CLXLogger *logger;
+@property (nonatomic, strong) CLXPrivacyService *privacyService;
 
 @end
 
@@ -131,18 +132,23 @@ static NSString * const SDK_PARAM_CUSTOM_DATA = @"sdk.customData";
     static CLXTrackingFieldResolver *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedInstance = [[CLXTrackingFieldResolver alloc] init];
+        sharedInstance = [[CLXTrackingFieldResolver alloc] initWithPrivacyService:[CLXPrivacyService sharedInstance]];
     });
     return sharedInstance;
 }
 
 - (instancetype)init {
+    return [self initWithPrivacyService:[CLXPrivacyService sharedInstance]];
+}
+
+- (instancetype)initWithPrivacyService:(CLXPrivacyService *)privacyService {
     self = [super init];
     if (self) {
         _requestDataMap = [NSMutableDictionary dictionary];
         _responseDataMap = [NSMutableDictionary dictionary];
         _sdkMap = [NSMutableDictionary dictionary];
         _logger = [[CLXLogger alloc] initWithCategory:@"TrackingFieldResolver"];
+        _privacyService = privacyService;
     }
     return self;
 }
@@ -349,7 +355,7 @@ static NSString * const SDK_PARAM_CUSTOM_DATA = @"sdk.customData";
 static NSString * const kZeroedIFA = @"00000000-0000-0000-0000-000000000000";
 
 - (nullable NSString *)handleIfaField:(NSString *)auctionId {
-    if ([[CLXPrivacyService sharedInstance] shouldClearPersonalData]) {
+    if ([self.privacyService shouldClearPersonalData]) {
         return kZeroedIFA;
     }
 

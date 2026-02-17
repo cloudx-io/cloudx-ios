@@ -1158,7 +1158,7 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
                       withPrivacyService:(CLXPrivacyService *)privacyService {
     // Use resolution methods that fallback to legacy TCF when CMP doesn't provide GPP
     // This ensures wide DSP coverage by always sending GPP format when consent is available
-    CLXConsentProvider *gppProvider = [CLXConsentProvider sharedInstance];
+    CLXConsentProvider *gppProvider = privacyService.consentProvider;
     
     NSString *gppString = [gppProvider resolveGppString];
     if (gppString) {

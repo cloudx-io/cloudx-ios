@@ -9,26 +9,32 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
-#import "CLXUserDefaultsTestHelper.h"
 
 @interface CLXGPPEdgeCasesTests : XCTestCase
 @property (nonatomic, strong) CLXConsentProvider *gppProvider;
 @property (nonatomic, strong) CLXPrivacyService *privacyService;
 @property (nonatomic, strong) CLXGeoLocationService *geoService;
+@property (nonatomic, strong) NSUserDefaults *testDefaults;
+@property (nonatomic, copy) NSString *testSuiteName;
 @end
 
 @implementation CLXGPPEdgeCasesTests
 
 - (void)setUp {
     [super setUp];
-    self.gppProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil];
-    self.privacyService = [CLXPrivacyService sharedInstance];
-    self.geoService = [CLXGeoLocationService shared];
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    self.testSuiteName = [[NSUUID UUID] UUIDString];
+    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
+    self.gppProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil userDefaults:self.testDefaults];
+    self.geoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
+    self.privacyService = [[CLXPrivacyService alloc] initWithUserDefaults:self.testDefaults
+                                                         consentProvider:self.gppProvider
+                                                      geoLocationService:self.geoService];
 }
 
 - (void)tearDown {
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    [self.testDefaults removePersistentDomainForName:self.testSuiteName];
+    self.testDefaults = nil;
+    self.testSuiteName = nil;
     [super tearDown];
 }
 
@@ -141,7 +147,7 @@
 // Test non-numeric SID values (defensive)
 - (void)testNonNumericSIDValues {
     // This tests UserDefaults parsing, not direct API
-    [[NSUserDefaults standardUserDefaults] setObject:@"not_a_number" forKey:kIABGPP_GppSID];
+    [self.testDefaults setObject:@"not_a_number" forKey:kIABGPP_GppSID];
     
     NSArray *result = [self.gppProvider gppSid];
     XCTAssertTrue(result == nil || [result count] == 0, @"Should handle non-numeric SID values gracefully");
@@ -158,8 +164,8 @@
     
     // Legacy CCPA says consent (1YNN = opt-out N, sale notice N, limited notice N)
     // Set CCPA via IAB standard UserDefaults key
-    [[NSUserDefaults standardUserDefaults] setObject:@"1YNN" forKey:@"IABUSPrivacy_String"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"1YNN" forKey:@"IABUSPrivacy_String"];
+    [self.testDefaults synchronize];
     
     [self setupCaliforniaUser];
     
@@ -178,8 +184,8 @@
     
     // Legacy CCPA says opt-out (1YYN = opt-out Y)
     // Set CCPA opt-out via IAB standard UserDefaults key
-    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:@"IABUSPrivacy_String"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"1YYN" forKey:@"IABUSPrivacy_String"];
+    [self.testDefaults synchronize];
     
     [self setupCaliforniaUser];
     
@@ -199,8 +205,8 @@
     [self.gppProvider setGppString:testGppString];
     [self.gppProvider setGppSid:testGppSid];
     
-    // Create new instance
-    CLXConsentProvider *newProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil];
+    // Create new instance with same test defaults
+    CLXConsentProvider *newProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil userDefaults:self.testDefaults];
     
     // Should retrieve same data
     NSString *retrievedString = [newProvider gppString];
@@ -220,8 +226,8 @@
     [self.gppProvider setGppString:nil];
     [self.gppProvider setGppSid:nil];
     
-    // Create new instance
-    CLXConsentProvider *newProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil];
+    // Create new instance with same test defaults
+    CLXConsentProvider *newProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil userDefaults:self.testDefaults];
     
     // Should remain cleared
     XCTAssertNil([newProvider gppString], @"Cleared GPP string should persist as nil");
@@ -376,8 +382,8 @@
 }
 
 - (void)setGeoHeaders:(NSDictionary *)headers {
-    [[NSUserDefaults standardUserDefaults] setObject:headers forKey:kCLXCoreRawGeoHeadersKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:headers forKey:kCLXCoreRawGeoHeadersKey];
+    [self.testDefaults synchronize];
 }
 
 @end

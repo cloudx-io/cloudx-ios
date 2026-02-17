@@ -15,13 +15,14 @@
 #import <CloudXCore/CLXSystemInformation.h>
 #import <CloudXCore/UIDevice+CLXIdentifier.h>
 #import <CloudXCore/CLXORTBConstants.h>
-#import "CLXUserDefaultsTestHelper.h"
 #import <CoreLocation/CoreLocation.h>
 
 @interface CLXBiddingConfigORTBFieldsTests : XCTestCase
 @property (nonatomic, strong) CLXPrivacyService *privacyService;
 @property (nonatomic, strong) CLXSDKConfigResponse *mockSDKConfig;
 @property (nonatomic, strong) CLXConfigImpressionModel *mockImpModel;
+@property (nonatomic, strong) NSUserDefaults *testDefaults;
+@property (nonatomic, copy) NSString *testSuiteName;
 @end
 
 @implementation CLXBiddingConfigORTBFieldsTests
@@ -29,7 +30,14 @@
 - (void)setUp {
     [super setUp];
     
-    self.privacyService = [[CLXPrivacyService alloc] init];
+    self.testSuiteName = [[NSUUID UUID] UUIDString];
+    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
+    CLXConsentProvider *isolatedProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil
+                                                                               userDefaults:self.testDefaults];
+    CLXGeoLocationService *isolatedGeoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
+    self.privacyService = [[CLXPrivacyService alloc] initWithUserDefaults:self.testDefaults
+                                                         consentProvider:isolatedProvider
+                                                      geoLocationService:isolatedGeoService];
     
     self.mockSDKConfig = [[CLXSDKConfigResponse alloc] init];
     self.mockSDKConfig.appID = @"test-app-id";
@@ -42,7 +50,9 @@
 }
 
 - (void)tearDown {
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    [self.testDefaults removePersistentDomainForName:self.testSuiteName];
+    self.testDefaults = nil;
+    self.testSuiteName = nil;
     [super tearDown];
 }
 
@@ -852,7 +862,7 @@
 }
 
 - (void)testExtCloudx_PluginVersion_WhenSet_ShouldBeIncluded {
-    // Set plugin version (simulating Unity/React Native wrapper)
+    // CLXBiddingConfigRequest reads pluginVersion from standardUserDefaults (not yet DI-refactored)
     [[NSUserDefaults standardUserDefaults] setObject:@"unity-1.2.3" forKey:kCLXCorePluginVersionKey];
 
     CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
@@ -861,10 +871,12 @@
     NSDictionary *cloudx = json[@"ext"][@"cloudx"];
     XCTAssertEqualObjects(cloudx[@"pluginVersion"], @"unity-1.2.3",
                           @"ext.cloudx.pluginVersion should match UserDefaults value");
+
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCorePluginVersionKey];
 }
 
 - (void)testExtCloudx_PluginVersion_WhenNotSet_ShouldBeAbsent {
-    // Ensure plugin version is not set
+    // CLXBiddingConfigRequest reads pluginVersion from standardUserDefaults (not yet DI-refactored)
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCorePluginVersionKey];
 
     CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
@@ -876,7 +888,7 @@
 }
 
 - (void)testExtCloudx_PluginVersion_WhenEmpty_ShouldBeAbsent {
-    // Set empty plugin version
+    // CLXBiddingConfigRequest reads pluginVersion from standardUserDefaults (not yet DI-refactored)
     [[NSUserDefaults standardUserDefaults] setObject:@"" forKey:kCLXCorePluginVersionKey];
 
     CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
@@ -885,6 +897,8 @@
     NSDictionary *cloudx = json[@"ext"][@"cloudx"];
     XCTAssertNil(cloudx[@"pluginVersion"],
                  @"ext.cloudx.pluginVersion should be absent when empty string");
+
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCorePluginVersionKey];
 }
 
 - (void)testExtCloudx_ShouldBePresentForAllAdTypes {

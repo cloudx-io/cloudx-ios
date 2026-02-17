@@ -11,7 +11,6 @@
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXConsentProvider.h>
-#import "CLXUserDefaultsTestHelper.h"
 #import <CoreLocation/CoreLocation.h>
 
 // Test category to expose internal methods for testing
@@ -45,8 +44,11 @@
 
 @interface CLXBiddingConfigRequestPrivacyTests : XCTestCase
 @property (nonatomic, strong) CLXPrivacyService *privacyService;
+@property (nonatomic, strong) CLXConsentProvider *gppProvider;
 @property (nonatomic, strong) CLXSDKConfigResponse *mockSDKConfig;
 @property (nonatomic, strong) CLXConfigImpressionModel *mockImpModel;
+@property (nonatomic, strong) NSUserDefaults *testDefaults;
+@property (nonatomic, copy) NSString *testSuiteName;
 @end
 
 @implementation CLXBiddingConfigRequestPrivacyTests
@@ -54,8 +56,13 @@
 - (void)setUp {
     [super setUp];
     
-    // Create privacy service using standardUserDefaults to replicate real-world scenarios
-    self.privacyService = [[CLXPrivacyService alloc] init];
+    self.testSuiteName = [[NSUUID UUID] UUIDString];
+    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
+    self.gppProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil userDefaults:self.testDefaults];
+    CLXGeoLocationService *isolatedGeoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
+    self.privacyService = [[CLXPrivacyService alloc] initWithUserDefaults:self.testDefaults
+                                                         consentProvider:self.gppProvider
+                                                      geoLocationService:isolatedGeoService];
     
     // Create mock SDK config with appID for tests
     self.mockSDKConfig = [[CLXSDKConfigResponse alloc] init];
@@ -67,24 +74,20 @@
     self.mockImpModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:self.mockSDKConfig
                                                                   auctionID:@"test-auction"
                                                               testGroupName:@"test-group"];
-    
-    // Don't clear in setUp - let tearDown handle cleanup to avoid race conditions
 }
 
 - (void)tearDown {
-    [self clearPrivacySettings];
-    
-    // Clear all CloudXCore keys to prevent test contamination
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
-    
+    [self.testDefaults removePersistentDomainForName:self.testSuiteName];
+    self.testDefaults = nil;
+    self.testSuiteName = nil;
     [super tearDown];
 }
 
 - (void)clearPrivacySettings {
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyGDPRConsentKey];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
+    [self.testDefaults synchronize];
 }
 
 // Test that GDPR consent string is properly included in bidding config
@@ -92,9 +95,9 @@
     [self clearPrivacySettings];
     
     NSString *testConsentString = @"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA";
-    [[NSUserDefaults standardUserDefaults] setObject:testConsentString forKey:kCLXPrivacyGDPRConsentKey];
-    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:testConsentString forKey:kCLXPrivacyGDPRConsentKey];
+    [self.testDefaults setInteger:1 forKey:kCLXPrivacyGDPRAppliesKey];
+    [self.testDefaults synchronize];
     
     CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc] 
         initWithAdType:CLXAdTypeBanner
@@ -113,7 +116,7 @@
                           tmax:@3.0
                       impModel:self.mockImpModel
                       settings:[CLXSettings sharedInstance]
-            privacyService:[CLXPrivacyService sharedInstance]];
+            privacyService:self.privacyService];
     
     // GDPR is now supported in bid requests
     XCTAssertNotNil(config.regulations.ext.iab.tcString, @"TC string should be included in bid request");
@@ -127,11 +130,11 @@
     [self clearPrivacySettings]; // Ensure clean state
     
     NSString *testCCPAString = @"1YNN";
-    [[NSUserDefaults standardUserDefaults] setObject:testCCPAString forKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:testCCPAString forKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults synchronize];
     
     // Verify the data was stored
-    NSString *storedCCPA = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXPrivacyCCPAPrivacyKey];
+    NSString *storedCCPA = [self.testDefaults stringForKey:kCLXPrivacyCCPAPrivacyKey];
     XCTAssertEqualObjects(storedCCPA, testCCPAString, @"CCPA string should be stored correctly");
     
     // Verify privacy service can read it
@@ -172,13 +175,13 @@
     NSString *testCCPAString = @"1YNN";
     
     // Set privacy settings - CCPA should be included in bidding config
-    [[NSUserDefaults standardUserDefaults] setObject:testGDPRConsent forKey:kCLXPrivacyGDPRConsentKey];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] setObject:testCCPAString forKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:testGDPRConsent forKey:kCLXPrivacyGDPRConsentKey];
+    [self.testDefaults setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
+    [self.testDefaults setObject:testCCPAString forKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults synchronize];
     
     // Verify CCPA data was stored and can be read by privacy service
-    NSString *storedCCPA = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXPrivacyCCPAPrivacyKey];
+    NSString *storedCCPA = [self.testDefaults stringForKey:kCLXPrivacyCCPAPrivacyKey];
     XCTAssertEqualObjects(storedCCPA, testCCPAString, @"CCPA string should be stored correctly");
     
     NSString *serviceCCPA = [self.privacyService ccpaPrivacyString];
@@ -223,9 +226,9 @@
 - (void)testGDPRAppliesYes_ShouldBeIncludedInBidRequest {
     [self clearPrivacySettings];
     
-    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"IABTCF_gdprApplies"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"CQbFSYAQbFSYAEsACBENCFF" forKey:@"IABTCF_TCString"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setInteger:1 forKey:@"IABTCF_gdprApplies"];
+    [self.testDefaults setObject:@"CQbFSYAQbFSYAEsACBENCFF" forKey:@"IABTCF_TCString"];
+    [self.testDefaults synchronize];
     
     CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc] 
         initWithAdType:CLXAdTypeBanner
@@ -254,8 +257,8 @@
 - (void)testGDPRAppliesNo_ShouldNotClearData {
     [self clearPrivacySettings];
     
-    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"IABTCF_gdprApplies"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setInteger:0 forKey:@"IABTCF_gdprApplies"];
+    [self.testDefaults synchronize];
     
     // When GDPR doesn't apply, bidding config should still function normally
     CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc] 
@@ -287,9 +290,9 @@
     [self clearPrivacySettings];
     
     NSString *testGppString = @"DBABLA~BVVqAAEABBENA.QA";
-    [[NSUserDefaults standardUserDefaults] setObject:testGppString forKey:@"IABGPP_HDR_GppString"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"8" forKey:@"IABGPP_GppSID"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:testGppString forKey:@"IABGPP_HDR_GppString"];
+    [self.testDefaults setObject:@"8" forKey:@"IABGPP_GppSID"];
+    [self.testDefaults synchronize];
     
     CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc] 
         initWithAdType:CLXAdTypeBanner
@@ -319,10 +322,10 @@
     [self clearPrivacySettings];
     
     // Clear GPP but set legacy TCF
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_HDR_GppString"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABGPP_GppSID"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"CQbFSYAQbFSYAEsACBENCFF" forKey:@"IABTCF_TCString"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults removeObjectForKey:@"IABGPP_HDR_GppString"];
+    [self.testDefaults removeObjectForKey:@"IABGPP_GppSID"];
+    [self.testDefaults setObject:@"CQbFSYAQbFSYAEsACBENCFF" forKey:@"IABTCF_TCString"];
+    [self.testDefaults synchronize];
     
     CLXBiddingConfigRequest *config = [[CLXBiddingConfigRequest alloc] 
         initWithAdType:CLXAdTypeBanner

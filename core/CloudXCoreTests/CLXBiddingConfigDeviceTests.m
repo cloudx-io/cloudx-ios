@@ -25,7 +25,6 @@
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXORTBConstants.h>
-#import "Helper/CLXUserDefaultsTestHelper.h"
 #import <CoreLocation/CoreLocation.h>
 
 #pragma mark - Test Category for CLXBiddingConfigRequest
@@ -56,6 +55,8 @@
 @property (nonatomic, strong) CLXPrivacyService *privacyService;
 @property (nonatomic, strong) CLXSDKConfigResponse *mockSDKConfig;
 @property (nonatomic, strong) CLXConfigImpressionModel *mockImpModel;
+@property (nonatomic, strong) NSUserDefaults *testDefaults;
+@property (nonatomic, copy) NSString *testSuiteName;
 @end
 
 @implementation CLXBiddingConfigDeviceTests
@@ -65,7 +66,14 @@
 - (void)setUp {
     [super setUp];
     
-    self.privacyService = [[CLXPrivacyService alloc] init];
+    self.testSuiteName = [[NSUUID UUID] UUIDString];
+    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
+    CLXConsentProvider *isolatedProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil
+                                                                               userDefaults:self.testDefaults];
+    CLXGeoLocationService *isolatedGeoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
+    self.privacyService = [[CLXPrivacyService alloc] initWithUserDefaults:self.testDefaults
+                                                         consentProvider:isolatedProvider
+                                                      geoLocationService:isolatedGeoService];
     
     self.mockSDKConfig = [[CLXSDKConfigResponse alloc] init];
     self.mockSDKConfig.appID = @"test-app-id";
@@ -78,7 +86,9 @@
 }
 
 - (void)tearDown {
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    [self.testDefaults removePersistentDomainForName:self.testSuiteName];
+    self.testDefaults = nil;
+    self.testSuiteName = nil;
     [super tearDown];
 }
 

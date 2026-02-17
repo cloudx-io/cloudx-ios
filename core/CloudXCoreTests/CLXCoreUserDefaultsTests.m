@@ -12,7 +12,6 @@
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXLiveInitService.h>
 #import "../Sources/CloudXCore/CloudXCoreInternal.h"
-#import "CLXUserDefaultsTestHelper.h"
 #import "Mocks/CLXMockInitService.h"
 
 @interface CloudXCore (Testing)
@@ -24,12 +23,17 @@
 
 @interface CLXCoreUserDefaultsTests : XCTestCase
 @property (nonatomic, strong) CLXMockInitService *mockInitService;
+@property (nonatomic, strong) NSUserDefaults *testDefaults;
+@property (nonatomic, copy) NSString *testSuiteName;
 @end
 
 @implementation CLXCoreUserDefaultsTests
 
 - (void)setUp {
     [super setUp];
+    
+    self.testSuiteName = [NSString stringWithFormat:@"CLXCoreUserDefaultsTests-%@", [[NSUUID UUID] UUIDString]];
+    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
     
     // Reset DI container to ensure clean state
     [[CLXDIContainer shared] reset];
@@ -43,15 +47,11 @@
     // Inject mock into DI container BEFORE any CloudXCore instances are created
     CLXDIContainer *container = [CLXDIContainer shared];
     [container registerType:[CLXLiveInitService class] instance:self.mockInitService];
-    
-    // Environment config no longer needed - removed in refactoring
-    
-    // Don't clear UserDefaults in setUp - let tearDown handle cleanup to avoid race conditions
 }
 
 - (void)tearDown {
-    // Clear ALL CloudXCore User Defaults keys to ensure test isolation
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    [self.testDefaults removePersistentDomainForName:self.testSuiteName];
+    self.testDefaults = nil;
     
     // Reset DI container to ensure clean state for next test
     [[CLXDIContainer shared] reset];
@@ -67,11 +67,11 @@
     NSString *testAppKey = @"test-app-key-123";
     
     // Directly write to UserDefaults using SDK's key constant
-    [[NSUserDefaults standardUserDefaults] setObject:testAppKey forKey:kCLXCoreAppKeyKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:testAppKey forKey:kCLXCoreAppKeyKey];
+    [self.testDefaults synchronize];
     
     // Verify the key constant is what we expect (unprefixed)
-    NSString *storedAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
+    NSString *storedAppKey = [self.testDefaults stringForKey:kCLXCoreAppKeyKey];
     XCTAssertEqualObjects(storedAppKey, testAppKey, @"App key should be stored with SDK's key constant");
 }
 
@@ -81,11 +81,11 @@
     NSString *testAccountID = @"test-account-789";
     
     // Directly write to UserDefaults using SDK's key constant
-    [[NSUserDefaults standardUserDefaults] setObject:testAccountID forKey:kCLXCoreAccountIDKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:testAccountID forKey:kCLXCoreAccountIDKey];
+    [self.testDefaults synchronize];
     
     // Verify the key constant works correctly
-    NSString *storedAccountID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAccountIDKey];
+    NSString *storedAccountID = [self.testDefaults stringForKey:kCLXCoreAccountIDKey];
     XCTAssertEqualObjects(storedAccountID, testAccountID, @"Account ID should be stored with SDK's key constant");
 }
 
@@ -95,11 +95,11 @@
     NSString *testSessionID = [[NSUUID UUID] UUIDString];
     
     // Directly write to UserDefaults using SDK's key constant
-    [[NSUserDefaults standardUserDefaults] setObject:testSessionID forKey:kCLXCoreSessionIDKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:testSessionID forKey:kCLXCoreSessionIDKey];
+    [self.testDefaults synchronize];
     
     // Verify the key constant works correctly
-    NSString *storedSessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey];
+    NSString *storedSessionID = [self.testDefaults stringForKey:kCLXCoreSessionIDKey];
     XCTAssertEqualObjects(storedSessionID, testSessionID, @"Session ID should be stored with SDK's key constant");
     XCTAssertTrue(storedSessionID.length > 0, @"Session ID should not be empty");
 }
@@ -110,11 +110,11 @@
     NSDictionary *testMetrics = @{@"test": @"value", @"count": @42};
     
     // Directly write to UserDefaults using SDK's key constant
-    [[NSUserDefaults standardUserDefaults] setObject:testMetrics forKey:kCLXCoreMetricsDictKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:testMetrics forKey:kCLXCoreMetricsDictKey];
+    [self.testDefaults synchronize];
     
     // Verify the key constant works correctly
-    NSDictionary *storedMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
+    NSDictionary *storedMetrics = [self.testDefaults dictionaryForKey:kCLXCoreMetricsDictKey];
     XCTAssertNotNil(storedMetrics, @"Metrics dictionary should be stored with SDK's key constant");
     XCTAssertEqualObjects(storedMetrics[@"test"], @"value", @"Metrics dictionary values should persist");
 }
@@ -125,11 +125,11 @@
     NSString *testEncodedString = @"test-encoded-string-abc123";
     
     // Directly write to UserDefaults using SDK's key constant
-    [[NSUserDefaults standardUserDefaults] setObject:testEncodedString forKey:kCLXCoreEncodedStringKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:testEncodedString forKey:kCLXCoreEncodedStringKey];
+    [self.testDefaults synchronize];
     
     // Verify the key constant works correctly
-    NSString *storedEncodedString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreEncodedStringKey];
+    NSString *storedEncodedString = [self.testDefaults stringForKey:kCLXCoreEncodedStringKey];
     XCTAssertEqualObjects(storedEncodedString, testEncodedString, @"Encoded string should be stored with SDK's key constant");
 }
 
@@ -155,39 +155,39 @@
     // This test demonstrates the collision risk using the OLD unprefixed keys CloudXCore USED TO USE
     
     // Simulate external app using the same unprefixed keys CloudXCore used to use
-    [[NSUserDefaults standardUserDefaults] setObject:@"external-app-key" forKey:@"appKey"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"external-account" forKey:@"accId_config"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"external-session" forKey:@"sessionIDKey"];
-    [[NSUserDefaults standardUserDefaults] setObject:@{@"external": @"metrics"} forKey:@"metricsDict"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"external-encoded" forKey:@"encodedString"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"external-hashed-user" forKey:@"hashedUserID"];
-    [[NSUserDefaults standardUserDefaults] setObject:@{@"external": @"user_data"} forKey:@"userKeyValue"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"external-bidder" forKey:@"userBidder"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"external-app-key" forKey:@"appKey"];
+    [self.testDefaults setObject:@"external-account" forKey:@"accId_config"];
+    [self.testDefaults setObject:@"external-session" forKey:@"sessionIDKey"];
+    [self.testDefaults setObject:@{@"external": @"metrics"} forKey:@"metricsDict"];
+    [self.testDefaults setObject:@"external-encoded" forKey:@"encodedString"];
+    [self.testDefaults setObject:@"external-hashed-user" forKey:@"hashedUserID"];
+    [self.testDefaults setObject:@{@"external": @"user_data"} forKey:@"userKeyValue"];
+    [self.testDefaults setObject:@"external-bidder" forKey:@"userBidder"];
+    [self.testDefaults synchronize];
     
     // Verify external data is stored
-    XCTAssertEqualObjects([[NSUserDefaults standardUserDefaults] stringForKey:@"appKey"], @"external-app-key");
-    XCTAssertEqualObjects([[NSUserDefaults standardUserDefaults] stringForKey:@"accId_config"], @"external-account");
+    XCTAssertEqualObjects([self.testDefaults stringForKey:@"appKey"], @"external-app-key");
+    XCTAssertEqualObjects([self.testDefaults stringForKey:@"accId_config"], @"external-account");
     
     // Now simulate what CloudXCore USED TO DO - it overwrites with the SAME unprefixed keys
-    [[NSUserDefaults standardUserDefaults] setValue:@"cloudx-app-key" forKey:@"appKey"];  // Line 342 in CloudXCoreAPI.m (OLD)
-    [[NSUserDefaults standardUserDefaults] setValue:@"cloudx-account" forKey:@"accId_config"];  // Line 343 in CloudXCoreAPI.m (OLD)
-    [[NSUserDefaults standardUserDefaults] setObject:[[NSUUID UUID] UUIDString] forKey:@"sessionIDKey"];  // Line 189 in CloudXCoreAPI.m (OLD)
-    [[NSUserDefaults standardUserDefaults] setObject:@{} forKey:@"metricsDict"];  // Line 131 in CloudXCoreAPI.m (OLD)
-    [[NSUserDefaults standardUserDefaults] setObject:@"cloudx-encoded" forKey:@"encodedString"];  // Line 255 in CloudXCoreAPI.m
-    [[NSUserDefaults standardUserDefaults] setValue:@"cloudx-hashed-user" forKey:@"hashedUserID"];  // Line 456 in CloudXCoreAPI.m
-    [[NSUserDefaults standardUserDefaults] setObject:@{@"cloudx": @"user_data"} forKey:@"userKeyValue"];  // Line 483 in CloudXCoreAPI.m
-    [[NSUserDefaults standardUserDefaults] setValue:@"cloudx-bidder" forKey:@"userBidder"];  // Line 509 in CloudXCoreAPI.m
+    [self.testDefaults setValue:@"cloudx-app-key" forKey:@"appKey"];  // Line 342 in CloudXCoreAPI.m (OLD)
+    [self.testDefaults setValue:@"cloudx-account" forKey:@"accId_config"];  // Line 343 in CloudXCoreAPI.m (OLD)
+    [self.testDefaults setObject:[[NSUUID UUID] UUIDString] forKey:@"sessionIDKey"];  // Line 189 in CloudXCoreAPI.m (OLD)
+    [self.testDefaults setObject:@{} forKey:@"metricsDict"];  // Line 131 in CloudXCoreAPI.m (OLD)
+    [self.testDefaults setObject:@"cloudx-encoded" forKey:@"encodedString"];  // Line 255 in CloudXCoreAPI.m
+    [self.testDefaults setValue:@"cloudx-hashed-user" forKey:@"hashedUserID"];  // Line 456 in CloudXCoreAPI.m
+    [self.testDefaults setObject:@{@"cloudx": @"user_data"} forKey:@"userKeyValue"];  // Line 483 in CloudXCoreAPI.m
+    [self.testDefaults setValue:@"cloudx-bidder" forKey:@"userBidder"];  // Line 509 in CloudXCoreAPI.m
     
     // Verify ALL external data was overwritten - MASSIVE COLLISION!
-    NSString *finalAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:@"appKey"];
-    NSString *finalAccountID = [[NSUserDefaults standardUserDefaults] stringForKey:@"accId_config"];
-    NSString *finalSessionID = [[NSUserDefaults standardUserDefaults] stringForKey:@"sessionIDKey"];
-    NSDictionary *finalMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"metricsDict"];
-    NSString *finalEncodedString = [[NSUserDefaults standardUserDefaults] stringForKey:@"encodedString"];
-    NSString *finalHashedUserID = [[NSUserDefaults standardUserDefaults] stringForKey:@"hashedUserID"];
-    NSDictionary *finalUserData = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"userKeyValue"];
-    NSString *finalBidder = [[NSUserDefaults standardUserDefaults] stringForKey:@"userBidder"];
+    NSString *finalAppKey = [self.testDefaults stringForKey:@"appKey"];
+    NSString *finalAccountID = [self.testDefaults stringForKey:@"accId_config"];
+    NSString *finalSessionID = [self.testDefaults stringForKey:@"sessionIDKey"];
+    NSDictionary *finalMetrics = [self.testDefaults dictionaryForKey:@"metricsDict"];
+    NSString *finalEncodedString = [self.testDefaults stringForKey:@"encodedString"];
+    NSString *finalHashedUserID = [self.testDefaults stringForKey:@"hashedUserID"];
+    NSDictionary *finalUserData = [self.testDefaults dictionaryForKey:@"userKeyValue"];
+    NSString *finalBidder = [self.testDefaults stringForKey:@"userBidder"];
     
     // All external data is now LOST due to collision
     XCTAssertEqualObjects(finalAppKey, @"cloudx-app-key", @"CloudXCore overwrote external app key - COLLISION!");
@@ -208,42 +208,42 @@
     // This test shows that our NEW prefixed keys prevent collisions
     
     // Simulate external app using common unprefixed keys
-    [[NSUserDefaults standardUserDefaults] setObject:@"external-app-key" forKey:@"appKey"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"external-account" forKey:@"accId_config"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"external-session" forKey:@"sessionIDKey"];
-    [[NSUserDefaults standardUserDefaults] setObject:@{@"external": @"metrics"} forKey:@"metricsDict"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"external-encoded" forKey:@"encodedString"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"external-hashed-user" forKey:@"hashedUserID"];
-    [[NSUserDefaults standardUserDefaults] setObject:@{@"external": @"user_data"} forKey:@"userKeyValue"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"external-bidder" forKey:@"userBidder"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"external-app-key" forKey:@"appKey"];
+    [self.testDefaults setObject:@"external-account" forKey:@"accId_config"];
+    [self.testDefaults setObject:@"external-session" forKey:@"sessionIDKey"];
+    [self.testDefaults setObject:@{@"external": @"metrics"} forKey:@"metricsDict"];
+    [self.testDefaults setObject:@"external-encoded" forKey:@"encodedString"];
+    [self.testDefaults setObject:@"external-hashed-user" forKey:@"hashedUserID"];
+    [self.testDefaults setObject:@{@"external": @"user_data"} forKey:@"userKeyValue"];
+    [self.testDefaults setObject:@"external-bidder" forKey:@"userBidder"];
+    [self.testDefaults synchronize];
     
     // Verify external data is stored
-    XCTAssertEqualObjects([[NSUserDefaults standardUserDefaults] stringForKey:@"appKey"], @"external-app-key");
-    XCTAssertEqualObjects([[NSUserDefaults standardUserDefaults] stringForKey:@"accId_config"], @"external-account");
+    XCTAssertEqualObjects([self.testDefaults stringForKey:@"appKey"], @"external-app-key");
+    XCTAssertEqualObjects([self.testDefaults stringForKey:@"accId_config"], @"external-account");
     
     // Now simulate what CloudXCore DOES NOW - it uses PREFIXED keys
-    [[NSUserDefaults standardUserDefaults] setValue:@"cloudx-app-key" forKey:kCLXCoreAppKeyKey];
-    [[NSUserDefaults standardUserDefaults] setValue:@"cloudx-account" forKey:kCLXCoreAccountIDKey];
-    [[NSUserDefaults standardUserDefaults] setObject:[[NSUUID UUID] UUIDString] forKey:kCLXCoreSessionIDKey];
-    [[NSUserDefaults standardUserDefaults] setObject:@{} forKey:kCLXCoreMetricsDictKey];
-    [[NSUserDefaults standardUserDefaults] setObject:@"cloudx-encoded" forKey:kCLXCoreEncodedStringKey];
+    [self.testDefaults setValue:@"cloudx-app-key" forKey:kCLXCoreAppKeyKey];
+    [self.testDefaults setValue:@"cloudx-account" forKey:kCLXCoreAccountIDKey];
+    [self.testDefaults setObject:[[NSUUID UUID] UUIDString] forKey:kCLXCoreSessionIDKey];
+    [self.testDefaults setObject:@{} forKey:kCLXCoreMetricsDictKey];
+    [self.testDefaults setObject:@"cloudx-encoded" forKey:kCLXCoreEncodedStringKey];
     // Note: hashedUserId is now stored in CLXKeyValueState, not UserDefaults
 
     // Verify external data is STILL INTACT - NO COLLISION!
-    NSString *externalAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:@"appKey"];
-    NSString *externalAccountID = [[NSUserDefaults standardUserDefaults] stringForKey:@"accId_config"];
-    NSString *externalSessionID = [[NSUserDefaults standardUserDefaults] stringForKey:@"sessionIDKey"];
-    NSDictionary *externalMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"metricsDict"];
-    NSString *externalEncodedString = [[NSUserDefaults standardUserDefaults] stringForKey:@"encodedString"];
-    NSString *externalHashedUserID = [[NSUserDefaults standardUserDefaults] stringForKey:@"hashedUserID"];
+    NSString *externalAppKey = [self.testDefaults stringForKey:@"appKey"];
+    NSString *externalAccountID = [self.testDefaults stringForKey:@"accId_config"];
+    NSString *externalSessionID = [self.testDefaults stringForKey:@"sessionIDKey"];
+    NSDictionary *externalMetrics = [self.testDefaults dictionaryForKey:@"metricsDict"];
+    NSString *externalEncodedString = [self.testDefaults stringForKey:@"encodedString"];
+    NSString *externalHashedUserID = [self.testDefaults stringForKey:@"hashedUserID"];
 
     // Verify CloudXCore data is stored in PREFIXED keys
-    NSString *cloudxAppKey = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAppKeyKey];
-    NSString *cloudxAccountID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAccountIDKey];
-    NSString *cloudxSessionID = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey];
-    NSDictionary *cloudxMetrics = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
-    NSString *cloudxEncodedString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreEncodedStringKey];
+    NSString *cloudxAppKey = [self.testDefaults stringForKey:kCLXCoreAppKeyKey];
+    NSString *cloudxAccountID = [self.testDefaults stringForKey:kCLXCoreAccountIDKey];
+    NSString *cloudxSessionID = [self.testDefaults stringForKey:kCLXCoreSessionIDKey];
+    NSDictionary *cloudxMetrics = [self.testDefaults dictionaryForKey:kCLXCoreMetricsDictKey];
+    NSString *cloudxEncodedString = [self.testDefaults stringForKey:kCLXCoreEncodedStringKey];
 
     // Assert external data is UNCHANGED
     XCTAssertEqualObjects(externalAppKey, @"external-app-key", @"External app key should be unchanged");

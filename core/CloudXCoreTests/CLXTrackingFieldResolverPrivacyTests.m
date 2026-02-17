@@ -33,7 +33,8 @@
 @interface CLXTrackingFieldResolverPrivacyTests : XCTestCase
 @property (nonatomic, strong) CLXTrackingFieldResolver *resolver;
 @property (nonatomic, strong) CLXPrivacyService *privacyService;
-@property (nonatomic, strong) NSString *originalSessionId;
+@property (nonatomic, strong) NSUserDefaults *testDefaults;
+@property (nonatomic, copy) NSString *testSuiteName;
 @property (nonatomic, strong) NSString *testAuctionId;
 @end
 
@@ -41,12 +42,19 @@
 
 - (void)setUp {
     [super setUp];
-    self.resolver = [CLXTrackingFieldResolver shared];
-    self.privacyService = [CLXPrivacyService sharedInstance];
-    self.testAuctionId = @"test-auction-12345";
     
-    // Store original session ID to restore later
-    self.originalSessionId = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreSessionIDKey];
+    self.testSuiteName = [[NSUUID UUID] UUIDString];
+    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
+    
+    CLXConsentProvider *isolatedProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil
+                                                                               userDefaults:self.testDefaults];
+    CLXGeoLocationService *isolatedGeoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
+    self.privacyService = [[CLXPrivacyService alloc] initWithUserDefaults:self.testDefaults
+                                                         consentProvider:isolatedProvider
+                                                      geoLocationService:isolatedGeoService];
+    
+    self.resolver = [[CLXTrackingFieldResolver alloc] initWithPrivacyService:self.privacyService];
+    self.testAuctionId = @"test-auction-12345";
     
     [self clearAllTestData];
     [self setupBaseTestConfiguration];
@@ -54,22 +62,19 @@
 
 - (void)tearDown {
     [self clearAllTestData];
-    
-    // Restore original session ID if it existed
-    if (self.originalSessionId) {
-        [[NSUserDefaults standardUserDefaults] setObject:self.originalSessionId forKey:kCLXCoreSessionIDKey];
-    }
-    
+    [self.testDefaults removePersistentDomainForName:self.testSuiteName];
+    self.testDefaults = nil;
+    self.testSuiteName = nil;
     [super tearDown];
 }
 
 - (void)clearAllTestData {
-    // Clear privacy settings
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreRawGeoHeadersKey];
+    // Clear privacy settings from isolated test defaults
+    [self.testDefaults removeObjectForKey:kCLXPrivacyGDPRConsentKey];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
+    [self.testDefaults removeObjectForKey:kCLXCoreRawGeoHeadersKey];
 
     // Clear CLXKeyValueState
     [[CLXKeyValueState shared] setHashedUserId:nil];
@@ -77,7 +82,7 @@
     // Clear resolver data
     [self.resolver clear];
 
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults synchronize];
 }
 
 - (void)setupUSUser {
@@ -85,8 +90,8 @@
         @"cloudfront-viewer-country-iso3": @"USA",
         @"cloudfront-viewer-country-region": @"TX"
     };
-    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
+    [self.testDefaults synchronize];
 }
 
 - (void)setupBaseTestConfiguration {
@@ -111,10 +116,10 @@
     NSString *validGDPRConsent = @"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA";
     NSString *expectedIFA = @"AEBE52E7-03EE-455A-B3C4-E57283966239";
     
-    [[NSUserDefaults standardUserDefaults] setObject:validGDPRConsent forKey:kCLXPrivacyGDPRConsentKey];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey]; // Ensure no CCPA blocking
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:validGDPRConsent forKey:kCLXPrivacyGDPRConsentKey];
+    [self.testDefaults setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyCCPAPrivacyKey]; // Ensure no CCPA blocking
+    [self.testDefaults synchronize];
     
     // WHEN: Privacy service is queried (using ignoring ATT version to bypass ATT dependency in tests)
     BOOL shouldClearData = [self.privacyService shouldClearPersonalDataIgnoringATT];
@@ -170,9 +175,9 @@
     // Set up US user for CCPA
     [self setupUSUser];
     
-    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey]; // CCPA opt-out
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey]; // CCPA opt-out
+    [self.testDefaults removeObjectForKey:kCLXPrivacyGDPRConsentKey];
+    [self.testDefaults synchronize];
     
     // WHEN: Privacy service is queried
     BOOL shouldClearData = [self.privacyService shouldClearPersonalDataIgnoringATT];
@@ -218,16 +223,16 @@
 // Test DNT flag behavior - when device DNT is true, should use hashed fallbacks or session ID
 - (void)testDNTEnabled_ShouldUseHashedFallbacks {
     // GIVEN: Privacy allows personal data BUT device has DNT=true
-    [[NSUserDefaults standardUserDefaults] setObject:@"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA" forKey:kCLXPrivacyGDPRConsentKey];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults setObject:@"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA" forKey:kCLXPrivacyGDPRConsentKey];
+    [self.testDefaults setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
     
     // Set up hashed fallbacks
     NSString *hashedUserId = @"hashed-user-abc123";
     NSString *hashedGeoIp = @"hashed-geo-def456";
     [[CLXKeyValueState shared] setHashedUserId:hashedUserId];
-    [[NSUserDefaults standardUserDefaults] setObject:hashedGeoIp forKey:kCLXPrivacyHashedGeoIpKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:hashedGeoIp forKey:kCLXPrivacyHashedGeoIpKey];
+    [self.testDefaults synchronize];
     
     // WHEN: Bid request has DNT=true
     NSString *originalIFA = @"AEBE52E7-03EE-455A-B3C4-E57283966239";
@@ -268,10 +273,10 @@
 // Test edge case - no fallbacks available, should gracefully handle
 - (void)testNoFallbacksAvailable_ShouldHandleGracefully {
     // GIVEN: Privacy blocks data (CCPA opt-out) AND no fallbacks are set
-    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey];
     [[CLXKeyValueState shared] setHashedUserId:nil];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
+    [self.testDefaults synchronize];
     
     // WHEN: Bid request contains IFA
     NSDictionary *testBidRequest = @{

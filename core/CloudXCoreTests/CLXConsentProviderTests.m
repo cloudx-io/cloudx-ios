@@ -7,22 +7,26 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
-#import "CLXUserDefaultsTestHelper.h"
 
 @interface CLXConsentProviderTests : XCTestCase
 @property (nonatomic, strong) CLXConsentProvider *gppProvider;
+@property (nonatomic, strong) NSUserDefaults *testDefaults;
+@property (nonatomic, copy) NSString *testSuiteName;
 @end
 
 @implementation CLXConsentProviderTests
 
 - (void)setUp {
     [super setUp];
-    self.gppProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil];
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    self.testSuiteName = [[NSUUID UUID] UUIDString];
+    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
+    self.gppProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil userDefaults:self.testDefaults];
 }
 
 - (void)tearDown {
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    [self.testDefaults removePersistentDomainForName:self.testSuiteName];
+    self.testDefaults = nil;
+    self.testSuiteName = nil;
     [super tearDown];
 }
 
@@ -65,7 +69,7 @@
         
         // Set raw SID string directly to UserDefaults to test parsing
         if (input.length > 0) {
-            [[NSUserDefaults standardUserDefaults] setObject:input forKey:kIABGPP_GppSID];
+            [self.testDefaults setObject:input forKey:kIABGPP_GppSID];
         }
         
         NSArray *result = [self.gppProvider gppSid];
@@ -262,8 +266,8 @@
 - (void)testTcStringFromUserDefaults {
     NSString *testTcString = @"CQbFSYAQbFSYAEsACBENCFFoAP_gAEPgACiQINJB";
     
-    [[NSUserDefaults standardUserDefaults] setObject:testTcString forKey:@"IABTCF_TCString"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:testTcString forKey:@"IABTCF_TCString"];
+    [self.testDefaults synchronize];
     
     NSString *retrievedTcString = [self.gppProvider tcString];
     XCTAssertEqualObjects(retrievedTcString, testTcString, @"TC string should be retrieved from UserDefaults");
@@ -272,15 +276,15 @@
 // Test GDPR applies reading from UserDefaults
 - (void)testGdprAppliesFromUserDefaults {
     // Test GDPR applies = YES
-    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"IABTCF_gdprApplies"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setInteger:1 forKey:@"IABTCF_gdprApplies"];
+    [self.testDefaults synchronize];
     
     NSNumber *gdprApplies = [self.gppProvider gdprApplies];
     XCTAssertEqualObjects(gdprApplies, @YES, @"GDPR applies should be YES when set to 1");
     
     // Test GDPR applies = NO
-    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"IABTCF_gdprApplies"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setInteger:0 forKey:@"IABTCF_gdprApplies"];
+    [self.testDefaults synchronize];
     
     gdprApplies = [self.gppProvider gdprApplies];
     XCTAssertEqualObjects(gdprApplies, @NO, @"GDPR applies should be NO when set to 0");
@@ -304,8 +308,8 @@
     
     // Set legacy TCF
     NSString *legacyTcString = @"CQbFSYAQbFSYAEsACBENCFFoAP_gAEPgACiQINJB";
-    [[NSUserDefaults standardUserDefaults] setObject:legacyTcString forKey:@"IABTCF_TCString"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:legacyTcString forKey:@"IABTCF_TCString"];
+    [self.testDefaults synchronize];
     
     NSString *resolved = [self.gppProvider resolveGppString];
     XCTAssertNotNil(resolved, @"Should construct GPP from legacy TCF");
@@ -329,8 +333,8 @@
     [self.gppProvider setGppString:nil];
     
     // Set legacy TCF
-    [[NSUserDefaults standardUserDefaults] setObject:@"CQbFSYAQbFSYAEsACBENCFFoAP" forKey:@"IABTCF_TCString"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"CQbFSYAQbFSYAEsACBENCFFoAP" forKey:@"IABTCF_TCString"];
+    [self.testDefaults synchronize];
     
     NSArray *resolved = [self.gppProvider resolveGppSid];
     XCTAssertNotNil(resolved, @"Should return SID when constructing from legacy TCF");
@@ -352,8 +356,8 @@
     [self.gppProvider setGppSid:nil];
     
     // Set legacy GDPR applies
-    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"IABTCF_gdprApplies"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setInteger:1 forKey:@"IABTCF_gdprApplies"];
+    [self.testDefaults synchronize];
     
     NSNumber *resolved = [self.gppProvider resolveGdprApplies];
     XCTAssertEqualObjects(resolved, @YES, @"Should return YES from legacy gdprApplies flag");

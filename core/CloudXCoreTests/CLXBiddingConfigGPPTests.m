@@ -10,7 +10,6 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
-#import "CLXUserDefaultsTestHelper.h"
 #import <CoreLocation/CoreLocation.h>
 
 // Test category for CLXBiddingConfigRequest to enable dependency injection
@@ -39,15 +38,21 @@
 @property (nonatomic, strong) CLXConsentProvider *gppProvider;
 @property (nonatomic, strong) CLXSDKConfigResponse *mockSDKConfig;
 @property (nonatomic, strong) CLXConfigImpressionModel *mockImpModel;
+@property (nonatomic, strong) NSUserDefaults *testDefaults;
+@property (nonatomic, copy) NSString *testSuiteName;
 @end
 
 @implementation CLXBiddingConfigGPPTests
 
 - (void)setUp {
     [super setUp];
-    self.privacyService = [[CLXPrivacyService alloc] init];
-    self.gppProvider = [CLXConsentProvider sharedInstance];
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    self.testSuiteName = [[NSUUID UUID] UUIDString];
+    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
+    self.gppProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil userDefaults:self.testDefaults];
+    CLXGeoLocationService *isolatedGeoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
+    self.privacyService = [[CLXPrivacyService alloc] initWithUserDefaults:self.testDefaults
+                                                         consentProvider:self.gppProvider
+                                                      geoLocationService:isolatedGeoService];
     
     // Explicitly clear GPP state for each test
     [self.gppProvider setGppString:nil];
@@ -66,10 +71,11 @@
 }
 
 - (void)tearDown {
-    // Clear GPP state to prevent interference with other tests
     [self.gppProvider setGppString:nil];
     [self.gppProvider setGppSid:nil];
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    [self.testDefaults removePersistentDomainForName:self.testSuiteName];
+    self.testDefaults = nil;
+    self.testSuiteName = nil;
     [super tearDown];
 }
 
@@ -126,8 +132,8 @@
     // Set up scenario that requires data clearing (CCPA opt-out)
     [self setupUSUser];
     // Set CCPA opt-out via IAB standard UserDefaults key
-    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:@"IABUSPrivacy_String"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"1YYN" forKey:@"IABUSPrivacy_String"];
+    [self.testDefaults synchronize];
     
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
     NSDictionary *json = [config json];
@@ -141,8 +147,8 @@
     // Set up scenario that requires data clearing (CCPA opt-out)
     [self setupUSUser];
     // Set CCPA opt-out via IAB standard UserDefaults key
-    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:@"IABUSPrivacy_String"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"1YYN" forKey:@"IABUSPrivacy_String"];
+    [self.testDefaults synchronize];
     
     CLLocation *testLocation = [[CLLocation alloc] initWithLatitude:37.7749 longitude:-122.4194];
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithLocation:testLocation];
@@ -159,8 +165,8 @@
     // Set up scenario that requires data clearing (CCPA opt-out)
     [self setupUSUser];
     // Set CCPA opt-out via IAB standard UserDefaults key
-    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:@"IABUSPrivacy_String"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"1YYN" forKey:@"IABUSPrivacy_String"];
+    [self.testDefaults synchronize];
     
     // Debug: Check what the privacy service is actually returning
     BOOL shouldClear = [self.privacyService shouldClearPersonalData];
@@ -204,8 +210,8 @@
     NSString *gppString = @"DBABrw~BAAAAAAAAABA.QA~BAAAAABA.QA";
     
     // Set CCPA string via IAB standard UserDefaults key
-    [[NSUserDefaults standardUserDefaults] setObject:ccpaString forKey:@"IABUSPrivacy_String"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:ccpaString forKey:@"IABUSPrivacy_String"];
+    [self.testDefaults synchronize];
     [self.gppProvider setGppString:gppString];
     
     CLXBiddingConfigRequest *config = [self createTestBiddingConfigWithPrivacyService];
@@ -286,7 +292,7 @@
         @"cloudfront-viewer-country-iso3": @"USA",
         @"cloudfront-viewer-country-region": @"TX"
     };
-    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
+    [self.testDefaults setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
 }
 
 - (void)setupNonUSUser {
@@ -294,7 +300,7 @@
         @"cloudfront-viewer-country-iso3": @"CAN",
         @"cloudfront-viewer-country-region": @"ON"
     };
-    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
+    [self.testDefaults setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
 }
 
 // Test unified privacy architecture - ATT-first behavior

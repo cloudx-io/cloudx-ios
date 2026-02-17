@@ -14,24 +14,27 @@
 #import <CloudXCore/CLXURLProvider.h>
 #import <CloudXCore/CLXBidNetworkService.h>
 #import <CloudXCore/CLXErrorReporter.h>
-#import "Helper/CLXUserDefaultsTestHelper.h"
 
 @interface CLXProtectedOperationsTests : XCTestCase
 @property (nonatomic, strong) CLXConsentProvider *gppProvider;
 @property (nonatomic, strong) CLXErrorReporter *errorReporter;
+@property (nonatomic, strong) NSUserDefaults *testDefaults;
+@property (nonatomic, copy) NSString *testSuiteName;
 @end
 
 @implementation CLXProtectedOperationsTests
 
 - (void)setUp {
     [super setUp];
+    self.testSuiteName = [NSString stringWithFormat:@"CLXProtectedOperationsTests-%@", [[NSUUID UUID] UUIDString]];
+    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
     self.errorReporter = [[CLXErrorReporter alloc] init];
-    self.gppProvider = [[CLXConsentProvider alloc] initWithErrorReporter:self.errorReporter];
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    self.gppProvider = [[CLXConsentProvider alloc] initWithErrorReporter:self.errorReporter userDefaults:self.testDefaults];
 }
 
 - (void)tearDown {
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    [self.testDefaults removePersistentDomainForName:self.testSuiteName];
+    self.testDefaults = nil;
     self.gppProvider = nil;
     self.errorReporter = nil;
     [super tearDown];

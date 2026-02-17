@@ -10,22 +10,24 @@
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXAdReportingNetworkService.h>
-#import "CLXUserDefaultsTestHelper.h"
 
 @interface CLXReportingUserDefaultsTests : XCTestCase
-
+@property (nonatomic, strong) NSUserDefaults *testDefaults;
+@property (nonatomic, copy) NSString *testSuiteName;
 @end
 
 @implementation CLXReportingUserDefaultsTests
 
 - (void)setUp {
     [super setUp];
-    // Don't clear in setUp - let tearDown handle cleanup to avoid race conditions
+    self.testSuiteName = [[NSUUID UUID] UUIDString];
+    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
 }
 
 - (void)tearDown {
-    // Clean up after each test
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    [self.testDefaults removePersistentDomainForName:self.testSuiteName];
+    self.testDefaults = nil;
+    self.testSuiteName = nil;
     [super tearDown];
 }
 
@@ -35,15 +37,18 @@
 - (void)testReportingServiceReadsGeoHeaders {
     // Focus on geo headers - this is what reporting service specifically handles
     NSDictionary *geoHeaders = @{@"lat": @"40.7128", @"lon": @"-74.0060"};
-    [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreGeoHeadersKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:geoHeaders forKey:kCLXCoreGeoHeadersKey];
+    [self.testDefaults synchronize];
     
-    // Create CLXAdReportingNetworkService instance
-    CLXAdReportingNetworkService *reportingService = [[CLXAdReportingNetworkService alloc] init];
+    // Create CLXAdReportingNetworkService instance with test defaults
+    NSURL *testURL = [NSURL URLWithString:@"https://test.example.com"];
+    CLXAdReportingNetworkService *reportingService = [[CLXAdReportingNetworkService alloc] initWithBaseURL:testURL
+                                                                                               urlSession:[NSURLSession sharedSession]
+                                                                                             userDefaults:self.testDefaults];
     XCTAssertNotNil(reportingService, @"CLXAdReportingNetworkService should be created");
     
     // Verify it can read geo headers (its specific functionality)
-    NSDictionary *storedGeoHeaders = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreGeoHeadersKey];
+    NSDictionary *storedGeoHeaders = [self.testDefaults dictionaryForKey:kCLXCoreGeoHeadersKey];
     XCTAssertEqualObjects(storedGeoHeaders, geoHeaders, @"CLXAdReportingNetworkService should read geo headers");
 }
 
@@ -51,34 +56,40 @@
 - (void)testReportingServiceUpdatesGeoData {
     // Initialize geo headers
     NSDictionary *initialGeo = @{@"lat": @"37.7749", @"lon": @"-122.4194"};
-    [[NSUserDefaults standardUserDefaults] setObject:initialGeo forKey:kCLXCoreGeoHeadersKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:initialGeo forKey:kCLXCoreGeoHeadersKey];
+    [self.testDefaults synchronize];
     
     // Create CLXAdReportingNetworkService and simulate geo update
-    CLXAdReportingNetworkService *reportingService = [[CLXAdReportingNetworkService alloc] init];
+    NSURL *testURL = [NSURL URLWithString:@"https://test.example.com"];
+    CLXAdReportingNetworkService *reportingService = [[CLXAdReportingNetworkService alloc] initWithBaseURL:testURL
+                                                                                               urlSession:[NSURLSession sharedSession]
+                                                                                             userDefaults:self.testDefaults];
     
     // Simulate geo data update (what reporting service does)
     NSDictionary *updatedGeo = @{@"lat": @"40.7128", @"lon": @"-74.0060", @"accuracy": @"high"};
-    [[NSUserDefaults standardUserDefaults] setObject:updatedGeo forKey:kCLXCoreGeoHeadersKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:updatedGeo forKey:kCLXCoreGeoHeadersKey];
+    [self.testDefaults synchronize];
     
     // Verify geo data was updated
-    NSDictionary *finalGeo = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreGeoHeadersKey];
+    NSDictionary *finalGeo = [self.testDefaults dictionaryForKey:kCLXCoreGeoHeadersKey];
     XCTAssertEqualObjects(finalGeo[@"accuracy"], @"high", @"CLXAdReportingNetworkService should update geo data");
 }
 
 // Test that CLXAdReportingNetworkService handles missing geo headers
 - (void)testReportingServiceHandlesMissingGeoHeaders {
     // Ensure no geo headers exist
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreGeoHeadersKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults removeObjectForKey:kCLXCoreGeoHeadersKey];
+    [self.testDefaults synchronize];
     
-    // Create CLXAdReportingNetworkService instance
-    CLXAdReportingNetworkService *reportingService = [[CLXAdReportingNetworkService alloc] init];
+    // Create CLXAdReportingNetworkService instance with test defaults
+    NSURL *testURL = [NSURL URLWithString:@"https://test.example.com"];
+    CLXAdReportingNetworkService *reportingService = [[CLXAdReportingNetworkService alloc] initWithBaseURL:testURL
+                                                                                               urlSession:[NSURLSession sharedSession]
+                                                                                             userDefaults:self.testDefaults];
     XCTAssertNotNil(reportingService, @"CLXAdReportingNetworkService should handle missing geo headers");
     
     // Verify no geo headers exist
-    NSDictionary *storedGeoHeaders = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreGeoHeadersKey];
+    NSDictionary *storedGeoHeaders = [self.testDefaults dictionaryForKey:kCLXCoreGeoHeadersKey];
     XCTAssertNil(storedGeoHeaders, @"No geo headers should exist initially");
 }
 
@@ -89,21 +100,24 @@
         @"lat": @"37.7749",
         @"lon": @"-122.4194"
     };
-    [[NSUserDefaults standardUserDefaults] setObject:existingGeo forKey:kCLXCoreGeoHeadersKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:existingGeo forKey:kCLXCoreGeoHeadersKey];
+    [self.testDefaults synchronize];
     
     // Create CLXAdReportingNetworkService and add new geo data
-    CLXAdReportingNetworkService *reportingService = [[CLXAdReportingNetworkService alloc] init];
+    NSURL *testURL = [NSURL URLWithString:@"https://test.example.com"];
+    CLXAdReportingNetworkService *reportingService = [[CLXAdReportingNetworkService alloc] initWithBaseURL:testURL
+                                                                                               urlSession:[NSURLSession sharedSession]
+                                                                                             userDefaults:self.testDefaults];
     
     // Simulate adding new geo data while preserving existing
-    NSDictionary *currentGeo = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreGeoHeadersKey];
+    NSDictionary *currentGeo = [self.testDefaults dictionaryForKey:kCLXCoreGeoHeadersKey];
     NSMutableDictionary *updatedGeo = [currentGeo mutableCopy];
     updatedGeo[@"accuracy"] = @"high";
-    [[NSUserDefaults standardUserDefaults] setObject:updatedGeo forKey:kCLXCoreGeoHeadersKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:updatedGeo forKey:kCLXCoreGeoHeadersKey];
+    [self.testDefaults synchronize];
     
     // Verify both existing and new geo data are preserved
-    NSDictionary *finalGeo = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreGeoHeadersKey];
+    NSDictionary *finalGeo = [self.testDefaults dictionaryForKey:kCLXCoreGeoHeadersKey];
     XCTAssertEqualObjects(finalGeo[@"lat"], @"37.7749", @"Existing geo data should be preserved");
     XCTAssertEqualObjects(finalGeo[@"accuracy"], @"high", @"New geo data should be added");
 }
@@ -113,18 +127,18 @@
 // Test collision risk with geo headers (reporting service's specific responsibility)
 - (void)testReportingServiceGeoHeadersCollisionRisk {
     // Simulate external app using same geo headers key
-    [[NSUserDefaults standardUserDefaults] setObject:@{@"external": @"geo"} forKey:kCLXCoreGeoHeadersKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@{@"external": @"geo"} forKey:kCLXCoreGeoHeadersKey];
+    [self.testDefaults synchronize];
     
     // Verify external geo data is stored
-    NSDictionary *externalGeo = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreGeoHeadersKey];
+    NSDictionary *externalGeo = [self.testDefaults dictionaryForKey:kCLXCoreGeoHeadersKey];
     XCTAssertEqualObjects(externalGeo[@"external"], @"geo", @"External geo data should be stored");
     
     // Reporting service overwrites with its own geo data
-    [[NSUserDefaults standardUserDefaults] setObject:@{@"reporting": @"geo"} forKey:kCLXCoreGeoHeadersKey];
+    [self.testDefaults setObject:@{@"reporting": @"geo"} forKey:kCLXCoreGeoHeadersKey];
     
     // External geo data is now lost - COLLISION!
-    NSDictionary *finalGeo = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreGeoHeadersKey];
+    NSDictionary *finalGeo = [self.testDefaults dictionaryForKey:kCLXCoreGeoHeadersKey];
     XCTAssertEqualObjects(finalGeo[@"reporting"], @"geo", @"Reporting geo data is present");
     XCTAssertNil(finalGeo[@"external"], @"External geo data was lost - COLLISION!");
 }

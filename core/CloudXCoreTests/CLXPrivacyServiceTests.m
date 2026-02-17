@@ -8,7 +8,6 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
-#import "CLXUserDefaultsTestHelper.h"
 
 // Test category to expose internal methods for testing
 // These methods are internal because server support for GDPR is not yet implemented
@@ -26,6 +25,8 @@
 @interface CLXPrivacyServiceTests : XCTestCase
 
 @property (nonatomic, strong) CLXPrivacyService *privacyService;
+@property (nonatomic, strong) NSUserDefaults *testDefaults;
+@property (nonatomic, copy) NSString *testSuiteName;
 
 @end
 
@@ -34,24 +35,29 @@
 - (void)setUp {
     [super setUp];
     
-    // Create privacy service using standardUserDefaults (same as production)
-    self.privacyService = [[CLXPrivacyService alloc] init];
-    
-    // Don't clear in setUp - let tearDown handle cleanup to avoid race conditions
+    self.testSuiteName = [[NSUUID UUID] UUIDString];
+    self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
+    CLXConsentProvider *isolatedProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil
+                                                                               userDefaults:self.testDefaults];
+    CLXGeoLocationService *isolatedGeoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
+    self.privacyService = [[CLXPrivacyService alloc] initWithUserDefaults:self.testDefaults
+                                                         consentProvider:isolatedProvider
+                                                      geoLocationService:isolatedGeoService];
 }
 
 - (void)tearDown {
-    // Clear all CloudXCore keys to prevent test contamination
-    [CLXUserDefaultsTestHelper clearAllCloudXCoreUserDefaultsKeys];
+    [self.testDefaults removePersistentDomainForName:self.testSuiteName];
+    self.testDefaults = nil;
+    self.testSuiteName = nil;
     [super tearDown];
 }
 
 - (void)clearPrivacySettings {
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRConsentKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyGDPRConsentKey];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
+    [self.testDefaults synchronize];
 }
 
 #pragma mark - GDPR Tests
@@ -70,9 +76,9 @@
         [self clearPrivacySettings];
         
         // Set up valid GDPR consent
-        [[NSUserDefaults standardUserDefaults] setObject:consentString forKey:kCLXPrivacyGDPRConsentKey];
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self.testDefaults setObject:consentString forKey:kCLXPrivacyGDPRConsentKey];
+        [self.testDefaults setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
+        [self.testDefaults synchronize];
         
         // Verify privacy service allows data
         BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
@@ -102,13 +108,13 @@
         [self clearPrivacySettings];
         
         // Set up invalid GDPR scenario
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
+        [self.testDefaults setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
         
         id consent = scenario[@"consent"];
         if (![consent isKindOfClass:[NSNull class]]) {
-            [[NSUserDefaults standardUserDefaults] setObject:consent forKey:kCLXPrivacyGDPRConsentKey];
+            [self.testDefaults setObject:consent forKey:kCLXPrivacyGDPRConsentKey];
         }
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self.testDefaults synchronize];
         
         // Verify privacy service blocks data
         BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
@@ -140,8 +146,8 @@
     for (NSString *ccpaString in ccpaOptOutStrings) {
         [self clearPrivacySettings];
         
-        [[NSUserDefaults standardUserDefaults] setObject:ccpaString forKey:kCLXPrivacyCCPAPrivacyKey];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self.testDefaults setObject:ccpaString forKey:kCLXPrivacyCCPAPrivacyKey];
+        [self.testDefaults synchronize];
         
         BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
         XCTAssertTrue(shouldClear, @"CCPA opt-out string '%@' (position 3 = Y) should clear personal data", ccpaString);
@@ -162,8 +168,8 @@
     for (NSString *ccpaString in ccpaAllowStrings) {
         [self clearPrivacySettings];
         
-        [[NSUserDefaults standardUserDefaults] setObject:ccpaString forKey:kCLXPrivacyCCPAPrivacyKey];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self.testDefaults setObject:ccpaString forKey:kCLXPrivacyCCPAPrivacyKey];
+        [self.testDefaults synchronize];
         
         BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
         XCTAssertFalse(shouldClear, @"CCPA consent string '%@' (position 3 != Y) should allow personal data", ccpaString);
@@ -188,20 +194,20 @@
 - (void)testComplexPrivacyScenarios {
     // Scenario 1: GDPR allows but CCPA blocks - CCPA should win
     [self clearPrivacySettings];
-    [[NSUserDefaults standardUserDefaults] setObject:@"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA" forKey:kCLXPrivacyGDPRConsentKey];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA" forKey:kCLXPrivacyGDPRConsentKey];
+    [self.testDefaults setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
+    [self.testDefaults setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults synchronize];
     
     BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
     XCTAssertTrue(shouldClear, @"CCPA opt-out should override GDPR consent");
     
     // Scenario 2: All privacy frameworks allow data
     [self clearPrivacySettings];
-    [[NSUserDefaults standardUserDefaults] setObject:@"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA" forKey:kCLXPrivacyGDPRConsentKey];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
-    [[NSUserDefaults standardUserDefaults] setObject:@"1NNN" forKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"CPcABcABcABcAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA" forKey:kCLXPrivacyGDPRConsentKey];
+    [self.testDefaults setBool:YES forKey:kCLXPrivacyGDPRAppliesKey];
+    [self.testDefaults setObject:@"1NNN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults synchronize];
     
     shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
     XCTAssertFalse(shouldClear, @"When all privacy frameworks allow, data should be allowed");
@@ -215,16 +221,16 @@
     
     // Set CCPA string via IAB standard key (as CMPs would)
     NSString *testCCPAString = @"1YNN";
-    [[NSUserDefaults standardUserDefaults] setObject:testCCPAString forKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:testCCPAString forKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults synchronize];
     
     // Verify SDK reads it correctly
     NSString *retrievedCCPA = [self.privacyService ccpaPrivacyString];
     XCTAssertEqualObjects(retrievedCCPA, testCCPAString, @"SDK should read CCPA string from IAB UserDefaults key");
     
     // Test clearing CCPA string
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults synchronize];
     
     NSString *clearedCCPA = [self.privacyService ccpaPrivacyString];
     XCTAssertNil(clearedCCPA, @"CCPA string should be nil when UserDefaults key is removed");
@@ -237,15 +243,15 @@
     [self clearPrivacySettings];
     
     // Test opt-out detected (Y at position 3)
-    [[NSUserDefaults standardUserDefaults] setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults synchronize];
     
     NSNumber *ccpaApplies = [self.privacyService ccpaApplies];
     XCTAssertEqualObjects(ccpaApplies, @YES, @"CCPA should detect opt-out from '1YYN' (Y at position 3)");
     
     // Test no opt-out (N at position 3)
-    [[NSUserDefaults standardUserDefaults] setObject:@"1YNN" forKey:kCLXPrivacyCCPAPrivacyKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"1YNN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults synchronize];
     
     ccpaApplies = [self.privacyService ccpaApplies];
     XCTAssertEqualObjects(ccpaApplies, @NO, @"CCPA should not detect opt-out from '1YNN' (N at position 3)");
@@ -259,17 +265,17 @@
     [self clearPrivacySettings];
     
     // Set up GDPR applies with all purposes granted
-    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"IABTCF_gdprApplies"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"1111111111" forKey:@"IABTCF_PurposeConsents"];
+    [self.testDefaults setInteger:1 forKey:@"IABTCF_gdprApplies"];
+    [self.testDefaults setObject:@"1111111111" forKey:@"IABTCF_PurposeConsents"];
     // Minimal valid TC string with all purposes granted
-    [[NSUserDefaults standardUserDefaults] setObject:@"CQbFSYAQbFSYAEsACBENCFFoAP_gAEPgACiQINJB" forKey:@"IABTCF_TCString"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setObject:@"CQbFSYAQbFSYAEsACBENCFFoAP_gAEPgACiQINJB" forKey:@"IABTCF_TCString"];
+    [self.testDefaults synchronize];
     
     // When GDPR applies and all purposes are granted, data should be allowed
     NSNumber *gdprApplies = [self.privacyService gdprApplies];
     XCTAssertEqualObjects(gdprApplies, @YES, @"GDPR applies should be YES");
     
-    NSString *purposeConsents = [[NSUserDefaults standardUserDefaults] stringForKey:@"IABTCF_PurposeConsents"];
+    NSString *purposeConsents = [self.testDefaults stringForKey:@"IABTCF_PurposeConsents"];
     XCTAssertTrue(purposeConsents.length >= 1 && [purposeConsents characterAtIndex:0] == '1', @"Purpose 1 should be granted");
 }
 
@@ -278,12 +284,12 @@
     [self clearPrivacySettings];
     
     // Set up GDPR applies with Purpose 1 denied
-    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"IABTCF_gdprApplies"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"0111111111" forKey:@"IABTCF_PurposeConsents"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"CQbFSYAQbFSYAEsACDENCFFgAHAAAEPg" forKey:@"IABTCF_TCString"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setInteger:1 forKey:@"IABTCF_gdprApplies"];
+    [self.testDefaults setObject:@"0111111111" forKey:@"IABTCF_PurposeConsents"];
+    [self.testDefaults setObject:@"CQbFSYAQbFSYAEsACDENCFFgAHAAAEPg" forKey:@"IABTCF_TCString"];
+    [self.testDefaults synchronize];
     
-    NSString *purposeConsents = [[NSUserDefaults standardUserDefaults] stringForKey:@"IABTCF_PurposeConsents"];
+    NSString *purposeConsents = [self.testDefaults stringForKey:@"IABTCF_PurposeConsents"];
     BOOL purpose1Granted = purposeConsents.length >= 1 && [purposeConsents characterAtIndex:0] == '1';
     XCTAssertFalse(purpose1Granted, @"Purpose 1 should be denied");
 }
@@ -293,12 +299,12 @@
     [self clearPrivacySettings];
     
     // Set up GDPR applies with no purposes granted
-    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"IABTCF_gdprApplies"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"0000000000" forKey:@"IABTCF_PurposeConsents"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"CQbFSYAQbFSYAEsACBENCFFgAAAA" forKey:@"IABTCF_TCString"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setInteger:1 forKey:@"IABTCF_gdprApplies"];
+    [self.testDefaults setObject:@"0000000000" forKey:@"IABTCF_PurposeConsents"];
+    [self.testDefaults setObject:@"CQbFSYAQbFSYAEsACBENCFFgAAAA" forKey:@"IABTCF_TCString"];
+    [self.testDefaults synchronize];
     
-    NSString *purposeConsents = [[NSUserDefaults standardUserDefaults] stringForKey:@"IABTCF_PurposeConsents"];
+    NSString *purposeConsents = [self.testDefaults stringForKey:@"IABTCF_PurposeConsents"];
     BOOL anyPurposeGranted = NO;
     for (NSUInteger i = 0; i < MIN(4, purposeConsents.length); i++) {
         if ([purposeConsents characterAtIndex:i] == '1') {
@@ -314,8 +320,8 @@
     [self clearPrivacySettings];
     
     // GDPR does not apply (non-EEA user)
-    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"IABTCF_gdprApplies"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults setInteger:0 forKey:@"IABTCF_gdprApplies"];
+    [self.testDefaults synchronize];
     
     NSNumber *gdprApplies = [self.privacyService gdprApplies];
     XCTAssertEqualObjects(gdprApplies, @NO, @"GDPR applies should be NO for non-EEA users");
@@ -326,8 +332,8 @@
     [self clearPrivacySettings];
     
     // No GDPR applies flag set
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"IABTCF_gdprApplies"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.testDefaults removeObjectForKey:@"IABTCF_gdprApplies"];
+    [self.testDefaults synchronize];
     
     NSNumber *gdprApplies = [self.privacyService gdprApplies];
     XCTAssertNil(gdprApplies, @"GDPR applies should be nil when not set");

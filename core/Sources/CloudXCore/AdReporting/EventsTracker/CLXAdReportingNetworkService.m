@@ -36,6 +36,7 @@
 @interface CLXAdReportingNetworkService ()
 @property (nonatomic, strong) CLXBaseNetworkService *baseNetworkService;
 @property (nonatomic, strong) CLXLogger *logger;
+@property (nonatomic, strong) NSUserDefaults *userDefaults;
 - (void)_trackGeoLatency:(NSInteger)latencyMs source:(NSString *)source;
 @end
 
@@ -53,19 +54,22 @@
         [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkGeoApi latency:latencyMs];
         [self.logger debug:[NSString stringWithFormat:@"[%@] Tracked geo latency: %ldms", source, (long)latencyMs]];
     } else {
-        [[NSUserDefaults standardUserDefaults] setInteger:latencyMs forKey:kCLXCoreGeoLatencyMsKey];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self.userDefaults setInteger:latencyMs forKey:kCLXCoreGeoLatencyMsKey];
+        [self.userDefaults synchronize];
         [self.logger debug:[NSString stringWithFormat:@"[%@] Stored geo latency: %ldms (will track after MetricsTracker init)", source, (long)latencyMs]];
     }
 }
 
 #pragma mark - Initialization
 
-- (instancetype)initWithBaseURL:(NSURL *)baseURL urlSession:(NSURLSession *)urlSession {
+- (instancetype)initWithBaseURL:(NSURL *)baseURL
+                     urlSession:(NSURLSession *)urlSession
+                   userDefaults:(NSUserDefaults *)userDefaults {
     self = [super init];
     if (self) {
         _baseNetworkService = [[CLXBaseNetworkService alloc] initWithBaseURL:baseURL.absoluteString urlSession:urlSession];
         _logger = [[CLXLogger alloc] initWithCategory:@"AdReporting"];
+        _userDefaults = userDefaults;
     }
     return self;
 }
@@ -140,9 +144,9 @@
     };
     
     // Store mock data in UserDefaults (same as production flow)
-    [[NSUserDefaults standardUserDefaults] setObject:mockRawHeaders forKey:kCLXCoreRawGeoHeadersKey];
-    [[NSUserDefaults standardUserDefaults] setObject:mockProcessedData forKey:kCLXCoreProcessedGeoDataKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.userDefaults setObject:mockRawHeaders forKey:kCLXCoreRawGeoHeadersKey];
+    [self.userDefaults setObject:mockProcessedData forKey:kCLXCoreProcessedGeoDataKey];
+    [self.userDefaults synchronize];
     
     [self.logger debug:[NSString stringWithFormat:@"[Simulator] Geo data set from locale: %@ - Region: %@", finalCountryISO3, regionCode]];
     
@@ -223,9 +227,9 @@
             [self.logger debug:[NSString stringWithFormat:@"CloudX: raw geo headers (for privacy): %@", rawGeoHeaders]];
             
             // Store both processed data and raw headers
-            [[NSUserDefaults standardUserDefaults] setObject:processedGeoData forKey:kCLXCoreProcessedGeoDataKey];
-            [[NSUserDefaults standardUserDefaults] setObject:rawGeoHeaders forKey:kCLXCoreRawGeoHeadersKey];
-            [[NSUserDefaults standardUserDefaults] synchronize];
+            [self.userDefaults setObject:processedGeoData forKey:kCLXCoreProcessedGeoDataKey];
+            [self.userDefaults setObject:rawGeoHeaders forKey:kCLXCoreRawGeoHeadersKey];
+            [self.userDefaults synchronize];
         }
     }];
     [task resume];
@@ -233,7 +237,7 @@
 
 - (void)metricsTrackingWithActionString:(NSString *)actionString error:(NSError **)error {
     // Use metrics URL from SDK response (stored in user defaults)
-    NSString *metricsURL = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreMetricsUrlKey];
+    NSString *metricsURL = [self.userDefaults stringForKey:kCLXCoreMetricsUrlKey];
     if (!metricsURL) {
         [self.logger debug:@"No metrics URL available - SDK performance metrics tracking disabled"];
         // Don't treat this as an error since it's handled with fallback in CloudXCoreAPI
@@ -250,12 +254,12 @@
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:fullURL];
     request.HTTPMethod = @"POST";
     
-    NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
-    NSString *encodedString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreEncodedStringKey];
+    NSDictionary *metricsDictionary = [self.userDefaults dictionaryForKey:kCLXCoreMetricsDictKey];
+    NSString *encodedString = [self.userDefaults stringForKey:kCLXCoreEncodedStringKey];
     
     NSMutableArray<NSDictionary<NSString *, NSString *> *> *items = [NSMutableArray array];
     
-    NSString *accountId = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreAccountIDKey];
+    NSString *accountId = [self.userDefaults stringForKey:kCLXCoreAccountIDKey];
    
     NSData *secret = [CLXXorEncryption generateXorSecret: accountId];
     NSString *campaignId = [CLXXorEncryption generateCampaignIdBase64: accountId];
@@ -305,7 +309,7 @@
     [self.logger debug:[NSString stringWithFormat:@"Environment: %@, Action: %@, Campaign: %@, EncodedLength: %lu", [CLXURLProvider environmentName], actionString ?: @"(nil)", campaignId ?: @"(nil)", (unsigned long)(encodedString.length)]];
     
     // Use impression tracker URL from SDK response for Rill tracking
-    NSString *trackingString = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreImpressionTrackerUrlKey];
+    NSString *trackingString = [self.userDefaults stringForKey:kCLXCoreImpressionTrackerUrlKey];
     
     if (!trackingString) {
         [self.logger warn:@"[CloudXCore] No tracking URL available - Rill analytics disabled"];
