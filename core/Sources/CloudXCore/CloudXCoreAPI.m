@@ -484,6 +484,9 @@ static CloudXCore *_sharedInstance = nil;
                     [self markAdapterReady:mappedNetworkName];
                 } else {
                     [self.logger error:[NSString stringWithFormat:@"Failed to initialize network: %@ - %@", mappedNetworkName, error.localizedDescription]];
+                    
+                    // Send error event when adapter fails to initialize (matching Android behavior)
+                    [self trackAdapterInitializationErrorForNetwork:mappedNetworkName originalError:error];
                 }
                 // Leave group after adapter initialization completes (success or failure)
                 dispatch_group_leave(adapterInitGroup);
@@ -1292,6 +1295,25 @@ static CloudXCore *_sharedInstance = nil;
                                                     encodedString:safeErrorEncrypted];
     
     [sharedInstance.logger info:@"Sent SDK error Analytics tracking event"];
+}
+
+/**
+ * Tracks an adapter initialization failure error event.
+ * Called synchronously within the adapter init completion block (which already runs
+ * inside a dispatch_group_wait barrier, so no need to dispatch to background).
+ *
+ * @param networkName The name of the network whose adapter failed to initialize
+ * @param originalError The original error from the adapter initialization attempt (may be nil)
+ */
+- (void)trackAdapterInitializationErrorForNetwork:(NSString *)networkName originalError:(NSError * _Nullable)originalError {
+    NSString *errorDetails = originalError.localizedDescription ?: @"No error details provided";
+    NSString *errorDescription = [NSString stringWithFormat:@"Adapter initialization failed: %@ - %@",
+                                  networkName, errorDetails];
+    
+    CLXError *adapterError = [CLXError errorWithCode:CLXErrorCodeAdapterInitializationError
+                                         description:errorDescription];
+    
+    [CloudXCore trackSDKError:adapterError];
 }
 
 #pragma mark - Visual Debugging
