@@ -58,7 +58,9 @@
     }
     
     // Enable foreign key constraints
-    [self _executeSQL:@"PRAGMA foreign_keys = ON;" withParameters:@[]];
+    if (![self _executeSQL:@"PRAGMA foreign_keys = ON;" withParameters:@[]]) {
+        [self.logger error:@"Failed to enable foreign key constraints"];
+    }
     
     [self.logger debug:[NSString stringWithFormat:@"Database opened successfully at %@", path]];
     return YES;
@@ -67,9 +69,13 @@
 - (void)closeDatabase {
     [self _dispatchSyncIfNeeded:^id {
         if (self->_database) {
-            sqlite3_close(self->_database);
-            self->_database = NULL;
-            [self.logger debug:@"Database closed"];
+            int closeResult = sqlite3_close(self->_database);
+            if (closeResult == SQLITE_OK) {
+                self->_database = NULL;
+                [self.logger debug:@"Database closed"];
+            } else {
+                [self.logger error:[NSString stringWithFormat:@"SQLite close failed: %d (%s)", closeResult, sqlite3_errmsg(self->_database)]];
+            }
         }
         return nil;
     }];
@@ -159,7 +165,8 @@
     
     int columnCount = sqlite3_column_count(statement);
     
-    while (sqlite3_step(statement) == SQLITE_ROW) {
+    int stepResult;
+    while ((stepResult = sqlite3_step(statement)) == SQLITE_ROW) {
         NSMutableDictionary *row = [NSMutableDictionary dictionary];
         
         for (int i = 0; i < columnCount; i++) {
@@ -169,6 +176,9 @@
         }
         
         [results addObject:[row copy]];
+    }
+    if (stepResult != SQLITE_DONE) {
+        [self.logger error:[NSString stringWithFormat:@"SQLite step failed during query: %d (%s)", stepResult, sqlite3_errmsg(self->_database)]];
     }
     
     sqlite3_finalize(statement);
@@ -231,30 +241,36 @@
  * Single responsibility: bind one parameter to a statement
  */
 - (void)_bindParameter:(id)parameter atIndex:(int)index toStatement:(sqlite3_stmt *)statement {
+    int bindResult = SQLITE_OK;
     if ([parameter isKindOfClass:[NSString class]]) {
-        sqlite3_bind_text(statement, index, [parameter UTF8String], -1, SQLITE_TRANSIENT);
+        bindResult = sqlite3_bind_text(statement, index, [parameter UTF8String], -1, SQLITE_TRANSIENT);
     } else if ([parameter isKindOfClass:[NSNumber class]]) {
         NSNumber *number = parameter;
         if (strcmp([number objCType], @encode(BOOL)) == 0) {
-            sqlite3_bind_int(statement, index, [number boolValue] ? 1 : 0);
+            bindResult = sqlite3_bind_int(statement, index, [number boolValue] ? 1 : 0);
         } else if (strcmp([number objCType], @encode(int)) == 0 || 
                    strcmp([number objCType], @encode(long)) == 0 ||
                    strcmp([number objCType], @encode(NSInteger)) == 0) {
-            sqlite3_bind_int64(statement, index, [number longLongValue]);
+            bindResult = sqlite3_bind_int64(statement, index, [number longLongValue]);
         } else {
-            sqlite3_bind_double(statement, index, [number doubleValue]);
+            bindResult = sqlite3_bind_double(statement, index, [number doubleValue]);
         }
     } else if ([parameter isKindOfClass:[NSData class]]) {
         NSData *data = parameter;
         // Handle empty NSData properly - SQLite needs a non-NULL pointer even for zero-length blobs
         if (data.length == 0) {
-            sqlite3_bind_blob(statement, index, "", 0, SQLITE_TRANSIENT);
+            bindResult = sqlite3_bind_blob(statement, index, "", 0, SQLITE_TRANSIENT);
         } else {
-            sqlite3_bind_blob(statement, index, data.bytes, (int)data.length, SQLITE_TRANSIENT);
+            bindResult = sqlite3_bind_blob(statement, index, data.bytes, (int)data.length, SQLITE_TRANSIENT);
         }
     } else if ([parameter isKindOfClass:[NSNull class]]) {
-        sqlite3_bind_null(statement, index);
+        bindResult = sqlite3_bind_null(statement, index);
+    } else {
+        [self.logger error:[NSString stringWithFormat:@"Unsupported SQLite parameter type %@ at index %d",
+                             NSStringFromClass([parameter class]), index]];
+        bindResult = sqlite3_bind_null(statement, index);
     }
+    [self _logSQLiteResultIfError:bindResult operation:[NSString stringWithFormat:@"bind at index %d", index]];
 }
 
 /**
@@ -303,6 +319,16 @@
         return NO;
     }
     return YES;
+}
+
+/**
+ * DRY helper: log SQLite errors without changing control flow
+ */
+- (void)_logSQLiteResultIfError:(int)result operation:(NSString *)operation {
+    if (result != SQLITE_OK && result != SQLITE_ROW && result != SQLITE_DONE) {
+        [self.logger error:[NSString stringWithFormat:@"SQLite %@ failed: %d (%s)",
+            operation, result, sqlite3_errmsg(self->_database)]];
+    }
 }
 
 @end

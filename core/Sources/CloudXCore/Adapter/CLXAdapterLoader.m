@@ -21,6 +21,19 @@ const int64_t CLXDefaultAdLoadTimeoutMs = 10000;
     // Use default if not set (matches Android default)
     NSTimeInterval seconds = (timeoutMs > 0) ? (timeoutMs / 1000.0) : (CLXDefaultAdLoadTimeoutMs / 1000.0);
 
+    // Validate adapter before scheduling timeout
+    if (![adapter respondsToSelector:@selector(load)]) {
+        CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXAdapterLoader"];
+        [logger error:[NSString stringWithFormat:@"Adapter %@ does not respond to -load selector", NSStringFromClass([adapter class])]];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (onTimeout) {
+                onTimeout([CLXError errorWithCode:CLXErrorCodeAdapterInternalError
+                                      description:[NSString stringWithFormat:@"Adapter %@ does not respond to -load", NSStringFromClass([adapter class])]]);
+            }
+        });
+        return;
+    }
+
     // Start timeout (fires on main queue)
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(seconds * NSEC_PER_SEC)),
                    dispatch_get_main_queue(), ^{
@@ -33,13 +46,7 @@ const int64_t CLXDefaultAdLoadTimeoutMs = 10000;
         }
     });
 
-    // Load adapter - warn if adapter doesn't implement -load
-    if ([adapter respondsToSelector:@selector(load)]) {
-        [adapter load];
-    } else {
-        CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CLXAdapterLoader"];
-        [logger error:[NSString stringWithFormat:@"Adapter %@ does not respond to -load selector", NSStringFromClass([adapter class])]];
-    }
+    [adapter load];
 }
 
 @end

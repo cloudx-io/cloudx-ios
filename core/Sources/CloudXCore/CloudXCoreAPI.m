@@ -572,9 +572,14 @@ static CloudXCore *_sharedInstance = nil;
     
     NSString *auctionEndpointUrl = endpointResolver.auctionEndpoint;
     
-    // Validate endpoints
+    // Validate endpoints (Android parity: missing auctionEndpointURL fails init via JSONException in JsonToConfig.kt)
     if (auctionEndpointUrl.length == 0) {
-        [self.logger error:@"SDK init missing auctionEndpointURL - auction requests will fail"];
+        [self.logger error:@"SDK init missing required auctionEndpointURL"];
+        if (completion) {
+            completion(nil, [CLXError errorWithCode:CLXErrorCodeInvalidResponse
+                                        description:@"SDK config missing required auctionEndpointURL"]);
+        }
+        return;
     } else {
         [self.logger info:[NSString stringWithFormat:@"Auction endpoint resolved: %@", auctionEndpointUrl]];
     }

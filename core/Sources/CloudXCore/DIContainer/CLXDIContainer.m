@@ -32,32 +32,37 @@
 
 - (nullable id)resolveType:(ServiceType)resolveType class:(Class)type {
     NSString *serviceName = NSStringFromClass(type);
+    id service = nil;
     
     switch (resolveType) {
         case ServiceTypeSingleton: {
-            id service = self.cache[serviceName];
-            if (service) {
-                return service;
-            } else {
-                id service = self.factories[serviceName];
-                if (service) {
-                    self.cache[serviceName] = service;
-                }
-                return service;
+            service = self.cache[serviceName];
+            if (!service) {
+                service = self.factories[serviceName];
+                if (service) { self.cache[serviceName] = service; }
             }
+            break;
         }
         case ServiceTypeNewSingleton: {
-            id service = self.factories[serviceName];
-            if (service) {
-                self.cache[serviceName] = service;
-            }
-            return service;
+            service = self.factories[serviceName];
+            if (service) { self.cache[serviceName] = service; }
+            break;
         }
         case ServiceTypeAutomatic:
         case ServiceTypeNew:
         default:
-            return self.factories[serviceName];
+            service = self.factories[serviceName];
+            break;
     }
+    
+    if (!service) {
+#ifdef DEBUG
+        // Debug-only: expected during early init before all services registered.
+        // Uses NSLog to avoid circular dependency (CLXLogger may itself be resolved from DI).
+        NSLog(@"[CLXDIContainer] No service registered for: %@", serviceName);
+#endif
+    }
+    return service;
 }
 
 - (void)reset {

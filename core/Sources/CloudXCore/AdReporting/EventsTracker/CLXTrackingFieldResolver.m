@@ -39,10 +39,12 @@ static NSString * const SDK_PARAM_CUSTOM_DATA = @"sdk.customData";
     static NSRegularExpression *filterRegex;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        NSError *regexError = nil;
         filterRegex = [NSRegularExpression
             regularExpressionWithPattern:@"^(\\w+)\\[(\\w+)=(.+)\\]$"
             options:0
-            error:nil];
+            error:&regexError];
+        if (regexError) { NSLog(@"[CLXTrackingFieldResolver] filterRegex compilation failed: %@", regexError); }
     });
 
     id current = self;
@@ -251,10 +253,12 @@ static NSString * const SDK_PARAM_CUSTOM_DATA = @"sdk.customData";
     static NSRegularExpression *placeholderRegex;
     static dispatch_once_t placeholderOnceToken;
     dispatch_once(&placeholderOnceToken, ^{
+        NSError *regexError = nil;
         placeholderRegex = [NSRegularExpression
             regularExpressionWithPattern:@"\\$\\{([^}]+)\\}"
             options:0
-            error:nil];
+            error:&regexError];
+        if (regexError) { NSLog(@"[CLXTrackingFieldResolver] placeholderRegex compilation failed: %@", regexError); }
     });
 
     // Placeholder expander (matches Android's expandTemplate)

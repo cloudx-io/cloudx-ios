@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CLXSFA00010000000001 /* CLXDIContainerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSFA00020000000001 /* CLXDIContainerTests.m */; };
+		CLXSFA00010000000002 /* CLXAdapterLoaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSFA00020000000002 /* CLXAdapterLoaderTests.m */; };
 		CLXBRPC8980C4FFAE9 /* CLXBidResponseParsingUnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXBRP089EEC3C9B3D /* CLXBidResponseParsingUnitTests.m */; };
 		CLXERUB3BE7F8074DF /* CLXEndpointResolutionUnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXERU9A3827307C63 /* CLXEndpointResolutionUnitTests.m */; };
 
@@ -292,6 +294,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CLXSFA00020000000001 /* CLXDIContainerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXDIContainerTests.m; sourceTree = "<group>"; };
+		CLXSFA00020000000002 /* CLXAdapterLoaderTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterLoaderTests.m; sourceTree = "<group>"; };
 		CLXBRP089EEC3C9B3D /* CLXBidResponseParsingUnitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBidResponseParsingUnitTests.m; sourceTree = "<group>"; };
 		CLXERU9A3827307C63 /* CLXEndpointResolutionUnitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXEndpointResolutionUnitTests.m; sourceTree = "<group>"; };
 		1916B0972E7DE20E00E49E3E /* CLXAuctionBidManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAuctionBidManager.h; sourceTree = "<group>"; };
@@ -666,6 +670,8 @@
 		19C7247E2E2390420012CFC7 /* CloudXCoreTests */ = {
 			isa = PBXGroup;
 			children = (
+				CLXSFA00020000000001 /* CLXDIContainerTests.m */,
+				CLXSFA00020000000002 /* CLXAdapterLoaderTests.m */,
 				CLXNEWTS0004000000000002 /* CLXBiddingConfigDeviceTests.m */,
 				194BC0BC2EF3F6520008DB33 /* CLXBidLifecycleEventTests.m */,
 				194BC0BD2EF3F6520008DB33 /* CLXRewardedRewardLogicTests.m */,
@@ -1425,6 +1431,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CLXSFA00010000000001 /* CLXDIContainerTests.m in Sources */,
+				CLXSFA00010000000002 /* CLXAdapterLoaderTests.m in Sources */,
 				CLXNEWTS0004000000000001 /* CLXBiddingConfigDeviceTests.m in Sources */,
 				CLXNEWMK0002000000000002 /* MockURLSession.m in Sources */,
 				19D929C22E6644BB00C84DAE /* CLXPublisherBannerSpecComplianceTests.m in Sources */,

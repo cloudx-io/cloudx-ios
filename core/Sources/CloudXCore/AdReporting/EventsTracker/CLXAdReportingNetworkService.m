@@ -247,7 +247,6 @@
     NSURL *fullURL = [NSURL URLWithString:urlString];
     if (!fullURL) {
         [self.logger error:[NSString stringWithFormat:@"CloudX: can't parse metricsTracking to URL: %@", urlString]];
-        [NSError errorWithDomain:@"CloudX" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Invalid URL"}];
         return;
     }
     
@@ -286,7 +285,12 @@
 
     // Prepare JSON data
     NSDictionary *bodyDict = @{@"items": items};
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bodyDict options:0 error:nil];
+    NSError *jsonError = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bodyDict options:0 error:&jsonError];
+    if (jsonError) {
+        [self.logger error:[NSString stringWithFormat:@"JSON serialization failed: %@", jsonError]];
+        return;
+    }
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [request setHTTPBody:jsonData];
     

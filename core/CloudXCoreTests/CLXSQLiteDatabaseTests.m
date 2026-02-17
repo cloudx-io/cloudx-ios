@@ -415,4 +415,56 @@
     // Test passes if no crash: Should complete without crashes or excessive memory usage
 }
 
+#pragma mark - Silent Failure Audit Tests
+
+/// Audit fix: nil SQL must return NO, not crash (added _validateSQL guard)
+- (void)testExecuteSQL_NilSQL_ReturnsFalse {
+    // Cast through variable to bypass nonnull compile-time check
+    NSString *nilSQL = nil;
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wnonnull"
+    XCTAssertFalse([self.database executeSQL:nilSQL], @"nil SQL should return NO");
+    #pragma clang diagnostic pop
+}
+
+/// Audit fix: nil SQL query must return empty array, not crash
+- (void)testExecuteQuery_NilSQL_ReturnsEmptyArray {
+    NSString *nilSQL = nil;
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wnonnull"
+    NSArray *results = [self.database executeQuery:nilSQL];
+    #pragma clang diagnostic pop
+    XCTAssertNotNil(results);
+    XCTAssertEqual(results.count, 0, @"nil SQL query should return empty results");
+}
+
+/// Audit fix: double close must not crash (added close result check + NULL guard)
+- (void)testCloseDatabase_CalledTwice_DoesNotCrash {
+    [self.database closeDatabase];
+    XCTAssertNoThrow([self.database closeDatabase], @"Double close must be a safe no-op");
+}
+
+/// Audit fix: bind result codes are now checked - verify all param types bind without error
+- (void)testParameterBinding_AllTypes_SucceedsWithCheckedBindResults {
+    [self.database executeSQL:@"CREATE TABLE bind_audit (id INTEGER PRIMARY KEY, v TEXT);"];
+
+    NSString *sql = @"INSERT INTO bind_audit (id, v) VALUES (?, ?);";
+    BOOL r1 = [self.database executeSQL:sql withParameters:@[@1, @"string"]];
+    BOOL r2 = [self.database executeSQL:sql withParameters:@[@2, @(42)]];
+    BOOL r3 = [self.database executeSQL:sql withParameters:@[@3, @(3.14)]];
+    BOOL r4 = [self.database executeSQL:sql withParameters:@[@4, [NSNull null]]];
+    BOOL r5 = [self.database executeSQL:sql withParameters:@[@5, [NSData data]]];
+    BOOL r6 = [self.database executeSQL:sql withParameters:@[@6, [@"bytes" dataUsingEncoding:NSUTF8StringEncoding]]];
+
+    XCTAssertTrue(r1, @"String bind");
+    XCTAssertTrue(r2, @"Integer bind");
+    XCTAssertTrue(r3, @"Double bind");
+    XCTAssertTrue(r4, @"NSNull bind");
+    XCTAssertTrue(r5, @"Empty NSData bind");
+    XCTAssertTrue(r6, @"NSData bind");
+
+    NSArray *rows = [self.database executeQuery:@"SELECT COUNT(*) as c FROM bind_audit;"];
+    XCTAssertEqual([rows[0][@"c"] integerValue], 6);
+}
+
 @end

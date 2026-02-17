@@ -238,13 +238,22 @@
         // Parse response dictionary into BidResponse object
         CLXBidResponse *bidResponse = [CLXBidResponse parseBidResponseFromDictionary:response];
         
-        // Log useful summary instead of massive raw response
-        if (bidResponse) {
-            NSString *currency = bidResponse.cur ?: @"USD";
-            NSInteger seatbidCount = bidResponse.seatbid ? bidResponse.seatbid.count : 0;
-            NSString *bidId = bidResponse.bidid ?: @"unknown";
-            [self.logger debug:[NSString stringWithFormat:@"[%@] [BidNetworkService] Parsed response - BidID: %@, Currency: %@, SeatBids: %ld", correlationId, bidId, currency, (long)seatbidCount]];
+        if (!bidResponse) {
+            NSError *parseError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse
+                                                  userInfo:@{
+                                                      NSLocalizedDescriptionKey: @"Failed to parse bid response",
+                                                      @"CLXCorrelationID": correlationId
+                                                  }];
+            [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [BidNetworkService] Failed to parse bid response", correlationId]];
+            if (completion) completion(nil, nil, parseError);
+            return;
         }
+        
+        // Log useful summary instead of massive raw response
+        NSString *currency = bidResponse.cur ?: @"USD";
+        NSInteger seatbidCount = bidResponse.seatbid ? bidResponse.seatbid.count : 0;
+        NSString *bidId = bidResponse.bidid ?: @"unknown";
+        [self.logger debug:[NSString stringWithFormat:@"[%@] [BidNetworkService] Parsed response - BidID: %@, Currency: %@, SeatBids: %ld", correlationId, bidId, currency, (long)seatbidCount]];
         
         // Pass both parsed object and raw JSON to completion handler
         if (completion) {
