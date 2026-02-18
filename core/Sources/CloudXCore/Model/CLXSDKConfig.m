@@ -83,7 +83,7 @@
         _appID = @"";
 
         // 2. Endpoints (required)
-        _auctionEndpointURL = [[CLXSDKConfigEndpointQuantumValue alloc] init];
+        _auctionEndpointURL = @"";
         _impressionTrackerURL = @"";
         _winLossNotificationURL = @"";
         _geoDataEndpointURL = @"";
@@ -181,28 +181,6 @@
         _adaptercode = @"";
     }
     return self;
-}
-
-@end
-
-@implementation CLXSDKConfigEndpointQuantumValue
-
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        // Initialize with nil values
-    }
-    return self;
-}
-
-- (nullable id)value {
-    if (self.endpointString) {
-        return self.endpointString;
-    }
-    if (self.endpointObject) {
-        return self.endpointObject;
-    }
-    return nil;
 }
 
 @end

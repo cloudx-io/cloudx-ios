@@ -73,8 +73,7 @@
     self.mockSDKConfig.accountID = @"test-account";
     
     self.mockImpModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:self.mockSDKConfig
-                                                                  auctionID:@"test-auction"
-                                                              testGroupName:@"test-group"];
+                                                                  auctionID:@"test-auction"];
 }
 
 - (void)tearDown {

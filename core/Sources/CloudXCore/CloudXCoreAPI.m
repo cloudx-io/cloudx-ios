@@ -27,7 +27,6 @@
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 #import <CloudXCore/CLXWinLossTracker.h>
 #import <CloudXCore/CLXKeyValueState.h>
-#import <CloudXCore/CLXEndpointResolver.h>
 #import <CloudXCore/CLXAdUnitValidator.h>
 
 // Adapter Protocols
@@ -106,9 +105,6 @@ NSString * const CLXSDKInitializedNotification = @"CLXSDKInitializedNotification
 @property (nonatomic, strong) id adFactory;
 @property (nonatomic, strong) id reportingService;
 @property (nonatomic, strong) CLXLogger *logger;
-@property (nonatomic, assign) double abTestValue;
-@property (nonatomic, copy) NSString *abTestName;
-@property (nonatomic, copy) NSString *defaultAuctionURL;
 @property (nonatomic, strong) CLXGeoLocationService *geoLocationService;
 @property (nonatomic, strong) CLXBidNetworkServiceClass *bidNetworkService;
 @property (nonatomic, strong) CLXAdNetworkFactories *adNetworkFactories;
@@ -162,16 +158,10 @@ static CloudXCore *_sharedInstance = nil;
         _logger = [[CLXLogger alloc] initWithCategory:@"CloudXCoreAPI.m"];
         [self.logger debug:@"Initializing CloudXCore instance"];
         _isInitialized = NO;
-        _abTestValue = (double)arc4random() / UINT32_MAX;
-        _abTestName = @"RandomTest";
-        // Default auction URL now comes from SDK response only
-        _defaultAuctionURL = @"";
         _readyAdapters = [NSMutableSet set];
-        
+
         // Resolve adapters immediately so banners created before SDK init have token sources
         [self resolveAdapters];
-        
-        [self.logger info:[NSString stringWithFormat:@"Instance initialized - AB Test: %@ (%.3f), Default URL: %@", _abTestName, _abTestValue, _defaultAuctionURL]];
     }
     return self;
 }
@@ -196,8 +186,7 @@ static CloudXCore *_sharedInstance = nil;
         return nil;
     }
     return [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
-                                                      auctionID:auctionID
-                                                  testGroupName:_abTestName];
+                                                      auctionID:auctionID];
 }
 
 - (void)initializeWithConfiguration:(CLXInitializationConfiguration *)configuration
@@ -340,8 +329,7 @@ static CloudXCore *_sharedInstance = nil;
         // Generate unique auction ID for this impression
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:config
-                                                                                      auctionID:auctionID
-                                                                                  testGroupName:_abTestName];
+                                                                                      auctionID:auctionID];
         
         if (config.geoDataEndpointURL) { // @"https://geoip.cloudx.io"
             [self.reportingService geoTrackingWithURLString:config.geoDataEndpointURL extras:geoHeaders];
@@ -523,7 +511,7 @@ static CloudXCore *_sharedInstance = nil;
                                              pluginVersion:pluginVersion
                                             deviceTypeName:DeviceTypeToString(deviceType)
                                             deviceTypeCode:(NSInteger)deviceType
-                                               abTestGroup:_abTestName ?: @""
+                                               abTestGroup:@""
                                                  appBundle:appBundle];
     
     CLXPayloadBuilder *payloadBuilder = [CLXPayloadBuilder createWithAccountId:config.accountID ?: @""
@@ -569,12 +557,8 @@ static CloudXCore *_sharedInstance = nil;
     [[CLXSessionMetricsTracker sharedInstance] resetAll];
     [self.logger info:@"Session metrics tracker reset on SDK init"];
     
-    // Resolve endpoints with A/B testing support
-    CLXEndpointResolver *endpointResolver = [[CLXEndpointResolver alloc] init];
-    [endpointResolver resolveFromConfig:config];
-    
-    NSString *auctionEndpointUrl = endpointResolver.auctionEndpoint;
-    
+    NSString *auctionEndpointUrl = config.auctionEndpointURL ?: @"";
+
     // Validate endpoints (Android parity: missing auctionEndpointURL fails init via JSONException in JsonToConfig.kt)
     if (auctionEndpointUrl.length == 0) {
         [self.logger error:@"SDK init missing required auctionEndpointURL"];
@@ -590,10 +574,6 @@ static CloudXCore *_sharedInstance = nil;
     // Metrics use impressionTrackerURL with /bulk suffix
     if (!config.impressionTrackerURL) {
         [self.logger debug:@"[CloudXCore] No impressionTrackerURL available - SDK performance metrics will be stored locally only"];
-    }
-    
-    if (endpointResolver.testGroupName.length > 0) {
-        [self.logger debug:[NSString stringWithFormat:@"[CloudXCore] A/B Test Group: %@", endpointResolver.testGroupName]];
     }
     
     // Register services in DI container
@@ -830,8 +810,7 @@ static CloudXCore *_sharedInstance = nil;
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
-                                                              auctionID:auctionID
-                                                          testGroupName:_abTestName];
+                                                              auctionID:auctionID];
     } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring banner initialization for ad unit: %@", adUnitId]];
@@ -908,8 +887,7 @@ static CloudXCore *_sharedInstance = nil;
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
-                                                              auctionID:auctionID
-                                                          testGroupName:_abTestName];
+                                                              auctionID:auctionID];
     } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring MREC initialization for ad unit: %@", adUnitId]];
@@ -985,8 +963,7 @@ static CloudXCore *_sharedInstance = nil;
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
-                                                              auctionID:auctionID
-                                                          testGroupName:_abTestName];
+                                                              auctionID:auctionID];
     } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring interstitial initialization for ad unit: %@", adUnitId]];
@@ -1058,8 +1035,7 @@ static CloudXCore *_sharedInstance = nil;
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
-                                                              auctionID:auctionID
-                                                          testGroupName:_abTestName];
+                                                              auctionID:auctionID];
     } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring rewarded initialization for ad unit: %@", adUnitId]];
@@ -1134,8 +1110,7 @@ static CloudXCore *_sharedInstance = nil;
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
-                                                              auctionID:auctionID
-                                                          testGroupName:_abTestName];
+                                                              auctionID:auctionID];
     } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring native initialization for ad unit: %@", adUnitId]];
@@ -1202,48 +1177,6 @@ static CloudXCore *_sharedInstance = nil;
         }
     }
     _adNetworkConfigs = [configsDict copy];
-}
-
-- (NSString *)chooseEndpointWithObject:(id)object value:(double)value {
-    NSString *stringToReturn = _defaultAuctionURL;
-    
-    // Check if object is a SDKConfigEndpointObject
-    if ([object isKindOfClass:[CLXSDKConfigEndpointObject class]]) {
-        CLXSDKConfigEndpointObject *endpointObject = (CLXSDKConfigEndpointObject *)object;
-        
-        // Get the default key
-        NSString *defaultKey = endpointObject.defaultKey;
-        if (defaultKey) {
-            stringToReturn = defaultKey;
-        }
-        
-        // Get the test array (EndpointValue structures)
-        NSArray *tests = endpointObject.test;
-        if ([tests isKindOfClass:[NSArray class]]) {
-            for (CLXSDKConfigEndpointValue *test in tests) {
-                if ([test isKindOfClass:[CLXSDKConfigEndpointValue class]]) {
-                    double ratio = test.ratio;
-                    NSString *testValue = test.value;
-                    NSString *testName = test.name;
-                    
-                    if (testValue) {
-                        if (value <= ratio) {
-                            // Use default key for this test
-                            stringToReturn = defaultKey ?: @"";
-                        } else {
-                            // Use test value
-                            stringToReturn = testValue;
-                            if (testName) {
-                                _abTestName = testName;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    return stringToReturn;
 }
 
 #pragma mark - Public Getters
@@ -1400,9 +1333,6 @@ static BOOL _visualDebuggingEnabled = NO;
     _adUnits = nil;
     _adFactory = nil;
     _reportingService = nil;
-    _abTestValue = (double)arc4random() / UINT32_MAX;
-    _abTestName = @"RandomTest";
-    _defaultAuctionURL = @"";
     _geoLocationService = nil;
     _bidNetworkService = nil;
     _adNetworkFactories = nil;

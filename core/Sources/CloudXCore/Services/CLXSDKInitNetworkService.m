@@ -18,7 +18,6 @@
 #import <CloudXCore/CLXMetricsTrackerImpl.h>
 #import <CloudXCore/CLXMetricsType.h>
 #import <CloudXCore/CLXMetricsConfig.h>
-#import <CloudXCore/CLXSDKConfigEndpointObject.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 
 static NSString *const kAPIRequestKeyAppKey = @"appKey";
@@ -482,9 +481,9 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
 
 #pragma mark - Parsing: Endpoint URL (matches Android toEndpointUrl)
 
-- (nullable CLXSDKConfigEndpointQuantumValue *)parseEndpointURLFromValue:(id)value
-                                                                   field:(NSString *)field
-                                                                   error:(NSError **)outError {
+- (nullable NSString *)parseEndpointURLFromValue:(id)value
+                                            field:(NSString *)field
+                                            error:(NSError **)outError {
     if (!value) {
         if (outError) {
             *outError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse
@@ -492,8 +491,6 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         }
         return nil;
     }
-
-    CLXSDKConfigEndpointQuantumValue *endpoint = [[CLXSDKConfigEndpointQuantumValue alloc] init];
 
     if ([value isKindOfClass:[NSString class]]) {
         NSString *str = (NSString *)value;
@@ -504,7 +501,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
             }
             return nil;
         }
-        endpoint.endpointString = str;
+        return str;
     } else if ([value isKindOfClass:[NSDictionary class]]) {
         NSDictionary *dict = (NSDictionary *)value;
         NSString *defaultURL = dict[@"default"];
@@ -515,7 +512,7 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
             }
             return nil;
         }
-        endpoint.endpointObject = [self parseEndpointObject:dict];
+        return defaultURL;
     } else {
         if (outError) {
             *outError = [CLXError errorWithCode:CLXErrorCodeInvalidResponse
@@ -523,8 +520,6 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         }
         return nil;
     }
-
-    return endpoint;
 }
 
 #pragma mark - Parsing: String Map (matches Android toStringMap)
@@ -574,37 +569,4 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     return config;
 }
 
-/**
- * @brief Parses endpoint object with default and test variants for A/B testing
- * @param endpointDict Dictionary containing 'default' and optionally 'test' array
- * @return CLXSDKConfigEndpointObject with parsed test variants
- */
-- (CLXSDKConfigEndpointObject *)parseEndpointObject:(NSDictionary *)endpointDict {
-    NSString *defaultValue = endpointDict[@"default"] ?: @"";
-    NSArray *testArray = endpointDict[@"test"];
-    NSMutableArray<CLXSDKConfigEndpointValue *> *testVariants = [NSMutableArray array];
-    
-    if (testArray && [testArray isKindOfClass:[NSArray class]]) {
-        for (id testItem in testArray) {
-            if ([testItem isKindOfClass:[NSDictionary class]]) {
-                NSDictionary *testDict = (NSDictionary *)testItem;
-                NSString *name = testDict[@"name"];
-                NSString *value = testDict[@"value"];
-                NSNumber *ratioNum = testDict[@"ratio"];
-                double ratio = ratioNum ? [ratioNum doubleValue] : 0.0;
-                
-                if (value && [value isKindOfClass:[NSString class]] && value.length > 0) {
-                    CLXSDKConfigEndpointValue *variant = [[CLXSDKConfigEndpointValue alloc] initWithName:name 
-                                                                                                    value:value 
-                                                                                                    ratio:ratio];
-                    [testVariants addObject:variant];
-                }
-            }
-        }
-    }
-    
-    return [[CLXSDKConfigEndpointObject alloc] initWithTest:testVariants.count > 0 ? testVariants : nil 
-                                                  defaultKey:defaultValue];
-}
-
-@end 
+@end

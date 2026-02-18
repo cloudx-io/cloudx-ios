@@ -95,8 +95,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXBidResponseExt *ext;
 @property (nonatomic, strong, nullable) NSArray<NSString *> *adomain;
 @property (nonatomic, assign) double price;
-@property (nonatomic, assign) int64_t abTestId;
-@property (nonatomic, copy, nullable) NSString *abTestGroup;
 @property (nonatomic, copy, nullable) NSString *nurl;
 @property (nonatomic, copy, nullable) NSString *lurl;
 @property (nonatomic, copy, nullable) NSString *iurl;

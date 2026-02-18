@@ -89,7 +89,7 @@ Tests are in `core/CloudXCoreTests/` (71 test files). XCTest-based, Objective-C.
 
 ## Branching & Release
 
-- **Trunk-based** workflow: `main` is the default branch, `develop` is the main PR target
+- **Trunk-based** workflow: `main` is the default branch and the main PR target
 - Release tags follow `vX.Y.Z-{component}` format (e.g., `v2.1.0-core`, `v1.1.25-meta`)
 - See `RELEASE.md` for the full multi-phase release process
 - CI runs on pushes to `main`/`release/**`/`hotfix/**` and all PRs

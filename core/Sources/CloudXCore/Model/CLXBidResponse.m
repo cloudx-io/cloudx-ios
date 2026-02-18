@@ -116,13 +116,11 @@ static void initializeLogger() {
     if (self.cid) dict[@"cid"] = self.cid;
     if (self.crid) dict[@"crid"] = self.crid;
     if (self.dealid) dict[@"dealid"] = self.dealid;
-    if (self.abTestGroup) dict[@"abTestGroup"] = self.abTestGroup;
     if (self.nurl) dict[@"nurl"] = self.nurl;
     if (self.lurl) dict[@"lurl"] = self.lurl;
     if (self.iurl) dict[@"iurl"] = self.iurl;
     
     dict[@"price"] = @(self.price);
-    dict[@"abTestId"] = @(self.abTestId);
     dict[@"w"] = @(self.w);
     dict[@"h"] = @(self.h);
     
@@ -538,15 +536,6 @@ static void initializeLogger() {
     
     id hValue = dictionary[@"h"];
     bid.h = (hValue && ![hValue isKindOfClass:[NSNull class]]) ? [hValue integerValue] : 0;
-    
-    // Parse optional fields with NSNull safety
-    id abTestIdValue = dictionary[@"abTestId"];
-    if (abTestIdValue && ![abTestIdValue isKindOfClass:[NSNull class]]) {
-        bid.abTestId = [abTestIdValue longLongValue];
-    }
-    if (dictionary[@"abTestGroup"]) {
-        bid.abTestGroup = dictionary[@"abTestGroup"];
-    }
     
     // Parse arrays - match original inline parsing exactly
     NSArray *adomainArray = dictionary[@"adomain"];

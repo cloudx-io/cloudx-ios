@@ -4,11 +4,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**
- * Default test group name used when no specific test group is configured
- */
-extern NSString * const CLXConfigImpressionModelDefaultTestGroupName;
-
 @interface CLXConfigImpressionModel : NSObject
 
 @property (nonatomic, readonly, copy) NSString *sessionID;
@@ -17,18 +12,15 @@ extern NSString * const CLXConfigImpressionModelDefaultTestGroupName;
 @property (nonatomic, readonly, copy) NSString *organizationID;
 @property (nonatomic, readonly, copy) NSString *accountID;
 @property (nonatomic, readonly, strong, nullable) CLXSDKConfigResponse *sdkConfig;
-@property (nonatomic, readonly, copy) NSString *testGroupName;
 
 /**
  * Creates a CLXConfigImpressionModel from SDK configuration response
  * @param sdkConfig The SDK configuration response containing environment-specific values
  * @param auctionID The unique auction identifier for this impression
- * @param testGroupName Optional test group name (uses default if nil)
  * @return Configured impression model instance
  */
 - (instancetype)initWithSDKConfig:(CLXSDKConfigResponse *)sdkConfig
-                        auctionID:(NSString *)auctionID
-                    testGroupName:(nullable NSString *)testGroupName;
+                        auctionID:(NSString *)auctionID;
 
 /**
  * Convenience initializer for testing purposes - creates instance with mock values
@@ -38,4 +30,4 @@ extern NSString * const CLXConfigImpressionModelDefaultTestGroupName;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

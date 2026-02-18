@@ -40,8 +40,7 @@
     
     // Create mock impression model
     self.mockImpModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:self.mockSDKConfig
-                                                                  auctionID:@"test-auction"
-                                                              testGroupName:@"test-group"];
+                                                                  auctionID:@"test-auction"];
     
     // Create isolated privacy service
     CLXConsentProvider *isolatedProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil

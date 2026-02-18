@@ -5,10 +5,8 @@
 #import <CloudXCore/CLXBiddingConfig.h>
 #import <CloudXCore/CLXSystemInformation.h>
 #import <CloudXCore/NSString+CLXSemicolon.h>
-#import <CloudXCore/CLXRillImpressionDefaultModel.h>
 #import <CloudXCore/CLXBidResponse.h>
 #import <CloudXCore/CLXBidAdSource.h>
-#import <CloudXCore/CLXRillImpressionProperties.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXVersion.h>
@@ -50,7 +48,7 @@
                     pluginVersion:pluginVersion
                    deviceTypeName:DeviceTypeToString([CLXSystemInformation shared].deviceType)
                    deviceTypeCode:[CLXSystemInformation shared].deviceType
-                      abTestGroup:rillImpressionModel.impModel.testGroupName ?: @""
+                      abTestGroup:@""
                         appBundle:appBundle];
     
     //Set server config
