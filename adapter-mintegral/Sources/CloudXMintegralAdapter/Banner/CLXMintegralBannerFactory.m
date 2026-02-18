@@ -5,7 +5,19 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBannerType.h>
 
+@interface CLXMintegralBannerFactory ()
+@property (nonatomic, strong) CLXLogger *logger;
+@end
+
 @implementation CLXMintegralBannerFactory
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _logger = [[CLXLogger alloc] initWithCategory:@"CLXMintegralBannerFactory"];
+    }
+    return self;
+}
 
 + (instancetype)createInstance {
     return [[CLXMintegralBannerFactory alloc] init];

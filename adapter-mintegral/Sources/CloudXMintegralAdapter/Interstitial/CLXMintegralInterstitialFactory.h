@@ -1,10 +1,9 @@
 #import <Foundation/Foundation.h>
 #import <CloudXCore/CLXAdapterInterstitialFactory.h>
-#import "CLXMintegralBaseFactory.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXMintegralInterstitialFactory : CLXMintegralBaseFactory <CLXAdapterInterstitialFactory>
+@interface CLXMintegralInterstitialFactory : NSObject <CLXAdapterInterstitialFactory>
 
 + (instancetype)createInstance;
 

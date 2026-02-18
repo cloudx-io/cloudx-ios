@@ -6,10 +6,17 @@
 
 @interface CLXMintegralBanner ()
 @property (nonatomic, strong) CLXLogger *logger;
-@property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, assign) BOOL isDestroyed;
 @property (nonatomic, assign) CGSize bannerSize;
+@property (nonatomic, copy) NSString *network;
+@property (nonatomic, copy) NSString *bidID;
+@property (nonatomic, copy) NSString *placementID;
 @property (nonatomic, copy, nullable) NSString *adUnitName;
+@property (nonatomic, copy) NSString *unitID;
+@property (nonatomic, copy, nullable) NSString *bidPayload;
+@property (nonatomic, copy, nullable) NSString *creativeID;
+@property (nonatomic, assign) NSInteger autoRefreshTime;
+@property (nonatomic, assign) BOOL showCloseButton;
 @property (nonatomic, strong, nullable) MTGBannerAdView *mintegralBannerView;
 @end
 
@@ -45,10 +52,6 @@
     return self;
 }
 
-- (void)dealloc {
-    [self destroy];
-}
-
 #pragma mark - Banner Size Conversion
 
 - (MTGBannerSizeType)bannerSizeTypeFromSize:(CGSize)size {
@@ -58,7 +61,10 @@
         return MTGLargeBannerType320x90;
     } else if (size.width == 300 && size.height == 250) {
         return MTGMediumRectangularBanner300x250;
+    } else if (size.width == 728 && size.height == 90) {
+        return MTGSmartBannerType; // Leaderboard - use smart banner
     } else {
+        [self.logger debug:[NSString stringWithFormat:@"Unknown banner size %.0fx%.0f, using smart banner", size.width, size.height]];
         return MTGSmartBannerType;
     }
 }
@@ -77,11 +83,6 @@
         return;
     }
     
-    if (_isLoading) {
-        [self.logger debug:@"Load already in progress"];
-        return;
-    }
-    
     // Validate unitID at load time
     if (!_unitID || _unitID.length == 0) {
         NSString *adUnitContext = _adUnitName ? [NSString stringWithFormat:@" for ad unit '%@'", _adUnitName] : @"";
@@ -91,14 +92,14 @@
         NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
                                      description:errorMessage];
         [self.logger error:error.localizedDescription];
-        
-        if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
-            [self.delegate failToLoadBanner:self error:error];
+
+        id<CLXAdapterBannerDelegate> delegate = self.delegate;
+        if (delegate && [delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
+            [delegate failToLoadBanner:self error:error];
         }
         return;
     }
     
-    _isLoading = YES;
     [self.logger debug:[NSString stringWithFormat:@"Loading banner - Placement: %@, PlacementID:%@, UnitID:%@", _adUnitName ?: @"(unknown)", _placementID, _unitID]];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -131,12 +132,15 @@
         [self.logger error:@"Cannot show - adapter is destroyed"];
         return;
     }
-    
-    [self.logger info:@"Showing banner"];
-    
-    if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
-        [self.delegate didShowBanner:self];
+
+    // Set viewController for click handling and modal presentation
+    if (self.mintegralBannerView && viewController) {
+        self.mintegralBannerView.viewController = viewController;
     }
+
+    [self.logger debug:@"showFromViewController called - impression will be tracked in adViewWillLogImpression"];
+    // Note: Do not fire didShowBanner here. The impression callback fires in adViewWillLogImpression:
+    // when the banner is actually displayed to the user.
 }
 
 - (void)destroy {
@@ -147,15 +151,17 @@
     [self.logger debug:@"Destroying banner adapter"];
     self.isDestroyed = YES;
     
-    if (self.mintegralBannerView) {
-        [self.mintegralBannerView removeFromSuperview];
-        [self.mintegralBannerView destroyBannerAdView];
-        self.mintegralBannerView.delegate = nil;
+    MTGBannerAdView *bannerView = self.mintegralBannerView;
+    if (bannerView) {
         self.mintegralBannerView = nil;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [bannerView removeFromSuperview];
+            [bannerView destroyBannerAdView];
+            bannerView.delegate = nil;
+        });
     }
     
     self.delegate = nil;
-    self.isLoading = NO;
 }
 
 #pragma mark - MTGBannerAdViewDelegate
@@ -166,7 +172,6 @@
     }
     
     [self.logger info:@"Banner loaded successfully"];
-    _isLoading = NO;
     _creativeID = adView.creativeId;
     
     id<CLXAdapterBannerDelegate> delegate = self.delegate;
@@ -183,12 +188,8 @@
     }
     
     [self.logger error:[NSString stringWithFormat:@"Failed to load: %@", error.localizedDescription]];
-    _isLoading = NO;
-    
-    NSError *mappedError = [CLXMintegralErrorHandler handleNetworkError:error
-                                                             withLogger:self.logger
-                                                                context:@"Banner Load"
-                                                            placementID:_placementID];
+
+    CLXError *mappedError = [CLXMintegralErrorHandler toCloudXError:error];
     
     id<CLXAdapterBannerDelegate> delegate = self.delegate;
     if (delegate && [delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
@@ -237,6 +238,9 @@
 }
 
 - (void)adViewWillLeaveApplication:(MTGBannerAdView *)adView {
+    if (self.isDestroyed) {
+        return;
+    }
     [self.logger debug:@"Will leave application"];
 }
 

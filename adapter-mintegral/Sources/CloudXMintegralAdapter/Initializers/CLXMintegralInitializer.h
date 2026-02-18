@@ -5,8 +5,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXMintegralInitializer : NSObject <CLXAdNetworkInitializer>
 
-@property (nonatomic, strong, readonly) NSString *sdkVersion;
-@property (nonatomic, strong, readonly) NSString *network;
+@property (nonatomic, copy, readonly) NSString *sdkVersion;
+@property (nonatomic, copy, readonly) NSString *network;
 
 + (BOOL)isInitialized;
 + (instancetype)createInstance;

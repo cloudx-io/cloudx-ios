@@ -6,9 +6,15 @@
 
 @interface CLXMintegralInterstitial ()
 @property (nonatomic, strong) CLXLogger *logger;
-@property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, assign) BOOL isDestroyed;
+@property (nonatomic, copy) NSString *placementID;
 @property (nonatomic, copy, nullable) NSString *adUnitName;
+@property (nonatomic, copy) NSString *unitID;
+@property (nonatomic, copy, nullable) NSString *bidPayload;
+@property (nonatomic, copy, nullable) NSString *creativeID;
+@property (nonatomic, assign) BOOL playVideoMute;
+@property (nonatomic, strong, nullable) MTGNewInterstitialBidAdManager *interstitialBidManager;
+@property (nonatomic, strong, nullable) MTGNewInterstitialAdManager *interstitialManager;
 @end
 
 @implementation CLXMintegralInterstitial
@@ -18,6 +24,7 @@
                      adUnitName:(nullable NSString *)adUnitName
                             unitID:(NSString *)unitID
                              bidID:(NSString *)bidID
+                     playVideoMute:(BOOL)playVideoMute
                           delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
     self = [super init];
     if (self) {
@@ -29,11 +36,12 @@
         _delegate = delegate;
         _sdkVersion = [CLXMintegralInitializer sdkVersion];
         _network = @"mintegral";
-        _playVideoMute = NO;
+        _playVideoMute = playVideoMute;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMintegralInterstitial"];
         _isDestroyed = NO;
-        
-        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@, PlacementID:%@, UnitID:%@", adUnitName ?: @"(unknown)", placementID, unitID]];
+
+        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@, PlacementID:%@, UnitID:%@, Bidding:%@",
+                           adUnitName ?: @"(unknown)", placementID, unitID, bidPayload.length > 0 ? @"YES" : @"NO"]];
     }
     return self;
 }
@@ -43,12 +51,7 @@
         [self.logger error:@"Cannot load - adapter is destroyed"];
         return;
     }
-    
-    if (_isLoading) {
-        [self.logger debug:@"Load already in progress"];
-        return;
-    }
-    
+
     // Validate unitID at load time
     if (!_unitID || _unitID.length == 0) {
         NSString *adUnitContext = _adUnitName ? [NSString stringWithFormat:@" for ad unit '%@'", _adUnitName] : @"";
@@ -58,42 +61,50 @@
         NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
                                      description:errorMessage];
         [self.logger error:error.localizedDescription];
-        
-        if ([self.delegate respondsToSelector:@selector(didFailToLoadWithInterstitial:error:)]) {
-            [self.delegate didFailToLoadWithInterstitial:self error:error];
+
+        id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+        if (delegate && [delegate respondsToSelector:@selector(didFailToLoadWithInterstitial:error:)]) {
+            [delegate didFailToLoadWithInterstitial:self error:error];
         }
         return;
     }
-    
-    _isLoading = YES;
+
     [self.logger debug:[NSString stringWithFormat:@"Loading interstitial - Placement: %@, PlacementID:%@, UnitID:%@", _adUnitName ?: @"(unknown)", _placementID, _unitID]];
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.isDestroyed) {
             return;
         }
-        
-        // Create the interstitial manager on main thread if not already created
-        if (!self.interstitialManager) {
-            self.interstitialManager = [[MTGNewInterstitialBidAdManager alloc] initWithPlacementId:self.placementID 
-                                                                                           unitId:self.unitID 
-                                                                                         delegate:self];
-        }
-        
-        // Apply mute setting before loading
-        self.interstitialManager.playVideoMute = self.playVideoMute;
-        
+
         if (self.bidPayload && self.bidPayload.length > 0) {
-            [self.interstitialManager loadAdWithBidToken:self.bidPayload];
-        } else {
-            // Waterfall/non-bidding not supported with MTGNewInterstitialBidAdManager
-            [self.logger error:@"Cannot load interstitial without bidPayload - requires bid token"];
-            self.isLoading = NO;
-            if ([self.delegate respondsToSelector:@selector(didFailToLoadWithInterstitial:error:)]) {
-                CLXError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed
-                                              description:@"Mintegral interstitial requires bid token for bidding flow"];
-                [self.delegate didFailToLoadWithInterstitial:self error:error];
+            // Bidding flow - use MTGNewInterstitialBidAdManager
+            if (!self.interstitialBidManager) {
+                self.interstitialBidManager = [[MTGNewInterstitialBidAdManager alloc] initWithPlacementId:self.placementID
+                                                                                                  unitId:self.unitID
+                                                                                                delegate:self];
             }
+            self.interstitialBidManager.playVideoMute = self.playVideoMute;
+            [self.interstitialBidManager loadAdWithBidToken:self.bidPayload];
+        } else {
+            // Waterfall flow - use MTGNewInterstitialAdManager
+            if (!self.interstitialManager) {
+                self.interstitialManager = [[MTGNewInterstitialAdManager alloc] initWithPlacementId:self.placementID
+                                                                                            unitId:self.unitID
+                                                                                          delegate:self];
+            }
+            self.interstitialManager.playVideoMute = self.playVideoMute;
+
+            // Check if ad is already cached
+            if ([self.interstitialManager isAdReady]) {
+                self->_creativeID = [self.interstitialManager getCreativeIdWithUnitId:self.unitID];
+                id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+                if (delegate && [delegate respondsToSelector:@selector(didLoadWithInterstitial:)]) {
+                    [delegate didLoadWithInterstitial:self];
+                }
+                return;
+            }
+
+            [self.interstitialManager loadAd];
         }
     });
 }
@@ -103,21 +114,30 @@
         [self.logger error:@"Cannot show - adapter is destroyed"];
         return;
     }
-    
-    BOOL ready = self.interstitialManager && [self.interstitialManager isAdReady];
-    
-    if (ready) {
-        [self.logger info:@"Showing interstitial"];
+
+    BOOL bidReady = self.interstitialBidManager && [self.interstitialBidManager isAdReady];
+    BOOL waterfallReady = self.interstitialManager && [self.interstitialManager isAdReady];
+
+    if (bidReady) {
+        [self.logger info:@"Showing interstitial (bidding)"];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.interstitialBidManager showFromViewController:viewController];
+        });
+    } else if (waterfallReady) {
+        [self.logger info:@"Showing interstitial (waterfall)"];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.interstitialManager showFromViewController:viewController];
         });
     } else {
         [self.logger error:@"Cannot show - ad not ready"];
-        
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdNotReady
+
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterAdNotReady
                                      description:@"Interstitial not ready"];
-        if ([self.delegate respondsToSelector:@selector(didFailToShowWithInterstitial:error:)]) {
-            [self.delegate didFailToShowWithInterstitial:self error:error];
+        id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+        if (delegate && [delegate respondsToSelector:@selector(didFailToShowWithInterstitial:error:)]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [delegate didFailToShowWithInterstitial:self error:error];
+            });
         }
     }
 }
@@ -132,10 +152,9 @@
     if (self.isDestroyed) {
         return;
     }
-    
-    [self.logger info:@"Interstitial loaded successfully"];
-    _isLoading = NO;
-    
+
+    [self.logger info:@"Interstitial loaded successfully (bidding)"];
+
     // Retrieve creative ID
     _creativeID = [adManager getCreativeIdWithUnitId:adManager.currentUnitId];
     
@@ -154,13 +173,9 @@
     }
     
     [self.logger error:[NSString stringWithFormat:@"Failed to load: %@", error.localizedDescription]];
-    _isLoading = NO;
-    
-    NSError *mappedError = [CLXMintegralErrorHandler handleNetworkError:error
-                                                             withLogger:self.logger
-                                                                context:@"Interstitial Load"
-                                                            placementID:_placementID];
-    
+
+    CLXError *mappedError = [CLXMintegralErrorHandler toCloudXError:error];
+
     // Capture strong reference to delegate before dispatching to main thread
     id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
     if (delegate && [delegate respondsToSelector:@selector(didFailToLoadWithInterstitial:error:)]) {
@@ -201,10 +216,7 @@
     
     [self.logger error:[NSString stringWithFormat:@"Failed to show: %@", error.localizedDescription]];
     
-    NSError *mappedError = [CLXMintegralErrorHandler handleNetworkError:error
-                                                             withLogger:self.logger
-                                                                context:@"Interstitial Show"
-                                                            placementID:_placementID];
+    CLXError *mappedError = [CLXMintegralErrorHandler toCloudXError:error];
     
     // Capture strong reference to delegate before dispatching to main thread
     id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
@@ -259,26 +271,144 @@
     [self.logger debug:@"End card shown"];
 }
 
-#pragma mark - Lifecycle
+#pragma mark - MTGNewInterstitialAdDelegate (Waterfall)
 
-- (void)dealloc {
-    [self destroy];
+- (void)newInterstitialAdLoadSuccess:(MTGNewInterstitialAdManager *)adManager {
+    [self.logger debug:@"Ad load success - waterfall (waiting for resources)"];
 }
+
+- (void)newInterstitialAdResourceLoadSuccess:(MTGNewInterstitialAdManager *)adManager {
+    if (self.isDestroyed) {
+        return;
+    }
+
+    [self.logger info:@"Interstitial loaded successfully (waterfall)"];
+
+    // Retrieve creative ID
+    _creativeID = [adManager getCreativeIdWithUnitId:adManager.currentUnitId];
+
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(didLoadWithInterstitial:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate didLoadWithInterstitial:self];
+        });
+    }
+}
+
+- (void)newInterstitialAdLoadFail:(nonnull NSError *)error adManager:(MTGNewInterstitialAdManager *)adManager {
+    if (self.isDestroyed) {
+        return;
+    }
+
+    [self.logger error:[NSString stringWithFormat:@"Failed to load (waterfall): %@", error.localizedDescription]];
+
+    CLXError *mappedError = [CLXMintegralErrorHandler toCloudXError:error];
+
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(didFailToLoadWithInterstitial:error:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate didFailToLoadWithInterstitial:self error:mappedError];
+        });
+    }
+}
+
+- (void)newInterstitialAdShowSuccess:(MTGNewInterstitialAdManager *)adManager {
+    if (self.isDestroyed) {
+        return;
+    }
+
+    [self.logger info:@"Interstitial displayed (waterfall)"];
+
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (!delegate) {
+        return;
+    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([delegate respondsToSelector:@selector(didShowWithInterstitial:)]) {
+            [delegate didShowWithInterstitial:self];
+        }
+
+        if ([delegate respondsToSelector:@selector(impressionWithInterstitial:)]) {
+            [delegate impressionWithInterstitial:self];
+        }
+    });
+}
+
+- (void)newInterstitialAdShowFail:(nonnull NSError *)error adManager:(MTGNewInterstitialAdManager *)adManager {
+    if (self.isDestroyed) {
+        return;
+    }
+
+    [self.logger error:[NSString stringWithFormat:@"Failed to show (waterfall): %@", error.localizedDescription]];
+
+    CLXError *mappedError = [CLXMintegralErrorHandler toCloudXError:error];
+
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(didFailToShowWithInterstitial:error:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate didFailToShowWithInterstitial:self error:mappedError];
+        });
+    }
+}
+
+- (void)newInterstitialAdClicked:(MTGNewInterstitialAdManager *)adManager {
+    if (self.isDestroyed) {
+        return;
+    }
+
+    [self.logger info:@"Interstitial clicked (waterfall)"];
+
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(clickWithInterstitial:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate clickWithInterstitial:self];
+        });
+    }
+}
+
+- (void)newInterstitialAdDismissedWithConverted:(BOOL)converted adManager:(MTGNewInterstitialAdManager *)adManager {
+    if (self.isDestroyed) {
+        return;
+    }
+
+    [self.logger info:@"Interstitial hidden (waterfall)"];
+
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (delegate && [delegate respondsToSelector:@selector(didCloseWithInterstitial:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [delegate didCloseWithInterstitial:self];
+        });
+    }
+}
+
+- (void)newInterstitialAdDidClosed:(MTGNewInterstitialAdManager *)adManager {
+    [self.logger debug:@"Video completed (waterfall)"];
+}
+
+- (void)newInterstitialAdPlayCompleted:(MTGNewInterstitialAdManager *)adManager {
+    [self.logger debug:@"Video play completed (waterfall)"];
+}
+
+- (void)newInterstitialAdEndCardShowSuccess:(MTGNewInterstitialAdManager *)adManager {
+    [self.logger debug:@"End card shown (waterfall)"];
+}
+
+#pragma mark - Lifecycle
 
 - (void)destroy {
     if (self.isDestroyed) {
         return;
     }
-    
+
     [self.logger debug:@"Destroying interstitial adapter"];
     self.isDestroyed = YES;
-    
-    if (self.interstitialManager) {
-        self.interstitialManager = nil;
-    }
-    
+
+    // Release managers (delegate is readonly, set at init time only)
+    self.interstitialBidManager = nil;
+    self.interstitialManager = nil;
+
     self.delegate = nil;
-    self.isLoading = NO;
 }
 
 @end

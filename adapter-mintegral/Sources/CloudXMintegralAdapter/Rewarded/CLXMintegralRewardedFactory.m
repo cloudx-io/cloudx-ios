@@ -4,7 +4,19 @@
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXLogger.h>
 
+@interface CLXMintegralRewardedFactory ()
+@property (nonatomic, strong) CLXLogger *logger;
+@end
+
 @implementation CLXMintegralRewardedFactory
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _logger = [[CLXLogger alloc] initWithCategory:@"CLXMintegralRewardedFactory"];
+    }
+    return self;
+}
 
 + (instancetype)createInstance {
     return [[CLXMintegralRewardedFactory alloc] init];
@@ -41,6 +53,10 @@
     [self.logger debug:[NSString stringWithFormat:@"[RewardedFactory] Creating Mintegral rewarded - Ad Unit: %@, placementID:%@, unitID:%@, hasBidPayload:%@",
                         adUnitName ?: @"(unknown)", ids.placementID, ids.unitID, bidPayload ? @"YES" : @"NO"]];
     
+    // Extract mute state from server extras
+    NSString *isMuted = extras[@"is_muted"];
+    BOOL playVideoMute = isMuted ? [isMuted boolValue] : NO;
+
     // Always create and return adapter (even with invalid parameters)
     // Validation errors will be reported in load() via delegate callback
     CLXMintegralRewarded *rewarded = [[CLXMintegralRewarded alloc] initWithBidPayload:bidPayload
@@ -48,8 +64,9 @@
                                                                         adUnitName:adUnitName
                                                                                unitID:ids.unitID
                                                                                 bidID:ids.bidID ?: @""
+                                                                        playVideoMute:playVideoMute
                                                                              delegate:delegate];
-    
+
     [self.logger debug:@"[RewardedFactory] Mintegral rewarded adapter created successfully"];
     return rewarded;
 }

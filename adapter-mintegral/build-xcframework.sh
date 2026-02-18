@@ -48,14 +48,14 @@ xcodebuild archive \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
   CODE_SIGNING_ALLOWED=NO \
   MACH_O_TYPE=staticlib \
-  IPHONEOS_DEPLOYMENT_TARGET=13.0 \
+  IPHONEOS_DEPLOYMENT_TARGET=14.0 \
   DEBUG_INFORMATION_FORMAT=dwarf \
   DEPLOYMENT_POSTPROCESSING=YES \
   STRIP_INSTALLED_PRODUCT=YES \
   STRIP_STYLE=non-global \
   COPY_PHASE_STRIP=YES \
-  HEADER_SEARCH_PATHS='$(SRCROOT)/Sources/CloudXMintegralAdapter $(SRCROOT)/Sources/CloudXMintegralAdapter/Base $(SRCROOT)/Sources/CloudXMintegralAdapter/Banner $(SRCROOT)/Sources/CloudXMintegralAdapter/Initializers $(SRCROOT)/Sources/CloudXMintegralAdapter/Interstitial $(SRCROOT)/Sources/CloudXMintegralAdapter/Rewarded $(SRCROOT)/Sources/CloudXMintegralAdapter/Utils' \
-  USER_HEADER_SEARCH_PATHS='$(SRCROOT)/Sources/CloudXMintegralAdapter $(SRCROOT)/Sources/CloudXMintegralAdapter/Base $(SRCROOT)/Sources/CloudXMintegralAdapter/Banner $(SRCROOT)/Sources/CloudXMintegralAdapter/Initializers $(SRCROOT)/Sources/CloudXMintegralAdapter/Interstitial $(SRCROOT)/Sources/CloudXMintegralAdapter/Rewarded $(SRCROOT)/Sources/CloudXMintegralAdapter/Utils' 2>&1 | tee xcodebuild-ios.log || print_error "Failed to build static framework for device."
+  HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMintegralAdapter $(SRCROOT)/Sources/CloudXMintegralAdapter/Base $(SRCROOT)/Sources/CloudXMintegralAdapter/Banner $(SRCROOT)/Sources/CloudXMintegralAdapter/Initializers $(SRCROOT)/Sources/CloudXMintegralAdapter/Interstitial $(SRCROOT)/Sources/CloudXMintegralAdapter/Rewarded $(SRCROOT)/Sources/CloudXMintegralAdapter/Utils' \
+  USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMintegralAdapter $(SRCROOT)/Sources/CloudXMintegralAdapter/Base $(SRCROOT)/Sources/CloudXMintegralAdapter/Banner $(SRCROOT)/Sources/CloudXMintegralAdapter/Initializers $(SRCROOT)/Sources/CloudXMintegralAdapter/Interstitial $(SRCROOT)/Sources/CloudXMintegralAdapter/Rewarded $(SRCROOT)/Sources/CloudXMintegralAdapter/Utils' 2>&1 | tee xcodebuild-ios.log || print_error "Failed to build static framework for device."
 
 # --- Step 3: Build Static Framework for Simulator ---
 print_status "3. Building Static Framework for Simulator..."
@@ -69,14 +69,14 @@ xcodebuild archive \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
   CODE_SIGNING_ALLOWED=NO \
   MACH_O_TYPE=staticlib \
-  IPHONEOS_DEPLOYMENT_TARGET=13.0 \
+  IPHONEOS_DEPLOYMENT_TARGET=14.0 \
   DEBUG_INFORMATION_FORMAT=dwarf \
   DEPLOYMENT_POSTPROCESSING=YES \
   STRIP_INSTALLED_PRODUCT=YES \
   STRIP_STYLE=non-global \
   COPY_PHASE_STRIP=YES \
-  HEADER_SEARCH_PATHS='$(SRCROOT)/Sources/CloudXMintegralAdapter $(SRCROOT)/Sources/CloudXMintegralAdapter/Base $(SRCROOT)/Sources/CloudXMintegralAdapter/Banner $(SRCROOT)/Sources/CloudXMintegralAdapter/Initializers $(SRCROOT)/Sources/CloudXMintegralAdapter/Interstitial $(SRCROOT)/Sources/CloudXMintegralAdapter/Rewarded $(SRCROOT)/Sources/CloudXMintegralAdapter/Utils' \
-  USER_HEADER_SEARCH_PATHS='$(SRCROOT)/Sources/CloudXMintegralAdapter $(SRCROOT)/Sources/CloudXMintegralAdapter/Base $(SRCROOT)/Sources/CloudXMintegralAdapter/Banner $(SRCROOT)/Sources/CloudXMintegralAdapter/Initializers $(SRCROOT)/Sources/CloudXMintegralAdapter/Interstitial $(SRCROOT)/Sources/CloudXMintegralAdapter/Rewarded $(SRCROOT)/Sources/CloudXMintegralAdapter/Utils' 2>&1 | tee xcodebuild-sim.log || print_error "Failed to build static framework for simulator."
+  HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMintegralAdapter $(SRCROOT)/Sources/CloudXMintegralAdapter/Base $(SRCROOT)/Sources/CloudXMintegralAdapter/Banner $(SRCROOT)/Sources/CloudXMintegralAdapter/Initializers $(SRCROOT)/Sources/CloudXMintegralAdapter/Interstitial $(SRCROOT)/Sources/CloudXMintegralAdapter/Rewarded $(SRCROOT)/Sources/CloudXMintegralAdapter/Utils' \
+  USER_HEADER_SEARCH_PATHS='$(SRCROOT)/../core/Sources $(SRCROOT)/Sources/CloudXMintegralAdapter $(SRCROOT)/Sources/CloudXMintegralAdapter/Base $(SRCROOT)/Sources/CloudXMintegralAdapter/Banner $(SRCROOT)/Sources/CloudXMintegralAdapter/Initializers $(SRCROOT)/Sources/CloudXMintegralAdapter/Interstitial $(SRCROOT)/Sources/CloudXMintegralAdapter/Rewarded $(SRCROOT)/Sources/CloudXMintegralAdapter/Utils' 2>&1 | tee xcodebuild-sim.log || print_error "Failed to build static framework for simulator."
 
 # --- Step 4: Create .xcframework ---
 print_status "4. Creating .xcframework..."

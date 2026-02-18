@@ -1,18 +1,8 @@
 #import "CLXMintegralBidTokenSource.h"
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
-#import <CloudXCore/CLXAdTrackingService.h>
-#import <MTGSDK/MTGSDK.h>
 #import <MTGSDKBidding/MTGBiddingSDK.h>
 #import "CLXMintegralInitializer.h"
-
-// Mintegral Ad Type values for buyerUIDWithDictionary
-// Note: These match MTGAdType enum values from the SDK
-static const NSInteger kMintegralInterstitialAd = 1;
-static const NSInteger kMintegralRewardVideoAd = 2;
-static const NSInteger kMintegralBannerAd = 6;
-static const NSInteger kMintegralSplashAd = 7;
-static const NSInteger kMintegralNativeAd = 8;
 
 @interface CLXMintegralBidTokenSource ()
 @property (nonatomic, strong) CLXLogger *logger;
@@ -37,32 +27,20 @@ static const NSInteger kMintegralNativeAd = 8;
     self = [super init];
     if (self) {
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMintegralBidTokenSource"];
-        _network = @"mintegral";
     }
     return self;
 }
 
 - (void)getTokenWithCompletion:(void (^)(NSDictionary<NSString *, NSString *> * _Nullable,
                                          NSError * _Nullable))completion {
-    // Use default implementation without ad info
-    [self getTokenWithPlacementId:nil unitId:nil adType:nil completion:completion];
-}
-
-- (void)getTokenWithPlacementId:(nullable NSString *)placementId
-                         unitId:(nullable NSString *)unitId
-                         adType:(nullable NSNumber *)adType
-                     completion:(void (^)(NSDictionary<NSString *, NSString *> * _Nullable,
-                                         NSError * _Nullable))completion {
-    
     [self.logger debug:@"Getting Mintegral bid token"];
-    
+
     // IMPORTANT: Must use background queue, NOT main queue.
     // Bid token generation can be a blocking call that acquires internal locks.
     // When another SDK concurrently calls the same method, this can take several seconds.
     // Calling on main thread causes UI freeze/ANR.
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @try {
-            // Check if SDK is initialized
             if (![CLXMintegralInitializer isInitialized]) {
                 NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed
                                              description:@"Mintegral SDK not initialized"];
@@ -70,54 +48,28 @@ static const NSInteger kMintegralNativeAd = 8;
                 if (completion) completion(nil, error);
                 return;
             }
-            
-            NSString *bidToken = nil;
-            
-            // Use enhanced buyerUIDWithDictionary if we have ad info (matching AppLovin)
-            if (placementId.length > 0 && unitId.length > 0 && adType != nil) {
-                NSDictionary *bidInfo = @{
-                    @"placementId": placementId ?: @"",
-                    @"unitId": unitId ?: @"",
-                    @"adType": adType
-                };
-                bidToken = [MTGBiddingSDK buyerUIDWithDictionary:bidInfo];
-                [self.logger debug:[NSString stringWithFormat:@"Using enhanced bid token with adType: %@", adType]];
-            } else {
-                // Fallback to basic buyerUID
-                bidToken = [MTGBiddingSDK buyerUID];
-                [self.logger debug:@"Using basic bid token"];
-            }
-            
+
+            // AppLovin uses buyerUIDWithDictionary: passing placementId/unitId/adType
+            // when available, falling back to basic buyerUID. Our protocol doesn't
+            // carry ad-unit context, so we use the basic variant; the server adds
+            // placement/unit IDs to the bid request on its side.
+            NSString *bidToken = [MTGBiddingSDK buyerUID];
+
             if (!bidToken || bidToken.length == 0) {
                 [self.logger warn:@"Mintegral returned empty bid token"];
-                bidToken = @""; // Use empty string instead of nil
-            } else {
-                [self.logger debug:[NSString stringWithFormat:@"Generated bid token (prefix): %@...", 
-                                  [bidToken substringToIndex:MIN(20, bidToken.length)]]];
+                if (completion) completion(nil, nil);
+                return;
             }
-            
-            // Get IDFA if available
-            NSString *idfa = [CLXAdTrackingService idfa];
-            
-            // Build token dictionary
-            NSMutableDictionary *tokenDict = [NSMutableDictionary dictionary];
-            
-            if (bidToken && bidToken.length > 0) {
-                tokenDict[@"bid_token"] = bidToken;
-            }
-            
-            if (idfa && idfa.length > 0) {
-                tokenDict[@"device_ifa"] = idfa;
-            }
-            
-            tokenDict[@"network"] = self.network;
-            tokenDict[@"sdk_version"] = [CLXMintegralInitializer sdkVersion];
-            
-            [self.logger info:[NSString stringWithFormat:@"Mintegral token generated with %lu keys",
-                              (unsigned long)tokenDict.count]];
-            
-            if (completion) completion([tokenDict copy], nil);
-            
+
+            [self.logger debug:[NSString stringWithFormat:@"Generated bid token (prefix): %@...",
+                              [bidToken substringToIndex:MIN(20, bidToken.length)]]];
+
+            NSDictionary *tokenDict = @{@"bid_token": bidToken};
+
+            [self.logger info:@"Mintegral token generated"];
+
+            if (completion) completion(tokenDict, nil);
+
         } @catch (NSException *exception) {
             NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed
                                          description:exception.reason ?: @"Mintegral token generation failed"];
@@ -125,28 +77,6 @@ static const NSInteger kMintegralNativeAd = 8;
             if (completion) completion(nil, error);
         }
     });
-}
-
-#pragma mark - Ad Type Helpers
-
-+ (NSNumber *)adTypeForBanner {
-    return @(kMintegralBannerAd);
-}
-
-+ (NSNumber *)adTypeForInterstitial {
-    return @(kMintegralInterstitialAd);
-}
-
-+ (NSNumber *)adTypeForRewarded {
-    return @(kMintegralRewardVideoAd);
-}
-
-+ (NSNumber *)adTypeForNative {
-    return @(kMintegralNativeAd);
-}
-
-+ (NSNumber *)adTypeForSplash {
-    return @(kMintegralSplashAd);
 }
 
 @end

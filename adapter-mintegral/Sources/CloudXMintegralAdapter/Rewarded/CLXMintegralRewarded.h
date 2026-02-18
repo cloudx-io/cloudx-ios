@@ -10,8 +10,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * CLXMintegralRewarded - Mintegral Rewarded Ad Implementation
  *
- * IMPORTANT: Uses MTGBidRewardAdManager as a SINGLETON via [MTGBidRewardAdManager sharedInstance]
- * This matches the AppLovin adapter pattern and Mintegral's recommended usage.
+ * Supports both bidding (MTGBidRewardAdManager) and waterfall (MTGRewardAdManager).
+ * Both use singleton pattern via [*sharedInstance].
  */
 @interface CLXMintegralRewarded : NSObject <MTGRewardAdLoadDelegate, MTGRewardAdShowDelegate, CLXAdapterRewarded>
 
@@ -19,21 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly) NSString *sdkVersion;
 @property (nonatomic, strong, readonly) NSString *network;
 @property (nonatomic, strong, readonly) NSString *bidID;
-@property (nonatomic, strong, readonly) NSString *placementID;
-
-/**
- * CloudX ad unit name for error messages and logging.
- *
- * This is separate from `placementID`/`unitID` because:
- * - `placementID` and `unitID` are Mintegral's internal identifiers used by their SDK
- * - `adUnitName` is CloudX's human-readable identifier shown in error messages,
- *   logs, and delegate callbacks to help publishers identify which ad unit failed
- */
-@property (nonatomic, copy, readonly, nullable) NSString *adUnitName;
-@property (nonatomic, strong, readonly) NSString *unitID;
-@property (nonatomic, copy, nullable) NSString *bidPayload;
-@property (nonatomic, copy, nullable) NSString *creativeID;
-@property (nonatomic, assign) BOOL playVideoMute;
 @property (nonatomic, assign, readonly) BOOL isReady;
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
@@ -41,13 +26,12 @@ NS_ASSUME_NONNULL_BEGIN
                      adUnitName:(nullable NSString *)adUnitName
                             unitID:(NSString *)unitID
                              bidID:(NSString *)bidID
+                     playVideoMute:(BOOL)playVideoMute
                           delegate:(id<CLXAdapterRewardedDelegate>)delegate;
 
 - (void)load;
 - (void)showFromViewController:(UIViewController *)viewController;
-- (void)destroy;
 
 @end
 
 NS_ASSUME_NONNULL_END
-

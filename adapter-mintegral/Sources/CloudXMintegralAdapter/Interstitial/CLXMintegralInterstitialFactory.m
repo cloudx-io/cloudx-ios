@@ -4,7 +4,19 @@
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXLogger.h>
 
+@interface CLXMintegralInterstitialFactory ()
+@property (nonatomic, strong) CLXLogger *logger;
+@end
+
 @implementation CLXMintegralInterstitialFactory
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _logger = [[CLXLogger alloc] initWithCategory:@"CLXMintegralInterstitialFactory"];
+    }
+    return self;
+}
 
 + (instancetype)createInstance {
     return [[CLXMintegralInterstitialFactory alloc] init];
@@ -41,6 +53,10 @@
     [self.logger debug:[NSString stringWithFormat:@"[InterstitialFactory] Creating Mintegral interstitial - Ad Unit: %@, placementID:%@, unitID:%@, hasBidPayload:%@",
                         adUnitName ?: @"(unknown)", ids.placementID, ids.unitID, bidPayload ? @"YES" : @"NO"]];
     
+    // Extract mute state from server extras
+    NSString *isMuted = extras[@"is_muted"];
+    BOOL playVideoMute = isMuted ? [isMuted boolValue] : NO;
+
     // Always create and return adapter (even with invalid parameters)
     // Validation errors will be reported in load() via delegate callback
     CLXMintegralInterstitial *interstitial = [[CLXMintegralInterstitial alloc] initWithBidPayload:bidPayload
@@ -48,8 +64,9 @@
                                                                                     adUnitName:adUnitName
                                                                                            unitID:ids.unitID
                                                                                             bidID:ids.bidID ?: @""
+                                                                                    playVideoMute:playVideoMute
                                                                                          delegate:delegate];
-    
+
     [self.logger debug:@"[InterstitialFactory] Mintegral interstitial adapter created successfully"];
     return interstitial;
 }

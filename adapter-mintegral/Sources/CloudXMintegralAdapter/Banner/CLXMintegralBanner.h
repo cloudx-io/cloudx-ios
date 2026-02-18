@@ -3,7 +3,6 @@
 #import <MTGSDKBanner/MTGBannerAdView.h>
 #import <MTGSDKBanner/MTGBannerAdViewDelegate.h>
 #import <CloudXCore/CLXAdapterBanner.h>
-#import <CloudXCore/CLXDestroyable.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -13,30 +12,12 @@ NS_ASSUME_NONNULL_BEGIN
  * Uses MTGBannerAdView which supports both bidding and waterfall.
  * Includes proper banner configuration: autoRefreshTime, showCloseButton.
  */
-@interface CLXMintegralBanner : NSObject <MTGBannerAdViewDelegate, CLXAdapterBanner, CLXDestroyable>
+@interface CLXMintegralBanner : NSObject <MTGBannerAdViewDelegate, CLXAdapterBanner>
 
 @property (nonatomic, weak, nullable) id<CLXAdapterBannerDelegate> delegate;
 @property (nonatomic, assign) BOOL timeout;
 @property (nonatomic, strong, nullable, readonly) UIView *bannerView;
-@property (nonatomic, strong, readonly) NSString *sdkVersion;
-@property (nonatomic, strong, readonly) NSString *network;
-@property (nonatomic, strong, readonly) NSString *bidID;
-@property (nonatomic, strong, readonly) NSString *placementID;
-
-/**
- * CloudX ad unit name for error messages and logging.
- *
- * This is separate from `placementID`/`unitID` because:
- * - `placementID` and `unitID` are Mintegral's internal identifiers used by their SDK
- * - `adUnitName` is CloudX's human-readable identifier shown in error messages,
- *   logs, and delegate callbacks to help publishers identify which ad unit failed
- */
-@property (nonatomic, copy, readonly, nullable) NSString *adUnitName;
-@property (nonatomic, strong, readonly) NSString *unitID;
-@property (nonatomic, copy, nullable) NSString *bidPayload;
-@property (nonatomic, copy, nullable) NSString *creativeID;
-@property (nonatomic, assign) NSInteger autoRefreshTime;  // 0 = disabled (default)
-@property (nonatomic, assign) BOOL showCloseButton;       // NO = hidden (default)
+@property (nonatomic, copy, readonly) NSString *sdkVersion;
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID
@@ -53,4 +34,3 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
-
