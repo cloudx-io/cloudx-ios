@@ -2,138 +2,138 @@
 //  CLXVungleErrorHandler.m
 //  CloudXVungleAdapter
 //
-//  Created by CloudX Team on 2024-09-14.
-//
 
 #import "CLXVungleErrorHandler.h"
-
-// Conditional import for CloudXCore header
-#if __has_include(<CloudXCore/CloudXCore.h>)
-#import <CloudXCore/CloudXCore.h>
-#else
-@import CloudXCore;
-#endif
-
-#import <VungleAdsSDK/VungleAdsSDK.h>
-
-NSString * const CLXVungleAdapterErrorDomain = @"com.cloudx.adapter.vungle";
+#import <CloudXCore/CLXError.h>
 
 @implementation CLXVungleErrorHandler
 
-+ (NSError *)handleVungleError:(NSError *)error
-                    withLogger:(CLXLogger *)logger
-                       context:(NSString *)context
-                   placementID:(NSString *)placementID {
-    
-    if (!error) {
-        return nil;
-    }
-    
-    NSString *errorDescription = [self descriptionForErrorCode:error.code];
-    NSString *logMessage = [NSString stringWithFormat:@"Vungle %@ Error - Placement: %@, Code: %ld, Description: %@, Original: %@",
-                           context, placementID, (long)error.code, errorDescription, error.localizedDescription];
-    
-    [logger error:logMessage];
-    
-    // Map to CloudX error and add metadata
-    NSError *mappedError = [self mapVungleError:error context:context];
-    
-    // Add metadata
-    NSMutableDictionary *userInfo = [mappedError.userInfo mutableCopy] ?: [NSMutableDictionary dictionary];
-    userInfo[@"original_error"] = error;
-    userInfo[@"placement_id"] = placementID;
-    userInfo[@"context"] = context;
-    userInfo[@"timestamp"] = @([[NSDate date] timeIntervalSince1970]);
-    
-    return [NSError errorWithDomain:mappedError.domain
-                               code:mappedError.code
-                           userInfo:userInfo];
-}
-
-+ (NSError *)mapVungleError:(NSError *)vungleError context:(NSString *)context {
++ (CLXError *)toCloudXError:(NSError *)vungleError isShowError:(BOOL)isShowError {
     if (!vungleError) {
-        return nil;
+        return [CLXError errorWithCode:CLXErrorCodeAdapterInternalError];
     }
-    
-    CLXVungleAdapterErrorCode mappedCode;
-    NSString *description;
-    
-    // Map Vungle error codes to CloudX error codes
-    // Note: Vungle SDK error codes may vary, this mapping covers common scenarios
-    switch (vungleError.code) {
-        case 10001: // VungleSDKErrorNoFill
-            mappedCode = CLXVungleAdapterErrorCodeNoFill;
-            description = @"No ad available to show";
-            break;
-            
-        case 10002: // VungleSDKErrorNetworkError
-            mappedCode = CLXVungleAdapterErrorCodeNetworkError;
-            description = @"Network connection error";
-            break;
-            
-        case 10003: // VungleSDKErrorInvalidPlacement
-            mappedCode = CLXVungleAdapterErrorCodeInvalidPlacement;
-            description = @"Invalid placement ID";
-            break;
-            
-        case 10004: // VungleSDKErrorNotInitialized
-            mappedCode = CLXVungleAdapterErrorCodeNotInitialized;
-            description = @"Vungle SDK not initialized";
-            break;
-            
-        case 10005: // VungleSDKErrorAdExpired
-            mappedCode = CLXVungleAdapterErrorCodeAdExpired;
-            description = @"Ad has expired";
-            break;
-            
-        case 10006: // VungleSDKErrorTimeout
-            mappedCode = CLXVungleAdapterErrorCodeTimeout;
-            description = @"Request timed out";
-            break;
-            
-        default:
-            mappedCode = CLXVungleAdapterErrorCodeLoadFailed;
-            description = vungleError.localizedDescription ?: @"Unknown Vungle SDK error";
-            break;
-    }
-    
-    NSDictionary *userInfo = @{
-        NSLocalizedDescriptionKey: description,
-        NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Vungle %@ error: %@", context, description],
-        @"vungle_error_code": @(vungleError.code),
-        @"vungle_error_domain": vungleError.domain ?: @"unknown"
-    };
-    
-    return [NSError errorWithDomain:CLXVungleAdapterErrorDomain
-                               code:mappedCode
-                           userInfo:userInfo];
-}
 
-+ (NSString *)descriptionForErrorCode:(NSInteger)errorCode {
-    switch (errorCode) {
-        case 10001:
-            return @"No Fill - No ad available for this request";
-        case 10002:
-            return @"Network Error - Unable to connect to Vungle servers";
-        case 10003:
-            return @"Invalid Placement - Placement ID not found or inactive";
-        case 10004:
-            return @"Not Initialized - Vungle SDK must be initialized before use";
-        case 10005:
-            return @"Ad Expired - The loaded ad has expired and cannot be shown";
-        case 10006:
-            return @"Timeout - Request timed out while loading ad";
-        case 10007:
-            return @"Invalid App ID - The provided App ID is invalid";
-        case 10008:
-            return @"Ad Already Loaded - An ad is already loaded for this placement";
-        case 10009:
-            return @"Ad Not Loaded - No ad is loaded for this placement";
-        case 10010:
-            return @"Internal Error - An internal error occurred in the Vungle SDK";
+    CLXErrorCode errorCode;
+
+    switch (vungleError.code) {
+
+        // --- Not Initialized ---
+        case 6:  // VungleErrorSdkNotInitialized
+            errorCode = CLXErrorCodeAdapterNotInitialized;
+            break;
+
+        // --- Invalid Configuration ---
+        case 2:    // VungleErrorInvalidAppID
+        case 201:  // VungleErrorInvalidPlacementID
+        case 207:  // VungleErrorPlacementAdTypeMismatch
+        case 222:  // VungleErrorInvalidWaterfallPlacementID
+        case 500:  // VungleErrorBannerViewInvalidSize
+        case 30001: // VungleErrorAdPublisherMismatch
+            errorCode = CLXErrorCodeAdapterInvalidConfiguration;
+            break;
+
+        // --- Missing View Controller ---
+        case 2009: // VungleErrorInvalidPlayParameter
+            errorCode = CLXErrorCodeAdapterMissingViewController;
+            break;
+
+        // --- Internal Error ---
+        case 119:   // VungleErrorJsonEncodeError
+        case 30002: // VungleErrorAdInternalIntegrationError
+        case 30003: // VungleErrorConfigNotFoundError
+        case 106:   // VungleErrorInvalidRequestBuilderError
+        case 131:   // VungleErrorMraidJsWriteFailed
+        case 130:   // VungleErrorMraidDownloadJsError
+        case 218:   // VungleErrorMraidJsDoesNotExist
+        case 219:   // VungleErrorMraidJsCopyFailed
+        case 109:   // VungleErrorTemplateUnzipError
+        case 114:   // VungleErrorAssetWriteError
+            errorCode = CLXErrorCodeAdapterInternalError;
+            break;
+
+        // --- Invalid Load State ---
+        case 202:  // VungleErrorAdConsumed
+        case 203:  // VungleErrorAdIsLoading
+        case 204:  // VungleErrorAdAlreadyLoaded
+        case 205:  // VungleErrorAdIsPlaying
+        case 206:  // VungleErrorAdAlreadyFailed
+        case 214:  // VungleErrorInvalidGzipBidPayload
+        case 208:  // VungleErrorInvalidBidPayload
+        case 209:  // VungleErrorInvalidJsonBidPayload
+        case 216:  // VungleErrorInvalidAdunitBidPayload
+        case 215:  // VungleErrorAdResponseEmpty
+        case 200:  // VungleErrorInvalidEventIDError
+        case 101:  // VungleErrorApiRequestError
+        case 102:  // VungleErrorApiResponseDataError
+        case 103:  // VungleErrorApiResponseDecodeError
+        case 104:  // VungleErrorApiFailedStatusCode
+        case 105:  // VungleErrorInvalidTemplateURL
+        case 111:  // VungleErrorInvalidAssetURL
+        case 112:  // VungleErrorAssetRequestError
+        case 113:  // VungleErrorAssetResponseDataError
+        case 117:  // VungleErrorAssetFailedStatusCode
+            errorCode = CLXErrorCodeAdapterInvalidLoadState;
+            break;
+
+        // --- Ad Not Loaded (context-dependent) ---
+        case 210:  // VungleErrorAdNotLoaded
+            errorCode = isShowError ? CLXErrorCodeAdapterAdNotReady : CLXErrorCodeAdapterInvalidLoadState;
+            break;
+
+        // --- Display Failed ---
+        case 115:  // VungleErrorInvalidIndexURL
+        case 302:  // VungleErrorInvalidIfaStatus
+        case 305:  // VungleErrorMraidBridgeError
+        case 400:  // VungleErrorConcurrentPlaybackUnsupported
+        case 317:  // VungleErrorAdClosedTemplateError
+        case 318:  // VungleErrorAdClosedMissingHeartbeat
+            errorCode = CLXErrorCodeAdapterDisplayFailed;
+            break;
+
+        // --- No Fill ---
+        case 212:   // VungleErrorPlacementSleep
+        case 10001: // VungleErrorAdNoFill
+        case 10002: // VungleErrorAdLoadTooFrequently
+            errorCode = CLXErrorCodeAdapterNoFill;
+            break;
+
+        // --- Timeout ---
+        case 217:  // VungleErrorAdResponseTimedOut
+            errorCode = CLXErrorCodeAdapterTimeout;
+            break;
+
+        // --- Server Error ---
+        case 220:   // VungleErrorAdResponseRetryAfter
+        case 221:   // VungleErrorAdLoadFailRetryAfter
+        case 20001: // VungleErrorAdServerError
+            errorCode = CLXErrorCodeAdapterServerError;
+            break;
+
+        // --- Ad Expired ---
+        case 304:  // VungleErrorAdExpired
+        case 307:  // VungleErrorAdExpiredOnPlay
+            errorCode = CLXErrorCodeAdapterAdExpired;
+            break;
+
+        // --- WebView Error ---
+        case 2000: // VungleErrorWebViewWebContentProcessDidTerminate
+        case 2001: // VungleErrorWebViewFailedNavigation
+        case 320:  // VungleErrorWebviewError
+            errorCode = CLXErrorCodeAdapterWebViewError;
+            break;
+
         default:
-            return [NSString stringWithFormat:@"Unknown Error - Vungle SDK error code %ld", (long)errorCode];
+            errorCode = CLXErrorCodeAdapterInternalError;
+            break;
     }
+
+    NSString *description = [NSString stringWithFormat:@"Vungle error %ld: %@",
+                             (long)vungleError.code,
+                             vungleError.localizedDescription ?: @"Unknown error"];
+
+    return [CLXError errorWithCode:errorCode
+                       description:description
+                   underlyingError:vungleError];
 }
 
 @end

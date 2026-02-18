@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		A1000001294A8A0000000001 /* CloudXVungleAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = A1000000294A8A0000000001 /* CloudXVungleAdapter.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		A1000002294A8A0000000001 /* CLXVungleBaseFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A1000003294A8A0000000001 /* CLXVungleBaseFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		A1000004294A8A0000000001 /* CLXVungleBaseFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A1000005294A8A0000000001 /* CLXVungleBaseFactory.m */; };
 		A1000006294A8A0000000001 /* CLXVungleErrorHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = A1000007294A8A0000000001 /* CLXVungleErrorHandler.h */; };
 		A1000008294A8A0000000001 /* CLXVungleErrorHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = A1000009294A8A0000000001 /* CLXVungleErrorHandler.m */; };
 		A100000A294A8A0000000001 /* CLXVungleInitializer.h in Headers */ = {isa = PBXBuildFile; fileRef = A100000B294A8A0000000001 /* CLXVungleInitializer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -28,14 +26,11 @@
 		A1000024294A8A0000000001 /* CLXVungleBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = A1000025294A8A0000000001 /* CLXVungleBanner.m */; };
 		A1000026294A8A0000000001 /* CLXVungleBannerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A1000027294A8A0000000001 /* CLXVungleBannerFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A1000028294A8A0000000001 /* CLXVungleBannerFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A1000029294A8A0000000001 /* CLXVungleBannerFactory.m */; };
-		A100002A294A8A0000000001 /* CLXVungleNative.h in Headers */ = {isa = PBXBuildFile; fileRef = A100002B294A8A0000000001 /* CLXVungleNative.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		A100002C294A8A0000000001 /* CLXVungleNative.m in Sources */ = {isa = PBXBuildFile; fileRef = A100002D294A8A0000000001 /* CLXVungleNative.m */; };
-		A100002E294A8A0000000001 /* CLXVungleNativeFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A100002F294A8A0000000001 /* CLXVungleNativeFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		A1000030294A8A0000000001 /* CLXVungleNativeFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A1000031294A8A0000000001 /* CLXVungleNativeFactory.m */; };
-		A1000032294A8A0000000001 /* CLXVungleAppOpen.h in Headers */ = {isa = PBXBuildFile; fileRef = A1000033294A8A0000000001 /* CLXVungleAppOpen.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		A1000034294A8A0000000001 /* CLXVungleAppOpen.m in Sources */ = {isa = PBXBuildFile; fileRef = A1000035294A8A0000000001 /* CLXVungleAppOpen.m */; };
 		A1000036294A8A0000000001 /* CLXVungleAppOpenFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A1000037294A8A0000000001 /* CLXVungleAppOpenFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A1000038294A8A0000000001 /* CLXVungleAppOpenFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A1000039294A8A0000000001 /* CLXVungleAppOpenFactory.m */; };
+		B1000001294A8A0000000001 /* CLXVungleAdapterVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = B1000002294A8A0000000001 /* CLXVungleAdapterVersion.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B1000003294A8A0000000001 /* CLXVungleAdapterVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = B1000004294A8A0000000001 /* CLXVungleAdapterVersion.m */; };
+		B1000005294A8A0000000001 /* CloudXVungleAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = B1000006294A8A0000000001 /* CloudXVungleAdapter.m */; };
 		CDED9BAF15240D48AF5B8545 /* Pods_CloudXVungleAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 031B74F43B93524A95385711 /* Pods_CloudXVungleAdapter.framework */; };
 /* End PBXBuildFile section */
 
@@ -43,8 +38,9 @@
 		031B74F43B93524A95385711 /* Pods_CloudXVungleAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXVungleAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AFE62617AD212851C2832E7 /* Pods-CloudXVungleAdapter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXVungleAdapter.debug.xcconfig"; path = "Target Support Files/Pods-CloudXVungleAdapter/Pods-CloudXVungleAdapter.debug.xcconfig"; sourceTree = "<group>"; };
 		A1000000294A8A0000000001 /* CloudXVungleAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CloudXVungleAdapter.h; sourceTree = "<group>"; };
-		A1000003294A8A0000000001 /* CLXVungleBaseFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVungleBaseFactory.h; sourceTree = "<group>"; };
-		A1000005294A8A0000000001 /* CLXVungleBaseFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVungleBaseFactory.m; sourceTree = "<group>"; };
+		B1000002294A8A0000000001 /* CLXVungleAdapterVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVungleAdapterVersion.h; sourceTree = "<group>"; };
+		B1000004294A8A0000000001 /* CLXVungleAdapterVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVungleAdapterVersion.m; sourceTree = "<group>"; };
+		B1000006294A8A0000000001 /* CloudXVungleAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CloudXVungleAdapter.m; sourceTree = "<group>"; };
 		A1000007294A8A0000000001 /* CLXVungleErrorHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVungleErrorHandler.h; sourceTree = "<group>"; };
 		A1000009294A8A0000000001 /* CLXVungleErrorHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVungleErrorHandler.m; sourceTree = "<group>"; };
 		A100000B294A8A0000000001 /* CLXVungleInitializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVungleInitializer.h; sourceTree = "<group>"; };
@@ -63,12 +59,6 @@
 		A1000025294A8A0000000001 /* CLXVungleBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVungleBanner.m; sourceTree = "<group>"; };
 		A1000027294A8A0000000001 /* CLXVungleBannerFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVungleBannerFactory.h; sourceTree = "<group>"; };
 		A1000029294A8A0000000001 /* CLXVungleBannerFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVungleBannerFactory.m; sourceTree = "<group>"; };
-		A100002B294A8A0000000001 /* CLXVungleNative.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVungleNative.h; sourceTree = "<group>"; };
-		A100002D294A8A0000000001 /* CLXVungleNative.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVungleNative.m; sourceTree = "<group>"; };
-		A100002F294A8A0000000001 /* CLXVungleNativeFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVungleNativeFactory.h; sourceTree = "<group>"; };
-		A1000031294A8A0000000001 /* CLXVungleNativeFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVungleNativeFactory.m; sourceTree = "<group>"; };
-		A1000033294A8A0000000001 /* CLXVungleAppOpen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVungleAppOpen.h; sourceTree = "<group>"; };
-		A1000035294A8A0000000001 /* CLXVungleAppOpen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVungleAppOpen.m; sourceTree = "<group>"; };
 		A1000037294A8A0000000001 /* CLXVungleAppOpenFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVungleAppOpenFactory.h; sourceTree = "<group>"; };
 		A1000039294A8A0000000001 /* CLXVungleAppOpenFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVungleAppOpenFactory.m; sourceTree = "<group>"; };
 		A100003A294A8A0000000001 /* CloudXVungleAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXVungleAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -126,27 +116,19 @@
 			isa = PBXGroup;
 			children = (
 				A1000000294A8A0000000001 /* CloudXVungleAdapter.h */,
+				B1000006294A8A0000000001 /* CloudXVungleAdapter.m */,
+				B1000002294A8A0000000001 /* CLXVungleAdapterVersion.h */,
+				B1000004294A8A0000000001 /* CLXVungleAdapterVersion.m */,
 				A100003B294A8A0000000001 /* Info.plist */,
-				A1000041294A8A0000000001 /* Base */,
 				A1000042294A8A0000000001 /* Utils */,
 				A1000043294A8A0000000001 /* Initializers */,
 				A1000044294A8A0000000001 /* BidTokenSource */,
 				A1000045294A8A0000000001 /* Interstitial */,
 				A1000046294A8A0000000001 /* Rewarded */,
 				A1000047294A8A0000000001 /* Banner */,
-				A1000048294A8A0000000001 /* Native */,
 				A1000049294A8A0000000001 /* AppOpen */,
 			);
 			path = CloudXVungleAdapter;
-			sourceTree = "<group>";
-		};
-		A1000041294A8A0000000001 /* Base */ = {
-			isa = PBXGroup;
-			children = (
-				A1000003294A8A0000000001 /* CLXVungleBaseFactory.h */,
-				A1000005294A8A0000000001 /* CLXVungleBaseFactory.m */,
-			);
-			path = Base;
 			sourceTree = "<group>";
 		};
 		A1000042294A8A0000000001 /* Utils */ = {
@@ -173,7 +155,7 @@
 				A100000F294A8A0000000001 /* CLXVungleBidTokenSource.h */,
 				A1000011294A8A0000000001 /* CLXVungleBidTokenSource.m */,
 			);
-			path = BidTokenSource;
+			name = BidTokenSource;
 			sourceTree = "<group>";
 		};
 		A1000045294A8A0000000001 /* Interstitial */ = {
@@ -209,22 +191,9 @@
 			path = Banner;
 			sourceTree = "<group>";
 		};
-		A1000048294A8A0000000001 /* Native */ = {
-			isa = PBXGroup;
-			children = (
-				A100002B294A8A0000000001 /* CLXVungleNative.h */,
-				A100002D294A8A0000000001 /* CLXVungleNative.m */,
-				A100002F294A8A0000000001 /* CLXVungleNativeFactory.h */,
-				A1000031294A8A0000000001 /* CLXVungleNativeFactory.m */,
-			);
-			path = Native;
-			sourceTree = "<group>";
-		};
 		A1000049294A8A0000000001 /* AppOpen */ = {
 			isa = PBXGroup;
 			children = (
-				A1000033294A8A0000000001 /* CLXVungleAppOpen.h */,
-				A1000035294A8A0000000001 /* CLXVungleAppOpen.m */,
 				A1000037294A8A0000000001 /* CLXVungleAppOpenFactory.h */,
 				A1000039294A8A0000000001 /* CLXVungleAppOpenFactory.m */,
 			);
@@ -249,7 +218,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000001294A8A0000000001 /* CloudXVungleAdapter.h in Headers */,
-				A1000002294A8A0000000001 /* CLXVungleBaseFactory.h in Headers */,
+				B1000001294A8A0000000001 /* CLXVungleAdapterVersion.h in Headers */,
 				A1000006294A8A0000000001 /* CLXVungleErrorHandler.h in Headers */,
 				A100000A294A8A0000000001 /* CLXVungleInitializer.h in Headers */,
 				A100000E294A8A0000000001 /* CLXVungleBidTokenSource.h in Headers */,
@@ -259,9 +228,6 @@
 				A100001E294A8A0000000001 /* CLXVungleRewardedFactory.h in Headers */,
 				A1000022294A8A0000000001 /* CLXVungleBanner.h in Headers */,
 				A1000026294A8A0000000001 /* CLXVungleBannerFactory.h in Headers */,
-				A100002A294A8A0000000001 /* CLXVungleNative.h in Headers */,
-				A100002E294A8A0000000001 /* CLXVungleNativeFactory.h in Headers */,
-				A1000032294A8A0000000001 /* CLXVungleAppOpen.h in Headers */,
 				A1000036294A8A0000000001 /* CLXVungleAppOpenFactory.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -378,7 +344,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A1000004294A8A0000000001 /* CLXVungleBaseFactory.m in Sources */,
+				B1000005294A8A0000000001 /* CloudXVungleAdapter.m in Sources */,
+				B1000003294A8A0000000001 /* CLXVungleAdapterVersion.m in Sources */,
 				A1000008294A8A0000000001 /* CLXVungleErrorHandler.m in Sources */,
 				A100000C294A8A0000000001 /* CLXVungleInitializer.m in Sources */,
 				A1000010294A8A0000000001 /* CLXVungleBidTokenSource.m in Sources */,
@@ -388,9 +355,6 @@
 				A1000020294A8A0000000001 /* CLXVungleRewardedFactory.m in Sources */,
 				A1000024294A8A0000000001 /* CLXVungleBanner.m in Sources */,
 				A1000028294A8A0000000001 /* CLXVungleBannerFactory.m in Sources */,
-				A100002C294A8A0000000001 /* CLXVungleNative.m in Sources */,
-				A1000030294A8A0000000001 /* CLXVungleNativeFactory.m in Sources */,
-				A1000034294A8A0000000001 /* CLXVungleAppOpen.m in Sources */,
 				A1000038294A8A0000000001 /* CLXVungleAppOpenFactory.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

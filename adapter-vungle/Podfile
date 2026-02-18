@@ -5,7 +5,7 @@ use_frameworks! :linkage => :static
 
 target 'CloudXVungleAdapter' do
   pod 'CloudXCore', :path => '../core'
-  pod 'VungleAds', '~> 7.4.0'
+  pod 'VungleAds', '~> 7.7.0'
 end
 
 post_install do |installer|

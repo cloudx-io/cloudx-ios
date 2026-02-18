@@ -2,17 +2,12 @@
 //  CLXVungleInitializer.h
 //  CloudXVungleAdapter
 //
-//  Created by CloudX Team on 2024-09-14.
-//
 
-// Conditional import for CloudXCore header
 #if __has_include(<CloudXCore/CloudXCore.h>)
 #import <CloudXCore/CloudXCore.h>
 #else
 @import CloudXCore;
 #endif
-
-@class CLXSettings;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -25,12 +20,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * SDK version of the Vungle SDK
  */
-@property (nonatomic, strong, readonly) NSString *sdkVersion;
+@property (nonatomic, copy, readonly) NSString *sdkVersion;
 
 /**
  * Network name identifier
  */
-@property (nonatomic, strong, readonly) NSString *network;
+@property (nonatomic, copy, readonly) NSString *network;
 
 /**
  * Checks if the Vungle SDK is initialized and ready for use

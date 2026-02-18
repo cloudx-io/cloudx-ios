@@ -2,13 +2,10 @@
 //  CLXVungleRewarded.m
 //  CloudXVungleAdapter
 //
-//  Created by CloudX Team on 2024-09-14.
-//
 
 #import "CLXVungleRewarded.h"
 #import "CLXVungleErrorHandler.h"
 
-// Conditional import for CloudXCore header
 #if __has_include(<CloudXCore/CloudXCore.h>)
 #import <CloudXCore/CloudXCore.h>
 #else
@@ -19,14 +16,11 @@
 
 @interface CLXVungleRewarded ()
 @property (nonatomic, strong) CLXLogger *logger;
-@property (nonatomic, strong, readwrite) NSString *bidID;
+@property (nonatomic, copy, readwrite) NSString *bidID;
 @property (nonatomic, copy, readwrite) NSString *placementID;
 @property (nonatomic, copy, readwrite, nullable) NSString *adUnitName;
-@property (nonatomic, assign, readwrite) BOOL isReady;
-@property (nonatomic, assign) BOOL isLoaded;
-@property (nonatomic, assign) BOOL isShowing;
-@property (nonatomic, assign) BOOL isDestroyed;
-@property (nonatomic, assign) BOOL hasRewarded;
+@property (nonatomic, strong, nullable) VungleRewarded *rewarded;
+@property (nonatomic, assign) BOOL grantedReward;
 @end
 
 @implementation CLXVungleRewarded
@@ -34,10 +28,10 @@
 #pragma mark - Initialization
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
-                       placementID:(NSString *)placementID
+                       placementID:(nullable NSString *)placementID
                      adUnitName:(nullable NSString *)adUnitName
                              bidID:(NSString *)bidID
-                          delegate:(id<CLXAdapterRewardedDelegate>)delegate {
+                          delegate:(nullable id<CLXAdapterRewardedDelegate>)delegate {
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
@@ -45,21 +39,13 @@
         _adUnitName = [adUnitName copy];
         _bidID = [bidID copy];
         _delegate = delegate;
-        _logger = [[CLXLogger alloc] initWithCategory:@"VungleRewarded"];
-        _isReady = NO;
-        _isLoaded = NO;
-        _isShowing = NO;
-        _isDestroyed = NO;
-        _hasRewarded = NO;
-        
-        [_logger debug:[NSString stringWithFormat:@"Initialized Vungle rewarded - Placement: %@ (%@), BidID: %@, HasBidPayload: %@", 
-                          adUnitName ?: @"(unknown)", placementID, bidID, bidPayload ? @"YES" : @"NO"]];
+        _logger = [[CLXLogger alloc] initWithCategory:@"CLXVungleRewarded"];
+        _grantedReward = NO;
+
+        [_logger debug:[NSString stringWithFormat:@"Initialized Vungle rewarded - Placement: %@ (%@), BidID: %@, HasBidPayload: %@",
+                          adUnitName ?: @"(unknown)", placementID ?: @"(nil)", bidID, bidPayload ? @"YES" : @"NO"]];
     }
     return self;
-}
-
-- (void)dealloc {
-    [self destroy];
 }
 
 #pragma mark - Public Properties
@@ -75,271 +61,140 @@
 #pragma mark - CLXAdapterRewarded Protocol
 
 - (void)load {
-    // Validate placement ID at load time
     if (!self.placementID || self.placementID.length == 0) {
         NSString *adUnitContext = self.adUnitName ? [NSString stringWithFormat:@" for ad unit '%@'", self.adUnitName] : @"";
-        NSString *errorMessage = [NSString stringWithFormat:@"Vungle placement ID is empty%@. "
-                                  "Make sure to configure the Vungle placement ID in your CloudX dashboard under Ad Unit Settings > Vungle.",
-                                  adUnitContext];
         NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
-                                     description:errorMessage];
+                                     description:[NSString stringWithFormat:@"Vungle placement ID is empty%@", adUnitContext]];
         [self.logger error:error.localizedDescription];
         [self handleLoadFailure:error];
         return;
     }
-    
-    // Validate delegate at load time
-    if (!self.delegate) {
-        NSString *adUnitContext = self.adUnitName ? [NSString stringWithFormat:@" for ad unit '%@'", self.adUnitName] : @"";
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidConfiguration
-                                     description:[NSString stringWithFormat:@"[Vungle] Missing delegate%@", adUnitContext]];
-        [self.logger error:error.localizedDescription];
-        return;
-    }
-    
-    if (self.isDestroyed) {
-        [self.logger error:@"Cannot load - adapter is destroyed"];
-        return;
-    }
-    
-    if (self.isLoaded) {
-        [self.logger error:@"Ad already loaded, ignoring duplicate load request"];
-        return;
-    }
-    
-    // Check if Vungle SDK is initialized
+
     if (![VungleAds isInitialized]) {
-        NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
-                                             code:CLXVungleAdapterErrorCodeNotInitialized
-                                          userInfo:nil];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterNotInitialized
+                                     description:@"Vungle SDK not initialized"];
         [self handleLoadFailure:error];
         return;
     }
-    
+
     [self.logger info:[NSString stringWithFormat:@"Loading rewarded ad for placement: %@", self.placementID]];
-    
-    // Create Vungle rewarded
+
     self.rewarded = [[VungleRewarded alloc] initWithPlacementId:self.placementID];
     self.rewarded.delegate = self;
-
-    // Load the ad
-    [self.logger debug:[NSString stringWithFormat:@"Loading %@ ad", self.bidPayload ? @"bidding" : @"waterfall"]];
     [self.rewarded load:self.bidPayload];
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
-    if (self.isDestroyed) {
-        [self.logger error:@"Cannot show - adapter is destroyed"];
+    if (![self.rewarded canPlayAd]) {
+        [self.logger error:@"Rewarded ad not ready to show"];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterAdNotReady
+                                     description:@"Rewarded ad is not loaded or ready to play"];
+        CLXError *clxError = [CLXVungleErrorHandler toCloudXError:error isShowError:YES];
+        id<CLXAdapterRewardedDelegate> delegate = self.delegate;
+        if (delegate) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [delegate didFailToShowWithRewarded:self error:clxError];
+            });
+        }
         return;
     }
-    
-    if (!self.isReady) {
-        NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
-                                             code:CLXVungleAdapterErrorCodeShowFailed
-                                          userInfo:nil];
-        [self handleShowFailure:error];
-        return;
-    }
-    
-    if (self.isShowing) {
-        [self.logger error:@"Ad is already showing, ignoring duplicate show request"];
-        return;
-    }
-    
-    if (!viewController) {
-        NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
-                                             code:CLXVungleAdapterErrorCodeShowFailed
-                                          userInfo:nil];
-        [self handleShowFailure:error];
-        return;
-    }
-    
+
     [self.logger info:@"Showing rewarded ad"];
-    self.isShowing = YES;
-    self.hasRewarded = NO;
-    
-    // Present the ad
+    self.grantedReward = NO;
     [self.rewarded presentWith:viewController];
 }
 
 - (void)destroy {
-    if (self.isDestroyed) {
-        return;
-    }
-
     [self.logger debug:@"Destroying rewarded adapter"];
-    self.isDestroyed = YES;
-    
-    // Clear delegate and cleanup
     if (self.rewarded) {
         self.rewarded.delegate = nil;
         self.rewarded = nil;
     }
-    
     self.delegate = nil;
-    self.isReady = NO;
-    self.isLoaded = NO;
-    self.isShowing = NO;
-    self.hasRewarded = NO;
+    self.grantedReward = NO;
 }
 
 #pragma mark - VungleRewardedDelegate
 
 - (void)rewardedAdDidLoad:(VungleRewarded *)rewarded {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring load callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger info:@"Rewarded ad loaded successfully"];
-    self.isLoaded = YES;
-    self.isReady = YES;
-    
-    if ([self.delegate respondsToSelector:@selector(didLoadWithRewarded:)]) {
-        [self.delegate didLoadWithRewarded:self];
-    }
+
+    [self.delegate didLoadWithRewarded:self];
 }
 
 - (void)rewardedAdDidFailToLoad:(VungleRewarded *)rewarded withError:(NSError *)error {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring load failure callback - adapter destroyed"];
-        return;
-    }
-    
     [self handleLoadFailure:error];
 }
 
 - (void)rewardedAdWillPresent:(VungleRewarded *)rewarded {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring will present callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger debug:@"Rewarded ad will present"];
 }
 
 - (void)rewardedAdDidPresent:(VungleRewarded *)rewarded {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring did present callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger info:@"Rewarded ad presented successfully"];
-    
-    if ([self.delegate respondsToSelector:@selector(didShowWithRewarded:)]) {
-        [self.delegate didShowWithRewarded:self];
-    }
+    // Note: didShow fires in didTrackImpression
 }
 
 - (void)rewardedAdDidFailToPresent:(VungleRewarded *)rewarded withError:(NSError *)error {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring present failure callback - adapter destroyed"];
-        return;
-    }
-    
     [self handleShowFailure:error];
 }
 
 - (void)rewardedAdDidTrackImpression:(VungleRewarded *)rewarded {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring impression callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger info:@"Rewarded ad impression tracked"];
-    
-    if ([self.delegate respondsToSelector:@selector(impressionWithRewarded:)]) {
-        [self.delegate impressionWithRewarded:self];
-    }
+
+    // Fire show then impression together
+    [self.delegate didShowWithRewarded:self];
+    [self.delegate impressionWithRewarded:self];
 }
 
 - (void)rewardedAdDidClick:(VungleRewarded *)rewarded {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring click callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger info:@"Rewarded ad clicked"];
-    
-    if ([self.delegate respondsToSelector:@selector(clickWithRewarded:)]) {
-        [self.delegate clickWithRewarded:self];
-    }
+
+    [self.delegate clickWithRewarded:self];
 }
 
 - (void)rewardedAdWillLeaveApplication:(VungleRewarded *)rewarded {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring will leave app callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger debug:@"Rewarded ad will leave application"];
 }
 
 - (void)rewardedAdDidRewardUser:(VungleRewarded *)rewarded {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring reward callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger info:@"User earned reward from rewarded ad"];
-    self.hasRewarded = YES;
-    
-    if ([self.delegate respondsToSelector:@selector(userRewardWithRewarded:)]) {
-        [self.delegate userRewardWithRewarded:self];
-    }
+    self.grantedReward = YES;
+    // Note: Reward is granted in didClose callback
 }
 
 - (void)rewardedAdWillClose:(VungleRewarded *)rewarded {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring will close callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger debug:@"Rewarded ad will close"];
 }
 
 - (void)rewardedAdDidClose:(VungleRewarded *)rewarded {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring did close callback - adapter destroyed"];
-        return;
+    [self.logger info:[NSString stringWithFormat:@"Rewarded ad closed - User rewarded: %@", self.grantedReward ? @"YES" : @"NO"]];
+
+    // Grant reward in close callback
+    if (self.grantedReward) {
+        [self.delegate userRewardWithRewarded:self];
     }
-    
-    [self.logger info:[NSString stringWithFormat:@"Rewarded ad closed - User rewarded: %@", self.hasRewarded ? @"YES" : @"NO"]];
-    self.isShowing = NO;
-    self.isReady = NO; // Ad is consumed after showing
-    self.isLoaded = NO;
-    
-    if ([self.delegate respondsToSelector:@selector(didCloseWithRewarded:)]) {
-        [self.delegate didCloseWithRewarded:self];
-    }
+
+    [self.delegate didCloseWithRewarded:self];
 }
 
 #pragma mark - Private Methods
 
 - (void)handleLoadFailure:(NSError *)error {
-    self.isReady = NO;
-    self.isLoaded = NO;
-    
-    NSError *mappedError = [CLXVungleErrorHandler handleVungleError:error
-                                                         withLogger:self.logger
-                                                            context:@"Rewarded"
-                                                        placementID:self.placementID];
-    
-    if ([self.delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
-        [self.delegate didFailToLoadWithRewarded:self error:mappedError];
+    [self.logger error:[NSString stringWithFormat:@"Rewarded load failed for placement %@: %@", self.placementID, error.localizedDescription]];
+    CLXError *clxError = [CLXVungleErrorHandler toCloudXError:error isShowError:NO];
+    id<CLXAdapterRewardedDelegate> delegate = self.delegate;
+    if (delegate) {
+        [delegate didFailToLoadWithRewarded:self error:clxError];
     }
 }
 
 - (void)handleShowFailure:(NSError *)error {
-    self.isShowing = NO;
-    
-    NSError *mappedError = [CLXVungleErrorHandler handleVungleError:error
-                                                         withLogger:self.logger
-                                                            context:@"Rewarded"
-                                                        placementID:self.placementID];
-    
-    if ([self.delegate respondsToSelector:@selector(didFailToShowWithRewarded:error:)]) {
-        [self.delegate didFailToShowWithRewarded:self error:mappedError];
+    [self.logger error:[NSString stringWithFormat:@"Rewarded show failed for placement %@: %@", self.placementID, error.localizedDescription]];
+    CLXError *clxError = [CLXVungleErrorHandler toCloudXError:error isShowError:YES];
+    id<CLXAdapterRewardedDelegate> delegate = self.delegate;
+    if (delegate) {
+        [delegate didFailToShowWithRewarded:self error:clxError];
     }
 }
 

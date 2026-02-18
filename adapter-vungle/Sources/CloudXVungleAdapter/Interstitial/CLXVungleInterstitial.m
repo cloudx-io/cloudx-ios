@@ -2,13 +2,10 @@
 //  CLXVungleInterstitial.m
 //  CloudXVungleAdapter
 //
-//  Created by CloudX Team on 2024-09-14.
-//
 
 #import "CLXVungleInterstitial.h"
 #import "CLXVungleErrorHandler.h"
 
-// Conditional import for CloudXCore header
 #if __has_include(<CloudXCore/CloudXCore.h>)
 #import <CloudXCore/CloudXCore.h>
 #else
@@ -19,12 +16,10 @@
 
 @interface CLXVungleInterstitial ()
 @property (nonatomic, strong) CLXLogger *logger;
-@property (nonatomic, strong, readwrite) NSString *bidID;
+@property (nonatomic, copy, readwrite) NSString *bidID;
 @property (nonatomic, copy, readwrite) NSString *placementID;
 @property (nonatomic, copy, readwrite, nullable) NSString *adUnitName;
-@property (nonatomic, assign) BOOL isLoaded;
-@property (nonatomic, assign) BOOL isShowing;
-@property (nonatomic, assign) BOOL isDestroyed;
+@property (nonatomic, strong, nullable) VungleInterstitial *interstitial;
 @end
 
 @implementation CLXVungleInterstitial
@@ -39,23 +34,16 @@
     self = [super init];
     if (self) {
         _bidPayload = [bidPayload copy];
-        _placementID = [placementID copy];  // Nullable - validation in load()
-        _adUnitName = [adUnitName copy];  // For error messages
+        _placementID = [placementID copy];
+        _adUnitName = [adUnitName copy];
         _bidID = [bidID copy];
-        _delegate = delegate;  // Nullable - validation in load()
-        _logger = [[CLXLogger alloc] initWithCategory:@"VungleInterstitial"];
-        _isLoaded = NO;
-        _isShowing = NO;
-        _isDestroyed = NO;
-        
-        [_logger debug:[NSString stringWithFormat:@"Initialized Vungle interstitial - Placement: %@ (%@), BidID: %@, HasBidPayload: %@", 
+        _delegate = delegate;
+        _logger = [[CLXLogger alloc] initWithCategory:@"CLXVungleInterstitial"];
+
+        [_logger debug:[NSString stringWithFormat:@"Initialized Vungle interstitial - Placement: %@ (%@), BidID: %@, HasBidPayload: %@",
                           adUnitName ?: @"(unknown)", placementID ?: @"(nil)", bidID, bidPayload ? @"YES" : @"NO"]];
     }
     return self;
-}
-
-- (void)dealloc {
-    [self destroy];
 }
 
 #pragma mark - Public Properties
@@ -71,251 +59,127 @@
 #pragma mark - CLXAdapterInterstitial Protocol
 
 - (void)load {
-    // Validate placement ID at load time
     if (!self.placementID || self.placementID.length == 0) {
         NSString *adUnitContext = self.adUnitName ? [NSString stringWithFormat:@" for ad unit '%@'", self.adUnitName] : @"";
-        NSString *errorMessage = [NSString stringWithFormat:@"Vungle placement ID is empty%@. "
-                                  "Make sure to configure the Vungle placement ID in your CloudX dashboard under Ad Unit Settings > Vungle.",
-                                  adUnitContext];
         NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
-                                     description:errorMessage];
+                                     description:[NSString stringWithFormat:@"Vungle placement ID is empty%@", adUnitContext]];
         [self.logger error:error.localizedDescription];
         [self handleLoadFailure:error];
         return;
     }
-    
-    // Validate delegate at load time
-    if (!self.delegate) {
-        NSString *adUnitContext = self.adUnitName ? [NSString stringWithFormat:@" for ad unit '%@'", self.adUnitName] : @"";
-        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidConfiguration
-                                     description:[NSString stringWithFormat:@"[Vungle] Missing delegate%@", adUnitContext]];
-        [self.logger error:error.localizedDescription];
-        return;
-    }
-    
-    if (self.isDestroyed) {
-        [self.logger error:@"Cannot load - adapter is destroyed"];
-        return;
-    }
-    
-    if (self.isLoaded) {
-        [self.logger error:@"Ad already loaded, ignoring duplicate load request"];
-        return;
-    }
-    
-    // Check if Vungle SDK is initialized
+
     if (![VungleAds isInitialized]) {
-        NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
-                                             code:CLXVungleAdapterErrorCodeNotInitialized
-                                         userInfo:nil];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterNotInitialized
+                                     description:@"Vungle SDK not initialized"];
         [self handleLoadFailure:error];
         return;
     }
-    
-    [self.logger info:[NSString stringWithFormat:@"Loading interstitial ad for placement: %@", self.placementID]];
-    
-    // Create Vungle interstitial
+
+    [self.logger info:[NSString stringWithFormat:@"Loading interstitial for placement: %@", self.placementID]];
+
     self.interstitial = [[VungleInterstitial alloc] initWithPlacementId:self.placementID];
     self.interstitial.delegate = self;
-
-    // Load the ad
-    [self.logger debug:[NSString stringWithFormat:@"Loading %@ ad", self.bidPayload ? @"bidding" : @"waterfall"]];
     [self.interstitial load:self.bidPayload];
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
-    if (self.isDestroyed) {
-        [self.logger error:@"Cannot show - adapter is destroyed"];
+    if (![self.interstitial canPlayAd]) {
+        [self.logger error:@"Interstitial ad not ready to show"];
+        NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterAdNotReady
+                                     description:@"Interstitial ad is not loaded or ready to play"];
+        CLXError *clxError = [CLXVungleErrorHandler toCloudXError:error isShowError:YES];
+        id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+        if (delegate) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [delegate didFailToShowWithInterstitial:self error:clxError];
+            });
+        }
         return;
     }
-    
-    if (!self.isLoaded) {
-        NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
-                                             code:CLXVungleAdapterErrorCodeShowFailed
-                                         userInfo:nil];
-        [self handleShowFailure:error];
-        return;
-    }
-    
-    if (self.isShowing) {
-        [self.logger error:@"Ad is already showing, ignoring duplicate show request"];
-        return;
-    }
-    
-    if (!viewController) {
-        NSError *error = [NSError errorWithDomain:CLXVungleAdapterErrorDomain
-                                             code:CLXVungleAdapterErrorCodeShowFailed
-                                         userInfo:nil];
-        [self handleShowFailure:error];
-        return;
-    }
-    
+
     [self.logger info:@"Showing interstitial ad"];
-    self.isShowing = YES;
-    
-    // Present the ad
     [self.interstitial presentWith:viewController];
 }
 
 - (void)destroy {
-    if (self.isDestroyed) {
-        return;
-    }
-
     [self.logger debug:@"Destroying interstitial adapter"];
-    self.isDestroyed = YES;
-
-    // Clear delegate and cleanup
     if (self.interstitial) {
         self.interstitial.delegate = nil;
         self.interstitial = nil;
     }
-    
     self.delegate = nil;
-    self.isLoaded = NO;
-    self.isShowing = NO;
 }
 
 #pragma mark - VungleInterstitialDelegate
 
 - (void)interstitialAdDidLoad:(VungleInterstitial *)interstitial {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring load callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger info:@"Interstitial ad loaded successfully"];
-    self.isLoaded = YES;
-    
-    if ([self.delegate respondsToSelector:@selector(didLoadWithInterstitial:)]) {
-        [self.delegate didLoadWithInterstitial:self];
-    }
+
+    [self.delegate didLoadWithInterstitial:self];
 }
 
 - (void)interstitialAdDidFailToLoad:(VungleInterstitial *)interstitial withError:(NSError *)error {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring load failure callback - adapter destroyed"];
-        return;
-    }
-    
     [self handleLoadFailure:error];
 }
 
 - (void)interstitialAdWillPresent:(VungleInterstitial *)interstitial {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring will present callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger debug:@"Interstitial ad will present"];
-    // Note: CloudX doesn't have a direct equivalent, but we can log this event
 }
 
 - (void)interstitialAdDidPresent:(VungleInterstitial *)interstitial {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring did present callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger info:@"Interstitial ad presented successfully"];
-    
-    if ([self.delegate respondsToSelector:@selector(didShowWithInterstitial:)]) {
-        [self.delegate didShowWithInterstitial:self];
-    }
+    // Note: didShow fires in didTrackImpression
 }
 
 - (void)interstitialAdDidFailToPresent:(VungleInterstitial *)interstitial withError:(NSError *)error {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring present failure callback - adapter destroyed"];
-        return;
-    }
-    
     [self handleShowFailure:error];
 }
 
 - (void)interstitialAdDidTrackImpression:(VungleInterstitial *)interstitial {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring impression callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger info:@"Interstitial ad impression tracked"];
-    
-    if ([self.delegate respondsToSelector:@selector(impressionWithInterstitial:)]) {
-        [self.delegate impressionWithInterstitial:self];
-    }
+
+    // Fire show then impression together
+    [self.delegate didShowWithInterstitial:self];
+    [self.delegate impressionWithInterstitial:self];
 }
 
 - (void)interstitialAdDidClick:(VungleInterstitial *)interstitial {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring click callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger info:@"Interstitial ad clicked"];
-    
-    if ([self.delegate respondsToSelector:@selector(clickWithInterstitial:)]) {
-        [self.delegate clickWithInterstitial:self];
-    }
+
+    [self.delegate clickWithInterstitial:self];
 }
 
 - (void)interstitialAdWillLeaveApplication:(VungleInterstitial *)interstitial {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring will leave app callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger debug:@"Interstitial ad will leave application"];
-    // Note: CloudX doesn't have a direct equivalent for this callback
 }
 
 - (void)interstitialAdWillClose:(VungleInterstitial *)interstitial {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring will close callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger debug:@"Interstitial ad will close"];
 }
 
 - (void)interstitialAdDidClose:(VungleInterstitial *)interstitial {
-    if (self.isDestroyed) {
-        [self.logger debug:@"Ignoring did close callback - adapter destroyed"];
-        return;
-    }
-    
     [self.logger info:@"Interstitial ad closed"];
-    self.isShowing = NO;
-    self.isLoaded = NO; // Ad is consumed after showing
-    
-    if ([self.delegate respondsToSelector:@selector(didCloseWithInterstitial:)]) {
-        [self.delegate didCloseWithInterstitial:self];
-    }
+
+    [self.delegate didCloseWithInterstitial:self];
 }
 
 #pragma mark - Private Methods
 
 - (void)handleLoadFailure:(NSError *)error {
-    NSError *mappedError = [CLXVungleErrorHandler handleVungleError:error
-                                                         withLogger:self.logger
-                                                            context:@"Interstitial"
-                                                        placementID:self.placementID];
-    
-    if ([self.delegate respondsToSelector:@selector(didFailToLoadWithInterstitial:error:)]) {
-        [self.delegate didFailToLoadWithInterstitial:self error:mappedError];
+    [self.logger error:[NSString stringWithFormat:@"Interstitial load failed for placement %@: %@", self.placementID, error.localizedDescription]];
+    CLXError *clxError = [CLXVungleErrorHandler toCloudXError:error isShowError:NO];
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (delegate) {
+        [delegate didFailToLoadWithInterstitial:self error:clxError];
     }
 }
 
 - (void)handleShowFailure:(NSError *)error {
-    self.isShowing = NO;
-    
-    NSError *mappedError = [CLXVungleErrorHandler handleVungleError:error
-                                                         withLogger:self.logger
-                                                            context:@"Interstitial"
-                                                        placementID:self.placementID];
-    
-    if ([self.delegate respondsToSelector:@selector(didFailToShowWithInterstitial:error:)]) {
-        [self.delegate didFailToShowWithInterstitial:self error:mappedError];
+    [self.logger error:[NSString stringWithFormat:@"Interstitial show failed for placement %@: %@", self.placementID, error.localizedDescription]];
+    CLXError *clxError = [CLXVungleErrorHandler toCloudXError:error isShowError:YES];
+    id<CLXAdapterInterstitialDelegate> delegate = self.delegate;
+    if (delegate) {
+        [delegate didFailToShowWithInterstitial:self error:clxError];
     }
 }
 
