@@ -17,16 +17,10 @@
 #import "CLXInMobiInterstitial.h"
 #endif
 
-#if __has_include(<CloudXInMobiAdapter/CLXInMobiBaseFactory.h>)
-#import <CloudXInMobiAdapter/CLXInMobiBaseFactory.h>
-#else
-#import "../Base/CLXInMobiBaseFactory.h"
-#endif
-
 #import <CloudXCore/CLXLogger.h>
 
 @interface CLXInMobiInterstitialFactory ()
-@property (nonatomic, strong) CLXInMobiBaseFactory *baseFactory;
+@property (nonatomic, strong) CLXLogger *logger;
 @end
 
 @implementation CLXInMobiInterstitialFactory
@@ -38,7 +32,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _baseFactory = [[CLXInMobiBaseFactory alloc] init];
+        _logger = [[CLXLogger alloc] initWithCategory:@"CLXInMobiInterstitialFactory"];
     }
     return self;
 }
@@ -50,20 +44,10 @@
                                          adUnitName:(NSString *)adUnitName
                                              delegate:(id<CLXAdapterInterstitialDelegate>)delegate {
 
-    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating interstitial - Ad Unit: %@ (%@), BidID: %@",
-                                    adUnitName ?: @"(unknown)", adId, bidId]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating interstitial - Ad Unit: %@ (%@), BidID: %@",
+                         adUnitName ?: @"(unknown)", adId, bidId]];
 
-    // Extract InMobi placement ID from extras
-    NSString *placementId = extras[@"placement_id"];
-    long long inmobiPlacementID = [self.baseFactory extractPlacementID:placementId];
-    
-    // v1.3.0: No longer return nil for validation errors
-    // Validation now happens in load() with proper error callbacks
-    if (inmobiPlacementID == 0) {
-        [self.baseFactory.logger error:@"Invalid placement ID - validation will be deferred to load()"];
-    }
-
-    // Note: Bid payload validation removed - InMobi SDK handles this internally
+    long long inmobiPlacementID = [extras[@"placement_id"] longLongValue];
 
     // Convert bid payload string to NSData if present
     NSData *bidPayloadData = nil;
@@ -78,8 +62,6 @@
                                                                                adUnitName:adUnitName
                                                                                        bidID:bidId
                                                                                     delegate:delegate];
-
-    [self.baseFactory.logger debug:@"Interstitial adapter created successfully"];
 
     return interstitial;
 }

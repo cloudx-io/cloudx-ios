@@ -2,8 +2,6 @@
 //  CLXInMobiErrorHandler.m
 //  CloudXInMobiAdapter
 //
-//  Created by CloudX Team.
-//
 
 #if __has_include(<CloudXInMobiAdapter/CLXInMobiErrorHandler.h>)
 #import <CloudXInMobiAdapter/CLXInMobiErrorHandler.h>
@@ -11,78 +9,66 @@
 #import "CLXInMobiErrorHandler.h"
 #endif
 
-#import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
+#import <InMobiSDK/InMobiSDK.h>
 
 @implementation CLXInMobiErrorHandler
 
-+ (NSError *)handleInMobiError:(NSError *)error
-                    withLogger:(CLXLogger *)logger
-                       context:(NSString *)context
-                   placementID:(NSString *)placementID {
-    
-    if (!error) {
-        return [CLXError errorWithCode:CLXErrorCodeLoadFailed
-                           description:@"Unknown error occurred"];
++ (CLXError *)toCloudXError:(NSError *)inMobiError {
+    if (!inMobiError) {
+        return [CLXError errorWithCode:CLXErrorCodeAdapterInternalError];
     }
-    
-    // Map InMobi error code to CloudX error code
-    CLXErrorCode clxCode = [self mapInMobiErrorCode:error.code];
-    
-    // Create enhanced error description
-    NSString *errorDescription = [NSString stringWithFormat:
-                                 @"InMobi %@ error for placement %@: %@ (Code: %ld)",
-                                 context, placementID, error.localizedDescription ?: @"Unknown error", (long)error.code];
-    
-    // Log the error
-    [logger error:errorDescription];
 
-    // Create CloudX error
-    return [CLXError errorWithCode:clxCode description:errorDescription];
-}
+    CLXErrorCode errorCode;
 
-+ (CLXErrorCode)mapInMobiErrorCode:(NSInteger)inMobiCode {
-    // InMobi error codes (from IMRequestStatus)
-    // 0: kIMStatusCodeNetworkUnReachable
-    // 1: kIMStatusCodeNoFill
-    // 2: kIMStatusCodeRequestInvalid
-    // 3: kIMStatusCodeRequestPending
-    // 4: kIMStatusCodeRequestTimedOut
-    // 5: kIMStatusCodeInternalError
-    // 6: kIMStatusCodeServerError
-    // 7: kIMStatusCodeAdActive
-    // 8: kIMStatusCodeEarlyRefreshRequest
-    // 9: kIMStatusCodeNoNetworkConnection
-    // 10: kIMStatusCodeNativeNotReady
-    // 11: kIMStatusCodeDroppedBySDK
-    
-    switch (inMobiCode) {
-        case 0:  // Network unreachable
-        case 9:  // No network connection
-            return CLXErrorCodeNetworkError;
-            
-        case 1:  // No fill
-            return CLXErrorCodeNoFill;
-            
-        case 2:  // Invalid request
-            return CLXErrorCodeInvalidAdUnit;
-            
-        case 4:  // Timeout
-            return CLXErrorCodeAdapterTimeout;
-            
-        case 10: // Native not ready
-        case 7:  // Ad active
-            return CLXErrorCodeAdNotReady;
-            
-        case 3:  // Request pending
-        case 5:  // Internal error
-        case 6:  // Server error
-        case 8:  // Early refresh
-        case 11: // Dropped by SDK
+    switch (inMobiError.code) {
+        case IMStatusCodeNetworkUnReachable:
+            errorCode = CLXErrorCodeAdapterNoConnection;
+            break;
+        case IMStatusCodeNoFill:
+            errorCode = CLXErrorCodeAdapterNoFill;
+            break;
+        case IMStatusCodeSdkNotInitialised:
+            errorCode = CLXErrorCodeAdapterNotInitialized;
+            break;
+        case IMStatusCodeRequestInvalid:
+        case IMStatusCodeInvalidBannerframe:
+            errorCode = CLXErrorCodeAdapterBadRequest;
+            break;
+        case IMStatusCodeIncorrectPlacementID:
+            errorCode = CLXErrorCodeAdapterInvalidConfiguration;
+            break;
+        case IMStatusCodeRequestPending:
+        case IMStatusCodeMultipleLoadsOnSameInstance:
+        case IMStatusCodeAdActive:
+        case IMStatusCodeEarlyRefreshRequest:
+            errorCode = CLXErrorCodeAdapterInvalidLoadState;
+            break;
+        case IMStatusCodeRequestTimedOut:
+            errorCode = CLXErrorCodeAdapterTimeout;
+            break;
+        case IMStatusCodeInternalError:
+        case IMStatusCodeDroppingNetworkRequest:
+        case IMStatusCodeInvalidAudioFrame:
+        case IMStatusCodeAudioDisabled:
+        case IMStatusCodeAudioDeviceVolumeLow:
+            errorCode = CLXErrorCodeAdapterInternalError;
+            break;
+        case IMStatusCodeServerError:
+            errorCode = CLXErrorCodeAdapterServerError;
+            break;
         default:
-            return CLXErrorCodeLoadFailed;
+            errorCode = CLXErrorCodeAdapterInternalError;
+            break;
     }
+
+    NSString *description = [NSString stringWithFormat:@"InMobi error %ld: %@",
+                             (long)inMobiError.code,
+                             inMobiError.localizedDescription ?: @"Unknown error"];
+
+    return [CLXError errorWithCode:errorCode
+                       description:description
+                   underlyingError:inMobiError];
 }
 
 @end
-

@@ -30,9 +30,11 @@
     NSString *_bidID;
 }
 @property (nonatomic, strong) CLXLogger *logger;
-@property (nonatomic, assign) BOOL isLoading;
+@property (nonatomic, strong, nullable) IMInterstitial *interstitial;
+@property (nonatomic, strong, nullable) NSData *bidPayload;
 @property (nonatomic, assign) long long placementID;
 @property (nonatomic, copy, nullable) NSString *adUnitName;
+@property (nonatomic, assign) BOOL hasGrantedReward;
 @end
 
 @implementation CLXInMobiRewarded
@@ -52,15 +54,8 @@
         _sdkVersion = [CLXInMobiInitializer sdkVersion];
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXInMobiRewarded"];
 
-        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@ (%lld%@), BidID: %@", 
+        [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@ (%lld%@), BidID: %@",
                            adUnitName ?: @"(unknown)", placementID, (placementID == 0 ? @" - invalid" : @""), bidID]];
-        
-        // Only create rewarded if placementID is valid
-        // Otherwise defer to load() for validation
-        if (placementID != 0) {
-            _interstitial = [[IMInterstitial alloc] initWithPlacementId:placementID];
-            _interstitial.delegate = self;
-        }
     }
     return self;
 }
@@ -89,98 +84,67 @@
         NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
                                      description:errorMessage];
         [self.logger error:error.localizedDescription];
-        
-        if ([self.delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
-            [self.delegate didFailToLoadWithRewarded:self error:error];
+
+        id<CLXAdapterRewardedDelegate> delegate = self.delegate;
+        if (delegate) {
+            [delegate didFailToLoadWithRewarded:self error:error];
         }
         return;
     }
     
-    // Create rewarded now if not already created (deferred from init)
     if (!_interstitial) {
         _interstitial = [[IMInterstitial alloc] initWithPlacementId:_placementID];
         _interstitial.delegate = self;
-        [self.logger debug:@"Created rewarded with validated placement ID"];
     }
     
-    if (_isLoading) {
-        [self.logger debug:@"Load already in progress"];
-        return;
-    }
-    
-    _isLoading = YES;
     [self.logger debug:[NSString stringWithFormat:@"Loading rewarded - Placement: %lld", _placementID]];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.interstitial setExtras:[CLXInMobiInitializer extras]];
-        if (self.bidPayload) {
-            [self.interstitial load:self.bidPayload];
-        } else {
-            [self.interstitial load];
-        }
-    });
+
+    [self.interstitial setExtras:[CLXInMobiInitializer extras]];
+    if (self.bidPayload) {
+        [self.interstitial load:self.bidPayload];
+    } else {
+        [self.interstitial load];
+    }
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
     BOOL ready = [self isReady];
-    
+
     if (ready) {
         [self.logger info:@"Showing rewarded ad"];
-        
-        if ([self.delegate respondsToSelector:@selector(didShowWithRewarded:)]) {
-            [self.delegate didShowWithRewarded:self];
-        }
-        
+
+        // Reset reward state for new show
+        self.hasGrantedReward = NO;
+
         [_interstitial showFrom:viewController];
     } else {
         [self.logger error:@"Cannot show ad - not ready"];
-        
-        NSError *showError = [CLXError errorWithCode:CLXErrorCodeAdNotReady 
+
+        NSError *showError = [CLXError errorWithCode:CLXErrorCodeAdapterAdNotReady
                                          description:@"Cannot show rewarded - ad not ready"];
-        
-        if ([self.delegate respondsToSelector:@selector(didFailToShowWithRewarded:error:)]) {
-            [self.delegate didFailToShowWithRewarded:self error:showError];
+        CLXError *clxError = [CLXInMobiErrorHandler toCloudXError:showError];
+        id<CLXAdapterRewardedDelegate> delegate = self.delegate;
+        if (delegate) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [delegate didFailToShowWithRewarded:self error:clxError];
+            });
         }
     }
-}
-
-- (void)destroy {
-    [self.logger debug:@"Destroying rewarded"];
-    
-    if (self.interstitial) {
-        self.interstitial.delegate = nil;
-        self.interstitial = nil;
-    }
-    
-    self.delegate = nil;
-    _isLoading = NO;
-    
-    [self.logger debug:@"Destruction complete"];
 }
 
 #pragma mark - IMInterstitialDelegate
 
 - (void)interstitialDidFinishLoading:(IMInterstitial *)interstitial {
     [self.logger info:[NSString stringWithFormat:@"Loaded successfully - Ready: %@", [interstitial isReady] ? @"YES" : @"NO"]];
-    _isLoading = NO;
-    
-    if ([self.delegate respondsToSelector:@selector(didLoadWithRewarded:)]) {
-        [self.delegate didLoadWithRewarded:self];
-    }
+
+    [self.delegate didLoadWithRewarded:self];
 }
 
 - (void)interstitial:(IMInterstitial *)interstitial didFailToLoadWithError:(IMRequestStatus *)error {
     [self.logger error:[NSString stringWithFormat:@"Failed to load: %@", error.localizedDescription]];
-    _isLoading = NO;
-    
-    NSError *clxError = [CLXInMobiErrorHandler handleInMobiError:[NSError errorWithDomain:@"InMobi" code:error.code userInfo:@{NSLocalizedDescriptionKey: error.localizedDescription}]
-                                                      withLogger:self.logger
-                                                         context:@"Rewarded Load"
-                                                     placementID:@(_placementID).stringValue];
-    
-    if ([self.delegate respondsToSelector:@selector(didFailToLoadWithRewarded:error:)]) {
-        [self.delegate didFailToLoadWithRewarded:self error:clxError];
-    }
+
+    CLXError *clxError = [CLXInMobiErrorHandler toCloudXError:error];
+    [self.delegate didFailToLoadWithRewarded:self error:clxError];
 }
 
 - (void)interstitialDidPresent:(IMInterstitial *)interstitial {
@@ -190,14 +154,8 @@
 - (void)interstitial:(IMInterstitial *)interstitial didFailToPresentWithError:(IMRequestStatus *)error {
     [self.logger error:[NSString stringWithFormat:@"Failed to show: %@", error.localizedDescription]];
     
-    NSError *clxError = [CLXInMobiErrorHandler handleInMobiError:[NSError errorWithDomain:@"InMobi" code:error.code userInfo:@{NSLocalizedDescriptionKey: error.localizedDescription}]
-                                                      withLogger:self.logger
-                                                         context:@"Rewarded Show"
-                                                     placementID:@(_placementID).stringValue];
-    
-    if ([self.delegate respondsToSelector:@selector(didFailToShowWithRewarded:error:)]) {
-        [self.delegate didFailToShowWithRewarded:self error:clxError];
-    }
+    CLXError *clxError = [CLXInMobiErrorHandler toCloudXError:error];
+    [self.delegate didFailToShowWithRewarded:self error:clxError];
 }
 
 - (void)interstitialWillPresent:(IMInterstitial *)interstitial {
@@ -206,45 +164,35 @@
 
 - (void)interstitialDidDismiss:(IMInterstitial *)interstitial {
     [self.logger info:@"Rewarded dismissed"];
-    
-    if ([self.delegate respondsToSelector:@selector(didCloseWithRewarded:)]) {
-        [self.delegate didCloseWithRewarded:self];
-    }
-}
 
-- (void)interstitialWillDismiss:(IMInterstitial *)interstitial {
-    [self.logger debug:@"Rewarded will dismiss"];
+    // Grant reward on close if user completed the reward action
+    if (self.hasGrantedReward) {
+        [self.logger info:@"Granting reward to user"];
+        [self.delegate userRewardWithRewarded:self];
+    }
+
+    [self.delegate didCloseWithRewarded:self];
 }
 
 - (void)interstitialAdImpressed:(IMInterstitial *)interstitial {
     // Native SDK impression callback - fires when ad is actually displayed/rendered
-    [self.logger info:@"Rewarded impression tracked by ad network SDK"];
-    
-    if ([self.delegate respondsToSelector:@selector(impressionWithRewarded:)]) {
-        [self.delegate impressionWithRewarded:self];
-    }
+    [self.logger info:@"Rewarded impression tracked"];
+
+    // Fire show callback on impression (when ad is actually visible)
+    [self.delegate didShowWithRewarded:self];
+    [self.delegate impressionWithRewarded:self];
 }
 
 - (void)interstitial:(IMInterstitial *)interstitial didInteractWithParams:(nullable NSDictionary *)params {
     [self.logger info:@"Rewarded clicked"];
     
-    if ([self.delegate respondsToSelector:@selector(clickWithRewarded:)]) {
-        [self.delegate clickWithRewarded:self];
-    }
+    [self.delegate clickWithRewarded:self];
 }
 
 - (void)interstitial:(IMInterstitial *)interstitial rewardActionCompletedWithRewards:(NSDictionary *)rewards {
-    [self.logger info:[NSString stringWithFormat:@"✅ Reward earned: %@", rewards]];
-    
-    // Try to extract reward info from InMobi rewards dictionary
-    // InMobi typically provides keys like "currency" and "amount"
-    if (rewards && [self.delegate respondsToSelector:@selector(userRewardWithRewarded:amount:label:)]) {
-        NSInteger amount = [rewards[@"amount"] integerValue] ?: 0;
-        NSString *currency = rewards[@"currency"];
-        [self.delegate userRewardWithRewarded:self amount:amount label:currency];
-    } else if ([self.delegate respondsToSelector:@selector(userRewardWithRewarded:)]) {
-        [self.delegate userRewardWithRewarded:self];
-    }
+    [self.logger info:[NSString stringWithFormat:@"Reward action completed: %@", rewards]];
+
+    self.hasGrantedReward = YES;
 }
 
 - (void)userWillLeaveApplicationFromInterstitial:(IMInterstitial *)interstitial {
@@ -253,10 +201,8 @@
 
 #pragma mark - Additional SDK callbacks (logging only - no delegate action)
 
-- (void)interstitialDidReceiveAd:(IMInterstitial *)interstitial {
-    // NO-OP: Ad content received before load completes. Logged for diagnostics only.
-    // Our SDK fires didLoadWithRewarded: when the ad is fully ready.
-    [self.logger debug:@"Rewarded did receive ad content"];
+- (void)interstitial:(IMInterstitial *)interstitial didReceiveWithMetaInfo:(IMAdMetaInfo *)metaInfo {
+    [self.logger debug:@"Rewarded request succeeded"];
 }
 
 @end

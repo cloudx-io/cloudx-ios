@@ -17,16 +17,10 @@
 #import "CLXInMobiRewarded.h"
 #endif
 
-#if __has_include(<CloudXInMobiAdapter/CLXInMobiBaseFactory.h>)
-#import <CloudXInMobiAdapter/CLXInMobiBaseFactory.h>
-#else
-#import "../Base/CLXInMobiBaseFactory.h"
-#endif
-
 #import <CloudXCore/CLXLogger.h>
 
 @interface CLXInMobiRewardedFactory ()
-@property (nonatomic, strong) CLXInMobiBaseFactory *baseFactory;
+@property (nonatomic, strong) CLXLogger *logger;
 @end
 
 @implementation CLXInMobiRewardedFactory
@@ -38,7 +32,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _baseFactory = [[CLXInMobiBaseFactory alloc] init];
+        _logger = [[CLXLogger alloc] initWithCategory:@"CLXInMobiRewardedFactory"];
     }
     return self;
 }
@@ -50,18 +44,11 @@
                                        adUnitName:(NSString *)adUnitName
                                            delegate:(id<CLXAdapterRewardedDelegate>)delegate {
     
-    // Extract placement ID from extras (server provides this in adapter_extras)
-    NSString *placementIdString = extras[@"placement_id"];
-    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating rewarded - Ad Unit: %@ (%@), BidID: %@, PlacementID: %@", adUnitName ?: @"(unknown)", adId, bidId, placementIdString]];
-    
-    long long inmobiPlacementID = [self.baseFactory extractPlacementID:placementIdString];
-    
-    // v1.3.0: No longer return nil for validation errors
-    // Validation now happens in load() with proper error callbacks
-    if (inmobiPlacementID == 0) {
-        [self.baseFactory.logger error:@"Invalid placement ID - validation will be deferred to load()"];
-    }
-    
+    [self.logger debug:[NSString stringWithFormat:@"Creating rewarded - Ad Unit: %@ (%@), BidID: %@",
+                         adUnitName ?: @"(unknown)", adId, bidId]];
+
+    long long inmobiPlacementID = [extras[@"placement_id"] longLongValue];
+
     NSData *bidPayloadData = nil;
     if (adm && adm.length > 0) {
         bidPayloadData = [adm dataUsingEncoding:NSUTF8StringEncoding];
@@ -74,9 +61,7 @@
                                                                    adUnitName:adUnitName
                                                                            bidID:bidId
                                                                         delegate:delegate];
-    
-    [self.baseFactory.logger debug:@"Rewarded adapter created successfully"];
-    
+
     return rewarded;
 }
 

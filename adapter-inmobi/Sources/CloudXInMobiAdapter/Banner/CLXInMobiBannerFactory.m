@@ -17,17 +17,11 @@
 #import "CLXInMobiBanner.h"
 #endif
 
-#if __has_include(<CloudXInMobiAdapter/CLXInMobiBaseFactory.h>)
-#import <CloudXInMobiAdapter/CLXInMobiBaseFactory.h>
-#else
-#import "../Base/CLXInMobiBaseFactory.h"
-#endif
-
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBannerType.h>
 
 @interface CLXInMobiBannerFactory ()
-@property (nonatomic, strong) CLXInMobiBaseFactory *baseFactory;
+@property (nonatomic, strong) CLXLogger *logger;
 @end
 
 @implementation CLXInMobiBannerFactory
@@ -39,7 +33,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _baseFactory = [[CLXInMobiBaseFactory alloc] init];
+        _logger = [[CLXLogger alloc] initWithCategory:@"CLXInMobiBannerFactory"];
     }
     return self;
 }
@@ -54,23 +48,10 @@
                                                 adUnitName:(NSString *)adUnitName
                                                     delegate:(id<CLXAdapterBannerDelegate>)delegate {
 
-    [self.baseFactory.logger debug:[NSString stringWithFormat:@"Creating banner - Ad Unit: %@ (%@), BidID: %@, Type: %ld",
-                                    adUnitName ?: @"(unknown)", adId, bidId, (long)type]];
+    [self.logger debug:[NSString stringWithFormat:@"Creating banner - Ad Unit: %@ (%@), BidID: %@, Type: %ld",
+                         adUnitName ?: @"(unknown)", adId, bidId, (long)type]];
 
-    // Extract placement ID from extras
-    NSString *placementId = extras[@"placement_id"];
-    if (!placementId) {
-        [self.baseFactory.logger error:@"Missing placement_id in extras"];
-        return nil;
-    }
-
-    long long inmobiPlacementID = [self.baseFactory extractPlacementID:placementId];
-    
-    // v1.3.0: No longer return nil for validation errors
-    // Validation now happens in load() with proper error callbacks
-    if (inmobiPlacementID == 0) {
-        [self.baseFactory.logger error:@"Invalid placement ID - validation will be deferred to load()"];
-    }
+    long long inmobiPlacementID = [extras[@"placement_id"] longLongValue];
 
     // Convert banner type to size
     CGSize bannerSize;
@@ -98,8 +79,6 @@
                                                                       size:bannerSize
                                                             viewController:viewController
                                                                   delegate:delegate];
-
-    [self.baseFactory.logger debug:@"Banner adapter created successfully"];
 
     return banner;
 }

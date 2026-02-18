@@ -5,7 +5,7 @@ use_frameworks! :linkage => :static
 
 target 'CloudXInMobiAdapter' do
   pod 'CloudXCore', :path => '../core'
-  pod 'InMobiSDK', '~> 10.8'
+  pod 'InMobiSDK', '~> 11.1'
 end
 
 post_install do |installer|

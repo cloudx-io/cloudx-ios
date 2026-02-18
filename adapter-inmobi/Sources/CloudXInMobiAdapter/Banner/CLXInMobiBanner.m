@@ -26,18 +26,18 @@
 #import "../Initializers/CLXInMobiInitializer.h"
 #endif
 
-@interface CLXInMobiBanner () {
-    NSString *_bidID;
-}
+@interface CLXInMobiBanner ()
 @property (nonatomic, strong) CLXLogger *logger;
-@property (nonatomic, assign) BOOL isLoading;
+@property (nonatomic, strong, nullable) IMBanner *banner;
+@property (nonatomic, strong, nullable) NSData *bidPayload;
 @property (nonatomic, assign) long long placementID;
 @property (nonatomic, copy, nullable) NSString *adUnitName;
-@property (nonatomic, weak) UIViewController *viewController;
-@property (nonatomic, assign) CGSize bannerSize;  // Store for deferred creation
+@property (nonatomic, assign) CGSize bannerSize;
 @end
 
 @implementation CLXInMobiBanner
+
+@synthesize timeout = _timeout;
 
 - (instancetype)initWithBidPayload:(nullable NSData *)bidPayload
                        placementID:(long long)placementID
@@ -51,9 +51,7 @@
         _bidPayload = bidPayload;
         _placementID = placementID;  // May be 0 (invalid) - validation in load()
         _adUnitName = [adUnitName copy];  // For error messages
-        _bidID = [bidID copy];
         _delegate = delegate;
-        _viewController = viewController;
         _bannerSize = size;  // Store for deferred creation
         _sdkVersion = [CLXInMobiInitializer sdkVersion];
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXInMobiBanner"];
@@ -67,20 +65,8 @@
     return self;
 }
 
-- (NSString *)bidID {
-    return _bidID;
-}
-
 - (UIView *)bannerView {
     return self.banner;
-}
-
-- (BOOL)clx_isFlexibleSize {
-    return NO;
-}
-
-- (BOOL)isFlexibleSize {
-    return [self clx_isFlexibleSize];
 }
 
 - (void)load {
@@ -93,46 +79,32 @@
         NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
                                      description:errorMessage];
         [self.logger error:error.localizedDescription];
-        
-        if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
-            [self.delegate failToLoadBanner:self error:error];
-        }
-        return;
-    }
-    
-    if (_isLoading) {
-        [self.logger debug:@"Load already in progress"];
-        return;
-    }
-    
-    _isLoading = YES;
-    
-    // All UI operations happen on main thread via dispatch_async
-    // Using dispatch_async (not sync) to prevent deadlocks when returning from deep links
-    __weak typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        typeof(self) strongSelf = weakSelf;
-        if (!strongSelf) return;
-        
-        // Create banner if not already created
-        if (!strongSelf.banner) {
-            CGSize size = strongSelf.bannerSize;
-            long long placement = strongSelf.placementID;
-            strongSelf.banner = [[IMBanner alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)
-                                                    placementId:placement];
-            strongSelf.banner.delegate = strongSelf;
-            [strongSelf.logger debug:[NSString stringWithFormat:@"Created banner - Placement: %lld", placement]];
-        }
-        
-        [strongSelf.logger debug:[NSString stringWithFormat:@"Loading banner - Placement: %lld", strongSelf.placementID]];
-        [strongSelf.banner setExtras:[CLXInMobiInitializer extras]];
 
-        if (strongSelf.bidPayload) {
-            [strongSelf.banner load:strongSelf.bidPayload];
-        } else {
-            [strongSelf.banner load];
+        id<CLXAdapterBannerDelegate> delegate = self.delegate;
+        if (delegate) {
+            [delegate failToLoadBanner:self error:error];
         }
-    });
+        return;
+    }
+
+    // Create banner if not already created (Core SDK guarantees main thread)
+    if (!self.banner) {
+        self.banner = [[IMBanner alloc] initWithFrame:CGRectMake(0, 0, _bannerSize.width, _bannerSize.height)
+                                          placementId:_placementID];
+        self.banner.transitionAnimation = UIViewAnimationTransitionNone;
+        [self.banner shouldAutoRefresh:NO];
+        self.banner.delegate = self;
+        [self.logger debug:[NSString stringWithFormat:@"Created banner - Placement: %lld", _placementID]];
+    }
+
+    [self.banner setExtras:[CLXInMobiInitializer extras]];
+
+    [self.logger debug:[NSString stringWithFormat:@"Loading banner - Placement: %lld", _placementID]];
+    if (_bidPayload) {
+        [self.banner load:_bidPayload];
+    } else {
+        [self.banner load];
+    }
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
@@ -143,11 +115,9 @@
 
 - (void)destroy {
     [self.logger debug:@"Destroying banner"];
-    
-    // Clear delegate and state immediately (thread-safe)
+
     self.delegate = nil;
-    _isLoading = NO;
-    
+
     // IMBanner is a UIView - must be cleaned up on main thread
     IMBanner *bannerToDestroy = self.banner;
     self.banner = nil;
@@ -168,88 +138,43 @@
 #pragma mark - IMBannerDelegate
 
 - (void)bannerDidFinishLoading:(IMBanner *)banner {
-    [self.logger info:@"Banner loaded successfully"];
-    _isLoading = NO;
-    
-    if ([self.delegate respondsToSelector:@selector(didLoadBanner:)]) {
-        [self.delegate didLoadBanner:self];
-    }
-}
-
-- (void)bannerAdImpressed:(IMBanner *)banner {
-    // Native SDK impression callback - fires when ad is actually displayed/rendered
-    [self.logger info:@"Banner impression tracked by ad network SDK"];
-    
-    if ([self.delegate respondsToSelector:@selector(didShowBanner:)]) {
-        [self.delegate didShowBanner:self];
-    }
-    
-    if ([self.delegate respondsToSelector:@selector(impressionBanner:)]) {
-        [self.delegate impressionBanner:self];
-    }
+    [self.logger info:@"Banner loaded"];
+    [self.delegate didLoadBanner:self];
 }
 
 - (void)banner:(IMBanner *)banner didFailToLoadWithError:(IMRequestStatus *)error {
-    [self.logger error:[NSString stringWithFormat:@"Failed to load: %@", error.localizedDescription]];
-    _isLoading = NO;
-    
-    NSError *clxError = [CLXInMobiErrorHandler handleInMobiError:[NSError errorWithDomain:@"InMobi" code:error.code userInfo:@{NSLocalizedDescriptionKey: error.localizedDescription}]
-                                                      withLogger:self.logger
-                                                         context:@"Banner Load"
-                                                     placementID:@(_placementID).stringValue];
-    
-    if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
-        [self.delegate failToLoadBanner:self error:clxError];
-    }
+    [self.logger error:[NSString stringWithFormat:@"Banner failed to load: %@", error.localizedDescription]];
+    CLXError *clxError = [CLXInMobiErrorHandler toCloudXError:error];
+    [self.delegate failToLoadBanner:self error:clxError];
 }
 
-- (void)banner:(IMBanner *)banner didInteractWithParams:(nullable NSDictionary *)params {
-    [self.logger info:@"👆 Banner clicked"];
-    
-    if ([self.delegate respondsToSelector:@selector(clickBanner:)]) {
-        [self.delegate clickBanner:self];
-    }
+- (void)bannerAdImpressed:(IMBanner *)banner {
+    [self.logger info:@"Banner impression tracked"];
+    [self.delegate didShowBanner:self];
+    [self.delegate impressionBanner:self];
 }
 
-- (void)userWillLeaveApplicationFromBanner:(IMBanner *)banner {
-    [self.logger debug:@"User will leave application"];
+- (void)banner:(IMBanner *)banner didInteractWithParams:(NSDictionary *)params {
+    [self.logger info:@"Banner clicked"];
+    [self.delegate clickBanner:self];
 }
 
-- (void)bannerWillPresentScreen:(IMBanner *)banner {
-    [self.logger debug:@"Banner will present screen"];
+- (void)bannerDidPresentScreen:(IMBanner *)banner {
+    [self.logger debug:@"Banner expanded"];
     if ([self.delegate respondsToSelector:@selector(didExpandBanner:)]) {
         [self.delegate didExpandBanner:self];
     }
 }
 
-- (void)bannerDidPresentScreen:(IMBanner *)banner {
-    [self.logger debug:@"Banner did present screen"];
-}
-
-- (void)bannerWillDismissScreen:(IMBanner *)banner {
-    [self.logger debug:@"Banner will dismiss screen"];
-}
-
 - (void)bannerDidDismissScreen:(IMBanner *)banner {
-    [self.logger debug:@"Banner did dismiss screen"];
+    [self.logger debug:@"Banner collapsed"];
     if ([self.delegate respondsToSelector:@selector(didCollapseBanner:)]) {
         [self.delegate didCollapseBanner:self];
     }
 }
 
-#pragma mark - Additional SDK callbacks (logging only - no delegate action)
-
-- (void)banner:(IMBanner *)banner didReceiveWithMetaInfo:(IMAdMetaInfo *)metaInfo {
-    // NO-OP: Metadata received before load completes. Logged for diagnostics only.
-    // Our SDK fires didLoadBanner: when the ad is fully ready, not on metadata receipt.
-    [self.logger debug:[NSString stringWithFormat:@"Banner received meta info - bidValue: %@", metaInfo.bidInfo]];
-}
-
-- (void)banner:(IMBanner *)banner rewardActionCompletedWithRewards:(NSDictionary *)rewards {
-    // NO-OP: Rewarded banners are not supported in our banner ad format.
-    // If the ad network sends rewards for banners, we log but do not propagate.
-    // Use the Rewarded ad format for reward-based ads.
-    [self.logger warn:[NSString stringWithFormat:@"Unexpected reward on banner ad (not supported): %@", rewards]];
+- (void)userWillLeaveApplicationFromBanner:(IMBanner *)banner {
+    [self.logger debug:@"User will leave application"];
 }
 
 @end

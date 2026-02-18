@@ -13,7 +13,6 @@
 
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
-#import <CloudXCore/CLXSettings.h>
 #import <InMobiSDK/InMobiSDK.h>
 
 #if __has_include(<CloudXInMobiAdapter/CLXInMobiInitializer.h>)
@@ -59,75 +58,29 @@
     // When another SDK concurrently calls the same method, this can take several seconds.
     // Calling on main thread causes UI freeze/ANR.
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        @try {
-            // Check if InMobi SDK is initialized
-            if (![CLXInMobiInitializer isInitialized]) {
-                [self.logger error:@"InMobi SDK not initialized. This may occur if InMobi has not been configured for this app in the CloudX dashboard. Please verify your InMobi adapter configuration includes a valid account_id."];
-                
-                NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
-                                             description:@"InMobi SDK not initialized"];
-                
-                if (completion) {
-                    completion(nil, error);
-                }
-                return;
-            }
-            
-            NSDictionary *extras = [CLXInMobiInitializer extras];
+        // Check if InMobi SDK is initialized
+        if (![CLXInMobiInitializer isInitialized]) {
+            [self.logger error:@"InMobi SDK not initialized. This may occur if InMobi has not been configured for this app in the CloudX dashboard. Please verify your InMobi adapter configuration includes a valid account_id."];
 
-            [self.logger debug:[NSString stringWithFormat:@"Requesting InMobi token with partner extras - tp: %@, tp-ver: %@",
-                               extras[@"tp"] ?: @"(none)", extras[@"tp-ver"] ?: @"(none)"]];
+            NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed
+                                         description:@"InMobi SDK not initialized"];
 
-            // Get InMobi bidder token with partner information
-            id tokenResponse = [IMSdk getTokenWithExtras:extras andKeywords:nil];
-            
-            // InMobi SDK returns the token directly as a string, not in a dictionary
-            NSString *token = nil;
-            if ([tokenResponse isKindOfClass:[NSString class]]) {
-                token = (NSString *)tokenResponse;
-            } else if ([tokenResponse isKindOfClass:[NSDictionary class]]) {
-                // Fallback: some InMobi SDK versions might return a dictionary
-                token = ((NSDictionary *)tokenResponse)[@"token"];
-            } else if (tokenResponse != nil) {
-                [self.logger warn:[NSString stringWithFormat:@"Unexpected token response type: %@", NSStringFromClass([tokenResponse class])]];
-            }
-            
-            NSString *idfa = [[CLXSettings sharedInstance] getIFA];
-            
-            [self.logger debug:[NSString stringWithFormat:@"InMobi bidder token: %@ | IDFA from CLXSettings: %@", 
-                               token ? @"[RECEIVED]" : @"[NIL]", idfa ? @"[AVAILABLE]" : @"[NIL]"]];
-            
-            // Create token dictionary with InMobi-specific data
-            NSMutableDictionary<NSString *, NSString *> *result = [NSMutableDictionary dictionary];
-            
-            if (token && token.length > 0) {
-                result[@"bid_token"] = token;
-            }
-            
-            if (idfa && idfa.length > 0) {
-                result[@"device_ifa"] = idfa;
-                [self.logger info:[NSString stringWithFormat:@"Using centralized IFA in device_ifa: %@", idfa]];
-            }
-            
-            // Add network identifier
-            result[@"network"] = @"inmobi";
-            
-            [self.logger info:[NSString stringWithFormat:@"Token created with %lu keys", (unsigned long)result.count]];
-            
-            if (completion) {
-                completion([result copy], nil);
-            }
-            
-        } @catch (NSException *exception) {
-            [self.logger error:[NSString stringWithFormat:@"Exception getting token: %@", exception.reason]];
-            
-            NSError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
-                                         description:exception.reason ?: @"Unknown exception occurred while getting bid token"];
-            
-            if (completion) {
-                completion(nil, error);
-            }
+            completion(nil, error);
+            return;
         }
+
+        NSDictionary *extras = [CLXInMobiInitializer extras];
+        NSString *token = [IMSdk getTokenWithExtras:extras andKeywords:nil];
+
+        [self.logger debug:[NSString stringWithFormat:@"InMobi bidder token: %@",
+                           token ? @"[RECEIVED]" : @"[NIL]"]];
+
+        NSDictionary<NSString *, NSString *> *result = nil;
+        if (token && token.length > 0) {
+            result = @{@"bid_token": token};
+        }
+
+        completion(result, nil);
     });
 }
 

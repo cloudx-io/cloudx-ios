@@ -12,9 +12,6 @@
 		A100000000000002 /* CLXInMobiBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000002 /* CLXInMobiBanner.h */; };
 		A100000000000003 /* CLXInMobiBannerFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000003 /* CLXInMobiBannerFactory.m */; };
 		A100000000000004 /* CLXInMobiBannerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000004 /* CLXInMobiBannerFactory.h */; };
-		/* Base */
-		A100000000000005 /* CLXInMobiBaseFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000005 /* CLXInMobiBaseFactory.m */; };
-		A100000000000006 /* CLXInMobiBaseFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000006 /* CLXInMobiBaseFactory.h */; };
 		/* BidTokenSource */
 		A100000000000007 /* CLXInMobiBidTokenSource.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000007 /* CLXInMobiBidTokenSource.m */; };
 		A100000000000008 /* CLXInMobiBidTokenSource.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000008 /* CLXInMobiBidTokenSource.h */; };
@@ -49,9 +46,6 @@
 		A200000000000002 /* CLXInMobiBanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBanner.h; sourceTree = "<group>"; };
 		A200000000000003 /* CLXInMobiBannerFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBannerFactory.m; sourceTree = "<group>"; };
 		A200000000000004 /* CLXInMobiBannerFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBannerFactory.h; sourceTree = "<group>"; };
-		/* Base */
-		A200000000000005 /* CLXInMobiBaseFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBaseFactory.m; sourceTree = "<group>"; };
-		A200000000000006 /* CLXInMobiBaseFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBaseFactory.h; sourceTree = "<group>"; };
 		/* BidTokenSource */
 		A200000000000007 /* CLXInMobiBidTokenSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBidTokenSource.m; sourceTree = "<group>"; };
 		A200000000000008 /* CLXInMobiBidTokenSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBidTokenSource.h; sourceTree = "<group>"; };
@@ -110,15 +104,6 @@
 			path = Banner;
 			sourceTree = "<group>";
 		};
-		A500000000000002 /* Base */ = {
-			isa = PBXGroup;
-			children = (
-				A200000000000006 /* CLXInMobiBaseFactory.h */,
-				A200000000000005 /* CLXInMobiBaseFactory.m */,
-			);
-			path = Base;
-			sourceTree = "<group>";
-		};
 		A500000000000003 /* BidTokenSource */ = {
 			isa = PBXGroup;
 			children = (
@@ -172,7 +157,6 @@
 			isa = PBXGroup;
 			children = (
 				A500000000000001 /* Banner */,
-				A500000000000002 /* Base */,
 				A500000000000003 /* BidTokenSource */,
 				A500000000000004 /* Initializers */,
 				A500000000000005 /* Interstitial */,
@@ -240,7 +224,6 @@
 			files = (
 				A100000000000002 /* CLXInMobiBanner.h in Headers */,
 				A100000000000004 /* CLXInMobiBannerFactory.h in Headers */,
-				A100000000000006 /* CLXInMobiBaseFactory.h in Headers */,
 				A100000000000008 /* CLXInMobiBidTokenSource.h in Headers */,
 				A10000000000000A /* CLXInMobiInitializer.h in Headers */,
 				A10000000000000C /* CLXInMobiInterstitial.h in Headers */,
@@ -350,7 +333,6 @@
 			files = (
 				A100000000000001 /* CLXInMobiBanner.m in Sources */,
 				A100000000000003 /* CLXInMobiBannerFactory.m in Sources */,
-				A100000000000005 /* CLXInMobiBaseFactory.m in Sources */,
 				A100000000000007 /* CLXInMobiBidTokenSource.m in Sources */,
 				A100000000000009 /* CLXInMobiInitializer.m in Sources */,
 				A10000000000000B /* CLXInMobiInterstitial.m in Sources */,
