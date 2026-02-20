@@ -349,7 +349,6 @@
     [queryItems addObject:[NSURLQueryItem queryItemWithName:@"campaignId" value:campaignId]];
     [queryItems addObject:[NSURLQueryItem queryItemWithName:@"eventValue" value:@"N%2FA"]];
     [queryItems addObject:[NSURLQueryItem queryItemWithName:@"eventName" value:eventName]];
-    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"debug" value:@"true"]];
     urlComponents.queryItems = queryItems;
     
     NSURL *fullURL = urlComponents.URL;
