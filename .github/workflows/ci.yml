@@ -1,7 +1,7 @@
 # CI: Build and Test
 #
 # Quality gate for all code changes. Runs on pushes to important branches
-# and on all pull requests targeting those branches.
+# and on all pull requests (regardless of target branch).
 
 name: CI
 
@@ -12,10 +12,6 @@ on:
       - 'release/**'
       - 'hotfix/**'
   pull_request:
-    branches:
-      - main
-      - 'release/**'
-      - 'hotfix/**'
   workflow_dispatch:
 
 jobs:
