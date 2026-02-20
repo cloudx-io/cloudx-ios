@@ -5,6 +5,254 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
 #import "MockCLXWinLossTracker.h"
+#import <CloudXCore/CLXWinLossTracker.h>
+#import <CloudXCore/CLXWinLossNetworkService.h>
+#import <CloudXCore/CLXSQLiteDatabase.h>
+#import <CloudXCore/CLXBidLifecycleEvent.h>
+#import <CloudXCore/CLXBidResponse.h>
+#import <CloudXCore/CLXAuctionBidManager.h>
+#import <CloudXCore/CLXSDKConfig.h>
+
+// MARK: - Mocks for Integration Tests
+
+@interface MockCLXWinLossNetworkService : NSObject <CLXWinLossNetworkServiceProtocol>
+@property (nonatomic, strong) NSMutableArray<NSDictionary *> *sentPayloads;
+@property (nonatomic, assign) BOOL shouldFail;
+@property (nonatomic, copy) void (^completionBlock)(BOOL success, NSError *error);
+@end
+
+@implementation MockCLXWinLossNetworkService
+@synthesize sentPayloads = _sentPayloads;
+@synthesize shouldFail = _shouldFail;
+@synthesize completionBlock = _completionBlock;
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _sentPayloads = [NSMutableArray array];
+        _shouldFail = NO;
+    }
+    return self;
+}
+
+- (void)sendWithAppKey:(NSString *)appKey
+           endpointUrl:(NSString *)endpointUrl
+               payload:(NSDictionary<NSString *, id> *)payload
+            completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
+    [self.sentPayloads addObject:payload];
+    
+    if (self.shouldFail) {
+        NSError *error = [NSError errorWithDomain:@"com.cloudx.test" code:500 userInfo:nil];
+        completion(NO, error);
+        if (self.completionBlock) self.completionBlock(NO, error);
+    } else {
+        completion(YES, nil);
+        if (self.completionBlock) self.completionBlock(YES, nil);
+    }
+}
+@end
+
+@interface MockCLXSQLiteDatabase : CLXSQLiteDatabase
+@property (nonatomic, strong) NSMutableArray<NSString *> *executedSQLs;
+@property (nonatomic, strong) NSMutableArray<NSArray *> *executedParameters;
+@property (nonatomic, strong) NSArray<NSDictionary *> *queryResult;
+@end
+
+@implementation MockCLXSQLiteDatabase
+@synthesize executedSQLs = _executedSQLs;
+@synthesize executedParameters = _executedParameters;
+@synthesize queryResult = _queryResult;
+
+- (instancetype)initWithDatabaseName:(NSString *)databaseName {
+    // Use in-memory database for testing to avoid file artifacts
+    self = [super initWithDatabaseName:@":memory:"]; 
+    if (self) {
+        _executedSQLs = [NSMutableArray array];
+        _executedParameters = [NSMutableArray array];
+        _queryResult = @[];
+    }
+    return self;
+}
+
+- (BOOL)executeSQL:(NSString *)sql {
+    [self.executedSQLs addObject:sql];
+    return YES;
+}
+
+- (BOOL)executeSQL:(NSString *)sql withParameters:(nullable NSArray *)parameters {
+    [self.executedSQLs addObject:sql];
+    if (parameters) {
+        [self.executedParameters addObject:parameters];
+    }
+    return YES;
+}
+
+- (NSArray<NSDictionary *> *)executeQuery:(NSString *)sql {
+    [self.executedSQLs addObject:sql];
+    // Return a mock result for last_insert_rowid()
+    if ([sql containsString:@"last_insert_rowid"]) {
+        return @[@{@"last_insert_rowid()": @(123)}];
+    }
+    return self.queryResult;
+}
+
+- (NSArray<NSDictionary *> *)executeQuery:(NSString *)sql withParameters:(nullable NSArray *)parameters {
+    [self.executedSQLs addObject:sql];
+    if (parameters) {
+        [self.executedParameters addObject:parameters];
+    }
+    return self.queryResult;
+}
+
+- (BOOL)tableExists:(NSString *)tableName {
+    return YES;
+}
+@end
+
+// MARK: - Integration Tests
+
+// Expose private properties for injection and testing
+@interface CLXWinLossTracker (IntegrationTesting)
+// Use correct type to match CLXWinLossTracker.m property type
+@property (nonatomic, strong) CLXWinLossNetworkService *networkService;
+@property (nonatomic, strong) CLXSQLiteDatabase *database;
+@property (nonatomic, strong) CLXAuctionBidManager *auctionBidManager;
+
+// Expose the private method for synchronous testing
+- (void)trackWinLoss:(NSDictionary<NSString *, id> *)payload
+           auctionId:(NSString *)auctionId
+               bidId:(NSString *)bidId;
+@end
+
+@interface CLXWinLossIntegrationTests : XCTestCase
+@property (nonatomic, strong) CLXWinLossTracker *tracker;
+@property (nonatomic, strong) MockCLXWinLossNetworkService *mockNetwork;
+@property (nonatomic, strong) MockCLXSQLiteDatabase *mockDatabase;
+@end
+
+@implementation CLXWinLossIntegrationTests
+
+- (void)setUp {
+    [super setUp];
+    
+    self.mockNetwork = [[MockCLXWinLossNetworkService alloc] init];
+    self.mockDatabase = [[MockCLXSQLiteDatabase alloc] initWithDatabaseName:@"test_db"];
+    
+    self.tracker = [[CLXWinLossTracker alloc] init];
+    
+    // Configure tracker FIRST
+    [self.tracker setAppKey:@"test-app-key"];
+    [self.tracker setEndpoint:@"https://test.com/winloss"];
+    
+    // Inject mocks AFTER configuration (so setEndpoint doesn't overwrite mock)
+    // Note: We cast to CLXWinLossNetworkService* because the property is typed as such,
+    // but at runtime it holds our mock which conforms to the protocol.
+    self.tracker.networkService = (CLXWinLossNetworkService *)self.mockNetwork;
+    self.tracker.database = self.mockDatabase;
+    
+    // Configure payload mapping
+    CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
+    config.winLossNotificationURL = @"https://test.com/winloss";
+    config.winLossNotificationPayloadConfig = @{
+        @"notificationType": @"sdk.[loadSuccess|renderSuccess|loss]",
+        @"url": @"sdk.[bid.nurl|bid.lurl]",
+        @"auctionId": @"auctionId",
+        @"bidId": @"bidId",
+        @"lossReason": @"sdk.lossReasonCode",
+        @"price": @"bid.price"
+    };
+    [self.tracker setConfig:config];
+}
+
+- (void)tearDown {
+    self.tracker = nil;
+    self.mockNetwork = nil;
+    self.mockDatabase = nil;
+    [super tearDown];
+}
+
+- (void)testTrackWinLoss_Success_ShouldSaveSendAndDelete {
+    // Given
+    NSString *auctionId = @"auction-1";
+    NSString *bidId = @"bid-1";
+    NSDictionary *payload = @{@"auctionId": auctionId, @"bidId": bidId};
+    
+    // When
+    // Call trackWinLoss directly to be synchronous
+    [self.tracker trackWinLoss:payload auctionId:auctionId bidId:bidId];
+    
+    // Then
+    XCTAssertEqual(self.mockNetwork.sentPayloads.count, 1);
+    NSDictionary *sentPayload = self.mockNetwork.sentPayloads.firstObject;
+    XCTAssertEqualObjects(sentPayload[@"auctionId"], auctionId);
+    XCTAssertEqualObjects(sentPayload[@"bidId"], bidId);
+    
+    // Verify DB interaction (save and delete)
+    BOOL hasInsert = NO;
+    BOOL hasDelete = NO;
+    for (NSString *sql in self.mockDatabase.executedSQLs) {
+        if ([sql containsString:@"INSERT INTO"]) hasInsert = YES;
+        if ([sql containsString:@"DELETE FROM"]) hasDelete = YES;
+    }
+    XCTAssertTrue(hasInsert, @"Should insert event into DB before sending");
+    XCTAssertTrue(hasDelete, @"Should delete event from DB after successful send");
+}
+
+- (void)testTrackWinLoss_NetworkFailure_ShouldKeepInDB {
+    // Given
+    NSString *auctionId = @"auction-1";
+    NSString *bidId = @"bid-1";
+    NSDictionary *payload = @{@"auctionId": auctionId, @"bidId": bidId};
+    
+    self.mockNetwork.shouldFail = YES;
+    
+    // When
+    [self.tracker trackWinLoss:payload auctionId:auctionId bidId:bidId];
+    
+    // Then
+    XCTAssertEqual(self.mockNetwork.sentPayloads.count, 1);
+    
+    // Verify DB interaction (save ONLY, no delete)
+    BOOL hasInsert = NO;
+    BOOL hasDelete = NO;
+    for (NSString *sql in self.mockDatabase.executedSQLs) {
+        if ([sql containsString:@"INSERT INTO"]) hasInsert = YES;
+        if ([sql containsString:@"DELETE FROM"]) hasDelete = YES;
+    }
+    XCTAssertTrue(hasInsert, @"Should insert event into DB before sending");
+    XCTAssertFalse(hasDelete, @"Should NOT delete event from DB after failed send");
+}
+
+- (void)testRetryLogic_ShouldSendCachedEvents {
+    // Given
+    NSString *cachedPayload = @"{\"auctionId\":\"cached-auction\",\"bidId\":\"cached-bid\"}";
+    self.mockDatabase.queryResult = @[
+        @{
+            @"id": @(1),
+            @"auctionId": @"cached-auction",
+            @"bidId": @"cached-bid",
+            @"payload": cachedPayload,
+            @"createdAt": @(1234567890)
+        }
+    ];
+    
+    // When
+    [self.tracker trySendingPendingWinLossEvents];
+    
+    // Then
+    XCTAssertEqual(self.mockNetwork.sentPayloads.count, 1);
+    NSDictionary *payload = self.mockNetwork.sentPayloads.firstObject;
+    XCTAssertEqualObjects(payload[@"auctionId"], @"cached-auction");
+    
+    // Verify DB interaction (delete after success)
+    BOOL hasDelete = NO;
+    for (NSString *sql in self.mockDatabase.executedSQLs) {
+        if ([sql containsString:@"DELETE FROM"]) hasDelete = YES;
+    }
+    XCTAssertTrue(hasDelete, @"Should delete cached event after successful retry");
+}
+
+@end
 
 /**
  * @brief P0 CRITICAL Tests for Win/Loss Event System
