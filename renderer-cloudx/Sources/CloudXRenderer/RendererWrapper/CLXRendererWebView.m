@@ -120,6 +120,7 @@
     configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeNone;
     configuration.allowsAirPlayForMediaPlayback = YES;
     configuration.allowsPictureInPictureMediaPlayback = NO; // Disable for ad content
+    configuration.preferences.javaScriptCanOpenWindowsAutomatically = YES;
     
     
     // User content controller for MRAID and performance optimization
@@ -372,6 +373,20 @@
     } else {
         decisionHandler(WKNavigationActionPolicyAllow);
     }
+}
+
+#pragma mark - WKUIDelegate
+
+- (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures {
+    if (navigationAction.targetFrame == nil) {
+        NSURL *url = navigationAction.request.URL;
+        [self.logger info:[NSString stringWithFormat:@"🔗 [CLICK] window.open() intercepted: %@", url.absoluteString]];
+        
+        if (url && [self.delegate respondsToSelector:@selector(webView:receivedClickthroughLink:)]) {
+            [self.delegate webView:self receivedClickthroughLink:url];
+        }
+    }
+    return nil;
 }
 
 #pragma mark - CLXMRAIDManagerDelegate

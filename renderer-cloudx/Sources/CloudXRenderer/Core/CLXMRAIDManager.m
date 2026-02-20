@@ -570,9 +570,17 @@
 }
 
 - (void)updateExposure:(CGFloat)exposedPercentage exposedRect:(CGRect)exposedRect {
+    if (_currentExposure == exposedPercentage && CGRectEqualToRect(_currentExposedRect, exposedRect)) {
+        return;
+    }
+
     _currentExposure = exposedPercentage;
     _currentExposedRect = exposedRect;
     
+    if (!self.webView || [self.webView.URL.absoluteString isEqualToString:@"about:blank"]) {
+        return;
+    }
+
     NSString *visibleRect = [NSString stringWithFormat:@"{x: %.0f, y: %.0f, width: %.0f, height: %.0f}",
                             exposedRect.origin.x, exposedRect.origin.y, 
                             exposedRect.size.width, exposedRect.size.height];
