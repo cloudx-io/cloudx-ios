@@ -295,7 +295,8 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
                       bidId:bid.id
                       event:[CLXBidLifecycleEvent lossEvent]
                  lossReason:@(CLXLossReasonLostToHigherBid)
-             winnerBidPrice:winnerBidPrice];
+             winnerBidPrice:winnerBidPrice
+                      error:nil];
         }
     }
 }
@@ -406,7 +407,8 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
             bidId:(NSString *)bidId
             event:(CLXBidLifecycleEvent *)event
        lossReason:(nullable NSNumber *)lossReason
-   winnerBidPrice:(double)winnerBidPrice {
+   winnerBidPrice:(double)winnerBidPrice
+            error:(nullable CLXError *)error {
     
     // Record the event for test inspection
     dispatch_sync(_syncQueue, ^{
@@ -455,7 +457,8 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
                                                                 bid:bid
                                                               event:event
                                                          lossReason:lossReason
-                                                     winnerBidPrice:winnerBidPrice];
+                                                     winnerBidPrice:winnerBidPrice
+                                                              error:error];
     
     if (payload) {
         // Call trackWinLoss SYNCHRONOUSLY - this captures the payload for test verification
@@ -472,7 +475,8 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
                                                                         bid:(CLXBidResponseBid *)bid
                                                                       event:(CLXBidLifecycleEvent *)event
                                                                  lossReason:(nullable NSNumber *)lossReason
-                                                             winnerBidPrice:(double)winnerBidPrice {
+                                                             winnerBidPrice:(double)winnerBidPrice
+                                                                      error:(nullable CLXError *)error {
     // Determine loaded bid price based on event type (same logic as parent)
     double loadedBidPrice = winnerBidPrice;
     if (event.type == CLXBidLifecycleEventTypeLoadSuccess || event.type == CLXBidLifecycleEventTypeRenderSuccess) {
@@ -485,7 +489,8 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
                                                                    bid:bid
                                                             lossReason:lossReason
                                                                  event:event
-                                                        loadedBidPrice:loadedBidPrice];
+                                                        loadedBidPrice:loadedBidPrice
+                                                                 error:error];
 }
 
 // REMOVED: URL template resolution - iOS now does zero client-side URL hydration (matches Android)

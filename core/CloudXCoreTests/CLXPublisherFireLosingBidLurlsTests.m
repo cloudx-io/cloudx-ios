@@ -39,7 +39,7 @@
         @"url": @"sdk.[bid.nurl|bid.lurl]",
         @"auctionId": @"auctionId",
         @"bidId": @"bidId",
-        @"lossReason": @"lossReason"
+        @"lossReason": @"sdk.lossReasonCode"
     };
     [[CLXWinLossTracker shared] setConfig:config];
     

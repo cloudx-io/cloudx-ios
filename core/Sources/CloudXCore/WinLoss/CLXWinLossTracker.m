@@ -186,7 +186,8 @@ static id<CLXWinLossTracking> _testInstance = nil;
             bidId:(NSString *)bidId
             event:(CLXBidLifecycleEvent *)event
        lossReason:(nullable NSNumber *)lossReason
-   winnerBidPrice:(double)winnerBidPrice {
+   winnerBidPrice:(double)winnerBidPrice
+            error:(nullable CLXError *)error {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         CLXBidResponseBid *bid = [self.auctionBidManager getBid:auctionId bidId:bidId];
@@ -203,12 +204,13 @@ static id<CLXWinLossTracking> _testInstance = nil;
         }
         
         // Build payload using field resolver with lifecycle event
-        NSDictionary<NSString *, id> *payload = [self.winLossFieldResolver 
+        NSDictionary<NSString *, id> *payload = [self.winLossFieldResolver
             buildWinLossPayloadWithAuctionId:auctionId
                                           bid:bid
                                    lossReason:lossReason
                                         event:event
-                               loadedBidPrice:loadedBidPrice];
+                               loadedBidPrice:loadedBidPrice
+                                        error:error];
         
         if (payload) {
             NSString *eventName = event.notificationType.length > 0 ? event.notificationType : @"BidReceived";
@@ -278,12 +280,13 @@ static id<CLXWinLossTracking> _testInstance = nil;
                            success:NO 
                         lossReason:@(CLXLossReasonLostToHigherBid)];
             
-            // Use sendEvent() with LOSS event type
+            // Use sendEvent() with LOSS event type (no error — lost to higher bid, not a failure)
             [self sendEvent:auctionId
                       bidId:bid.id
                       event:[CLXBidLifecycleEvent lossEvent]
                  lossReason:@(CLXLossReasonLostToHigherBid)
-             winnerBidPrice:winnerBidPrice];
+             winnerBidPrice:winnerBidPrice
+                      error:nil];
             
             lossCount++;
         }
@@ -437,10 +440,17 @@ static id<CLXWinLossTracking> _testInstance = nil;
             if (eventId) {
                 [self deleteEventWithId:[eventId stringValue]];
             }
+        } else if (error.code == CLXErrorCodeClientError) {
+            // 4xx = permanent failure, delete to prevent infinite retry
+            [self.logger warn:[NSString stringWithFormat:@"Deleting win/loss event %@ due to client error: %@",
+                                 eventId, error.localizedDescription]];
+            if (eventId) {
+                [self deleteEventWithId:[eventId stringValue]];
+            }
         } else {
-            [self.logger error:[NSString stringWithFormat:@"Send failed: %@", 
+            // 5xx / network / timeout = transient, keep for retry
+            [self.logger error:[NSString stringWithFormat:@"Send failed: %@",
                                error ? error.localizedDescription : @"Unknown error"]];
-            // Keep in database for retry
         }
     }];
 }
@@ -509,6 +519,11 @@ static id<CLXWinLossTracking> _testInstance = nil;
                                         payload:payload
                                      completion:^(BOOL success, NSError * _Nullable error) {
                 if (success) {
+                    [self deleteEventWithId:cachedEvent.eventId];
+                } else if (error.code == CLXErrorCodeClientError) {
+                    // 4xx = permanent failure, delete to prevent infinite retry
+                    [self.logger warn:[NSString stringWithFormat:@"Deleting cached event %@ due to client error: %@",
+                                         cachedEvent.eventId, error.localizedDescription]];
                     [self deleteEventWithId:cachedEvent.eventId];
                 } else {
                     [self.logger error:[NSString stringWithFormat:@"Cached event failed: %@", cachedEvent.eventId]];

@@ -743,7 +743,8 @@ NS_ASSUME_NONNULL_BEGIN
                                      bidId:self.lastBidResponse.bidID
                                      event:[CLXBidLifecycleEvent loadSuccessEvent]
                                 lossReason:@(CLXLossReasonBidWon)
-                            winnerBidPrice:self.lastBidResponse.price];
+                            winnerBidPrice:self.lastBidResponse.price
+                                     error:nil];
             
             [self.logger debug:[NSString stringWithFormat:@"Fired LOAD_SUCCESS event (nurl) for bidID=%@", self.lastBidResponse.bidID]];
         }
@@ -828,11 +829,13 @@ NS_ASSUME_NONNULL_BEGIN
                                      success:NO 
                                   lossReason:@(lossReason)];
         
+        CLXError *clxError = [error isKindOfClass:[CLXError class]] ? (CLXError *)error : nil;
         [self.winLossTracker sendEvent:self.currentBidResponse.id
                                   bidId:self.lastBidResponse.bid.id
                                   event:[CLXBidLifecycleEvent lossEvent]
                              lossReason:@(lossReason)
-                         winnerBidPrice:-1.0];
+                         winnerBidPrice:-1.0
+                                  error:clxError];
         
         [self.logger debug:[NSString stringWithFormat:@"Sent LOSS event for failed winner rank=%ld, reason=%ld", (long)self.lastBidResponse.bid.ext.cloudx.rank, (long)lossReason]];
     }
@@ -894,7 +897,8 @@ NS_ASSUME_NONNULL_BEGIN
                                      bidId:self.lastBidResponse.bidID
                                      event:[CLXBidLifecycleEvent renderSuccessEvent]
                                 lossReason:@(CLXLossReasonBidWon)
-                            winnerBidPrice:self.lastBidResponse.price];
+                            winnerBidPrice:self.lastBidResponse.price
+                                     error:nil];
             
             [self.logger debug:@"RENDER_SUCCESS event (burl) fired"];
 

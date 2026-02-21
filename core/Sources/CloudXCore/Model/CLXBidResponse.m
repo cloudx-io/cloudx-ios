@@ -102,104 +102,6 @@ static void initializeLogger() {
 
 // MARK: - Individual Bid Implementation
 @implementation CLXBidResponseBid
-- (NSDictionary *)toDictionary {
-    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    
-    if (self.id) dict[@"id"] = self.id;
-    if (self.adm) dict[@"adm"] = self.adm;
-    if (self.adid) dict[@"adid"] = self.adid;
-    if (self.impid) dict[@"impid"] = self.impid;
-    if (self.bundle) dict[@"bundle"] = self.bundle;
-    if (self.burl) dict[@"burl"] = self.burl;
-    if (self.adomain) dict[@"adomain"] = self.adomain;
-    if (self.cat) dict[@"cat"] = self.cat;
-    if (self.cid) dict[@"cid"] = self.cid;
-    if (self.crid) dict[@"crid"] = self.crid;
-    if (self.dealid) dict[@"dealid"] = self.dealid;
-    if (self.nurl) dict[@"nurl"] = self.nurl;
-    if (self.lurl) dict[@"lurl"] = self.lurl;
-    if (self.iurl) dict[@"iurl"] = self.iurl;
-    
-    dict[@"price"] = @(self.price);
-    dict[@"w"] = @(self.w);
-    dict[@"h"] = @(self.h);
-    
-    if (self.ext) {
-        NSMutableDictionary *extDict = [NSMutableDictionary dictionary];
-        // Basic values
-        extDict[@"origbidcpm"] = @(self.ext.origbidcpm);
-        if (self.ext.origbidcur) extDict[@"origbidcur"] = self.ext.origbidcur;
-        
-        // SKAdNetwork data
-        if (self.ext.skadn) {
-            NSMutableDictionary *skadDict = [NSMutableDictionary dictionary];
-            skadDict[@"version"] = self.ext.skadn.version;
-            skadDict[@"network"] = self.ext.skadn.network;
-            if (self.ext.skadn.sourceidentifier) skadDict[@"sourceidentifier"] = self.ext.skadn.sourceidentifier;
-            if (self.ext.skadn.campaign) skadDict[@"campaign"] = self.ext.skadn.campaign;
-            skadDict[@"itunesitem"] = self.ext.skadn.itunesitem;
-            if (self.ext.skadn.productpageid) skadDict[@"productpageid"] = self.ext.skadn.productpageid;
-            if (self.ext.skadn.fidelities) {
-                NSMutableArray *fidArray = [NSMutableArray array];
-                for (CLXBidResponseSKAdFidelity *fidelity in self.ext.skadn.fidelities) {
-                    if ([fidelity respondsToSelector:@selector(toDictionary)]) {
-                        [fidArray addObject:[fidelity performSelector:@selector(toDictionary)]];
-                    }
-                }
-                skadDict[@"fidelities"] = fidArray;
-            }
-            if (self.ext.skadn.nonce) skadDict[@"nonce"] = self.ext.skadn.nonce;
-            skadDict[@"sourceapp"] = self.ext.skadn.sourceapp;
-            if (self.ext.skadn.timestamp) skadDict[@"timestamp"] = self.ext.skadn.timestamp;
-            if (self.ext.skadn.signature) skadDict[@"signature"] = self.ext.skadn.signature;
-            extDict[@"skadn"] = skadDict;
-        }
-        
-        // CloudX data
-        if (self.ext.cloudx) {
-            NSMutableDictionary *cloudDict = [NSMutableDictionary dictionary];
-            cloudDict[@"rank"] = @(self.ext.cloudx.rank);
-            cloudDict[@"revenue"] = @(self.ext.cloudx.revenue);
-            cloudDict[@"test"] = @(self.ext.cloudx.test);
-            if (self.ext.cloudx.adapterExtras) cloudDict[@"adapterExtras"] = self.ext.cloudx.adapterExtras;
-            extDict[@"cloudx"] = cloudDict;
-        }
-        
-        // Prebid data
-        if (self.ext.prebid) {
-            NSMutableDictionary *prebidDict = [NSMutableDictionary dictionary];
-            
-            // Add "type" if it exists
-            if (self.ext.prebid.type) {
-                prebidDict[@"type"] = self.ext.prebid.type;
-            }
-            
-            // Add "meta" if it exists
-            if (self.ext.prebid.meta) {
-                NSMutableDictionary *metaDict = [NSMutableDictionary dictionary];
-                if (self.ext.prebid.meta.adaptercode) {
-                    metaDict[@"adaptercode"] = self.ext.prebid.meta.adaptercode;
-                }
-                prebidDict[@"meta"] = metaDict;
-            }
-            extDict[@"prebid"] = prebidDict;
-        }
-        dict[@"ext"] = extDict;
-    }
-
-    return dict;
-}
-
-- (NSString *)toJSON {
-    NSDictionary *dict = [self toDictionary];
-    NSError *error;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:&error];
-    if (!jsonData) {
-        NSLog(@"JSON Serialization error: %@", error);
-        return nil;
-    }
-    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-}
 @end
 
 // MARK: - Seat Bid Implementation
@@ -513,7 +415,8 @@ static void initializeLogger() {
     }
     
     CLXBidResponseBid *bid = [[CLXBidResponseBid alloc] init];
-    
+    bid.rawJSON = dictionary;
+
     // Parse basic fields
     bid.id = dictionary[@"id"];
     bid.adm = dictionary[@"adm"];

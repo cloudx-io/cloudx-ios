@@ -104,9 +104,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *dealid;
 @property (nonatomic, assign) NSInteger w;
 @property (nonatomic, assign) NSInteger h;
-
-- (NSDictionary *)toDictionary;
-- (nullable NSString *)toJSON;
+@property (nonatomic, copy, nullable) NSDictionary *rawJSON;
 @end
 
 // MARK: - Seat Bid

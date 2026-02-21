@@ -68,46 +68,6 @@
     
     NSString *jsonBody = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     
-    // Enhanced debug logging - try to determine if this is a win or loss notification
-    __block NSString *notificationType = @"UNKNOWN";
-    NSError *parseError;
-    id payloadData = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&parseError];
-    if (!parseError && [payloadData isKindOfClass:[NSDictionary class]]) {
-        NSDictionary *payload = (NSDictionary *)payloadData;
-        
-        // Check for loss indicators first
-        if (payload[@"loss_reason"] || payload[@"ortb_loss_code"]) {
-            notificationType = @"LOSS";
-        } else {
-            // For win detection, look for any price-related field with positive value
-            // Since field names are configurable, check common price field patterns
-            NSArray *priceFieldPatterns = @[@"clearing_price", @"price", @"bid_price", @"auction_price", @"settlement_price"];
-            for (NSString *priceField in priceFieldPatterns) {
-                if (payload[priceField] && [payload[priceField] doubleValue] > 0) {
-                    notificationType = @"WIN";
-                    break;
-                }
-            }
-            
-            // If no price field found but no loss reason, likely still a win
-            if ([notificationType isEqualToString:@"UNKNOWN"] && payload.count > 0) {
-                // Check if any field contains a positive numeric value (likely a price)
-                for (id value in payload.allValues) {
-                    if ([value isKindOfClass:[NSNumber class]] && [value doubleValue] > 0) {
-                        notificationType = @"WIN";
-                        break;
-                    } else if ([value isKindOfClass:[NSString class]]) {
-                        double numericValue = [value doubleValue];
-                        if (numericValue > 0) {
-                            notificationType = @"WIN";
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
     // Prepare headers matching Android's implementation
     NSMutableDictionary *headers = [[NSMutableDictionary alloc] init];
     headers[@"Authorization"] = [NSString stringWithFormat:@"Bearer %@", appKey];
@@ -148,8 +108,12 @@
             }
         } else {
             [self.logger error:[NSString stringWithFormat:@"HTTP %ld", (long)statusCode]];
-            
-            NSError *statusError = [CLXError errorWithCode:CLXErrorCodeServerError 
+
+            CLXErrorCode errorCode = (statusCode >= 400 && statusCode < 500)
+                ? CLXErrorCodeClientError
+                : CLXErrorCodeServerError;
+
+            NSError *statusError = [CLXError errorWithCode:errorCode
                                                description:[NSString stringWithFormat:@"HTTP %ld", (long)statusCode]];
             if (completion) {
                 completion(NO, statusError);

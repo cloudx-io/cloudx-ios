@@ -673,11 +673,13 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                      success:NO 
                                   lossReason:@(lossReason)];
         
+        CLXError *clxError = [error isKindOfClass:[CLXError class]] ? (CLXError *)error : nil;
         [self.winLossTracker sendEvent:self.currentBidResponse.id
                                   bidId:self.lastBidResponse.bid.id
                                   event:[CLXBidLifecycleEvent lossEvent]
                              lossReason:@(lossReason)
-                         winnerBidPrice:-1.0];
+                         winnerBidPrice:-1.0
+                                  error:clxError];
         
         [self.logger debug:[NSString stringWithFormat:@"Sent LOSS event for failed ad type %ld, reason=%ld", (long)[self adType], (long)lossReason]];
     } else {
@@ -761,7 +763,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                  bidId:bidID
                                  event:[CLXBidLifecycleEvent loadSuccessEvent]
                             lossReason:@(CLXLossReasonBidWon)
-                        winnerBidPrice:price];
+                        winnerBidPrice:price
+                                 error:nil];
         
         [self.logger debug:[NSString stringWithFormat:@"[PublisherFullscreenAd] Fired LOAD_SUCCESS event (nurl) for bidID=%@", bidID]];
     }
@@ -782,7 +785,8 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                                  bidId:bidID
                                  event:[CLXBidLifecycleEvent renderSuccessEvent]
                             lossReason:@(CLXLossReasonBidWon)
-                        winnerBidPrice:winningBid.price];
+                        winnerBidPrice:winningBid.price
+                                 error:nil];
         
         [self.logger debug:@"[PublisherFullscreenAd] RENDER_SUCCESS event (burl) fired"];
     } else {

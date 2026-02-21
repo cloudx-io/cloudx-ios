@@ -252,6 +252,11 @@ extern NSString * const CLXErrorDomain;
  */
 @property (nonatomic, readonly, nullable) NSError *underlyingError;
 
+/**
+ * Returns the string name for a CLXErrorCode, matching Android's CloudXErrorCode.name
+ */
++ (NSString *)nameForCode:(CLXErrorCode)code;
+
 @end
 
 /**

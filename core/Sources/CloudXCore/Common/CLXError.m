@@ -231,6 +231,54 @@ NSString * const CLXErrorDomain = @"com.cloudx.sdk.error";
     }
 }
 
++ (NSString *)nameForCode:(CLXErrorCode)code {
+    switch (code) {
+        case CLXErrorCodeInternalError: return @"INTERNAL_ERROR";
+        case CLXErrorCodeNotInitialized: return @"NOT_INITIALIZED";
+        case CLXErrorCodeNoAdaptersFound: return @"NO_ADAPTERS_FOUND";
+        case CLXErrorCodeNoNetworksConfigured: return @"NO_NETWORKS_CONFIGURED";
+        case CLXErrorCodeInvalidAppKey: return @"INVALID_APP_KEY";
+        case CLXErrorCodeSDKDisabled: return @"SDK_DISABLED";
+        case CLXErrorCodeNetworkError: return @"NETWORK_ERROR";
+        case CLXErrorCodeNetworkTimeout: return @"NETWORK_TIMEOUT";
+        case CLXErrorCodeServerError: return @"NETWORK_SERVER_ERROR";
+        case CLXErrorCodeClientError: return @"NETWORK_CLIENT_ERROR";
+        case CLXErrorCodeTooManyRequests: return @"NETWORK_TOO_MANY_REQUESTS";
+        case CLXErrorCodeInvalidResponse: return @"NETWORK_INVALID_RESPONSE";
+        case CLXErrorCodeNoConnection: return @"NETWORK_NO_CONNECTION";
+        case CLXErrorCodeInvalidAdUnit: return @"INVALID_AD_UNIT";
+        case CLXErrorCodeAdsDisabled: return @"ADS_DISABLED";
+        case CLXErrorCodeNoFill: return @"NO_FILL";
+        case CLXErrorCodeLoadFailed: return @"LOAD_FAILED";
+        case CLXErrorCodeAdNotReady: return @"AD_NOT_READY";
+        case CLXErrorCodeAdAlreadyShowing: return @"AD_ALREADY_SHOWING";
+        case CLXErrorCodeInvalidNativeView: return @"INVALID_NATIVE_VIEW";
+        case CLXErrorCodeAdapterInternalError: return @"ADAPTER_INTERNAL_ERROR";
+        case CLXErrorCodeAdapterNoFill: return @"ADAPTER_NO_FILL";
+        case CLXErrorCodeAdapterInvalidLoadState: return @"ADAPTER_INVALID_LOAD_STATE";
+        case CLXErrorCodeAdapterInvalidConfiguration: return @"ADAPTER_INVALID_CONFIGURATION";
+        case CLXErrorCodeAdapterInvalidServerExtras: return @"ADAPTER_INVALID_SERVER_EXTRAS";
+        case CLXErrorCodeAdapterBadRequest: return @"ADAPTER_BAD_REQUEST";
+        case CLXErrorCodeAdapterNotInitialized: return @"ADAPTER_NOT_INITIALIZED";
+        case CLXErrorCodeAdapterInitializationError: return @"ADAPTER_INITIALIZATION_ERROR";
+        case CLXErrorCodeAdapterAdNotReady: return @"ADAPTER_AD_NOT_READY";
+        case CLXErrorCodeAdapterLoadTimeout: return @"ADAPTER_LOAD_TIMEOUT";
+        case CLXErrorCodeAdapterTimeout: return @"ADAPTER_TIMEOUT";
+        case CLXErrorCodeAdapterNoConnection: return @"ADAPTER_NO_CONNECTION";
+        case CLXErrorCodeAdapterServerError: return @"ADAPTER_SERVER_ERROR";
+        case CLXErrorCodeAdapterBidTokenTimeout: return @"ADAPTER_BID_TOKEN_TIMEOUT";
+        case CLXErrorCodeAdapterBidTokenNotSupported: return @"ADAPTER_BID_TOKEN_NOT_SUPPORTED";
+        case CLXErrorCodeAdapterWebViewError: return @"ADAPTER_WEBVIEW_ERROR";
+        case CLXErrorCodeAdapterAdExpired: return @"ADAPTER_AD_EXPIRED";
+        case CLXErrorCodeAdapterAdFrequencyCapped: return @"ADAPTER_AD_FREQUENCY_CAPPED";
+        case CLXErrorCodeAdapterRewardError: return @"ADAPTER_REWARD_ERROR";
+        case CLXErrorCodeAdapterMissingNativeAdAssets: return @"ADAPTER_MISSING_NATIVE_AD_ASSETS";
+        case CLXErrorCodeAdapterMissingViewController: return @"ADAPTER_MISSING_ACTIVITY";
+        case CLXErrorCodeAdapterDisplayFailed: return @"ADAPTER_DISPLAY_FAILED";
+        default: return [NSString stringWithFormat:@"UNKNOWN_%ld", (long)code];
+    }
+}
+
 #pragma mark - Properties
 
 - (NSError *)underlyingError {

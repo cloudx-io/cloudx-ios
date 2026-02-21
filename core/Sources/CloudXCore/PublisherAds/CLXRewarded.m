@@ -313,8 +313,9 @@ NS_ASSUME_NONNULL_BEGIN
         [self.winLossTracker sendEvent:self.currentBidResponse.id
                                  bidId:bidID
                                  event:[CLXBidLifecycleEvent rewardEvent]
-                            lossReason:nil
-                        winnerBidPrice:price];
+                            lossReason:@(CLXLossReasonBidWon)
+                        winnerBidPrice:price
+                                 error:nil];
         
         [self.logger debug:@"[CLXRewarded] REWARD event fired"];
     } else {

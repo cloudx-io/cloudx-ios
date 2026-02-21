@@ -477,22 +477,24 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
     NSString *failureReason = creationError.localizedDescription
         ?: [self diagnoseCreationFailure:currentBid bidIndex:bidIndex];
     [failureReasons addObject:failureReason];
-    
-    [self.logger debug:[NSString stringWithFormat:@"[%@] Bid %ld failed: %@", 
+    CLXError *clxError = [CLXError errorWithCode:CLXErrorCodeAdapterInternalError description:failureReason];
+
+    [self.logger debug:[NSString stringWithFormat:@"[%@] Bid %ld failed: %@",
                        correlationId, (long)bidIndex + 1, failureReason]];
-    
+
     // Send server-side loss notification for adapter creation failures
     if (auctionID && currentBid.id) {
-        [self.winLossTracker setBidLoadResult:auctionID 
-                                       bidId:currentBid.id 
-                                     success:NO 
+        [self.winLossTracker setBidLoadResult:auctionID
+                                       bidId:currentBid.id
+                                     success:NO
                                   lossReason:@(CLXLossReasonInternalError)];
-        
+
         [self.winLossTracker sendEvent:auctionID
                                   bidId:currentBid.id
                                   event:[CLXBidLifecycleEvent lossEvent]
                              lossReason:@(CLXLossReasonInternalError)
-                         winnerBidPrice:-1.0];
+                         winnerBidPrice:-1.0
+                                  error:clxError];
         
         [self.logger debug:[NSString stringWithFormat:@"[%@] 📤 [CLXBidAdSource] Sent LOSS event for uncreatable bid rank=%ld, reason=InternalError", correlationId, (long)currentBid.ext.cloudx.rank]];
     }

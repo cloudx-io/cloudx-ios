@@ -44,7 +44,8 @@
                                                                             bid:testBid
                                                                      lossReason:@(1)
                                                                           event:[CLXBidLifecycleEvent loadSuccessEvent]
-                                                                 loadedBidPrice:2.50];
+                                                                 loadedBidPrice:2.50
+                                                                          error:nil];
     
     XCTAssertNil(result, @"Should return nil when no payload mapping is configured");
 }
@@ -62,165 +63,142 @@
                                                                             bid:testBid
                                                                      lossReason:@(1)
                                                                           event:[CLXBidLifecycleEvent loadSuccessEvent]
-                                                                 loadedBidPrice:2.50];
+                                                                 loadedBidPrice:2.50
+                                                                          error:nil];
     
     XCTAssertNotNil(result, @"Should return dictionary even with empty mapping");
     XCTAssertEqual(result.count, 0, @"Should return empty dictionary for empty mapping");
 }
 
-#pragma mark - Field Resolution Edge Cases
+#pragma mark - Field Resolution: Hardcoded Cases
 
 /**
- * Test resolution of SDK-specific fields with edge cases
+ * Test sdk.sdk always returns "sdk"
  */
-- (void)testResolveField_SDKFields_EdgeCases {
-    [self setMockPayloadMapping:@{
-        @"win_field": @"sdk.win",
-        @"loss_field": @"sdk.loss",
-        @"loss_reason_code_field": @"sdk.lossReasonCode",
-        @"win_loss_field": @"sdk.[win|loss]",
-        @"sdk_field": @"sdk.sdk"
-    }];
-    
+- (void)testResolveField_SdkSdk_AlwaysReturnsSdk {
+    [self setMockPayloadMapping:@{@"sdk_field": @"sdk.sdk"}];
     CLXBidResponseBid *testBid = [self createTestBid];
-    
-    // Test WIN scenario
+
+    NSDictionary *result = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
+                                                                            bid:testBid
+                                                                     lossReason:@(0)
+                                                                          event:[CLXBidLifecycleEvent loadSuccessEvent]
+                                                                 loadedBidPrice:2.50
+                                                                          error:nil];
+
+    XCTAssertEqualObjects(result[@"sdk_field"], @"sdk", @"sdk.sdk should always return 'sdk'");
+}
+
+/**
+ * Test sdk.lossReasonCode returns numeric loss reason
+ */
+- (void)testResolveField_LossReasonCode_ReturnsNumericValue {
+    [self setMockPayloadMapping:@{@"loss_reason_code_field": @"sdk.lossReasonCode"}];
+    CLXBidResponseBid *testBid = [self createTestBid];
+
     NSDictionary *winResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                bid:testBid
-                                                                        lossReason:@(0)  // Bid Won
+                                                                        lossReason:@(0)
                                                                              event:[CLXBidLifecycleEvent loadSuccessEvent]
-                                                                    loadedBidPrice:2.50];
-    
-    XCTAssertEqualObjects(winResult[@"win_field"], @"win", @"sdk.win should return 'win' for win events");
-    XCTAssertNil(winResult[@"loss_field"], @"sdk.loss should return nil for win events");
-    XCTAssertEqualObjects(winResult[@"loss_reason_code_field"], @(0), @"sdk.lossReasonCode should return numeric code 0 for Bid Won");
-    XCTAssertEqualObjects(winResult[@"win_loss_field"], @"win", @"sdk.[win|loss] should return 'win' for wins");
-    XCTAssertEqualObjects(winResult[@"sdk_field"], @"sdk", @"sdk.sdk should always return 'sdk'");
-    
-    // Test LOSS scenario
-    NSDictionary *lossResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
-                                                                                bid:testBid
-                                                                         lossReason:@(102)  // Lost to Higher Bid
-                                                                              event:[CLXBidLifecycleEvent lossEvent]
-                                                                     loadedBidPrice:2.50];
-    
-    XCTAssertNil(lossResult[@"win_field"], @"sdk.win should return nil for loss events");
-    XCTAssertEqualObjects(lossResult[@"loss_field"], @"loss", @"sdk.loss should return 'loss' for loss events");
-    XCTAssertEqualObjects(lossResult[@"loss_reason_code_field"], @(102), @"sdk.lossReasonCode should return numeric code 102 for Lost to Higher Bid");
-    XCTAssertEqualObjects(lossResult[@"win_loss_field"], @"loss", @"sdk.[win|loss] should return 'loss' for losses");
-    XCTAssertEqualObjects(lossResult[@"sdk_field"], @"sdk", @"sdk.sdk should always return 'sdk'");
-}
+                                                                    loadedBidPrice:2.50
+                                                                          error:nil];
+    XCTAssertEqualObjects(winResult[@"loss_reason_code_field"], @(0), @"Should return 0 for BidWon");
 
-/**
- * Test resolution of SDK-specific fields for REWARD events
- * Reward events should be treated as wins (user completed the rewarded ad)
- */
-- (void)testResolveField_SDKFields_RewardEvent {
-    [self setMockPayloadMapping:@{
-        @"win_field": @"sdk.win",
-        @"loss_field": @"sdk.loss",
-        @"reward_field": @"sdk.reward",
-        @"win_loss_field": @"sdk.[win|loss]",
-        @"sdk_field": @"sdk.sdk"
-    }];
-    
-    CLXBidResponseBid *testBid = [self createTestBid];
-    
-    // Test REWARD scenario - should be treated as a WIN
-    NSDictionary *rewardResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
-                                                                                  bid:testBid
-                                                                           lossReason:nil
-                                                                                event:[CLXBidLifecycleEvent rewardEvent]
-                                                                       loadedBidPrice:2.50];
-    
-    // Reward events should return "win" for sdk.win (reward is a type of win)
-    XCTAssertEqualObjects(rewardResult[@"win_field"], @"win", @"sdk.win should return 'win' for reward events");
-    
-    // Reward events should return nil for sdk.loss
-    XCTAssertNil(rewardResult[@"loss_field"], @"sdk.loss should return nil for reward events");
-    
-    // Reward events should return "reward" for sdk.reward
-    XCTAssertEqualObjects(rewardResult[@"reward_field"], @"reward", @"sdk.reward should return 'reward' for reward events");
-    
-    // Reward events should return "win" for sdk.[win|loss] (reward counts as win)
-    XCTAssertEqualObjects(rewardResult[@"win_loss_field"], @"win", @"sdk.[win|loss] should return 'win' for reward events");
-    
-    // sdk.sdk should always return "sdk"
-    XCTAssertEqualObjects(rewardResult[@"sdk_field"], @"sdk", @"sdk.sdk should always return 'sdk'");
-}
-
-/**
- * Test that sdk.reward field only returns value for reward events
- */
-- (void)testResolveField_RewardField_OnlyForRewardEvents {
-    [self setMockPayloadMapping:@{@"reward_field": @"sdk.reward"}];
-    
-    CLXBidResponseBid *testBid = [self createTestBid];
-    
-    // Test that sdk.reward returns nil for non-reward events
-    NSDictionary *loadSuccessResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
-                                                                                       bid:testBid
-                                                                                lossReason:nil
-                                                                                     event:[CLXBidLifecycleEvent loadSuccessEvent]
-                                                                            loadedBidPrice:2.50];
-    XCTAssertEqual(loadSuccessResult.count, 0, @"sdk.reward should return nil for loadSuccess events");
-    
-    NSDictionary *renderSuccessResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
-                                                                                         bid:testBid
-                                                                                  lossReason:nil
-                                                                                       event:[CLXBidLifecycleEvent renderSuccessEvent]
-                                                                              loadedBidPrice:2.50];
-    XCTAssertEqual(renderSuccessResult.count, 0, @"sdk.reward should return nil for renderSuccess events");
-    
     NSDictionary *lossResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                 bid:testBid
                                                                          lossReason:@(102)
                                                                               event:[CLXBidLifecycleEvent lossEvent]
-                                                                     loadedBidPrice:2.50];
-    XCTAssertEqual(lossResult.count, 0, @"sdk.reward should return nil for loss events");
-    
-    // Test that sdk.reward returns "reward" only for reward events
+                                                                     loadedBidPrice:2.50
+                                                                          error:nil];
+    XCTAssertEqualObjects(lossResult[@"loss_reason_code_field"], @(102), @"Should return 102 for LostToHigherBid");
+}
+
+#pragma mark - Field Resolution: payloadKey-based Cases
+
+/**
+ * Test notificationType payloadKey returns event.notificationType
+ */
+- (void)testResolveField_NotificationType_ReturnsEventNotificationType {
+    [self setMockPayloadMapping:@{@"notificationType": @"notification"}];
+    CLXBidResponseBid *testBid = [self createTestBid];
+
+    NSDictionary *loadResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
+                                                                                bid:testBid
+                                                                         lossReason:@(0)
+                                                                              event:[CLXBidLifecycleEvent loadSuccessEvent]
+                                                                     loadedBidPrice:2.50
+                                                                          error:nil];
+    XCTAssertEqualObjects(loadResult[@"notificationType"], @"loadSuccess", @"Should return event notificationType for loadSuccess");
+
+    NSDictionary *lossResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
+                                                                                bid:testBid
+                                                                         lossReason:@(102)
+                                                                              event:[CLXBidLifecycleEvent lossEvent]
+                                                                     loadedBidPrice:2.50
+                                                                          error:nil];
+    XCTAssertEqualObjects(lossResult[@"notificationType"], @"loss", @"Should return event notificationType for loss");
+
     NSDictionary *rewardResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                   bid:testBid
                                                                            lossReason:nil
                                                                                 event:[CLXBidLifecycleEvent rewardEvent]
-                                                                       loadedBidPrice:2.50];
-    XCTAssertEqualObjects(rewardResult[@"reward_field"], @"reward", @"sdk.reward should return 'reward' for reward events");
+                                                                       loadedBidPrice:2.50
+                                                                          error:nil];
+    XCTAssertEqualObjects(rewardResult[@"notificationType"], @"rewardEarned", @"Should return event notificationType for reward");
 }
 
 /**
- * Test URL field resolution with missing or malformed URLs
+ * Test bid payloadKey returns bid dictionary
  */
-- (void)testResolveField_URLFields_MissingURLs {
-    [self setMockPayloadMapping:@{@"url_field": @"sdk.[bid.nurl|bid.lurl]"}];
-    
-    // Test with bid that has no URLs
-    CLXBidResponseBid *bidWithoutURLs = [[CLXBidResponseBid alloc] init];
-    bidWithoutURLs.nurl = nil;
-    bidWithoutURLs.lurl = nil;
-    
+- (void)testResolveField_BidPayloadKey_ReturnsBidDictionary {
+    [self setMockPayloadMapping:@{@"bid": @"seatbid[0].bid[0]"}];
+    CLXBidResponseBid *testBid = [self createTestBid];
+
     NSDictionary *result = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
-                                                                            bid:bidWithoutURLs
-                                                                     lossReason:@(1)
+                                                                            bid:testBid
+                                                                     lossReason:@(0)
                                                                           event:[CLXBidLifecycleEvent loadSuccessEvent]
-                                                                 loadedBidPrice:2.50];
-    
-    XCTAssertNotNil(result, @"Should return dictionary when payload mapping is configured");
-    XCTAssertEqual(result.count, 0, @"Should return empty dictionary when URL fields resolve to nil");
-    
-    // Test with empty URLs
-    CLXBidResponseBid *bidWithEmptyURLs = [[CLXBidResponseBid alloc] init];
-    bidWithEmptyURLs.nurl = @"";
-    bidWithEmptyURLs.lurl = @"";
-    
-    NSDictionary *emptyResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
-                                                                                 bid:bidWithEmptyURLs
-                                                                          lossReason:@(1)
-                                                                               event:[CLXBidLifecycleEvent loadSuccessEvent]
-                                                                      loadedBidPrice:2.50];
-    
-    XCTAssertNotNil(emptyResult, @"Should return dictionary when payload mapping is configured");
-    XCTAssertEqual(emptyResult.count, 0, @"Should return empty dictionary when URL fields resolve to empty strings");
+                                                                 loadedBidPrice:2.50
+                                                                          error:nil];
+    XCTAssertNotNil(result[@"bid"], @"Should return bid dictionary for payloadKey 'bid'");
+    XCTAssertTrue([result[@"bid"] isKindOfClass:[NSDictionary class]], @"bid should be a dictionary");
+}
+
+/**
+ * Test bid payloadKey with nil bid returns no bid field
+ */
+- (void)testResolveField_BidPayloadKey_NilBid_ReturnsNil {
+    [self setMockPayloadMapping:@{@"bid": @"seatbid[0].bid[0]"}];
+
+    NSDictionary *result = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
+                                                                            bid:nil
+                                                                     lossReason:@(1)
+                                                                          event:[CLXBidLifecycleEvent lossEvent]
+                                                                 loadedBidPrice:2.50
+                                                                          error:nil];
+    XCTAssertNil(result[@"bid"], @"Should return nil for bid when bid object is nil");
+}
+
+#pragma mark - Delegation to TrackingFieldResolver
+
+/**
+ * Test that unrecognized field paths delegate to CLXTrackingFieldResolver
+ * (without auction data set up, TrackingFieldResolver returns nil)
+ */
+- (void)testResolveField_UnrecognizedFieldPath_DelegatesToTrackingFieldResolver {
+    [self setMockPayloadMapping:@{@"some_field": @"bid.price"}];
+    CLXBidResponseBid *testBid = [self createTestBid];
+
+    // Without setting up auction data in TrackingFieldResolver, bid.* fields return nil
+    NSDictionary *result = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
+                                                                            bid:testBid
+                                                                     lossReason:@(0)
+                                                                          event:[CLXBidLifecycleEvent loadSuccessEvent]
+                                                                 loadedBidPrice:2.50
+                                                                          error:nil];
+
+    // Field delegates to TrackingFieldResolver — without auction data, resolves to nil
+    XCTAssertNotNil(result, @"Should return dictionary even when delegated fields resolve to nil");
 }
 
 /**
@@ -236,7 +214,8 @@
                                                                                       bid:testBid
                                                                               lossReason:nil
                                                                                    event:[CLXBidLifecycleEvent lossEvent]
-                                                                          loadedBidPrice:2.50];
+                                                                          loadedBidPrice:2.50
+                                                                          error:nil];
     
     XCTAssertEqual(nilReasonResult.count, 0, @"Should not include field when loss reason is nil");
     
@@ -245,7 +224,8 @@
                                                                                       bid:testBid
                                                                                lossReason:@(0)
                                                                                     event:[CLXBidLifecycleEvent lossEvent]
-                                                                           loadedBidPrice:2.50];
+                                                                           loadedBidPrice:2.50
+                                                                          error:nil];
     
     XCTAssertEqualObjects(zeroReasonResult[@"loss_reason_code"], @(0), @"Should return numeric code 0 for Bid Won");
     
@@ -254,14 +234,11 @@
                                                                                            bid:testBid
                                                                                     lossReason:@(-1)
                                                                                          event:[CLXBidLifecycleEvent lossEvent]
-                                                                                loadedBidPrice:2.50];
+                                                                                loadedBidPrice:2.50
+                                                                          error:nil];
     
     XCTAssertEqualObjects(negativeReasonResult[@"loss_reason_code"], @(-1), @"Loss reason code should pass through numeric values as-is");
 }
-
-#pragma mark - URL Template Processing Tests (REMOVED)
-// REMOVED: URL template replacement tests - iOS now does zero client-side URL hydration (matches Android)
-// URLs are sent raw with macros intact (${AUCTION_PRICE}, ${AUCTION_LOSS}) to the server for hydration
 
 #pragma mark - Input Validation Tests
 
@@ -269,89 +246,84 @@
  * Test behavior with nil and invalid inputs
  */
 - (void)testBuildPayload_InvalidInputs_ShouldHandleGracefully {
-    [self setMockPayloadMapping:@{@"test_field": @"sdk.win"}];
-    
+    [self setMockPayloadMapping:@{@"sdk_field": @"sdk.sdk"}];
+
     // Test with nil auction ID
     NSDictionary *nilAuctionResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:nil
                                                                                       bid:[self createTestBid]
                                                                                lossReason:@(1)
                                                                                     event:[CLXBidLifecycleEvent loadSuccessEvent]
-                                                                           loadedBidPrice:2.50];
-    
+                                                                           loadedBidPrice:2.50
+                                                                          error:nil];
+
     XCTAssertNotNil(nilAuctionResult, @"Should not crash with nil auction ID");
-    
+
     // Test with empty auction ID
     NSDictionary *emptyAuctionResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@""
                                                                                         bid:[self createTestBid]
                                                                                  lossReason:@(1)
                                                                                       event:[CLXBidLifecycleEvent loadSuccessEvent]
-                                                                             loadedBidPrice:2.50];
-    
+                                                                             loadedBidPrice:2.50
+                                                                          error:nil];
+
     XCTAssertNotNil(emptyAuctionResult, @"Should not crash with empty auction ID");
-    
+
     // Test with nil bid
     NSDictionary *nilBidResult = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction"
                                                                                    bid:nil
                                                                             lossReason:@(1)
                                                                                  event:[CLXBidLifecycleEvent loadSuccessEvent]
-                                                                        loadedBidPrice:2.50];
-    
+                                                                        loadedBidPrice:2.50
+                                                                          error:nil];
+
     XCTAssertNotNil(nilBidResult, @"Should not crash with nil bid");
-    XCTAssertEqualObjects(nilBidResult[@"test_field"], @"win", @"Should still resolve non-bid fields with nil bid");
+    XCTAssertEqualObjects(nilBidResult[@"sdk_field"], @"sdk", @"Should still resolve non-bid fields with nil bid");
+}
+
+- (void)testSetConfig_ServerPayloadMapping_ShouldConfigureCorrectly {
+    CLXSDKConfigResponse *mockConfig = [[CLXSDKConfigResponse alloc] init];
+    mockConfig.winLossNotificationPayloadConfig = @{
+        @"notificationType": @"notification",
+        @"source": @"sdk.sdk",
+        @"lossReasonCode": @"sdk.lossReasonCode"
+    };
+
+    [self.fieldResolver setConfig:mockConfig];
+
+    CLXBidResponseBid *testBid = [[CLXBidResponseBid alloc] init];
+    testBid.price = 1.50;
+
+    NSDictionary *result = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction-123"
+                                                                            bid:testBid
+                                                                     lossReason:@(0)
+                                                                          event:[CLXBidLifecycleEvent loadSuccessEvent]
+                                                                 loadedBidPrice:1.50
+                                                                          error:nil];
+
+    XCTAssertNotNil(result, @"Should build payload with server config");
+    XCTAssertEqualObjects(result[@"notificationType"], @"loadSuccess", @"Should return event notificationType via payloadKey check");
+    XCTAssertEqualObjects(result[@"source"], @"sdk", @"Should resolve sdk.sdk to 'sdk'");
+    XCTAssertEqualObjects(result[@"lossReasonCode"], @(0), @"Should return numeric loss reason code");
 }
 
 #pragma mark - Helper Methods
 
 - (CLXBidResponseBid *)createTestBid {
     CLXBidResponseBid *bid = [[CLXBidResponseBid alloc] init];
+    bid.id = @"test-bid-1";
+    bid.price = 2.50;
     bid.nurl = @"https://win.com/track?price=${AUCTION_PRICE}";
     bid.lurl = @"https://loss.com/track?reason=${AUCTION_LOSS}&price=${AUCTION_PRICE}";
+    bid.rawJSON = @{
+        @"id": @"test-bid-1",
+        @"price": @(2.50),
+        @"nurl": @"https://win.com/track?price=${AUCTION_PRICE}",
+        @"lurl": @"https://loss.com/track?reason=${AUCTION_LOSS}&price=${AUCTION_PRICE}"
+    };
     return bid;
 }
 
-- (void)testSetConfig_ServerPayloadMapping_ShouldConfigureCorrectly {
-    // Create a mock config response with payload mapping (like from server)
-    // Using field paths that we know work from other tests
-    CLXSDKConfigResponse *mockConfig = [[CLXSDKConfigResponse alloc] init];
-    mockConfig.winLossNotificationPayloadConfig = @{
-        @"notificationType": @"sdk.[win|loss]",
-        @"source": @"sdk.sdk",
-        @"lossReason": @"sdk.lossReason", 
-        @"url": @"sdk.[bid.nurl|bid.lurl]"
-    };
-    
-    // Set the config (this should update the payload mapping)
-    [self.fieldResolver setConfig:mockConfig];
-    
-    // Create test bid
-    CLXBidResponseBid *testBid = [[CLXBidResponseBid alloc] init];
-    testBid.price = 1.50;
-    testBid.nurl = @"https://example.com/win?price=${AUCTION_PRICE}";
-    testBid.ext = @{@"prebid": @{@"meta": @{@"adaptercode": @"meta"}}};
-    
-    // Build payload
-    NSDictionary *result = [self.fieldResolver buildWinLossPayloadWithAuctionId:@"test-auction-123"
-                                                                            bid:testBid
-                                                                     lossReason:nil
-                                                                          event:[CLXBidLifecycleEvent loadSuccessEvent]
-                                                                 loadedBidPrice:1.50];
-    
-    // Verify server config was applied
-    XCTAssertNotNil(result, @"Should build payload with server config");
-    XCTAssertEqual(result.count, 3, @"Should have 3 fields from server config (lossReason is nil for win events)");
-    
-    // Verify specific field mappings work
-    XCTAssertEqualObjects(result[@"notificationType"], @"win", @"Should resolve sdk.[win|loss] to 'win' for win events");
-    XCTAssertEqualObjects(result[@"source"], @"sdk", @"Should resolve sdk.sdk to 'sdk'");
-    XCTAssertNil(result[@"lossReason"], @"Should resolve sdk.lossReason to nil for win events (no loss reason)");
-    // ZERO client-side URL hydration - server does all macro replacement
-    XCTAssertEqualObjects(result[@"url"], @"https://example.com/win?price=${AUCTION_PRICE}", @"Should send URL with raw macros intact - server does hydration");
-}
-
-#pragma mark - Helper Methods
-
 - (void)setMockPayloadMapping:(NSDictionary<NSString *, NSString *> *)mapping {
-    // Clean dependency injection - no KVO hacks needed!
     self.fieldResolver = [[CLXWinLossFieldResolver alloc] initWithPayloadMapping:mapping];
 }
 

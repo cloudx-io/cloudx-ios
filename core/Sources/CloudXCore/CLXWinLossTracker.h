@@ -77,16 +77,18 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Sends a lifecycle event notification for bid state changes
  * @param auctionId The auction identifier
- * @param bidId The bid identifier  
+ * @param bidId The bid identifier
  * @param event The lifecycle event type (LOAD_SUCCESS, RENDER_SUCCESS, or LOSS)
  * @param lossReason The loss reason (for LOSS events)
  * @param winnerBidPrice The price of the winning bid
+ * @param error The error that caused the failure (for LOSS events). Nil for successful events.
  */
 - (void)sendEvent:(NSString *)auctionId
             bidId:(NSString *)bidId
             event:(CLXBidLifecycleEvent *)event
        lossReason:(nullable NSNumber *)lossReason
-   winnerBidPrice:(double)winnerBidPrice;
+   winnerBidPrice:(double)winnerBidPrice
+            error:(nullable CLXError *)error;
 
 /**
  * Sends loss notifications for all losing bids in an auction
