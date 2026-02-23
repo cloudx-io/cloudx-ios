@@ -29,6 +29,7 @@
 @interface CLXPrivacyService (Internal)
 - (nullable NSString *)gdprConsentString;
 - (nullable NSNumber *)gdprApplies;
+// Checks GDPR/CCPA only, ignoring ATT. Use for ATT-exempt identifiers like IDFV.
 - (BOOL)shouldClearPersonalDataIgnoringATT;
 @end
 
@@ -64,6 +65,10 @@
     return self;
 }
 
+// Determines whether personal data (device identifiers, etc.) should be suppressed.
+// Checks ATT authorization first, then falls through to GDPR/CCPA compliance.
+// Use this for ATT-governed identifiers like IDFA.
+// For ATT-exempt identifiers like IDFV, use shouldClearPersonalDataIgnoringATT instead.
 - (BOOL)shouldClearPersonalData {
     // iOS ATT is the primary privacy control - platform-first approach
     if (![CLXAdTrackingService isIDFAAccessAllowed]) {
@@ -173,11 +178,12 @@
     return requiresPiiRemoval;
 }
 
+// Checks only GDPR/CCPA compliance without considering ATT authorization.
+// Use this for identifiers that are ATT-exempt by platform design (e.g., IDFV).
+// IDFV does not require ATT consent per Apple's documentation, but is still a
+// persistent identifier subject to GDPR (Art. 4) and CCPA regulations.
 - (BOOL)shouldClearPersonalDataIgnoringATT {
-    // INTERNAL METHOD: This method includes GDPR checks that are not yet supported by server in bid requests
-    // Internal method includes comprehensive privacy checks - should not be exposed to publishers
-    
-    // Check GDPR consent (INTERNAL - server not supported yet)
+    // Check GDPR consent
     NSString *gdprConsent = [self gdprConsentString];
     NSNumber *gdprApplies = [self gdprApplies];
     
