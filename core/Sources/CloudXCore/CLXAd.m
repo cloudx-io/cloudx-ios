@@ -93,12 +93,7 @@
             networkPlacement = bidResponse.crid ?: bidResponse.id;
         }
         
-        // Try to get network name from prebid meta (primary source) or adapter extras (fallback)
-        if (bidResponse.ext && bidResponse.ext.prebid && bidResponse.ext.prebid.meta && bidResponse.ext.prebid.meta.adaptercode) {
-            networkName = bidResponse.ext.prebid.meta.adaptercode;
-        } else if (bidResponse.ext && bidResponse.ext.cloudx && bidResponse.ext.cloudx.adapterExtras) {
-            networkName = bidResponse.ext.cloudx.adapterExtras[@"bidder"] ?: bidResponse.ext.cloudx.adapterExtras[@"adapter"];
-        }
+        networkName = [CLXBidResponse resolveAdapterCodeFromExt:bidResponse.ext];
         
         // Use provided ad unit name if available, otherwise try adapter extras, then fall back to ad unit ID
         if (adUnitName && adUnitName.length > 0) {

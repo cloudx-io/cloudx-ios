@@ -515,7 +515,11 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
                                                         auctionID:(nullable NSString *)auctionID
                                                          bidRequest:(NSDictionary *)bidRequest {
     
-    NSString *networkName = bid.ext.prebid.meta.adaptercode ?: @"TestVastNetwork";
+    NSString *networkName = [CLXBidResponse resolveAdapterCodeFromExt:bid.ext];
+    if (!networkName || networkName.length == 0) {
+        [self.logger warn:[NSString stringWithFormat:@"Bid %@ has no adaptercode in ext.cloudx or ext.prebid.meta — falling back to TestVastNetwork", bid.id]];
+        networkName = @"TestVastNetwork";
+    }
     
     // Map server-side network names to client-side adapter names
     if ([networkName isEqualToString:@"testbidder"]) {
@@ -574,9 +578,9 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
     }
     
     // Check for missing adaptercode (factory lookup will fail if adapter doesn't exist)
-    NSString *adapterCode = bid.ext.prebid.meta.adaptercode;
+    NSString *adapterCode = [CLXBidResponse resolveAdapterCodeFromExt:bid.ext];
     if (!adapterCode || adapterCode.length == 0) {
-        [issues addObject:@"missing ext.prebid.meta.adaptercode"];
+        [issues addObject:@"missing adaptercode (checked ext.cloudx, ext.prebid.meta, and adapterExtras)"];
     }
     
     // Check for valid bid ID

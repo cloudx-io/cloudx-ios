@@ -65,6 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) double revenue;
 @property (nonatomic, strong, nullable) NSDictionary<NSString *, NSString *> *adapterExtras;
 @property (nonatomic, assign) NSInteger test;
+@property (nonatomic, copy, nullable) NSString *adaptercode;
 
 - (NSDictionary *)toDictionary;
 @end
@@ -151,6 +152,11 @@ NS_ASSUME_NONNULL_BEGIN
 // Marshaling methods for tracking field resolution
 - (NSDictionary *)marshalToJSONDictionary;
 + (NSDictionary *)marshalBidToJSONDictionary:(CLXBidResponseBid *)bid;
+
+/// Resolves the adapter code from a bid ext using the canonical priority chain:
+/// ext.cloudx.adaptercode > ext.prebid.meta.adaptercode > adapterExtras bidder/adapter.
+/// Returns nil if no adapter code is available from any source.
++ (nullable NSString *)resolveAdapterCodeFromExt:(nullable CLXBidResponseExt *)ext;
 
 @end
 

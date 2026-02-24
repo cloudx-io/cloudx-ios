@@ -246,6 +246,7 @@ static void initializeLogger() {
         if (ext.cloudx.adapterExtras) {
             cloudxDict[@"adapterExtras"] = ext.cloudx.adapterExtras;
         }
+        [self addStringFieldToDict:cloudxDict key:@"adaptercode" value:ext.cloudx.adaptercode];
         extDict[@"cloudx"] = cloudxDict;
     }
     
@@ -266,6 +267,16 @@ static void initializeLogger() {
     }
 }
 
+#pragma mark - Adapter Code Resolution
+
++ (nullable NSString *)resolveAdapterCodeFromExt:(nullable CLXBidResponseExt *)ext {
+    return ext.cloudx.adaptercode
+        ?: ext.prebid.meta.adaptercode
+        ?: ext.cloudx.adapterExtras[@"bidder"]
+        ?: ext.cloudx.adapterExtras[@"adapter"];
+}
+
+#pragma mark - Parsing Methods
 
 + (CLXBidResponseCloudXParticipants *)parseExtParticipantsFromDictionary:(NSDictionary *)dictionary {
     if (![dictionary isKindOfClass:[NSDictionary class]]) {
@@ -575,6 +586,12 @@ static void initializeLogger() {
     NSDictionary *adapterExtrasDict = dictionary[@"adapter_extras"];
     if ([adapterExtrasDict isKindOfClass:[NSDictionary class]]) {
         cloudx.adapterExtras = adapterExtrasDict;
+    }
+
+    // Parse adaptercode (SDK >= 2.1 receives this in ext.cloudx instead of ext.prebid.meta)
+    NSString *adapterCode = dictionary[@"adaptercode"];
+    if ([adapterCode isKindOfClass:[NSString class]]) {
+        cloudx.adaptercode = adapterCode;
     }
 
     return cloudx;
