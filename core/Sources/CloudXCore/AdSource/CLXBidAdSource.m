@@ -344,9 +344,7 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
     
     dispatch_group_t group = dispatch_group_create();
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    
-    // Request bid tokens from all available adapters
-    // Note: All adapters are guaranteed initialized when SDK is ready (blocking init)
+    dispatch_queue_t tokenQueue = dispatch_queue_create("com.cloudx.bidTokenDict", DISPATCH_QUEUE_SERIAL);
     
     for (NSString *adapterName in self.bidTokenSources.allKeys) {
         id<CLXBidTokenSource> tokenSource = self.bidTokenSources[adapterName];
@@ -355,13 +353,17 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
         [tokenSource getTokenWithCompletion:^(NSDictionary<NSString *,NSString *> * _Nullable token, NSError * _Nullable error) {
             if (error) {
                 [self.logger error:[NSString stringWithFormat:@"Failed to get token for adapter %@: %@", adapterName, error.localizedDescription]];
+                dispatch_group_leave(group);
             } else if (token) {
                 [self.logger verbose:[NSString stringWithFormat:@"Got token for adapter %@: %@", adapterName, token]];
-                networkNameTokenDict[adapterName] = token;
+                dispatch_async(tokenQueue, ^{
+                    networkNameTokenDict[adapterName] = token;
+                    dispatch_group_leave(group);
+                });
             } else {
                 [self.logger debug:[NSString stringWithFormat:@"[CLXBidAdSource] No token returned for adapter %@", adapterName]];
+                dispatch_group_leave(group);
             }
-            dispatch_group_leave(group);
         }];
     }
     
