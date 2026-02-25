@@ -605,8 +605,13 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     self.currentState = CLXFullscreenAdStateIDLE;
 }
 
-- (void)handleAdClose {
+- (BOOL)handleAdClose {
+    if (self.currentState != CLXFullscreenAdStateSHOWING) {
+        [self.logger warn:@"Ignoring duplicate adapter close callback"];
+        return NO;
+    }
     [self cleanupAdDisplayState];
+    return YES;
 }
 
 /**

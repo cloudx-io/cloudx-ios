@@ -187,7 +187,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)didCloseWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {
-    [self handleAdClose];
+    if (![self handleAdClose]) return;
     self.currentAdapter = nil;
     
     dispatch_async(dispatch_get_main_queue(), ^{

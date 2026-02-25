@@ -43,8 +43,8 @@ NS_ASSUME_NONNULL_BEGIN
 // Adapter load latency tracking
 - (void)trackAdapterLoadLatencyWithError:(nullable NSError *)error;
 
-// Ad close handling
-- (void)handleAdClose;
+// Ad close handling (returns NO if close was already processed — guards against adapters double-firing)
+- (BOOL)handleAdClose;
 - (void)handleClickTracking;
 
 /**
