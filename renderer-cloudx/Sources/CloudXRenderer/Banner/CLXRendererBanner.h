@@ -23,13 +23,11 @@ NS_ASSUME_NONNULL_BEGIN
  * @param adMarkup HTML/VAST markup from winning bid response
  * @param hasCloseButton Whether banner should show close button
  * @param type Banner type (standard, interscroller, etc.)
- * @param viewController Parent view controller for presentation
  * @param delegate Callback delegate for ad events
  */
 - (instancetype)initWithAdm:(NSString *)adMarkup
              hasClosedButton:(BOOL)hasCloseButton
                         type:(CLXBannerType)type
-               viewController:(UIViewController *)viewController
                      delegate:(nullable id<CLXAdapterBannerDelegate>)delegate;
 
 @end

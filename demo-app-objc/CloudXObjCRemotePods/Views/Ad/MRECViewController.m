@@ -27,9 +27,9 @@
     buttonStack.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:buttonStack];
     
-    // Load MREC button
+    // Load MREC button (new API — no viewController)
     UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [loadButton setTitle:@"Load MREC" forState:UIControlStateNormal];
+    [loadButton setTitle:@"Load MREC (New API)" forState:UIControlStateNormal];
     [loadButton addTarget:self action:@selector(loadMRECAd) forControlEvents:UIControlEventTouchUpInside];
     loadButton.backgroundColor = [UIColor systemGreenColor];
     [loadButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -38,7 +38,16 @@
     loadButton.translatesAutoresizingMaskIntoConstraints = NO;
     [buttonStack addArrangedSubview:loadButton];
     
-    // Show button removed - MREC is auto-added to view on push
+    // Load MREC button (deprecated API — passes viewController)
+    UIButton *loadDeprecatedButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [loadDeprecatedButton setTitle:@"Load MREC (Deprecated)" forState:UIControlStateNormal];
+    [loadDeprecatedButton addTarget:self action:@selector(loadMRECAdDeprecated) forControlEvents:UIControlEventTouchUpInside];
+    loadDeprecatedButton.backgroundColor = [UIColor systemOrangeColor];
+    [loadDeprecatedButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    loadDeprecatedButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    loadDeprecatedButton.layer.cornerRadius = 8;
+    loadDeprecatedButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:loadDeprecatedButton];
     
     // Auto-refresh toggle button (positioned separately above status label)
     self.autoRefreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -57,6 +66,8 @@
         [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
         [loadButton.widthAnchor constraintEqualToConstant:200],
         [loadButton.heightAnchor constraintEqualToConstant:44],
+        [loadDeprecatedButton.widthAnchor constraintEqualToConstant:200],
+        [loadDeprecatedButton.heightAnchor constraintEqualToConstant:44],
         
         // Auto-refresh button positioned above status label
         [self.autoRefreshButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
@@ -93,21 +104,18 @@
 }
 
 - (void)loadMRECAd {
-    
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"MREC is already loading."];
         return;
     }
     
-    if (!self.mrecAd) {
-        [self createAndAddMRECToView];
-    }
+    [self resetAdState];
+    [self createAndAddMRECToView];
     
     if (!self.mrecAd) {
-        return; // Failed to create
+        return;
     }
     
-    // Start loading
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
     [self.mrecAd load];
@@ -120,7 +128,7 @@
     if (_settings.mrecAdUnitId.length > 0) {
         adUnitId = _settings.mrecAdUnitId;
     }
-    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:adUnitId viewController:self];
+    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:adUnitId];
     self.mrecAd.delegate = self;
     self.mrecAd.revenueDelegate = self;
     self.mrecAd.placement = @"demo_mrec";
@@ -143,10 +151,54 @@
     ]];
 }
 
-- (void)createMRECAd {
-    // Legacy method - now just calls the new method
-    [self createAndAddMRECToView];
+- (void)loadMRECAdDeprecated {
+    if (self.isLoading) {
+        [self showAlertWithTitle:@"Info" message:@"MREC is already loading."];
+        return;
+    }
+    
+    [self resetAdState];
+    [self createAndAddMRECToViewDeprecated];
+    
+    if (!self.mrecAd) {
+        return;
+    }
+    
+    self.isLoading = YES;
+    [self updateStatusUIWithState:AdStateLoading];
+    [self.mrecAd load];
 }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+- (void)createAndAddMRECToViewDeprecated {
+    NSString *adUnitId = [self adUnitId];
+    if (_settings.mrecAdUnitId.length > 0) {
+        adUnitId = _settings.mrecAdUnitId;
+    }
+    
+    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:adUnitId viewController:self];
+    self.mrecAd.delegate = self;
+    self.mrecAd.revenueDelegate = self;
+    self.mrecAd.placement = @"demo_mrec";
+    self.mrecAd.customData = @"screen:detail,section:sidebar";
+
+    if (!self.mrecAd) {
+        [self showAlertWithTitle:@"Error" message:@"Failed to create MREC (deprecated API)."];
+        return;
+    }
+    
+    self.mrecAd.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.mrecAd];
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [self.mrecAd.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [self.mrecAd.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:210],
+        [self.mrecAd.widthAnchor constraintEqualToConstant:300],
+        [self.mrecAd.heightAnchor constraintEqualToConstant:250]
+    ]];
+}
+#pragma clang diagnostic pop
 
 // showMRECAd method removed - MREC is auto-added to view on push
 
@@ -241,8 +293,7 @@
     [self updateStatusUIWithState:AdStateLoading];
 
     NSString *adUnitId = [self adUnitId];
-    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:adUnitId
-                                                viewController:self];
+    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:adUnitId];
     self.mrecAd.delegate = self;
     self.mrecAd.revenueDelegate = self;
     self.mrecAd.placement = @"demo_mrec";

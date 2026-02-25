@@ -15,6 +15,17 @@
 @interface CLXBannerAdView (Testing)
 @property (nonatomic, copy, readwrite) NSString *adUnitId;
 @property (nonatomic, assign, readwrite) CLXBannerType adFormat;
+@property (nonatomic, weak, nullable) UIViewController *viewController;
+@end
+
+// Minimal mock reporting service for real CLXPublisherBanner creation in VC tests
+@interface CLXBannerAdViewTestReportingService : NSObject <CLXAdEventReporting>
+@end
+
+@implementation CLXBannerAdViewTestReportingService
+- (void)metricsTrackingWithActionString:(NSString *)actionString {}
+- (void)rillTrackingWithActionString:(NSString *)actionString campaignId:(NSString *)campaignId encodedString:(NSString *)encodedString {}
+- (void)geoTrackingWithURLString:(NSString *)fullURL extras:(NSDictionary<NSString *, NSString *> *)extras {}
 @end
 
 // MARK: - Mock Objects (using shared CLXBannerMocks)
@@ -214,5 +225,82 @@
     XCTAssertNoThrow([self.bannerAdView didCollapseAd:testAd], 
                     @"Should handle non-supporting delegates gracefully");
 }
+
+// MARK: - Deprecated viewController Property Tests
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
+- (CLXBannerAdView *)createBannerAdViewWithRealPublisherBanner {
+    CLXSDKConfigAdUnit *adUnit = [[CLXSDKConfigAdUnit alloc] init];
+    adUnit.id = @"vc-test-placement";
+    adUnit.bannerRefreshRateMs = 30000;
+    
+    CLXSettings *settings = [[CLXSettings alloc] init];
+    CLXBannerAdViewTestReportingService *reportingService = [[CLXBannerAdViewTestReportingService alloc] init];
+    
+    CLXPublisherBanner *realBanner = [[CLXPublisherBanner alloc] initWithAdUnit:adUnit
+                                                                                 userID:@"test-user"
+                                                                            publisherID:@"test-pub"
+                                                               suspendPreloadWhenInvisible:NO
+                                                                                delegate:nil
+                                                                              bannerType:CLXBannerTypeW320H50
+                                                                               impModel:nil
+                                                                            adFactories:@{}
+                                                                         bidTokenSources:@{}
+                                                                     bidRequestTimeout:2.0
+                                                                      reportingService:reportingService
+                                                                               settings:settings];
+    
+    return [[CLXBannerAdView alloc] initWithBanner:realBanner type:CLXBannerTypeW320H50];
+}
+
+- (void)testViewControllerPropertyDefaultsToNil {
+    CLXBannerAdView *adView = [self createBannerAdViewWithRealPublisherBanner];
+    
+    XCTAssertNil(adView.viewController, @"viewController should default to nil");
+    
+    [adView destroy];
+}
+
+- (void)testViewControllerPropertySetAndGet {
+    CLXBannerAdView *adView = [self createBannerAdViewWithRealPublisherBanner];
+    
+    UIViewController *vc = [[UIViewController alloc] init];
+    adView.viewController = vc;
+    
+    XCTAssertEqual(adView.viewController, vc, @"viewController getter should return the value set via setter");
+    
+    [adView destroy];
+}
+
+- (void)testViewControllerPropertySetToNilAfterSetting {
+    CLXBannerAdView *adView = [self createBannerAdViewWithRealPublisherBanner];
+    
+    UIViewController *vc = [[UIViewController alloc] init];
+    adView.viewController = vc;
+    XCTAssertEqual(adView.viewController, vc);
+    
+    adView.viewController = nil;
+    XCTAssertNil(adView.viewController, @"viewController should return nil after being explicitly set to nil");
+    
+    [adView destroy];
+}
+
+- (void)testViewControllerPropertyWeakSemantics {
+    CLXBannerAdView *adView = [self createBannerAdViewWithRealPublisherBanner];
+    
+    @autoreleasepool {
+        UIViewController *vc = [[UIViewController alloc] init];
+        adView.viewController = vc;
+        XCTAssertNotNil(adView.viewController, @"viewController should be non-nil while strong ref exists");
+    }
+    
+    XCTAssertNil(adView.viewController, @"viewController should auto-nil when the only strong holder is deallocated (weak semantics)");
+    
+    [adView destroy];
+}
+
+#pragma clang diagnostic pop
 
 @end

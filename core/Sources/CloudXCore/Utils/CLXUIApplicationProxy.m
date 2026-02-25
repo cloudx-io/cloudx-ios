@@ -77,4 +77,37 @@ static BOOL _isAppEnvironmentValue = NO;
     return window ? window.safeAreaInsets : UIEdgeInsetsZero;
 }
 
++ (UIViewController *)topViewController {
+    NSAssert([NSThread isMainThread], @"topViewController must be called on the main thread");
+    UIViewController *vc = [self keyWindow].rootViewController;
+    return [self clx_topViewControllerFrom:vc];
+}
+
+/**
+ * Recursively resolves the top-most presentable view controller from a root.
+ *
+ * Traversal order:
+ * 1. UINavigationController → visibleViewController (already accounts for presented modals per Apple docs)
+ * 2. presentedViewController chain (checked before tab selection so modals on a tab bar controller aren't missed)
+ * 3. UITabBarController → selectedViewController
+ *
+ * Returns the container itself when its child is nil (e.g. empty nav controller),
+ * guaranteeing a non-nil result whenever a non-nil root is provided.
+ */
++ (UIViewController *)clx_topViewControllerFrom:(UIViewController *)vc {
+    if (!vc) return nil;
+    if ([vc isKindOfClass:[UINavigationController class]]) {
+        UIViewController *visible = ((UINavigationController *)vc).visibleViewController;
+        return visible ? [self clx_topViewControllerFrom:visible] : vc;
+    }
+    if (vc.presentedViewController) {
+        return [self clx_topViewControllerFrom:vc.presentedViewController];
+    }
+    if ([vc isKindOfClass:[UITabBarController class]]) {
+        UIViewController *selected = ((UITabBarController *)vc).selectedViewController;
+        return selected ? [self clx_topViewControllerFrom:selected] : vc;
+    }
+    return vc;
+}
+
 @end

@@ -27,8 +27,7 @@
     return @"mintegral";
 }
 
-- (nullable id<CLXAdapterBanner>)createWithViewController:(UIViewController *)viewController
-                                                     type:(CLXBannerType)type
+- (nullable id<CLXAdapterBanner>)createWithType:(CLXBannerType)type
                                                      adId:(NSString *)adId
                                                     bidId:(NSString *)bidId
                                                       adm:(NSString *)adm

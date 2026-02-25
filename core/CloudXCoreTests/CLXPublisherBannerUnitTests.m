@@ -9,18 +9,11 @@
 #import <XCTest/XCTest.h>
 #import <Foundation/Foundation.h>
 #import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXUIApplicationProxy.h>
 #import <objc/runtime.h>
 #define CLXBANNER_MOCKS_IMPLEMENTATION
 #import "Mocks/CLXBannerMocks.h"
 #import <objc/objc.h>
-
-// Test category to expose private properties
-@interface CLXPublisherBanner (Testing)
-@property (nonatomic, strong, nullable) id<CLXAdapterBanner> currentLoadingBanner;
-@property (nonatomic, assign) BOOL autoRefreshEnabled;
-@property (nonatomic, strong, nullable) NSDate *lastManualRefreshTime;
-- (void)_timerDidReachEndSynchronous;
-@end
 
 // MARK: - Test Constants
 
@@ -33,12 +26,14 @@ static NSString * const kTestNetwork = @"testbidder";
 static const NSTimeInterval kTestRefreshInterval = 5.0;
 static const NSTimeInterval kTestTimeout = 2.0;
 
-// MARK: - Categories to expose private methods and properties
+// MARK: - Category to expose private methods and properties
 
 @interface CLXPublisherBanner (Testing) <CLXAdapterBannerDelegate>
 
-// Expose private properties for testing (only properties not already public)
+// Expose private properties for testing
 @property (nonatomic, strong, nullable) id<CLXAdapterBanner> currentLoadingBanner;
+@property (nonatomic, assign) BOOL autoRefreshEnabled;
+@property (nonatomic, strong, nullable) NSDate *lastManualRefreshTime;
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, assign) BOOL forceStop;
 @property (nonatomic, strong) CLXBannerTimerService *timerService;
@@ -99,8 +94,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
     return self;
 }
 
-- (nullable id<CLXAdapterBanner>)createWithViewController:(UIViewController *)viewController
-                                                        type:(CLXBannerType)type
+- (nullable id<CLXAdapterBanner>)createWithType:(CLXBannerType)type
                                                         adId:(NSString *)adId
                                                        bidId:(NSString *)bidId
                                                          adm:(NSString *)adm
@@ -187,8 +181,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
     NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *testAdFactories = @{kTestNetwork: self.mockFactory};
     NSDictionary<NSString *, id<CLXBidTokenSource>> *testBidTokenSources = @{};
     
-    self.banner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
-                                                           adUnit:self.testPlacement
+    self.banner = [[CLXPublisherBanner alloc] initWithAdUnit:self.testPlacement
                                                               userID:kTestUserID
                                                          publisherID:kTestPublisherID
                                             suspendPreloadWhenInvisible:NO
@@ -232,8 +225,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
     NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *testAdFactories = @{kTestNetwork: self.mockFactory};
     NSDictionary<NSString *, id<CLXBidTokenSource>> *testBidTokenSources = @{};
     
-    CLXPublisherBanner *customBanner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
-                                                                                adUnit:self.testPlacement
+    CLXPublisherBanner *customBanner = [[CLXPublisherBanner alloc] initWithAdUnit:self.testPlacement
                                                                                    userID:kTestUserID
                                                                               publisherID:kTestPublisherID
                                                                  suspendPreloadWhenInvisible:NO
@@ -558,8 +550,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
 // Test that banner with empty injected factories still initializes (will use fallback)
 - (void)testBannerInitializesWithEmptyInjectedFactories {
     // Create banner with empty factories (simulates deferred init scenario)
-    CLXPublisherBanner *emptyFactoriesBanner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
-                                                                                        adUnit:self.testPlacement
+    CLXPublisherBanner *emptyFactoriesBanner = [[CLXPublisherBanner alloc] initWithAdUnit:self.testPlacement
                                                                                            userID:kTestUserID
                                                                                       publisherID:kTestPublisherID
                                                                          suspendPreloadWhenInvisible:NO
@@ -580,8 +571,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
 // Test that banner with nil placement (deferred init) still initializes
 - (void)testBannerInitializesWithNilPlacement {
     // Create banner with nil placement (simulates SDK not initialized scenario)
-    CLXPublisherBanner *deferredBanner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
-                                                                                  adUnit:nil
+    CLXPublisherBanner *deferredBanner = [[CLXPublisherBanner alloc] initWithAdUnit:nil
                                                                                      userID:kTestUserID
                                                                                 publisherID:kTestPublisherID
                                                                    suspendPreloadWhenInvisible:NO
@@ -630,8 +620,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
 // Test that requestedAdUnitId can be set for deferred initialization
 - (void)testRequestedPlacementNameCanBeSetForDeferredInit {
     // Create banner with nil placement
-    CLXPublisherBanner *deferredBanner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
-                                                                                  adUnit:nil
+    CLXPublisherBanner *deferredBanner = [[CLXPublisherBanner alloc] initWithAdUnit:nil
                                                                                      userID:kTestUserID
                                                                                 publisherID:kTestPublisherID
                                                                    suspendPreloadWhenInvisible:NO
@@ -842,6 +831,16 @@ static const NSTimeInterval kTestTimeout = 2.0;
     // Then: Should forward to banner delegate
     XCTAssertTrue(mockDelegate.didExpandCalled, @"didExpandBanner should forward to delegate");
     XCTAssertTrue(mockDelegate.didCollapseCalled, @"didCollapseBanner should forward to delegate");
+}
+
+#pragma mark - CLXUIApplicationProxy topViewController
+
+- (void)testTopViewControllerReturnsNilInUnitTestContext {
+    // CLXUIApplicationProxy.topViewController relies on the key window.
+    // In a headless unit-test runner there is typically no key window,
+    // so this verifies the method does not crash and returns nil safely.
+    XCTAssertNoThrow([CLXUIApplicationProxy topViewController],
+                     @"topViewController must not crash in a unit-test environment");
 }
 
 #pragma mark - Load After Destroy Error Callback Tests

@@ -102,14 +102,13 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
     return self;
 }
 
-- (nullable id<CLXAdapterBanner>)createWithViewController:(UIViewController *)viewController
-                                                        type:(CLXBannerType)type
+- (nullable id<CLXAdapterBanner>)createWithType:(CLXBannerType)type
                                                         adId:(NSString *)adId
                                                        bidId:(NSString *)bidId
                                                          adm:(NSString *)adm
                                              hasClosedButton:(BOOL)hasClosedButton
                                                       extras:(NSDictionary<NSString *, NSString *> *)extras
-                                               placementName:(nullable NSString *)placementName
+                                               adUnitName:(nullable NSString *)adUnitName
                                                     delegate:(id<CLXAdapterBannerDelegate>)delegate {
     [self.creationTimes addObject:[NSDate date]];
     
@@ -324,8 +323,7 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
     self.testImpModel = [[CLXConfigImpressionModel alloc] init];
     self.testSettings = [[CLXSettings alloc] init];
     
-    self.banner = [[CLXPublisherBanner alloc] initWithViewController:self.testViewController
-                                                           adUnit:self.testPlacement
+    self.banner = [[CLXPublisherBanner alloc] initWithAdUnit:self.testPlacement
                                                               userID:kSpecTestUserID
                                                          publisherID:kSpecTestPublisherID
                                             suspendPreloadWhenInvisible:NO

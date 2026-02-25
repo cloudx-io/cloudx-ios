@@ -366,7 +366,7 @@
  */
 - (void)testBehavior_HybridDependencyInjectionParametersExist {
     // Verify the init method with injection parameters exists
-    SEL initSelector = @selector(initWithViewController:adUnit:userID:publisherID:suspendPreloadWhenInvisible:delegate:bannerType:impModel:adFactories:bidTokenSources:bidRequestTimeout:reportingService:settings:);
+    SEL initSelector = @selector(initWithAdUnit:userID:publisherID:suspendPreloadWhenInvisible:delegate:bannerType:impModel:adFactories:bidTokenSources:bidRequestTimeout:reportingService:settings:);
 
     XCTAssertTrue([CLXPublisherBanner instancesRespondToSelector:initSelector],
                   @"Banner should have init method with adFactories and bidTokenSources for hybrid DI");

@@ -6,6 +6,7 @@
 #import "CLXMetaBanner.h"
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
+#import <CloudXCore/CLXUIApplicationProxy.h>
 
 #if __has_include(<CloudXMetaAdapter/CLXMetaErrorHandler.h>)
 #import <CloudXMetaAdapter/CLXMetaErrorHandler.h>
@@ -21,7 +22,6 @@
 /// CloudX ad unit name for error messages (separate from Meta's placementID)
 @property (nonatomic, copy, nullable) NSString *adUnitName;
 @property (nonatomic, copy) NSString *bidPayload;
-@property (nonatomic, strong) UIViewController *viewController;
 @property (nonatomic, assign) CLXBannerType type;
 @property (nonatomic, strong) CLXLogger *logger;
 
@@ -34,7 +34,6 @@
                      adUnitName:(nullable NSString *)adUnitName
                             bidID:(NSString *)bidID
                              type:(CLXBannerType)type
-                    viewController:(UIViewController *)viewController
                          delegate:(id<CLXAdapterBannerDelegate>)delegate {
     
     self = [super init];
@@ -44,7 +43,6 @@
         _adUnitName = adUnitName;
         _bidID = bidID;
         _type = type;
-        _viewController = viewController;
         _delegate = delegate;
         _sdkVersion = FB_AD_SDK_VERSION;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMetaBanner"];
@@ -79,7 +77,7 @@
         return;
     }
 
-    [self.logger debug:[NSString stringWithFormat:@"Loading banner - Placement: %@", _placementID]];
+    [self.logger debug:[NSString stringWithFormat:@"Loading banner - Placement: %@, Type: %ld", _placementID, (long)_type]];
 
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -90,7 +88,7 @@
             FBAdSize adSize = [strongSelf fbAdSizeForType:strongSelf.type];
             strongSelf.bannerView = [[FBAdView alloc] initWithPlacementID:strongSelf.placementID
                                                                    adSize:adSize
-                                                       rootViewController:strongSelf.viewController];
+                                                       rootViewController:[CLXUIApplicationProxy topViewController]];
             strongSelf.bannerView.frame = CGRectMake(0, 0, adSize.size.width, adSize.size.height);
             strongSelf.bannerView.delegate = strongSelf;
         }
@@ -178,7 +176,7 @@
 }
 
 - (UIViewController *)viewControllerForPresentingModalView {
-    return self.viewController ?: [self topViewController];
+    return [CLXUIApplicationProxy topViewController];
 }
 
 #pragma mark - Helpers
@@ -191,38 +189,6 @@
         default:
             return kFBAdSizeHeight50Banner;
     }
-}
-
-- (UIViewController *)topViewController {
-    UIViewController *rootVC = nil;
-    
-    if (@available(iOS 13.0, *)) {
-        NSSet *scenes = [UIApplication sharedApplication].connectedScenes;
-        for (UIWindowScene *scene in scenes) {
-            if (scene.activationState == UISceneActivationStateForegroundActive) {
-                for (UIWindow *window in scene.windows) {
-                    if (window.isKeyWindow) {
-                        rootVC = window.rootViewController;
-                        break;
-                    }
-                }
-                if (rootVC) break;
-            }
-        }
-    }
-    
-    if (!rootVC) {
-        #pragma clang diagnostic push
-        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
-        #pragma clang diagnostic pop
-    }
-    
-    while (rootVC.presentedViewController) {
-        rootVC = rootVC.presentedViewController;
-    }
-    
-    return rootVC;
 }
 
 @end

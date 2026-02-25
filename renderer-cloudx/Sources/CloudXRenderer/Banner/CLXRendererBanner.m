@@ -20,6 +20,7 @@
 #import "../CLXRendererVersion.h"
 #import <SafariServices/SafariServices.h>
 #import <CloudXCore/CLXLogger.h>
+#import <CloudXCore/CLXUIApplicationProxy.h>
 
 // Use our wrapper to avoid Swift dependencies
 #import "../RendererWrapper/CLXRendererWebView.h"
@@ -33,7 +34,6 @@
 @interface CLXRendererBanner () <CLXRendererWebViewDelegate>
 
 @property (nonatomic, strong) NSString *adm;
-@property (nonatomic, strong) UIViewController *viewController;
 @property (nonatomic, assign) CLXBannerType type;
 @property (nonatomic, assign) BOOL hasClosedButton;
 @property (nonatomic, strong) CLXRendererWebView *webView;
@@ -61,14 +61,12 @@
  * @param adm Ad markup string (HTML/JavaScript content)
  * @param hasClosedButton Whether to show close button for expandable ads
  * @param type Banner type (standard, MREC, etc.)
- * @param viewController View controller for modal presentations
  * @param delegate Banner delegate for event callbacks
  * @return Initialized CLXRendererBanner instance
  */
 - (instancetype)initWithAdm:(NSString *)adm
              hasClosedButton:(BOOL)hasClosedButton
                         type:(CLXBannerType)type
-               viewController:(UIViewController *)viewController
                      delegate:(id<CLXAdapterBannerDelegate>)delegate {
     self.logger = [[CLXLogger alloc] initWithCategory:@"CloudXRendererBanner"];
     [self.logger debug:[NSString stringWithFormat:@"CloudXRendererBanner initialization - Markup: %lu chars, Type: %ld, CloseBtn: %@", (unsigned long)adm.length, (long)type, hasClosedButton ? @"YES" : @"NO"]];
@@ -81,7 +79,6 @@
         // Configure core properties
         self.delegate = delegate;
         self.adm = adm;
-        self.viewController = viewController;
         self.type = type;
         self.hasClosedButton = hasClosedButton;
         
@@ -141,15 +138,6 @@
         [self.logger error:@"Cannot load - ad markup is empty or nil"];
         if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
             NSError *error = [NSError errorWithDomain:@"CloudXRendererBanner" code:400 userInfo:@{NSLocalizedDescriptionKey: @"Ad markup is empty or nil"}];
-            [self.delegate failToLoadBanner:self error:error];
-        }
-        return;
-    }
-    
-    if (!self.viewController) {
-        [self.logger error:@"Cannot load - view controller is nil"];
-        if ([self.delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
-            NSError *error = [NSError errorWithDomain:@"CloudXRendererBanner" code:401 userInfo:@{NSLocalizedDescriptionKey: @"View controller is nil"}];
             [self.delegate failToLoadBanner:self error:error];
         }
         return;
@@ -358,8 +346,7 @@
  * @return UIViewController for presenting modals.
  */
 - (UIViewController *)viewControllerForPresentingModals {
-    [self.logger debug:@"viewControllerForPresentingModals called"];
-    return self.viewController;
+    return [CLXUIApplicationProxy topViewController];
 }
 
 /**
@@ -462,11 +449,17 @@
     
     // Open the URL in Safari
     dispatch_async(dispatch_get_main_queue(), ^{
+        UIViewController *presentingVC = [CLXUIApplicationProxy topViewController];
+        if (!presentingVC) {
+            [self.logger error:@"No view controller available to present Safari — click-through dropped"];
+            return;
+        }
+        
         SFSafariViewControllerConfiguration *config = [[SFSafariViewControllerConfiguration alloc] init];
         config.entersReaderIfAvailable = YES;
         
         SFSafariViewController *safariVC = [[SFSafariViewController alloc] initWithURL:url configuration:config];
-        [self.viewController presentViewController:safariVC animated:YES completion:nil];
+        [presentingVC presentViewController:safariVC animated:YES completion:nil];
     });
 }
 

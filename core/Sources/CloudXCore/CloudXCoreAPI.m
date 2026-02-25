@@ -91,6 +91,12 @@
 @property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
 @end
 
+// Internal access to the VC stored by deprecated createBanner/MRECWithAdUnitId:viewController: APIs.
+// The property is declared in CLXBannerAdView.m's class extension (not on the public header).
+@interface CLXBannerAdView (DeprecatedVCAccess)
+@property (nonatomic, weak, nullable) UIViewController *viewController;
+@end
+
 // Internal notification name for SDK initialization completion (exported in header)
 NSString * const CLXSDKInitializedNotification = @"CLXSDKInitializedNotification";
 
@@ -768,8 +774,7 @@ static CloudXCore *_sharedInstance = nil;
     [self.logger info:@"All key-value pairs cleared"];
 }
 
-- (CLXBannerAdView *)createBannerWithAdUnitId:(NSString *)adUnitId
-                                   viewController:(UIViewController *)viewController {
+- (CLXBannerAdView *)createBannerWithAdUnitId:(NSString *)adUnitId {
     // Track banner creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     if (metricsTracker) {
@@ -817,8 +822,7 @@ static CloudXCore *_sharedInstance = nil;
     }
     
     // ALWAYS create banner (errors deferred to load())
-    CLXPublisherBanner *banner = [[CLXPublisherBanner alloc] initWithViewController:viewController
-                                                                     adUnit:adUnitConfig
+    CLXPublisherBanner *banner = [[CLXPublisherBanner alloc] initWithAdUnit:adUnitConfig
                                                                         userID:@""
                                                                    publisherID:@""
                                                    suspendPreloadWhenInvisible:NO
@@ -846,8 +850,22 @@ static CloudXCore *_sharedInstance = nil;
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeW320H50];
 }
 
-- (CLXBannerAdView *)createMRECWithAdUnitId:(NSString *)adUnitId
-                                viewController:(UIViewController *)viewController {
+// Deprecated: the SDK now resolves the presenting VC via topViewController at
+// the moment it's needed (JIT). This overload exists solely for backward compat
+// with host apps that already pass a VC. The stored VC is used as a first-choice
+// fallback in didLoadBanner: before falling back to JIT resolution.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
+- (CLXBannerAdView *)createBannerWithAdUnitId:(NSString *)adUnitId
+                               viewController:(UIViewController *)viewController {
+    CLXBannerAdView *adView = [self createBannerWithAdUnitId:adUnitId];
+    adView.viewController = viewController;
+    return adView;
+}
+#pragma clang diagnostic pop
+
+- (CLXBannerAdView *)createMRECWithAdUnitId:(NSString *)adUnitId {
     // Track MREC creation method call (nil-safe like Android's optional chaining)
     id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
     if (metricsTracker) {
@@ -894,8 +912,7 @@ static CloudXCore *_sharedInstance = nil;
     }
     
     // ALWAYS create banner (errors deferred to load())
-    CLXPublisherBanner *banner = [[CLXPublisherBanner alloc] initWithViewController:viewController
-                                                                     adUnit:adUnitConfig
+    CLXPublisherBanner *banner = [[CLXPublisherBanner alloc] initWithAdUnit:adUnitConfig
                                                                         userID:@""
                                                                    publisherID:@""
                                                     suspendPreloadWhenInvisible:NO
@@ -922,6 +939,18 @@ static CloudXCore *_sharedInstance = nil;
     // ALWAYS return non-nil
     return [[CLXBannerAdView alloc] initWithBanner:banner type:CLXBannerTypeMREC];
 }
+
+// Deprecated: same rationale as createBannerWithAdUnitId:viewController: above.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
+- (CLXBannerAdView *)createMRECWithAdUnitId:(NSString *)adUnitId
+                             viewController:(UIViewController *)viewController {
+    CLXBannerAdView *adView = [self createMRECWithAdUnitId:adUnitId];
+    adView.viewController = viewController;
+    return adView;
+}
+#pragma clang diagnostic pop
 
 - (CLXInterstitial *)createInterstitialWithAdUnitId:(NSString *)adUnitId {
     // Track interstitial creation method call (nil-safe like Android's optional chaining)

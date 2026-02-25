@@ -66,7 +66,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Private properties
 @property (nonatomic, strong, nullable) id<CLXBidAdSourceProtocol> bidAdSource;
-@property (nonatomic, weak, nullable) UIViewController *viewController;
 @property (nonatomic, strong, nullable) CLXBidAdSourceResponse *lastBidResponse;
 @property (nonatomic, strong, nullable) CLXBidResponse *currentBidResponse;
 @property (nonatomic, strong, nullable) id<CLXAdapterBanner> currentLoadingBanner;
@@ -127,8 +126,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Initialization
 
-- (instancetype)initWithViewController:(UIViewController *)viewController
-                             adUnit:(nullable CLXSDKConfigAdUnit *)adUnit
+- (instancetype)initWithAdUnit:(nullable CLXSDKConfigAdUnit *)adUnit
                                 userID:(NSString *)userID
                            publisherID:(NSString *)publisherID
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
@@ -147,7 +145,6 @@ NS_ASSUME_NONNULL_BEGIN
         _suspendPreloadWhenInvisible = suspendPreloadWhenInvisible;
         _delegate = delegate;
         _bannerType = bannerType;
-        _viewController = viewController;
         _adFactories = [adFactories copy];
         _bidTokenSources = [bidTokenSources copy];
         
@@ -474,9 +471,7 @@ NS_ASSUME_NONNULL_BEGIN
         if ([bidItem conformsToProtocol:@protocol(CLXAdapterBanner)]) {
             id<CLXAdapterBanner> banner = (id<CLXAdapterBanner>)bidItem;
             
-            // CRITICAL: Set delegate so adapter can call didShowBanner: on CLXPublisherBanner
             banner.delegate = self;
-            NSLog(@"🔵 [CLXPublisherBanner] Set adapter delegate to self for ad unit: %@", self.adUnitId);
             
             [self.logger success:[NSString stringWithFormat:@"Successfully created banner from bid for ad unit: %@ (%@)", self.adUnitId, NSStringFromClass([(NSObject *)banner class])]];
             [self loadAdItem:banner];
@@ -591,14 +586,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
     
-    if (!self.viewController) {
-        [self.logger error:@"No view controller available for banner creation"];
-        [CLXError setError:outError code:CLXErrorCodeLoadFailed description:@"No view controller available for banner creation"];
-        return nil;
-    }
-    
-    id<CLXAdapterBanner> creativeBanner = [factory createWithViewController:self.viewController
-                                                                          type:self.bannerType
+    id<CLXAdapterBanner> creativeBanner = [factory createWithType:self.bannerType
                                                                           adId:adId
                                                                          bidId:bidId
                                                                             adm:adm

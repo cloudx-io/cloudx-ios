@@ -66,9 +66,9 @@
     buttonStack.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:buttonStack];
     
-    // Load Banner button
+    // Load Banner button (new API — no viewController)
     UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [loadButton setTitle:@"Load Banner" forState:UIControlStateNormal];
+    [loadButton setTitle:@"Load Banner (New API)" forState:UIControlStateNormal];
     [loadButton addTarget:self action:@selector(loadBannerAd) forControlEvents:UIControlEventTouchUpInside];
     loadButton.backgroundColor = [UIColor systemGreenColor];
     [loadButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -76,6 +76,17 @@
     loadButton.layer.cornerRadius = 8;
     loadButton.translatesAutoresizingMaskIntoConstraints = NO;
     [buttonStack addArrangedSubview:loadButton];
+    
+    // Load Banner button (deprecated API — passes viewController)
+    UIButton *loadDeprecatedButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [loadDeprecatedButton setTitle:@"Load Banner (Deprecated)" forState:UIControlStateNormal];
+    [loadDeprecatedButton addTarget:self action:@selector(loadBannerAdDeprecated) forControlEvents:UIControlEventTouchUpInside];
+    loadDeprecatedButton.backgroundColor = [UIColor systemOrangeColor];
+    [loadDeprecatedButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    loadDeprecatedButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    loadDeprecatedButton.layer.cornerRadius = 8;
+    loadDeprecatedButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:loadDeprecatedButton];
     
     // Auto-refresh toggle button
     self.autoRefreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -95,6 +106,8 @@
         [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
         [loadButton.widthAnchor constraintEqualToConstant:200],
         [loadButton.heightAnchor constraintEqualToConstant:44],
+        [loadDeprecatedButton.widthAnchor constraintEqualToConstant:200],
+        [loadDeprecatedButton.heightAnchor constraintEqualToConstant:44],
         [self.autoRefreshButton.widthAnchor constraintEqualToConstant:200],
         [self.autoRefreshButton.heightAnchor constraintEqualToConstant:44]
     ]];
@@ -127,15 +140,13 @@
         return;
     }
     
-    if (!self.bannerAd) {
-        [self createAndAddBannerToView];
-    }
+    [self resetAdState];
+    [self createAndAddBannerToView];
     
     if (!self.bannerAd) {
-        return; // Failed to create
+        return;
     }
     
-    // Start loading
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
     [self.bannerAd load];
@@ -153,8 +164,7 @@
         adUnitId = _settings.bannerAdUnitId;
     }
     
-    self.bannerAd = [[CloudXCore shared] createBannerWithAdUnitId:adUnitId
-                                                     viewController:self];
+    self.bannerAd = [[CloudXCore shared] createBannerWithAdUnitId:adUnitId];
     self.bannerAd.delegate = self;
     self.bannerAd.revenueDelegate = self;
     self.bannerAd.placement = @"demo_banner";
@@ -169,10 +179,46 @@
     [self addBannerToViewHierarchy];
 }
 
-- (void)loadBanner {
-    // Legacy method - now just calls the new method
-    [self createAndAddBannerToView];
+- (void)loadBannerAdDeprecated {
+    if (self.isLoading) {
+        [self showAlertWithTitle:@"Info" message:@"Banner is already loading."];
+        return;
+    }
+    
+    [self resetAdState];
+    [self createAndAddBannerToViewDeprecated];
+    
+    if (!self.bannerAd) {
+        return;
+    }
+    
+    self.isLoading = YES;
+    [self updateStatusUIWithState:AdStateLoading];
+    [self.bannerAd load];
 }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+- (void)createAndAddBannerToViewDeprecated {
+    NSString *adUnitId = [self adUnitId];
+    if (_settings.bannerAdUnitId.length > 0) {
+        adUnitId = _settings.bannerAdUnitId;
+    }
+    
+    self.bannerAd = [[CloudXCore shared] createBannerWithAdUnitId:adUnitId viewController:self];
+    self.bannerAd.delegate = self;
+    self.bannerAd.revenueDelegate = self;
+    self.bannerAd.placement = @"demo_banner";
+    self.bannerAd.customData = @"screen:home,position:bottom";
+
+    if (!self.bannerAd) {
+        [self showAlertWithTitle:@"Error" message:@"Failed to create banner (deprecated API)."];
+        return;
+    }
+    
+    [self addBannerToViewHierarchy];
+}
+#pragma clang diagnostic pop
 
 // showBannerAd method removed - Banner is auto-added to view on push
 

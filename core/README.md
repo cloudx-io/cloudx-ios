@@ -74,8 +74,7 @@ CloudXCore.shared.initialize(with: config) { sdkConfig, error in
 @implementation YourViewController
 
 - (void)createBannerAd {
-    self.bannerAd = [[CloudXCore shared] createBannerWithAdUnitId:@"your-banner-ad-unit-id"
-                                                   viewController:self];
+    self.bannerAd = [[CloudXCore shared] createBannerWithAdUnitId:@"your-banner-ad-unit-id"];
     self.bannerAd.delegate = self;
     self.bannerAd.revenueDelegate = self;
 
@@ -137,8 +136,7 @@ class YourViewController: UIViewController, CLXBannerDelegate, CLXAdRevenueDeleg
     private var bannerAd: CLXBannerAdView?
 
     func createBannerAd() {
-        bannerAd = CloudXCore.shared.createBanner(adUnitId: "your-banner-ad-unit-id",
-                                                  viewController: self)
+        bannerAd = CloudXCore.shared.createBanner(adUnitId: "your-banner-ad-unit-id")
         bannerAd?.delegate = self
         bannerAd?.revenueDelegate = self
 
@@ -234,8 +232,7 @@ bannerAd?.customData = "level:5,coins:100"
 @implementation YourViewController
 
 - (void)createMRECAd {
-    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:@"your-mrec-ad-unit-id"
-                                               viewController:self];
+    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:@"your-mrec-ad-unit-id"];
     self.mrecAd.delegate = self;
     self.mrecAd.revenueDelegate = self;
 
@@ -297,8 +294,7 @@ class YourViewController: UIViewController, CLXBannerDelegate, CLXAdRevenueDeleg
     private var mrecAd: CLXBannerAdView?
 
     func createMRECAd() {
-        mrecAd = CloudXCore.shared.createMREC(adUnitId: "your-mrec-ad-unit-id",
-                                              viewController: self)
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: "your-mrec-ad-unit-id")
         mrecAd?.delegate = self
         mrecAd?.revenueDelegate = self
 

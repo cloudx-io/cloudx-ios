@@ -44,7 +44,6 @@
                      adUnitName:(nullable NSString *)adUnitName
                              bidID:(NSString *)bidID
                               size:(CGSize)size
-                    viewController:(UIViewController *)viewController
                           delegate:(id<CLXAdapterBannerDelegate>)delegate {
     self = [super init];
     if (self) {

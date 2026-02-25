@@ -22,6 +22,7 @@
 #import <CloudXCore/CLXDebugOverlayManager.h>
 #import <CloudXCore/CLXDebugErrorView.h>
 #import <CloudXCore/CLXDebugClickFeedback.h>
+#import <CloudXCore/CLXUIApplicationProxy.h>
 
 // Category to expose internal visibility method (not in public header)
 @interface CLXPublisherBanner (CLXBannerVisibility)
@@ -34,7 +35,6 @@
 @property (nonatomic, strong, nullable, readonly) id<CLXAdapterBanner> prefetchedBanner;
 @property (nonatomic, strong, nullable, readonly) CLXBidAdSourceResponse *lastBidResponse;
 @property (nonatomic, copy, readonly) NSString *adUnitName;
-@property (nonatomic, weak, nullable, readonly) UIViewController *viewController;
 @end
 
 // Category to expose placement/customData setters for tracking
@@ -50,7 +50,8 @@
 @property (nonatomic, copy, readwrite) NSString *adUnitId;
 @property (nonatomic, assign, readwrite) CLXBannerType adFormat;
 @property (nonatomic, strong) UIGestureRecognizer *debugTapGesture;
-@property (nonatomic, weak) UIView *currentBannerView;  // Track the actual third-party SDK view
+@property (nonatomic, weak) UIView *currentBannerView;
+@property (nonatomic, weak, nullable) UIViewController *viewController;
 
 @end
 
@@ -62,6 +63,7 @@ static void initializeLogger() {
 }
 
 @implementation CLXBannerAdView
+
 
 - (instancetype)initWithBanner:(id<CLXBanner>)banner type:(CLXBannerType)type {
     CGSize size = CGSizeZero;
@@ -93,9 +95,6 @@ static void initializeLogger() {
         }
         
         _banner.delegate = self;
-        if ([_banner respondsToSelector:@selector(setDelegate:)]) {
-            [_banner setDelegate:self];
-        }
 
         // Set up revenue delegate relay
         if ([_banner respondsToSelector:@selector(setRevenueDelegate:)]) {
@@ -369,16 +368,11 @@ static void initializeLogger() {
         [self layoutIfNeeded];
         
         // Tell the adapter to show the banner (required to trigger didShowBanner: callback)
-        UIViewController *viewController = nil;
-        if ([self.banner isKindOfClass:[CLXPublisherBanner class]]) {
-            CLXPublisherBanner *publisherBanner = (CLXPublisherBanner *)self.banner;
-            viewController = publisherBanner.viewController;
-            [logger debug:[NSString stringWithFormat:@"[CLXBannerAdView] About to call showFromViewController with VC: %@", viewController]];
-        }
-        
-        if (viewController) {
+        // Prefer VC from deprecated createBanner:viewController: path if set, otherwise JIT resolve
+        UIViewController *topVC = _viewController ?: [CLXUIApplicationProxy topViewController];
+        if (topVC) {
             [logger info:@"[CLXBannerAdView] Calling banner.showFromViewController"];
-            [banner showFromViewController:viewController];
+            [banner showFromViewController:topVC];
             [logger info:@"[CLXBannerAdView] Returned from banner.showFromViewController"];
         } else {
             [logger warn:@"[CLXBannerAdView] No view controller available to show banner - didDisplayAd will not be called"];

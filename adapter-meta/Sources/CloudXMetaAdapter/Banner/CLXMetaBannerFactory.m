@@ -41,8 +41,7 @@
     return [[CLXMetaBannerFactory alloc] init];
 }
 
-- (nullable id<CLXAdapterBanner>)createWithViewController:(UIViewController *)viewController
-                                                     type:(CLXBannerType)type
+- (nullable id<CLXAdapterBanner>)createWithType:(CLXBannerType)type
                                                      adId:(NSString *)adId
                                                     bidId:(NSString *)bidId
                                                       adm:(NSString *)adm
@@ -66,7 +65,6 @@
                                                         adUnitName:adUnitName
                                                                 bidID:bidId
                                                                  type:type
-                                                       viewController:viewController
                                                              delegate:delegate];
 
     return banner;

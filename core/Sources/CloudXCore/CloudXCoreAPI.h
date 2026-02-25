@@ -121,24 +121,46 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 /**
  * Create a banner ad
  * @param adUnitId The ad unit ID. This should match the ad unit name in the CloudX dashboard
- * @param viewController The view controller in which the ad will be displayed
  * @return A CLXBannerAdView object
- * @discussion Set the delegate property on the returned object to receive ad events
+ * @discussion Set the delegate property on the returned object to receive ad events.
  */
 - (nullable CLXBannerAdView *)createBannerWithAdUnitId:(NSString *)adUnitId
-                                          viewController:(UIViewController *)viewController
-    NS_SWIFT_NAME(createBanner(adUnitId:viewController:));
+    NS_SWIFT_NAME(createBanner(adUnitId:));
+
+/**
+ * @deprecated Use createBannerWithAdUnitId: instead.
+ * Create a banner ad with an explicit view controller.
+ * @param adUnitId The ad unit ID. This should match the ad unit name in the CloudX dashboard
+ * @param viewController The view controller used for modal presentation. No longer required;
+ *        the SDK resolves the presenting view controller automatically.
+ * @return A CLXBannerAdView object
+ */
+- (nullable CLXBannerAdView *)createBannerWithAdUnitId:(NSString *)adUnitId
+                                        viewController:(UIViewController *)viewController
+    NS_SWIFT_NAME(createBanner(adUnitId:viewController:))
+    __deprecated_msg("Use createBannerWithAdUnitId: instead. The SDK resolves the presenting view controller automatically.");
 
 /**
  * Create a MREC ad
  * @param adUnitId The ad unit ID. This should match the ad unit name in the CloudX dashboard
- * @param viewController The view controller in which the ad will be displayed
  * @return A CLXBannerAdView object
- * @discussion Set the delegate property on the returned object to receive ad events
+ * @discussion Set the delegate property on the returned object to receive ad events.
  */
 - (nullable CLXBannerAdView *)createMRECWithAdUnitId:(NSString *)adUnitId
-                                         viewController:(UIViewController *)viewController
-    NS_SWIFT_NAME(createMREC(adUnitId:viewController:));
+    NS_SWIFT_NAME(createMREC(adUnitId:));
+
+/**
+ * @deprecated Use createMRECWithAdUnitId: instead.
+ * Create a MREC ad with an explicit view controller.
+ * @param adUnitId The ad unit ID. This should match the ad unit name in the CloudX dashboard
+ * @param viewController The view controller used for modal presentation. No longer required;
+ *        the SDK resolves the presenting view controller automatically.
+ * @return A CLXBannerAdView object
+ */
+- (nullable CLXBannerAdView *)createMRECWithAdUnitId:(NSString *)adUnitId
+                                       viewController:(UIViewController *)viewController
+    NS_SWIFT_NAME(createMREC(adUnitId:viewController:))
+    __deprecated_msg("Use createMRECWithAdUnitId: instead. The SDK resolves the presenting view controller automatically.");
 
 /**
  * Create an interstitial ad

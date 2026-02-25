@@ -47,7 +47,6 @@
  * Validates input parameters and creates a properly configured banner instance.
  * Performs comprehensive validation and logging for debugging purposes.
  * 
- * @param viewController View controller for modal presentations
  * @param type Banner type (standard, MREC, etc.)
  * @param adId Unique identifier for the ad
  * @param bidId Unique identifier for the bid
@@ -58,8 +57,7 @@
  * @param delegate Banner delegate for event callbacks
  * @return Configured CLXRendererBanner instance or nil if creation fails
  */
-- (nullable id<CLXAdapterBanner>)createWithViewController:(UIViewController *)viewController
-                                                      type:(CLXBannerType)type
+- (nullable id<CLXAdapterBanner>)createWithType:(CLXBannerType)type
                                                       adId:(NSString *)adId
                                                      bidId:(NSString *)bidId
                                                        adm:(NSString *)adm
@@ -70,12 +68,6 @@
     CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXRendererBannerFactory"];
     [logger debug:[NSString stringWithFormat:@"Creating banner - Ad Unit: %@ (%@), BidID: %@, Type: %ld, Markup: %lu chars, CloseBtn: %@", 
                   adUnitName ?: @"(unknown)", adId, bidId, (long)type, (unsigned long)(adm ? adm.length : 0), hasClosedButton ? @"YES" : @"NO"]];
-    
-    // Validate required parameters
-    if (!viewController) {
-        [logger error:@"Cannot create banner - viewController is nil"];
-        return nil;
-    }
     
     if (!adm || adm.length == 0) {
         [logger error:@"Cannot create banner - ad markup is empty or nil"];
@@ -94,11 +86,9 @@
                       [adm substringToIndex:MIN(150, adm.length)]]];
     }
     
-    // Create banner instance with validated parameters
     CLXRendererBanner *banner = [[CLXRendererBanner alloc] initWithAdm:adm
                                                                         hasClosedButton:hasClosedButton
                                                                                    type:type
-                                                                          viewController:viewController
                                                                                delegate:delegate];
     
     if (banner) {

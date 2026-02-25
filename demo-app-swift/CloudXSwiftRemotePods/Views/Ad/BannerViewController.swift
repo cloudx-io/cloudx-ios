@@ -22,9 +22,9 @@ class BannerViewController: BaseAdViewController {
         buttonStack.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(buttonStack)
         
-        // Load Banner button
+        // Load Banner button (new API — no viewController)
         let loadButton = UIButton(type: .system)
-        loadButton.setTitle("Load Banner", for: .normal)
+        loadButton.setTitle("Load Banner (New API)", for: .normal)
         loadButton.addTarget(self, action: #selector(loadBannerAd), for: .touchUpInside)
         loadButton.backgroundColor = .systemGreen
         loadButton.setTitleColor(.white, for: .normal)
@@ -32,6 +32,17 @@ class BannerViewController: BaseAdViewController {
         loadButton.layer.cornerRadius = 8
         loadButton.translatesAutoresizingMaskIntoConstraints = false
         buttonStack.addArrangedSubview(loadButton)
+        
+        // Load Banner button (deprecated API — passes viewController)
+        let loadDeprecatedButton = UIButton(type: .system)
+        loadDeprecatedButton.setTitle("Load Banner (Deprecated)", for: .normal)
+        loadDeprecatedButton.addTarget(self, action: #selector(loadBannerAdDeprecated), for: .touchUpInside)
+        loadDeprecatedButton.backgroundColor = .systemOrange
+        loadDeprecatedButton.setTitleColor(.white, for: .normal)
+        loadDeprecatedButton.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        loadDeprecatedButton.layer.cornerRadius = 8
+        loadDeprecatedButton.translatesAutoresizingMaskIntoConstraints = false
+        buttonStack.addArrangedSubview(loadDeprecatedButton)
         
         // Auto-refresh toggle button
         autoRefreshButton = UIButton(type: .system)
@@ -50,6 +61,8 @@ class BannerViewController: BaseAdViewController {
             buttonStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 100),
             loadButton.widthAnchor.constraint(equalToConstant: 200),
             loadButton.heightAnchor.constraint(equalToConstant: 44),
+            loadDeprecatedButton.widthAnchor.constraint(equalToConstant: 200),
+            loadDeprecatedButton.heightAnchor.constraint(equalToConstant: 44),
             autoRefreshButton.widthAnchor.constraint(equalToConstant: 200),
             autoRefreshButton.heightAnchor.constraint(equalToConstant: 44)
         ])
@@ -69,15 +82,11 @@ class BannerViewController: BaseAdViewController {
             return
         }
         
-        if bannerAd == nil {
-            createAndAddBannerToView()
-        }
+        resetAdState()
+        createAndAddBannerToView()
         
-        guard let bannerAd = bannerAd else {
-            return // Failed to create
-        }
+        guard let bannerAd = bannerAd else { return }
         
-        // Start loading
         isLoading = true
         updateStatusUI(state: .loading)
         bannerAd.load()
@@ -108,8 +117,7 @@ class BannerViewController: BaseAdViewController {
         
         // Create banner ad with ad unit ID from config
         let adUnitId = CLXDemoConfigManager.sharedManager.currentConfig.bannerAdUnitId
-        bannerAd = cloudX.createBanner(adUnitId: adUnitId,
-                                      viewController: self)
+        bannerAd = cloudX.createBanner(adUnitId: adUnitId)
         
         if bannerAd == nil {
             DemoAppLogger.sharedInstance.logMessage("❌ Failed to create Banner ad instance")
@@ -119,6 +127,37 @@ class BannerViewController: BaseAdViewController {
             bannerAd?.delegate = self
             bannerAd?.revenueDelegate = self
             // Add banner to view hierarchy immediately
+            addBannerToViewHierarchy()
+        }
+    }
+    
+    @objc private func loadBannerAdDeprecated() {
+        if isLoading {
+            showAlert(title: "Info", message: "Banner is already loading.")
+            return
+        }
+        
+        resetAdState()
+        createAndAddBannerToViewDeprecated()
+        
+        guard let bannerAd = bannerAd else { return }
+        
+        isLoading = true
+        updateStatusUI(state: .loading)
+        bannerAd.load()
+    }
+    
+    private func createAndAddBannerToViewDeprecated() {
+        let adUnitId = CLXDemoConfigManager.sharedManager.currentConfig.bannerAdUnitId
+        bannerAd = cloudX.createBanner(adUnitId: adUnitId, viewController: self)
+        
+        if bannerAd == nil {
+            DemoAppLogger.sharedInstance.logMessage("Failed to create Banner ad (deprecated API)")
+            showAlert(title: "Error", message: "Failed to create Banner ad (deprecated API)")
+        } else {
+            DemoAppLogger.sharedInstance.logMessage("Banner ad created via deprecated API")
+            bannerAd?.delegate = self
+            bannerAd?.revenueDelegate = self
             addBannerToViewHierarchy()
         }
     }

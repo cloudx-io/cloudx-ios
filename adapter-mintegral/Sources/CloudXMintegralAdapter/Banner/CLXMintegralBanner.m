@@ -1,6 +1,7 @@
 #import "CLXMintegralBanner.h"
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
+#import <CloudXCore/CLXUIApplicationProxy.h>
 #import "CLXMintegralErrorHandler.h"
 #import "CLXMintegralInitializer.h"
 
@@ -112,7 +113,7 @@
             self.mintegralBannerView = [[MTGBannerAdView alloc] initBannerAdViewWithBannerSizeType:sizeType
                                                                                       placementId:self.placementID
                                                                                            unitId:self.unitID
-                                                                               rootViewController:nil];
+                                                                               rootViewController:[CLXUIApplicationProxy topViewController]];
             self.mintegralBannerView.delegate = self;
         }
         

@@ -20,9 +20,9 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         buttonStack.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(buttonStack)
         
-        // Load MREC button
+        // Load MREC button (new API — no viewController)
         let loadButton = UIButton(type: .system)
-        loadButton.setTitle("Load MREC", for: .normal)
+        loadButton.setTitle("Load MREC (New API)", for: .normal)
         loadButton.addTarget(self, action: #selector(loadMRECAd), for: .touchUpInside)
         loadButton.backgroundColor = .systemGreen
         loadButton.setTitleColor(.white, for: .normal)
@@ -31,7 +31,16 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         loadButton.translatesAutoresizingMaskIntoConstraints = false
         buttonStack.addArrangedSubview(loadButton)
         
-        // Show button removed - MREC is auto-added to view on push
+        // Load MREC button (deprecated API — passes viewController)
+        let loadDeprecatedButton = UIButton(type: .system)
+        loadDeprecatedButton.setTitle("Load MREC (Deprecated)", for: .normal)
+        loadDeprecatedButton.addTarget(self, action: #selector(loadMRECAdDeprecated), for: .touchUpInside)
+        loadDeprecatedButton.backgroundColor = .systemOrange
+        loadDeprecatedButton.setTitleColor(.white, for: .normal)
+        loadDeprecatedButton.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        loadDeprecatedButton.layer.cornerRadius = 8
+        loadDeprecatedButton.translatesAutoresizingMaskIntoConstraints = false
+        buttonStack.addArrangedSubview(loadDeprecatedButton)
         
         // Auto-refresh toggle button (positioned separately above status label)
         autoRefreshButton = UIButton(type: .system)
@@ -50,6 +59,8 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
             buttonStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 100),
             loadButton.widthAnchor.constraint(equalToConstant: 200),
             loadButton.heightAnchor.constraint(equalToConstant: 44),
+            loadDeprecatedButton.widthAnchor.constraint(equalToConstant: 200),
+            loadDeprecatedButton.heightAnchor.constraint(equalToConstant: 44),
             
             // Auto-refresh button positioned above status label
             autoRefreshButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -85,21 +96,16 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
     }
     
     @objc private func loadMRECAd() {
-        
         if isLoading {
             showAlert(title: "Info", message: "MREC is already loading.")
             return
         }
         
-        if mrecAd == nil {
-            createAndAddMRECToView()
-        }
+        resetAdState()
+        createAndAddMRECToView()
         
-        guard let mrecAd = mrecAd else {
-            return // Failed to create
-        }
+        guard let mrecAd = mrecAd else { return }
         
-        // Start loading
         isLoading = true
         updateStatusUI(state: .loading)
         mrecAd.load()
@@ -112,7 +118,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         if !settings.mrecAdUnitId.isEmpty {
             adUnitId = settings.mrecAdUnitId
         }
-        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId, viewController: self)
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId)
         mrecAd?.delegate = self
         mrecAd?.revenueDelegate = self
 
@@ -133,9 +139,45 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         ])
     }
     
-    private func createMRECAd() {
-        // Legacy method - now just calls the new method
-        createAndAddMRECToView()
+    @objc private func loadMRECAdDeprecated() {
+        if isLoading {
+            showAlert(title: "Info", message: "MREC is already loading.")
+            return
+        }
+        
+        resetAdState()
+        createAndAddMRECToViewDeprecated()
+        
+        guard let mrecAd = mrecAd else { return }
+        
+        isLoading = true
+        updateStatusUI(state: .loading)
+        mrecAd.load()
+    }
+    
+    private func createAndAddMRECToViewDeprecated() {
+        var adUnitId = self.adUnitId
+        if !settings.mrecAdUnitId.isEmpty {
+            adUnitId = settings.mrecAdUnitId
+        }
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId, viewController: self)
+        mrecAd?.delegate = self
+        mrecAd?.revenueDelegate = self
+        
+        guard let mrecAd = mrecAd else {
+            showAlert(title: "Error", message: "Failed to create MREC (deprecated API).")
+            return
+        }
+        
+        mrecAd.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(mrecAd)
+        
+        NSLayoutConstraint.activate([
+            mrecAd.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            mrecAd.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 210),
+            mrecAd.widthAnchor.constraint(equalToConstant: 300),
+            mrecAd.heightAnchor.constraint(equalToConstant: 250)
+        ])
     }
     
     // showMRECAd method removed - MREC is auto-added to view on push
@@ -182,8 +224,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         updateStatusUI(state: .loading)
 
         let adUnitId = self.adUnitId
-        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId,
-                                            viewController: self)
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId)
         mrecAd?.delegate = self
         
         if let mrecAd = mrecAd {
