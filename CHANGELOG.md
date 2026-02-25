@@ -13,6 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.0-beta] - 2026-02-25
+
+### Added
+- **ILRD (Impression Level Revenue Data)** - Added support for tracking revenue data from AppLovin MAX SDK
+- **IDFV Tracking** - Added IDFV to bid requests and config init for DAU/MAU analytics
+
+### Fixed
+- **Adapter Code Resolution** - Fixed adaptercode resolution for SDK >= 2.1 after SSP ext.cloudx migration
+- **Thread Safety** - Fixed thread safety crash in bid token dictionary construction
+
+---
+
 ## [2.1.0-beta] - 2026-02-10
 
 ### Fixed
