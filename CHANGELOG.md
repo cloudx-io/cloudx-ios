@@ -16,12 +16,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.2.0-beta] - 2026-02-25
 
 ### Added
-- **ILRD (Impression Level Revenue Data)** - Added support for tracking revenue data from AppLovin MAX SDK
-- **IDFV Tracking** - Added IDFV to bid requests and config init for DAU/MAU analytics
+- **IDFV Tracking** - IDFV (ifv) now included in config init and bid requests for DAU/MAU analytics (#399)
+- **Adapter Init Error Tracking** - SDK now sends error events when adapter initialization fails (#335)
+- **Win/Loss Payload Parity** - Aligned iOS win/loss notification payloads with Android (#332)
 
 ### Fixed
-- **Adapter Code Resolution** - Fixed adaptercode resolution for SDK >= 2.1 after SSP ext.cloudx migration
-- **Thread Safety** - Fixed thread safety crash in bid token dictionary construction
+- **Duplicate didHideAd Callback** - Fixed fullscreen ads firing didHideAd twice on close (#404)
+- **Adapter Code Resolution** - Fixed adaptercode resolution for SDK >= 2.1 after SSP ext.cloudx migration (#402)
+- **Thread Safety** - Fixed thread safety crash in bid token dictionary construction (#401)
+- **Double Revenue Callback** - Fixed CloudX renderer rewarded ads firing revenue callback twice (#394)
+- **Silent Failures** - Audited and fixed silent failures across core SDK (#384)
+- **Adapter Creation Errors** - Real adapter creation errors now propagate through bid waterfall (#387)
+
+### Changed
+- **JIT ViewController Resolution** - Banner/MREC ads now resolve the presenting view controller at use time instead of storing a weak reference (#400)
+- **Removed Fullscreen Force-Close Timer** - Removed the timer-based force-close mechanism for fullscreen ads (#403)
+- **Adapter Rewrites** - InMobi (#381), Vungle (#380), and Mintegral (#379) adapters fully rewritten
+- **Removed Dead Code** - Cleaned up dead database code, endpoint config, A/B test code, and non-deterministic tests
 
 ---
 
