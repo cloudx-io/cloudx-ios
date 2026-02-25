@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Silent Failures** - Audited and fixed silent failures across core SDK (#384)
 - **Adapter Creation Errors** - Real adapter creation errors now propagate through bid waterfall (#387)
 
+### Deprecated
+- `createBanner(adUnitId:viewController:)` — use `createBanner(adUnitId:)` instead. The SDK now resolves the presenting view controller automatically. (#400)
+- `createMREC(adUnitId:viewController:)` — use `createMREC(adUnitId:)` instead. The SDK now resolves the presenting view controller automatically. (#400)
+
 ### Changed
 - **JIT ViewController Resolution** - Banner/MREC ads now resolve the presenting view controller at use time instead of storing a weak reference (#400)
 - **Removed Fullscreen Force-Close Timer** - Removed the timer-based force-close mechanism for fullscreen ads (#403)
