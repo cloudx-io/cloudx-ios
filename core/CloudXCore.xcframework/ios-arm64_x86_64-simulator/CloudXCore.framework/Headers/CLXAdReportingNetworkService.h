@@ -4,7 +4,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXAdReportingNetworkService : NSObject
 
-- (instancetype)initWithBaseURL:(NSURL *)baseURL urlSession:(NSURLSession *)urlSession;
+- (instancetype)initWithBaseURL:(NSURL *)baseURL
+                     urlSession:(NSURLSession *)urlSession
+                   userDefaults:(NSUserDefaults *)userDefaults;
 
 // Legacy trackNUrlWithPrice and trackLUrlWithLUrl methods removed
 // Use CLXWinLossNetworkService for server-side win/loss tracking instead

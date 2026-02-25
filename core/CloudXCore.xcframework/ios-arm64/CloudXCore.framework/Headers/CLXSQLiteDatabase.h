@@ -47,12 +47,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<NSDictionary *> *)executeQuery:(NSString *)sql withParameters:(nullable NSArray *)parameters;
 
 /**
- * Transaction support
- */
-- (void)executeInTransaction:(void (^)(void))block;
-- (BOOL)executeInTransactionWithResult:(BOOL (^)(void))block;
-
-/**
  * Utility methods
  */
 - (NSString *)databasePath;

@@ -27,18 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (NSURL *)initApiUrl;
 
-/**
- * @brief Returns the auction API URL
- * @return The URL string for ad auctions
- */
-+ (NSString *)auctionApiUrl;
-
-/**
- * @brief Returns the metrics API URL
- * @return The URL string for metrics reporting
- */
-+ (NSString *)metricsApiUrl;
-
 // MARK: - Environment Utilities
 
 /**

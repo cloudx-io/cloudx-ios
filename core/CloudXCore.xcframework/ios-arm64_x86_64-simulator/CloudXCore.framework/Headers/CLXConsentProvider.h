@@ -36,11 +36,13 @@ extern NSString * const kIABGPP_GppSID;
 + (instancetype)sharedInstance;
 
 /**
- * @brief Initializes GPP provider with dependency injection for error reporting
+ * @brief Initializes GPP provider with dependency injection
  * @param errorReporter Optional error reporter for exception tracking
+ * @param userDefaults The UserDefaults instance to use for reading and storing consent data
  * @return An initialized CLXConsentProvider instance
  */
-- (instancetype)initWithErrorReporter:(nullable CLXErrorReporter *)errorReporter;
+- (instancetype)initWithErrorReporter:(nullable CLXErrorReporter *)errorReporter
+                         userDefaults:(NSUserDefaults *)userDefaults;
 
 /**
  * @brief Gets the GPP consent string from UserDefaults

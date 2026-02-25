@@ -188,6 +188,15 @@ extern NSString * const CLXErrorDomain;
 + (instancetype)errorWithCode:(CLXErrorCode)code underlyingError:(nullable NSError *)underlyingError;
 
 /**
+ * Convenience method to populate an NSError output parameter.
+ * Centralizes the nil guard so callers don't need to repeat `if (outError)` checks.
+ * @param outError The output error pointer (may be NULL)
+ * @param code The CloudX error code
+ * @param description Human-readable error description
+ */
++ (void)setError:(NSError * __autoreleasing _Nullable * _Nullable)outError code:(CLXErrorCode)code description:(NSString *)description;
+
+/**
  * Converts an NSError to CLXError, preserving the original error code and type if already CLXError
  * @param error The error to convert (may be NSError or CLXError)
  * @param fallbackCode The CLXErrorCode to use for description fallback (not for the error code itself)
@@ -242,6 +251,11 @@ extern NSString * const CLXErrorDomain;
  * @discussion Accessible via userInfo[NSUnderlyingErrorKey] per standard NSError patterns
  */
 @property (nonatomic, readonly, nullable) NSError *underlyingError;
+
+/**
+ * Returns the string name for a CLXErrorCode, matching Android's CloudXErrorCode.name
+ */
++ (NSString *)nameForCode:(CLXErrorCode)code;
 
 @end
 

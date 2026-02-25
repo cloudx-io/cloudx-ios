@@ -11,6 +11,9 @@
 
 #import <Foundation/Foundation.h>
 
+@class CLXConsentProvider;
+@class CLXGeoLocationService;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -28,6 +31,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)sharedInstance;
 
+/**
+ * @brief The consent provider used by this privacy service
+ */
+@property (nonatomic, strong, readonly) CLXConsentProvider *consentProvider;
+
+/**
+ * @brief Initializes the privacy service with required dependencies
+ * @param userDefaults The UserDefaults instance to use for storing privacy-related data
+ * @param consentProvider The consent provider used to manage privacy consent state
+ * @param geoLocationService The geo location service used for geography-based privacy checks
+ * @return An initialized CLXPrivacyService instance
+ */
+- (instancetype)initWithUserDefaults:(NSUserDefaults *)userDefaults
+                     consentProvider:(CLXConsentProvider *)consentProvider
+                  geoLocationService:(CLXGeoLocationService *)geoLocationService;
 
 /**
  * @brief Determines if personal data should be cleared based on privacy settings

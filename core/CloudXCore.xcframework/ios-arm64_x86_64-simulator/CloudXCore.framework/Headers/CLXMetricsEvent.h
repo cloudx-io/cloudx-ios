@@ -37,32 +37,10 @@ NS_ASSUME_NONNULL_BEGIN
                      metricName:(NSString *)metricName
                       auctionId:(NSString *)auctionId;
 
-- (instancetype)initWithSessionId:(NSString *)sessionId
-                       metricName:(NSString *)metricName
-                        auctionId:(NSString *)auctionId;
-
 /**
- * Metrics operations
+ * Serialization
  */
-- (void)incrementCounter;
-- (void)incrementCounterBy:(NSInteger)amount;
-- (void)addLatency:(NSInteger)latencyMs;
-- (NSTimeInterval)averageLatency;
-
-/**
- * Factory methods for common metrics
- */
-+ (instancetype)impressionMetricWithSessionId:(NSString *)sessionId auctionId:(NSString *)auctionId;
-+ (instancetype)clickMetricWithSessionId:(NSString *)sessionId auctionId:(NSString *)auctionId;
-+ (instancetype)loadLatencyMetricWithSessionId:(NSString *)sessionId 
-                                     auctionId:(NSString *)auctionId 
-                                       latency:(NSInteger)latencyMs;
-
-/**
- * Database column names (matching Android table structure)
- */
-+ (NSArray<NSString *> *)sqlColumnNames;
-+ (NSString *)sqlTableName;
++ (nullable instancetype)fromDictionary:(NSDictionary *)dictionary;
 
 @end
 

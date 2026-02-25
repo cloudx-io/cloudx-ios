@@ -21,9 +21,9 @@ __attribute__((visibility("default"))) void CloudXVungleAdapterRegister(void);
 @end
 
 // Public headers - Base Infrastructure
-#import "CLXVungleBaseFactory.h"
 #import "CLXVungleErrorHandler.h"
 #import "CLXVungleInitializer.h"
+#import "CLXVungleAdapterVersion.h"
 
 // Public headers - Bid Token Source
 #import "CLXVungleBidTokenSource.h"
@@ -40,10 +40,5 @@ __attribute__((visibility("default"))) void CloudXVungleAdapterRegister(void);
 #import "CLXVungleBanner.h"
 #import "CLXVungleBannerFactory.h"
 
-// Public headers - Native
-#import "CLXVungleNative.h"
-#import "CLXVungleNativeFactory.h"
-
 // Public headers - App Open
-#import "CLXVungleAppOpen.h"
 #import "CLXVungleAppOpenFactory.h"

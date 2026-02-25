@@ -20,24 +20,14 @@ __attribute__((visibility("default"))) void CloudXInMobiAdapterRegister(void);
 @interface CloudXInMobiAdapter : NSObject
 @end
 
-// Public headers - Initializer
-#import "CLXInMobiInitializer.h"
-
-// Public headers - Bid Token Source  
-#import "CLXInMobiBidTokenSource.h"
-
-// Public headers - Interstitial
-#import "CLXInMobiInterstitial.h"
-#import "CLXInMobiInterstitialFactory.h"
-
-// Public headers - Banner
 #import "CLXInMobiBanner.h"
 #import "CLXInMobiBannerFactory.h"
-
-// Public headers - Rewarded
+#import "CLXInMobiInterstitial.h"
+#import "CLXInMobiInterstitialFactory.h"
 #import "CLXInMobiRewarded.h"
 #import "CLXInMobiRewardedFactory.h"
+#import "CLXInMobiInitializer.h"
+#import "CLXInMobiBidTokenSource.h"
+#import "CLXInMobiAdapterVersion.h"
 
-// Public headers - Base & Utils
-#import "CLXInMobiBaseFactory.h"
 

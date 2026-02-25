@@ -2,69 +2,32 @@
 //  CLXVungleErrorHandler.h
 //  CloudXVungleAdapter
 //
-//  Created by CloudX Team on 2024-09-14.
-//
 
 #import <Foundation/Foundation.h>
 
+#if __has_include(<CloudXCore/CLXError.h>)
+#import <CloudXCore/CLXError.h>
+#else
+#import "CLXError.h"
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
-@class CLXLogger;
-
 /**
- * Centralized error handler for Vungle SDK errors
- * Provides comprehensive logging and error categorization for all VungleAds SDK error codes
+ * Maps Vungle SDK errors to CloudX adapter errors.
  */
 @interface CLXVungleErrorHandler : NSObject
 
 /**
- * Error domain for Vungle adapter errors
+ * Converts a Vungle SDK error to a CLXError with appropriate adapter error code.
+ * Preserves the original Vungle error as underlying error for debugging.
+ *
+ * @param vungleError The NSError from Vungle SDK
+ * @param isShowError YES if the error occurred during ad presentation, NO for load errors.
+ *        This affects mapping for certain error codes (e.g., VungleErrorAdNotLoaded).
+ * @return CLXError with mapped adapter error code and original Vungle error as underlying error
  */
-extern NSString * const CLXVungleAdapterErrorDomain;
-
-/**
- * Vungle adapter error codes
- */
-typedef NS_ENUM(NSInteger, CLXVungleAdapterErrorCode) {
-    CLXVungleAdapterErrorCodeInitializationFailed = 1000,
-    CLXVungleAdapterErrorCodeLoadFailed = 1001,
-    CLXVungleAdapterErrorCodeShowFailed = 1002,
-    CLXVungleAdapterErrorCodeInvalidConfiguration = 1003,
-    CLXVungleAdapterErrorCodeNotInitialized = 1004,
-    CLXVungleAdapterErrorCodeNoFill = 1005,
-    CLXVungleAdapterErrorCodeTimeout = 1006,
-    CLXVungleAdapterErrorCodeNetworkError = 1007,
-    CLXVungleAdapterErrorCodeInvalidPlacement = 1008,
-    CLXVungleAdapterErrorCodeAdExpired = 1009
-};
-
-/**
- * Processes and logs Vungle SDK errors with comprehensive details
- * @param error The NSError from Vungle SDK
- * @param logger The logger instance to use for logging
- * @param context Additional context (e.g., "Banner", "Interstitial", "Rewarded", "Native")
- * @param placementID The placement ID where the error occurred
- * @return Enhanced NSError with additional metadata
- */
-+ (NSError *)handleVungleError:(NSError *)error
-                    withLogger:(CLXLogger *)logger
-                       context:(NSString *)context
-                   placementID:(NSString *)placementID;
-
-/**
- * Creates a CloudX-compatible error from Vungle error
- * @param vungleError The original Vungle SDK error
- * @param context Additional context information
- * @return CloudX error with mapped error code
- */
-+ (NSError *)mapVungleError:(NSError *)vungleError context:(NSString *)context;
-
-/**
- * Gets a human-readable description of the error code
- * @param errorCode The Vungle SDK error code
- * @return Descriptive string explaining the error
- */
-+ (NSString *)descriptionForErrorCode:(NSInteger)errorCode;
++ (CLXError *)toCloudXError:(NSError *)vungleError isShowError:(BOOL)isShowError;
 
 @end
 

@@ -20,7 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
                      adUnitName:(nullable NSString *)adUnitName
                              bidID:(NSString *)bidID
                               type:(CLXBannerType)type
-                    viewController:(UIViewController *)viewController
                           delegate:(id<CLXAdapterBannerDelegate>)delegate;
 
 @end
