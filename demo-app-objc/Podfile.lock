@@ -16,29 +16,22 @@ PODS:
   - VungleAds (7.6.3)
 
 DEPENDENCIES:
-  - CloudXCore (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.2.0-beta-core/core/CloudXCore.podspec`)
-  - CloudXInMobiAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.2.0-beta-inmobi/adapter-inmobi/CloudXInMobiAdapter.podspec`)
-  - CloudXMetaAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.2.0-beta-meta/adapter-meta/CloudXMetaAdapter.podspec`)
-  - CloudXRenderer (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.2.0-beta-renderer/renderer-cloudx/CloudXRenderer.podspec`)
-  - CloudXVungleAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.2.0-beta-vungle/adapter-vungle/CloudXVungleAdapter.podspec`)
+  - CloudXCore (= 2.2.0-beta)
+  - CloudXInMobiAdapter (= 2.2.0-beta)
+  - CloudXMetaAdapter (= 2.2.0-beta)
+  - CloudXRenderer (= 2.2.0-beta)
+  - CloudXVungleAdapter (= 2.2.0-beta)
 
 SPEC REPOS:
   trunk:
+    - CloudXCore
+    - CloudXInMobiAdapter
+    - CloudXMetaAdapter
+    - CloudXRenderer
+    - CloudXVungleAdapter
     - FBAudienceNetwork
     - InMobiSDK
     - VungleAds
-
-EXTERNAL SOURCES:
-  CloudXCore:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.2.0-beta-core/core/CloudXCore.podspec
-  CloudXInMobiAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.2.0-beta-inmobi/adapter-inmobi/CloudXInMobiAdapter.podspec
-  CloudXMetaAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.2.0-beta-meta/adapter-meta/CloudXMetaAdapter.podspec
-  CloudXRenderer:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.2.0-beta-renderer/renderer-cloudx/CloudXRenderer.podspec
-  CloudXVungleAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/v2.2.0-beta-vungle/adapter-vungle/CloudXVungleAdapter.podspec
 
 SPEC CHECKSUMS:
   CloudXCore: 4bbcbbd7af2f879cfcf401d53e81593915860c3c
@@ -50,6 +43,6 @@ SPEC CHECKSUMS:
   InMobiSDK: 4642fb34a961980ab94a1ac460c6e16e113498e6
   VungleAds: 40e87d1eaba17ac818b0f94461fd8ed21ad768dc
 
-PODFILE CHECKSUM: 2f6c45b091820f3f596cbaa4f4569f06e726ea27
+PODFILE CHECKSUM: 2a9f2c9cafe8c65b165d538989e8e8a33c64569f
 
 COCOAPODS: 1.16.2
