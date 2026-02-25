@@ -2,13 +2,10 @@
 //  CLXVungleBanner.h
 //  CloudXVungleAdapter
 //
-//  Created by CloudX Team on 2024-09-14.
-//
 
 #import <Foundation/Foundation.h>
 #import <VungleAdsSDK/VungleAdsSDK.h>
 
-// Conditional import for CloudXCore header
 #if __has_include(<CloudXCore/CloudXCore.h>)
 #import <CloudXCore/CloudXCore.h>
 #else
@@ -22,17 +19,12 @@ NS_ASSUME_NONNULL_BEGIN
  * Manages the lifecycle of Vungle banner/MREC ads including loading, showing, and cleanup.
  * Supports standard banner sizes (320x50, 300x50, 728x90) and MREC (300x250).
  */
-@interface CLXVungleBanner : NSObject <VungleBannerViewDelegate, CLXAdapterBanner, CLXDestroyable>
+@interface CLXVungleBanner : NSObject <VungleBannerViewDelegate, CLXAdapterBanner>
 
 /**
  * CloudX adapter delegate for receiving ad events
  */
 @property (nonatomic, weak, nullable) id<CLXAdapterBannerDelegate> delegate;
-
-/**
- * Flag indicating if the ad loading timed out
- */
-@property (nonatomic, assign) BOOL timeout;
 
 /**
  * The underlying Vungle banner view
@@ -60,19 +52,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly, nullable) NSString *adUnitName;
 
 /**
- * CloudX bid ID
- */
-@property (nonatomic, copy, readonly) NSString *bidID;
-
-/**
  * Banner type (size)
  */
 @property (nonatomic, assign, readonly) CLXBannerType bannerType;
-
-/**
- * View controller for presenting the banner
- */
-@property (nonatomic, weak, readonly, nullable) UIViewController *viewController;
 
 /**
  * Bid payload for programmatic ads (nil for waterfall)
@@ -86,12 +68,8 @@ NS_ASSUME_NONNULL_BEGIN
  * @param adUnitName The CloudX placement name for error messages (nullable)
  * @param bidID The CloudX bid ID
  * @param type The banner type/size
- * @param viewController The view controller for presenting the banner
- * @param delegate The CloudX adapter delegate (nullable - validation deferred to load())
+ * @param delegate The CloudX adapter delegate
  * @return Initialized banner adapter
- * @discussion As of v1.3.0, placementID and delegate can be nil. Validation occurs in load()
- *             and errors are reported via delegate callback.
- * @since 1.3.0 placementID and delegate parameters are now nullable
  * @since 1.4.0 adUnitName parameter added for better error messages
  */
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
@@ -99,7 +77,6 @@ NS_ASSUME_NONNULL_BEGIN
                      adUnitName:(nullable NSString *)adUnitName
                              bidID:(NSString *)bidID
                               type:(CLXBannerType)type
-                    viewController:(UIViewController *)viewController
                           delegate:(nullable id<CLXAdapterBannerDelegate>)delegate;
 
 /**

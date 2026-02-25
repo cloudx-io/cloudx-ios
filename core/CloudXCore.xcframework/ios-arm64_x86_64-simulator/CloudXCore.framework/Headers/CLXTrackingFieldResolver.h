@@ -2,6 +2,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class CLXPrivacyService;
 @class CLXSDKConfigResponse;
 
 // Public constant (matches Android companion object)
@@ -17,6 +18,12 @@ extern NSString * const SDK_PARAM_RESPONSE_IN_MILLIS;
  * Shared singleton instance
  */
 + (instancetype)shared;
+
+/**
+ * Designated initializer with dependency injection for testability
+ * @param privacyService The privacy service to use for personal data checks
+ */
+- (instancetype)initWithPrivacyService:(CLXPrivacyService *)privacyService;
 
 #pragma mark - Config Setup
 

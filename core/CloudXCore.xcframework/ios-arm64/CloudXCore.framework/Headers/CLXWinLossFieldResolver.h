@@ -48,30 +48,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setConfig:(CLXSDKConfigResponse *)config;
 
 /**
- * Builds a win/loss notification payload with dynamic field resolution
- * Builds a complete win/loss notification payload
- * 
- * @param auctionId The auction identifier
- * @param bid The bid object (nullable for some loss scenarios)
- * @param lossReason The loss reason (nullable for win scenarios)
- * @param isWin Whether this is a win (YES) or loss (NO) notification
- * @param loadedBidPrice The price of the winning bid
- * @return Dictionary containing the payload, or nil if no mapping configured
- */
-- (nullable NSDictionary<NSString *, id> *)buildWinLossPayloadWithAuctionId:(NSString *)auctionId
-                                                                        bid:(nullable CLXBidResponseBid *)bid
-                                                                 lossReason:(nullable NSNumber *)lossReason
-                                                                      isWin:(BOOL)isWin
-                                                              loadedBidPrice:(double)loadedBidPrice;
-
-/**
- * Build win/loss payload with lifecycle event (new method for dynamic URL resolution)
+ * Builds a win/loss notification payload with dynamic field resolution.
+ * Delegates most field paths to CLXTrackingFieldResolver.
  */
 - (nullable NSDictionary<NSString *, id> *)buildWinLossPayloadWithAuctionId:(NSString *)auctionId
                                                                         bid:(nullable CLXBidResponseBid *)bid
                                                                  lossReason:(nullable NSNumber *)lossReason
                                                                       event:(CLXBidLifecycleEvent *)event
-                                                              loadedBidPrice:(double)loadedBidPrice;
+                                                              loadedBidPrice:(double)loadedBidPrice
+                                                                      error:(nullable CLXError *)error;
 
 @end
 

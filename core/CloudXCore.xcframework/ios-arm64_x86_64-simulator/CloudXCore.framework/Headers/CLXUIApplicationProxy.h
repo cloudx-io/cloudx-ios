@@ -29,6 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// Returns safe area insets from the key window, or UIEdgeInsetsZero if unavailable.
 @property (class, nonatomic, readonly) UIEdgeInsets safeAreaInsets;
 
+/// Returns the top-most presented view controller from the key window, or nil in extensions/background.
+@property (class, nonatomic, readonly, nullable) UIViewController *topViewController;
+
 @end
 
 NS_ASSUME_NONNULL_END

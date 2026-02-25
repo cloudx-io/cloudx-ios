@@ -6,7 +6,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
 #import <CloudXCore/CLXBannerType.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -19,7 +18,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Creates a new instance of CloudXAdapterBanner with the given parameters.
 /// - Parameters:
-///   - viewController: viewController where the banner will be displayed
 ///   - type: type of the banner (mrec, banner, etc.)
 ///   - adId: id of ad from bid response
 ///   - bidId: bid id from bid response
@@ -29,8 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///   - adUnitName: CloudX ad unit name for error messaging (may be nil for legacy callers)
 ///   - delegate: delegate for the adapter
 /// - Returns: CloudXAdapterBanner instance
-- (nullable id<CLXAdapterBanner>)createWithViewController:(UIViewController *)viewController
-                                                       type:(CLXBannerType)type
+- (nullable id<CLXAdapterBanner>)createWithType:(CLXBannerType)type
                                                        adId:(NSString *)adId
                                                       bidId:(NSString *)bidId
                                                         adm:(NSString *)adm
@@ -41,4 +38,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

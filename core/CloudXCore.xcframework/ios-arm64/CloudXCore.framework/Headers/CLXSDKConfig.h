@@ -14,8 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Forward declarations for classes defined in this file
 @class CLXSDKConfigResponse;
-@class CLXSDKConfigEndpointObject;
-@class CLXSDKConfigEndpointValue;
 @class CLXSDKConfigImp;
 @class CLXSDKConfigBanner;
 @class CLXSDKConfigFormat;
@@ -24,7 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXSDKConfigBidExt;
 @class CLXSDKConfigCloudXExt;
 @class CLXSDKConfigMeta;
-@class CLXSDKConfigEndpointQuantumValue;
 @class CLXSDKConfigLineItem;
 @class CLXSDKConfigQuantumValue;
 @class CLXSDKConfigTargetingStrategy;
@@ -41,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *accountID;
 @property (nonatomic, copy, nullable) NSArray<CLXSDKConfigBidder *> *bidders;
 @property (nonatomic, copy, nullable) NSArray<CLXSDKConfigAdUnit *> *adUnits;
-@property (nonatomic, strong, nullable) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
+@property (nonatomic, copy, nullable) NSString *auctionEndpointURL;
 @property (nonatomic, copy, nullable) NSString *organizationID;
 @property (nonatomic, copy, nullable) NSString *impressionTrackerURL;
 @property (nonatomic, strong, nullable) CLXMetricsConfig *metricsConfig;
@@ -83,7 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
 // ═══════════════════════════════════════════════════════════════════════════
 // 2. Endpoints (required)
 // ═══════════════════════════════════════════════════════════════════════════
-@property (nonatomic, strong) CLXSDKConfigEndpointQuantumValue *auctionEndpointURL;
+@property (nonatomic, copy) NSString *auctionEndpointURL;
 @property (nonatomic, copy) NSString *impressionTrackerURL;
 @property (nonatomic, copy) NSString *winLossNotificationURL;
 @property (nonatomic, copy) NSString *geoDataEndpointURL;
@@ -156,26 +153,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXSDKConfigMeta : NSObject
 @property (nonatomic, copy) NSString *adaptercode;
-- (instancetype)init;
-@end
-
-@interface CLXSDKConfigEndpointQuantumValue : NSObject
-@property (nonatomic, strong, nullable) CLXSDKConfigEndpointObject *endpointObject;
-@property (nonatomic, copy, nullable) NSString *endpointString;
-- (instancetype)init;
-- (nullable id)value;
-@end
-
-@interface CLXSDKConfigEndpointObject : NSObject
-@property (nonatomic, copy, nullable) NSArray<CLXSDKConfigEndpointValue *> *test;
-@property (nonatomic, copy, nullable) NSString *defaultKey;
-- (instancetype)init;
-@end
-
-@interface CLXSDKConfigEndpointValue : NSObject
-@property (nonatomic, copy, nullable) NSString *name;
-@property (nonatomic, copy) NSString *value;
-@property (nonatomic, assign) double ratio;
 - (instancetype)init;
 @end
 

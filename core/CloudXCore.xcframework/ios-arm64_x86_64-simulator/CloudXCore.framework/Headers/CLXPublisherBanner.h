@@ -91,7 +91,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Initializes a new PublisherBanner with the given parameters.
- * @param viewController The view controller where the banner will be displayed
  * @param adUnit The ad unit configuration (nil if SDK not initialized, will be resolved on load)
  * @param userID The user ID
  * @param publisherID The publisher ID
@@ -106,8 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param settings The settings instance for configuration (injected for testability)
  * @return Initialized PublisherBanner instance
  */
-- (instancetype)initWithViewController:(UIViewController *)viewController
-                             adUnit:(nullable CLXSDKConfigAdUnit *)adUnit
+- (instancetype)initWithAdUnit:(nullable CLXSDKConfigAdUnit *)adUnit
                                 userID:(NSString *)userID
                            publisherID:(NSString *)publisherID
               suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
