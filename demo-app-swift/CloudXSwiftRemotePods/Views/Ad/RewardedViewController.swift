@@ -61,7 +61,9 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        resetAdState()
+        if rewardedAd == nil || isLoading {
+            resetAdState()
+        }
     }
     
     deinit {

@@ -64,7 +64,9 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [self resetAdState];
+    if (!self.rewardedAd || self.isLoading) {
+        [self resetAdState];
+    }
 }
 
 - (void)dealloc {

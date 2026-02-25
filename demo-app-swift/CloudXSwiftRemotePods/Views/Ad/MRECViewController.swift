@@ -213,8 +213,8 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         updateStatusUI(state: .noAd)
         
         DispatchQueue.main.async { [weak self] in
-            let errorMessage = error.localizedDescription
-            self?.showAlert(title: "MREC Error", message: errorMessage)
+            let errorMessage = (error as NSError).detailedDemoDescription
+            self?.showAlert(title: "MREC Ad Load Failed", message: errorMessage)
         }
     }
     
