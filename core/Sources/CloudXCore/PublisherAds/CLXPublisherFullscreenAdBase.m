@@ -8,11 +8,6 @@
  */
 
 #import <CloudXCore/CLXPublisherFullscreenAdBase.h>
-#import <CloudXCore/CLXAdapterInterstitial.h>
-#import <CloudXCore/CLXUserDefaultsKeys.h>
-#import <CloudXCore/CLXAdapterRewarded.h>
-#import <CloudXCore/CLXAdapterInterstitialFactory.h>
-#import <CloudXCore/CLXAdapterRewardedFactory.h>
 #import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXBidTokenSource.h>
 #import <CloudXCore/CLXAdNetworkFactories.h>
@@ -31,7 +26,6 @@
 #import <CloudXCore/CLXDestroyable.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXRillTrackingService.h>
-#import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXSessionMetricsTracker.h>
 #import <CloudXCore/CLXAdType.h>
 #import <CloudXCore/CLXAd.h>
@@ -39,50 +33,10 @@
 #import <CloudXCore/CloudXCoreAPI.h>
 #import <CloudXCore/CloudXCoreInternal.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
-#import <CloudXCore/CLXSDKConfig.h>
-#import "CLXUIApplicationProxy.h"
 #import <CloudXCore/CLXAdapterLoader.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
-#import <objc/runtime.h>
 
 NS_ASSUME_NONNULL_BEGIN
-
-#pragma mark - Force Close Timeout Constants
-/**
- * Maximum time (in seconds) a fullscreen ad can remain on-screen before the SDK forcibly closes it.
- * This is a SAFETY mechanism for stuck/broken ads, NOT a constraint on video content length.
- *
- * IMPORTANT: This is different from bid request `video.maxduration`:
- *   - `maxduration` = max video FILE length sent to bidders (60s)
- *   - Force close timeout = max TOTAL on-screen time (video + end card + user interaction)
- *
- * Timeline for a 60s rewarded video:
- *   [0s]     Video starts
- *   [60s]    Video ends, end card appears
- *   [60-90s] User views end card, may interact with CTA
- *   [90s+]   User dismisses or SDK force-closes if stuck
- *
- * Values chosen to be generous enough for legitimate ad experiences while still
- * protecting users from truly stuck ads.
- *
- * 🔧 PUBLISHER CONFIGURABILITY CANDIDATE:
- *    These values could potentially be configurable via server-side ad unit settings
- *    if publishers need different timeout behaviors for their specific use cases.
- */
-
-/// Force close timeout for REWARDED ads (120 seconds / 2 minutes)
-/// Rationale: Users must complete video to earn reward, so we allow extra time for:
-///   - Full video playback (up to 60s)
-///   - End card display and interaction (30-60s)
-///   - Network latency/buffering
-static const NSTimeInterval kCLXForceCloseTimeoutRewarded = 120.0;
-
-/// Force close timeout for INTERSTITIAL ads (90 seconds)
-/// Rationale: Shorter than rewarded because:
-///   - Skippable after ~5s (user can exit early)
-///   - Typically shorter video content
-///   - User didn't opt-in for extended experience
-static const NSTimeInterval kCLXForceCloseTimeoutInterstitial = 90.0;
 
 /**
  * Ad state enumeration defining the lifecycle states of fullscreen ads
@@ -114,13 +68,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, strong, nullable) CLXBidAdSource *bidAdSource;
 @property (nonatomic, strong) CLXSettings *settings;
-
-// Display state tracking
-@property (nonatomic, strong, nullable) NSTimer *closeTimer;
-@property (nonatomic, assign) NSTimeInterval forceCloseEventDelay;
-@property (nonatomic, assign) BOOL closeEventReceived;
-@property (nonatomic, strong, nullable) NSDate *impressionTime;
-@property (nonatomic, weak, nullable) UIViewController *presentingViewController;
 
 // Bid response data for NURL firing
 @property (nonatomic, strong, nullable) CLXBidResponse *currentBidResponse;
@@ -188,13 +135,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
         _impModel = impModel;
         _bidRequestTimeout = bidRequestTimeout;
         
-        // Set force close timeout based on ad type
-        // See constant definitions above for detailed rationale
-        _forceCloseEventDelay = ([self adType] == CLXAdTypeRewarded) 
-            ? kCLXForceCloseTimeoutRewarded 
-            : kCLXForceCloseTimeoutInterstitial;
-        
-        _closeEventReceived = NO;
         _pendingLoadRequestCount = 0;
         
         // Initialize Analytics tracking service
@@ -262,7 +202,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     [self.logger debug:[NSString stringWithFormat:@"Destroying fullscreen ad for ad unit: %@", self.adUnitId]];
     
     // Remove notification observer
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"CLXSDKInitializedNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:CLXSDKInitializedNotification object:nil];
     
     // Set state to destroyed
     self.currentState = CLXFullscreenAdStateDESTROYED;
@@ -285,9 +225,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     if (currentAdapter && [currentAdapter conformsToProtocol:@protocol(CLXDestroyable)]) {
         [(id<CLXDestroyable>)currentAdapter destroy];
     }
-    
-    // Invalidate timers
-    [self.closeTimer invalidate];
 }
 
 #pragma mark - Public Methods
@@ -492,22 +429,9 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     self.currentState = CLXFullscreenAdStateSHOWING;
     [self.logger debug:@"State transitioned to SHOWING"];
 
-    // Set up display state
-    self.closeEventReceived = NO;
-    self.presentingViewController = viewController;
-
-    // Set up force close timer
-    self.closeTimer = [NSTimer scheduledTimerWithTimeInterval:self.forceCloseEventDelay
-                                                       repeats:NO
-                                                         block:^(NSTimer * _Nonnull timer) {
-        if (!self.closeEventReceived) {
-            [self.logger debug:@"Force close timer fired - no close event received"];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self forceCloseAdAndNotify];
-            });
-        }
-        [self.closeTimer invalidate];
-    }];
+    // Trust network adapters to manage their own ad dismiss lifecycle.
+    // A force-close timer was previously here but caused premature dismissal
+    // of legitimate ad experiences (e.g. playable end cards on rewarded ads).
 
     // Display the loaded ad using the appropriate adapter
     [self showCurrentAdapterFromViewController:viewController];
@@ -568,46 +492,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
                 format:@"Subclass must override %@", NSStringFromSelector(_cmd)];
 }
 
-- (void)notifyForceClose {
-    [NSException raise:NSInternalInconsistencyException 
-                format:@"Subclass must override %@", NSStringFromSelector(_cmd)];
-}
-
-#pragma mark - Force Close Implementation
-
-- (void)forceCloseAdAndNotify {
-    NSString *networkName = self.lastBidResponse.networkName ?: @"unknown";
-    [self.logger error:[NSString stringWithFormat:@"⚠️ FORCE CLOSE: %@ adapter failed to dismiss after %.0fs timeout - this indicates an SDK bug", 
-                       networkName, self.forceCloseEventDelay]];
-    
-    // Try to dismiss any presented view controller on our presenting VC
-    UIViewController *presentingVC = self.presentingViewController;
-    if (presentingVC && presentingVC.presentedViewController) {
-        [self.logger debug:@"Found presented view controller - dismissing it"];
-        [presentingVC dismissViewControllerAnimated:NO completion:^{
-            [self.logger debug:@"Presented view controller dismissed successfully"];
-            self.presentingViewController = nil;
-            [self notifyForceClose];
-        }];
-    } else {
-        // No presented VC found, or it was already dismissed
-        // Try to find and dismiss from the root view controller as a fallback
-        UIViewController *rootVC = [CLXUIApplicationProxy keyWindow].rootViewController;
-        if (rootVC && rootVC.presentedViewController) {
-            [self.logger debug:@"Fallback: dismissing from root view controller"];
-            [rootVC dismissViewControllerAnimated:NO completion:^{
-                [self.logger debug:@"Root VC presented view controller dismissed"];
-                self.presentingViewController = nil;
-                [self notifyForceClose];
-            }];
-        } else {
-            [self.logger debug:@"No presented view controller found to dismiss"];
-            self.presentingViewController = nil;
-            [self notifyForceClose];
-        }
-    }
-}
-
 #pragma mark - Protected Helper Methods
 
 - (void)handleBidResponse:(CLXBidAdSourceResponse *)response error:(NSError *)error {
@@ -654,14 +538,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     
     // Configure adapter delegate and initiate loading with timeout protection
     [self setupAdapterAndLoad:adapter];
-}
-
-- (void)applyMetrics {
-    // Metrics tracking removed - CLXAppSessionService was write-only dead code
-}
-
-- (void)sendLossNotificationForFailedAd {
-    [self sendLossNotificationForFailedAdWithError:nil];
 }
 
 - (void)sendLossNotificationForFailedAdWithError:(nullable NSError *)error {
@@ -719,24 +595,17 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
  * Follows DRY principle - shared by handleAdClose and handleShowFailure.
  */
 - (void)cleanupAdDisplayState {
-    // Invalidate close timer
-    [self.closeTimer invalidate];
-    
     // Destroy the adapter (delegates to subclass via getCurrentAdapter)
     id currentAdapter = [self getCurrentAdapter];
     if (currentAdapter && [currentAdapter conformsToProtocol:@protocol(CLXDestroyable)]) {
         [(id<CLXDestroyable>)currentAdapter destroy];
     }
-    
+
     // Transition back to idle
     self.currentState = CLXFullscreenAdStateIDLE;
 }
 
 - (void)handleAdClose {
-    // Mark close event received
-    self.closeEventReceived = YES;
-    
-    // Shared cleanup (DRY)
     [self cleanupAdDisplayState];
 }
 
@@ -745,10 +614,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
  * Fixes: Publishers can now call load() in didFailToDisplayAd callback.
  */
 - (void)handleShowFailure {
-    // Clear presenting view controller reference (not needed for normal close)
-    self.presentingViewController = nil;
-    
-    // Shared cleanup (DRY)
     [self cleanupAdDisplayState];
 }
 
@@ -771,9 +636,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 }
 
 - (void)fireRenderSuccessEventForBidID:(NSString *)bidID adType:(CLXAdType)adType {
-    self.impressionTime = [NSDate date];
-    [self applyMetrics];
-    
     [[CLXSessionMetricsTracker sharedInstance] recordImpressionForAdUnit:self.adUnitName adType:adType];
     [self.rillTrackingService sendImpressionEvent];
     
@@ -798,7 +660,6 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     [self.logger debug:@"Clicked on ad"];
     [self.rillTrackingService sendClickEvent];
 }
-
 
 - (CLXAd *)createAdObject {
     // Determine ad format based on ad type

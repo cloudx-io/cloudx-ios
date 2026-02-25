@@ -38,7 +38,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)fireRenderSuccessEventForBidID:(NSString *)bidID adType:(NSInteger)adType;
 
 // Loss notification
-- (void)sendLossNotificationForFailedAd;
 - (void)sendLossNotificationForFailedAdWithError:(nullable NSError *)error;
 
 // Adapter load latency tracking

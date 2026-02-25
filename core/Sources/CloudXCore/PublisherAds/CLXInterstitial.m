@@ -129,14 +129,6 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)notifyForceClose {
-    if ([self.delegate respondsToSelector:@selector(didHideAd:)]) {
-        CLXAd *ad = [self createAdObject];
-        [self.logger logDelegateCallback:@"🔚 Interstitial didHideAd" ad:ad];
-        [self.delegate didHideAd:ad];
-    }
-}
-
 #pragma mark - CLXAdapterInterstitialDelegate
 
 - (void)didLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial {

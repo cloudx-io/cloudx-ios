@@ -124,11 +124,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)notifyShowFailure:(CLXError *)error NS_REQUIRES_SUPER;
 
-/**
- * Notifies the delegate that the ad was force closed by timeout.
- */
-- (void)notifyForceClose NS_REQUIRES_SUPER;
-
 @end
 
 NS_ASSUME_NONNULL_END

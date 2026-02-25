@@ -980,7 +980,7 @@ NS_ASSUME_NONNULL_BEGIN
     [self.logger debug:[NSString stringWithFormat:@"Destroying banner for ad unit: %@", self.adUnitId]];
     
     // Remove notification observer
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"CLXSDKInitializedNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:CLXSDKInitializedNotification object:nil];
     
     self.isDestroyed = YES;
     self.isLoading = NO;
