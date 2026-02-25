@@ -103,9 +103,11 @@ class BannerViewController: BaseAdViewController {
     private func createAndAddBannerToView() {
         guard bannerAd == nil else { return }
         
-        // Create banner ad with adUnitId from config
-        let adUnitId = CLXDemoConfigManager.sharedManager.currentConfig.bannerAdUnitId
-        bannerAd = cloudX.createBanner(adUnitId: adUnitId, viewController: self)
+        var adUnitId = CLXDemoConfigManager.sharedManager.currentConfig.bannerAdUnitId
+        if !settings.bannerAdUnitId.isEmpty {
+            adUnitId = settings.bannerAdUnitId
+        }
+        bannerAd = cloudX.createBanner(adUnitId: adUnitId)
         bannerAd?.delegate = self
         bannerAd?.revenueDelegate = self
         bannerAd?.placement = "demo_banner"

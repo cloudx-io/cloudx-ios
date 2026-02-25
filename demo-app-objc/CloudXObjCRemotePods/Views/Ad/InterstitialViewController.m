@@ -66,7 +66,11 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [self resetAdState];
+    // Only reset if we're actually leaving the tab — not when a fullscreen ad
+    // is presented over us (which also triggers viewWillDisappear).
+    if (!self.interstitialAd || self.isLoading) {
+        [self resetAdState];
+    }
 }
 
 - (void)dealloc {

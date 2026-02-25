@@ -13,6 +13,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.0-beta] - 2026-02-25
+
+### Added
+- **IDFV Tracking** - IDFV (ifv) now included in config init and bid requests for DAU/MAU analytics
+- **Adapter Init Error Tracking** - SDK now sends error events when adapter initialization fails
+- **Win/Loss Payload Parity** - Aligned iOS win/loss notification payloads with Android
+
+### Fixed
+- **Duplicate didHideAd Callback** - Fixed fullscreen ads firing didHideAd twice on close
+- **Adapter Code Resolution** - Fixed adaptercode resolution for SDK >= 2.1 after SSP ext.cloudx migration
+- **Thread Safety** - Fixed thread safety crash in bid token dictionary construction
+- **Double Revenue Callback** - Fixed CloudX renderer test rewarded ads firing revenue callback twice
+- **Silent Failures** - Audited and fixed silent failures across core SDK
+- **Adapter Creation Errors** - Real adapter creation errors now propagate through bid waterfall
+
+### Changed
+- **JIT ViewController Resolution** - Banner/MREC ads now resolve the presenting view controller at use time instead of storing a weak reference
+- **Removed Fullscreen Force-Close Timer** - Removed the timer-based force-close mechanism for fullscreen ads
+- **Adapter Rewrites** - InMobi, Vungle, and Mintegral adapters fully rewritten
+- **Removed Dead Code** - Cleaned up dead database code, endpoint config, A/B test code, and non-deterministic tests
+
+---
+
 ## [2.1.0-beta] - 2026-02-10
 
 ### Fixed

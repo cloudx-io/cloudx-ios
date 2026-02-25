@@ -112,7 +112,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         if !settings.mrecAdUnitId.isEmpty {
             adUnitId = settings.mrecAdUnitId
         }
-        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId, viewController: self)
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId)
         mrecAd?.delegate = self
         mrecAd?.revenueDelegate = self
         mrecAd?.placement = "demo_mrec"
@@ -184,8 +184,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         updateStatusUI(state: .loading)
 
         let adUnitId = self.adUnitId
-        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId,
-                                            viewController: self)
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId)
         mrecAd?.delegate = self
         mrecAd?.revenueDelegate = self
         
@@ -214,8 +213,8 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         updateStatusUI(state: .noAd)
         
         DispatchQueue.main.async { [weak self] in
-            let errorMessage = error.localizedDescription
-            self?.showAlert(title: "MREC Error", message: errorMessage)
+            let errorMessage = (error as NSError).detailedDemoDescription
+            self?.showAlert(title: "MREC Ad Load Failed", message: errorMessage)
         }
     }
     

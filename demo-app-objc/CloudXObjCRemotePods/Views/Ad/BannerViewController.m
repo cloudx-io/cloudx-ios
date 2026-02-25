@@ -150,8 +150,7 @@
         adUnitId = _settings.bannerAdUnitId;
     }
     
-    self.bannerAd = [[CloudXCore shared] createBannerWithAdUnitId:adUnitId
-                                                      viewController:self];
+    self.bannerAd = [[CloudXCore shared] createBannerWithAdUnitId:adUnitId];
     self.bannerAd.delegate = self;
     self.bannerAd.revenueDelegate = self;
     self.bannerAd.placement = @"demo_banner";

@@ -105,7 +105,11 @@ class InterstitialViewController: BaseAdViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        resetAdState()
+        // Only reset if we're actually leaving the tab — not when a fullscreen ad
+        // is presented over us (which also triggers viewWillDisappear).
+        if interstitialAd == nil || isLoading {
+            resetAdState()
+        }
     }
     
     deinit {
@@ -198,8 +202,8 @@ extension InterstitialViewController: CLXInterstitialDelegate, CLXAdRevenueDeleg
         updateStatusUI(state: AdState.noAd)
         
         DispatchQueue.main.async { [weak self] in
-            let errorMessage = error.localizedDescription
-            self?.showAlert(title: "Interstitial Ad Error", message: errorMessage)
+            let errorMessage = (error as NSError).detailedDemoDescription
+            self?.showAlert(title: "Interstitial Ad Load Failed", message: errorMessage)
             self?.interstitialAd = nil
         }
     }
@@ -214,8 +218,8 @@ extension InterstitialViewController: CLXInterstitialDelegate, CLXAdRevenueDeleg
         
         DispatchQueue.main.async { [weak self] in
             self?.interstitialAd = nil
-            let errorMessage = error.localizedDescription
-            self?.showAlert(title: "Interstitial Ad Error", message: errorMessage)
+            let errorMessage = (error as NSError).detailedDemoDescription
+            self?.showAlert(title: "Interstitial Ad Show Failed", message: errorMessage)
         }
     }
     
