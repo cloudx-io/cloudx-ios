@@ -112,7 +112,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         if !settings.mrecAdUnitId.isEmpty {
             adUnitId = settings.mrecAdUnitId
         }
-        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId, viewController: self)
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId)
         mrecAd?.delegate = self
         mrecAd?.revenueDelegate = self
         mrecAd?.placement = "demo_mrec"
@@ -184,8 +184,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         updateStatusUI(state: .loading)
 
         let adUnitId = self.adUnitId
-        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId,
-                                            viewController: self)
+        mrecAd = CloudXCore.shared.createMREC(adUnitId: adUnitId)
         mrecAd?.delegate = self
         mrecAd?.revenueDelegate = self
         

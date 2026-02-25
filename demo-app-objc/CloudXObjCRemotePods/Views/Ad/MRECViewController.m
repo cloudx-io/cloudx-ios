@@ -120,7 +120,7 @@
     if (_settings.mrecAdUnitId.length > 0) {
         adUnitId = _settings.mrecAdUnitId;
     }
-    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:adUnitId viewController:self];
+    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:adUnitId];
     self.mrecAd.delegate = self;
     self.mrecAd.revenueDelegate = self;
     self.mrecAd.placement = @"demo_mrec";
@@ -239,8 +239,7 @@
     [self updateStatusUIWithState:AdStateLoading];
 
     NSString *adUnitId = [self adUnitId];
-    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:adUnitId
-                                                 viewController:self];
+    self.mrecAd = [[CloudXCore shared] createMRECWithAdUnitId:adUnitId];
     self.mrecAd.delegate = self;
     self.mrecAd.revenueDelegate = self;
     self.mrecAd.placement = @"demo_mrec";
