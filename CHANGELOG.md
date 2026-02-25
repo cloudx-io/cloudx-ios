@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Duplicate didHideAd Callback** - Fixed fullscreen ads firing didHideAd twice on close (#404)
 - **Adapter Code Resolution** - Fixed adaptercode resolution for SDK >= 2.1 after SSP ext.cloudx migration (#402)
 - **Thread Safety** - Fixed thread safety crash in bid token dictionary construction (#401)
-- **Double Revenue Callback** - Fixed CloudX renderer rewarded ads firing revenue callback twice (#394)
+- **Double Revenue Callback** - Fixed CloudX renderer test rewarded ads firing revenue callback twice (#394)
 - **Silent Failures** - Audited and fixed silent failures across core SDK (#384)
 - **Adapter Creation Errors** - Real adapter creation errors now propagate through bid waterfall (#387)
 
