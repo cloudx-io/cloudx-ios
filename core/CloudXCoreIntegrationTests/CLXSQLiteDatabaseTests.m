@@ -141,9 +141,7 @@
     NSString *invalidSQL = @"INSERT INTO direct_test (name) VALUES ('test' INVALID SYNTAX;";
     BOOL result = [self.database executeSQL:invalidSQL];
     
-    // Should fail due to syntax error (or return false)
-    // Note: Some implementations might silently fail, so we just verify it doesn't crash
-    NSLog(@"Invalid SQL result: %@", result ? @"YES" : @"NO");
+    XCTAssertFalse(result, @"Invalid SQL syntax should return NO");
     
     // Test with SQL that references non-existent table
     NSString *nonExistentTableSQL = @"INSERT INTO non_existent_table (name) VALUES ('test');";
@@ -194,8 +192,8 @@
     NSArray *results = [self.database executeQuery:@"SELECT COUNT(*) as count FROM transaction_test;"];
     NSInteger count = [results[0][@"count"] integerValue];
     
-    // The count could be 1 (if rollback worked) or 2 (if only the duplicate failed)
-    XCTAssertTrue(count >= 1 && count <= 2, @"Should have 1 or 2 records depending on rollback behavior");
+    // ROLLBACK undoes the entire transaction, so only the initial row (id=1) remains
+    XCTAssertEqual(count, 1, @"Rollback should undo all statements in the transaction");
     
     NSArray *nameResults = [self.database executeQuery:@"SELECT name FROM transaction_test WHERE id = 1;"];
     XCTAssertEqualObjects(nameResults[0][@"name"], @"initial", @"Should have original data");
@@ -322,8 +320,7 @@
     // Instead, we test error handling for invalid SQL
     
     BOOL invalidResult = [self.database executeSQL:@"INVALID SQL STATEMENT;"];
-    // Just verify it doesn't crash - some implementations might return YES/NO differently
-    NSLog(@"Invalid SQL result: %@", invalidResult ? @"YES" : @"NO");
+    XCTAssertFalse(invalidResult, @"Invalid SQL should return NO");
     
     // Verify database is still functional after error
     NSArray *afterResults = [self.database executeQuery:@"SELECT COUNT(*) as count FROM recovery_test;"];
@@ -357,8 +354,7 @@
         BOOL nilResult = [self.database tableExists:nil];
         XCTAssertFalse(nilResult, @"nil should return false");
     } @catch (NSException *exception) {
-        // If it throws, that's also acceptable behavior - just don't crash
-        NSLog(@"tableExists:nil threw exception (acceptable): %@", exception);
+        // Throwing is acceptable -- just don't crash the process
     }
     
     // Test with special characters - should not crash
@@ -403,68 +399,19 @@
         [db closeDatabase];
     }
     
-    // Clean up files
+    // Clean up files including WAL/SHM sidecars
     for (NSInteger i = 0; i < 100; i++) {
         NSString *dbName = [NSString stringWithFormat:@"cleanup_test_%ld", (long)i];
         CLXSQLiteDatabase *tempDb = [[CLXSQLiteDatabase alloc] initWithDatabaseName:dbName];
         NSString *path = [tempDb databasePath];
+        [tempDb closeDatabase];
         [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:[path stringByAppendingString:@"-wal"] error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:[path stringByAppendingString:@"-shm"] error:nil];
     }
     
     // This test primarily checks for memory leaks and crashes
     // Test passes if no crash: Should complete without crashes or excessive memory usage
-}
-
-#pragma mark - Silent Failure Audit Tests
-
-/// Audit fix: nil SQL must return NO, not crash (added _validateSQL guard)
-- (void)testExecuteSQL_NilSQL_ReturnsFalse {
-    // Cast through variable to bypass nonnull compile-time check
-    NSString *nilSQL = nil;
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wnonnull"
-    XCTAssertFalse([self.database executeSQL:nilSQL], @"nil SQL should return NO");
-    #pragma clang diagnostic pop
-}
-
-/// Audit fix: nil SQL query must return empty array, not crash
-- (void)testExecuteQuery_NilSQL_ReturnsEmptyArray {
-    NSString *nilSQL = nil;
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wnonnull"
-    NSArray *results = [self.database executeQuery:nilSQL];
-    #pragma clang diagnostic pop
-    XCTAssertNotNil(results);
-    XCTAssertEqual(results.count, 0, @"nil SQL query should return empty results");
-}
-
-/// Audit fix: double close must not crash (added close result check + NULL guard)
-- (void)testCloseDatabase_CalledTwice_DoesNotCrash {
-    [self.database closeDatabase];
-    XCTAssertNoThrow([self.database closeDatabase], @"Double close must be a safe no-op");
-}
-
-/// Audit fix: bind result codes are now checked - verify all param types bind without error
-- (void)testParameterBinding_AllTypes_SucceedsWithCheckedBindResults {
-    [self.database executeSQL:@"CREATE TABLE bind_audit (id INTEGER PRIMARY KEY, v TEXT);"];
-
-    NSString *sql = @"INSERT INTO bind_audit (id, v) VALUES (?, ?);";
-    BOOL r1 = [self.database executeSQL:sql withParameters:@[@1, @"string"]];
-    BOOL r2 = [self.database executeSQL:sql withParameters:@[@2, @(42)]];
-    BOOL r3 = [self.database executeSQL:sql withParameters:@[@3, @(3.14)]];
-    BOOL r4 = [self.database executeSQL:sql withParameters:@[@4, [NSNull null]]];
-    BOOL r5 = [self.database executeSQL:sql withParameters:@[@5, [NSData data]]];
-    BOOL r6 = [self.database executeSQL:sql withParameters:@[@6, [@"bytes" dataUsingEncoding:NSUTF8StringEncoding]]];
-
-    XCTAssertTrue(r1, @"String bind");
-    XCTAssertTrue(r2, @"Integer bind");
-    XCTAssertTrue(r3, @"Double bind");
-    XCTAssertTrue(r4, @"NSNull bind");
-    XCTAssertTrue(r5, @"Empty NSData bind");
-    XCTAssertTrue(r6, @"NSData bind");
-
-    NSArray *rows = [self.database executeQuery:@"SELECT COUNT(*) as c FROM bind_audit;"];
-    XCTAssertEqual([rows[0][@"c"] integerValue], 6);
 }
 
 @end

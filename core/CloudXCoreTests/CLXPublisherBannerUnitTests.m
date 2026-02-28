@@ -201,6 +201,10 @@ static const NSTimeInterval kTestTimeout = 2.0;
     self.mockDelegate = nil;
     self.mockFactory = nil;
     self.testViewController = nil;
+    self.testPlacement = nil;
+    self.testImpModel = nil;
+    self.testSettings = nil;
+    self.mockReportingService = nil;
     [super tearDown];
 }
 

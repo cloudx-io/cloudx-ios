@@ -201,6 +201,10 @@ static const NSTimeInterval kBasicRefreshInterval = 5.0;
     [self.banner destroy];
     self.banner = nil;
     self.mockDelegate = nil;
+    self.testViewController = nil;
+    self.testPlacement = nil;
+    self.testImpModel = nil;
+    self.testSettings = nil;
     [super tearDown];
 }
 

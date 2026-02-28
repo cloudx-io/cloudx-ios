@@ -342,6 +342,10 @@ static const NSTimeInterval kSpecTestTimeout = 1.0;
     self.banner = nil;
     self.specDelegate = nil;
     self.timingFactory = nil;
+    self.testViewController = nil;
+    self.testPlacement = nil;
+    self.testImpModel = nil;
+    self.testSettings = nil;
     [super tearDown];
 }
 

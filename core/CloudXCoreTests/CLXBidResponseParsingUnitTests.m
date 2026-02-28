@@ -240,7 +240,7 @@
     for (NSInteger i = 0; i < 100; i++) {
         NSDictionary *bid = @{
             @"id": [NSString stringWithFormat:@"bid_%ld", (long)i],
-            @"price": @(arc4random_uniform(1000) / 100.0),
+            @"price": @((i * 37 % 100) / 10.0),
             @"adm": [@"" stringByPaddingToLength:1000 withString:@"ad_content " startingAtIndex:0],
             @"w": @320,
             @"h": @50,
