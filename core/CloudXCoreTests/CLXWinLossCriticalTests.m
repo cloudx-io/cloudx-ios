@@ -113,8 +113,7 @@
 
 // Expose private properties for injection and testing
 @interface CLXWinLossTracker (IntegrationTesting)
-// Use correct type to match CLXWinLossTracker.m property type
-@property (nonatomic, strong) CLXWinLossNetworkService *networkService;
+@property (nonatomic, strong) id<CLXWinLossNetworkServiceProtocol> networkService;
 @property (nonatomic, strong) CLXSQLiteDatabase *database;
 @property (nonatomic, strong) CLXAuctionBidManager *auctionBidManager;
 
@@ -145,9 +144,7 @@
     [self.tracker setEndpoint:@"https://test.com/winloss"];
     
     // Inject mocks AFTER configuration (so setEndpoint doesn't overwrite mock)
-    // Note: We cast to CLXWinLossNetworkService* because the property is typed as such,
-    // but at runtime it holds our mock which conforms to the protocol.
-    self.tracker.networkService = (CLXWinLossNetworkService *)self.mockNetwork;
+    self.tracker.networkService = self.mockNetwork;
     self.tracker.database = self.mockDatabase;
     
     // Configure payload mapping

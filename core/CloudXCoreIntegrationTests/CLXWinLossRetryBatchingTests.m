@@ -4,37 +4,93 @@
 
 /**
  * @file CLXWinLossRetryBatchingTests.m
- * @brief DISABLED - Integration tests that make real network calls
- * 
- * ⚠️ QUARANTINED: These tests make real network calls to httpbin.org and have
- * 22 sleep/wait patterns. They are integration tests, not unit tests, and cause
- * CI flakiness.
- * 
- * TODO: Convert to proper unit tests using MockURLSession, or move to a
- * separate integration test target that runs on a schedule (not on every PR).
- * 
- * Original description:
- * These tests verify that the win/loss system properly handles network failures,
- * caches failed events, and retries them with appropriate batching behavior.
- * This is critical for ensuring no revenue events are lost due to temporary
- * network issues or server downtime.
+ * @brief Tests for win/loss event persistence, retry, and batching
+ *
+ * Verifies that the win/loss system properly persists failed events to SQLite,
+ * retries them on demand, and cleans up after successful delivery. Uses a mock
+ * network service for deterministic, fast execution with a real SQLite database
+ * to test actual persistence behavior.
  */
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
-#import "Mocks/MockCLXWinLossTracker.h"
+#import <CloudXCore/CLXWinLossTracker.h>
+#import <CloudXCore/CLXWinLossNetworkService.h>
+#import <CloudXCore/CLXBidLifecycleEvent.h>
+#import <CloudXCore/CLXBidResponse.h>
+#import <CloudXCore/CLXSDKConfig.h>
 
-// MARK: - Test Constants
+#pragma mark - Mock Network Service
+
+@interface CLXRetryTestMockNetwork : NSObject <CLXWinLossNetworkServiceProtocol>
+@property (nonatomic, strong) NSMutableArray<NSDictionary *> *sentPayloads;
+@property (nonatomic, assign) BOOL shouldFail;
+/// When YES, the mock never calls the completion handler — simulating iOS
+/// suspending the process after the TCP connection opens but before the
+/// response arrives. The event should already be in SQLite at this point.
+@property (nonatomic, assign) BOOL shouldHang;
+@property (nonatomic, copy, nullable) void (^onSendCompleted)(void);
+@end
+
+@implementation CLXRetryTestMockNetwork
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _sentPayloads = [NSMutableArray array];
+        _shouldFail = NO;
+        _shouldHang = NO;
+    }
+    return self;
+}
+
+- (void)sendWithAppKey:(NSString *)appKey
+           endpointUrl:(NSString *)endpointUrl
+               payload:(NSDictionary<NSString *, id> *)payload
+            completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
+    [self.sentPayloads addObject:payload];
+
+    if (self.shouldHang) {
+        if (self.onSendCompleted) {
+            self.onSendCompleted();
+        }
+        return;
+    }
+
+    if (self.shouldFail) {
+        NSError *error = [NSError errorWithDomain:@"com.cloudx.test"
+                                             code:500
+                                         userInfo:@{NSLocalizedDescriptionKey: @"Mock server error"}];
+        completion(NO, error);
+    } else {
+        completion(YES, nil);
+    }
+
+    if (self.onSendCompleted) {
+        self.onSendCompleted();
+    }
+}
+
+@end
+
+#pragma mark - Private Property Access
+
+@interface CLXWinLossTracker (RetryTesting)
+@property (nonatomic, strong) id<CLXWinLossNetworkServiceProtocol> networkService;
+- (NSArray *)getAllCachedEvents;
+- (void)deleteAllEvents;
+@end
+
+#pragma mark - Test Constants
 
 static NSString * const kTestAuctionID = @"retry-test-auction";
 static NSString * const kTestBidID = @"retry-test-bid";
-static NSString * const kTestValidEndpoint = @"https://httpbin.org/post";
-static NSString * const kTestInvalidEndpoint = @"https://invalid-nonexistent-endpoint-12345.com/win-loss";
 static NSString * const kTestAppKey = @"test-app-key-retry";
+static NSString * const kTestEndpoint = @"https://test.cloudx.io/notifications";
 
 @interface CLXWinLossRetryBatchingTests : XCTestCase
-@property (nonatomic, strong) CLXWinLossTracker *realTracker;
-@property (nonatomic, strong) MockCLXWinLossTracker *mockTracker;
+@property (nonatomic, strong) CLXWinLossTracker *tracker;
+@property (nonatomic, strong) CLXRetryTestMockNetwork *mockNetwork;
 @end
 
 @implementation CLXWinLossRetryBatchingTests
@@ -43,40 +99,27 @@ static NSString * const kTestAppKey = @"test-app-key-retry";
 
 - (void)setUp {
     [super setUp];
-    
-    // QUARANTINED: Skip all tests - these are integration tests making real network calls
-    XCTSkip(@"QUARANTINED: Integration tests with real network calls. Convert to unit tests with mocks.");
-    
-    // Wait a bit for any async operations from previous tests to complete
-    [NSThread sleepForTimeInterval:0.5];
-    
-    // Use real tracker for database/retry tests
-    self.realTracker = [[CLXWinLossTracker alloc] init];
-    [self.realTracker setAppKey:kTestAppKey];
-    
-    // Clean up any existing cached events
-    [self.realTracker deleteAllEvents];
-    
-    // Ensure cleanup completes before test starts
-    [NSThread sleepForTimeInterval:0.2];
-    
-    // Set up mock tracker for unit tests
-    self.mockTracker = [[MockCLXWinLossTracker alloc] init];
+
+    self.tracker = [[CLXWinLossTracker alloc] init];
+    [self.tracker setAppKey:kTestAppKey];
+    [self.tracker setEndpoint:kTestEndpoint];
+
+    self.mockNetwork = [[CLXRetryTestMockNetwork alloc] init];
+    self.tracker.networkService = self.mockNetwork;
+
+    [self setUpTrackerWithValidConfig];
+    [self.tracker deleteAllEvents];
 }
 
 - (void)tearDown {
-    // Clean up cached events thoroughly
-    [self.realTracker deleteAllEvents];
-    
-    // Wait for cleanup to complete
-    [NSThread sleepForTimeInterval:0.3];
-    
+    [self.tracker deleteAllEvents];
     [CLXWinLossTracker resetSharedInstance];
-    
+    self.tracker = nil;
+    self.mockNetwork = nil;
     [super tearDown];
 }
 
-#pragma mark - Helper Methods
+#pragma mark - Helpers
 
 - (CLXBidResponseBid *)createTestBidWithId:(NSString *)bidId {
     CLXBidResponseBid *bid = [[CLXBidResponseBid alloc] init];
@@ -84,539 +127,540 @@ static NSString * const kTestAppKey = @"test-app-key-retry";
     bid.price = 2.50;
     bid.lurl = @"https://test.com/lurl";
     bid.nurl = @"https://test.com/nurl";
-    
     bid.ext = [[CLXBidResponseExt alloc] init];
     bid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
     bid.ext.cloudx.rank = 1;
-    
     return bid;
 }
 
 - (void)setUpTrackerWithValidConfig {
-    // Set up configuration with payload mapping so events are actually processed
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.winLossNotificationPayloadConfig = @{
         @"auctionId": @"auctionId",
         @"bidId": @"bid.id",
         @"price": @"bid.price",
-        @"eventType": @"eventType"
+        @"notificationType": @"sdk.[loadSuccess|renderSuccess|loss]"
     };
-    [self.realTracker setConfig:config];
+    [self.tracker setConfig:config];
 }
 
-#pragma mark - MARK: Network Failure and Caching Tests
+- (void)sendEventAndWait:(NSString *)auctionId
+                   bidId:(NSString *)bidId
+                   event:(CLXBidLifecycleEvent *)event
+              lossReason:(nullable NSNumber *)lossReason {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Send completed"];
+    self.mockNetwork.onSendCompleted = ^{
+        [expectation fulfill];
+    };
 
-/**
- * Test that win notifications are cached when network requests fail
- * This ensures no revenue events are lost due to temporary network issues
- */
+    [self.tracker sendEvent:auctionId
+                      bidId:bidId
+                      event:event
+                 lossReason:lossReason
+             winnerBidPrice:-1.0
+                      error:nil];
+
+    [self waitForExpectations:@[expectation] timeout:5.0];
+    self.mockNetwork.onSendCompleted = nil;
+}
+
+- (void)sendMultipleEventsAndWait:(NSInteger)count
+                           bidIds:(NSArray<NSString *> *)bidIds
+                        auctionId:(NSString *)auctionId
+                            event:(CLXBidLifecycleEvent *)event {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"All sends completed"];
+    expectation.expectedFulfillmentCount = count;
+    self.mockNetwork.onSendCompleted = ^{
+        [expectation fulfill];
+    };
+
+    for (NSInteger i = 0; i < count; i++) {
+        [self.tracker sendEvent:auctionId
+                          bidId:bidIds[i]
+                          event:event
+                     lossReason:nil
+                 winnerBidPrice:-1.0
+                          error:nil];
+    }
+
+    [self waitForExpectations:@[expectation] timeout:10.0];
+    self.mockNetwork.onSendCompleted = nil;
+}
+
+#pragma mark - MARK: Network Failure and Caching
+
 - (void)testWinNotification_NetworkFailure_ShouldCacheEvent {
-    // Given: Tracker configured with invalid endpoint (will cause network failure)
-    [self.realTracker setEndpoint:kTestInvalidEndpoint];
-    [self setUpTrackerWithValidConfig];
-    
-    // Add test bid
-    CLXBidResponseBid *testBid = [self createTestBidWithId:kTestBidID];
-    [self.realTracker addBid:kTestAuctionID bid:testBid];
-    
-    // Verify no cached events initially
-    NSArray *initialEvents = [self.realTracker getAllCachedEvents];
-    XCTAssertEqual(initialEvents.count, 0, @"Should start with no cached events");
-    
-    // When: Sending win notification (will fail due to invalid endpoint)
-    [self.realTracker sendEvent:kTestAuctionID bidId:kTestBidID event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil];
-    
-    // Then: Poll for event to be cached (more reliable than fixed sleep in CI)
-    XCTestExpectation *cacheExpectation = [self expectationWithDescription:@"Event should be cached"];
-    
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        // Poll with timeout - check every 0.5s for up to 10s
-        for (int i = 0; i < 20; i++) {
-            [NSThread sleepForTimeInterval:0.5];
-            NSArray *cachedEvents = [self.realTracker getAllCachedEvents];
-            if (cachedEvents.count > 0) {
-                [cacheExpectation fulfill];
-                return;
-            }
-        }
-    });
-    
-    [self waitForExpectations:@[cacheExpectation] timeout:12.0];
-    
-    // Final verification
-    NSArray *cachedEvents = [self.realTracker getAllCachedEvents];
-    XCTAssertGreaterThan(cachedEvents.count, 0, @"Failed win notification should be cached");
+    self.mockNetwork.shouldFail = YES;
+
+    CLXBidResponseBid *bid = [self createTestBidWithId:kTestBidID];
+    [self.tracker addBid:kTestAuctionID bid:bid];
+
+    NSArray *initialEvents = [self.tracker getAllCachedEvents];
+    XCTAssertEqual(initialEvents.count, 0);
+
+    [self sendEventAndWait:kTestAuctionID
+                     bidId:kTestBidID
+                     event:[CLXBidLifecycleEvent loadSuccessEvent]
+                lossReason:nil];
+
+    NSArray *cachedEvents = [self.tracker getAllCachedEvents];
+    XCTAssertEqual(cachedEvents.count, 1, @"Failed notification should remain in SQLite for retry");
 }
 
-/**
- * Test that loss notifications are cached when network requests fail
- * Ensures loss events are also preserved during network issues
- */
 - (void)testLossNotification_NetworkFailure_ShouldCacheEvent {
-    // Given: Tracker configured with invalid endpoint
-    [self.realTracker setEndpoint:kTestInvalidEndpoint];
-    [self setUpTrackerWithValidConfig];
-    
-    // Add test bid and set it to failed state
-    CLXBidResponseBid *testBid = [self createTestBidWithId:kTestBidID];
-    [self.realTracker addBid:kTestAuctionID bid:testBid];
-    [self.realTracker setBidLoadResult:kTestAuctionID bidId:kTestBidID success:NO lossReason:@(CLXLossReasonInternalError)];
-    
-    // Verify no cached events initially
-    NSArray *initialEvents = [self.realTracker getAllCachedEvents];
-    XCTAssertEqual(initialEvents.count, 0, @"Should start with no cached events");
-    
-    // When: Sending loss notification (will fail due to invalid endpoint)
-    [self.realTracker sendEvent:kTestAuctionID bidId:kTestBidID event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0 error:nil];
-    
-    // Then: Poll for event to be cached (more reliable than fixed sleep in CI)
-    XCTestExpectation *cacheExpectation = [self expectationWithDescription:@"Event should be cached"];
-    
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        // Poll with timeout - check every 0.5s for up to 10s
-        for (int i = 0; i < 20; i++) {
-            [NSThread sleepForTimeInterval:0.5];
-            NSArray *cachedEvents = [self.realTracker getAllCachedEvents];
-            if (cachedEvents.count > 0) {
-                [cacheExpectation fulfill];
-                return;
-            }
-        }
-    });
-    
-    [self waitForExpectations:@[cacheExpectation] timeout:12.0];
-    
-    // Final verification
-    NSArray *cachedEvents = [self.realTracker getAllCachedEvents];
-    XCTAssertGreaterThan(cachedEvents.count, 0, @"Failed loss notification should be cached");
+    self.mockNetwork.shouldFail = YES;
+
+    CLXBidResponseBid *bid = [self createTestBidWithId:kTestBidID];
+    [self.tracker addBid:kTestAuctionID bid:bid];
+    [self.tracker setBidLoadResult:kTestAuctionID bidId:kTestBidID success:NO lossReason:@(CLXLossReasonInternalError)];
+
+    [self sendEventAndWait:kTestAuctionID
+                     bidId:kTestBidID
+                     event:[CLXBidLifecycleEvent lossEvent]
+                lossReason:@(CLXLossReasonInternalError)];
+
+    NSArray *cachedEvents = [self.tracker getAllCachedEvents];
+    XCTAssertEqual(cachedEvents.count, 1, @"Failed loss notification should remain in SQLite for retry");
 }
 
-/**
- * Test that multiple failed events are all cached properly
- * Ensures batching works correctly for multiple failures
- */
 - (void)testMultipleFailures_ShouldCacheAllEvents {
-    // Given: Tracker configured with invalid endpoint
-    [self.realTracker setEndpoint:kTestInvalidEndpoint];
-    [self setUpTrackerWithValidConfig];
-    
-    // Create multiple test bids
+    self.mockNetwork.shouldFail = YES;
+
     NSArray *bidIds = @[@"bid-1", @"bid-2", @"bid-3", @"bid-4", @"bid-5"];
     for (NSString *bidId in bidIds) {
         CLXBidResponseBid *bid = [self createTestBidWithId:bidId];
-        [self.realTracker addBid:kTestAuctionID bid:bid];
+        [self.tracker addBid:kTestAuctionID bid:bid];
     }
-    
-    // When: Sending multiple win/loss notifications (all will fail)
-    [self.realTracker sendEvent:kTestAuctionID bidId:bidIds[0] event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil];
-    [self.realTracker sendEvent:kTestAuctionID bidId:bidIds[1] event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil];
-    
-    // Set up some bids for loss notifications
-    [self.realTracker setBidLoadResult:kTestAuctionID bidId:bidIds[2] success:NO lossReason:@(CLXLossReasonInternalError)];
-    [self.realTracker setBidLoadResult:kTestAuctionID bidId:bidIds[3] success:NO lossReason:@(CLXLossReasonLostToHigherBid)];
-    [self.realTracker setBidLoadResult:kTestAuctionID bidId:bidIds[4] success:NO lossReason:@(CLXLossReasonInternalError)];
-    
-    [self.realTracker sendEvent:kTestAuctionID bidId:bidIds[2] event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0 error:nil];
-    [self.realTracker sendEvent:kTestAuctionID bidId:bidIds[3] event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0 error:nil];
-    [self.realTracker sendEvent:kTestAuctionID bidId:bidIds[4] event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0 error:nil];
-    
-    // Give network operations time to fail and cache events
-    [NSThread sleepForTimeInterval:4.0];
-    
-    // Then: All events should be cached
-    NSArray *cachedEvents = [self.realTracker getAllCachedEvents];
+
+    [self sendMultipleEventsAndWait:5
+                            bidIds:bidIds
+                         auctionId:kTestAuctionID
+                             event:[CLXBidLifecycleEvent loadSuccessEvent]];
+
+    NSArray *cachedEvents = [self.tracker getAllCachedEvents];
     XCTAssertEqual(cachedEvents.count, 5, @"All 5 failed notifications should be cached");
 }
 
-#pragma mark - MARK: Retry Logic Tests
+- (void)testSuccessfulSend_ShouldNotCacheEvent {
+    self.mockNetwork.shouldFail = NO;
 
-/**
- * Test that cached events are retried when endpoint becomes available
- * This is critical for ensuring cached events are eventually delivered
- */
-- (void)testRetryLogic_EndpointBecomesAvailable_ShouldRetryAndClearCache {
-    // Given: Events cached due to network failure
-    [self.realTracker setEndpoint:kTestInvalidEndpoint];
-    [self setUpTrackerWithValidConfig];
-    
-    CLXBidResponseBid *testBid = [self createTestBidWithId:kTestBidID];
-    [self.realTracker addBid:kTestAuctionID bid:testBid];
-    
-    // Send notification that will fail and be cached
-    [self.realTracker sendEvent:kTestAuctionID bidId:kTestBidID event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil];
-    [NSThread sleepForTimeInterval:2.0];
-    
-    // Verify event is cached
-    NSArray *cachedEventsBeforeRetry = [self.realTracker getAllCachedEvents];
-    XCTAssertGreaterThan(cachedEventsBeforeRetry.count, 0, @"Should have cached events before retry");
-    
-    // When: Endpoint becomes available and retry is triggered
-    [self.realTracker setEndpoint:kTestValidEndpoint];
-    [self.realTracker trySendingPendingWinLossEvents];
-    
-    // Give network operation time to complete
-    [NSThread sleepForTimeInterval:3.0];
-    
-    // Then: Cached events should be cleared (assuming successful retry)
-    // Note: We can't guarantee httpbin.org will always be available, so we test the mechanism
-    NSArray *cachedEventsAfterRetry = [self.realTracker getAllCachedEvents];
-    
-    // The important thing is that the retry mechanism was invoked
-    // In a real scenario with a working endpoint, events would be cleared
-    // Test passes if no crash: Retry mechanism should be invoked without crashing
+    CLXBidResponseBid *bid = [self createTestBidWithId:kTestBidID];
+    [self.tracker addBid:kTestAuctionID bid:bid];
+
+    [self sendEventAndWait:kTestAuctionID
+                     bidId:kTestBidID
+                     event:[CLXBidLifecycleEvent loadSuccessEvent]
+                lossReason:nil];
+
+    NSArray *cachedEvents = [self.tracker getAllCachedEvents];
+    XCTAssertEqual(cachedEvents.count, 0, @"Successful send should delete event from SQLite");
 }
 
-/**
- * Test the trySendingPendingWinLossEvents method with various cache states
- * Ensures the retry mechanism handles different scenarios correctly
- */
-- (void)testTrySendingPendingEvents_VariousCacheStates_ShouldHandleCorrectly {
-    [self setUpTrackerWithValidConfig];
-    
-    // Test 1: Empty cache
-    [self.realTracker setEndpoint:kTestValidEndpoint];
-    XCTAssertNoThrow([self.realTracker trySendingPendingWinLossEvents], 
-                     @"Should handle empty cache without crashing");
-    
-    // Test 2: Cache with single event
-    [self.realTracker setEndpoint:kTestInvalidEndpoint];
-    CLXBidResponseBid *bid1 = [self createTestBidWithId:@"single-event-bid"];
-    [self.realTracker addBid:kTestAuctionID bid:bid1];
-    [self.realTracker sendEvent:kTestAuctionID bidId:@"single-event-bid" event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil];
-    [NSThread sleepForTimeInterval:1.5];
-    
-    [self.realTracker setEndpoint:kTestValidEndpoint];
-    XCTAssertNoThrow([self.realTracker trySendingPendingWinLossEvents], 
-                     @"Should handle single cached event without crashing");
-    
-    // Test 3: Cache with multiple events
-    [self.realTracker setEndpoint:kTestInvalidEndpoint];
-    for (NSInteger i = 0; i < 10; i++) {
-        NSString *bidId = [NSString stringWithFormat:@"multi-event-bid-%ld", (long)i];
-        CLXBidResponseBid *bid = [self createTestBidWithId:bidId];
-        [self.realTracker addBid:kTestAuctionID bid:bid];
-        [self.realTracker sendEvent:kTestAuctionID bidId:bidId event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil];
-    }
-    [NSThread sleepForTimeInterval:2.0];
-    
-    [self.realTracker setEndpoint:kTestValidEndpoint];
-    XCTAssertNoThrow([self.realTracker trySendingPendingWinLossEvents], 
-                     @"Should handle multiple cached events without crashing");
+#pragma mark - MARK: App Suspension Simulation
+
+- (void)testAppSuspension_CompletionNeverFires_EventRemainsInDatabase {
+    // Simulate iOS suspending the process after the network request starts
+    // but before the response arrives. The completion handler never fires.
+    self.mockNetwork.shouldHang = YES;
+
+    CLXBidResponseBid *bid = [self createTestBidWithId:kTestBidID];
+    [self.tracker addBid:kTestAuctionID bid:bid];
+
+    // sendEvent dispatches async → saves to DB → calls network send →
+    // mock hangs (never calls completion). onSendCompleted fires after
+    // the mock captures the payload, confirming the DB write happened.
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Network send attempted"];
+    self.mockNetwork.onSendCompleted = ^{
+        [expectation fulfill];
+    };
+
+    [self.tracker sendEvent:kTestAuctionID
+                      bidId:kTestBidID
+                      event:[CLXBidLifecycleEvent loadSuccessEvent]
+                 lossReason:nil
+             winnerBidPrice:-1.0
+                      error:nil];
+
+    [self waitForExpectations:@[expectation] timeout:5.0];
+    self.mockNetwork.onSendCompleted = nil;
+
+    // The completion never fired, so the event was never deleted.
+    // It must still be in SQLite.
+    NSArray *cachedEvents = [self.tracker getAllCachedEvents];
+    XCTAssertEqual(cachedEvents.count, 1,
+                   @"Event must survive in SQLite when completion handler never fires (app suspended)");
 }
 
-#pragma mark - MARK: Batching Behavior Tests
+- (void)testAppSuspension_NextLaunchRetry_ShouldDeliverEvent {
+    // Phase 1: Simulate first app session where the request hangs (app suspended)
+    self.mockNetwork.shouldHang = YES;
 
-/**
- * Test that multiple cached events are processed efficiently in batches
- * Ensures the system can handle large numbers of cached events without performance issues
- */
-- (void)testBatchProcessing_LargeNumberOfCachedEvents_ShouldProcessEfficiently {
-    // Given: Large number of cached events
-    [self.realTracker setEndpoint:kTestInvalidEndpoint];
-    [self setUpTrackerWithValidConfig];
-    
-    // Record baseline count to handle test pollution from other tests
-    NSArray *baselineEvents = [self.realTracker getAllCachedEvents];
-    NSInteger baselineCount = baselineEvents.count;
-    
-    NSInteger eventCount = 100;
-    NSArray *eventTypes = @[@"win", @"loss"];
-    
+    CLXBidResponseBid *bid = [self createTestBidWithId:kTestBidID];
+    [self.tracker addBid:kTestAuctionID bid:bid];
+
+    XCTestExpectation *hangExpectation = [self expectationWithDescription:@"Hang send attempted"];
+    self.mockNetwork.onSendCompleted = ^{
+        [hangExpectation fulfill];
+    };
+
+    [self.tracker sendEvent:kTestAuctionID
+                      bidId:kTestBidID
+                      event:[CLXBidLifecycleEvent loadSuccessEvent]
+                 lossReason:nil
+             winnerBidPrice:-1.0
+                      error:nil];
+
+    [self waitForExpectations:@[hangExpectation] timeout:5.0];
+    self.mockNetwork.onSendCompleted = nil;
+
+    XCTAssertEqual([self.tracker getAllCachedEvents].count, 1);
+
+    // Phase 2: Simulate next app launch — new tracker reads same SQLite DB
+    CLXWinLossTracker *newTracker = [[CLXWinLossTracker alloc] init];
+    [newTracker setAppKey:kTestAppKey];
+    [newTracker setEndpoint:kTestEndpoint];
+
+    CLXRetryTestMockNetwork *freshMock = [[CLXRetryTestMockNetwork alloc] init];
+    freshMock.shouldFail = NO;
+    newTracker.networkService = freshMock;
+
+    // This is what CloudXCoreAPI.m calls on SDK init
+    [newTracker trySendingPendingWinLossEvents];
+
+    XCTAssertEqual(freshMock.sentPayloads.count, 1,
+                   @"Retry on next launch should send the event that was stuck in SQLite");
+    XCTAssertEqual([newTracker getAllCachedEvents].count, 0,
+                   @"Successful retry should clear the event from SQLite");
+
+    [newTracker deleteAllEvents];
+}
+
+#pragma mark - MARK: Retry Logic
+
+- (void)testRetryLogic_ShouldSendCachedEventsAndClearDatabase {
+    // Phase 1: Fail events so they get cached
+    self.mockNetwork.shouldFail = YES;
+
+    CLXBidResponseBid *bid1 = [self createTestBidWithId:@"retry-bid-1"];
+    CLXBidResponseBid *bid2 = [self createTestBidWithId:@"retry-bid-2"];
+    [self.tracker addBid:kTestAuctionID bid:bid1];
+    [self.tracker addBid:kTestAuctionID bid:bid2];
+
+    [self sendMultipleEventsAndWait:2
+                            bidIds:@[@"retry-bid-1", @"retry-bid-2"]
+                         auctionId:kTestAuctionID
+                             event:[CLXBidLifecycleEvent loadSuccessEvent]];
+
+    NSArray *cachedBefore = [self.tracker getAllCachedEvents];
+    XCTAssertEqual(cachedBefore.count, 2, @"Both events should be cached after failure");
+
+    // Phase 2: Switch mock to succeed and retry
+    self.mockNetwork.shouldFail = NO;
+    [self.mockNetwork.sentPayloads removeAllObjects];
+
+    [self.tracker trySendingPendingWinLossEvents];
+
+    NSArray *cachedAfter = [self.tracker getAllCachedEvents];
+    XCTAssertEqual(cachedAfter.count, 0, @"Successful retry should clear all cached events");
+    XCTAssertEqual(self.mockNetwork.sentPayloads.count, 2, @"Retry should have sent both cached events");
+}
+
+- (void)testRetryLogic_EmptyCache_ShouldNoOp {
+    NSArray *cachedEvents = [self.tracker getAllCachedEvents];
+    XCTAssertEqual(cachedEvents.count, 0);
+
+    XCTAssertNoThrow([self.tracker trySendingPendingWinLossEvents],
+                     @"Retry with empty cache should complete without error");
+    XCTAssertEqual(self.mockNetwork.sentPayloads.count, 0, @"Nothing to send from empty cache");
+}
+
+- (void)testRetryLogic_PersistentFailure_ShouldKeepEventsInDatabase {
+    // Phase 1: Fail events so they get cached
+    self.mockNetwork.shouldFail = YES;
+
+    CLXBidResponseBid *bid = [self createTestBidWithId:kTestBidID];
+    [self.tracker addBid:kTestAuctionID bid:bid];
+
+    [self sendEventAndWait:kTestAuctionID
+                     bidId:kTestBidID
+                     event:[CLXBidLifecycleEvent loadSuccessEvent]
+                lossReason:nil];
+
+    // Phase 2: Retry while still failing
+    [self.mockNetwork.sentPayloads removeAllObjects];
+    [self.tracker trySendingPendingWinLossEvents];
+
+    NSArray *cachedAfter = [self.tracker getAllCachedEvents];
+    XCTAssertEqual(cachedAfter.count, 1, @"Events should remain in DB when retry also fails");
+    XCTAssertEqual(self.mockNetwork.sentPayloads.count, 1, @"Retry should have attempted to send");
+}
+
+#pragma mark - MARK: Batching Behavior
+
+- (void)testBatchRetry_MultipleCachedEvents_ShouldSendAll {
+    self.mockNetwork.shouldFail = YES;
+
+    NSInteger eventCount = 10;
+    NSMutableArray *bidIds = [NSMutableArray array];
     for (NSInteger i = 0; i < eventCount; i++) {
         NSString *bidId = [NSString stringWithFormat:@"batch-bid-%ld", (long)i];
-        NSString *auctionId = [NSString stringWithFormat:@"batch-auction-%ld", (long)i]; // Use unique auction ID per bid
+        NSString *auctionId = [NSString stringWithFormat:@"batch-auction-%ld", (long)i];
+        [bidIds addObject:bidId];
         CLXBidResponseBid *bid = [self createTestBidWithId:bidId];
-        [self.realTracker addBid:auctionId bid:bid];
-        
-        // Alternate between win and loss notifications
-        NSString *eventType = eventTypes[i % 2];
-        if ([eventType isEqualToString:@"win"]) {
-            [self.realTracker sendEvent:auctionId bidId:bidId event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil];
-        } else {
-            [self.realTracker setBidLoadResult:auctionId bidId:bidId success:NO lossReason:@(CLXLossReasonInternalError)];
-            [self.realTracker sendEvent:auctionId bidId:bidId event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0 error:nil];
-        }
-        
-        // Small delay to prevent overwhelming the async queue
-        if (i % 10 == 9) {
-            [NSThread sleepForTimeInterval:0.1];
-        }
+        [self.tracker addBid:auctionId bid:bid];
     }
-    
-    // Give time for all events to be cached (increased for async processing)
-    // Use a longer wait and check periodically to ensure async operations complete
-    NSInteger maxWaitTime = 10;
-    NSInteger waitInterval = 1;
-    NSInteger currentWaitTime = 0;
-    
-    while (currentWaitTime < maxWaitTime) {
-        [NSThread sleepForTimeInterval:waitInterval];
-        currentWaitTime += waitInterval;
-        
-        NSArray *currentCachedEvents = [self.realTracker getAllCachedEvents];
-        
-        // If we have reached the expected count (baseline + new events), break early
-        if (currentCachedEvents.count >= baselineCount + eventCount) {
-            break;
-        }
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"All sends completed"];
+    expectation.expectedFulfillmentCount = eventCount;
+    self.mockNetwork.onSendCompleted = ^{
+        [expectation fulfill];
+    };
+
+    for (NSInteger i = 0; i < eventCount; i++) {
+        NSString *auctionId = [NSString stringWithFormat:@"batch-auction-%ld", (long)i];
+        [self.tracker sendEvent:auctionId
+                          bidId:bidIds[i]
+                          event:[CLXBidLifecycleEvent loadSuccessEvent]
+                     lossReason:nil
+                 winnerBidPrice:-1.0
+                          error:nil];
     }
-    
-    // Verify all events are cached - check delta from baseline to be resilient to test pollution
-    NSArray *cachedEvents = [self.realTracker getAllCachedEvents];
-    NSInteger actualNewEvents = cachedEvents.count - baselineCount;
-    // Allow for 1-2 events to be missed due to async timing (98% success rate for batch processing test)
-    NSInteger minExpectedEvents = (NSInteger)(eventCount * 0.98);
-    XCTAssertGreaterThanOrEqual(actualNewEvents, minExpectedEvents, @"Should have cached at least %ld new events (got %ld)", (long)minExpectedEvents, (long)actualNewEvents);
-    
-    // When: Processing batch retry
-    [self.realTracker setEndpoint:kTestValidEndpoint];
-    NSDate *startTime = [NSDate date];
-    [self.realTracker trySendingPendingWinLossEvents];
-    NSTimeInterval batchProcessingTime = [[NSDate date] timeIntervalSinceDate:startTime];
-    
-    // Then: Should process efficiently
-    XCTAssertLessThan(batchProcessingTime, 2.0, @"Should process %ld events within 2 seconds", (long)eventCount);
-    
-    // Give time for network operations to complete
-    [NSThread sleepForTimeInterval:4.0];
+
+    [self waitForExpectations:@[expectation] timeout:10.0];
+    self.mockNetwork.onSendCompleted = nil;
+
+    NSArray *cachedBefore = [self.tracker getAllCachedEvents];
+    XCTAssertEqual(cachedBefore.count, eventCount);
+
+    // Retry all at once
+    self.mockNetwork.shouldFail = NO;
+    [self.mockNetwork.sentPayloads removeAllObjects];
+
+    [self.tracker trySendingPendingWinLossEvents];
+
+    NSArray *cachedAfter = [self.tracker getAllCachedEvents];
+    XCTAssertEqual(cachedAfter.count, 0, @"All cached events should be cleared after successful batch retry");
+    XCTAssertEqual(self.mockNetwork.sentPayloads.count, eventCount, @"All events should have been retried");
 }
 
-/**
- * Test concurrent retry operations
- * Ensures thread safety when multiple retry operations are triggered simultaneously
- */
-- (void)testConcurrentRetryOperations_ShouldMaintainConsistency {
-    // Given: Some cached events
-    [self.realTracker setEndpoint:kTestInvalidEndpoint];
-    [self setUpTrackerWithValidConfig];
-    
-    // Create some cached events
-    for (NSInteger i = 0; i < 20; i++) {
+- (void)testBatchRetry_ProcessingTime_ShouldBeEfficient {
+    self.mockNetwork.shouldFail = YES;
+
+    NSInteger eventCount = 20;
+    NSMutableArray *bidIds = [NSMutableArray array];
+    for (NSInteger i = 0; i < eventCount; i++) {
+        NSString *bidId = [NSString stringWithFormat:@"perf-bid-%ld", (long)i];
+        NSString *auctionId = [NSString stringWithFormat:@"perf-auction-%ld", (long)i];
+        [bidIds addObject:bidId];
+        CLXBidResponseBid *bid = [self createTestBidWithId:bidId];
+        [self.tracker addBid:auctionId bid:bid];
+    }
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"All sends completed"];
+    expectation.expectedFulfillmentCount = eventCount;
+    self.mockNetwork.onSendCompleted = ^{
+        [expectation fulfill];
+    };
+
+    for (NSInteger i = 0; i < eventCount; i++) {
+        NSString *auctionId = [NSString stringWithFormat:@"perf-auction-%ld", (long)i];
+        [self.tracker sendEvent:auctionId
+                          bidId:bidIds[i]
+                          event:[CLXBidLifecycleEvent loadSuccessEvent]
+                     lossReason:nil
+                 winnerBidPrice:-1.0
+                          error:nil];
+    }
+
+    [self waitForExpectations:@[expectation] timeout:10.0];
+    self.mockNetwork.onSendCompleted = nil;
+
+    self.mockNetwork.shouldFail = NO;
+    [self.mockNetwork.sentPayloads removeAllObjects];
+
+    [self.tracker trySendingPendingWinLossEvents];
+
+    XCTAssertEqual(self.mockNetwork.sentPayloads.count, eventCount,
+                   @"All %ld cached events should have been retried", (long)eventCount);
+    XCTAssertEqual([self.tracker getAllCachedEvents].count, 0,
+                   @"All events should be cleared after successful batch retry");
+}
+
+#pragma mark - MARK: Database Consistency
+
+- (void)testDatabaseConsistency_NewEventsWhileRetrying_ShouldNotCorrupt {
+    // Phase 1: Cache some events via failure
+    self.mockNetwork.shouldFail = YES;
+
+    NSArray *bidIds = @[@"db-test-1", @"db-test-2", @"db-test-3"];
+    for (NSString *bidId in bidIds) {
+        CLXBidResponseBid *bid = [self createTestBidWithId:bidId];
+        [self.tracker addBid:kTestAuctionID bid:bid];
+    }
+
+    [self sendMultipleEventsAndWait:3
+                            bidIds:bidIds
+                         auctionId:kTestAuctionID
+                             event:[CLXBidLifecycleEvent loadSuccessEvent]];
+
+    XCTAssertEqual([self.tracker getAllCachedEvents].count, 3);
+
+    // Phase 2: Retry succeeds, clearing the 3 original events
+    self.mockNetwork.shouldFail = NO;
+    [self.tracker trySendingPendingWinLossEvents];
+
+    XCTAssertEqual([self.tracker getAllCachedEvents].count, 0, @"Retried events should be cleared");
+
+    // Phase 3: New events that fail should still be cacheable
+    self.mockNetwork.shouldFail = YES;
+    [self.mockNetwork.sentPayloads removeAllObjects];
+
+    CLXBidResponseBid *newBid = [self createTestBidWithId:@"post-retry-bid"];
+    [self.tracker addBid:@"new-auction" bid:newBid];
+
+    [self sendEventAndWait:@"new-auction"
+                     bidId:@"post-retry-bid"
+                     event:[CLXBidLifecycleEvent loadSuccessEvent]
+                lossReason:nil];
+
+    NSArray *finalEvents = [self.tracker getAllCachedEvents];
+    XCTAssertEqual(finalEvents.count, 1, @"Database should still accept new events after retry cycle");
+}
+
+#pragma mark - MARK: Configuration Edge Cases
+
+- (void)testRetryLogic_NilEndpoint_ShouldHandleGracefully {
+    [self.tracker setEndpoint:nil];
+    XCTAssertNoThrow([self.tracker trySendingPendingWinLossEvents]);
+}
+
+- (void)testRetryLogic_EmptyEndpoint_ShouldHandleGracefully {
+    [self.tracker setEndpoint:@""];
+    // setEndpoint: replaces networkService when the URL is non-nil (including @""),
+    // so restore the mock to keep the test isolated from real networking.
+    self.tracker.networkService = self.mockNetwork;
+    XCTAssertNoThrow([self.tracker trySendingPendingWinLossEvents]);
+}
+
+- (void)testRetryLogic_NilAppKey_ShouldHandleGracefully {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+    [self.tracker setAppKey:nil];
+#pragma clang diagnostic pop
+    XCTAssertNoThrow([self.tracker trySendingPendingWinLossEvents]);
+}
+
+- (void)testRetryLogic_EmptyAppKey_ShouldHandleGracefully {
+    [self.tracker setAppKey:@""];
+    XCTAssertNoThrow([self.tracker trySendingPendingWinLossEvents]);
+}
+
+#pragma mark - MARK: Concurrent Operations
+
+- (void)testConcurrentRetryOperations_ShouldNotCrash {
+    self.mockNetwork.shouldFail = YES;
+
+    for (NSInteger i = 0; i < 10; i++) {
         NSString *bidId = [NSString stringWithFormat:@"concurrent-bid-%ld", (long)i];
         CLXBidResponseBid *bid = [self createTestBidWithId:bidId];
-        [self.realTracker addBid:kTestAuctionID bid:bid];
-        [self.realTracker sendEvent:kTestAuctionID bidId:bidId event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil];
+        [self.tracker addBid:kTestAuctionID bid:bid];
     }
-    
-    [NSThread sleepForTimeInterval:2.0];
-    
-    // When: Multiple concurrent retry operations
-    [self.realTracker setEndpoint:kTestValidEndpoint];
-    
+
+    XCTestExpectation *sendExpectation = [self expectationWithDescription:@"All initial sends completed"];
+    sendExpectation.expectedFulfillmentCount = 10;
+    self.mockNetwork.onSendCompleted = ^{
+        [sendExpectation fulfill];
+    };
+
+    for (NSInteger i = 0; i < 10; i++) {
+        NSString *bidId = [NSString stringWithFormat:@"concurrent-bid-%ld", (long)i];
+        [self.tracker sendEvent:kTestAuctionID
+                          bidId:bidId
+                          event:[CLXBidLifecycleEvent loadSuccessEvent]
+                     lossReason:nil
+                 winnerBidPrice:-1.0
+                          error:nil];
+    }
+
+    [self waitForExpectations:@[sendExpectation] timeout:10.0];
+    self.mockNetwork.onSendCompleted = nil;
+
+    // Trigger multiple concurrent retries
+    self.mockNetwork.shouldFail = NO;
+
     dispatch_group_t group = dispatch_group_create();
-    NSInteger concurrentRetries = 10;
-    
-    for (NSInteger i = 0; i < concurrentRetries; i++) {
+    for (NSInteger i = 0; i < 5; i++) {
         dispatch_group_enter(group);
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [self.realTracker trySendingPendingWinLossEvents];
+            [self.tracker trySendingPendingWinLossEvents];
             dispatch_group_leave(group);
         });
     }
-    
-    // Wait for all concurrent operations to complete
-    dispatch_group_wait(group, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC));
-    
-    // Then: Should not crash and should maintain consistency
-    // Test passes if no crash: Concurrent retry operations should complete without crashing
+
+    long result = dispatch_group_wait(group, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC));
+    XCTAssertEqual(result, 0, @"Concurrent retries should complete without deadlock");
+    XCTAssertEqual([self.tracker getAllCachedEvents].count, 0,
+                   @"All events should be cleared after concurrent retries complete");
 }
 
-#pragma mark - MARK: Database Consistency Tests
+- (void)testNewEventsDuringRetry_ShouldNotBlock {
+    self.mockNetwork.shouldFail = YES;
 
-/**
- * Test that database operations maintain consistency during retry operations
- * Ensures no events are lost or duplicated during retry processing
- */
-- (void)testDatabaseConsistency_DuringRetryOperations_ShouldMaintainIntegrity {
-    [self setUpTrackerWithValidConfig];
-    
-    // Given: Initial state with some cached events
-    [self.realTracker setEndpoint:kTestInvalidEndpoint];
-    
-    NSArray *testBidIds = @[@"db-test-1", @"db-test-2", @"db-test-3"];
-    for (NSString *bidId in testBidIds) {
+    CLXBidResponseBid *cachedBid = [self createTestBidWithId:@"cached-bid"];
+    [self.tracker addBid:kTestAuctionID bid:cachedBid];
+
+    [self sendEventAndWait:kTestAuctionID
+                     bidId:@"cached-bid"
+                     event:[CLXBidLifecycleEvent loadSuccessEvent]
+                lossReason:nil];
+
+    XCTAssertEqual([self.tracker getAllCachedEvents].count, 1);
+
+    // Start retry (synchronous with mock)
+    self.mockNetwork.shouldFail = NO;
+    [self.tracker trySendingPendingWinLossEvents];
+
+    // Sending new events after retry should work
+    self.mockNetwork.shouldFail = YES;
+    CLXBidResponseBid *newBid = [self createTestBidWithId:@"new-bid"];
+    [self.tracker addBid:@"new-auction" bid:newBid];
+
+    XCTAssertNoThrow(
+        [self sendEventAndWait:@"new-auction"
+                         bidId:@"new-bid"
+                         event:[CLXBidLifecycleEvent loadSuccessEvent]
+                    lossReason:nil],
+        @"New notifications should not be blocked by prior retry operations"
+    );
+}
+
+#pragma mark - MARK: Database Cleanup After Successful Retry
+
+- (void)testDatabaseCleanup_SuccessfulRetry_ShouldRemoveAllCachedEvents {
+    self.mockNetwork.shouldFail = YES;
+
+    NSArray *bidIds = @[@"cleanup-bid-1", @"cleanup-bid-2", @"cleanup-bid-3"];
+    for (NSString *bidId in bidIds) {
         CLXBidResponseBid *bid = [self createTestBidWithId:bidId];
-        [self.realTracker addBid:kTestAuctionID bid:bid];
-        [self.realTracker sendEvent:kTestAuctionID bidId:bidId event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil];
+        [self.tracker addBid:kTestAuctionID bid:bid];
     }
-    
-    [NSThread sleepForTimeInterval:2.0];
-    
-    // Verify initial cache state
-    NSArray *initialCachedEvents = [self.realTracker getAllCachedEvents];
-    XCTAssertEqual(initialCachedEvents.count, testBidIds.count, @"Should have cached all test events");
-    
-    // When: Performing retry operations while adding new events
-    [self.realTracker setEndpoint:kTestValidEndpoint];
-    
-    // Start retry operation
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self.realTracker trySendingPendingWinLossEvents];
-    });
-    
-    // Simultaneously add new events (these should fail and be cached)
-    [self.realTracker setEndpoint:kTestInvalidEndpoint];
-    CLXBidResponseBid *newBid = [self createTestBidWithId:@"concurrent-new-bid"];
-    [self.realTracker addBid:kTestAuctionID bid:newBid];
-    [self.realTracker sendEvent:kTestAuctionID bidId:@"concurrent-new-bid" event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil];
-    
-    // Give operations time to complete
-    [NSThread sleepForTimeInterval:3.0];
-    
-    // Then: Database should maintain consistency
-    NSArray *finalCachedEvents = [self.realTracker getAllCachedEvents];
-    
-    // The exact count depends on retry success, but database should not be corrupted
-    XCTAssertNotNil(finalCachedEvents, @"Database should remain functional");
-    XCTAssertTrue(finalCachedEvents.count >= 1, @"Should have at least the new concurrent event");
-}
 
-#pragma mark - MARK: Configuration and Error Handling Tests
+    [self sendMultipleEventsAndWait:3
+                            bidIds:bidIds
+                         auctionId:kTestAuctionID
+                             event:[CLXBidLifecycleEvent loadSuccessEvent]];
 
-/**
- * Test retry behavior with various configuration states
- * Ensures retry logic handles edge cases in configuration
- */
-- (void)testRetryLogic_VariousConfigurations_ShouldHandleGracefully {
-    // Test 1: No endpoint configured
-    [self.realTracker setEndpoint:nil];
-    XCTAssertNoThrow([self.realTracker trySendingPendingWinLossEvents], 
-                     @"Should handle nil endpoint gracefully");
-    
-    // Test 2: Empty endpoint
-    [self.realTracker setEndpoint:@""];
-    XCTAssertNoThrow([self.realTracker trySendingPendingWinLossEvents], 
-                     @"Should handle empty endpoint gracefully");
-    
-    // Test 3: No app key configured
-    [self.realTracker setAppKey:nil];
-    [self.realTracker setEndpoint:kTestValidEndpoint];
-    XCTAssertNoThrow([self.realTracker trySendingPendingWinLossEvents], 
-                     @"Should handle nil app key gracefully");
-    
-    // Test 4: Empty app key
-    [self.realTracker setAppKey:@""];
-    XCTAssertNoThrow([self.realTracker trySendingPendingWinLossEvents], 
-                     @"Should handle empty app key gracefully");
-    
-    // Test 5: No payload configuration
-    [self.realTracker setAppKey:kTestAppKey];
-    [self.realTracker setConfig:nil];
-    XCTAssertNoThrow([self.realTracker trySendingPendingWinLossEvents], 
-                     @"Should handle nil config gracefully");
-}
+    XCTAssertEqual([self.tracker getAllCachedEvents].count, 3);
 
-/**
- * Test that retry operations don't interfere with new win/loss notifications
- * Ensures ongoing retry operations don't block new event processing
- */
-- (void)testRetryOperations_DontBlockNewEvents_ShouldAllowConcurrentProcessing {
-    [self setUpTrackerWithValidConfig];
-    
-    // Given: Some cached events that will trigger retry
-    [self.realTracker setEndpoint:kTestInvalidEndpoint];
-    CLXBidResponseBid *cachedBid = [self createTestBidWithId:@"cached-event-bid"];
-    [self.realTracker addBid:kTestAuctionID bid:cachedBid];
-    [self.realTracker sendEvent:kTestAuctionID bidId:@"cached-event-bid" event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil];
-    [NSThread sleepForTimeInterval:1.5];
-    
-    // When: Starting retry operation
-    [self.realTracker setEndpoint:kTestValidEndpoint];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self.realTracker trySendingPendingWinLossEvents];
-    });
-    
-    // Simultaneously send new win/loss notifications
-    CLXBidResponseBid *newBid = [self createTestBidWithId:@"new-event-bid"];
-    [self.realTracker addBid:kTestAuctionID bid:newBid];
-    
-    // These should not be blocked by the retry operation
-    XCTAssertNoThrow([self.realTracker sendEvent:kTestAuctionID bidId:@"new-event-bid" event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil],
-                     @"New win notifications should not be blocked by retry operations");
-    
-    CLXBidResponseBid *anotherBid = [self createTestBidWithId:@"another-new-bid"];
-    [self.realTracker addBid:kTestAuctionID bid:anotherBid];
-    [self.realTracker setBidLoadResult:kTestAuctionID bidId:@"another-new-bid" success:NO lossReason:@(CLXLossReasonInternalError)];
-    
-    XCTAssertNoThrow([self.realTracker sendEvent:kTestAuctionID bidId:@"another-new-bid" event:[CLXBidLifecycleEvent lossEvent] lossReason:@(CLXLossReasonInternalError) winnerBidPrice:-1.0 error:nil],
-                     @"New loss notifications should not be blocked by retry operations");
-    
-    // Give operations time to complete
-    [NSThread sleepForTimeInterval:2.0];
-}
+    // Successful retry
+    self.mockNetwork.shouldFail = NO;
+    [self.mockNetwork.sentPayloads removeAllObjects];
+    [self.tracker trySendingPendingWinLossEvents];
 
-#pragma mark - MARK: Performance and Memory Tests
-
-/**
- * Test memory usage during large batch retry operations
- * Ensures the system doesn't have memory leaks during retry processing
- */
-- (void)testMemoryUsage_LargeBatchRetry_ShouldNotLeak {
-    [self setUpTrackerWithValidConfig];
-    
-    // Create a large number of cached events
-    [self.realTracker setEndpoint:kTestInvalidEndpoint];
-    NSInteger largeEventCount = 500;
-    
-    for (NSInteger i = 0; i < largeEventCount; i++) {
-        NSString *bidId = [NSString stringWithFormat:@"memory-test-bid-%ld", (long)i];
-        CLXBidResponseBid *bid = [self createTestBidWithId:bidId];
-        [self.realTracker addBid:kTestAuctionID bid:bid];
-        [self.realTracker sendEvent:kTestAuctionID bidId:bidId event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil];
-    }
-    
-    [NSThread sleepForTimeInterval:3.0];
-    
-    // Trigger retry operation
-    [self.realTracker setEndpoint:kTestValidEndpoint];
-    [self.realTracker trySendingPendingWinLossEvents];
-    
-    // Give time for processing
-    [NSThread sleepForTimeInterval:5.0];
-    
-    // The test mainly ensures no crashes occur during large batch processing
-    // Memory leak detection would be handled by Xcode's memory tools
-    // Test passes if no crash: Large batch retry should complete without memory issues
-}
-
-/**
- * Test that database cleanup works correctly after successful retries
- * Ensures cached events are properly removed after successful delivery
- */
-- (void)testDatabaseCleanup_SuccessfulRetries_ShouldRemoveCachedEvents {
-    [self setUpTrackerWithValidConfig];
-    
-    // Given: Some events that will be cached due to failure
-    [self.realTracker setEndpoint:kTestInvalidEndpoint];
-    
-    NSArray *testBids = @[@"cleanup-bid-1", @"cleanup-bid-2"];
-    for (NSString *bidId in testBids) {
-        CLXBidResponseBid *bid = [self createTestBidWithId:bidId];
-        [self.realTracker addBid:kTestAuctionID bid:bid];
-        [self.realTracker sendEvent:kTestAuctionID bidId:bidId event:[CLXBidLifecycleEvent loadSuccessEvent] lossReason:nil winnerBidPrice:-1.0 error:nil];
-    }
-    
-    [NSThread sleepForTimeInterval:2.0];
-    
-    // Verify events are cached
-    NSArray *cachedBeforeRetry = [self.realTracker getAllCachedEvents];
-    XCTAssertEqual(cachedBeforeRetry.count, testBids.count, @"Should have cached test events");
-    
-    // When: Successful retry (using valid endpoint)
-    [self.realTracker setEndpoint:kTestValidEndpoint];
-    [self.realTracker trySendingPendingWinLossEvents];
-    
-    // Give time for network operations and cleanup
-    [NSThread sleepForTimeInterval:4.0];
-    
-    // Then: Cached events should be cleaned up
-    // Note: This test may be flaky depending on network conditions
-    // The important thing is that the cleanup mechanism exists
-    NSArray *cachedAfterRetry = [self.realTracker getAllCachedEvents];
-    
-    // In ideal conditions, successful retries would clear the cache
-    // But we can't guarantee network conditions, so we test the mechanism exists
-    XCTAssertNotNil(cachedAfterRetry, @"Database should remain functional after retry operations");
+    XCTAssertEqual([self.tracker getAllCachedEvents].count, 0,
+                   @"All events should be deleted from SQLite after successful retry");
+    XCTAssertEqual(self.mockNetwork.sentPayloads.count, 3,
+                   @"All 3 cached events should have been sent on retry");
 }
 
 @end

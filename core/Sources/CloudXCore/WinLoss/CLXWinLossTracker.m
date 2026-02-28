@@ -81,7 +81,7 @@ static NSString *const kStateLoss = @"LOSS";
 @interface CLXWinLossTracker ()
 @property (nonatomic, strong) CLXAuctionBidManager *auctionBidManager;
 @property (nonatomic, strong) CLXWinLossFieldResolver *winLossFieldResolver;
-@property (nonatomic, strong) CLXWinLossNetworkService *networkService;
+@property (nonatomic, strong) id<CLXWinLossNetworkServiceProtocol> networkService;
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, strong) CLXSQLiteDatabase *database;
 
