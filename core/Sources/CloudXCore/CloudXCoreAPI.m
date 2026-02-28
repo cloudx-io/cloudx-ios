@@ -27,6 +27,10 @@
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 #import <CloudXCore/CLXWinLossTracker.h>
 #import <CloudXCore/CLXKeyValueState.h>
+#import <CloudXCore/CLXIlrdTracker.h>
+#import <CloudXCore/CLXIlrdService.h>
+#import <CloudXCore/CLXAlIlrd.h>
+#import <CloudXCore/CLXIlrdProvider.h>
 #import <CloudXCore/CLXAdUnitValidator.h>
 
 // Adapter Protocols
@@ -115,6 +119,7 @@ NSString * const CLXSDKInitializedNotification = @"CLXSDKInitializedNotification
 @property (nonatomic, strong) CLXBidNetworkServiceClass *bidNetworkService;
 @property (nonatomic, strong) CLXAdNetworkFactories *adNetworkFactories;
 @property (nonatomic, strong) NSMutableSet<NSString *> *readyAdapters;
+@property (nonatomic, strong, nullable) CLXIlrdTracker *ilrdTracker;
 @end
 
 static CloudXCore *_sharedInstance = nil;
@@ -322,7 +327,18 @@ static CloudXCore *_sharedInstance = nil;
         
         // Retry any cached win/loss events from previous sessions
         [[CLXWinLossTracker shared] trySendingPendingWinLossEvents];
-        
+
+        // Initialize ILRD tracking if endpoint is configured
+        if (config.ilrdEndpointURL.length > 0) {
+            CLXAlIlrd *provider = [[CLXAlIlrd alloc] initWithAccountName:config.accountName];
+            NSDictionary *providers = @{ @(CLXIlrdPlatformAl): provider };
+            CLXIlrdService *service = [[CLXIlrdService alloc] initWithProviders:providers];
+            _ilrdTracker = [[CLXIlrdTracker alloc] initWithAppKey:_appKey
+                                                     endpointUrl:config.ilrdEndpointURL
+                                                     ilrdService:service];
+            [_ilrdTracker start];
+        }
+
         NSMutableDictionary *geoHeaders = [NSMutableDictionary dictionary];
         if (config.geoHeaders) {
             for (CLXSDKConfigGeoBid *geoBid in config.geoHeaders) {
@@ -351,7 +367,7 @@ static CloudXCore *_sharedInstance = nil;
             }
             [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsDictKey];
         }
-        
+
         // Create bid request for SDK init tracking to populate bidRequest.* fields
         NSDictionary *sdkInitBidRequest = [self createSDKInitBidRequestWithAuctionId:auctionID impModel:impModel];
         [[CLXTrackingFieldResolver shared] setRequestData:auctionID bidRequestJSON:sdkInitBidRequest];
@@ -1366,7 +1382,10 @@ static BOOL _visualDebuggingEnabled = NO;
     _bidNetworkService = nil;
     _adNetworkFactories = nil;
     [_readyAdapters removeAllObjects];
-    
+
+    [_ilrdTracker stop];
+    _ilrdTracker = nil;
+
     // Note: We don't reset the singleton instance itself or the initService
     // as those are meant to persist across the app lifecycle
 }

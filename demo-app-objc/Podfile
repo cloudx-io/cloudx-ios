@@ -10,6 +10,7 @@ target 'CloudXObjCRemotePods' do
   pod 'CloudXInMobiAdapter', :path => '../adapter-inmobi'
   pod 'CloudXMintegralAdapter', :path => '../adapter-mintegral'
   pod 'CloudXRenderer', :path => '../renderer-cloudx'
+  pod 'AppLovinSDK'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths

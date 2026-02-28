@@ -282,6 +282,9 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
 
     config.organizationID = response[@"organizationID"];  // optional
 
+    config.accountName = [self requiredString:@"accountName" from:response error:outError];
+    if (!config.accountName) return nil;
+
     // ═══════════════════════════════════════════════════════════════════════════
     // 2. Endpoints
     // ═══════════════════════════════════════════════════════════════════════════
@@ -298,6 +301,14 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
 
     config.geoDataEndpointURL = [self requiredString:@"geoDataEndpointURL" from:response error:outError];
     if (!config.geoDataEndpointURL) return nil;
+
+    /*
+     * ilrdEndpointURL is optional. Only set if present and non-empty.
+     */
+    NSString *ilrdEndpointURL = response[@"ilrdEndpointURL"];
+    if ([ilrdEndpointURL isKindOfClass:[NSString class]] && ilrdEndpointURL.length > 0) {
+        config.ilrdEndpointURL = ilrdEndpointURL;
+    }
 
     // ═══════════════════════════════════════════════════════════════════════════
     // 3. Core Config

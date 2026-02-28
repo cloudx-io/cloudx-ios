@@ -81,6 +81,7 @@
         _accountID = @"";
         _sessionID = @"";
         _appID = @"";
+        _accountName = @"";
 
         // 2. Endpoints (required)
         _auctionEndpointURL = @"";

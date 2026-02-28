@@ -37,6 +37,7 @@
         @"accountID": @"CLDX2_dc",
         @"sessionID": @"test-session-123",
         @"appID": @"test-app-123",
+        @"accountName": @"TestAccount",
         // 2. Endpoints
         @"auctionEndpointURL": @"https://auction.cloudx.io/bid",
         @"impressionTrackerURL": @"https://tracker.cloudx.io/impression",
