@@ -46,6 +46,13 @@
 #import <CloudXCore/CLXAuctionBidManager.h>
 #import <CloudXCore/CLXBidLifecycleEvent.h>
 
+// ILRD (Impression Level Revenue Data)
+#import <CloudXCore/CLXIlrdProvider.h>
+#import <CloudXCore/CLXAlIlrd.h>
+#import <CloudXCore/CLXIlrdService.h>
+#import <CloudXCore/CLXIlrdNetworkService.h>
+#import <CloudXCore/CLXIlrdTracker.h>
+
 // Tracking Services
 #import <CloudXCore/CLXRillTrackingService.h>
 #import <CloudXCore/CLXRillImpressionModel.h>
