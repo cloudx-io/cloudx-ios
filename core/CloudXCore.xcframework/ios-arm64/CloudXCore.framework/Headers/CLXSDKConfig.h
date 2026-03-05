@@ -76,6 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *sessionID;
 @property (nonatomic, copy) NSString *appID;
 @property (nonatomic, copy, nullable) NSString *organizationID;
+@property (nonatomic, copy) NSString *accountName;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 2. Endpoints (required)
@@ -84,6 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *impressionTrackerURL;
 @property (nonatomic, copy) NSString *winLossNotificationURL;
 @property (nonatomic, copy) NSString *geoDataEndpointURL;
+@property (nonatomic, copy, nullable) NSString *ilrdEndpointURL;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 3. Core Config (required)
