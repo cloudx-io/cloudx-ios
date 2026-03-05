@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.2.1-beta] - 2026-03-05
 
 ### Added
-- **ILRD (Impression Level Revenue Data)** - Publishers can now receive impression-level revenue data via the `cloudXBanner:didPayRevenue:` and `cloudXFullscreen:didPayRevenue:` delegate callbacks (#405)
+- **ILRD (Impression Level Revenue Data)** - Internal tracking of third-party impression-level revenue data for analytics (#405)
 
 ### Changed
 - **Test Infrastructure** - Comprehensive test audit: separated integration tests from unit tests and enforced FIRST principles (#406)
