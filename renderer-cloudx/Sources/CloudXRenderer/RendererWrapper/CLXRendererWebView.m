@@ -225,7 +225,13 @@
 
 - (void)didMoveToWindow {
     [super didMoveToWindow];
-    // View lifecycle management - no additional logging needed
+    // Restart viewability tracking when the view enters a window.
+    // The tracker may have been stopped during view reparenting (superview momentarily nil)
+    // or never started because the view had no window at didFinishNavigation time.
+    if (self.window && self.hasFinishedLoading && self.enableViewabilityTracking) {
+        [self.logger debug:@"View moved to window — restarting viewability tracking"];
+        [self startViewabilityTracking];
+    }
 }
 
 #pragma mark - Public Methods
