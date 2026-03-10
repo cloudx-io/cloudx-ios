@@ -38,7 +38,7 @@ The CloudX iOS SDK uses a **trunk-based** branching strategy with two repositori
 | **CloudXMetaAdapter** | Static | ✅ Published | Meta Audience Network integration |
 | **CloudXVungleAdapter** | Static | ✅ Published | Vungle/Liftoff integration |
 | **CloudXInMobiAdapter** | Static | ✅ Published | InMobi integration |
-| **CloudXMintegralAdapter** | Static | ⚠️ **BETA** | Mintegral integration (not on trunk yet) |
+| **CloudXMintegralAdapter** | Static | ✅ Published | Mintegral integration |
 | **CloudXMolocoAdapter** | Static | ⚠️ **BETA** | Moloco integration (not on trunk yet) |
 | **CloudXRenderer** | Static | ✅ Published | Creative rendering engine |
 
@@ -89,8 +89,8 @@ git pull origin main
 ./scripts/update-version-constant.sh vungle "X.Y.Z"
 ./scripts/update-version-constant.sh inmobi "X.Y.Z"
 ./scripts/update-version-constant.sh renderer "X.Y.Z"
-# Also update mintegral/moloco if releasing those:
-# ./scripts/update-version-constant.sh mintegral "X.Y.Z"
+./scripts/update-version-constant.sh mintegral "X.Y.Z"
+# Also update moloco if releasing:
 # ./scripts/update-version-constant.sh moloco "X.Y.Z"
 
 # 3. Update podspec versions (only components being released)
@@ -99,8 +99,8 @@ sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-meta/CloudXMetaAdapte
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-vungle/CloudXVungleAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-inmobi/CloudXInMobiAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" renderer-cloudx/CloudXRenderer.podspec
-# Also update mintegral/moloco if releasing those:
-# sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-mintegral/CloudXMintegralAdapter.podspec
+sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-mintegral/CloudXMintegralAdapter.podspec
+# Also update moloco if releasing:
 # sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-moloco/CloudXMolocoAdapter.podspec
 
 # 4. Update ALL CHANGELOGs with release notes:
@@ -114,8 +114,9 @@ cd renderer-cloudx && ./build-xcframework.sh X.Y.Z && cd ..
 cd adapter-meta && ./build-xcframework.sh && cd ..
 cd adapter-vungle && ./build-xcframework.sh && cd ..
 cd adapter-inmobi && ./build-xcframework.sh && cd ..
-# Also build mintegral if releasing:
-# cd adapter-mintegral && ./build-xcframework.sh && cd ..
+cd adapter-mintegral && ./build-xcframework.sh && cd ..
+# Also build moloco if releasing:
+# cd adapter-moloco && ./build-xcframework.sh && cd ..
 
 # 6. Commit and push directly to main
 git add -A
@@ -141,6 +142,7 @@ cp ../cloudx-ios-private/adapter-meta/CloudXMetaAdapter.xcframework.zip adapter-
 cp ../cloudx-ios-private/adapter-vungle/CloudXVungleAdapter.xcframework.zip adapter-vungle/
 cp ../cloudx-ios-private/adapter-inmobi/CloudXInMobiAdapter.xcframework.zip adapter-inmobi/
 cp ../cloudx-ios-private/renderer-cloudx/CloudXRenderer.xcframework.zip renderer-cloudx/
+cp ../cloudx-ios-private/adapter-mintegral/CloudXMintegralAdapter.xcframework.zip adapter-mintegral/
 
 # 4. Unzip xcframeworks
 cd core && rm -rf CloudXCore.xcframework && unzip -o CloudXCore.xcframework.zip && cd ..
@@ -148,6 +150,7 @@ cd adapter-meta && rm -rf CloudXMetaAdapter.xcframework && unzip -o CloudXMetaAd
 cd adapter-vungle && rm -rf CloudXVungleAdapter.xcframework && unzip -o CloudXVungleAdapter.xcframework.zip && cd ..
 cd adapter-inmobi && rm -rf CloudXInMobiAdapter.xcframework && unzip -o CloudXInMobiAdapter.xcframework.zip && cd ..
 cd renderer-cloudx && rm -rf CloudXRenderer.xcframework && unzip -o CloudXRenderer.xcframework.zip && cd ..
+cd adapter-mintegral && rm -rf CloudXMintegralAdapter.xcframework && unzip -o CloudXMintegralAdapter.xcframework.zip && cd ..
 
 # 5. Update podspecs (located alongside xcframeworks in subdirectories)
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" core/CloudXCore.podspec
@@ -155,12 +158,14 @@ sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-meta/CloudXMetaAdapte
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-vungle/CloudXVungleAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-inmobi/CloudXInMobiAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" renderer-cloudx/CloudXRenderer.podspec
+sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-mintegral/CloudXMintegralAdapter.podspec
 
 # 6. Update dependency versions in adapter podspecs
 sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" adapter-meta/CloudXMetaAdapter.podspec
 sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" adapter-vungle/CloudXVungleAdapter.podspec
 sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" adapter-inmobi/CloudXInMobiAdapter.podspec
 sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" renderer-cloudx/CloudXRenderer.podspec
+sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" adapter-mintegral/CloudXMintegralAdapter.podspec
 
 # 7. Commit and push
 git add -A
@@ -195,6 +200,7 @@ target 'CloudXObjCRemotePods' do
   pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
   pod 'CloudXVungleAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
   pod 'CloudXInMobiAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
+  pod 'CloudXMintegralAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths
@@ -224,6 +230,7 @@ target 'CloudXSwiftRemotePods' do
   pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
   pod 'CloudXVungleAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
   pod 'CloudXInMobiAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
+  pod 'CloudXMintegralAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
 
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths
@@ -266,6 +273,7 @@ target 'CloudXObjCRemotePods' do
   pod 'CloudXRenderer', '~> X.Y.Z'
   pod 'CloudXVungleAdapter', '~> X.Y.Z'
   pod 'CloudXInMobiAdapter', '~> X.Y.Z'
+  pod 'CloudXMintegralAdapter', '~> X.Y.Z'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths
@@ -291,6 +299,7 @@ target 'CloudXSwiftRemotePods' do
   pod 'CloudXRenderer', '~> X.Y.Z'
   pod 'CloudXVungleAdapter', '~> X.Y.Z'
   pod 'CloudXInMobiAdapter', '~> X.Y.Z'
+  pod 'CloudXMintegralAdapter', '~> X.Y.Z'
 
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths
@@ -330,7 +339,8 @@ git tag vX.Y.Z-meta
 git tag vX.Y.Z-vungle
 git tag vX.Y.Z-inmobi
 git tag vX.Y.Z-renderer
-git push origin vX.Y.Z-core vX.Y.Z-meta vX.Y.Z-vungle vX.Y.Z-inmobi vX.Y.Z-renderer
+git tag vX.Y.Z-mintegral
+git push origin vX.Y.Z-core vX.Y.Z-meta vX.Y.Z-vungle vX.Y.Z-inmobi vX.Y.Z-renderer vX.Y.Z-mintegral
 
 # Create GitHub releases with xcframework attachments
 gh release create vX.Y.Z-core --title "CloudXCore X.Y.Z" core/CloudXCore.xcframework.zip
@@ -338,6 +348,7 @@ gh release create vX.Y.Z-meta --title "CloudXMetaAdapter X.Y.Z" adapter-meta/Clo
 gh release create vX.Y.Z-vungle --title "CloudXVungleAdapter X.Y.Z" adapter-vungle/CloudXVungleAdapter.xcframework.zip
 gh release create vX.Y.Z-inmobi --title "CloudXInMobiAdapter X.Y.Z" adapter-inmobi/CloudXInMobiAdapter.xcframework.zip
 gh release create vX.Y.Z-renderer --title "CloudXRenderer X.Y.Z" renderer-cloudx/CloudXRenderer.xcframework.zip
+gh release create vX.Y.Z-mintegral --title "CloudXMintegralAdapter X.Y.Z" adapter-mintegral/CloudXMintegralAdapter.xcframework.zip
 ```
 
 #### Step 2: Tag PRIVATE Repo Main and Create dSYM Release
@@ -354,7 +365,8 @@ git tag vX.Y.Z-meta
 git tag vX.Y.Z-vungle
 git tag vX.Y.Z-inmobi
 git tag vX.Y.Z-renderer
-git push origin vX.Y.Z-core vX.Y.Z-meta vX.Y.Z-vungle vX.Y.Z-inmobi vX.Y.Z-renderer
+git tag vX.Y.Z-mintegral
+git push origin vX.Y.Z-core vX.Y.Z-meta vX.Y.Z-vungle vX.Y.Z-inmobi vX.Y.Z-renderer vX.Y.Z-mintegral
 ```
 
 #### Step 4: Upload dSYMs to PRIVATE Release (CloudXCore Only)
@@ -395,9 +407,6 @@ echo "🔗 https://github.com/cloudx-io/cloudx-ios-private/releases/tag/vX.Y.Z-c
 
 **⚠️ CRITICAL: This step is required for third-party developers to install via `pod 'CloudXCore'`**
 
-**⚠️ NOTE: CloudXMintegralAdapter is NOT pushed to CocoaPods trunk yet (BETA status).**
-When the Mintegral adapter is production-ready, add it to the trunk push commands below.
-
 ```bash
 cd cloudx-ios
 
@@ -416,9 +425,7 @@ pod trunk push renderer-cloudx/CloudXRenderer.podspec --allow-warnings
 pod trunk push adapter-meta/CloudXMetaAdapter.podspec --allow-warnings
 pod trunk push adapter-vungle/CloudXVungleAdapter.podspec --allow-warnings
 pod trunk push adapter-inmobi/CloudXInMobiAdapter.podspec --allow-warnings
-
-# TODO: Add Mintegral when ready for production release:
-# pod trunk push adapter-mintegral/CloudXMintegralAdapter.podspec --allow-warnings
+pod trunk push adapter-mintegral/CloudXMintegralAdapter.podspec --allow-warnings
 
 # Verify pods are published
 pod trunk info CloudXCore
@@ -426,7 +433,7 @@ pod trunk info CloudXMetaAdapter
 pod trunk info CloudXVungleAdapter
 pod trunk info CloudXInMobiAdapter
 pod trunk info CloudXRenderer
-# pod trunk info CloudXMintegralAdapter  # Add when released to trunk
+pod trunk info CloudXMintegralAdapter
 ```
 
 **Note:** CocoaPods Trunk can take 5-15 minutes to propagate. Run `pod repo update` to get the latest specs.
@@ -465,13 +472,12 @@ If `pod install` fails with version not found, wait a few more minutes for CDN p
 
 ---
 
-### Beta Adapter Releases (Mintegral, Moloco)
+### Beta Adapter Releases (Moloco)
 
 **⚠️ The following adapters are in BETA and are NOT pushed to CocoaPods trunk:**
 
 | Adapter | Status | When to Release to Trunk |
 |---------|--------|--------------------------|
-| CloudXMintegralAdapter | BETA | When production-ready and fully tested |
 | CloudXMolocoAdapter | BETA | When production-ready and fully tested |
 
 #### How Beta Adapters Are Released
@@ -479,18 +485,18 @@ If `pod install` fails with version not found, wait a few more minutes for CDN p
 Beta adapters use a **soft release** process:
 
 1. **GitHub Release Only** - Creates a pre-release on GitHub with xcframework
-2. **No CocoaPods Trunk Push** - NOT available via `pod 'CloudXMintegralAdapter'`
+2. **No CocoaPods Trunk Push** - NOT available via `pod 'CloudXMolocoAdapter'`
 3. **Pre-release Flag** - Marked as pre-release in GitHub (not "latest")
 
 #### How to Release a Beta Adapter
 
 ```bash
 # Tag format: v{version}-{adapter}
-# Example for Mintegral:
-git tag v1.3.0-mintegral
-git push origin v1.3.0-mintegral
+# Example for Moloco:
+git tag v1.3.0-moloco
+git push origin v1.3.0-moloco
 
-# This triggers .github/workflows/mintegral-release.yml
+# This triggers .github/workflows/moloco-release.yml
 # which creates a GitHub pre-release but does NOT push to trunk
 ```
 
@@ -499,8 +505,8 @@ git push origin v1.3.0-mintegral
 Users must reference the GitHub tag directly in their Podfile:
 
 ```ruby
-# Podfile for Mintegral beta
-pod 'CloudXMintegralAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.3.0-mintegral'
+# Podfile for Moloco beta
+pod 'CloudXMolocoAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => 'v1.3.0-moloco'
 ```
 
 #### Promoting Beta to Production
@@ -541,6 +547,7 @@ git checkout -b release-X.Y.Z
 #   s.dependency 'CloudXRenderer', '~> X.Y.Z'
 #   s.dependency 'CloudXVungleAdapter', '~> X.Y.Z'
 #   s.dependency 'CloudXInMobiAdapter', '~> X.Y.Z'
+#   s.dependency 'CloudXMintegralAdapter', '~> X.Y.Z'
 
 # 3. Update pubspec.yaml version
 # Edit pubspec.yaml:
@@ -590,6 +597,7 @@ git checkout -b release-X.Y.Z
 #   s.dependency 'CloudXRenderer', '~> X.Y.Z'
 #   s.dependency 'CloudXVungleAdapter', '~> X.Y.Z'
 #   s.dependency 'CloudXInMobiAdapter', '~> X.Y.Z'
+#   s.dependency 'CloudXMintegralAdapter', '~> X.Y.Z'
 
 # 3. Update package.json version
 # Edit package.json:
@@ -639,6 +647,7 @@ git checkout -b release-X.Y.Z
 #   CloudXRenderer ~> X.Y.Z
 #   CloudXVungleAdapter ~> X.Y.Z
 #   CloudXInMobiAdapter ~> X.Y.Z
+#   CloudXMintegralAdapter ~> X.Y.Z
 
 # 3. Update package version (package.json or equivalent)
 
@@ -777,6 +786,7 @@ pod trunk me
 | CloudXMetaAdapter | Static | ❌ No | Remains static - DO NOT CHANGE |
 | CloudXVungleAdapter | Static | ❌ No | Remains static - DO NOT CHANGE |
 | CloudXInMobiAdapter | Static | ❌ No | Remains static - DO NOT CHANGE |
+| CloudXMintegralAdapter | Static | ❌ No | Remains static - DO NOT CHANGE |
 | CloudXRenderer | Static | ❌ No | Remains static - DO NOT CHANGE |
 
 **Why only CloudXCore is dynamic:**
