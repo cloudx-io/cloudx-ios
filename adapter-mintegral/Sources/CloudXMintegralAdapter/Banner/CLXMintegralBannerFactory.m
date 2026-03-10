@@ -72,10 +72,11 @@
     // Validation errors will be reported in load() via delegate callback
     CLXMintegralBanner *banner = [[CLXMintegralBanner alloc] initWithBidPayload:bidPayload
                                                                     placementID:ids.placementID
-                                                                  adUnitName:adUnitName
+                                                                     adUnitName:adUnitName
                                                                          unitID:ids.unitID
                                                                            size:bannerSize
                                                                           bidID:ids.bidID ?: @""
+                                                                hasClosedButton:hasClosedButton
                                                                        delegate:delegate];
     
     [self.logger debug:@"[BannerFactory] Mintegral banner adapter created successfully"];

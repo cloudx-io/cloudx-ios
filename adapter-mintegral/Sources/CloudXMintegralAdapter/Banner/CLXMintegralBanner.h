@@ -21,10 +21,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID
-                     adUnitName:(nullable NSString *)adUnitName
+                        adUnitName:(nullable NSString *)adUnitName
                             unitID:(NSString *)unitID
                               size:(CGSize)size
                              bidID:(NSString *)bidID
+                   hasClosedButton:(BOOL)hasClosedButton
                           delegate:(id<CLXAdapterBannerDelegate>)delegate;
 
 - (void)load;

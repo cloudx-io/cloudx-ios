@@ -49,9 +49,7 @@
                 return;
             }
 
-            // AppLovin uses buyerUIDWithDictionary: passing placementId/unitId/adType
-            // when available, falling back to basic buyerUID. Our protocol doesn't
-            // carry ad-unit context, so we use the basic variant; the server adds
+            // Protocol does not include ad-unit context; server adds
             // placement/unit IDs to the bid request on its side.
             NSString *bidToken = [MTGBiddingSDK buyerUID];
 

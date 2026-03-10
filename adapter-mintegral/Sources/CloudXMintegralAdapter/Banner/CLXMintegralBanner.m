@@ -25,10 +25,11 @@
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID
-                     adUnitName:(nullable NSString *)adUnitName
+                        adUnitName:(nullable NSString *)adUnitName
                             unitID:(NSString *)unitID
                               size:(CGSize)size
                              bidID:(NSString *)bidID
+                   hasClosedButton:(BOOL)hasClosedButton
                           delegate:(id<CLXAdapterBannerDelegate>)delegate {
     self = [super init];
     if (self) {
@@ -41,7 +42,7 @@
         _sdkVersion = [CLXMintegralInitializer sdkVersion];
         _network = @"mintegral";
         _autoRefreshTime = 0;
-        _showCloseButton = NO;
+        _showCloseButton = hasClosedButton;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMintegralBanner"];
         _isDestroyed = NO;
         _timeout = NO;
