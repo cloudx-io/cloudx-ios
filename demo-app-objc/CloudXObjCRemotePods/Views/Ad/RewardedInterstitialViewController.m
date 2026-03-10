@@ -61,7 +61,12 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [self resetAdState];
+    // Skip cleanup when a fullscreen ad is presented on top — the ad object must
+    // stay alive to receive show/click/close delegate callbacks. On a tab switch
+    // presentedViewController is nil, so cleanup proceeds normally.
+    if (!self.presentedViewController) {
+        [self resetAdState];
+    }
 }
 
 - (void)dealloc {
@@ -73,8 +78,6 @@
 }
 
 - (void)loadRewardedInterstitialAd {
-    NSLog(@"[RewardedInterstitialViewController] loadRewardedInterstitialAd called");
-
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"Rewarded Interstitial is already loading."];
         return;
@@ -85,25 +88,20 @@
         return;
     }
 
-    NSLog(@"[RewardedInterstitialViewController] Starting rewarded interstitial ad load process...");
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
 
     NSString *adUnitId = [self adUnitId];
-    NSLog(@"[RewardedInterstitialViewController] Using ad unit: %@", adUnitId);
 
-    // Create rewarded interstitial with comprehensive logging
-    NSLog(@"[RewardedInterstitialViewController] Calling createRewardedWithAdUnitId: %@", adUnitId);
     self.rewardedInterstitialAd = [[CloudXCore shared] createRewardedWithAdUnitId:adUnitId];
     self.rewardedInterstitialAd.delegate = self;
     self.rewardedInterstitialAd.revenueDelegate = self;
 
     if (self.rewardedInterstitialAd) {
-        NSLog(@"[RewardedInterstitialViewController] ✅ Rewarded interstitial ad instance created successfully: %@", self.rewardedInterstitialAd);
-        NSLog(@"[RewardedInterstitialViewController] Loading rewarded interstitial ad instance...");
+        [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Loading rewarded interstitial (adUnit: %@)", adUnitId]];
         [self.rewardedInterstitialAd load];
     } else {
-        NSLog(@"[RewardedInterstitialViewController] ❌ Failed to create rewarded interstitial with ad unit: %@", adUnitId);
+        [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Failed to create rewarded interstitial (adUnit: %@)", adUnitId]];
         self.isLoading = NO;
         [self updateStatusUIWithState:AdStateNoAd];
         [self showAlertWithTitle:@"Error" message:@"Failed to create rewarded interstitial ad."];
@@ -116,8 +114,6 @@
 }
 
 - (void)showRewardedInterstitialAd {
-    NSLog(@"[RewardedInterstitialViewController] 'Show Rewarded Interstitial' button tapped.");
-    
     if (!self.rewardedInterstitialAd) {
         [self showAlertWithTitle:@"Error" message:@"No rewarded interstitial loaded. Please load first."];
         return;

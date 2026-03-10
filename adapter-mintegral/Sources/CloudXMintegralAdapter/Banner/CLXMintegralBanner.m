@@ -7,7 +7,6 @@
 
 @interface CLXMintegralBanner ()
 @property (nonatomic, strong) CLXLogger *logger;
-@property (nonatomic, assign) BOOL isDestroyed;
 @property (nonatomic, assign) CGSize bannerSize;
 @property (nonatomic, copy) NSString *network;
 @property (nonatomic, copy) NSString *bidID;
@@ -44,7 +43,6 @@
         _autoRefreshTime = 0;
         _showCloseButton = hasClosedButton;
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXMintegralBanner"];
-        _isDestroyed = NO;
         _timeout = NO;
         _bannerSize = size;
         
@@ -80,12 +78,6 @@
 #pragma mark - CLXAdapterBanner Protocol
 
 - (void)load {
-    if (self.isDestroyed) {
-        [self.logger error:@"Cannot load - adapter is destroyed"];
-        return;
-    }
-    
-    // Validate unitID at load time
     if (!_unitID || _unitID.length == 0) {
         NSString *adUnitContext = _adUnitName ? [NSString stringWithFormat:@" for ad unit '%@'", _adUnitName] : @"";
         NSString *errorMessage = [NSString stringWithFormat:@"Mintegral unit ID is empty%@. "
@@ -94,48 +86,32 @@
         NSError *error = [CLXError errorWithCode:CLXErrorCodeAdapterInvalidServerExtras
                                      description:errorMessage];
         [self.logger error:error.localizedDescription];
-
-        id<CLXAdapterBannerDelegate> delegate = self.delegate;
-        if (delegate && [delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
-            [delegate failToLoadBanner:self error:error];
-        }
+        [self.delegate failToLoadBanner:self error:error];
         return;
     }
     
     [self.logger debug:[NSString stringWithFormat:@"Loading banner - Placement: %@, PlacementID:%@, UnitID:%@", _adUnitName ?: @"(unknown)", _placementID, _unitID]];
+
+    if (!self.mintegralBannerView) {
+        MTGBannerSizeType sizeType = [self bannerSizeTypeFromSize:self.bannerSize];
+        self.mintegralBannerView = [[MTGBannerAdView alloc] initBannerAdViewWithBannerSizeType:sizeType
+                                                                                  placementId:self.placementID
+                                                                                       unitId:self.unitID
+                                                                           rootViewController:[CLXUIApplicationProxy topViewController]];
+        self.mintegralBannerView.delegate = self;
+    }
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.isDestroyed) {
-            return;
-        }
-        
-        if (!self.mintegralBannerView) {
-            MTGBannerSizeType sizeType = [self bannerSizeTypeFromSize:self.bannerSize];
-            self.mintegralBannerView = [[MTGBannerAdView alloc] initBannerAdViewWithBannerSizeType:sizeType
-                                                                                      placementId:self.placementID
-                                                                                           unitId:self.unitID
-                                                                               rootViewController:[CLXUIApplicationProxy topViewController]];
-            self.mintegralBannerView.delegate = self;
-        }
-        
-        self.mintegralBannerView.autoRefreshTime = self.autoRefreshTime;
-        self.mintegralBannerView.showCloseButton = self.showCloseButton ? MTGBoolYes : MTGBoolNo;
-        
-        if (self.bidPayload && self.bidPayload.length > 0) {
-            [self.mintegralBannerView loadBannerAdWithBidToken:self.bidPayload];
-        } else {
-            [self.mintegralBannerView loadBannerAd];
-        }
-    });
+    self.mintegralBannerView.autoRefreshTime = self.autoRefreshTime;
+    self.mintegralBannerView.showCloseButton = self.showCloseButton ? MTGBoolYes : MTGBoolNo;
+    
+    if (self.bidPayload && self.bidPayload.length > 0) {
+        [self.mintegralBannerView loadBannerAdWithBidToken:self.bidPayload];
+    } else {
+        [self.mintegralBannerView loadBannerAd];
+    }
 }
 
 - (void)showFromViewController:(UIViewController *)viewController {
-    if (self.isDestroyed) {
-        [self.logger error:@"Cannot show - adapter is destroyed"];
-        return;
-    }
-
-    // Set viewController for click handling and modal presentation
     if (self.mintegralBannerView && viewController) {
         self.mintegralBannerView.viewController = viewController;
     }
@@ -146,21 +122,12 @@
 }
 
 - (void)destroy {
-    if (self.isDestroyed) {
-        return;
-    }
-    
     [self.logger debug:@"Destroying banner adapter"];
-    self.isDestroyed = YES;
     
-    MTGBannerAdView *bannerView = self.mintegralBannerView;
-    if (bannerView) {
+    if (self.mintegralBannerView) {
+        self.mintegralBannerView.delegate = nil;
+        [self.mintegralBannerView destroyBannerAdView];
         self.mintegralBannerView = nil;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [bannerView removeFromSuperview];
-            [bannerView destroyBannerAdView];
-            bannerView.delegate = nil;
-        });
     }
     
     self.delegate = nil;
@@ -169,126 +136,45 @@
 #pragma mark - MTGBannerAdViewDelegate
 
 - (void)adViewLoadSuccess:(MTGBannerAdView *)adView {
-    if (self.isDestroyed) {
-        return;
-    }
-    
     [self.logger info:@"Banner loaded successfully"];
     _creativeID = adView.creativeId;
-    
-    id<CLXAdapterBannerDelegate> delegate = self.delegate;
-    if (delegate && [delegate respondsToSelector:@selector(didLoadBanner:)]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [delegate didLoadBanner:self];
-        });
-    }
+    [self.delegate didLoadBanner:self];
 }
 
 - (void)adViewLoadFailedWithError:(NSError *)error adView:(MTGBannerAdView *)adView {
-    if (self.isDestroyed) {
-        return;
-    }
-    
     [self.logger error:[NSString stringWithFormat:@"Failed to load: %@", error.localizedDescription]];
-
     CLXError *mappedError = [CLXMintegralErrorHandler toCloudXError:error];
-    
-    id<CLXAdapterBannerDelegate> delegate = self.delegate;
-    if (delegate && [delegate respondsToSelector:@selector(failToLoadBanner:error:)]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [delegate failToLoadBanner:self error:mappedError];
-        });
-    }
+    [self.delegate failToLoadBanner:self error:mappedError];
 }
 
 - (void)adViewWillLogImpression:(MTGBannerAdView *)adView {
-    if (self.isDestroyed) {
-        return;
-    }
-    
     [self.logger info:@"Banner displayed"];
-    
-    id<CLXAdapterBannerDelegate> delegate = self.delegate;
-    if (!delegate) {
-        return;
-    }
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([delegate respondsToSelector:@selector(didShowBanner:)]) {
-            [delegate didShowBanner:self];
-        }
-        
-        if ([delegate respondsToSelector:@selector(impressionBanner:)]) {
-            [delegate impressionBanner:self];
-        }
-    });
+    [self.delegate didShowBanner:self];
+    [self.delegate impressionBanner:self];
 }
 
 - (void)adViewDidClicked:(MTGBannerAdView *)adView {
-    if (self.isDestroyed) {
-        return;
-    }
-    
     [self.logger info:@"Banner clicked"];
-    
-    id<CLXAdapterBannerDelegate> delegate = self.delegate;
-    if (delegate && [delegate respondsToSelector:@selector(clickBanner:)]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [delegate clickBanner:self];
-        });
-    }
+    [self.delegate clickBanner:self];
 }
 
 - (void)adViewWillLeaveApplication:(MTGBannerAdView *)adView {
-    if (self.isDestroyed) {
-        return;
-    }
     [self.logger debug:@"Will leave application"];
 }
 
 - (void)adViewWillOpenFullScreen:(MTGBannerAdView *)adView {
-    if (self.isDestroyed) {
-        return;
-    }
-    
     [self.logger info:@"Banner expanded"];
-    
-    id<CLXAdapterBannerDelegate> delegate = self.delegate;
-    if (delegate && [delegate respondsToSelector:@selector(didExpandBanner:)]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [delegate didExpandBanner:self];
-        });
-    }
+    [self.delegate didExpandBanner:self];
 }
 
 - (void)adViewCloseFullScreen:(MTGBannerAdView *)adView {
-    if (self.isDestroyed) {
-        return;
-    }
-    
     [self.logger info:@"Banner collapsed"];
-    
-    id<CLXAdapterBannerDelegate> delegate = self.delegate;
-    if (delegate && [delegate respondsToSelector:@selector(didCollapseBanner:)]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [delegate didCollapseBanner:self];
-        });
-    }
+    [self.delegate didCollapseBanner:self];
 }
 
 - (void)adViewClosed:(MTGBannerAdView *)adView {
-    if (self.isDestroyed) {
-        return;
-    }
-    
     [self.logger info:@"Banner closed"];
-    
-    id<CLXAdapterBannerDelegate> delegate = self.delegate;
-    if (delegate && [delegate respondsToSelector:@selector(closedByUserActionBanner:)]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [delegate closedByUserActionBanner:self];
-        });
-    }
+    [self.delegate closedByUserActionBanner:self];
 }
 
 @end

@@ -65,7 +65,12 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [self resetAdState];
+    // Skip cleanup when a fullscreen ad is presented on top — the ad object must
+    // stay alive to receive show/click/close delegate callbacks. On a tab switch
+    // presentedViewController is nil, so cleanup proceeds normally.
+    if (!self.presentedViewController) {
+        [self resetAdState];
+    }
 }
 
 - (void)dealloc {
@@ -92,14 +97,10 @@
 }
 
 - (void)loadRewarded {
-    NSLog(@"[RewardedViewController] loadRewarded called");
-
     if (self.isLoading || self.rewardedAd) {
-        NSLog(@"[RewardedViewController] Rewarded ad process already started");
         return;
     }
 
-    NSLog(@"[RewardedViewController] Starting rewarded ad load process...");
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
 
@@ -107,20 +108,16 @@
     if (_settings.rewardedAdUnitId.length > 0) {
         adUnitId = _settings.rewardedAdUnitId;
     }
-    NSLog(@"[RewardedViewController] Using ad unit: %@", adUnitId);
 
-    // Create rewarded with comprehensive logging
-    NSLog(@"[RewardedViewController] Calling createRewardedWithAdUnitId: %@", adUnitId);
     self.rewardedAd = [[CloudXCore shared] createRewardedWithAdUnitId:adUnitId];
     self.rewardedAd.delegate = self;
     self.rewardedAd.revenueDelegate = self;
     
     if (self.rewardedAd) {
-        NSLog(@"[RewardedViewController] ✅ Rewarded ad instance created successfully: %@", self.rewardedAd);
-        NSLog(@"[RewardedViewController] Loading rewarded ad instance...");
+        [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Loading rewarded ad (adUnit: %@)", adUnitId]];
         [self.rewardedAd load];
     } else {
-        NSLog(@"[RewardedViewController] ❌ Failed to create rewarded with ad unit: %@", adUnitId);
+        [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Failed to create rewarded ad (adUnit: %@)", adUnitId]];
         self.isLoading = NO;
         [self updateStatusUIWithState:AdStateNoAd];
         [self showAlertWithTitle:@"Error" message:@"Failed to create rewarded ad."];
@@ -135,36 +132,27 @@
 - (void)createRewardedAd {
     if (self.rewardedAd) return;
     NSString *adUnitId = [self adUnitId];
-    NSLog(@"[RewardedViewController] Creating new Rewarded ad instance with ad unit: %@", adUnitId);
-    // SDK config debugging removed to avoid undeclared selector warnings
     self.rewardedAd = [[CloudXCore shared] createRewardedWithAdUnitId:adUnitId];
     self.rewardedAd.delegate = self;
     self.rewardedAd.revenueDelegate = self;
     if (self.rewardedAd) {
-        NSLog(@"✅ Rewarded ad instance created successfully: %@", self.rewardedAd);
         [self startPollingReadyState];
     } else {
-        NSLog(@"❌ Failed to create rewarded ad instance for ad unit: %@", adUnitId);
+        [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Failed to create rewarded ad (adUnit: %@)", adUnitId]];
     }
 }
 
 - (void)startPollingReadyState {
-    // Poll every 0.5 seconds to check if the ad is ready
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (!self.rewardedAd) {
-            NSLog(@"❌ No rewarded ad instance available for polling");
             return;
         }
         
-        NSLog(@"🔍 Checking ad ready state...");
         if (self.rewardedAd.isReady) {
-            NSLog(@"✅ Ad is now ready from queue");
             self.isLoading = NO;
             [self updateStatusUIWithState:AdStateReady];
-            // Do NOT show the ad here!
             return;
         } else {
-            NSLog(@"⏳ Ad not ready yet, continuing to poll...");
             self.isLoading = YES;
             [self updateStatusUIWithState:AdStateLoading];
             [self startPollingReadyState];
@@ -173,40 +161,25 @@
 }
 
 - (void)showRewardedAd {
-    NSLog(@"🔄 [RewardedViewController] showRewardedAd called");
-    NSLog(@"📊 [RewardedViewController] Current state:");
-    NSLog(@"📊 [RewardedViewController] - isLoading: %d", self.isLoading);
-    NSLog(@"📊 [RewardedViewController] - rewardedAd: %@", self.rewardedAd);
-    NSLog(@"📊 [RewardedViewController] - rewardedAd.isReady: %d", self.rewardedAd.isReady);
-    
     if (self.isLoading) {
-        NSLog(@"⏳ [RewardedViewController] Already loading an ad, please wait...");
         return;
     }
     
-    // If ad is ready, show it immediately
     if (self.rewardedAd && self.rewardedAd.isReady) {
-        NSLog(@"👀 [RewardedViewController] Ad ready, showing immediately...");
-        NSLog(@"📊 [RewardedViewController] Calling showFromViewController on: %@", self.rewardedAd);
-        [self.rewardedAd showFromViewController:self];
+        [self.rewardedAd showFromViewController:self placement:@"rewarded_demo" customData:nil];
         return;
     }
     
-    // If no ad instance or not ready, create a new one
     if (!self.rewardedAd) {
-        NSLog(@"📱 [RewardedViewController] No ad instance found, creating new one...");
         [self createRewardedAd];
     }
     
     if (!self.rewardedAd) {
-        NSLog(@"❌ [RewardedViewController] Failed to create Rewarded ad instance");
         [self showAlertWithTitle:@"Error" message:@"Failed to create Rewarded ad."];
         return;
     }
     
-    // If we have an ad but it's not ready, start loading
     if (!self.rewardedAd.isReady) {
-        NSLog(@"📱 [RewardedViewController] Ad not ready, starting load...");
         self.isLoading = YES;
         [self.rewardedAd load];
     }

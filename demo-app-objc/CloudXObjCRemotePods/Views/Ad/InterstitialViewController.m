@@ -66,7 +66,12 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [self resetAdState];
+    // Skip cleanup when a fullscreen ad is presented on top — the ad object must
+    // stay alive to receive show/click/close delegate callbacks. On a tab switch
+    // presentedViewController is nil, so cleanup proceeds normally.
+    if (!self.presentedViewController) {
+        [self resetAdState];
+    }
 }
 
 - (void)dealloc {
