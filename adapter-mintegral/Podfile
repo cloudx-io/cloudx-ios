@@ -5,9 +5,9 @@ use_frameworks! :linkage => :static
 
 target 'CloudXMintegralAdapter' do
   pod 'CloudXCore', :path => '../core'
-  pod 'MintegralAdSDK/BidBannerAd', '~> 8.0'
-  pod 'MintegralAdSDK/BidNewInterstitialAd', '~> 8.0'
-  pod 'MintegralAdSDK/BidRewardVideoAd', '~> 8.0'
+  pod 'MintegralAdSDK/BidBannerAd', '~> 8.0.8'
+  pod 'MintegralAdSDK/BidNewInterstitialAd', '~> 8.0.8'
+  pod 'MintegralAdSDK/BidRewardVideoAd', '~> 8.0.8'
 end
 
 post_install do |installer|

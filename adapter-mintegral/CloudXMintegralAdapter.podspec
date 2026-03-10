@@ -33,10 +33,10 @@ Pod::Spec.new do |s|
   
   # Mintegral SDK 8.x with bidding support
   # Uses: MTGBannerAdView, MTGNewInterstitialBidAdManager, MTGBidRewardAdManager
-  s.dependency 'MintegralAdSDK', '~> 8.0'
-  s.dependency 'MintegralAdSDK/BidBannerAd', '~> 8.0'
-  s.dependency 'MintegralAdSDK/BidNewInterstitialAd', '~> 8.0'
-  s.dependency 'MintegralAdSDK/BidRewardVideoAd', '~> 8.0'
+  s.dependency 'MintegralAdSDK', '~> 8.0.8'
+  s.dependency 'MintegralAdSDK/BidBannerAd', '~> 8.0.8'
+  s.dependency 'MintegralAdSDK/BidNewInterstitialAd', '~> 8.0.8'
+  s.dependency 'MintegralAdSDK/BidRewardVideoAd', '~> 8.0.8'
 
   s.frameworks = ['Foundation', 'UIKit', 'AdSupport', 'CoreGraphics', 'CoreTelephony', 'SystemConfiguration', 'AVFoundation', 'CoreMedia', 'QuartzCore', 'StoreKit', 'WebKit']
   s.weak_frameworks = ['AppTrackingTransparency']
