@@ -26,7 +26,7 @@
     [self.logger info:@"Starting factory resolution for adapters"];
     
     // Get all known adapter names (this would be equivalent to SDKConfig.KnownAdapterName.allCases in Swift)
-    NSArray *knownAdapterNames = @[@"testbidder", @"googleAdManager", @"meta", @"mintegral", @"cloudx", @"cloudXRenderer", @"vungle", @"inmobi", @"moloco"];
+    NSArray *knownAdapterNames = @[@"testbidder", @"googleAdManager", @"meta", @"mintegral", @"cloudx", @"cloudXRenderer", @"vungle", @"inmobi", @"moloco", @"unity"];
     
     for (NSString *adapterName in knownAdapterNames) {
         NSString *className = [self classNameForAdapterName:adapterName];
@@ -167,6 +167,8 @@
         return @"InMobi";
     } else if ([adapterName isEqualToString:@"moloco"]) {
         return @"Moloco";
+    } else if ([adapterName isEqualToString:@"unity"]) {
+        return @"Unity";
     } else {
         return @"Renderer"; // default to Renderer (testbidder)
     }

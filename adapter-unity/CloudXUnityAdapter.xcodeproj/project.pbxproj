@@ -1,0 +1,563 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1FB3B85FCBDCBA84446FA6AA /* Pods_CloudXUnityAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 700C6ADFB4254A8374A69C3C /* Pods_CloudXUnityAdapter.framework */; };
+		A2000100294A8A0000000001 /* CloudXUnityAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = A2000000294A8A0000000001 /* CloudXUnityAdapter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A2000101294A8A0000000001 /* CloudXUnityAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = A2000001294A8A0000000001 /* CloudXUnityAdapter.m */; };
+		A2000102294A8A0000000001 /* CLXUnityAdapterVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = A2000002294A8A0000000001 /* CLXUnityAdapterVersion.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A2000103294A8A0000000001 /* CLXUnityAdapterVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = A2000003294A8A0000000001 /* CLXUnityAdapterVersion.m */; };
+		A2000104294A8A0000000001 /* CLXUnityBidTokenSource.h in Headers */ = {isa = PBXBuildFile; fileRef = A2000004294A8A0000000001 /* CLXUnityBidTokenSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A2000105294A8A0000000001 /* CLXUnityBidTokenSource.m in Sources */ = {isa = PBXBuildFile; fileRef = A2000005294A8A0000000001 /* CLXUnityBidTokenSource.m */; };
+		A2000106294A8A0000000001 /* CLXUnityInitializer.h in Headers */ = {isa = PBXBuildFile; fileRef = A2000006294A8A0000000001 /* CLXUnityInitializer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A2000107294A8A0000000001 /* CLXUnityInitializer.m in Sources */ = {isa = PBXBuildFile; fileRef = A2000007294A8A0000000001 /* CLXUnityInitializer.m */; };
+		A2000108294A8A0000000001 /* CLXUnityErrorHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = A2000008294A8A0000000001 /* CLXUnityErrorHandler.h */; };
+		A2000109294A8A0000000001 /* CLXUnityErrorHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = A2000009294A8A0000000001 /* CLXUnityErrorHandler.m */; };
+		A200010A294A8A0000000001 /* CLXUnityInterstitial.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000A294A8A0000000001 /* CLXUnityInterstitial.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A200010B294A8A0000000001 /* CLXUnityInterstitial.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000B294A8A0000000001 /* CLXUnityInterstitial.m */; };
+		A200010C294A8A0000000001 /* CLXUnityInterstitialFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000C294A8A0000000001 /* CLXUnityInterstitialFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A200010D294A8A0000000001 /* CLXUnityInterstitialFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000D294A8A0000000001 /* CLXUnityInterstitialFactory.m */; };
+		A200010E294A8A0000000001 /* CLXUnityRewarded.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000E294A8A0000000001 /* CLXUnityRewarded.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A200010F294A8A0000000001 /* CLXUnityRewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000F294A8A0000000001 /* CLXUnityRewarded.m */; };
+		A2000110294A8A0000000001 /* CLXUnityRewardedFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A2000010294A8A0000000001 /* CLXUnityRewardedFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A2000111294A8A0000000001 /* CLXUnityRewardedFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A2000011294A8A0000000001 /* CLXUnityRewardedFactory.m */; };
+		A2000112294A8A0000000001 /* CLXUnityBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = A2000012294A8A0000000001 /* CLXUnityBanner.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A2000113294A8A0000000001 /* CLXUnityBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = A2000013294A8A0000000001 /* CLXUnityBanner.m */; };
+		A2000114294A8A0000000001 /* CLXUnityBannerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A2000014294A8A0000000001 /* CLXUnityBannerFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A2000115294A8A0000000001 /* CLXUnityBannerFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A2000015294A8A0000000001 /* CLXUnityBannerFactory.m */; };
+		A2000117294A8A0000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A2000017294A8A0000000001 /* PrivacyInfo.xcprivacy */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		700C6ADFB4254A8374A69C3C /* Pods_CloudXUnityAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXUnityAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		760F2624C3AB927AB79E2C9B /* Pods-CloudXUnityAdapter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXUnityAdapter.release.xcconfig"; path = "Target Support Files/Pods-CloudXUnityAdapter/Pods-CloudXUnityAdapter.release.xcconfig"; sourceTree = "<group>"; };
+		91FF98DE7501967ED1B06A93 /* Pods-CloudXUnityAdapter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXUnityAdapter.debug.xcconfig"; path = "Target Support Files/Pods-CloudXUnityAdapter/Pods-CloudXUnityAdapter.debug.xcconfig"; sourceTree = "<group>"; };
+		A2000000294A8A0000000001 /* CloudXUnityAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CloudXUnityAdapter.h; sourceTree = "<group>"; };
+		A2000001294A8A0000000001 /* CloudXUnityAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CloudXUnityAdapter.m; sourceTree = "<group>"; };
+		A2000002294A8A0000000001 /* CLXUnityAdapterVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXUnityAdapterVersion.h; sourceTree = "<group>"; };
+		A2000003294A8A0000000001 /* CLXUnityAdapterVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXUnityAdapterVersion.m; sourceTree = "<group>"; };
+		A2000004294A8A0000000001 /* CLXUnityBidTokenSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXUnityBidTokenSource.h; sourceTree = "<group>"; };
+		A2000005294A8A0000000001 /* CLXUnityBidTokenSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXUnityBidTokenSource.m; sourceTree = "<group>"; };
+		A2000006294A8A0000000001 /* CLXUnityInitializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXUnityInitializer.h; sourceTree = "<group>"; };
+		A2000007294A8A0000000001 /* CLXUnityInitializer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXUnityInitializer.m; sourceTree = "<group>"; };
+		A2000008294A8A0000000001 /* CLXUnityErrorHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXUnityErrorHandler.h; sourceTree = "<group>"; };
+		A2000009294A8A0000000001 /* CLXUnityErrorHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXUnityErrorHandler.m; sourceTree = "<group>"; };
+		A200000A294A8A0000000001 /* CLXUnityInterstitial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXUnityInterstitial.h; sourceTree = "<group>"; };
+		A200000B294A8A0000000001 /* CLXUnityInterstitial.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXUnityInterstitial.m; sourceTree = "<group>"; };
+		A200000C294A8A0000000001 /* CLXUnityInterstitialFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXUnityInterstitialFactory.h; sourceTree = "<group>"; };
+		A200000D294A8A0000000001 /* CLXUnityInterstitialFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXUnityInterstitialFactory.m; sourceTree = "<group>"; };
+		A200000E294A8A0000000001 /* CLXUnityRewarded.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXUnityRewarded.h; sourceTree = "<group>"; };
+		A200000F294A8A0000000001 /* CLXUnityRewarded.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXUnityRewarded.m; sourceTree = "<group>"; };
+		A2000010294A8A0000000001 /* CLXUnityRewardedFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXUnityRewardedFactory.h; sourceTree = "<group>"; };
+		A2000011294A8A0000000001 /* CLXUnityRewardedFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXUnityRewardedFactory.m; sourceTree = "<group>"; };
+		A2000012294A8A0000000001 /* CLXUnityBanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXUnityBanner.h; sourceTree = "<group>"; };
+		A2000013294A8A0000000001 /* CLXUnityBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXUnityBanner.m; sourceTree = "<group>"; };
+		A2000014294A8A0000000001 /* CLXUnityBannerFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXUnityBannerFactory.h; sourceTree = "<group>"; };
+		A2000015294A8A0000000001 /* CLXUnityBannerFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXUnityBannerFactory.m; sourceTree = "<group>"; };
+		A2000016294A8A0000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A2000017294A8A0000000001 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A2000018294A8A0000000001 /* CloudXUnityAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXUnityAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A2000200294A8A0000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1FB3B85FCBDCBA84446FA6AA /* Pods_CloudXUnityAdapter.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		67B99734DFECB81E96F72B1A /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				91FF98DE7501967ED1B06A93 /* Pods-CloudXUnityAdapter.debug.xcconfig */,
+				760F2624C3AB927AB79E2C9B /* Pods-CloudXUnityAdapter.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		A2000300294A8A0000000001 = {
+			isa = PBXGroup;
+			children = (
+				A2000301294A8A0000000001 /* Sources */,
+				A2000302294A8A0000000001 /* Products */,
+				67B99734DFECB81E96F72B1A /* Pods */,
+				E905FE278D5E137CE460B6D6 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		A2000301294A8A0000000001 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				A2000303294A8A0000000001 /* CloudXUnityAdapter */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		A2000302294A8A0000000001 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A2000018294A8A0000000001 /* CloudXUnityAdapter.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A2000303294A8A0000000001 /* CloudXUnityAdapter */ = {
+			isa = PBXGroup;
+			children = (
+				A2000000294A8A0000000001 /* CloudXUnityAdapter.h */,
+				A2000001294A8A0000000001 /* CloudXUnityAdapter.m */,
+				A2000002294A8A0000000001 /* CLXUnityAdapterVersion.h */,
+				A2000003294A8A0000000001 /* CLXUnityAdapterVersion.m */,
+				A2000004294A8A0000000001 /* CLXUnityBidTokenSource.h */,
+				A2000005294A8A0000000001 /* CLXUnityBidTokenSource.m */,
+				A2000016294A8A0000000001 /* Info.plist */,
+				A2000017294A8A0000000001 /* PrivacyInfo.xcprivacy */,
+				A2000304294A8A0000000001 /* Utils */,
+				A2000305294A8A0000000001 /* Initializers */,
+				A2000306294A8A0000000001 /* Interstitial */,
+				A2000307294A8A0000000001 /* Rewarded */,
+				A2000308294A8A0000000001 /* Banner */,
+			);
+			path = CloudXUnityAdapter;
+			sourceTree = "<group>";
+		};
+		A2000304294A8A0000000001 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				A2000008294A8A0000000001 /* CLXUnityErrorHandler.h */,
+				A2000009294A8A0000000001 /* CLXUnityErrorHandler.m */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		A2000305294A8A0000000001 /* Initializers */ = {
+			isa = PBXGroup;
+			children = (
+				A2000006294A8A0000000001 /* CLXUnityInitializer.h */,
+				A2000007294A8A0000000001 /* CLXUnityInitializer.m */,
+			);
+			path = Initializers;
+			sourceTree = "<group>";
+		};
+		A2000306294A8A0000000001 /* Interstitial */ = {
+			isa = PBXGroup;
+			children = (
+				A200000A294A8A0000000001 /* CLXUnityInterstitial.h */,
+				A200000B294A8A0000000001 /* CLXUnityInterstitial.m */,
+				A200000C294A8A0000000001 /* CLXUnityInterstitialFactory.h */,
+				A200000D294A8A0000000001 /* CLXUnityInterstitialFactory.m */,
+			);
+			path = Interstitial;
+			sourceTree = "<group>";
+		};
+		A2000307294A8A0000000001 /* Rewarded */ = {
+			isa = PBXGroup;
+			children = (
+				A200000E294A8A0000000001 /* CLXUnityRewarded.h */,
+				A200000F294A8A0000000001 /* CLXUnityRewarded.m */,
+				A2000010294A8A0000000001 /* CLXUnityRewardedFactory.h */,
+				A2000011294A8A0000000001 /* CLXUnityRewardedFactory.m */,
+			);
+			path = Rewarded;
+			sourceTree = "<group>";
+		};
+		A2000308294A8A0000000001 /* Banner */ = {
+			isa = PBXGroup;
+			children = (
+				A2000012294A8A0000000001 /* CLXUnityBanner.h */,
+				A2000013294A8A0000000001 /* CLXUnityBanner.m */,
+				A2000014294A8A0000000001 /* CLXUnityBannerFactory.h */,
+				A2000015294A8A0000000001 /* CLXUnityBannerFactory.m */,
+			);
+			path = Banner;
+			sourceTree = "<group>";
+		};
+		E905FE278D5E137CE460B6D6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				700C6ADFB4254A8374A69C3C /* Pods_CloudXUnityAdapter.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		A2000400294A8A0000000001 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2000100294A8A0000000001 /* CloudXUnityAdapter.h in Headers */,
+				A2000102294A8A0000000001 /* CLXUnityAdapterVersion.h in Headers */,
+				A2000104294A8A0000000001 /* CLXUnityBidTokenSource.h in Headers */,
+				A2000106294A8A0000000001 /* CLXUnityInitializer.h in Headers */,
+				A2000108294A8A0000000001 /* CLXUnityErrorHandler.h in Headers */,
+				A200010A294A8A0000000001 /* CLXUnityInterstitial.h in Headers */,
+				A200010C294A8A0000000001 /* CLXUnityInterstitialFactory.h in Headers */,
+				A200010E294A8A0000000001 /* CLXUnityRewarded.h in Headers */,
+				A2000110294A8A0000000001 /* CLXUnityRewardedFactory.h in Headers */,
+				A2000112294A8A0000000001 /* CLXUnityBanner.h in Headers */,
+				A2000114294A8A0000000001 /* CLXUnityBannerFactory.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		A2000500294A8A0000000001 /* CloudXUnityAdapter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2000600294A8A0000000001 /* Build configuration list for PBXNativeTarget "CloudXUnityAdapter" */;
+			buildPhases = (
+				872ED3D3C8472C76425CDBE2 /* [CP] Check Pods Manifest.lock */,
+				A2000400294A8A0000000001 /* Headers */,
+				A2000401294A8A0000000001 /* Sources */,
+				A2000200294A8A0000000001 /* Frameworks */,
+				A2000402294A8A0000000001 /* Resources */,
+				25AEABF03948A23B57402C7F /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CloudXUnityAdapter;
+			productName = CloudXUnityAdapter;
+			productReference = A2000018294A8A0000000001 /* CloudXUnityAdapter.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A2000700294A8A0000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					A2000500294A8A0000000001 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = A2000601294A8A0000000001 /* Build configuration list for PBXProject "CloudXUnityAdapter" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A2000300294A8A0000000001;
+			productRefGroup = A2000302294A8A0000000001 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A2000500294A8A0000000001 /* CloudXUnityAdapter */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A2000402294A8A0000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2000117294A8A0000000001 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		25AEABF03948A23B57402C7F /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXUnityAdapter/Pods-CloudXUnityAdapter-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXUnityAdapter/Pods-CloudXUnityAdapter-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXUnityAdapter/Pods-CloudXUnityAdapter-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		872ED3D3C8472C76425CDBE2 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXUnityAdapter-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A2000401294A8A0000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2000101294A8A0000000001 /* CloudXUnityAdapter.m in Sources */,
+				A2000103294A8A0000000001 /* CLXUnityAdapterVersion.m in Sources */,
+				A2000105294A8A0000000001 /* CLXUnityBidTokenSource.m in Sources */,
+				A2000107294A8A0000000001 /* CLXUnityInitializer.m in Sources */,
+				A2000109294A8A0000000001 /* CLXUnityErrorHandler.m in Sources */,
+				A200010B294A8A0000000001 /* CLXUnityInterstitial.m in Sources */,
+				A200010D294A8A0000000001 /* CLXUnityInterstitialFactory.m in Sources */,
+				A200010F294A8A0000000001 /* CLXUnityRewarded.m in Sources */,
+				A2000111294A8A0000000001 /* CLXUnityRewardedFactory.m in Sources */,
+				A2000113294A8A0000000001 /* CLXUnityBanner.m in Sources */,
+				A2000115294A8A0000000001 /* CLXUnityBannerFactory.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A2000800294A8A0000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		A2000801294A8A0000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A2000802294A8A0000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 91FF98DE7501967ED1B06A93 /* Pods-CloudXUnityAdapter.debug.xcconfig */;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/CloudXUnityAdapter/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 CloudX, Inc. All rights reserved.";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				MODULEMAP_FILE = Sources/CloudXUnityAdapter/module.modulemap;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.cloudx.adapter.unity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A2000803294A8A0000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 760F2624C3AB927AB79E2C9B /* Pods-CloudXUnityAdapter.release.xcconfig */;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/CloudXUnityAdapter/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 CloudX, Inc. All rights reserved.";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				MODULEMAP_FILE = Sources/CloudXUnityAdapter/module.modulemap;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.cloudx.adapter.unity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A2000600294A8A0000000001 /* Build configuration list for PBXNativeTarget "CloudXUnityAdapter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2000802294A8A0000000001 /* Debug */,
+				A2000803294A8A0000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2000601294A8A0000000001 /* Build configuration list for PBXProject "CloudXUnityAdapter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2000800294A8A0000000001 /* Debug */,
+				A2000801294A8A0000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A2000700294A8A0000000001 /* Project object */;
+}

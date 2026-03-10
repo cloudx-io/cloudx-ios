@@ -15,6 +15,9 @@ PODS:
     - MintegralAdSDK/BidRewardVideoAd (~> 8.0)
   - CloudXRenderer (2.2.1-beta):
     - CloudXCore
+  - CloudXUnityAdapter (2.0.0-rc):
+    - CloudXCore
+    - UnityAds (~> 4.17.0)
   - CloudXVungleAdapter (2.2.1-beta):
     - CloudXCore
     - VungleAds (~> 7.6.0)
@@ -55,6 +58,7 @@ PODS:
     - MintegralAdSDK/NativeAd
   - MintegralAdSDK/RewardVideoAd (8.0.7):
     - MintegralAdSDK/NativeAd
+  - UnityAds (4.17.0)
   - VungleAds (7.6.3)
 
 DEPENDENCIES:
@@ -64,6 +68,7 @@ DEPENDENCIES:
   - CloudXMetaAdapter (from `../adapter-meta`)
   - CloudXMintegralAdapter (from `../adapter-mintegral`)
   - CloudXRenderer (from `../renderer-cloudx`)
+  - CloudXUnityAdapter (from `../adapter-unity`)
   - CloudXVungleAdapter (from `../adapter-vungle`)
 
 SPEC REPOS:
@@ -72,6 +77,7 @@ SPEC REPOS:
     - FBAudienceNetwork
     - InMobiSDK
     - MintegralAdSDK
+    - UnityAds
     - VungleAds
 
 EXTERNAL SOURCES:
@@ -85,6 +91,8 @@ EXTERNAL SOURCES:
     :path: "../adapter-mintegral"
   CloudXRenderer:
     :path: "../renderer-cloudx"
+  CloudXUnityAdapter:
+    :path: "../adapter-unity"
   CloudXVungleAdapter:
     :path: "../adapter-vungle"
 
@@ -95,12 +103,14 @@ SPEC CHECKSUMS:
   CloudXMetaAdapter: 2251862dc72110da4063cce293584d89406a43a6
   CloudXMintegralAdapter: d2d9d54688442f8b7aa81a6c1669a061a76838a5
   CloudXRenderer: 277147b16dbaa96e0b789397ce5a45f035a1540b
+  CloudXUnityAdapter: be6d2bf5ac02dc7f8bc37f5950b3bcce1328640c
   CloudXVungleAdapter: adf63d40d5083deadd7871a72d903f55f07a962e
   FBAudienceNetwork: 85d18a65c9e35bc426bd4664cf3ae2a1172d7b60
   InMobiSDK: 4642fb34a961980ab94a1ac460c6e16e113498e6
   MintegralAdSDK: 9fde3aa7b739121e4e76ae83bcc612a4af27d7e5
+  UnityAds: adbe0d522fd14b8298c5e159164fc43396165843
   VungleAds: 40e87d1eaba17ac818b0f94461fd8ed21ad768dc
 
-PODFILE CHECKSUM: 052ef5428da24c673ac49e08236030fa88dbd530
+PODFILE CHECKSUM: 47834c1ebcdd027766aa3eb8d6e887617d64175f
 
 COCOAPODS: 1.16.2
