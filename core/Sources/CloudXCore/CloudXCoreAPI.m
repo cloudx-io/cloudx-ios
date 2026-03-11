@@ -79,6 +79,7 @@
 @interface CLXPublisherBanner (DeferredInit)
 @property (nonatomic, strong, nullable) CLXError *deferredError;
 @property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
+@property (nonatomic, copy, nullable) NSString *adUnitId;
 @end
 
 // Private category to expose deferred initialization properties for fullscreen ads
@@ -86,6 +87,7 @@
 @interface CLXPublisherFullscreenAdBase (DeferredInit)
 @property (nonatomic, strong, nullable) CLXError *deferredError;
 @property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
+@property (nonatomic, copy, nullable) NSString *adUnitId;
 @end
 
 // Private category to expose deferred initialization properties for native ads
@@ -93,6 +95,7 @@
 @interface CLXPublisherNative (DeferredInit)
 @property (nonatomic, strong, nullable) CLXError *deferredError;
 @property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
+@property (nonatomic, copy, nullable) NSString *adUnitId;
 @end
 
 // Internal access to the VC stored by deprecated createBanner/MRECWithAdUnitId:viewController: APIs.
@@ -860,6 +863,7 @@ static CloudXCore *_sharedInstance = nil;
     // If SDK not initialized, store the requested ad unit name for deferred lookup
     if (!adUnitConfig) {
         banner.requestedAdUnitId = adUnitId;
+        banner.adUnitId = adUnitId;
     }
 
     // ALWAYS return non-nil
@@ -950,6 +954,7 @@ static CloudXCore *_sharedInstance = nil;
     // If SDK not initialized, store the requested ad unit name for deferred lookup
     if (!adUnitConfig) {
         banner.requestedAdUnitId = adUnitId;
+        banner.adUnitId = adUnitId;
     }
 
     // ALWAYS return non-nil
@@ -1034,6 +1039,7 @@ static CloudXCore *_sharedInstance = nil;
     // If SDK not initialized, store the requested ad unit name for deferred lookup
     if (!adUnitConfig) {
         interstitial.requestedAdUnitId = adUnitId;
+        interstitial.adUnitId = adUnitId;
     }
     
     // ALWAYS return non-nil
@@ -1106,6 +1112,7 @@ static CloudXCore *_sharedInstance = nil;
     // If SDK not initialized, store the requested ad unit name for deferred lookup
     if (!adUnitConfig) {
         rewarded.requestedAdUnitId = adUnitId;
+        rewarded.adUnitId = adUnitId;
     }
     
     // ALWAYS return non-nil
@@ -1183,6 +1190,7 @@ static CloudXCore *_sharedInstance = nil;
     // If SDK not initialized, store the requested ad unit name for deferred lookup
     if (!adUnitConfig) {
         native.requestedAdUnitId = adUnitId;
+        native.adUnitId = adUnitId;
     }
     
     // Use default template if adUnitConfig is nil (deferred init case)

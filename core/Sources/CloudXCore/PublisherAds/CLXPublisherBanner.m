@@ -306,7 +306,6 @@ NS_ASSUME_NONNULL_BEGIN
             self.requestedAdUnitId = nil;
         } else {
             if (self.delegate && [self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
-                // Provide detailed error message with available ad units (mirrors Android AdUnitValidator)
                 NSArray<NSString *> *availableAdUnits = [[CloudXCore shared] availableAdUnitIds];
                 NSString *availableAdUnitsString = availableAdUnits.count > 0 
                     ? [availableAdUnits componentsJoinedByString:@", "] 

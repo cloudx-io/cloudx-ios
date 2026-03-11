@@ -244,7 +244,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     
     // Check for deferred error from create method
     if (self.deferredError) {
-        [self.logger error:[NSString stringWithFormat:@"Fullscreen ad creation failed with deferred error: %@", self.deferredError.localizedDescription]];
+        [self.logger error:[NSString stringWithFormat:@"Fullscreen ad creation failed with deferred error (adUnitId: %@): %@", self.adUnitId ?: @"(nil)", self.deferredError.localizedDescription]];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self notifyLoadFailure:self.deferredError];
         });
@@ -317,7 +317,7 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
             // Clear the requested ad unit ID since initialization is complete
             self.requestedAdUnitId = nil;
         } else {
-            // Provide detailed error message with available ad units (mirrors Android AdUnitValidator)
+            // Provide detailed error message with available ad units
             NSArray<NSString *> *availableAdUnits = [[CloudXCore shared] availableAdUnitIds];
             NSString *availableAdUnitsString = availableAdUnits.count > 0 
                 ? [availableAdUnits componentsJoinedByString:@", "] 
