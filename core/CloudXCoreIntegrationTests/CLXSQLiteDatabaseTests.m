@@ -414,4 +414,33 @@
     // Test passes if no crash: Should complete without crashes or excessive memory usage
 }
 
+#pragma mark - Real I/O Tests (moved from unit tests — require filesystem)
+
+- (void)testTableExists_AfterCreation_ReturnsTrue {
+    [self.database executeSQL:@"CREATE TABLE exists_test (id INTEGER);"];
+    XCTAssertTrue([self.database tableExists:@"exists_test"]);
+}
+
+- (void)testParameterBinding_AllTypes_Succeeds {
+    [self.database executeSQL:@"CREATE TABLE bind_test (id INTEGER PRIMARY KEY, v TEXT);"];
+
+    NSString *sql = @"INSERT INTO bind_test (id, v) VALUES (?, ?);";
+    BOOL r1 = [self.database executeSQL:sql withParameters:@[@1, @"string"]];
+    BOOL r2 = [self.database executeSQL:sql withParameters:@[@2, @(42)]];
+    BOOL r3 = [self.database executeSQL:sql withParameters:@[@3, @(3.14)]];
+    BOOL r4 = [self.database executeSQL:sql withParameters:@[@4, [NSNull null]]];
+    BOOL r5 = [self.database executeSQL:sql withParameters:@[@5, [NSData data]]];
+    BOOL r6 = [self.database executeSQL:sql withParameters:@[@6, [@"bytes" dataUsingEncoding:NSUTF8StringEncoding]]];
+
+    XCTAssertTrue(r1, @"String bind");
+    XCTAssertTrue(r2, @"Integer bind");
+    XCTAssertTrue(r3, @"Double bind");
+    XCTAssertTrue(r4, @"NSNull bind");
+    XCTAssertTrue(r5, @"Empty NSData bind");
+    XCTAssertTrue(r6, @"NSData bind");
+
+    NSArray *rows = [self.database executeQuery:@"SELECT COUNT(*) as c FROM bind_test;"];
+    XCTAssertEqual([rows[0][@"c"] integerValue], 6);
+}
+
 @end

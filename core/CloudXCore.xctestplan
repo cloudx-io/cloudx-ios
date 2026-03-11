@@ -18,7 +18,7 @@
   },
   "testTargets" : [
     {
-      "parallelizable" : false,
+      "parallelizable" : true,
       "target" : {
         "containerPath" : "container:CloudXCore.xcodeproj",
         "identifier" : "19C724792E2390420012CFC7",

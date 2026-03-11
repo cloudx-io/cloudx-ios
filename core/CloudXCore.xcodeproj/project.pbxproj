@@ -255,6 +255,7 @@
 		A29159BA773F7E820DD3C68D /* CLXSdkConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 99FA2AC5EECD9376EC954FC4 /* CLXSdkConfiguration.m */; };
 		AA0000012F01000000000001 /* CLXAdapterInitErrorTrackingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AA0000012F01000000000002 /* CLXAdapterInitErrorTrackingTests.m */; };
 		ADF30BB2933F365A4E6E5652 /* CLXDeferredErrorAdUnitIdTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B323532213A91E1FA134821 /* CLXDeferredErrorAdUnitIdTests.m */; };
+		AUDITBF000000000001 /* CLXErrorReporterPerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AUDITFR050000000001 /* CLXErrorReporterPerformanceTests.m */; };
 		AUDITBF010000000001 /* CLXBidAdSourceThreadSafetyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXTS00010000000001 /* CLXBidAdSourceThreadSafetyTests.m */; };
 		AUDITBF020000000001 /* CLXWinLossRetryBatchingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AUDITFR010000000001 /* CLXWinLossRetryBatchingTests.m */; };
 		AUDITBF030000000001 /* CLXWinLossTrackingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AUDITFR020000000001 /* CLXWinLossTrackingTests.m */; };
@@ -575,6 +576,7 @@
 		AUDITFR020000000001 /* CLXWinLossTrackingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXWinLossTrackingTests.m; sourceTree = "<group>"; };
 		AUDITFR030000000001 /* CLXWinLossTrackingIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXWinLossTrackingIntegrationTests.m; sourceTree = "<group>"; };
 		AUDITFR040000000001 /* CLXAdapterLoaderIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterLoaderIntegrationTests.m; sourceTree = "<group>"; };
+		AUDITFR050000000001 /* CLXErrorReporterPerformanceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXErrorReporterPerformanceTests.m; sourceTree = "<group>"; };
 		BABA00012F27A1B600E49E3E /* CLXPayloadBuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPayloadBuilder.h; sourceTree = "<group>"; };
 		BABA00022F27A1B600E49E3E /* CLXPayloadBuilder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPayloadBuilder.m; sourceTree = "<group>"; };
 		BD3F90AE521A7F6C18C00B27 /* CLXLossReasonMapper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Sources/CloudXCore/CLXLossReasonMapper.h; sourceTree = SOURCE_ROOT; };
@@ -1174,6 +1176,7 @@
 				AUDITFR010000000001 /* CLXWinLossRetryBatchingTests.m */,
 				AUDITFR030000000001 /* CLXWinLossTrackingIntegrationTests.m */,
 				AUDITFR040000000001 /* CLXAdapterLoaderIntegrationTests.m */,
+				AUDITFR050000000001 /* CLXErrorReporterPerformanceTests.m */,
 			);
 			path = CloudXCoreIntegrationTests;
 			sourceTree = "<group>";
@@ -1618,6 +1621,7 @@
 				AUDITBF020000000001 /* CLXWinLossRetryBatchingTests.m in Sources */,
 				AUDITBF040000000001 /* CLXWinLossTrackingIntegrationTests.m in Sources */,
 				AUDITBF050000000001 /* CLXAdapterLoaderIntegrationTests.m in Sources */,
+				AUDITBF000000000001 /* CLXErrorReporterPerformanceTests.m in Sources */,
 				AUDITBF060000000001 /* MockCLXWinLossTracker.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

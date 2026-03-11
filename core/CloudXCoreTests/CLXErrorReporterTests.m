@@ -260,25 +260,15 @@
     XCTAssertEqual([CLXErrorReporter shared], firstInstance, @"Singleton should return same instance");
 }
 
-#pragma mark - Performance Tests
+#pragma mark - Rapid-Fire Reporting (No measureBlock)
 
-/**
- * @brief Test error reporting performance under load
- * @discussion Measures performance of error reporting to ensure it doesn't impact app performance
- */
-- (void)testErrorReporting_PerformanceUnderLoad {
-    // Arrange
-    NSInteger reportCount = 1000;
-    
-    // Act & Assert
-    [self measureBlock:^{
-        for (NSInteger i = 0; i < reportCount; i++) {
-            NSException *exception = [NSException exceptionWithName:@"PerformanceTestException"
-                                                            reason:[NSString stringWithFormat:@"Performance test exception %ld", (long)i]
-                                                          userInfo:@{@"iteration": @(i)}];
-            [self.errorReporter reportException:exception context:@{@"test": @"performance"}];
-        }
-    }];
+- (void)testReportException_CalledRepeatedly_DoesNotCrash {
+    for (NSInteger i = 0; i < 50; i++) {
+        NSException *exception = [NSException exceptionWithName:@"RepeatException"
+                                                        reason:[NSString stringWithFormat:@"iteration %ld", (long)i]
+                                                      userInfo:nil];
+        XCTAssertNoThrow([self.errorReporter reportException:exception context:@{@"test": @"rapid"}]);
+    }
 }
 
 #pragma mark - Fail-Safety Tests

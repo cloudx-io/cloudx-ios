@@ -137,33 +137,38 @@
     XCTAssertFalse([self.database tableExists:@"nonexistent_table"]);
 }
 
-- (void)testTableExists_AfterCreation_ReturnsTrue {
-    [self.database executeSQL:@"CREATE TABLE exists_test (id INTEGER);"];
-    XCTAssertTrue([self.database tableExists:@"exists_test"]);
+- (void)testTableExists_OnClosedDatabase_ReturnsFalse {
+    [self.database closeDatabase];
+    XCTAssertFalse([self.database tableExists:@"any_table"],
+                   @"tableExists must return NO when the database handle is closed");
 }
 
-#pragma mark - Parameter Binding
+#pragma mark - Parameter Binding (Guards)
 
-- (void)testParameterBinding_AllTypes_Succeeds {
-    [self.database executeSQL:@"CREATE TABLE bind_test (id INTEGER PRIMARY KEY, v TEXT);"];
+- (void)testExecuteSQL_WithEmptyParameterArray_ReturnsFalse {
+    BOOL result = [self.database executeSQL:@"" withParameters:@[]];
+    XCTAssertFalse(result, @"Empty SQL with empty params should return NO");
+}
 
-    NSString *sql = @"INSERT INTO bind_test (id, v) VALUES (?, ?);";
-    BOOL r1 = [self.database executeSQL:sql withParameters:@[@1, @"string"]];
-    BOOL r2 = [self.database executeSQL:sql withParameters:@[@2, @(42)]];
-    BOOL r3 = [self.database executeSQL:sql withParameters:@[@3, @(3.14)]];
-    BOOL r4 = [self.database executeSQL:sql withParameters:@[@4, [NSNull null]]];
-    BOOL r5 = [self.database executeSQL:sql withParameters:@[@5, [NSData data]]];
-    BOOL r6 = [self.database executeSQL:sql withParameters:@[@6, [@"bytes" dataUsingEncoding:NSUTF8StringEncoding]]];
+- (void)testExecuteSQL_WithNilParameters_ReturnsFalse {
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wnonnull"
+    BOOL result = [self.database executeSQL:@"" withParameters:nil];
+    #pragma clang diagnostic pop
+    XCTAssertFalse(result, @"Empty SQL with nil params should return NO");
+}
 
-    XCTAssertTrue(r1, @"String bind");
-    XCTAssertTrue(r2, @"Integer bind");
-    XCTAssertTrue(r3, @"Double bind");
-    XCTAssertTrue(r4, @"NSNull bind");
-    XCTAssertTrue(r5, @"Empty NSData bind");
-    XCTAssertTrue(r6, @"NSData bind");
+- (void)testExecuteSQL_WithParameters_OnClosedDatabase_ReturnsFalse {
+    [self.database closeDatabase];
+    BOOL result = [self.database executeSQL:@"INSERT INTO t (c) VALUES (?);" withParameters:@[@"v"]];
+    XCTAssertFalse(result, @"Should fail when database is closed regardless of parameters");
+}
 
-    NSArray *rows = [self.database executeQuery:@"SELECT COUNT(*) as c FROM bind_test;"];
-    XCTAssertEqual([rows[0][@"c"] integerValue], 6);
+- (void)testExecuteQuery_WithParameters_OnClosedDatabase_ReturnsEmptyArray {
+    [self.database closeDatabase];
+    NSArray *results = [self.database executeQuery:@"SELECT * FROM t WHERE c = ?;" withParameters:@[@"v"]];
+    XCTAssertNotNil(results);
+    XCTAssertEqual(results.count, 0, @"Should return empty result when database is closed");
 }
 
 #pragma mark - Invalid SQL (Syntax)
