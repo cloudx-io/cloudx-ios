@@ -1,0 +1,24 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '13.0'
+
+target 'CloudXAdPreview' do
+  use_frameworks! :linkage => :static
+
+  # Pods for LOCAL development with source files from private repo
+  pod 'CloudXCore', :path => '../core'
+  pod 'CloudXMetaAdapter', :path => '../adapter-meta'
+  pod 'CloudXRenderer', :path => '../renderer-cloudx'
+  pod 'CloudXVungleAdapter', :path => '../adapter-vungle'
+  pod 'CloudXInMobiAdapter', :path => '../adapter-inmobi'
+  pod 'CloudXMintegralAdapter', :path => '../adapter-mintegral'
+
+  target 'CloudXAdPreviewTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'CloudXAdPreviewUITests' do
+    # Pods for testing
+  end
+
+end

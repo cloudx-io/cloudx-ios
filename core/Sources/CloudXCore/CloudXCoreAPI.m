@@ -428,7 +428,7 @@ static CloudXCore *_sharedInstance = nil;
         [self.logger info:@"Test mode automatically enabled for iOS Simulator"];
     }
 #endif
-    
+
     // Compute test mode enabled flag
     BOOL testModeEnabled = (testModeValue != 0);
     if (testModeEnabled) {

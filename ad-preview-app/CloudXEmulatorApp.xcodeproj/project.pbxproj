@@ -1,0 +1,779 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5C7BE07CF2E5A5F17190B980 /* Pods_CloudXAdPreviewTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EE879C12ECD44BD5FF204DF /* Pods_CloudXAdPreviewTests.framework */; };
+		96B9B01D77D480F2E17706EC /* Pods_CloudXAdPreview.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93323735C12A989589664E73 /* Pods_CloudXAdPreview.framework */; };
+		9C239B7F47A3C288E72394F6 /* Pods_CloudXAdPreview_CloudXAdPreviewUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BAFF53C414CE37426AFC7FEC /* Pods_CloudXAdPreview_CloudXAdPreviewUITests.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		195FD5AD2DE3C8000026F997 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 195FD58E2DE3C7FF0026F997 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 195FD5952DE3C7FF0026F997;
+			remoteInfo = CloudXAdPreview;
+		};
+		195FD5B72DE3C8000026F997 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 195FD58E2DE3C7FF0026F997 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 195FD5952DE3C7FF0026F997;
+			remoteInfo = CloudXAdPreview;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		06FC80381E292E38CC81EEEB /* Pods-CloudXAdPreview.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXAdPreview.release.xcconfig"; path = "Target Support Files/Pods-CloudXAdPreview/Pods-CloudXAdPreview.release.xcconfig"; sourceTree = "<group>"; };
+		195FD5962DE3C7FF0026F997 /* CloudXAdPreview.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CloudXAdPreview.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		195FD5AC2DE3C8000026F997 /* CloudXAdPreviewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXAdPreviewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		195FD5B62DE3C8000026F997 /* CloudXAdPreviewUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXAdPreviewUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		23E4221F9B7ADE0CFDFE476D /* Pods-CloudXAdPreviewTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXAdPreviewTests.release.xcconfig"; path = "Target Support Files/Pods-CloudXAdPreviewTests/Pods-CloudXAdPreviewTests.release.xcconfig"; sourceTree = "<group>"; };
+		2EE879C12ECD44BD5FF204DF /* Pods_CloudXAdPreviewTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXAdPreviewTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DD144EBFC81B0961DE210F0 /* Pods-CloudXAdPreviewTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXAdPreviewTests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXAdPreviewTests/Pods-CloudXAdPreviewTests.debug.xcconfig"; sourceTree = "<group>"; };
+		431D39269251EAB954F35032 /* Pods-CloudXEmulatorApp-CloudXEmulatorAppUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXEmulatorApp-CloudXEmulatorAppUITests.release.xcconfig"; path = "Target Support Files/Pods-CloudXEmulatorApp-CloudXEmulatorAppUITests/Pods-CloudXEmulatorApp-CloudXEmulatorAppUITests.release.xcconfig"; sourceTree = "<group>"; };
+		599A02EA2C10670FA4F3956C /* Pods-CloudXEmulatorApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXEmulatorApp.release.xcconfig"; path = "Target Support Files/Pods-CloudXEmulatorApp/Pods-CloudXEmulatorApp.release.xcconfig"; sourceTree = "<group>"; };
+		5F922BB1AB0B2215573A3955 /* Pods-CloudXEmulatorApp-CloudXEmulatorAppUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXEmulatorApp-CloudXEmulatorAppUITests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXEmulatorApp-CloudXEmulatorAppUITests/Pods-CloudXEmulatorApp-CloudXEmulatorAppUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		6A311DC8D8F29A09AF8F623A /* Pods-CloudXAdPreview-CloudXAdPreviewUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXAdPreview-CloudXAdPreviewUITests.release.xcconfig"; path = "Target Support Files/Pods-CloudXAdPreview-CloudXAdPreviewUITests/Pods-CloudXAdPreview-CloudXAdPreviewUITests.release.xcconfig"; sourceTree = "<group>"; };
+		70BA7392892EB0B6C1D2A03A /* Pods-CloudXAdPreview-CloudXAdPreviewUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXAdPreview-CloudXAdPreviewUITests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXAdPreview-CloudXAdPreviewUITests/Pods-CloudXAdPreview-CloudXAdPreviewUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		93323735C12A989589664E73 /* Pods_CloudXAdPreview.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXAdPreview.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7F1D5B2927D8F7C528332A2 /* Pods-CloudXEmulatorApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXEmulatorApp.debug.xcconfig"; path = "Target Support Files/Pods-CloudXEmulatorApp/Pods-CloudXEmulatorApp.debug.xcconfig"; sourceTree = "<group>"; };
+		BAFF53C414CE37426AFC7FEC /* Pods_CloudXAdPreview_CloudXAdPreviewUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXAdPreview_CloudXAdPreviewUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BD14A40FB76B284333E1A18A /* Pods-CloudXEmulatorAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXEmulatorAppTests.release.xcconfig"; path = "Target Support Files/Pods-CloudXEmulatorAppTests/Pods-CloudXEmulatorAppTests.release.xcconfig"; sourceTree = "<group>"; };
+		E6560F0A4690E043529D4790 /* Pods-CloudXEmulatorAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXEmulatorAppTests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXEmulatorAppTests/Pods-CloudXEmulatorAppTests.debug.xcconfig"; sourceTree = "<group>"; };
+		E657CB2936A7C33FCF238450 /* Pods-CloudXAdPreview.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXAdPreview.debug.xcconfig"; path = "Target Support Files/Pods-CloudXAdPreview/Pods-CloudXAdPreview.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		195FD5BE2DE3C8000026F997 /* Exceptions for "CloudXEmulatorApp" folder in "CloudXAdPreview" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 195FD5952DE3C7FF0026F997 /* CloudXAdPreview */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		195FD5982DE3C7FF0026F997 /* CloudXEmulatorApp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				195FD5BE2DE3C8000026F997 /* Exceptions for "CloudXEmulatorApp" folder in "CloudXAdPreview" target */,
+			);
+			path = CloudXEmulatorApp;
+			sourceTree = "<group>";
+		};
+		195FD5AF2DE3C8000026F997 /* CloudXEmulatorAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = CloudXEmulatorAppTests;
+			sourceTree = "<group>";
+		};
+		195FD5B92DE3C8000026F997 /* CloudXEmulatorAppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = CloudXEmulatorAppUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		195FD5932DE3C7FF0026F997 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96B9B01D77D480F2E17706EC /* Pods_CloudXAdPreview.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		195FD5A92DE3C8000026F997 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5C7BE07CF2E5A5F17190B980 /* Pods_CloudXAdPreviewTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		195FD5B32DE3C8000026F997 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C239B7F47A3C288E72394F6 /* Pods_CloudXAdPreview_CloudXAdPreviewUITests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		195FD58D2DE3C7FF0026F997 = {
+			isa = PBXGroup;
+			children = (
+				195FD5982DE3C7FF0026F997 /* CloudXEmulatorApp */,
+				195FD5AF2DE3C8000026F997 /* CloudXEmulatorAppTests */,
+				195FD5B92DE3C8000026F997 /* CloudXEmulatorAppUITests */,
+				195FD5972DE3C7FF0026F997 /* Products */,
+				E1698230A3F518F2A8E30456 /* Pods */,
+				268BA537D5A1567044308043 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		195FD5972DE3C7FF0026F997 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				195FD5962DE3C7FF0026F997 /* CloudXAdPreview.app */,
+				195FD5AC2DE3C8000026F997 /* CloudXAdPreviewTests.xctest */,
+				195FD5B62DE3C8000026F997 /* CloudXAdPreviewUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		268BA537D5A1567044308043 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				93323735C12A989589664E73 /* Pods_CloudXAdPreview.framework */,
+				BAFF53C414CE37426AFC7FEC /* Pods_CloudXAdPreview_CloudXAdPreviewUITests.framework */,
+				2EE879C12ECD44BD5FF204DF /* Pods_CloudXAdPreviewTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E1698230A3F518F2A8E30456 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				A7F1D5B2927D8F7C528332A2 /* Pods-CloudXEmulatorApp.debug.xcconfig */,
+				599A02EA2C10670FA4F3956C /* Pods-CloudXEmulatorApp.release.xcconfig */,
+				5F922BB1AB0B2215573A3955 /* Pods-CloudXEmulatorApp-CloudXEmulatorAppUITests.debug.xcconfig */,
+				431D39269251EAB954F35032 /* Pods-CloudXEmulatorApp-CloudXEmulatorAppUITests.release.xcconfig */,
+				E6560F0A4690E043529D4790 /* Pods-CloudXEmulatorAppTests.debug.xcconfig */,
+				BD14A40FB76B284333E1A18A /* Pods-CloudXEmulatorAppTests.release.xcconfig */,
+				E657CB2936A7C33FCF238450 /* Pods-CloudXAdPreview.debug.xcconfig */,
+				06FC80381E292E38CC81EEEB /* Pods-CloudXAdPreview.release.xcconfig */,
+				70BA7392892EB0B6C1D2A03A /* Pods-CloudXAdPreview-CloudXAdPreviewUITests.debug.xcconfig */,
+				6A311DC8D8F29A09AF8F623A /* Pods-CloudXAdPreview-CloudXAdPreviewUITests.release.xcconfig */,
+				3DD144EBFC81B0961DE210F0 /* Pods-CloudXAdPreviewTests.debug.xcconfig */,
+				23E4221F9B7ADE0CFDFE476D /* Pods-CloudXAdPreviewTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		195FD5952DE3C7FF0026F997 /* CloudXAdPreview */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 195FD5BF2DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXAdPreview" */;
+			buildPhases = (
+				15D964051A222F1A42D8C208 /* [CP] Check Pods Manifest.lock */,
+				195FD5922DE3C7FF0026F997 /* Sources */,
+				195FD5932DE3C7FF0026F997 /* Frameworks */,
+				195FD5942DE3C7FF0026F997 /* Resources */,
+				3FA80EC0A36A57F7E9EDF124 /* [CP] Embed Pods Frameworks */,
+				86D78F399B86A475F7906799 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				195FD5982DE3C7FF0026F997 /* CloudXEmulatorApp */,
+			);
+			name = CloudXAdPreview;
+			productName = CloudXAdPreview;
+			productReference = 195FD5962DE3C7FF0026F997 /* CloudXAdPreview.app */;
+			productType = "com.apple.product-type.application";
+		};
+		195FD5AB2DE3C8000026F997 /* CloudXAdPreviewTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 195FD5C42DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXAdPreviewTests" */;
+			buildPhases = (
+				CBF5C4E47CEDAA542B6DD472 /* [CP] Check Pods Manifest.lock */,
+				195FD5A82DE3C8000026F997 /* Sources */,
+				195FD5A92DE3C8000026F997 /* Frameworks */,
+				195FD5AA2DE3C8000026F997 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				195FD5AE2DE3C8000026F997 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				195FD5AF2DE3C8000026F997 /* CloudXEmulatorAppTests */,
+			);
+			name = CloudXAdPreviewTests;
+			productName = CloudXAdPreviewTests;
+			productReference = 195FD5AC2DE3C8000026F997 /* CloudXAdPreviewTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		195FD5B52DE3C8000026F997 /* CloudXAdPreviewUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 195FD5C72DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXAdPreviewUITests" */;
+			buildPhases = (
+				43F0D695A7654B7F52739EEC /* [CP] Check Pods Manifest.lock */,
+				195FD5B22DE3C8000026F997 /* Sources */,
+				195FD5B32DE3C8000026F997 /* Frameworks */,
+				195FD5B42DE3C8000026F997 /* Resources */,
+				3CDC5E66F7ACE1E217AC32CD /* [CP] Embed Pods Frameworks */,
+				4E189D269143C80EDA3825DF /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				195FD5B82DE3C8000026F997 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				195FD5B92DE3C8000026F997 /* CloudXEmulatorAppUITests */,
+			);
+			name = CloudXAdPreviewUITests;
+			productName = CloudXAdPreviewUITests;
+			productReference = 195FD5B62DE3C8000026F997 /* CloudXAdPreviewUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		195FD58E2DE3C7FF0026F997 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					195FD5952DE3C7FF0026F997 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					195FD5AB2DE3C8000026F997 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 195FD5952DE3C7FF0026F997;
+					};
+					195FD5B52DE3C8000026F997 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 195FD5952DE3C7FF0026F997;
+					};
+				};
+			};
+			buildConfigurationList = 195FD5912DE3C7FF0026F997 /* Build configuration list for PBXProject "CloudXEmulatorApp" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 195FD58D2DE3C7FF0026F997;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 195FD5972DE3C7FF0026F997 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				195FD5952DE3C7FF0026F997 /* CloudXAdPreview */,
+				195FD5AB2DE3C8000026F997 /* CloudXAdPreviewTests */,
+				195FD5B52DE3C8000026F997 /* CloudXAdPreviewUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		195FD5942DE3C7FF0026F997 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		195FD5AA2DE3C8000026F997 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		195FD5B42DE3C8000026F997 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		15D964051A222F1A42D8C208 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXAdPreview-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3CDC5E66F7ACE1E217AC32CD /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXAdPreview-CloudXAdPreviewUITests/Pods-CloudXAdPreview-CloudXAdPreviewUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXAdPreview-CloudXAdPreviewUITests/Pods-CloudXAdPreview-CloudXAdPreviewUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXAdPreview-CloudXAdPreviewUITests/Pods-CloudXAdPreview-CloudXAdPreviewUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3FA80EC0A36A57F7E9EDF124 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXAdPreview/Pods-CloudXAdPreview-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXAdPreview/Pods-CloudXAdPreview-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXAdPreview/Pods-CloudXAdPreview-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		43F0D695A7654B7F52739EEC /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXAdPreview-CloudXAdPreviewUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4E189D269143C80EDA3825DF /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXAdPreview-CloudXAdPreviewUITests/Pods-CloudXAdPreview-CloudXAdPreviewUITests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXAdPreview-CloudXAdPreviewUITests/Pods-CloudXAdPreview-CloudXAdPreviewUITests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXAdPreview-CloudXAdPreviewUITests/Pods-CloudXAdPreview-CloudXAdPreviewUITests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		86D78F399B86A475F7906799 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXAdPreview/Pods-CloudXAdPreview-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-CloudXAdPreview/Pods-CloudXAdPreview-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CloudXAdPreview/Pods-CloudXAdPreview-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CBF5C4E47CEDAA542B6DD472 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CloudXAdPreviewTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		195FD5922DE3C7FF0026F997 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		195FD5A82DE3C8000026F997 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		195FD5B22DE3C8000026F997 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		195FD5AE2DE3C8000026F997 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 195FD5952DE3C7FF0026F997 /* CloudXAdPreview */;
+			targetProxy = 195FD5AD2DE3C8000026F997 /* PBXContainerItemProxy */;
+		};
+		195FD5B82DE3C8000026F997 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 195FD5952DE3C7FF0026F997 /* CloudXAdPreview */;
+			targetProxy = 195FD5B72DE3C8000026F997 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		195FD5C02DE3C8000026F997 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E657CB2936A7C33FCF238450 /* Pods-CloudXAdPreview.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SFK4FBZQ9F;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CloudXEmulatorApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CloudXAdPreview;
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "This identifier will be used to deliver personalized ads to you.";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.10;
+				PRODUCT_BUNDLE_IDENTIFIER = io.cloudx.emulator;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		195FD5C12DE3C8000026F997 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 06FC80381E292E38CC81EEEB /* Pods-CloudXAdPreview.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SFK4FBZQ9F;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CloudXEmulatorApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CloudXAdPreview;
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "This identifier will be used to deliver personalized ads to you.";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.10;
+				PRODUCT_BUNDLE_IDENTIFIER = io.cloudx.emulator;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		195FD5C22DE3C8000026F997 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		195FD5C32DE3C8000026F997 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		195FD5C52DE3C8000026F997 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3DD144EBFC81B0961DE210F0 /* Pods-CloudXAdPreviewTests.debug.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.10;
+				PRODUCT_BUNDLE_IDENTIFIER = "cloudx.CloudXAdPreviewTests${DEVELOPMENT_TEAM}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CloudXAdPreview.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CloudXAdPreview";
+			};
+			name = Debug;
+		};
+		195FD5C62DE3C8000026F997 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 23E4221F9B7ADE0CFDFE476D /* Pods-CloudXAdPreviewTests.release.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.10;
+				PRODUCT_BUNDLE_IDENTIFIER = "cloudx.CloudXAdPreviewTests${DEVELOPMENT_TEAM}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CloudXAdPreview.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CloudXAdPreview";
+			};
+			name = Release;
+		};
+		195FD5C82DE3C8000026F997 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 70BA7392892EB0B6C1D2A03A /* Pods-CloudXAdPreview-CloudXAdPreviewUITests.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.10;
+				PRODUCT_BUNDLE_IDENTIFIER = "cloudx.CloudXAdPreviewUITests${DEVELOPMENT_TEAM}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CloudXAdPreview;
+			};
+			name = Debug;
+		};
+		195FD5C92DE3C8000026F997 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6A311DC8D8F29A09AF8F623A /* Pods-CloudXAdPreview-CloudXAdPreviewUITests.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.10;
+				PRODUCT_BUNDLE_IDENTIFIER = "cloudx.CloudXAdPreviewUITests${DEVELOPMENT_TEAM}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CloudXAdPreview;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		195FD5912DE3C7FF0026F997 /* Build configuration list for PBXProject "CloudXEmulatorApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				195FD5C22DE3C8000026F997 /* Debug */,
+				195FD5C32DE3C8000026F997 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		195FD5BF2DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXAdPreview" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				195FD5C02DE3C8000026F997 /* Debug */,
+				195FD5C12DE3C8000026F997 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		195FD5C42DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXAdPreviewTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				195FD5C52DE3C8000026F997 /* Debug */,
+				195FD5C62DE3C8000026F997 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		195FD5C72DE3C8000026F997 /* Build configuration list for PBXNativeTarget "CloudXAdPreviewUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				195FD5C82DE3C8000026F997 /* Debug */,
+				195FD5C92DE3C8000026F997 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 195FD58E2DE3C7FF0026F997 /* Project object */;
+}

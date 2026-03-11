@@ -46,12 +46,17 @@
     
     self.mockImpModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:self.mockSDKConfig
                                                                   auctionID:@"test-auction"];
+
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreBundleConfigKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)tearDown {
     [self.testDefaults removePersistentDomainForName:self.testSuiteName];
     self.testDefaults = nil;
     self.testSuiteName = nil;
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreBundleConfigKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     [super tearDown];
 }
 
@@ -76,6 +81,21 @@
                       impModel:self.mockImpModel
                       settings:[CLXSettings sharedInstance]
                 privacyService:self.privacyService];
+}
+
+- (void)testAppBundle_UsesBundleOverrideOnSimulator {
+    NSString *overrideBundle = @"io.cloudx.override.bundle";
+    [[NSUserDefaults standardUserDefaults] setObject:overrideBundle forKey:kCLXCoreBundleConfigKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+
+    CLXBiddingConfigRequest *config = [self createBiddingConfigWithAdType:CLXAdTypeBanner];
+    NSDictionary *json = [config json];
+
+#if TARGET_IPHONE_SIMULATOR
+    XCTAssertEqualObjects(json[@"app"][@"bundle"], overrideBundle);
+#else
+    XCTAssertEqualObjects(json[@"app"][@"bundle"], [NSBundle mainBundle].bundleIdentifier);
+#endif
 }
 
 #pragma mark - device.model Tests

@@ -69,9 +69,6 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXCoreDntKey @"CLXCore_dnt"
 #define kCLXCoreUserAgentValueKey @"CLXCore_userAgent"
 
-// Additional configuration keys
-#define kCLXCoreIfaConfigKey @"CLXCore_ifa_config"
-
 // Privacy service keys
 // IAB standard keys for CMP compatibility (GDPR TCF, CCPA/US Privacy)
 #define kCLXPrivacyGDPRConsentKey @"IABTCF_TCString"

@@ -31,7 +31,7 @@
     [userDefaults removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
     
     // Clear any other keys that might be used in migration tests
-    [userDefaults removeObjectForKey:kCLXCoreIfaConfigKey];
+    [userDefaults removeObjectForKey:kCLXCoreIFAConfigKey];
     
     // Clear IAB GPP keys (used by CLXConsentProvider)
     [userDefaults removeObjectForKey:@"IABGPP_HDR_GppString"];

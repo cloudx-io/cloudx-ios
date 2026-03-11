@@ -116,3 +116,6 @@ unity-binaries/*.xcframework.zip
 
 # Test results
 *.xcresult
+
+# AI artifacts
+.codex-derived/

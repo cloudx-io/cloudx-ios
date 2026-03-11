@@ -183,12 +183,20 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
     NSString *idfa = [CLXSystemInformation shared].idfa ?: @"00000-00000-00000-000000";
     NSString *idfv = [CLXSystemInformation shared].idfv ?: @"00000-00000-00000-000000";
     
+    NSString *effectiveBundle = [CLXSystemInformation shared].appBundleIdentifier;
+#if TARGET_IPHONE_SIMULATOR
+    NSString *bundleOverride = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreBundleConfigKey];
+    if (bundleOverride.length > 0) {
+        effectiveBundle = bundleOverride;
+    }
+#endif
+
     // Log IFA at INFO level for test whitelisting - developers can copy this to whitelist their device
     [self.logger info:[NSString stringWithFormat:@"Device IFA for test whitelisting: %@", idfa]];
-    [self.logger debug:[NSString stringWithFormat:@"Device info - Bundle: %@, OS: %@, IDFV: %@", [CLXSystemInformation shared].appBundleIdentifier, [CLXSystemInformation shared].osVersion, idfv]];
+    [self.logger debug:[NSString stringWithFormat:@"Device info - Bundle: %@, OS: %@, IDFV: %@", effectiveBundle, [CLXSystemInformation shared].osVersion, idfv]];
     
     CLXSDKConfigRequest *request = [[CLXSDKConfigRequest alloc] init];
-    request.bundle = [CLXSystemInformation shared].appBundleIdentifier;
+    request.bundle = effectiveBundle;
     request.os = @"iOS";
     request.osVersion = [CLXSystemInformation shared].osVersion;
     request.model = [UIDevice clx_deviceIdentifier];

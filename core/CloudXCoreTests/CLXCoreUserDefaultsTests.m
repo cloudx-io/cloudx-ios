@@ -11,7 +11,6 @@
 #import <CloudXCore/CLXKeyValueState.h>
 #import <CloudXCore/CLXDIContainer.h>
 #import <CloudXCore/CLXLiveInitService.h>
-#import "../Sources/CloudXCore/CloudXCoreInternal.h"
 #import "Mocks/CLXMockInitService.h"
 
 @interface CloudXCore (Testing)
