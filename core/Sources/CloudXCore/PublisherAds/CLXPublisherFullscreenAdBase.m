@@ -350,9 +350,15 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
             });
             return;
         }
-        case CLXFullscreenAdStateSHOWING:
-            [self.logger debug:[NSString stringWithFormat:@"[%@] [PublisherFullscreenAd] Currently showing, ignoring load request", self.currentCorrelationId]];
+        case CLXFullscreenAdStateSHOWING: {
+            [self.logger error:[NSString stringWithFormat:@"[%@] [PublisherFullscreenAd] Cannot load — ad is currently being displayed", self.currentCorrelationId]];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                CLXError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed
+                                              description:@"Cannot load ad while another ad is currently being displayed. Wait for the current ad to be dismissed."];
+                [self notifyLoadFailure:error];
+            });
             return;
+        }
         case CLXFullscreenAdStateDESTROYED:
             // Defensive guard: DESTROYED state is already handled in load() at the top.
             // This case handles edge scenarios where performLoad() is called directly
