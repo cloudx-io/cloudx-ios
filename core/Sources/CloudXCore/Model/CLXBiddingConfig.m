@@ -394,13 +394,7 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         publisher.publisherID = publisherID;
         publisher.ext = publisherExt;
         
-        NSString *bundle = [[NSBundle mainBundle] bundleIdentifier];
-#if TARGET_IPHONE_SIMULATOR
-        NSString *bundleOverride = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreBundleConfigKey];
-        if (bundleOverride.length > 0) {
-            bundle = bundleOverride;
-        }
-#endif
+        NSString *bundle = [CLXSystemInformation shared].effectiveAppBundleIdentifier;
         
         // Read app key values from CLXKeyValueState
         NSDictionary *appKeyValues = [[CLXKeyValueState shared] appKeyValues] ?: @{};

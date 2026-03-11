@@ -41,7 +41,7 @@
                    auctionId, rillImpressionModel.lastBidResponse.auctionId ? @"bid response" : @"account ID"]];
     
     // Set session data
-    NSString *appBundle = [[NSBundle mainBundle] bundleIdentifier] ?: @"";
+    NSString *appBundle = [CLXSystemInformation shared].effectiveAppBundleIdentifier;
     NSString *pluginVersion = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCorePluginVersionKey];
     [resolver setSessionConstData:rillImpressionModel.impModel.sessionID ?: @""
                        sdkVersion:CLXSDKVersion

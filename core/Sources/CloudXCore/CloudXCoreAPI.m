@@ -528,7 +528,7 @@ static CloudXCore *_sharedInstance = nil;
     // PayloadBuilder centralizes payload construction with {eventId} placeholder replacement
     
     // Set session constant data BEFORE creating PayloadBuilder so appBundle is included in payload
-    NSString *appBundle = [[NSBundle mainBundle] bundleIdentifier] ?: @"";
+    NSString *appBundle = [CLXSystemInformation shared].effectiveAppBundleIdentifier;
     NSString *pluginVersion = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCorePluginVersionKey];
     DeviceType deviceType = [CLXSystemInformation shared].deviceType;
     [[CLXTrackingFieldResolver shared] setSessionConstData:config.sessionID ?: @""

@@ -9,6 +9,7 @@
 
 #import <CloudXCore/CLXSystemInformation.h>
 #import <CloudXCore/CLXVersion.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <UIKit/UIKit.h>
 #import <AdSupport/AdSupport.h>
 #import <AppTrackingTransparency/AppTrackingTransparency.h>
@@ -66,6 +67,17 @@ static CLXSystemInformation *sharedInstance = nil;
 
 - (NSString *)appBundleIdentifier {
     return [[NSBundle mainBundle] bundleIdentifier] ?: @"";
+}
+
+- (NSString *)effectiveAppBundleIdentifier {
+    NSString *bundle = self.appBundleIdentifier;
+#if TARGET_IPHONE_SIMULATOR
+    NSString *bundleOverride = [[NSUserDefaults standardUserDefaults] stringForKey:kCLXCoreBundleConfigKey];
+    if (bundleOverride.length > 0) {
+        bundle = bundleOverride;
+    }
+#endif
+    return bundle;
 }
 
 - (NSString *)appVersion {
