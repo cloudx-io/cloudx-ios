@@ -1,0 +1,17 @@
+framework module CloudXUnityAdapter {
+    umbrella header "CloudXUnityAdapter.h"
+
+    export *
+    module * { export * }
+
+    // Explicit module for UnityAds SDK dependency
+    link framework "UnityAds"
+
+    // Required frameworks
+    link framework "Foundation"
+    link framework "UIKit"
+    link framework "AdSupport"
+    link framework "CoreTelephony"
+    link framework "StoreKit"
+    link framework "WebKit"
+}
