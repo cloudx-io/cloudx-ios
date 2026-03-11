@@ -201,18 +201,40 @@ static BOOL _globalTimestampsEnabled = NO;
 
 #pragma mark - Delegate Callback Logging
 
+- (void)appendAdUnitContext:(NSMutableString *)message
+                 adUnitName:(nullable NSString *)adUnitName
+                   adUnitId:(nullable NSString *)adUnitId
+                networkName:(nullable NSString *)networkName {
+    if (adUnitName) {
+        [message appendFormat:@"\n  📍 Ad Unit: %@", adUnitName];
+    }
+    if (adUnitId) {
+        [message appendFormat:@"\n  🆔 Ad Unit ID: %@", adUnitId];
+    }
+    if (networkName) {
+        [message appendFormat:@"\n  🏢 Bidder: %@", networkName];
+    }
+}
+
+- (void)appendErrorContext:(NSMutableString *)message error:(nullable CLXError *)error {
+    if (error) {
+        [message appendFormat:@"\n  ⚠️ Error: %@", error.localizedDescription ?: @"Unknown error"];
+        if (error.code != 0) {
+            [message appendFormat:@"\n  🔢 Code: %ld", (long)error.code];
+        }
+    } else {
+        [message appendString:@"\n  ⚠️ Error: (null)"];
+    }
+}
+
 - (void)logDelegateCallback:(NSString *)callbackName ad:(CLXAd *)ad {
     NSMutableString *message = [NSMutableString stringWithString:callbackName];
     
     if (ad) {
-        [message appendString:@"\n  📍 Ad Unit: "];
-        [message appendString:ad.adUnitName ?: @"(null)"];
-        
-        [message appendString:@"\n  🆔 Ad Unit ID: "];
-        [message appendString:ad.adUnitId ?: @"(null)"];
-        
-        [message appendString:@"\n  🏢 Bidder: "];
-        [message appendString:ad.networkName ?: @"(null)"];
+        [self appendAdUnitContext:message
+                      adUnitName:ad.adUnitName
+                        adUnitId:ad.adUnitId
+                     networkName:ad.networkName];
         
         [message appendString:@"\n  🔗 External ID: "];
         [message appendString:ad.networkPlacement ?: @"(null)"];
@@ -231,19 +253,17 @@ static BOOL _globalTimestampsEnabled = NO;
 }
 
 - (void)logDelegateError:(NSString *)callbackName error:(CLXError *)error {
+    [self logDelegateError:callbackName adUnitName:nil adUnitId:nil networkName:nil error:error];
+}
+
+- (void)logDelegateError:(NSString *)callbackName
+             adUnitName:(nullable NSString *)adUnitName
+               adUnitId:(nullable NSString *)adUnitId
+            networkName:(nullable NSString *)networkName
+                  error:(nullable CLXError *)error {
     NSMutableString *message = [NSMutableString stringWithString:callbackName];
-    
-    if (error) {
-        [message appendString:@"\n  ⚠️ Error: "];
-        [message appendString:error.localizedDescription ?: @"Unknown error"];
-        
-        if (error.code != 0) {
-            [message appendFormat:@"\n  🔢 Code: %ld", (long)error.code];
-        }
-    } else {
-        [message appendString:@" - Error: (null)"];
-    }
-    
+    [self appendAdUnitContext:message adUnitName:adUnitName adUnitId:adUnitId networkName:networkName];
+    [self appendErrorContext:message error:error];
     [self logAtLevel:CLXLogLevelError emojiType:CLXLogEmojiError message:message];
 }
 

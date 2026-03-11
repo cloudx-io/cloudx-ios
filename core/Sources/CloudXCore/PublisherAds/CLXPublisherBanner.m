@@ -236,7 +236,7 @@ NS_ASSUME_NONNULL_BEGIN
         if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
             CLXError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
                                           description:@"Cannot load ad after destroy() has been called. Create a new ad instance to load another ad."];
-            [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" error:error];
+            [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" adUnitName:self.adUnitName adUnitId:self.adUnitId networkName:self.lastBidResponse.networkName error:error];
             [self.delegate didFailToLoadAd:self.adUnitId error:error];
         }
     });
@@ -254,7 +254,7 @@ NS_ASSUME_NONNULL_BEGIN
     if (self.deferredError) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
-                [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" error:self.deferredError];
+                [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" adUnitName:self.adUnitName adUnitId:self.adUnitId networkName:self.lastBidResponse.networkName error:self.deferredError];
                 [self.delegate didFailToLoadAd:self.adUnitId error:self.deferredError];
             }
         });
@@ -313,7 +313,7 @@ NS_ASSUME_NONNULL_BEGIN
                 CLXError *error = [CLXError errorWithCode:CLXErrorCodeInvalidAdUnit 
                                               description:[NSString stringWithFormat:@"Ad unit '%@' not found in SDK configuration. Available ad units: [%@].", 
                                                           self.requestedAdUnitId, availableAdUnitsString]];
-                [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" error:error];
+                [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" adUnitName:self.adUnitName adUnitId:self.requestedAdUnitId networkName:nil error:error];
                 [self.delegate didFailToLoadAd:self.adUnitId error:error];
             }
             return;
@@ -343,7 +343,7 @@ NS_ASSUME_NONNULL_BEGIN
             if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
                 CLXError *error = [CLXError errorWithCode:CLXErrorCodeLoadFailed 
                                               description:@"Internal error: BidAdSource not available. SDK may not be properly initialized."];
-                [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" error:error];
+                [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" adUnitName:self.adUnitName adUnitId:self.adUnitId networkName:nil error:error];
                 [self.delegate didFailToLoadAd:self.adUnitId error:error];
             }
         });
@@ -857,7 +857,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     // Emit error to delegate
     if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
-        [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" error:delegateError];
+        [self.logger logDelegateError:@"❌ Banner didFailToLoadAd" adUnitName:self.adUnitName adUnitId:self.adUnitId networkName:self.lastBidResponse.networkName error:delegateError];
         [self.delegate didFailToLoadAd:self.adUnitId error:delegateError];
     }
    

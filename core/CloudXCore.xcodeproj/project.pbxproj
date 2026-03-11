@@ -249,6 +249,7 @@
 		19PRIVACY0002000000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 19PRIVACY0001000000000001 /* PrivacyInfo.xcprivacy */; };
 		2816B352E645DF103BB8A776 /* CLXEventType.m in Sources */ = {isa = PBXBuildFile; fileRef = E42754A92780774B1BFA391E /* CLXEventType.m */; };
 		2B39A5D0E21142C6B7DA2DF9 /* CLXEventType.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A1A56010795A2C3B0C83847 /* CLXEventType.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		56D01B15FD9902FBC9FF0A12 /* CLXLoggerDelegateErrorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 851E738266F1EB217925CE72 /* CLXLoggerDelegateErrorTests.m */; };
 		87A7AFEA6107EE5AEC2E6161 /* CLXAdapterLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = FD3F150B4D80A1DA1031EDEB /* CLXAdapterLoader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9C9A9BB83364F0DFB2059385 /* CLXSdkConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = FBBA381156DD111B81ED1927 /* CLXSdkConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A29159BA773F7E820DD3C68D /* CLXSdkConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 99FA2AC5EECD9376EC954FC4 /* CLXSdkConfiguration.m */; };
@@ -565,6 +566,7 @@
 		19PRIVACY0001000000000001 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		2A1A56010795A2C3B0C83847 /* CLXEventType.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXEventType.h; sourceTree = "<group>"; };
 		6FE25D639309C9F445DC93FF /* CLXLossReasonMapper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = Sources/CloudXCore/WinLoss/CLXLossReasonMapper.m; sourceTree = SOURCE_ROOT; };
+		851E738266F1EB217925CE72 /* CLXLoggerDelegateErrorTests.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXLoggerDelegateErrorTests.m; sourceTree = "<group>"; };
 		99FA2AC5EECD9376EC954FC4 /* CLXSdkConfiguration.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = Sources/CloudXCore/Common/CLXSdkConfiguration.m; sourceTree = SOURCE_ROOT; };
 		9B323532213A91E1FA134821 /* CLXDeferredErrorAdUnitIdTests.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXDeferredErrorAdUnitIdTests.m; sourceTree = "<group>"; };
 		AA0000012F01000000000002 /* CLXAdapterInitErrorTrackingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterInitErrorTrackingTests.m; sourceTree = "<group>"; };
@@ -777,6 +779,7 @@
 				19D928FD2E6403E000C84DAE /* CLXBiddingConfigPrivacyTests.m */,
 				19D928FF2E6403E000C84DAE /* CLXPrivacyServiceTests.m */,
 				19D929002E6403E000C84DAE /* CLXTrackingFieldResolverPrivacyTests.m */,
+				851E738266F1EB217925CE72 /* CLXLoggerDelegateErrorTests.m */,
 				9B323532213A91E1FA134821 /* CLXDeferredErrorAdUnitIdTests.m */,
 			);
 			path = CloudXCoreTests;
@@ -1601,6 +1604,7 @@
 				1979933B2E772E5000EBA0A3 /* CLXProtectedOperationsTests.m in Sources */,
 				AA0000012F01000000000001 /* CLXAdapterInitErrorTrackingTests.m in Sources */,
 				19D92C9E2E6DE89A00C84DAE /* CLXPublisherAdsUserDefaultsTests.m in Sources */,
+				56D01B15FD9902FBC9FF0A12 /* CLXLoggerDelegateErrorTests.m in Sources */,
 				ADF30BB2933F365A4E6E5652 /* CLXDeferredErrorAdUnitIdTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

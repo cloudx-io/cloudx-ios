@@ -165,7 +165,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)notifyLoadFailure:(CLXError *)error {
     [[CLXDebugOverlayManager shared] flashError];
     if ([self.delegate respondsToSelector:@selector(didFailToLoadAd:error:)]) {
-        [self.logger logDelegateError:@"❌ Rewarded didFailToLoadAd" error:error];
+        [self.logger logDelegateError:@"❌ Rewarded didFailToLoadAd" adUnitName:self.adUnitName adUnitId:self.adUnitId networkName:self.lastBidResponse.networkName error:error];
         [self.delegate didFailToLoadAd:self.adUnitId error:error];
     }
 }
@@ -173,7 +173,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)notifyShowFailure:(CLXError *)error {
     [[CLXDebugOverlayManager shared] flashError];
     if ([self.delegate respondsToSelector:@selector(didFailToDisplayAd:error:)]) {
-        [self.logger logDelegateError:@"❌ Rewarded didFailToDisplayAd" error:error];
+        [self.logger logDelegateError:@"❌ Rewarded didFailToDisplayAd" adUnitName:self.adUnitName adUnitId:self.adUnitId networkName:self.lastBidResponse.networkName error:error];
         [self.delegate didFailToDisplayAd:[self createAdObject] error:error];
     }
 }
