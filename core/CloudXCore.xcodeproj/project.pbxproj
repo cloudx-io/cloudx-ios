@@ -18,6 +18,8 @@
 		CLXSESS0000000000001 /* CLXSessionNetworkServiceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSESSF000000000001 /* CLXSessionNetworkServiceTests.m */; };
 		CLXSESS0000000000002 /* CLXSessionTrackerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSESSF000000000002 /* CLXSessionTrackerTests.m */; };
 		CLXSESS0000000000003 /* MockCLXSessionNetworkService.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSESSF000000000004 /* MockCLXSessionNetworkService.m */; };
+		CLXSESSIT00000000001 /* CLXSessionTrackerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSESSFIT0000000001 /* CLXSessionTrackerTests.m */; };
+		CLXSESSIT00000000002 /* MockCLXSessionNetworkService.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSESSF000000000004 /* MockCLXSessionNetworkService.m */; };
 		1916B0F92E7DECDD00E49E3E /* MockCLXWinLossTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B0F82E7DECDD00E49E3E /* MockCLXWinLossTracker.m */; };
 		1916B1692E7DF8ED00E49E3E /* CLXSQLiteDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B1672E7DF8ED00E49E3E /* CLXSQLiteDatabase.m */; };
 		1916B16C2E7DFD9A00E49E3E /* CLXSQLiteDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B16B2E7DFD9A00E49E3E /* CLXSQLiteDatabase.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -337,6 +339,7 @@
 		ED6D9307122C4BFDB9E6B5C6 /* CLXSessionTracker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionTracker.m; sourceTree = "<group>"; };
 		CLXSESSF000000000001 /* CLXSessionNetworkServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionNetworkServiceTests.m; sourceTree = "<group>"; };
 		CLXSESSF000000000002 /* CLXSessionTrackerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionTrackerTests.m; sourceTree = "<group>"; };
+		CLXSESSFIT0000000001 /* CLXSessionTrackerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionTrackerTests.m; sourceTree = "<group>"; };
 		CLXSESSF000000000003 /* MockCLXSessionNetworkService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MockCLXSessionNetworkService.h; sourceTree = "<group>"; };
 		CLXSESSF000000000004 /* MockCLXSessionNetworkService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MockCLXSessionNetworkService.m; sourceTree = "<group>"; };
 		1916B0F72E7DECDD00E49E3E /* MockCLXWinLossTracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MockCLXWinLossTracker.h; sourceTree = "<group>"; };
@@ -1208,6 +1211,7 @@
 			isa = PBXGroup;
 			children = (
 				B962D45141A8D8DA20B31C73 /* CLXSystemInformationTests.m */,
+				CLXSESSFIT0000000001 /* CLXSessionTrackerTests.m */,
 				1916B16D2E7E061B00E49E3E /* CLXSQLiteDatabaseTests.m */,
 				CLXTS00010000000001 /* CLXBidAdSourceThreadSafetyTests.m */,
 				AUDITFR010000000001 /* CLXWinLossRetryBatchingTests.m */,
@@ -1662,6 +1666,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				CLXSYSINFO0001000001 /* CLXSystemInformationTests.m in Sources */,
+				CLXSESSIT00000000001 /* CLXSessionTrackerTests.m in Sources */,
+				CLXSESSIT00000000002 /* MockCLXSessionNetworkService.m in Sources */,
 				CLXIT00010000000001 /* CLXSQLiteDatabaseTests.m in Sources */,
 				AUDITBF010000000001 /* CLXBidAdSourceThreadSafetyTests.m in Sources */,
 				AUDITBF020000000001 /* CLXWinLossRetryBatchingTests.m in Sources */,

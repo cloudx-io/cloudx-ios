@@ -35,6 +35,10 @@
             completion(NO, error);
         }
     }
+
+    if (_onSendCalled) {
+        _onSendCalled();
+    }
 }
 
 @end

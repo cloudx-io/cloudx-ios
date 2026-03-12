@@ -18,6 +18,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSDictionary<NSString *, id> *lastPayload;
 @property (nonatomic, copy, nullable) NSString *lastAppKey;
 
+/// Set this before the act phase; the mock calls it after capturing
+/// the payload, allowing tests to fulfill an XCTestExpectation
+/// without dispatch_after timing.
+@property (nonatomic, copy, nullable) void (^onSendCalled)(void);
+
 @end
 
 NS_ASSUME_NONNULL_END
