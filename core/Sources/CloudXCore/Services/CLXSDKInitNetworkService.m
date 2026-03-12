@@ -312,6 +312,12 @@ static NSString *const kAPIRequestKeyIfa = @"ifa";
         config.ilrdEndpointURL = ilrdEndpointURL;
     }
 
+    // sessionEndpointURL is optional. Only set if present and non-empty.
+    NSString *sessionEndpointURL = response[@"sessionEndpointURL"];
+    if ([sessionEndpointURL isKindOfClass:[NSString class]] && sessionEndpointURL.length > 0) {
+        config.sessionEndpointURL = sessionEndpointURL;
+    }
+
     // ═══════════════════════════════════════════════════════════════════════════
     // 3. Core Config
     // ═══════════════════════════════════════════════════════════════════════════

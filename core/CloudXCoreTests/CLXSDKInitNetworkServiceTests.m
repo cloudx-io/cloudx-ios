@@ -720,6 +720,83 @@
     XCTAssertEqualObjects(rewardedPlacement.rewardCurrency, @"gems", @"Should parse rewardCurrency");
 }
 
+#pragma mark - Session Endpoint URL Parsing Tests
+
+/**
+ * Test that sessionEndpointURL is parsed when present
+ */
+- (void)testParseSDKConfig_WithSessionEndpointURL_ShouldParse {
+    // Given: Response with sessionEndpointURL
+    NSMutableDictionary *response = [self validResponse];
+    response[@"sessionEndpointURL"] = @"https://session.cloudx.io/session";
+
+    // When: Parse SDK config
+    NSError *error = nil;
+    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response error:&error];
+
+    // Then: Should parse sessionEndpointURL
+    XCTAssertNotNil(config, @"Config should be parsed");
+    XCTAssertNil(error, @"Error should be nil");
+    XCTAssertEqualObjects(config.sessionEndpointURL, @"https://session.cloudx.io/session",
+                          @"Should parse sessionEndpointURL");
+}
+
+/**
+ * Test that missing sessionEndpointURL does not cause failure (optional field)
+ */
+- (void)testParseSDKConfig_MissingSessionEndpointURL_ShouldSucceedWithNil {
+    // Given: Response without sessionEndpointURL
+    NSMutableDictionary *response = [self validResponse];
+    // sessionEndpointURL is not set
+
+    // When: Parse SDK config
+    NSError *error = nil;
+    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response error:&error];
+
+    // Then: Should succeed with nil sessionEndpointURL
+    XCTAssertNotNil(config, @"Config should be parsed");
+    XCTAssertNil(error, @"Error should be nil");
+    XCTAssertNil(config.sessionEndpointURL, @"sessionEndpointURL should be nil when not in response");
+}
+
+/**
+ * Test that empty sessionEndpointURL is treated as absent
+ */
+- (void)testParseSDKConfig_EmptySessionEndpointURL_ShouldBeNil {
+    // Given: Response with empty sessionEndpointURL
+    NSMutableDictionary *response = [self validResponse];
+    response[@"sessionEndpointURL"] = @"";
+
+    // When: Parse SDK config
+    NSError *error = nil;
+    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response error:&error];
+
+    // Then: Should succeed with nil sessionEndpointURL (empty string filtered out)
+    XCTAssertNotNil(config, @"Config should be parsed");
+    XCTAssertNil(error, @"Error should be nil");
+    XCTAssertNil(config.sessionEndpointURL, @"sessionEndpointURL should be nil for empty string");
+}
+
+/**
+ * Test that non-string sessionEndpointURL is ignored
+ */
+- (void)testParseSDKConfig_NonStringSessionEndpointURL_ShouldBeNil {
+    // Given: Response with non-string sessionEndpointURL
+    NSMutableDictionary *response = [self validResponse];
+    response[@"sessionEndpointURL"] = @12345;  // Number instead of string
+
+    // When: Parse SDK config
+    NSError *error = nil;
+    CLXSDKConfigResponse *config = [self.networkService parseSDKConfigFromResponse:response error:&error];
+
+    // Then: Should succeed with nil sessionEndpointURL (type check filters it out)
+    XCTAssertNotNil(config, @"Config should be parsed");
+    XCTAssertNil(error, @"Error should be nil");
+    XCTAssertNil(config.sessionEndpointURL, @"sessionEndpointURL should be nil for non-string value");
+}
+
+#pragma mark - Bundle Override Tests
+
 - (void)testCreateRequest_UsesBundleOverrideWhenPresent {
     NSString *overrideBundle = @"io.cloudx.override.bundle";
     [[NSUserDefaults standardUserDefaults] setObject:overrideBundle forKey:kCLXCoreBundleConfigKey];

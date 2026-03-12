@@ -61,6 +61,8 @@
 #import <CloudXCore/CLXWinLossNetworkService.h>
 #import <CloudXCore/CLXWinLossFieldResolver.h>
 #import <CloudXCore/CLXAdReportingNetworkService.h>
+#import <CloudXCore/CLXSessionTracker.h>
+#import <CloudXCore/CLXSessionNetworkService.h>
 
 // Metrics & Events
 #import <CloudXCore/CLXMetricsTrackerImpl.h>

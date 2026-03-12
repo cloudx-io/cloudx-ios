@@ -26,6 +26,9 @@
 #import <CloudXCore/CLXXorEncryption.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 #import <CloudXCore/CLXWinLossTracker.h>
+#import <CloudXCore/CLXSessionTracker.h>
+#import <CloudXCore/CLXSessionNetworkService.h>
+#import <CloudXCore/CLXBaseNetworkService.h>
 #import <CloudXCore/CLXKeyValueState.h>
 #import <CloudXCore/CLXIlrdTracker.h>
 #import <CloudXCore/CLXIlrdService.h>
@@ -401,6 +404,18 @@ static CloudXCore *_sharedInstance = nil;
         
         if (encodedString.length > 0) {
             [self.reportingService rillTrackingWithActionString:@"sdkinitenc" campaignId: safeCampaignId encodedString: safeEncrypted];
+        }
+
+        // Send session init event if session endpoint is configured
+        if (config.sessionEndpointURL.length > 0) {
+            CLXBaseNetworkService *baseService = [[CLXBaseNetworkService alloc]
+                initWithBaseURL:config.sessionEndpointURL
+                     urlSession:[NSURLSession sharedSession]];
+            CLXSessionNetworkService *networkService = [[CLXSessionNetworkService alloc]
+                initWithBaseNetworkService:baseService];
+            CLXSessionTracker *sessionTracker = [[CLXSessionTracker alloc]
+                initWithNetworkService:networkService];
+            [sessionTracker sendInitEventWithAppKey:self->_appKey config:config];
         }
     }];
 }
