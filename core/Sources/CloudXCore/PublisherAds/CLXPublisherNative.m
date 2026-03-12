@@ -698,7 +698,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)clickWithNative:(id<CLXAdapterNative>)native {
     [self.rillTrackingService sendClickEvent];
-    
+
+    // Fire CLICK lifecycle event (burl) on click
+    if (self.lastBidResponse.bidID && self.currentBidResponse && self.currentBidResponse.id) {
+        [self.winLossTracker sendEvent:self.currentBidResponse.id
+                                 bidId:self.lastBidResponse.bidID
+                                 event:[CLXBidLifecycleEvent clickEvent]
+                            lossReason:@(CLXLossReasonBidWon)
+                        winnerBidPrice:self.lastBidResponse.price
+                                 error:nil];
+    }
+
     // Show click confirmed feedback - stops pending animation and shows green border
     if (native.nativeView) {
         [CLXDebugClickFeedback showClickConfirmedOnView:native.nativeView];

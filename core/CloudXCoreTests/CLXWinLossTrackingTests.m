@@ -510,6 +510,48 @@ static const NSInteger kTestRank3 = 3;
 }
 
 /**
+ * Test sendEvent with CLICK event
+ * Click notifications use burl and should fire as a win notification
+ */
+- (void)testSendEvent_Click_ShouldFireBurl {
+    // Given: A bid with burl (billing URL)
+    CLXBidResponseBid *bid = [[CLXBidResponseBid alloc] init];
+    bid.id = kTestBidID1;
+    bid.burl = @"https://network.com/burl?price=${AUCTION_PRICE}";
+    bid.nurl = kTestNURL1;
+    bid.price = kTestPrice;
+    bid.ext = [[CLXBidResponseExt alloc] init];
+    bid.ext.cloudx = [[CLXBidResponseCloudX alloc] init];
+    bid.ext.cloudx.rank = kTestRank1;
+
+    [self.mockTracker addBid:kTestAuctionID bid:bid];
+
+    // When: Sending CLICK event
+    CLXBidLifecycleEvent *clickEvent = [CLXBidLifecycleEvent clickEvent];
+    [self.mockTracker sendEvent:kTestAuctionID
+                          bidId:kTestBidID1
+                          event:clickEvent
+                     lossReason:nil
+                 winnerBidPrice:kTestPrice
+                          error:nil];
+
+    // Then: Click event should be recorded and sent as win notification (burl)
+    XCTAssertEqual(self.mockTracker.sendEventCallCount, 1, @"sendEvent should be called once");
+    XCTAssertEqual(self.mockTracker.lifecycleEvents.count, 1, @"Lifecycle event should be recorded");
+
+    NSDictionary *lifecycleEvent = self.mockTracker.lifecycleEvents.firstObject;
+    XCTAssertEqualObjects(lifecycleEvent[@"eventType"], @"CLICK", @"Event type should be CLICK");
+    XCTAssertEqualObjects(lifecycleEvent[@"urlType"], @"burl", @"URL type should be burl for click");
+    XCTAssertEqualObjects(lifecycleEvent[@"notificationType"], @"click", @"Notification type should match");
+
+    XCTAssertEqual(self.mockTracker.winNotifications.count, 1, @"Click event should be sent as win notification");
+    XCTAssertEqual(self.mockTracker.lossNotifications.count, 0, @"Should not have loss notifications");
+
+    NSDictionary *winNotification = self.mockTracker.winNotifications.firstObject;
+    XCTAssertEqualObjects(winNotification[@"notificationType"], @"click", @"Notification type should be click");
+}
+
+/**
  * P0 CRITICAL: Test that lifecycle events use correct URL type for each event
  */
 - (void)testSendEvent_CorrectURLTypeForEachEventType {
@@ -537,6 +579,10 @@ static const NSInteger kTestRank3 = 3;
     // When/Then: LOSS uses lurl
     CLXBidLifecycleEvent *lossEvent = [CLXBidLifecycleEvent lossEvent];
     XCTAssertEqualObjects(lossEvent.urlType, @"lurl", @"LOSS should use lurl");
+
+    // When/Then: CLICK uses burl
+    CLXBidLifecycleEvent *clickEvent = [CLXBidLifecycleEvent clickEvent];
+    XCTAssertEqualObjects(clickEvent.urlType, @"burl", @"CLICK should use burl");
 }
 
 #pragma mark - MARK: P0 CRITICAL - Network Success Cleanup Tests

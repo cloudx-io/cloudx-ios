@@ -29,8 +29,10 @@
                           @"CLXNotificationTypeRenderSuccess should be 'renderSuccess'");
     XCTAssertEqualObjects(CLXNotificationTypeLoss, @"loss", 
                           @"CLXNotificationTypeLoss should be 'loss'");
-    XCTAssertEqualObjects(CLXNotificationTypeRewardEarned, @"rewardEarned", 
+    XCTAssertEqualObjects(CLXNotificationTypeRewardEarned, @"rewardEarned",
                           @"CLXNotificationTypeRewardEarned should be 'rewardEarned'");
+    XCTAssertEqualObjects(CLXNotificationTypeClick, @"click",
+                          @"CLXNotificationTypeClick should be 'click'");
 }
 
 /**
@@ -91,13 +93,27 @@
  */
 - (void)testRewardEvent_ReturnsCorrectProperties {
     CLXBidLifecycleEvent *event = [CLXBidLifecycleEvent rewardEvent];
-    
+
     XCTAssertNotNil(event, @"rewardEvent should return non-nil object");
     XCTAssertEqual(event.type, CLXBidLifecycleEventTypeReward, @"type should be Reward");
-    XCTAssertEqualObjects(event.notificationType, CLXNotificationTypeRewardEarned, 
+    XCTAssertEqualObjects(event.notificationType, CLXNotificationTypeRewardEarned,
                           @"notificationType should be CLXNotificationTypeRewardEarned");
-    XCTAssertEqualObjects(event.urlType, CLXURLTypeBurl, 
+    XCTAssertEqualObjects(event.urlType, CLXURLTypeBurl,
                           @"urlType should be CLXURLTypeBurl for reward (same as render)");
+}
+
+/**
+ * Test clickEvent factory method
+ */
+- (void)testClickEvent_ReturnsCorrectProperties {
+    CLXBidLifecycleEvent *event = [CLXBidLifecycleEvent clickEvent];
+
+    XCTAssertNotNil(event, @"clickEvent should return non-nil object");
+    XCTAssertEqual(event.type, CLXBidLifecycleEventTypeClick, @"type should be Click");
+    XCTAssertEqualObjects(event.notificationType, CLXNotificationTypeClick,
+                          @"notificationType should be CLXNotificationTypeClick");
+    XCTAssertEqualObjects(event.urlType, CLXURLTypeBurl,
+                          @"urlType should be CLXURLTypeBurl for click");
 }
 
 #pragma mark - Event Type Enum Tests
@@ -116,8 +132,16 @@
                       @"RenderSuccess and Loss should have different values");
     XCTAssertNotEqual(CLXBidLifecycleEventTypeRenderSuccess, CLXBidLifecycleEventTypeReward, 
                       @"RenderSuccess and Reward should have different values");
-    XCTAssertNotEqual(CLXBidLifecycleEventTypeLoss, CLXBidLifecycleEventTypeReward, 
+    XCTAssertNotEqual(CLXBidLifecycleEventTypeLoss, CLXBidLifecycleEventTypeReward,
                       @"Loss and Reward should have different values");
+    XCTAssertNotEqual(CLXBidLifecycleEventTypeClick, CLXBidLifecycleEventTypeLoadSuccess,
+                      @"Click and LoadSuccess should have different values");
+    XCTAssertNotEqual(CLXBidLifecycleEventTypeClick, CLXBidLifecycleEventTypeRenderSuccess,
+                      @"Click and RenderSuccess should have different values");
+    XCTAssertNotEqual(CLXBidLifecycleEventTypeClick, CLXBidLifecycleEventTypeLoss,
+                      @"Click and Loss should have different values");
+    XCTAssertNotEqual(CLXBidLifecycleEventTypeClick, CLXBidLifecycleEventTypeReward,
+                      @"Click and Reward should have different values");
 }
 
 #pragma mark - URL Type Consistency Tests
@@ -137,6 +161,10 @@
     // Reward uses burl (billing URL) - same as render since it's a billable event
     CLXBidLifecycleEvent *reward = [CLXBidLifecycleEvent rewardEvent];
     XCTAssertEqualObjects(reward.urlType, CLXURLTypeBurl, @"Reward should use burl (billable event)");
+
+    // Click uses burl (billing URL) - click is a billable event
+    CLXBidLifecycleEvent *click = [CLXBidLifecycleEvent clickEvent];
+    XCTAssertEqualObjects(click.urlType, CLXURLTypeBurl, @"Click should use burl (billable event)");
 }
 
 /**

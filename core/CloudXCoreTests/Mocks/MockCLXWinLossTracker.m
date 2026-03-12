@@ -320,10 +320,11 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
         
         // Derive type from notificationType
         NSString *type = @"unknown";
-        if ([notificationType isEqualToString:@"loadSuccess"] || 
+        if ([notificationType isEqualToString:@"loadSuccess"] ||
             [notificationType isEqualToString:@"renderSuccess"] ||
             [notificationType isEqualToString:@"rewardEarned"] ||
-            [notificationType isEqualToString:@"load_success"] || 
+            [notificationType isEqualToString:@"click"] ||
+            [notificationType isEqualToString:@"load_success"] ||
             [notificationType isEqualToString:@"render_success"] ||
             [notificationType isEqualToString:@"reward_earned"]) {
             type = @"win";
@@ -374,10 +375,11 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
         // Categorize by notificationType (support both camelCase and snake_case)
         // camelCase: loadSuccess, renderSuccess, rewardEarned, loss (from event.notificationType)
         // snake_case: load_success, render_success, reward_earned, loss (from sdk.[notificationType])
-        if ([notificationType isEqualToString:@"loadSuccess"] || 
+        if ([notificationType isEqualToString:@"loadSuccess"] ||
             [notificationType isEqualToString:@"renderSuccess"] ||
             [notificationType isEqualToString:@"rewardEarned"] ||
-            [notificationType isEqualToString:@"load_success"] || 
+            [notificationType isEqualToString:@"click"] ||
+            [notificationType isEqualToString:@"load_success"] ||
             [notificationType isEqualToString:@"render_success"] ||
             [notificationType isEqualToString:@"reward_earned"]) {
             [self.winNotifications addObject:[notification copy]];
@@ -427,6 +429,9 @@ static MockCLXWinLossTracker *_sharedTestInstance = nil;
                 break;
             case CLXBidLifecycleEventTypeReward:
                 eventTypeString = @"REWARD";
+                break;
+            case CLXBidLifecycleEventTypeClick:
+                eventTypeString = @"CLICK";
                 break;
         }
         

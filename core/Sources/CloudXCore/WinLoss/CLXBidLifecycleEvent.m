@@ -15,6 +15,7 @@ NSString * const CLXNotificationTypeLoadSuccess = @"loadSuccess";
 NSString * const CLXNotificationTypeRenderSuccess = @"renderSuccess";
 NSString * const CLXNotificationTypeLoss = @"loss";
 NSString * const CLXNotificationTypeRewardEarned = @"rewardEarned";
+NSString * const CLXNotificationTypeClick = @"click";
 
 #pragma mark - URL Type Constants
 
@@ -47,6 +48,12 @@ NSString * const CLXURLTypeLurl = @"lurl";
 + (instancetype)rewardEvent {
     return [[self alloc] initWithType:CLXBidLifecycleEventTypeReward
                      notificationType:CLXNotificationTypeRewardEarned
+                              urlType:CLXURLTypeBurl];
+}
+
++ (instancetype)clickEvent {
+    return [[self alloc] initWithType:CLXBidLifecycleEventTypeClick
+                     notificationType:CLXNotificationTypeClick
                               urlType:CLXURLTypeBurl];
 }
 

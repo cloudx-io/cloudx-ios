@@ -670,6 +670,16 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)handleClickTracking {
     [self.logger debug:@"Clicked on ad"];
     [self.rillTrackingService sendClickEvent];
+
+    // Fire CLICK lifecycle event (burl) on click
+    if (self.lastBidResponse.bid.id && self.currentBidResponse && self.currentBidResponse.id) {
+        [self.winLossTracker sendEvent:self.currentBidResponse.id
+                                 bidId:self.lastBidResponse.bid.id
+                                 event:[CLXBidLifecycleEvent clickEvent]
+                            lossReason:@(CLXLossReasonBidWon)
+                        winnerBidPrice:self.lastBidResponse.bid.price
+                                 error:nil];
+    }
 }
 
 - (CLXAd *)createAdObject {
