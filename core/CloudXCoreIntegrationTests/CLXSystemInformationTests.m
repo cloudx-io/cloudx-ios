@@ -1,9 +1,13 @@
 //
 //  CLXSystemInformationTests.m
-//  CloudXCoreTests
+//  CloudXCoreIntegrationTests
 //
 //  Tests for CLXSystemInformation, specifically effectiveAppBundleIdentifier
 //  and its interaction with the emulator bundle override.
+//
+//  Lives in the integration test target because these tests mutate
+//  NSUserDefaults (shared global state) and read from a singleton,
+//  which causes flaky failures under parallel test execution.
 //
 
 #import <XCTest/XCTest.h>
