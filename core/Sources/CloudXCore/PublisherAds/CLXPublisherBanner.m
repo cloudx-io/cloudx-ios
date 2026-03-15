@@ -45,6 +45,7 @@
 #import <CloudXCore/CLXXorEncryption.h>
 #import <CloudXCore/CloudXCoreAPI.h>
 #import <CloudXCore/CloudXCoreInternal.h>
+#import <CloudXCore/CLXAuctionResult.h>
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXDebugOverlayManager.h>
@@ -400,10 +401,24 @@ NS_ASSUME_NONNULL_BEGIN
 
         if (error) {
             [self.logger error:[NSString stringWithFormat:@"[%@] Bid request failed - %@ (Domain: %@, Code: %ld)", strongSelf.currentCorrelationId, error.clx_fullErrorMessage, error.domain, (long)error.code]];
-            
+
+            /* Post auction result */
+            NSString *auctionId = [strongSelf.bidAdSource getCurrentBidResponse].id;
+            if (auctionId) {
+                NSInteger bannerAdType = (strongSelf.bannerType == CLXBannerTypeW320H50) ? CLXAdTypeBanner : CLXAdTypeMrec;
+                [[NSNotificationCenter defaultCenter] postNotificationName:CLXAuctionResultNotification
+                                                                    object:nil
+                                                                  userInfo:@{
+                    CLXAuctionResultAdTypeKey: @(bannerAdType),
+                    CLXAuctionResultAuctionIdKey: auctionId,
+                    CLXAuctionResultAdUnitIdKey: strongSelf.adUnitId,
+                    CLXAuctionResultFilledKey: @NO,
+                }];
+            }
+
             // Store the original error to preserve detailed server messages
             strongSelf.lastBidError = error;
-            
+
             // Continue with waterfall - continueBannerChain will use the stored error
             [strongSelf continueBannerChain];
             return;
@@ -423,7 +438,20 @@ NS_ASSUME_NONNULL_BEGIN
         
         // Store the full bid response for LURL firing by getting it from bidAdSource
         strongSelf.currentBidResponse = [strongSelf.bidAdSource getCurrentBidResponse];
-        
+
+        /* Post auction result */
+        if (strongSelf.currentBidResponse.id) {
+            NSInteger bannerAdType = (strongSelf.bannerType == CLXBannerTypeW320H50) ? CLXAdTypeBanner : CLXAdTypeMrec;
+            [[NSNotificationCenter defaultCenter] postNotificationName:CLXAuctionResultNotification
+                                                                object:nil
+                                                              userInfo:@{
+                CLXAuctionResultAdTypeKey: @(bannerAdType),
+                CLXAuctionResultAuctionIdKey: strongSelf.currentBidResponse.id,
+                CLXAuctionResultAdUnitIdKey: strongSelf.adUnitId,
+                CLXAuctionResultFilledKey: @YES,
+            }];
+        }
+
         // Set up Analytics tracking data
         [strongSelf.rillTrackingService setupTrackingDataFromBidResponse:response
                                                                 impModel:strongSelf.impModel

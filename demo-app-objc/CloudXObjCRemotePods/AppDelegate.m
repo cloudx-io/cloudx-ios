@@ -9,9 +9,12 @@
 #import <CloudXCore/CloudXCore.h>
 #import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <AdSupport/AdSupport.h>
+@import AppLovinSDK;
 #import "DemoAppLogger.h"
 #import "AdDemoTabViewController.h"
 #import "CLXBidResponseSwizzler.h"
+
+static NSString *const kAppLovinSdkKey = @"CZ_XxS0v1pDXVdV2yDXaxO4dOV8849QwTq7iDFlGLsJZngU95AEyaq2z8lF0GRlSvdknWDpTDp1GmprFC1FiJ1";
 
 @interface AppDelegate ()
 
@@ -35,7 +38,10 @@
     
     // Request App Tracking Transparency permission
     [self requestAppTrackingTransparencyPermission];
-    
+
+    // Initialize AppLovin SDK for ILRD testing
+    [self initializeAppLovinSdk];
+
     // Set up window with AdDemoTabViewController (the real UI)
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.window.rootViewController = [[AdDemoTabViewController alloc] init];
@@ -70,5 +76,17 @@
     }
 }
 
+- (void)initializeAppLovinSdk {
+    ALSdkInitializationConfiguration *config =
+        [ALSdkInitializationConfiguration configurationWithSdkKey:kAppLovinSdkKey builderBlock:^(ALSdkInitializationConfigurationBuilder *builder) {
+            builder.mediationProvider = ALMediationProviderMAX;
+        }];
+
+    ALSdk *sdk = [ALSdk shared];
+    sdk.settings.verboseLoggingEnabled = YES;
+    [sdk initializeWithConfiguration:config completionHandler:^(ALSdkConfiguration *sdkConfig) {
+        NSLog(@"AppLovin SDK initialized");
+    }];
+}
 
 @end

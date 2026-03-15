@@ -32,6 +32,7 @@
 #import <CloudXCore/CLXKeyValueState.h>
 #import <CloudXCore/CLXIlrdTracker.h>
 #import <CloudXCore/CLXIlrdService.h>
+#import <CloudXCore/CLXIlrdNetworkService.h>
 #import <CloudXCore/CLXAlIlrd.h>
 #import <CloudXCore/CLXIlrdProvider.h>
 #import <CloudXCore/CLXAdUnitValidator.h>
@@ -336,13 +337,21 @@ static CloudXCore *_sharedInstance = nil;
 
         // Initialize ILRD tracking if endpoint is configured
         if (config.ilrdEndpointURL.length > 0) {
+            [self.logger info:[NSString stringWithFormat:@"ILRD tracking enabled: %@", config.ilrdEndpointURL]];
             CLXAlIlrd *provider = [[CLXAlIlrd alloc] initWithAccountName:config.accountName];
             NSDictionary *providers = @{ @(CLXIlrdPlatformAl): provider };
             CLXIlrdService *service = [[CLXIlrdService alloc] initWithProviders:providers];
-            _ilrdTracker = [[CLXIlrdTracker alloc] initWithAppKey:_appKey
-                                                     endpointUrl:config.ilrdEndpointURL
-                                                     ilrdService:service];
-            [_ilrdTracker start];
+            CLXIlrdNetworkService *networkService = [[CLXIlrdNetworkService alloc]
+                initWithBaseURL:config.ilrdEndpointURL
+                     urlSession:[NSURLSession sharedSession]];
+            self->_ilrdTracker = [[CLXIlrdTracker alloc] initWithAppKey:self->_appKey
+                                                             accountId:config.accountID
+                                                             sessionId:config.sessionID
+                                                            sdkVersion:[CLXSystemInformation shared].sdkVersion
+                                                           endpointUrl:config.ilrdEndpointURL
+                                                           ilrdService:service
+                                                        networkService:networkService];
+            [self->_ilrdTracker start];
         }
 
         NSMutableDictionary *geoHeaders = [NSMutableDictionary dictionary];

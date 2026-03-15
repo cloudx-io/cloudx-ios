@@ -115,9 +115,9 @@ typedef NS_ENUM(NSInteger, CLXActiveAdType) {
 
     // Assert
     XCTAssertNotNil(capturedEvent, @"ILRD event should not be nil");
-    XCTAssertEqualObjects(capturedEvent[@"platform"], @"applovin");
+    XCTAssertEqualObjects(capturedEvent[@"platform"], @"AppLovin");
     XCTAssertNotNil(capturedEvent[@"revenue"], @"Revenue should be present");
-    XCTAssertNotNil(capturedEvent[@"ad_format"], @"Ad format should be present");
+    XCTAssertNotNil(capturedEvent[@"adFormat"], @"Ad format should be present");
 }
 
 - (void)testIlrdEventSentWhenInterstitialShown {
@@ -147,9 +147,9 @@ typedef NS_ENUM(NSInteger, CLXActiveAdType) {
 
     // Assert
     XCTAssertNotNil(capturedEvent, @"ILRD event should not be nil");
-    XCTAssertEqualObjects(capturedEvent[@"platform"], @"applovin");
+    XCTAssertEqualObjects(capturedEvent[@"platform"], @"AppLovin");
     XCTAssertNotNil(capturedEvent[@"revenue"], @"Revenue should be present");
-    XCTAssertNotNil(capturedEvent[@"ad_format"], @"Ad format should be present");
+    XCTAssertNotNil(capturedEvent[@"adFormat"], @"Ad format should be present");
 }
 
 - (void)testIlrdEventSentWhenRewardedShown {
@@ -179,9 +179,9 @@ typedef NS_ENUM(NSInteger, CLXActiveAdType) {
 
     // Assert
     XCTAssertNotNil(capturedEvent, @"ILRD event should not be nil");
-    XCTAssertEqualObjects(capturedEvent[@"platform"], @"applovin");
+    XCTAssertEqualObjects(capturedEvent[@"platform"], @"AppLovin");
     XCTAssertNotNil(capturedEvent[@"revenue"], @"Revenue should be present");
-    XCTAssertNotNil(capturedEvent[@"ad_format"], @"Ad format should be present");
+    XCTAssertNotNil(capturedEvent[@"adFormat"], @"Ad format should be present");
 }
 
 #pragma mark - MAAdDelegate / MAAdViewAdDelegate / MARewardedAdDelegate

@@ -56,15 +56,26 @@
     XCTAssertEqualObjects(result, @"");
 }
 
-- (void)testSnakeCaseFromSingleUppercase {
-    // Arrange
+- (void)testSnakeCaseFromConsecutiveUppercase {
+    // Arrange -- matches Android regex: ([a-z])([A-Z]) only splits at lowercase->uppercase
     CLXAlIlrd *subject = [[CLXAlIlrd alloc] initWithAccountName:@"ABC"];
 
     // Act
     NSString *result = [subject accountNameAsSnakeCase];
 
     // Assert
-    XCTAssertEqualObjects(result, @"a_b_c");
+    XCTAssertEqualObjects(result, @"abc");
+}
+
+- (void)testSnakeCaseFromMixedCaseWithConsecutiveUppercase {
+    // Arrange
+    CLXAlIlrd *subject = [[CLXAlIlrd alloc] initWithAccountName:@"testABC"];
+
+    // Act
+    NSString *result = [subject accountNameAsSnakeCase];
+
+    // Assert
+    XCTAssertEqualObjects(result, @"test_abc");
 }
 
 #pragma mark - Subscribe Without AL SDK

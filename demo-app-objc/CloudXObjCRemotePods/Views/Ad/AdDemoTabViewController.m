@@ -5,6 +5,7 @@
 #import "RewardedViewController.h"
 #import "MRECViewController.h"
 #import "RewardedInterstitialViewController.h"
+#import "IlrdViewController.h"
 #import "SettingsViewController.h"
 #import "KeyValueDemoViewController.h"
 
@@ -32,6 +33,9 @@
     RewardedInterstitialViewController *rewardedInterstitialVC = [[RewardedInterstitialViewController alloc] init];
     rewardedInterstitialVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Reward Inter" image:[UIImage systemImageNamed:@"star.square"] tag:7];
     
+    IlrdViewController *ilrdVC = [[IlrdViewController alloc] init];
+    ilrdVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"ILRD" image:[UIImage systemImageNamed:@"dollarsign.circle"] tag:8];
+
     KeyValueDemoViewController *keyValueVC = [[KeyValueDemoViewController alloc] init];
     keyValueVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Key-Values" image:[UIImage systemImageNamed:@"key.fill"] tag:9];
     
@@ -47,6 +51,7 @@
         [[UINavigationController alloc] initWithRootViewController:rewardedVC],
         [[UINavigationController alloc] initWithRootViewController:mrecVC],
         [[UINavigationController alloc] initWithRootViewController:rewardedInterstitialVC],
+        [[UINavigationController alloc] initWithRootViewController:ilrdVC],
         [[UINavigationController alloc] initWithRootViewController:keyValueVC],
         [[UINavigationController alloc] initWithRootViewController:settinsVC]
     ];

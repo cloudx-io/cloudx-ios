@@ -7,56 +7,56 @@ PODS:
   - CloudXMetaAdapter (2.2.1-beta):
     - CloudXCore
     - FBAudienceNetwork (~> 6.21.0)
-  - CloudXMintegralAdapter (2.0.0):
-    - CloudXCore (~> 2.0)
-    - MintegralAdSDK (~> 8.0)
-    - MintegralAdSDK/BidBannerAd (~> 8.0)
-    - MintegralAdSDK/BidNewInterstitialAd (~> 8.0)
-    - MintegralAdSDK/BidRewardVideoAd (~> 8.0)
+  - CloudXMintegralAdapter (2.2.1-beta):
+    - CloudXCore (= 2.2.1-beta)
+    - MintegralAdSDK (~> 8.0.8)
+    - MintegralAdSDK/BidBannerAd (~> 8.0.8)
+    - MintegralAdSDK/BidNewInterstitialAd (~> 8.0.8)
+    - MintegralAdSDK/BidRewardVideoAd (~> 8.0.8)
   - CloudXRenderer (2.2.1-beta):
     - CloudXCore
-  - CloudXUnityAdapter (2.0.0-rc):
-    - CloudXCore
+  - CloudXUnityAdapter (2.2.1-beta):
+    - CloudXCore (= 2.2.1-beta)
     - UnityAds (~> 4.17.0)
   - CloudXVungleAdapter (2.2.1-beta):
     - CloudXCore
     - VungleAds (~> 7.6.0)
   - FBAudienceNetwork (6.21.1)
   - InMobiSDK (11.1.1)
-  - MintegralAdSDK (8.0.7):
-    - MintegralAdSDK/BannerAd (= 8.0.7)
-    - MintegralAdSDK/BidBannerAd (= 8.0.7)
-    - MintegralAdSDK/BidInterstitialVideoAd (= 8.0.7)
-    - MintegralAdSDK/BidNativeAd (= 8.0.7)
-    - MintegralAdSDK/BidNewInterstitialAd (= 8.0.7)
-    - MintegralAdSDK/BidRewardVideoAd (= 8.0.7)
-    - MintegralAdSDK/InterstitialVideoAd (= 8.0.7)
-    - MintegralAdSDK/NativeAd (= 8.0.7)
-    - MintegralAdSDK/NewInterstitialAd (= 8.0.7)
-    - MintegralAdSDK/RewardVideoAd (= 8.0.7)
-  - MintegralAdSDK/BannerAd (8.0.7):
+  - MintegralAdSDK (8.0.8):
+    - MintegralAdSDK/BannerAd (= 8.0.8)
+    - MintegralAdSDK/BidBannerAd (= 8.0.8)
+    - MintegralAdSDK/BidInterstitialVideoAd (= 8.0.8)
+    - MintegralAdSDK/BidNativeAd (= 8.0.8)
+    - MintegralAdSDK/BidNewInterstitialAd (= 8.0.8)
+    - MintegralAdSDK/BidRewardVideoAd (= 8.0.8)
+    - MintegralAdSDK/InterstitialVideoAd (= 8.0.8)
+    - MintegralAdSDK/NativeAd (= 8.0.8)
+    - MintegralAdSDK/NewInterstitialAd (= 8.0.8)
+    - MintegralAdSDK/RewardVideoAd (= 8.0.8)
+  - MintegralAdSDK/BannerAd (8.0.8):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/BidBannerAd (8.0.7):
+  - MintegralAdSDK/BidBannerAd (8.0.8):
     - MintegralAdSDK/BannerAd
     - MintegralAdSDK/BidNativeAd
-  - MintegralAdSDK/BidInterstitialVideoAd (8.0.7):
+  - MintegralAdSDK/BidInterstitialVideoAd (8.0.8):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/InterstitialVideoAd
-  - MintegralAdSDK/BidNativeAd (8.0.7):
+  - MintegralAdSDK/BidNativeAd (8.0.8):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/BidNewInterstitialAd (8.0.7):
+  - MintegralAdSDK/BidNewInterstitialAd (8.0.8):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/NewInterstitialAd
-  - MintegralAdSDK/BidRewardVideoAd (8.0.7):
+  - MintegralAdSDK/BidRewardVideoAd (8.0.8):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/RewardVideoAd
-  - MintegralAdSDK/InterstitialVideoAd (8.0.7):
+  - MintegralAdSDK/InterstitialVideoAd (8.0.8):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/NativeAd (8.0.7)
-  - MintegralAdSDK/NewInterstitialAd (8.0.7):
+  - MintegralAdSDK/NativeAd (8.0.8)
+  - MintegralAdSDK/NewInterstitialAd (8.0.8):
     - MintegralAdSDK/InterstitialVideoAd
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/RewardVideoAd (8.0.7):
+  - MintegralAdSDK/RewardVideoAd (8.0.8):
     - MintegralAdSDK/NativeAd
   - UnityAds (4.17.0)
   - VungleAds (7.6.3)
@@ -101,13 +101,13 @@ SPEC CHECKSUMS:
   CloudXCore: 4b96697eef0d2f3400b0de961a747567d413dcf2
   CloudXInMobiAdapter: 63554ebcb5574a8bf3b14f3115ab41d393f6f07c
   CloudXMetaAdapter: 2251862dc72110da4063cce293584d89406a43a6
-  CloudXMintegralAdapter: d2d9d54688442f8b7aa81a6c1669a061a76838a5
+  CloudXMintegralAdapter: 550fbfb07e90c4966846875107f3cd7f532891ad
   CloudXRenderer: 277147b16dbaa96e0b789397ce5a45f035a1540b
-  CloudXUnityAdapter: be6d2bf5ac02dc7f8bc37f5950b3bcce1328640c
+  CloudXUnityAdapter: f91813dd996929befc2ba7e29ec3ce4d1095f362
   CloudXVungleAdapter: adf63d40d5083deadd7871a72d903f55f07a962e
   FBAudienceNetwork: 85d18a65c9e35bc426bd4664cf3ae2a1172d7b60
   InMobiSDK: 4642fb34a961980ab94a1ac460c6e16e113498e6
-  MintegralAdSDK: 9fde3aa7b739121e4e76ae83bcc612a4af27d7e5
+  MintegralAdSDK: f02fdbab6494030b4fe4b01d8bbf654263834a20
   UnityAds: adbe0d522fd14b8298c5e159164fc43396165843
   VungleAds: 40e87d1eaba17ac818b0f94461fd8ed21ad768dc
 

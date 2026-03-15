@@ -33,6 +33,7 @@
 #import <CloudXCore/CloudXCoreAPI.h>
 #import <CloudXCore/CloudXCoreInternal.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
+#import <CloudXCore/CLXAuctionResult.h>
 #import <CloudXCore/CLXAdapterLoader.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
 
@@ -503,19 +504,32 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
 - (void)handleBidResponse:(CLXBidAdSourceResponse *)response error:(NSError *)error {
     if (error) {
         [self.logger error:[NSString stringWithFormat:@"[%@] ❌ [PublisherFullscreenAd] Bid request failed: %@", self.currentCorrelationId, error.clx_fullErrorMessage]];
-        
+
+        /* Post auction result */
+        NSString *auctionId = [self.bidAdSource getCurrentBidResponse].id;
+        if (auctionId) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:CLXAuctionResultNotification
+                                                                object:nil
+                                                              userInfo:@{
+                CLXAuctionResultAdTypeKey: @([self adType]),
+                CLXAuctionResultAuctionIdKey: auctionId,
+                CLXAuctionResultAdUnitIdKey: self.adUnitId,
+                CLXAuctionResultFilledKey: @NO,
+            }];
+        }
+
         // Transition back to idle
         self.currentState = CLXFullscreenAdStateIDLE;
-        
+
         CLXError *clxError = [CLXError errorFromError:error withFallbackCode:CLXErrorCodeLoadFailed];
-        
+
         // Call failure delegate
         dispatch_async(dispatch_get_main_queue(), ^{
             [self notifyLoadFailure:clxError];
         });
         return;
     }
-    
+
     // Create adapter instance from bid response
     [self.logger debug:[NSString stringWithFormat:@"createBidAd - AdID: %@, BidID: %@, Network: %@", response.bid.adid, response.bidID, response.networkName]];
     
@@ -532,7 +546,19 @@ typedef NS_ENUM(NSInteger, CLXFullscreenAdState) {
     // Store bid response for NURL firing
     self.currentBidResponse = [self.bidAdSource getCurrentBidResponse];
     self.lastBidResponse = response;
-    
+
+    /* Post auction result */
+    if (self.currentBidResponse.id) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:CLXAuctionResultNotification
+                                                            object:nil
+                                                          userInfo:@{
+            CLXAuctionResultAdTypeKey: @([self adType]),
+            CLXAuctionResultAuctionIdKey: self.currentBidResponse.id,
+            CLXAuctionResultAdUnitIdKey: self.adUnitId,
+            CLXAuctionResultFilledKey: @YES,
+        }];
+    }
+
     // Set up Analytics tracking data
     [self.rillTrackingService setupTrackingDataFromBidResponse:response
                                                       impModel:self.impModel

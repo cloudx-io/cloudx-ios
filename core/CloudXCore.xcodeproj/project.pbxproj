@@ -309,6 +309,8 @@
 		CLXUAP00010000000001 /* CLXUIApplicationProxyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXUAP00020000000001 /* CLXUIApplicationProxyTests.m */; };
 		CLXUT00010000000001 /* CLXSQLiteDatabaseUnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXUT00020000000001 /* CLXSQLiteDatabaseUnitTests.m */; };
 		D7578637480434D163489DAF /* CLXAdapterLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = DB241498E65B2AA5899EB74E /* CLXAdapterLoader.m */; };
+		CLXAR00B0000000000001 /* CLXAuctionResult.h in Headers */ = {isa = PBXBuildFile; fileRef = CLXAR00F0000000000001 /* CLXAuctionResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CLXAR00B0000000000002 /* CLXAuctionResult.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXAR00F0000000000002 /* CLXAuctionResult.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -640,6 +642,8 @@
 		E42754A92780774B1BFA391E /* CLXEventType.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXEventType.m; sourceTree = "<group>"; };
 		FBBA381156DD111B81ED1927 /* CLXSdkConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSdkConfiguration.h; sourceTree = "<group>"; };
 		FD3F150B4D80A1DA1031EDEB /* CLXAdapterLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXAdapterLoader.h; sourceTree = "<group>"; };
+		CLXAR00F0000000000001 /* CLXAuctionResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAuctionResult.h; sourceTree = "<group>"; };
+		CLXAR00F0000000000002 /* CLXAuctionResult.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAuctionResult.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -921,6 +925,7 @@
 				19C724A32E2390810012CFC7 /* CLXConfigImpressionModel.m */,
 				19C724B82E2390810012CFC7 /* CLXNativeTemplate.m */,
 				19C724BA2E2390810012CFC7 /* CLXSDKConfig.m */,
+				CLXAR00F0000000000002 /* CLXAuctionResult.m */,
 				19C724BB2E2390810012CFC7 /* CLXSDKConfigBidder.m */,
 				19C724BD2E2390810012CFC7 /* CLXSDKConfigAdUnit.m */,
 				19C724BE2E2390810012CFC7 /* CLXSDKConfigRequest.m */,
@@ -1024,6 +1029,7 @@
 				892B61910B3B462996C5BA08 /* CLXSessionTracker.h */,
 				A5011EF645674A8FAFE56E7E /* Session */,
 				CLXILRDG0000000000001 /* Ilrd */,
+				CLXAR00F0000000000001 /* CLXAuctionResult.h */,
 				CLXILRDF0000000000001 /* CLXIlrdProvider.h */,
 				CLXILRDF0000000000002 /* CLXAlIlrd.h */,
 				CLXILRDF0000000000003 /* CLXIlrdService.h */,
@@ -1316,6 +1322,7 @@
 				1916B09C2E7DE20E00E49E3E /* CLXWinLossNetworkService.h in Headers */,
 				E104A92589A24DF1BA794371 /* CLXSessionNetworkService.h in Headers */,
 				DC771E9A21E6488998F117BA /* CLXSessionTracker.h in Headers */,
+				CLXAR00B0000000000001 /* CLXAuctionResult.h in Headers */,
 				CLXILRDB0000000000001 /* CLXIlrdProvider.h in Headers */,
 				CLXILRDB0000000000002 /* CLXAlIlrd.h in Headers */,
 				CLXILRDB0000000000003 /* CLXIlrdService.h in Headers */,
@@ -1538,6 +1545,7 @@
 				CLXILRDB0000000000007 /* CLXIlrdService.m in Sources */,
 				CLXILRDB0000000000008 /* CLXIlrdNetworkService.m in Sources */,
 				CLXILRDB0000000000009 /* CLXIlrdTracker.m in Sources */,
+				CLXAR00B0000000000002 /* CLXAuctionResult.m in Sources */,
 				19C725C22E2390810012CFC7 /* CLXBidderConfig.m in Sources */,
 				19C725C42E2390810012CFC7 /* CLXAdTrackingService.m in Sources */,
 				19D927B92E62314500C84DAE /* CLXSettings.m in Sources */,

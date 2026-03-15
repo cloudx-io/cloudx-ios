@@ -108,6 +108,9 @@ static NSString *const kTestEndpointUrl = @"https://test.example.com/ilrd";
     self.spyNetworkService = [[SpyCLXIlrdNetworkService alloc] init];
 
     self.tracker = [[CLXIlrdTracker alloc] initWithAppKey:kApplovinAppKey
+                                                accountId:@"test-account"
+                                                sessionId:@"test-session"
+                                               sdkVersion:@"2.0.0-test"
                                               endpointUrl:kTestEndpointUrl
                                               ilrdService:self.ilrdService
                                            networkService:self.spyNetworkService];
@@ -151,18 +154,25 @@ static NSString *const kTestEndpointUrl = @"https://test.example.com/ilrd";
     NSDictionary<NSString *, id> *payload = self.spyNetworkService.lastPayload;
     XCTAssertNotNil(payload, @"Payload should not be nil");
 
+    /* Provider event fields */
     NSNumber *timestamp = payload[@"timestamp"];
     XCTAssertNotNil(timestamp, @"timestamp should be present");
     XCTAssertGreaterThan(timestamp.doubleValue, 0, @"timestamp should be positive");
 
-    XCTAssertEqualObjects(payload[@"platform"], @"applovin", @"platform should be applovin");
+    XCTAssertEqualObjects(payload[@"platform"], @"AppLovin", @"platform should be AppLovin");
 
     NSNumber *revenue = payload[@"revenue"];
     XCTAssertNotNil(revenue, @"revenue should be present");
 
-    XCTAssertNotNil(payload[@"ad_format"], @"ad_format should be present");
+    XCTAssertNotNil(payload[@"adFormat"], @"adFormat should be present (camelCase)");
 
-    // Assert - tracker passed correct appKey
+    /* SDK identity fields */
+    XCTAssertEqualObjects(payload[@"accountId"], @"test-account", @"accountId should be set");
+    XCTAssertEqualObjects(payload[@"sessionId"], @"test-session", @"sessionId should be set");
+    XCTAssertEqualObjects(payload[@"os"], @"ios", @"os should be ios");
+    XCTAssertEqualObjects(payload[@"sdkVersion"], @"2.0.0-test", @"sdkVersion should be set");
+
+    /* Tracker passed correct appKey */
     XCTAssertEqualObjects(self.spyNetworkService.lastAppKey, kApplovinAppKey, @"appKey should match");
 }
 

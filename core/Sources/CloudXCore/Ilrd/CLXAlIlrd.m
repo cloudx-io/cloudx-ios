@@ -45,9 +45,13 @@
             continue;
         }
 
+        /*
+         * Insert underscore only at lowercase->uppercase boundaries.
+         * Matches Android regex: ([a-z])([A-Z]) -> $1_$2
+         */
         if ([[NSCharacterSet uppercaseLetterCharacterSet] characterIsMember:ch] && i > 0) {
             unichar prev = [_accountName characterAtIndex:i - 1];
-            if (prev != ' ' && prev != '_') {
+            if ([[NSCharacterSet lowercaseLetterCharacterSet] characterIsMember:prev]) {
                 [result appendString:@"_"];
             }
         }
@@ -229,42 +233,57 @@
     /* Required fields */
     NSTimeInterval timestamp = [[NSDate date] timeIntervalSince1970];
     event[@"timestamp"] = @((long long)(timestamp * 1000));
-    event[@"platform"] = @"applovin";
+    event[@"platform"] = @"AppLovin";
 
     NSNumber *revenue = data[@"revenue"];
     if ([revenue isKindOfClass:[NSNumber class]]) {
         event[@"revenue"] = revenue;
     }
 
-    /* Optional fields - only include if present and non-null */
+    /* Optional fields -- camelCase keys matching Android */
+    NSString *precision = data[@"precision"];
+    if ([precision isKindOfClass:[NSString class]] && precision.length > 0) {
+        event[@"precision"] = precision;
+    }
+
     NSString *countryCode = data[@"country_code"];
     if ([countryCode isKindOfClass:[NSString class]] && countryCode.length > 0) {
-        event[@"country_code"] = countryCode;
+        event[@"countryCode"] = countryCode;
     }
 
     NSString *networkName = data[@"network_name"];
     if ([networkName isKindOfClass:[NSString class]] && networkName.length > 0) {
-        event[@"network_name"] = networkName;
+        event[@"networkName"] = networkName;
     }
 
     NSString *maxAdUnitId = data[@"max_ad_unit_id"];
     if ([maxAdUnitId isKindOfClass:[NSString class]] && maxAdUnitId.length > 0) {
-        event[@"max_ad_unit_id"] = maxAdUnitId;
+        event[@"adUnitId"] = maxAdUnitId;
     }
 
     NSString *placementId = data[@"third_party_ad_placement_id"];
     if ([placementId isKindOfClass:[NSString class]] && placementId.length > 0) {
-        event[@"third_party_ad_placement_id"] = placementId;
+        event[@"thirdPartyAdPlacementId"] = placementId;
     }
 
     NSString *adFormat = data[@"ad_format"];
     if ([adFormat isKindOfClass:[NSString class]] && adFormat.length > 0) {
-        event[@"ad_format"] = adFormat;
+        event[@"adFormat"] = [self normalizeAdFormat:adFormat];
+    }
+
+    NSString *creativeId = data[@"creative_id"];
+    if ([creativeId isKindOfClass:[NSString class]] && creativeId.length > 0) {
+        event[@"creativeId"] = creativeId;
+    }
+
+    NSString *networkPlacement = data[@"network_placement"];
+    if ([networkPlacement isKindOfClass:[NSString class]] && networkPlacement.length > 0) {
+        event[@"networkPlacement"] = networkPlacement;
     }
 
     NSString *userSegment = data[@"user_segment"];
     if ([userSegment isKindOfClass:[NSString class]] && userSegment.length > 0) {
-        event[@"user_segment"] = userSegment;
+        event[@"userSegment"] = userSegment;
     }
 
     NSString *eventId = data[@"id"];
@@ -272,7 +291,7 @@
         event[@"id"] = eventId;
     }
 
-    [self.logger debug:[NSString stringWithFormat:@"ILRD event received: revenue=%@, ad_format=%@",
+    [self.logger debug:[NSString stringWithFormat:@"ILRD event received: revenue=%@, adFormat=%@",
                         revenue, adFormat ?: @"(nil)"]];
 
     CLXIlrdEventCallback callback;
@@ -282,6 +301,20 @@
     if (callback) {
         callback([event copy]);
     }
+}
+
+/**
+ * Normalizes raw AppLovin ad format strings to CX ad type names.
+ * Matches Android's `String.toAdType()` in ApplovinIlrd.kt.
+ */
+- (NSString *)normalizeAdFormat:(NSString *)raw {
+    NSString *upper = [raw uppercaseString];
+    if ([upper isEqualToString:@"INTER"]) return @"interstitial";
+    if ([upper isEqualToString:@"REWARDED"]) return @"rewarded";
+    if ([upper isEqualToString:@"BANNER"]) return @"banner";
+    if ([upper isEqualToString:@"MREC"]) return @"mrec";
+    [self.logger error:[NSString stringWithFormat:@"Unknown ad format: %@", raw]];
+    return raw;
 }
 
 @end
