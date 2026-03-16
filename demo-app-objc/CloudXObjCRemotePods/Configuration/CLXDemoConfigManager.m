@@ -109,16 +109,16 @@
 
     // Production Configuration (ObjCDemoApp - cloudx.CloudXObjCRemotePods)
     CLXDemoConfig *prodConfig = [[CLXDemoConfig alloc]
-        initWithAppKey:@"WpSSEfm-f9U8rB03iN6eJ"
+        initWithAppKey:@"ihtOXvp3X9JlMQ5p0_RYL"
         hashedUserId:@"prod-user-123"
         baseURL:@"https://pro.cloudx.io/sdk"
-        bannerAdUnitId:@"YyG8H2zPWdWoAu7ULGph9"
-        mrecAdUnitId:@"ae5QwaAN5QMLZ9PsUplYx"
-        interstitialAdUnitId:@"FjWHlfkKkxP0L0dxZCDV2"
-        nativeAdUnitId:@"-"
+        bannerAdUnitId:@"LyPxKhBFiUCd1xMLYQhGc"
+        mrecAdUnitId:@"EWaeXDSmKYbs220gM5hTv"
+        interstitialAdUnitId:@"txZ7NmISq-MsuPH0ULKbD"
+        nativeAdUnitId:@"Q33RbPmBH-wix45Mu6--Z"
         nativeBannerAdUnitId:@"-"
-        rewardedAdUnitId:@"zOqLE6UgDGe6ZScH-Acb-"
-        rewardedInterstitialAdUnitId:@"-"];
+        rewardedAdUnitId:@"um9Ek08ScJBWuzSMTyW3b"
+        rewardedInterstitialAdUnitId:@"I-JRnXEQc2bG5dm1EWoZ6"];
     
     _configurations = @{
         @(CLXDemoEnvironmentLocal): localConfig,
