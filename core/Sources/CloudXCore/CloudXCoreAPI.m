@@ -39,6 +39,8 @@
 #import <CloudXCore/CLXAlIlrd.h>
 #import <CloudXCore/CLXIlrdProvider.h>
 #import <CloudXCore/CLXAdUnitValidator.h>
+#import <CloudXCore/CLXManualPrivacyState.h>
+#import <CloudXCore/CLXAdapterPrivacyForwarder.h>
 
 // Adapter Protocols
 #import <CloudXCore/CLXAdapterNative.h>
@@ -1391,6 +1393,30 @@ static BOOL _visualDebuggingEnabled = NO;
 
 + (void)setLoggingTimestampsEnabled:(BOOL)enabled {
     [[CLXLogger shared] setTimestampsEnabled:enabled];
+}
+
+#pragma mark - Manual Privacy Controls
+
++ (void)setHasUserConsent:(nullable NSNumber *)hasUserConsent {
+    CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXCoreAPI"];
+    [logger info:[NSString stringWithFormat:@"setHasUserConsent: %@", hasUserConsent ?: @"nil"]];
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    if (metricsTracker) {
+        [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetHasUserConsent];
+    }
+    [[CLXManualPrivacyState sharedInstance] setHasUserConsent:hasUserConsent];
+    [[CLXAdapterPrivacyForwarder sharedInstance] pushCurrentPrivacySettings];
+}
+
++ (void)setDoNotSell:(nullable NSNumber *)doNotSell {
+    CLXLogger *logger = [[CLXLogger alloc] initWithCategory:@"CloudXCoreAPI"];
+    [logger info:[NSString stringWithFormat:@"setDoNotSell: %@", doNotSell ?: @"nil"]];
+    id<CLXMetricsTrackerProtocol> metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
+    if (metricsTracker) {
+        [metricsTracker trackMethodCall:CLXMetricsTypeMethodSetDoNotSell];
+    }
+    [[CLXManualPrivacyState sharedInstance] setDoNotSell:doNotSell];
+    [[CLXAdapterPrivacyForwarder sharedInstance] pushCurrentPrivacySettings];
 }
 
 #pragma mark - SDK Lifecycle

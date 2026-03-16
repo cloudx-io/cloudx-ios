@@ -9,11 +9,13 @@
  */
 
 #import <CloudXCore/CLXPrivacyService.h>
+#import <CloudXCore/CLXPrivacyConsentResolver.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXAdTrackingService.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXGeoLocationService.h>
+#import <CloudXCore/CLXManualPrivacyState.h>
 
 // Private category for internal methods (not exposed in public header)
 // GDPR methods are temporarily private because server-side support for GDPR is not implemented
@@ -82,7 +84,6 @@
 
 - (BOOL)shouldClearPersonalDataForCompliance {
     CLXGeoLocationService *geoService = self.geoLocationService;
-    
     // EU users: Check GDPR consent
     if ([geoService isEUUser]) {
         return [self shouldClearPersonalDataForGDPR];
@@ -122,60 +123,42 @@
             return YES;
         }
         
-        // Legacy CCPA string check for backward compatibility
-        // IAB US Privacy String format: Position 3 (0-indexed: 2) is the opt-out flag
-        // 1YYN = opted out (Y at position 2), 1YNN = not opted out (N at position 2)
-        NSString *ccpaString = [self ccpaPrivacyString];
-        if (ccpaString.length >= 3 && [ccpaString characterAtIndex:2] == 'Y') {
-            [self.logger debug:@"Legacy CCPA opt-out detected (position 3 = Y) - clearing personal data"];
+        // Legacy CCPA string via shared resolver
+        NSNumber *legacyDoNotSell = [CLXPrivacyConsentResolver resolveIabUsPrivacyDoNotSell:self.userDefaults];
+        if (legacyDoNotSell != nil && [legacyDoNotSell boolValue]) {
+            [self.logger debug:@"Legacy CCPA opt-out detected - clearing personal data"];
+            return YES;
+        }
+
+        // Manual fallback: Publisher-set do-not-sell override (US users only, matches Android)
+        NSNumber *manualDoNotSell = [CLXManualPrivacyState sharedInstance].doNotSell;
+        if (manualDoNotSell != nil && [manualDoNotSell boolValue]) {
+            [self.logger debug:@"Manual doNotSell=YES - clearing personal data"];
             return YES;
         }
     }
-    
+
     [self.logger verbose:@"Personal data can be used (all compliance checks passed)"];
     return NO;
 }
 
 - (BOOL)shouldClearPersonalDataForGDPR {
-    CLXConsentProvider *gppProvider = self.consentProvider;
-    
-    // Priority 1: Check GPP Section 2 (EU TCF via GPP - new IAB standard)
-    NSArray<NSNumber *> *gppSid = [gppProvider gppSid];
-    if (gppSid && [gppSid containsObject:@(CLXGppTargetEUTCF)]) {
-        CLXPrivacyConsent *tcfConsent = [gppProvider decodeGppForTarget:@(CLXGppTargetEUTCF)];
-        if (tcfConsent) {
-            BOOL requiresPiiRemoval = [tcfConsent requiresPiiRemoval];
-            [self.logger debug:[NSString stringWithFormat:@"GPP EU TCF (SID 2) consent: requiresPiiRemoval=%@", @(requiresPiiRemoval)]];
-            return requiresPiiRemoval;
-        }
+    // Shared IAB resolver: GPP SID 2 → legacy TCF
+    NSNumber *iabConsent = [CLXPrivacyConsentResolver resolveIabGdprConsent:self.consentProvider];
+    if (iabConsent != nil) {
+        BOOL requiresPiiRemoval = ![iabConsent boolValue];
+        [self.logger debug:[NSString stringWithFormat:@"GDPR consent from IAB: requiresPiiRemoval=%@", @(requiresPiiRemoval)]];
+        return requiresPiiRemoval;
     }
-    
-    // Priority 2: Legacy TCF flow - for CMPs that don't support GPP yet
-    NSNumber *gdprApplies = [gppProvider gdprApplies];
-    
-    // If GDPR doesn't apply, no restrictions
-    if (!gdprApplies || ![gdprApplies boolValue]) {
-        [self.logger debug:@"GDPR does not apply (legacy TCF) - no restrictions"];
-        return NO;
-    }
-    
-    // GDPR applies - decode the TC string
-    NSString *tcString = [gppProvider tcString];
-    if (!tcString || tcString.length == 0) {
-        [self.logger debug:@"GDPR applies but no TC string - clearing personal data"];
+
+    // Manual fallback — for publishers not using a CMP
+    NSNumber *manualConsent = [CLXManualPrivacyState sharedInstance].hasUserConsent;
+    if (manualConsent != nil && ![manualConsent boolValue]) {
+        [self.logger debug:@"Manual hasUserConsent=NO - clearing personal data for GDPR"];
         return YES;
     }
-    
-    // Decode TC string to check purpose and vendor consents
-    CLXPrivacyConsent *tcfConsent = [gppProvider decodeTcString:tcString];
-    if (!tcfConsent) {
-        [self.logger debug:@"Failed to decode TC string - clearing personal data"];
-        return YES;
-    }
-    
-    BOOL requiresPiiRemoval = [tcfConsent requiresPiiRemoval];
-    [self.logger debug:[NSString stringWithFormat:@"Legacy TCF consent: requiresPiiRemoval=%@", @(requiresPiiRemoval)]];
-    return requiresPiiRemoval;
+
+    return NO;
 }
 
 // Checks only GDPR/CCPA compliance without considering ATT authorization.
@@ -200,14 +183,27 @@
         }
     }
     
-    // Check CCPA opt-out (PUBLIC - server supported)
-    // IAB US Privacy String format: Position 3 (0-indexed: 2) is the opt-out flag
-    NSString *ccpaString = [self ccpaPrivacyString];
-    if (ccpaString.length >= 3 && [ccpaString characterAtIndex:2] == 'Y') {
-        [self.logger debug:@"CCPA opt-out detected (position 3 = Y) - clearing personal data"];
+    // Check CCPA opt-out via shared resolver
+    NSNumber *legacyDoNotSell = [CLXPrivacyConsentResolver resolveIabUsPrivacyDoNotSell:self.userDefaults];
+    if (legacyDoNotSell != nil && [legacyDoNotSell boolValue]) {
+        [self.logger debug:@"CCPA opt-out detected - clearing personal data"];
         return YES;
     }
-    
+
+    // Manual fallback: Publisher-set hasUserConsent override
+    NSNumber *manualConsent = [CLXManualPrivacyState sharedInstance].hasUserConsent;
+    if (manualConsent != nil && ![manualConsent boolValue]) {
+        [self.logger debug:@"Manual hasUserConsent=NO - clearing personal data (ignoring ATT)"];
+        return YES;
+    }
+
+    // Manual fallback: Publisher-set do-not-sell override
+    NSNumber *manualDoNotSell = [CLXManualPrivacyState sharedInstance].doNotSell;
+    if (manualDoNotSell != nil && [manualDoNotSell boolValue]) {
+        [self.logger debug:@"Manual doNotSell=YES - clearing personal data (ignoring ATT)"];
+        return YES;
+    }
+
     [self.logger verbose:@"Personal data can be used (ignoring ATT)"];
     return NO;
 }

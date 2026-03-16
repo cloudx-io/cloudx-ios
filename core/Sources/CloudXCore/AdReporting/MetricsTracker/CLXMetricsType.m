@@ -23,6 +23,8 @@ NSString * const CLXMetricsTypeMethodSetHashedUserId = @"method_set_hashed_user_
 NSString * const CLXMetricsTypeMethodSetUserKeyValues = @"method_set_user_key_values";
 NSString * const CLXMetricsTypeMethodSetAppKeyValues = @"method_set_app_key_values";
 NSString * const CLXMetricsTypeMethodBannerRefresh = @"method_banner_refresh";
+NSString * const CLXMetricsTypeMethodSetHasUserConsent = @"method_set_has_user_consent";
+NSString * const CLXMetricsTypeMethodSetDoNotSell = @"method_set_do_not_sell";
 
 @implementation CLXMetricsType
 
@@ -64,7 +66,9 @@ NSString * const CLXMetricsTypeMethodBannerRefresh = @"method_banner_refresh";
             CLXMetricsTypeMethodSetHashedUserId,
             CLXMetricsTypeMethodSetUserKeyValues,
             CLXMetricsTypeMethodSetAppKeyValues,
-            CLXMetricsTypeMethodBannerRefresh
+            CLXMetricsTypeMethodBannerRefresh,
+            CLXMetricsTypeMethodSetHasUserConsent,
+            CLXMetricsTypeMethodSetDoNotSell
         ];
     });
     return methodTypes;

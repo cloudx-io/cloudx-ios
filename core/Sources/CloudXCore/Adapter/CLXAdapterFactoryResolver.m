@@ -1,4 +1,5 @@
 #import <CloudXCore/CLXAdapterFactoryResolver.h>
+#import <CloudXCore/CLXAdNetwork.h>
 #import <CloudXCore/CLXLogger.h>
 
 @interface CLXAdapterFactoryResolver ()
@@ -25,11 +26,8 @@
     
     [self.logger info:@"Starting factory resolution for adapters"];
     
-    // Get all known adapter names (this would be equivalent to SDKConfig.KnownAdapterName.allCases in Swift)
-    NSArray *knownAdapterNames = @[@"testbidder", @"googleAdManager", @"meta", @"mintegral", @"cloudx", @"cloudXRenderer", @"vungle", @"inmobi", @"moloco", @"unity"];
-    
-    for (NSString *adapterName in knownAdapterNames) {
-        NSString *className = [self classNameForAdapterName:adapterName];
+    for (CLXAdNetwork adapterName in CLXAllAdNetworks()) {
+        NSString *className = CLXAdNetworkClassName(adapterName);
         // Special case: Renderer uses CloudXRenderer module, not CLXRendererAdapter
         NSString *namespace = [className isEqualToString:@"Renderer"] ? @"CloudXRenderer" : [NSString stringWithFormat:@"CLX%@Adapter", className];
         
@@ -148,30 +146,4 @@
     return nil;
 }
 
-- (NSString *)classNameForAdapterName:(NSString *)adapterName {
-    if ([adapterName isEqualToString:@"testbidder"]) {
-        return @"Renderer";  // Testbidder is implemented by the CloudX Renderer
-    } else if ([adapterName isEqualToString:@"googleAdManager"]) {
-        return @"AdManager";
-    } else if ([adapterName isEqualToString:@"meta"]) {
-        return @"Meta";
-    } else if ([adapterName isEqualToString:@"mintegral"]) {
-        return @"Mintegral";
-    } else if ([adapterName isEqualToString:@"cloudx"]) {
-        return @"DSP";
-    } else if ([adapterName isEqualToString:@"cloudXRenderer"]) {
-        return @"Renderer";
-    } else if ([adapterName isEqualToString:@"vungle"]) {
-        return @"Vungle";
-    } else if ([adapterName isEqualToString:@"inmobi"]) {
-        return @"InMobi";
-    } else if ([adapterName isEqualToString:@"moloco"]) {
-        return @"Moloco";
-    } else if ([adapterName isEqualToString:@"unity"]) {
-        return @"Unity";
-    } else {
-        return @"Renderer"; // default to Renderer (testbidder)
-    }
-}
-
-@end 
+@end

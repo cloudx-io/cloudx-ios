@@ -46,6 +46,7 @@
 }
 
 - (void)tearDown {
+    [[CLXManualPrivacyState sharedInstance] clear];
     [self.testDefaults removePersistentDomainForName:self.testSuiteName];
     self.testDefaults = nil;
     self.testSuiteName = nil;
@@ -337,6 +338,64 @@
     
     NSNumber *gdprApplies = [self.privacyService gdprApplies];
     XCTAssertNil(gdprApplies, @"GDPR applies should be nil when not set");
+}
+
+#pragma mark - Manual Privacy Fallback Tests
+
+// Test manual doNotSell=YES triggers data clearing when no CMP signals
+- (void)testManualDoNotSell_YES_ShouldClearPersonalData {
+    [self clearPrivacySettings];
+
+    // No CMP signals, but publisher manually set doNotSell
+    [[CLXManualPrivacyState sharedInstance] setDoNotSell:@YES];
+
+    BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
+    XCTAssertTrue(shouldClear, @"Manual doNotSell=YES should clear personal data");
+}
+
+// Test manual doNotSell=NO does NOT trigger data clearing
+- (void)testManualDoNotSell_NO_ShouldAllowPersonalData {
+    [self clearPrivacySettings];
+
+    [[CLXManualPrivacyState sharedInstance] setDoNotSell:@NO];
+
+    BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
+    XCTAssertFalse(shouldClear, @"Manual doNotSell=NO should allow personal data");
+}
+
+// Test manual doNotSell=nil (not set) does NOT trigger data clearing
+- (void)testManualDoNotSell_Nil_ShouldAllowPersonalData {
+    [self clearPrivacySettings];
+
+    [[CLXManualPrivacyState sharedInstance] setDoNotSell:nil];
+
+    BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
+    XCTAssertFalse(shouldClear, @"Manual doNotSell=nil should defer and allow personal data");
+}
+
+// Test CMP CCPA signal takes priority over manual doNotSell
+- (void)testCCPAOptOut_OverridesManualDoNotSell_NO {
+    [self clearPrivacySettings];
+
+    // CMP says opt-out, but publisher manually says doNotSell=NO
+    [self.testDefaults setObject:@"1YYN" forKey:kCLXPrivacyCCPAPrivacyKey];
+    [self.testDefaults synchronize];
+    [[CLXManualPrivacyState sharedInstance] setDoNotSell:@NO];
+
+    BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
+    XCTAssertTrue(shouldClear, @"CMP CCPA opt-out should override manual doNotSell=NO");
+}
+
+// Test clearing manual state restores default behavior
+- (void)testClearManualState_RestoresDefaultBehavior {
+    [self clearPrivacySettings];
+
+    // Set and then clear
+    [[CLXManualPrivacyState sharedInstance] setDoNotSell:@YES];
+    [[CLXManualPrivacyState sharedInstance] clear];
+
+    BOOL shouldClear = [self.privacyService shouldClearPersonalDataIgnoringATT];
+    XCTAssertFalse(shouldClear, @"After clearing manual state, should defer to CMP (which has no signal = allow)");
 }
 
 @end

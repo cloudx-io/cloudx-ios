@@ -48,34 +48,39 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 4 // SDK, Ad Unit, Logging, QA Tools
+        return 5 // SDK, Ad Unit, Privacy, Logging, QA Tools
     }
-    
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
         case 0: return 3 // SDK Settings: App Key, Init URL, Hashed User ID
         case 1: return 4 // Ad Unit Settings
-        case 2: return 4 // Logging: Enable, Emojis, Timestamps, Level
-        case 3: return 1 // QA Tools: Print Bid Response
+        case 2: return 2 // Privacy: Has User Consent, Do Not Sell
+        case 3: return 4 // Logging: Enable, Emojis, Timestamps, Level
+        case 4: return 1 // QA Tools: Print Bid Response
         default: return 0
         }
     }
-    
+
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
         case 0: return "SDK Settings"
         case 1: return "Ad Unit Settings"
-        case 2: return "Logging Controls 🪵"
-        case 3: return "🔍 QA Tools"
+        case 2: return "Manual Privacy Controls"
+        case 3: return "Logging Controls 🪵"
+        case 4: return "🔍 QA Tools"
         default: return nil
         }
     }
-    
+
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if section == 2 {
-            return "V=Verbose (all logs), D=Debug (dev logs), I=Info (key events), W=Warn (issues), E=Error (failures only). Toggle emojis to test plain text mode for log aggregation systems."
+            return "Override CMP consent signals. Not Set = defer to CMP. These call CloudXCore.setHasUserConsent() / setDoNotSell()."
         }
         if section == 3 {
+            return "V=Verbose (all logs), D=Debug (dev logs), I=Info (key events), W=Warn (issues), E=Error (failures only). Toggle emojis to test plain text mode for log aggregation systems."
+        }
+        if section == 4 {
             return "When enabled, the full bid response JSON from the server is printed to the Xcode console. This is for QA/internal testing only."
         }
         return nil
@@ -133,7 +138,30 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
                 textField.text = settings.rewardedAdUnitId
             default: break
             }
-        case 2: // Logging
+        case 2: // Privacy
+            textField.removeFromSuperview()
+            switch indexPath.row {
+            case 0:
+                cell.textLabel?.text = "Has User Consent"
+                let control = UISegmentedControl(items: ["Not Set", "Yes", "No"])
+                let stored = UserDefaults.standard.object(forKey: "CLXDemo_hasUserConsent") as? Bool
+                control.selectedSegmentIndex = stored == nil ? 0 : (stored! ? 1 : 2)
+                control.frame = CGRect(x: 0, y: 0, width: 200, height: 30)
+                control.tag = 250
+                control.addTarget(self, action: #selector(privacyControlChanged(_:)), for: .valueChanged)
+                cell.accessoryView = control
+            case 1:
+                cell.textLabel?.text = "Do Not Sell"
+                let control = UISegmentedControl(items: ["Not Set", "Yes", "No"])
+                let stored = UserDefaults.standard.object(forKey: "CLXDemo_doNotSell") as? Bool
+                control.selectedSegmentIndex = stored == nil ? 0 : (stored! ? 1 : 2)
+                control.frame = CGRect(x: 0, y: 0, width: 200, height: 30)
+                control.tag = 251
+                control.addTarget(self, action: #selector(privacyControlChanged(_:)), for: .valueChanged)
+                cell.accessoryView = control
+            default: break
+            }
+        case 3: // Logging
             textField.removeFromSuperview() // We'll use switches for all logging controls
             switch indexPath.row {
             case 0:
@@ -170,7 +198,7 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
                 cell.accessoryView = levelControl
             default: break
             }
-        case 3: // QA Tools
+        case 4: // QA Tools
             textField.removeFromSuperview()
             switch indexPath.row {
             case 0:
@@ -187,6 +215,33 @@ class SettingsViewController: UITableViewController, UITextFieldDelegate {
         return cell
     }
     
+    @objc private func privacyControlChanged(_ sender: UISegmentedControl) {
+        // 0=Not Set, 1=Yes, 2=No
+        let value: NSNumber? = sender.selectedSegmentIndex == 0 ? nil : NSNumber(value: sender.selectedSegmentIndex == 1)
+
+        if sender.tag == 250 {
+            // Has User Consent
+            CloudXCore.setHasUserConsent(value)
+            if let v = value {
+                UserDefaults.standard.set(v.boolValue, forKey: "CLXDemo_hasUserConsent")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "CLXDemo_hasUserConsent")
+            }
+            let label = sender.selectedSegmentIndex == 0 ? "Not Set" : (sender.selectedSegmentIndex == 1 ? "YES" : "NO")
+            print("🔒 Has User Consent set to: \(label)")
+        } else if sender.tag == 251 {
+            // Do Not Sell
+            CloudXCore.setDoNotSell(value)
+            if let v = value {
+                UserDefaults.standard.set(v.boolValue, forKey: "CLXDemo_doNotSell")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "CLXDemo_doNotSell")
+            }
+            let label = sender.selectedSegmentIndex == 0 ? "Not Set" : (sender.selectedSegmentIndex == 1 ? "YES" : "NO")
+            print("🔒 Do Not Sell set to: \(label)")
+        }
+    }
+
     @objc private func loggingToggleChanged(_ sender: UISwitch) {
         if sender.tag == 200 {
             // Logging Enabled/Disabled (using CLXLogLevelNone to disable)

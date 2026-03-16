@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		968244291648D519919AE925 /* CLXMintegralPrivacyHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 5206D696F072FF95D0BA6F8B /* CLXMintegralPrivacyHandler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B100000000000001 /* CLXMintegralBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = B200000000000001 /* CLXMintegralBanner.m */; };
 		B100000000000002 /* CLXMintegralBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = B200000000000002 /* CLXMintegralBanner.h */; };
 		B100000000000003 /* CLXMintegralBannerFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = B200000000000003 /* CLXMintegralBannerFactory.m */; };
@@ -32,9 +33,12 @@
 		B100000000000020 /* Pods_CloudXMintegralAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B200000000000020 /* Pods_CloudXMintegralAdapter.framework */; };
 		B100000000000022 /* CLXMintegralIDExtractor.m in Sources */ = {isa = PBXBuildFile; fileRef = B200000000000022 /* CLXMintegralIDExtractor.m */; };
 		B100000000000023 /* CLXMintegralIDExtractor.h in Headers */ = {isa = PBXBuildFile; fileRef = B200000000000023 /* CLXMintegralIDExtractor.h */; };
+		E7730E83FD5B01A3074A0FE6 /* CLXMintegralPrivacyHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 12C5F18A73FB734C3C084CA7 /* CLXMintegralPrivacyHandler.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		12C5F18A73FB734C3C084CA7 /* CLXMintegralPrivacyHandler.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXMintegralPrivacyHandler.m; sourceTree = "<group>"; };
+		5206D696F072FF95D0BA6F8B /* CLXMintegralPrivacyHandler.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXMintegralPrivacyHandler.h; sourceTree = "<group>"; };
 		B200000000000001 /* CLXMintegralBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMintegralBanner.m; sourceTree = "<group>"; };
 		B200000000000002 /* CLXMintegralBanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMintegralBanner.h; sourceTree = "<group>"; };
 		B200000000000003 /* CLXMintegralBannerFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMintegralBannerFactory.m; sourceTree = "<group>"; };
@@ -156,6 +160,8 @@
 				B20000000000001C /* CLXMintegralAdapterVersion.m */,
 				B20000000000001D /* Info.plist */,
 				B20000000000001E /* module.modulemap */,
+				5206D696F072FF95D0BA6F8B /* CLXMintegralPrivacyHandler.h */,
+				12C5F18A73FB734C3C084CA7 /* CLXMintegralPrivacyHandler.m */,
 			);
 			path = CloudXMintegralAdapter;
 			sourceTree = "<group>";
@@ -222,6 +228,7 @@
 				B100000000000023 /* CLXMintegralIDExtractor.h in Headers */,
 				B100000000000019 /* CloudXMintegralAdapter.h in Headers */,
 				B10000000000001B /* CLXMintegralAdapterVersion.h in Headers */,
+				968244291648D519919AE925 /* CLXMintegralPrivacyHandler.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -350,6 +357,7 @@
 				B100000000000022 /* CLXMintegralIDExtractor.m in Sources */,
 				B10000000000001A /* CloudXMintegralAdapter.m in Sources */,
 				B10000000000001C /* CLXMintegralAdapterVersion.m in Sources */,
+				E7730E83FD5B01A3074A0FE6 /* CLXMintegralPrivacyHandler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		16ADD50DEC4133D84EAB3021 /* CLXVunglePrivacyHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = BB791A1CEAFB9DB6CB2D1C3D /* CLXVunglePrivacyHandler.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D921B7297A73CCD92DB22F1 /* CLXVunglePrivacyHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = C74691D2C7F8BB740BB3488E /* CLXVunglePrivacyHandler.m */; };
 		A1000001294A8A0000000001 /* CloudXVungleAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = A1000000294A8A0000000001 /* CloudXVungleAdapter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A1000006294A8A0000000001 /* CLXVungleErrorHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = A1000007294A8A0000000001 /* CLXVungleErrorHandler.h */; };
 		A1000008294A8A0000000001 /* CLXVungleErrorHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = A1000009294A8A0000000001 /* CLXVungleErrorHandler.m */; };
@@ -63,6 +65,8 @@
 		A1000039294A8A0000000001 /* CLXVungleAppOpenFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVungleAppOpenFactory.m; sourceTree = "<group>"; };
 		A100003A294A8A0000000001 /* CloudXVungleAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXVungleAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A100003B294A8A0000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BB791A1CEAFB9DB6CB2D1C3D /* CLXVunglePrivacyHandler.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXVunglePrivacyHandler.h; sourceTree = "<group>"; };
+		C74691D2C7F8BB740BB3488E /* CLXVunglePrivacyHandler.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXVunglePrivacyHandler.m; sourceTree = "<group>"; };
 		FBA9F5E098CDAE8D5BE7BD3D /* Pods-CloudXVungleAdapter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXVungleAdapter.release.xcconfig"; path = "Target Support Files/Pods-CloudXVungleAdapter/Pods-CloudXVungleAdapter.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -127,6 +131,8 @@
 				A1000046294A8A0000000001 /* Rewarded */,
 				A1000047294A8A0000000001 /* Banner */,
 				A1000049294A8A0000000001 /* AppOpen */,
+				BB791A1CEAFB9DB6CB2D1C3D /* CLXVunglePrivacyHandler.h */,
+				C74691D2C7F8BB740BB3488E /* CLXVunglePrivacyHandler.m */,
 			);
 			path = CloudXVungleAdapter;
 			sourceTree = "<group>";
@@ -229,6 +235,7 @@
 				A1000022294A8A0000000001 /* CLXVungleBanner.h in Headers */,
 				A1000026294A8A0000000001 /* CLXVungleBannerFactory.h in Headers */,
 				A1000036294A8A0000000001 /* CLXVungleAppOpenFactory.h in Headers */,
+				16ADD50DEC4133D84EAB3021 /* CLXVunglePrivacyHandler.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -356,6 +363,7 @@
 				A1000024294A8A0000000001 /* CLXVungleBanner.m in Sources */,
 				A1000028294A8A0000000001 /* CLXVungleBannerFactory.m in Sources */,
 				A1000038294A8A0000000001 /* CLXVungleAppOpenFactory.m in Sources */,
+				3D921B7297A73CCD92DB22F1 /* CLXVunglePrivacyHandler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

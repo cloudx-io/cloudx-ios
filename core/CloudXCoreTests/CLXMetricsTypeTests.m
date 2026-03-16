@@ -93,7 +93,7 @@
     NSArray<NSString *> *methodTypes = [CLXMetricsType allMethodCallTypes];
     
     XCTAssertNotNil(methodTypes);
-    XCTAssertEqual(methodTypes.count, 10);
+    XCTAssertEqual(methodTypes.count, 12);
     XCTAssertTrue([methodTypes containsObject:CLXMetricsTypeMethodSdkInit]);
     XCTAssertTrue([methodTypes containsObject:CLXMetricsTypeMethodCreateBanner]);
     XCTAssertTrue([methodTypes containsObject:CLXMetricsTypeMethodCreateInterstitial]);
@@ -104,6 +104,8 @@
     XCTAssertTrue([methodTypes containsObject:CLXMetricsTypeMethodSetUserKeyValues]);
     XCTAssertTrue([methodTypes containsObject:CLXMetricsTypeMethodSetAppKeyValues]);
     XCTAssertTrue([methodTypes containsObject:CLXMetricsTypeMethodBannerRefresh]);
+    XCTAssertTrue([methodTypes containsObject:CLXMetricsTypeMethodSetHasUserConsent]);
+    XCTAssertTrue([methodTypes containsObject:CLXMetricsTypeMethodSetDoNotSell]);
 }
 
 - (void)testIsValidMetricType {

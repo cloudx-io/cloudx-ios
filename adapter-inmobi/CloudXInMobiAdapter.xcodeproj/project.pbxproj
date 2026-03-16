@@ -7,78 +7,70 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		/* Banner */
+		0EB678F3C345504CC690BB66 /* CLXInMobiPrivacyHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = E5A3F30358EE66BCDC4F9316 /* CLXInMobiPrivacyHandler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A100000000000001 /* CLXInMobiBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000001 /* CLXInMobiBanner.m */; };
 		A100000000000002 /* CLXInMobiBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000002 /* CLXInMobiBanner.h */; };
 		A100000000000003 /* CLXInMobiBannerFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000003 /* CLXInMobiBannerFactory.m */; };
 		A100000000000004 /* CLXInMobiBannerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000004 /* CLXInMobiBannerFactory.h */; };
+		A100000000000005 /* CLXInMobiBaseFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000005 /* CLXInMobiBaseFactory.m */; };
+		A100000000000006 /* CLXInMobiBaseFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000006 /* CLXInMobiBaseFactory.h */; };
 		/* BidTokenSource */
 		A100000000000007 /* CLXInMobiBidTokenSource.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000007 /* CLXInMobiBidTokenSource.m */; };
 		A100000000000008 /* CLXInMobiBidTokenSource.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000008 /* CLXInMobiBidTokenSource.h */; };
-		/* Initializers */
 		A100000000000009 /* CLXInMobiInitializer.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000009 /* CLXInMobiInitializer.m */; };
 		A10000000000000A /* CLXInMobiInitializer.h in Headers */ = {isa = PBXBuildFile; fileRef = A20000000000000A /* CLXInMobiInitializer.h */; };
-		/* Interstitial */
 		A10000000000000B /* CLXInMobiInterstitial.m in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000B /* CLXInMobiInterstitial.m */; };
 		A10000000000000C /* CLXInMobiInterstitial.h in Headers */ = {isa = PBXBuildFile; fileRef = A20000000000000C /* CLXInMobiInterstitial.h */; };
 		A10000000000000D /* CLXInMobiInterstitialFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000D /* CLXInMobiInterstitialFactory.m */; };
 		A10000000000000E /* CLXInMobiInterstitialFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A20000000000000E /* CLXInMobiInterstitialFactory.h */; };
-		/* Rewarded */
 		A100000000000013 /* CLXInMobiRewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000013 /* CLXInMobiRewarded.m */; };
 		A100000000000014 /* CLXInMobiRewarded.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000014 /* CLXInMobiRewarded.h */; };
 		A100000000000015 /* CLXInMobiRewardedFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000015 /* CLXInMobiRewardedFactory.m */; };
 		A100000000000016 /* CLXInMobiRewardedFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000016 /* CLXInMobiRewardedFactory.h */; };
-		/* Utils */
 		A100000000000017 /* CLXInMobiErrorHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000017 /* CLXInMobiErrorHandler.m */; };
 		A100000000000018 /* CLXInMobiErrorHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000018 /* CLXInMobiErrorHandler.h */; };
-		/* Root files */
 		A100000000000019 /* CloudXInMobiAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000019 /* CloudXInMobiAdapter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A10000000000001A /* CloudXInMobiAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000001A /* CloudXInMobiAdapter.m */; };
 		A10000000000001B /* CLXInMobiAdapterVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = A20000000000001B /* CLXInMobiAdapterVersion.h */; };
 		A10000000000001C /* CLXInMobiAdapterVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000001C /* CLXInMobiAdapterVersion.m */; };
-		/* Pods Framework */
 		A100000000000020 /* Pods_CloudXInMobiAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A200000000000020 /* Pods_CloudXInMobiAdapter.framework */; };
+		DA5AA8E6188357B6869A1375 /* CLXInMobiPrivacyHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FFF2CA4C0979D0960CDA3947 /* CLXInMobiPrivacyHandler.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		/* Banner */
 		A200000000000001 /* CLXInMobiBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBanner.m; sourceTree = "<group>"; };
 		A200000000000002 /* CLXInMobiBanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBanner.h; sourceTree = "<group>"; };
 		A200000000000003 /* CLXInMobiBannerFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBannerFactory.m; sourceTree = "<group>"; };
 		A200000000000004 /* CLXInMobiBannerFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBannerFactory.h; sourceTree = "<group>"; };
+		A200000000000005 /* CLXInMobiBaseFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBaseFactory.m; sourceTree = "<group>"; };
+		A200000000000006 /* CLXInMobiBaseFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBaseFactory.h; sourceTree = "<group>"; };
 		/* BidTokenSource */
 		A200000000000007 /* CLXInMobiBidTokenSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBidTokenSource.m; sourceTree = "<group>"; };
 		A200000000000008 /* CLXInMobiBidTokenSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBidTokenSource.h; sourceTree = "<group>"; };
-		/* Initializers */
 		A200000000000009 /* CLXInMobiInitializer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiInitializer.m; sourceTree = "<group>"; };
 		A20000000000000A /* CLXInMobiInitializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiInitializer.h; sourceTree = "<group>"; };
-		/* Interstitial */
 		A20000000000000B /* CLXInMobiInterstitial.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiInterstitial.m; sourceTree = "<group>"; };
 		A20000000000000C /* CLXInMobiInterstitial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiInterstitial.h; sourceTree = "<group>"; };
 		A20000000000000D /* CLXInMobiInterstitialFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiInterstitialFactory.m; sourceTree = "<group>"; };
 		A20000000000000E /* CLXInMobiInterstitialFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiInterstitialFactory.h; sourceTree = "<group>"; };
-		/* Rewarded */
 		A200000000000013 /* CLXInMobiRewarded.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiRewarded.m; sourceTree = "<group>"; };
 		A200000000000014 /* CLXInMobiRewarded.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiRewarded.h; sourceTree = "<group>"; };
 		A200000000000015 /* CLXInMobiRewardedFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiRewardedFactory.m; sourceTree = "<group>"; };
 		A200000000000016 /* CLXInMobiRewardedFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiRewardedFactory.h; sourceTree = "<group>"; };
-		/* Utils */
 		A200000000000017 /* CLXInMobiErrorHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiErrorHandler.m; sourceTree = "<group>"; };
 		A200000000000018 /* CLXInMobiErrorHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiErrorHandler.h; sourceTree = "<group>"; };
-		/* Root files */
 		A200000000000019 /* CloudXInMobiAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CloudXInMobiAdapter.h; sourceTree = "<group>"; };
 		A20000000000001A /* CloudXInMobiAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CloudXInMobiAdapter.m; sourceTree = "<group>"; };
 		A20000000000001B /* CLXInMobiAdapterVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiAdapterVersion.h; sourceTree = "<group>"; };
 		A20000000000001C /* CLXInMobiAdapterVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiAdapterVersion.m; sourceTree = "<group>"; };
 		A20000000000001D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A20000000000001E /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
-		/* Pods xcconfig files */
 		A20000000000001F /* Pods-CloudXInMobiAdapter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXInMobiAdapter.debug.xcconfig"; path = "Target Support Files/Pods-CloudXInMobiAdapter/Pods-CloudXInMobiAdapter.debug.xcconfig"; sourceTree = "<group>"; };
-		A200000000000021 /* Pods-CloudXInMobiAdapter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXInMobiAdapter.release.xcconfig"; path = "Target Support Files/Pods-CloudXInMobiAdapter/Pods-CloudXInMobiAdapter.release.xcconfig"; sourceTree = "<group>"; };
-		/* Pods Framework */
 		A200000000000020 /* Pods_CloudXInMobiAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXInMobiAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		/* Framework product */
+		A200000000000021 /* Pods-CloudXInMobiAdapter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXInMobiAdapter.release.xcconfig"; path = "Target Support Files/Pods-CloudXInMobiAdapter/Pods-CloudXInMobiAdapter.release.xcconfig"; sourceTree = "<group>"; };
 		A300000000000001 /* CloudXInMobiAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXInMobiAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E5A3F30358EE66BCDC4F9316 /* CLXInMobiPrivacyHandler.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXInMobiPrivacyHandler.h; sourceTree = "<group>"; };
+		FFF2CA4C0979D0960CDA3947 /* CLXInMobiPrivacyHandler.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiPrivacyHandler.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,6 +160,8 @@
 				A20000000000001C /* CLXInMobiAdapterVersion.m */,
 				A20000000000001D /* Info.plist */,
 				A20000000000001E /* module.modulemap */,
+				E5A3F30358EE66BCDC4F9316 /* CLXInMobiPrivacyHandler.h */,
+				FFF2CA4C0979D0960CDA3947 /* CLXInMobiPrivacyHandler.m */,
 			);
 			path = CloudXInMobiAdapter;
 			sourceTree = "<group>";
@@ -205,7 +199,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		A50000000000000E /* Root */ = {
+		A50000000000000E = {
 			isa = PBXGroup;
 			children = (
 				A50000000000000A /* Sources */,
@@ -233,6 +227,7 @@
 				A100000000000018 /* CLXInMobiErrorHandler.h in Headers */,
 				A100000000000019 /* CloudXInMobiAdapter.h in Headers */,
 				A10000000000001B /* CLXInMobiAdapterVersion.h in Headers */,
+				0EB678F3C345504CC690BB66 /* CLXInMobiPrivacyHandler.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,7 +276,7 @@
 				en,
 				Base,
 			);
-			mainGroup = A50000000000000E /* Root */;
+			mainGroup = A50000000000000E;
 			productRefGroup = A50000000000000B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -342,6 +337,7 @@
 				A100000000000017 /* CLXInMobiErrorHandler.m in Sources */,
 				A10000000000001A /* CloudXInMobiAdapter.m in Sources */,
 				A10000000000001C /* CLXInMobiAdapterVersion.m in Sources */,
+				DA5AA8E6188357B6869A1375 /* CLXInMobiPrivacyHandler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -516,15 +512,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AD00000000000001 /* Build configuration list for PBXProject "CloudXInMobiAdapter" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				AE00000000000001 /* Debug */,
-				AE00000000000002 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		A900000000000001 /* Build configuration list for PBXNativeTarget "CloudXInMobiAdapter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -534,8 +521,16 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		AD00000000000001 /* Build configuration list for PBXProject "CloudXInMobiAdapter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AE00000000000001 /* Debug */,
+				AE00000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 	};
 	rootObject = AC00000000000001 /* Project object */;
 }
-

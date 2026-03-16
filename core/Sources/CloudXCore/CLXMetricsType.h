@@ -36,6 +36,8 @@ extern NSString * const CLXMetricsTypeMethodSetHashedUserId;  // "method_set_has
 extern NSString * const CLXMetricsTypeMethodSetUserKeyValues; // "method_set_user_key_values"
 extern NSString * const CLXMetricsTypeMethodSetAppKeyValues;  // "method_set_app_key_values"
 extern NSString * const CLXMetricsTypeMethodBannerRefresh;    // "method_banner_refresh"
+extern NSString * const CLXMetricsTypeMethodSetHasUserConsent; // "method_set_has_user_consent"
+extern NSString * const CLXMetricsTypeMethodSetDoNotSell;     // "method_set_do_not_sell"
 
 /**
  * Utility class for metrics type validation and categorization
