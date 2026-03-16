@@ -33,6 +33,10 @@
         _bidReq = nil;
         _sdkInitRequest = nil;
         _geoReq = nil;
+        _adapterInit = nil;
+        _adapterLoad = nil;
+        _adapterError = nil;
+        _timeToFirstAd = nil;
     }
     return self;
 }
@@ -44,6 +48,10 @@
         _bidReq = dictionary[@"bidReq"] ? [[CLXMetricsConfigNetworkSubConfig alloc] initWithDictionary:dictionary[@"bidReq"]] : nil;
         _sdkInitRequest = dictionary[@"initSdkReq"] ? [[CLXMetricsConfigNetworkSubConfig alloc] initWithDictionary:dictionary[@"initSdkReq"]] : nil;
         _geoReq = dictionary[@"geoReq"] ? [[CLXMetricsConfigNetworkSubConfig alloc] initWithDictionary:dictionary[@"geoReq"]] : nil;
+        _adapterInit = dictionary[@"adapterInit"] ? [[CLXMetricsConfigNetworkSubConfig alloc] initWithDictionary:dictionary[@"adapterInit"]] : nil;
+        _adapterLoad = dictionary[@"adapterLoad"] ? [[CLXMetricsConfigNetworkSubConfig alloc] initWithDictionary:dictionary[@"adapterLoad"]] : nil;
+        _adapterError = dictionary[@"adapterError"] ? [[CLXMetricsConfigNetworkSubConfig alloc] initWithDictionary:dictionary[@"adapterError"]] : nil;
+        _timeToFirstAd = dictionary[@"timeToFirstAd"] ? [[CLXMetricsConfigNetworkSubConfig alloc] initWithDictionary:dictionary[@"timeToFirstAd"]] : nil;
     }
     return self;
 }
@@ -125,7 +133,31 @@
                 geoReqDict[@"enabled"] = dictionary[@"network_calls.geo_req.enabled"];
                 networkDict[@"geoReq"] = geoReqDict;
             }
-            
+
+            NSMutableDictionary *adapterInitDict = [NSMutableDictionary dictionary];
+            if (dictionary[@"networkCalls.adapterInit.enabled"]) {
+                adapterInitDict[@"enabled"] = dictionary[@"networkCalls.adapterInit.enabled"];
+                networkDict[@"adapterInit"] = adapterInitDict;
+            }
+
+            NSMutableDictionary *adapterLoadDict = [NSMutableDictionary dictionary];
+            if (dictionary[@"networkCalls.adapterLoad.enabled"]) {
+                adapterLoadDict[@"enabled"] = dictionary[@"networkCalls.adapterLoad.enabled"];
+                networkDict[@"adapterLoad"] = adapterLoadDict;
+            }
+
+            NSMutableDictionary *adapterErrorDict = [NSMutableDictionary dictionary];
+            if (dictionary[@"networkCalls.adapterError.enabled"]) {
+                adapterErrorDict[@"enabled"] = dictionary[@"networkCalls.adapterError.enabled"];
+                networkDict[@"adapterError"] = adapterErrorDict;
+            }
+
+            NSMutableDictionary *timeToFirstAdDict = [NSMutableDictionary dictionary];
+            if (dictionary[@"networkCalls.timeToFirstAd.enabled"]) {
+                timeToFirstAdDict[@"enabled"] = dictionary[@"networkCalls.timeToFirstAd.enabled"];
+                networkDict[@"timeToFirstAd"] = timeToFirstAdDict;
+            }
+
             if (networkDict.count > 0) {
                 networkCallsData = networkDict;
             }
@@ -150,15 +182,31 @@
 }
 
 - (BOOL)isBidRequestNetworkCallsEnabled {
-    return [self isNetworkCallsEnabled] && self.networkCalls.bidReq != nil && self.networkCalls.bidReq.enabled.boolValue;
+    return self.networkCalls.bidReq != nil && self.networkCalls.bidReq.enabled.boolValue;
 }
 
 - (BOOL)isSdkInitNetworkCallsEnabled {
-    return [self isNetworkCallsEnabled] && self.networkCalls.sdkInitRequest != nil && self.networkCalls.sdkInitRequest.enabled.boolValue;
+    return self.networkCalls.sdkInitRequest != nil && self.networkCalls.sdkInitRequest.enabled.boolValue;
 }
 
 - (BOOL)isGeoNetworkCallsEnabled {
-    return [self isNetworkCallsEnabled] && self.networkCalls.geoReq != nil && self.networkCalls.geoReq.enabled.boolValue;
+    return self.networkCalls.geoReq != nil && self.networkCalls.geoReq.enabled.boolValue;
+}
+
+- (BOOL)isAdapterInitNetworkCallsEnabled {
+    return self.networkCalls.adapterInit != nil && self.networkCalls.adapterInit.enabled.boolValue;
+}
+
+- (BOOL)isAdapterLoadNetworkCallsEnabled {
+    return self.networkCalls.adapterLoad != nil && self.networkCalls.adapterLoad.enabled.boolValue;
+}
+
+- (BOOL)isAdapterErrorNetworkCallsEnabled {
+    return self.networkCalls.adapterError != nil && self.networkCalls.adapterError.enabled.boolValue;
+}
+
+- (BOOL)isTimeToFirstAdNetworkCallsEnabled {
+    return self.networkCalls.timeToFirstAd != nil && self.networkCalls.timeToFirstAd.enabled.boolValue;
 }
 
 - (NSString *)description {

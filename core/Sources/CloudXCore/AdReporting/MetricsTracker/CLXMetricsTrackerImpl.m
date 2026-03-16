@@ -155,11 +155,12 @@
             isCallMetricsEnabled = [self.metricsConfig isGeoNetworkCallsEnabled];
         } else if ([networkType isEqualToString:CLXMetricsTypeNetworkBidRequest]) {
             isCallMetricsEnabled = [self.metricsConfig isBidRequestNetworkCallsEnabled];
-        } else if ([networkType isEqualToString:CLXMetricsTypeNetworkTimeout] ||
-                   [networkType isEqualToString:CLXMetricsTypeNetworkAdapterLoad] ||
-                   [networkType isEqualToString:CLXMetricsTypeNetworkTimeToFirstAd]) {
-            // Timeout, adapter load, and time-to-first-ad metrics follow network calls enabled setting
-            isCallMetricsEnabled = YES;
+        } else if ([networkType isEqualToString:CLXMetricsTypeNetworkAdapterLoad]) {
+            isCallMetricsEnabled = [self.metricsConfig isAdapterLoadNetworkCallsEnabled];
+        } else if ([networkType isEqualToString:CLXMetricsTypeNetworkTimeout]) {
+            isCallMetricsEnabled = [self.metricsConfig isAdapterErrorNetworkCallsEnabled];
+        } else if ([networkType isEqualToString:CLXMetricsTypeNetworkTimeToFirstAd]) {
+            isCallMetricsEnabled = [self.metricsConfig isTimeToFirstAdNetworkCallsEnabled];
         }
         
         if (isNetworkCallMetricsEnabled && isCallMetricsEnabled) {
@@ -167,7 +168,7 @@
         }
         
         // If error is a timeout, also track the timeout metric
-        if (error && isNetworkCallMetricsEnabled && [self _isTimeoutError:error]) {
+        if (error && isNetworkCallMetricsEnabled && [self.metricsConfig isAdapterErrorNetworkCallsEnabled] && [self _isTimeoutError:error]) {
             [self _trackMetric:CLXMetricsTypeNetworkTimeout latency:latencyMs];
         }
     });

@@ -129,15 +129,15 @@
     config2.networkCalls.bidReq.enabled = @NO;
     XCTAssertFalse([config2 isBidRequestNetworkCallsEnabled]);
     
-    // Test global disabled but specific enabled
+    // Test sub-config only checks its own flag (global check is in tracker)
     CLXMetricsConfig *config3 = [[CLXMetricsConfig alloc] init];
     config3.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
     config3.networkCalls.enabled = @NO;
     config3.networkCalls.bidReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
     config3.networkCalls.bidReq.enabled = @YES;
-    XCTAssertFalse([config3 isBidRequestNetworkCallsEnabled]);
-    
-    // Test both disabled
+    XCTAssertTrue([config3 isBidRequestNetworkCallsEnabled]);
+
+    // Test specific disabled
     CLXMetricsConfig *config4 = [[CLXMetricsConfig alloc] init];
     config4.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
     config4.networkCalls.enabled = @NO;
@@ -180,6 +180,138 @@
     config2.networkCalls.geoReq = [[CLXMetricsConfigNetworkSubConfig alloc] init];
     config2.networkCalls.geoReq.enabled = @NO;
     XCTAssertFalse([config2 isGeoNetworkCallsEnabled]);
+}
+
+- (void)testIsAdapterInitNetworkCallsEnabled {
+    // Test both global and specific enabled
+    CLXMetricsConfig *config1 = [[CLXMetricsConfig alloc] init];
+    config1.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config1.networkCalls.enabled = @YES;
+    config1.networkCalls.adapterInit = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config1.networkCalls.adapterInit.enabled = @YES;
+    XCTAssertTrue([config1 isAdapterInitNetworkCallsEnabled]);
+
+    // Test global enabled but specific disabled
+    CLXMetricsConfig *config2 = [[CLXMetricsConfig alloc] init];
+    config2.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config2.networkCalls.enabled = @YES;
+    config2.networkCalls.adapterInit = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config2.networkCalls.adapterInit.enabled = @NO;
+    XCTAssertFalse([config2 isAdapterInitNetworkCallsEnabled]);
+
+    // Test nil sub-config (disabled by default)
+    CLXMetricsConfig *config3 = [[CLXMetricsConfig alloc] init];
+    config3.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config3.networkCalls.enabled = @YES;
+    XCTAssertFalse([config3 isAdapterInitNetworkCallsEnabled]);
+}
+
+- (void)testIsAdapterLoadNetworkCallsEnabled {
+    // Test both global and specific enabled
+    CLXMetricsConfig *config1 = [[CLXMetricsConfig alloc] init];
+    config1.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config1.networkCalls.enabled = @YES;
+    config1.networkCalls.adapterLoad = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config1.networkCalls.adapterLoad.enabled = @YES;
+    XCTAssertTrue([config1 isAdapterLoadNetworkCallsEnabled]);
+
+    // Test global enabled but specific disabled
+    CLXMetricsConfig *config2 = [[CLXMetricsConfig alloc] init];
+    config2.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config2.networkCalls.enabled = @YES;
+    config2.networkCalls.adapterLoad = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config2.networkCalls.adapterLoad.enabled = @NO;
+    XCTAssertFalse([config2 isAdapterLoadNetworkCallsEnabled]);
+
+    // Test sub-config only checks its own flag (global check is in tracker)
+    CLXMetricsConfig *config3 = [[CLXMetricsConfig alloc] init];
+    config3.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config3.networkCalls.enabled = @NO;
+    config3.networkCalls.adapterLoad = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config3.networkCalls.adapterLoad.enabled = @YES;
+    XCTAssertTrue([config3 isAdapterLoadNetworkCallsEnabled]);
+
+    // Test nil sub-config (disabled by default)
+    CLXMetricsConfig *config4 = [[CLXMetricsConfig alloc] init];
+    config4.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config4.networkCalls.enabled = @YES;
+    XCTAssertFalse([config4 isAdapterLoadNetworkCallsEnabled]);
+}
+
+- (void)testIsAdapterErrorNetworkCallsEnabled {
+    // Test both global and specific enabled
+    CLXMetricsConfig *config1 = [[CLXMetricsConfig alloc] init];
+    config1.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config1.networkCalls.enabled = @YES;
+    config1.networkCalls.adapterError = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config1.networkCalls.adapterError.enabled = @YES;
+    XCTAssertTrue([config1 isAdapterErrorNetworkCallsEnabled]);
+
+    // Test global enabled but specific disabled
+    CLXMetricsConfig *config2 = [[CLXMetricsConfig alloc] init];
+    config2.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config2.networkCalls.enabled = @YES;
+    config2.networkCalls.adapterError = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config2.networkCalls.adapterError.enabled = @NO;
+    XCTAssertFalse([config2 isAdapterErrorNetworkCallsEnabled]);
+
+    // Test nil sub-config (disabled by default)
+    CLXMetricsConfig *config3 = [[CLXMetricsConfig alloc] init];
+    config3.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config3.networkCalls.enabled = @YES;
+    XCTAssertFalse([config3 isAdapterErrorNetworkCallsEnabled]);
+}
+
+- (void)testIsTimeToFirstAdNetworkCallsEnabled {
+    // Test both global and specific enabled
+    CLXMetricsConfig *config1 = [[CLXMetricsConfig alloc] init];
+    config1.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config1.networkCalls.enabled = @YES;
+    config1.networkCalls.timeToFirstAd = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config1.networkCalls.timeToFirstAd.enabled = @YES;
+    XCTAssertTrue([config1 isTimeToFirstAdNetworkCallsEnabled]);
+
+    // Test global enabled but specific disabled
+    CLXMetricsConfig *config2 = [[CLXMetricsConfig alloc] init];
+    config2.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config2.networkCalls.enabled = @YES;
+    config2.networkCalls.timeToFirstAd = [[CLXMetricsConfigNetworkSubConfig alloc] init];
+    config2.networkCalls.timeToFirstAd.enabled = @NO;
+    XCTAssertFalse([config2 isTimeToFirstAdNetworkCallsEnabled]);
+
+    // Test nil sub-config (disabled by default)
+    CLXMetricsConfig *config3 = [[CLXMetricsConfig alloc] init];
+    config3.networkCalls = [[CLXMetricsConfigNetworkCalls alloc] init];
+    config3.networkCalls.enabled = @YES;
+    XCTAssertFalse([config3 isTimeToFirstAdNetworkCallsEnabled]);
+}
+
+- (void)testFromDictionaryWithNestedNetworkSubConfigs {
+    NSDictionary *dictionary = @{
+        @"sendIntervalSeconds": @60,
+        @"sdkAPICalls": @{@"enabled": @YES},
+        @"networkCalls": @{
+            @"enabled": @YES,
+            @"bidReq": @{@"enabled": @YES},
+            @"initSdkReq": @{@"enabled": @YES},
+            @"geoReq": @{@"enabled": @YES},
+            @"adapterInit": @{@"enabled": @YES},
+            @"adapterLoad": @{@"enabled": @YES},
+            @"adapterError": @{@"enabled": @NO},
+            @"timeToFirstAd": @{@"enabled": @YES}
+        }
+    };
+
+    CLXMetricsConfig *config = [CLXMetricsConfig fromDictionary:dictionary];
+
+    XCTAssertTrue([config isNetworkCallsEnabled]);
+    XCTAssertTrue([config isBidRequestNetworkCallsEnabled]);
+    XCTAssertTrue([config isSdkInitNetworkCallsEnabled]);
+    XCTAssertTrue([config isGeoNetworkCallsEnabled]);
+    XCTAssertTrue([config isAdapterInitNetworkCallsEnabled]);
+    XCTAssertTrue([config isAdapterLoadNetworkCallsEnabled]);
+    XCTAssertFalse([config isAdapterErrorNetworkCallsEnabled]);
+    XCTAssertTrue([config isTimeToFirstAdNetworkCallsEnabled]);
 }
 
 - (void)testDescription {
