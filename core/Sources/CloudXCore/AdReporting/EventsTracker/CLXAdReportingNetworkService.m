@@ -26,10 +26,6 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXXorEncryption.h>
-#import <CloudXCore/CLXDIContainer.h>
-#import <CloudXCore/CLXMetricsTrackerProtocol.h>
-#import <CloudXCore/CLXMetricsTrackerImpl.h>
-#import <CloudXCore/CLXMetricsType.h>
 #import <CloudXCore/NSString+CLXSemicolon.h>
 #import <CloudXCore/CLXURLProvider.h>
 
@@ -37,28 +33,11 @@
 @property (nonatomic, strong) CLXBaseNetworkService *baseNetworkService;
 @property (nonatomic, strong) CLXLogger *logger;
 @property (nonatomic, strong) NSUserDefaults *userDefaults;
-- (void)_trackGeoLatency:(NSInteger)latencyMs source:(NSString *)source;
 @end
 
 @implementation CLXAdReportingNetworkService
 
-#pragma mark - Private Helpers
 
-/**
- * Tracks geo API latency, attempting immediate tracking via MetricsTracker if available,
- * falling back to UserDefaults storage for later tracking by CloudXCoreAPI.
- */
-- (void)_trackGeoLatency:(NSInteger)latencyMs source:(NSString *)source {
-    CLXMetricsTrackerImpl *metricsTracker = [[CLXDIContainer shared] resolveType:ServiceTypeSingleton class:[CLXMetricsTrackerImpl class]];
-    if (metricsTracker) {
-        [metricsTracker trackNetworkCall:CLXMetricsTypeNetworkGeoApi latency:latencyMs];
-        [self.logger debug:[NSString stringWithFormat:@"[%@] Tracked geo latency: %ldms", source, (long)latencyMs]];
-    } else {
-        [self.userDefaults setInteger:latencyMs forKey:kCLXCoreGeoLatencyMsKey];
-        [self.userDefaults synchronize];
-        [self.logger debug:[NSString stringWithFormat:@"[%@] Stored geo latency: %ldms (will track after MetricsTracker init)", source, (long)latencyMs]];
-    }
-}
 
 #pragma mark - Initialization
 
@@ -79,161 +58,7 @@
 // Legacy trackNUrlWithPrice and trackLUrlWithLUrl methods removed
 // Use CLXWinLossNetworkService for server-side win/loss tracking instead
 
-- (void)geoHeadersWithURLString:(NSString *)fullURL
-                          extras:(NSDictionary<NSString *, NSString *> *)extras
-{
-    // ==================================================================================
-    // SIMULATOR-ONLY GEO FALLBACK
-    // ==================================================================================
-    // Purpose: Provide geo data when running on iOS Simulator for testing.
-    //
-    // Why: The CloudFront geo endpoint (geoip.cloudx.io) returns 403 Forbidden when
-    //      accessed from iOS Simulator because CloudFront blocks simulator IPs.
-    //      Without geo data, SDK cannot determine user country for ad targeting.
-    //
-    // Solution: Use device's actual locale/region settings to detect country.
-    //           This matches the real location of the developer running the simulator.
-    //
-    // Safety: This code is ONLY compiled for simulator builds via TARGET_IPHONE_SIMULATOR.
-    //         Real iOS devices will ALWAYS use actual CloudFront geo data from headers.
-    //         This code is completely stripped from production builds at compile time.
-    // ==================================================================================
-    #if TARGET_IPHONE_SIMULATOR
-    NSDate *simulatorGeoStartTime = [NSDate date];
-    
-    [self.logger debug:@"[Simulator] CloudFront blocks simulator IPs - using device locale for geo data"];
-    
-    // Get actual country from device's locale settings
-    NSLocale *currentLocale = [NSLocale currentLocale];
-    NSString *countryCode = [currentLocale objectForKey:NSLocaleCountryCode]; // e.g., "CH", "US", "GB"
-    
-    // Convert ISO2 (CH) to ISO3 (CHE) format for CloudFront compatibility
-    NSLocale *enUSLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
-    NSString *countryISO3 = [enUSLocale displayNameForKey:NSLocaleCountryCode value:countryCode];
-    
-    // Map common ISO2 codes to ISO3 (fallback if displayName doesn't work)
-    NSDictionary *iso2ToISO3 = @{
-        @"US": @"USA", @"GB": @"GBR", @"DE": @"DEU", @"FR": @"FRA", @"IT": @"ITA",
-        @"ES": @"ESP", @"CH": @"CHE", @"AT": @"AUT", @"BE": @"BEL", @"NL": @"NLD",
-        @"SE": @"SWE", @"NO": @"NOR", @"DK": @"DNK", @"FI": @"FIN", @"PL": @"POL",
-        @"PT": @"PRT", @"GR": @"GRC", @"IE": @"IRL", @"CZ": @"CZE", @"HU": @"HUN",
-        @"RO": @"ROU", @"BG": @"BGR", @"HR": @"HRV", @"SK": @"SVK", @"SI": @"SVN",
-        @"LT": @"LTU", @"LV": @"LVA", @"EE": @"EST", @"CY": @"CYP", @"MT": @"MLT",
-        @"LU": @"LUX", @"IS": @"ISL", @"LI": @"LIE", @"MC": @"MCO", @"AD": @"AND",
-        @"SM": @"SMR", @"VA": @"VAT", @"UA": @"UKR", @"BY": @"BLR", @"MD": @"MDA",
-        @"RU": @"RUS", @"RS": @"SRB", @"ME": @"MNE", @"MK": @"MKD", @"BA": @"BIH",
-        @"AL": @"ALB", @"XK": @"XKX"
-    };
-    
-    NSString *finalCountryISO3 = iso2ToISO3[countryCode] ?: @"USA"; // Default to USA if unknown
-    
-    // Get region/state from locale (may be nil)
-    NSString *regionCode = [[NSTimeZone localTimeZone] abbreviation] ?: @"";
-    
-    [self.logger debug:[NSString stringWithFormat:@"[Simulator] Detected country from device locale: %@ (%@)", countryCode, finalCountryISO3]];
-    
-    // Mock CloudFront headers using detected country
-    NSDictionary *mockRawHeaders = @{
-        @"cloudfront-viewer-country-iso3": finalCountryISO3,
-        @"cloudfront-viewer-country-region": regionCode
-    };
-    
-    // Mock processed geo data for bid requests (OpenRTB format)
-    NSDictionary *mockProcessedData = @{
-        @"region": regionCode
-    };
-    
-    // Store mock data in UserDefaults (same as production flow)
-    [self.userDefaults setObject:mockRawHeaders forKey:kCLXCoreRawGeoHeadersKey];
-    [self.userDefaults setObject:mockProcessedData forKey:kCLXCoreProcessedGeoDataKey];
-    [self.userDefaults synchronize];
-    
-    [self.logger debug:[NSString stringWithFormat:@"[Simulator] Geo data set from locale: %@ - Region: %@", finalCountryISO3, regionCode]];
-    
-    // Track geo latency (uses helper method for DRY)
-    NSTimeInterval simulatorGeoLatency = [[NSDate date] timeIntervalSinceDate:simulatorGeoStartTime] * 1000;
-    [self _trackGeoLatency:(NSInteger)simulatorGeoLatency source:@"Simulator"];
-    
-    // Skip actual network call for simulator
-    return;
-    #endif
-    // ==================================================================================
-    // END SIMULATOR-ONLY CODE
-    // ==================================================================================
-    
-    // Track geo API network call latency
-    NSDate *geoRequestStartTime = [NSDate date];
-    
-    // Convert params to query string
-    NSURL *url = [NSURL URLWithString:fullURL];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    request.HTTPMethod = @"GET";
-    
-    NSURLSession *session = [NSURLSession sharedSession];
-    NSURLSessionDataTask *task = [session dataTaskWithRequest:request
-                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        // Track geo API network call latency (uses helper method for DRY)
-        NSTimeInterval geoRequestLatency = [[NSDate date] timeIntervalSinceDate:geoRequestStartTime] * 1000;
-        [self _trackGeoLatency:(NSInteger)geoRequestLatency source:@"GeoAPI"];
-        
-        if (error) {
-            [self.logger error:[NSString stringWithFormat:@"CloudX: geoHeaders error: %@", error]];
-            //completion(nil, error);
-        } else {
-            [self.logger debug:[NSString stringWithFormat:@"CloudX: geoHeaders: %@", fullURL]];
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-            NSMutableDictionary *processedGeoData = [NSMutableDictionary dictionary];
-            NSMutableDictionary *rawGeoHeaders = [NSMutableDictionary dictionary];
-            
-            // Store all raw CloudFront headers for privacy checks
-            // Also capture gdpr-applies header which is critical for EU user detection
-            NSDictionary *allHeaders = [httpResponse allHeaderFields];
-            for (NSString *headerKey in allHeaders) {
-                NSString *lowerKey = [headerKey lowercaseString];
-                // Include CloudFront headers and privacy-related headers (gdpr-applies)
-                if ([lowerKey hasPrefix:@"cloudfront-"] || [lowerKey isEqualToString:@"gdpr-applies"]) {
-                    rawGeoHeaders[lowerKey] = allHeaders[headerKey];
-                }
-            }
-            
-            // Process geo headers mapping (source -> target) where:
-            // source = CloudFront header name (e.g. "cloudfront-viewer-city")
-            // target = OpenRTB field name (e.g. "city")
-            for (NSString *sourceHeader in extras) {
-                NSString *targetField = extras[sourceHeader];
-                NSString *headerValue = [httpResponse valueForHTTPHeaderField:sourceHeader];
-                if (headerValue && targetField) {
-                    processedGeoData[targetField] = headerValue;
-                }
-            }
-            
-            // Fallback: Extract common CloudFront headers if not provided by server config
-            // This ensures parity with Android which gets all fields
-            if (!processedGeoData[@"region"]) {
-                NSString *region = [httpResponse valueForHTTPHeaderField:@"cloudfront-viewer-country-region"];
-                if (region) processedGeoData[@"region"] = region;
-            }
-            if (!processedGeoData[@"zip"]) {
-                NSString *zip = [httpResponse valueForHTTPHeaderField:@"cloudfront-viewer-postal-code"];
-                if (zip) processedGeoData[@"zip"] = zip;
-            }
-            if (!processedGeoData[@"metro"]) {
-                NSString *metro = [httpResponse valueForHTTPHeaderField:@"cloudfront-viewer-metro-code"];
-                if (metro) processedGeoData[@"metro"] = metro;
-            }
-            
-            [self.logger debug:[NSString stringWithFormat:@"CloudX: geoHeaders response status code: %ld", (long)[httpResponse statusCode]]];
-            [self.logger debug:[NSString stringWithFormat:@"CloudX: processed geo data (for bid request): %@", processedGeoData]];
-            [self.logger debug:[NSString stringWithFormat:@"CloudX: raw geo headers (for privacy): %@", rawGeoHeaders]];
-            
-            // Store both processed data and raw headers
-            [self.userDefaults setObject:processedGeoData forKey:kCLXCoreProcessedGeoDataKey];
-            [self.userDefaults setObject:rawGeoHeaders forKey:kCLXCoreRawGeoHeadersKey];
-            [self.userDefaults synchronize];
-        }
-    }];
-    [task resume];
-}
+
 
 - (void)metricsTrackingWithActionString:(NSString *)actionString error:(NSError **)error {
     // Use metrics URL from SDK response (stored in user defaults)

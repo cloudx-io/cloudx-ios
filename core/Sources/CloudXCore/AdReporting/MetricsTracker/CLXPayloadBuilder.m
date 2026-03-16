@@ -47,19 +47,26 @@ static NSString * const kPlaceholderEventId = @"{eventId}";
     UIDevice *device = [UIDevice currentDevice];
     NSString *model = [CLXSystemInformation shared].model ?: @"unknown";
     NSString *osVersion = device.systemVersion ?: @"unknown";
-    NSString *countryCode = [[CLXGeoLocationService shared] countryCode] ?: @"";
-    
     // Get IFA and DNT for sdk.ifa field resolution
     // If privacy requires clearing personal data, use empty string for IFA
     BOOL piiRemove = [[CLXPrivacyService sharedInstance] shouldClearPersonalData];
     NSString *ifa = piiRemove ? @"" : ([CLXAdTrackingService idfa] ?: @"");
     NSNumber *dnt = @([CLXAdTrackingService dnt] ? 1 : 0);
-    
-    // Build geo dictionary for bidRequest.device.geo.country resolution
+
+    // Build geo dictionary from processedGeoData (mirrors Android PayloadBuilder)
+    // Filter out reserved keys to prevent server-controlled mappings from re-introducing PII
+    static NSSet *reservedGeoKeys;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        reservedGeoKeys = [NSSet setWithObjects:@"lat", @"lon", @"type", @"utcoffset", nil];
+    });
+    NSDictionary<NSString *, NSString *> *processedGeo = [[CLXGeoLocationService shared] processedGeoData];
     NSMutableDictionary *geoDict = [NSMutableDictionary dictionary];
-    if (countryCode.length > 0) {
-        geoDict[@"country"] = countryCode;
-    }
+    [processedGeo enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSString *value, BOOL *stop) {
+        if (![reservedGeoKeys containsObject:key]) {
+            geoDict[key] = value;
+        }
+    }];
     
     NSDictionary *placeholderBidRequest = @{
         @"id": kPlaceholderEventId,

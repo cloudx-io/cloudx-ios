@@ -7,7 +7,7 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
-#import <CloudXCore/CLXUserDefaultsKeys.h>
+#import "CLXGeoInfo.h"
 
 @interface CLXGeoLocationServiceGPPTests : XCTestCase
 @property (nonatomic, strong) CLXGeoLocationService *geoService;
@@ -22,9 +22,13 @@
     self.testSuiteName = [NSString stringWithFormat:@"CLXGeoLocationServiceGPPTests-%@", [[NSUUID UUID] UUIDString]];
     self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
     self.geoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
+    // Clear any existing geo info
+    [self.geoService setGeoInfo:nil];
 }
 
 - (void)tearDown {
+    // Clear geo info after tests
+    [self.geoService setGeoInfo:nil];
     [self.testDefaults removePersistentDomainForName:self.testSuiteName];
     self.testDefaults = nil;
     self.geoService = nil;
@@ -106,13 +110,14 @@
 
 // Test missing geo headers handling
 - (void)testMissingGeoHeadersHandling {
-    // Clear geo headers
-    [self.testDefaults removeObjectForKey:kCLXCoreRawGeoHeadersKey];
-    
+    // Clear geo info
+    [self.geoService setGeoInfo:nil];
+
+
     // Should default to non-US user when no geo data
     XCTAssertFalse([self.geoService isUSUser], @"Should default to non-US user when no geo headers");
     XCTAssertFalse([self.geoService isCaliforniaUser], @"Should default to non-California user when no geo headers");
-    
+
     NSDictionary *geoHeaders = [self.geoService geoHeaders];
     XCTAssertNil(geoHeaders, @"Should return nil when no geo headers are set");
 }
@@ -139,7 +144,7 @@
     }];
     XCTAssertFalse([self.geoService isUSUser], @"Should not detect US user with empty country");
     XCTAssertFalse([self.geoService isCaliforniaUser], @"Should not detect California user with empty region");
-    
+
     // Test nil values in dictionary (using empty strings since NSUserDefaults can't store NSNull)
     [self setGeoHeaders:@{
         @"cloudfront-viewer-country-iso3": @"",
@@ -147,14 +152,9 @@
     }];
     XCTAssertFalse([self.geoService isUSUser], @"Should handle empty string values gracefully");
     XCTAssertFalse([self.geoService isCaliforniaUser], @"Should handle empty string values gracefully");
-    
-    // Test non-string values
-    [self setGeoHeaders:@{
-        @"cloudfront-viewer-country-iso3": @123,
-        @"cloudfront-viewer-country-region": @456
-    }];
-    XCTAssertFalse([self.geoService isUSUser], @"Should handle non-string values gracefully");
-    XCTAssertFalse([self.geoService isCaliforniaUser], @"Should handle non-string values gracefully");
+
+    // Note: Not testing non-string values (e.g., NSNumber) as that violates the type contract
+    // NSDictionary<NSString *, NSString *> enforces string-to-string mapping
 }
 
 // Test California user must be US user
@@ -219,12 +219,12 @@
     }];
     XCTAssertTrue([self.geoService isEUUser], @"Should detect EU user when gdpr-applies is 'TRUE' (case insensitive)");
     
-    // Test gdpr-applies = 1
+    // gdpr-applies = "1" is NOT treated as true (matching Android behavior)
     [self setGeoHeaders:@{
         @"cloudfront-viewer-country-iso3": @"ITA",
         @"gdpr-applies": @"1"
     }];
-    XCTAssertTrue([self.geoService isEUUser], @"Should detect EU user when gdpr-applies is '1'");
+    XCTAssertFalse([self.geoService isEUUser], @"Should not detect EU user when gdpr-applies is '1' (only 'true' is accepted)");
 }
 
 // Test non-EU user detection based on gdpr-applies header
@@ -282,11 +282,15 @@
 
 - (void)setGeoHeaders:(NSDictionary *)headers {
     if (headers) {
-        [self.testDefaults setObject:headers forKey:kCLXCoreRawGeoHeadersKey];
+        // Create CLXGeoInfo with raw headers and set it on the service
+        CLXGeoInfo *geoInfo = [[CLXGeoInfo alloc] initWithProcessedGeoInfo:@{}
+                                                                rawGeoInfo:headers
+                                                               hashedGeoIp:nil];
+        [self.geoService setGeoInfo:geoInfo];
     } else {
-        [self.testDefaults removeObjectForKey:kCLXCoreRawGeoHeadersKey];
+        // Clear geo info
+        [self.geoService setGeoInfo:nil];
     }
-    [self.testDefaults synchronize];
 }
 
 @end

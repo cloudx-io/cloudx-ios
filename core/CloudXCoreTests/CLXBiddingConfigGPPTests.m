@@ -10,6 +10,7 @@
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
+#import "CLXGeoInfo.h"
 #import <CoreLocation/CoreLocation.h>
 
 // Test category for CLXBiddingConfigRequest to enable dependency injection
@@ -36,6 +37,7 @@
 @interface CLXBiddingConfigGPPTests : XCTestCase
 @property (nonatomic, strong) CLXPrivacyService *privacyService;
 @property (nonatomic, strong) CLXConsentProvider *gppProvider;
+@property (nonatomic, strong) CLXGeoLocationService *geoService;
 @property (nonatomic, strong) CLXSDKConfigResponse *mockSDKConfig;
 @property (nonatomic, strong) CLXConfigImpressionModel *mockImpModel;
 @property (nonatomic, strong) NSUserDefaults *testDefaults;
@@ -49,10 +51,10 @@
     self.testSuiteName = [[NSUUID UUID] UUIDString];
     self.testDefaults = [[NSUserDefaults alloc] initWithSuiteName:self.testSuiteName];
     self.gppProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil userDefaults:self.testDefaults];
-    CLXGeoLocationService *isolatedGeoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
+    self.geoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
     self.privacyService = [[CLXPrivacyService alloc] initWithUserDefaults:self.testDefaults
                                                          consentProvider:self.gppProvider
-                                                      geoLocationService:isolatedGeoService];
+                                                      geoLocationService:self.geoService];
     
     // Explicitly clear GPP state for each test
     [self.gppProvider setGppString:nil];
@@ -66,10 +68,13 @@
     
     // Create mock impression model
     self.mockImpModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:self.mockSDKConfig
-                                                                  auctionID:@"test-auction"];
+                                                                  auctionID:@"test-auction"
+                                                              testGroupName:@"test-group"];
 }
 
 - (void)tearDown {
+    [self.geoService setGeoInfo:nil];
+    self.geoService = nil;
     [self.gppProvider setGppString:nil];
     [self.gppProvider setGppSid:nil];
     [self.testDefaults removePersistentDomainForName:self.testSuiteName];
@@ -287,19 +292,19 @@
 }
 
 - (void)setupUSUser {
-    NSDictionary *geoHeaders = @{
-        @"cloudfront-viewer-country-iso3": @"USA",
-        @"cloudfront-viewer-country-region": @"TX"
-    };
-    [self.testDefaults setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
+    CLXGeoInfo *geoInfo = [[CLXGeoInfo alloc] initWithProcessedGeoInfo:@{}
+                                                            rawGeoInfo:@{@"cloudfront-viewer-country-iso3": @"USA",
+                                                                         @"cloudfront-viewer-country-region": @"TX"}
+                                                           hashedGeoIp:nil];
+    [self.geoService setGeoInfo:geoInfo];
 }
 
 - (void)setupNonUSUser {
-    NSDictionary *geoHeaders = @{
-        @"cloudfront-viewer-country-iso3": @"CAN",
-        @"cloudfront-viewer-country-region": @"ON"
-    };
-    [self.testDefaults setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
+    CLXGeoInfo *geoInfo = [[CLXGeoInfo alloc] initWithProcessedGeoInfo:@{}
+                                                            rawGeoInfo:@{@"cloudfront-viewer-country-iso3": @"CAN",
+                                                                         @"cloudfront-viewer-country-region": @"ON"}
+                                                           hashedGeoIp:nil];
+    [self.geoService setGeoInfo:geoInfo];
 }
 
 // Test unified privacy architecture - ATT-first behavior

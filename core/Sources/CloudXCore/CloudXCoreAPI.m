@@ -20,6 +20,9 @@
 #import <CloudXCore/CLXAdapterFactoryResolver.h>
 #import <CloudXCore/CloudXCoreAPI.h>
 #import <CloudXCore/CLXGeoLocationService.h>
+#import <CloudXCore/CLXGeoService.h>
+#import <CloudXCore/CLXGeoApi.h>
+#import <CloudXCore/CLXGeoInfo.h>
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXBidResponse.h>
 #import <CloudXCore/CLXBidderConfig.h>
@@ -122,11 +125,17 @@ NSString * const CLXSDKInitializedNotification = @"CLXSDKInitializedNotification
 @property (nonatomic, strong) id adFactory;
 @property (nonatomic, strong) id reportingService;
 @property (nonatomic, strong) CLXLogger *logger;
+@property (nonatomic, assign) double abTestValue;
+@property (nonatomic, copy) NSString *abTestName;
+@property (nonatomic, copy) NSString *defaultAuctionURL;
 @property (nonatomic, strong) CLXGeoLocationService *geoLocationService;
 @property (nonatomic, strong) CLXBidNetworkServiceClass *bidNetworkService;
 @property (nonatomic, strong) CLXAdNetworkFactories *adNetworkFactories;
 @property (nonatomic, strong) NSMutableSet<NSString *> *readyAdapters;
 @property (nonatomic, strong, nullable) CLXIlrdTracker *ilrdTracker;
+- (void)resolveAdapters;
+- (void)processSDKConfig:(CLXSDKConfigResponse *)config completion:(void (^)(CLXSdkConfiguration * _Nullable, CLXError * _Nullable))completion;
+- (NSDictionary *)createSDKInitBidRequestWithAuctionId:(NSString *)auctionId impModel:(CLXConfigImpressionModel *)impModel;
 @end
 
 static CloudXCore *_sharedInstance = nil;
@@ -176,6 +185,9 @@ static CloudXCore *_sharedInstance = nil;
         _logger = [[CLXLogger alloc] initWithCategory:@"CloudXCoreAPI.m"];
         [self.logger debug:@"Initializing CloudXCore instance"];
         _isInitialized = NO;
+        _abTestValue = (double)arc4random() / UINT32_MAX;
+        _abTestName = @"RandomTest";
+        _defaultAuctionURL = @"";
         _readyAdapters = [NSMutableSet set];
 
         // Resolve adapters immediately so banners created before SDK init have token sources
@@ -204,7 +216,8 @@ static CloudXCore *_sharedInstance = nil;
         return nil;
     }
     return [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
-                                                      auctionID:auctionID];
+                                                      auctionID:auctionID
+                                                  testGroupName:_abTestName];
 }
 
 - (void)initializeWithConfiguration:(CLXInitializationConfiguration *)configuration
@@ -353,23 +366,79 @@ static CloudXCore *_sharedInstance = nil;
                                                         networkService:networkService];
             [self->_ilrdTracker start];
         }
-
-        NSMutableDictionary *geoHeaders = [NSMutableDictionary dictionary];
-        if (config.geoHeaders) {
-            for (CLXSDKConfigGeoBid *geoBid in config.geoHeaders) {
-                geoHeaders[geoBid.source] = geoBid.target;
-            }
-            [self.logger debug:[NSString stringWithFormat:@"geoHeaders Dictionary: %@", geoHeaders]];
-            [[NSUserDefaults standardUserDefaults] setObject:geoHeaders forKey:kCLXCoreGeoHeadersKey];
-        }
         
         // Generate unique auction ID for this impression
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         CLXConfigImpressionModel *impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:config
-                                                                                      auctionID:auctionID];
-        
-        if (config.geoDataEndpointURL) { // @"https://geoip.cloudx.io"
-            [self.reportingService geoTrackingWithURLString:config.geoDataEndpointURL extras:geoHeaders];
+                                                                                      auctionID:auctionID
+                                                                                  testGroupName:_abTestName];
+
+        // Block that continues initialization after geo info is set
+        void (^continueInitialization)(void) = ^{
+            // Create bid request for SDK init tracking to populate bidRequest.* fields
+            NSDictionary *sdkInitBidRequest = [self createSDKInitBidRequestWithAuctionId:auctionID impModel:impModel];
+            [[CLXTrackingFieldResolver shared] setRequestData:auctionID bidRequestJSON:sdkInitBidRequest];
+            [self.logger debug:[NSString stringWithFormat:@"Created bid request for SDK init tracking - Auction ID: %@", auctionID]];
+
+            CLXRillImpressionModel *model = [[CLXRillImpressionModel alloc] initWithLastBidResponse:nil impModel:impModel adapterName:@"" loadBannerTimesCount:0 adUnitId:@""];
+
+            NSString* encodedString = [CLXRillImpressionInitService createDataStringWithRillImpressionModel:model];
+
+            // Store encodedString BEFORE processSDKConfig so metrics tracker can use it as basePayload
+            // This is the server-driven tracking payload that contains all fields ClickHouse expects
+            [[NSUserDefaults standardUserDefaults] setObject:encodedString forKey:kCLXCoreEncodedStringKey];
+
+            [self.logger info:@"InitService returned config, processing"];
+            [self processSDKConfig:config completion:completion];
+
+            NSString *accountId = impModel.accountID;
+            NSString *payload = encodedString;
+
+            NSData *secret = [CLXXorEncryption generateXorSecret: accountId];
+            NSString *campaignId = [CLXXorEncryption generateCampaignIdBase64: accountId];
+
+            NSString *encrypted = [CLXXorEncryption encrypt: payload secret: secret];
+
+            NSString *safeEncrypted = [encrypted clx_urlQueryEncodedString];
+
+            NSString *safeCampaignId = [campaignId clx_urlQueryEncodedString];
+
+            if (encodedString.length > 0) {
+                [self.reportingService rillTrackingWithActionString:@"sdkinitenc" campaignId: safeCampaignId encodedString: safeEncrypted];
+            }
+
+            // Send session init event if session endpoint is configured
+            if (config.sessionEndpointURL.length > 0) {
+                CLXBaseNetworkService *baseService = [[CLXBaseNetworkService alloc]
+                    initWithBaseURL:config.sessionEndpointURL
+                         urlSession:[NSURLSession sharedSession]];
+                CLXSessionNetworkService *networkService = [[CLXSessionNetworkService alloc]
+                    initWithBaseNetworkService:baseService];
+                CLXSessionTracker *sessionTracker = [[CLXSessionTracker alloc]
+                    initWithNetworkService:networkService];
+                [sessionTracker sendInitEventWithAppKey:self->_appKey config:config];
+            }
+        };
+
+        // Initialize and fetch geo data using new CLXGeoService
+        // geoDataEndpointURL is nonnull - config parsing fails if missing from server response
+        NSMutableDictionary<NSString *, NSString *> *headerMapping = [NSMutableDictionary dictionary];
+        for (CLXSDKConfigGeoBid *geoBid in config.geoHeaders) {
+            headerMapping[geoBid.source] = geoBid.target;
+        }
+        CLXGeoApi *geoApi = [[CLXGeoApi alloc] initWithUrl:config.geoDataEndpointURL];
+        CLXGeoService *geoService = [[CLXGeoService alloc] initWithHeaderMapping:headerMapping
+                                                                        geoApi:geoApi];
+
+        [geoService fetchAndProcessGeo:^(CLXGeoInfo *geoInfo) {
+            [self.logger debug:[NSString stringWithFormat:@"Geo fetch completed: %lu processed fields, hashedGeoIp: %@",
+                               (unsigned long)geoInfo.processedGeoInfo.count,
+                               geoInfo.hashedGeoIp ?: @"(none)"]];
+
+            // Set geo info on singleton to make it available to all components
+            [[CLXGeoLocationService shared] setGeoInfo:geoInfo];
+
+            // Track geo request metric
             NSDictionary *metricsDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kCLXCoreMetricsDictKey];
             NSMutableDictionary* metricsDict = [metricsDictionary mutableCopy];
             if ([metricsDict.allKeys containsObject:@"network_call_geo_req"]) {
@@ -381,51 +450,10 @@ static CloudXCore *_sharedInstance = nil;
                 metricsDict[@"network_call_geo_req"] = @"1";
             }
             [[NSUserDefaults standardUserDefaults] setObject:metricsDict forKey:kCLXCoreMetricsDictKey];
-        }
 
-        // Create bid request for SDK init tracking to populate bidRequest.* fields
-        NSDictionary *sdkInitBidRequest = [self createSDKInitBidRequestWithAuctionId:auctionID impModel:impModel];
-        [[CLXTrackingFieldResolver shared] setRequestData:auctionID bidRequestJSON:sdkInitBidRequest];
-        [self.logger debug:[NSString stringWithFormat:@"Created bid request for SDK init tracking - Auction ID: %@", auctionID]];
-        
-        CLXRillImpressionModel *model = [[CLXRillImpressionModel alloc] initWithLastBidResponse:nil impModel:impModel adapterName:@"" loadBannerTimesCount:0 adUnitId:@""];
-        
-        NSString* encodedString = [CLXRillImpressionInitService createDataStringWithRillImpressionModel:model];
-        
-        // Store encodedString BEFORE processSDKConfig so metrics tracker can use it as basePayload
-        // This is the server-driven tracking payload that contains all fields ClickHouse expects
-        [[NSUserDefaults standardUserDefaults] setObject:encodedString forKey:kCLXCoreEncodedStringKey];
-        
-        [self.logger info:@"InitService returned config, processing"];
-        [self processSDKConfig:config completion:completion];
-        
-        NSString *accountId = impModel.accountID;
-        NSString *payload = encodedString;
-        
-        NSData *secret = [CLXXorEncryption generateXorSecret: accountId];
-        NSString *campaignId = [CLXXorEncryption generateCampaignIdBase64: accountId];
-        
-        NSString *encrypted = [CLXXorEncryption encrypt: payload secret: secret];
-        
-        NSString *safeEncrypted = [encrypted clx_urlQueryEncodedString];
-        
-        NSString *safeCampaignId = [campaignId clx_urlQueryEncodedString];
-        
-        if (encodedString.length > 0) {
-            [self.reportingService rillTrackingWithActionString:@"sdkinitenc" campaignId: safeCampaignId encodedString: safeEncrypted];
-        }
-
-        // Send session init event if session endpoint is configured
-        if (config.sessionEndpointURL.length > 0) {
-            CLXBaseNetworkService *baseService = [[CLXBaseNetworkService alloc]
-                initWithBaseURL:config.sessionEndpointURL
-                     urlSession:[NSURLSession sharedSession]];
-            CLXSessionNetworkService *networkService = [[CLXSessionNetworkService alloc]
-                initWithBaseNetworkService:baseService];
-            CLXSessionTracker *sessionTracker = [[CLXSessionTracker alloc]
-                initWithNetworkService:networkService];
-            [sessionTracker sendInitEventWithAppKey:self->_appKey config:config];
-        }
+            // Continue with initialization after geo is set
+            continueInitialization();
+        }];
     }];
 }
 
@@ -560,7 +588,7 @@ static CloudXCore *_sharedInstance = nil;
                                              pluginVersion:pluginVersion
                                             deviceTypeName:DeviceTypeToString(deviceType)
                                             deviceTypeCode:(NSInteger)deviceType
-                                               abTestGroup:@""
+                                               abTestGroup:_abTestName ?: @""
                                                  appBundle:appBundle];
     
     CLXPayloadBuilder *payloadBuilder = [CLXPayloadBuilder createWithAccountId:config.accountID ?: @""
@@ -858,7 +886,8 @@ static CloudXCore *_sharedInstance = nil;
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
-                                                              auctionID:auctionID];
+                                                              auctionID:auctionID
+                                                          testGroupName:_abTestName];
     } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring banner initialization for ad unit: %@", adUnitId]];
@@ -949,7 +978,8 @@ static CloudXCore *_sharedInstance = nil;
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
-                                                              auctionID:auctionID];
+                                                              auctionID:auctionID
+                                                          testGroupName:_abTestName];
     } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring MREC initialization for ad unit: %@", adUnitId]];
@@ -1037,7 +1067,8 @@ static CloudXCore *_sharedInstance = nil;
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
-                                                              auctionID:auctionID];
+                                                              auctionID:auctionID
+                                                          testGroupName:_abTestName];
     } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring interstitial initialization for ad unit: %@", adUnitId]];
@@ -1110,7 +1141,8 @@ static CloudXCore *_sharedInstance = nil;
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
-                                                              auctionID:auctionID];
+                                                              auctionID:auctionID
+                                                          testGroupName:_abTestName];
     } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring rewarded initialization for ad unit: %@", adUnitId]];
@@ -1186,7 +1218,8 @@ static CloudXCore *_sharedInstance = nil;
         // SDK is initialized - create impression model now
         NSString *auctionID = [[NSUUID UUID] UUIDString];
         impModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:_sdkConfig
-                                                              auctionID:auctionID];
+                                                              auctionID:auctionID
+                                                          testGroupName:_abTestName];
     } else if (!adUnitConfig && !_isInitialized) {
         // SDK not initialized yet - defer all initialization to load() time
         [self.logger debug:[NSString stringWithFormat:@"SDK not initialized - deferring native initialization for ad unit: %@", adUnitId]];
@@ -1410,6 +1443,9 @@ static BOOL _visualDebuggingEnabled = NO;
     _adUnits = nil;
     _adFactory = nil;
     _reportingService = nil;
+    _abTestValue = (double)arc4random() / UINT32_MAX;
+    _abTestName = @"RandomTest";
+    _defaultAuctionURL = @"";
     _geoLocationService = nil;
     _bidNetworkService = nil;
     _adNetworkFactories = nil;

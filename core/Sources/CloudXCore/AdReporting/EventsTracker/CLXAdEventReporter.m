@@ -32,22 +32,6 @@
 // Legacy fireNurlForRevenueWithPrice and fireLurlWithUrl methods removed
 // Use CLXWinLossTracker for server-side win/loss tracking instead
 
-- (void)geoTrackingWithURLString:(NSString *)fullURL
-                          extras:(NSDictionary<NSString *, NSString *> *)extras {
-    __weak typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (!strongSelf) {
-            return;
-        }
-        NSError *error;
-        [strongSelf.reportNetworkService geoHeadersWithURLString:fullURL extras:extras];
-        if (error) {
-            [strongSelf.logger error:[NSString stringWithFormat:@"Failed to track geo: %@", error.localizedDescription]];
-        }
-    });
-}
-
 - (void)rillTrackingWithActionString:(NSString *)actionString campaignId:(NSString *)campaignId encodedString:(NSString *)encodedString {
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

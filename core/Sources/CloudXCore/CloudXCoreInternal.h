@@ -93,6 +93,9 @@
 #import <CloudXCore/CLXURLProvider.h>
 #import <CloudXCore/CLXReachabilityService.h>
 #import <CloudXCore/CLXGeoLocationService.h>
+#import <CloudXCore/CLXGeoApi.h>
+#import <CloudXCore/CLXGeoService.h>
+#import <CloudXCore/CLXGeoInfo.h>
 #import <CloudXCore/CLXSKAdNetworkService.h>
 
 // State & Storage

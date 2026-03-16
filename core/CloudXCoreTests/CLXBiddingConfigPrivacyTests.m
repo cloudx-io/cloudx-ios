@@ -72,7 +72,8 @@
     
     // Create mock impression model
     self.mockImpModel = [[CLXConfigImpressionModel alloc] initWithSDKConfig:self.mockSDKConfig
-                                                                  auctionID:@"test-auction"];
+                                                                  auctionID:@"test-auction"
+                                                              testGroupName:@"test-group"];
 }
 
 - (void)tearDown {

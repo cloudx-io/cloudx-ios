@@ -35,9 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Additional configuration keys
 #define kCLXCoreBundleConfigKey @"CLXCore_bundle_config"
-#define kCLXCoreGeoHeadersKey @"CLXCore_geoHeaders"
-#define kCLXCoreProcessedGeoDataKey @"CLXCore_processedGeoData"
-#define kCLXCoreRawGeoHeadersKey @"CLXCore_rawGeoHeaders"
 #define kCLXCoreIFAConfigKey @"CLXCore_ifa_config"
 #define kCLXCoreAIPromptKey @"CLXCore_aiPrompt"
 

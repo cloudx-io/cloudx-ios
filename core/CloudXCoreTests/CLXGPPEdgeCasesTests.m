@@ -9,6 +9,7 @@
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
+#import "CLXGeoInfo.h"
 
 @interface CLXGPPEdgeCasesTests : XCTestCase
 @property (nonatomic, strong) CLXConsentProvider *gppProvider;
@@ -32,8 +33,10 @@
 }
 
 - (void)tearDown {
+    [self.geoService setGeoInfo:nil];
     [self.testDefaults removePersistentDomainForName:self.testSuiteName];
     self.testDefaults = nil;
+    self.geoService = nil;
     self.testSuiteName = nil;
     [super tearDown];
 }
@@ -382,8 +385,14 @@
 }
 
 - (void)setGeoHeaders:(NSDictionary *)headers {
-    [self.testDefaults setObject:headers forKey:kCLXCoreRawGeoHeadersKey];
-    [self.testDefaults synchronize];
+    if (headers) {
+        CLXGeoInfo *geoInfo = [[CLXGeoInfo alloc] initWithProcessedGeoInfo:@{}
+                                                                rawGeoInfo:headers
+                                                               hashedGeoIp:nil];
+        [self.geoService setGeoInfo:geoInfo];
+    } else {
+        [self.geoService setGeoInfo:nil];
+    }
 }
 
 @end

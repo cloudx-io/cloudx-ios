@@ -431,15 +431,9 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
             }
         }
         
-        // Note: accuracy not available from CloudFront headers
-        geo.accuracy = location ? @(location.horizontalAccuracy) : nil;
         geo.type = @1;
         geo.utcoffset = @([[NSTimeZone localTimeZone] secondsFromGMT] / 60);
-        geo.country = [geoService countryCode];
-        geo.region = [geoService region];
-        geo.city = [geoService city];
-        geo.zip = [geoService zip];
-        geo.metro = [geoService metro];
+        geo.processedGeoFields = [geoService processedGeoData];
         
         CLXBiddingConfigDeviceExt *deviceExt = [[CLXBiddingConfigDeviceExt alloc] init];
         deviceExt.ifv = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
@@ -596,15 +590,11 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         // Note: IFA is already privacy-aware at source level (CLXSettings.getIFA)
         BOOL shouldClearPersonalData = [privacyService shouldClearPersonalData];
         if (shouldClearPersonalData) {
-            // Clear precise location data but keep general geo fields for contextual targeting
+            // Clear precise location data but keep processed geo fields for contextual targeting
+            // Matches Android: lat/lon/type excluded when piiRemove, utcoffset + processedGeoInfo always included
             if (_device.geo) {
                 _device.geo.lat = nil;
                 _device.geo.lon = nil;
-                _device.geo.accuracy = nil;
-                // Keep country, region, city, zip, and metro for contextual targeting
-                // This matches Android implementation which always includes geo data
-                // regardless of privacy settings (only lat/lon/accuracy are cleared)
-                // Keep utcoffset for timezone-based functionality
             }
         }
         
@@ -1109,38 +1099,35 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
 
 - (NSDictionary *)convertDeviceGeoToJSON:(CLXBiddingConfigDeviceGeo *)geo {
     NSMutableDictionary *json = [NSMutableDictionary dictionary];
+
+    // Android parity: lat, lon, type only included when lat/lon are present
     if (geo.lat) {
         json[@"lat"] = geo.lat;
     }
     if (geo.lon) {
         json[@"lon"] = geo.lon;
     }
-    if (geo.accuracy) {
-        json[@"accuracy"] = geo.accuracy;
+    if (geo.lat || geo.lon) {
+        json[@"type"] = geo.type ?: @0;
     }
-    if (geo.country) {
-        json[@"country"] = geo.country;
-    }
-    json[@"type"] = geo.type ?: @0;
+
     json[@"utcoffset"] = geo.utcoffset ?: @0;
-    
-    // Enhanced geo fields
-    if (geo.country) {
-        json[@"country"] = geo.country;
-    }
-    if (geo.region) {
-        json[@"region"] = geo.region;
-    }
-    if (geo.city) {
-        json[@"city"] = geo.city;
-    }
-    if (geo.zip) {
-        json[@"zip"] = geo.zip;
-    }
-    if (geo.metro) {
-        json[@"metro"] = geo.metro;
-    }
-    
+
+    // Iterate processed geo fields (country, region, city, zip, metro)
+    // Mirrors Android: processedGeoInfo.forEach { put(key, value) }
+    // Filter out reserved keys to prevent server-controlled mappings from overwriting
+    // privacy-cleared lat/lon or other structurally-set fields (type, utcoffset)
+    static NSSet *reservedGeoKeys;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        reservedGeoKeys = [NSSet setWithObjects:@"lat", @"lon", @"type", @"utcoffset", nil];
+    });
+    [geo.processedGeoFields enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSString *value, BOOL *stop) {
+        if (![reservedGeoKeys containsObject:key]) {
+            json[key] = value;
+        }
+    }];
+
     return [json copy];
 }
 

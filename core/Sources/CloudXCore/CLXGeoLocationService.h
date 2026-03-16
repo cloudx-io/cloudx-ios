@@ -1,19 +1,10 @@
 #import <Foundation/Foundation.h>
-#import <CoreLocation/CoreLocation.h>
+
+@class CLXGeoInfo;
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**
- * GeoLocationService provides location services for the CloudX SDK.
- * It manages CoreLocation permissions and provides current location data.
- */
 @interface CLXGeoLocationService : NSObject
-
-/**
- * Returns the current location if available and authorized.
- * @return The current CLLocation object, or nil if not available.
- */
-@property (nonatomic, readonly, nullable) CLLocation *currentLocation;
 
 /**
  * Returns the shared singleton instance of GeoLocationService.
@@ -29,7 +20,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithUserDefaults:(NSUserDefaults *)userDefaults;
 
 /**
- * Gets raw geo headers from UserDefaults for privacy compliance
+ * Sets the geo information for this session.
+ * Called by SDK initialization after geo data is fetched.
+ * @param geoInfo The fetched geo information
+ */
+- (void)setGeoInfo:(nullable CLXGeoInfo *)geoInfo;
+
+/**
+ * Gets raw geo headers from CLXGeoInfo for privacy compliance
  * @return Dictionary of raw CloudFront headers if available, nil otherwise
  * @discussion Used for determining user geography for privacy regulations (US/CA checks)
  */
@@ -63,41 +61,6 @@ NS_ASSUME_NONNULL_BEGIN
  *             Per IAB TCF spec, GDPR applies when user is in EU/EEA region.
  */
 - (BOOL)isEUUser;
-
-/**
- * Gets the user's country code from geo headers
- * @return The country code (e.g., "USA", "GBR") if available, nil otherwise
- * @discussion Uses cloudfront-viewer-country-iso3 header for country determination
- */
-- (nullable NSString *)countryCode;
-
-/**
- * Gets the user's region/state code from processed geo data
- * @return The region code (e.g., "CA", "NY") if available, nil otherwise
- * @discussion Maps to OpenRTB device.geo.region field
- */
-- (nullable NSString *)region;
-
-/**
- * Gets the user's city from processed geo data
- * @return The city name if available, nil otherwise
- * @discussion Maps to OpenRTB device.geo.city field
- */
-- (nullable NSString *)city;
-
-/**
- * Gets the user's postal/zip code from processed geo data
- * @return The zip code if available, nil otherwise
- * @discussion Maps to OpenRTB device.geo.zip field
- */
-- (nullable NSString *)zip;
-
-/**
- * Gets the user's DMA (Designated Market Area) code from processed geo data
- * @return The metro/DMA code if available, nil otherwise
- * @discussion Maps to OpenRTB device.geo.metro field
- */
-- (nullable NSString *)metro;
 
 @end
 

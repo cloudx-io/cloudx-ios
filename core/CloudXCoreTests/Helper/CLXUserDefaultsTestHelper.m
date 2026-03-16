@@ -57,7 +57,6 @@
         kCLXCoreEncodedStringKey,
         kCLXCoreMetricsDictKey,
         kCLXCoreBundleConfigKey,
-        kCLXCoreGeoHeadersKey,
         kCLXCoreIFAConfigKey,
         kCLXCoreAIPromptKey,
         kCLXCoreBannerAppKeyKey,

@@ -9,6 +9,7 @@
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXUserDefaultsKeys.h>
 #import <CloudXCore/CLXKeyValueState.h>
+#import "CLXGeoInfo.h"
 
 // Private interface to access internal methods for robust testing
 @interface CLXTrackingFieldResolver (Testing)
@@ -33,6 +34,7 @@
 @interface CLXTrackingFieldResolverPrivacyTests : XCTestCase
 @property (nonatomic, strong) CLXTrackingFieldResolver *resolver;
 @property (nonatomic, strong) CLXPrivacyService *privacyService;
+@property (nonatomic, strong) CLXGeoLocationService *geoService;
 @property (nonatomic, strong) NSUserDefaults *testDefaults;
 @property (nonatomic, copy) NSString *testSuiteName;
 @property (nonatomic, strong) NSString *testAuctionId;
@@ -48,10 +50,10 @@
     
     CLXConsentProvider *isolatedProvider = [[CLXConsentProvider alloc] initWithErrorReporter:nil
                                                                                userDefaults:self.testDefaults];
-    CLXGeoLocationService *isolatedGeoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
+    self.geoService = [[CLXGeoLocationService alloc] initWithUserDefaults:self.testDefaults];
     self.privacyService = [[CLXPrivacyService alloc] initWithUserDefaults:self.testDefaults
                                                          consentProvider:isolatedProvider
-                                                      geoLocationService:isolatedGeoService];
+                                                      geoLocationService:self.geoService];
     
     self.resolver = [[CLXTrackingFieldResolver alloc] initWithPrivacyService:self.privacyService];
     self.testAuctionId = @"test-auction-12345";
@@ -62,6 +64,8 @@
 
 - (void)tearDown {
     [self clearAllTestData];
+    [self.geoService setGeoInfo:nil];
+    self.geoService = nil;
     [self.testDefaults removePersistentDomainForName:self.testSuiteName];
     self.testDefaults = nil;
     self.testSuiteName = nil;
@@ -74,7 +78,6 @@
     [self.testDefaults removeObjectForKey:kCLXPrivacyCCPAPrivacyKey];
     [self.testDefaults removeObjectForKey:kCLXPrivacyGDPRAppliesKey];
     [self.testDefaults removeObjectForKey:kCLXPrivacyHashedGeoIpKey];
-    [self.testDefaults removeObjectForKey:kCLXCoreRawGeoHeadersKey];
 
     // Clear CLXKeyValueState
     [[CLXKeyValueState shared] setHashedUserId:nil];
@@ -86,12 +89,11 @@
 }
 
 - (void)setupUSUser {
-    NSDictionary *geoHeaders = @{
-        @"cloudfront-viewer-country-iso3": @"USA",
-        @"cloudfront-viewer-country-region": @"TX"
-    };
-    [self.testDefaults setObject:geoHeaders forKey:kCLXCoreRawGeoHeadersKey];
-    [self.testDefaults synchronize];
+    CLXGeoInfo *geoInfo = [[CLXGeoInfo alloc] initWithProcessedGeoInfo:@{}
+                                                            rawGeoInfo:@{@"cloudfront-viewer-country-iso3": @"USA",
+                                                                         @"cloudfront-viewer-country-region": @"TX"}
+                                                           hashedGeoIp:nil];
+    [self.geoService setGeoInfo:geoInfo];
 }
 
 - (void)setupBaseTestConfiguration {
