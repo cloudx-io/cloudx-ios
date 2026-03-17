@@ -1,25 +1,25 @@
 PODS:
   - AppLovinSDK (13.6.0)
-  - CloudXCore (2.2.1-beta)
-  - CloudXInMobiAdapter (2.2.1-beta):
-    - CloudXCore
+  - CloudXCore (2.2.2)
+  - CloudXInMobiAdapter (2.2.2):
+    - CloudXCore (= 2.2.2)
     - InMobiSDK (~> 11.1)
-  - CloudXMetaAdapter (2.2.1-beta):
-    - CloudXCore
+  - CloudXMetaAdapter (2.2.2):
+    - CloudXCore (= 2.2.2)
     - FBAudienceNetwork (~> 6.21.0)
-  - CloudXMintegralAdapter (2.2.1-beta):
-    - CloudXCore (= 2.2.1-beta)
+  - CloudXMintegralAdapter (2.2.2):
+    - CloudXCore (= 2.2.2)
     - MintegralAdSDK (~> 8.0.8)
     - MintegralAdSDK/BidBannerAd (~> 8.0.8)
     - MintegralAdSDK/BidNewInterstitialAd (~> 8.0.8)
     - MintegralAdSDK/BidRewardVideoAd (~> 8.0.8)
-  - CloudXRenderer (2.2.1-beta):
-    - CloudXCore
-  - CloudXUnityAdapter (2.2.1-beta):
-    - CloudXCore (= 2.2.1-beta)
+  - CloudXRenderer (2.2.2):
+    - CloudXCore (= 2.2.2)
+  - CloudXUnityAdapter (2.2.2):
+    - CloudXCore (= 2.2.2)
     - UnityAds (~> 4.17.0)
-  - CloudXVungleAdapter (2.2.1-beta):
-    - CloudXCore
+  - CloudXVungleAdapter (2.2.2):
+    - CloudXCore (= 2.2.2)
     - VungleAds (~> 7.6.0)
   - FBAudienceNetwork (6.21.1)
   - InMobiSDK (11.1.1)
@@ -98,13 +98,13 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   AppLovinSDK: c516661fbeb9d7ba1ec8c10c8da60581178a6204
-  CloudXCore: 4b96697eef0d2f3400b0de961a747567d413dcf2
-  CloudXInMobiAdapter: 63554ebcb5574a8bf3b14f3115ab41d393f6f07c
-  CloudXMetaAdapter: 2251862dc72110da4063cce293584d89406a43a6
-  CloudXMintegralAdapter: 550fbfb07e90c4966846875107f3cd7f532891ad
-  CloudXRenderer: 277147b16dbaa96e0b789397ce5a45f035a1540b
-  CloudXUnityAdapter: f91813dd996929befc2ba7e29ec3ce4d1095f362
-  CloudXVungleAdapter: adf63d40d5083deadd7871a72d903f55f07a962e
+  CloudXCore: b33cbaeefcc9526b5e250b30407d0db2c3a9de77
+  CloudXInMobiAdapter: 2ed918197a0c51fd2c96754b01767999c58de081
+  CloudXMetaAdapter: e9b172d5763f6c91e5cbd95d3bec0770210cc442
+  CloudXMintegralAdapter: 67bd9a6a064340bcff7d6bcf22c0b0132cedf2e9
+  CloudXRenderer: 1d56bad0a03fbc318fca3794e5c4a1a35ae30fd9
+  CloudXUnityAdapter: 3d86b3a536a1cf2250542a997ae5cfc57c0ff556
+  CloudXVungleAdapter: 4ba5407208966856dd1c2a2131708158027ce6de
   FBAudienceNetwork: 85d18a65c9e35bc426bd4664cf3ae2a1172d7b60
   InMobiSDK: 4642fb34a961980ab94a1ac460c6e16e113498e6
   MintegralAdSDK: f02fdbab6494030b4fe4b01d8bbf654263834a20

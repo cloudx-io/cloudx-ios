@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
     'CloudXInMobiAdapter' => ['Sources/CloudXInMobiAdapter/PrivacyInfo.xcprivacy']
   }
   
-  s.dependency 'CloudXCore'
+  s.dependency 'CloudXCore', s.version.to_s
   s.dependency 'InMobiSDK', '~> 11.1'
   
   s.frameworks = [

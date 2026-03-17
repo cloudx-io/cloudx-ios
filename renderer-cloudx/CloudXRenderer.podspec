@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.public_header_files = 'Sources/CloudXRenderer/**/*.h'
   
   # Dependencies
-  s.dependency 'CloudXCore'
+  s.dependency 'CloudXCore', s.version.to_s
   
   # Build settings
   s.pod_target_xcconfig = {

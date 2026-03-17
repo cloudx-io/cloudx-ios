@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXUnityAdapter'
-  s.version = '2.2.1-beta'
+  s.version = '2.2.2'
   s.summary = 'Unity Ads Adapter for CloudX iOS SDK'
   s.description = 'Unity Ads adapter for CloudX iOS SDK supporting Interstitial, Rewarded, and Banner/MREC ads'
   s.homepage = 'https://github.com/cloudx-xenoss/CloudXUnityAdapter'
@@ -22,8 +22,7 @@ Pod::Spec.new do |s|
     'CloudXUnityAdapter' => ['Sources/CloudXUnityAdapter/PrivacyInfo.xcprivacy']
   }
 
-  s.dependency 'CloudXCore', '2.2.1-beta'
-  # TODO: Update version once Unity beta SDK is released on CocoaPods
+  s.dependency 'CloudXCore', s.version.to_s
   s.dependency 'UnityAds', '~> 4.17.0'
 
   s.framework = 'Foundation'

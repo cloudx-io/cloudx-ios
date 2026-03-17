@@ -29,7 +29,7 @@ Pod::Spec.new do |s|
     'CloudXMintegralAdapter' => ['Sources/CloudXMintegralAdapter/PrivacyInfo.xcprivacy']
   }
 
-  s.dependency 'CloudXCore', '2.2.2'
+  s.dependency 'CloudXCore', s.version.to_s
   
   # Mintegral SDK 8.x with bidding support
   # Uses: MTGBannerAdView, MTGNewInterstitialBidAdManager, MTGBidRewardAdManager

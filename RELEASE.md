@@ -75,16 +75,16 @@ atos -o CloudXCore-ios.dSYM/Contents/Resources/DWARF/CloudXCore \
 
 ### Phase 1: Prepare Release (Private Repo)
 
-**Note:** Changes are committed directly to `main` in the private repo (no release branch needed).
-The public repo uses a release branch for testing before merge (see Phase 2).
-
 ```bash
 # 1. Checkout and update main
 cd cloudx-ios-private
 git checkout main
 git pull origin main
 
-# 2. Update version constants (only components being released)
+# 2. Create a release branch
+git checkout -b release-X.Y.Z
+
+# 3. Update version constants (only components being released)
 ./scripts/update-version-constant.sh core "X.Y.Z"
 ./scripts/update-version-constant.sh meta "X.Y.Z"
 ./scripts/update-version-constant.sh vungle "X.Y.Z"
@@ -95,7 +95,9 @@ git pull origin main
 # Also update moloco if releasing:
 # ./scripts/update-version-constant.sh moloco "X.Y.Z"
 
-# 3. Update podspec versions (only components being released)
+# 4. Update podspec versions (only components being released)
+#    All adapter/renderer podspecs use `s.dependency 'CloudXCore', s.version.to_s`
+#    so updating s.version automatically pins the CloudXCore dependency to match.
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" core/CloudXCore.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-meta/CloudXMetaAdapter.podspec
 sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-vungle/CloudXVungleAdapter.podspec
@@ -106,12 +108,12 @@ sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-unity/CloudXUnityAdap
 # Also update moloco if releasing:
 # sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-moloco/CloudXMolocoAdapter.podspec
 
-# 4. Update CHANGELOGs (see "CHANGELOGs" section for public vs private guidance):
+# 5. Update CHANGELOGs (see "CHANGELOGs" section for public vs private guidance):
 #    - cloudx-ios-private/CHANGELOG.md (internal — full technical detail, PR numbers)
 #    - cloudx-ios/CHANGELOG.md (public — user-facing changes only)
 #    - docs: updated separately in Phase 2b
 
-# 5. Build xcframeworks
+# 6. Build xcframeworks
 cd core && ./build-xcframework.sh X.Y.Z && cd ..
 cd renderer-cloudx && ./build-xcframework.sh X.Y.Z && cd ..
 cd adapter-meta && ./build-xcframework.sh && cd ..
@@ -122,10 +124,11 @@ cd adapter-unity && ./build-xcframework.sh && cd ..
 # Also build moloco if releasing:
 # cd adapter-moloco && ./build-xcframework.sh && cd ..
 
-# 6. Commit and push directly to main
+# 7. Commit, push, and create PR
 git add -A
 git commit -m "Prepare release X.Y.Z"
-git push origin main
+git push -u origin release-X.Y.Z
+gh pr create --base main --head release-X.Y.Z --title "Release X.Y.Z (private)"
 ```
 
 ### Phase 2: Release to Public Repo (For Testing)
@@ -184,12 +187,12 @@ for spec in core/CloudXCore.podspec adapter-meta/CloudXMetaAdapter.podspec adapt
   sed -i '' 's/:tag => "v#{s.version}-[^"]*"/:tag => "v#{s.version}"/' "$spec"
 done
 
-# 7. Commit and push
+# 8. Commit and push
 git add -A
 git commit -m "Release X.Y.Z"
 git push origin release-X.Y.Z
 
-# 8. Create PR to main
+# 9. Create PR to main
 gh pr create --base main --head release-X.Y.Z --title "Release X.Y.Z"
 ```
 
@@ -395,15 +398,17 @@ gh release create vX.Y.Z \
   adapter-unity/CloudXUnityAdapter.xcframework.zip
 ```
 
-#### Step 2: Tag PRIVATE Repo Main and Create dSYM Release
+#### Step 2: Merge PRIVATE Repo PR, Tag, and Create dSYM Release
 
-**Note:** No PR to merge for the private repo -- changes were committed directly to main in Phase 1.
 All components share the same version, so the private repo uses a **single tag and single release** per version.
 
 **⚠️ CRITICAL: dSYMs must stay in the PRIVATE repo - never upload to public repo!**
 
 ```bash
+# Merge the private repo PR (via GitHub or CLI)
 cd cloudx-ios-private
+gh pr merge release-X.Y.Z --merge
+
 git checkout main
 git pull origin main
 
@@ -424,7 +429,7 @@ When a host app owner reports a crash in CloudXCore:
 2. Use atos or symbolicatecrash to symbolicate the crash
 
 ### Corresponding Public Release
-https://github.com/cloudx-io/cloudx-ios/releases/tag/vX.Y.Z-core" \
+https://github.com/cloudx-io/cloudx-ios/releases/tag/vX.Y.Z" \
   core/CloudXCore-dSYMs.zip
 ```
 
@@ -449,11 +454,11 @@ pod trunk register YOUR_EMAIL 'Your Name' --description='Release machine'
 # Check email and click verification link
 
 # ⚠️ PRE-FLIGHT: Verify every podspec source tag matches an actual git tag.
-# Each podspec has s.source = { :tag => "v#{s.version}-<component>" }.
-# Confirm the corresponding tags exist BEFORE pushing:
+# All podspecs use s.source = { :tag => "v#{s.version}" } (unified tag).
+# Confirm the tag exists BEFORE pushing:
 grep -r "s\.source" --include="*.podspec" . | grep -v Pods
-git tag -l "vX.Y.Z-*"
-# Every podspec tag must have a matching git tag. If not, fix before proceeding.
+git tag -l "vX.Y.Z"
+# The single vX.Y.Z tag must exist. If not, fix before proceeding.
 
 # Push each podspec to trunk (ORDER MATTERS - Core first!)
 pod trunk push core/CloudXCore.podspec --allow-warnings

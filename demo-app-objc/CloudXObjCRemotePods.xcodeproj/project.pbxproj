@@ -65,11 +65,15 @@
 		};
 		1967EE4F2DDFC83700D3E27F /* CloudXObjCRemotePodsTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = CloudXObjCRemotePodsTests;
 			sourceTree = "<group>";
 		};
 		1967EE592DDFC83700D3E27F /* CloudXObjCRemotePodsUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = CloudXObjCRemotePodsUITests;
 			sourceTree = "<group>";
 		};
@@ -318,13 +322,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests/Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests/Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -339,13 +339,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests/Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests/Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -360,13 +356,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CloudXObjCRemotePods/Pods-CloudXObjCRemotePods-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CloudXObjCRemotePods/Pods-CloudXObjCRemotePods-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -381,13 +373,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CloudXObjCRemotePods/Pods-CloudXObjCRemotePods-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CloudXObjCRemotePods/Pods-CloudXObjCRemotePods-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.source_files = 'Sources/CloudXMetaAdapter/**/*.{h,m}'
   s.public_header_files = 'Sources/CloudXMetaAdapter/**/*.h'
   
-  s.dependency 'CloudXCore'
+  s.dependency 'CloudXCore', s.version.to_s
   s.dependency 'FBAudienceNetwork', '~> 6.21.0'
   s.frameworks = [
     'AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit'

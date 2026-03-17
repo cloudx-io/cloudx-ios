@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
     'CloudXVungleAdapter' => ['Sources/CloudXVungleAdapter/PrivacyInfo.xcprivacy']
   }
   
-  s.dependency 'CloudXCore'
+  s.dependency 'CloudXCore', s.version.to_s
   s.dependency 'VungleAds', '~> 7.6.0'
   
   s.framework = 'Foundation'
