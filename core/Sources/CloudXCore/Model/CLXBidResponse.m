@@ -108,9 +108,23 @@ static void initializeLogger() {
 @implementation CLXBidResponseSeatBid
 @end
 
+// MARK: - Non-Bid Implementation
+@implementation CLXBidResponseNonBid
+@end
+
+// MARK: - Seat Non-Bid Implementation
+@implementation CLXBidResponseSeatNonBid
+@end
+
+// MARK: - Prebid Response Extension Implementation
+@implementation CLXBidResponsePrebidResponseExt
+@end
+
 // MARK: - Response Extension Implementation
 @implementation CLXBidResponseResponseExt
 @end
+
+NSString * const CLXNonBidDetailsKey = @"CLXNonBidDetailsKey";
 
 // MARK: - Main Bid Response Implementation
 @implementation CLXBidResponse
@@ -267,6 +281,71 @@ static void initializeLogger() {
     }
 }
 
+#pragma mark - Non-Bid Summary
+
++ (NSString *)labelForNonBidReasonCode:(NSInteger)code {
+    switch (code) {
+        case 0:   return @"NoBid";
+        case 100: return @"Error";
+        case 101: return @"Timeout";
+        case 102: return @"RequestBlocked";
+        case 103: return @"BidderUnreachable";
+        case 300: return @"Rejected";
+        case 301: return @"BelowFloor";
+        case 303: return @"CategoryMappingInvalid";
+        case 304: return @"BelowDealFloor";
+        case 351: return @"CreativeSizeNotAllowed";
+        case 352: return @"CreativeNotSecure";
+        default:  return [NSString stringWithFormat:@"Unknown (%ld)", (long)code];
+    }
+}
+
++ (nullable NSString *)nonBidSummaryFromResponse:(nullable CLXBidResponse *)response {
+    if (!response) {
+        return nil;
+    }
+    
+    NSMutableArray<NSString *> *parts = [NSMutableArray array];
+    
+    if (response.nbr != nil) {
+        NSString *nbrLabel = [self labelForNonBidReasonCode:response.nbr.integerValue];
+        [parts addObject:[NSString stringWithFormat:@"NBR: %@ (%@)", response.nbr, nbrLabel]];
+    }
+    
+    NSArray<CLXBidResponseSeatNonBid *> *seatNonBids = response.ext.prebid.seatNonBid;
+    if (seatNonBids.count > 0) {
+        static const NSInteger kMaxSeatEntries = 10;
+        NSMutableArray<NSString *> *seatEntries = [NSMutableArray array];
+        NSInteger totalEntries = 0;
+        for (CLXBidResponseSeatNonBid *seatNonBid in seatNonBids) {
+            NSString *seatName = seatNonBid.seat ?: @"unknown";
+            for (CLXBidResponseNonBid *nonBid in seatNonBid.nonBid) {
+                totalEntries++;
+                if (seatEntries.count < kMaxSeatEntries) {
+                    NSString *label = [self labelForNonBidReasonCode:nonBid.statusCode];
+                    NSString *impId = nonBid.impId ?: @"unknown";
+                    [seatEntries addObject:[NSString stringWithFormat:@"%@=%@ (%ld) for %@",
+                                            seatName, label, (long)nonBid.statusCode, impId]];
+                }
+            }
+        }
+        if (seatEntries.count > 0) {
+            NSMutableString *seatSummary = [NSMutableString stringWithFormat:@"Seat non-bids: %@", [seatEntries componentsJoinedByString:@", "]];
+            NSInteger overflow = totalEntries - kMaxSeatEntries;
+            if (overflow > 0) {
+                [seatSummary appendFormat:@" ... and %ld more", (long)overflow];
+            }
+            [parts addObject:[seatSummary copy]];
+        }
+    }
+    
+    if (parts.count == 0) {
+        return nil;
+    }
+    
+    return [parts componentsJoinedByString:@". "];
+}
+
 #pragma mark - Adapter Code Resolution
 
 + (nullable NSString *)resolveAdapterCodeFromExt:(nullable CLXBidResponseExt *)ext {
@@ -346,6 +425,57 @@ static void initializeLogger() {
         }
     }
     
+    NSDictionary *prebidDict = dictionary[@"prebid"];
+    if ([prebidDict isKindOfClass:[NSDictionary class]]) {
+        NSArray *seatNonBidArray = prebidDict[@"seatnonbid"];
+        if ([seatNonBidArray isKindOfClass:[NSArray class]]) {
+            CLXBidResponsePrebidResponseExt *prebidExt = [[CLXBidResponsePrebidResponseExt alloc] init];
+            NSMutableArray<CLXBidResponseSeatNonBid *> *seatNonBids = [NSMutableArray array];
+            
+            for (id seatEntry in seatNonBidArray) {
+                if (![seatEntry isKindOfClass:[NSDictionary class]]) {
+                    continue;
+                }
+                NSDictionary *seatDict = (NSDictionary *)seatEntry;
+                CLXBidResponseSeatNonBid *seatNonBid = [[CLXBidResponseSeatNonBid alloc] init];
+                
+                id seatValue = seatDict[@"seat"];
+                if ([seatValue isKindOfClass:[NSString class]]) {
+                    seatNonBid.seat = seatValue;
+                }
+                
+                NSArray *nonBidArray = seatDict[@"nonbid"];
+                NSMutableArray<CLXBidResponseNonBid *> *nonBids = [NSMutableArray array];
+                if ([nonBidArray isKindOfClass:[NSArray class]]) {
+                    for (id nonBidEntry in nonBidArray) {
+                        if (![nonBidEntry isKindOfClass:[NSDictionary class]]) {
+                            continue;
+                        }
+                        NSDictionary *nonBidDict = (NSDictionary *)nonBidEntry;
+                        CLXBidResponseNonBid *nonBid = [[CLXBidResponseNonBid alloc] init];
+                        
+                        id impIdValue = nonBidDict[@"impid"];
+                        if ([impIdValue isKindOfClass:[NSString class]]) {
+                            nonBid.impId = impIdValue;
+                        }
+                        
+                        id statusCodeValue = nonBidDict[@"statuscode"];
+                        if ([statusCodeValue isKindOfClass:[NSNumber class]]) {
+                            nonBid.statusCode = [statusCodeValue integerValue];
+                        }
+                        
+                        [nonBids addObject:nonBid];
+                    }
+                }
+                seatNonBid.nonBid = [nonBids copy];
+                [seatNonBids addObject:seatNonBid];
+            }
+            
+            prebidExt.seatNonBid = [seatNonBids copy];
+            ext.prebid = prebidExt;
+        }
+    }
+    
     return ext;
 }
 
@@ -361,6 +491,11 @@ static void initializeLogger() {
     response.id = dictionary[@"id"];
     response.bidid = dictionary[@"bidid"];
     response.cur = dictionary[@"cur"];
+    
+    id nbrValue = dictionary[@"nbr"];
+    if ([nbrValue isKindOfClass:[NSNumber class]]) {
+        response.nbr = nbrValue;
+    }
     
     NSDictionary *extDict = dictionary[@"ext"];
     if ([extDict isKindOfClass:[NSDictionary class]]) {

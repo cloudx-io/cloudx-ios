@@ -620,6 +620,7 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         // NO = production (concise responses), YES = verbose debug information
         // Set to NO to match Android SDK behavior and keep responses lightweight
         prebid.debug = @NO;
+        prebid.returnallbidstatus = @YES;
         prebid.adservertargeting = [prebidArray copy];
         
         CLXBiddingConfigRequestExt *ext = [[CLXBiddingConfigRequestExt alloc] init];
@@ -1372,6 +1373,7 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
     
     return @{
         @"debug": prebid.debug ?: @YES,
+        @"returnallbidstatus": prebid.returnallbidstatus ?: @NO,
         @"adservertargeting": [targetingArray copy]
     };
 }

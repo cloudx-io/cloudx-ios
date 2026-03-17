@@ -405,6 +405,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXBiddingConfigRequestExtPrebidDebug : NSObject
 @property (nonatomic, strong) NSNumber *debug;
+@property (nonatomic, strong) NSNumber *returnallbidstatus;
 @property (nonatomic, strong) NSArray<CLXBiddingConfigRequestExtAdserverTargeting *> *adservertargeting;
 @end
 

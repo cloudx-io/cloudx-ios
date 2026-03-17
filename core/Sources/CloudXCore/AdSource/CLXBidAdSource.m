@@ -384,9 +384,22 @@ static inline CLXAdFormat CLXAdFormatFromAdType(CLXAdType adType) {
     NSArray<CLXBidResponseBid *> *sortedBids = [response getAllBidsForWaterfall];
     
     if (sortedBids.count == 0) {
-        [self.logger error:[NSString stringWithFormat:@"[%@] No bids found in response", correlationId]];
+        NSMutableString *message = [NSMutableString stringWithString:@"No bids in auction response."];
+        NSString *nonBidSummary = [CLXBidResponse nonBidSummaryFromResponse:response];
+        if (nonBidSummary.length > 0) {
+            [message appendFormat:@" %@", nonBidSummary];
+        }
+        
+        [self.logger error:[NSString stringWithFormat:@"[%@] %@", correlationId, message]];
+        
+        NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+        userInfo[NSLocalizedDescriptionKey] = [message copy];
+        if (nonBidSummary.length > 0) {
+            userInfo[CLXNonBidDetailsKey] = nonBidSummary;
+        }
+        
         if (completion) {
-            completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:CLXBidAdSourceErrorNoBid userInfo:@{NSLocalizedDescriptionKey: @"No bids in auction response."}]);
+            completion(nil, [NSError errorWithDomain:@"CLXBidAdSource" code:CLXBidAdSourceErrorNoBid userInfo:[userInfo copy]]);
         }
         return;
     }

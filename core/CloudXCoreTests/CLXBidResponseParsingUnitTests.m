@@ -310,4 +310,575 @@
     XCTAssertEqual(successCount, totalOperations, @"All concurrent parsing operations should succeed");
 }
 
+#pragma mark - SeatNonBid Parsing Tests
+
+- (void)testParseSeatNonBid_ValidMultiSeatResponse_ParsesAllSeatsAndNonBids {
+    NSDictionary *responseDict = @{
+        @"id": @"test-response",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{
+                        @"seat": @"audienceNetwork",
+                        @"nonbid": @[
+                            @{@"impid": @"imp-1", @"statuscode": @0},
+                            @{@"impid": @"imp-2", @"statuscode": @100}
+                        ]
+                    },
+                    @{
+                        @"seat": @"vungle",
+                        @"nonbid": @[
+                            @{@"impid": @"imp-1", @"statuscode": @101}
+                        ]
+                    }
+                ]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertNotNil(response.ext.prebid, @"Prebid response ext should be parsed");
+    NSArray<CLXBidResponseSeatNonBid *> *seatNonBids = response.ext.prebid.seatNonBid;
+    XCTAssertEqual(seatNonBids.count, 2, @"Should have two seat non-bid entries");
+    
+    CLXBidResponseSeatNonBid *firstSeat = seatNonBids[0];
+    XCTAssertEqualObjects(firstSeat.seat, @"audienceNetwork");
+    XCTAssertEqual(firstSeat.nonBid.count, 2);
+    XCTAssertEqualObjects(firstSeat.nonBid[0].impId, @"imp-1");
+    XCTAssertEqual(firstSeat.nonBid[0].statusCode, 0);
+    XCTAssertEqualObjects(firstSeat.nonBid[1].impId, @"imp-2");
+    XCTAssertEqual(firstSeat.nonBid[1].statusCode, 100);
+    
+    CLXBidResponseSeatNonBid *secondSeat = seatNonBids[1];
+    XCTAssertEqualObjects(secondSeat.seat, @"vungle");
+    XCTAssertEqual(secondSeat.nonBid.count, 1);
+    XCTAssertEqualObjects(secondSeat.nonBid[0].impId, @"imp-1");
+    XCTAssertEqual(secondSeat.nonBid[0].statusCode, 101);
+}
+
+- (void)testParseSeatNonBid_SingleSeatSingleNonBid_ParsesCorrectly {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{@"seat": @"appnexus", @"nonbid": @[@{@"impid": @"my-imp", @"statuscode": @300}]}
+                ]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertEqual(response.ext.prebid.seatNonBid.count, 1);
+    XCTAssertEqualObjects(response.ext.prebid.seatNonBid[0].seat, @"appnexus");
+    XCTAssertEqual(response.ext.prebid.seatNonBid[0].nonBid[0].statusCode, 300);
+    XCTAssertEqualObjects(response.ext.prebid.seatNonBid[0].nonBid[0].impId, @"my-imp");
+}
+
+- (void)testParseSeatNonBid_EmptyArray_ReturnsEmptyNonBidArray {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertNotNil(response.ext.prebid, @"Prebid ext should exist");
+    XCTAssertNotNil(response.ext.prebid.seatNonBid, @"seatNonBid should be an empty array, not nil");
+    XCTAssertEqual(response.ext.prebid.seatNonBid.count, 0);
+}
+
+- (void)testParseSeatNonBid_MissingFromResponse_ReturnsNilPrebid {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"cloudx": @{
+                @"serverVersion": @"1.0"
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertNil(response.ext.prebid, @"Prebid should be nil when not in response");
+}
+
+- (void)testParseSeatNonBid_NilSeatnonbidKey_ReturnsNilSeatNonBid {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"auctiontimestamp": @1709740800000
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertNil(response.ext.prebid, @"Prebid ext should be nil when seatnonbid key is absent");
+}
+
+- (void)testParseSeatNonBid_NonBidWithUnknownStatusCode_PreservesRawCode {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{@"seat": @"bidder", @"nonbid": @[@{@"impid": @"imp-1", @"statuscode": @9999}]}
+                ]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertEqual(response.ext.prebid.seatNonBid[0].nonBid[0].statusCode, 9999);
+}
+
+- (void)testParseSeatNonBid_MalformedNonBidEntries_SkipsInvalidKeepsValid {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{
+                        @"seat": @"bidder",
+                        @"nonbid": @[
+                            @"not_a_dict",
+                            [NSNull null],
+                            @{@"impid": @"valid-imp", @"statuscode": @101},
+                            @{},
+                        ]
+                    },
+                    @"not_a_seat_dict",
+                    [NSNull null]
+                ]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = nil;
+    XCTAssertNoThrow(response = [CLXBidResponse parseBidResponseFromDictionary:responseDict],
+                     @"Should not crash on malformed non-bid entries");
+    
+    XCTAssertEqual(response.ext.prebid.seatNonBid.count, 1, @"Only the valid seat dict should be parsed");
+    CLXBidResponseSeatNonBid *seat = response.ext.prebid.seatNonBid[0];
+    XCTAssertEqual(seat.nonBid.count, 2, @"Valid non-bid dicts + empty dict should parse; string/NSNull skipped");
+    XCTAssertEqualObjects(seat.nonBid[0].impId, @"valid-imp");
+    XCTAssertEqual(seat.nonBid[0].statusCode, 101);
+}
+
+- (void)testParseSeatNonBid_MissingSeatKey_DefaultsToNilSeat {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{@"nonbid": @[@{@"impid": @"imp-1", @"statuscode": @0}]}
+                ]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertNil(response.ext.prebid.seatNonBid[0].seat, @"Seat should be nil when key is missing");
+    XCTAssertEqual(response.ext.prebid.seatNonBid[0].nonBid.count, 1);
+}
+
+- (void)testParseSeatNonBid_MissingImpIdInNonBid_DefaultsToNilImpId {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{@"seat": @"bidder", @"nonbid": @[@{@"statuscode": @100}]}
+                ]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertNil(response.ext.prebid.seatNonBid[0].nonBid[0].impId, @"impId should be nil when key is missing");
+    XCTAssertEqual(response.ext.prebid.seatNonBid[0].nonBid[0].statusCode, 100);
+}
+
+- (void)testParseSeatNonBid_StatusCodeZero_ParsesAsNoBidGeneral {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{@"seat": @"bidder", @"nonbid": @[@{@"impid": @"imp-1", @"statuscode": @0}]}
+                ]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertEqual(response.ext.prebid.seatNonBid[0].nonBid[0].statusCode, 0, @"Zero is a valid status code (NoBidGeneral)");
+}
+
+- (void)testParseSeatNonBid_NegativeStatusCode_PreservesNegativeValue {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{@"seat": @"bidder", @"nonbid": @[@{@"impid": @"imp-1", @"statuscode": @(-1)}]}
+                ]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = nil;
+    XCTAssertNoThrow(response = [CLXBidResponse parseBidResponseFromDictionary:responseDict],
+                     @"Negative status code should not crash");
+    
+    XCTAssertEqual(response.ext.prebid.seatNonBid[0].nonBid[0].statusCode, -1);
+}
+
+- (void)testParseSeatNonBid_StatusCodeNotANumber_DefaultsToZero {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{@"seat": @"bidder", @"nonbid": @[@{@"impid": @"imp-1", @"statuscode": @"not_a_number"}]}
+                ]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = nil;
+    XCTAssertNoThrow(response = [CLXBidResponse parseBidResponseFromDictionary:responseDict],
+                     @"String status code should not crash");
+    
+    XCTAssertEqual(response.ext.prebid.seatNonBid[0].nonBid[0].statusCode, 0,
+                   @"Non-numeric statuscode should default to 0");
+}
+
+#pragma mark - Top-Level NBR Parsing Tests
+
+- (void)testParseNBR_ValidIntegerValue_ParsesCorrectly {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"nbr": @1
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertNotNil(response.nbr);
+    XCTAssertEqualObjects(response.nbr, @1);
+}
+
+- (void)testParseNBR_Zero_ParsesAsZero {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"nbr": @0
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertNotNil(response.nbr, @"nbr:0 should parse as @0, not nil");
+    XCTAssertEqualObjects(response.nbr, @0);
+}
+
+- (void)testParseNBR_MissingFromResponse_NbrIsNil {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[]
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertNil(response.nbr, @"nbr should be nil when absent from response");
+}
+
+- (void)testParseNBR_NullValue_NbrIsNil {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"nbr": [NSNull null]
+    };
+    
+    CLXBidResponse *response = nil;
+    XCTAssertNoThrow(response = [CLXBidResponse parseBidResponseFromDictionary:responseDict],
+                     @"NSNull nbr should not crash");
+    
+    XCTAssertNil(response.nbr, @"NSNull nbr should be treated as nil");
+}
+
+- (void)testParseNBR_StringValue_NbrIsNil {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"nbr": @"not_a_number"
+    };
+    
+    CLXBidResponse *response = nil;
+    XCTAssertNoThrow(response = [CLXBidResponse parseBidResponseFromDictionary:responseDict],
+                     @"String nbr should not crash");
+    
+    XCTAssertNil(response.nbr, @"String nbr should be treated as nil");
+}
+
+- (void)testParseNBR_LargeValue_PreservesValue {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"nbr": @99999
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertEqualObjects(response.nbr, @99999);
+}
+
+#pragma mark - Combined SeatNonBid + NBR Tests
+
+- (void)testParseBothSeatNonBidAndNBR_FullServerResponse_ParsesBothCorrectly {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"nbr": @1,
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{@"seat": @"bidder", @"nonbid": @[@{@"impid": @"imp-1", @"statuscode": @101}]}
+                ]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertEqualObjects(response.nbr, @1, @"Top-level nbr should be parsed");
+    XCTAssertEqual(response.ext.prebid.seatNonBid.count, 1, @"seatNonBid should be parsed");
+    XCTAssertEqual(response.ext.prebid.seatNonBid[0].nonBid[0].statusCode, 101);
+}
+
+- (void)testParseNeitherSeatNonBidNorNBR_LegacyResponse_BackwardCompatible {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[@{
+            @"bid": @[@{
+                @"id": @"bid-1",
+                @"price": @1.50,
+                @"adm": @"<html>ad</html>",
+                @"w": @320,
+                @"h": @50
+            }]
+        }]
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    
+    XCTAssertNil(response.nbr, @"nbr should be nil in legacy response");
+    XCTAssertNil(response.ext, @"ext should be nil when not present");
+    XCTAssertEqual([response allBids].count, 1, @"Regular bids should still parse");
+}
+
+#pragma mark - nonBidSummaryFromResponse Tests
+
+- (void)testNonBidSummary_MultipleSeatNonBids_ProducesHumanReadableString {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{@"seat": @"audienceNetwork", @"nonbid": @[@{@"impid": @"imp-1", @"statuscode": @0}]},
+                    @{@"seat": @"vungle", @"nonbid": @[@{@"impid": @"imp-1", @"statuscode": @101}]}
+                ]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    NSString *summary = [CLXBidResponse nonBidSummaryFromResponse:response];
+    
+    XCTAssertNotNil(summary);
+    XCTAssertTrue([summary containsString:@"audienceNetwork"], @"Should contain seat name");
+    XCTAssertTrue([summary containsString:@"NoBid"], @"Should contain human-readable label for code 0");
+    XCTAssertTrue([summary containsString:@"vungle"], @"Should contain second seat name");
+    XCTAssertTrue([summary containsString:@"Timeout"], @"Should contain human-readable label for code 101");
+    XCTAssertTrue([summary containsString:@"imp-1"], @"Should contain imp ID");
+}
+
+- (void)testNonBidSummary_UnknownStatusCode_DisplaysUnknownWithRawCode {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{@"seat": @"bidder", @"nonbid": @[@{@"impid": @"imp-1", @"statuscode": @9999}]}
+                ]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    NSString *summary = [CLXBidResponse nonBidSummaryFromResponse:response];
+    
+    XCTAssertTrue([summary containsString:@"Unknown (9999)"], @"Unknown codes should show raw value");
+}
+
+- (void)testNonBidSummary_AllKnownCodes_MapsCorrectNames {
+    NSDictionary *codeToLabel = @{
+        @0:   @"NoBid",
+        @100: @"Error",
+        @101: @"Timeout",
+        @102: @"RequestBlocked",
+        @103: @"BidderUnreachable",
+        @300: @"Rejected",
+        @301: @"BelowFloor",
+        @303: @"CategoryMappingInvalid",
+        @304: @"BelowDealFloor",
+        @351: @"CreativeSizeNotAllowed",
+        @352: @"CreativeNotSecure"
+    };
+    
+    for (NSNumber *code in codeToLabel) {
+        NSString *expectedLabel = codeToLabel[code];
+        NSString *actualLabel = [CLXBidResponse labelForNonBidReasonCode:code.integerValue];
+        XCTAssertEqualObjects(actualLabel, expectedLabel,
+                              @"Code %@ should map to '%@' but got '%@'", code, expectedLabel, actualLabel);
+    }
+}
+
+- (void)testNonBidSummary_NilResponse_ReturnsNil {
+    NSString *summary = [CLXBidResponse nonBidSummaryFromResponse:nil];
+    
+    XCTAssertNil(summary, @"Nil response should produce nil summary");
+}
+
+- (void)testNonBidSummary_ResponseWithNoBidsAndNoSeatNonBid_ReturnsNil {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[]
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    NSString *summary = [CLXBidResponse nonBidSummaryFromResponse:response];
+    
+    XCTAssertNil(summary, @"Response with no non-bid info should return nil summary");
+}
+
+- (void)testNonBidSummary_ResponseWithNBROnly_IncludesNBRInSummary {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"nbr": @1
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    NSString *summary = [CLXBidResponse nonBidSummaryFromResponse:response];
+    
+    XCTAssertNotNil(summary);
+    XCTAssertTrue([summary containsString:@"NBR"], @"Should contain NBR prefix");
+    XCTAssertTrue([summary containsString:@"1"], @"Should contain the NBR code");
+}
+
+- (void)testNonBidSummary_ResponseWithNBRAndSeatNonBid_IncludesBoth {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"nbr": @1,
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{@"seat": @"bidder", @"nonbid": @[@{@"impid": @"imp-1", @"statuscode": @0}]}
+                ]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    NSString *summary = [CLXBidResponse nonBidSummaryFromResponse:response];
+    
+    XCTAssertNotNil(summary);
+    XCTAssertTrue([summary containsString:@"NBR"], @"Should contain NBR section");
+    XCTAssertTrue([summary containsString:@"Seat non-bids"], @"Should contain seat non-bids section");
+}
+
+- (void)testNonBidSummary_EmptySeatNonBidArray_ReturnsNilOrNBROnly {
+    NSDictionary *responseDict = @{
+        @"id": @"test",
+        @"seatbid": @[],
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[]
+            }
+        }
+    };
+    
+    CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:responseDict];
+    NSString *summary = [CLXBidResponse nonBidSummaryFromResponse:response];
+    
+    XCTAssertNil(summary, @"Empty seatnonbid array with no NBR should return nil");
+}
+
+#pragma mark - Concurrent SeatNonBid Parsing Thread Safety
+
+- (void)testParseSeatNonBid_ConcurrentParsing_ThreadSafe {
+    NSDictionary *testResponse = @{
+        @"id": @"concurrent_nonbid_test",
+        @"seatbid": @[],
+        @"nbr": @1,
+        @"ext": @{
+            @"prebid": @{
+                @"seatnonbid": @[
+                    @{@"seat": @"bidder_a", @"nonbid": @[@{@"impid": @"imp-1", @"statuscode": @0}]},
+                    @{@"seat": @"bidder_b", @"nonbid": @[@{@"impid": @"imp-1", @"statuscode": @101}]}
+                ]
+            }
+        }
+    };
+    
+    NSInteger totalOperations = 20;
+    __block NSInteger successCount = 0;
+    dispatch_queue_t countQueue = dispatch_queue_create("test.nonbid.count.queue", DISPATCH_QUEUE_SERIAL);
+    
+    dispatch_apply(totalOperations, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t i) {
+        CLXBidResponse *response = [CLXBidResponse parseBidResponseFromDictionary:testResponse];
+        
+        BOOL success = (response != nil
+                        && [response.nbr isEqualToNumber:@1]
+                        && response.ext.prebid.seatNonBid.count == 2
+                        && response.ext.prebid.seatNonBid[0].nonBid.count == 1);
+        
+        dispatch_sync(countQueue, ^{
+            if (success) {
+                successCount++;
+            }
+        });
+    });
+    
+    XCTAssertEqual(successCount, totalOperations, @"All concurrent seatNonBid parsing operations should succeed");
+}
+
 @end

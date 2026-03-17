@@ -8,6 +8,7 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CLXBidAdSource.h>
+#import <CloudXCore/CLXBidResponse.h>
 #import <CloudXCore/CLXError.h>
 
 #pragma mark - Test Helpers
@@ -153,6 +154,13 @@
 - (void)testErrorCodesUnchanged {
     XCTAssertEqual(CLXBidAdSourceErrorNoBid, 0, @"CLXBidAdSourceErrorNoBid should remain 0");
     XCTAssertEqual(CLXBidAdSourceErrorAdapterCreationFailed, 1, @"CLXBidAdSourceErrorAdapterCreationFailed should remain 1");
+}
+
+#pragma mark - CLXNonBidDetailsKey Propagation
+
+- (void)testErrorCodesUnchanged_IncludesNewKey {
+    XCTAssertNotNil(CLXNonBidDetailsKey, @"CLXNonBidDetailsKey constant should exist");
+    XCTAssertTrue(CLXNonBidDetailsKey.length > 0, @"CLXNonBidDetailsKey should be a non-empty string");
 }
 
 @end
