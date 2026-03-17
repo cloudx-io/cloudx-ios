@@ -13,6 +13,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.2] - 2026-03-16
+
+### Added
+- **Manual Privacy API** — New `setHasUserConsent:` and `setDoNotSell:` methods for publisher-controlled privacy consent
+- **Mintegral Adapter** — Mintegral adapter now available as a standard release
+
+### Fixed
+- **Improved Error Visibility** — Increased error visibility for no-bid scenarios, making it easier to diagnose fill rate issues
+- **Fullscreen Ad Loading** — Fixed an issue where loading a fullscreen ad while another was showing could silently fail
+- **Fullscreen Failure Callbacks** — Fixed missing ad unit ID in fullscreen ad failure callbacks
+- **Renderer Impression Tracking** — Fixed viewability tracking accuracy in CloudX Renderer
+
+### Changed
+- **Mintegral SDK** — Upgraded from 8.0.7 to 8.0.8
+
+---
+
 ## [2.2.1-beta] - 2026-03-05
 
 ### Changed

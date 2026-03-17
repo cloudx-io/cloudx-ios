@@ -42,8 +42,11 @@ typedef NS_ENUM(NSInteger, DeviceType) {
 /** The SDK bundle identifier */
 @property (nonatomic, readonly) NSString *sdkBundle;
 
-/** The app bundle identifier */
+/** The app bundle identifier (real main bundle) */
 @property (nonatomic, readonly) NSString *appBundleIdentifier;
+
+/** The effective app bundle identifier, honoring the emulator bundle override on simulator builds. */
+@property (nonatomic, readonly) NSString *effectiveAppBundleIdentifier;
 
 /** The app version */
 @property (nonatomic, readonly) NSString *appVersion;

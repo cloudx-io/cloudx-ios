@@ -152,15 +152,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXBiddingConfigDeviceGeo : NSObject
 @property (nonatomic, strong, nullable) NSNumber *lat;
 @property (nonatomic, strong, nullable) NSNumber *lon;
-@property (nonatomic, strong, nullable) NSNumber *accuracy;
 @property (nonatomic, strong) NSNumber *type;
 @property (nonatomic, strong) NSNumber *utcoffset;
-// Enhanced geo fields for comprehensive location data
-@property (nonatomic, copy, nullable) NSString *country;
-@property (nonatomic, copy, nullable) NSString *region;
-@property (nonatomic, copy, nullable) NSString *city;
-@property (nonatomic, copy, nullable) NSString *zip;
-@property (nonatomic, strong, nullable) NSNumber *metro;
+/// Processed geo fields from server (country, region, city, zip, metro) — iterated into bid request JSON.
+/// Mirrors Android's processedGeoInfo.forEach { put(key, value) } pattern.
+@property (nonatomic, copy, nullable) NSDictionary<NSString *, NSString *> *processedGeoFields;
 @end
 
 @interface CLXBiddingConfigDeviceExt : NSObject
@@ -409,6 +405,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXBiddingConfigRequestExtPrebidDebug : NSObject
 @property (nonatomic, strong) NSNumber *debug;
+@property (nonatomic, strong) NSNumber *returnallbidstatus;
 @property (nonatomic, strong) NSArray<CLXBiddingConfigRequestExtAdserverTargeting *> *adservertargeting;
 @end
 

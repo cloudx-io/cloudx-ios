@@ -122,10 +122,27 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSDictionary *)toDictionary;
 @end
 
+// MARK: - Non-Bid (per impression within a seat)
+@interface CLXBidResponseNonBid : NSObject
+@property (nonatomic, copy, nullable) NSString *impId;
+@property (nonatomic, assign) NSInteger statusCode;
+@end
+
+// MARK: - Seat Non-Bid (per bidder seat)
+@interface CLXBidResponseSeatNonBid : NSObject
+@property (nonatomic, copy, nullable) NSString *seat;
+@property (nonatomic, strong) NSArray<CLXBidResponseNonBid *> *nonBid;
+@end
+
+// MARK: - Prebid Response Extension
+@interface CLXBidResponsePrebidResponseExt : NSObject
+@property (nonatomic, strong, nullable) NSArray<CLXBidResponseSeatNonBid *> *seatNonBid;
+@end
+
 // MARK: - Response Extension
 @interface CLXBidResponseResponseExt : NSObject
-// Add any response-level extension fields here
 @property (nonatomic, strong, nullable) CLXBidResponseAuction *cloudx;
+@property (nonatomic, strong, nullable) CLXBidResponsePrebidResponseExt *prebid;
 @end
 
 // MARK: - Main Bid Response
@@ -135,6 +152,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSArray<CLXBidResponseSeatBid *> *seatbid;
 @property (nonatomic, copy, nullable) NSString *cur;
 @property (nonatomic, strong, nullable) CLXBidResponseResponseExt *ext;
+@property (nonatomic, strong, nullable) NSNumber *nbr;
 
 // Helper methods to get bids
 - (NSArray<CLXBidResponseBid *> *)allBids;
@@ -158,6 +176,16 @@ NS_ASSUME_NONNULL_BEGIN
 /// Returns nil if no adapter code is available from any source.
 + (nullable NSString *)resolveAdapterCodeFromExt:(nullable CLXBidResponseExt *)ext;
 
+/// Builds a human-readable summary of non-bid reasons from the response.
+/// Includes top-level NBR and per-seat non-bid details when available.
+/// Returns nil if no non-bid information is present.
++ (nullable NSString *)nonBidSummaryFromResponse:(nullable CLXBidResponse *)response;
+
+/// Returns a human-readable label for a non-bid reason status code.
++ (NSString *)labelForNonBidReasonCode:(NSInteger)code;
+
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END
+
+extern NSString * const CLXNonBidDetailsKey;

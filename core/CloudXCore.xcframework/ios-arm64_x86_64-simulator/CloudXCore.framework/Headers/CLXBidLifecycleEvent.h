@@ -4,7 +4,7 @@
 
 /**
  * @file CLXBidLifecycleEvent.h
- * @brief Defines the lifecycle events for bid tracking (LOAD_SUCCESS, RENDER_SUCCESS, LOSS, REWARD)
+ * @brief Defines the lifecycle events for bid tracking (LOAD_SUCCESS, RENDER_SUCCESS, LOSS, REWARD, CLICK)
  *
  * Each lifecycle event has an associated notification type and URL type (lurl, nurl, burl)
  * that determines which URL to fire and what payload to send.
@@ -24,6 +24,8 @@ extern NSString * const CLXNotificationTypeRenderSuccess;
 extern NSString * const CLXNotificationTypeLoss;
 /** Notification type for rewarded ad completion */
 extern NSString * const CLXNotificationTypeRewardEarned;
+/** Notification type for ad click */
+extern NSString * const CLXNotificationTypeClick;
 
 #pragma mark - URL Type Constants
 
@@ -66,7 +68,14 @@ typedef NS_ENUM(NSInteger, CLXBidLifecycleEventType) {
      * notificationType: CLXNotificationTypeRewardEarned
      * urlType: CLXURLTypeBurl
      */
-    CLXBidLifecycleEventTypeReward
+    CLXBidLifecycleEventTypeReward,
+
+    /**
+     * User clicked on an ad
+     * notificationType: CLXNotificationTypeClick
+     * urlType: CLXURLTypeBurl
+     */
+    CLXBidLifecycleEventTypeClick
 };
 
 /**
@@ -108,6 +117,11 @@ typedef NS_ENUM(NSInteger, CLXBidLifecycleEventType) {
  * Factory method for REWARD event (user completed rewarded ad)
  */
 + (instancetype)rewardEvent;
+
+/**
+ * Factory method for CLICK event (user clicked on an ad)
+ */
++ (instancetype)clickEvent;
 
 /**
  * Designated initializer

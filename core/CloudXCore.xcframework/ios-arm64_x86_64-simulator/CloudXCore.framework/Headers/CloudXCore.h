@@ -72,6 +72,7 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 // =============================================================================
 
 // Adapter Protocols
+#import <CloudXCore/CLXAdNetwork.h>
 #import <CloudXCore/CLXAdapterBanner.h>
 #import <CloudXCore/CLXAdapterBannerFactory.h>
 #import <CloudXCore/CLXAdapterRewarded.h>
@@ -96,6 +97,13 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXAdEventReporting.h>
 #import <CloudXCore/CLXAdEventReporter.h>
 #import <CloudXCore/CLXTrackingFieldResolver.h>
+
+// Manual Privacy Controls
+#import <CloudXCore/CLXManualPrivacyState.h>
+#import <CloudXCore/CLXAdapterPrivacyHandler.h>
+#import <CloudXCore/CLXAdapterPrivacySettings.h>
+#import <CloudXCore/CLXPrivacyConsentResolver.h>
+#import <CloudXCore/CLXAdapterPrivacyForwarder.h>
 
 // Utilities
 #import <CloudXCore/CLXLogger.h>

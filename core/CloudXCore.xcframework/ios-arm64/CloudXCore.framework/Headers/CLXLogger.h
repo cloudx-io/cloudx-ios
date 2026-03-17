@@ -64,6 +64,15 @@ typedef NS_ENUM(NSInteger, CLXLogEmoji) {
 - (void)logDelegateError:(NSString *)callbackName error:(nullable CLXError *)error;
 
 /**
+ * Log a delegate error callback with ad unit context (name, ID, network) alongside the error.
+ */
+- (void)logDelegateError:(NSString *)callbackName
+             adUnitName:(nullable NSString *)adUnitName
+               adUnitId:(nullable NSString *)adUnitId
+            networkName:(nullable NSString *)networkName
+                  error:(nullable CLXError *)error;
+
+/**
  * Set the minimum log level. Messages below this level will be suppressed.
  * @param minLogLevel The minimum log level (CLXLogLevel)
  * @discussion Use CLXLogLevelNone to disable all logging.

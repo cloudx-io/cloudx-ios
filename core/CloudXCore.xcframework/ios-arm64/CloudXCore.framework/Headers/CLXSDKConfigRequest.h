@@ -1,5 +1,7 @@
 #import <Foundation/Foundation.h>
 
+@class CLXAdapterMetadata;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXSDKConfigRequestFormat : NSObject
@@ -31,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSArray<CLXSDKConfigRequestImp *> *imp;
 @property (nonatomic, copy) NSString *id;
 @property (nonatomic, strong) NSDictionary<NSString *, NSString *> *urlParams;
+@property (nonatomic, strong) NSArray<CLXAdapterMetadata *> *adapters;
 
 - (NSDictionary *)json;
 
