@@ -12,9 +12,6 @@
 		A100000000000002 /* CLXInMobiBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000002 /* CLXInMobiBanner.h */; };
 		A100000000000003 /* CLXInMobiBannerFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000003 /* CLXInMobiBannerFactory.m */; };
 		A100000000000004 /* CLXInMobiBannerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000004 /* CLXInMobiBannerFactory.h */; };
-		A100000000000005 /* CLXInMobiBaseFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000005 /* CLXInMobiBaseFactory.m */; };
-		A100000000000006 /* CLXInMobiBaseFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000006 /* CLXInMobiBaseFactory.h */; };
-		/* BidTokenSource */
 		A100000000000007 /* CLXInMobiBidTokenSource.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000007 /* CLXInMobiBidTokenSource.m */; };
 		A100000000000008 /* CLXInMobiBidTokenSource.h in Headers */ = {isa = PBXBuildFile; fileRef = A200000000000008 /* CLXInMobiBidTokenSource.h */; };
 		A100000000000009 /* CLXInMobiInitializer.m in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000009 /* CLXInMobiInitializer.m */; };
@@ -34,17 +31,17 @@
 		A10000000000001B /* CLXInMobiAdapterVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = A20000000000001B /* CLXInMobiAdapterVersion.h */; };
 		A10000000000001C /* CLXInMobiAdapterVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000001C /* CLXInMobiAdapterVersion.m */; };
 		A100000000000020 /* Pods_CloudXInMobiAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A200000000000020 /* Pods_CloudXInMobiAdapter.framework */; };
+		A9EF0369B4D119688E2C7567 /* CLXInMobiMetadataProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = C8482090D4F45EAF45D4A218 /* CLXInMobiMetadataProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA5AA8E6188357B6869A1375 /* CLXInMobiPrivacyHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FFF2CA4C0979D0960CDA3947 /* CLXInMobiPrivacyHandler.m */; };
+		E9714E010331E4D36BA5CFE5 /* CLXInMobiMetadataProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AA8DAAE9B20BF9867406F84 /* CLXInMobiMetadataProvider.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0AA8DAAE9B20BF9867406F84 /* CLXInMobiMetadataProvider.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiMetadataProvider.m; sourceTree = "<group>"; };
 		A200000000000001 /* CLXInMobiBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBanner.m; sourceTree = "<group>"; };
 		A200000000000002 /* CLXInMobiBanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBanner.h; sourceTree = "<group>"; };
 		A200000000000003 /* CLXInMobiBannerFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBannerFactory.m; sourceTree = "<group>"; };
 		A200000000000004 /* CLXInMobiBannerFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBannerFactory.h; sourceTree = "<group>"; };
-		A200000000000005 /* CLXInMobiBaseFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBaseFactory.m; sourceTree = "<group>"; };
-		A200000000000006 /* CLXInMobiBaseFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBaseFactory.h; sourceTree = "<group>"; };
-		/* BidTokenSource */
 		A200000000000007 /* CLXInMobiBidTokenSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiBidTokenSource.m; sourceTree = "<group>"; };
 		A200000000000008 /* CLXInMobiBidTokenSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInMobiBidTokenSource.h; sourceTree = "<group>"; };
 		A200000000000009 /* CLXInMobiInitializer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiInitializer.m; sourceTree = "<group>"; };
@@ -69,6 +66,7 @@
 		A200000000000020 /* Pods_CloudXInMobiAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXInMobiAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200000000000021 /* Pods-CloudXInMobiAdapter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXInMobiAdapter.release.xcconfig"; path = "Target Support Files/Pods-CloudXInMobiAdapter/Pods-CloudXInMobiAdapter.release.xcconfig"; sourceTree = "<group>"; };
 		A300000000000001 /* CloudXInMobiAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXInMobiAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8482090D4F45EAF45D4A218 /* CLXInMobiMetadataProvider.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXInMobiMetadataProvider.h; sourceTree = "<group>"; };
 		E5A3F30358EE66BCDC4F9316 /* CLXInMobiPrivacyHandler.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXInMobiPrivacyHandler.h; sourceTree = "<group>"; };
 		FFF2CA4C0979D0960CDA3947 /* CLXInMobiPrivacyHandler.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXInMobiPrivacyHandler.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -162,6 +160,8 @@
 				A20000000000001E /* module.modulemap */,
 				E5A3F30358EE66BCDC4F9316 /* CLXInMobiPrivacyHandler.h */,
 				FFF2CA4C0979D0960CDA3947 /* CLXInMobiPrivacyHandler.m */,
+				C8482090D4F45EAF45D4A218 /* CLXInMobiMetadataProvider.h */,
+				0AA8DAAE9B20BF9867406F84 /* CLXInMobiMetadataProvider.m */,
 			);
 			path = CloudXInMobiAdapter;
 			sourceTree = "<group>";
@@ -228,6 +228,7 @@
 				A100000000000019 /* CloudXInMobiAdapter.h in Headers */,
 				A10000000000001B /* CLXInMobiAdapterVersion.h in Headers */,
 				0EB678F3C345504CC690BB66 /* CLXInMobiPrivacyHandler.h in Headers */,
+				A9EF0369B4D119688E2C7567 /* CLXInMobiMetadataProvider.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -338,6 +339,7 @@
 				A10000000000001A /* CloudXInMobiAdapter.m in Sources */,
 				A10000000000001C /* CLXInMobiAdapterVersion.m in Sources */,
 				DA5AA8E6188357B6869A1375 /* CLXInMobiPrivacyHandler.m in Sources */,
+				E9714E010331E4D36BA5CFE5 /* CLXInMobiMetadataProvider.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

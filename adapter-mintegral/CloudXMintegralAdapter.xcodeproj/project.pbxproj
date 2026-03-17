@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2438D573FC99D21222985BB5 /* CLXMintegralMetadataProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B749642207C800D7D5BB2B /* CLXMintegralMetadataProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		95AFC0A338F07B981E20C1CA /* CLXMintegralMetadataProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 70897E046A54996B37F33516 /* CLXMintegralMetadataProvider.m */; };
 		968244291648D519919AE925 /* CLXMintegralPrivacyHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 5206D696F072FF95D0BA6F8B /* CLXMintegralPrivacyHandler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B100000000000001 /* CLXMintegralBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = B200000000000001 /* CLXMintegralBanner.m */; };
 		B100000000000002 /* CLXMintegralBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = B200000000000002 /* CLXMintegralBanner.h */; };
@@ -39,6 +41,7 @@
 /* Begin PBXFileReference section */
 		12C5F18A73FB734C3C084CA7 /* CLXMintegralPrivacyHandler.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXMintegralPrivacyHandler.m; sourceTree = "<group>"; };
 		5206D696F072FF95D0BA6F8B /* CLXMintegralPrivacyHandler.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXMintegralPrivacyHandler.h; sourceTree = "<group>"; };
+		70897E046A54996B37F33516 /* CLXMintegralMetadataProvider.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXMintegralMetadataProvider.m; sourceTree = "<group>"; };
 		B200000000000001 /* CLXMintegralBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMintegralBanner.m; sourceTree = "<group>"; };
 		B200000000000002 /* CLXMintegralBanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMintegralBanner.h; sourceTree = "<group>"; };
 		B200000000000003 /* CLXMintegralBannerFactory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMintegralBannerFactory.m; sourceTree = "<group>"; };
@@ -69,6 +72,7 @@
 		B200000000000022 /* CLXMintegralIDExtractor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMintegralIDExtractor.m; sourceTree = "<group>"; };
 		B200000000000023 /* CLXMintegralIDExtractor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMintegralIDExtractor.h; sourceTree = "<group>"; };
 		B300000000000001 /* CloudXMintegralAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXMintegralAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0B749642207C800D7D5BB2B /* CLXMintegralMetadataProvider.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXMintegralMetadataProvider.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -162,6 +166,8 @@
 				B20000000000001E /* module.modulemap */,
 				5206D696F072FF95D0BA6F8B /* CLXMintegralPrivacyHandler.h */,
 				12C5F18A73FB734C3C084CA7 /* CLXMintegralPrivacyHandler.m */,
+				D0B749642207C800D7D5BB2B /* CLXMintegralMetadataProvider.h */,
+				70897E046A54996B37F33516 /* CLXMintegralMetadataProvider.m */,
 			);
 			path = CloudXMintegralAdapter;
 			sourceTree = "<group>";
@@ -229,6 +235,7 @@
 				B100000000000019 /* CloudXMintegralAdapter.h in Headers */,
 				B10000000000001B /* CLXMintegralAdapterVersion.h in Headers */,
 				968244291648D519919AE925 /* CLXMintegralPrivacyHandler.h in Headers */,
+				2438D573FC99D21222985BB5 /* CLXMintegralMetadataProvider.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -358,6 +365,7 @@
 				B10000000000001A /* CloudXMintegralAdapter.m in Sources */,
 				B10000000000001C /* CLXMintegralAdapterVersion.m in Sources */,
 				E7730E83FD5B01A3074A0FE6 /* CLXMintegralPrivacyHandler.m in Sources */,
+				95AFC0A338F07B981E20C1CA /* CLXMintegralMetadataProvider.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,7 +499,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.2.1-beta;
+				MARKETING_VERSION = "2.2.1-beta";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cloudx.CloudXMintegralAdapter;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -519,7 +527,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.2.1-beta;
+				MARKETING_VERSION = "2.2.1-beta";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cloudx.CloudXMintegralAdapter;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
