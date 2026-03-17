@@ -191,6 +191,7 @@
 - (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ MREC failed to load (%@) - Error: %@", adUnitId, error ? error.localizedDescription : @"Unknown error"]];
     self.isLoading = NO;
+    [self updateStatusUIWithState:AdStateNoAd];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
