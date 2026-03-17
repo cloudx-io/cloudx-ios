@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1FB3B85FCBDCBA84446FA6AA /* Pods_CloudXUnityAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 700C6ADFB4254A8374A69C3C /* Pods_CloudXUnityAdapter.framework */; };
+		7E5DCB10847B4D03ABEBE10C /* CLXUnityMetadataProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = F9EB2145EE97F4E90BCEF500 /* CLXUnityMetadataProvider.m */; };
 		A2000100294A8A0000000001 /* CloudXUnityAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = A2000000294A8A0000000001 /* CloudXUnityAdapter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A2000101294A8A0000000001 /* CloudXUnityAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = A2000001294A8A0000000001 /* CloudXUnityAdapter.m */; };
 		A2000102294A8A0000000001 /* CLXUnityAdapterVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = A2000002294A8A0000000001 /* CLXUnityAdapterVersion.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -31,9 +32,11 @@
 		A2000114294A8A0000000001 /* CLXUnityBannerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A2000014294A8A0000000001 /* CLXUnityBannerFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A2000115294A8A0000000001 /* CLXUnityBannerFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = A2000015294A8A0000000001 /* CLXUnityBannerFactory.m */; };
 		A2000117294A8A0000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A2000017294A8A0000000001 /* PrivacyInfo.xcprivacy */; };
+		B58548B7E7F0B1EFB7EE238D /* CLXUnityMetadataProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 323782B51E850B4910EAC6F3 /* CLXUnityMetadataProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		323782B51E850B4910EAC6F3 /* CLXUnityMetadataProvider.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXUnityMetadataProvider.h; sourceTree = "<group>"; };
 		700C6ADFB4254A8374A69C3C /* Pods_CloudXUnityAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXUnityAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		760F2624C3AB927AB79E2C9B /* Pods-CloudXUnityAdapter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXUnityAdapter.release.xcconfig"; path = "Target Support Files/Pods-CloudXUnityAdapter/Pods-CloudXUnityAdapter.release.xcconfig"; sourceTree = "<group>"; };
 		91FF98DE7501967ED1B06A93 /* Pods-CloudXUnityAdapter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXUnityAdapter.debug.xcconfig"; path = "Target Support Files/Pods-CloudXUnityAdapter/Pods-CloudXUnityAdapter.debug.xcconfig"; sourceTree = "<group>"; };
@@ -62,6 +65,7 @@
 		A2000016294A8A0000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A2000017294A8A0000000001 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		A2000018294A8A0000000001 /* CloudXUnityAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXUnityAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F9EB2145EE97F4E90BCEF500 /* CLXUnityMetadataProvider.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXUnityMetadataProvider.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +132,8 @@
 				A2000306294A8A0000000001 /* Interstitial */,
 				A2000307294A8A0000000001 /* Rewarded */,
 				A2000308294A8A0000000001 /* Banner */,
+				323782B51E850B4910EAC6F3 /* CLXUnityMetadataProvider.h */,
+				F9EB2145EE97F4E90BCEF500 /* CLXUnityMetadataProvider.m */,
 			);
 			path = CloudXUnityAdapter;
 			sourceTree = "<group>";
@@ -209,6 +215,7 @@
 				A2000110294A8A0000000001 /* CLXUnityRewardedFactory.h in Headers */,
 				A2000112294A8A0000000001 /* CLXUnityBanner.h in Headers */,
 				A2000114294A8A0000000001 /* CLXUnityBannerFactory.h in Headers */,
+				B58548B7E7F0B1EFB7EE238D /* CLXUnityMetadataProvider.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,6 +343,7 @@
 				A2000111294A8A0000000001 /* CLXUnityRewardedFactory.m in Sources */,
 				A2000113294A8A0000000001 /* CLXUnityBanner.m in Sources */,
 				A2000115294A8A0000000001 /* CLXUnityBannerFactory.m in Sources */,
+				7E5DCB10847B4D03ABEBE10C /* CLXUnityMetadataProvider.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

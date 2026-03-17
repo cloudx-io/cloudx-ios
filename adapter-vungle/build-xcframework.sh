@@ -30,6 +30,10 @@ FRAMEWORK_NAME="CloudXVungleAdapter"
 print_status "1. Setting up the environment..."
 pod install || print_error "Pod install failed."
 
+# --- Step 1a: Validate Compile Sources ---
+print_status "1a. Validating all .m files are in the Xcode project..."
+bash ../scripts/validate-compile-sources.sh Sources/CloudXVungleAdapter CloudXVungleAdapter.xcodeproj/project.pbxproj || print_error "Compile sources validation failed. See above."
+
 # --- Step 2: Build Static Framework for Device ---
 print_status "2. Building Static Framework for Device..."
 xcodebuild archive \

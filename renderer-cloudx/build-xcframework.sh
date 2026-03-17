@@ -117,6 +117,11 @@ print_step "📦 Installing CocoaPods dependencies..."
 pod install || print_error "Pod install failed"
 print_success "CocoaPods dependencies installed"
 
+# Validate compile sources
+print_step "🔍 Validating all .m files are in the Xcode project..."
+bash ../scripts/validate-compile-sources.sh Sources/CloudXRenderer CloudXRenderer.xcodeproj/project.pbxproj || print_error "Compile sources validation failed. See above."
+print_success "All source files validated"
+
 # Build for iOS Device
 print_step "📱 Building for iOS device (STATIC)..."
 set -o pipefail

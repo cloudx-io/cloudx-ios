@@ -140,6 +140,11 @@ rm -rf "$ARCHIVE_DIR" "$OUTPUT_XCFRAMEWORK" "$ZIP_OUTPUT" "$DSYM_OUTPUT" "releas
 mkdir -p "$ARCHIVE_DIR"
 print_success "Build directory cleaned"
 
+# Validate compile sources
+print_step "🔍 Validating all .m files are in the Xcode project..."
+bash ../scripts/validate-compile-sources.sh Sources/CloudXCore CloudXCore.xcodeproj/project.pbxproj || print_error "Compile sources validation failed. See above."
+print_success "All source files validated"
+
 # Build for iOS Device
 print_step "📱 Building for iOS device (DYNAMIC)..."
 set -o pipefail
