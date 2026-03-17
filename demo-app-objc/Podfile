@@ -3,12 +3,12 @@ platform :ios, '13.0'
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore', '~> 2.2.1-beta'
-  pod 'CloudXMetaAdapter', '~> 2.2.1-beta'
-  pod 'CloudXRenderer', '~> 2.2.1-beta'
-  pod 'CloudXVungleAdapter', '~> 2.2.1-beta'
-  pod 'CloudXInMobiAdapter', '~> 2.2.1-beta'
-  pod 'CloudXMintegralAdapter', '~> 2.2.1-beta'
+  pod 'CloudXCore', '~> 2.2.2'
+  pod 'CloudXMetaAdapter', '~> 2.2.2'
+  pod 'CloudXRenderer', '~> 2.2.2'
+  pod 'CloudXVungleAdapter', '~> 2.2.2'
+  pod 'CloudXInMobiAdapter', '~> 2.2.2'
+  pod 'CloudXMintegralAdapter', '~> 2.2.2'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths
