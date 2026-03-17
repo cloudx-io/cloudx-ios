@@ -175,6 +175,15 @@ sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y
 sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" adapter-mintegral/CloudXMintegralAdapter.podspec
 sed -i '' "s/s\.dependency 'CloudXCore', '[^']*'/s.dependency 'CloudXCore', 'X.Y.Z'/" adapter-unity/CloudXUnityAdapter.podspec
 
+# 7. Update podspec source tags to unified format: "v#{s.version}" (not "v#{s.version}-component")
+#    ⚠️ ONE-TIME MIGRATION (2.2.3+): Previous releases used per-component tags (e.g., v2.2.2-core).
+#    Starting with the next release, all podspecs must use "v#{s.version}" so a single git tag works.
+#    Verify with: grep 's\.source' --include='*.podspec' -r . | grep -v Pods
+#    Every podspec should show :tag => "v#{s.version}" — no -core, -meta, etc. suffixes.
+for spec in core/CloudXCore.podspec adapter-meta/CloudXMetaAdapter.podspec adapter-vungle/CloudXVungleAdapter.podspec adapter-inmobi/CloudXInMobiAdapter.podspec renderer-cloudx/CloudXRenderer.podspec adapter-mintegral/CloudXMintegralAdapter.podspec adapter-unity/CloudXUnityAdapter.podspec; do
+  sed -i '' 's/:tag => "v#{s.version}-[^"]*"/:tag => "v#{s.version}"/' "$spec"
+done
+
 # 7. Commit and push
 git add -A
 git commit -m "Release X.Y.Z"
@@ -364,29 +373,26 @@ git push origin release-X.Y.Z
 
 ```bash
 # Go to GitHub and merge cloudx-ios PR to main
-# Then tag and create releases:
+# Then tag and create a single release:
 
 cd cloudx-ios
 git checkout main
 git pull origin main
 
-git tag vX.Y.Z-core
-git tag vX.Y.Z-meta
-git tag vX.Y.Z-vungle
-git tag vX.Y.Z-inmobi
-git tag vX.Y.Z-renderer
-git tag vX.Y.Z-mintegral
-git tag vX.Y.Z-unity
-git push origin vX.Y.Z-core vX.Y.Z-meta vX.Y.Z-vungle vX.Y.Z-inmobi vX.Y.Z-renderer vX.Y.Z-mintegral vX.Y.Z-unity
+git tag vX.Y.Z
+git push origin vX.Y.Z
 
-# Create GitHub releases with xcframework attachments
-gh release create vX.Y.Z-core --title "CloudXCore X.Y.Z" core/CloudXCore.xcframework.zip
-gh release create vX.Y.Z-meta --title "CloudXMetaAdapter X.Y.Z" adapter-meta/CloudXMetaAdapter.xcframework.zip
-gh release create vX.Y.Z-vungle --title "CloudXVungleAdapter X.Y.Z" adapter-vungle/CloudXVungleAdapter.xcframework.zip
-gh release create vX.Y.Z-inmobi --title "CloudXInMobiAdapter X.Y.Z" adapter-inmobi/CloudXInMobiAdapter.xcframework.zip
-gh release create vX.Y.Z-renderer --title "CloudXRenderer X.Y.Z" renderer-cloudx/CloudXRenderer.xcframework.zip
-gh release create vX.Y.Z-mintegral --title "CloudXMintegralAdapter X.Y.Z" adapter-mintegral/CloudXMintegralAdapter.xcframework.zip
-gh release create vX.Y.Z-unity --title "CloudXUnityAdapter X.Y.Z" adapter-unity/CloudXUnityAdapter.xcframework.zip
+# Create a single GitHub release with ALL xcframework zips attached
+# Omit any adapter not being released (e.g., remove the unity line if not releasing unity)
+gh release create vX.Y.Z \
+  --title "CloudX iOS SDK X.Y.Z" \
+  core/CloudXCore.xcframework.zip \
+  adapter-meta/CloudXMetaAdapter.xcframework.zip \
+  adapter-vungle/CloudXVungleAdapter.xcframework.zip \
+  adapter-inmobi/CloudXInMobiAdapter.xcframework.zip \
+  renderer-cloudx/CloudXRenderer.xcframework.zip \
+  adapter-mintegral/CloudXMintegralAdapter.xcframework.zip \
+  adapter-unity/CloudXUnityAdapter.xcframework.zip
 ```
 
 #### Step 2: Tag PRIVATE Repo Main and Create dSYM Release
@@ -846,10 +852,11 @@ pod trunk me
 ### General Release Rules
 
 1. **Never push source code to public repo** - Binary distribution only
-2. **Tag main after merge** - Per-component tags (`vX.Y.Z-core`, `vX.Y.Z-meta`, etc.)
-3. **Update ALL CHANGELOGs** - Internal (cloudx-ios-private), public (cloudx-ios), AND docs (docs/ios/changelog.mdx)
-4. **Test demo apps BEFORE merging PRs** - Verify xcframeworks work
-5. **Push to CocoaPods Trunk** - Required for public `pod install`
+2. **One tag per version** - Single `vX.Y.Z` tag on both repos (all components share the same version)
+3. **One GitHub release per version** - Single release with all xcframework zips (public) or dSYMs (private) attached
+4. **Update ALL CHANGELOGs** - Internal (cloudx-ios-private), public (cloudx-ios), AND docs (docs/ios/changelog.mdx)
+5. **Test demo apps BEFORE merging PRs** - Verify xcframeworks work
+6. **Push to CocoaPods Trunk** - Required for public `pod install`
 
 ### Framework Type Rules (CRITICAL)
 
