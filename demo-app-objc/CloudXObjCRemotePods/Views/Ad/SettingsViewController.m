@@ -67,7 +67,7 @@
         case 0: return 3; // SDK Settings: App Key, Init URL, Hashed User ID
         case 1: return 4; // Ad Unit Settings
         case 2: return 4; // Logging: Enable, Emojis, Timestamps, Level
-        case 3: return 1; // QA Tools: Print Bid Response
+        case 3: return 2; // QA Tools: Print Bid Response, Simulate Error
         default: return 0;
     }
 }
@@ -87,7 +87,7 @@
         return @"V=Verbose (all logs), D=Debug (dev logs), I=Info (key events), W=Warn (issues), E=Error (failures only). Toggle emojis to test plain text mode for log aggregation systems.";
     }
     if (section == 3) {
-        return @"When enabled, the full bid response JSON from the server is printed to the Xcode console. This is for QA/internal testing only.";
+        return @"Print Bid Response logs the full JSON to Xcode console. Simulate Error arms a one-shot error that fires on the next ad load, then resets to Off.";
     }
     return nil;
 }
@@ -197,6 +197,15 @@
                     cell.accessoryView = toggle;
                     break;
                 }
+                case 1: {
+                    cell.textLabel.text = @"Simulate Error";
+                    UISegmentedControl *errorPicker = [[UISegmentedControl alloc] initWithItems:@[@"Off", @"400", @"500", @"NoFill"]];
+                    errorPicker.selectedSegmentIndex = [CLXBidResponseSwizzler simulatedErrorType];
+                    errorPicker.frame = CGRectMake(0, 0, 220, 30);
+                    [errorPicker addTarget:self action:@selector(simulateErrorChanged:) forControlEvents:UIControlEventValueChanged];
+                    cell.accessoryView = errorPicker;
+                    break;
+                }
             }
             break;
     }
@@ -270,6 +279,14 @@
     }
     
     NSLog(@"🔍 Print Full Bid Response %@", sender.isOn ? @"ENABLED" : @"DISABLED");
+}
+
+- (void)simulateErrorChanged:(UISegmentedControl *)sender {
+    CLXSimulatedErrorType errorType = (CLXSimulatedErrorType)sender.selectedSegmentIndex;
+    [CLXBidResponseSwizzler setSimulatedErrorType:errorType];
+    
+    NSArray *labels = @[@"Off", @"HTTP 400", @"HTTP 500", @"No Fill"];
+    NSLog(@"🔍 Simulate Error: %@", labels[sender.selectedSegmentIndex]);
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {

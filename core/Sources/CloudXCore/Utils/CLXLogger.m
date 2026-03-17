@@ -219,6 +219,9 @@ static BOOL _globalTimestampsEnabled = NO;
 - (void)appendErrorContext:(NSMutableString *)message error:(nullable CLXError *)error {
     if (error) {
         [message appendFormat:@"\n  ⚠️ Error: %@", error.localizedDescription ?: @"Unknown error"];
+        if (error.localizedFailureReason.length > 0) {
+            [message appendFormat:@"\n  📋 Detail: %@", error.localizedFailureReason];
+        }
         if (error.code != 0) {
             [message appendFormat:@"\n  🔢 Code: %ld", (long)error.code];
         }

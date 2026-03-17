@@ -521,24 +521,27 @@ NS_ASSUME_NONNULL_BEGIN
     } else {
         [self.logger info:[NSString stringWithFormat:@"[%@] Waterfall exhausted (no fill) - propagating to delegate", self.currentCorrelationId]];
         
-        // Preserve original error if available, otherwise create no-fill error
         NSError *errorToReport;
         if (self.lastBidError) {
-            // Preserve the detailed message from the bid error
-            NSString *message = self.lastBidError.clx_fullErrorMessage;
-            
-            // Map CLXBidAdSourceError to appropriate CLXErrorCode
-            // Single bid failures (CLXBidAdSourceErrorAdapterCreationFailed) get CLXErrorCodeLoadFailed
-            // to surface specific error details rather than generic NO_FILL
-            CLXErrorCode errorCode;
-            if (self.lastBidError.code == CLXBidAdSourceErrorAdapterCreationFailed) {
-                errorCode = CLXErrorCodeLoadFailed;
+            if ([self.lastBidError isKindOfClass:[CLXError class]]) {
+                // Network/auction-level CLXError — preserve code, description, failureReason, and underlyingError
+                errorToReport = self.lastBidError;
+            } else if ([self.lastBidError.domain isEqualToString:@"CLXBidAdSource"]
+                       && self.lastBidError.code == CLXBidAdSourceErrorAdapterCreationFailed) {
+                errorToReport = [CLXError errorWithCode:CLXErrorCodeLoadFailed
+                                            description:self.lastBidError.localizedDescription
+                                        underlyingError:self.lastBidError];
+            } else if ([self.lastBidError.domain isEqualToString:@"CLXBidAdSource"]
+                       && self.lastBidError.code == CLXBidAdSourceErrorNoBid) {
+                errorToReport = [CLXError errorWithCode:CLXErrorCodeNoFill
+                                            description:self.lastBidError.localizedDescription
+                                        underlyingError:self.lastBidError];
             } else {
-                errorCode = CLXErrorCodeNoFill;
+                errorToReport = [CLXError errorWithCode:CLXErrorCodeLoadFailed
+                                            description:self.lastBidError.localizedDescription
+                                        underlyingError:self.lastBidError];
             }
-            errorToReport = [CLXError errorWithCode:errorCode description:message];
         } else {
-            // No error but no response either - genuine no fill
             errorToReport = [CLXError errorWithCode:CLXErrorCodeNoFill description:@"No ad available - waterfall exhausted"];
         }
         
@@ -820,7 +823,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (void)failToLoadBanner:(nullable id<CLXAdapterBanner>)banner error:(nullable NSError *)error {
-    [self.logger info:[NSString stringWithFormat:@"[%@] failToLoadBanner for ad unit: %@ - %@", self.currentCorrelationId, self.adUnitId, error.localizedDescription ?: @"Unknown error"]];
+    [self.logger info:[NSString stringWithFormat:@"[%@] failToLoadBanner for ad unit: %@ - %@", self.currentCorrelationId, self.adUnitId, error.clx_fullErrorMessage ?: @"Unknown error"]];
 
 
     // Track adapter load latency with metrics tracker (failure)

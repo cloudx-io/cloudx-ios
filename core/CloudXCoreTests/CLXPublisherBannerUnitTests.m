@@ -46,6 +46,8 @@ static const NSTimeInterval kTestTimeout = 2.0;
 @property (nonatomic, assign) NSUInteger pendingLoadRequestCount;
 @property (nonatomic, strong, nullable) NSError *deferredError;
 @property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
+// Error propagation
+@property (nonatomic, strong, nullable) NSError *lastBidError;
 
 // Expose private methods for testing
 - (void)setVisible:(BOOL)visible;
@@ -378,8 +380,7 @@ static const NSTimeInterval kTestTimeout = 2.0;
                                                   code:CLXBidAdSourceErrorAdapterCreationFailed 
                                               userInfo:@{NSLocalizedDescriptionKey: specificErrorMessage}];
     
-    // Set the lastBidError to simulate single bid failure from CLXBidAdSource
-    [self.banner setValue:singleBidError forKey:@"lastBidError"];
+    self.banner.lastBidError = singleBidError;
     
     // Call continueBannerChain which handles the error mapping
     [self.banner continueBannerChain];
@@ -390,6 +391,136 @@ static const NSTimeInterval kTestTimeout = 2.0;
                    @"Single bid failure should surface CLXErrorCodeLoadFailed, not generic NO_FILL");
     XCTAssertTrue([self.mockDelegate.lastError.localizedDescription containsString:@"adm is empty"], 
                   @"Specific error message should be preserved");
+}
+
+#pragma mark - Error Propagation Tests
+
+- (void)testHTTP400CLXErrorPreservesCodeAndServerMessage {
+    NSString *serverBody = @"Invalid request: request.imp[0].ext.prebid.bidder.vungle failed validation.\nplacementId: Does not match minimum length of 1";
+    CLXError *httpError = [CLXError errorWithHTTPStatusCode:400 serverMessage:serverBody];
+
+    self.banner.lastBidError = httpError;
+
+    [self.banner continueBannerChain];
+
+    XCTAssertTrue(self.mockDelegate.failToLoadCalled);
+    XCTAssertEqual(self.mockDelegate.lastError.code, CLXErrorCodeClientError,
+                   @"HTTP 400 should surface as CLXErrorCodeClientError, not NoFill");
+    XCTAssertEqualObjects(self.mockDelegate.lastError.localizedFailureReason, serverBody,
+                          @"Server body should be preserved as localizedFailureReason");
+    XCTAssertTrue([self.mockDelegate.lastError.localizedDescription containsString:@"HTTP 400"],
+                  @"HTTP status should be in the description");
+}
+
+- (void)testHTTP500CLXErrorPreservesCode {
+    CLXError *serverError = [CLXError errorWithHTTPStatusCode:500 serverMessage:@"Internal Server Error"];
+
+    self.banner.lastBidError = serverError;
+
+    [self.banner continueBannerChain];
+
+    XCTAssertTrue(self.mockDelegate.failToLoadCalled);
+    XCTAssertEqual(self.mockDelegate.lastError.code, CLXErrorCodeServerError,
+                   @"HTTP 500 should surface as CLXErrorCodeServerError");
+    XCTAssertEqualObjects(self.mockDelegate.lastError.localizedFailureReason, @"Internal Server Error");
+}
+
+- (void)testBidAdSourceNoBidMapsToNoFillWithUnderlyingError {
+    NSError *waterfallError = [NSError errorWithDomain:@"CLXBidAdSource"
+                                                  code:CLXBidAdSourceErrorNoBid
+                                              userInfo:@{NSLocalizedDescriptionKey: @"All 3 bid(s) failed"}];
+
+    self.banner.lastBidError = waterfallError;
+
+    [self.banner continueBannerChain];
+
+    XCTAssertTrue(self.mockDelegate.failToLoadCalled);
+    XCTAssertEqual(self.mockDelegate.lastError.code, CLXErrorCodeNoFill,
+                   @"Waterfall exhaustion should map to CLXErrorCodeNoFill");
+    XCTAssertTrue([self.mockDelegate.lastError.localizedDescription containsString:@"All 3 bid(s) failed"],
+                  @"Failure summary should be preserved");
+    XCTAssertEqualObjects(self.mockDelegate.lastError.userInfo[NSUnderlyingErrorKey], waterfallError,
+                          @"Original BidAdSource error should be stored as underlyingError");
+}
+
+- (void)testAdapterCreationFailedMapsToLoadFailedWithUnderlyingError {
+    NSString *specificMessage = @"Bid 'bid-42': adapter class not found";
+    NSError *adapterError = [NSError errorWithDomain:@"CLXBidAdSource"
+                                                code:CLXBidAdSourceErrorAdapterCreationFailed
+                                            userInfo:@{NSLocalizedDescriptionKey: specificMessage}];
+
+    self.banner.lastBidError = adapterError;
+
+    [self.banner continueBannerChain];
+
+    XCTAssertTrue(self.mockDelegate.failToLoadCalled);
+    XCTAssertEqual(self.mockDelegate.lastError.code, CLXErrorCodeLoadFailed,
+                   @"Single bid adapter failure should map to CLXErrorCodeLoadFailed");
+    XCTAssertTrue([self.mockDelegate.lastError.localizedDescription containsString:@"adapter class not found"]);
+    XCTAssertEqualObjects(self.mockDelegate.lastError.userInfo[NSUnderlyingErrorKey], adapterError,
+                          @"Original adapter error should be stored as underlyingError");
+}
+
+- (void)testNilLastBidErrorProducesGenericNoFill {
+    self.banner.lastBidError = nil;
+
+    [self.banner continueBannerChain];
+
+    XCTAssertTrue(self.mockDelegate.failToLoadCalled);
+    XCTAssertEqual(self.mockDelegate.lastError.code, CLXErrorCodeNoFill);
+    XCTAssertTrue([self.mockDelegate.lastError.localizedDescription containsString:@"No ad available"],
+                  @"Generic no-fill message should be used when no bid error exists");
+}
+
+- (void)testFailureReasonPreservedThroughDelegateForHTTPError {
+    NSString *reason = @"request.imp[0].banner.format: Array must have at least 1 items";
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    userInfo[NSLocalizedDescriptionKey] = @"Client Error - HTTP 400";
+    userInfo[NSLocalizedFailureReasonErrorKey] = reason;
+    CLXError *httpError = [[CLXError alloc] initWithDomain:CLXErrorDomain code:CLXErrorCodeClientError userInfo:userInfo];
+
+    self.banner.lastBidError = httpError;
+
+    [self.banner continueBannerChain];
+
+    XCTAssertTrue(self.mockDelegate.failToLoadCalled);
+    CLXError *delegateError = (CLXError *)self.mockDelegate.lastError;
+    XCTAssertEqualObjects(delegateError.localizedFailureReason, reason,
+                          @"localizedFailureReason must survive the full error chain to the delegate");
+    XCTAssertEqual(delegateError.code, CLXErrorCodeClientError);
+}
+
+- (void)testUnknownDomainErrorWrapsAsLoadFailed {
+    NSError *unknownError = [NSError errorWithDomain:@"SomeThirdPartyDomain"
+                                                code:42
+                                            userInfo:@{NSLocalizedDescriptionKey: @"Unexpected failure"}];
+
+    self.banner.lastBidError = unknownError;
+
+    [self.banner continueBannerChain];
+
+    XCTAssertTrue(self.mockDelegate.failToLoadCalled);
+    XCTAssertEqual(self.mockDelegate.lastError.code, CLXErrorCodeLoadFailed,
+                   @"Unknown error domains should be wrapped as CLXErrorCodeLoadFailed");
+    XCTAssertTrue([self.mockDelegate.lastError.localizedDescription containsString:@"Unexpected failure"]);
+    XCTAssertEqualObjects(self.mockDelegate.lastError.userInfo[NSUnderlyingErrorKey], unknownError,
+                          @"Original unknown error should be stored as underlyingError");
+}
+
+- (void)testErrorCodeZeroFromNonBidAdSourceDomainMapsToLoadFailedNotNoFill {
+    NSError *foreignCodeZeroError = [NSError errorWithDomain:@"NSCocoaErrorDomain"
+                                                        code:0
+                                                    userInfo:@{NSLocalizedDescriptionKey: @"Some Foundation error"}];
+
+    self.banner.lastBidError = foreignCodeZeroError;
+
+    [self.banner continueBannerChain];
+
+    XCTAssertTrue(self.mockDelegate.failToLoadCalled);
+    XCTAssertEqual(self.mockDelegate.lastError.code, CLXErrorCodeLoadFailed,
+                   @"Code 0 from a non-CLXBidAdSource domain must NOT match CLXBidAdSourceErrorNoBid");
+    XCTAssertEqualObjects(self.mockDelegate.lastError.userInfo[NSUnderlyingErrorKey], foreignCodeZeroError,
+                          @"Original error should be stored as underlyingError");
 }
 
 #pragma mark - Timer and Refresh Tests

@@ -296,6 +296,7 @@
 		AUDITBF040000000001 /* CLXWinLossTrackingIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AUDITFR030000000001 /* CLXWinLossTrackingIntegrationTests.m */; };
 		AUDITBF050000000001 /* CLXAdapterLoaderIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AUDITFR040000000001 /* CLXAdapterLoaderIntegrationTests.m */; };
 		AUDITBF060000000001 /* MockCLXWinLossTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B0F82E7DECDD00E49E3E /* MockCLXWinLossTracker.m */; };
+		ERRPROP0BF000000001 /* CLXBannerErrorPropagationIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ERRPROP0FR000000001 /* CLXBannerErrorPropagationIntegrationTests.m */; };
 		BABA00032F27A1B600E49E3E /* CLXPayloadBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = BABA00012F27A1B600E49E3E /* CLXPayloadBuilder.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BABA00042F27A1B600E49E3E /* CLXPayloadBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = BABA00022F27A1B600E49E3E /* CLXPayloadBuilder.m */; };
 		BBCC8925685470E6FEABD98B /* CLXLossReasonMapper.h in Headers */ = {isa = PBXBuildFile; fileRef = BD3F90AE521A7F6C18C00B27 /* CLXLossReasonMapper.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -670,8 +671,8 @@
 		B0F9DD3D51F8DFDB760174EF /* CLXManualPrivacyStateTests.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXManualPrivacyStateTests.m; sourceTree = "<group>"; };
 		B0F206B761B3DBAAC2FF9D20 /* CLXGeoInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXGeoInfo.m; sourceTree = "<group>"; };
 		B6FF8117C060F29E3DD83E9B /* CLXGeoInfoTests.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXGeoInfoTests.m; sourceTree = "<group>"; };
-
 		B962D45141A8D8DA20B31C73 /* CLXSystemInformationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSystemInformationTests.m; sourceTree = "<group>"; };
+		ERRPROP0FR000000001 /* CLXBannerErrorPropagationIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBannerErrorPropagationIntegrationTests.m; sourceTree = "<group>"; };
 		BABA00012F27A1B600E49E3E /* CLXPayloadBuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPayloadBuilder.h; sourceTree = "<group>"; };
 		BABA00022F27A1B600E49E3E /* CLXPayloadBuilder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPayloadBuilder.m; sourceTree = "<group>"; };
 		BD3F90AE521A7F6C18C00B27 /* CLXLossReasonMapper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Sources/CloudXCore/CLXLossReasonMapper.h; sourceTree = SOURCE_ROOT; };
@@ -1334,6 +1335,7 @@
 				AUDITFR030000000001 /* CLXWinLossTrackingIntegrationTests.m */,
 				AUDITFR040000000001 /* CLXAdapterLoaderIntegrationTests.m */,
 				AUDITFR050000000001 /* CLXErrorReporterPerformanceTests.m */,
+				ERRPROP0FR000000001 /* CLXBannerErrorPropagationIntegrationTests.m */,
 			);
 			path = CloudXCoreIntegrationTests;
 			sourceTree = "<group>";
@@ -1822,6 +1824,7 @@
 				AUDITBF050000000001 /* CLXAdapterLoaderIntegrationTests.m in Sources */,
 				AUDITBF000000000001 /* CLXErrorReporterPerformanceTests.m in Sources */,
 				AUDITBF060000000001 /* MockCLXWinLossTracker.m in Sources */,
+				ERRPROP0BF000000001 /* CLXBannerErrorPropagationIntegrationTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
