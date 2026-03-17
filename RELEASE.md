@@ -360,55 +360,65 @@ git push origin release-X.Y.Z
 
 **Only proceed after Phase 3 testing is successful!**
 
-#### Versioning Strategy
-
-All components (core, adapters, renderer) share the same version number and are released together.
-Each release uses a **single tag and single GitHub release** with all xcframework zips attached.
-
 #### Step 1: Merge PUBLIC Repo PR
 
 ```bash
 # Go to GitHub and merge cloudx-ios PR to main
-# Then tag and create a single unified release:
+# Then tag and create releases:
 
 cd cloudx-ios
 git checkout main
 git pull origin main
 
-git tag vX.Y.Z
-git push origin vX.Y.Z
+git tag vX.Y.Z-core
+git tag vX.Y.Z-meta
+git tag vX.Y.Z-vungle
+git tag vX.Y.Z-inmobi
+git tag vX.Y.Z-renderer
+git tag vX.Y.Z-mintegral
+git tag vX.Y.Z-unity
+git push origin vX.Y.Z-core vX.Y.Z-meta vX.Y.Z-vungle vX.Y.Z-inmobi vX.Y.Z-renderer vX.Y.Z-mintegral vX.Y.Z-unity
 
-# Create a single GitHub release with ALL xcframework zips attached
-gh release create vX.Y.Z \
-  --title "CloudX iOS SDK X.Y.Z" \
-  core/CloudXCore.xcframework.zip \
-  adapter-meta/CloudXMetaAdapter.xcframework.zip \
-  adapter-vungle/CloudXVungleAdapter.xcframework.zip \
-  adapter-inmobi/CloudXInMobiAdapter.xcframework.zip \
-  renderer-cloudx/CloudXRenderer.xcframework.zip \
-  adapter-mintegral/CloudXMintegralAdapter.xcframework.zip \
-  adapter-unity/CloudXUnityAdapter.xcframework.zip
-# Omit any adapter not being released (e.g., remove the unity line if not releasing unity)
+# Create GitHub releases with xcframework attachments
+gh release create vX.Y.Z-core --title "CloudXCore X.Y.Z" core/CloudXCore.xcframework.zip
+gh release create vX.Y.Z-meta --title "CloudXMetaAdapter X.Y.Z" adapter-meta/CloudXMetaAdapter.xcframework.zip
+gh release create vX.Y.Z-vungle --title "CloudXVungleAdapter X.Y.Z" adapter-vungle/CloudXVungleAdapter.xcframework.zip
+gh release create vX.Y.Z-inmobi --title "CloudXInMobiAdapter X.Y.Z" adapter-inmobi/CloudXInMobiAdapter.xcframework.zip
+gh release create vX.Y.Z-renderer --title "CloudXRenderer X.Y.Z" renderer-cloudx/CloudXRenderer.xcframework.zip
+gh release create vX.Y.Z-mintegral --title "CloudXMintegralAdapter X.Y.Z" adapter-mintegral/CloudXMintegralAdapter.xcframework.zip
+gh release create vX.Y.Z-unity --title "CloudXUnityAdapter X.Y.Z" adapter-unity/CloudXUnityAdapter.xcframework.zip
 ```
 
-#### Step 2: Tag PRIVATE Repo and Upload dSYMs
+#### Step 2: Tag PRIVATE Repo Main and Create dSYM Release
 
 **Note:** No PR to merge for the private repo -- changes were committed directly to main in Phase 1.
-
-**⚠️ CRITICAL: dSYMs must stay in the PRIVATE repo - never upload to public repo!**
 
 ```bash
 cd cloudx-ios-private
 git checkout main
 git pull origin main
 
-git tag vX.Y.Z
-git push origin vX.Y.Z
+git tag vX.Y.Z-core
+git tag vX.Y.Z-meta
+git tag vX.Y.Z-vungle
+git tag vX.Y.Z-inmobi
+git tag vX.Y.Z-renderer
+git tag vX.Y.Z-mintegral
+git tag vX.Y.Z-unity
+git push origin vX.Y.Z-core vX.Y.Z-meta vX.Y.Z-vungle vX.Y.Z-inmobi vX.Y.Z-renderer vX.Y.Z-mintegral vX.Y.Z-unity
+```
+
+#### Step 3: Upload dSYMs to PRIVATE Release (CloudXCore Only)
+
+**⚠️ CRITICAL: dSYMs must stay in the PRIVATE repo - never upload to public repo!**
+
+```bash
+cd cloudx-ios-private
 
 # Create private release with dSYMs for crash symbolication
-gh release create vX.Y.Z \
-  --title "CloudX iOS SDK X.Y.Z (INTERNAL — dSYMs)" \
-  --notes "## CloudX iOS SDK vX.Y.Z — dSYMs
+gh release create vX.Y.Z-core \
+  --title "CloudXCore X.Y.Z dSYMs (INTERNAL)" \
+  --notes "## CloudXCore v X.Y.Z dSYMs
 
 ⚠️ **CONFIDENTIAL**: These dSYMs are for internal crash symbolication only.
 Never share these files outside the CloudX organization.
@@ -419,13 +429,13 @@ When a host app owner reports a crash in CloudXCore:
 2. Use atos or symbolicatecrash to symbolicate the crash
 
 ### Corresponding Public Release
-https://github.com/cloudx-io/cloudx-ios/releases/tag/vX.Y.Z" \
+https://github.com/cloudx-io/cloudx-ios/releases/tag/vX.Y.Z-core" \
   core/CloudXCore-dSYMs.zip
 ```
 
 **Verification:** Confirm dSYMs are only in the private repo:
 - ✅ `cloudx-ios-private` release has `CloudXCore-dSYMs.zip`
-- ✅ `cloudx-ios` release has xcframework zips only (no dSYMs!)
+- ✅ `cloudx-ios` release has ONLY `CloudXCore.xcframework.zip` (no dSYMs!)
 
 ---
 
@@ -443,16 +453,29 @@ pod trunk me
 pod trunk register YOUR_EMAIL 'Your Name' --description='Release machine'
 # Check email and click verification link
 
+# ⚠️ PRE-FLIGHT: Verify every podspec source tag matches an actual git tag.
+# Each podspec has s.source = { :tag => "v#{s.version}-<component>" }.
+# Confirm the corresponding tags exist BEFORE pushing:
+grep -r "s\.source" --include="*.podspec" . | grep -v Pods
+git tag -l "vX.Y.Z-*"
+# Every podspec tag must have a matching git tag. If not, fix before proceeding.
+
 # Push each podspec to trunk (ORDER MATTERS - Core first!)
 pod trunk push core/CloudXCore.podspec --allow-warnings
 
-# Wait for CloudXCore to be available, then push adapters
-pod trunk push renderer-cloudx/CloudXRenderer.podspec --allow-warnings
-pod trunk push adapter-meta/CloudXMetaAdapter.podspec --allow-warnings
-pod trunk push adapter-vungle/CloudXVungleAdapter.podspec --allow-warnings
-pod trunk push adapter-inmobi/CloudXInMobiAdapter.podspec --allow-warnings
-pod trunk push adapter-mintegral/CloudXMintegralAdapter.podspec --allow-warnings
-pod trunk push adapter-unity/CloudXUnityAdapter.podspec --allow-warnings
+# Wait for CloudXCore CDN propagation before pushing adapters.
+# The CDN can take 5-30+ minutes. Check with:
+#   curl -s "https://cdn.cocoapods.org/all_pods_versions_7_4_3.txt" | grep CloudXCore
+# Must show X.Y.Z in the version list. Retry every 2-3 min until it appears.
+# Do NOT try workarounds — just wait for the CDN.
+
+# Once Core is on CDN, push adapters (can run in parallel with --skip-import-validation):
+pod trunk push renderer-cloudx/CloudXRenderer.podspec --allow-warnings --skip-import-validation --skip-tests
+pod trunk push adapter-meta/CloudXMetaAdapter.podspec --allow-warnings --skip-import-validation --skip-tests
+pod trunk push adapter-vungle/CloudXVungleAdapter.podspec --allow-warnings --skip-import-validation --skip-tests
+pod trunk push adapter-inmobi/CloudXInMobiAdapter.podspec --allow-warnings --skip-import-validation --skip-tests
+pod trunk push adapter-mintegral/CloudXMintegralAdapter.podspec --allow-warnings --skip-import-validation --skip-tests
+pod trunk push adapter-unity/CloudXUnityAdapter.podspec --allow-warnings --skip-import-validation --skip-tests
 
 # Verify pods are published
 pod trunk info CloudXCore
@@ -834,11 +857,10 @@ pod trunk me
 ### General Release Rules
 
 1. **Never push source code to public repo** - Binary distribution only
-2. **Tag main after merge** - Single `vX.Y.Z` tag per release (all components share the same version)
-3. **Single GitHub release per version** - One release with all xcframework zips attached (not one release per component)
-4. **Update ALL CHANGELOGs** - Internal (cloudx-ios-private), public (cloudx-ios), AND docs (docs/ios/changelog.mdx)
-5. **Test demo apps BEFORE merging PRs** - Verify xcframeworks work
-6. **Push to CocoaPods Trunk** - Required for public `pod install`
+2. **Tag main after merge** - Per-component tags (`vX.Y.Z-core`, `vX.Y.Z-meta`, etc.)
+3. **Update ALL CHANGELOGs** - Internal (cloudx-ios-private), public (cloudx-ios), AND docs (docs/ios/changelog.mdx)
+4. **Test demo apps BEFORE merging PRs** - Verify xcframeworks work
+5. **Push to CocoaPods Trunk** - Required for public `pod install`
 
 ### Framework Type Rules (CRITICAL)
 
@@ -994,7 +1016,7 @@ ls -la build/dSYMs/  # Should contain .dSYM folders
 **Symbolicating a crash report:**
 ```bash
 # Download dSYMs from private release
-gh release download vX.Y.Z --repo cloudx-io/cloudx-ios-private --pattern "*dSYMs*"
+gh release download vX.Y.Z-core --repo cloudx-io/cloudx-ios-private --pattern "*dSYMs*"
 unzip CloudXCore-dSYMs.zip
 
 # Symbolicate using atos
