@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXMintegralAdapter'
-  s.version = '2.2.1-beta'
+  s.version = '2.2.2'
   s.summary = 'CloudX Adapter for Mintegral iOS SDK'
   s.description = <<-DESC
     The CloudX Mintegral Adapter enables publishers to monetize their iOS applications 
@@ -29,7 +29,7 @@ Pod::Spec.new do |s|
     'CloudXMintegralAdapter' => ['Sources/CloudXMintegralAdapter/PrivacyInfo.xcprivacy']
   }
 
-  s.dependency 'CloudXCore', '2.2.1-beta'
+  s.dependency 'CloudXCore', '2.2.2'
   
   # Mintegral SDK 8.x with bidding support
   # Uses: MTGBannerAdView, MTGNewInterstitialBidAdManager, MTGBidRewardAdManager

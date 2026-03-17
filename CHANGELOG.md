@@ -13,6 +13,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.2] - 2026-03-16
+
+### Added
+- **Manual Privacy API** — `setHasUserConsent:` and `setDoNotSell:` for publisher-controlled privacy consent (#390)
+- **Click Notifications** — SDK now sends click notifications to server (#430)
+- **Session Init Event** — SDK sends session initialization event after SDK initialization (#431)
+- **Adapter Metadata in Config** — Adapter metadata included in config/init requests (#439)
+- **Non-Bid Error Reporting** — Parse seatNonBid and nbr for actionable no-bid diagnostics (#415)
+- **Per-Metric Config Gating** — Individual metric types can be gated via server config (#440)
+- **Unity Ads Adapter** — New adapter for Unity Ads with interstitial, rewarded, and banner support (#378)
+- **Mintegral Adapter** — Mintegral adapter promoted to standard release flow (#421)
+
+### Fixed
+- **Banner Error Propagation** — Preserve server diagnostic messages in banner error callbacks (#414)
+- **Fullscreen Silent Load Failure** — Fix silent load failure when fullscreen ad is in SHOWING state (#412)
+- **Fullscreen Failure Callbacks** — Fix nil adUnitId in fullscreen ad failure callbacks (#410)
+- **Mintegral Deployment Target** — Aligned Mintegral adapter deployment target to iOS 13.0 (#429)
+- **Mintegral Adapter Hardening** — Fixed privacy handling, init retry, and removed unnecessary dispatch wrapping (#419)
+- **Renderer Impression Tracking** — Fixed viewability bugs in CloudX Renderer (#416)
+
+### Changed
+- **Geo Service Refactor** — Refactored geo service to align with cross-platform GeoApi/GeoService/GeoInfo architecture (#382)
+- **ILRD Enhancements** — Added auction correlation and SDK identity to ILRD tracking (#437)
+- **Mintegral SDK** — Upgraded from 8.0.7 to 8.0.8 (#420)
+- **Removed Moloco Adapter** — Removed beta Moloco adapter from codebase (#428)
+
+---
+
 ## [2.2.1-beta] - 2026-03-05
 
 ### Added
