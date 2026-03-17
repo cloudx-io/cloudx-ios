@@ -22,7 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Adapter Metadata in Config** — Adapter metadata included in config/init requests (#439)
 - **Non-Bid Error Reporting** — Parse seatNonBid and nbr for actionable no-bid diagnostics (#415)
 - **Per-Metric Config Gating** — Individual metric types can be gated via server config (#440)
-- **Unity Ads Adapter** — New adapter for Unity Ads with interstitial, rewarded, and banner support (#378)
 - **Mintegral Adapter** — Mintegral adapter promoted to standard release flow (#421)
 
 ### Fixed

@@ -723,10 +723,37 @@ git push origin --delete release-X.Y.Z
 | File | Repository | When to Update |
 |------|------------|----------------|
 | `CHANGELOG.md` | cloudx-ios-private | Phase 1 (prepare release) |
-| `CHANGELOG.md` | cloudx-ios | Phase 2 (copy from internal) |
-| `ios/changelog.mdx` | docs | Phase 2 (add version entry) |
+| `CHANGELOG.md` | cloudx-ios | Phase 2 (write public version) |
+| `ios/changelog.mdx` | docs | Phase 2 (write public version) |
 
 **Format:** Follow [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format with sections for Added, Changed, Fixed, Removed.
+
+### Private CHANGELOG (cloudx-ios-private)
+
+The internal changelog includes **all** changes with full technical detail and PR numbers. This is for internal reference only.
+
+**Include:** Internal infrastructure (ILRD, session events, click notifications, adapter metadata, metrics gating), refactors (geo service, architecture alignment), test improvements, CI/CD changes, internal tooling, adapter hardening details, and all bug fixes with root-cause detail.
+
+### Public CHANGELOG (cloudx-ios, docs)
+
+The public changelog is for **publishers integrating the SDK**. Only include changes that affect the public API, observable behavior, or integration requirements.
+
+**Include:**
+- New public APIs (e.g., `setHasUserConsent:`, `setDoNotSell:`)
+- New adapter availability (e.g., "Mintegral adapter now available")
+- Bug fixes that publishers may have encountered (describe the symptom, not the internal cause)
+- Third-party SDK version upgrades that affect publisher builds
+- Deprecations and migration guides
+
+**Exclude:**
+- Internal tracking systems (ILRD, session events, click notifications, adapter metadata)
+- Internal infrastructure (metrics gating, config request changes)
+- Internal refactors (geo service architecture, code cleanup)
+- Test infrastructure changes
+- CI/CD and build system changes
+- Detailed root-cause analysis of bugs (describe the fix from the publisher's perspective)
+
+**Tone:** Describe changes from the publisher's perspective. Instead of "Parse seatNonBid and nbr for actionable no-bid diagnostics," write "Improved error visibility for no-bid scenarios." Instead of "Preserve server diagnostic messages in banner error callbacks," write "Fixed an issue where some error details were lost in banner ad callbacks."
 
 ---
 
