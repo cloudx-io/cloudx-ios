@@ -22,6 +22,7 @@ enum EmulatorDebugConfig {
     }
 
     static func deinitializeSDK() {
+        // Safe before first init: both reset paths are idempotent cache/state clears.
         CloudXCore.shared.resetForEmulator()
     }
 }

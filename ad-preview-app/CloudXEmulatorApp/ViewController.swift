@@ -555,19 +555,6 @@ enum EventLogger {
         log("overrides_applied", data: overrides)
     }
 
-    static func adLoading(format: String, placement: String) {
-        log("ad_loading", data: ["format": format, "placement": placement])
-    }
-
-    static func adRewarded(format: String, placement: String, rewardType: String, rewardAmount: Int) {
-        log("ad_rewarded", data: [
-            "format": format,
-            "placement": placement,
-            "reward_type": rewardType,
-            "reward_amount": rewardAmount
-        ])
-    }
-
     static func deepLinkReceived(_ uri: String) {
         log("deep_link_received", data: ["uri": uri])
     }
@@ -1304,6 +1291,7 @@ final class EmulatorViewController: UIViewController {
     private var bidInsightSnapshot = BidInsightSnapshot()
     private var displayedCount = 0
     private var currentLoadStartMs: Int64?
+    private var currentAttemptId: String?
 
     private var pendingPostInitLoad: DispatchWorkItem?
     private var pendingFirstLoadRetry: DispatchWorkItem?
@@ -1507,10 +1495,12 @@ final class EmulatorViewController: UIViewController {
         )
 
         if needsInit {
-            if sdkInitialized {
-                EmulatorDebugConfig.deinitializeSDK()
-                sdkInitialized = false
-            }
+            // Always reset before re-init: CLXLiveInitService captures init URL at construction.
+            // Without a reset, a failed previous init can keep a stale environment endpoint.
+            EmulatorDebugConfig.deinitializeSDK()
+            sdkInitialized = false
+            initializedAppKey = nil
+            initializedEnv = nil
 
             EmulatorDebugConfig.setEnvironment(request.env)
             EventLogger.log("ENV_SET", data: ["env": request.env.rawValue])
@@ -1639,6 +1629,7 @@ final class EmulatorViewController: UIViewController {
     private func loadAd(for request: DeepLinkLoadRequest) {
         sessionSnapshot.attemptCount += 1
         currentLoadStartMs = nowMs()
+        currentAttemptId = UUID().uuidString
 
         bidInsightSnapshot.status = "Attempt #\(sessionSnapshot.attemptCount) in progress"
         bidInsightSnapshot.winningNetwork = nil
@@ -1653,7 +1644,7 @@ final class EmulatorViewController: UIViewController {
         updateBidInsightsUI()
 
         updateStatus(.loading)
-        EventLogger.adLoading(format: request.format.rawValue, placement: request.adUnitId)
+        EventLogger.log("ad_loading", data: adEventPayload(request: request, outcome: "loading"))
 
         switch request.format {
         case .banner:
@@ -2145,6 +2136,43 @@ final class EmulatorViewController: UIViewController {
         guard let code = CLXErrorCode(rawValue: error.code) else { return "UNKNOWN" }
         return CLXError.name(for: code)
     }
+
+    private func adEventPayload(
+        request: DeepLinkLoadRequest,
+        outcome: String? = nil,
+        includeLatency: Bool = false,
+        extras: [String: Any?] = [:]
+    ) -> [String: Any] {
+        var payload: [String: Any] = [
+            "attempt_no": sessionSnapshot.attemptCount,
+            "platform": "ios",
+            "format": request.format.rawValue,
+            "placement": request.adUnitId
+        ]
+
+        if let attemptId = currentAttemptId {
+            payload["attempt_id"] = attemptId
+        }
+        if let outcome {
+            payload["outcome"] = outcome
+        }
+        if includeLatency, let latencyMs = currentLoadLatencyMs() {
+            payload["latency_ms"] = latencyMs
+        }
+
+        for (key, value) in extras {
+            if let value {
+                payload[key] = value
+            }
+        }
+
+        return payload
+    }
+
+    private func currentLoadLatencyMs() -> Int64? {
+        guard let start = currentLoadStartMs else { return nil }
+        return nowMs() - start
+    }
 }
 
 extension EmulatorViewController: CLXBannerDelegate, CLXInterstitialDelegate, CLXRewardedDelegate, CLXAdRevenueDelegate {
@@ -2156,12 +2184,15 @@ extension EmulatorViewController: CLXBannerDelegate, CLXInterstitialDelegate, CL
             self.onAdLoadSucceeded()
             self.recordLoaded(ad: ad)
 
-            EventLogger.log("ad_loaded", data: [
-                "format": request.format.rawValue,
-                "placement": request.adUnitId,
-                "network": ad.networkName ?? "",
-                "network_placement": ad.networkPlacement ?? ""
-            ])
+            EventLogger.log("ad_loaded", data: self.adEventPayload(
+                request: request,
+                outcome: "loaded",
+                includeLatency: true,
+                extras: [
+                    "network": ad.networkName ?? "",
+                    "network_placement": ad.networkPlacement
+                ]
+            ))
             self.updateStatus(.loaded)
 
             if request.format.isInline {
@@ -2170,11 +2201,11 @@ extension EmulatorViewController: CLXBannerDelegate, CLXInterstitialDelegate, CL
 
             if request.format.isInline, let bannerAd = self.bannerAd {
                 self.attachAdViewCentered(bannerAd)
-                EventLogger.log("ad_displayed", data: [
-                    "format": request.format.rawValue,
-                    "placement": request.adUnitId,
-                    "network": ad.networkName ?? ""
-                ])
+                EventLogger.log("ad_displayed", data: self.adEventPayload(
+                    request: request,
+                    outcome: "displayed",
+                    extras: ["network": ad.networkName ?? ""]
+                ))
                 self.recordDisplayed()
                 self.updateStatus(.displayed)
             } else {
@@ -2191,13 +2222,16 @@ extension EmulatorViewController: CLXBannerDelegate, CLXInterstitialDelegate, CL
             self.startAutoRefreshTimerFromSDKIfNeeded(for: request.format)
 
             self.recordFailure(message: error.localizedDescription, errorCode: error.code)
-            EventLogger.log("ad_load_failed", data: [
-                "format": request.format.rawValue,
-                "placement": request.adUnitId,
-                "error": error.localizedDescription,
-                "error_code": error.code,
-                "error_name": self.errorName(for: error)
-            ])
+            EventLogger.log("ad_load_failed", data: self.adEventPayload(
+                request: request,
+                outcome: "failed",
+                includeLatency: true,
+                extras: [
+                    "error": error.localizedDescription,
+                    "error_code": error.code,
+                    "error_name": self.errorName(for: error)
+                ]
+            ))
 
             let retryScheduled = self.maybeScheduleFirstLoadRetry(for: request, error: error)
             if retryScheduled {
@@ -2213,11 +2247,11 @@ extension EmulatorViewController: CLXBannerDelegate, CLXInterstitialDelegate, CL
             guard let self else { return }
             guard let request = self.currentRequest else { return }
 
-            EventLogger.log("ad_clicked", data: [
-                "format": request.format.rawValue,
-                "placement": request.adUnitId,
-                "network": ad.networkName ?? ""
-            ])
+            EventLogger.log("ad_clicked", data: self.adEventPayload(
+                request: request,
+                outcome: "clicked",
+                extras: ["network": ad.networkName ?? ""]
+            ))
             self.updateStatus(.clicked)
         }
     }
@@ -2231,11 +2265,11 @@ extension EmulatorViewController: CLXBannerDelegate, CLXInterstitialDelegate, CL
             guard let self else { return }
             guard let request = self.currentRequest else { return }
 
-            EventLogger.log("ad_displayed", data: [
-                "format": request.format.rawValue,
-                "placement": request.adUnitId,
-                "network": ad.networkName ?? ""
-            ])
+            EventLogger.log("ad_displayed", data: self.adEventPayload(
+                request: request,
+                outcome: "displayed",
+                extras: ["network": ad.networkName ?? ""]
+            ))
             self.recordDisplayed()
             self.updateStatus(.displayed)
         }
@@ -2247,13 +2281,15 @@ extension EmulatorViewController: CLXBannerDelegate, CLXInterstitialDelegate, CL
             guard let request = self.currentRequest else { return }
 
             self.recordFailure(message: error.localizedDescription, errorCode: error.code)
-            EventLogger.log("ad_display_failed", data: [
-                "format": request.format.rawValue,
-                "placement": request.adUnitId,
-                "error": error.localizedDescription,
-                "error_code": error.code,
-                "error_name": self.errorName(for: error)
-            ])
+            EventLogger.log("ad_display_failed", data: self.adEventPayload(
+                request: request,
+                outcome: "display_failed",
+                extras: [
+                    "error": error.localizedDescription,
+                    "error_code": error.code,
+                    "error_name": self.errorName(for: error)
+                ]
+            ))
             self.updateStatus(.error(message: error.localizedDescription))
         }
     }
@@ -2263,10 +2299,10 @@ extension EmulatorViewController: CLXBannerDelegate, CLXInterstitialDelegate, CL
             guard let self else { return }
             guard let request = self.currentRequest else { return }
 
-            EventLogger.log("ad_closed", data: [
-                "format": request.format.rawValue,
-                "placement": request.adUnitId
-            ])
+            EventLogger.log("ad_closed", data: self.adEventPayload(
+                request: request,
+                outcome: "closed"
+            ))
             self.updateStatus(.closed)
             self.mainViewRef.showFullscreenButton.isEnabled = false
         }
@@ -2276,12 +2312,14 @@ extension EmulatorViewController: CLXBannerDelegate, CLXInterstitialDelegate, CL
         runOnMain { [weak self] in
             guard let self else { return }
             guard let request = self.currentRequest else { return }
-            EventLogger.adRewarded(
-                format: request.format.rawValue,
-                placement: request.adUnitId,
-                rewardType: reward.label,
-                rewardAmount: Int(reward.amount)
-            )
+            EventLogger.log("ad_rewarded", data: self.adEventPayload(
+                request: request,
+                outcome: "rewarded",
+                extras: [
+                    "reward_type": reward.label,
+                    "reward_amount": reward.amount
+                ]
+            ))
         }
     }
 
@@ -2293,11 +2331,14 @@ extension EmulatorViewController: CLXBannerDelegate, CLXInterstitialDelegate, CL
             self.bidInsightSnapshot.revenueUsd = ad.revenue?.doubleValue
             self.updateBidInsightsUI()
 
-            EventLogger.log("ad_revenue_paid", data: [
-                "placement": request.adUnitId,
-                "network": ad.networkName ?? "",
-                "revenue_usd": ad.revenue?.doubleValue ?? 0
-            ])
+            EventLogger.log("ad_revenue_paid", data: self.adEventPayload(
+                request: request,
+                outcome: "revenue_paid",
+                extras: [
+                    "network": ad.networkName ?? "",
+                    "revenue_usd": ad.revenue?.doubleValue ?? 0
+                ]
+            ))
         }
     }
 }
