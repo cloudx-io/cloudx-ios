@@ -10,6 +10,7 @@
 #import "CLXVungleRewardedFactory.h"
 #import "CLXVungleBannerFactory.h"
 #import "CLXVungleAppOpenFactory.h"
+#import "CLXVungleMetadataProvider.h"
 
 #if __has_include(<CloudXCore/CloudXCore.h>)
 #import <CloudXCore/CloudXCore.h>
@@ -32,6 +33,7 @@ __attribute__((visibility("default"))) void CloudXVungleAdapterRegister(void) {
     [CLXVungleRewardedFactory class];
     [CLXVungleBannerFactory class];
     [CLXVungleAppOpenFactory class];
+    [CLXVungleMetadataProvider class];
 
     [logger debug:@"Vungle adapter classes loaded"];
 }

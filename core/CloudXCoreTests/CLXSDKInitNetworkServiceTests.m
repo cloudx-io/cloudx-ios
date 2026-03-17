@@ -817,4 +817,21 @@
     XCTAssertEqualObjects(request.bundle, expectedBundle, @"init request should use system bundle when override is absent");
 }
 
+#pragma mark - Adapter Metadata Tests
+
+- (void)testCreateRequest_PopulatesAdaptersArray {
+    CLXSDKConfigRequest *request = [self.networkService createRequest];
+
+    XCTAssertNotNil(request.adapters, @"adapters should not be nil");
+    // In the test target no adapter frameworks are linked, so this should be empty
+}
+
+- (void)testCreateRequest_AdaptersIncludedInJson {
+    CLXSDKConfigRequest *request = [self.networkService createRequest];
+    NSDictionary *json = [request json];
+
+    XCTAssertNotNil(json[@"adapters"], @"JSON should include adapters key");
+    XCTAssertTrue([json[@"adapters"] isKindOfClass:[NSArray class]], @"adapters should be an array");
+}
+
 @end

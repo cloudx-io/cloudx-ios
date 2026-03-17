@@ -28,8 +28,7 @@
     
     for (CLXAdNetwork adapterName in CLXAllAdNetworks()) {
         NSString *className = CLXAdNetworkClassName(adapterName);
-        // Special case: Renderer uses CloudXRenderer module, not CLXRendererAdapter
-        NSString *namespace = [className isEqualToString:@"Renderer"] ? @"CloudXRenderer" : [NSString stringWithFormat:@"CLX%@Adapter", className];
+        NSString *namespace = CLXAdNetworkAdapterNamespace(adapterName);
         
         [self.logger debug:[NSString stringWithFormat:@"Looking for adapter: %@, className: %@, namespace: %@", adapterName, className, namespace]];
         

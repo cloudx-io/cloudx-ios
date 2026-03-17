@@ -9,6 +9,7 @@
 #import "CLXUnityInterstitialFactory.h"
 #import "CLXUnityRewardedFactory.h"
 #import "CLXUnityBannerFactory.h"
+#import "CLXUnityMetadataProvider.h"
 
 #if __has_include(<CloudXCore/CloudXCore.h>)
 #import <CloudXCore/CloudXCore.h>
@@ -33,6 +34,7 @@ __attribute__((visibility("default"))) void CloudXUnityAdapterRegister(void) {
     [CLXUnityInterstitialFactory class];
     [CLXUnityRewardedFactory class];
     [CLXUnityBannerFactory class];
+    [CLXUnityMetadataProvider class];
 
     [logger debug:@"Unity adapter classes loaded"];
 }

@@ -9,6 +9,7 @@
 #import "CLXMetaInterstitialFactory.h"
 #import "CLXMetaRewardedFactory.h"
 #import "CLXMetaBannerFactory.h"
+#import "CLXMetaMetadataProvider.h"
 
 #if __has_include(<CloudXCore/CloudXCore.h>)
 #import <CloudXCore/CloudXCore.h>
@@ -33,6 +34,7 @@ __attribute__((visibility("default"))) void CloudXMetaAdapterRegister(void) {
     [CLXMetaInterstitialFactory class];
     [CLXMetaRewardedFactory class];
     [CLXMetaBannerFactory class];
+    [CLXMetaMetadataProvider class];
 
     [logger debug:@"Meta adapter classes loaded"];
 }

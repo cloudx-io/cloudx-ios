@@ -13,6 +13,7 @@
 #import "CLXMintegralInterstitialFactory.h"
 #import "CLXMintegralRewardedFactory.h"
 #import "CLXMintegralBannerFactory.h"
+#import "CLXMintegralMetadataProvider.h"
 
 // Conditional import for CloudXCore header
 #if __has_include(<CloudXCore/CloudXCore.h>)
@@ -42,6 +43,7 @@ __attribute__((visibility("default"))) void CloudXMintegralAdapterRegister(void)
     [CLXMintegralInterstitialFactory class];
     [CLXMintegralRewardedFactory class];
     [CLXMintegralBannerFactory class];
+    [CLXMintegralMetadataProvider class];
     
     [registrationLogger debug:@"Mintegral adapter classes loaded successfully"];
 }

@@ -87,6 +87,14 @@
 // Database
 #import <CloudXCore/CLXSQLiteDatabase.h>
 
+// Adapter Network Mapping
+#import <CloudXCore/CLXAdNetwork.h>
+
+// Adapter Metadata
+#import <CloudXCore/CLXAdapterMetadataProvider.h>
+#import <CloudXCore/CLXAdapterMetadata.h>
+#import <CloudXCore/CLXAdapterMetadataResolver.h>
+
 // Network Services
 #import <CloudXCore/CLXBaseNetworkService.h>
 #import <CloudXCore/CLXSDKInitNetworkService.h>

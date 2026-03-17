@@ -353,6 +353,12 @@
 		CLXUAP00010000000001 /* CLXUIApplicationProxyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXUAP00020000000001 /* CLXUIApplicationProxyTests.m */; };
 		CLXUT00010000000001 /* CLXSQLiteDatabaseUnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXUT00020000000001 /* CLXSQLiteDatabaseUnitTests.m */; };
 		D7578637480434D163489DAF /* CLXAdapterLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = DB241498E65B2AA5899EB74E /* CLXAdapterLoader.m */; };
+		CLXAMPR0B00000000001 /* CLXAdapterMetadataProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = CLXAMPR0F00000000001 /* CLXAdapterMetadataProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CLXAMMD0B00000000001 /* CLXAdapterMetadata.h in Headers */ = {isa = PBXBuildFile; fileRef = CLXAMMD0F00000000001 /* CLXAdapterMetadata.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CLXAMRS0B00000000001 /* CLXAdapterMetadataResolver.h in Headers */ = {isa = PBXBuildFile; fileRef = CLXAMRS0F00000000001 /* CLXAdapterMetadataResolver.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CLXAMMD0B00000000002 /* CLXAdapterMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXAMMD0F00000000002 /* CLXAdapterMetadata.m */; };
+		CLXAMRS0B00000000002 /* CLXAdapterMetadataResolver.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXAMRS0F00000000002 /* CLXAdapterMetadataResolver.m */; };
+		CLXAMTS0B00000000001 /* CLXAdapterMetadataTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXAMTS0F00000000001 /* CLXAdapterMetadataTests.m */; };
 		CLXAR00B0000000000001 /* CLXAuctionResult.h in Headers */ = {isa = PBXBuildFile; fileRef = CLXAR00F0000000000001 /* CLXAuctionResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CLXAR00B0000000000002 /* CLXAuctionResult.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXAR00F0000000000002 /* CLXAuctionResult.m */; };
 /* End PBXBuildFile section */
@@ -713,6 +719,12 @@
 		E42754A92780774B1BFA391E /* CLXEventType.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXEventType.m; sourceTree = "<group>"; };
 		FBBA381156DD111B81ED1927 /* CLXSdkConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXSdkConfiguration.h; sourceTree = "<group>"; };
 		FD3F150B4D80A1DA1031EDEB /* CLXAdapterLoader.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXAdapterLoader.h; sourceTree = "<group>"; };
+		CLXAMPR0F00000000001 /* CLXAdapterMetadataProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAdapterMetadataProvider.h; sourceTree = "<group>"; };
+		CLXAMMD0F00000000001 /* CLXAdapterMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAdapterMetadata.h; sourceTree = "<group>"; };
+		CLXAMRS0F00000000001 /* CLXAdapterMetadataResolver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAdapterMetadataResolver.h; sourceTree = "<group>"; };
+		CLXAMMD0F00000000002 /* CLXAdapterMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterMetadata.m; sourceTree = "<group>"; };
+		CLXAMRS0F00000000002 /* CLXAdapterMetadataResolver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterMetadataResolver.m; sourceTree = "<group>"; };
+		CLXAMTS0F00000000001 /* CLXAdapterMetadataTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAdapterMetadataTests.m; sourceTree = "<group>"; };
 		CLXAR00F0000000000001 /* CLXAuctionResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXAuctionResult.h; sourceTree = "<group>"; };
 		CLXAR00F0000000000002 /* CLXAuctionResult.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXAuctionResult.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -855,6 +867,7 @@
 				CLXSESSF000000000001 /* CLXSessionNetworkServiceTests.m */,
 				CLXSESSF000000000002 /* CLXSessionTrackerTests.m */,
 				197994832E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m */,
+				CLXAMTS0F00000000001 /* CLXAdapterMetadataTests.m */,
 				1979947F2E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m */,
 				197994802E7B484C00EBA0A3 /* CLXTrackingFieldResolverBidDimensionTests.m */,
 				197993332E772E5000EBA0A3 /* CLXErrorReporterTests.m */,
@@ -909,6 +922,8 @@
 				196B5A672EE9970A00262ECF /* CLXAdapterBanner.m */,
 				FD3F150B4D80A1DA1031EDEB /* CLXAdapterLoader.h */,
 				DB241498E65B2AA5899EB74E /* CLXAdapterLoader.m */,
+				CLXAMMD0F00000000002 /* CLXAdapterMetadata.m */,
+				CLXAMRS0F00000000002 /* CLXAdapterMetadataResolver.m */,
 				CA94E9EC794FF4B15AEAC577 /* CLXAdapterPrivacySettings.m */,
 				6EF2C76484BF8D2AFCDBBD26 /* CLXAdapterPrivacyForwarder.m */,
 			);
@@ -1158,6 +1173,9 @@
 				19C724E52E2390810012CFC7 /* CLXAdapterBanner.h */,
 				19C724E62E2390810012CFC7 /* CLXAdapterBannerFactory.h */,
 				19C724E72E2390810012CFC7 /* CLXAdapterFactoryResolver.h */,
+				CLXAMPR0F00000000001 /* CLXAdapterMetadataProvider.h */,
+				CLXAMMD0F00000000001 /* CLXAdapterMetadata.h */,
+				CLXAMRS0F00000000001 /* CLXAdapterMetadataResolver.h */,
 				19C724E82E2390810012CFC7 /* CLXAdapterInterstitial.h */,
 				19C724E92E2390810012CFC7 /* CLXAdapterInterstitialFactory.h */,
 				19C724EA2E2390810012CFC7 /* CLXAdapterNative.h */,
@@ -1353,6 +1371,9 @@
 				19C725632E2390810012CFC7 /* CLXBidderConfig.h in Headers */,
 				19C725662E2390810012CFC7 /* CLXBidAdSource.h in Headers */,
 				19C725682E2390810012CFC7 /* CLXAdapterFactoryResolver.h in Headers */,
+				CLXAMPR0B00000000001 /* CLXAdapterMetadataProvider.h in Headers */,
+				CLXAMMD0B00000000001 /* CLXAdapterMetadata.h in Headers */,
+				CLXAMRS0B00000000001 /* CLXAdapterMetadataResolver.h in Headers */,
 				19C725692E2390810012CFC7 /* UIDevice+CLXIdentifier.h in Headers */,
 				19C7256A2E2390810012CFC7 /* CLXDestroyable.h in Headers */,
 				19C7256C2E2390810012CFC7 /* CLXSystemInformation.h in Headers */,
@@ -1652,6 +1673,8 @@
 				19D927B92E62314500C84DAE /* CLXSettings.m in Sources */,
 				19C725C82E2390810012CFC7 /* CLXSDKConfigBidder.m in Sources */,
 				19C725C92E2390810012CFC7 /* CLXAdapterFactoryResolver.m in Sources */,
+				CLXAMMD0B00000000002 /* CLXAdapterMetadata.m in Sources */,
+				CLXAMRS0B00000000002 /* CLXAdapterMetadataResolver.m in Sources */,
 				19C725CA2E2390810012CFC7 /* CLXSDKInitNetworkService.m in Sources */,
 				19EC254A2EACB45F005C8EF6 /* CLXVersion.m in Sources */,
 				19C725CC2E2390810012CFC7 /* CLXNativeAdView.m in Sources */,
@@ -1719,6 +1742,7 @@
 				194BC0C12EF3F6520008DB33 /* CLXBidLifecycleEventTests.m in Sources */,
 				19D92C392E6A3B8E00C84DAE /* CLXPublisherBannerBasicTests.m in Sources */,
 				197994842E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m in Sources */,
+				CLXAMTS0B00000000001 /* CLXAdapterMetadataTests.m in Sources */,
 				1916B32C2E8314C800E49E3E /* CLXAppKeyAppIDDistinctionTests.m in Sources */,
 				19D92C3E2E6A3B8E00C84DAE /* CLXRevenueCallbackEdgeCaseTests.m in Sources */,
 				19D929012E6403E000C84DAE /* CLXPrivacyServiceTests.m in Sources */,

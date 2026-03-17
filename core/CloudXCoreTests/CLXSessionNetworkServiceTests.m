@@ -22,7 +22,8 @@ static NSString * const kTestEndpointURL = @"https://session.cloudx.io/session";
     [super setUp];
     _mockURLSession = [[MockURLSession alloc] init];
     _baseNetworkService = [[CLXBaseNetworkService alloc] initWithBaseURL:kTestEndpointURL
-                                                             urlSession:_mockURLSession];
+                                                             urlSession:_mockURLSession
+                                                              scheduler:[[CLXSynchronousScheduler alloc] init]];
     _subject = [[CLXSessionNetworkService alloc] initWithBaseNetworkService:_baseNetworkService];
 }
 
@@ -128,7 +129,6 @@ static NSString * const kTestEndpointURL = @"https://session.cloudx.io/session";
     [_mockURLSession enqueueError:networkError];
 
     // When
-    XCTestExpectation *expectation = [self expectationWithDescription:@"completion called"];
     __block BOOL completionSuccess = YES;
     __block NSError *completionError = nil;
     [_subject sendWithAppKey:kTestAppKey
@@ -136,11 +136,9 @@ static NSString * const kTestEndpointURL = @"https://session.cloudx.io/session";
                   completion:^(BOOL success, NSError * _Nullable error) {
         completionSuccess = success;
         completionError = error;
-        [expectation fulfill];
     }];
 
-    // Then: wait for retry delay + completion
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    // Then
     XCTAssertFalse(completionSuccess, @"Should fail on network error");
     XCTAssertNotNil(completionError, @"Should pass error to completion");
 }
@@ -163,17 +161,14 @@ static NSString * const kTestEndpointURL = @"https://session.cloudx.io/session";
     [_mockURLSession enqueueResponseWithStatusCode:200 data:successData];
 
     // When
-    XCTestExpectation *expectation = [self expectationWithDescription:@"retry completion"];
     __block BOOL completionSuccess = NO;
     [_subject sendWithAppKey:kTestAppKey
                      payload:[self samplePayload]
                   completion:^(BOOL success, NSError * _Nullable error) {
         completionSuccess = success;
-        [expectation fulfill];
     }];
 
-    // Then: wait for retry delay + completion
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    // Then
     XCTAssertEqual(_mockURLSession.callCount, 2, @"Should retry once after failure");
     XCTAssertTrue(completionSuccess, @"Should succeed on retry");
 }

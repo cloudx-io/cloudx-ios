@@ -1,4 +1,5 @@
 #import <CloudXCore/CLXSDKConfigRequest.h>
+#import <CloudXCore/CLXAdapterMetadata.h>
 
 @implementation CLXSDKConfigRequestFormat
 
@@ -66,6 +67,12 @@
     json[@"imp"] = impArray;
     json[@"id"] = self.id ?: @"";
     json[@"urlParams"] = self.urlParams ?: @{};
+
+    NSMutableArray *adaptersArray = [NSMutableArray array];
+    for (CLXAdapterMetadata *adapter in self.adapters) {
+        [adaptersArray addObject:[adapter json]];
+    }
+    json[@"adapters"] = adaptersArray;
     
     return json;
 }
