@@ -16,26 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.2.2] - 2026-03-16
 
 ### Added
-- **Manual Privacy API** — `setHasUserConsent:` and `setDoNotSell:` for publisher-controlled privacy consent
-- **Click Notifications** — SDK now sends click notifications to server
-- **Session Init Event** — SDK sends session initialization event after SDK initialization
-- **Adapter Metadata in Config** — Adapter metadata included in config/init requests
-- **Non-Bid Error Reporting** — Actionable no-bid error diagnostics via seatNonBid parsing
-- **Per-Metric Config Gating** — Individual metric types can be gated via server config
-- **Unity Ads Adapter** — New adapter for Unity Ads with interstitial, rewarded, and banner support
-- **Mintegral Adapter** — Mintegral adapter promoted to standard release flow
+- **Manual Privacy API** — New `setHasUserConsent:` and `setDoNotSell:` methods for publisher-controlled privacy consent
+- **Mintegral Adapter** — Mintegral adapter now available as a standard release
 
 ### Fixed
-- **Banner Error Propagation** — Preserve server diagnostic messages in banner error callbacks
-- **Fullscreen Silent Load Failure** — Fix silent load failure when fullscreen ad is in SHOWING state
-- **Fullscreen Failure Callbacks** — Fix nil adUnitId in fullscreen ad failure callbacks
-- **Mintegral Deployment Target** — Aligned Mintegral adapter deployment target to iOS 13.0
-- **Mintegral Adapter Hardening** — Fixed privacy handling, init retry, and removed unnecessary dispatch wrapping
-- **Renderer Impression Tracking** — Fixed viewability bugs in CloudX Renderer
+- **Improved Error Visibility** — Increased error visibility for no-bid scenarios, making it easier to diagnose fill rate issues
+- **Fullscreen Ad Loading** — Fixed an issue where loading a fullscreen ad while another was showing could silently fail
+- **Fullscreen Failure Callbacks** — Fixed missing ad unit ID in fullscreen ad failure callbacks
+- **Renderer Impression Tracking** — Fixed viewability tracking accuracy in CloudX Renderer
 
 ### Changed
-- **Geo Service Refactor** — Refactored geo service architecture for cross-platform alignment
-- **ILRD Enhancements** — Added auction correlation and SDK identity to ILRD tracking
 - **Mintegral SDK** — Upgraded from 8.0.7 to 8.0.8
 
 ---
