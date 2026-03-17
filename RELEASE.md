@@ -392,33 +392,22 @@ gh release create vX.Y.Z-unity --title "CloudXUnityAdapter X.Y.Z" adapter-unity/
 #### Step 2: Tag PRIVATE Repo Main and Create dSYM Release
 
 **Note:** No PR to merge for the private repo -- changes were committed directly to main in Phase 1.
+All components share the same version, so the private repo uses a **single tag and single release** per version.
+
+**⚠️ CRITICAL: dSYMs must stay in the PRIVATE repo - never upload to public repo!**
 
 ```bash
 cd cloudx-ios-private
 git checkout main
 git pull origin main
 
-git tag vX.Y.Z-core
-git tag vX.Y.Z-meta
-git tag vX.Y.Z-vungle
-git tag vX.Y.Z-inmobi
-git tag vX.Y.Z-renderer
-git tag vX.Y.Z-mintegral
-git tag vX.Y.Z-unity
-git push origin vX.Y.Z-core vX.Y.Z-meta vX.Y.Z-vungle vX.Y.Z-inmobi vX.Y.Z-renderer vX.Y.Z-mintegral vX.Y.Z-unity
-```
+git tag vX.Y.Z
+git push origin vX.Y.Z
 
-#### Step 3: Upload dSYMs to PRIVATE Release (CloudXCore Only)
-
-**⚠️ CRITICAL: dSYMs must stay in the PRIVATE repo - never upload to public repo!**
-
-```bash
-cd cloudx-ios-private
-
-# Create private release with dSYMs for crash symbolication
-gh release create vX.Y.Z-core \
-  --title "CloudXCore X.Y.Z dSYMs (INTERNAL)" \
-  --notes "## CloudXCore v X.Y.Z dSYMs
+# Create a single private release with dSYMs for crash symbolication
+gh release create vX.Y.Z \
+  --title "CloudX iOS SDK X.Y.Z (INTERNAL — dSYMs)" \
+  --notes "## CloudX iOS SDK vX.Y.Z — dSYMs
 
 ⚠️ **CONFIDENTIAL**: These dSYMs are for internal crash symbolication only.
 Never share these files outside the CloudX organization.
@@ -435,7 +424,7 @@ https://github.com/cloudx-io/cloudx-ios/releases/tag/vX.Y.Z-core" \
 
 **Verification:** Confirm dSYMs are only in the private repo:
 - ✅ `cloudx-ios-private` release has `CloudXCore-dSYMs.zip`
-- ✅ `cloudx-ios` release has ONLY `CloudXCore.xcframework.zip` (no dSYMs!)
+- ✅ `cloudx-ios` releases have ONLY xcframework zips (no dSYMs!)
 
 ---
 
@@ -1016,7 +1005,7 @@ ls -la build/dSYMs/  # Should contain .dSYM folders
 **Symbolicating a crash report:**
 ```bash
 # Download dSYMs from private release
-gh release download vX.Y.Z-core --repo cloudx-io/cloudx-ios-private --pattern "*dSYMs*"
+gh release download vX.Y.Z --repo cloudx-io/cloudx-ios-private --pattern "*dSYMs*"
 unzip CloudXCore-dSYMs.zip
 
 # Symbolicate using atos
