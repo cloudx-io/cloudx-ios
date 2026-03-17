@@ -35,9 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Additional configuration keys
 #define kCLXCoreBundleConfigKey @"CLXCore_bundle_config"
-#define kCLXCoreGeoHeadersKey @"CLXCore_geoHeaders"
-#define kCLXCoreProcessedGeoDataKey @"CLXCore_processedGeoData"
-#define kCLXCoreRawGeoHeadersKey @"CLXCore_rawGeoHeaders"
 #define kCLXCoreIFAConfigKey @"CLXCore_ifa_config"
 #define kCLXCoreAIPromptKey @"CLXCore_aiPrompt"
 
@@ -68,9 +65,6 @@ NS_ASSUME_NONNULL_BEGIN
 #define kCLXCoreDeviceKey @"CLXCore_device"
 #define kCLXCoreDntKey @"CLXCore_dnt"
 #define kCLXCoreUserAgentValueKey @"CLXCore_userAgent"
-
-// Additional configuration keys
-#define kCLXCoreIfaConfigKey @"CLXCore_ifa_config"
 
 // Privacy service keys
 // IAB standard keys for CMP compatibility (GDPR TCF, CCPA/US Privacy)

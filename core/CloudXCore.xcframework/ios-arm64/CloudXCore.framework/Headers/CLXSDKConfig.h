@@ -86,6 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *winLossNotificationURL;
 @property (nonatomic, copy) NSString *geoDataEndpointURL;
 @property (nonatomic, copy, nullable) NSString *ilrdEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sessionEndpointURL;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 3. Core Config (required)

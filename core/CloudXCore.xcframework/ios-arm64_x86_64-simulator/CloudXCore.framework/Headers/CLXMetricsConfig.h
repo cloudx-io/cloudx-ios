@@ -25,6 +25,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) CLXMetricsConfigNetworkSubConfig *bidReq;
 @property (nonatomic, strong) CLXMetricsConfigNetworkSubConfig *sdkInitRequest; // renamed from initSdkReq
 @property (nonatomic, strong) CLXMetricsConfigNetworkSubConfig *geoReq;
+@property (nonatomic, strong) CLXMetricsConfigNetworkSubConfig *adapterInit;
+@property (nonatomic, strong) CLXMetricsConfigNetworkSubConfig *adapterLoad;
+@property (nonatomic, strong) CLXMetricsConfigNetworkSubConfig *adapterError;
+@property (nonatomic, strong) CLXMetricsConfigNetworkSubConfig *timeToFirstAd;
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;
 
@@ -55,6 +59,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isBidRequestNetworkCallsEnabled;
 - (BOOL)isSdkInitNetworkCallsEnabled;
 - (BOOL)isGeoNetworkCallsEnabled;
+- (BOOL)isAdapterInitNetworkCallsEnabled;
+- (BOOL)isAdapterLoadNetworkCallsEnabled;
+- (BOOL)isAdapterErrorNetworkCallsEnabled;
+- (BOOL)isTimeToFirstAdNetworkCallsEnabled;
 
 @end
 

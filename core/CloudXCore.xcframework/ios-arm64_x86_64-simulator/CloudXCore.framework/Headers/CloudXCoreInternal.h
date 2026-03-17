@@ -46,6 +46,9 @@
 #import <CloudXCore/CLXAuctionBidManager.h>
 #import <CloudXCore/CLXBidLifecycleEvent.h>
 
+// Auction Results
+#import <CloudXCore/CLXAuctionResult.h>
+
 // ILRD (Impression Level Revenue Data)
 #import <CloudXCore/CLXIlrdProvider.h>
 #import <CloudXCore/CLXAlIlrd.h>
@@ -61,6 +64,8 @@
 #import <CloudXCore/CLXWinLossNetworkService.h>
 #import <CloudXCore/CLXWinLossFieldResolver.h>
 #import <CloudXCore/CLXAdReportingNetworkService.h>
+#import <CloudXCore/CLXSessionTracker.h>
+#import <CloudXCore/CLXSessionNetworkService.h>
 
 // Metrics & Events
 #import <CloudXCore/CLXMetricsTrackerImpl.h>
@@ -82,12 +87,23 @@
 // Database
 #import <CloudXCore/CLXSQLiteDatabase.h>
 
+// Adapter Network Mapping
+#import <CloudXCore/CLXAdNetwork.h>
+
+// Adapter Metadata
+#import <CloudXCore/CLXAdapterMetadataProvider.h>
+#import <CloudXCore/CLXAdapterMetadata.h>
+#import <CloudXCore/CLXAdapterMetadataResolver.h>
+
 // Network Services
 #import <CloudXCore/CLXBaseNetworkService.h>
 #import <CloudXCore/CLXSDKInitNetworkService.h>
 #import <CloudXCore/CLXURLProvider.h>
 #import <CloudXCore/CLXReachabilityService.h>
 #import <CloudXCore/CLXGeoLocationService.h>
+#import <CloudXCore/CLXGeoApi.h>
+#import <CloudXCore/CLXGeoService.h>
+#import <CloudXCore/CLXGeoInfo.h>
 #import <CloudXCore/CLXSKAdNetworkService.h>
 
 // State & Storage

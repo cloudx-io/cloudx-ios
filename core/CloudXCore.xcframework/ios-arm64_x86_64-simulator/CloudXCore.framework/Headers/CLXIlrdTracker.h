@@ -10,35 +10,24 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol CLXIlrdNetworkServiceProtocol;
 
 /**
- * Coordinates ILRD event collection and sending.
- * Subscribes to an IlrdService for events and forwards them
- * to the backend via the network service on a serial background queue.
+ * Collects ILRD impression events from CLXIlrdService, enriches them with SDK identity
+ * and CX auction data, then sends them to the backend via CLXIlrdNetworkService.
+ *
+ * Observes CLXAuctionResultNotification to track no-fill auctions per ad format.
+ * When an ILRD impression arrives for a format that had a no-fill, the event is
+ * enriched with cxAuctionId and cxAdUnitId (one-shot, then consumed).
  */
 @interface CLXIlrdTracker : NSObject
 
-/**
- * Full initializer with injectable network service (for testing).
- */
 - (instancetype)initWithAppKey:(NSString *)appKey
+                     accountId:(NSString *)accountId
+                     sessionId:(NSString *)sessionId
+                    sdkVersion:(NSString *)sdkVersion
                    endpointUrl:(NSString *)endpointUrl
                    ilrdService:(CLXIlrdService *)ilrdService
                 networkService:(id<CLXIlrdNetworkServiceProtocol>)networkService;
 
-/**
- * Convenience initializer that creates a default network service.
- */
-- (instancetype)initWithAppKey:(NSString *)appKey
-                   endpointUrl:(NSString *)endpointUrl
-                   ilrdService:(CLXIlrdService *)ilrdService;
-
-/**
- * Start listening for ILRD events and sending them to the backend.
- */
 - (void)start;
-
-/**
- * Stop listening and clean up.
- */
 - (void)stop;
 
 - (instancetype)init NS_UNAVAILABLE;

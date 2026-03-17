@@ -12,8 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 // Use CLXWinLossNetworkService for server-side win/loss tracking instead
 - (void)rillTrackingWithActionString:(NSString *)urlString campaignId:(NSString *)campaignId encodedString:(NSString *)encodedString error:(NSError **)error;
 - (void)metricsTrackingWithActionString:(NSString *)actionString error:(NSError **)error;
-- (void)geoHeadersWithURLString:(NSString *)fullURL
-                         extras:(NSDictionary<NSString *, NSString *> *)extras;
 
 @end
 
