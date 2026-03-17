@@ -1,48 +1,94 @@
 PODS:
-  - CloudXCore (2.2.0-beta)
-  - CloudXInMobiAdapter (2.2.0-beta):
-    - CloudXCore (= 2.2.0-beta)
+  - CloudXCore (2.2.2)
+  - CloudXInMobiAdapter (2.2.2):
+    - CloudXCore (= 2.2.2)
     - InMobiSDK (~> 11.1)
-  - CloudXMetaAdapter (2.2.0-beta):
-    - CloudXCore (= 2.2.0-beta)
+  - CloudXMetaAdapter (2.2.2):
+    - CloudXCore (= 2.2.2)
     - FBAudienceNetwork (~> 6.21.0)
-  - CloudXRenderer (2.2.0-beta):
-    - CloudXCore (= 2.2.0-beta)
-  - CloudXVungleAdapter (2.2.0-beta):
-    - CloudXCore (= 2.2.0-beta)
+  - CloudXMintegralAdapter (2.2.2):
+    - CloudXCore (= 2.2.2)
+    - MintegralAdSDK (~> 8.0)
+    - MintegralAdSDK/BidBannerAd (~> 8.0)
+    - MintegralAdSDK/BidNewInterstitialAd (~> 8.0)
+    - MintegralAdSDK/BidRewardVideoAd (~> 8.0)
+  - CloudXRenderer (2.2.2):
+    - CloudXCore (= 2.2.2)
+  - CloudXVungleAdapter (2.2.2):
+    - CloudXCore (= 2.2.2)
     - VungleAds (~> 7.6.0)
   - FBAudienceNetwork (6.21.1)
   - InMobiSDK (11.1.1)
+  - MintegralAdSDK (8.0.8):
+    - MintegralAdSDK/BannerAd (= 8.0.8)
+    - MintegralAdSDK/BidBannerAd (= 8.0.8)
+    - MintegralAdSDK/BidInterstitialVideoAd (= 8.0.8)
+    - MintegralAdSDK/BidNativeAd (= 8.0.8)
+    - MintegralAdSDK/BidNewInterstitialAd (= 8.0.8)
+    - MintegralAdSDK/BidRewardVideoAd (= 8.0.8)
+    - MintegralAdSDK/InterstitialVideoAd (= 8.0.8)
+    - MintegralAdSDK/NativeAd (= 8.0.8)
+    - MintegralAdSDK/NewInterstitialAd (= 8.0.8)
+    - MintegralAdSDK/RewardVideoAd (= 8.0.8)
+  - MintegralAdSDK/BannerAd (8.0.8):
+    - MintegralAdSDK/NativeAd
+  - MintegralAdSDK/BidBannerAd (8.0.8):
+    - MintegralAdSDK/BannerAd
+    - MintegralAdSDK/BidNativeAd
+  - MintegralAdSDK/BidInterstitialVideoAd (8.0.8):
+    - MintegralAdSDK/BidNativeAd
+    - MintegralAdSDK/InterstitialVideoAd
+  - MintegralAdSDK/BidNativeAd (8.0.8):
+    - MintegralAdSDK/NativeAd
+  - MintegralAdSDK/BidNewInterstitialAd (8.0.8):
+    - MintegralAdSDK/BidNativeAd
+    - MintegralAdSDK/NewInterstitialAd
+  - MintegralAdSDK/BidRewardVideoAd (8.0.8):
+    - MintegralAdSDK/BidNativeAd
+    - MintegralAdSDK/RewardVideoAd
+  - MintegralAdSDK/InterstitialVideoAd (8.0.8):
+    - MintegralAdSDK/NativeAd
+  - MintegralAdSDK/NativeAd (8.0.8)
+  - MintegralAdSDK/NewInterstitialAd (8.0.8):
+    - MintegralAdSDK/InterstitialVideoAd
+    - MintegralAdSDK/NativeAd
+  - MintegralAdSDK/RewardVideoAd (8.0.8):
+    - MintegralAdSDK/NativeAd
   - VungleAds (7.6.3)
 
 DEPENDENCIES:
-  - CloudXCore (= 2.2.0-beta)
-  - CloudXInMobiAdapter (= 2.2.0-beta)
-  - CloudXMetaAdapter (= 2.2.0-beta)
-  - CloudXRenderer (= 2.2.0-beta)
-  - CloudXVungleAdapter (= 2.2.0-beta)
+  - CloudXCore (~> 2.2.2)
+  - CloudXInMobiAdapter (~> 2.2.2)
+  - CloudXMetaAdapter (~> 2.2.2)
+  - CloudXMintegralAdapter (~> 2.2.2)
+  - CloudXRenderer (~> 2.2.2)
+  - CloudXVungleAdapter (~> 2.2.2)
 
 SPEC REPOS:
   trunk:
     - CloudXCore
     - CloudXInMobiAdapter
     - CloudXMetaAdapter
+    - CloudXMintegralAdapter
     - CloudXRenderer
     - CloudXVungleAdapter
     - FBAudienceNetwork
     - InMobiSDK
+    - MintegralAdSDK
     - VungleAds
 
 SPEC CHECKSUMS:
-  CloudXCore: 4bbcbbd7af2f879cfcf401d53e81593915860c3c
-  CloudXInMobiAdapter: 33093398a4dda64057f36d6eb5f14b1c97a68958
-  CloudXMetaAdapter: 6613aefcddc0896d06ce18496cdcca1a624948e4
-  CloudXRenderer: 64d4fe1c5669df2f628e7a4f4bf6d32e96326279
-  CloudXVungleAdapter: b6d5a7777f79f0169d0f223f72ddc40e95156d06
+  CloudXCore: 899911f3fd05bf96238981573c6f2088bdc05ed6
+  CloudXInMobiAdapter: 387ef528ec78b00c41bea21352c80a9a3990fb2b
+  CloudXMetaAdapter: 03392e622b99265ac5d166d0f3133a549cd70aa0
+  CloudXMintegralAdapter: 7888cd4d8c20934fed8352ab9898f21ade0fd88d
+  CloudXRenderer: e7325be066364ffac787ccb8fc0c6a878f784363
+  CloudXVungleAdapter: fe7175e70efddcb30d87206fa055309ce30cb284
   FBAudienceNetwork: 85d18a65c9e35bc426bd4664cf3ae2a1172d7b60
   InMobiSDK: 4642fb34a961980ab94a1ac460c6e16e113498e6
+  MintegralAdSDK: f02fdbab6494030b4fe4b01d8bbf654263834a20
   VungleAds: 40e87d1eaba17ac818b0f94461fd8ed21ad768dc
 
-PODFILE CHECKSUM: 2a9f2c9cafe8c65b165d538989e8e8a33c64569f
+PODFILE CHECKSUM: fe95636180be65ae07167d2791627a4d7dd11561
 
 COCOAPODS: 1.16.2
