@@ -106,10 +106,10 @@ sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-unity/CloudXUnityAdap
 # Also update moloco if releasing:
 # sed -i '' "s/s\.version.*=.*/s.version = 'X.Y.Z'/" adapter-moloco/CloudXMolocoAdapter.podspec
 
-# 4. Update ALL CHANGELOGs with release notes:
-#    - cloudx-ios-private/CHANGELOG.md (internal)
-#    - cloudx-ios/CHANGELOG.md (public - copy from internal after Phase 2)
-#    - docs/ios/changelog.mdx (public docs - add version entry)
+# 4. Update CHANGELOGs (see "CHANGELOGs" section for public vs private guidance):
+#    - cloudx-ios-private/CHANGELOG.md (internal — full technical detail, PR numbers)
+#    - cloudx-ios/CHANGELOG.md (public — user-facing changes only)
+#    - docs: updated separately in Phase 2b
 
 # 5. Build xcframeworks
 cd core && ./build-xcframework.sh X.Y.Z && cd ..
@@ -183,6 +183,30 @@ git push origin release-X.Y.Z
 # 8. Create PR to main
 gh pr create --base main --head release-X.Y.Z --title "Release X.Y.Z"
 ```
+
+### Phase 2b: Update Docs Repo
+
+```bash
+cd docs
+git checkout main
+git pull origin main
+git checkout -b release-ios-X.Y.Z
+```
+
+**1. Changelog (en + zh):** Add a version entry to `en/ios/changelog.mdx` and `zh/ios/changelog.mdx`. Include **only user-facing changes** — see the "CHANGELOGs" section for guidance.
+
+**2. Adapter pages (if a new adapter is being released):** Create `en/ios/adapters/<adapter>.mdx` and `zh/ios/adapters/<adapter>.mdx`. Mirror the structure of existing adapter pages (e.g., `meta.mdx`): title/description frontmatter, Requirements, Installation (CocoaPods + Manual), Info.plist (SKAdNetwork IDs, ATT), Project Configuration, Support. Add the new page to both language sections in `docs.json` under the Adapters group.
+
+**3. Integration page (if the Podfile example needs updating):** Add the new adapter pod to the CocoaPods example in `en/ios/integration.mdx` and `zh/ios/integration.mdx`, matching the existing comment style (`# Network SDK X.Y.Z`). Only touch the integration page when the Podfile example or API surface changes — keep edits minimal and match the existing format exactly.
+
+```bash
+git add -A
+git commit -m "Add docs for iOS X.Y.Z release"
+git push origin release-ios-X.Y.Z
+gh pr create --base main --head release-ios-X.Y.Z --title "iOS X.Y.Z docs"
+```
+
+---
 
 ### Phase 3: Test Demo Apps (CRITICAL - DO BEFORE MERGING)
 
