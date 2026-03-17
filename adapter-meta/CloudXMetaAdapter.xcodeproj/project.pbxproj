@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1916B6A42E872DC000E49E3E /* CLXMetaAdapterVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B6A22E872DC000E49E3E /* CLXMetaAdapterVersion.h */; };
-		1916B6A52E872DC000E49E3E /* CLXMetaAdapterVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B6A32E872DC000E49E3E /* CLXMetaAdapterVersion.m */; };
 		1916B6942E872D9A00E49E3E /* CLXMetaErrorHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B6922E872D9A00E49E3E /* CLXMetaErrorHandler.m */; };
 		1916B6952E872D9A00E49E3E /* CLXMetaErrorHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B6912E872D9A00E49E3E /* CLXMetaErrorHandler.h */; };
-		1916B6F32E87343F00E49E3E /* CLXMetaBidTokenSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B68F2E872D6100E49E3E /* CLXMetaBidTokenSource.m */; };
-		1916B6F42E87344600E49E3E /* CLXMetaBidTokenSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B68E2E872D6100E49E3E /* CLXMetaBidTokenSource.h */; };
 		1916B6A02E872DB000E49E3E /* CLXMetaUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B69E2E872DB000E49E3E /* CLXMetaUtils.m */; };
 		1916B6A12E872DB000E49E3E /* CLXMetaUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B69D2E872DB000E49E3E /* CLXMetaUtils.h */; };
+		1916B6A42E872DC000E49E3E /* CLXMetaAdapterVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B6A22E872DC000E49E3E /* CLXMetaAdapterVersion.h */; };
+		1916B6A52E872DC000E49E3E /* CLXMetaAdapterVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B6A32E872DC000E49E3E /* CLXMetaAdapterVersion.m */; };
+		1916B6F32E87343F00E49E3E /* CLXMetaBidTokenSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 1916B68F2E872D6100E49E3E /* CLXMetaBidTokenSource.m */; };
+		1916B6F42E87344600E49E3E /* CLXMetaBidTokenSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B68E2E872D6100E49E3E /* CLXMetaBidTokenSource.h */; };
 		1973D7602E28ED7900DCCF08 /* CLXMetaInitializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7492E28ED7900DCCF08 /* CLXMetaInitializer.h */; };
 		1973D7622E28ED7900DCCF08 /* CLXMetaBannerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7452E28ED7900DCCF08 /* CLXMetaBannerFactory.h */; };
 		1973D7632E28ED7900DCCF08 /* CLXMetaRewardedFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 1973D7582E28ED7900DCCF08 /* CLXMetaRewardedFactory.h */; };
@@ -33,6 +33,8 @@
 		7939568B33E2BE7927F56011 /* Pods_CloudXMetaAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30F449A87DD41E124E5E79E9 /* Pods_CloudXMetaAdapter.framework */; };
 		948510983B3BC2DC83481F66 /* Pods_CloudXMetaAdapter_CloudXMetaAdapterTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3B8390555932722B534EB02 /* Pods_CloudXMetaAdapter_CloudXMetaAdapterTests.framework */; };
 		C03E43D92C7F36DF001AB933 /* CloudXMetaAdapter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C03E43CE2C7F36DF001AB933 /* CloudXMetaAdapter.framework */; };
+		C0AEAE9EA990181C6C4B1C39 /* CLXMetaMetadataProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 46E47088EE99D15643DE305D /* CLXMetaMetadataProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ED632C2410F9C97C4788D08C /* CLXMetaMetadataProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE1E09D88CB15E070D2891A /* CLXMetaMetadataProvider.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,14 +49,14 @@
 
 /* Begin PBXFileReference section */
 		12652B13D1A6D05E518EB07B /* Pods-CloudXMetaAdapter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXMetaAdapter.debug.xcconfig"; path = "Target Support Files/Pods-CloudXMetaAdapter/Pods-CloudXMetaAdapter.debug.xcconfig"; sourceTree = "<group>"; };
-		1916B6A22E872DC000E49E3E /* CLXMetaAdapterVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaAdapterVersion.h; sourceTree = "<group>"; };
-		1916B6A32E872DC000E49E3E /* CLXMetaAdapterVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaAdapterVersion.m; sourceTree = "<group>"; };
 		1916B68E2E872D6100E49E3E /* CLXMetaBidTokenSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaBidTokenSource.h; sourceTree = "<group>"; };
 		1916B68F2E872D6100E49E3E /* CLXMetaBidTokenSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaBidTokenSource.m; sourceTree = "<group>"; };
 		1916B6912E872D9A00E49E3E /* CLXMetaErrorHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaErrorHandler.h; sourceTree = "<group>"; };
 		1916B6922E872D9A00E49E3E /* CLXMetaErrorHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaErrorHandler.m; sourceTree = "<group>"; };
 		1916B69D2E872DB000E49E3E /* CLXMetaUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaUtils.h; sourceTree = "<group>"; };
 		1916B69E2E872DB000E49E3E /* CLXMetaUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaUtils.m; sourceTree = "<group>"; };
+		1916B6A22E872DC000E49E3E /* CLXMetaAdapterVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaAdapterVersion.h; sourceTree = "<group>"; };
+		1916B6A32E872DC000E49E3E /* CLXMetaAdapterVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaAdapterVersion.m; sourceTree = "<group>"; };
 		1973D7432E28ED7900DCCF08 /* CLXMetaBanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaBanner.h; sourceTree = "<group>"; };
 		1973D7442E28ED7900DCCF08 /* CLXMetaBanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXMetaBanner.m; sourceTree = "<group>"; };
 		1973D7452E28ED7900DCCF08 /* CLXMetaBannerFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXMetaBannerFactory.h; sourceTree = "<group>"; };
@@ -72,7 +74,9 @@
 		1973D75B2E28ED7900DCCF08 /* CloudXMetaAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CloudXMetaAdapter.h; sourceTree = "<group>"; };
 		1973D75C2E28ED7900DCCF08 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1973D75D2E28ED7900DCCF08 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
+		1BE1E09D88CB15E070D2891A /* CLXMetaMetadataProvider.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXMetaMetadataProvider.m; sourceTree = "<group>"; };
 		30F449A87DD41E124E5E79E9 /* Pods_CloudXMetaAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXMetaAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		46E47088EE99D15643DE305D /* CLXMetaMetadataProvider.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXMetaMetadataProvider.h; sourceTree = "<group>"; };
 		76B9EF8DFC96391110464EB3 /* Pods-CloudXMetaAdapter-CloudXMetaAdapterTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXMetaAdapter-CloudXMetaAdapterTests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests/Pods-CloudXMetaAdapter-CloudXMetaAdapterTests.debug.xcconfig"; sourceTree = "<group>"; };
 		84133EA9A08333E7971E8340 /* Pods-CloudXMetaAdapter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXMetaAdapter.release.xcconfig"; path = "Target Support Files/Pods-CloudXMetaAdapter/Pods-CloudXMetaAdapter.release.xcconfig"; sourceTree = "<group>"; };
 		B3B8390555932722B534EB02 /* Pods_CloudXMetaAdapter_CloudXMetaAdapterTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXMetaAdapter_CloudXMetaAdapterTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -181,6 +185,8 @@
 				1973D75B2E28ED7900DCCF08 /* CloudXMetaAdapter.h */,
 				1973D75C2E28ED7900DCCF08 /* Info.plist */,
 				1973D75D2E28ED7900DCCF08 /* module.modulemap */,
+				46E47088EE99D15643DE305D /* CLXMetaMetadataProvider.h */,
+				1BE1E09D88CB15E070D2891A /* CLXMetaMetadataProvider.m */,
 			);
 			path = CloudXMetaAdapter;
 			sourceTree = "<group>";
@@ -256,6 +262,7 @@
 				1973D7692E28ED7900DCCF08 /* CloudXMetaAdapter.h in Headers */,
 				1916B6952E872D9A00E49E3E /* CLXMetaErrorHandler.h in Headers */,
 				1916B6A12E872DB000E49E3E /* CLXMetaUtils.h in Headers */,
+				C0AEAE9EA990181C6C4B1C39 /* CLXMetaMetadataProvider.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -471,6 +478,7 @@
 				1973D7702E28ED7900DCCF08 /* CLXMetaBanner.m in Sources */,
 				1973D7712E28ED7900DCCF08 /* CLXMetaInterstitialFactory.m in Sources */,
 				1973D7722E28ED7900DCCF08 /* CLXMetaRewardedFactory.m in Sources */,
+				ED632C2410F9C97C4788D08C /* CLXMetaMetadataProvider.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
