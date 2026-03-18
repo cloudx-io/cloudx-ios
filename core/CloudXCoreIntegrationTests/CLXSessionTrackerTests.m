@@ -4,12 +4,12 @@
  * CLXSessionTrackerTests (Integration)
  *
  * Lives in the integration test target because the production code
- * dispatches to a background queue, and the original tests used
- * dispatch_after with hardcoded delays to race against it. Under
- * parallel test execution this causes flaky timeouts.
+ * dispatches to a background queue via dispatch_async and accesses
+ * CLXSystemInformation singleton, which causes flaky failures under
+ * parallel unit test execution.
  *
- * Deterministic unit tests for payload construction live in
- * CloudXCoreTests/CLXSessionTrackerTests.m.
+ * Uses the mock's onSendCalled callback to fulfill expectations
+ * deterministically instead of dispatch_after timing.
  */
 
 #import <XCTest/XCTest.h>
@@ -40,10 +40,10 @@ static NSString * const kTestAccountID = @"CLDX2_dc";
     [super tearDown];
 }
 
-#pragma mark - Test Helpers
+#pragma mark - Helpers
 
-- (CLXSDKConfigResponse *)configWithSessionID:(NSString *)sessionID
-                                    accountID:(NSString *)accountID
+- (CLXSDKConfigResponse *)configWithSessionID:(nullable NSString *)sessionID
+                                    accountID:(nullable NSString *)accountID
                                  deviceConfig:(nullable CLXSDKConfigDeviceConfig *)deviceConfig {
     CLXSDKConfigResponse *config = [[CLXSDKConfigResponse alloc] init];
     config.sessionID = sessionID;
@@ -57,107 +57,60 @@ static NSString * const kTestAccountID = @"CLDX2_dc";
     return [self configWithSessionID:kTestSessionID accountID:kTestAccountID deviceConfig:nil];
 }
 
+- (void)sendInitEventAndWaitWithConfig:(CLXSDKConfigResponse *)config {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"mock received send"];
+    _mockNetworkService.onSendCalled = ^{
+        [expectation fulfill];
+    };
+
+    [_subject sendInitEventWithAppKey:kTestAppKey config:config];
+
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+}
+
 #pragma mark - Init Event Sending
 
 - (void)testSendInitEvent_ShouldCallNetworkService {
-    // When
-    [_subject sendInitEventWithAppKey:kTestAppKey config:[self defaultConfig]];
+    [self sendInitEventAndWaitWithConfig:[self defaultConfig]];
 
-    // Wait for async dispatch
-    XCTestExpectation *expectation = [self expectationWithDescription:@"send dispatched"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // Then
     XCTAssertEqual(_mockNetworkService.sendCallCount, 1, @"Should send one event");
 }
 
 - (void)testSendInitEvent_ShouldPassAppKeyToNetworkService {
-    // When
-    [_subject sendInitEventWithAppKey:kTestAppKey config:[self defaultConfig]];
+    [self sendInitEventAndWaitWithConfig:[self defaultConfig]];
 
-    // Wait for async dispatch
-    XCTestExpectation *expectation = [self expectationWithDescription:@"send dispatched"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // Then
     XCTAssertEqualObjects(_mockNetworkService.lastAppKey, kTestAppKey, @"Should pass app key");
 }
 
 #pragma mark - Payload Fields
 
 - (void)testSendInitEvent_PayloadContainsSessionID {
-    // When
-    [_subject sendInitEventWithAppKey:kTestAppKey config:[self defaultConfig]];
+    [self sendInitEventAndWaitWithConfig:[self defaultConfig]];
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"send dispatched"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // Then
     XCTAssertEqualObjects(_mockNetworkService.lastPayload[@"sessionId"], kTestSessionID);
 }
 
 - (void)testSendInitEvent_PayloadContainsAccountID {
-    // When
-    [_subject sendInitEventWithAppKey:kTestAppKey config:[self defaultConfig]];
+    [self sendInitEventAndWaitWithConfig:[self defaultConfig]];
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"send dispatched"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // Then
     XCTAssertEqualObjects(_mockNetworkService.lastPayload[@"accountId"], kTestAccountID);
 }
 
 - (void)testSendInitEvent_PayloadContainsEventTypeInit {
-    // When
-    [_subject sendInitEventWithAppKey:kTestAppKey config:[self defaultConfig]];
+    [self sendInitEventAndWaitWithConfig:[self defaultConfig]];
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"send dispatched"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // Then
     XCTAssertEqualObjects(_mockNetworkService.lastPayload[@"eventType"], @"init");
 }
 
 - (void)testSendInitEvent_PayloadContainsDeviceOSiOS {
-    // When
-    [_subject sendInitEventWithAppKey:kTestAppKey config:[self defaultConfig]];
+    [self sendInitEventAndWaitWithConfig:[self defaultConfig]];
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"send dispatched"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // Then
     XCTAssertEqualObjects(_mockNetworkService.lastPayload[@"deviceOS"], @"iOS");
 }
 
 - (void)testSendInitEvent_PayloadContainsAllRequiredFields {
-    // When
-    [_subject sendInitEventWithAppKey:kTestAppKey config:[self defaultConfig]];
+    [self sendInitEventAndWaitWithConfig:[self defaultConfig]];
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"send dispatched"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // Then: verify all expected keys are present
     NSDictionary *payload = _mockNetworkService.lastPayload;
     XCTAssertNotNil(payload, @"Payload should not be nil");
     NSArray *requiredKeys = @[
@@ -173,94 +126,52 @@ static NSString * const kTestAccountID = @"CLDX2_dc";
 #pragma mark - Test Flag
 
 - (void)testSendInitEvent_TestFlagZeroWhenNoDeviceConfig {
-    // Given: config without deviceConfig
     CLXSDKConfigResponse *config = [self defaultConfig];
     config.deviceConfig = nil;
 
-    // When
-    [_subject sendInitEventWithAppKey:kTestAppKey config:config];
+    [self sendInitEventAndWaitWithConfig:config];
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"send dispatched"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // Then
-    XCTAssertEqualObjects(_mockNetworkService.lastPayload[@"test"], @0, @"Test flag should be 0 when no deviceConfig");
+    XCTAssertEqualObjects(_mockNetworkService.lastPayload[@"test"], @0,
+                          @"Test flag should be 0 when no deviceConfig");
 }
 
 - (void)testSendInitEvent_TestFlagFromDeviceConfig {
-    // Given: config with test mode enabled
     CLXSDKConfigDeviceConfig *deviceConfig = [[CLXSDKConfigDeviceConfig alloc] init];
     deviceConfig.test = 1;
     CLXSDKConfigResponse *config = [self configWithSessionID:kTestSessionID
                                                    accountID:kTestAccountID
                                                 deviceConfig:deviceConfig];
 
-    // When
-    [_subject sendInitEventWithAppKey:kTestAppKey config:config];
+    [self sendInitEventAndWaitWithConfig:config];
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"send dispatched"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // Then
-    XCTAssertEqualObjects(_mockNetworkService.lastPayload[@"test"], @1, @"Test flag should match deviceConfig.test");
+    XCTAssertEqualObjects(_mockNetworkService.lastPayload[@"test"], @1,
+                          @"Test flag should match deviceConfig.test");
 }
 
 #pragma mark - Nil / Empty Fields
 
 - (void)testSendInitEvent_NilSessionID_ShouldSendEmptyString {
-    // Given: config with nil sessionID
     CLXSDKConfigResponse *config = [self configWithSessionID:nil accountID:kTestAccountID deviceConfig:nil];
 
-    // When
-    [_subject sendInitEventWithAppKey:kTestAppKey config:config];
+    [self sendInitEventAndWaitWithConfig:config];
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"send dispatched"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // Then: should fall back to empty string, not crash
     XCTAssertEqualObjects(_mockNetworkService.lastPayload[@"sessionId"], @"");
 }
 
 - (void)testSendInitEvent_NilAccountID_ShouldSendEmptyString {
-    // Given: config with nil accountID
     CLXSDKConfigResponse *config = [self configWithSessionID:kTestSessionID accountID:nil deviceConfig:nil];
 
-    // When
-    [_subject sendInitEventWithAppKey:kTestAppKey config:config];
+    [self sendInitEventAndWaitWithConfig:config];
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"send dispatched"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // Then
     XCTAssertEqualObjects(_mockNetworkService.lastPayload[@"accountId"], @"");
 }
 
 #pragma mark - Network Failure
 
 - (void)testSendInitEvent_NetworkFailure_ShouldNotCrash {
-    // Given: network service will fail
     _mockNetworkService.shouldSucceed = NO;
 
-    // When / Then: should not crash
-    [_subject sendInitEventWithAppKey:kTestAppKey config:[self defaultConfig]];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"send dispatched"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [self sendInitEventAndWaitWithConfig:[self defaultConfig]];
 
     XCTAssertEqual(_mockNetworkService.sendCallCount, 1, @"Should still attempt to send");
 }

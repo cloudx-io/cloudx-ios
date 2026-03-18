@@ -21,7 +21,6 @@
 		3717717E5F284054B8ADD4F5 /* CLXSessionTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = ED6D9307122C4BFDB9E6B5C6 /* CLXSessionTracker.m */; };
 		1916B09E2E7DE20E00E49E3E /* CLXWinLossFieldResolver.h in Headers */ = {isa = PBXBuildFile; fileRef = 1916B0982E7DE20E00E49E3E /* CLXWinLossFieldResolver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CLXSESS0000000000001 /* CLXSessionNetworkServiceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSESSF000000000001 /* CLXSessionNetworkServiceTests.m */; };
-		CLXSESS0000000000002 /* CLXSessionTrackerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSESSF000000000002 /* CLXSessionTrackerTests.m */; };
 		CLXSESS0000000000003 /* MockCLXSessionNetworkService.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSESSF000000000004 /* MockCLXSessionNetworkService.m */; };
 		CLXSESSIT00000000001 /* CLXSessionTrackerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSESSFIT0000000001 /* CLXSessionTrackerTests.m */; };
 		CLXSESSIT00000000002 /* MockCLXSessionNetworkService.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXSESSF000000000004 /* MockCLXSessionNetworkService.m */; };
@@ -274,6 +273,7 @@
 		7A349090F349350FC11CB088 /* CLXAdapterPrivacyForwarderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C701D717094AA5A5ECF36A2 /* CLXAdapterPrivacyForwarderTests.m */; };
 		87A7AFEA6107EE5AEC2E6161 /* CLXAdapterLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = FD3F150B4D80A1DA1031EDEB /* CLXAdapterLoader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CLXSYSINFO0001000001 /* CLXSystemInformationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B962D45141A8D8DA20B31C73 /* CLXSystemInformationTests.m */; };
+		CLXINITNSI0001000001 /* CLXSDKInitNetworkServiceIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXINITNSI0002000001 /* CLXSDKInitNetworkServiceIntegrationTests.m */; };
 		946D96D82E04F7B200C34BD5 /* CLXPrivacyConsentResolverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CF91ACF62450842C30E9E4E0 /* CLXPrivacyConsentResolverTests.m */; };
 		34ABF3AFA8F4FA6BD0327676 /* CLXGeoService.m in Sources */ = {isa = PBXBuildFile; fileRef = 240C9325E3772FA9A080F404 /* CLXGeoService.m */; };
 		56D01B15FD9902FBC9FF0A12 /* CLXLoggerDelegateErrorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 851E738266F1EB217925CE72 /* CLXLoggerDelegateErrorTests.m */; };
@@ -391,7 +391,6 @@
 		F28D9D2FF0314241B9080CB3 /* CLXSessionNetworkService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionNetworkService.m; sourceTree = "<group>"; };
 		ED6D9307122C4BFDB9E6B5C6 /* CLXSessionTracker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionTracker.m; sourceTree = "<group>"; };
 		CLXSESSF000000000001 /* CLXSessionNetworkServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionNetworkServiceTests.m; sourceTree = "<group>"; };
-		CLXSESSF000000000002 /* CLXSessionTrackerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionTrackerTests.m; sourceTree = "<group>"; };
 		CLXSESSFIT0000000001 /* CLXSessionTrackerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSessionTrackerTests.m; sourceTree = "<group>"; };
 		CLXSESSF000000000003 /* MockCLXSessionNetworkService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MockCLXSessionNetworkService.h; sourceTree = "<group>"; };
 		CLXSESSF000000000004 /* MockCLXSessionNetworkService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MockCLXSessionNetworkService.m; sourceTree = "<group>"; };
@@ -703,6 +702,7 @@
 		CLXINITCFG0001000000000002 /* CLXInitializationConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXInitializationConfiguration.h; sourceTree = "<group>"; };
 		CLXINITCFG0002000000000002 /* CLXInitializationConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXInitializationConfiguration.m; sourceTree = "<group>"; };
 		CLXIT00050000000001 /* CloudXCoreIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudXCoreIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CLXINITNSI0002000001 /* CLXSDKInitNetworkServiceIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXSDKInitNetworkServiceIntegrationTests.m; sourceTree = "<group>"; };
 		CLXNEWMK0002000000000001 /* MockURLSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MockURLSession.h; sourceTree = "<group>"; };
 		CLXNEWMK0002000000000003 /* MockURLSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MockURLSession.m; sourceTree = "<group>"; };
 		CLXNEWTS0004000000000002 /* CLXBiddingConfigDeviceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBiddingConfigDeviceTests.m; sourceTree = "<group>"; };
@@ -866,7 +866,6 @@
 				CLXILRDF0000000000011 /* CLXIlrdServiceTests.m */,
 				CLXILRDF0000000000012 /* CLXIlrdTrackerTests.m */,
 				CLXSESSF000000000001 /* CLXSessionNetworkServiceTests.m */,
-				CLXSESSF000000000002 /* CLXSessionTrackerTests.m */,
 				197994832E7B611E00EBA0A3 /* CLXSDKInitNetworkServiceTests.m */,
 				CLXAMTS0F00000000001 /* CLXAdapterMetadataTests.m */,
 				1979947F2E7B484C00EBA0A3 /* CLXBidNetworkServiceHybridTests.m */,
@@ -1328,6 +1327,7 @@
 			isa = PBXGroup;
 			children = (
 				B962D45141A8D8DA20B31C73 /* CLXSystemInformationTests.m */,
+				CLXINITNSI0002000001 /* CLXSDKInitNetworkServiceIntegrationTests.m */,
 				CLXSESSFIT0000000001 /* CLXSessionTrackerTests.m */,
 				1916B16D2E7E061B00E49E3E /* CLXSQLiteDatabaseTests.m */,
 				CLXTS00010000000001 /* CLXBidAdSourceThreadSafetyTests.m */,
@@ -1784,7 +1784,6 @@
 				CLXILRDB0000000000011 /* CLXIlrdServiceTests.m in Sources */,
 				CLXILRDB0000000000012 /* CLXIlrdTrackerTests.m in Sources */,
 				CLXSESS0000000000001 /* CLXSessionNetworkServiceTests.m in Sources */,
-				CLXSESS0000000000002 /* CLXSessionTrackerTests.m in Sources */,
 				CLXSESS0000000000003 /* MockCLXSessionNetworkService.m in Sources */,
 				CLXILRDB0000000000014 /* MockCLXIlrdProvider.m in Sources */,
 				CLXILRDB0000000000016 /* MockCLXIlrdNetworkService.m in Sources */,
@@ -1815,6 +1814,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CLXSYSINFO0001000001 /* CLXSystemInformationTests.m in Sources */,
+				CLXINITNSI0001000001 /* CLXSDKInitNetworkServiceIntegrationTests.m in Sources */,
 				CLXSESSIT00000000001 /* CLXSessionTrackerTests.m in Sources */,
 				CLXSESSIT00000000002 /* MockCLXSessionNetworkService.m in Sources */,
 				CLXIT00010000000001 /* CLXSQLiteDatabaseTests.m in Sources */,

@@ -8,12 +8,9 @@
 
 #import <XCTest/XCTest.h>
 #import <CloudXCore/CloudXCore.h>
-#import <CloudXCore/CLXUserDefaultsKeys.h>
 
-// Private interface to access internal methods for testing
 @interface CLXSDKInitNetworkService (Testing)
 - (nullable CLXSDKConfigResponse *)parseSDKConfigFromResponse:(NSDictionary *)response error:(NSError **)outError;
-- (CLXSDKConfigRequest *)createRequest;
 @end
 
 @interface CLXSDKInitNetworkServiceTests : XCTestCase
@@ -25,13 +22,10 @@
 - (void)setUp {
     [super setUp];
     self.networkService = [[CLXSDKInitNetworkService alloc] init];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreBundleConfigKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)tearDown {
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreBundleConfigKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    self.networkService = nil;
     [super tearDown];
 }
 
@@ -793,45 +787,6 @@
     XCTAssertNotNil(config, @"Config should be parsed");
     XCTAssertNil(error, @"Error should be nil");
     XCTAssertNil(config.sessionEndpointURL, @"sessionEndpointURL should be nil for non-string value");
-}
-
-#pragma mark - Bundle Override Tests
-
-- (void)testCreateRequest_UsesBundleOverrideWhenPresent {
-    NSString *overrideBundle = @"io.cloudx.override.bundle";
-    [[NSUserDefaults standardUserDefaults] setObject:overrideBundle forKey:kCLXCoreBundleConfigKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-
-    CLXSDKConfigRequest *request = [self.networkService createRequest];
-
-    XCTAssertEqualObjects(request.bundle, overrideBundle, @"init request bundle must honor override");
-}
-
-- (void)testCreateRequest_UsesSystemBundleWhenNoOverride {
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCLXCoreBundleConfigKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-
-    CLXSDKConfigRequest *request = [self.networkService createRequest];
-    NSString *expectedBundle = [CLXSystemInformation shared].appBundleIdentifier;
-
-    XCTAssertEqualObjects(request.bundle, expectedBundle, @"init request should use system bundle when override is absent");
-}
-
-#pragma mark - Adapter Metadata Tests
-
-- (void)testCreateRequest_PopulatesAdaptersArray {
-    CLXSDKConfigRequest *request = [self.networkService createRequest];
-
-    XCTAssertNotNil(request.adapters, @"adapters should not be nil");
-    // In the test target no adapter frameworks are linked, so this should be empty
-}
-
-- (void)testCreateRequest_AdaptersIncludedInJson {
-    CLXSDKConfigRequest *request = [self.networkService createRequest];
-    NSDictionary *json = [request json];
-
-    XCTAssertNotNil(json[@"adapters"], @"JSON should include adapters key");
-    XCTAssertTrue([json[@"adapters"] isKindOfClass:[NSArray class]], @"adapters should be an array");
 }
 
 @end
