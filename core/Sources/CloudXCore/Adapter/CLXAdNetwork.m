@@ -12,7 +12,7 @@ CLXAdNetwork const CLXAdNetworkCloudX          = @"cloudx";
 CLXAdNetwork const CLXAdNetworkCloudXRenderer  = @"cloudXRenderer";
 CLXAdNetwork const CLXAdNetworkVungle          = @"vungle";
 CLXAdNetwork const CLXAdNetworkInMobi          = @"inmobi";
-CLXAdNetwork const CLXAdNetworkUnity           = @"unity";
+CLXAdNetwork const CLXAdNetworkUnityAds         = @"unityads";
 CLXAdNetwork const CLXAdNetworkMoloco          = @"moloco";
 
 NSArray<CLXAdNetwork> *CLXAllAdNetworks(void) {
@@ -28,7 +28,7 @@ NSArray<CLXAdNetwork> *CLXAllAdNetworks(void) {
             CLXAdNetworkCloudXRenderer,
             CLXAdNetworkVungle,
             CLXAdNetworkInMobi,
-            CLXAdNetworkUnity,
+            CLXAdNetworkUnityAds,
             CLXAdNetworkMoloco,
         ];
     });
@@ -48,7 +48,7 @@ NSString *CLXAdNetworkClassName(CLXAdNetwork network) {
             CLXAdNetworkCloudXRenderer:  @"Renderer",
             CLXAdNetworkVungle:          @"Vungle",
             CLXAdNetworkInMobi:          @"InMobi",
-            CLXAdNetworkUnity:           @"Unity",
+            CLXAdNetworkUnityAds:         @"UnityAds",
             CLXAdNetworkMoloco:          @"Moloco",
         };
     });

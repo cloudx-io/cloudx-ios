@@ -64,20 +64,18 @@
     // ==========================================================================
 
     // Local Configuration (localhost testing - bundle: cloudx.CloudXObjCRemotePods)
-    // App key from database (SELECT app_key FROM apps WHERE bundle_id = 'cloudx.CloudXObjCRemotePods')
-    // Note: app_key != id. The YAML config shows id, but SDK needs the actual app_key column value
-    // TODO: Replace ad unit names with actual IDs from local server config
+    // App: ObjCDemoApp (Etu14DW4xsGyMnoQe_sqr) — Unity Ads, Meta, Vungle, InMobi, Mintegral
     CLXDemoConfig *localConfig = [[CLXDemoConfig alloc]
-        initWithAppKey:@"E5RotGdN8i7hWhkax1e1o"
+        initWithAppKey:@"ihtOXvp3X9JlMQ5p0_RYL"
         hashedUserId:@"test-user-123"
         baseURL:@"http://localhost:8090/sdk"
-        bannerAdUnitId:@"banner"
-        mrecAdUnitId:@"mrec"
-        interstitialAdUnitId:@"interstitial"
+        bannerAdUnitId:@"LyPxKhBFiUCd1xMLYQhGc"
+        mrecAdUnitId:@"EWaeXDSmKYbs220gM5hTv"
+        interstitialAdUnitId:@"txZ7NmISq-MsuPH0ULKbD"
         nativeAdUnitId:@"-"
         nativeBannerAdUnitId:@"-"
-        rewardedAdUnitId:@"rewarded"
-        rewardedInterstitialAdUnitId:@"rewarded"];
+        rewardedAdUnitId:@"um9Ek08ScJBWuzSMTyW3b"
+        rewardedInterstitialAdUnitId:@"um9Ek08ScJBWuzSMTyW3b"];
 
     // Staging Configuration (MetaTestApp-9-22-25 - bundle: cloudx.CloudXObjCRemotePods)
     // TODO: Replace ad unit names with actual IDs from staging server config

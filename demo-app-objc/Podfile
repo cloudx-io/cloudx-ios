@@ -9,7 +9,7 @@ target 'CloudXObjCRemotePods' do
   pod 'CloudXVungleAdapter', :path => '../adapter-vungle'
   pod 'CloudXInMobiAdapter', :path => '../adapter-inmobi'
   pod 'CloudXMintegralAdapter', :path => '../adapter-mintegral'
-  pod 'CloudXUnityAdapter', :path => '../adapter-unity'
+  pod 'CloudXUnityAdsAdapter', :path => '../adapter-unityads'
   pod 'CloudXRenderer', :path => '../renderer-cloudx'
   pod 'AppLovinSDK'
 

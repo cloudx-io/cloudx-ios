@@ -24,7 +24,7 @@
 #   inmobi    = CloudXInMobiAdapter
 #   mintegral = CloudXMintegralAdapter
 #   moloco    = CloudXMolocoAdapter
-#   unity     = CloudXUnityAdapter
+#   unityads  = CloudXUnityAdsAdapter
 #
 # EXAMPLES:
 #   ./update-version-constant.sh core "X.Y.Z-dev.156+abc1234"
@@ -59,7 +59,7 @@ FULL_VERSION=$2
 
 if [ -z "$COMPONENT" ] || [ -z "$FULL_VERSION" ]; then
     echo "Usage: $0 <component> <full_version>"
-    echo "Components: core, meta, renderer, vungle, inmobi, mintegral, moloco, unity"
+    echo "Components: core, meta, renderer, vungle, inmobi, mintegral, moloco, unityads"
     exit 1
 fi
 
@@ -93,13 +93,13 @@ case $COMPONENT in
         VERSION_FILE="adapter-moloco/Sources/CloudXMolocoAdapter/CLXMolocoAdapterVersion.m"
         CONSTANT_NAME="CLXMolocoAdapterVersion"
         ;;
-    unity)
-        VERSION_FILE="adapter-unity/Sources/CloudXUnityAdapter/CLXUnityAdapterVersion.m"
-        CONSTANT_NAME="CLXUnityAdapterVersion"
+    unityads)
+        VERSION_FILE="adapter-unityads/Sources/CloudXUnityAdsAdapter/CLXUnityAdsAdapterVersion.m"
+        CONSTANT_NAME="CLXUnityAdsAdapterVersion"
         ;;
     *)
         echo "Error: Unknown component '$COMPONENT'" >&2
-        echo "Valid components: core, meta, renderer, vungle, inmobi, mintegral, moloco, unity" >&2
+        echo "Valid components: core, meta, renderer, vungle, inmobi, mintegral, moloco, unityads" >&2
         exit 1
         ;;
 esac
