@@ -25,7 +25,7 @@ pod install || print_error "Pod install failed."
 
 # --- Step 1a: Validate Compile Sources ---
 print_status "1a. Validating all .m files are in the Xcode project..."
-bash ../scripts/validate-compile-sources.sh Sources/CloudXUnityAdapter CloudXUnityAdapter.xcodeproj/project.pbxproj || print_error "Compile sources validation failed. See above."
+bash ../scripts/validate-compile-sources.sh Sources/CloudXUnityAdsAdapter CloudXUnityAdsAdapter.xcodeproj/project.pbxproj || print_error "Compile sources validation failed. See above."
 
 # --- Step 1.5: Setup Module Structure ---
 print_status "1.5. Setting up module structure..."

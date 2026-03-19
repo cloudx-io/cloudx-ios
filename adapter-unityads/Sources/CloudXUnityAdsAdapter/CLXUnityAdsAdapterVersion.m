@@ -4,4 +4,4 @@
 
 #import "CLXUnityAdsAdapterVersion.h"
 
-NSString * const CLXUnityAdsAdapterVersion = @"2.2.1-beta";
+NSString * const CLXUnityAdsAdapterVersion = @"2.2.3";

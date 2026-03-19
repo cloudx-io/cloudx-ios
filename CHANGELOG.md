@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.3] - 2026-03-19
+
+### Fixed
+- **Unity Ads Network Name Casing** — Fixed case-sensitivity mismatch between server bidder config (`unityAds`) and SDK adapter registration (`unityads`), which prevented the Unity Ads adapter from receiving initialization parameters (e.g., `game_id`) (#444)
+
+---
+
 ## [2.2.2] - 2026-03-16
 
 ### Added

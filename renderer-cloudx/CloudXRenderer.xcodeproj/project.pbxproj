@@ -11,8 +11,6 @@
 		19D063A82E30F0B000B3B99C /* CloudXRenderer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19D0639D2E30F0B000B3B99C /* CloudXRenderer.framework */; };
 		19D064882E30F5DB00B3B99C /* CLXPerformanceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064632E30F5DB00B3B99C /* CLXPerformanceManager.m */; };
 		19D064892E30F5DB00B3B99C /* CloudXRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064852E30F5DB00B3B99C /* CloudXRenderer.m */; };
-		19D064B02E30F5DB00B3B99C /* CLXRendererVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064B12E30F5DB00B3B99C /* CLXRendererVersion.m */; };
-		19D064B22E30F5DB00B3B99C /* CLXRendererVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064B32E30F5DB00B3B99C /* CLXRendererVersion.h */; };
 		19D0648A2E30F5DB00B3B99C /* CLXMRAIDManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064612E30F5DB00B3B99C /* CLXMRAIDManager.m */; };
 		19D0648B2E30F5DB00B3B99C /* CLXViewabilityTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064682E30F5DB00B3B99C /* CLXViewabilityTracker.m */; };
 		19D0648C2E30F5DB00B3B99C /* CLXRendererRewarded.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D0647D2E30F5DB00B3B99C /* CLXRendererRewarded.m */; };
@@ -30,7 +28,6 @@
 		19D064982E30F5DB00B3B99C /* CLXDemoAdapterError.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D0645D2E30F5DB00B3B99C /* CLXDemoAdapterError.m */; };
 		19D064992E30F5DB00B3B99C /* CLXRendererBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064582E30F5DB00B3B99C /* CLXRendererBanner.m */; };
 		19D0649A2E30F5DB00B3B99C /* CLXRendererWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D0647A2E30F5DB00B3B99C /* CLXRendererWebView.m */; };
-		19D064C12E30F5DB00B3B99C /* CLXVASTParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064C02E30F5DB00B3B99C /* CLXVASTParser.m */; };
 		19D0649B2E30F5DB00B3B99C /* CLXRendererInterstitial.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D0646D2E30F5DB00B3B99C /* CLXRendererInterstitial.h */; };
 		19D0649C2E30F5DB00B3B99C /* CLXPerformanceManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064622E30F5DB00B3B99C /* CLXPerformanceManager.h */; };
 		19D0649D2E30F5DB00B3B99C /* CLXVASTParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064662E30F5DB00B3B99C /* CLXVASTParser.h */; };
@@ -51,7 +48,12 @@
 		19D064AC2E30F5DB00B3B99C /* CLXRendererRewardedFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D0647E2E30F5DB00B3B99C /* CLXRendererRewardedFactory.h */; };
 		19D064AD2E30F5DB00B3B99C /* CLXViewabilityTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064672E30F5DB00B3B99C /* CLXViewabilityTracker.h */; };
 		19D064AE2E30F5DB00B3B99C /* CLXRendererWebView.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064792E30F5DB00B3B99C /* CLXRendererWebView.h */; };
+		19D064B02E30F5DB00B3B99C /* CLXRendererVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064B12E30F5DB00B3B99C /* CLXRendererVersion.m */; };
+		19D064B22E30F5DB00B3B99C /* CLXRendererVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 19D064B32E30F5DB00B3B99C /* CLXRendererVersion.h */; };
+		19D064C12E30F5DB00B3B99C /* CLXVASTParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D064C02E30F5DB00B3B99C /* CLXVASTParser.m */; };
 		44C704E2D9102EEA69674156 /* Pods_CloudXRenderer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B32A6CD8F250BA4A8A8C85 /* Pods_CloudXRenderer.framework */; };
+		744A33CDB5C38ECBC950D129 /* CLXRendererBidTokenSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 0F06CDC520870B63D2EAD345 /* CLXRendererBidTokenSource.m */; };
+		9970E49570432573E0D2E2DE /* CLXRendererBidTokenSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B6DA9245823E93F5DD11DAD /* CLXRendererBidTokenSource.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +67,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0F06CDC520870B63D2EAD345 /* CLXRendererBidTokenSource.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXRendererBidTokenSource.m; sourceTree = "<group>"; };
 		131F609E0EEE3DEFABFC22F0 /* Pods_CloudXRenderer_CloudXRendererTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXRenderer_CloudXRendererTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1816A8DB4D8FBB34DD46438A /* Pods-CloudXRenderer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXRenderer.debug.xcconfig"; path = "Target Support Files/Pods-CloudXRenderer/Pods-CloudXRenderer.debug.xcconfig"; sourceTree = "<group>"; };
 		19D0639D2E30F0B000B3B99C /* CloudXRenderer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CloudXRenderer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -84,7 +87,6 @@
 		19D064642E30F5DB00B3B99C /* CLXRendererError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXRendererError.h; sourceTree = "<group>"; };
 		19D064652E30F5DB00B3B99C /* CLXRendererError.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXRendererError.m; sourceTree = "<group>"; };
 		19D064662E30F5DB00B3B99C /* CLXVASTParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXVASTParser.h; sourceTree = "<group>"; };
-		19D064C02E30F5DB00B3B99C /* CLXVASTParser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVASTParser.m; sourceTree = "<group>"; };
 		19D064672E30F5DB00B3B99C /* CLXViewabilityTracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXViewabilityTracker.h; sourceTree = "<group>"; };
 		19D064682E30F5DB00B3B99C /* CLXViewabilityTracker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXViewabilityTracker.m; sourceTree = "<group>"; };
 		19D0646A2E30F5DB00B3B99C /* CLXRendererInitializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXRendererInitializer.h; sourceTree = "<group>"; };
@@ -111,7 +113,9 @@
 		19D064852E30F5DB00B3B99C /* CloudXRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CloudXRenderer.m; sourceTree = "<group>"; };
 		19D064B12E30F5DB00B3B99C /* CLXRendererVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXRendererVersion.m; sourceTree = "<group>"; };
 		19D064B32E30F5DB00B3B99C /* CLXRendererVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXRendererVersion.h; sourceTree = "<group>"; };
+		19D064C02E30F5DB00B3B99C /* CLXVASTParser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXVASTParser.m; sourceTree = "<group>"; };
 		567DC775B0126D2EA8DD65D5 /* Pods-CloudXRenderer-CloudXRendererTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXRenderer-CloudXRendererTests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXRenderer-CloudXRendererTests/Pods-CloudXRenderer-CloudXRendererTests.debug.xcconfig"; sourceTree = "<group>"; };
+		5B6DA9245823E93F5DD11DAD /* CLXRendererBidTokenSource.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXRendererBidTokenSource.h; sourceTree = "<group>"; };
 		766EE519075158CB6B184951 /* Pods-CloudXRenderer-CloudXRendererTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXRenderer-CloudXRendererTests.release.xcconfig"; path = "Target Support Files/Pods-CloudXRenderer-CloudXRendererTests/Pods-CloudXRenderer-CloudXRendererTests.release.xcconfig"; sourceTree = "<group>"; };
 		96B32A6CD8F250BA4A8A8C85 /* Pods_CloudXRenderer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXRenderer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2FCB439174687C2BF071729 /* Pods-CloudXRenderer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXRenderer.release.xcconfig"; path = "Target Support Files/Pods-CloudXRenderer/Pods-CloudXRenderer.release.xcconfig"; sourceTree = "<group>"; };
@@ -196,6 +200,8 @@
 				19D064C02E30F5DB00B3B99C /* CLXVASTParser.m */,
 				19D064672E30F5DB00B3B99C /* CLXViewabilityTracker.h */,
 				19D064682E30F5DB00B3B99C /* CLXViewabilityTracker.m */,
+				5B6DA9245823E93F5DD11DAD /* CLXRendererBidTokenSource.h */,
+				0F06CDC520870B63D2EAD345 /* CLXRendererBidTokenSource.m */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -337,6 +343,7 @@
 				19D064AC2E30F5DB00B3B99C /* CLXRendererRewardedFactory.h in Headers */,
 				19D064AD2E30F5DB00B3B99C /* CLXViewabilityTracker.h in Headers */,
 				19D064AE2E30F5DB00B3B99C /* CLXRendererWebView.h in Headers */,
+				9970E49570432573E0D2E2DE /* CLXRendererBidTokenSource.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -529,6 +536,7 @@
 				19D064992E30F5DB00B3B99C /* CLXRendererBanner.m in Sources */,
 				19D0649A2E30F5DB00B3B99C /* CLXRendererWebView.m in Sources */,
 				19D064C12E30F5DB00B3B99C /* CLXVASTParser.m in Sources */,
+				744A33CDB5C38ECBC950D129 /* CLXRendererBidTokenSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

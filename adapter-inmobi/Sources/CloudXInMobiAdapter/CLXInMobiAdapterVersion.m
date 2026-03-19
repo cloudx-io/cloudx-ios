@@ -9,5 +9,5 @@
 
 #import "CLXInMobiAdapterVersion.h"
 
-NSString * const CLXInMobiAdapterVersion = @"2.2.2";
+NSString * const CLXInMobiAdapterVersion = @"2.2.3";
 

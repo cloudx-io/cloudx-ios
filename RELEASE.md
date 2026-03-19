@@ -228,24 +228,27 @@ gh pr create --base main --head release-ios-X.Y.Z --title "iOS X.Y.Z docs"
 
 Test **both** the Objective-C and Swift demo apps with temporary branch URLs:
 
+**⚠️ URL FORMAT: Use `:podspec =>` with `raw.githubusercontent.com` URLs. Do NOT use `:git =>` — podspecs are in subdirectories, not the repo root, so `:git` cannot find them.**
+
 **Objective-C Demo App:**
 ```bash
 cd cloudx-ios/demo-app-objc
 
 # Temporarily update Podfile to test from feature branch
+# URL format: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/<BRANCH>/path/to/podspec
 cat > Podfile << 'EOF'
 platform :ios, '13.0'
 
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
-  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
-  pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
-  pod 'CloudXVungleAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
-  pod 'CloudXInMobiAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
-  pod 'CloudXMintegralAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
-  pod 'CloudXUnityAdsAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
+  pod 'CloudXCore', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/core/CloudXCore.podspec'
+  pod 'CloudXMetaAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/adapter-meta/CloudXMetaAdapter.podspec'
+  pod 'CloudXRenderer', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/renderer-cloudx/CloudXRenderer.podspec'
+  pod 'CloudXVungleAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/adapter-vungle/CloudXVungleAdapter.podspec'
+  pod 'CloudXInMobiAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/adapter-inmobi/CloudXInMobiAdapter.podspec'
+  pod 'CloudXMintegralAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/adapter-mintegral/CloudXMintegralAdapter.podspec'
+  pod 'CloudXUnityAdsAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/adapter-unityads/CloudXUnityAdsAdapter.podspec'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths
@@ -270,13 +273,13 @@ platform :ios, '13.0'
 target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
-  pod 'CloudXMetaAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
-  pod 'CloudXRenderer', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
-  pod 'CloudXVungleAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
-  pod 'CloudXInMobiAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
-  pod 'CloudXMintegralAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
-  pod 'CloudXUnityAdsAdapter', :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-X.Y.Z'
+  pod 'CloudXCore', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/core/CloudXCore.podspec'
+  pod 'CloudXMetaAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/adapter-meta/CloudXMetaAdapter.podspec'
+  pod 'CloudXRenderer', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/renderer-cloudx/CloudXRenderer.podspec'
+  pod 'CloudXVungleAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/adapter-vungle/CloudXVungleAdapter.podspec'
+  pod 'CloudXInMobiAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/adapter-inmobi/CloudXInMobiAdapter.podspec'
+  pod 'CloudXMintegralAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/adapter-mintegral/CloudXMintegralAdapter.podspec'
+  pod 'CloudXUnityAdsAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-X.Y.Z/adapter-unityads/CloudXUnityAdsAdapter.podspec'
 
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths

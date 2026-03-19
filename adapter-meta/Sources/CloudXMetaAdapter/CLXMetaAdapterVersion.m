@@ -4,5 +4,5 @@
 
 #import "CLXMetaAdapterVersion.h"
 
-NSString * const CLXMetaAdapterVersion = @"2.2.2";
+NSString * const CLXMetaAdapterVersion = @"2.2.3";
 

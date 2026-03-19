@@ -9,5 +9,5 @@
 
 #import "CLXMintegralAdapterVersion.h"
 
-NSString * const CLXMintegralAdapterVersion = @"2.2.2";
+NSString * const CLXMintegralAdapterVersion = @"2.2.3";
 

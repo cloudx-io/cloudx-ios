@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'CloudXRenderer'
-  s.version = '2.2.2'
+  s.version = '2.2.3'
   s.summary = 'CloudX Renderer for in-house and third-party demand sources'
   s.description = 'CloudX renderer for rendering ad markup from CloudX or third-party demand sources - local development version'
   s.homepage = 'https://github.com/cloudx-io/cloudx-ios'
