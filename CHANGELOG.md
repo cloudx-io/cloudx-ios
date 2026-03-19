@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.3] - 2026-03-19
+
+### Added
+- **Unity Ads Adapter** — Unity Ads adapter now available for banner, interstitial, and rewarded ads
+
+### Fixed
+- **Unity Ads Initialization** — Fixed an issue where the Unity Ads adapter could fail to initialize correctly in some configurations
+
+---
+
 ## [2.2.2] - 2026-03-16
 
 ### Added
