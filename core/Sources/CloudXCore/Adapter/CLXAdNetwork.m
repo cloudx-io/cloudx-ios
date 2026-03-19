@@ -12,7 +12,7 @@ CLXAdNetwork const CLXAdNetworkCloudX          = @"cloudx";
 CLXAdNetwork const CLXAdNetworkCloudXRenderer  = @"cloudXRenderer";
 CLXAdNetwork const CLXAdNetworkVungle          = @"vungle";
 CLXAdNetwork const CLXAdNetworkInMobi          = @"inmobi";
-CLXAdNetwork const CLXAdNetworkUnityAds         = @"unityads";
+CLXAdNetwork const CLXAdNetworkUnityAds         = @"unityAds";
 CLXAdNetwork const CLXAdNetworkMoloco          = @"moloco";
 
 NSArray<CLXAdNetwork> *CLXAllAdNetworks(void) {

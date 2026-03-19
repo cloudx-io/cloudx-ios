@@ -59,7 +59,7 @@
         _bidID = [bidID copy];
         _delegate = delegate;
         _sdkVersion = [UnityAds getVersion];
-        _network = @"unityads";
+        _network = @"unityAds";
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXUnityAdsRewarded"];
 
         [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@ (%@), BidID: %@",

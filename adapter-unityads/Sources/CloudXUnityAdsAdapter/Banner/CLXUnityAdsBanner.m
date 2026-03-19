@@ -61,7 +61,7 @@
         _bannerType = type;
         _delegate = delegate;
         _sdkVersion = [UnityAds getVersion];
-        _network = @"unityads";
+        _network = @"unityAds";
         _logger = [[CLXLogger alloc] initWithCategory:@"CLXUnityAdsBanner"];
 
         [self.logger debug:[NSString stringWithFormat:@"Init - Placement: %@ (%@), BidID: %@, Type: %ld",

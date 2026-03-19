@@ -686,7 +686,7 @@ static const NSUInteger kMaxOSConsoleLogs = 1000;  // Match SDK's 1000 limit
                 NSArray *adKeywords = @[
                     // SDK names
                     @"vungle", @"facebook", @"meta", @"audience", @"admob", @"applovin", 
-                    @"unityads", @"ironsource", @"chartboost", @"inmobi", @"mintegral",
+                    @"unityAds", @"ironsource", @"chartboost", @"inmobi", @"mintegral",
                     @"pangle", @"bytedance", @"tapjoy", @"adcolony", @"digitalturbine",
                     @"fyber", @"smaato", @"amazon", @"criteo", @"verve", @"hybid",
                     @"ogury", @"mytarget", @"liftoff", @"magnite", @"moloco",

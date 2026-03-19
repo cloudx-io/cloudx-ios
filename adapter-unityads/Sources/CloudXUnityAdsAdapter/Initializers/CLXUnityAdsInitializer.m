@@ -69,7 +69,7 @@ static BOOL CLXUnityAdsSDKInitializing = NO;
 }
 
 - (NSString *)network {
-    return @"unityads";
+    return @"unityAds";
 }
 
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config
