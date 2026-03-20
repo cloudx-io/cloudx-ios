@@ -13,7 +13,6 @@ CLXAdNetwork const CLXAdNetworkCloudXRenderer  = @"cloudXRenderer";
 CLXAdNetwork const CLXAdNetworkVungle          = @"vungle";
 CLXAdNetwork const CLXAdNetworkInMobi          = @"inmobi";
 CLXAdNetwork const CLXAdNetworkUnityAds         = @"unityAds";
-CLXAdNetwork const CLXAdNetworkMoloco          = @"moloco";
 
 NSArray<CLXAdNetwork> *CLXAllAdNetworks(void) {
     static NSArray<CLXAdNetwork> *all;
@@ -29,7 +28,6 @@ NSArray<CLXAdNetwork> *CLXAllAdNetworks(void) {
             CLXAdNetworkVungle,
             CLXAdNetworkInMobi,
             CLXAdNetworkUnityAds,
-            CLXAdNetworkMoloco,
         ];
     });
     return all;
@@ -49,7 +47,6 @@ NSString *CLXAdNetworkClassName(CLXAdNetwork network) {
             CLXAdNetworkVungle:          @"Vungle",
             CLXAdNetworkInMobi:          @"InMobi",
             CLXAdNetworkUnityAds:         @"UnityAds",
-            CLXAdNetworkMoloco:          @"Moloco",
         };
     });
     return map[network] ?: @"Renderer";
