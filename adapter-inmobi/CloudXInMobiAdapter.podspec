@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   
   # Dependencies
   s.dependency 'CloudXCore', '2.2.3'
-  s.dependency 'InMobiSDK', '~> 11.1'
+  s.dependency 'InMobiSDK', '>= 10.5.6', '< 12.0'
   
   s.frameworks = ['AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit']
   s.weak_frameworks = ['Combine', 'CryptoKit', 'SafariServices', 'SwiftUI', 'WebKit']
