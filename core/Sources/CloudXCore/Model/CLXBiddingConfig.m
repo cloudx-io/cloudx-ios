@@ -424,19 +424,20 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
             if (rawGeoHeaders) {
                 NSString *latString = rawGeoHeaders[@"cloudfront-viewer-latitude"];
                 NSString *lonString = rawGeoHeaders[@"cloudfront-viewer-longitude"];
+                NSLocale *posixLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
                 NSDecimalNumberHandler *roundTo2 = [NSDecimalNumberHandler
                     decimalNumberHandlerWithRoundingMode:NSRoundPlain
                     scale:2
                     raiseOnExactness:NO raiseOnOverflow:NO
                     raiseOnUnderflow:NO raiseOnDivideByZero:NO];
                 if (latString && [latString isKindOfClass:[NSString class]] && latString.length > 0) {
-                    NSDecimalNumber *lat = [NSDecimalNumber decimalNumberWithString:latString];
+                    NSDecimalNumber *lat = [NSDecimalNumber decimalNumberWithString:latString locale:posixLocale];
                     if (![lat isEqualToNumber:[NSDecimalNumber notANumber]]) {
                         geo.lat = [lat decimalNumberByRoundingAccordingToBehavior:roundTo2];
                     }
                 }
                 if (lonString && [lonString isKindOfClass:[NSString class]] && lonString.length > 0) {
-                    NSDecimalNumber *lon = [NSDecimalNumber decimalNumberWithString:lonString];
+                    NSDecimalNumber *lon = [NSDecimalNumber decimalNumberWithString:lonString locale:posixLocale];
                     if (![lon isEqualToNumber:[NSDecimalNumber notANumber]]) {
                         geo.lon = [lon decimalNumberByRoundingAccordingToBehavior:roundTo2];
                     }
