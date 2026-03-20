@@ -228,6 +228,7 @@
 		19D929012E6403E000C84DAE /* CLXPrivacyServiceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D928FF2E6403E000C84DAE /* CLXPrivacyServiceTests.m */; };
 		19D929032E6403E000C84DAE /* CLXTrackingFieldResolverPrivacyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D929002E6403E000C84DAE /* CLXTrackingFieldResolverPrivacyTests.m */; };
 		19D929042E6403E000C84DAE /* CLXBiddingConfigPrivacyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D928FD2E6403E000C84DAE /* CLXBiddingConfigPrivacyTests.m */; };
+		CLXLOC001000000000000001 /* CLXLocationControlsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CLXLOC001000000000000002 /* CLXLocationControlsTests.m */; };
 		19D929C22E6644BB00C84DAE /* CLXPublisherBannerSpecComplianceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D929C02E6644BB00C84DAE /* CLXPublisherBannerSpecComplianceTests.m */; };
 		19D929C42E6644BB00C84DAE /* CLXPublisherBannerUnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D929C12E6644BB00C84DAE /* CLXPublisherBannerUnitTests.m */; };
 		19D92A492E68C54C00C84DAE /* CLXAd.m in Sources */ = {isa = PBXBuildFile; fileRef = 19D92A472E68C54C00C84DAE /* CLXAd.m */; };
@@ -600,6 +601,7 @@
 		19D928BE2E63F44B00C84DAE /* CLXPrivacyService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CLXPrivacyService.h; sourceTree = "<group>"; };
 		19D928BF2E63F44B00C84DAE /* CLXPrivacyService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPrivacyService.m; sourceTree = "<group>"; };
 		19D928FD2E6403E000C84DAE /* CLXBiddingConfigPrivacyTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXBiddingConfigPrivacyTests.m; sourceTree = "<group>"; };
+		CLXLOC001000000000000002 /* CLXLocationControlsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXLocationControlsTests.m; sourceTree = "<group>"; };
 		19D928FF2E6403E000C84DAE /* CLXPrivacyServiceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPrivacyServiceTests.m; sourceTree = "<group>"; };
 		19D929002E6403E000C84DAE /* CLXTrackingFieldResolverPrivacyTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXTrackingFieldResolverPrivacyTests.m; sourceTree = "<group>"; };
 		19D929C02E6644BB00C84DAE /* CLXPublisherBannerSpecComplianceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CLXPublisherBannerSpecComplianceTests.m; sourceTree = "<group>"; };
@@ -898,6 +900,7 @@
 				19D92B3F2E690C2A00C84DAE /* CLXAdFormatDelegateCallbackTests.m */,
 				19D92B402E690C2A00C84DAE /* CLXDelegateCallbackTypeTests.m */,
 				19D928FD2E6403E000C84DAE /* CLXBiddingConfigPrivacyTests.m */,
+				CLXLOC001000000000000002 /* CLXLocationControlsTests.m */,
 				19D928FF2E6403E000C84DAE /* CLXPrivacyServiceTests.m */,
 				19D929002E6403E000C84DAE /* CLXTrackingFieldResolverPrivacyTests.m */,
 				B0F9DD3D51F8DFDB760174EF /* CLXManualPrivacyStateTests.m */,
@@ -1755,6 +1758,7 @@
 				19D92B412E690C2A00C84DAE /* CLXAdFormatDelegateCallbackTests.m in Sources */,
 				19D92B422E690C2A00C84DAE /* CLXDelegateCallbackTypeTests.m in Sources */,
 				19D929042E6403E000C84DAE /* CLXBiddingConfigPrivacyTests.m in Sources */,
+				CLXLOC001000000000000001 /* CLXLocationControlsTests.m in Sources */,
 				196C05BA2ECDDEA60087146A /* CLXSDKInitQueueTests.m in Sources */,
 				1916B0F92E7DECDD00E49E3E /* MockCLXWinLossTracker.m in Sources */,
 				19D92C812E6B7F7300C84DAE /* CLXBannerAdViewUnitTests.m in Sources */,

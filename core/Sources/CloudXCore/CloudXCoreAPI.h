@@ -232,6 +232,29 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  */
 + (void)setLoggingTimestampsEnabled:(BOOL)enabled;
 
+#pragma mark - Location Controls
+
+/**
+ * Control whether IP-derived location coordinates are included in bid requests.
+ * @param enabled YES to include lat/lon in bid requests (default), NO to omit them.
+ * @discussion When disabled, latitude and longitude are excluded from bid requests entirely.
+ * Other non-PII geo fields (country, region, city, utcoffset) are still included.
+ * This can be called before or after SDK initialization.
+ *
+ * Example:
+ * @code
+ * // Disable location sharing before initializing the SDK
+ * [CloudXCore setLocationSharingEnabled:NO];
+ * @endcode
+ */
++ (void)setLocationSharingEnabled:(BOOL)enabled;
+
+/**
+ * Check if location sharing is currently enabled
+ * @return YES if location coordinates will be included in bid requests (default), NO otherwise
+ */
++ (BOOL)isLocationSharingEnabled;
+
 #pragma mark - Manual Privacy Controls
 
 /**

@@ -1395,6 +1395,18 @@ static BOOL _visualDebuggingEnabled = NO;
     [[CLXLogger shared] setTimestampsEnabled:enabled];
 }
 
+#pragma mark - Location Controls
+
++ (void)setLocationSharingEnabled:(BOOL)enabled {
+    CLXLogger *locationLogger = [[CLXLogger alloc] initWithCategory:@"CloudXCoreAPI"];
+    [locationLogger info:[NSString stringWithFormat:@"setLocationSharingEnabled: %@", enabled ? @"YES" : @"NO"]];
+    [CLXSettings sharedInstance].locationSharingEnabled = enabled;
+}
+
++ (BOOL)isLocationSharingEnabled {
+    return [CLXSettings sharedInstance].locationSharingEnabled;
+}
+
 #pragma mark - Manual Privacy Controls
 
 + (void)setHasUserConsent:(nullable NSNumber *)hasUserConsent {

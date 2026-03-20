@@ -25,6 +25,14 @@ static CLXLogger *logger;
     return sharedInstance;
 }
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _locationSharingEnabled = YES;
+    }
+    return self;
+}
+
 - (NSString *)getIFA {
     NSString *ifa = nil;
     

@@ -418,20 +418,34 @@ static NSInteger ReachabilityTypeToORTBConnectionType(ReachabilityType type) {
         CLXGeoLocationService *geoService = [CLXGeoLocationService shared];
         CLXBiddingConfigDeviceGeo *geo = [[CLXBiddingConfigDeviceGeo alloc] init];
         
-        // Extract lat/lon from CloudFront headers (raw geo headers)
-        NSDictionary *rawGeoHeaders = [geoService geoHeaders];
-        if (rawGeoHeaders) {
-            NSString *latString = rawGeoHeaders[@"cloudfront-viewer-latitude"];
-            NSString *lonString = rawGeoHeaders[@"cloudfront-viewer-longitude"];
-            if (latString && [latString isKindOfClass:[NSString class]]) {
-                geo.lat = @([latString doubleValue]);
-            }
-            if (lonString && [lonString isKindOfClass:[NSString class]]) {
-                geo.lon = @([lonString doubleValue]);
+        // Only include lat/lon when the publisher has not disabled location sharing
+        if (settings.locationSharingEnabled) {
+            NSDictionary *rawGeoHeaders = [geoService geoHeaders];
+            if (rawGeoHeaders) {
+                NSString *latString = rawGeoHeaders[@"cloudfront-viewer-latitude"];
+                NSString *lonString = rawGeoHeaders[@"cloudfront-viewer-longitude"];
+                NSDecimalNumberHandler *roundTo2 = [NSDecimalNumberHandler
+                    decimalNumberHandlerWithRoundingMode:NSRoundPlain
+                    scale:2
+                    raiseOnExactness:NO raiseOnOverflow:NO
+                    raiseOnUnderflow:NO raiseOnDivideByZero:NO];
+                if (latString && [latString isKindOfClass:[NSString class]] && latString.length > 0) {
+                    NSDecimalNumber *lat = [NSDecimalNumber decimalNumberWithString:latString];
+                    if (![lat isEqualToNumber:[NSDecimalNumber notANumber]]) {
+                        geo.lat = [lat decimalNumberByRoundingAccordingToBehavior:roundTo2];
+                    }
+                }
+                if (lonString && [lonString isKindOfClass:[NSString class]] && lonString.length > 0) {
+                    NSDecimalNumber *lon = [NSDecimalNumber decimalNumberWithString:lonString];
+                    if (![lon isEqualToNumber:[NSDecimalNumber notANumber]]) {
+                        geo.lon = [lon decimalNumberByRoundingAccordingToBehavior:roundTo2];
+                    }
+                }
             }
         }
         
-        geo.type = @1;
+        // OpenRTB geo type 2 = IP-based (coordinates are derived from IP geolocation, not device GPS)
+        geo.type = @2;
         geo.utcoffset = @([[NSTimeZone localTimeZone] secondsFromGMT] / 60);
         geo.processedGeoFields = [geoService processedGeoData];
         
