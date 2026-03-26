@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.4] - 2026-03-26
+
+### Changed
+- **Server-Driven Location Controls** — Location coordinate sharing in bid requests is now controlled via the CloudX dashboard (account-scoped). No SDK code changes required for publishers.
+- **Improved Bid Request Data** — Content language is now included in bid requests for improved ad targeting
+
+---
+
 ## [2.2.3] - 2026-03-19
 
 ### Added
