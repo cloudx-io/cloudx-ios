@@ -106,6 +106,8 @@ NS_ASSUME_NONNULL_BEGIN
 // ═══════════════════════════════════════════════════════════════════════════
 @property (nonatomic, strong, nullable) CLXMetricsConfig *metricsConfig;
 @property (nonatomic, strong, nullable) CLXSDKConfigDeviceConfig *deviceConfig;
+/// When NO, latitude/longitude are omitted from bid requests. Default YES when absent from JSON.
+@property (nonatomic, assign) BOOL locationSharingEnabled;
 /// Raw JSON response for dynamic field resolution (used by TrackingFieldResolver)
 @property (nonatomic, strong, nullable) NSDictionary *rawJSON;
 

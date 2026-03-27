@@ -176,6 +176,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *appID;
 @property (nonatomic, copy) NSString *bundle;
 @property (nonatomic, copy) NSString *ver;
+@property (nonatomic, strong, nullable) NSDictionary<NSString *, NSString *> *content;
 @property (nonatomic, strong) CLXBiddingConfigApplicationPublisher *publisher;
 @property (nonatomic, strong) CLXBiddingConfigApplicationExt *ext;
 @end

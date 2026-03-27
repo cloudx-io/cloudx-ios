@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXMintegralAdapter'
-  s.version = '2.2.3'
+  s.version = '2.2.4'
   s.summary          = 'CloudX Mintegral Adapter - Static Framework'
   s.description      = 'Mintegral adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-mintegral/CloudXMintegralAdapter.xcframework'
 
   # Dependencies
-  s.dependency 'CloudXCore', '2.2.3'
+  s.dependency 'CloudXCore', '2.2.4'
   s.dependency 'MintegralAdSDK', '~> 8.0'
   s.dependency 'MintegralAdSDK/BidBannerAd', '~> 8.0'
   s.dependency 'MintegralAdSDK/BidNewInterstitialAd', '~> 8.0'
