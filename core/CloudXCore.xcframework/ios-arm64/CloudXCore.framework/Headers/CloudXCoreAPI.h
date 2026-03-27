@@ -235,35 +235,37 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 #pragma mark - Manual Privacy Controls
 
 /**
- * Set the user's GDPR consent status manually (bypassing CMP frameworks)
- * @param hasUserConsent @YES if user consented, @NO if not, nil to clear (defer to CMP)
- * @discussion This is a class method that can be called before SDK initialization.
+ * Set the user's GDPR consent status manually (bypassing CMP frameworks).
+ * @param hasUserConsent @YES if user consented, @NO if not, nil to clear (defer to CMP).
+ * @discussion Call this @b before initializing the SDK. Some ad network SDKs require privacy
+ * settings at initialization time and will not apply values set after init.
+ *
  * When set, this value is used as a fallback after GPP/TCF signals in the privacy resolution chain.
  * Setting this also triggers an immediate push of resolved privacy settings to all adapter handlers.
  *
  * Example:
  * @code
- * // User granted consent
+ * // Set privacy BEFORE initializing the SDK
  * [CloudXCore setHasUserConsent:@YES];
- * // Clear manual consent (defer to CMP)
- * [CloudXCore setHasUserConsent:nil];
+ * [[CloudXCore shared] initializeWithConfiguration:config completion:completion];
  * @endcode
  */
 + (void)setHasUserConsent:(nullable NSNumber *)hasUserConsent;
 
 /**
- * Set the user's CCPA do-not-sell status manually (bypassing CMP frameworks)
- * @param doNotSell @YES if user opted out of sale, @NO if sale allowed, nil to clear (defer to CMP)
- * @discussion This is a class method that can be called before SDK initialization.
+ * Set the user's CCPA do-not-sell status manually (bypassing CMP frameworks).
+ * @param doNotSell @YES if user opted out of sale, @NO if sale allowed, nil to clear (defer to CMP).
+ * @discussion Call this @b before initializing the SDK. Some ad network SDKs require privacy
+ * settings at initialization time and will not apply values set after init.
+ *
  * When set, this value is used as a fallback after GPP/CCPA signals in the privacy resolution chain.
  * Setting this also triggers an immediate push of resolved privacy settings to all adapter handlers.
  *
  * Example:
  * @code
- * // User opted out of sale
+ * // Set privacy BEFORE initializing the SDK
  * [CloudXCore setDoNotSell:@YES];
- * // Clear manual do-not-sell (defer to CMP)
- * [CloudXCore setDoNotSell:nil];
+ * [[CloudXCore shared] initializeWithConfiguration:config completion:completion];
  * @endcode
  */
 + (void)setDoNotSell:(nullable NSNumber *)doNotSell;

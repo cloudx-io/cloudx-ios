@@ -24,7 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Delegate for the adapter, used to notify about ad events.
  */
-@property (nonatomic, weak, nullable) id<CLXAdapterBannerDelegate> delegate;
+/// Strong to keep the callback chain alive through the ad lifecycle. Cycle is broken in destroy.
+@property (nonatomic, strong, nullable) id<CLXAdapterBannerDelegate> delegate;
 
 /**
  * Flag to indicate if the banner loading timed out.

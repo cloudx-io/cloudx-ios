@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXMetaInterstitial : NSObject <FBInterstitialAdDelegate, CLXAdapterInterstitial>
 
-@property (nonatomic, weak, nullable) id<CLXAdapterInterstitialDelegate> delegate;
+@property (nonatomic, strong, nullable) id<CLXAdapterInterstitialDelegate> delegate;
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
 
 - (instancetype)initWithBidPayload:(NSString *)bidPayload

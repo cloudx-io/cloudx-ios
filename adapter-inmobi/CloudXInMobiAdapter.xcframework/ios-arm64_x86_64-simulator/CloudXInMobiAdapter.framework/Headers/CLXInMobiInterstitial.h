@@ -13,8 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXInMobiInterstitial : NSObject <IMInterstitialDelegate, CLXAdapterInterstitial>
 
-@property (nonatomic, weak, nullable) id<CLXAdapterInterstitialDelegate> delegate;
+@property (nonatomic, strong, nullable) id<CLXAdapterInterstitialDelegate> delegate;
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
+@property (nonatomic, assign, readonly) BOOL isReady;
 
 - (instancetype)initWithBidPayload:(nullable NSData *)bidPayload
                        placementID:(long long)placementID

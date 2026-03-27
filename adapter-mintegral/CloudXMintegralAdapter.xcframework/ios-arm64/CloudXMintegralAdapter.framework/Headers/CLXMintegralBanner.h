@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CLXMintegralBanner : NSObject <MTGBannerAdViewDelegate, CLXAdapterBanner>
 
-@property (nonatomic, weak, nullable) id<CLXAdapterBannerDelegate> delegate;
+@property (nonatomic, strong, nullable) id<CLXAdapterBannerDelegate> delegate;
 @property (nonatomic, assign) BOOL timeout;
 @property (nonatomic, strong, nullable, readonly) UIView *bannerView;
 @property (nonatomic, copy, readonly) NSString *sdkVersion;

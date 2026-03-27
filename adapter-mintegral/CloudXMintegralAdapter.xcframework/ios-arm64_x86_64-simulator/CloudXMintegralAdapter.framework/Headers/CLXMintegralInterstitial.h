@@ -14,10 +14,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CLXMintegralInterstitial : NSObject <MTGNewInterstitialBidAdDelegate, MTGNewInterstitialAdDelegate, CLXAdapterInterstitial>
 
-@property (nonatomic, weak, nullable) id<CLXAdapterInterstitialDelegate> delegate;
+@property (nonatomic, strong, nullable) id<CLXAdapterInterstitialDelegate> delegate;
 @property (nonatomic, strong, readonly) NSString *sdkVersion;
 @property (nonatomic, strong, readonly) NSString *network;
 @property (nonatomic, strong, readonly) NSString *bidID;
+@property (nonatomic, assign, readonly) BOOL isReady;
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID

@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXInMobiBanner : NSObject <IMBannerDelegate, CLXAdapterBanner>
 
-@property (nonatomic, weak, nullable) id<CLXAdapterBannerDelegate> delegate;
+@property (nonatomic, strong, nullable) id<CLXAdapterBannerDelegate> delegate;
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
 
 - (instancetype)initWithBidPayload:(nullable NSData *)bidPayload

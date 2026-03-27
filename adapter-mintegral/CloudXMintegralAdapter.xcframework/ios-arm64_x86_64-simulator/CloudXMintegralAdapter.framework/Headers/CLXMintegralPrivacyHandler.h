@@ -15,7 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * @class CLXMintegralPrivacyHandler
- * @brief Forwards resolved privacy settings to the Mintegral SDK
+ * @brief Forwards publisher-set privacy flags to the Mintegral SDK.
+ * @discussion Active when publishers call setHasUserConsent:/setDoNotSell:
+ *             to manage consent directly. Not needed when a CMP is in use —
+ *             Mintegral reads CMP consent from NSUserDefaults on its own.
  */
 @interface CLXMintegralPrivacyHandler : NSObject <CLXAdapterPrivacyHandler>
 @end

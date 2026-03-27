@@ -83,6 +83,8 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     CLXErrorCodeAdsDisabled = 301,
     /// No ad fill available (no ads to show)
     CLXErrorCodeNoFill = 302,
+    /// Cannot load a fullscreen ad while another ad is currently being displayed
+    CLXErrorCodeLoadNotAllowedWhileShowing = 303,
     /// Ad failed to load for unknown reasons
     CLXErrorCodeLoadFailed = 304,
     
