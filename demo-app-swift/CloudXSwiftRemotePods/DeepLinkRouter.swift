@@ -324,18 +324,18 @@ enum DeepLinkRouter {
                 DemoAppLogger.sharedInstance.logMessage(
                     "test-all: ✅ \(format) loaded successfully (attempt \(attempt))")
 
-                let afterRevenue = {
-                    if shouldShow {
-                        showAndWaitForDismissal(format: format, adVC: adVC) {
+                if shouldShow {
+                    // Fullscreen: revenue fires on impression, so show first then verify revenue after dismissal
+                    showAndWaitForDismissal(format: format, adVC: adVC) {
+                        waitForRevenueCallback(stateVC, timeout: revenueTimeout, format: format) {
                             runFormat(formats, at: index + 1, tabVC: tabVC)
                         }
-                    } else {
+                    }
+                } else {
+                    // Banner/MREC: revenue fires after auto-display on load
+                    waitForRevenueCallback(stateVC, timeout: revenueTimeout, format: format) {
                         runFormat(formats, at: index + 1, tabVC: tabVC)
                     }
-                }
-
-                waitForRevenueCallback(stateVC, timeout: revenueTimeout, format: format) {
-                    afterRevenue()
                 }
             } else if attempt < maxRetries {
                 DemoAppLogger.sharedInstance.logMessage(

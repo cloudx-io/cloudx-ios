@@ -353,12 +353,14 @@ static NSTimeInterval const kRevenuePollInterval = 0.5;
                     [NSString stringWithFormat:@"test-all: ✅ %@ loaded successfully (attempt %lu)", format, (unsigned long)attempt]];
 
                 if (shouldShow) {
-                    [self waitForRevenueCallback:adVC timeout:kRevenueTimeout format:format completion:^{
-                        [self showAndWaitForDismissal:format adVC:adVC completion:^{
+                    // Fullscreen: revenue fires on impression, so show first then verify revenue after dismissal
+                    [self showAndWaitForDismissal:format adVC:adVC completion:^{
+                        [self waitForRevenueCallback:adVC timeout:kRevenueTimeout format:format completion:^{
                             [self runFormat:formats atIndex:index + 1 tabVC:tabVC];
                         }];
                     }];
                 } else {
+                    // Banner/MREC: revenue fires after auto-display on load
                     [self waitForRevenueCallback:adVC timeout:kRevenueTimeout format:format completion:^{
                         [self runFormat:formats atIndex:index + 1 tabVC:tabVC];
                     }];
