@@ -82,7 +82,7 @@
 }
 
 - (void)loadInterstitialAd {
-    self.revenueReceived = NO;
+    self.receivedCallbacks = AdCallbackEventNone;
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"Interstitial is already loading."];
         return;
@@ -203,7 +203,7 @@
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {
-    self.revenueReceived = YES;
+    self.receivedCallbacks |= AdCallbackEventRevenueReceived;
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Interstitial didPayRevenue" ad:ad];
 }
 

@@ -78,7 +78,7 @@
 }
 
 - (void)loadRewardedAd {
-    self.revenueReceived = NO;
+    self.receivedCallbacks = AdCallbackEventNone;
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"Rewarded ad is already loading."];
         return;
@@ -209,7 +209,7 @@
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {
-    self.revenueReceived = YES;
+    self.receivedCallbacks |= AdCallbackEventRevenueReceived;
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Rewarded didPayRevenue" ad:ad];
 }
 
