@@ -51,19 +51,22 @@ static BOOL _isDismissing = NO;
     DemoToastView *toast = [[DemoToastView alloc] initWithTitle:title
                                                         message:message
                                              hostViewController:viewController];
-    [viewController.view addSubview:toast];
+
+    // Add to the window so the safe area is hardware-only (notch), not nav bar
+    UIView *container = viewController.view.window ?: viewController.view;
+    [container addSubview:toast];
 
     toast.translatesAutoresizingMaskIntoConstraints = NO;
-    toast.topConstraint = [toast.topAnchor constraintEqualToAnchor:viewController.view.safeAreaLayoutGuide.topAnchor
+    toast.topConstraint = [toast.topAnchor constraintEqualToAnchor:container.safeAreaLayoutGuide.topAnchor
                                                            constant:-120];
 
     [NSLayoutConstraint activateConstraints:@[
         toast.topConstraint,
-        [toast.leadingAnchor constraintEqualToAnchor:viewController.view.leadingAnchor constant:kToastHorizontalPadding],
-        [toast.trailingAnchor constraintEqualToAnchor:viewController.view.trailingAnchor constant:-kToastHorizontalPadding]
+        [toast.leadingAnchor constraintEqualToAnchor:container.leadingAnchor constant:kToastHorizontalPadding],
+        [toast.trailingAnchor constraintEqualToAnchor:container.trailingAnchor constant:-kToastHorizontalPadding]
     ]];
 
-    [viewController.view layoutIfNeeded];
+    [container layoutIfNeeded];
 
     toast.topConstraint.constant = 0;
     [UIView animateWithDuration:kToastAnimationDuration

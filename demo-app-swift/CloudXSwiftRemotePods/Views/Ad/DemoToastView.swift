@@ -45,22 +45,25 @@ final class DemoToastView: UIView {
                                      title: String,
                                      message: String) {
         let toast = DemoToastView(title: title, message: message, host: viewController)
-        viewController.view.addSubview(toast)
+
+        // Add to the window so the safe area is hardware-only (notch), not nav bar
+        let container = viewController.view.window ?? viewController.view!
+        container.addSubview(toast)
 
         toast.translatesAutoresizingMaskIntoConstraints = false
         let top = toast.topAnchor.constraint(
-            equalTo: viewController.view.safeAreaLayoutGuide.topAnchor,
+            equalTo: container.safeAreaLayoutGuide.topAnchor,
             constant: -120
         )
         toast.topConstraint = top
 
         NSLayoutConstraint.activate([
             top,
-            toast.leadingAnchor.constraint(equalTo: viewController.view.leadingAnchor, constant: horizontalPadding),
-            toast.trailingAnchor.constraint(equalTo: viewController.view.trailingAnchor, constant: -horizontalPadding)
+            toast.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: horizontalPadding),
+            toast.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -horizontalPadding)
         ])
 
-        viewController.view.layoutIfNeeded()
+        container.layoutIfNeeded()
 
         top.constant = 0
         UIView.animate(
