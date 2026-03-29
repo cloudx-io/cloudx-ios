@@ -175,8 +175,6 @@
     
     // Add banner to view hierarchy
     self.bannerAd.translatesAutoresizingMaskIntoConstraints = NO;
-    self.bannerAd.backgroundColor = [UIColor redColor]; // DEBUG: Make banner container visible
-    
     [self.view addSubview:self.bannerAd];
 
     [NSLayoutConstraint activateConstraints:@[
