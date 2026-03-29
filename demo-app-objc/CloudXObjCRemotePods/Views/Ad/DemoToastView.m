@@ -65,7 +65,7 @@ static BOOL _isDismissing = NO;
 
     [viewController.view layoutIfNeeded];
 
-    toast.topConstraint.constant = 8;
+    toast.topConstraint.constant = 0;
     [UIView animateWithDuration:kToastAnimationDuration
                           delay:0
          usingSpringWithDamping:0.8

@@ -62,7 +62,7 @@ final class DemoToastView: UIView {
 
         viewController.view.layoutIfNeeded()
 
-        top.constant = 8
+        top.constant = 0
         UIView.animate(
             withDuration: animationDuration,
             delay: 0,
@@ -146,7 +146,7 @@ final class DemoToastView: UIView {
 
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(toastTapped)))
 
-        let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(dismissAnimated))
+        let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(dismissAnimated as () -> Void))
         swipeUp.direction = .up
         addGestureRecognizer(swipeUp)
     }
