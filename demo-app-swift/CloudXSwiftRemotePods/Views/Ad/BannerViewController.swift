@@ -64,6 +64,7 @@ class BannerViewController: BaseAdViewController {
     }
     
     @objc private func loadBannerAd() {
+        revenueReceived = false
         if isLoading {
             showAlert(title: "Info", message: "Banner is already loading.")
             return
@@ -178,6 +179,7 @@ extension BannerViewController: CLXBannerDelegate, CLXAdRevenueDelegate {
     }
     
     func didPayRevenue(for ad: CLXAd) {
+        revenueReceived = true
         DemoAppLogger.sharedInstance.logAdEvent("💰 Banner didPayRevenue", ad: ad)
     }
     

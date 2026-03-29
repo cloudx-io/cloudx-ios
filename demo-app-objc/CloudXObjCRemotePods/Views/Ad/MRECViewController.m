@@ -93,7 +93,7 @@
 }
 
 - (void)loadMRECAd {
-    
+    self.revenueReceived = NO;
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"MREC is already loading."];
         return;
@@ -204,6 +204,7 @@
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {
+    self.revenueReceived = YES;
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 MREC didPayRevenue" ad:ad];
 }
 

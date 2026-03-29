@@ -3,6 +3,7 @@ import CloudXCore
 
 protocol AdStateManaging {
     var isLoading: Bool { get set }
+    var revenueReceived: Bool { get set }
     func updateStatusUI(state: AdState)
 }
 
@@ -31,6 +32,7 @@ enum AdState {
 class BaseAdViewController: UIViewController, AdStateManaging {
     var cloudX: CloudXCore { CloudXCore.shared }
     var isLoading = false
+    var revenueReceived = false
     
     var appKey: String? {
         return CLXDemoConfigManager.sharedManager.currentConfig.appKey

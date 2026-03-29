@@ -10,6 +10,7 @@ typedef NS_ENUM(NSInteger, AdState) {
 
 @protocol AdStateManaging <NSObject>
 @property (nonatomic, assign) BOOL isLoading;
+@property (nonatomic, assign) BOOL revenueReceived;
 - (void)updateStatusUIWithState:(AdState)state;
 @end
 
@@ -20,6 +21,7 @@ typedef NS_ENUM(NSInteger, AdState) {
 @property (nonatomic, strong) UIStackView *statusStack;
 @property (nonatomic, strong) UIButton *sdkDebuggerButton;
 @property (nonatomic, assign) BOOL isLoading;
+@property (nonatomic, assign) BOOL revenueReceived;
 
 - (void)showAlertWithTitle:(NSString *)title message:(NSString *)message;
 - (void)initializeSDK;

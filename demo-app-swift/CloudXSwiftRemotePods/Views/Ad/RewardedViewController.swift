@@ -75,6 +75,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
     }
     
     @objc private func loadRewardedAd() {
+        revenueReceived = false
         if isLoading {
             showAlert(title: "Info", message: "Rewarded ad is already loading.")
             return
@@ -184,6 +185,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
     }
     
     func didPayRevenue(for ad: CLXAd) {
+        revenueReceived = true
         DemoAppLogger.sharedInstance.logAdEvent("💰 Rewarded didPayRevenue", ad: ad)
     }
     

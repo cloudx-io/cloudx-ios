@@ -122,6 +122,7 @@
 }
 
 - (void)loadBannerAd {
+    self.revenueReceived = NO;
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"Banner is already loading."];
         return;
@@ -258,6 +259,7 @@
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {
+    self.revenueReceived = YES;
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Banner didPayRevenue" ad:ad];
 }
 
