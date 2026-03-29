@@ -6,6 +6,7 @@
 #import "LogsModalViewController.h"
 #import "DemoAppLogger.h"
 #import "CLXDemoConfigManager.h"
+#import "DemoToastView.h"
 
 @implementation BaseAdViewController
 
@@ -46,19 +47,7 @@
 - (void)showAlertWithTitle:(NSString *)title message:(NSString *)message {
     NSString *safeTitle = title ?: @"Alert";
     NSString *safeMessage = message ?: @"";
-    dispatch_async(dispatch_get_main_queue(), ^{
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:safeTitle
-                                                                     message:safeMessage
-                                                              preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK"
-                                                          style:UIAlertActionStyleDefault
-                                                        handler:^(UIAlertAction * _Nonnull action) {
-            // No action needed
-        }];
-        [alert addAction:okAction];
-        [self presentViewController:alert animated:YES completion:nil];
-    });
+    [DemoToastView showInViewController:self title:safeTitle message:safeMessage];
 }
 
 - (void)initializeSDKWithCompletion:(void (^)(BOOL success, NSError *error))completion {

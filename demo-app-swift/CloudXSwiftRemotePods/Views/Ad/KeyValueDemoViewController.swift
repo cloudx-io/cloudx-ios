@@ -510,11 +510,11 @@ class KeyValueDemoViewController: UIViewController, UITableViewDelegate, UITable
         let key = sortedKeys[indexPath.row]
         let value = kvDict[key] ?? ""
         
-        let alert = UIAlertController(title: "Key-Value Details",
-                                     message: "Key: \(key)\nValue: \(value)\n\nType: \(indexPath.section == 0 ? "User-Level" : "App-Level")",
-                                     preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        present(alert, animated: true, completion: nil)
+        DemoToastView.show(
+            in: self,
+            title: "Key-Value Details",
+            message: "Key: \(key)\nValue: \(value)\n\nType: \(indexPath.section == 0 ? "User-Level" : "App-Level")"
+        )
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -560,9 +560,7 @@ class KeyValueDemoViewController: UIViewController, UITableViewDelegate, UITable
     // MARK: - Helpers
     
     private func showAlert(title: String, message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        present(alert, animated: true, completion: nil)
+        DemoToastView.show(in: self, title: title, message: message)
     }
 }
 
