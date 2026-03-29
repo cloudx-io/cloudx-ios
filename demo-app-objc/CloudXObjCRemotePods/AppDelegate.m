@@ -11,7 +11,6 @@
 #import <AdSupport/AdSupport.h>
 #import "DemoAppLogger.h"
 #import "AdDemoTabViewController.h"
-#import "CLXDeepLinkRouter.h"
 
 @interface AppDelegate ()
 
@@ -34,9 +33,6 @@
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.window.rootViewController = [[AdDemoTabViewController alloc] init];
     [self.window makeKeyAndVisible];
-    
-    // Process automation launch arguments (e.g., -CLXTestFormat banner -CLXTestAction load)
-    [CLXDeepLinkRouter handleLaunchArguments];
     
     return YES;
 }
@@ -67,8 +63,5 @@
     }
 }
 
-- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-    return [CLXDeepLinkRouter handleURL:url];
-}
 
 @end
