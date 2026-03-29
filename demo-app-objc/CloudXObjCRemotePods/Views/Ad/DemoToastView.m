@@ -18,6 +18,7 @@ static const CGFloat kToastCornerRadius = 12.0;
 
 static NSMutableArray<void (^)(void)> *_toastQueue;
 static BOOL _isShowingToast = NO;
+static BOOL _isDismissing = NO;
 
 @implementation DemoToastView
 
@@ -158,13 +159,15 @@ static BOOL _isShowingToast = NO;
 - (void)scheduleAutoDismiss {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kToastDisplayDuration * NSEC_PER_SEC)),
                    dispatch_get_main_queue(), ^{
-        if (self.superview) {
+        if (self.superview && !_isDismissing) {
             [self dismissAnimated];
         }
     });
 }
 
 - (void)toastTapped {
+    if (_isDismissing) return;
+
     UIViewController *host = self.hostViewController;
     NSString *msg = self.fullMessage;
     NSString *title = self.titleLabel.text;
@@ -184,6 +187,9 @@ static BOOL _isShowingToast = NO;
 }
 
 - (void)dismissAnimatedWithCompletion:(void (^ _Nullable)(void))completion {
+    if (_isDismissing) return;
+    _isDismissing = YES;
+
     self.topConstraint.constant = -120;
     [UIView animateWithDuration:kToastAnimationDuration
                           delay:0
@@ -192,6 +198,7 @@ static BOOL _isShowingToast = NO;
         [self.superview layoutIfNeeded];
         self.alpha = 0;
     } completion:^(BOOL finished) {
+        _isDismissing = NO;
         [self removeFromSuperview];
         if (completion) completion();
         [DemoToastView dequeueNext];

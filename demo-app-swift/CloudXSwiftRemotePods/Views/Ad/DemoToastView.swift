@@ -8,6 +8,7 @@ final class DemoToastView: UIView {
 
     private static var toastQueue: [() -> Void] = []
     private static var isShowingToast = false
+    private static var isDismissing = false
 
     private let titleLabel = UILabel()
     private let messageLabel = UILabel()
@@ -154,12 +155,14 @@ final class DemoToastView: UIView {
 
     private func scheduleAutoDismiss() {
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.displayDuration) { [weak self] in
-            guard let self, self.superview != nil else { return }
+            guard let self, self.superview != nil, !Self.isDismissing else { return }
             self.dismissAnimated()
         }
     }
 
     @objc private func toastTapped() {
+        guard !Self.isDismissing else { return }
+
         let host = hostViewController
         let msg = fullMessage
         let title = titleLabel.text ?? ""
@@ -177,6 +180,9 @@ final class DemoToastView: UIView {
     }
 
     private func dismissAnimated(completion: (() -> Void)?) {
+        guard !Self.isDismissing else { return }
+        Self.isDismissing = true
+
         topConstraint?.constant = -120
         UIView.animate(
             withDuration: Self.animationDuration,
@@ -187,6 +193,7 @@ final class DemoToastView: UIView {
                 self.alpha = 0
             },
             completion: { _ in
+                Self.isDismissing = false
                 self.removeFromSuperview()
                 completion?()
                 Self.dequeueNext()

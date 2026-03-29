@@ -47,9 +47,7 @@
 - (void)showAlertWithTitle:(NSString *)title message:(NSString *)message {
     NSString *safeTitle = title ?: @"Alert";
     NSString *safeMessage = message ?: @"";
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [DemoToastView showInViewController:self title:safeTitle message:safeMessage];
-    });
+    [DemoToastView showInViewController:self title:safeTitle message:safeMessage];
 }
 
 - (void)initializeSDKWithCompletion:(void (^)(BOOL success, NSError *error))completion {

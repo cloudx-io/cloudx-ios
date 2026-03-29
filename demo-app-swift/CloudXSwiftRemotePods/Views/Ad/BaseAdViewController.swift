@@ -89,9 +89,7 @@ class BaseAdViewController: UIViewController, AdStateManaging {
     private static var lastAdFormat: String?
     
     func showAlert(title: String, message: String) {
-        DispatchQueue.main.async {
-            DemoToastView.show(in: self, title: title, message: message)
-        }
+        DemoToastView.show(in: self, title: title, message: message)
     }
     
     func initializeSDK() async {
