@@ -46,15 +46,15 @@ final class DemoToastView: UIView {
                                      message: String) {
         let toast = DemoToastView(title: title, message: message, host: viewController)
 
-        // Add to the window so the safe area is hardware-only (notch), not nav bar
         let container = viewController.view.window ?? viewController.view!
         container.addSubview(toast)
 
         toast.translatesAutoresizingMaskIntoConstraints = false
-        let top = toast.topAnchor.constraint(
-            equalTo: container.safeAreaLayoutGuide.topAnchor,
-            constant: -120
-        )
+
+        // Anchor to the window's top + safe area inset manually to avoid layout engine ambiguity
+        var safeTop = container.safeAreaInsets.top
+        if safeTop < 20 { safeTop = 59 } // Dynamic Island fallback
+        let top = toast.topAnchor.constraint(equalTo: container.topAnchor, constant: -120)
         toast.topConstraint = top
 
         NSLayoutConstraint.activate([
@@ -65,14 +65,15 @@ final class DemoToastView: UIView {
 
         container.layoutIfNeeded()
 
-        top.constant = 0
+        // Slide to just below the hardware safe area (notch / Dynamic Island) with 4pt breathing room
+        top.constant = safeTop + 4
         UIView.animate(
             withDuration: animationDuration,
             delay: 0,
             usingSpringWithDamping: 0.8,
             initialSpringVelocity: 0.5,
             options: .curveEaseOut,
-            animations: { viewController.view.layoutIfNeeded() },
+            animations: { container.layoutIfNeeded() },
             completion: { _ in toast.scheduleAutoDismiss() }
         )
     }
