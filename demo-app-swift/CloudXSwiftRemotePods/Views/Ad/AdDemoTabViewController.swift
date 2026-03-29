@@ -1,13 +1,6 @@
 import UIKit
 
 class AdDemoTabViewController: UITabBarController {
-
-    /// Selects the tab at the given index, handling the "More" tab if needed.
-    func selectTab(at index: Int) {
-        if index < (viewControllers?.count ?? 0) {
-            selectedIndex = index
-        }
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

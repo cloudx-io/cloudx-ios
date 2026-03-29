@@ -31,14 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window?.rootViewController = AdDemoTabViewController()
         self.window?.makeKeyAndVisible()
         
-        // Process automation launch arguments (e.g., -CLXTestFormat banner -CLXTestAction load)
-        DeepLinkRouter.handleLaunchArguments()
-        
         return true
-    }
-    
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        return DeepLinkRouter.handleURL(url)
     }
     
     private func requestAppTrackingTransparencyPermission() {
