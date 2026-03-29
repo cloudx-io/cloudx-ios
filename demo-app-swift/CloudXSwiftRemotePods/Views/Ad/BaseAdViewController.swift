@@ -90,9 +90,7 @@ class BaseAdViewController: UIViewController, AdStateManaging {
     
     func showAlert(title: String, message: String) {
         DispatchQueue.main.async {
-            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-            alert.addAction(.init(title: "OK", style: .default))
-            self.present(alert, animated: true)
+            DemoToastView.show(in: self, title: title, message: message)
         }
     }
     

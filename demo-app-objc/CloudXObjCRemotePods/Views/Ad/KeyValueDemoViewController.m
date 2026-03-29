@@ -9,6 +9,7 @@
 #import <CloudXCore/CloudXCore.h>
 #import <CloudXCore/CLXKeyValueState.h>
 #import "DemoAppLogger.h"
+#import "DemoToastView.h"
 
 @interface KeyValueDemoViewController () <UITableViewDelegate, UITableViewDataSource>
 
@@ -518,14 +519,10 @@
     NSArray *sortedKeys = [[kvDict allKeys] sortedArrayUsingSelector:@selector(compare:)];
     NSString *key = sortedKeys[indexPath.row];
     NSString *value = kvDict[key];
-    
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Key-Value Details" 
-                                                                   message:[NSString stringWithFormat:@"Key: %@\nValue: %@\n\nType: %@", 
-                                                                           key, value,
-                                                                           indexPath.section == 0 ? @"User-Level" : @"App-Level"]
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
-    [self presentViewController:alert animated:YES completion:nil];
+    NSString *detail = [NSString stringWithFormat:@"Key: %@\nValue: %@\n\nType: %@",
+                        key, value,
+                        indexPath.section == 0 ? @"User-Level" : @"App-Level"];
+    [DemoToastView showInViewController:self title:@"Key-Value Details" message:detail];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -560,11 +557,7 @@
 #pragma mark - Helpers
 
 - (void)showAlert:(NSString *)title message:(NSString *)message {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title 
-                                                                   message:message 
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
-    [self presentViewController:alert animated:YES completion:nil];
+    [DemoToastView showInViewController:self title:title message:message];
 }
 
 @end
