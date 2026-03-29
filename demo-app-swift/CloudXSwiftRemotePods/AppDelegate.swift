@@ -31,7 +31,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window?.rootViewController = AdDemoTabViewController()
         self.window?.makeKeyAndVisible()
         
+        DeepLinkRouter.handleLaunchArguments()
+        
         return true
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        return DeepLinkRouter.handleURL(url)
     }
     
     private func requestAppTrackingTransparencyPermission() {

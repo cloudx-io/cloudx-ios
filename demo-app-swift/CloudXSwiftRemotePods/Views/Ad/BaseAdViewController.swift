@@ -1,8 +1,19 @@
 import UIKit
 import CloudXCore
 
+struct AdCallbackEvent: OptionSet {
+    let rawValue: UInt
+    static let loaded           = AdCallbackEvent(rawValue: 1 << 0)
+    static let revenueReceived  = AdCallbackEvent(rawValue: 1 << 1)
+    static let clicked          = AdCallbackEvent(rawValue: 1 << 2)
+    static let displayed        = AdCallbackEvent(rawValue: 1 << 3)
+    static let hidden           = AdCallbackEvent(rawValue: 1 << 4)
+    static let rewarded         = AdCallbackEvent(rawValue: 1 << 5)
+}
+
 protocol AdStateManaging {
     var isLoading: Bool { get set }
+    var receivedCallbacks: AdCallbackEvent { get set }
     func updateStatusUI(state: AdState)
 }
 
@@ -31,6 +42,7 @@ enum AdState {
 class BaseAdViewController: UIViewController, AdStateManaging {
     var cloudX: CloudXCore { CloudXCore.shared }
     var isLoading = false
+    var receivedCallbacks: AdCallbackEvent = []
     
     var appKey: String? {
         return CLXDemoConfigManager.sharedManager.currentConfig.appKey

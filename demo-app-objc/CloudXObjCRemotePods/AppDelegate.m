@@ -11,6 +11,7 @@
 #import <AdSupport/AdSupport.h>
 #import "DemoAppLogger.h"
 #import "AdDemoTabViewController.h"
+#import "CLXDeepLinkRouter.h"
 
 @interface AppDelegate ()
 
@@ -34,7 +35,13 @@
     self.window.rootViewController = [[AdDemoTabViewController alloc] init];
     [self.window makeKeyAndVisible];
     
+    [CLXDeepLinkRouter handleLaunchArguments];
+    
     return YES;
+}
+
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+    return [CLXDeepLinkRouter handleURL:url];
 }
 
 - (void)requestAppTrackingTransparencyPermission {

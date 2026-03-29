@@ -47,4 +47,10 @@
     ];
 }
 
+- (void)selectTabIndex:(NSUInteger)index {
+    if (index < self.viewControllers.count) {
+        self.selectedIndex = index;
+    }
+}
+
 @end 

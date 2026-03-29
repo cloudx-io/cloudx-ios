@@ -93,7 +93,7 @@
 }
 
 - (void)loadMRECAd {
-    
+    self.receivedCallbacks = AdCallbackEventNone;
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"MREC is already loading."];
         return;
@@ -158,6 +158,7 @@
         self.mrecAd = nil;
     }
     self.isLoading = NO;
+    self.receivedCallbacks = AdCallbackEventNone;
 }
 
 - (void)toggleAutoRefresh {
@@ -204,6 +205,7 @@
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventRevenueReceived;
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 MREC didPayRevenue" ad:ad];
 }
 

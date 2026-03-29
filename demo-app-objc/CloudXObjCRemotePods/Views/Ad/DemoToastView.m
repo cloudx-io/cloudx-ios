@@ -51,28 +51,35 @@ static BOOL _isDismissing = NO;
     DemoToastView *toast = [[DemoToastView alloc] initWithTitle:title
                                                         message:message
                                              hostViewController:viewController];
-    [viewController.view addSubview:toast];
+
+    UIView *container = viewController.view.window ?: viewController.view;
+    [container addSubview:toast];
 
     toast.translatesAutoresizingMaskIntoConstraints = NO;
-    toast.topConstraint = [toast.topAnchor constraintEqualToAnchor:viewController.view.safeAreaLayoutGuide.topAnchor
+
+    // Anchor to the window's top + safe area inset manually to avoid layout engine ambiguity
+    CGFloat safeTop = container.safeAreaInsets.top;
+    if (safeTop < 20) safeTop = 59; // Dynamic Island fallback
+    toast.topConstraint = [toast.topAnchor constraintEqualToAnchor:container.topAnchor
                                                            constant:-120];
 
     [NSLayoutConstraint activateConstraints:@[
         toast.topConstraint,
-        [toast.leadingAnchor constraintEqualToAnchor:viewController.view.leadingAnchor constant:kToastHorizontalPadding],
-        [toast.trailingAnchor constraintEqualToAnchor:viewController.view.trailingAnchor constant:-kToastHorizontalPadding]
+        [toast.leadingAnchor constraintEqualToAnchor:container.leadingAnchor constant:kToastHorizontalPadding],
+        [toast.trailingAnchor constraintEqualToAnchor:container.trailingAnchor constant:-kToastHorizontalPadding]
     ]];
 
-    [viewController.view layoutIfNeeded];
+    [container layoutIfNeeded];
 
-    toast.topConstraint.constant = 0;
+    // Slide to just below the hardware safe area (notch / Dynamic Island) with 4pt breathing room
+    toast.topConstraint.constant = safeTop + 4;
     [UIView animateWithDuration:kToastAnimationDuration
                           delay:0
          usingSpringWithDamping:0.8
           initialSpringVelocity:0.5
                         options:UIViewAnimationOptionCurveEaseOut
                      animations:^{
-        [viewController.view layoutIfNeeded];
+        [container layoutIfNeeded];
     } completion:^(BOOL finished) {
         [toast scheduleAutoDismiss];
     }];

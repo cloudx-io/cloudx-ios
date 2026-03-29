@@ -64,6 +64,7 @@ class BannerViewController: BaseAdViewController {
     }
     
     @objc private func loadBannerAd() {
+        receivedCallbacks = []
         if isLoading {
             showAlert(title: "Info", message: "Banner is already loading.")
             return
@@ -150,6 +151,7 @@ class BannerViewController: BaseAdViewController {
         bannerAd?.destroy()
         bannerAd = nil
         isLoading = false
+        receivedCallbacks = []
         updateStatusUI(state: .noAd)
     }
 }
@@ -178,6 +180,7 @@ extension BannerViewController: CLXBannerDelegate, CLXAdRevenueDelegate {
     }
     
     func didPayRevenue(for ad: CLXAd) {
+        receivedCallbacks.insert(.revenueReceived)
         DemoAppLogger.sharedInstance.logAdEvent("💰 Banner didPayRevenue", ad: ad)
     }
     

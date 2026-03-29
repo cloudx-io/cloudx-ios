@@ -122,6 +122,7 @@
 }
 
 - (void)loadBannerAd {
+    self.receivedCallbacks = AdCallbackEventNone;
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"Banner is already loading."];
         return;
@@ -174,8 +175,6 @@
     
     // Add banner to view hierarchy
     self.bannerAd.translatesAutoresizingMaskIntoConstraints = NO;
-    self.bannerAd.backgroundColor = [UIColor redColor]; // DEBUG: Make banner container visible
-    
     [self.view addSubview:self.bannerAd];
 
     [NSLayoutConstraint activateConstraints:@[
@@ -227,6 +226,7 @@
     }
     self.bannerAd = nil;
     self.isLoading = NO;
+    self.receivedCallbacks = AdCallbackEventNone;
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
@@ -258,6 +258,7 @@
 }
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventRevenueReceived;
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Banner didPayRevenue" ad:ad];
 }
 

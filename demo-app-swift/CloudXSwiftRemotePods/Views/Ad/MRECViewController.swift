@@ -85,7 +85,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
     }
     
     @objc private func loadMRECAd() {
-        
+        receivedCallbacks = []
         if isLoading {
             showAlert(title: "Info", message: "MREC is already loading.")
             return
@@ -150,6 +150,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
             self.mrecAd = nil
         }
         isLoading = false
+        receivedCallbacks = []
     }
     
     @objc private func toggleAutoRefresh() {
@@ -223,6 +224,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
     }
     
     func didPayRevenue(for ad: CLXAd) {
+        receivedCallbacks.insert(.revenueReceived)
         DemoAppLogger.sharedInstance.logAdEvent("💰 MREC didPayRevenue", ad: ad)
     }
     

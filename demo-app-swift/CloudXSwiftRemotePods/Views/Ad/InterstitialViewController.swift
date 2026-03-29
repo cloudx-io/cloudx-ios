@@ -61,7 +61,7 @@ class InterstitialViewController: BaseAdViewController {
     }
     
     @objc private func loadInterstitialAd() {
-        
+        receivedCallbacks = []
         if isLoading {
             showAlert(title: "Info", message: "Interstitial is already loading.")
             return
@@ -184,6 +184,7 @@ class InterstitialViewController: BaseAdViewController {
         interstitialAd = nil
         isLoading = false
         showAdWhenLoaded = false
+        receivedCallbacks = []
         updateStatusUI(state: AdState.noAd)
     }
 }
@@ -238,6 +239,7 @@ extension InterstitialViewController: CLXInterstitialDelegate, CLXAdRevenueDeleg
     }
     
     func didPayRevenue(for ad: CLXAd) {
+        receivedCallbacks.insert(.revenueReceived)
         DemoAppLogger.sharedInstance.logAdEvent("💰 Interstitial didPayRevenue", ad: ad)
     }
 } 

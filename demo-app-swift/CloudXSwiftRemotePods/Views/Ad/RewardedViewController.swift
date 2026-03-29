@@ -75,6 +75,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
     }
     
     @objc private func loadRewardedAd() {
+        receivedCallbacks = []
         if isLoading {
             showAlert(title: "Info", message: "Rewarded ad is already loading.")
             return
@@ -117,6 +118,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
     private func resetAdState() {
         rewardedAd = nil
         isLoading = false
+        receivedCallbacks = []
     }
     
     @objc private func showRewardedAd() {
@@ -184,6 +186,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
     }
     
     func didPayRevenue(for ad: CLXAd) {
+        receivedCallbacks.insert(.revenueReceived)
         DemoAppLogger.sharedInstance.logAdEvent("💰 Rewarded didPayRevenue", ad: ad)
     }
     
