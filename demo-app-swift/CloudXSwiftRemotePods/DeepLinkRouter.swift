@@ -225,6 +225,7 @@ enum DeepLinkRouter {
 
     private static let adLoadTimeout: TimeInterval = 30.0
     private static let revenueTimeout: TimeInterval = 5.0
+    private static let revenuePollInterval: TimeInterval = 0.5
     private static let fullscreenDismissTimeout: TimeInterval = 90.0
     private static let pollInterval: TimeInterval = 1.0
     private static let maxLoadRetries = 3
@@ -257,7 +258,8 @@ enum DeepLinkRouter {
         DemoAppLogger.sharedInstance.logMessage(
             "test-all [\(index + 1)/\(formats.count)]: Testing \(format)")
 
-        let _ = dismissAlertReturningClassName()
+        let dismissedClassName = dismissAlertReturningClassName()
+        logUIState(dismissedClassName: dismissedClassName)
 
         guard let tabIdx = tabIndex(for: format),
               tabIdx < tabVC.viewControllers?.count ?? 0 else {
@@ -432,8 +434,8 @@ enum DeepLinkRouter {
             return
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            pollRevenueState(adVC, elapsed: elapsed + 0.5, timeout: timeout, format: format, completion: completion)
+        DispatchQueue.main.asyncAfter(deadline: .now() + revenuePollInterval) {
+            pollRevenueState(adVC, elapsed: elapsed + revenuePollInterval, timeout: timeout, format: format, completion: completion)
         }
     }
 

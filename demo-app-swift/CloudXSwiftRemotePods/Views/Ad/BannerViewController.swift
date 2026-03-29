@@ -151,6 +151,7 @@ class BannerViewController: BaseAdViewController {
         bannerAd?.destroy()
         bannerAd = nil
         isLoading = false
+        receivedCallbacks = []
         updateStatusUI(state: .noAd)
     }
 }

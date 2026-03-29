@@ -118,6 +118,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
     private func resetAdState() {
         rewardedAd = nil
         isLoading = false
+        receivedCallbacks = []
     }
     
     @objc private func showRewardedAd() {

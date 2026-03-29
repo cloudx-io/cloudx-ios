@@ -158,6 +158,7 @@
         self.mrecAd = nil;
     }
     self.isLoading = NO;
+    self.receivedCallbacks = AdCallbackEventNone;
 }
 
 - (void)toggleAutoRefresh {

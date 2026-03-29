@@ -184,6 +184,7 @@ class InterstitialViewController: BaseAdViewController {
         interstitialAd = nil
         isLoading = false
         showAdWhenLoaded = false
+        receivedCallbacks = []
         updateStatusUI(state: AdState.noAd)
     }
 }

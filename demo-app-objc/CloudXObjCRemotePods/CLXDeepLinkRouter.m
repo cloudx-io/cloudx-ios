@@ -11,6 +11,8 @@ static NSTimeInterval const kFullscreenDismissTimeout = 90.0;
 static NSTimeInterval const kPollInterval = 1.0;
 static NSUInteger const kMaxLoadRetries = 3;
 static NSTimeInterval const kRetryDelay = 3.0;
+static NSTimeInterval const kRevenueTimeout = 5.0;
+static NSTimeInterval const kRevenuePollInterval = 0.5;
 
 @implementation CLXDeepLinkRouter
 
@@ -351,13 +353,13 @@ static NSTimeInterval const kRetryDelay = 3.0;
                     [NSString stringWithFormat:@"test-all: ✅ %@ loaded successfully (attempt %lu)", format, (unsigned long)attempt]];
 
                 if (shouldShow) {
-                    [self waitForRevenueCallback:adVC timeout:5.0 format:format completion:^{
+                    [self waitForRevenueCallback:adVC timeout:kRevenueTimeout format:format completion:^{
                         [self showAndWaitForDismissal:format adVC:adVC completion:^{
                             [self runFormat:formats atIndex:index + 1 tabVC:tabVC];
                         }];
                     }];
                 } else {
-                    [self waitForRevenueCallback:adVC timeout:5.0 format:format completion:^{
+                    [self waitForRevenueCallback:adVC timeout:kRevenueTimeout format:format completion:^{
                         [self runFormat:formats atIndex:index + 1 tabVC:tabVC];
                     }];
                 }
@@ -423,10 +425,9 @@ static NSTimeInterval const kRetryDelay = 3.0;
         }
 
         // Fullscreen ad is likely displaying — wait for it to be dismissed
-        [self waitForFullscreenDismissal:adVC
-                                 elapsed:0
-                                 timeout:kFullscreenDismissTimeout
-                              completion:^{
+        [self waitForFullscreenDismissalElapsed:0
+                                        timeout:kFullscreenDismissTimeout
+                                     completion:^{
             [[DemoAppLogger sharedInstance] logMessage:
                 [NSString stringWithFormat:@"test-all: %@ fullscreen dismissed", format]];
             if (completion) completion();
@@ -434,10 +435,9 @@ static NSTimeInterval const kRetryDelay = 3.0;
     });
 }
 
-+ (void)waitForFullscreenDismissal:(UIViewController *)adVC
-                           elapsed:(NSTimeInterval)elapsed
-                           timeout:(NSTimeInterval)timeout
-                        completion:(void (^)(void))completion {
++ (void)waitForFullscreenDismissalElapsed:(NSTimeInterval)elapsed
+                                    timeout:(NSTimeInterval)timeout
+                                 completion:(void (^)(void))completion {
 
     UIViewController *rootVC = [self keyWindowFromConnectedScenes].rootViewController;
     UIViewController *presented = rootVC.presentedViewController;
@@ -458,7 +458,7 @@ static NSTimeInterval const kRetryDelay = 3.0;
     }
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self waitForFullscreenDismissal:adVC elapsed:elapsed + 2.0 timeout:timeout completion:completion];
+        [self waitForFullscreenDismissalElapsed:elapsed + 2.0 timeout:timeout completion:completion];
     });
 }
 
@@ -537,8 +537,8 @@ static NSTimeInterval const kRetryDelay = 3.0;
         return;
     }
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self pollRevenueState:adVC elapsed:elapsed + 0.5 timeout:timeout format:format completion:completion];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kRevenuePollInterval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self pollRevenueState:adVC elapsed:elapsed + kRevenuePollInterval timeout:timeout format:format completion:completion];
     });
 }
 

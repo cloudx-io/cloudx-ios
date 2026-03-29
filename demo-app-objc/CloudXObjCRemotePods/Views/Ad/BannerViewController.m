@@ -228,6 +228,7 @@
     }
     self.bannerAd = nil;
     self.isLoading = NO;
+    self.receivedCallbacks = AdCallbackEventNone;
     [self updateStatusUIWithState:AdStateNoAd];
 }
 

@@ -150,6 +150,7 @@
     self.interstitialAd = nil;
     self.isLoading = NO;
     self.showAdWhenLoaded = NO;
+    self.receivedCallbacks = AdCallbackEventNone;
     [self updateStatusUIWithState:AdStateNoAd];
 }
 

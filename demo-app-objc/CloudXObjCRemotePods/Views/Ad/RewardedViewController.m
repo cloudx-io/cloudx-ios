@@ -121,6 +121,7 @@
 - (void)resetAdState {
     self.rewardedAd = nil;
     self.isLoading = NO;
+    self.receivedCallbacks = AdCallbackEventNone;
 }
 
 - (void)createRewardedAd {

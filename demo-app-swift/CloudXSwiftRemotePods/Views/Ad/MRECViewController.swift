@@ -150,6 +150,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
             self.mrecAd = nil
         }
         isLoading = false
+        receivedCallbacks = []
     }
     
     @objc private func toggleAutoRefresh() {
