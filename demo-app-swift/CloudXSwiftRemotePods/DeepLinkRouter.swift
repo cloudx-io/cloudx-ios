@@ -118,8 +118,8 @@ enum DeepLinkRouter {
 
         let action = queryValue(forKey: "action", in: url) ?? "load"
 
-        guard let tabIndex = tabIndex(for: format) else {
-            DemoAppLogger.sharedInstance.logMessage("Unknown format: \(format)")
+        guard let tabIndex = tabIndex(for: format, in: tabVC) else {
+            DemoAppLogger.sharedInstance.logMessage("Unknown or unavailable format: \(format)")
             return
         }
 
@@ -269,9 +269,9 @@ enum DeepLinkRouter {
         let dismissedClassName = dismissAlertReturningClassName()
         logUIState(dismissedClassName: dismissedClassName)
 
-        guard let tabIdx = tabIndex(for: format),
+        guard let tabIdx = tabIndex(for: format, in: tabVC),
               tabIdx < tabVC.viewControllers?.count ?? 0 else {
-            DemoAppLogger.sharedInstance.logMessage("test-all: Skipping \(format) — invalid tab index")
+            DemoAppLogger.sharedInstance.logMessage("test-all: Skipping \(format) — no matching tab in this app")
             runFormat(formats, at: index + 1, tabVC: tabVC)
             return
         }
@@ -574,15 +574,37 @@ enum DeepLinkRouter {
 
     // MARK: - Tab Resolution
 
-    private static func tabIndex(for format: String) -> Int? {
-        let map: [String: Int] = [
-            "banner": 1,
-            "mrec": 4,
-            "interstitial": 2,
-            "rewarded": 3,
-            "rewarded-interstitial": 5,
+    /// Scans the tab bar's viewControllers array and matches by VC class name
+    /// rather than hardcoded indices, so the router works regardless of which
+    /// formats an app includes or how its tabs are ordered.
+    private static func tabIndex(for format: String, in tabVC: AdDemoTabViewController) -> Int? {
+        let classNameMap: [String: String] = [
+            "banner":                "BannerViewController",
+            "mrec":                  "MRECViewController",
+            "interstitial":          "InterstitialViewController",
+            "rewarded":              "RewardedViewController",
+            "rewarded-interstitial": "RewardedInterstitialViewController",
         ]
-        return map[format]
+
+        guard let targetClassName = classNameMap[format],
+              let vcs = tabVC.viewControllers else { return nil }
+
+        for (index, vc) in vcs.enumerated() {
+            let contentVC: UIViewController?
+            if let navVC = vc as? UINavigationController {
+                contentVC = navVC.viewControllers.first
+            } else {
+                contentVC = vc
+            }
+            guard let contentVC = contentVC else { continue }
+            if String(describing: type(of: contentVC)) == targetClassName {
+                return index
+            }
+        }
+
+        DemoAppLogger.sharedInstance.logMessage(
+            "tabIndex(for:): No tab found for '\(format)' (expected VC class: \(targetClassName))")
+        return nil
     }
 
     private static func selector(for format: String, action: String) -> Selector? {

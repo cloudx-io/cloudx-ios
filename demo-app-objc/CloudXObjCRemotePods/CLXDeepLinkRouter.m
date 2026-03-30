@@ -130,9 +130,9 @@ static NSTimeInterval const kRevenuePollInterval = 0.5;
         return;
     }
 
-    NSInteger tabIndex = [self tabIndexForFormat:format];
+    NSInteger tabIndex = [self tabIndexForFormat:format inTabVC:tabVC];
     if (tabIndex < 0) {
-        [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Unknown format: %@", format]];
+        [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Unknown or unavailable format: %@", format]];
         return;
     }
 
@@ -299,10 +299,10 @@ static NSTimeInterval const kRevenuePollInterval = 0.5;
     NSString *dismissedAlert = [self dismissAlertReturningClassName];
     [self logUIState:dismissedAlert];
 
-    NSInteger tabIndex = [self tabIndexForFormat:format];
+    NSInteger tabIndex = [self tabIndexForFormat:format inTabVC:tabVC];
     if (tabIndex < 0 || tabIndex >= (NSInteger)tabVC.viewControllers.count) {
         [[DemoAppLogger sharedInstance] logMessage:
-            [NSString stringWithFormat:@"⚠️ test-all: Skipping %@ — invalid tab index", format]];
+            [NSString stringWithFormat:@"⚠️ test-all: Skipping %@ — no matching tab in this app", format]];
         [self runFormat:formats atIndex:index + 1 tabVC:tabVC];
         return;
     }
@@ -613,20 +613,41 @@ static NSTimeInterval const kRevenuePollInterval = 0.5;
 
 #pragma mark - Tab & VC Resolution
 
-+ (NSInteger)tabIndexForFormat:(NSString *)format {
-    static NSDictionary<NSString *, NSNumber *> *map;
+// Scans the tab bar's viewControllers array and matches by VC class name
+// rather than hardcoded indices, so the router works regardless of which
+// formats an app includes or how its tabs are ordered.
++ (NSInteger)tabIndexForFormat:(NSString *)format inTabVC:(AdDemoTabViewController *)tabVC {
+    static NSDictionary<NSString *, NSString *> *classNameMap;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        map = @{
-            @"banner": @1,
-            @"mrec": @4,
-            @"interstitial": @2,
-            @"rewarded": @3,
-            @"rewarded-interstitial": @5,
+        classNameMap = @{
+            @"banner":                 @"BannerViewController",
+            @"mrec":                   @"MRECViewController",
+            @"interstitial":           @"InterstitialViewController",
+            @"rewarded":               @"RewardedViewController",
+            @"rewarded-interstitial":  @"RewardedInterstitialViewController",
         };
     });
-    NSNumber *index = map[format];
-    return index ? index.integerValue : -1;
+
+    NSString *targetClassName = classNameMap[format];
+    if (!targetClassName) return -1;
+
+    NSArray<UIViewController *> *vcs = tabVC.viewControllers;
+    for (NSUInteger i = 0; i < vcs.count; i++) {
+        UIViewController *vc = vcs[i];
+        UIViewController *contentVC = vc;
+        if ([vc isKindOfClass:[UINavigationController class]]) {
+            contentVC = ((UINavigationController *)vc).viewControllers.firstObject;
+        }
+        if (!contentVC) continue;
+        if ([NSStringFromClass([contentVC class]) isEqualToString:targetClassName]) {
+            return (NSInteger)i;
+        }
+    }
+
+    [[DemoAppLogger sharedInstance] logMessage:
+        [NSString stringWithFormat:@"tabIndexForFormat: No tab found for '%@' (expected VC class: %@)", format, targetClassName]];
+    return -1;
 }
 
 + (SEL)selectorForFormat:(NSString *)format action:(NSString *)action {
