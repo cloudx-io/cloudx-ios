@@ -7,16 +7,18 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXDestroyable.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol CLXAdapterRewardedDelegate;
 
 /// Protocol for rewarded adapters.
-@protocol CLXAdapterRewarded <NSObject>
+@protocol CLXAdapterRewarded <CLXDestroyable>
 
 /// Delegate for the adapter, used to notify about ad events.
-@property (nonatomic, weak) id<CLXAdapterRewardedDelegate> delegate;
+/// Strong to keep the callback chain alive through the ad lifecycle. Cycle is broken in destroy.
+@property (nonatomic, strong, nullable) id<CLXAdapterRewardedDelegate> delegate;
 
 /// SDK version of the adapter.
 @property (nonatomic, strong, readonly) NSString *sdkVersion;
@@ -36,6 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// Shows the rewarded adapter.
 /// - Parameter viewController: view controller where the interstitial will be displayed
 - (void)showFromViewController:(UIViewController *)viewController;
+
+/// Destroys the adapter and breaks the retain cycle by nilling the delegate.
+- (void)destroy;
 
 @end
 

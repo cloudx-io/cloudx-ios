@@ -100,6 +100,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable id)getCurrentAdapter NS_REQUIRES_SUPER;
 
 /**
+ * Clears the current adapter reference after cleanup.
+ */
+- (void)clearCurrentAdapter NS_REQUIRES_SUPER;
+
+/**
  * Sets up the adapter delegate and initiates loading with timeout protection.
  */
 - (void)setupAdapterAndLoad:(id)adapter NS_REQUIRES_SUPER;
@@ -127,6 +132,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
-
 
 

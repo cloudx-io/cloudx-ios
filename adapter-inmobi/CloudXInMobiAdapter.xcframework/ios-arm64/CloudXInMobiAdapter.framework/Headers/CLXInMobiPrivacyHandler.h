@@ -15,7 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * @class CLXInMobiPrivacyHandler
- * @brief Forwards resolved privacy settings to the InMobi SDK
+ * @brief Forwards publisher-set privacy flags to the InMobi SDK.
+ * @discussion Active when publishers call setHasUserConsent:/setDoNotSell:
+ *             to manage consent directly. Not needed when a CMP is in use —
+ *             InMobi reads CMP consent from NSUserDefaults on its own.
  */
 @interface CLXInMobiPrivacyHandler : NSObject <CLXAdapterPrivacyHandler>
 @end

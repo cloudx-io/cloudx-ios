@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXUnityAdsBanner : NSObject <CLXAdapterBanner, UADSBannerAdDelegate>
 
-@property (nonatomic, weak, nullable) id<CLXAdapterBannerDelegate> delegate;
+@property (nonatomic, strong, nullable) id<CLXAdapterBannerDelegate> delegate;
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
 @property (nonatomic, copy, readonly) NSString *network;
 @property (nonatomic, copy, readonly) NSString *bidID;

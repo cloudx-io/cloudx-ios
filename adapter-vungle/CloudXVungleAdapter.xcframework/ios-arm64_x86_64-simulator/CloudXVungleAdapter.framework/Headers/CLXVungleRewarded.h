@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * CloudX adapter delegate for receiving ad events
  */
-@property (nonatomic, weak, nullable) id<CLXAdapterRewardedDelegate> delegate;
+@property (nonatomic, strong, nullable) id<CLXAdapterRewardedDelegate> delegate;
 
 /**
  * SDK version of the Vungle SDK

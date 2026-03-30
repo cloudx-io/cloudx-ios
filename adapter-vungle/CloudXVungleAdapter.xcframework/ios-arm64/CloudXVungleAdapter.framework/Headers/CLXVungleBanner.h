@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * CloudX adapter delegate for receiving ad events
  */
-@property (nonatomic, weak, nullable) id<CLXAdapterBannerDelegate> delegate;
+@property (nonatomic, strong, nullable) id<CLXAdapterBannerDelegate> delegate;
 
 /**
  * The underlying Vungle banner view

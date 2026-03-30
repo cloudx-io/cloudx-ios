@@ -7,16 +7,18 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXDestroyable.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol CLXAdapterInterstitialDelegate;
 
 /// Protocol for interstitial adapters. Interstitial adapters are responsible for loading and showing interstitial ads.
-@protocol CLXAdapterInterstitial <NSObject>
+@protocol CLXAdapterInterstitial <CLXDestroyable>
 
 /// Delegate for the adapter, used to notify about ad events.
-@property (nonatomic, weak) id<CLXAdapterInterstitialDelegate> delegate;
+/// Strong to keep the callback chain alive through the ad lifecycle. Cycle is broken in destroy.
+@property (nonatomic, strong, nullable) id<CLXAdapterInterstitialDelegate> delegate;
 
 /// SDK version of the adapter.
 @property (nonatomic, strong, readonly) NSString *sdkVersion;
@@ -27,12 +29,18 @@ NS_ASSUME_NONNULL_BEGIN
 /// Ad id from bid response.
 @property (nonatomic, strong, readonly) NSString *bidID;
 
+/// Whether the ad is ready to be shown.
+@property (nonatomic, assign, readonly) BOOL isReady;
+
 /// Loads the adapter interstitial.
 - (void)load;
 
 /// Shows the adapter interstitial.
 /// - Parameter viewController: view controller where the interstitial will be displayed
 - (void)showFromViewController:(UIViewController *)viewController;
+
+/// Destroys the adapter and breaks the retain cycle by nilling the delegate.
+- (void)destroy;
 
 @end
 

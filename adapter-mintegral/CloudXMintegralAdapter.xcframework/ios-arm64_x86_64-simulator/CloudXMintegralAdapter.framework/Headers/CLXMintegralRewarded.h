@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CLXMintegralRewarded : NSObject <MTGRewardAdLoadDelegate, MTGRewardAdShowDelegate, CLXAdapterRewarded>
 
-@property (nonatomic, weak, nullable) id<CLXAdapterRewardedDelegate> delegate;
+@property (nonatomic, strong, nullable) id<CLXAdapterRewardedDelegate> delegate;
 @property (nonatomic, strong, readonly) NSString *sdkVersion;
 @property (nonatomic, strong, readonly) NSString *network;
 @property (nonatomic, strong, readonly) NSString *bidID;

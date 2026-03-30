@@ -13,6 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.5] - 2026-03-27
+
+### Added
+- **Privacy Consent for Unity Ads** — Unity Ads adapter now supports GDPR and CCPA privacy consent forwarding
+
+### Changed
+- **Improved Dependency Compatibility** — Relaxed third-party SDK version constraints to prevent CocoaPods dependency conflicts when integrating alongside other mediation SDKs
+
+### Fixed
+- **Fullscreen Ad Reliability** — Fixed an issue where ad lifecycle callbacks could be silently lost in rare scenarios
+- **iOS 16 Crash Fix** — Fixed a crash on iOS 16 devices related to session tracking
+
+---
+
 ## [2.2.4] - 2026-03-26
 
 ### Changed

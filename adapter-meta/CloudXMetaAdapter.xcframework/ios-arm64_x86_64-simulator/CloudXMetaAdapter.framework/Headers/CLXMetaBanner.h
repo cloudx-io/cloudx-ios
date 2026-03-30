@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXMetaBanner : NSObject <FBAdViewDelegate, CLXAdapterBanner, CLXDestroyable>
 
-@property (nonatomic, weak, nullable) id<CLXAdapterBannerDelegate> delegate;
+@property (nonatomic, strong, nullable) id<CLXAdapterBannerDelegate> delegate;
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
 @property (nonatomic, assign) BOOL timeout;
 

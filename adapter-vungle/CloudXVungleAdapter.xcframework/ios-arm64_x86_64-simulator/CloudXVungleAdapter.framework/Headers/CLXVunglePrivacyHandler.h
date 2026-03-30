@@ -15,7 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * @class CLXVunglePrivacyHandler
- * @brief Forwards resolved privacy settings to the Vungle (Liftoff) SDK
+ * @brief Forwards publisher-set privacy flags to the Vungle (Liftoff) SDK.
+ * @discussion Active when publishers call setHasUserConsent:/setDoNotSell:
+ *             to manage consent directly. Not needed when a CMP is in use —
+ *             Vungle reads CMP consent from NSUserDefaults on its own.
  */
 @interface CLXVunglePrivacyHandler : NSObject <CLXAdapterPrivacyHandler>
 @end
