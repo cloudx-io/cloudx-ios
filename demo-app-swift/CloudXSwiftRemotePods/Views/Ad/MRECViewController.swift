@@ -198,6 +198,8 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
         }
     }
     
+    override func adViewForClickTesting() -> UIView? { mrecAd }
+
     // MARK: - CLXBannerDelegate
     
     func didLoad(_ ad: CLXAd) {
@@ -220,6 +222,7 @@ class MRECViewController: BaseAdViewController, CLXBannerDelegate, CLXAdRevenueD
     }
     
     func didClick(_ ad: CLXAd) {
+        receivedCallbacks.insert(.clicked)
         DemoAppLogger.sharedInstance.logAdEvent("👆 MREC didClickAd", ad: ad)
     }
     

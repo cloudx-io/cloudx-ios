@@ -206,6 +206,7 @@
 }
 
 - (void)didClickAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventClicked;
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Rewarded didClickAd" ad:ad];
 }
 

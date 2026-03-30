@@ -182,6 +182,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
     }
     
     func didClick(_ ad: CLXAd) {
+        receivedCallbacks.insert(.clicked)
         DemoAppLogger.sharedInstance.logAdEvent("👆 Rewarded didClickAd", ad: ad)
     }
     

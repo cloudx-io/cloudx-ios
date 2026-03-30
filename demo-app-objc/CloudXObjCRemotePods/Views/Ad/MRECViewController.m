@@ -201,6 +201,7 @@
 }
 
 - (void)didClickAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventClicked;
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 MREC didClickAd" ad:ad];
 }
 
@@ -255,6 +256,10 @@
         [self updateStatusUIWithState:AdStateNoAd];
         [self showAlertWithTitle:@"Error" message:@"Failed to create MREC."];
     }
+}
+
+- (nullable UIView *)adViewForClickTesting {
+    return self.mrecAd;
 }
 
 @end 

@@ -235,6 +235,7 @@ extension InterstitialViewController: CLXInterstitialDelegate, CLXAdRevenueDeleg
     }
     
     func didClick(_ ad: CLXAd) {
+        receivedCallbacks.insert(.clicked)
         DemoAppLogger.sharedInstance.logAdEvent("👆 Interstitial didClickAd", ad: ad)
     }
     

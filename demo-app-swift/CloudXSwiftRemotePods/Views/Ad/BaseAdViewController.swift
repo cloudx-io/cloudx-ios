@@ -15,6 +15,7 @@ protocol AdStateManaging {
     var isLoading: Bool { get set }
     var receivedCallbacks: AdCallbackEvent { get set }
     func updateStatusUI(state: AdState)
+    func adViewForClickTesting() -> UIView?
 }
 
 enum AdState {
@@ -43,6 +44,8 @@ class BaseAdViewController: UIViewController, AdStateManaging {
     var cloudX: CloudXCore { CloudXCore.shared }
     var isLoading = false
     var receivedCallbacks: AdCallbackEvent = []
+
+    func adViewForClickTesting() -> UIView? { nil }
     
     var appKey: String? {
         return CLXDemoConfigManager.sharedManager.currentConfig.appKey

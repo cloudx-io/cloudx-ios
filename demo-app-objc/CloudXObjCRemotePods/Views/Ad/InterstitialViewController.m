@@ -200,6 +200,7 @@
 }
 
 - (void)didClickAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventClicked;
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Interstitial didClickAd" ad:ad];
 }
 
