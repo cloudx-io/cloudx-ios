@@ -3,13 +3,13 @@ platform :ios, '13.0'
 target 'CloudXObjCRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/core/CloudXCore.podspec'
-  pod 'CloudXMetaAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-meta/CloudXMetaAdapter.podspec'
-  pod 'CloudXRenderer', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/renderer-cloudx/CloudXRenderer.podspec'
-  pod 'CloudXVungleAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-vungle/CloudXVungleAdapter.podspec'
-  pod 'CloudXInMobiAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-inmobi/CloudXInMobiAdapter.podspec'
-  pod 'CloudXMintegralAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-mintegral/CloudXMintegralAdapter.podspec'
-  pod 'CloudXUnityAdsAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-unityads/CloudXUnityAdsAdapter.podspec'
+  pod 'CloudXCore', '~> 2.2.5'
+  pod 'CloudXMetaAdapter', '~> 2.2.5'
+  pod 'CloudXRenderer', '~> 2.2.5'
+  pod 'CloudXVungleAdapter', '~> 2.2.5'
+  pod 'CloudXInMobiAdapter', '~> 2.2.5'
+  pod 'CloudXMintegralAdapter', '~> 2.2.5'
+  pod 'CloudXUnityAdsAdapter', '~> 2.2.5'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths

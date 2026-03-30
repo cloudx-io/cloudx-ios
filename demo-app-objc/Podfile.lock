@@ -61,37 +61,28 @@ PODS:
   - VungleAds (7.6.3)
 
 DEPENDENCIES:
-  - CloudXCore (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/core/CloudXCore.podspec`)
-  - CloudXInMobiAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-inmobi/CloudXInMobiAdapter.podspec`)
-  - CloudXMetaAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-meta/CloudXMetaAdapter.podspec`)
-  - CloudXMintegralAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-mintegral/CloudXMintegralAdapter.podspec`)
-  - CloudXRenderer (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/renderer-cloudx/CloudXRenderer.podspec`)
-  - CloudXUnityAdsAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-unityads/CloudXUnityAdsAdapter.podspec`)
-  - CloudXVungleAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-vungle/CloudXVungleAdapter.podspec`)
+  - CloudXCore (~> 2.2.5)
+  - CloudXInMobiAdapter (~> 2.2.5)
+  - CloudXMetaAdapter (~> 2.2.5)
+  - CloudXMintegralAdapter (~> 2.2.5)
+  - CloudXRenderer (~> 2.2.5)
+  - CloudXUnityAdsAdapter (~> 2.2.5)
+  - CloudXVungleAdapter (~> 2.2.5)
 
 SPEC REPOS:
   trunk:
+    - CloudXCore
+    - CloudXInMobiAdapter
+    - CloudXMetaAdapter
+    - CloudXMintegralAdapter
+    - CloudXRenderer
+    - CloudXUnityAdsAdapter
+    - CloudXVungleAdapter
     - FBAudienceNetwork
     - InMobiSDK
     - MintegralAdSDK
     - UnityAds
     - VungleAds
-
-EXTERNAL SOURCES:
-  CloudXCore:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/core/CloudXCore.podspec
-  CloudXInMobiAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-inmobi/CloudXInMobiAdapter.podspec
-  CloudXMetaAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-meta/CloudXMetaAdapter.podspec
-  CloudXMintegralAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-mintegral/CloudXMintegralAdapter.podspec
-  CloudXRenderer:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/renderer-cloudx/CloudXRenderer.podspec
-  CloudXUnityAdsAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-unityads/CloudXUnityAdsAdapter.podspec
-  CloudXVungleAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-vungle/CloudXVungleAdapter.podspec
 
 SPEC CHECKSUMS:
   CloudXCore: bb7931f7af9f7dade01fcda7d0b4bfc66bbe0f46
@@ -107,6 +98,6 @@ SPEC CHECKSUMS:
   UnityAds: adbe0d522fd14b8298c5e159164fc43396165843
   VungleAds: 40e87d1eaba17ac818b0f94461fd8ed21ad768dc
 
-PODFILE CHECKSUM: 6f894bbca200dfe5aa7d6030cfad3c3ae335df6c
+PODFILE CHECKSUM: 55b76b28d5d71b783d350933e1ff48943d7e7059
 
 COCOAPODS: 1.16.2
