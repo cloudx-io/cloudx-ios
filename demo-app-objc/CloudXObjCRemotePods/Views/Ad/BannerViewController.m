@@ -254,6 +254,7 @@
 }
 
 - (void)didClickAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventClicked;
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Banner didClickAd" ad:ad];
 }
 
@@ -284,6 +285,10 @@
 - (void)updateStatusUIWithState:(AdState)state {
     self.adState = state;
     [super updateStatusUIWithState:state];
+}
+
+- (nullable UIView *)adViewForClickTesting {
+    return self.bannerAd;
 }
 
 @end 

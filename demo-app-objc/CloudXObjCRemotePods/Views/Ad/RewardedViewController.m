@@ -185,6 +185,7 @@
 }
 
 - (void)didDisplayAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventDisplayed;
     [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Rewarded didDisplayAd" ad:ad];
 }
 
@@ -200,12 +201,14 @@
 }
 
 - (void)didHideAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventHidden;
     [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Rewarded didHideAd" ad:ad];
     self.rewardedAd = nil;
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
 - (void)didClickAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventClicked;
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Rewarded didClickAd" ad:ad];
 }
 

@@ -210,6 +210,7 @@ extension InterstitialViewController: CLXInterstitialDelegate, CLXAdRevenueDeleg
     }
     
     func didDisplay(_ ad: CLXAd) {
+        receivedCallbacks.insert(.displayed)
         DemoAppLogger.sharedInstance.logAdEvent("👀 Interstitial didDisplayAd", ad: ad)
     }
     
@@ -225,6 +226,7 @@ extension InterstitialViewController: CLXInterstitialDelegate, CLXAdRevenueDeleg
     }
     
     func didHide(_ ad: CLXAd) {
+        receivedCallbacks.insert(.hidden)
         DemoAppLogger.sharedInstance.logAdEvent("🔚 Interstitial didHideAd", ad: ad)
         
         showAdWhenLoaded = false
@@ -235,6 +237,7 @@ extension InterstitialViewController: CLXInterstitialDelegate, CLXAdRevenueDeleg
     }
     
     func didClick(_ ad: CLXAd) {
+        receivedCallbacks.insert(.clicked)
         DemoAppLogger.sharedInstance.logAdEvent("👆 Interstitial didClickAd", ad: ad)
     }
     

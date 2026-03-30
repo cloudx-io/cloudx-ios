@@ -175,6 +175,7 @@
 }
 
 - (void)didDisplayAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventDisplayed;
     [[DemoAppLogger sharedInstance] logAdEvent:@"👀 Interstitial didDisplayAd" ad:ad];
 }
 
@@ -190,6 +191,7 @@
 }
 
 - (void)didHideAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventHidden;
     [[DemoAppLogger sharedInstance] logAdEvent:@"🔚 Interstitial didHideAd" ad:ad];
     
     self.showAdWhenLoaded = NO;
@@ -200,6 +202,7 @@
 }
 
 - (void)didClickAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventClicked;
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Interstitial didClickAd" ad:ad];
 }
 

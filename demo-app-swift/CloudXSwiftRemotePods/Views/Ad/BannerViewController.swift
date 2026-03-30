@@ -154,6 +154,8 @@ class BannerViewController: BaseAdViewController {
         receivedCallbacks = []
         updateStatusUI(state: .noAd)
     }
+
+    override func adViewForClickTesting() -> UIView? { bannerAd }
 }
 
 extension BannerViewController: CLXBannerDelegate, CLXAdRevenueDelegate {
@@ -176,6 +178,7 @@ extension BannerViewController: CLXBannerDelegate, CLXAdRevenueDelegate {
     }
     
     func didClick(_ ad: CLXAd) {
+        receivedCallbacks.insert(.clicked)
         DemoAppLogger.sharedInstance.logAdEvent("👆 Banner didClickAd", ad: ad)
     }
     

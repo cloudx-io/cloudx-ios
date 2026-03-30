@@ -22,6 +22,8 @@ typedef NS_OPTIONS(NSUInteger, AdCallbackEvent) {
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, assign) AdCallbackEvent receivedCallbacks;
 - (void)updateStatusUIWithState:(AdState)state;
+@optional
+- (nullable UIView *)adViewForClickTesting;
 @end
 
 @interface BaseAdViewController : UIViewController <AdStateManaging>
