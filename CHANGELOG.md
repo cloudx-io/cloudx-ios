@@ -17,11 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Privacy Consent for Unity Ads** — Unity Ads adapter now supports GDPR and CCPA privacy consent forwarding
-
-### Changed
-- **Improved Dependency Compatibility** — Relaxed third-party SDK version constraints to prevent CocoaPods dependency conflicts when integrating alongside other mediation SDKs
+- **`isAdReady` Support** — Fullscreen ad adapters now support `isAdReady` for reliably querying ad availability before calling show
 
 ### Fixed
+- **Banner Visibility Accuracy** — Fixed an issue where setting `banner.hidden = YES` did not pause ad refresh. Hidden banners could continue loading ads without being impression-eligible, potentially impacting CPMs. Banners now correctly respect the `hidden` property for refresh and display logic.
 - **Fullscreen Ad Reliability** — Fixed an issue where ad lifecycle callbacks could be silently lost in rare scenarios
 - **iOS 16 Crash Fix** — Fixed a crash on iOS 16 devices related to session tracking
 
