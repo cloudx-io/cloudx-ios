@@ -17,7 +17,6 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
             @"mrec":                   @"MRECViewController",
             @"interstitial":           @"InterstitialViewController",
             @"rewarded":               @"RewardedViewController",
-            @"rewarded-interstitial":  @"RewardedInterstitialViewController",
         };
     });
     return map;
@@ -53,13 +52,12 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
 #pragma mark - Format Configuration
 
 - (NSArray<NSString *> *)supportedFormats {
-    return @[@"banner", @"mrec", @"interstitial", @"rewarded", @"rewarded-interstitial"];
+    return @[@"banner", @"mrec", @"interstitial", @"rewarded"];
 }
 
 - (BOOL)isFullscreenFormat:(NSString *)format {
     return [format isEqualToString:@"interstitial"] ||
-           [format isEqualToString:@"rewarded"] ||
-           [format isEqualToString:@"rewarded-interstitial"];
+           [format isEqualToString:@"rewarded"];
 }
 
 - (nullable SEL)loadSelectorForFormat:(NSString *)format {
@@ -67,14 +65,12 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
     if ([format isEqualToString:@"mrec"])                  return @selector(loadMRECAd);
     if ([format isEqualToString:@"interstitial"])           return @selector(loadInterstitialAd);
     if ([format isEqualToString:@"rewarded"])               return @selector(loadRewardedAd);
-    if ([format isEqualToString:@"rewarded-interstitial"])  return @selector(loadRewardedInterstitialAd);
     return nil;
 }
 
 - (nullable SEL)showSelectorForFormat:(NSString *)format {
     if ([format isEqualToString:@"interstitial"])           return @selector(showInterstitialAd);
     if ([format isEqualToString:@"rewarded"])               return @selector(showRewardedAd);
-    if ([format isEqualToString:@"rewarded-interstitial"])  return @selector(showRewardedInterstitialAd);
     return nil;
 }
 
