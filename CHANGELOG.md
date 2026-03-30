@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.6] - 2026-03-30
+
+### Fixed
+- **Vungle Rewarded Crash Fix** — Fixed a crash when checking ad readiness for Vungle rewarded ads
+- **Banner Visibility Accuracy** — Fixed an issue where setting `banner.hidden = YES` did not pause ad refresh. Hidden banners could continue loading ads without being impression-eligible, potentially impacting CPMs.
+- **Improved Dependency Compatibility** — Widened third-party SDK version constraints (VungleAds, FBAudienceNetwork, InMobiSDK) to prevent CocoaPods dependency conflicts when integrating alongside other mediation SDKs
+
+---
+
 ## [2.2.5] - 2026-03-27
 
 ### Added
