@@ -106,8 +106,8 @@ static NSTimeInterval const kRevenuePollInterval = 0.5;
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         UIViewController *initVC = [self vcAtTabIndex:0 inTabVC:tabVC];
-        SEL selector = [self initSelectorForEnvironment:env];
-        if ([initVC respondsToSelector:selector]) {
+        SEL selector = [self resolveInitSelectorForVC:initVC environment:env];
+        if (selector) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
             [initVC performSelector:selector];
@@ -191,10 +191,10 @@ static NSTimeInterval const kRevenuePollInterval = 0.5;
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         UIViewController *initVC = [self vcAtTabIndex:0 inTabVC:tabVC];
-        SEL initSel = [self initSelectorForEnvironment:env];
+        SEL initSel = [self resolveInitSelectorForVC:initVC environment:env];
 
-        if (![initVC respondsToSelector:initSel]) {
-            [[DemoAppLogger sharedInstance] logMessage:@"test-all: Init VC does not respond to init selector — aborting"];
+        if (!initSel) {
+            [[DemoAppLogger sharedInstance] logMessage:@"test-all: Init VC does not respond to any init selector — aborting"];
             return;
         }
 
@@ -655,6 +655,16 @@ static NSTimeInterval const kRevenuePollInterval = 0.5;
     if ([env isEqualToString:@"staging"]) return @selector(initializeWithStagingEnvironment);
     if ([env isEqualToString:@"dev"]) return @selector(initializeWithDevEnvironment);
     return @selector(initializeWithProductionEnvironment);
+}
+
+// Returns the best init selector the VC responds to: environment-specific first,
+// then generic initializeSDK as fallback for apps with a single init button.
++ (nullable SEL)resolveInitSelectorForVC:(UIViewController *)vc environment:(NSString *)env {
+    SEL envSel = [self initSelectorForEnvironment:env];
+    if ([vc respondsToSelector:envSel]) return envSel;
+    SEL genericSel = @selector(initializeSDK);
+    if ([vc respondsToSelector:genericSel]) return genericSel;
+    return nil;
 }
 
 + (nullable UIViewController *)vcAtTabIndex:(NSInteger)tabIndex inTabVC:(AdDemoTabViewController *)tabVC {

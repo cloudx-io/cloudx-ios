@@ -102,8 +102,7 @@ enum DeepLinkRouter {
             guard let navVC = tabVC.selectedViewController as? UINavigationController,
                   let initVC = navVC.viewControllers.first else { return }
 
-            let selector = initSelector(for: env)
-            if initVC.responds(to: selector) {
+            if let selector = resolveInitSelector(for: initVC, env: env) {
                 initVC.perform(selector)
             }
         }
@@ -163,9 +162,8 @@ enum DeepLinkRouter {
             guard let navVC = tabVC.selectedViewController as? UINavigationController,
                   let initVC = navVC.viewControllers.first else { return }
 
-            let sel = initSelector(for: env)
-            guard initVC.responds(to: sel) else {
-                DemoAppLogger.sharedInstance.logMessage("test-all: Init VC does not respond to init selector — aborting")
+            guard let sel = resolveInitSelector(for: initVC, env: env) else {
+                DemoAppLogger.sharedInstance.logMessage("test-all: Init VC does not respond to any init selector — aborting")
                 return
             }
 
@@ -612,6 +610,16 @@ enum DeepLinkRouter {
         case "dev": return NSSelectorFromString("initializeWithDevEnvironment")
         default: return NSSelectorFromString("initializeWithProductionEnvironment")
         }
+    }
+
+    /// Returns the best init selector the VC responds to: environment-specific first,
+    /// then generic initializeSDK as fallback for apps with a single init button.
+    private static func resolveInitSelector(for vc: UIViewController, env: String) -> Selector? {
+        let envSel = initSelector(for: env)
+        if vc.responds(to: envSel) { return envSel }
+        let genericSel = NSSelectorFromString("initializeSDK")
+        if vc.responds(to: genericSel) { return genericSel }
+        return nil
     }
 
     // MARK: - Helpers
