@@ -37,6 +37,16 @@ enum DeepLinkRouter {
             }
         }
 
+        // Fallback: on iOS 26+, simctl launch writes -key value pairs to
+        // NSUserDefaults volatile domain but not ProcessInfo.arguments.
+        if format == nil && command == nil {
+            let defaults = UserDefaults.standard
+            command = defaults.string(forKey: "CLXTestCommand")
+            format = defaults.string(forKey: "CLXTestFormat")
+            action = defaults.string(forKey: "CLXTestAction")
+            env = defaults.string(forKey: "CLXTestEnv")
+        }
+
         guard format != nil || command != nil else { return }
 
         guard let url: URL = {

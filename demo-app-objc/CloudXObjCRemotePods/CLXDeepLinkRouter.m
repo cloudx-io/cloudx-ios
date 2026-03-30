@@ -38,6 +38,16 @@ static NSTimeInterval const kRevenuePollInterval = 0.5;
         }
     }
 
+    // Fallback: on iOS 26+, simctl launch writes -key value pairs to
+    // NSUserDefaults volatile domain but not NSProcessInfo.arguments.
+    if (!format && !command) {
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        command = [defaults stringForKey:@"CLXTestCommand"];
+        format = [defaults stringForKey:@"CLXTestFormat"];
+        action = [defaults stringForKey:@"CLXTestAction"];
+        env = [defaults stringForKey:@"CLXTestEnv"];
+    }
+
     if (!format && !command) return;
 
     NSURL *url;
