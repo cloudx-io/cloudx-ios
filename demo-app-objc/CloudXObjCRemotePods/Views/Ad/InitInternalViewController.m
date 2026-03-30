@@ -54,6 +54,32 @@
     ]];
 }
 
+- (void)updateStatusUIWithState:(AdState)state {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSString *text;
+        UIColor *color;
+
+        switch (state) {
+            case AdStateNoAd:
+                text = @"SDK Not Initialized";
+                color = [UIColor systemRedColor];
+                break;
+            case AdStateLoading:
+                text = @"Initializing SDK...";
+                color = [UIColor systemYellowColor];
+                break;
+            case AdStateReady:
+                text = @"SDK Initialized";
+                color = [UIColor systemGreenColor];
+                break;
+        }
+
+        self.statusLabel.text = text;
+        self.statusLabel.textColor = color;
+        self.statusIndicator.backgroundColor = color;
+    });
+}
+
 - (void)initializeSDK {
     if (self.isSDKInitialized) {
         [self showAlertWithTitle:@"SDK Already Initialized" message:@"The SDK is already initialized."];

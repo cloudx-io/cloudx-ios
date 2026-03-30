@@ -161,6 +161,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
     }
     
     func didDisplay(_ ad: CLXAd) {
+        receivedCallbacks.insert(.displayed)
         DemoAppLogger.sharedInstance.logAdEvent("👀 Rewarded didDisplayAd", ad: ad)
     }
     
@@ -176,6 +177,7 @@ class RewardedViewController: BaseAdViewController, CLXRewardedDelegate, CLXAdRe
     }
     
     func didHide(_ ad: CLXAd) {
+        receivedCallbacks.insert(.hidden)
         DemoAppLogger.sharedInstance.logAdEvent("🔚 Rewarded didHideAd", ad: ad)
         rewardedAd = nil
         updateStatusUI(state: .noAd)

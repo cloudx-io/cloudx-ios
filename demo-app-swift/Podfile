@@ -11,6 +11,8 @@ target 'CloudXSwiftRemotePods' do
   pod 'CloudXMintegralAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-mintegral/CloudXMintegralAdapter.podspec'
   pod 'CloudXUnityAdsAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-unityads/CloudXUnityAdsAdapter.podspec'
 
+  pod 'CloudXTestHarness', :path => '../../cloudx-qa-automation/sdk/ios/CloudXTestHarness'
+
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths
   end

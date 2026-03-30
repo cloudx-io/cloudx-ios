@@ -14,6 +14,7 @@ PODS:
     - MintegralAdSDK/BidRewardVideoAd (~> 8.0)
   - CloudXRenderer (2.2.5):
     - CloudXCore (= 2.2.5)
+  - CloudXTestHarness (0.1.0)
   - CloudXUnityAdsAdapter (2.2.5):
     - CloudXCore (= 2.2.5)
     - UnityAds (~> 4.17.0)
@@ -66,6 +67,7 @@ DEPENDENCIES:
   - CloudXMetaAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-meta/CloudXMetaAdapter.podspec`)
   - CloudXMintegralAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-mintegral/CloudXMintegralAdapter.podspec`)
   - CloudXRenderer (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/renderer-cloudx/CloudXRenderer.podspec`)
+  - CloudXTestHarness (from `../../cloudx-qa-automation/sdk/ios/CloudXTestHarness`)
   - CloudXUnityAdsAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-unityads/CloudXUnityAdsAdapter.podspec`)
   - CloudXVungleAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-vungle/CloudXVungleAdapter.podspec`)
 
@@ -88,6 +90,8 @@ EXTERNAL SOURCES:
     :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-mintegral/CloudXMintegralAdapter.podspec
   CloudXRenderer:
     :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/renderer-cloudx/CloudXRenderer.podspec
+  CloudXTestHarness:
+    :path: "../../cloudx-qa-automation/sdk/ios/CloudXTestHarness"
   CloudXUnityAdsAdapter:
     :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-2.2.5/adapter-unityads/CloudXUnityAdsAdapter.podspec
   CloudXVungleAdapter:
@@ -99,6 +103,7 @@ SPEC CHECKSUMS:
   CloudXMetaAdapter: e11c4a11974b11a1f5024ce92fe387c4fcf14ce2
   CloudXMintegralAdapter: c76f821c9633d9cf095ae8b52e88dba3d5e64bf9
   CloudXRenderer: 0b9e15b3c787221743a950a8a46b0ace0bf7cd41
+  CloudXTestHarness: 624eb03a06d2049b107547c255828a50b54dd8c1
   CloudXUnityAdsAdapter: 177b6fdcb37fd7200a9d392a7e40471758235991
   CloudXVungleAdapter: 0d9e362fdb7810c207f6217b039197649cfe7d99
   FBAudienceNetwork: 85d18a65c9e35bc426bd4664cf3ae2a1172d7b60
@@ -107,6 +112,6 @@ SPEC CHECKSUMS:
   UnityAds: adbe0d522fd14b8298c5e159164fc43396165843
   VungleAds: 40e87d1eaba17ac818b0f94461fd8ed21ad768dc
 
-PODFILE CHECKSUM: 3f9ac27ed87ff023f0ab09efa10d4a9eb437ce38
+PODFILE CHECKSUM: c7669a7fc537e33ce84cbe398cb699e2a89326fd
 
 COCOAPODS: 1.16.2

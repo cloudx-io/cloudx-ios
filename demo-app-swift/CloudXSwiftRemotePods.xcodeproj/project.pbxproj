@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		4DD876C55EFDF951921746DA /* Pods_CloudXSwiftRemotePodsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 210995F64F6CE9E1CA99FA0D /* Pods_CloudXSwiftRemotePodsTests.framework */; };
 		5CEBE496246CB7F22175D1DB /* Pods_CloudXSwiftRemotePods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 969E6A13E4870F468B2C97C1 /* Pods_CloudXSwiftRemotePods.framework */; };
-		A5015A29F67E85ED79CA3C30 /* CLXSyntheticTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FE5473AC599AD7FBC5F1361 /* CLXSyntheticTouch.m */; };
 		E3E890ABF9A350BD9F41DF81 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30A83812C9F200636B4CBF27 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */; };
 /* End PBXBuildFile section */
 
@@ -41,8 +40,6 @@
 		277FC88C6CF1AD307FFEBBF4 /* Pods-CloudXSwiftRemotePods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods/Pods-CloudXSwiftRemotePods.debug.xcconfig"; sourceTree = "<group>"; };
 		30A83812C9F200636B4CBF27 /* Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePods_CloudXSwiftRemotePodsUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3976EB4F4BF62B6D5539BE6A /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.release.xcconfig"; sourceTree = "<group>"; };
-		4746E478B15FD8BCB81D78D0 /* CLXSyntheticTouch.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CLXSyntheticTouch.h; sourceTree = "<group>"; };
-		5FE5473AC599AD7FBC5F1361 /* CLXSyntheticTouch.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CLXSyntheticTouch.m; sourceTree = "<group>"; };
 		969E6A13E4870F468B2C97C1 /* Pods_CloudXSwiftRemotePods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXSwiftRemotePods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B86BF64856422458B376B338 /* Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests/Pods-CloudXSwiftRemotePods-CloudXSwiftRemotePodsUITests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -136,8 +133,6 @@
 		3C2CBF88E844070AD78FADE4 /* ManualFiles */ = {
 			isa = PBXGroup;
 			children = (
-				4746E478B15FD8BCB81D78D0 /* CLXSyntheticTouch.h */,
-				5FE5473AC599AD7FBC5F1361 /* CLXSyntheticTouch.m */,
 			);
 			name = ManualFiles;
 			path = CloudXSwiftRemotePods;
@@ -448,7 +443,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A5015A29F67E85ED79CA3C30 /* CLXSyntheticTouch.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
