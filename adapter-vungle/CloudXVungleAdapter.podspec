@@ -13,6 +13,7 @@ Pod::Spec.new do |s|
   
   # Dependencies
   s.dependency 'CloudXCore', '2.2.6'
+  # 7.4.0 floor: VungleBannerView APIs introduced in 7.4; versions 7.0–7.3 lack banner support
   s.dependency 'VungleAds', '>= 7.4.0', '< 8.0'
   
   s.frameworks = ['AVFoundation', 'AudioToolbox', 'CFNetwork', 'CoreGraphics', 'CoreMedia', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']
