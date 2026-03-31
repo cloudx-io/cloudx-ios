@@ -26,6 +26,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) id<CLXAdapterRewardedDelegate> delegate;
 
 /**
+ * Whether the rewarded ad is ready to be shown.
+ */
+@property (nonatomic, assign, readonly) BOOL isReady;
+
+/**
  * SDK version of the Vungle SDK
  */
 @property (nonatomic, copy, readonly) NSString *sdkVersion;

@@ -3,15 +3,13 @@ platform :ios, '13.0'
 target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore', '~> 2.2.5'
-  pod 'CloudXMetaAdapter', '~> 2.2.5'
-  pod 'CloudXRenderer', '~> 2.2.5'
-  pod 'CloudXVungleAdapter', '~> 2.2.5'
-  pod 'CloudXInMobiAdapter', '~> 2.2.5'
-  pod 'CloudXMintegralAdapter', '~> 2.2.5'
-  pod 'CloudXUnityAdsAdapter', '~> 2.2.5'
-
-  pod 'CloudXTestHarness', :path => '../../cloudx-qa-automation/sdk/ios/CloudXTestHarness'
+  pod 'CloudXCore', '~> 2.2.6'
+  pod 'CloudXMetaAdapter', '~> 2.2.6'
+  pod 'CloudXRenderer', '~> 2.2.6'
+  pod 'CloudXVungleAdapter', '~> 2.2.6'
+  pod 'CloudXInMobiAdapter', '~> 2.2.6'
+  pod 'CloudXMintegralAdapter', '~> 2.2.6'
+  pod 'CloudXUnityAdsAdapter', '~> 2.2.6'
 
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths
