@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.7] - 2026-04-01
+
+### Fixed
+- **Deferred Banner Display** — Fixed an issue where banners loaded before being added to the view hierarchy would fail to render when attached later. The load-then-show pattern now works correctly.
+
+---
+
 ## [2.2.6] - 2026-03-30
 
 ### Added
