@@ -13,6 +13,7 @@ enum DeepLinkRouter {
 
     fileprivate static let classNameMap: [String: String] = [
         "banner":                "BannerViewController",
+        "banner_deferred":       "BannerViewController",
         "mrec":                  "MRECViewController",
         "interstitial":          "InterstitialViewController",
         "rewarded":              "RewardedViewController",
@@ -59,7 +60,7 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
     // MARK: - Format Configuration
 
     func supportedFormats() -> [String] {
-        ["banner", "mrec", "interstitial", "rewarded"]
+        ["banner", "banner_deferred", "mrec", "interstitial", "rewarded"]
     }
 
     func isFullscreenFormat(_ format: String) -> Bool {
@@ -69,6 +70,7 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
     func loadSelector(forFormat format: String) -> Selector? {
         switch format {
         case "banner":                return NSSelectorFromString("loadBannerAd")
+        case "banner_deferred":       return NSSelectorFromString("loadBannerDeferred")
         case "mrec":                  return NSSelectorFromString("loadMRECAd")
         case "interstitial":          return NSSelectorFromString("loadInterstitialAd")
         case "rewarded":              return NSSelectorFromString("loadRewardedAd")
@@ -78,6 +80,7 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
 
     func showSelector(forFormat format: String) -> Selector? {
         switch format {
+        case "banner_deferred":       return NSSelectorFromString("showDeferredBanner")
         case "interstitial":          return NSSelectorFromString("showInterstitialAd")
         case "rewarded":              return NSSelectorFromString("showRewardedAd")
         default:                      return nil

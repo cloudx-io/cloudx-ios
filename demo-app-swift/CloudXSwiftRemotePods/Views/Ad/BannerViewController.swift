@@ -3,8 +3,11 @@ import CloudXCore
 
 class BannerViewController: BaseAdViewController {
     private var bannerAd: CLXBannerAdView?
+    private var deferredBannerAd: CLXBannerAdView?
     private var autoRefreshButton: UIButton!
+    private var loadDeferredButton: UIButton!
     private var autoRefreshEnabled = true
+    private var isDeferredLoad = false
     private let settings = UserDefaultsSettings.shared
     
     override func viewDidLoad() {
@@ -33,6 +36,17 @@ class BannerViewController: BaseAdViewController {
         loadButton.translatesAutoresizingMaskIntoConstraints = false
         buttonStack.addArrangedSubview(loadButton)
         
+        // Load (Deferred) button — loads without adding to hierarchy
+        loadDeferredButton = UIButton(type: .system)
+        loadDeferredButton.setTitle("Load (Deferred)", for: .normal)
+        loadDeferredButton.addTarget(self, action: #selector(loadBannerDeferred), for: .touchUpInside)
+        loadDeferredButton.backgroundColor = .systemBlue
+        loadDeferredButton.setTitleColor(.white, for: .normal)
+        loadDeferredButton.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        loadDeferredButton.layer.cornerRadius = 8
+        loadDeferredButton.translatesAutoresizingMaskIntoConstraints = false
+        buttonStack.addArrangedSubview(loadDeferredButton)
+        
         // Auto-refresh toggle button
         autoRefreshButton = UIButton(type: .system)
         autoRefreshButton.setTitle("Stop Auto-Refresh", for: .normal)
@@ -50,6 +64,8 @@ class BannerViewController: BaseAdViewController {
             buttonStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 100),
             loadButton.widthAnchor.constraint(equalToConstant: 200),
             loadButton.heightAnchor.constraint(equalToConstant: 44),
+            loadDeferredButton.widthAnchor.constraint(equalToConstant: 200),
+            loadDeferredButton.heightAnchor.constraint(equalToConstant: 44),
             autoRefreshButton.widthAnchor.constraint(equalToConstant: 200),
             autoRefreshButton.heightAnchor.constraint(equalToConstant: 44)
         ])
@@ -65,10 +81,15 @@ class BannerViewController: BaseAdViewController {
     
     @objc private func loadBannerAd() {
         receivedCallbacks = []
+        resetDeferredButtonState()
         if isLoading {
             showAlert(title: "Info", message: "Banner is already loading.")
             return
         }
+        
+        deferredBannerAd?.removeFromSuperview()
+        deferredBannerAd?.destroy()
+        deferredBannerAd = nil
         
         if bannerAd == nil {
             createAndAddBannerToView()
@@ -81,6 +102,45 @@ class BannerViewController: BaseAdViewController {
         isLoading = true
         updateStatusUI(state: .loading)
         bannerAd.load()
+    }
+    
+    @objc func loadBannerDeferred() {
+        receivedCallbacks = []
+        if isLoading {
+            showAlert(title: "Info", message: "Banner is already loading.")
+            return
+        }
+        
+        bannerAd?.removeFromSuperview()
+        bannerAd?.destroy()
+        bannerAd = nil
+        deferredBannerAd?.removeFromSuperview()
+        deferredBannerAd?.destroy()
+        deferredBannerAd = nil
+        isDeferredLoad = true
+        
+        var adUnitId = CLXDemoConfigManager.sharedManager.currentConfig.bannerAdUnitId
+        if !settings.bannerAdUnitId.isEmpty {
+            adUnitId = settings.bannerAdUnitId
+        }
+        deferredBannerAd = cloudX.createBanner(adUnitId: adUnitId)
+        deferredBannerAd?.delegate = self
+        deferredBannerAd?.revenueDelegate = self
+        deferredBannerAd?.placement = "demo_banner"
+        deferredBannerAd?.customData = "screen:home,position:bottom"
+        
+        isLoading = true
+        updateStatusUI(state: .loading)
+        deferredBannerAd?.load()
+    }
+    
+    @objc func showDeferredBanner() {
+        guard isDeferredLoad, let deferredBannerAd else { return }
+        isDeferredLoad = false
+        bannerAd = deferredBannerAd
+        self.deferredBannerAd = nil
+        addBannerToViewHierarchy()
+        resetDeferredButtonState()
     }
     
     @objc private func toggleAutoRefresh() {
@@ -146,16 +206,28 @@ class BannerViewController: BaseAdViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
+    private func resetDeferredButtonState() {
+        isDeferredLoad = false
+        loadDeferredButton?.setTitle("Load (Deferred)", for: .normal)
+        loadDeferredButton?.backgroundColor = .systemBlue
+        loadDeferredButton?.removeTarget(self, action: #selector(showDeferredBanner), for: .touchUpInside)
+        loadDeferredButton?.addTarget(self, action: #selector(loadBannerDeferred), for: .touchUpInside)
+    }
+    
     private func resetAdState() {
         bannerAd?.removeFromSuperview()
         bannerAd?.destroy()
         bannerAd = nil
+        deferredBannerAd?.removeFromSuperview()
+        deferredBannerAd?.destroy()
+        deferredBannerAd = nil
         isLoading = false
         receivedCallbacks = []
+        resetDeferredButtonState()
         updateStatusUI(state: .noAd)
     }
 
-    override func adViewForClickTesting() -> UIView? { bannerAd }
+    override func adViewForClickTesting() -> UIView? { bannerAd ?? deferredBannerAd }
 }
 
 extension BannerViewController: CLXBannerDelegate, CLXAdRevenueDelegate {
@@ -163,6 +235,13 @@ extension BannerViewController: CLXBannerDelegate, CLXAdRevenueDelegate {
         DemoAppLogger.sharedInstance.logAdEvent("✅ Banner didLoadAd", ad: ad)
         isLoading = false
         updateStatusUI(state: .ready)
+        
+        if isDeferredLoad {
+            loadDeferredButton.setTitle("Show Banner", for: .normal)
+            loadDeferredButton.backgroundColor = .systemOrange
+            loadDeferredButton.removeTarget(self, action: #selector(loadBannerDeferred), for: .touchUpInside)
+            loadDeferredButton.addTarget(self, action: #selector(showDeferredBanner), for: .touchUpInside)
+        }
     }
     
     func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
@@ -170,6 +249,8 @@ extension BannerViewController: CLXBannerDelegate, CLXAdRevenueDelegate {
         isLoading = false
         updateStatusUI(state: .noAd)
         bannerAd = nil
+        deferredBannerAd = nil
+        resetDeferredButtonState()
         
         DispatchQueue.main.async { [weak self] in
             let errorMessage = (error as NSError).detailedDemoDescription

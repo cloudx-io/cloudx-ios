@@ -14,6 +14,7 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
     dispatch_once(&onceToken, ^{
         map = @{
             @"banner":                 @"BannerViewController",
+            @"banner_deferred":        @"BannerViewController",
             @"mrec":                   @"MRECViewController",
             @"interstitial":           @"InterstitialViewController",
             @"rewarded":               @"RewardedViewController",
@@ -52,7 +53,7 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
 #pragma mark - Format Configuration
 
 - (NSArray<NSString *> *)supportedFormats {
-    return @[@"banner", @"mrec", @"interstitial", @"rewarded"];
+    return @[@"banner", @"banner_deferred", @"mrec", @"interstitial", @"rewarded"];
 }
 
 - (BOOL)isFullscreenFormat:(NSString *)format {
@@ -62,6 +63,7 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
 
 - (nullable SEL)loadSelectorForFormat:(NSString *)format {
     if ([format isEqualToString:@"banner"])                return @selector(loadBannerAd);
+    if ([format isEqualToString:@"banner_deferred"])       return @selector(loadBannerDeferred);
     if ([format isEqualToString:@"mrec"])                  return @selector(loadMRECAd);
     if ([format isEqualToString:@"interstitial"])           return @selector(loadInterstitialAd);
     if ([format isEqualToString:@"rewarded"])               return @selector(loadRewardedAd);
@@ -69,6 +71,7 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
 }
 
 - (nullable SEL)showSelectorForFormat:(NSString *)format {
+    if ([format isEqualToString:@"banner_deferred"])       return @selector(showDeferredBanner);
     if ([format isEqualToString:@"interstitial"])           return @selector(showInterstitialAd);
     if ([format isEqualToString:@"rewarded"])               return @selector(showRewardedAd);
     return nil;
