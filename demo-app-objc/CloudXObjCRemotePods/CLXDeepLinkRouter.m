@@ -1,4 +1,6 @@
 #import "CLXDeepLinkRouter.h"
+
+#if __has_include(<CloudXTestHarness/CLXTestHarness.h>)
 #import "AdDemoTabViewController.h"
 #import "BaseAdViewController.h"
 #import "DemoAppLogger.h"
@@ -275,3 +277,14 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
 }
 
 @end
+
+#else
+
+// CloudXTestHarness not available — provide no-op stubs so the app compiles without the QA pod.
+@implementation CLXDeepLinkRouter
++ (void)setup {}
++ (BOOL)handleURL:(NSURL *)url { return NO; }
++ (void)handleLaunchArguments {}
+@end
+
+#endif
