@@ -1,12 +1,8 @@
 import UIKit
+
+#if canImport(CloudXTestHarness)
 import CloudXTestHarness
 
-/// App-specific adapter that bridges the demo app to CLXTestHarnessEngine.
-///
-/// Implements CLXTestHarnessApp to provide app-specific details
-/// (tab navigation, format-to-selector mapping, ad state queries, logging).
-/// All generic automation logic (dismiss detection, click testing, polling,
-/// synthetic UITouch) lives in the CloudXTestHarness pod.
 private let kSDKInitTimeout: TimeInterval = 30.0
 
 enum DeepLinkRouter {
@@ -18,7 +14,6 @@ enum DeepLinkRouter {
         "rewarded":              "RewardedViewController",
     ]
 
-    /// Register the adapter and forward launch arguments.
     static func setup() {
         CLXTestHarnessEngine.register(Adapter.shared)
     }
@@ -230,3 +225,15 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
             .first { $0.isKeyWindow }
     }
 }
+
+#else
+
+// CloudXTestHarness not available — provide no-op stubs so the app compiles without the QA pod.
+enum DeepLinkRouter {
+    static func setup() {}
+    static func handleLaunchArguments() {}
+    @discardableResult
+    static func handleURL(_ url: URL) -> Bool { false }
+}
+
+#endif
