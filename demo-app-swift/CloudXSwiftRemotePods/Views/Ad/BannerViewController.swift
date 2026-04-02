@@ -236,18 +236,21 @@ extension BannerViewController: CLXBannerDelegate, CLXAdRevenueDelegate {
     
     func didFailToLoadAd(_ adUnitId: String, error: CLXError) {
         DemoAppLogger.sharedInstance.logMessage("❌ Banner failed to load (\(adUnitId)) - Error: \(error.localizedDescription)")
-        isLoading = false
-        updateStatusUI(state: .noAd)
-        bannerAd?.removeFromSuperview()
-        bannerAd?.destroy()
-        bannerAd = nil
-        deferredBannerAd?.destroy()
-        deferredBannerAd = nil
-        resetDeferredButtonState()
         
+        // Delegate may fire on a background queue (CFNetwork); all UIKit calls must be on main.
         DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.isLoading = false
+            self.updateStatusUI(state: .noAd)
+            self.bannerAd?.removeFromSuperview()
+            self.bannerAd?.destroy()
+            self.bannerAd = nil
+            self.deferredBannerAd?.destroy()
+            self.deferredBannerAd = nil
+            self.resetDeferredButtonState()
+            
             let errorMessage = (error as NSError).detailedDemoDescription
-            self?.showAlert(title: "Banner Ad Load Failed", message: errorMessage)
+            self.showAlert(title: "Banner Ad Load Failed", message: errorMessage)
         }
     }
     

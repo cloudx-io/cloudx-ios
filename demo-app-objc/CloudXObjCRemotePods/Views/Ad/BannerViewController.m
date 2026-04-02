@@ -314,16 +314,17 @@
 - (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failed to load (%@) - Error: %@", adUnitId, error ? error.localizedDescription : @"Unknown error"]];
     
-    self.isLoading = NO;
-    [self updateStatusUIWithState:AdStateNoAd];
-    [self.bannerAd removeFromSuperview];
-    [self.bannerAd destroy];
-    self.bannerAd = nil;
-    [self.deferredBannerAd destroy];
-    self.deferredBannerAd = nil;
-    [self resetDeferredButtonState];
-    
+    // Delegate may fire on a background queue (CFNetwork); all UIKit calls must be on main.
     dispatch_async(dispatch_get_main_queue(), ^{
+        self.isLoading = NO;
+        [self updateStatusUIWithState:AdStateNoAd];
+        [self.bannerAd removeFromSuperview];
+        [self.bannerAd destroy];
+        self.bannerAd = nil;
+        [self.deferredBannerAd destroy];
+        self.deferredBannerAd = nil;
+        [self resetDeferredButtonState];
+        
         NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
         [self showAlertWithTitle:@"Banner Ad Load Failed" message:errorMessage];
     });
