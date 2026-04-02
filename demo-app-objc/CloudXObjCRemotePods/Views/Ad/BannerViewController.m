@@ -7,10 +7,13 @@
 
 @interface BannerViewController ()
 @property (nonatomic, strong) CLXBannerAdView *bannerAd;
+@property (nonatomic, strong) CLXBannerAdView *deferredBannerAd;
 @property (nonatomic, assign) BOOL isSDKInitialized;
 @property (nonatomic, assign) AdState adState;
 @property (nonatomic, strong) UIButton *autoRefreshButton;
+@property (nonatomic, strong) UIButton *loadDeferredButton;
 @property (nonatomic, assign) BOOL autoRefreshEnabled;
+@property (nonatomic, assign) BOOL isDeferredLoad;
 @property (nonatomic, strong) UserDefaultsSettings *settings;
 @end
 
@@ -66,7 +69,7 @@
     buttonStack.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:buttonStack];
     
-    // Load Banner button
+    // Load Banner button — standard flow: add to view hierarchy, then load
     UIButton *loadButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [loadButton setTitle:@"Load Banner" forState:UIControlStateNormal];
     [loadButton addTarget:self action:@selector(loadBannerAd) forControlEvents:UIControlEventTouchUpInside];
@@ -76,6 +79,17 @@
     loadButton.layer.cornerRadius = 8;
     loadButton.translatesAutoresizingMaskIntoConstraints = NO;
     [buttonStack addArrangedSubview:loadButton];
+    
+    // Load (Deferred) button — loads without adding to hierarchy, then shows on tap
+    self.loadDeferredButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [self.loadDeferredButton setTitle:@"Load (Deferred)" forState:UIControlStateNormal];
+    [self.loadDeferredButton addTarget:self action:@selector(loadBannerDeferred) forControlEvents:UIControlEventTouchUpInside];
+    self.loadDeferredButton.backgroundColor = [UIColor systemBlueColor];
+    [self.loadDeferredButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    self.loadDeferredButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    self.loadDeferredButton.layer.cornerRadius = 8;
+    self.loadDeferredButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [buttonStack addArrangedSubview:self.loadDeferredButton];
     
     // Auto-refresh toggle button
     self.autoRefreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -95,6 +109,8 @@
         [buttonStack.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:100],
         [loadButton.widthAnchor constraintEqualToConstant:200],
         [loadButton.heightAnchor constraintEqualToConstant:44],
+        [self.loadDeferredButton.widthAnchor constraintEqualToConstant:200],
+        [self.loadDeferredButton.heightAnchor constraintEqualToConstant:44],
         [self.autoRefreshButton.widthAnchor constraintEqualToConstant:200],
         [self.autoRefreshButton.heightAnchor constraintEqualToConstant:44]
     ]];
@@ -123,20 +139,19 @@
 
 - (void)loadBannerAd {
     self.receivedCallbacks = AdCallbackEventNone;
+    [self resetDeferredButtonState];
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"Banner is already loading."];
         return;
     }
     
-    if (!self.bannerAd) {
-        [self createAndAddBannerToView];
-    }
+    [self resetAdState];
+    [self createAndAddBannerToView];
     
     if (!self.bannerAd) {
-        return; // Failed to create
+        return;
     }
     
-    // Start loading
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
     [self.bannerAd load];
@@ -152,6 +167,10 @@
     }
     
     self.bannerAd = [[CloudXCore shared] createBannerWithAdUnitId:adUnitId];
+    if (!self.bannerAd) {
+        [self showAlertWithTitle:@"Error" message:@"Failed to create banner."];
+        return;
+    }
     self.bannerAd.delegate = self;
     self.bannerAd.revenueDelegate = self;
     self.bannerAd.placement = @"demo_banner";
@@ -161,12 +180,53 @@
     [self addBannerToViewHierarchy];
 }
 
-- (void)loadBanner {
-    // Legacy method - now just calls the new method
-    [self createAndAddBannerToView];
+- (void)loadBannerDeferred {
+    self.receivedCallbacks = AdCallbackEventNone;
+    if (self.isLoading) {
+        [self showAlertWithTitle:@"Info" message:@"Banner is already loading."];
+        return;
+    }
+    
+    [self.bannerAd removeFromSuperview];
+    [self.bannerAd destroy];
+    self.bannerAd = nil;
+    [self.deferredBannerAd removeFromSuperview];
+    [self.deferredBannerAd destroy];
+    self.deferredBannerAd = nil;
+    self.isDeferredLoad = YES;
+    
+    NSString *adUnitId = [self adUnitId];
+    if (_settings.bannerAdUnitId.length > 0) {
+        adUnitId = _settings.bannerAdUnitId;
+    }
+    
+    self.deferredBannerAd = [[CloudXCore shared] createBannerWithAdUnitId:adUnitId];
+    self.deferredBannerAd.delegate = self;
+    self.deferredBannerAd.revenueDelegate = self;
+    self.deferredBannerAd.placement = @"demo_banner";
+    self.deferredBannerAd.customData = @"screen:home,position:bottom";
+    
+    self.isLoading = YES;
+    [self updateStatusUIWithState:AdStateLoading];
+    [self.deferredBannerAd load];
 }
 
-// showBannerAd method removed - Banner is auto-added to view on push
+- (void)showDeferredBanner {
+    if (!self.isDeferredLoad || !self.deferredBannerAd) return;
+    self.isDeferredLoad = NO;
+    self.bannerAd = self.deferredBannerAd;
+    self.deferredBannerAd = nil;
+    [self addBannerToViewHierarchy];
+    [self resetDeferredButtonState];
+}
+
+- (void)resetDeferredButtonState {
+    self.isDeferredLoad = NO;
+    [self.loadDeferredButton setTitle:@"Load (Deferred)" forState:UIControlStateNormal];
+    self.loadDeferredButton.backgroundColor = [UIColor systemBlueColor];
+    [self.loadDeferredButton removeTarget:self action:@selector(showDeferredBanner) forControlEvents:UIControlEventTouchUpInside];
+    [self.loadDeferredButton addTarget:self action:@selector(loadBannerDeferred) forControlEvents:UIControlEventTouchUpInside];
+}
 
 - (void)addBannerToViewHierarchy {
     if (!self.bannerAd || self.bannerAd.superview) {
@@ -224,9 +284,15 @@
         [self.bannerAd removeFromSuperview];
         [self.bannerAd destroy];
     }
+    if (self.deferredBannerAd) {
+        [self.deferredBannerAd removeFromSuperview];
+        [self.deferredBannerAd destroy];
+    }
     self.bannerAd = nil;
+    self.deferredBannerAd = nil;
     self.isLoading = NO;
     self.receivedCallbacks = AdCallbackEventNone;
+    [self resetDeferredButtonState];
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
@@ -237,17 +303,28 @@
     self.isLoading = NO;
     [self updateStatusUIWithState:AdStateReady];
     
-    // Don't auto-show - user must press Show Banner button
+    if (self.isDeferredLoad) {
+        [self.loadDeferredButton setTitle:@"Show Banner" forState:UIControlStateNormal];
+        self.loadDeferredButton.backgroundColor = [UIColor systemOrangeColor];
+        [self.loadDeferredButton removeTarget:self action:@selector(loadBannerDeferred) forControlEvents:UIControlEventTouchUpInside];
+        [self.loadDeferredButton addTarget:self action:@selector(showDeferredBanner) forControlEvents:UIControlEventTouchUpInside];
+    }
 }
 
 - (void)didFailToLoadAd:(NSString *)adUnitId error:(CLXError *)error {
     [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:@"❌ Banner failed to load (%@) - Error: %@", adUnitId, error ? error.localizedDescription : @"Unknown error"]];
     
-    self.isLoading = NO;
-    [self updateStatusUIWithState:AdStateNoAd];
-    self.bannerAd = nil;
-    
+    // Delegate may fire on a background queue (CFNetwork); all UIKit calls must be on main.
     dispatch_async(dispatch_get_main_queue(), ^{
+        self.isLoading = NO;
+        [self updateStatusUIWithState:AdStateNoAd];
+        [self.bannerAd removeFromSuperview];
+        [self.bannerAd destroy];
+        self.bannerAd = nil;
+        [self.deferredBannerAd destroy];
+        self.deferredBannerAd = nil;
+        [self resetDeferredButtonState];
+        
         NSString *errorMessage = error ? [error detailedDemoDescription] : @"Unknown error occurred";
         [self showAlertWithTitle:@"Banner Ad Load Failed" message:errorMessage];
     });
@@ -263,22 +340,22 @@
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Banner didPayRevenue" ad:ad];
 }
 
-// NEW MAX SDK Compatibility Delegate Methods
+// Banner-specific delegate methods
 - (void)didExpandAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"🔍 Banner didExpandAd" ad:ad];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showAlertWithTitle:@"Banner Expanded!" 
-                         message:@"Banner ad expanded to full screen. This is a new MAX SDK compatibility feature."];
+                         message:@"Banner ad expanded to full screen."];
     });
 }
 
 - (void)didCollapseAd:(CLXAd *)ad {
-    [[DemoAppLogger sharedInstance] logAdEvent:@"🔍 Banner didCollapseAd" ad:ad];
+    [[DemoAppLogger sharedInstance] logAdEvent:@"🔽 Banner didCollapseAd" ad:ad];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showAlertWithTitle:@"Banner Collapsed!" 
-                         message:@"Banner ad collapsed from full screen. This is a new MAX SDK compatibility feature."];
+                         message:@"Banner ad collapsed from full screen."];
     });
 }
 
@@ -288,7 +365,7 @@
 }
 
 - (nullable UIView *)adViewForClickTesting {
-    return self.bannerAd;
+    return self.bannerAd ?: self.deferredBannerAd;
 }
 
 @end 
