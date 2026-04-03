@@ -2,85 +2,70 @@
  * Copyright (c) 2024 CloudX. All rights reserved.
  */
 
-/**
- * @file CLXPublisherNative.h
- * @brief Publisher native ad implementation
- */
-
 #import <UIKit/UIKit.h>
-#import <CloudXCore/CloudXCore.h>
-#import <CloudXCore/CLXNative.h>
-#import <CloudXCore/CLXNativeDelegate.h>
 #import <CloudXCore/CLXAdapterNative.h>
-#import <CloudXCore/CLXAdapterNativeFactory.h>
 #import <CloudXCore/CLXNativeTemplate.h>
-#import <CloudXCore/CLXSDKConfigAdUnit.h>
-#import <CloudXCore/CLXBidTokenSource.h>
-#import <CloudXCore/CLXNativeAdView.h>
-#import <CloudXCore/CLXAdRevenueDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class CLXAd;
+@class CLXNativeAd;
+@class CLXNativeAdView;
+@class CLXError;
+@class CLXSDKConfigAdUnit;
+@class CLXConfigImpressionModel;
+@class CLXBidAdSourceResponse;
+@class CLXBidResponseBid;
+
 @protocol CLXAdEventReporting;
-@class CLXEnvironmentConfig;
+@protocol CLXBidTokenSource;
+@protocol CLXAdapterNativeFactory;
+@protocol CLXPublisherNativeDelegate;
 
-/**
- * CLXPublisherNative implements the CLXNative protocol and handles native ad loading,
- * bidding, and lifecycle management.
- */
-@interface CLXPublisherNative : NSObject <CLXNative>
+@interface CLXPublisherNative : NSObject <CLXAdapterNativeDelegate>
 
-/**
- * Flag to indicate whether to suspend preloading when the ad is not visible.
- */
-@property (nonatomic, assign) BOOL suspendPreloadWhenInvisible;
-
-/**
- * Delegate for native ad events. Supports both old adapter methods and new CLXAd methods.
- */
-@property (nonatomic, weak, nullable) id<CLXNativeDelegate, CLXAdapterNativeDelegate> delegate;
-
-/**
- * Delegate for revenue events (impression-level revenue data).
- */
-@property (nonatomic, weak, nullable) id<CLXAdRevenueDelegate> revenueDelegate;
-
-/**
- * The type of native ad template.
- */
+@property (nonatomic, weak, nullable) id<CLXPublisherNativeDelegate> publisherDelegate;
 @property (nonatomic, readonly) CLXNativeTemplate nativeType;
+@property (nonatomic, copy, nullable) NSString *adUnitId;
+@property (nonatomic, copy, nullable) NSString *adUnitName;
+@property (nonatomic, strong, nullable, readonly) CLXBidAdSourceResponse *lastBidResponse;
 
+- (instancetype)initWithAdUnit:(nullable CLXSDKConfigAdUnit *)adUnit
+                        userID:(NSString *)userID
+                   publisherID:(NSString *)publisherID
+                    nativeType:(CLXNativeTemplate)nativeType
+                      impModel:(nullable CLXConfigImpressionModel *)impModel
+                   adFactories:(NSDictionary<NSString *, id<CLXAdapterNativeFactory>> *)adFactories
+               bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
+             bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
+              reportingService:(id<CLXAdEventReporting>)reportingService;
 
+- (void)load;
+- (void)destroyCurrentAd;
+- (void)destroy;
 
-/**
- * Initializes a new CLXPublisherNative with the given parameters.
- * @param viewController The view controller where the native ad will be displayed
- * @param adUnit The ad unit configuration (nil if SDK not initialized, will be resolved on load)
- * @param userID The user ID
- * @param publisherID The publisher ID
- * @param suspendPreloadWhenInvisible Whether to suspend preloading when not visible
- * @param delegate The delegate to receive events
- * @param nativeType The type of native ad template
- * @param impModel The impression model (nil if SDK not initialized, will be created on load)
- * @param adFactories Dictionary of native ad factories
- * @param bidTokenSources Dictionary of bid token sources
- * @param bidRequestTimeout Bid request timeout
- * @param reportingService The reporting service
- * @return Initialized CLXPublisherNative instance
- */
-- (instancetype)initWithViewController:(UIViewController *)viewController
-                             adUnit:(nullable CLXSDKConfigAdUnit *)adUnit
-                                userID:(NSString *)userID
-                           publisherID:(NSString *)publisherID
-              suspendPreloadWhenInvisible:(BOOL)suspendPreloadWhenInvisible
-                               delegate:(nullable id<CLXNativeDelegate, CLXAdapterNativeDelegate>)delegate
-                             nativeType:(CLXNativeTemplate)nativeType
-                               impModel:(nullable CLXConfigImpressionModel *)impModel
-                              adFactories:(NSDictionary<NSString *, id<CLXAdapterNativeFactory>> *)adFactories
-                           bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
-                        bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
-                         reportingService:(id<CLXAdEventReporting>)reportingService;
+@property (nonatomic, copy, nullable) NSString *requestedAdUnitId;
+@property (nonatomic, strong, nullable) CLXError *deferredError;
+@property (nonatomic, copy, nullable) NSString *publisherPlacement;
+@property (nonatomic, copy, nullable) NSString *publisherCustomData;
+@property (nonatomic, copy, nullable) NSDictionary<NSString *, id> *localExtraParameters;
+@property (nonatomic, assign, readonly) BOOL isReady;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+@protocol CLXPublisherNativeDelegate <NSObject>
+
+- (void)publisherNative:(CLXPublisherNative *)publisherNative didLoadNativeAd:(CLXNativeAd *)nativeAd forAd:(CLXAd *)ad;
+- (void)publisherNative:(CLXPublisherNative *)publisherNative didFailToLoadWithError:(CLXError *)error;
+- (void)publisherNative:(CLXPublisherNative *)publisherNative didDisplayAd:(CLXAd *)ad;
+- (void)publisherNative:(CLXPublisherNative *)publisherNative didClickAd:(CLXAd *)ad;
+- (void)publisherNative:(CLXPublisherNative *)publisherNative didPayRevenueForAd:(CLXAd *)ad;
+
+@optional
+- (void)publisherNative:(CLXPublisherNative *)publisherNative didExpireAd:(CLXAd *)ad;
+/** User completed AdChoices opt-out (reported/hid the ad). The ad creative is invalidated. */
+- (void)publisherNative:(CLXPublisherNative *)publisherNative didCloseAd:(CLXAd *)ad;
+
+@end
+
+NS_ASSUME_NONNULL_END

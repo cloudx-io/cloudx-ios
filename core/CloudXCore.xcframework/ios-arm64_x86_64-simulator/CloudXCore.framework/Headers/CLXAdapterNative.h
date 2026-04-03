@@ -1,72 +1,49 @@
-//
-//  CloudXAdapterNative.h
-//  CloudXCore
-//
-//  Created by CloudX Team.
-//
+/*
+ * Copyright (c) 2024 CloudX. All rights reserved.
+ */
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class CLXNativeAd;
 @protocol CLXAdapterNativeDelegate;
 
-/// Protocol for native ad adapters. Native ad adapters are responsible for loading and showing native ads.
 @protocol CLXAdapterNative <NSObject>
 
-/// Delegate for the adapter, used to notify about ad events.
-@property (nonatomic, weak) id<CLXAdapterNativeDelegate> delegate;
+@property (nonatomic, strong, nullable) id<CLXAdapterNativeDelegate> delegate;
+@property (nonatomic, copy, readonly) NSString *sdkVersion;
 
-/// Flag to indicate if the native loading timed out.
-@property (nonatomic, assign) BOOL timeout;
-
-/// View containing the native ad.
-@property (nonatomic, strong, readonly, nullable) UIView *nativeView;
-
-/// SDK version of the adapter.
-@property (nonatomic, strong, readonly) NSString *sdkVersion;
-
-/// Loads the native ad.
 - (void)load;
-
-/// Shows the native ad from the given view controller.
-- (void)showFromViewController:(UIViewController *)viewController;
-
-/// Destroys the native ad.
 - (void)destroy;
 
 @end
 
-/// Delegate for the native adapter.
+/**
+ * Delegate through which native adapters report lifecycle events to the core SDK.
+ *
+ * Required callbacks must be called by every adapter. Optional callbacks are only
+ * expected from adapters whose underlying SDK provides the corresponding event.
+ * The core SDK checks respondsToSelector: before forwarding optional callbacks
+ * to the publisher, so adapters may safely call them without coordination.
+ */
 @protocol CLXAdapterNativeDelegate <NSObject>
 
-/// Called when the adapter has loaded the native ad.
-/// - Parameter native: the native ad that was loaded
-- (void)didLoadWithNative:(id<CLXAdapterNative>)native;
+- (void)didLoadNativeAd:(CLXNativeAd *)nativeAd extraInfo:(nullable NSDictionary<NSString *, id> *)extraInfo;
+- (void)didFailToLoadNativeAdWithError:(nullable NSError *)error;
+- (void)didDisplayNativeAdWithExtraInfo:(nullable NSDictionary<NSString *, id> *)extraInfo;
+- (void)didClickNativeAd;
 
-/// Called when the adapter failed to load the native ad.
-/// - Parameters:
-///   - native: native ad that failed to load
-///   - error: error that caused the failure
-- (void)failToLoadWithNative:(nullable id<CLXAdapterNative>)native error:(nullable NSError *)error;
+@optional
 
-/// Called when the adapter has shown the native ad.
-/// - Parameter native: the native ad that was shown
-- (void)didShowWithNative:(id<CLXAdapterNative>)native;
-
-/// Called when the adapter has tracked impression.
-/// - Parameter native: the native ad that was shown
-- (void)impressionWithNative:(id<CLXAdapterNative>)native;
-
-/// Called when the adapter has tracked click.
-/// - Parameter native: native ad that was clicked
-- (void)clickWithNative:(id<CLXAdapterNative>)native;
-
-/// Called when the adapter has tracked close click.
-/// - Parameter native: native ad that was closed
-- (void)closeWithNative:(id<CLXAdapterNative>)native;
+/**
+ * The user hid or reported the ad via the network's opt-out control (e.g., AdChoices).
+ * Adapters should call this when the underlying SDK fires its ad-closed/ad-hidden
+ * callback. Not all networks provide this event — only implement if the SDK supports it.
+ */
+- (void)didCloseNativeAd;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

@@ -13,6 +13,7 @@ typedef NS_ENUM(NSInteger, SDKConfigAdType) {
     SDKConfigAdTypeMrec,
     SDKConfigAdTypeInterstitial,
     SDKConfigAdTypeRewarded,
+    SDKConfigAdTypeNative,
     SDKConfigAdTypeUnknown
 };
 

@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Delegate for native ad events.
  */
-@property (nonatomic, weak, nullable) id<CLXAdapterNativeDelegate> delegate;
+@property (nonatomic, strong, nullable) id<CLXAdapterNativeDelegate> delegate;
 
 /**
  * The type of native ad template.
