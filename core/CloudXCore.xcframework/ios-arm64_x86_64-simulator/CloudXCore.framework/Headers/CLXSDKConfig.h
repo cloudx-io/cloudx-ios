@@ -88,6 +88,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *ilrdEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sessionEndpointURL;
 
+// 2b. Event Telemetry Endpoints (optional — nil means telemetry for that event is disabled)
+@property (nonatomic, copy, nullable) NSString *sdkInitEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkBidReqEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkLoadSuccessEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkLossEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkImpressionEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkClickEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkRewardEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkErrorEndpointURL;
+
 // ═══════════════════════════════════════════════════════════════════════════
 // 3. Core Config (required)
 // ═══════════════════════════════════════════════════════════════════════════

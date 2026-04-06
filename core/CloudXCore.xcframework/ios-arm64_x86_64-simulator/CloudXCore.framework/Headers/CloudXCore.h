@@ -60,6 +60,16 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXRewardedDelegate.h>
 #import <CloudXCore/CLXReward.h>
 
+// Native
+#import <CloudXCore/CLXNativeAd.h>
+#import <CloudXCore/CLXNativeAdImage.h>
+#import <CloudXCore/CLXNativeAdBuilder.h>
+#import <CloudXCore/CLXNativeAdView.h>
+#import <CloudXCore/CLXNativeAdViewBinder.h>
+#import <CloudXCore/CLXNativeAdLoader.h>
+#import <CloudXCore/CLXNativeAdDelegate.h>
+#import <CloudXCore/CLXNativeTemplate.h>
+
 // Debug UI
 #import <CloudXCore/CLXDebugOverlayManager.h>
 #import <CloudXCore/CLXDebugButton.h>
@@ -79,6 +89,8 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXAdapterRewardedFactory.h>
 #import <CloudXCore/CLXAdapterInterstitial.h>
 #import <CloudXCore/CLXAdapterInterstitialFactory.h>
+#import <CloudXCore/CLXAdapterNative.h>
+#import <CloudXCore/CLXAdapterNativeFactory.h>
 #import <CloudXCore/CLXAdNetworkInitializer.h>
 #import <CloudXCore/CLXAdNetworkFactories.h>
 #import <CloudXCore/CLXBidTokenSource.h>

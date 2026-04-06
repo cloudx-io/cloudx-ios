@@ -12,6 +12,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class CLXNativeAd;
+
 /**
  * CLXAd represents metadata about a loaded ad (similar to MAAd in MAX SDK).
  * Contains information about the ad's network, placement, revenue, etc.
@@ -68,6 +70,29 @@ NS_ASSUME_NONNULL_BEGIN
  * The human-readable ad unit name (e.g., "demo-mrec-1")
  */
 @property (nonatomic, readonly, nullable) NSString *adUnitName;
+
+/**
+ * The native ad asset container (native format only).
+ * Access individual assets (title, body, media, etc.) and check isExpired through this property.
+ * Nil for non-native ad formats.
+ */
+@property (nonatomic, strong, nullable) CLXNativeAd *nativeAd;
+
+/**
+ * Precision of the revenue value.
+ * Possible values: "exact", "estimated", "publisher_defined", "undefined", ""
+ */
+@property (nonatomic, copy, nullable) NSString *revenuePrecision;
+
+/**
+ * The creative identifier for this ad, used for creative-level issue reporting.
+ */
+@property (nonatomic, copy, nullable) NSString *creativeIdentifier;
+
+/**
+ * Time in seconds from ad request to ad response, useful for debugging latency.
+ */
+@property (nonatomic, assign) NSTimeInterval requestLatency;
 
 #pragma mark - Initializers
 

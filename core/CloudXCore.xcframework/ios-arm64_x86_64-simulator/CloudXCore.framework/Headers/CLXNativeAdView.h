@@ -2,67 +2,41 @@
  * Copyright (c) 2024 CloudX. All rights reserved.
  */
 
-/**
- * @file CloudXNativeAdView.h
- * @brief Native ad view class
- */
-
 #import <UIKit/UIKit.h>
-#import <CloudXCore/CLXAd.h>
-#import <CloudXCore/CLXNativeDelegate.h>
-#import <CloudXCore/CLXAdapterNative.h>
-#import <CloudXCore/CLXAdRevenueDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol CLXNative;
+@class CLXNativeAd;
+@class CLXNativeAdViewBinder;
 
-/**
- * The native ad view. Add this object to your view hierarchy to display native ads.
- */
-@interface CLXNativeAdView : UIView <CLXAdDelegate, CLXAdapterNativeDelegate>
+@interface CLXNativeAdView : UIView
 
-/**
- * Delegate for the native ad view to notify about ad events.
- */
-@property (nonatomic, weak, nullable) id<CLXNativeDelegate> delegate;
+#pragma mark - Sub-View Slots (IBOutlet-compatible)
 
-/**
- * Delegate that receives revenue events for the native ad.
- */
-@property (nonatomic, weak, nullable) id<CLXAdRevenueDelegate> revenueDelegate;
+@property (nonatomic, weak, nullable) IBOutlet UILabel *titleLabel;
+@property (nonatomic, weak, nullable) IBOutlet UILabel *advertiserLabel;
+@property (nonatomic, weak, nullable) IBOutlet UILabel *bodyLabel;
+@property (nonatomic, weak, nullable) IBOutlet UIButton *callToActionButton;
+@property (nonatomic, weak, nullable) IBOutlet UIImageView *iconImageView;
+@property (nonatomic, weak, nullable) IBOutlet UIView *iconContentView
+    __attribute__((deprecated("Use iconImageView instead.")));
+@property (nonatomic, weak, nullable) IBOutlet UIView *optionsContentView;
+@property (nonatomic, weak, nullable) IBOutlet UIView *mediaContentView;
+@property (nonatomic, weak, nullable) IBOutlet UIView *starRatingContentView;
 
-/**
- * Flag to indicate if the native ad is ready to be shown.
- */
-@property (nonatomic, assign, readwrite) BOOL isReady;
+#pragma mark - Methods
 
-/**
- * A boolean indicating whether to suspend preloading the ad when it's not visible.
- */
-@property (nonatomic, assign) BOOL suspendPreloadWhenInvisible;
+- (void)bindViewsWithViewBinder:(CLXNativeAdViewBinder *)binder;
 
-/**
- * Initializes a new CLXNativeAdView with the given native, type, and delegate.
- * @param native The native instance
- * @param type The native template type
- * @param delegate The delegate to receive events
- * @return Initialized native ad view
- */
-- (instancetype)initWithNative:(id<CLXNative>)native 
-                         type:(NSInteger)type 
-                     delegate:(nullable id<CLXNativeDelegate>)delegate;
+- (UIView *)getMainView;
 
-/**
- * Starts loading the native ad
- */
-- (void)load;
+- (void)renderWithNativeAd:(CLXNativeAd *)nativeAd;
 
-/**
- * Destroys the native ad and release all resources
- */
-- (void)destroy;
++ (CLXNativeAdView *)viewFromAd:(CLXNativeAd *)ad;
++ (CLXNativeAdView *)viewFromAd:(CLXNativeAd *)ad withTemplate:(NSString *)templateName;
+
+- (void)prepareForReuse;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

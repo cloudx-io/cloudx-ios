@@ -184,6 +184,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, strong, readonly) CLXAdNetworkFactories *adNetworkFactories;
 
+/**
+ * Ad event reporting service for tracking impressions, clicks, etc.
+ * @discussion Internal property — used by CLXNativeAdLoader and other publisher ad objects.
+ */
+@property (nonatomic, strong, readonly) id reportingService;
+
 #pragma mark - Native Ads (Internal - not part of public API)
 
 /**

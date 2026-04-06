@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.8] - 2026-04-03
+
+### Fixed
+- **Crash Fix** — Fixed a crash that could occur during concurrent ad event tracking on background threads
+
+---
+
 ## [2.2.7] - 2026-04-01
 
 ### Fixed
