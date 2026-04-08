@@ -1,26 +1,23 @@
 // swift-tools-version: 5.9
-
+// Requires Xcode 15+
 import PackageDescription
 
 let package = Package(
     name: "CloudXCore",
     platforms: [
-        .iOS(.v14)
+        .iOS(.v13)
     ],
     products: [
         .library(
             name: "CloudXCore",
             targets: ["CloudXCore"]
-        )
+        ),
     ],
     targets: [
         .binaryTarget(
             name: "CloudXCore",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v1.1.57-core/CloudXCore.xcframework.zip",
-            checksum: "PLACEHOLDER_CHECKSUM_TO_BE_UPDATED_BY_RELEASE_WORKFLOW"
-        )
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v2.2.8/CloudXCore.xcframework.zip",
+            checksum: "e215f429a5f7adb4cc26aaf35864a869e5b9150496d4e0977ff07bf048b71774"
+        ),
     ]
 )
-
-
-
