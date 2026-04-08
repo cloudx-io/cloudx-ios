@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXVungleAdapter'
-  s.version = '2.2.8.1'
+  s.version = '2.2.8'
   s.summary          = 'CloudX Vungle Adapter - Static Framework'
   s.description      = 'Vungle/Liftoff adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-vungle/CloudXVungleAdapter.xcframework'
   
   # Dependencies
-  s.dependency 'CloudXCore', '2.2.8.1'
+  s.dependency 'CloudXCore', '2.2.8'
   # 7.4.0 floor: VungleBannerView APIs introduced in 7.4; versions 7.0–7.3 lack banner support
   s.dependency 'VungleAds', '>= 7.4.0', '< 8.0'
   
