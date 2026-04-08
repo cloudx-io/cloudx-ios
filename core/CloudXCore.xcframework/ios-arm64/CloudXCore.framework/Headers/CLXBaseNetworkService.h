@@ -98,7 +98,7 @@ NS_ASSUME_NONNULL_BEGIN
                          timeout:(NSTimeInterval)timeout
                       maxRetries:(NSInteger)maxRetries
                           delay:(NSTimeInterval)delay
-                     completion:(void (^)(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled, NSHTTPURLResponse * _Nullable httpResponse))completion;
+                     completion:(void (^)(id _Nullable response, NSError * _Nullable error, BOOL isKillSwitchEnabled))completion;
 
 @end
 
