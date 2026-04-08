@@ -2,6 +2,22 @@
 // Requires Xcode 15+
 import PackageDescription
 
+// CloudX iOS SDK — Swift Package Manager distribution
+//
+// This package ships only the components whose third-party SDK dependencies
+// have official SPM support:
+//   - CloudXCore
+//   - CloudXMetaAdapter      (requires github.com/facebook/FBAudienceNetwork)
+//   - CloudXVungleAdapter    (requires github.com/Vungle/VungleAdsSDK-SwiftPackageManager)
+//   - CloudXMintegralAdapter (requires github.com/Mintegral-official/MintegralAdSDK-Swift-Package)
+//
+// NOT included (no official SPM for the underlying SDK — use CocoaPods instead):
+//   - CloudXInMobiAdapter
+//   - CloudXUnityAdsAdapter
+//   - CloudXRenderer (being merged into Core)
+//
+// CocoaPods + SPM hybrid in the same project is supported by Xcode.
+
 let package = Package(
     name: "CloudX",
     platforms: [
@@ -11,10 +27,7 @@ let package = Package(
         .library(name: "CloudXCore", targets: ["CloudXCore"]),
         .library(name: "CloudXMetaAdapter", targets: ["CloudXMetaAdapter"]),
         .library(name: "CloudXVungleAdapter", targets: ["CloudXVungleAdapter"]),
-        .library(name: "CloudXInMobiAdapter", targets: ["CloudXInMobiAdapter"]),
         .library(name: "CloudXMintegralAdapter", targets: ["CloudXMintegralAdapter"]),
-        .library(name: "CloudXUnityAdsAdapter", targets: ["CloudXUnityAdsAdapter"]),
-        .library(name: "CloudXRenderer", targets: ["CloudXRenderer"]),
     ],
     targets: [
         .binaryTarget(
@@ -33,24 +46,9 @@ let package = Package(
             checksum: "7e1d736b04874ea1c6c25f25f93d4298f618478a982f4b6d0a8f2dc4eaaa595a"
         ),
         .binaryTarget(
-            name: "CloudXInMobiAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v2.2.8/CloudXInMobiAdapter.xcframework.zip",
-            checksum: "111b3b11f9e11f4dbc2e081033f877b3b41f7a75967ac9fd9767b1cb0e85c760"
-        ),
-        .binaryTarget(
             name: "CloudXMintegralAdapter",
             url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v2.2.8/CloudXMintegralAdapter.xcframework.zip",
             checksum: "010c45e368fe041c4e6852d36318c3b7788a39b657bde78bcdcddf9076b965ca"
-        ),
-        .binaryTarget(
-            name: "CloudXUnityAdsAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v2.2.8/CloudXUnityAdsAdapter.xcframework.zip",
-            checksum: "cbe0e95035dd0cdfb5cf95d09e751d064592b28a59b52e86dde2810a928f5db8"
-        ),
-        .binaryTarget(
-            name: "CloudXRenderer",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v2.2.8/CloudXRenderer.xcframework.zip",
-            checksum: "b9656cfb5382389c5445bec9dbd80a6b7e45993c336ea0ad52fb85a02215a94f"
         ),
     ]
 )
