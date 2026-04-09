@@ -80,6 +80,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable NSNumber *)longitude;
 
+/**
+ * Gets the ISO-3 country code from raw geo headers.
+ * Reads from cloudfront-viewer-country-iso3 header.
+ * @return Country ISO-3 code (e.g., "USA") or nil if not available
+ */
+- (nullable NSString *)countryISO3;
+
 @end
 
 NS_ASSUME_NONNULL_END

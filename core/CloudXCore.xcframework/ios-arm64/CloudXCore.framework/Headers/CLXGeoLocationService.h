@@ -62,6 +62,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)isEUUser;
 
+/**
+ * Gets the ISO-3 country code from geo headers (e.g., "USA")
+ * @return Country code or nil if not available
+ */
+- (nullable NSString *)deviceCountry;
+
 @end
 
 NS_ASSUME_NONNULL_END 
