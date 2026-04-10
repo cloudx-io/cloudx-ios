@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXInMobiAdapter'
-  s.version = '2.2.8'
+  s.version = '2.2.9'
   s.summary          = 'CloudX InMobi Adapter - Static Framework'
   s.description      = 'InMobi adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-inmobi/CloudXInMobiAdapter.xcframework'
   
   # Dependencies
-  s.dependency 'CloudXCore', '2.2.8'
+  s.dependency 'CloudXCore', '2.2.9'
   s.dependency 'InMobiSDK', '>= 11.0.0', '< 12.0'
   
   s.frameworks = ['AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit']

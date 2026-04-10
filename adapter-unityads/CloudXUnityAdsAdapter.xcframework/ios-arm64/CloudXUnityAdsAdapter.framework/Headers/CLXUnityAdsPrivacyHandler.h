@@ -15,10 +15,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * @class CLXUnityAdsPrivacyHandler
- * @brief Forwards privacy settings to the Unity Ads SDK.
- * @discussion Unity Ads does not read CMP consent from NSUserDefaults on its
- *             own, so this handler forwards the full resolved signal whether
- *             the publisher uses a CMP or manual methods.
+ * @brief Forwards resolved privacy signals to the Unity Ads SDK via UADSMetaData.
+ * @discussion Unity Ads is not a registered TCF vendor and does not read IAB
+ *             strings from NSUserDefaults. The CloudX core SDK resolves IAB/CMP
+ *             signals and manual publisher consent into CLXAdapterPrivacySettings,
+ *             then pushes to this handler. This handler forwards the pre-resolved
+ *             consent to gdpr.consent and privacy.consent metadata keys.
  */
 @interface CLXUnityAdsPrivacyHandler : NSObject <CLXAdapterPrivacyHandler>
 @end

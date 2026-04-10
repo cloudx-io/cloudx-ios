@@ -23,7 +23,6 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 @class CLXSDKConfigAdUnit;
 @class CLXInterstitial;
 @class CLXRewarded;
-@class CLXNativeAdLoader;
 
 /**
  * The main class of the CloudX SDK.
@@ -180,15 +179,6 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  */
 - (nullable CLXRewarded *)createRewardedWithAdUnitId:(NSString *)adUnitId
     NS_SWIFT_NAME(createRewarded(adUnitId:));
-
-/**
- * Create a native ad loader
- * @param adUnitIdentifier The ad unit identifier. This should match the ad unit name in the CloudX dashboard
- * @return A CLXNativeAdLoader object
- * @discussion Set the nativeAdDelegate and revenueDelegate on the returned object, then call loadAd.
- */
-- (CLXNativeAdLoader *)createNativeAdLoaderWithAdUnitIdentifier:(NSString *)adUnitIdentifier
-    NS_SWIFT_NAME(createNativeAdLoader(adUnitIdentifier:));
 
 #pragma mark - Visual Debugging
 

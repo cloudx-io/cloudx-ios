@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.9] - 2026-04-09
+
+### Fixed
+- **Unity Ads Initialization Failures** — Fixed "Network Error" / "Invalid Game ID" failures with Unity Ads in certain regions. Initialization now uses the correct threading model required by the Unity Ads SDK.
+- **Unity Ads Privacy Consent** — Fixed GDPR consent derivation and migrated to the current Unity Ads privacy API. Both initialization and ad-request paths now correctly forward privacy signals.
+- **Unity Ads Rewarded Callbacks** — Fixed an issue where subsequent rewarded ad shows could emit spurious reward callbacks.
+- **Unity Ads Bid Token Errors** — Failed bid token retrieval now correctly reports an error instead of silently succeeding with no token.
+- **Ad Revenue Reporting Accuracy** — Fixed win/loss network reporting to correctly distinguish success from failure based on HTTP status code.
+
+---
+
 ## [2.2.8] - 2026-04-03
 
 ### Fixed

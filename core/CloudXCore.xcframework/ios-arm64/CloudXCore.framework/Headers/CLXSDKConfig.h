@@ -124,6 +124,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// SDK init network call latency in milliseconds (for metrics tracking)
 @property (nonatomic, assign) NSInteger sdkInitLatencyMs;
 
+/** Server timestamp in epoch millis from init response serverTimeMs field (for trusted clock sync). 0 if unavailable. */
+@property (nonatomic, assign) long long serverTimestampMillis;
+
 - (instancetype)init;
 @end
 
