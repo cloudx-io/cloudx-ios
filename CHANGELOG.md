@@ -17,7 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Unity Ads Adapter** — Fixed initialization, privacy consent forwarding, rewarded callbacks, and bid token error handling for improved reliability across regions.
-- **Ad Revenue Reporting Accuracy** — Fixed win/loss network reporting to correctly distinguish success from failure based on HTTP status code.
 
 ---
 
