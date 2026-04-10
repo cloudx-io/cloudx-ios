@@ -33,8 +33,9 @@ class DemoAppLogger {
             let entry = DemoAppLogEntry(message: message)
             self.logs.append(entry)
             
-            // Also log to console for Xcode debugging
-            print("📱 [DemoApp] \(message)")
+            // NSLog goes through os_log (captured by `simctl spawn log stream`).
+            // Swift print() only goes to stdout which is not visible to os_log.
+            NSLog("📱 [DemoApp] %@", message)
             
             // Keep only the last 500 logs to prevent memory issues
             if self.logs.count > 500 {
