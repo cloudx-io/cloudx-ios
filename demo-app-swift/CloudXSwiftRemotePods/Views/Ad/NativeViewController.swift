@@ -228,6 +228,7 @@ class NativeViewController: BaseAdViewController {
             return
         }
         resetAdState()
+        receivedCallbacks = []
         activeFlow = .manual
 
         let adView = buildManualAdView()
@@ -256,6 +257,7 @@ class NativeViewController: BaseAdViewController {
             return
         }
         resetAdState()
+        receivedCallbacks = []
         activeFlow = .lateBinding
         isLoading = true
         updateStatusUI(state: .loading)

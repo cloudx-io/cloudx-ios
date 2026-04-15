@@ -45,7 +45,11 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
         tabVC.selectTab(at: tabIndex)
         let contentVC = vcAtTabIndex(tabIndex, in: tabVC)
 
-        if format == "native", let navVC = contentVC?.navigationController {
+        if format == "native" {
+            guard let navVC = contentVC?.navigationController else {
+                logMessage("Native tab has no UINavigationController — cannot push NativeViewController")
+                return nil
+            }
             let nativeVC = NativeViewController()
             navVC.pushViewController(nativeVC, animated: false)
             return nativeVC

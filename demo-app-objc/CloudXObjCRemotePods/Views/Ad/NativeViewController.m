@@ -265,6 +265,7 @@ typedef NS_ENUM(NSInteger, NativeFlow) {
         return;
     }
     [self resetAdState];
+    self.receivedCallbacks = AdCallbackEventNone;
     self.activeFlow = NativeFlowManual;
 
     CLXNativeAdView *adView = [self buildManualAdView];
@@ -293,6 +294,7 @@ typedef NS_ENUM(NSInteger, NativeFlow) {
         return;
     }
     [self resetAdState];
+    self.receivedCallbacks = AdCallbackEventNone;
     self.activeFlow = NativeFlowLateBinding;
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];

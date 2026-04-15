@@ -47,7 +47,10 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
 
     if ([format isEqualToString:@"native"]) {
         UINavigationController *navVC = contentVC.navigationController;
-        if (!navVC) return nil;
+        if (!navVC) {
+            [self logMessage:@"Native tab has no UINavigationController — cannot push NativeViewController"];
+            return nil;
+        }
         NativeViewController *nativeVC = [[NativeViewController alloc] init];
         [navVC pushViewController:nativeVC animated:NO];
         return nativeVC;
@@ -79,7 +82,7 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
     if ([format isEqualToString:@"mrec"])                  return @selector(loadMRECAd);
     if ([format isEqualToString:@"interstitial"])           return @selector(loadInterstitialAd);
     if ([format isEqualToString:@"rewarded"])               return @selector(loadRewardedAd);
-    if ([format isEqualToString:@"native"])                return @selector(loadNativeAd);
+    if ([format isEqualToString:@"native"])                 return @selector(loadNativeAd);
     return nil;
 }
 
