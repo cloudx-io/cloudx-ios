@@ -4,6 +4,7 @@
 #import "InterstitialViewController.h"
 #import "RewardedViewController.h"
 #import "MRECViewController.h"
+#import "NativeMenuViewController.h"
 #import "SettingsViewController.h"
 #import "KeyValueDemoViewController.h"
 
@@ -27,21 +28,25 @@
     
     MRECViewController *mrecVC = [[MRECViewController alloc] init];
     mrecVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"MREC" image:[UIImage systemImageNamed:@"rectangle.3.group"] tag:4];
-    
+
+    NativeMenuViewController *nativeVC = [[NativeMenuViewController alloc] init];
+    nativeVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Native" image:[UIImage systemImageNamed:@"doc.richtext"] tag:5];
+
     KeyValueDemoViewController *keyValueVC = [[KeyValueDemoViewController alloc] init];
-    keyValueVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Key-Values" image:[UIImage systemImageNamed:@"key.fill"] tag:5];
+    keyValueVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Key-Values" image:[UIImage systemImageNamed:@"key.fill"] tag:6];
     
     SettingsViewController *settinsVC = [[SettingsViewController alloc] init];
-    settinsVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:[UIImage systemImageNamed:@"gearshape"] tag:6];
+    settinsVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:[UIImage systemImageNamed:@"gearshape"] tag:7];
 
     
-    // Set view controllers
+    // Set view controllers - Additional VCs appear in "More" section
     self.viewControllers = @[
         [[UINavigationController alloc] initWithRootViewController:initInternalVC],
         [[UINavigationController alloc] initWithRootViewController:bannerVC],
         [[UINavigationController alloc] initWithRootViewController:interstitialVC],
         [[UINavigationController alloc] initWithRootViewController:rewardedVC],
         [[UINavigationController alloc] initWithRootViewController:mrecVC],
+        [[UINavigationController alloc] initWithRootViewController:nativeVC],
         [[UINavigationController alloc] initWithRootViewController:keyValueVC],
         [[UINavigationController alloc] initWithRootViewController:settinsVC]
     ];

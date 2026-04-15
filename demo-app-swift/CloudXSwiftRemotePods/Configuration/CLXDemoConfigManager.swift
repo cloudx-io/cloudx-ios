@@ -47,8 +47,8 @@ class CLXDemoConfigManager {
             bannerAdUnitId: "Ce5-ltAX5zFz5QJ3TzEjY",
             mrecAdUnitId: "xMLHNFIkwieu2SLyeD0sQ",
             interstitialAdUnitId: "rkw0ncj6mSphKtmnl8Cw_",
-            nativeAdUnitId: "-",
-            nativeBannerAdUnitId: "-",
+            nativeAdUnitId: "Q33RbPmBH-wix45Mu6--Z",
+            nativeBannerAdUnitId: "-2_Lw2b4QTlu7x6tKZ6Ww",
             rewardedAdUnitId: "WJje0XGqL5n56Sa8dlt8L",
             rewardedInterstitialAdUnitId: "-"
         )
