@@ -3,6 +3,7 @@
 #if __has_include(<CloudXTestHarness/CLXTestHarness.h>)
 #import "AdDemoTabViewController.h"
 #import "BaseAdViewController.h"
+#import "NativeViewController.h"
 #import "DemoAppLogger.h"
 #import <CloudXTestHarness/CLXTestHarness.h>
 
@@ -19,6 +20,7 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
             @"mrec":                   @"MRECViewController",
             @"interstitial":           @"InterstitialViewController",
             @"rewarded":               @"RewardedViewController",
+            @"native":                 @"NativeMenuViewController",
         };
     });
     return map;
@@ -41,7 +43,20 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
     if (tabIndex < 0) return nil;
 
     [tabVC selectTabIndex:tabIndex];
-    return [self vcAtTabIndex:tabIndex inTabVC:tabVC];
+    UIViewController *contentVC = [self vcAtTabIndex:tabIndex inTabVC:tabVC];
+
+    if ([format isEqualToString:@"native"]) {
+        UINavigationController *navVC = contentVC.navigationController;
+        if (!navVC) {
+            [self logMessage:@"Native tab has no UINavigationController — cannot push NativeViewController"];
+            return nil;
+        }
+        NativeViewController *nativeVC = [[NativeViewController alloc] init];
+        [navVC pushViewController:nativeVC animated:NO];
+        return nativeVC;
+    }
+
+    return contentVC;
 }
 
 - (nullable UIViewController *)navigateToInit {
@@ -54,7 +69,7 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
 #pragma mark - Format Configuration
 
 - (NSArray<NSString *> *)supportedFormats {
-    return @[@"banner", @"mrec", @"interstitial", @"rewarded"];
+    return @[@"banner", @"mrec", @"interstitial", @"rewarded", @"native"];
 }
 
 - (BOOL)isFullscreenFormat:(NSString *)format {
@@ -67,6 +82,7 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
     if ([format isEqualToString:@"mrec"])                  return @selector(loadMRECAd);
     if ([format isEqualToString:@"interstitial"])           return @selector(loadInterstitialAd);
     if ([format isEqualToString:@"rewarded"])               return @selector(loadRewardedAd);
+    if ([format isEqualToString:@"native"])                 return @selector(loadNativeAd);
     return nil;
 }
 

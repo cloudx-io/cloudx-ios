@@ -27,12 +27,15 @@ class AdDemoTabViewController: UITabBarController {
         
         let mrecVC = MRECViewController()
         mrecVC.tabBarItem = UITabBarItem(title: "MREC", image: UIImage(systemName: "rectangle.3.group"), tag: 4)
-        
+
+        let nativeVC = NativeMenuViewController()
+        nativeVC.tabBarItem = UITabBarItem(title: "Native", image: UIImage(systemName: "doc.richtext"), tag: 5)
+
         let keyValueVC = KeyValueDemoViewController()
-        keyValueVC.tabBarItem = UITabBarItem(title: "Key-Values", image: UIImage(systemName: "key.fill"), tag: 5)
+        keyValueVC.tabBarItem = UITabBarItem(title: "Key-Values", image: UIImage(systemName: "key.fill"), tag: 6)
         
         let settingsVC = SettingsViewController()
-        settingsVC.tabBarItem = UITabBarItem(title: "Settings", image: UIImage(systemName: "gearshape"), tag: 6)
+        settingsVC.tabBarItem = UITabBarItem(title: "Settings", image: UIImage(systemName: "gearshape"), tag: 7)
         
         // Set view controllers - Additional VCs appear in "More" section
         self.viewControllers = [
@@ -41,6 +44,7 @@ class AdDemoTabViewController: UITabBarController {
             UINavigationController(rootViewController: interstitialVC),
             UINavigationController(rootViewController: rewardedVC),
             UINavigationController(rootViewController: mrecVC),
+            UINavigationController(rootViewController: nativeVC),
             UINavigationController(rootViewController: keyValueVC),
             UINavigationController(rootViewController: settingsVC)
         ]
