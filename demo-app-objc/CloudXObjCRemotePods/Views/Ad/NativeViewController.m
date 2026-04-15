@@ -239,12 +239,17 @@ typedef NS_ENUM(NSInteger, NativeFlow) {
 
 #pragma mark - Flow A: Template
 
+- (void)loadNativeAd {
+    [self loadTemplate];
+}
+
 - (void)loadTemplate {
     if (self.isLoading) {
         [self showAlertWithTitle:@"Info" message:@"Native ad is already loading."];
         return;
     }
     [self resetAdState];
+    self.receivedCallbacks = AdCallbackEventNone;
     self.activeFlow = NativeFlowTemplate;
     self.isLoading = YES;
     [self updateStatusUIWithState:AdStateLoading];
@@ -609,6 +614,7 @@ typedef NS_ENUM(NSInteger, NativeFlow) {
 - (void)didLoadNativeAd:(nullable CLXNativeAdView *)nativeAdView forAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Native didLoadNativeAd" ad:ad];
     self.isLoading = NO;
+    self.receivedCallbacks |= AdCallbackEventLoaded;
     self.loadedAd = ad;
 
     if (self.activeFlow == NativeFlowLateBinding) {
@@ -646,6 +652,7 @@ typedef NS_ENUM(NSInteger, NativeFlow) {
 }
 
 - (void)didClickNativeAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventClicked;
     [[DemoAppLogger sharedInstance] logAdEvent:@"👆 Native didClickNativeAd" ad:ad];
 }
 
@@ -661,7 +668,12 @@ typedef NS_ENUM(NSInteger, NativeFlow) {
 #pragma mark - CLXAdRevenueDelegate
 
 - (void)didPayRevenueForAd:(CLXAd *)ad {
+    self.receivedCallbacks |= AdCallbackEventRevenueReceived;
     [[DemoAppLogger sharedInstance] logAdEvent:@"💰 Native didPayRevenueForAd" ad:ad];
+}
+
+- (nullable UIView *)adViewForClickTesting {
+    return self.nativeAdView;
 }
 
 - (void)updateStatusUIWithState:(AdState)state {

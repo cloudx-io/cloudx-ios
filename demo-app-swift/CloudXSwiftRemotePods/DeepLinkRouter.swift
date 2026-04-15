@@ -12,6 +12,7 @@ enum DeepLinkRouter {
         "mrec":                  "MRECViewController",
         "interstitial":          "InterstitialViewController",
         "rewarded":              "RewardedViewController",
+        "native":                "NativeMenuViewController",
     ]
 
     static func setup() {
@@ -42,7 +43,15 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
         guard let tabVC = resolveTabViewController(),
               let tabIndex = tabIndex(for: format, in: tabVC) else { return nil }
         tabVC.selectTab(at: tabIndex)
-        return vcAtTabIndex(tabIndex, in: tabVC)
+        let contentVC = vcAtTabIndex(tabIndex, in: tabVC)
+
+        if format == "native", let navVC = contentVC?.navigationController {
+            let nativeVC = NativeViewController()
+            navVC.pushViewController(nativeVC, animated: false)
+            return nativeVC
+        }
+
+        return contentVC
     }
 
     func navigateToInit() -> UIViewController? {
@@ -54,7 +63,7 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
     // MARK: - Format Configuration
 
     func supportedFormats() -> [String] {
-        ["banner", "mrec", "interstitial", "rewarded"]
+        ["banner", "mrec", "interstitial", "rewarded", "native"]
     }
 
     func isFullscreenFormat(_ format: String) -> Bool {
@@ -67,6 +76,7 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
         case "mrec":                  return NSSelectorFromString("loadMRECAd")
         case "interstitial":          return NSSelectorFromString("loadInterstitialAd")
         case "rewarded":              return NSSelectorFromString("loadRewardedAd")
+        case "native":                return NSSelectorFromString("loadNativeAd")
         default:                      return nil
         }
     }

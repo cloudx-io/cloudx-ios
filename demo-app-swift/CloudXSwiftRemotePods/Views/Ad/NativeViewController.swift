@@ -202,12 +202,17 @@ class NativeViewController: BaseAdViewController {
 
     // MARK: - Flow A: Template
 
+    @objc func loadNativeAd() {
+        loadTemplate()
+    }
+
     private func loadTemplate() {
         guard !isLoading else {
             showAlert(title: "Info", message: "Native ad is already loading.")
             return
         }
         resetAdState()
+        receivedCallbacks = []
         activeFlow = .template
         isLoading = true
         updateStatusUI(state: .loading)
@@ -526,6 +531,8 @@ class NativeViewController: BaseAdViewController {
         return adView
     }
 
+    override func adViewForClickTesting() -> UIView? { nativeAdView }
+
     // MARK: - Display
 
     private func displayAdView(_ adView: CLXNativeAdView) {
@@ -549,6 +556,7 @@ extension NativeViewController: CLXNativeAdDelegate {
     func didLoadNativeAd(_ nativeAdView: CLXNativeAdView?, for ad: CLXAd) {
         DemoAppLogger.sharedInstance.logAdEvent("✅ Native didLoadNativeAd", ad: ad)
         isLoading = false
+        receivedCallbacks.insert(.loaded)
         loadedAd = ad
 
         if activeFlow == .lateBinding {
@@ -586,6 +594,7 @@ extension NativeViewController: CLXNativeAdDelegate {
     }
 
     func didClickNativeAd(_ ad: CLXAd) {
+        receivedCallbacks.insert(.clicked)
         DemoAppLogger.sharedInstance.logAdEvent("👆 Native didClickNativeAd", ad: ad)
     }
 
@@ -603,6 +612,7 @@ extension NativeViewController: CLXNativeAdDelegate {
 
 extension NativeViewController: CLXAdRevenueDelegate {
     func didPayRevenue(for ad: CLXAd) {
+        receivedCallbacks.insert(.revenueReceived)
         DemoAppLogger.sharedInstance.logAdEvent("💰 Native didPayRevenueForAd", ad: ad)
     }
 }
