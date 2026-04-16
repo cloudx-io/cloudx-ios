@@ -142,13 +142,18 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     /// Missing view controller required for ad display
     CLXErrorCodeAdapterMissingViewController = 620,
     /// Ad display failed
-    CLXErrorCodeAdapterDisplayFailed = 621
+    CLXErrorCodeAdapterDisplayFailed = 621,
+    /// Ad network SDK initialization timed out (server-configurable per adapter)
+    CLXErrorCodeAdapterInitializationTimeout = 622
 };
 
 /**
  * CloudX SDK error domain
  */
 extern NSString * const CLXErrorDomain;
+
+/// UserInfo key for the raw HTTP status code in errors created via errorWithHTTPStatusCode:.
+extern NSString * const CLXHTTPStatusCodeKey;
 
 /**
  * CloudX SDK error class - industry standard error handling

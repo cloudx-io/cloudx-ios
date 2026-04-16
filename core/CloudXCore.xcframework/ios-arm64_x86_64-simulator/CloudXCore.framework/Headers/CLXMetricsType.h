@@ -26,7 +26,7 @@ extern NSString * const CLXMetricsTypeNetworkTimeToFirstAd; // "network_call_tim
  * Method call metrics types
  * Matches Android's sealed class Method(typeCode: String) : MetricsType(typeCode)
  */
-extern NSString * const CLXMetricsTypeMethodSdkInit;           // "method_sdk_init"
+extern NSString * const CLXMetricsTypeMethodSdkInit;           // "method_init"
 extern NSString * const CLXMetricsTypeMethodCreateBanner;     // "method_create_banner"
 extern NSString * const CLXMetricsTypeMethodCreateInterstitial; // "method_create_interstitial"
 extern NSString * const CLXMetricsTypeMethodCreateRewarded;   // "method_create_rewarded"

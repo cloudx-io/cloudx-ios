@@ -13,7 +13,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol CLXAdEventReporting;
-@class CLXBidAdSource;
 @class CLXBidAdSourceResponse;
 @class CLXConfigImpressionModel;
 
@@ -30,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithReportingService:(id<CLXAdEventReporting>)reportingService;
 
 /**
- * Sets up Rill tracking data and sends bid request event
+ * Sets up winner-scoped Rill tracking data for subsequent impression/click events.
  * @param bidResponse The bid response containing ad data
  * @param impModel The impression model containing account information
  * @param adUnitId The ad unit identifier
@@ -41,6 +40,13 @@ NS_ASSUME_NONNULL_BEGIN
                                 impModel:(CLXConfigImpressionModel *)impModel
                                 adUnitId:(NSString *)adUnitId
                                loadCount:(NSInteger)loadCount;
+
+/**
+ * Sends the legacy bid request (`bidreqenc`) event for a completed auction attempt without a winning bid path,
+ * matching Android legacy bid-request timing (success and failure).
+ */
+- (void)sendLegacyBidRequestAttemptIfPossibleWithImpModel:(CLXConfigImpressionModel *)impModel
+                                                auctionId:(NSString *)auctionId;
 
 /**
  * Sends bid request tracking event using previously set up data

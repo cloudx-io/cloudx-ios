@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.1.0] - 2026-04-16
+
+### Added
+- **Meta Reels & Native Ads** — Meta Reels (9:16 vertical video) and other Meta native ad formats are now supported via `CLXPublisherNative`. This release supports Meta native ads only; additional bidder support is coming in a future release.
+- **Per-Adapter Initialization Timeout** — SDK initialization now supports per-adapter timeouts for more predictable startup behavior.
+
+### Fixed
+- **Xcode 26 Compatibility** — Resolved a build warning when compiling with Xcode 26.
+
+---
+
 ## [2.2.9] - 2026-04-09
 
 ### Fixed
