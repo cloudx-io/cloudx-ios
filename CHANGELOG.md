@@ -16,12 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [3.1.0] - 2026-04-16
 
 ### Added
-- **Native Ads** — Native ad format is now publicly available. Publishers can integrate native ads using `CLXPublisherNative` for fully customizable ad experiences.
-- **Swift Package Manager** — Single root-level `Package.swift` for simplified SPM integration (supports Core, Meta, Vungle, and Mintegral adapters).
+- **Meta Reels & Native Ads** — Meta Reels (9:16 vertical video) and other Meta native ad formats are now supported via `CLXPublisherNative`. This release supports Meta native ads only; additional bidder support is coming in a future release.
 - **Per-Adapter Initialization Timeout** — SDK initialization now supports per-adapter timeouts for more predictable startup behavior.
-
-### Changed
-- **Version Alignment** — iOS SDK version aligned with Android SDK (3.x) for consistent cross-platform versioning.
 
 ### Fixed
 - **Xcode 26 Compatibility** — Resolved a build warning when compiling with Xcode 26.
