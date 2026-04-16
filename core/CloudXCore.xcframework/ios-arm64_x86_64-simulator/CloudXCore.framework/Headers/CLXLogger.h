@@ -2,6 +2,7 @@
 
 @class CLXAd;
 @class CLXError;
+@class CLXRemoteLogTelemetryTracker;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -92,6 +93,11 @@ typedef NS_ENUM(NSInteger, CLXLogEmoji) {
  * @discussion Timestamps are formatted as HH:mm:ss.SSS and appear after [CloudX]
  */
 - (void)setTimestampsEnabled:(BOOL)enabled;
+
+#pragma mark - Remote Log Telemetry
+
+/** Set the remote log tracker for forwarding SDK logs. Called once during SDK init. */
++ (void)setRemoteLogTracker:(nullable CLXRemoteLogTelemetryTracker *)tracker;
 
 @end
 

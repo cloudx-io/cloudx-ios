@@ -28,6 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXSDKConfigTargeting;
 @class CLXSDKConfigCondition;
 @class CLXSDKConfigGeoBid;
+@class CLXTelemetryMetricsConfig;
+@class CLXTelemetryEventsConfig;
+@class CLXTelemetryLogsConfig;
 @class CLXSDKConfigDeviceConfig;
 
 @interface CLXSDKConfig : NSObject
@@ -97,6 +100,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *sdkClickEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sdkRewardEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sdkErrorEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkMetricsEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkLogEndpointURL;
+
+// 2b-ii. Telemetry subsystem configs (server-driven tuning knobs)
+@property (nonatomic, strong, nullable) CLXTelemetryMetricsConfig *telemetryMetricsConfig;
+@property (nonatomic, strong, nullable) CLXTelemetryEventsConfig *telemetryEventsConfig;
+@property (nonatomic, strong, nullable) CLXTelemetryLogsConfig *telemetryLogsConfig;
+
+// 2c. Opaque server telemetry payloads
+@property (nonatomic, copy, nullable) NSString *configTelemetryPayload;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 3. Core Config (required)

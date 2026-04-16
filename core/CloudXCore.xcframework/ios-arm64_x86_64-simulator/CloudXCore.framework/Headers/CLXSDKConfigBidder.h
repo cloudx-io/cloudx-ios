@@ -25,6 +25,12 @@ typedef NS_ENUM(NSInteger, SDKConfigKnownAdapterName) {
 @property (nonatomic, strong) NSDictionary<NSString *, id> *bidderInitData;
 @property (nonatomic, strong) NSString *networkName;
 
+/**
+ * Server-configurable per-adapter initialization timeout in milliseconds.
+ * 0 means no timeout (unlimited wait). Parsed from the @c initTimeoutMs JSON field.
+ */
+@property (nonatomic, assign) NSInteger initTimeoutMs;
+
 - (instancetype)initWithBidderInitData:(NSDictionary<NSString *, id> *)bidderInitData
                     networkName:(NSString *)networkName;
 

@@ -66,6 +66,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSDictionary<NSString *, NSString *> *adapterExtras;
 @property (nonatomic, assign) NSInteger test;
 @property (nonatomic, copy, nullable) NSString *adaptercode;
+@property (nonatomic, copy, nullable) NSString *auctionTelemetryPayload;
+@property (nonatomic, copy, nullable) NSString *bidTelemetryPayload;
 
 - (NSDictionary *)toDictionary;
 @end

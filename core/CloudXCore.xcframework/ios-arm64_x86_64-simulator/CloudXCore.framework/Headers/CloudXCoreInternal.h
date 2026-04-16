@@ -27,13 +27,11 @@
 #import <CloudXCore/CLXPublisherBanner.h>
 #import <CloudXCore/CLXPublisherNative.h>
 
-// Native (internal - not exposed in public API)
+// Native (legacy CLXNative / CLXNativeDelegate — new API is CLXNativeAdLoader in public header)
 #import <CloudXCore/CLXNative.h>
 #import <CloudXCore/CLXNativeDelegate.h>
 #import <CloudXCore/CLXNativeAdView.h>
 #import <CloudXCore/CLXNativeTemplate.h>
-#import <CloudXCore/CLXAdapterNative.h>
-#import <CloudXCore/CLXAdapterNativeFactory.h>
 
 // Initialization
 #import <CloudXCore/CLXInitService.h>
