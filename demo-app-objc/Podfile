@@ -11,6 +11,14 @@ target 'CloudXObjCRemotePods' do
   pod 'CloudXMintegralAdapter', '~> 3.1.0'
   pod 'CloudXUnityAdsAdapter', '~> 3.1.0'
 
+  # Local QA harness. Enabled only when CLX_QA_HARNESS=1 so normal dev/release
+  # builds remain unchanged. The demo app's CLXDeepLinkRouter is guarded by
+  # __has_include(<CloudXTestHarness/CLXTestHarness.h>) and falls back to
+  # no-op stubs when the harness is absent.
+  if ENV['CLX_QA_HARNESS'] == '1'
+    pod 'CloudXTestHarness', :path => '../../cloudx-qa-automation/sdk/ios/CloudXTestHarness'
+  end
+
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths
   end

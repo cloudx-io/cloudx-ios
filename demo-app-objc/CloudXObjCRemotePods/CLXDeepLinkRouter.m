@@ -6,6 +6,10 @@
 #import "NativeViewController.h"
 #import "DemoAppLogger.h"
 #import <CloudXTestHarness/CLXTestHarness.h>
+#import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXKeyValueState.h>
+#import <CloudXCore/CLXManualPrivacyState.h>
+#import <CloudXCore/CLXUserDefaultsKeys.h>
 
 static NSTimeInterval const kSDKInitTimeout = 30.0;
 
@@ -265,6 +269,141 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
         }
     }
     return nil;
+}
+
+#pragma mark - Settings Mutation (CLXTestHarnessApp optional)
+
+static NSError *clx_mutationError(NSString *reason) {
+    return [NSError errorWithDomain:@"CLXDemoDeepLinkRouter"
+                               code:1001
+                           userInfo:@{ NSLocalizedDescriptionKey: reason ?: @"unknown" }];
+}
+
+- (BOOL)applySettingsMutation:(NSString *)mutationId
+                        params:(NSDictionary *)params
+                         error:(NSError *__autoreleasing *)error {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    CloudXCore *core = [CloudXCore shared];
+
+    if ([mutationId isEqualToString:@"gdpr_applies"]) {
+        NSNumber *applies = params[@"applies"] ?: @YES;
+        NSString *consent = params[@"consent"] ?: @"CPabc";
+        [defaults setObject:applies forKey:kCLXPrivacyGDPRAppliesKey];
+        [defaults setObject:consent forKey:kCLXPrivacyGDPRConsentKey];
+        [CloudXCore setHasUserConsent:@YES];
+        return YES;
+    }
+    if ([mutationId isEqualToString:@"us_privacy"]) {
+        NSString *value = params[@"value"] ?: @"1YNN";
+        [defaults setObject:value forKey:kCLXPrivacyCCPAPrivacyKey];
+        return YES;
+    }
+    if ([mutationId isEqualToString:@"hashed_user_id"]) {
+        NSString *value = params[@"value"];
+        if (![value isKindOfClass:[NSString class]] || value.length == 0) {
+            if (error) *error = clx_mutationError(@"hashed_user_id requires non-empty value");
+            return NO;
+        }
+        [core setHashedUserID:value];
+        return YES;
+    }
+    if ([mutationId isEqualToString:@"user_kv_add"]) {
+        NSString *key = params[@"key"];
+        NSString *value = params[@"value"];
+        if (![key isKindOfClass:[NSString class]] || ![value isKindOfClass:[NSString class]]) {
+            if (error) *error = clx_mutationError(@"user_kv_add requires string key and value");
+            return NO;
+        }
+        [core setUserKeyValue:key value:value];
+        return YES;
+    }
+    if ([mutationId isEqualToString:@"app_kv_add"]) {
+        NSString *key = params[@"key"];
+        NSString *value = params[@"value"];
+        if (![key isKindOfClass:[NSString class]] || ![value isKindOfClass:[NSString class]]) {
+            if (error) *error = clx_mutationError(@"app_kv_add requires string key and value");
+            return NO;
+        }
+        [core setAppKeyValue:key value:value];
+        return YES;
+    }
+    if ([mutationId isEqualToString:@"clear_all_kvs"]) {
+        [core clearAllKeyValues];
+        return YES;
+    }
+    if ([mutationId isEqualToString:@"user_targeting_off"]) {
+        // No first-class API yet; clear user KVs as the observable equivalent
+        // so user.ext.data / demographics are absent on the next bid request.
+        [core clearAllKeyValues];
+        return YES;
+    }
+    if ([mutationId isEqualToString:@"hi_roi_targeting_signals"]) {
+        NSDictionary *userKVs = params[@"user"] ?: @{
+            @"ltv_bucket": @"high",
+            @"retention_d7": @"true",
+        };
+        NSDictionary *appKVs = params[@"app"] ?: @{
+            @"content_rating": @"E",
+            @"monetization_tier": @"premium",
+        };
+        for (NSString *key in userKVs) {
+            id value = userKVs[key];
+            if ([value isKindOfClass:[NSString class]]) {
+                [core setUserKeyValue:key value:(NSString *)value];
+            }
+        }
+        for (NSString *key in appKVs) {
+            id value = appKVs[key];
+            if ([value isKindOfClass:[NSString class]]) {
+                [core setAppKeyValue:key value:(NSString *)value];
+            }
+        }
+        return YES;
+    }
+
+    if (error) *error = clx_mutationError([NSString stringWithFormat:@"unsupported mutationId: %@", mutationId]);
+    return NO;
+}
+
+- (BOOL)verifyCleanState:(NSError *__autoreleasing *)error {
+    CLXManualPrivacyState *privacy = [CLXManualPrivacyState sharedInstance];
+    if (privacy.hasUserConsent != nil) {
+        if (error) *error = clx_mutationError(@"CLXManualPrivacyState.hasUserConsent is set");
+        return NO;
+    }
+    if (privacy.doNotSell != nil) {
+        if (error) *error = clx_mutationError(@"CLXManualPrivacyState.doNotSell is set");
+        return NO;
+    }
+
+    CLXKeyValueState *kvs = [CLXKeyValueState shared];
+    if (kvs.hashedUserId.length > 0) {
+        if (error) *error = clx_mutationError(@"CLXKeyValueState.hashedUserId is set");
+        return NO;
+    }
+    if (kvs.userKeyValues.count > 0) {
+        if (error) *error = clx_mutationError(@"CLXKeyValueState.userKeyValues is non-empty");
+        return NO;
+    }
+    if (kvs.appKeyValues.count > 0) {
+        if (error) *error = clx_mutationError(@"CLXKeyValueState.appKeyValues is non-empty");
+        return NO;
+    }
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSArray<NSString *> *iabKeys = @[
+        kCLXPrivacyGDPRAppliesKey,
+        kCLXPrivacyGDPRConsentKey,
+        kCLXPrivacyCCPAPrivacyKey,
+    ];
+    for (NSString *key in iabKeys) {
+        if ([defaults objectForKey:key] != nil) {
+            if (error) *error = clx_mutationError([NSString stringWithFormat:@"NSUserDefaults %@ is set", key]);
+            return NO;
+        }
+    }
+
+    return YES;
 }
 
 @end
