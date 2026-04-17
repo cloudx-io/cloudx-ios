@@ -2,6 +2,7 @@ import UIKit
 
 #if canImport(CloudXTestHarness)
 import CloudXTestHarness
+import CloudXCore
 
 private let kSDKInitTimeout: TimeInterval = 30.0
 
@@ -237,6 +238,102 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
             .compactMap { $0 as? UIWindowScene }
             .flatMap { $0.windows }
             .first { $0.isKeyWindow }
+    }
+
+    // MARK: - Settings Mutation (CLXTestHarnessApp optional)
+
+    private static func mutationError(_ reason: String) -> NSError {
+        NSError(domain: "CLXDemoDeepLinkRouter",
+                code: 1001,
+                userInfo: [NSLocalizedDescriptionKey: reason])
+    }
+
+    func applySettingsMutation(_ mutationId: String,
+                                params: [AnyHashable: Any]) throws {
+        let defaults = UserDefaults.standard
+        let core = CloudXCore.shared()
+
+        switch mutationId {
+        case "gdpr_applies":
+            let applies = params["applies"] as? NSNumber ?? NSNumber(value: true)
+            let consent = (params["consent"] as? String) ?? "CPabc"
+            defaults.set(applies, forKey: "IABTCF_gdprApplies")
+            defaults.set(consent, forKey: "IABTCF_TCString")
+            CloudXCore.setHasUserConsent(NSNumber(value: true))
+
+        case "us_privacy":
+            let value = (params["value"] as? String) ?? "1YNN"
+            defaults.set(value, forKey: "IABUSPrivacy_String")
+
+        case "hashed_user_id":
+            guard let value = params["value"] as? String, !value.isEmpty else {
+                throw Adapter.mutationError("hashed_user_id requires non-empty value")
+            }
+            core.setHashedUserID(value)
+
+        case "user_kv_add":
+            guard let key = params["key"] as? String,
+                  let value = params["value"] as? String else {
+                throw Adapter.mutationError("user_kv_add requires string key and value")
+            }
+            core.setUserKeyValue(key, value: value)
+
+        case "app_kv_add":
+            guard let key = params["key"] as? String,
+                  let value = params["value"] as? String else {
+                throw Adapter.mutationError("app_kv_add requires string key and value")
+            }
+            core.setAppKeyValue(key, value: value)
+
+        case "clear_all_kvs":
+            core.clearAllKeyValues()
+
+        case "user_targeting_off":
+            // No first-class API yet; clear user KVs as the observable equivalent.
+            core.clearAllKeyValues()
+
+        case "hi_roi_targeting_signals":
+            let userKVs = (params["user"] as? [String: String]) ?? [
+                "ltv_bucket": "high",
+                "retention_d7": "true",
+            ]
+            let appKVs = (params["app"] as? [String: String]) ?? [
+                "content_rating": "E",
+                "monetization_tier": "premium",
+            ]
+            for (key, value) in userKVs { core.setUserKeyValue(key, value: value) }
+            for (key, value) in appKVs { core.setAppKeyValue(key, value: value) }
+
+        default:
+            throw Adapter.mutationError("unsupported mutationId: \(mutationId)")
+        }
+    }
+
+    func verifyCleanState() throws {
+        let privacy = CLXManualPrivacyState.sharedInstance()
+        if privacy.hasUserConsent != nil {
+            throw Adapter.mutationError("CLXManualPrivacyState.hasUserConsent is set")
+        }
+        if privacy.doNotSell != nil {
+            throw Adapter.mutationError("CLXManualPrivacyState.doNotSell is set")
+        }
+
+        let kvs = CLXKeyValueState.shared()
+        if let hashed = kvs.hashedUserId, !hashed.isEmpty {
+            throw Adapter.mutationError("CLXKeyValueState.hashedUserId is set")
+        }
+        if kvs.userKeyValues.count > 0 {
+            throw Adapter.mutationError("CLXKeyValueState.userKeyValues is non-empty")
+        }
+        if kvs.appKeyValues.count > 0 {
+            throw Adapter.mutationError("CLXKeyValueState.appKeyValues is non-empty")
+        }
+
+        let iabKeys = ["IABTCF_gdprApplies", "IABTCF_TCString", "IABUSPrivacy_String"]
+        let defaults = UserDefaults.standard
+        for key in iabKeys where defaults.object(forKey: key) != nil {
+            throw Adapter.mutationError("UserDefaults \(key) is set")
+        }
     }
 }
 
