@@ -251,7 +251,7 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
     func applySettingsMutation(_ mutationId: String,
                                 params: [AnyHashable: Any]) throws {
         let defaults = UserDefaults.standard
-        let core = CloudXCore.shared()
+        let core = CloudXCore.shared
 
         switch mutationId {
         case "gdpr_applies":

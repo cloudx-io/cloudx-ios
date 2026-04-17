@@ -11,6 +11,14 @@ target 'CloudXSwiftRemotePods' do
   pod 'CloudXMintegralAdapter', '~> 3.1.0'
   pod 'CloudXUnityAdsAdapter', '~> 3.1.0'
 
+  # Local QA harness. Enabled only when CLX_QA_HARNESS=1 so normal dev/release
+  # builds remain unchanged. DeepLinkRouter is guarded by
+  # canImport(CloudXTestHarness) and falls back to no-op stubs when the harness
+  # is absent.
+  if ENV['CLX_QA_HARNESS'] == '1'
+    pod 'CloudXTestHarness', :path => '../../cloudx-qa-automation/sdk/ios/CloudXTestHarness'
+  end
+
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths
   end

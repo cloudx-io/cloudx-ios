@@ -1,24 +1,24 @@
 PODS:
-  - CloudXCore (2.2.9)
-  - CloudXInMobiAdapter (2.2.9):
-    - CloudXCore (= 2.2.9)
+  - CloudXCore (3.1.0)
+  - CloudXInMobiAdapter (3.1.0):
+    - CloudXCore (= 3.1.0)
     - InMobiSDK (< 12.0, >= 11.0.0)
-  - CloudXMetaAdapter (2.2.9):
-    - CloudXCore (= 2.2.9)
+  - CloudXMetaAdapter (3.1.0):
+    - CloudXCore (= 3.1.0)
     - FBAudienceNetwork (< 7.0, >= 6.9.0)
-  - CloudXMintegralAdapter (2.2.9):
-    - CloudXCore (= 2.2.9)
+  - CloudXMintegralAdapter (3.1.0):
+    - CloudXCore (= 3.1.0)
     - MintegralAdSDK (~> 8.0)
     - MintegralAdSDK/BidBannerAd (~> 8.0)
     - MintegralAdSDK/BidNewInterstitialAd (~> 8.0)
     - MintegralAdSDK/BidRewardVideoAd (~> 8.0)
-  - CloudXRenderer (2.2.9):
-    - CloudXCore (= 2.2.9)
-  - CloudXUnityAdsAdapter (2.2.9):
-    - CloudXCore (= 2.2.9)
+  - CloudXRenderer (3.1.0):
+    - CloudXCore (= 3.1.0)
+  - CloudXUnityAdsAdapter (3.1.0):
+    - CloudXCore (= 3.1.0)
     - UnityAds (~> 4.17.0)
-  - CloudXVungleAdapter (2.2.9):
-    - CloudXCore (= 2.2.9)
+  - CloudXVungleAdapter (3.1.0):
+    - CloudXCore (= 3.1.0)
     - VungleAds (< 8.0, >= 7.4.0)
   - FBAudienceNetwork (6.21.1)
   - InMobiSDK (11.2.0)
@@ -58,16 +58,16 @@ PODS:
   - MintegralAdSDK/RewardVideoAd (8.1.1):
     - MintegralAdSDK/NativeAd
   - UnityAds (4.17.0)
-  - VungleAds (7.7.1)
+  - VungleAds (7.7.2)
 
 DEPENDENCIES:
-  - CloudXCore (~> 2.2.9)
-  - CloudXInMobiAdapter (~> 2.2.9)
-  - CloudXMetaAdapter (~> 2.2.9)
-  - CloudXMintegralAdapter (~> 2.2.9)
-  - CloudXRenderer (~> 2.2.9)
-  - CloudXUnityAdsAdapter (~> 2.2.9)
-  - CloudXVungleAdapter (~> 2.2.9)
+  - CloudXCore (~> 3.1.0)
+  - CloudXInMobiAdapter (~> 3.1.0)
+  - CloudXMetaAdapter (~> 3.1.0)
+  - CloudXMintegralAdapter (~> 3.1.0)
+  - CloudXRenderer (~> 3.1.0)
+  - CloudXUnityAdsAdapter (~> 3.1.0)
+  - CloudXVungleAdapter (~> 3.1.0)
 
 SPEC REPOS:
   trunk:
@@ -85,19 +85,19 @@ SPEC REPOS:
     - VungleAds
 
 SPEC CHECKSUMS:
-  CloudXCore: 409c559936a63bb1364cf85237e72129da03ecfc
-  CloudXInMobiAdapter: 28c1f8cea73c480c3e03fbd0b04a813b3e4f5a1a
-  CloudXMetaAdapter: c50d3e86b24a6cd82b552cea58a99cec7fa00e4f
-  CloudXMintegralAdapter: 6f3b5dcf1bdf7d388a72d8caec40bd877d8f3dda
-  CloudXRenderer: 8e37cd5201c2d410a1f84088c51195a5aa29f11a
-  CloudXUnityAdsAdapter: 0eadb3278c5e2e0211bd6a86d4bc4a4f442c2e81
-  CloudXVungleAdapter: 78e4dd5e3216bb881c02cf8615bbf98e52717447
+  CloudXCore: 4ec790b817d818e50b485289b832116f7da4ab25
+  CloudXInMobiAdapter: 5f2bbfb2f146dd2466592bdc59334cf8cb9b53a3
+  CloudXMetaAdapter: a15e48c9ce02d518db49578145a0a2574820e5fa
+  CloudXMintegralAdapter: 1c92ec727cfad8ae2a6ba5227dba51aaed2a8052
+  CloudXRenderer: 56ad15a24c7cf56280f5c2344d2304330668d857
+  CloudXUnityAdsAdapter: 270501625d4560e539e157cf8d56efa514959b80
+  CloudXVungleAdapter: d82770f30054897fc6fdc444192c20c3e3b5c9ab
   FBAudienceNetwork: 85d18a65c9e35bc426bd4664cf3ae2a1172d7b60
   InMobiSDK: 07312ef7eff433d72e8a0f06ef7b50685b3e2ca5
   MintegralAdSDK: 4325769f93ef336237799b5fb455335985fbc8b7
   UnityAds: adbe0d522fd14b8298c5e159164fc43396165843
-  VungleAds: c1f0dd0d8531b200b9f6a3f78e292ded75540eae
+  VungleAds: 03d93126f39d6056055a8b9edca701c6a3391d8b
 
-PODFILE CHECKSUM: 8c25af70cdc4ce65a7bd9c8a4cd821ad266ba67d
+PODFILE CHECKSUM: 616dd21bb9a4097591ee5251a4ecfcc91a81041f
 
 COCOAPODS: 1.16.2
