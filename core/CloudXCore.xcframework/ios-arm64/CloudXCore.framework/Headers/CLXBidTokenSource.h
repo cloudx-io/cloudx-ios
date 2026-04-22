@@ -23,6 +23,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)getTokenWithCompletion:(void (^)(NSDictionary<NSString *, NSString *> * _Nullable token, NSError * _Nullable error))completion;
 
+@optional
+
+/**
+ * @brief Returns Prebid Server bidder params for impression-level configuration.
+ * @discussion Adapters that require per-impression bidder params (e.g., zoneId for Magnite)
+ * should implement this method. The returned dictionary is placed at
+ * imp.ext.prebid.bidder.<adapterName> in the OpenRTB bid request.
+ * @return Bidder params dictionary, or nil if no impression-level params are needed.
+ */
+- (nullable NSDictionary *)bidderImpressionParams;
+
 @end
 
 NS_ASSUME_NONNULL_END 

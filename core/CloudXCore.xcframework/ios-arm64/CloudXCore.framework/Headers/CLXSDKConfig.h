@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXTelemetryMetricsConfig;
 @class CLXTelemetryEventsConfig;
 @class CLXTelemetryLogsConfig;
+@class CLXRemoteLogConfig;
 @class CLXSDKConfigDeviceConfig;
 
 @interface CLXSDKConfig : NSObject
@@ -107,6 +108,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXTelemetryMetricsConfig *telemetryMetricsConfig;
 @property (nonatomic, strong, nullable) CLXTelemetryEventsConfig *telemetryEventsConfig;
 @property (nonatomic, strong, nullable) CLXTelemetryLogsConfig *telemetryLogsConfig;
+
+// 2b-iii. Server-driven remote log collection gates (nil when the server omits `remoteLogConfig`
+// or sets `enabled=false`). When non-nil, applies level, substring filter, max-entries, and
+// duration gates in the remote log tracker.
+@property (nonatomic, strong, nullable) CLXRemoteLogConfig *remoteLogConfig;
 
 // 2c. Opaque server telemetry payloads
 @property (nonatomic, copy, nullable) NSString *configTelemetryPayload;

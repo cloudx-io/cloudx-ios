@@ -109,6 +109,7 @@ NS_ASSUME_NONNULL_BEGIN
                       location:(CLLocation *)location
                      userAgent:(NSString *)userAgent
                    adapterInfo:(NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)adapterInfo
+                 bidderParams:(nullable NSDictionary<NSString *, NSDictionary *> *)bidderParams
            nativeAdRequirements:(id)nativeAdRequirements
            skadRequestParameters:(id)skadRequestParameters
                           tmax:(NSNumber *)tmax
