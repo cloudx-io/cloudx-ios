@@ -16,10 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [3.2.0] - 2026-04-22
 
 ### Added
-- **Magnite Adapter** — New `CloudXMagniteAdapter` supporting Banner (320x50), MREC (300x250), Interstitial, and Rewarded ad formats via `MagniteSDK`. Install via `pod 'CloudXMagniteAdapter', '~> 3.2.0'`. Includes IAB TCF (GDPR) and CCPA privacy handling.
-
-### Fixed
-- **`winLossNotificationURL` tolerance** — Fixed an issue where an explicitly empty `winLossNotificationURL` in the SDK initialization response could prevent the SDK from initializing cleanly. An empty string now disables win/loss tracking gracefully, consistent with how missing fields are handled.
+- **Magnite Adapter** — New `CloudXMagniteAdapter` (Banner, MREC, Interstitial, Rewarded). Install: `pod 'CloudXMagniteAdapter', '~> 3.2.0'`.
+- **Richer dashboard telemetry** — Full telemetry overhaul. More robust event capture, new events, and increased observability.
 
 ---
 
