@@ -42,6 +42,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)setEnvironment:(NSString *)environment;
 
+/**
+ * Set custom local initialization URL (used when environment is "local")
+ * @param url Full URL to provisioning /sdk endpoint
+ */
++ (void)setLocalInitializationURL:(NSString *)url;
+
 @end
 
 NS_ASSUME_NONNULL_END 

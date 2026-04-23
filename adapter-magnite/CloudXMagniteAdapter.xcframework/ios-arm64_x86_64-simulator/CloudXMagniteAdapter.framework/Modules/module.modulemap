@@ -1,0 +1,18 @@
+framework module CloudXMagniteAdapter {
+    umbrella header "CloudXMagniteAdapter.h"
+
+    export *
+    module * { export * }
+
+    link "MagniteSDK"
+
+    link framework "Foundation"
+    link framework "UIKit"
+    link framework "WebKit"
+    link framework "AVFoundation"
+    link framework "CoreMedia"
+    link framework "CoreGraphics"
+    link framework "CoreTelephony"
+    link framework "SystemConfiguration"
+    link framework "StoreKit"
+}

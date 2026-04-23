@@ -11,6 +11,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CoreGraphics/CoreGraphics.h>
 
 @class CLXLogger;
 
@@ -21,6 +22,19 @@ typedef NS_ENUM(NSInteger, DeviceType) {
     DeviceTypeTablet = 5,
     DeviceTypeUnknown = 1
 };
+
+/**
+ * @brief Canonical wire-format values for `CLXSystemInformation.appDistribution`.
+ * @discussion Exposed as constants rather than inline string literals so call sites
+ *             and tests compare against the same symbol — typos become compile errors.
+ *             The string values themselves are the wire contract with the SSP and
+ *             must not change without coordinating the schema.
+ */
+FOUNDATION_EXPORT NSString * const CLXAppDistributionSimulator;
+FOUNDATION_EXPORT NSString * const CLXAppDistributionDebug;
+FOUNDATION_EXPORT NSString * const CLXAppDistributionTestFlight;
+FOUNDATION_EXPORT NSString * const CLXAppDistributionEnterprise;
+FOUNDATION_EXPORT NSString * const CLXAppDistributionAppStore;
 
 /**
  * @class SystemInformation
@@ -48,8 +62,11 @@ typedef NS_ENUM(NSInteger, DeviceType) {
 /** The effective app bundle identifier, honoring the emulator bundle override on simulator builds. */
 @property (nonatomic, readonly) NSString *effectiveAppBundleIdentifier;
 
-/** The app version */
+/** The app version name (CFBundleShortVersionString, e.g. "1.2.3"). */
 @property (nonatomic, readonly) NSString *appVersion;
+
+/** The app build number (CFBundleVersion, e.g. "42" or "2024.01.15.1"). */
+@property (nonatomic, readonly) NSString *appBuildNumber;
 
 /** The OS version */
 @property (nonatomic, readonly) NSString *osVersion;
@@ -79,9 +96,44 @@ typedef NS_ENUM(NSInteger, DeviceType) {
 @property (nonatomic, readonly) NSString *displayManager;
 
 /**
- * Determines if the app is running from the App Store.
- * Returns NO for debug builds, simulator, TestFlight, and local builds.
- * Returns YES only for production App Store distribution.
+ * @brief User's device language as a BCP 47 tag (e.g. `"en-US"`, `"zh-Hant-HK"`).
+ * @return Non-nil language tag, empty string only if the system returns no preferred language.
+ * @discussion Memoized at shared-instance init. Stable for the SDK session lifetime.
+ */
+@property (nonatomic, copy, readonly) NSString *deviceLanguage;
+
+/**
+ * @brief Pixel density scale factor for the main screen (e.g. 2.0, 3.0).
+ * @discussion Corresponds to `UIScreen.mainScreen.scale`. `[UIScreen mainScreen]` must
+ *             be accessed on the main thread on recent iOS runtimes, so the value is
+ *             captured once at shared-instance init (dispatched to main if necessary)
+ *             and returned from cache thereafter. Stable for the SDK session lifetime.
+ */
+@property (nonatomic, readonly) CGFloat screenScale;
+
+/**
+ * @brief YES when the SDK is running in the iOS Simulator; NO on physical devices.
+ * @discussion Implemented as a `TARGET_OS_SIMULATOR` compile-time guard. Safe across
+ *             xcframework distribution because Apple ships separate binary slices per
+ *             platform — the device slice returns NO and the simulator slice returns YES.
+ */
+@property (nonatomic, readonly) BOOL isVirtualDevice;
+
+/**
+ * @brief Classified distribution channel for the host app.
+ * @discussion Returns one of: `"simulator"`, `"debug"`, `"testflight"`, `"enterprise"`,
+ *             `"appstore"`, or `nil` when the classifier cannot match. Derived from the
+ *             receipt path + `embedded.mobileprovision` presence + compile-time guards.
+ *             Note: `"appstore"` covers both real App Store distribution and notarized
+ *             EU alternative-marketplace distribution — Apple's receipt system produces
+ *             identical signatures for both.
+ */
+@property (nonatomic, copy, readonly, nullable) NSString *appDistribution;
+
+/**
+ * @brief Convenience — YES iff `appDistribution` equals `"appstore"`.
+ * @discussion Preserved for existing callers. Prefer reading `appDistribution` directly
+ *             when the call site needs to distinguish TestFlight / enterprise / debug.
  */
 @property (nonatomic, readonly) BOOL isAppStoreEnvironment;
 
@@ -90,4 +142,19 @@ typedef NS_ENUM(NSInteger, DeviceType) {
 NS_ASSUME_NONNULL_END
 
 // Helper function to convert DeviceType enum to NSString
-FOUNDATION_EXPORT NSString * _Nonnull DeviceTypeToString(DeviceType type); 
+FOUNDATION_EXPORT NSString * _Nonnull DeviceTypeToString(DeviceType type);
+
+/**
+ * Classifies an app distribution channel from the receipt path and embedded-provisioning
+ * state. Exposed for unit testing; production callers should use `CLXSystemInformation.shared.appDistribution`.
+ *
+ * @param receiptPath             Path from `[[NSBundle mainBundle] appStoreReceiptURL].path`,
+ *                                or a test fixture. May be nil.
+ * @param embeddedProvisionPresent YES if `embedded.mobileprovision` exists in the bundle.
+ * @return `CLXAppDistributionTestFlight` / `CLXAppDistributionEnterprise` /
+ *         `CLXAppDistributionAppStore`, or nil when the classifier cannot match.
+ *         Does not handle simulator or debug slices — those are compile-time branches
+ *         in the caller.
+ */
+FOUNDATION_EXPORT NSString * _Nullable CLXClassifyAppDistributionFromReceiptPath(NSString * _Nullable receiptPath,
+                                                                                  BOOL embeddedProvisionPresent);

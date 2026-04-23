@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
                          publisherID:(NSString *)publisherID
                               userID:(NSString *)userID
                          adapterInfo:(NSDictionary *)adapterInfo
+                       bidderParams:(nullable NSDictionary<NSString *, NSDictionary *> *)bidderParams
                nativeAdRequirements:(nullable id)nativeAdRequirements
                                 tmax:(nullable NSNumber *)tmax
                            impModel:(nullable CLXConfigImpressionModel *)impModel
