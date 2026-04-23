@@ -104,7 +104,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   CloudXCore: 91febd74bc295cd07dabcf7969db6ef9c314e5a6
   CloudXInMobiAdapter: e96e9f2f52b301d1263d799f0097cb12d8e642c8
-  CloudXMagniteAdapter: 2fa9e349377e1c8f80a1c9e3c303458eecf6e5f5
+  CloudXMagniteAdapter: a07abd4c36032bbc133b56943a2694d491d798ba
   CloudXMetaAdapter: 83dae2341dac6462e17e7bf8a9831ada59c8aaba
   CloudXMintegralAdapter: 407afba00236f1070cec273b64d6cc9852bf34d8
   CloudXRenderer: f9bce9b1632739b3b1937a71d05c78eb92e3707f
