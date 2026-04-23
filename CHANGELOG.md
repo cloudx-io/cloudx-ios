@@ -17,9 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Magnite Adapter** — New `CloudXMagniteAdapter` (Banner, MREC, Interstitial, Rewarded). Install: `pod 'CloudXMagniteAdapter', '~> 3.2.0'`.
+- **Richer dashboard telemetry** — SDK now reports app marketing version + build number with every telemetry event, and `method_load` / `method_show` metrics carry the full auction telemetry payload.
 
 ### Fixed
-- **`winLossNotificationURL` tolerance** — Empty string in the init response no longer blocks SDK initialization.
+- **Telemetry delivery** — Resolves silent HTTP 400 on metrics and remote-log flushes.
 
 ---
 
