@@ -10,6 +10,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion This singleton manages key-value pairs separately for user-level
  * and app-level targeting, similar to Android's SdkKeyValueState.
  */
+CLX_INTERNAL_TESTING
 @interface CLXKeyValueState : NSObject
 
 /**

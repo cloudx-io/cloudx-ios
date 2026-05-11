@@ -18,19 +18,14 @@ NS_ASSUME_NONNULL_BEGIN
  * Vungle interstitial adapter implementing CloudX adapter protocol.
  * Manages the lifecycle of Vungle interstitial ads including loading, showing, and cleanup.
  */
-@interface CLXVungleInterstitial : NSObject <VungleInterstitialDelegate, CLXAdapterInterstitial>
+@interface CLXVungleInterstitial : CLXAdapterInterstitial <VungleInterstitialDelegate>
 
 /**
  * CloudX adapter delegate for receiving ad events
  */
-@property (nonatomic, strong, nullable) id<CLXAdapterInterstitialDelegate> delegate;
-
 /**
  * SDK version of the Vungle SDK
  */
-@property (nonatomic, copy, readonly) NSString *sdkVersion;
-@property (nonatomic, assign, readonly) BOOL isReady;
-
 /**
  * Vungle placement ID for this ad
  */
@@ -64,25 +59,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                      adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID
-                          delegate:(nullable id<CLXAdapterInterstitialDelegate>)delegate;
+                             bidID:(NSString *)bidID;
 
 /**
  * Loads the interstitial ad
  */
-- (void)load;
-
 /**
  * Shows the interstitial ad from the specified view controller
  * @param viewController The view controller to present from
  */
-- (void)showFromViewController:(UIViewController *)viewController;
-
 /**
  * Destroys the adapter and cleans up resources
  */
-- (void)destroy;
-
 @end
 
 NS_ASSUME_NONNULL_END

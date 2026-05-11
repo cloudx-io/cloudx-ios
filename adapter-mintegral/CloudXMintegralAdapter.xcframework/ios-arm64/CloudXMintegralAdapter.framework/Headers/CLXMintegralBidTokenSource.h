@@ -3,11 +3,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXMintegralBidTokenSource : NSObject <CLXBidTokenSource>
+@interface CLXMintegralBidTokenSource : CLXBidTokenSource
 
 + (instancetype)sharedInstance;
-+ (instancetype)createInstance;
-
 @end
 
 NS_ASSUME_NONNULL_END

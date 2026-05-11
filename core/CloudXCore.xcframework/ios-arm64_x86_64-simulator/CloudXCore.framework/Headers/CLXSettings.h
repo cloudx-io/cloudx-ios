@@ -1,7 +1,9 @@
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+CLX_PUBLIC
 @interface CLXSettings : NSObject
 
 + (instancetype)sharedInstance;

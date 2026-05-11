@@ -11,6 +11,7 @@
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXInitService.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion This service handles the actual initialization of the SDK in a live environment,
  * coordinating with the network service to perform the initialization.
  */
+CLX_INTERNAL_TESTING
 @interface CLXLiveInitService : NSObject <CLXInitService>
 
 /** Logger instance for tracking initialization process */

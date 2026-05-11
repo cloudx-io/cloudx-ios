@@ -3,12 +3,14 @@
  */
 
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class CLXNativeAd;
 @class CLXNativeAdViewBinder;
 
+CLX_PUBLIC
 @interface CLXNativeAdView : UIView
 
 #pragma mark - Sub-View Slots (IBOutlet-compatible)

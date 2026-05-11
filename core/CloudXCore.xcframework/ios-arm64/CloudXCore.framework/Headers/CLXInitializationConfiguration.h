@@ -6,6 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Builder for constructing CLXInitializationConfiguration instances.
  */
+CLX_PUBLIC
 @interface CLXInitializationConfigurationBuilder : NSObject
 
 /**
@@ -36,6 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
  *         }];
  * @endcode
  */
+CLX_PUBLIC
 @interface CLXInitializationConfiguration : NSObject
 
 /**

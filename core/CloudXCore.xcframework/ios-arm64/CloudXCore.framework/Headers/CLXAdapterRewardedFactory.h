@@ -1,37 +1,33 @@
-//
-//  CloudXAdapterRewardedFactory.h
-//  CloudXCore
-//
-//  Created by CloudX Team.
-//
+/*
+ * Copyright (c) 2026 CloudX. All rights reserved.
+ */
+
+/**
+ * @file CLXAdapterRewardedFactory.h
+ * @brief Abstract base class for rewarded adapter factories
+ */
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol CLXAdapterRewarded;
-@protocol CLXAdapterRewardedDelegate;
+@class CLXAdapterRewarded;
 
-/// Factory for rewarded adapters.
-@protocol CLXAdapterRewardedFactory <NSObject>
+/// Abstract base class for rewarded adapter factories.
+/// Subclass MUST override the create method.
+CLX_PUBLIC_ADAPTER
+@interface CLXAdapterRewardedFactory : NSObject
 
-/// Creates a new instance of CloudXAdapterRewarded with the given parameters.
-/// - Parameters:
-///   - adId: id of ad from bid response
-///   - bidId: bid id from bid response
-///   - adm: ad markup with data for rendering
-///   - extras: adapters extra info
-///   - adUnitName: CloudX ad unit name for error messaging (may be nil for legacy callers)
-///   - delegate: delegate for the adapter
-/// - Returns: new instance of CloudXAdapterRewarded
-- (nullable id<CLXAdapterRewarded>)createWithAdId:(NSString *)adId
-                                             bidId:(NSString *)bidId
-                                               adm:(NSString *)adm
-                                            extras:(NSDictionary<NSString *, NSString *> *)extras
-                                     adUnitName:(nullable NSString *)adUnitName
-                                          delegate:(id<CLXAdapterRewardedDelegate>)delegate;
++ (instancetype)createInstance;
+
+- (nullable CLXAdapterRewarded *)createWithAdId:(NSString *)adId
+                                          bidId:(NSString *)bidId
+                                            adm:(NSString *)adm
+                                         extras:(NSDictionary<NSString *, NSString *> *)extras
+                                     adUnitName:(nullable NSString *)adUnitName;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

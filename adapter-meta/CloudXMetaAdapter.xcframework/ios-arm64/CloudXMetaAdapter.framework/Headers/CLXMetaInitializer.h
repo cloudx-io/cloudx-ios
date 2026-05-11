@@ -5,13 +5,12 @@
 
 #import <CloudXCore/CloudXCore.h>
 
-@interface CLXMetaInitializer : NSObject <CLXAdNetworkInitializer>
+@interface CLXMetaInitializer : CLXAdNetworkInitializer
 
-@property (nonatomic, strong, readonly) NSString *sdkVersion;
-@property (nonatomic, strong, readonly) NSString *network;
+@property (nonatomic, copy, readonly) NSString *sdkVersion;
+@property (nonatomic, copy, readonly) NSString *network;
 
 + (BOOL)isInitialized;
-+ (instancetype)createInstance;
 + (NSString *)sdkVersion;
 
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config 

@@ -13,9 +13,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXUnityAdsInterstitialFactory : NSObject <CLXAdapterInterstitialFactory>
-
-+ (instancetype)createInstance;
+@interface CLXUnityAdsInterstitialFactory : CLXAdapterInterstitialFactory
 
 @end
 

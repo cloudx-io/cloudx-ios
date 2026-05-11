@@ -10,10 +10,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXInMobiInitializer : NSObject <CLXAdNetworkInitializer>
+@interface CLXInMobiInitializer : CLXAdNetworkInitializer
 
 + (BOOL)isInitialized;
-+ (instancetype)createInstance;
 + (NSString *)sdkVersion;
 + (NSDictionary<NSString *, NSString *> *)extras;
 

@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Initializer for the Magnite advertising network adapter.
  * Handles SDK initialization, configuration, and state management.
  */
-@interface CLXMagniteInitializer : NSObject <CLXAdNetworkInitializer>
+@interface CLXMagniteInitializer : CLXAdNetworkInitializer
 
 /**
  * SDK version of the Magnite SDK
@@ -55,8 +55,6 @@ NS_ASSUME_NONNULL_BEGIN
  * Factory method to create a new initializer instance
  * @return New initializer instance
  */
-+ (instancetype)createInstance;
-
 /**
  * Gets the current Magnite SDK version
  * @return SDK version string

@@ -3,9 +3,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXMintegralBannerFactory : NSObject <CLXAdapterBannerFactory>
-
-+ (instancetype)createInstance;
+@interface CLXMintegralBannerFactory : CLXAdapterBannerFactory
 
 @end
 

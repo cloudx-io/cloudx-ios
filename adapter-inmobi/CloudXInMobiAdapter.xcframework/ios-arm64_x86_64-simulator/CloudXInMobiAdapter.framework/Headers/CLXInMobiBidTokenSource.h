@@ -10,9 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXInMobiBidTokenSource : NSObject <CLXBidTokenSource>
-
-+ (instancetype)createInstance;
+@interface CLXInMobiBidTokenSource : CLXBidTokenSource
 
 @end
 

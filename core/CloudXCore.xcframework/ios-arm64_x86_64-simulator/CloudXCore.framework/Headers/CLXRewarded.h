@@ -11,6 +11,7 @@
 #import <CloudXCore/CLXPublisherFullscreenAdBase.h>
 #import <CloudXCore/CLXRewardedDelegate.h>
 #import <CloudXCore/CLXAdRevenueDelegate.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
  * CLXRewarded represents a rewarded ad in the CloudX SDK.
  * Rewarded ads are full-screen video ads that users can watch in exchange for in-app rewards.
  */
+CLX_PUBLIC
 @interface CLXRewarded : CLXPublisherFullscreenAdBase
 
 /**

@@ -13,24 +13,14 @@ NS_ASSUME_NONNULL_BEGIN
  * Supports both bidding (MTGBidRewardAdManager) and waterfall (MTGRewardAdManager).
  * Both use singleton pattern via [*sharedInstance].
  */
-@interface CLXMintegralRewarded : NSObject <MTGRewardAdLoadDelegate, MTGRewardAdShowDelegate, CLXAdapterRewarded>
-
-@property (nonatomic, strong, nullable) id<CLXAdapterRewardedDelegate> delegate;
-@property (nonatomic, strong, readonly) NSString *sdkVersion;
-@property (nonatomic, strong, readonly) NSString *network;
-@property (nonatomic, strong, readonly) NSString *bidID;
-@property (nonatomic, assign, readonly) BOOL isReady;
+@interface CLXMintegralRewarded : CLXAdapterRewarded <MTGRewardAdLoadDelegate, MTGRewardAdShowDelegate>
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID
                      adUnitName:(nullable NSString *)adUnitName
                             unitID:(NSString *)unitID
                              bidID:(NSString *)bidID
-                     playVideoMute:(BOOL)playVideoMute
-                          delegate:(id<CLXAdapterRewardedDelegate>)delegate;
-
-- (void)load;
-- (void)showFromViewController:(UIViewController *)viewController;
+                     playVideoMute:(BOOL)playVideoMute;
 
 @end
 

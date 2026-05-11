@@ -11,16 +11,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXInMobiRewarded : NSObject <IMInterstitialDelegate, CLXAdapterRewarded>
-
-@property (nonatomic, strong, nullable) id<CLXAdapterRewardedDelegate> delegate;
-@property (nonatomic, copy, readonly) NSString *sdkVersion;
+@interface CLXInMobiRewarded : CLXAdapterRewarded <IMInterstitialDelegate>
 
 - (instancetype)initWithBidPayload:(nullable NSData *)bidPayload
                        placementID:(long long)placementID
                      adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID
-                          delegate:(id<CLXAdapterRewardedDelegate>)delegate;
+                             bidID:(NSString *)bidID;
 
 @end
 

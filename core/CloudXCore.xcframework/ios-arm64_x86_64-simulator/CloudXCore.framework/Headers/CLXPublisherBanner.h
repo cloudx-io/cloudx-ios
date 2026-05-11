@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
  * PublisherBanner implements the CloudXBanner protocol and handles banner ad loading,
  * bidding, and lifecycle management.
  */
-@interface CLXPublisherBanner : NSObject <CLXBanner, CLXAdapterBannerDelegate>
+@interface CLXPublisherBanner : NSObject <CLXBanner>
 
 /**
  * Flag to indicate whether to suspend preloading when the ad is not visible.
@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Delegate for banner ad events.
  */
-@property (nonatomic, weak, nullable) id<CLXBannerDelegate, CLXAdapterBannerDelegate> delegate;
+@property (nonatomic, weak, nullable) id<CLXBannerDelegate> delegate;
 
 /**
  * Delegate for revenue events (impression-level revenue data).
@@ -77,12 +77,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The currently displayed banner adapter.
  */
-@property (nonatomic, strong, readonly, nullable) id<CLXAdapterBanner> bannerOnScreen;
+@property (nonatomic, strong, readonly, nullable) CLXAdapterBanner * bannerOnScreen;
 
 /**
  * The prefetched banner adapter waiting to be displayed.
  */
-@property (nonatomic, strong, readonly, nullable) id<CLXAdapterBanner> prefetchedBanner;
+@property (nonatomic, strong, readonly, nullable) CLXAdapterBanner * prefetchedBanner;
 
 /**
  * The ad unit ID for this banner.
@@ -112,8 +112,8 @@ NS_ASSUME_NONNULL_BEGIN
                                delegate:(nullable id<CLXBannerDelegate>)delegate
                              bannerType:(CLXBannerType)bannerType
                                impModel:(nullable CLXConfigImpressionModel *)impModel
-                              adFactories:(NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *)adFactories
-                           bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
+                              adFactories:(NSDictionary<NSString *, CLXAdapterBannerFactory *> *)adFactories
+                           bidTokenSources:(NSDictionary<NSString *, CLXBidTokenSource *> *)bidTokenSources
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                          reportingService:(id<CLXAdEventReporting>)reportingService
                               settings:(CLXSettings *)settings;

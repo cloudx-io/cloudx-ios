@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
  *             then pushes to this handler. This handler forwards the pre-resolved
  *             consent to gdpr.consent and privacy.consent metadata keys.
  */
-@interface CLXUnityAdsPrivacyHandler : NSObject <CLXAdapterPrivacyHandler>
+@interface CLXUnityAdsPrivacyHandler : CLXAdapterPrivacyHandler
 @end
 
 NS_ASSUME_NONNULL_END

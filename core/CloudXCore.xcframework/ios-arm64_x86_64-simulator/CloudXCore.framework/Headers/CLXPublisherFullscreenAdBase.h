@@ -18,9 +18,9 @@
 @class CLXBidAdSourceResponse;
 @class CLXAd;
 @class CLXError;
-@protocol CLXBidTokenSource;
-@protocol CLXAdapterInterstitial;
-@protocol CLXAdapterRewarded;
+@class CLXBidTokenSource;
+@class CLXAdapterInterstitial;
+@class CLXAdapterRewarded;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
               rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl
                          impModel:(nullable CLXConfigImpressionModel *)impModel
                       adFactories:(nullable CLXAdNetworkFactories *)adFactories
-                  bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
+                  bidTokenSources:(NSDictionary<NSString *, CLXBidTokenSource *> *)bidTokenSources
                bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                 reportingService:(id<CLXAdEventReporting>)reportingService
                         settings:(CLXSettings *)settings;
@@ -58,6 +58,38 @@ NS_ASSUME_NONNULL_BEGIN
  * Loads the fullscreen ad.
  */
 - (void)load;
+
+/**
+ * Sets or clears an extra parameter attached to future bid requests for this ad.
+ *
+ * Supported value types: NSString, NSNumber (including boolean), NSArray,
+ * and NSDictionary keyed by NSString. Pass nil to remove the key. Invalid
+ * values are ignored and logged — they never fail ad loading.
+ *
+ * Reserved floor keys:
+ * - `minFloor` — single-round publisher floor in USD CPM. Accepts an
+ *   NSNumber or decimal NSString (e.g. `@"1.25"`).
+ * - `minFloors` — per-round floor overrides. Accepts an NSArray of
+ *   NSNumber / decimal NSString values, or a JSON-array NSString
+ *   (e.g. `@"[1.2, 0.95]"`).
+ *
+ * Values are captured at call time. If you pass an NSDictionary or NSArray
+ * and later mutate it, earlier bid requests are unaffected — call
+ * setExtraParameter:value: again to push updates.
+ *
+ * Mixed-validity containers: an NSDictionary keeps its valid entries and
+ * drops the invalid ones; an NSArray is all-or-nothing — any invalid
+ * element discards the entire array, to preserve positional ordering for
+ * keys like `minFloors`.
+ *
+ * Timing: fullscreen ads use the values current at the time of `load`;
+ * changes after that take effect on the next `load` call.
+ *
+ * @param key Parameter key. Empty keys are ignored.
+ * @param value Value to store, or nil to remove the key.
+ */
+- (void)setExtraParameter:(NSString *)key
+                    value:(nullable id)value NS_SWIFT_NAME(setExtraParameter(_:value:));
 
 /**
  * Shows the fullscreen ad from the provided view controller.
@@ -115,22 +147,29 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showCurrentAdapterFromViewController:(UIViewController *)viewController NS_REQUIRES_SUPER;
 
 /**
- * Notifies the delegate of successful load.
+ * Strong-captures the publisher delegate at enqueue time, dispatches to the
+ * main queue, and notifies the delegate of successful load.
+ *
+ * Subclasses MUST capture `self.delegate` strongly BEFORE `dispatch_async`
+ * and pass it to the with-delegate variant of the notify method, so a
+ * publisher releasing its delegate between enqueue and main-queue drain
+ * cannot drop the callback.
  */
-- (void)notifyLoadSuccess NS_REQUIRES_SUPER;
+- (void)enqueueLoadSuccess NS_REQUIRES_SUPER;
 
 /**
- * Notifies the delegate of load failure.
+ * Strong-captures the publisher delegate at enqueue time, dispatches to the
+ * main queue, and notifies the delegate of load failure. See -enqueueLoadSuccess.
  */
-- (void)notifyLoadFailure:(CLXError *)error NS_REQUIRES_SUPER;
+- (void)enqueueLoadFailure:(CLXError *)error NS_REQUIRES_SUPER;
 
 /**
- * Notifies the delegate of show failure.
+ * Strong-captures the publisher delegate at enqueue time, dispatches to the
+ * main queue, and notifies the delegate of show failure. See -enqueueLoadSuccess.
  */
-- (void)notifyShowFailure:(CLXError *)error NS_REQUIRES_SUPER;
+- (void)enqueueShowFailure:(CLXError *)error NS_REQUIRES_SUPER;
 
 @end
 
 NS_ASSUME_NONNULL_END
-
 

@@ -12,24 +12,14 @@ NS_ASSUME_NONNULL_BEGIN
  * Uses the NEW Interstitial API as recommended by Mintegral.
  * Supports both bidding (MTGNewInterstitialBidAdManager) and waterfall (MTGNewInterstitialAdManager).
  */
-@interface CLXMintegralInterstitial : NSObject <MTGNewInterstitialBidAdDelegate, MTGNewInterstitialAdDelegate, CLXAdapterInterstitial>
-
-@property (nonatomic, strong, nullable) id<CLXAdapterInterstitialDelegate> delegate;
-@property (nonatomic, strong, readonly) NSString *sdkVersion;
-@property (nonatomic, strong, readonly) NSString *network;
-@property (nonatomic, strong, readonly) NSString *bidID;
-@property (nonatomic, assign, readonly) BOOL isReady;
+@interface CLXMintegralInterstitial : CLXAdapterInterstitial <MTGNewInterstitialBidAdDelegate, MTGNewInterstitialAdDelegate>
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID
                      adUnitName:(nullable NSString *)adUnitName
                             unitID:(NSString *)unitID
                              bidID:(NSString *)bidID
-                     playVideoMute:(BOOL)playVideoMute
-                          delegate:(id<CLXAdapterInterstitialDelegate>)delegate;
-
-- (void)load;
-- (void)showFromViewController:(UIViewController *)viewController;
+                     playVideoMute:(BOOL)playVideoMute;
 
 @end
 

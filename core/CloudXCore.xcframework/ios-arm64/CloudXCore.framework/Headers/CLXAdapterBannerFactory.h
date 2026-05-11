@@ -1,40 +1,35 @@
-//
-//  CloudXAdapterBannerFactory.h
-//  CloudXCore
-//
-//  Created by CloudX Team.
-//
+/*
+ * Copyright (c) 2026 CloudX. All rights reserved.
+ */
+
+/**
+ * @file CLXAdapterBannerFactory.h
+ * @brief Abstract base class for banner adapter factories
+ */
 
 #import <Foundation/Foundation.h>
 #import <CloudXCore/CLXBannerType.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol CLXAdapterBanner;
-@protocol CLXAdapterBannerDelegate;
+@class CLXAdapterBanner;
 
-/// Factory for creating banner ad adapters.
-@protocol CLXAdapterBannerFactory <NSObject>
+/// Abstract base class for banner adapter factories.
+/// Subclass MUST override @c -createWithType:adId:bidId:adm:hasClosedButton:extras:adUnitName:.
+/// The wrapper attaches itself as the adapter's delegate after construction.
+CLX_PUBLIC_ADAPTER
+@interface CLXAdapterBannerFactory : NSObject
 
-/// Creates a new instance of CloudXAdapterBanner with the given parameters.
-/// - Parameters:
-///   - type: type of the banner (mrec, banner, etc.)
-///   - adId: id of ad from bid response
-///   - bidId: bid id from bid response
-///   - adm: ad markup with data for rendering
-///   - hasClosedButton: whether the banner has a close button
-///   - extras: adapters extra info
-///   - adUnitName: CloudX ad unit name for error messaging (may be nil for legacy callers)
-///   - delegate: delegate for the adapter
-/// - Returns: CloudXAdapterBanner instance
-- (nullable id<CLXAdapterBanner>)createWithType:(CLXBannerType)type
-                                                       adId:(NSString *)adId
-                                                      bidId:(NSString *)bidId
-                                                        adm:(NSString *)adm
-                                            hasClosedButton:(BOOL)hasClosedButton
-                                                     extras:(NSDictionary<NSString *, NSString *> *)extras
-                                              adUnitName:(nullable NSString *)adUnitName
-                                                   delegate:(id<CLXAdapterBannerDelegate>)delegate;
++ (instancetype)createInstance;
+
+- (nullable CLXAdapterBanner *)createWithType:(CLXBannerType)type
+                                          adId:(NSString *)adId
+                                         bidId:(NSString *)bidId
+                                           adm:(NSString *)adm
+                               hasClosedButton:(BOOL)hasClosedButton
+                                        extras:(NSDictionary<NSString *, NSString *> *)extras
+                                    adUnitName:(nullable NSString *)adUnitName;
 
 @end
 

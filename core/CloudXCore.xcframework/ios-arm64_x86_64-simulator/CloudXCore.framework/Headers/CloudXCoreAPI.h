@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXExport.h>
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXInitializationConfiguration.h>
@@ -11,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Notification posted when SDK initialization completes
  * @discussion Internal notification used by ad objects to coordinate queued operations
  */
+CLX_PUBLIC
 FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 
 // Forward declarations for public interfaces
@@ -30,6 +32,7 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
  * Use this class to initialise the SDK and create ads.
  * @discussion Thread-safe singleton. All methods should be called from the main thread.
  */
+CLX_PUBLIC
 @interface CloudXCore : NSObject
 
 /**

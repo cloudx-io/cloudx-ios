@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
  *             to manage consent directly. Not needed when a CMP is in use —
  *             InMobi reads CMP consent from NSUserDefaults on its own.
  */
-@interface CLXInMobiPrivacyHandler : NSObject <CLXAdapterPrivacyHandler>
+@interface CLXInMobiPrivacyHandler : CLXAdapterPrivacyHandler
 @end
 
 NS_ASSUME_NONNULL_END

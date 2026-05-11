@@ -19,23 +19,17 @@ NS_ASSUME_NONNULL_BEGIN
  * Manages the lifecycle of Vungle banner/MREC ads including loading, showing, and cleanup.
  * Supports standard banner sizes (320x50, 300x50, 728x90) and MREC (300x250).
  */
-@interface CLXVungleBanner : NSObject <VungleBannerViewDelegate, CLXAdapterBanner>
+@interface CLXVungleBanner : CLXAdapterBanner <VungleBannerViewDelegate>
 
 /**
  * CloudX adapter delegate for receiving ad events
  */
-@property (nonatomic, strong, nullable) id<CLXAdapterBannerDelegate> delegate;
-
 /**
  * The underlying Vungle banner view
  */
-@property (nonatomic, strong, nullable, readonly) UIView *bannerView;
-
 /**
  * SDK version of the Vungle SDK
  */
-@property (nonatomic, copy, readonly) NSString *sdkVersion;
-
 /**
  * Vungle placement ID for this ad
  */
@@ -76,25 +70,18 @@ NS_ASSUME_NONNULL_BEGIN
                        placementID:(nullable NSString *)placementID
                      adUnitName:(nullable NSString *)adUnitName
                              bidID:(NSString *)bidID
-                              type:(CLXBannerType)type
-                          delegate:(nullable id<CLXAdapterBannerDelegate>)delegate;
+                              type:(CLXBannerType)type;
 
 /**
  * Loads the banner ad
  */
-- (void)load;
-
 /**
  * Shows the banner ad from the given view controller
  * @param viewController The view controller to show from
  */
-- (void)showFromViewController:(UIViewController *)viewController;
-
 /**
  * Destroys the banner ad and cleans up resources
  */
-- (void)destroy;
-
 @end
 
 NS_ASSUME_NONNULL_END

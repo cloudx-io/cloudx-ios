@@ -12,6 +12,7 @@
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXBaseNetworkService.h>
 #import <CloudXCore/CLXSDKConfigRequest.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -21,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion This service manages the network communication for initializing the SDK,
  * including retry logic and error handling.
  */
+CLX_INTERNAL_TESTING
 @interface CLXSDKInitNetworkService : CLXBaseNetworkService
 
 /** Logger instance for tracking initialization process */

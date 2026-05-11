@@ -44,6 +44,28 @@
 #import <CloudXCore/CLXAuctionBidManager.h>
 #import <CloudXCore/CLXBidLifecycleEvent.h>
 
+// Renderer headers (CLXRendererLifecycleState and the
+// M1.4 utility classes — CLXRendererNetworkSession, CLXSafeExecution) are
+// intentionally NOT imported here. They are CocoaPods-private
+// (s.private_header_files = 'Sources/CloudXCore/Renderer/**/*.h') and accessed
+// from renderer .m files via quoted imports + HEADER_SEARCH_PATHS, matching
+// canonical's pattern. Importing them in this public umbrella would trigger
+// "non-modular header inside framework module" errors when consumers build
+// CloudXCore as a Pod.
+//
+// CLXAdMarkupDetector and CLXBlankCreativeDetector are not part of CloudXCore:
+// markup classification is the server's responsibility via the bid response
+// crtype field (CLXBidRoute consumes this for routing), and blank-creative
+// detection has not been proven out in production yet.
+//
+// CLXExtrasReader is not included: CloudX-owned renderer configuration should
+// use typed bid/renderer models rather than a stringly typed extras map.
+//
+// CLXWKScriptHelper is deferred (CXD-1383): the active renderer-cloudx pod
+// defines a class of the same name, and the demo app links both pods via
+// static linkage, so adding CLXWKScriptHelper to CloudXCore would produce
+// duplicate-symbol errors at link time. It ports when renderer-cloudx retires.
+
 // Auction Results
 #import <CloudXCore/CLXAuctionResult.h>
 
@@ -56,12 +78,18 @@
 
 // Tracking Services
 #import <CloudXCore/CLXRillTrackingService.h>
+#import <CloudXCore/CLXAdapterWrapper.h>
+#import <CloudXCore/CLXAdapterWrapperRegistry.h>
+#import <CloudXCore/CLXBannerAdapterWrapper.h>
+#import <CloudXCore/CLXFullscreenAdapterWrapper.h>
+#import <CloudXCore/CLXNativeAdapterWrapper.h>
 #import <CloudXCore/CLXRillImpressionModel.h>
 #import <CloudXCore/CLXRillImpressionInitService.h>
 #import <CloudXCore/CLXWinLossTracker.h>
 #import <CloudXCore/CLXWinLossNetworkService.h>
 #import <CloudXCore/CLXWinLossFieldResolver.h>
 #import <CloudXCore/CLXAdReportingNetworkService.h>
+#import <CloudXCore/CLXAdReportingEventStore.h>
 #import <CloudXCore/CLXSessionTracker.h>
 #import <CloudXCore/CLXSessionNetworkService.h>
 
@@ -87,6 +115,13 @@
 
 // Adapter Network Mapping
 #import <CloudXCore/CLXAdNetwork.h>
+
+// Internal partner headers — hidden symbols used only by CloudXCore itself
+// and its unit test suite. Not for adapter consumption.
+#import <CloudXCore/CLXAdNetwork+Internal.h>
+#import <CloudXCore/CLXBidAdSource+Internal.h>
+#import <CloudXCore/CLXBidResponse+Internal.h>
+#import <CloudXCore/CLXSystemInformation+Internal.h>
 
 // Adapter Metadata
 #import <CloudXCore/CLXAdapterMetadataProvider.h>

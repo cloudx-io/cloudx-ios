@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Initializer for the Vungle advertising network adapter.
  * Handles SDK initialization, configuration, and state management.
  */
-@interface CLXVungleInitializer : NSObject <CLXAdNetworkInitializer>
+@interface CLXVungleInitializer : CLXAdNetworkInitializer
 
 /**
  * SDK version of the Vungle SDK
@@ -37,8 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
  * Factory method to create a new initializer instance
  * @return New initializer instance
  */
-+ (instancetype)createInstance;
-
 /**
  * Gets the current Vungle SDK version
  * @return SDK version string

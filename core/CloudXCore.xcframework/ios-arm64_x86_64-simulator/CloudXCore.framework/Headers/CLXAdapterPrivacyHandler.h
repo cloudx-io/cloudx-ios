@@ -1,35 +1,29 @@
 /*
- * Copyright (c) 2024 CloudX. All rights reserved.
+ * Copyright (c) 2026 CloudX. All rights reserved.
  */
 
 /**
  * @file CLXAdapterPrivacyHandler.h
- * @brief Protocol for adapter-specific privacy settings handling
- * @details Each ad network adapter implements this protocol to receive
- *          resolved privacy settings and forward them to its SDK.
+ * @brief Abstract base class for adapter-specific privacy settings handling
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 @class CLXAdapterPrivacySettings;
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * @protocol CLXAdapterPrivacyHandler
- * @brief Protocol that adapter privacy handlers implement to receive privacy updates
- * @discussion Adapters that need privacy settings implement this protocol.
- *             The CLXAdapterPrivacyForwarder discovers handlers via NSClassFromString
- *             and calls updatePrivacySettings: when settings change.
+ * Abstract base class for adapter privacy handlers.
+ *
+ * Subclass MUST override @c -updatePrivacySettings:.
+ * The CLXAdapterPrivacyForwarder discovers handlers via NSClassFromString
+ * and calls @c -updatePrivacySettings: when settings change.
  */
-@protocol CLXAdapterPrivacyHandler <NSObject>
+CLX_PUBLIC_ADAPTER
+@interface CLXAdapterPrivacyHandler : NSObject
 
-@required
-
-/**
- * @brief Called when resolved privacy settings change
- * @param settings The current resolved privacy settings
- */
 - (void)updatePrivacySettings:(CLXAdapterPrivacySettings *)settings;
 
 @end

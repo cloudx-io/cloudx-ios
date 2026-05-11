@@ -7,9 +7,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXMetaNativeFactory : NSObject <CLXAdapterNativeFactory>
-
-+ (instancetype)createInstance;
+@interface CLXMetaNativeFactory : CLXAdapterNativeFactory
 
 @end
 

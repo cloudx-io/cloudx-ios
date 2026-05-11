@@ -9,19 +9,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXMetaRewarded : NSObject <FBRewardedVideoAdDelegate, CLXAdapterRewarded>
-
-@property (nonatomic, strong, nullable) id<CLXAdapterRewardedDelegate> delegate;
-@property (nonatomic, copy, readonly) NSString *sdkVersion;
+@interface CLXMetaRewarded : CLXAdapterRewarded <FBRewardedVideoAdDelegate>
 
 - (instancetype)initWithBidPayload:(NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                      adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID
-                          delegate:(id<CLXAdapterRewardedDelegate>)delegate;
+                             bidID:(NSString *)bidID;
 
 - (void)setRewardDataWithUserID:(NSString *)userID withCurrency:(NSString *)currency;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

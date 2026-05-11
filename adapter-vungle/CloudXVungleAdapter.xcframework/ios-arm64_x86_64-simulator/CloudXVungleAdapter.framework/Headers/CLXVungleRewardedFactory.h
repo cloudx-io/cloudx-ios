@@ -17,14 +17,12 @@ NS_ASSUME_NONNULL_BEGIN
  * Factory for creating Vungle rewarded adapters.
  * Implements the CloudX adapter factory protocol for rewarded ads.
  */
-@interface CLXVungleRewardedFactory : NSObject <CLXAdapterRewardedFactory>
+@interface CLXVungleRewardedFactory : CLXAdapterRewardedFactory
 
 /**
  * Factory method to create a new factory instance
  * @return New factory instance
  */
-+ (instancetype)createInstance;
-
 @end
 
 NS_ASSUME_NONNULL_END

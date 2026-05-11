@@ -12,6 +12,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
+#import <CloudXCore/CLXExport.h>
 
 @class CLXLogger;
 
@@ -24,24 +25,12 @@ typedef NS_ENUM(NSInteger, DeviceType) {
 };
 
 /**
- * @brief Canonical wire-format values for `CLXSystemInformation.appDistribution`.
- * @discussion Exposed as constants rather than inline string literals so call sites
- *             and tests compare against the same symbol — typos become compile errors.
- *             The string values themselves are the wire contract with the SSP and
- *             must not change without coordinating the schema.
- */
-FOUNDATION_EXPORT NSString * const CLXAppDistributionSimulator;
-FOUNDATION_EXPORT NSString * const CLXAppDistributionDebug;
-FOUNDATION_EXPORT NSString * const CLXAppDistributionTestFlight;
-FOUNDATION_EXPORT NSString * const CLXAppDistributionEnterprise;
-FOUNDATION_EXPORT NSString * const CLXAppDistributionAppStore;
-
-/**
  * @class SystemInformation
  * @brief Singleton class providing system information
  * @discussion This class provides access to various system information needed by the SDK,
  * including device identifiers, OS version, and SDK version.
  */
+CLX_PUBLIC_ADAPTER
 @interface CLXSystemInformation : NSObject
 
 /** Shared instance of SystemInformation */
@@ -140,21 +129,3 @@ FOUNDATION_EXPORT NSString * const CLXAppDistributionAppStore;
 @end
 
 NS_ASSUME_NONNULL_END
-
-// Helper function to convert DeviceType enum to NSString
-FOUNDATION_EXPORT NSString * _Nonnull DeviceTypeToString(DeviceType type);
-
-/**
- * Classifies an app distribution channel from the receipt path and embedded-provisioning
- * state. Exposed for unit testing; production callers should use `CLXSystemInformation.shared.appDistribution`.
- *
- * @param receiptPath             Path from `[[NSBundle mainBundle] appStoreReceiptURL].path`,
- *                                or a test fixture. May be nil.
- * @param embeddedProvisionPresent YES if `embedded.mobileprovision` exists in the bundle.
- * @return `CLXAppDistributionTestFlight` / `CLXAppDistributionEnterprise` /
- *         `CLXAppDistributionAppStore`, or nil when the classifier cannot match.
- *         Does not handle simulator or debug slices — those are compile-time branches
- *         in the caller.
- */
-FOUNDATION_EXPORT NSString * _Nullable CLXClassifyAppDistributionFromReceiptPath(NSString * _Nullable receiptPath,
-                                                                                  BOOL embeddedProvisionPresent);

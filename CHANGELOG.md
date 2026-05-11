@@ -13,6 +13,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.3.0-beta] - 2026-05-11
+
+### Added
+- **Per-request bid floor controls** — Added support for setting bid floors per ad request, including native ad requests.
+
+### Changed
+- **Improved ad lifecycle reliability** — Improved callback delivery during fast reloads, ad dismissals, and adapter teardown. This reduces rare cases where display, close, reward, or revenue callbacks could arrive late or be missed.
+- **Improved analytics attribution** — Improved impression, click, and win/loss attribution consistency across the full ad lifecycle.
+- **Improved renderer routing** — Improved CloudX-rendered creative routing based on the returned creative type.
+
+### Fixed
+- **Impression/click analytics replay** — Improved persistence and retry behavior for impression and click analytics without changing existing metrics behavior.
+- **Fresh-install persistence reliability** — Fixed an issue where local persistence could fail to initialize correctly on a fresh app install or clean simulator.
+
+---
+
 ## [3.2.0] - 2026-04-22
 
 ### Added

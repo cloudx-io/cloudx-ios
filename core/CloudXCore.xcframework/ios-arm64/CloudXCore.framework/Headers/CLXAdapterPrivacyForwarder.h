@@ -10,6 +10,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion Observes IAB privacy keys in NSUserDefaults via KVO to auto-push on CMP changes.
  *             Call pushCurrentPrivacySettings after manual consent changes.
  */
+CLX_PUBLIC_ADAPTER
 @interface CLXAdapterPrivacyForwarder : NSObject
 
 /**

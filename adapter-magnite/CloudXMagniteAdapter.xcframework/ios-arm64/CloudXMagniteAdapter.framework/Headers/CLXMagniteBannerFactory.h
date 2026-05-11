@@ -17,14 +17,12 @@ NS_ASSUME_NONNULL_BEGIN
  * Factory for creating Magnite banner adapters.
  * Implements the CloudX adapter factory protocol for banner/MREC ads.
  */
-@interface CLXMagniteBannerFactory : NSObject <CLXAdapterBannerFactory>
+@interface CLXMagniteBannerFactory : CLXAdapterBannerFactory
 
 /**
  * Factory method to create a new factory instance
  * @return New factory instance
  */
-+ (instancetype)createInstance;
-
 @end
 
 NS_ASSUME_NONNULL_END

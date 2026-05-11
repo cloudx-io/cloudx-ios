@@ -13,18 +13,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXMetaBannerFactory : NSObject <CLXAdapterBannerFactory>
+@interface CLXMetaBannerFactory : CLXAdapterBannerFactory
 
-+ (instancetype)createInstance;
-
-- (nullable id<CLXAdapterBanner>)createWithType:(CLXBannerType)type
+- (nullable CLXAdapterBanner *)createWithType:(CLXBannerType)type
                                                          adId:(NSString *)adId
                                                         bidId:(NSString *)bidId
                                                           adm:(NSString *)adm
                                               hasClosedButton:(BOOL)hasClosedButton
                                                        extras:(NSDictionary<NSString *, NSString *> *)extras
-                                                   adUnitName:(NSString *)adUnitName
-                                                     delegate:(id<CLXAdapterBannerDelegate>)delegate;
+                                                   adUnitName:(NSString *)adUnitName;
 
 @end
 

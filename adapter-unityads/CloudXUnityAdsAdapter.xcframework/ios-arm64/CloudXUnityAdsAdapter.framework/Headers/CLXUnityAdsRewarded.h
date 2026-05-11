@@ -9,19 +9,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXUnityAdsRewarded : NSObject <UADSRewardedShowDelegate, CLXAdapterRewarded>
-
-@property (nonatomic, strong, nullable) id<CLXAdapterRewardedDelegate> delegate;
-@property (nonatomic, strong, readonly) NSString *sdkVersion;
-@property (nonatomic, strong, readonly) NSString *network;
-@property (nonatomic, strong, readonly) NSString *bidID;
-@property (nonatomic, assign, readonly) BOOL isReady;
+@interface CLXUnityAdsRewarded : CLXAdapterRewarded <UADSRewardedShowDelegate>
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                      placementName:(nullable NSString *)placementName
-                             bidID:(NSString *)bidID
-                          delegate:(id<CLXAdapterRewardedDelegate>)delegate;
+                             bidID:(NSString *)bidID;
 
 @end
 

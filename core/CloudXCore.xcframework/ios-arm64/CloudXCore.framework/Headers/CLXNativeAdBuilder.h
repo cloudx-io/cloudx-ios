@@ -4,11 +4,13 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class CLXNativeAdImage;
 
+CLX_PUBLIC
 @interface CLXNativeAdBuilder : NSObject
 
 @property (nonatomic, copy, nullable) NSString *title;

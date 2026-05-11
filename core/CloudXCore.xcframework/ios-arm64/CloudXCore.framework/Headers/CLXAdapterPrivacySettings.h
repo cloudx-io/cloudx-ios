@@ -8,6 +8,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
  *             because most ad SDKs auto-read IAB strings from NSUserDefaults — passing
  *             resolved values would double-signal consent.
  */
+CLX_PUBLIC_ADAPTER
 @interface CLXAdapterPrivacySettings : NSObject
 
 /**

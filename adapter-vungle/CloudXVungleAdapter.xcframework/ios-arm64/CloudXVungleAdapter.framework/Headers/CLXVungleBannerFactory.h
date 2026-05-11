@@ -17,14 +17,12 @@ NS_ASSUME_NONNULL_BEGIN
  * Factory for creating Vungle banner adapters.
  * Implements the CloudX adapter factory protocol for banner/MREC ads.
  */
-@interface CLXVungleBannerFactory : NSObject <CLXAdapterBannerFactory>
+@interface CLXVungleBannerFactory : CLXAdapterBannerFactory
 
 /**
  * Factory method to create a new factory instance
  * @return New factory instance
  */
-+ (instancetype)createInstance;
-
 @end
 
 NS_ASSUME_NONNULL_END

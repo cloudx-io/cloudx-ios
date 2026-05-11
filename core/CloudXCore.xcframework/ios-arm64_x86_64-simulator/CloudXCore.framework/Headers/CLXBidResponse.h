@@ -9,6 +9,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class CLXBidResponseCloudXRender;
+
 NS_ASSUME_NONNULL_BEGIN
 
 // MARK: - SKAdNetwork Fidelity
@@ -45,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *bidder;
 @property (nonatomic, copy) NSString *lineItemId;
 @property (nonatomic, assign) NSInteger bidFloor;
-@property (nonatomic, assign) NSString * bid;
+@property (nonatomic, copy) NSString *bid;
 @property (nonatomic, assign) NSInteger responseTimeMillis;
 @property (nonatomic, assign) NSInteger rank;
 
@@ -68,6 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *adaptercode;
 @property (nonatomic, copy, nullable) NSString *auctionTelemetryPayload;
 @property (nonatomic, copy, nullable) NSString *bidTelemetryPayload;
+@property (nonatomic, strong, nullable) CLXBidResponseCloudXRender *render;
 
 - (NSDictionary *)toDictionary;
 @end
@@ -83,6 +86,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXBidResponseSKAd *skadn;
 @property (nonatomic, assign) double origbidcpm;
 @property (nonatomic, copy, nullable) NSString *origbidcur;
+/// Creative type hint from the DSP (e.g. "html", "mraid", "vast"). Surfaced for
+/// the renderer routing layer to consume; this DTO does not interpret it.
+@property (nonatomic, copy, nullable) NSString *crtype;
 @property (nonatomic, strong, nullable) CLXBidResponseCloudX *cloudx;
 @property (nonatomic, strong, nullable) CLXBidResponsePrebid *prebid;
 @end
@@ -189,5 +195,3 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
-
-extern NSString * const CLXNonBidDetailsKey;

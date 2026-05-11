@@ -10,9 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXInMobiRewardedFactory : NSObject <CLXAdapterRewardedFactory>
-
-+ (instancetype)createInstance;
+@interface CLXInMobiRewardedFactory : CLXAdapterRewardedFactory
 
 @end
 
