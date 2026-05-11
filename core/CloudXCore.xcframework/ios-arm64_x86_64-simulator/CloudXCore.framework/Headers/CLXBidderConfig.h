@@ -6,12 +6,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 @class CLXSDKConfigResponse;
 
 NS_ASSUME_NONNULL_BEGIN
 
 /// Configuration for the ad network SDK such as app id, ad unit id, etc.
+CLX_PUBLIC_ADAPTER
 @interface CLXBidderConfig : NSObject
 
 /// Bid network SDK's specific data required for its initializing.

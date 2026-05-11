@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,6 +15,7 @@ typedef NS_ENUM(NSInteger, ServiceType) {
 - (nullable id)resolveType:(ServiceType)resolveType class:(Class)type;
 @end
 
+CLX_INTERNAL_TESTING
 @interface CLXDIContainer : NSObject <CLXDIContainerProtocol>
 
 + (instancetype)shared;

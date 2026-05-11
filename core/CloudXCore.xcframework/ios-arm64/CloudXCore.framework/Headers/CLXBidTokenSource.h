@@ -1,39 +1,37 @@
 /*
- * Copyright (c) 2024 CloudX. All rights reserved.
+ * Copyright (c) 2026 CloudX. All rights reserved.
  */
 
 /**
- * @file CloudXBidTokenSource.h
- * @brief Bid token source protocol
+ * @file CLXBidTokenSource.h
+ * @brief Abstract base class for bid token sources
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * CloudXBidTokenSource is a protocol for networks that require bid tokens for bid requests.
- * It mirrors the Swift BidTokenSource protocol and provides access to bid tokens from ad networks.
+ * Abstract base class for networks that require bid tokens for bid requests.
+ *
+ * Subclass MUST override @c -getTokenWithCompletion:. Optional impression-level
+ * params can be returned via @c -bidderImpressionParams (default nil).
  */
-@protocol CLXBidTokenSource <NSObject>
+CLX_PUBLIC_ADAPTER
+@interface CLXBidTokenSource : NSObject
 
-/**
- * Returns bid token from ad network.
- * @param completion Completion block that returns the token dictionary or error
- */
++ (instancetype)createInstance;
+
+/// Returns bid token from ad network. Subclass MUST override.
 - (void)getTokenWithCompletion:(void (^)(NSDictionary<NSString *, NSString *> * _Nullable token, NSError * _Nullable error))completion;
 
-@optional
-
-/**
- * @brief Returns Prebid Server bidder params for impression-level configuration.
- * @discussion Adapters that require per-impression bidder params (e.g., zoneId for Magnite)
- * should implement this method. The returned dictionary is placed at
- * imp.ext.prebid.bidder.<adapterName> in the OpenRTB bid request.
- * @return Bidder params dictionary, or nil if no impression-level params are needed.
- */
+/// Returns Prebid Server bidder params for impression-level configuration.
+/// Default implementation returns nil — override for adapters that need per-impression bidder params
+/// (e.g. zoneId for Magnite). The returned dictionary is placed at
+/// @c imp.ext.prebid.bidder.<adapterName> in the OpenRTB bid request.
 - (nullable NSDictionary *)bidderImpressionParams;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

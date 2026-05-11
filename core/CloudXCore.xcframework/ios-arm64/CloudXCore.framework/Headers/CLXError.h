@@ -6,6 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -58,6 +59,13 @@ typedef NS_ENUM(NSInteger, CLXLossReason) {
  *   @c NO_FILL (302) instead. During SDK initialization, individual adapter init failures are
  *   not surfaced to the publisher — the SDK tracks them via metrics, and the publisher receives
  *   a successful initialization callback as long as at least one adapter succeeds.
+ *
+ * Renderer-internal failures (e.g. blank-creative pixel-scan failures, invalid VAST media
+ * files, embedded renderer not yet wired) are surfaced through the existing public codes
+ * (@c CLXErrorCodeNoFill, @c CLXErrorCodeLoadFailed, etc.). When a more specific underlying
+ * cause is available it is preserved on the public NSError via @c NSUnderlyingErrorKey for
+ * telemetry and debugging. A dedicated renderer-internal error vocabulary may be introduced
+ * in a later milestone if a real emission site needs the differentiation.
  */
 typedef NS_ENUM(NSInteger, CLXErrorCode) {
 
@@ -429,14 +437,17 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
 /**
  * CloudX SDK error domain
  */
+CLX_PUBLIC
 extern NSString * const CLXErrorDomain;
 
 /// UserInfo key for the raw HTTP status code in errors created via errorWithHTTPStatusCode:.
+CLX_PUBLIC
 extern NSString * const CLXHTTPStatusCodeKey;
 
 /**
  * CloudX SDK error class - industry standard error handling
  */
+CLX_PUBLIC
 @interface CLXError : NSError
 
 /**

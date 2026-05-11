@@ -1,45 +1,65 @@
-//
-//  CloudXAdapterRewarded.h
-//  CloudXCore
-//
-//  Created by CloudX Team.
-//
+/*
+ * Copyright (c) 2026 CloudX. All rights reserved.
+ */
+
+/**
+ * @file CLXAdapterRewarded.h
+ * @brief Abstract base class for rewarded adapters
+ */
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXDestroyable.h>
-
-NS_ASSUME_NONNULL_BEGIN
+#import <CloudXCore/CLXExport.h>
 
 @protocol CLXAdapterRewardedDelegate;
 
-/// Protocol for rewarded adapters.
-@protocol CLXAdapterRewarded <CLXDestroyable>
+NS_ASSUME_NONNULL_BEGIN
+
+/**
+ * Abstract base class for rewarded adapters.
+ *
+ * Subclass per ad network. Required overrides: @c -load,
+ * @c -showFromViewController:, @c -destroy. Subclasses populate the
+ * @protected ivars at construction time and during the load lifecycle.
+ * The @c delegate retain-cycle break must happen in @c -destroy.
+ */
+CLX_PUBLIC_ADAPTER
+@interface CLXAdapterRewarded : NSObject <CLXDestroyable> {
+@protected
+    id<CLXAdapterRewardedDelegate> _Nullable _delegate;
+    NSString *_sdkVersion;
+    NSString *_network;
+    NSString *_bidID;
+    BOOL _isReady;
+}
 
 /// Delegate for the adapter, used to notify about ad events.
-/// Strong to keep the callback chain alive through the ad lifecycle. Cycle is broken in destroy.
+/// Strong to keep the callback chain alive through the ad lifecycle.
+/// Cycle is broken in @c -destroy.
 @property (nonatomic, strong, nullable) id<CLXAdapterRewardedDelegate> delegate;
 
 /// SDK version of the adapter.
-@property (nonatomic, strong, readonly) NSString *sdkVersion;
+@property (nonatomic, copy, readonly) NSString *sdkVersion;
 
-/// Network name of the adapter. F.e. "AdMob", "Facebook", etc.
-@property (nonatomic, strong, readonly) NSString *network;
+/// Network name of the adapter, e.g. @c "AdMob", @c "Facebook".
+@property (nonatomic, copy, readonly) NSString *network;
 
 /// Ad id from bid response.
-@property (nonatomic, strong, readonly) NSString *bidID;
+@property (nonatomic, copy, readonly) NSString *bidID;
 
 /// Whether the ad is ready to be shown.
 @property (nonatomic, assign, readonly) BOOL isReady;
 
-/// Loads the rewarded adapter.
+/// Loads the rewarded adapter. Subclass MUST override.
 - (void)load;
 
-/// Shows the rewarded adapter.
-/// - Parameter viewController: view controller where the interstitial will be displayed
+/// Shows the rewarded adapter. Subclass MUST override.
+/// @param viewController View controller from which the rewarded ad is shown.
 - (void)showFromViewController:(UIViewController *)viewController;
 
 /// Destroys the adapter and breaks the retain cycle by nilling the delegate.
+/// Subclass MUST override.
 - (void)destroy;
 
 @end
@@ -48,52 +68,51 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol CLXAdapterRewardedDelegate <NSObject>
 
 /// Called when the adapter has loaded the rewarded.
-/// - Parameter rewarded: the rewarded that was loaded
-- (void)didLoadWithRewarded:(id<CLXAdapterRewarded>)rewarded;
+/// @param rewarded The rewarded adapter that was loaded.
+- (void)didLoadWithRewarded:(CLXAdapterRewarded *)rewarded;
 
 /// Called when the adapter failed to load the rewarded.
-/// - Parameter rewarded: the rewarded that failed to load
-/// - Parameter error: the error that caused the failure
-- (void)didFailToLoadWithRewarded:(id<CLXAdapterRewarded>)rewarded error:(NSError *)error;
+/// @param rewarded The rewarded adapter that failed to load.
+/// @param error The error that caused the failure.
+- (void)didFailToLoadWithRewarded:(CLXAdapterRewarded *)rewarded error:(NSError *)error;
 
 /// Called when the adapter has shown the rewarded.
-/// - Parameter rewarded: the rewarded that was shown
-- (void)didShowWithRewarded:(id<CLXAdapterRewarded>)rewarded;
+/// @param rewarded The rewarded adapter that was shown.
+- (void)didShowWithRewarded:(CLXAdapterRewarded *)rewarded;
 
 /// Called when the adapter has tracked impression.
-/// - Parameter rewarded: the rewarded that was shown
-- (void)impressionWithRewarded:(id<CLXAdapterRewarded>)rewarded;
+/// @param rewarded The rewarded adapter that was shown.
+- (void)impressionWithRewarded:(CLXAdapterRewarded *)rewarded;
 
 /// Called when the adapter has closed the rewarded.
-/// - Parameter rewarded: the rewarded that was closed
-- (void)didCloseWithRewarded:(id<CLXAdapterRewarded>)rewarded;
+/// @param rewarded The rewarded adapter that was closed.
+- (void)didCloseWithRewarded:(CLXAdapterRewarded *)rewarded;
 
-/// Called when the adapter has failed to show the rewarded.
-/// - Parameter rewarded: the rewarded that failed to show
-/// - Parameter error: error that caused the failure
-- (void)didFailToShowWithRewarded:(id<CLXAdapterRewarded>)rewarded error:(NSError *)error;
+/// Called when the adapter failed to show the rewarded.
+/// @param rewarded The rewarded adapter that failed to show.
+/// @param error The error that caused the failure.
+- (void)didFailToShowWithRewarded:(CLXAdapterRewarded *)rewarded error:(NSError *)error;
 
-/// Called when the adapter has clicked the rewarded.
-/// - Parameter rewarded: the rewarded that was clicked
-- (void)clickWithRewarded:(id<CLXAdapterRewarded>)rewarded;
+/// Called when the adapter has tracked click.
+/// @param rewarded The rewarded adapter that was clicked.
+- (void)clickWithRewarded:(CLXAdapterRewarded *)rewarded;
 
-/// Called when the adapter has expired the rewarded.
-/// - Parameter rewarded: the rewarded that was expired
-- (void)expiredWithRewarded:(id<CLXAdapterRewarded>)rewarded;
+/// Called when the adapter expired the rewarded.
+/// @param rewarded The rewarded adapter that expired.
+- (void)expiredWithRewarded:(CLXAdapterRewarded *)rewarded;
 
-/// Called when the adapter has rewarded the user (deprecated - use userRewardWithRewarded:amount:label: instead)
-/// - Parameter rewarded: the rewarded that was rewarded
-- (void)userRewardWithRewarded:(id<CLXAdapterRewarded>)rewarded;
+/// Deprecated — use the amount/label form below.
+/// @param rewarded The rewarded adapter that triggered the reward.
+- (void)userRewardWithRewarded:(CLXAdapterRewarded *)rewarded;
 
 @optional
 
-/// Called when the adapter has rewarded the user with reward details.
-/// - Parameters:
-///   - rewarded: the rewarded adapter that triggered the reward
-///   - amount: the reward amount from the ad network (0 if not provided)
-///   - label: the reward label/currency from the ad network (nil if not provided)
-- (void)userRewardWithRewarded:(id<CLXAdapterRewarded>)rewarded amount:(NSInteger)amount label:(nullable NSString *)label;
+/// Called when the adapter rewarded the user with reward details.
+/// @param rewarded The rewarded adapter that triggered the reward.
+/// @param amount The reward amount from the ad network (0 if not provided).
+/// @param label The reward label/currency from the ad network (nil if not provided).
+- (void)userRewardWithRewarded:(CLXAdapterRewarded *)rewarded amount:(NSInteger)amount label:(nullable NSString *)label;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

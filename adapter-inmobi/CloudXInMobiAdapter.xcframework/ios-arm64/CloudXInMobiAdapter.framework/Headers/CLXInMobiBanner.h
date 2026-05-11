@@ -12,17 +12,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXInMobiBanner : NSObject <IMBannerDelegate, CLXAdapterBanner>
-
-@property (nonatomic, strong, nullable) id<CLXAdapterBannerDelegate> delegate;
-@property (nonatomic, copy, readonly) NSString *sdkVersion;
+@interface CLXInMobiBanner : CLXAdapterBanner <IMBannerDelegate>
 
 - (instancetype)initWithBidPayload:(nullable NSData *)bidPayload
                        placementID:(long long)placementID
                      adUnitName:(nullable NSString *)adUnitName
                              bidID:(NSString *)bidID
-                              size:(CGSize)size
-                          delegate:(id<CLXAdapterBannerDelegate>)delegate;
+                              size:(CGSize)size;
 
 @end
 

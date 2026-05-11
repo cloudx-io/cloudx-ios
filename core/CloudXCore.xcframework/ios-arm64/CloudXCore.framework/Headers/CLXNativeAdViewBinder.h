@@ -3,9 +3,11 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+CLX_PUBLIC
 @interface CLXNativeAdViewBinderBuilder : NSObject
 
 @property (nonatomic, assign) NSInteger titleLabelTag;
@@ -23,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^CLXNativeAdViewBinderBuilderBlock)(CLXNativeAdViewBinderBuilder *builder);
 
+CLX_PUBLIC
 @interface CLXNativeAdViewBinder : NSObject
 
 @property (nonatomic, assign, readonly) NSInteger titleLabelTag;

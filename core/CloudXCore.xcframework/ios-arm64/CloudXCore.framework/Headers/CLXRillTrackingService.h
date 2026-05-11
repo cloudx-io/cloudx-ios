@@ -19,6 +19,14 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Centralized service responsible for setting up and sending Rill analytics events.
  * Follows single responsibility principle and provides clean, testable interface.
+ *
+ * Two surface shapes are exposed: the legacy stateful `setupTrackingDataFromBidResponse:` +
+ * `sendImpressionEvent` / `sendClickEvent` path (publisher-as-delegate Track A; survives
+ * for legacy callers retained as a test surface), and the stateless
+ * `sendImpressionEventWithAuctionId:...` / `sendClickEventWithAuctionId:...` path used
+ * by the per-adapter wrapper. The stateless path takes the frozen attribution
+ * identifiers directly so a late callback fired after publisher rotation still
+ * attributes to the original auction.
  */
 @interface CLXRillTrackingService : NSObject
 
@@ -62,6 +70,38 @@ NS_ASSUME_NONNULL_BEGIN
  * Sends click tracking event using previously set up data
  */
 - (void)sendClickEvent;
+
+/**
+ * Stateless impression emission for the per-adapter wrapper path. Reads
+ * attribution identifiers directly from the caller's frozen lifecycle context
+ * (typically `CLXAdapterLifecycleContext`) instead of the service's mutable
+ * per-instance state. Use this from a per-adapter wrapper so a late callback
+ * fired after publisher rotation still attributes to the original auction.
+ *
+ * `campaignId` is derived inside the service via
+ * `[CLXXorEncryption generateCampaignIdBase64:]` — callers do not need to
+ * compute or pass it.
+ *
+ * Tracking-payload data (placement / customData / request / response JSON) is
+ * resolved from `CLXTrackingFieldResolver`'s shared per-`auctionId` bucket;
+ * the caller is responsible for ensuring that bucket has not been cleared
+ * between adapter attach and emission.
+ *
+ * No-ops (with debug log only) when `auctionId` or `accountId` is nil/empty,
+ * so the per-callback site can stay free of guard branches.
+ */
+- (void)sendImpressionEventWithAuctionId:(nullable NSString *)auctionId
+                                   bidId:(nullable NSString *)bidId
+                               accountId:(nullable NSString *)accountId;
+
+/**
+ * Stateless click emission counterpart to
+ * `sendImpressionEventWithAuctionId:bidId:accountId:`. Same attribution semantics,
+ * same no-op-on-missing-input behavior.
+ */
+- (void)sendClickEventWithAuctionId:(nullable NSString *)auctionId
+                              bidId:(nullable NSString *)bidId
+                          accountId:(nullable NSString *)accountId;
 
 /**
  * Checks if tracking data is properly configured

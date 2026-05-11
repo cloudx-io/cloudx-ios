@@ -9,19 +9,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXUnityAdsInterstitial : NSObject <UADSInterstitialShowDelegate, CLXAdapterInterstitial>
-
-@property (nonatomic, strong, nullable) id<CLXAdapterInterstitialDelegate> delegate;
-@property (nonatomic, strong, readonly) NSString *sdkVersion;
-@property (nonatomic, strong, readonly) NSString *network;
-@property (nonatomic, strong, readonly) NSString *bidID;
-@property (nonatomic, assign, readonly) BOOL isReady;
+@interface CLXUnityAdsInterstitial : CLXAdapterInterstitial <UADSInterstitialShowDelegate>
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                      placementName:(nullable NSString *)placementName
-                             bidID:(NSString *)bidID
-                          delegate:(id<CLXAdapterInterstitialDelegate>)delegate;
+                             bidID:(NSString *)bidID;
 
 @end
 

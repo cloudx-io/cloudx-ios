@@ -17,14 +17,12 @@ NS_ASSUME_NONNULL_BEGIN
  * Factory for creating Vungle interstitial adapters.
  * Implements the CloudX adapter factory protocol for interstitial ads.
  */
-@interface CLXVungleInterstitialFactory : NSObject <CLXAdapterInterstitialFactory>
+@interface CLXVungleInterstitialFactory : CLXAdapterInterstitialFactory
 
 /**
  * Factory method to create a new factory instance
  * @return New factory instance
  */
-+ (instancetype)createInstance;
-
 @end
 
 NS_ASSUME_NONNULL_END

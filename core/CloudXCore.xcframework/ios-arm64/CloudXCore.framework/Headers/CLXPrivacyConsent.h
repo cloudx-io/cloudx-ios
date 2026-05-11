@@ -9,6 +9,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -27,6 +28,7 @@ typedef NS_ENUM(NSInteger, CLXGppTarget) {
  * @brief Represents parsed GPP consent information
  * @discussion Contains opt-out flags and business logic for determining when to clear personal data
  */
+CLX_PUBLIC
 @interface CLXPrivacyConsent : NSObject
 
 /**

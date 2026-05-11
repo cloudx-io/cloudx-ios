@@ -50,7 +50,7 @@ extern const int64_t CLXDefaultAdLoadTimeoutMs;
  *     __strong typeof(weakSelf) strongSelf = weakSelf;
  *     if (strongSelf) {
  *         [strongSelf transitionToIdleState];
- *         [strongSelf notifyLoadFailure:error];
+ *         [strongSelf enqueueLoadFailure:error];
  *     }
  * }];
  * @endcode

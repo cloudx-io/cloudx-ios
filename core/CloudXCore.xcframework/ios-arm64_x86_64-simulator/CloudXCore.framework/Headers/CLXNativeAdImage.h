@@ -4,9 +4,11 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+CLX_PUBLIC
 @interface CLXNativeAdImage : NSObject
 
 @property (nonatomic, strong, readonly, nullable) UIImage *image;

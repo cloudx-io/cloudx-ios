@@ -18,23 +18,14 @@ NS_ASSUME_NONNULL_BEGIN
  * Vungle rewarded adapter implementing CloudX adapter protocol.
  * Manages the lifecycle of Vungle rewarded ads including loading, showing, and reward handling.
  */
-@interface CLXVungleRewarded : NSObject <VungleRewardedDelegate, CLXAdapterRewarded>
-
-/**
- * CloudX adapter delegate for receiving ad events
- */
-@property (nonatomic, strong, nullable) id<CLXAdapterRewardedDelegate> delegate;
+@interface CLXVungleRewarded : CLXAdapterRewarded <VungleRewardedDelegate>
 
 /**
  * Whether the rewarded ad is ready to be shown.
  */
-@property (nonatomic, assign, readonly) BOOL isReady;
-
 /**
  * SDK version of the Vungle SDK
  */
-@property (nonatomic, copy, readonly) NSString *sdkVersion;
-
 /**
  * Vungle placement ID for this ad
  */
@@ -61,32 +52,24 @@ NS_ASSUME_NONNULL_BEGIN
  * @param placementID The Vungle placement ID (nullable - validation deferred to load())
  * @param adUnitName The CloudX placement name for error messages (nullable)
  * @param bidID The CloudX bid ID
- * @param delegate The CloudX adapter delegate
  * @return Initialized rewarded adapter
  * @since 1.4.0 adUnitName parameter added for better error messages
  */
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                      adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID
-                          delegate:(nullable id<CLXAdapterRewardedDelegate>)delegate;
+                             bidID:(NSString *)bidID;
 
 /**
  * Loads the rewarded ad
  */
-- (void)load;
-
 /**
  * Shows the rewarded ad from the specified view controller
  * @param viewController The view controller to present from
  */
-- (void)showFromViewController:(UIViewController *)viewController;
-
 /**
  * Destroys the adapter and cleans up resources
  */
-- (void)destroy;
-
 @end
 
 NS_ASSUME_NONNULL_END

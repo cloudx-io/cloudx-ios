@@ -10,9 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXInMobiBannerFactory : NSObject <CLXAdapterBannerFactory>
-
-+ (instancetype)createInstance;
+@interface CLXInMobiBannerFactory : CLXAdapterBannerFactory
 
 @end
 

@@ -12,6 +12,8 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+#import <CloudXCore/CLXExport.h>
+
 //! Project version number for CloudXCore.
 FOUNDATION_EXPORT double CloudXCoreVersionNumber;
 
@@ -34,6 +36,7 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXPrivacyConsent.h>
 #import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXSDKConfig.h>
+#import <CloudXCore/CLXSDKRaceSafetyConfig.h>
 #import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXBiddingConfig.h>
 
@@ -97,8 +100,11 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXAdapterFactoryResolver.h>
 #import <CloudXCore/CLXAdapterLoader.h>
 
+
 // Adapter Models
 #import <CloudXCore/CLXBidResponse.h>
+#import <CloudXCore/CLXBidResponseExtModels.h>
+#import <CloudXCore/CLXBidRoute.h>
 #import <CloudXCore/CLXBidderConfig.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
 #import <CloudXCore/CLXFullscreenAd.h>
@@ -130,6 +136,3 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 // These are NOT part of the public API and may change without notice.
 
 #import <CloudXCore/CloudXCoreInternal.h>
-
-NS_ASSUME_NONNULL_BEGIN
-NS_ASSUME_NONNULL_END

@@ -70,6 +70,7 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
 
 - (void)requestBidWithAdUnitID:(NSString *)adUnitID
               storedImpressionId:(NSString *)storedImpressionId
+            localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters
                       impModel:(nullable CLXConfigImpressionModel *)impModel
                       successWin:(BOOL)successWin
                    correlationId:(NSString *)correlationId
@@ -110,7 +111,7 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
                  hasCloseButton:(BOOL)hasCloseButton
                    publisherID:(NSString *)publisherID
                         adType:(NSInteger)adType
-                bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
+                bidTokenSources:(NSDictionary<NSString *, CLXBidTokenSource *> *)bidTokenSources
          nativeAdRequirements:(nullable id)nativeAdRequirements
             bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                reportingService:(id<CLXAdEventReporting>)reportingService

@@ -7,27 +7,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /// Typed adapter network identifier — single source of truth for known ad networks.
+///
+/// Concrete network identifier constants (e.g. `CLXAdNetworkMeta`) are declared
+/// in `CLXAdNetwork+Internal.h`. They are referenced only by CloudXCore's own
+/// registry/dispatch code and are intentionally hidden in the shipped binary.
+/// Adapter authors should not need them — use the metadata provider machinery
+/// in `CLXAdapterMetadataProvider` instead.
 typedef NSString *CLXAdNetwork NS_STRING_ENUM;
-
-extern CLXAdNetwork const CLXAdNetworkTestBidder;
-extern CLXAdNetwork const CLXAdNetworkGoogleAdManager;
-extern CLXAdNetwork const CLXAdNetworkMeta;
-extern CLXAdNetwork const CLXAdNetworkMintegral;
-extern CLXAdNetwork const CLXAdNetworkCloudX;
-extern CLXAdNetwork const CLXAdNetworkCloudXRenderer;
-extern CLXAdNetwork const CLXAdNetworkVungle;
-extern CLXAdNetwork const CLXAdNetworkInMobi;
-extern CLXAdNetwork const CLXAdNetworkUnityAds;
-extern CLXAdNetwork const CLXAdNetworkMagnite;
-
-/// All known ad networks.
-extern NSArray<CLXAdNetwork> *CLXAllAdNetworks(void);
-
-/// Maps a network identifier to its ObjC class name prefix (e.g. CLXAdNetworkInMobi → @"InMobi").
-extern NSString *CLXAdNetworkClassName(CLXAdNetwork network);
-
-/// Maps a network identifier to its adapter framework namespace
-/// (e.g. CLXAdNetworkMeta → @"CLXMetaAdapter", CLXAdNetworkCloudXRenderer → @"CloudXRenderer").
-extern NSString *_Nullable CLXAdNetworkAdapterNamespace(CLXAdNetwork network);
 
 NS_ASSUME_NONNULL_END

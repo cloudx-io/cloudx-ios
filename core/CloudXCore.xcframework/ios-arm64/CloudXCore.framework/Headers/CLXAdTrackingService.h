@@ -10,6 +10,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion This service provides access to IDFA, DNT, and LAT functionality
  * following iOS privacy guidelines and App Tracking Transparency framework.
  */
+CLX_PUBLIC_ADAPTER
 @interface CLXAdTrackingService : NSObject
 
 /**

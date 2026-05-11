@@ -41,6 +41,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)executeSQL:(NSString *)sql withParameters:(nullable NSArray *)parameters;
 
 /**
+ * Atomic INSERT + sqlite3_last_insert_rowid() in a single serial-queue block.
+ *
+ * Use this for any pipeline where the caller needs the new row's id (typical
+ * pattern: persist-before-send, then delete-on-2xx). A naive
+ *   executeSQL: INSERT ...
+ *   executeQuery: SELECT last_insert_rowid()
+ * pair acquires the queue twice and lets a concurrent INSERT interleave, which
+ * returns the wrong id and causes delete-by-id to wipe the wrong row.
+ *
+ * Returns the new rowid on success, or nil on failure.
+ */
+- (nullable NSNumber *)executeInsertSQL:(NSString *)sql withParameters:(nullable NSArray *)parameters;
+
+/**
  * Query execution
  */
 - (NSArray<NSDictionary *> *)executeQuery:(NSString *)sql;

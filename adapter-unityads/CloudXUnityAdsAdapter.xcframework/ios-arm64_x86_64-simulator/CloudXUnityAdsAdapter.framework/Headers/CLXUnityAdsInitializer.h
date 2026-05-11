@@ -7,13 +7,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXUnityAdsInitializer : NSObject <CLXAdNetworkInitializer>
+@interface CLXUnityAdsInitializer : CLXAdNetworkInitializer
 
 @property (nonatomic, strong, readonly) NSString *sdkVersion;
 @property (nonatomic, strong, readonly) NSString *network;
 
 + (BOOL)isInitialized;
-+ (instancetype)createInstance;
 + (NSString *)sdkVersion;
 
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config

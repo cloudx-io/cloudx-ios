@@ -11,6 +11,7 @@
 #import <CloudXCore/CLXPublisherFullscreenAdBase.h>
 #import <CloudXCore/CLXInterstitialDelegate.h>
 #import <CloudXCore/CLXAdRevenueDelegate.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
  * CLXInterstitial represents an interstitial ad in the CloudX SDK.
  * Interstitial ads are full-screen ads that appear at natural transition points in an app.
  */
+CLX_PUBLIC
 @interface CLXInterstitial : CLXPublisherFullscreenAdBase
 
 /**

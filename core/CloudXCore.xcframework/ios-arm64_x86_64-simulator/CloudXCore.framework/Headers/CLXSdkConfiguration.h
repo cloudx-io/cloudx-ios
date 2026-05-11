@@ -6,6 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
  * This object is passed to the initialization completion handler upon success.
  * Currently empty, reserved for future use to provide SDK configuration details.
  */
+CLX_PUBLIC
 @interface CLXSdkConfiguration : NSObject
 
 @end

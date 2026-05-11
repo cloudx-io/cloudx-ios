@@ -10,6 +10,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Format: MAJOR.MINOR.PATCH (e.g., "X.Y.Z")
  * This constant is automatically updated during the release process
  */
+CLX_PUBLIC
 FOUNDATION_EXPORT NSString * const CLXSDKVersion;
 
 NS_ASSUME_NONNULL_END

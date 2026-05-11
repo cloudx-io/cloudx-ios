@@ -8,11 +8,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXUnityAdsBidTokenSource : NSObject <CLXBidTokenSource>
+@interface CLXUnityAdsBidTokenSource : CLXBidTokenSource
 
 + (instancetype)sharedInstance;
-+ (instancetype)createInstance;
-
 @end
 
 NS_ASSUME_NONNULL_END

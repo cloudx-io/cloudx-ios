@@ -3,8 +3,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXVungleMetadataProvider : NSObject <CLXAdapterMetadataProvider>
-+ (instancetype)createInstance;
+@interface CLXVungleMetadataProvider : CLXAdapterMetadataProvider
 @end
 
 NS_ASSUME_NONNULL_END

@@ -3,6 +3,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -11,8 +12,31 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol CLXNativeAdDelegate;
 @protocol CLXAdRevenueDelegate;
 
+/**
+ * @brief localExtraParameters key disabling fullscreen on video taps.
+ * @discussion Adapter-tier. Set via `-setLocalExtraParameterForKey:value:`
+ *             with `@YES`/`@NO`. Honored by adapters that support native
+ *             video playback; silently ignored by adapters that do not.
+ */
+CLX_PUBLIC_ADAPTER
 extern NSString *const CLXNativeVideoDisableFullScreenKey;
+
+/**
+ * @brief localExtraParameters key starting native video playback unmuted.
+ * @discussion Adapter-tier. Set via `-setLocalExtraParameterForKey:value:`
+ *             with `@YES`/`@NO`. Honored by adapters that support native
+ *             video playback; silently ignored by adapters that do not.
+ */
+CLX_PUBLIC_ADAPTER
 extern NSString *const CLXNativeVideoStartUnmutedKey;
+
+/**
+ * @brief localExtraParameters key hiding media controls on native video.
+ * @discussion Adapter-tier. Set via `-setLocalExtraParameterForKey:value:`
+ *             with `@YES`/`@NO`. Honored by adapters that support native
+ *             video playback; silently ignored by adapters that do not.
+ */
+CLX_PUBLIC_ADAPTER
 extern NSString *const CLXNativeVideoHideMediaControlsKey;
 
 /**
@@ -23,6 +47,7 @@ extern NSString *const CLXNativeVideoHideMediaControlsKey;
  *       adapter will fail with a load error. Additional adapter support
  *       (Mintegral, Pangle, etc.) is planned for future releases.
  */
+CLX_PUBLIC
 @interface CLXNativeAdLoader : NSObject
 
 #pragma mark - Properties
@@ -117,16 +142,47 @@ extern NSString *const CLXNativeVideoHideMediaControlsKey;
 #pragma mark - Extra Parameters
 
 /**
- * Set a server-side extra parameter to include in bid requests.
- * These are string-keyed, string-valued parameters forwarded to the ad server.
- * @note Currently stored for future bid request enrichment. Not yet included in bid payloads.
+ * Sets or clears an extra parameter attached to future bid requests for this ad.
+ *
+ * Supported value types: NSString, NSNumber (including boolean), NSArray,
+ * and NSDictionary keyed by NSString. Pass nil to remove the key. Invalid
+ * values are ignored and logged — they never fail ad loading.
+ *
+ * Reserved floor keys:
+ * - `minFloor` — single-round publisher floor in USD CPM. Accepts an
+ *   NSNumber or decimal NSString (e.g. `@"1.25"`).
+ * - `minFloors` — per-round floor overrides. Accepts an NSArray of
+ *   NSNumber / decimal NSString values, or a JSON-array NSString
+ *   (e.g. `@"[1.2, 0.95]"`).
+ *
+ * Values are captured at call time. If you pass an NSDictionary or NSArray
+ * and later mutate it, earlier bid requests are unaffected — call
+ * setExtraParameter:value: again to push updates.
+ *
+ * Mixed-validity containers: an NSDictionary keeps its valid entries and
+ * drops the invalid ones; an NSArray is all-or-nothing — any invalid
+ * element discards the entire array, to preserve positional ordering for
+ * keys like `minFloors`.
+ *
+ * Timing: native ads use the values current at the time of `loadAd`;
+ * changes after that take effect on the next `loadAd` call.
+ *
+ * @param key Parameter key. Empty keys are ignored.
+ * @param value Value to store, or nil to remove the key.
  */
-- (void)setExtraParameterForKey:(NSString *)key value:(nullable NSString *)value;
+- (void)setExtraParameter:(NSString *)key
+                    value:(nullable id)value NS_SWIFT_NAME(setExtraParameter(_:value:));
 
 /**
- * Set a client-side extra parameter passed directly to the adapter at creation time.
- * These are string-keyed, any-typed parameters forwarded to the adapter factory.
- * Use for adapter-specific configuration (e.g., Google ad view tags).
+ * Sets or clears an adapter-level parameter for this native ad. The value is
+ * forwarded to the underlying native ad adapter and is NOT sent in the bid
+ * request.
+ *
+ * Use `setExtraParameter:value:` instead to send a value as an auction signal,
+ * including per-request floor overrides (`minFloor` / `minFloors`).
+ *
+ * @param key Parameter key. Empty keys are ignored.
+ * @param value Value to store, or nil to remove the key.
  */
 - (void)setLocalExtraParameterForKey:(NSString *)key value:(nullable id)value;
 

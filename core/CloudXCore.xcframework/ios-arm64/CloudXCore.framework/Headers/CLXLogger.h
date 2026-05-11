@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 @class CLXAd;
 @class CLXError;
@@ -25,6 +26,7 @@ typedef NS_ENUM(NSInteger, CLXLogEmoji) {
     CLXLogEmojiEvent      // 🎉
 };
 
+CLX_PUBLIC_ADAPTER
 @interface CLXLogger : NSObject
 
 + (instancetype)shared;
@@ -93,6 +95,30 @@ typedef NS_ENUM(NSInteger, CLXLogEmoji) {
  * @discussion Timestamps are formatted as HH:mm:ss.SSS and appear after [CloudX]
  */
 - (void)setTimestampsEnabled:(BOOL)enabled;
+
+#pragma mark - Race-Correlation Logging
+
+/**
+ * Log a message and attach a structured correlation context for remote log telemetry.
+ *
+ * The context is forwarded to the remote log tracker alongside the emitted log entry so
+ * server-side queries can correlate these logs with the matching adapter-lifecycle events
+ * (auctionId, adUnitId, adUnitType, bidder). Console output is unchanged — the human-readable
+ * message is printed as-is. When the remote tracker is nil, the context is simply dropped.
+ *
+ * Prefer this over concatenating identifiers into the message string at race-sensitive sites
+ * (close/destroy/impression-after-destroy) where machine correlation matters more than
+ * console readability.
+ */
+- (void)logAtLevel:(CLXLogLevel)level
+         emojiType:(CLXLogEmoji)emojiType
+           message:(NSString *)message
+           context:(nullable NSDictionary<NSString *, id> *)context;
+
+/** WARN-level convenience for race-sensitive sites. */
+- (void)warn:(NSString *)message context:(nullable NSDictionary<NSString *, id> *)context;
+/** ERROR-level convenience for race-sensitive sites. */
+- (void)error:(NSString *)message context:(nullable NSDictionary<NSString *, id> *)context;
 
 #pragma mark - Remote Log Telemetry
 

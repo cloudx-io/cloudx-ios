@@ -1,33 +1,29 @@
-//
-//  CloudXAdNetworkInitializer.h
-//  CloudXCore
-//
-//  Created by CloudX Team.
-//
+/*
+ * Copyright (c) 2026 CloudX. All rights reserved.
+ */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class CLXBidderConfig;
 
-/// Protocol for initializing ad network SDKs.
-@protocol CLXAdNetworkInitializer <NSObject>
+/// Abstract base class for ad network initializers.
+/// Subclass MUST override @c +isInitialized and @c -initializeWithConfig:testMode:completion:.
+CLX_PUBLIC_ADAPTER
+@interface CLXAdNetworkInitializer : NSObject
 
-/// Flag to indicate if the ad network SDK is initialized.
+/// Whether the ad network SDK is initialized.
 + (BOOL)isInitialized;
 
-/// Creates an instance of the initializer.
 + (instancetype)createInstance;
 
-/// CloudX SDK call this method to initialize the ad network SDK.
-/// - Parameter config: configuration for the ad network SDK such as app id, ad unit id
-/// - Parameter testMode: whether test mode is enabled (from server deviceConfig)
-/// - Returns: true if the initialization was successful, false otherwise
-- (void)initializeWithConfig:(nullable CLXBidderConfig *)config 
+/// CloudX SDK calls this method to initialize the ad network SDK.
+- (void)initializeWithConfig:(nullable CLXBidderConfig *)config
                     testMode:(BOOL)testMode
                   completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

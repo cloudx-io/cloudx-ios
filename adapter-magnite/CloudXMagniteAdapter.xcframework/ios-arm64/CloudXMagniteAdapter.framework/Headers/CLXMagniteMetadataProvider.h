@@ -7,8 +7,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXMagniteMetadataProvider : NSObject <CLXAdapterMetadataProvider>
-+ (instancetype)createInstance;
+@interface CLXMagniteMetadataProvider : CLXAdapterMetadataProvider
 @end
 
 NS_ASSUME_NONNULL_END

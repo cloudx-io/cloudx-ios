@@ -47,7 +47,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXBiddingConfigImpressionVideo;
 @class CLXBiddingConfigImpressionNative;
 @class CLXBiddingConfigImpressionExt;
-//@class CLXBiddingConfigImpressionExtData;
 @class CLXBiddingConfigImpressionPMP;
 @class CLXBiddingConfigImpressionBannerFormat;
 @class CLXBiddingConfigImpressionExtStoredImpression;
@@ -85,6 +84,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXNativeAdRequirements *nativeAdRequirements;
 @property (nonatomic, strong, nullable) CLXSKAdRequestParameters *skadRequestParameters;
 @property (nonatomic, strong, nullable) NSNumber *tmax;
+@property (nonatomic, copy, nullable) NSDictionary<NSString *, id> *localExtraParameters;
 
 // Nested objects
 @property (nonatomic, strong) NSArray<CLXBiddingConfigImpression *> *impressions;
@@ -221,7 +221,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CLXBiddingConfigUserExt : NSObject
-//@property (nonatomic, copy) NSString *consent;
 @property (nonatomic, strong) NSDictionary<NSString *, NSString *> *data;
 @property (nonatomic, strong) NSArray<CLXBiddingConfigUserExtEids *> *eids;
 

@@ -18,24 +18,18 @@ NS_ASSUME_NONNULL_BEGIN
  * Manages the lifecycle of Magnite banner/MREC ads including loading, showing, and cleanup.
  * Supports standard banner (320x50) and MREC (300x250).
  */
-@interface CLXMagniteBanner : NSObject <CLXAdapterBanner>
+@interface CLXMagniteBanner : CLXAdapterBanner
 
 /**
  * CloudX adapter delegate for receiving ad events.
  * Strong to keep the callback chain alive through the ad lifecycle. Cycle is broken in destroy.
  */
-@property (nonatomic, strong, nullable) id<CLXAdapterBannerDelegate> delegate;
-
 /**
  * The underlying Magnite banner view
  */
-@property (nonatomic, strong, nullable, readonly) UIView *bannerView;
-
 /**
  * SDK version of the Magnite SDK
  */
-@property (nonatomic, copy, readonly) NSString *sdkVersion;
-
 /**
  * Magnite placement ID for this ad
  */
@@ -63,25 +57,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                         adUnitName:(nullable NSString *)adUnitName
-                              type:(CLXBannerType)type
-                          delegate:(nullable id<CLXAdapterBannerDelegate>)delegate;
+                              type:(CLXBannerType)type;
 
 /**
  * Loads the banner ad
  */
-- (void)load;
-
 /**
  * Shows the banner ad from the given view controller
  * @param viewController The view controller to show from
  */
-- (void)showFromViewController:(UIViewController *)viewController;
-
 /**
  * Destroys the banner ad and cleans up resources
  */
-- (void)destroy;
-
 @end
 
 NS_ASSUME_NONNULL_END

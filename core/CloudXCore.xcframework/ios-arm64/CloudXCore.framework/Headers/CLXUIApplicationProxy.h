@@ -3,6 +3,7 @@
  */
 
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * All methods are safe to call from any context - they will simply return nil in extensions.
  */
+CLX_PUBLIC_ADAPTER
 @interface CLXUIApplicationProxy : NSObject
 
 /// Returns YES if running in a full app context (UIApplication available), NO in extensions.

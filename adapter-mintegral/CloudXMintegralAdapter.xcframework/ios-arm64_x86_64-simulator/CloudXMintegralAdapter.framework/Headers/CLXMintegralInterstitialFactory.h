@@ -3,9 +3,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXMintegralInterstitialFactory : NSObject <CLXAdapterInterstitialFactory>
-
-+ (instancetype)createInstance;
+@interface CLXMintegralInterstitialFactory : CLXAdapterInterstitialFactory
 
 @end
 

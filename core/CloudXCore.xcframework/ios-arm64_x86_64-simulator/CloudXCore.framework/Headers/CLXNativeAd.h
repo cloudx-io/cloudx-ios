@@ -4,6 +4,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -13,17 +14,27 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^CLXNativeAdBuilderBlock)(CLXNativeAdBuilder *builder);
 
+CLX_PUBLIC
 extern NSInteger const CLXNativeAdViewTagTitleLabel;
+CLX_PUBLIC
 extern NSInteger const CLXNativeAdViewTagMediaViewContainer;
+CLX_PUBLIC
 extern NSInteger const CLXNativeAdViewTagIconImageView;
+CLX_PUBLIC
 extern NSInteger const CLXNativeAdViewTagBodyLabel;
+CLX_PUBLIC
 extern NSInteger const CLXNativeAdViewTagCallToActionButton;
+CLX_PUBLIC
 extern NSInteger const CLXNativeAdViewTagAdvertiserLabel;
+CLX_PUBLIC
 extern NSInteger const CLXNativeAdViewTagOptionsContentView;
+CLX_PUBLIC
 extern NSInteger const CLXNativeAdViewTagStarRatingContentView;
+CLX_PUBLIC
 extern NSInteger const CLXNativeAdViewTagIconContentView
     __attribute__((deprecated("Use CLXNativeAdViewTagIconImageView instead.")));
 
+CLX_PUBLIC
 @interface CLXNativeAd : NSObject
 
 #pragma mark - Asset Properties (readonly, set via builder)

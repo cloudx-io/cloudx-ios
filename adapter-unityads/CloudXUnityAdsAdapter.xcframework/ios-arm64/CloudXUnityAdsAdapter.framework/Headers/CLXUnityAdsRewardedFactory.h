@@ -13,9 +13,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXUnityAdsRewardedFactory : NSObject <CLXAdapterRewardedFactory>
-
-+ (instancetype)createInstance;
+@interface CLXUnityAdsRewardedFactory : CLXAdapterRewardedFactory
 
 @end
 

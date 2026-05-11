@@ -18,14 +18,12 @@ NS_ASSUME_NONNULL_BEGIN
  * Implements the CloudX adapter factory protocol for App Open ads.
  * App Open ads use the interstitial factory protocol but with dedicated App Open placements.
  */
-@interface CLXVungleAppOpenFactory : NSObject <CLXAdapterInterstitialFactory>
+@interface CLXVungleAppOpenFactory : CLXAdapterInterstitialFactory
 
 /**
  * Factory method to create a new factory instance
  * @return New factory instance
  */
-+ (instancetype)createInstance;
-
 @end
 
 NS_ASSUME_NONNULL_END

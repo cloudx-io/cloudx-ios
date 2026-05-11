@@ -10,6 +10,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion This class provides centralized access to various SDK endpoint URLs
  * and allows for easy configuration of different environments.
  */
+CLX_INTERNAL_TESTING
 @interface CLXURLProvider : NSObject
 
 /**

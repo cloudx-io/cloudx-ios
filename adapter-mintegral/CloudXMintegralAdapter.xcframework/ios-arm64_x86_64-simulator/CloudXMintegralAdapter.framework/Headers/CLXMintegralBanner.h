@@ -12,12 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Uses MTGBannerAdView which supports both bidding and waterfall.
  * Includes proper banner configuration: autoRefreshTime, showCloseButton.
  */
-@interface CLXMintegralBanner : NSObject <MTGBannerAdViewDelegate, CLXAdapterBanner>
-
-@property (nonatomic, strong, nullable) id<CLXAdapterBannerDelegate> delegate;
-@property (nonatomic, assign) BOOL timeout;
-@property (nonatomic, strong, nullable, readonly) UIView *bannerView;
-@property (nonatomic, copy, readonly) NSString *sdkVersion;
+@interface CLXMintegralBanner : CLXAdapterBanner <MTGBannerAdViewDelegate>
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(NSString *)placementID
@@ -25,12 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
                             unitID:(NSString *)unitID
                               size:(CGSize)size
                              bidID:(NSString *)bidID
-                   hasClosedButton:(BOOL)hasClosedButton
-                          delegate:(id<CLXAdapterBannerDelegate>)delegate;
-
-- (void)load;
-- (void)showFromViewController:(UIViewController *)viewController;
-- (void)destroy;
+                   hasClosedButton:(BOOL)hasClosedButton;
 
 @end
 

@@ -17,24 +17,18 @@ NS_ASSUME_NONNULL_BEGIN
  * Magnite interstitial adapter implementing CloudX adapter protocol.
  * Manages the lifecycle of Magnite interstitial ads including loading, showing, and cleanup.
  */
-@interface CLXMagniteInterstitial : NSObject <CLXAdapterInterstitial>
+@interface CLXMagniteInterstitial : CLXAdapterInterstitial
 
 /**
  * CloudX adapter delegate for receiving ad events.
  * Strong to keep the callback chain alive through the ad lifecycle. Cycle is broken in destroy.
  */
-@property (nonatomic, strong, nullable) id<CLXAdapterInterstitialDelegate> delegate;
-
 /**
  * SDK version of the Magnite SDK
  */
-@property (nonatomic, copy, readonly) NSString *sdkVersion;
-
 /**
  * Network name identifier
  */
-@property (nonatomic, copy, readonly) NSString *network;
-
 /**
  * Magnite placement ID for this ad
  */
@@ -57,25 +51,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                         adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID
-                          delegate:(nullable id<CLXAdapterInterstitialDelegate>)delegate;
+                             bidID:(NSString *)bidID;
 
 /**
  * Loads the interstitial ad
  */
-- (void)load;
-
 /**
  * Shows the interstitial ad from the specified view controller
  * @param viewController The view controller to present from
  */
-- (void)showFromViewController:(UIViewController *)viewController;
-
 /**
  * Destroys the adapter and cleans up resources
  */
-- (void)destroy;
-
 @end
 
 NS_ASSUME_NONNULL_END

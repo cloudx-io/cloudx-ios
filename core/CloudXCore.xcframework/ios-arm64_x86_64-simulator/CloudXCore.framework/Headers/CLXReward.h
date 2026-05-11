@@ -8,6 +8,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
  * CLXReward represents a reward given to the user after watching a rewarded ad.
  * Similar to MAReward in AppLovin MAX SDK.
  */
+CLX_PUBLIC
 @interface CLXReward : NSObject
 
 /**

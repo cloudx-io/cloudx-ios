@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXExport.h>
 #import <CloudXCore/CLXNativeTemplate.h>
 #import <CloudXCore/CLXSDKConfigRequest.h>
 #import <CloudXCore/CLXSDKConfigBidder.h>
@@ -32,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXTelemetryEventsConfig;
 @class CLXTelemetryLogsConfig;
 @class CLXRemoteLogConfig;
+@class CLXSDKRaceSafetyConfig;
 @class CLXSDKConfigDeviceConfig;
 
 @interface CLXSDKConfig : NSObject
@@ -71,6 +73,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 // Response structure
+CLX_INTERNAL_TESTING
 @interface CLXSDKConfigResponse : NSObject
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -104,6 +107,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *sdkMetricsEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sdkLogEndpointURL;
 
+// CXD-1176: adapter-lifecycle observability events flow through the metrics
+// pipeline (single `sdkMetricsEndpointURL` + server-side allow-list in
+// `telemetryMetricsConfig.metrics`). No per-event URLs needed.
+
 // 2b-ii. Telemetry subsystem configs (server-driven tuning knobs)
 @property (nonatomic, strong, nullable) CLXTelemetryMetricsConfig *telemetryMetricsConfig;
 @property (nonatomic, strong, nullable) CLXTelemetryEventsConfig *telemetryEventsConfig;
@@ -113,6 +120,11 @@ NS_ASSUME_NONNULL_BEGIN
 // or sets `enabled=false`). When non-nil, applies level, substring filter, max-entries, and
 // duration gates in the remote log tracker.
 @property (nonatomic, strong, nullable) CLXRemoteLogConfig *remoteLogConfig;
+
+// 2b-iv. Server-driven adapter lifecycle race-safety knobs (CXD-1182). Nil means all fixes
+// remain off and the SDK keeps its legacy synchronous destroy + immediate VC-assignment
+// behavior. See CLXSDKRaceSafetyConfig for per-field semantics.
+@property (nonatomic, strong, nullable) CLXSDKRaceSafetyConfig *raceSafetyConfig;
 
 // 2c. Opaque server telemetry payloads
 @property (nonatomic, copy, nullable) NSString *configTelemetryPayload;

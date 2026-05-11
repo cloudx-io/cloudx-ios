@@ -1,37 +1,34 @@
-//
-//  CloudXAdapterInterstitialFactory.h
-//  CloudXCore
-//
-//  Created by CloudX Team.
-//
+/*
+ * Copyright (c) 2026 CloudX. All rights reserved.
+ */
+
+/**
+ * @file CLXAdapterInterstitialFactory.h
+ * @brief Abstract base class for interstitial adapter factories
+ */
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol CLXAdapterInterstitial;
-@protocol CLXAdapterInterstitialDelegate;
+@class CLXAdapterInterstitial;
 
-/// Factory for creating interstitial adapters.
-@protocol CLXAdapterInterstitialFactory <NSObject>
+/// Abstract base class for interstitial adapter factories.
+/// Subclass MUST override @c -createWithAdId:bidId:adm:extras:adUnitName:.
+/// The wrapper attaches itself as the adapter's delegate after construction.
+CLX_PUBLIC_ADAPTER
+@interface CLXAdapterInterstitialFactory : NSObject
 
-/// Creates a new instance of CLXAdapterInterstitial with the given parameters.
-/// - Parameters:
-///   - adId: id of ad from bid response
-///   - bidId: bid id from bid response
-///   - adm: ad markup with data for rendering
-///   - extras: adapters extra info
-///   - adUnitName: CloudX ad unit name for error messaging (may be nil for legacy callers)
-///   - delegate: delegate for the adapter
-/// - Returns: new instance of CLXAdapterInterstitial
-- (nullable id<CLXAdapterInterstitial>)createWithAdId:(NSString *)adId
-                                                 bidId:(NSString *)bidId
-                                                   adm:(NSString *)adm
-                                                extras:(NSDictionary<NSString *, NSString *> *)extras
-                                         adUnitName:(nullable NSString *)adUnitName
-                                              delegate:(id<CLXAdapterInterstitialDelegate>)delegate;
++ (instancetype)createInstance;
+
+- (nullable CLXAdapterInterstitial *)createWithAdId:(NSString *)adId
+                                              bidId:(NSString *)bidId
+                                                adm:(NSString *)adm
+                                             extras:(NSDictionary<NSString *, NSString *> *)extras
+                                         adUnitName:(nullable NSString *)adUnitName;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

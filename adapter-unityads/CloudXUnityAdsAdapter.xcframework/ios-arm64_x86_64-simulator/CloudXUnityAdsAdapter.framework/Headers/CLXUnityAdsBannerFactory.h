@@ -13,9 +13,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXUnityAdsBannerFactory : NSObject <CLXAdapterBannerFactory>
-
-+ (instancetype)createInstance;
+@interface CLXUnityAdsBannerFactory : CLXAdapterBannerFactory
 
 @end
 

@@ -18,11 +18,11 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXBidResponseBid;
 
 @protocol CLXAdEventReporting;
-@protocol CLXBidTokenSource;
-@protocol CLXAdapterNativeFactory;
+@class CLXBidTokenSource;
+@class CLXAdapterNativeFactory;
 @protocol CLXPublisherNativeDelegate;
 
-@interface CLXPublisherNative : NSObject <CLXAdapterNativeDelegate>
+@interface CLXPublisherNative : NSObject
 
 @property (nonatomic, weak, nullable) id<CLXPublisherNativeDelegate> publisherDelegate;
 @property (nonatomic, readonly) CLXNativeTemplate nativeType;
@@ -35,8 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
                    publisherID:(NSString *)publisherID
                     nativeType:(CLXNativeTemplate)nativeType
                       impModel:(nullable CLXConfigImpressionModel *)impModel
-                   adFactories:(NSDictionary<NSString *, id<CLXAdapterNativeFactory>> *)adFactories
-               bidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
+                   adFactories:(NSDictionary<NSString *, CLXAdapterNativeFactory *> *)adFactories
+               bidTokenSources:(NSDictionary<NSString *, CLXBidTokenSource *> *)bidTokenSources
              bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
               reportingService:(id<CLXAdEventReporting>)reportingService;
 

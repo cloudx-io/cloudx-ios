@@ -11,12 +11,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol CLXAdNetworkInitializer;
-@protocol CLXAdapterBannerFactory;
-@protocol CLXAdapterInterstitialFactory;
-@protocol CLXAdapterRewardedFactory;
-@protocol CLXAdapterNativeFactory;
-@protocol CLXBidTokenSource;
+@class CLXAdNetworkInitializer;
+@class CLXAdapterBannerFactory;
+@class CLXAdapterInterstitialFactory;
+@class CLXAdapterRewardedFactory;
+@class CLXAdapterNativeFactory;
+@class CLXBidTokenSource;
 
 /**
  * CLXAdNetworkFactories is a container for all ad network factories and components.
@@ -27,32 +27,32 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Bid token sources for each adapter network.
  */
-@property (nonatomic, strong, readonly) NSDictionary<NSString *, id<CLXBidTokenSource>> *bidTokenSources;
+@property (nonatomic, strong, readonly) NSDictionary<NSString *, CLXBidTokenSource *> *bidTokenSources;
 
 /**
  * Initializers for each adapter network.
  */
-@property (nonatomic, strong, readonly) NSDictionary<NSString *, id<CLXAdNetworkInitializer>> *initializers;
+@property (nonatomic, strong, readonly) NSDictionary<NSString *, CLXAdNetworkInitializer *> *initializers;
 
 /**
  * Interstitial factories for each adapter network.
  */
-@property (nonatomic, strong, readonly) NSDictionary<NSString *, id<CLXAdapterInterstitialFactory>> *interstitials;
+@property (nonatomic, strong, readonly) NSDictionary<NSString *, CLXAdapterInterstitialFactory *> *interstitials;
 
 /**
  * Rewarded interstitial factories for each adapter network.
  */
-@property (nonatomic, strong, readonly) NSDictionary<NSString *, id<CLXAdapterRewardedFactory>> *rewardedInterstitials;
+@property (nonatomic, strong, readonly) NSDictionary<NSString *, CLXAdapterRewardedFactory *> *rewardedInterstitials;
 
 /**
  * Banner factories for each adapter network.
  */
-@property (nonatomic, strong, readonly) NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *banners;
+@property (nonatomic, strong, readonly) NSDictionary<NSString *, CLXAdapterBannerFactory *> *banners;
 
 /**
  * Native factories for each adapter network.
  */
-@property (nonatomic, strong, readonly) NSDictionary<NSString *, id<CLXAdapterNativeFactory>> *native;
+@property (nonatomic, strong, readonly) NSDictionary<NSString *, CLXAdapterNativeFactory *> *native;
 
 /**
  * Helper property to check if all fields are empty.
@@ -69,12 +69,12 @@ NS_ASSUME_NONNULL_BEGIN
  * @param native Dictionary of native factories
  * @return Initialized CLXAdNetworkFactories instance
  */
-- (instancetype)initWithBidTokenSources:(NSDictionary<NSString *, id<CLXBidTokenSource>> *)bidTokenSources
-                           initializers:(NSDictionary<NSString *, id<CLXAdNetworkInitializer>> *)initializers
-                          interstitials:(NSDictionary<NSString *, id<CLXAdapterInterstitialFactory>> *)interstitials
-                   rewardedInterstitials:(NSDictionary<NSString *, id<CLXAdapterRewardedFactory>> *)rewardedInterstitials
-                                 banners:(NSDictionary<NSString *, id<CLXAdapterBannerFactory>> *)banners
-                                   native:(NSDictionary<NSString *, id<CLXAdapterNativeFactory>> *)native;
+- (instancetype)initWithBidTokenSources:(NSDictionary<NSString *, CLXBidTokenSource *> *)bidTokenSources
+                           initializers:(NSDictionary<NSString *, CLXAdNetworkInitializer *> *)initializers
+                          interstitials:(NSDictionary<NSString *, CLXAdapterInterstitialFactory *> *)interstitials
+                   rewardedInterstitials:(NSDictionary<NSString *, CLXAdapterRewardedFactory *> *)rewardedInterstitials
+                                 banners:(NSDictionary<NSString *, CLXAdapterBannerFactory *> *)banners
+                                   native:(NSDictionary<NSString *, CLXAdapterNativeFactory *> *)native;
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;
 

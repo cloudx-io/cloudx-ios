@@ -1,45 +1,64 @@
-//
-//  CloudXAdapterInterstitial.h
-//  CloudXCore
-//
-//  Created by CloudX Team.
-//
+/*
+ * Copyright (c) 2026 CloudX. All rights reserved.
+ */
+
+/**
+ * @file CLXAdapterInterstitial.h
+ * @brief Abstract base class for interstitial adapters
+ */
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXDestroyable.h>
-
-NS_ASSUME_NONNULL_BEGIN
+#import <CloudXCore/CLXExport.h>
 
 @protocol CLXAdapterInterstitialDelegate;
 
-/// Protocol for interstitial adapters. Interstitial adapters are responsible for loading and showing interstitial ads.
-@protocol CLXAdapterInterstitial <CLXDestroyable>
+NS_ASSUME_NONNULL_BEGIN
+
+/**
+ * Abstract base class for interstitial adapters.
+ *
+ * Subclass per ad network. Required overrides: @c -load,
+ * @c -showFromViewController:, @c -destroy. Subclasses populate the
+ * @protected ivars at construction time and during the load lifecycle.
+ * The @c delegate retain-cycle break must happen in @c -destroy.
+ */
+CLX_PUBLIC_ADAPTER
+@interface CLXAdapterInterstitial : NSObject <CLXDestroyable> {
+@protected
+    id<CLXAdapterInterstitialDelegate> _Nullable _delegate;
+    NSString *_sdkVersion;
+    NSString *_network;
+    NSString *_bidID;
+    BOOL _isReady;
+}
 
 /// Delegate for the adapter, used to notify about ad events.
-/// Strong to keep the callback chain alive through the ad lifecycle. Cycle is broken in destroy.
+/// Strong to keep the callback chain alive through the ad lifecycle.
+/// Cycle is broken in @c -destroy.
 @property (nonatomic, strong, nullable) id<CLXAdapterInterstitialDelegate> delegate;
 
 /// SDK version of the adapter.
-@property (nonatomic, strong, readonly) NSString *sdkVersion;
+@property (nonatomic, copy, readonly) NSString *sdkVersion;
 
-/// Network name of the adapter. F.e. "AdMob", "Facebook", etc.
-@property (nonatomic, strong, readonly) NSString *network;
+/// Network name of the adapter. e.g. "AdMob", "Facebook".
+@property (nonatomic, copy, readonly) NSString *network;
 
 /// Ad id from bid response.
-@property (nonatomic, strong, readonly) NSString *bidID;
+@property (nonatomic, copy, readonly) NSString *bidID;
 
 /// Whether the ad is ready to be shown.
 @property (nonatomic, assign, readonly) BOOL isReady;
 
-/// Loads the adapter interstitial.
+/// Loads the adapter interstitial. Subclass MUST override.
 - (void)load;
 
-/// Shows the adapter interstitial.
-/// - Parameter viewController: view controller where the interstitial will be displayed
+/// Shows the adapter interstitial. Subclass MUST override.
 - (void)showFromViewController:(UIViewController *)viewController;
 
 /// Destroys the adapter and breaks the retain cycle by nilling the delegate.
+/// Subclass MUST override.
 - (void)destroy;
 
 @end
@@ -47,42 +66,15 @@ NS_ASSUME_NONNULL_BEGIN
 /// Delegate for the interstitial adapter.
 @protocol CLXAdapterInterstitialDelegate <NSObject>
 
-/// Called when the adapter has loaded the interstitial.
-/// - Parameter interstitial: the interstitial that was loaded
-- (void)didLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial;
-
-/// Called when the adapter failed to load the interstitial.
-/// - Parameters:
-///   - interstitial: the interstitial that failed to load
-///   - error: the error that caused the failure
-- (void)didFailToLoadWithInterstitial:(id<CLXAdapterInterstitial>)interstitial error:(NSError *)error;
-
-/// Called when the adapter has shown the interstitial.
-/// - Parameter interstitial: the interstitial that was shown
-- (void)didShowWithInterstitial:(id<CLXAdapterInterstitial>)interstitial;
-
-/// Called when the adapter has failed to show the interstitial.
-/// - Parameters:
-///   - interstitial: the interstitial that failed to show
-///   - error: error that caused the failure
-- (void)didFailToShowWithInterstitial:(id<CLXAdapterInterstitial>)interstitial error:(NSError *)error;
-
-/// Called when the adapter has tracked impression.
-/// - Parameter interstitial: the interstitial that was shown
-- (void)impressionWithInterstitial:(id<CLXAdapterInterstitial>)interstitial;
-
-/// Called when the adapter has closed the interstitial.
-/// - Parameter interstitial: the interstitial that was closed
-- (void)didCloseWithInterstitial:(id<CLXAdapterInterstitial>)interstitial;
-
-/// Called when the adapter has tracked click.
-/// - Parameter interstitial: interstitial that was clicked
-- (void)clickWithInterstitial:(id<CLXAdapterInterstitial>)interstitial;
-
-/// Called when the adapter has expired the interstitial.
-/// - Parameter interstitial: interstitial that was expired
-- (void)expiredWithInterstitial:(id<CLXAdapterInterstitial>)interstitial;
+- (void)didLoadWithInterstitial:(CLXAdapterInterstitial *)interstitial;
+- (void)didFailToLoadWithInterstitial:(CLXAdapterInterstitial *)interstitial error:(NSError *)error;
+- (void)didShowWithInterstitial:(CLXAdapterInterstitial *)interstitial;
+- (void)didFailToShowWithInterstitial:(CLXAdapterInterstitial *)interstitial error:(NSError *)error;
+- (void)impressionWithInterstitial:(CLXAdapterInterstitial *)interstitial;
+- (void)didCloseWithInterstitial:(CLXAdapterInterstitial *)interstitial;
+- (void)clickWithInterstitial:(CLXAdapterInterstitial *)interstitial;
+- (void)expiredWithInterstitial:(CLXAdapterInterstitial *)interstitial;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

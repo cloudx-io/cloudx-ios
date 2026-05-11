@@ -9,6 +9,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CloudXCore/CLXAdFormat.h>
+#import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -25,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * - networkPlacement: Network-specific placement ID (e.g., Meta placement ID, Mintegral ad_unit_id)
  * - revenue: Revenue for this impression
  */
+CLX_PUBLIC
 @interface CLXAd : NSObject
 
 #pragma mark - Primary Properties (aligned with Android SDK)

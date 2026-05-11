@@ -13,9 +13,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXMetaRewardedFactory : NSObject <CLXAdapterRewardedFactory>
-
-+ (instancetype)createInstance;
+@interface CLXMetaRewardedFactory : CLXAdapterRewardedFactory
 
 @end
 

@@ -30,23 +30,23 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "CloudXCore",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.2.0/CloudXCore.xcframework.zip",
-            checksum: "883a83858eda90a79a656d7659ec15467546283a683a22c62bd0595a61a5b7e7"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.3.0/CloudXCore.xcframework.zip",
+            checksum: "c7f6d4f779bcfd44745be0041023d40518a395a325cd01aeea227df2e359de46"
         ),
         .binaryTarget(
             name: "CloudXMetaAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.2.0/CloudXMetaAdapter.xcframework.zip",
-            checksum: "16042de0e989c5b07b601a9f48bcffaafaf665f6b81cff34afc966e7db713614"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.3.0/CloudXMetaAdapter.xcframework.zip",
+            checksum: "26684210a39ad183ae9a517675fba89c7cf92d97736f8a08a0c9ad2b09e605d4"
         ),
         .binaryTarget(
             name: "CloudXVungleAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.2.0/CloudXVungleAdapter.xcframework.zip",
-            checksum: "4c7feced0708f895c858991e7a71ef9c8be002d74dbbd847a38c970e2baa1dc9"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.3.0/CloudXVungleAdapter.xcframework.zip",
+            checksum: "9614506616ee18d261687819869bc45f17e292ac52b707af9b47919c10c18613"
         ),
         .binaryTarget(
             name: "CloudXMintegralAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.2.0/CloudXMintegralAdapter.xcframework.zip",
-            checksum: "893fc3d32d2e4be9a03c515d246c46578f3c2787bf5b5afc0cb76154f85b84d8"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.3.0/CloudXMintegralAdapter.xcframework.zip",
+            checksum: "29351472f8cb1f31d84736730bf153160ad4a4236ba2981cf5f7b2925257681a"
         ),
     ]
 )
