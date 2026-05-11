@@ -31,7 +31,7 @@ let package = Package(
         .binaryTarget(
             name: "CloudXCore",
             url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.3.0/CloudXCore.xcframework.zip",
-            checksum: "c7f6d4f779bcfd44745be0041023d40518a395a325cd01aeea227df2e359de46"
+            checksum: "d7bed1d664f1e56317e516b5ea877b62aebf40a04040c3d462336faf005fcee0"
         ),
         .binaryTarget(
             name: "CloudXMetaAdapter",

@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Improved renderer routing** — Improved CloudX-rendered creative routing based on the returned creative type.
 
 ### Fixed
-- **Rill impression/click replay** — Improved persistence and retry behavior for legacy impression and click analytics without changing SDK Metrics behavior.
+- **Impression/click analytics replay** — Improved persistence and retry behavior for impression and click analytics without changing existing metrics behavior.
 - **Fresh-install persistence reliability** — Fixed an issue where local persistence could fail to initialize correctly on a fresh app install or clean simulator.
 
 ---
