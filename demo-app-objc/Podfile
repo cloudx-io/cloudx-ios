@@ -11,6 +11,7 @@ target 'CloudXObjCRemotePods' do
   pod 'CloudXMintegralAdapter', '3.3.0-beta'
   pod 'CloudXUnityAdsAdapter',  '3.3.0-beta'
   pod 'CloudXMagniteAdapter',   '3.3.0-beta'
+  pod 'CloudXMolocoAdapter',    :path => '../../cloudx-ios-private/adapter-moloco'
 
   target 'CloudXObjCRemotePodsTests' do
     inherit! :search_paths
