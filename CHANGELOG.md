@@ -18,14 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Verve Adapter** — New `CloudXVerveAdapter` (Banner, MREC, Interstitial, Rewarded, Native). Install: `pod 'CloudXVerveAdapter', '~> 3.4.0'`. Backed by HyBid 3.8.0.
 - **Moloco Adapter** — New `CloudXMolocoAdapter` (Banner, MREC, Interstitial, Rewarded, Native). Install: `pod 'CloudXMolocoAdapter', '~> 3.4.0'`. Backed by MolocoSDKiOS `~> 4.6.0`.
-- **CloudX-rendered banner / MREC HTML and MRAID 3.0** — Banner and MREC HTML creatives can now be served through the CloudX renderer (in addition to the network's own SDK renderer), with MRAID 3.0 support.
+- **Non-SDK CloudX-rendered HTML banner and MREC with MRAID 3.0** — HTML banner and MREC creatives can now be served through the CloudX renderer, with MRAID 3.0 support.
 - **Native-in-banner and native-in-MREC support** — Native creatives can be served into banner or MREC slots on Meta, Vungle, and Moloco.
-- **Per-request extras on `CLXBanner` and `CLXBannerAdView`** — New `setExtraParameter:value:` API lets publishers attach arbitrary per-request metadata to outgoing bid requests, including reserved `minFloor` (single-round) and `minFloors` (per-round) keys for publisher-defined bid floors. Supported value types: `NSString`, `NSNumber`, `NSArray`, `NSDictionary`. Banner refreshes pick up the current stored values on each auction.
+- **Per-request extras across all ad-format APIs** — New `setExtraParameter:value:` API on `CLXBanner` / `CLXBannerAdView`, `CLXFullscreenAd` (interstitial + rewarded), and `CLXNativeAdLoader` lets publishers attach arbitrary per-request metadata to outgoing bid requests, including reserved `minFloor` (single-round) and `minFloors` (per-round) keys for publisher-defined bid floors. Supported value types: `NSString`, `NSNumber`, `NSArray`, `NSDictionary`. Banner refreshes pick up the current stored values on each auction.
 - **`CLXAd.adValues` property** — New read-only `NSDictionary<NSString *, NSString *>` exposing SDK-defined loaded-ad metadata. Values may be absent depending on ad format and network.
 
 ### Changed
 - **UnityAds adapter version range** — Widened to accept Unity Ads 4.x patch releases (`>= 4.17.0`, `< 5.0`) so publishers can adopt newer Unity Ads SDK fixes without waiting for an adapter release.
-- **`CLXAdDelegate` main-queue threading is now documented contract** — All `CLXAdDelegate` callbacks (and protocols that extend it) deliver on the main queue and may fire inline relative to the SDK call that triggered them. No runtime change; re-entrant delegate implementations are unaffected.
+- **Publisher delegate main-queue threading is now documented contract** — All `CLXAdDelegate` callbacks (and protocols that extend it) and `CLXAdRevenueDelegate` callbacks deliver on the main queue and may fire inline relative to the SDK call that triggered them. No runtime change; re-entrant delegate implementations are unaffected.
 
 ### Fixed
 - **Native ad memory leak during long sessions** — Long-lived publisher integrations that load many native ads no longer accumulate retained observers across native ad refresh cycles.
