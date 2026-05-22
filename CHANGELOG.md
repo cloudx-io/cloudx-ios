@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [3.4.0] - 2026-05-22
 
 ### Added
+- **Verve Adapter** — New `CloudXVerveAdapter` (Banner, MREC, Interstitial, Rewarded, Native). Install: `pod 'CloudXVerveAdapter', '~> 3.4.0'`. Backed by HyBid 3.8.0. Fullscreen construction and teardown are dispatched on the main thread; banner reloads do not leak.
+- **Moloco Adapter** — New `CloudXMolocoAdapter` (Banner, MREC, Interstitial, Rewarded, Native). Install: `pod 'CloudXMolocoAdapter', '~> 3.4.0'`. Backed by MolocoSDKiOS `~> 4.6.0`.
+- **Native-in-banner support across Meta, Vungle, and Moloco** — Native creatives can now be served into a banner or MREC slot via the CloudX renderer. The format is picker-routable in the test harness (`_cloudx_meta.format`) and supported end-to-end on Meta, Vungle, and Moloco.
 - **Per-request extras on Banner and BannerAdView** — New `setExtraParameter:value:` API on `CLXBanner` and `CLXBannerAdView` lets publishers attach arbitrary per-request metadata to outgoing bid requests, including reserved `minFloor` (single-round) and `minFloors` (per-round) keys for publisher-defined bid floors. Supported value types: `NSString`, `NSNumber`, `NSArray`, `NSDictionary`. Values are captured at call time; banner refreshes pick up the current stored values on each auction.
 - **Ad metadata on `CLXAd`** — New `CLXAd.adValues` property (`NSDictionary<NSString *, NSString *>`) exposes SDK-defined loaded-ad metadata to publishers. Values are read-only and may be absent depending on ad format and network.
 - **Native ad CTA tap forwarding** — Tapping a native ad's call-to-action button now reliably fires the same click pipeline as tapping the surrounding ad container, eliminating cases where CTA taps were observed but not counted as clicks.
@@ -30,10 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **HTML banner load-event race** — Fixed a sporadic race where `didLoadAd` could fire before the banner creative finished navigating, occasionally resulting in a blank impression.
 - **Banner `window.open` clickthrough** — Restored clickthrough on banner creatives that open the click URL via `window.open` rather than a direct link.
 - **Native ad memory leak during long sessions** — Fixed a `MutationObserver` retention issue in long-lived MRAID controllers that could accumulate observers across native ad refresh cycles.
-- **Verve adapter fullscreen main-thread compliance** — Fullscreen ad construction and teardown now consistently dispatch to the main thread, preventing rare assertion failures when destroying a Verve interstitial mid-load.
-
-### Internal release scope
-- New `CloudXVerveAdapter` (Banner, MREC, Interstitial, Rewarded, Native) is in-tree and built but **not yet published to CocoaPods Trunk** in 3.4.0. Publishers who want early access can integrate via the private repo; a public trunk push is planned for a follow-up release.
 
 ---
 

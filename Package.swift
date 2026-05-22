@@ -14,6 +14,8 @@ import PackageDescription
 //   - CloudXInMobiAdapter (no official InMobiSDK SPM)
 //   - CloudXUnityAdsAdapter (no official UnityAds SPM)
 //   - CloudXMagniteAdapter (no official MagniteSDK SPM)
+//   - CloudXMolocoAdapter (MolocoSDKiOS SPM not yet validated against this binary)
+//   - CloudXVerveAdapter (HyBid SPM not yet validated against this binary)
 //   - CloudXRenderer (being merged into Core)
 
 let package = Package(
