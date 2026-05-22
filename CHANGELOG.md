@@ -16,23 +16,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [3.4.0] - 2026-05-22
 
 ### Added
-- **Verve Adapter** — New `CloudXVerveAdapter` (Banner, MREC, Interstitial, Rewarded, Native). Install: `pod 'CloudXVerveAdapter', '~> 3.4.0'`. Backed by HyBid 3.8.0. Fullscreen construction and teardown are dispatched on the main thread; banner reloads do not leak.
+- **Verve Adapter** — New `CloudXVerveAdapter` (Banner, MREC, Interstitial, Rewarded, Native). Install: `pod 'CloudXVerveAdapter', '~> 3.4.0'`. Backed by HyBid 3.8.0.
 - **Moloco Adapter** — New `CloudXMolocoAdapter` (Banner, MREC, Interstitial, Rewarded, Native). Install: `pod 'CloudXMolocoAdapter', '~> 3.4.0'`. Backed by MolocoSDKiOS `~> 4.6.0`.
-- **Native-in-banner support across Meta, Vungle, and Moloco** — Native creatives can now be served into a banner or MREC slot via the CloudX renderer. The format is picker-routable in the test harness (`_cloudx_meta.format`) and supported end-to-end on Meta, Vungle, and Moloco.
-- **Per-request extras on Banner and BannerAdView** — New `setExtraParameter:value:` API on `CLXBanner` and `CLXBannerAdView` lets publishers attach arbitrary per-request metadata to outgoing bid requests, including reserved `minFloor` (single-round) and `minFloors` (per-round) keys for publisher-defined bid floors. Supported value types: `NSString`, `NSNumber`, `NSArray`, `NSDictionary`. Values are captured at call time; banner refreshes pick up the current stored values on each auction.
-- **Ad metadata on `CLXAd`** — New `CLXAd.adValues` property (`NSDictionary<NSString *, NSString *>`) exposes SDK-defined loaded-ad metadata to publishers. Values are read-only and may be absent depending on ad format and network.
-- **Native ad CTA tap forwarding** — Tapping a native ad's call-to-action button now reliably fires the same click pipeline as tapping the surrounding ad container, eliminating cases where CTA taps were observed but not counted as clicks.
-- **MRAID 2.0 expand and resize support** — Banner creatives that use MRAID `expand()` or `resize()` now render correctly, with the creative locked inside its slot at both the frame and CSS layers.
+- **CloudX-rendered banner / MREC HTML and MRAID 3.0** — Banner and MREC HTML creatives can now be served through the CloudX renderer (in addition to the network's own SDK renderer), with MRAID 3.0 support.
+- **Native-in-banner and native-in-MREC support** — Native creatives can be served into banner or MREC slots on Meta, Vungle, and Moloco.
+- **Per-request extras on `CLXBanner` and `CLXBannerAdView`** — New `setExtraParameter:value:` API lets publishers attach arbitrary per-request metadata to outgoing bid requests, including reserved `minFloor` (single-round) and `minFloors` (per-round) keys for publisher-defined bid floors. Supported value types: `NSString`, `NSNumber`, `NSArray`, `NSDictionary`. Banner refreshes pick up the current stored values on each auction.
+- **`CLXAd.adValues` property** — New read-only `NSDictionary<NSString *, NSString *>` exposing SDK-defined loaded-ad metadata. Values may be absent depending on ad format and network.
 
 ### Changed
-- **Documented main-queue delegate threading** — Documented the existing behavior that all `CLXAdDelegate` callbacks (and protocols that extend it) deliver on the main queue and may fire inline relative to the SDK call that triggered them. Re-entrant publisher implementations are unaffected; non-re-entrant ones should now be reviewed. No runtime behavior change.
 - **UnityAds adapter version range** — Widened to accept Unity Ads 4.x patch releases (`>= 4.17.0`, `< 5.0`) so publishers can adopt newer Unity Ads SDK fixes without waiting for an adapter release.
-- **GDPR-applies wire encoding** — `gdprApplies` now serializes as a JSON boolean (`true`/`false`) instead of an integer, matching SSP and Android wire shape.
+- **`CLXAdDelegate` main-queue threading is now documented contract** — All `CLXAdDelegate` callbacks (and protocols that extend it) deliver on the main queue and may fire inline relative to the SDK call that triggered them. No runtime change; re-entrant delegate implementations are unaffected.
 
 ### Fixed
-- **HTML banner load-event race** — Fixed a sporadic race where `didLoadAd` could fire before the banner creative finished navigating, occasionally resulting in a blank impression.
-- **Banner `window.open` clickthrough** — Restored clickthrough on banner creatives that open the click URL via `window.open` rather than a direct link.
-- **Native ad memory leak during long sessions** — Fixed a `MutationObserver` retention issue in long-lived MRAID controllers that could accumulate observers across native ad refresh cycles.
+- **Native ad memory leak during long sessions** — Long-lived publisher integrations that load many native ads no longer accumulate retained observers across native ad refresh cycles.
 
 ---
 
