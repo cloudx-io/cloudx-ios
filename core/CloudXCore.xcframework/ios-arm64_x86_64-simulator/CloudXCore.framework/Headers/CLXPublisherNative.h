@@ -53,6 +53,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/**
+ * Internal native fan-out protocol consumed by `CLXNativeAdLoader`.
+ *
+ * @note Threading contract: all callbacks deliver on the main queue and may
+ * fire inline relative to the SDK call that triggered them. See
+ * `CLXAdDelegate` for the SDK-wide contract; implementations re-entering the
+ * SDK from a callback must be re-entrant-safe.
+ */
 @protocol CLXPublisherNativeDelegate <NSObject>
 
 - (void)publisherNative:(CLXPublisherNative *)publisherNative didLoadNativeAd:(CLXNativeAd *)nativeAd forAd:(CLXAd *)ad;

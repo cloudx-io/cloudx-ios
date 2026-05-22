@@ -158,6 +158,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Adapter slot rotation: this adapter failed to load. Wrapper has already self-released. */
 - (void)bannerWrapper:(CLXBannerAdapterWrapper *)wrapper didFailToLoadWithError:(nullable NSError *)error;
 
+/** Adapter loaded successfully, then entered a terminal renderer failure state. */
+- (void)bannerWrapper:(CLXBannerAdapterWrapper *)wrapper didFailAfterLoadWithError:(NSError *)error;
+
 /** Adapter signaled "shown" (typically a no-op, here for protocol completeness). */
 - (void)bannerWrapperDidShow:(CLXBannerAdapterWrapper *)wrapper;
 

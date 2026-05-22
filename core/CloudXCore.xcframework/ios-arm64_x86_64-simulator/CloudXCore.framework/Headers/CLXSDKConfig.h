@@ -28,7 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXSDKConfigTargetingStrategy;
 @class CLXSDKConfigTargeting;
 @class CLXSDKConfigCondition;
-@class CLXSDKConfigGeoBid;
 @class CLXTelemetryMetricsConfig;
 @class CLXTelemetryEventsConfig;
 @class CLXTelemetryLogsConfig;
@@ -40,12 +39,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy, nullable) NSString *appKey;
 @property (nonatomic, assign) BOOL isDebug;
-@property (nonatomic, copy, nullable) NSString *sessionID;
 @property (nonatomic, copy, nullable) NSString *accountID;
 @property (nonatomic, copy, nullable) NSArray<CLXSDKConfigBidder *> *bidders;
 @property (nonatomic, copy, nullable) NSArray<CLXSDKConfigAdUnit *> *adUnits;
 @property (nonatomic, copy, nullable) NSString *auctionEndpointURL;
-@property (nonatomic, copy, nullable) NSString *organizationID;
 @property (nonatomic, copy, nullable) NSString *impressionTrackerURL;
 @property (nonatomic, strong, nullable) CLXMetricsConfig *metricsConfig;
 @property (nonatomic, strong, nullable) NSArray<NSString *> *tracking;
@@ -76,24 +73,23 @@ NS_ASSUME_NONNULL_BEGIN
 CLX_INTERNAL_TESTING
 @interface CLXSDKConfigResponse : NSObject
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 1. Identity (required)
-// ═══════════════════════════════════════════════════════════════════════════
 @property (nonatomic, copy) NSString *accountID;
-@property (nonatomic, copy) NSString *sessionID;
-@property (nonatomic, copy) NSString *appID;
-@property (nonatomic, copy, nullable) NSString *organizationID;
 @property (nonatomic, copy) NSString *accountName;
+@property (nonatomic, copy) NSString *organizationID;
+@property (nonatomic, copy) NSString *appID;
+/// Server-resolved country code. Empty string when unresolved.
+@property (nonatomic, copy) NSString *country;
 
-// ═══════════════════════════════════════════════════════════════════════════
+/// Server-issued opaque token; echoed verbatim on subsequent requests.
+@property (nonatomic, copy) NSString *configPayload;
+
 // 2. Endpoints (required)
-// ═══════════════════════════════════════════════════════════════════════════
 @property (nonatomic, copy) NSString *auctionEndpointURL;
 @property (nonatomic, copy) NSString *impressionTrackerURL;
 @property (nonatomic, copy) NSString *winLossNotificationURL;
-@property (nonatomic, copy) NSString *geoDataEndpointURL;
 @property (nonatomic, copy, nullable) NSString *ilrdEndpointURL;
-@property (nonatomic, copy, nullable) NSString *sessionEndpointURL;
+@property (nonatomic, copy, nullable) NSString *arbiterEndpointURL;
+@property (nonatomic, assign) NSInteger arbiterTimeoutMs;
 
 // 2b. Event Telemetry Endpoints (optional — nil means telemetry for that event is disabled)
 @property (nonatomic, copy, nullable) NSString *sdkInitEndpointURL;
@@ -126,29 +122,17 @@ CLX_INTERNAL_TESTING
 // behavior. See CLXSDKRaceSafetyConfig for per-field semantics.
 @property (nonatomic, strong, nullable) CLXSDKRaceSafetyConfig *raceSafetyConfig;
 
-// 2c. Opaque server telemetry payloads
-@property (nonatomic, copy, nullable) NSString *configTelemetryPayload;
-
-// ═══════════════════════════════════════════════════════════════════════════
 // 3. Core Config (required)
-// ═══════════════════════════════════════════════════════════════════════════
 @property (nonatomic, strong) NSArray<CLXSDKConfigBidder *> *bidders;
 @property (nonatomic, strong) NSArray<CLXSDKConfigAdUnit *> *adUnits;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 4. Tracking & Geo (required)
-// ═══════════════════════════════════════════════════════════════════════════
+// 4. Tracking (required)
 @property (nonatomic, strong) NSArray<NSString *> *tracking;
-@property (nonatomic, copy) NSArray<CLXSDKConfigGeoBid *> *geoHeaders;
 @property (nonatomic, strong) NSDictionary<NSString *, NSString *> *winLossNotificationPayloadConfig;
 
-// ═══════════════════════════════════════════════════════════════════════════
 // 5. Optional Config
-// ═══════════════════════════════════════════════════════════════════════════
 @property (nonatomic, strong, nullable) CLXMetricsConfig *metricsConfig;
 @property (nonatomic, strong, nullable) CLXSDKConfigDeviceConfig *deviceConfig;
-/// When NO, latitude/longitude are omitted from bid requests. Default YES when absent from JSON.
-@property (nonatomic, assign) BOOL locationSharingEnabled;
 /// Raw JSON response for dynamic field resolution (used by TrackingFieldResolver)
 @property (nonatomic, strong, nullable) NSDictionary *rawJSON;
 
@@ -164,12 +148,6 @@ CLX_INTERNAL_TESTING
 @interface CLXSDKConfigSeatBid : NSObject
 @property (nonatomic, strong) NSArray<CLXSDKConfigBid *> *bid;
 @property (nonatomic, copy) NSString *seat;
-- (instancetype)init;
-@end
-
-@interface CLXSDKConfigGeoBid : NSObject
-@property (nonatomic, copy) NSString *source;
-@property (nonatomic, copy) NSString *target;
 - (instancetype)init;
 @end
 

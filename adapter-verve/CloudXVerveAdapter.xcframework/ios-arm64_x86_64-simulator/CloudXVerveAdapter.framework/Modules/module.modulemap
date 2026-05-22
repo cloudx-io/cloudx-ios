@@ -1,0 +1,6 @@
+framework module CloudXVerveAdapter {
+  umbrella header "CloudXVerveAdapter-umbrella.h"
+
+  export *
+  module * { export * }
+}

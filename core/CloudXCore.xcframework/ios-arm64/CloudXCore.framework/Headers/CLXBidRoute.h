@@ -62,6 +62,17 @@ typedef NS_ENUM(NSInteger, CLXBidRouteKind) {
  *   1. bid.ext.cloudx.render.provider == "cloudx" -> embedded renderer.
  *   2. Otherwise -> external adapter, keyed by the resolved adaptercode.
  *
+ * The server owns renderer creative-type selection and emits Android-aligned
+ * crtype values. Routing trusts that contract here; CLXBidAdSource's
+ * createBidAd block applies a defense-in-depth crtype guard at adapter
+ * creation time and falls through to the next bid for unsupported values.
+ *
+ * Platform divergence on missing crtype is intentional: iOS treats a missing
+ * crtype on a CloudX renderer bid as the implicit HTML default and lets the
+ * bid through; Android (PR 266) filters at parse time so renderer creation
+ * can hard-switch on HTML vs MRAID. The server contract remains the source
+ * of truth on both platforms.
+ *
  * @param bid The bid to route. Must not be nil.
  * @return A CLXBidRoute whose kind and bidderName reflect the bid's ext fields.
  */

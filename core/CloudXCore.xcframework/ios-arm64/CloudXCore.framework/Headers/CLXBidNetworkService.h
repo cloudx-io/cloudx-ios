@@ -4,32 +4,18 @@
 #import <CloudXCore/CLXAdType.h>
 
 @class CLXErrorReporter;
+@class CLXBidRequestPayload;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol CLXBidNetworkService <NSObject>
 
-- (void)createBidRequestWithAdUnitID:(NSString *)adUnitID
-                  storedImpressionId:(NSString *)storedImpressionId
-                              adType:(CLXAdType)adType
-                              dealID:(nullable NSString *)dealID
-                            bidFloor:(float)bidFloor
-                         publisherID:(NSString *)publisherID
-                              userID:(NSString *)userID
-                         adapterInfo:(NSDictionary *)adapterInfo
-                        bidderParams:(nullable NSDictionary<NSString *, NSDictionary *> *)bidderParams
-                localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters
-               nativeAdRequirements:(nullable id)nativeAdRequirements
-                                tmax:(nullable NSNumber *)tmax
-                           impModel:(nullable CLXConfigImpressionModel *)impModel
-                       correlationId:(NSString *)correlationId
-                          completion:(void (^)(id _Nullable bidRequest, NSError * _Nullable error))completion;
-
-- (void)startAuctionWithBidRequest:(id)bidRequest
-                            appKey:(NSString *)appKey
-                           timeout:(NSTimeInterval)timeout
-                     correlationId:(NSString *)correlationId
-                        completion:(void (^)(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error))completion;
+/** POSTs the v2 SignalPayload with `X-CloudX-Payload-Version: 2`. */
+- (void)sendBidRequestWithPayload:(CLXBidRequestPayload *)payload
+                           appKey:(NSString *)appKey
+                          timeout:(NSTimeInterval)timeout
+                    correlationId:(NSString *)correlationId
+                       completion:(void (^)(CLXBidResponse * _Nullable parsedResponse, NSDictionary * _Nullable rawJSON, NSError * _Nullable error))completion;
 
 @end
 

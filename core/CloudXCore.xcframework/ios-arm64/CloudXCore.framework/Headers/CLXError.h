@@ -64,8 +64,9 @@ typedef NS_ENUM(NSInteger, CLXLossReason) {
  * files, embedded renderer not yet wired) are surfaced through the existing public codes
  * (@c CLXErrorCodeNoFill, @c CLXErrorCodeLoadFailed, etc.). When a more specific underlying
  * cause is available it is preserved on the public NSError via @c NSUnderlyingErrorKey for
- * telemetry and debugging. A dedicated renderer-internal error vocabulary may be introduced
- * in a later milestone if a real emission site needs the differentiation.
+ * telemetry and debugging. The renderer-internal vocabulary is defined by
+ * @c CLXRendererInternalError under @c Renderer/Core/ and is intentionally not exported
+ * from this public header.
  */
 typedef NS_ENUM(NSInteger, CLXErrorCode) {
 
@@ -431,7 +432,26 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
      * Publisher action: May indicate a slow network or unresponsive ad network SDK.
      * Check device connectivity and adapter logs.
      */
-    CLXErrorCodeAdapterInitializationTimeout = 622
+    CLXErrorCodeAdapterInitializationTimeout = 622,
+
+    /**
+     * The bid is routed to the CloudX renderer but its creative type is not supported by
+     * the embedded renderer (e.g. video or native arriving on a renderer-marked bid).
+     * Returned from createBidAd: so the waterfall continues to the next ranked bid rather
+     * than committing to a bid that cannot load.
+     *
+     * Publisher action: None - the SDK will fall through to the next bid in the waterfall.
+     */
+    CLXErrorCodeUnsupportedRenderer = 623,
+
+    /**
+     * The WKWebView's WebContent process terminated unexpectedly. The renderer treats
+     * this as a hard failure (no silent reload) so the ad is marked failed-to-load and
+     * caller-side state - MRAID bridge, viewability tracker, OMID session - is reset.
+     *
+     * Publisher action: None - the SDK reports failure via the standard load callback.
+     */
+    CLXErrorCodeRendererTerminated = 624
 };
 
 /**

@@ -16,9 +16,9 @@ CLX_PUBLIC
 
 // MARK: - Location Controls
 
-/// Whether the SDK is permitted to include IP-derived coordinates in bid requests.
-/// Default is YES (backward compatible). When NO, lat/lon are omitted from bid requests.
-@property (nonatomic, assign) BOOL locationSharingEnabled;
+/// @deprecated No-op. Server-controlled.
+@property (nonatomic, assign) BOOL locationSharingEnabled
+    __attribute__((deprecated("Server-controlled; this property is a no-op.")));
 
 @end
 

@@ -11,10 +11,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXMetaNativeAd : CLXNativeAd <FBMediaViewDelegate>
 
-@property (nonatomic, strong, nullable) FBNativeAd *fbNativeAd;
+/// Holds either `FBNativeAd` (full native, has media view) or `FBNativeBannerAd` (compact, no media view).
+/// Downstream code branches on `isKindOfClass:` at register and options-wiring time.
+@property (nonatomic, strong, nullable) FBNativeAdBase *fbNativeAd;
 @property (nonatomic, weak, nullable) id<CLXAdapterNativeDelegate> adapterDelegate;
 
-- (instancetype)initWithFBNativeAd:(FBNativeAd *)fbNativeAd
+- (instancetype)initWithFBNativeAd:(FBNativeAdBase *)fbNativeAd
               localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters;
 
 @end

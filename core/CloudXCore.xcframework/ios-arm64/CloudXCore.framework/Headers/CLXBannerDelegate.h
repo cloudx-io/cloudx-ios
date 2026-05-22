@@ -17,6 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Protocol for Banner ad delegates.
  * Extends CLXAdDelegate with banner-specific callbacks.
+ *
+ * @note Threading contract: see `CLXAdDelegate`. All callbacks (inherited and
+ * banner-specific) deliver on the main queue and may fire inline relative to
+ * the SDK call that triggered them.
  */
 @protocol CLXBannerDelegate <CLXAdDelegate>
 

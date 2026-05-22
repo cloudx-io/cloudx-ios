@@ -1,7 +1,7 @@
 window.MRAID_ENV = {
   version: '3.0',
   sdk: 'CloudX',
-  sdkVersion: '1.3.0',
+  sdkVersion: '{{SDK_VERSION}}',
   appId: '',
   ifa: '',
   limitAdTracking: false,
@@ -28,53 +28,57 @@ var mraid = (function() {
   // ============================================
   // CONSOLE.LOG INTERCEPTION
   // ============================================
-  // Capture ALL creative console.log calls and route to native CLXLogger
-  // This enables instrumented creatives to emit signals via console.log
-  (function() {
-    var originalLog = console.log;
-    var originalWarn = console.warn;
-    var originalError = console.error;
-    var originalInfo = console.info;
-    var originalDebug = console.debug;
-    
-    function forwardToNative(level, args) {
-      try {
-        var message = Array.prototype.slice.call(args).map(function(arg) {
-          if (typeof arg === 'object') {
-            try { return JSON.stringify(arg); } catch(e) { return String(arg); }
-          }
-          return String(arg);
-        }).join(' ');
-        
-        window.webkit.messageHandlers.mraid.postMessage({
-          action: 'consoleLog',
-          level: level,
-          message: message
-        });
-      } catch (e) { /* Ignore if bridge not ready */ }
-    }
-    
-    console.log = function() {
-      forwardToNative('debug', arguments);
-      originalLog.apply(console, arguments);
-    };
-    console.warn = function() {
-      forwardToNative('warn', arguments);
-      originalWarn.apply(console, arguments);
-    };
-    console.error = function() {
-      forwardToNative('error', arguments);
-      originalError.apply(console, arguments);
-    };
-    console.info = function() {
-      forwardToNative('info', arguments);
-      originalInfo.apply(console, arguments);
-    };
-    console.debug = function() {
-      forwardToNative('verbose', arguments);
-      originalDebug.apply(console, arguments);
-    };
-  })();
+  // Capture creative console.* calls and route to native CLXLogger.
+  // Gated on window.__CLX_RENDERER_DEBUG__ (default false) - production
+  // builds do not forward creative console output across the bridge to
+  // avoid log-bandwidth amplification by hostile or noisy creatives.
+  if (window.__CLX_RENDERER_DEBUG__) {
+    (function() {
+      var originalLog = console.log;
+      var originalWarn = console.warn;
+      var originalError = console.error;
+      var originalInfo = console.info;
+      var originalDebug = console.debug;
+
+      function forwardToNative(level, args) {
+        try {
+          var message = Array.prototype.slice.call(args).map(function(arg) {
+            if (typeof arg === 'object') {
+              try { return JSON.stringify(arg); } catch(e) { return String(arg); }
+            }
+            return String(arg);
+          }).join(' ');
+
+          window.webkit.messageHandlers.mraid.postMessage({
+            action: 'consoleLog',
+            level: level,
+            message: message
+          });
+        } catch (e) { /* Ignore if bridge not ready */ }
+      }
+
+      console.log = function() {
+        forwardToNative('debug', arguments);
+        originalLog.apply(console, arguments);
+      };
+      console.warn = function() {
+        forwardToNative('warn', arguments);
+        originalWarn.apply(console, arguments);
+      };
+      console.error = function() {
+        forwardToNative('error', arguments);
+        originalError.apply(console, arguments);
+      };
+      console.info = function() {
+        forwardToNative('info', arguments);
+        originalInfo.apply(console, arguments);
+      };
+      console.debug = function() {
+        forwardToNative('verbose', arguments);
+        originalDebug.apply(console, arguments);
+      };
+    })();
+  }
   
   // ============================================
   // STATE VARIABLES
@@ -137,8 +141,8 @@ var mraid = (function() {
   // - location: always returns -1; location is supplied via OpenRTB bid request, not MRAID.
   // Do not change these to true without a product decision and host-app integration.
   var allSupports = {
-    sms: true,
-    tel: true,
+    sms: false,
+    tel: false,
     calendar: false,
     storePicture: false,
     inlineVideo: {{INLINE_VIDEO}},
@@ -147,10 +151,21 @@ var mraid = (function() {
   
   // Event listeners
   var eventListeners = {};
+
+  // CXD-1664: `ready` event idempotency. markReady() flips this once and
+  // ignores subsequent invocations so the creative observes `ready`
+  // exactly once even if native re-invokes markReady() on a navigation
+  // retry or re-injection.
+  var readyFired = false;
   
   // ============================================
-  // TRANSITION HANDLING (from Prebid)
-  // Prevents race conditions during state changes
+  // TRANSITION HANDLING
+  // Coalesces non-error events emitted while the runtime is mid-transition
+  // (e.g. layout updates that fire as the creative is moving between
+  // default/expanded/resized). Events accumulated in eventsQueue are flushed
+  // once transitionLevel returns to zero, with the newest payload per event
+  // type winning. Error events bypass the queue so creative-side handlers
+  // see failures immediately.
   // ============================================
   var eventsQueue = [];
   var transitionLevel = 0;
@@ -180,8 +195,13 @@ var mraid = (function() {
   }
   
   // ============================================
-  // NATIVE CALL QUEUE (from Prebid)
-  // Ensures ordered command execution
+  // NATIVE CALL QUEUE
+  // Serializes JS-to-native bridge calls so the native side processes one
+  // message at a time. callNative() flips nativeCallInProcess true before
+  // posting; the native handler MUST drive _internal.nativeCallComplete()
+  // (on every accepted AND rejected path) to flip it back, which drains the
+  // queue. Without this invariant a single rejection wedges the queue and
+  // every subsequent mraid call is silently buffered forever.
   // ============================================
   var nativeCallQueue = [];
   var nativeCallInProcess = false;
@@ -224,6 +244,17 @@ var mraid = (function() {
       }
     }
   }
+
+  function safeURLDescription(url) {
+    try {
+      var parsed = new URL(String(url), document.location.href);
+      return parsed.host ? parsed.protocol + '//' + parsed.host : parsed.protocol.replace(':', '');
+    } catch (e) {
+      var value = String(url || '');
+      var match = value.match(/^([a-zA-Z][a-zA-Z0-9+.-]*):/);
+      return match ? match[1].toLowerCase() : '(no scheme)';
+    }
+  }
   
   // ============================================
   // INTERNAL STATE HANDLERS (called by native)
@@ -232,6 +263,17 @@ var mraid = (function() {
     onStateChange('default');
     fireEvent('ready');
   }
+
+  // CXD-1664: native-owned `ready` event timing. Invoked from
+  // CLXCoreMRAIDManager.webViewDidFinishNavigation after the manager has
+  // seeded MRAID geometry (default position, current position, screen size,
+  // max size, viewability). Idempotent across repeated native invocations
+  // so a re-injection from a navigation retry does not double-fire `ready`.
+  function markReady() {
+    if (readyFired) return;
+    readyFired = true;
+    onReady();
+  }
   
   function onReadyExpanded() {
     onStateChange('expanded');
@@ -239,11 +281,22 @@ var mraid = (function() {
   }
   
   function onStateChange(newState) {
-    state = newState;
+    // (PR #740 review finding F1.) A legitimate same-state native callback
+    // (e.g. resized → resized re-position) must still drain the transition
+    // queue or transitionLevel stays pinned and subsequent native events
+    // queue indefinitely. Dedupe only the creative-facing fireEvent below;
+    // the finishTransition path runs whenever the native side calls back,
+    // regardless of whether the state value changed.
+    var stateChanged = (state !== newState);
+    if (stateChanged) {
+      state = newState;
+    }
     if (transitionLevel > 0) {
-      addEventToQueue({ event: 'stateChange', args: state });
+      if (stateChanged) {
+        addEventToQueue({ event: 'stateChange', args: state });
+      }
       finishTransition();
-    } else {
+    } else if (stateChanged) {
       fireEvent('stateChange', state);
     }
   }
@@ -346,7 +399,7 @@ var mraid = (function() {
     // ACTIONS
     // ============================================
     open: function(url) {
-      mraidLog('debug', 'open: ' + url);
+      mraidLog('debug', 'open: ' + safeURLDescription(url));
       callNative('open', { url: url });
     },
     
@@ -357,7 +410,7 @@ var mraid = (function() {
     },
     
     expand: function(url) {
-      mraidLog('debug', 'expand: ' + (url || '(no URL)'));
+      mraidLog('debug', 'expand: ' + (url ? safeURLDescription(url) : '(no URL)'));
       if (url) {
         transitionLevel++;
         callNative('expand', { url: url });
@@ -381,12 +434,12 @@ var mraid = (function() {
     },
     
     playVideo: function(url) {
-      mraidLog('debug', 'playVideo: ' + url);
+      mraidLog('debug', 'playVideo: ' + safeURLDescription(url));
       callNative('playVideo', { url: url });
     },
     
     storePicture: function(url) {
-      mraidLog('debug', 'storePicture: ' + url);
+      mraidLog('debug', 'storePicture: ' + safeURLDescription(url));
       callNative('storePicture', { url: url });
     },
     
@@ -429,7 +482,13 @@ var mraid = (function() {
     },
     
     // ============================================
-    // RESIZE PROPERTIES (with full validation from Prebid)
+    // RESIZE PROPERTIES
+    // setResizeProperties enforces the MRAID 3.0 resize envelope: width and
+    // height must be positive numbers, customClosePosition must be one of
+    // the recognized anchor strings, and offsets must be numeric. Invalid
+    // input flips resizePropertiesInitialized back to false so a subsequent
+    // mraid.resize() call surfaces a deterministic error instead of acting
+    // on a half-validated dictionary.
     // ============================================
     getResizeProperties: function() { mraidLog('debug', 'getResizeProperties: ' + JSON.stringify(resizeProperties)); return resizeProperties; },
     
@@ -564,6 +623,7 @@ var mraid = (function() {
     // ============================================
     useCustomClose: function(useCustomClose) {
       mraidLog('warn', 'useCustomClose() is deprecated in MRAID 3.0 and ignored by this SDK');
+      onError('useCustomClose is not supported.', 'useCustomClose');
     },
     
     // useCustomClose is the last public method — internal functions live on _internal below
@@ -572,6 +632,15 @@ var mraid = (function() {
   // P2-20: Internal SDK functions are not part of the public MRAID API.
   // Creatives must not call these — they are for native-to-JS communication only.
   publicAPI._internal = {
+    disposables: [],
+    dispose: function() {
+      var queue = this.disposables;
+      this.disposables = [];
+      for (var i = 0; i < queue.length; i++) {
+        try { queue[i](); } catch (e) {}
+      }
+    },
+
     nativeCallComplete: function() {
       if (nativeCallQueue.length === 0) {
         nativeCallInProcess = false;
@@ -583,6 +652,11 @@ var mraid = (function() {
     
     onReady: onReady,
     onReadyExpanded: onReadyExpanded,
+    // CXD-1664: native-owned entry point for the `ready` event. Native
+    // calls this from webViewDidFinishNavigation after geometry seeding,
+    // replacing the JS-side DOMContentLoaded setTimeout that used to
+    // race the native init.
+    markReady: markReady,
     onStateChange: onStateChange,
     onViewableChange: onViewableChange,
     onSizeChange: onSizeChange,
@@ -619,14 +693,12 @@ var mraid = (function() {
 // Make mraid globally available
 window.mraid = mraid;
 
-// Auto-initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() { if (mraid._internal && typeof mraid._internal.onReady === 'function') mraid._internal.onReady(); }, 100);
-  });
-} else {
-  setTimeout(function() { if (mraid._internal && typeof mraid._internal.onReady === 'function') mraid._internal.onReady(); }, 100);
-}
+// CXD-1664: native owns `ready` event timing. The bundled runtime no
+// longer auto-fires `ready` from DOMContentLoaded via setTimeout; native
+// invokes mraid._internal.markReady() from CLXCoreMRAIDManager after
+// geometry seeding completes. This eliminates the race where JS could
+// fire `ready` before native finished initializing currentPosition /
+// defaultPosition / screenSize / maxSize / viewability.
 
 // ============================================================
 // Content Error Monitoring
@@ -636,12 +708,23 @@ if (document.readyState === 'loading') {
 (function() {
   var reportedErrors = {}; // Prevent duplicate reports
 
+  function safeContentErrorURLDescription(url) {
+    try {
+      var parsed = new URL(String(url), document.location.href);
+      return parsed.host ? parsed.protocol + '//' + parsed.host : parsed.protocol.replace(':', '');
+    } catch (e) {
+      var value = String(url || '');
+      var match = value.match(/^([a-zA-Z][a-zA-Z0-9+.-]*):/);
+      return match ? match[1].toLowerCase() : '(no scheme)';
+    }
+  }
+
   function reportContentError(mediaType, src, error) {
     var key = mediaType + ':' + src;
     if (reportedErrors[key]) return; // Already reported
     reportedErrors[key] = true;
 
-    console.error('[CloudX] Content error: ' + mediaType + ' failed to load: ' + src);
+    console.error('[CloudX] Content error: ' + mediaType + ' failed to load: ' + safeContentErrorURLDescription(src));
     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.mraid) {
       window.webkit.messageHandlers.mraid.postMessage({
         action: 'contentError',
@@ -727,4 +810,9 @@ if (document.readyState === 'loading') {
     childList: true,
     subtree: true
   });
+  if (window.mraid && window.mraid._internal && window.mraid._internal.disposables) {
+    window.mraid._internal.disposables.push(function() {
+      observer.disconnect();
+    });
+  }
 })();

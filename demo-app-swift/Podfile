@@ -3,15 +3,16 @@ platform :ios, '13.0'
 target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore',             '3.3.0-beta'
-  pod 'CloudXMetaAdapter',      '3.3.0-beta'
-  pod 'CloudXRenderer',         '3.3.0-beta'
-  pod 'CloudXVungleAdapter',    '3.3.0-beta'
-  pod 'CloudXInMobiAdapter',    '3.3.0-beta'
-  pod 'CloudXMintegralAdapter', '3.3.0-beta'
-  pod 'CloudXUnityAdsAdapter',  '3.3.0-beta'
-  pod 'CloudXMagniteAdapter',   '3.3.0-beta'
-  pod 'CloudXMolocoAdapter',    :path => '../../cloudx-ios-private/adapter-moloco'
+  pod 'CloudXCore',             '~> 3.4.0'
+  pod 'CloudXRenderer',         '~> 3.4.0'
+  pod 'CloudXMetaAdapter',      '~> 3.4.0'
+  pod 'CloudXVungleAdapter',    '~> 3.4.0'
+  pod 'CloudXInMobiAdapter',    '~> 3.4.0'
+  pod 'CloudXMintegralAdapter', '~> 3.4.0'
+  pod 'CloudXUnityAdsAdapter',  '~> 3.4.0'
+  pod 'CloudXMagniteAdapter',   '~> 3.4.0'
+  pod 'CloudXMolocoAdapter',    '~> 3.4.0'
+  pod 'CloudXVerveAdapter',     '~> 3.4.0'
 
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths

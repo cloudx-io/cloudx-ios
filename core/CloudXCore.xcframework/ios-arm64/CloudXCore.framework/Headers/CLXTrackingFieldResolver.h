@@ -4,6 +4,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class CLXPrivacyService;
 @class CLXSDKConfigResponse;
+@class CLXLegacyTrackerSnapshot;
 
 // Public constant (matches Android companion object)
 extern NSString * const SDK_PARAM_RESPONSE_IN_MILLIS;
@@ -43,10 +44,9 @@ extern NSString * const SDK_PARAM_RESPONSE_IN_MILLIS;
 
 #pragma mark - Data Methods (matches Android)
 
-/**
- * Matches Android: setRequestData(auctionId: String, json: JSONObject)
- */
-- (void)setRequestData:(NSString *)auctionId bidRequestJSON:(NSDictionary *)json;
+/** Registers the snapshot resolved by legacy `bidRequest.*` and `sdk.ifa` template paths. */
+- (void)setLegacyTrackerSnapshot:(CLXLegacyTrackerSnapshot *)snapshot
+                       auctionId:(NSString *)auctionId;
 
 /**
  * Matches Android: setResponseData(auctionId: String, json: JSONObject)
@@ -69,11 +69,6 @@ extern NSString * const SDK_PARAM_RESPONSE_IN_MILLIS;
              deviceTypeCode:(NSInteger)deviceTypeCode
                 abTestGroup:(NSString *)abTestGroup
                   appBundle:(NSString *)appBundle;
-
-/**
- * Sets the hashed geo IP for privacy-safe tracking
- */
-- (void)setHashedGeoIp:(nullable NSString *)hashedGeoIp;
 
 #pragma mark - Payload Building (matches Android)
 

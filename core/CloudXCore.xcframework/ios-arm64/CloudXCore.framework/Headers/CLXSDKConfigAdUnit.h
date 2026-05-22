@@ -27,6 +27,7 @@ typedef NS_ENUM(NSInteger, SDKConfigAdType) {
 @property (nonatomic, assign) int64_t bannerRefreshRateMs;
 @property (nonatomic, assign) SDKConfigAdType type;
 @property (nonatomic, assign) BOOL hasCloseButton;
+@property (nonatomic, assign) BOOL arbiterEnabled;
 @property (nonatomic, copy, nullable) NSString *firstImpressionPlacementSuffix;
 @property (nonatomic, assign) NSInteger firstImpressionLoopIndexStart;
 @property (nonatomic, assign) NSInteger firstImpressionLoopIndexEnd;
@@ -37,11 +38,10 @@ typedef NS_ENUM(NSInteger, SDKConfigAdType) {
 // Rewarded ad configuration
 @property (nonatomic, assign) NSInteger rewardAmount;
 @property (nonatomic, copy, nullable) NSString *rewardCurrency;
-@property (nonatomic, copy, nullable) NSString *rewardCallbackUrl;
 
 - (instancetype)init;
 - (NSString *)ilrdDescription;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

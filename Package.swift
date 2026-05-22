@@ -14,6 +14,8 @@ import PackageDescription
 //   - CloudXInMobiAdapter (no official InMobiSDK SPM)
 //   - CloudXUnityAdsAdapter (no official UnityAds SPM)
 //   - CloudXMagniteAdapter (no official MagniteSDK SPM)
+//   - CloudXMolocoAdapter (MolocoSDKiOS SPM not yet validated against this binary)
+//   - CloudXVerveAdapter (HyBid SPM not yet validated against this binary)
 //   - CloudXRenderer (being merged into Core)
 
 let package = Package(
@@ -30,23 +32,23 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "CloudXCore",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.3.0-beta/CloudXCore.xcframework.zip",
-            checksum: "1fefc1769e1b4b4643db36bf317c20c9cf9ccf490e477ddebd033736c7c0999f"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.0/CloudXCore.xcframework.zip",
+            checksum: "b5304073ad0e5e10321ce90d930daa3f12dba089c95483c5d7b4ef65cd2be545"
         ),
         .binaryTarget(
             name: "CloudXMetaAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.3.0-beta/CloudXMetaAdapter.xcframework.zip",
-            checksum: "26684210a39ad183ae9a517675fba89c7cf92d97736f8a08a0c9ad2b09e605d4"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.0/CloudXMetaAdapter.xcframework.zip",
+            checksum: "c00079889c8dce137f2399e09626c5802f138793ac77d5b4169f3c8bb025af0e"
         ),
         .binaryTarget(
             name: "CloudXVungleAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.3.0-beta/CloudXVungleAdapter.xcframework.zip",
-            checksum: "9614506616ee18d261687819869bc45f17e292ac52b707af9b47919c10c18613"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.0/CloudXVungleAdapter.xcframework.zip",
+            checksum: "a78da4b7f57732e9f4444624a101303989e4c1a0720d81a252b54be1052136d3"
         ),
         .binaryTarget(
             name: "CloudXMintegralAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.3.0-beta/CloudXMintegralAdapter.xcframework.zip",
-            checksum: "29351472f8cb1f31d84736730bf153160ad4a4236ba2981cf5f7b2925257681a"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.0/CloudXMintegralAdapter.xcframework.zip",
+            checksum: "766de8c4e77ca6475d17195fe35c835f995f817da42009dd9e7870845bacd042"
         ),
     ]
 )

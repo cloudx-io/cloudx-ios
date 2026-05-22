@@ -4,20 +4,15 @@
 
 /**
  * @file CLXAdReportingEventStore.h
- * @brief SQLite-backed durable storage for the legacy Rill SDKIMP / clickenc
- *        events that flow through CLXAdReportingNetworkService.
+ * @brief SQLite-backed durable storage for the legacy Rill SDKIMP and legacy
+ *        metrics POST events that flow through CLXAdReportingNetworkService.
  *
- * Mirrors the persist-before-send pattern from CLXWinLossTracker. One table
- * (cached_rill_events_table) in the cloudx_ad_reporting_pending.sqlite file
- * (in ~/Documents). The file lives alongside (but is independent of)
- * cloudx_winloss.sqlite so deprecation lifecycles for the AdReporting Rill
- * surface and win/loss can move separately.
- *
- * The legacy metrics POST surface (CLXAdReportingNetworkService
- * metricsTrackingWithActionString:) is deliberately NOT persisted by this
- * store. That surface remains fire-and-forget; this decision was made when
- * the broader PR #699 was reverted (PR #709) in favor of Rill-only
- * persistence.
+ * Mirrors the persist-before-send pattern from CLXWinLossTracker. Two tables
+ * (cached_rill_events_table, cached_metrics_events_table) coexist in the
+ * cloudx_ad_reporting_pending.sqlite file (in ~/Documents). The file lives
+ * alongside (but is independent of) cloudx_winloss.sqlite so deprecation
+ * lifecycles for the two AdReporting surfaces and win/loss can move
+ * separately.
  *
  * NOT to be confused with the first-party telemetry pipeline (CXD-804) under
  * Sources/CloudXCore/Telemetry: that pipeline has its own JSONL store
@@ -56,10 +51,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 @end
 
+/** Cached metrics event row — corresponds to one row in cached_metrics_events_table. */
+@interface CLXCachedMetricsEvent : NSObject
+@property (nonatomic, copy, readonly) NSNumber *eventId;
+@property (nonatomic, copy, readonly) NSData *requestBody;
+@property (nonatomic, copy, readonly) NSString *baseUrl;
+@property (nonatomic, assign, readonly) int64_t createdAt;
+
+- (instancetype)initWithEventId:(NSNumber *)eventId
+                    requestBody:(NSData *)requestBody
+                        baseUrl:(NSString *)baseUrl
+                      createdAt:(int64_t)createdAt NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
+@end
+
 #pragma mark - Store
 
 /**
- * Save / getAll / delete trio for legacy Rill SDKIMP / clickenc events.
+ * Per-pipeline save / getAll / delete trio for Rill SDKIMP and metrics POST events.
  * Owns its own CLXSQLiteDatabase instance keyed by databaseName.
  */
 @interface CLXAdReportingEventStore : NSObject
@@ -94,6 +103,32 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Deletes the row with the given id (no-op if not found or id is nil). */
 - (void)deleteRillEventWithId:(nullable NSNumber *)eventId;
+
+#pragma mark - Metrics pipeline
+
+/**
+ * Saves a metrics event row before sending. The requestBody is the **raw JSON
+ * payload bytes** (NOT the source dictionary, NOT pre-gzipped). The send path
+ * (CLXBaseNetworkService) applies gzip deterministically on every send, so live
+ * sends and replay-on-launch send byte-equivalent gzipped bodies even after
+ * NSUserDefaults rotation between sessions.
+ *
+ * We persist raw JSON (rather than pre-gzipped bytes) because:
+ *   - The gzip step is owned by CLXBaseNetworkService and is identical for live
+ *     and replay paths, so wire-byte equivalence is preserved either way.
+ *   - Persisting the post-gzip bytes would couple the store to a specific
+ *     compression implementation; persisting raw JSON keeps the contract simple.
+ *
+ * Returns the new row's auto-incremented id, or nil if any required field is invalid.
+ */
+- (nullable NSNumber *)saveMetricsEventWithRequestBody:(NSData *)requestBody
+                                               baseUrl:(NSString *)baseUrl;
+
+/** Returns all currently-cached metrics events, ordered by id ascending. Never nil. */
+- (NSArray<CLXCachedMetricsEvent *> *)getAllCachedMetricsEvents;
+
+/** Deletes the row with the given id (no-op if not found or id is nil). */
+- (void)deleteMetricsEventWithId:(nullable NSNumber *)eventId;
 
 @end
 

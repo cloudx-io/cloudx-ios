@@ -40,5 +40,10 @@ __attribute__((visibility("default"))) void CloudXVungleAdapterRegister(void);
 #import "CLXVungleBanner.h"
 #import "CLXVungleBannerFactory.h"
 
+// Public headers - Native
+#import "CLXVungleNative.h"
+#import "CLXVungleNativeFactory.h"
+#import "CLXVungleNativeAd.h"
+
 // Public headers - App Open
 #import "CLXVungleAppOpenFactory.h"

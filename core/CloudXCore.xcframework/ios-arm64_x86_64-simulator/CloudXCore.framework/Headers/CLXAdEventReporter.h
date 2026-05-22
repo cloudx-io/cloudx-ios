@@ -9,10 +9,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)metricsTrackingWithActionString:(NSString *)actionString;
 - (void)rillTrackingWithActionString:(NSString *)actionString campaignId:(NSString *)campaignId encodedString:(NSString *)encodedString;
 
-// Replay-on-launch: drain SQLite-cached Rill events from previous sessions.
-// Dispatches async — must NOT block CloudXCoreAPI init. The legacy metrics
-// POST is fire-and-forget and has no replay counterpart.
+// Replay-on-launch: drain SQLite-cached Rill / metrics events from previous sessions.
+// Both dispatch async — must NOT block CloudXCoreAPI init.
 - (void)trySendingPendingRillEvents;
+- (void)trySendingPendingMetricsEvents;
 
 // Legacy win/loss methods removed - use CLXWinLossTracker for server-side tracking
 @end

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXMintegralAdapter'
-  s.version = '3.3.0-beta'
+  s.version = '3.4.0'
   s.summary          = 'CloudX Mintegral Adapter - Static Framework'
   s.description      = 'Mintegral adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -12,11 +12,12 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-mintegral/CloudXMintegralAdapter.xcframework'
 
   # Dependencies
-  s.dependency 'CloudXCore', '3.3.0-beta'
+  s.dependency 'CloudXCore', '3.4.0'
   s.dependency 'MintegralAdSDK', '~> 8.0'
   s.dependency 'MintegralAdSDK/BidBannerAd', '~> 8.0'
   s.dependency 'MintegralAdSDK/BidNewInterstitialAd', '~> 8.0'
   s.dependency 'MintegralAdSDK/BidRewardVideoAd', '~> 8.0'
+  s.dependency 'MintegralAdSDK/BidNativeAdvancedAd', '~> 8.0'
 
   s.frameworks = ['Foundation', 'UIKit', 'AdSupport', 'CoreGraphics', 'CoreTelephony', 'SystemConfiguration', 'AVFoundation', 'CoreMedia', 'QuartzCore', 'StoreKit', 'WebKit']
   s.weak_frameworks = ['AppTrackingTransparency']

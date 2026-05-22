@@ -34,28 +34,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isInitialized;
 
 /**
- * Zone IDs from the SSP init response, used for Prebid Server bidder params.
- * @return Array of zone ID values, or nil if not yet initialized.
- */
-+ (nullable NSArray *)zoneIds;
-
-/**
- * Account ID from the SSP init response, used for Prebid Server bidder params.
- * @return Account ID as NSNumber, or nil if not yet initialized.
- */
-+ (nullable NSNumber *)accountId;
-
-/**
- * Site ID from the SSP init response, used for Prebid Server bidder params.
- * @return Site ID as NSNumber, or nil if not yet initialized.
- */
-+ (nullable NSNumber *)siteId;
-
-/**
- * Factory method to create a new initializer instance
- * @return New initializer instance
- */
-/**
  * Gets the current Magnite SDK version
  * @return SDK version string
  */

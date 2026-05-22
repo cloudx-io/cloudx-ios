@@ -40,6 +40,113 @@ extern NSString * const CLXMetricsTypeMethodSetHasUserConsent; // "method_set_ha
 extern NSString * const CLXMetricsTypeMethodSetDoNotSell;     // "method_set_do_not_sell"
 
 /**
+ * Renderer metrics types
+ *
+ * In-process renderer counters that surface security and stability events.
+ * Reported through `CLXRendererTelemetryFacade` (resolved at the call site to
+ * the singleton `CLXMetricsTelemetryTracker`) — each metric is its own
+ * named constant so dashboards can split them, and each emission carries a
+ * structured `CLXRendererTelemetryContext` (auction / bid / ad-unit / format)
+ * + `reason` field for grouping. Keep payload semantics aligned across SDKs
+ * where applicable. Legacy renderer counters retain their `method_*` prefix
+ * for wire-format stability with the previous transport.
+ */
+extern NSString * const CLXMetricsTypeRendererNavigationDenied;  // "method_renderer_navigation_denied"
+extern NSString * const CLXMetricsTypeRendererMRAIDCloseRejected; // "method_renderer_mraid_close_rejected"
+extern NSString * const CLXMetricsTypeRendererMRAIDUnloadRejected; // "method_renderer_mraid_unload_rejected"
+extern NSString * const CLXMetricsTypeRendererMRAIDOpenDenied;    // "method_renderer_mraid_open_denied"
+extern NSString * const CLXMetricsTypeRendererBridgeRejected;     // "method_renderer_bridge_rejected"
+
+extern NSString * const CLXMetricsTypeRendererHTMLLoad;           // "renderer_html_load_ms"
+extern NSString * const CLXMetricsTypeRendererVideoTTFF;          // "renderer_video_ttff_ms"
+extern NSString * const CLXMetricsTypeRendererSecurityRedirectBlocked; // "renderer_security_redirect_blocked"
+extern NSString * const CLXMetricsTypeRendererSecuritySchemeBlocked;   // "renderer_security_scheme_blocked"
+extern NSString * const CLXMetricsTypeRendererSecurityBridgeFlood;     // "renderer_security_bridge_flood"
+extern NSString * const CLXMetricsTypeRendererSecurityPayloadRejected; // "renderer_security_payload_rejected"
+extern NSString * const CLXMetricsTypeRendererBlankRenderDetected;     // "renderer_blank_render_detected"
+extern NSString * const CLXMetricsTypeRendererVisualBlankDetected;     // "renderer_visual_blank_detected"
+extern NSString * const CLXMetricsTypeRendererVideoStart;              // "renderer_video_start"
+extern NSString * const CLXMetricsTypeRendererVideoComplete;           // "renderer_video_complete"
+extern NSString * const CLXMetricsTypeRendererVideoSkip;               // "renderer_video_skip"
+extern NSString * const CLXMetricsTypeRendererVideoError;              // "renderer_video_error"
+extern NSString * const CLXMetricsTypeRendererVideoBuffering;          // "renderer_video_buffering_ms"
+extern NSString * const CLXMetricsTypeRendererHeavyAdDetected;         // "renderer_heavy_ad_detected"
+extern NSString * const CLXMetricsTypeRendererWebViewCreate;           // "renderer_webview_create_ms"
+extern NSString * const CLXMetricsTypeRendererCreativeSize;            // "renderer_creative_size_bytes"
+extern NSString * const CLXMetricsTypeRendererViewableTime;            // "renderer_viewable_time_ms"
+extern NSString * const CLXMetricsTypeRendererOMIDSessionFailure;      // "renderer_omid_session_failure"
+extern NSString * const CLXMetricsTypeRendererOMIDVideoNoVerification; // "renderer_omid_video_no_verification"
+extern NSString * const CLXMetricsTypeRendererDuplicateImpression;     // "renderer_duplicate_impression"
+extern NSString * const CLXMetricsTypeRendererMRAIDExpand;             // "renderer_mraid_expand"
+extern NSString * const CLXMetricsTypeRendererMRAIDResize;             // "renderer_mraid_resize"
+extern NSString * const CLXMetricsTypeRendererMRAIDExpandError;        // "renderer_mraid_expand_error"
+extern NSString * const CLXMetricsTypeRendererMRAIDResizeError;        // "renderer_mraid_resize_error"
+extern NSString * const CLXMetricsTypeRendererClickLatency;            // "renderer_click_latency_ms"
+extern NSString * const CLXMetricsTypeRendererClickBlocked;            // "renderer_click_blocked"
+extern NSString * const CLXMetricsTypeRendererClickDestination;        // "renderer_click_destination"
+extern NSString * const CLXMetricsTypeRendererVASTUnfiredEvent;        // "renderer_vast_unfired_event"
+extern NSString * const CLXMetricsTypeRendererLoadSuccess;             // "renderer_load_success"
+extern NSString * const CLXMetricsTypeRendererLoadFailed;              // "renderer_load_failed"
+extern NSString * const CLXMetricsTypeRendererRenderSuccess;           // "renderer_render_success"
+extern NSString * const CLXMetricsTypeRendererRenderFailed;            // "renderer_render_failed"
+extern NSString * const CLXMetricsTypeRendererWebViewCrash;            // "renderer_webview_crash"
+extern NSString * const CLXMetricsTypeRendererJSError;                 // "renderer_js_error"
+extern NSString * const CLXMetricsTypeRendererVideoFirstQuartile;      // "renderer_video_first_quartile"
+extern NSString * const CLXMetricsTypeRendererVideoMidpoint;           // "renderer_video_midpoint"
+extern NSString * const CLXMetricsTypeRendererVideoThirdQuartile;      // "renderer_video_third_quartile"
+extern NSString * const CLXMetricsTypeRendererTimeToCloseEnabled;      // "renderer_time_to_close_enabled_ms"
+extern NSString * const CLXMetricsTypeRendererTimeToDismiss;           // "renderer_time_to_dismiss_ms"
+extern NSString * const CLXMetricsTypeRendererMemoryDelta;             // "renderer_memory_delta_bytes"
+extern NSString * const CLXMetricsTypeRendererMemoryWarning;           // "renderer_memory_warning"
+extern NSString * const CLXMetricsTypeRendererHTMLDownload;            // "renderer_html_download_ms"
+extern NSString * const CLXMetricsTypeRendererHTMLPaint;               // "renderer_html_paint_ms"
+extern NSString * const CLXMetricsTypeRendererVASTWrapperResolution;   // "renderer_vast_wrapper_resolution_ms"
+extern NSString * const CLXMetricsTypeRendererVASTWrapperDepth;        // "renderer_vast_wrapper_depth"
+extern NSString * const CLXMetricsTypeRendererMRAIDExpandDuration;     // "renderer_mraid_expand_ms"
+extern NSString * const CLXMetricsTypeRendererMRAIDResizeDuration;     // "renderer_mraid_resize_ms"
+extern NSString * const CLXMetricsTypeRendererMRAIDOpenWithoutGesture; // "renderer_mraid_open_without_gesture"
+extern NSString * const CLXMetricsTypeRendererRedirectAttemptCount;    // "renderer_redirect_attempt_count"
+extern NSString * const CLXMetricsTypeRendererNavigationTotalCount;    // "renderer_navigation_total_count"
+extern NSString * const CLXMetricsTypeRendererExcessiveCPUDetected;    // "renderer_excessive_cpu_detected"
+extern NSString * const CLXMetricsTypeRendererSecurityMRAIDOpenBlocked; // "renderer_security_mraid_open_blocked"
+extern NSString * const CLXMetricsTypeRendererVerificationNotExecuted; // "renderer_verification_not_executed"
+extern NSString * const CLXMetricsTypeRendererSubresourceFailure;      // "renderer_subresource_failure"
+extern NSString * const CLXMetricsTypeRendererCreativeReady;           // "renderer_creative_ready"
+extern NSString * const CLXMetricsTypeRendererViewabilitySummary;      // "renderer_viewability_summary"
+extern NSString * const CLXMetricsTypeRendererStuckLoad;               // "renderer_stuck_load"
+extern NSString * const CLXMetricsTypeRendererStuckReady;              // "renderer_stuck_ready"
+extern NSString * const CLXMetricsTypeRendererStuckImpression;         // "renderer_stuck_impression"
+extern NSString * const CLXMetricsTypeRendererStuckClose;              // "renderer_stuck_close"
+extern NSString * const CLXMetricsTypeRendererCloseBeforeImpression;   // "renderer_close_before_impression"
+extern NSString * const CLXMetricsTypeRendererDoubleShow;              // "renderer_double_show"
+extern NSString * const CLXMetricsTypeRendererLongBuffering;           // "renderer_long_buffering"
+extern NSString * const CLXMetricsTypeRendererMediaLoadFailure;        // "renderer_media_load_failure"
+extern NSString * const CLXMetricsTypeRendererEndCardShown;            // "renderer_end_card_shown"
+extern NSString * const CLXMetricsTypeRendererEndCardFailure;          // "renderer_end_card_failure"
+extern NSString * const CLXMetricsTypeRendererCompanionFallback;       // "renderer_companion_fallback"
+extern NSString * const CLXMetricsTypeRendererDECFallback;             // "renderer_dec_fallback"
+
+// OMID session-creation failure paths. Each phase emits its own constant so
+// dashboards can split the rate by reason without an additional payload field.
+extern NSString * const CLXMetricsTypeRendererOMIDActivationFailed;    // "method_renderer_omid_activation_failed"
+extern NSString * const CLXMetricsTypeRendererOMIDPartnerMissing;      // "method_renderer_omid_partner_missing"
+extern NSString * const CLXMetricsTypeRendererOMIDConfigurationFailed; // "method_renderer_omid_configuration_failed"
+extern NSString * const CLXMetricsTypeRendererOMIDContextFailed;       // "method_renderer_omid_context_failed"
+extern NSString * const CLXMetricsTypeRendererOMIDSessionFailed;       // "method_renderer_omid_session_failed"
+extern NSString * const CLXMetricsTypeRendererOMIDAdEventsFailed;      // "method_renderer_omid_ad_events_failed"
+
+// Per-impression OMID fire failure. Emitted from the renderer when the
+// viewability tracker hits the MRC threshold but OMID's impressionOccurred
+// call fails. impressionBanner: still fires; this metric is the system of
+// record for the OMID side dropping the impression.
+extern NSString * const CLXMetricsTypeRendererOMIDImpressionFireFailure; // "method_renderer_omid_impression_fire_failure"
+
+// CLXCoreRendererBanner dealloc with no terminal delegate callback observed.
+// This means the renderer was released before didLoadBanner: or failToLoad:
+// reached the publisher - a leak from the publisher's perspective.
+extern NSString * const CLXMetricsTypeRendererBannerLeak; // "method_renderer_banner_leak"
+
+/**
  * Utility class for metrics type validation and categorization
  */
 @interface CLXMetricsType : NSObject
@@ -55,6 +162,11 @@ extern NSString * const CLXMetricsTypeMethodSetDoNotSell;     // "method_set_do_
 + (BOOL)isMethodCallType:(NSString *)metricType;
 
 /**
+ * Check if a metric type is a renderer metric type
+ */
++ (BOOL)isRendererType:(NSString *)metricType;
+
+/**
  * Get all network call types
  */
 + (NSArray<NSString *> *)allNetworkCallTypes;
@@ -63,6 +175,11 @@ extern NSString * const CLXMetricsTypeMethodSetDoNotSell;     // "method_set_do_
  * Get all method call types
  */
 + (NSArray<NSString *> *)allMethodCallTypes;
+
+/**
+ * Get all renderer metric types
+ */
++ (NSArray<NSString *> *)allRendererTypes;
 
 /**
  * Validate that a metric type is known
