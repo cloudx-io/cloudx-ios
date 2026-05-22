@@ -20,6 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Extends CLXFullscreenAdDelegate with rewarded-specific callbacks.
  * Mirrors AppLovin MAX SDK's MARewardedAdDelegate pattern.
+ *
+ * @note Threading contract: see `CLXAdDelegate`. All callbacks (inherited and
+ * rewarded-specific) deliver on the main queue and may fire inline relative
+ * to the SDK call that triggered them.
  */
 @protocol CLXRewardedDelegate <CLXFullscreenAdDelegate>
 

@@ -17,6 +17,15 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Base protocol for all ad delegates.
  * Provides common delegate methods for all ad types.
+ *
+ * @note Threading contract: all delegate methods declared by this protocol
+ * (and protocols that extend it — `CLXBannerDelegate`, `CLXFullscreenAdDelegate`,
+ * `CLXNativeDelegate`, `CLXInterstitialDelegate`, `CLXRewardedDelegate`,
+ * `CLXAdRevenueDelegate`) are delivered on the main queue. The SDK does not
+ * promise next-runloop deferral — when an SDK call originates on the main
+ * queue, the delegate callback may fire inline before the SDK call returns.
+ * Implementations that re-enter the SDK from a delegate method (e.g. calling
+ * `[banner load]` from `didFailToLoadAd:`) must be re-entrant-safe.
  */
 @protocol CLXAdDelegate <NSObject>
 

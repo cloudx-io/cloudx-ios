@@ -20,9 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
  * Abstract base class for banner adapters.
  *
  * Subclass per ad network. Required overrides: @c -load,
- * @c -showFromViewController:, @c -destroy. Subclasses populate the
- * @protected ivars at construction time and during the load lifecycle.
- * The @c delegate retain-cycle break must happen in @c -destroy.
+ * @c -showFromViewController:, @c -destroy. Subclasses populate @c _bannerView
+ * during the load lifecycle. The @c delegate retain-cycle break must happen in
+ * @c -destroy.
  *
  * @important Adapter implementations MUST NOT invoke any
  * @c CLXAdapterBannerDelegate method from @c -init or other construction
@@ -37,11 +37,7 @@ CLX_PUBLIC_ADAPTER
 @interface CLXAdapterBanner : NSObject <CLXDestroyable> {
 @protected
     id<CLXAdapterBannerDelegate> _Nullable _delegate;
-    NSString *_sdkVersion;
-    NSString *_network;
-    NSString *_bidID;
     UIView * _Nullable _bannerView;
-    BOOL _timeout;
 }
 
 /// Delegate for the adapter, used to notify about ad events.
@@ -49,20 +45,8 @@ CLX_PUBLIC_ADAPTER
 /// Cycle is broken in @c -destroy.
 @property (nonatomic, strong, nullable) id<CLXAdapterBannerDelegate> delegate;
 
-/// Flag to indicate if the banner loading timed out.
-@property (nonatomic, assign) BOOL timeout;
-
 /// View containing the banner.
 @property (nonatomic, strong, nullable, readonly) UIView *bannerView;
-
-/// SDK version of the adapter.
-@property (nonatomic, copy, readonly) NSString *sdkVersion;
-
-/// Network name of the adapter, e.g. @c "AdMob", @c "Facebook".
-@property (nonatomic, copy, readonly) NSString *network;
-
-/// Ad id from bid response.
-@property (nonatomic, copy, readonly) NSString *bidID;
 
 /// Loads the banner. Subclass MUST override.
 - (void)load;
@@ -114,6 +98,14 @@ CLX_PUBLIC_ADAPTER
 
 /// Called when the banner collapses.
 - (void)didCollapseBanner:(CLXAdapterBanner *)banner;
+
+/// Called when a banner that previously succeeded @c didLoadBanner: enters a
+/// terminal failure state (e.g. WebContent process termination after the
+/// initial load callback). Distinct from @c failToLoadBanner:error: which
+/// signals pre-load failure; the protocol contract is
+/// @c didLoadBanner: xor @c failToLoadBanner: on the initial load, and this
+/// method is the post-load terminal-failure shape.
+- (void)bannerDidFailAfterLoad:(CLXAdapterBanner *)banner error:(NSError *)error;
 
 @end
 

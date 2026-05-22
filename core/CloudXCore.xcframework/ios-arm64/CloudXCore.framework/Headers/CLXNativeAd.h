@@ -95,6 +95,20 @@ CLX_PUBLIC
 
 - (BOOL)isContainerClickable;
 
+/**
+ * Whether the adapter returns a fully-composed `mediaView` that should be used
+ * as the entire ad surface, bypassing template assembly.
+ *
+ * Distinct from `isContainerClickable`, which describes the *click* model
+ * (single container tap vs. per-view registration). An adapter may be
+ * container-clickable while still relying on CloudX template rendering of its
+ * raw assets (e.g. Moloco). Only override to YES when the underlying SDK
+ * returns a pre-rendered view (e.g. Mintegral's `fetchAdView`, CloudX renderer).
+ *
+ * Default: NO.
+ */
+- (BOOL)isSelfRendered;
+
 - (void)performClick;
 
 @end

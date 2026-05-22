@@ -18,6 +18,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Protocol for fullscreen ad delegates (interstitial and rewarded).
  * Extends CLXAdDelegate with display lifecycle callbacks.
+ *
+ * @note Threading contract: see `CLXAdDelegate`. All callbacks (inherited and
+ * fullscreen-specific) deliver on the main queue and may fire inline relative
+ * to the SDK call that triggered them.
  */
 @protocol CLXFullscreenAdDelegate <CLXAdDelegate>
 

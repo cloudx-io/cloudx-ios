@@ -16,6 +16,13 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Protocol for Native ad delegates.
  * Extends BaseAdDelegate to provide native ad specific delegate methods.
+ *
+ * @note Threading contract: see `CLXAdDelegate`. All inherited callbacks
+ * deliver on the main queue and may fire inline relative to the SDK call
+ * that triggered them. The publisher-facing fan-out methods declared by
+ * `CLXPublisherNativeDelegate` (didLoadNativeAd:forAd:, didDisplayAd:,
+ * didExpireAd:, didCloseAd:, didFailToLoadWithError:) follow the same
+ * contract.
  */
 @protocol CLXNativeDelegate <CLXAdDelegate>
 

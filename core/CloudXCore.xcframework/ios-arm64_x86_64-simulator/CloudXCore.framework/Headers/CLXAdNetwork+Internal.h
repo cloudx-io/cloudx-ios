@@ -27,6 +27,8 @@ extern CLXAdNetwork const CLXAdNetworkVungle;
 extern CLXAdNetwork const CLXAdNetworkInMobi;
 extern CLXAdNetwork const CLXAdNetworkUnityAds;
 extern CLXAdNetwork const CLXAdNetworkMagnite;
+extern CLXAdNetwork const CLXAdNetworkMoloco;
+extern CLXAdNetwork const CLXAdNetworkVerve;
 
 /// All known ad networks.
 extern NSArray<CLXAdNetwork> *CLXAllAdNetworks(void);

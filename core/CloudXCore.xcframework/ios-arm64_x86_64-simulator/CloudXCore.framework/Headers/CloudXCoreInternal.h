@@ -90,8 +90,6 @@
 #import <CloudXCore/CLXWinLossFieldResolver.h>
 #import <CloudXCore/CLXAdReportingNetworkService.h>
 #import <CloudXCore/CLXAdReportingEventStore.h>
-#import <CloudXCore/CLXSessionTracker.h>
-#import <CloudXCore/CLXSessionNetworkService.h>
 
 // Metrics & Events
 #import <CloudXCore/CLXMetricsTrackerImpl.h>
@@ -121,7 +119,17 @@
 #import <CloudXCore/CLXAdNetwork+Internal.h>
 #import <CloudXCore/CLXBidAdSource+Internal.h>
 #import <CloudXCore/CLXBidResponse+Internal.h>
+#import <CloudXCore/CLXPrivacyService+Internal.h>
 #import <CloudXCore/CLXSystemInformation+Internal.h>
+
+// v2 wire types — SDK↔SSP internal
+#import <CloudXCore/CLXPrivacyBlock.h>
+#import <CloudXCore/CLXSDKBlock.h>
+#import <CloudXCore/CLXSDKBlockProvider.h>
+#import <CloudXCore/CLXUserAgentProvider.h>
+#import <CloudXCore/CLXLegacyTrackerSnapshot.h>
+#import <CloudXCore/CLXBidSignals.h>
+#import <CloudXCore/CLXBidRequestPayload.h>
 
 // Adapter Metadata
 #import <CloudXCore/CLXAdapterMetadataProvider.h>
@@ -134,8 +142,6 @@
 #import <CloudXCore/CLXURLProvider.h>
 #import <CloudXCore/CLXReachabilityService.h>
 #import <CloudXCore/CLXGeoLocationService.h>
-#import <CloudXCore/CLXGeoApi.h>
-#import <CloudXCore/CLXGeoService.h>
 #import <CloudXCore/CLXGeoInfo.h>
 #import <CloudXCore/CLXSKAdNetworkService.h>
 

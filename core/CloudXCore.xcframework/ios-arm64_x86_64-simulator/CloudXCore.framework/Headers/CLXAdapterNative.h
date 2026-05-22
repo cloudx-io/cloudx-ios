@@ -21,26 +21,19 @@ NS_ASSUME_NONNULL_BEGIN
  * Abstract base class for native adapters.
  *
  * Subclass per ad network. Required overrides: @c -load, @c -destroy.
- * Subclasses populate @c _sdkVersion and @c _delegate. The @c delegate
- * retain-cycle break must happen in @c -destroy.
+ * Subclasses notify @c _delegate as native lifecycle events occur. The @c
+ * delegate retain-cycle break must happen in @c -destroy.
  */
 CLX_PUBLIC_ADAPTER
 @interface CLXAdapterNative : NSObject <CLXDestroyable> {
 @protected
     id<CLXAdapterNativeDelegate> _Nullable _delegate;
-    NSString *_sdkVersion;
-    NSString *_network;
-    NSString *_bidID;
 }
 
 @property (nonatomic, strong, nullable) id<CLXAdapterNativeDelegate> delegate;
-@property (nonatomic, copy, readonly) NSString *sdkVersion;
 
-/// Network name of the adapter, e.g. @c "AdMob", @c "Facebook".
-@property (nonatomic, copy, readonly) NSString *network;
-
-/// Ad id from bid response.
-@property (nonatomic, copy, readonly) NSString *bidID;
+/// Adapter SDK version, or an empty string when the adapter does not expose one.
+- (NSString *)sdkVersion;
 
 /// Loads the native ad. Subclass MUST override.
 - (void)load;

@@ -1,42 +1,26 @@
 #import <Foundation/Foundation.h>
 
+@class CLXSDKBlock;
+@class CLXPrivacyBlock;
 @class CLXAdapterMetadata;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXSDKConfigRequestFormat : NSObject
-@property (nonatomic, assign) NSInteger w;
-@property (nonatomic, assign) NSInteger h;
-@end
-
-@interface CLXSDKConfigRequestBanner : NSObject
-@property (nonatomic, strong) NSArray<CLXSDKConfigRequestFormat *> *format;
-@end
-
-@interface CLXSDKConfigRequestImp : NSObject
-@property (nonatomic, copy) NSString *id;
-@property (nonatomic, strong, nullable) CLXSDKConfigRequestBanner *banner;
-@end
-
+/**
+ * v2 SDK init request body. Wire shape `{id, sdk, privacy, adapters}` —
+ * block field names match server's pkg/bidrequest/v2.SDKBlock and
+ * pkg/configpayload/v2.PrivacyBlock verbatim. Adapters[] stays at root —
+ * init-only, no analog on bid/telemetry surfaces.
+ */
 @interface CLXSDKConfigRequest : NSObject
 
-@property (nonatomic, copy) NSString *bundle;
-@property (nonatomic, copy) NSString *os;
-@property (nonatomic, copy) NSString *osVersion;
-@property (nonatomic, copy) NSString *model;
-@property (nonatomic, copy) NSString *vendor;
-@property (nonatomic, copy) NSString *ifa;
-@property (nonatomic, copy) NSString *ifv;
-@property (nonatomic, copy) NSString *sdkVersion;
-@property (nonatomic, copy, nullable) NSString *pluginVersion;
-@property (nonatomic, assign) BOOL dnt;
-@property (nonatomic, strong) NSArray<CLXSDKConfigRequestImp *> *imp;
-@property (nonatomic, copy) NSString *id;
-@property (nonatomic, strong) NSDictionary<NSString *, NSString *> *urlParams;
+@property (nonatomic, copy) NSString *sessionId;
+@property (nonatomic, strong) CLXSDKBlock *sdk;
+@property (nonatomic, strong) CLXPrivacyBlock *privacy;
 @property (nonatomic, strong) NSArray<CLXAdapterMetadata *> *adapters;
 
 - (NSDictionary *)json;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

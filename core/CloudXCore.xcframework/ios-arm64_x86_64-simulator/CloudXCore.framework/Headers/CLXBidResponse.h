@@ -13,6 +13,20 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ * OpenRTB bid markup media type values carried in `seatbid[].bid[].mtype`.
+ */
+typedef NS_ENUM(NSInteger, CLXOpenRTBMarkupType) {
+    /** Banner display markup. */
+    CLXOpenRTBMarkupTypeBanner = 1,
+    /** Video markup. */
+    CLXOpenRTBMarkupTypeVideo = 2,
+    /** Audio markup. */
+    CLXOpenRTBMarkupTypeAudio = 3,
+    /** Native markup. */
+    CLXOpenRTBMarkupTypeNative = 4,
+};
+
 // MARK: - SKAdNetwork Fidelity
 @interface CLXBidResponseSKAdFidelity : NSObject
 @property (nonatomic, assign) NSInteger fidelity;
@@ -70,6 +84,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *adaptercode;
 @property (nonatomic, copy, nullable) NSString *auctionTelemetryPayload;
 @property (nonatomic, copy, nullable) NSString *bidTelemetryPayload;
+@property (nonatomic, copy, nullable) NSString *arbiterAuctionPayload;
+@property (nonatomic, copy, nullable) NSString *arbiterBidPayload;
 @property (nonatomic, strong, nullable) CLXBidResponseCloudXRender *render;
 
 - (NSDictionary *)toDictionary;
@@ -86,8 +102,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) CLXBidResponseSKAd *skadn;
 @property (nonatomic, assign) double origbidcpm;
 @property (nonatomic, copy, nullable) NSString *origbidcur;
-/// Creative type hint from the DSP (e.g. "html", "mraid", "vast"). Surfaced for
-/// the renderer routing layer to consume; this DTO does not interpret it.
+/// Creative type hint from the DSP. The embedded renderer recognizes "html"
+/// as a single canonical value covering both plain-HTML and MRAID-using
+/// creatives — the MRAID JavaScript runtime is injected for every renderer-
+/// routed banner unconditionally, so the renderer never needs a per-bid hint
+/// to wire the bridge. Other declared values ("vast", "video", "native",
+/// historical "mraid", etc.) are rejected at routing time by the I2 guard in
+/// CLXBidAdSource. Missing crtype is allowed and treated as the implicit
+/// "html" default. Surfaced as an opaque string for telemetry; this DTO
+/// does not interpret it.
 @property (nonatomic, copy, nullable) NSString *crtype;
 @property (nonatomic, strong, nullable) CLXBidResponseCloudX *cloudx;
 @property (nonatomic, strong, nullable) CLXBidResponsePrebid *prebid;
@@ -113,6 +136,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *dealid;
 @property (nonatomic, assign) NSInteger w;
 @property (nonatomic, assign) NSInteger h;
+/// OpenRTB media type for this bid. See `CLXOpenRTBMarkupType`.
+@property (nonatomic, strong, nullable) NSNumber *mtype;
 @property (nonatomic, copy, nullable) NSDictionary *rawJSON;
 @end
 
@@ -126,6 +151,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXBidResponseAuction : NSObject
 @property (nonatomic, strong, nullable) CLXBidResponseCloudXAuction *auction;
 @property (nonatomic, copy, nullable) NSString *serverVersion;
+@property (nonatomic, copy, nullable) NSString *arbiterAuctionPayload;
 
 - (NSDictionary *)toDictionary;
 @end

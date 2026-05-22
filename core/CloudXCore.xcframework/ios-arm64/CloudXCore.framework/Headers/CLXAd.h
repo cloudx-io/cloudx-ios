@@ -66,6 +66,13 @@ CLX_PUBLIC
  */
 @property (nonatomic, readonly, nullable) NSString *placement;
 
+/**
+ * SDK-defined ad metadata values associated with this loaded ad.
+ *
+ * Values may be absent depending on ad format, network, auction result, or SDK version.
+ */
+@property (nonatomic, copy, readonly) NSDictionary<NSString *, NSString *> *adValues;
+
 #pragma mark - Additional Properties (iOS-specific)
 
 /**
@@ -99,7 +106,9 @@ CLX_PUBLIC
 #pragma mark - Initializers
 
 /**
- * Initializes a CLXAd with the provided metadata
+ * Initializes a CLXAd with the provided metadata and SDK-defined ad values.
+ *
+ * Pass nil for adValues when no SDK-defined metadata should be attached.
  */
 - (instancetype)initWithAdUnitName:(nullable NSString *)adUnitName
                           adUnitId:(nullable NSString *)adUnitId
@@ -107,7 +116,8 @@ CLX_PUBLIC
                   networkPlacement:(nullable NSString *)networkPlacement
                            revenue:(nullable NSNumber *)revenue
                           adFormat:(CLXAdFormat)adFormat
-                         placement:(nullable NSString *)placement;
+                         placement:(nullable NSString *)placement
+                          adValues:(nullable NSDictionary<NSString *, NSString *> *)adValues;
 
 /**
  * Factory method to create CLXAd from bid response data

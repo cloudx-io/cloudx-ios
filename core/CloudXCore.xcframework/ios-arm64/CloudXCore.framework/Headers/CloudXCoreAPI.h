@@ -5,6 +5,8 @@
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXInitializationConfiguration.h>
 #import <CloudXCore/CLXSdkConfiguration.h>
+#import <CloudXCore/CLXArbiterConfiguration.h>
+#import <CloudXCore/CLXArbiterResult.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -26,6 +28,8 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 @class CLXInterstitial;
 @class CLXRewarded;
 @class CLXNativeAdLoader;
+
+typedef void (^CLXArbiterCompletion)(CLXArbiterResult *result);
 
 /**
  * The main class of the CloudX SDK.
@@ -192,6 +196,17 @@ CLX_PUBLIC
  */
 - (CLXNativeAdLoader *)createNativeAdLoaderWithAdUnitIdentifier:(NSString *)adUnitIdentifier
     NS_SWIFT_NAME(createNativeAdLoader(adUnitIdentifier:));
+
+/**
+ * Runs the configured bids through the CloudX arbiter.
+ *
+ * The SDK submits the configured bids to the Trusted Arbiter and returns the selected
+ * platform. If the arbiter service is unavailable or fails, the SDK falls back to the
+ * highest plaintext bid supplied to the arbiter.
+ */
+- (void)arbiterWithConfiguration:(CLXArbiterConfiguration *)configuration
+                      completion:(CLXArbiterCompletion)completion
+    NS_SWIFT_NAME(arbiter(with:completion:));
 
 #pragma mark - Visual Debugging
 

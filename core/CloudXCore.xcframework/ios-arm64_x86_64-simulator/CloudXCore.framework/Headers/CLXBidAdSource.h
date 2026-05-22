@@ -14,7 +14,7 @@
 #import <CloudXCore/CLXAdNetworkFactories.h>
 #import <CloudXCore/CLXError.h>
 
-@class CLXBidResponseBid, CLXBiddingConfigRequest, CLXBidResponse, CLXAd, CLXEnvironmentConfig;
+@class CLXBidResponseBid, CLXBidResponse, CLXAd, CLXEnvironmentConfig;
 @protocol CLXAdEventReporting;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -45,7 +45,6 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
 @property (nonatomic, copy, readonly) NSString *bidID;
 @property (nonatomic, copy, readonly) NSString *networkName;
 @property (nonatomic, strong, readonly) CLXBidResponseBid *bid;
-@property (nonatomic, strong, readonly) CLXBiddingConfigRequest *bidRequest;
 @property (nonatomic, copy, readonly) id _Nullable (^createBidAd)(NSError * _Nullable * _Nullable);
 @property (nonatomic, strong, readonly, nullable) CLXAd *clxAd;
 
@@ -56,7 +55,6 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
                          nurl:(nullable NSString *)nurl
                         bidID:(NSString *)bidID
                           bid:(CLXBidResponseBid *)bid
-                   bidRequest:(CLXBiddingConfigRequest *)bidRequest
                   networkName:(NSString *)networkName
                        clxAd:(nullable CLXAd *)clxAd
                   createBidAd:(id _Nullable (^)(NSError * _Nullable * _Nullable error))createBidAd;
@@ -115,8 +113,37 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
          nativeAdRequirements:(nullable id)nativeAdRequirements
             bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                reportingService:(id<CLXAdEventReporting>)reportingService
-                   createBidAd:(id _Nullable (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString * _Nullable burl, BOOL hasCloseButton, NSString *network, NSError * _Nullable * _Nullable error))createBidAd;
+                   createBidAd:(id _Nullable (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString * _Nullable burl, BOOL hasCloseButton, NSString *network, NSNumber * _Nullable mtype, NSError * _Nullable * _Nullable error))createBidAd;
+
+/**
+ * Initialize a new bid ad source with arbiter bid request opt-in.
+ * @param userID User identifier
+ * @param adUnitId Ad unit identifier
+ * @param dealID Deal identifier (optional)
+ * @param hasCloseButton Whether the ad has a close button
+ * @param publisherID Publisher identifier
+ * @param adType Type of ad
+ * @param bidTokenSources Dictionary of bid token sources by adapter name
+ * @param nativeAdRequirements Native ad requirements (optional)
+ * @param bidRequestTimeout Timeout in seconds for HTTP request and OpenRTB tmax (0 = use session default)
+ * @param arbiterEnabled Whether bid requests should opt into encrypted CloudX bid payloads for arbiter.
+ * @param reportingService Reporting service for events
+ * @param createBidAd Block to create bid ads
+ * @return Initialized bid ad source
+ */
+- (instancetype)initWithUserID:(nullable NSString *)userID
+                      adUnitId:(NSString *)adUnitId
+                        dealID:(nullable NSString *)dealID
+                 hasCloseButton:(BOOL)hasCloseButton
+                   publisherID:(NSString *)publisherID
+                        adType:(NSInteger)adType
+                bidTokenSources:(NSDictionary<NSString *, CLXBidTokenSource *> *)bidTokenSources
+         nativeAdRequirements:(nullable id)nativeAdRequirements
+            bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
+                arbiterEnabled:(BOOL)arbiterEnabled
+               reportingService:(id<CLXAdEventReporting>)reportingService
+                   createBidAd:(id _Nullable (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString * _Nullable burl, BOOL hasCloseButton, NSString *network, NSNumber * _Nullable mtype, NSError * _Nullable * _Nullable error))createBidAd;
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

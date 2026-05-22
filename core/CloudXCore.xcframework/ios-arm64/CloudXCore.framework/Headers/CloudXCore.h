@@ -29,6 +29,10 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CloudXCoreAPI.h>
 #import <CloudXCore/CLXError.h>
 #import <CloudXCore/CLXAdType.h>
+#import <CloudXCore/CLXArbiterBid.h>
+#import <CloudXCore/CLXArbiterConfiguration.h>
+#import <CloudXCore/CLXArbiterPlatform.h>
+#import <CloudXCore/CLXArbiterResult.h>
 
 // Configuration
 #import <CloudXCore/CLXInitializationConfiguration.h>
@@ -38,7 +42,6 @@ FOUNDATION_EXPORT const unsigned char CloudXCoreVersionString[];
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXSDKRaceSafetyConfig.h>
 #import <CloudXCore/CLXSDKConfigAdUnit.h>
-#import <CloudXCore/CLXBiddingConfig.h>
 
 // Ad Base
 #import <CloudXCore/CLXAd.h>

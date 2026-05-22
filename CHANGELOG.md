@@ -13,6 +13,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.4.0] - 2026-05-22
+
+### Added
+- **Per-request extras on Banner and BannerAdView** — New `setExtraParameter:value:` API on `CLXBanner` and `CLXBannerAdView` lets publishers attach arbitrary per-request metadata to outgoing bid requests, including reserved `minFloor` (single-round) and `minFloors` (per-round) keys for publisher-defined bid floors. Supported value types: `NSString`, `NSNumber`, `NSArray`, `NSDictionary`. Values are captured at call time; banner refreshes pick up the current stored values on each auction.
+- **Ad metadata on `CLXAd`** — New `CLXAd.adValues` property (`NSDictionary<NSString *, NSString *>`) exposes SDK-defined loaded-ad metadata to publishers. Values are read-only and may be absent depending on ad format and network.
+- **Native ad CTA tap forwarding** — Tapping a native ad's call-to-action button now reliably fires the same click pipeline as tapping the surrounding ad container, eliminating cases where CTA taps were observed but not counted as clicks.
+- **MRAID 2.0 expand and resize support** — Banner creatives that use MRAID `expand()` or `resize()` now render correctly, with the creative locked inside its slot at both the frame and CSS layers.
+
+### Changed
+- **Documented main-queue delegate threading** — Documented the existing behavior that all `CLXAdDelegate` callbacks (and protocols that extend it) deliver on the main queue and may fire inline relative to the SDK call that triggered them. Re-entrant publisher implementations are unaffected; non-re-entrant ones should now be reviewed. No runtime behavior change.
+- **UnityAds adapter version range** — Widened to accept Unity Ads 4.x patch releases (`>= 4.17.0`, `< 5.0`) so publishers can adopt newer Unity Ads SDK fixes without waiting for an adapter release.
+- **GDPR-applies wire encoding** — `gdprApplies` now serializes as a JSON boolean (`true`/`false`) instead of an integer, matching SSP and Android wire shape.
+
+### Fixed
+- **HTML banner load-event race** — Fixed a sporadic race where `didLoadAd` could fire before the banner creative finished navigating, occasionally resulting in a blank impression.
+- **Banner `window.open` clickthrough** — Restored clickthrough on banner creatives that open the click URL via `window.open` rather than a direct link.
+- **Native ad memory leak during long sessions** — Fixed a `MutationObserver` retention issue in long-lived MRAID controllers that could accumulate observers across native ad refresh cycles.
+- **Verve adapter fullscreen main-thread compliance** — Fullscreen ad construction and teardown now consistently dispatch to the main thread, preventing rare assertion failures when destroying a Verve interstitial mid-load.
+
+### Internal release scope
+- New `CloudXVerveAdapter` (Banner, MREC, Interstitial, Rewarded, Native) is in-tree and built but **not yet published to CocoaPods Trunk** in 3.4.0. Publishers who want early access can integrate via the private repo; a public trunk push is planned for a follow-up release.
+
+---
+
 ## [3.3.0-beta] - 2026-05-11
 
 ### Added
