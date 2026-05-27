@@ -17,18 +17,27 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern CLXAdNetwork const CLXAdNetworkTestBidder;
-extern CLXAdNetwork const CLXAdNetworkGoogleAdManager;
-extern CLXAdNetwork const CLXAdNetworkMeta;
-extern CLXAdNetwork const CLXAdNetworkMintegral;
+extern CLXAdNetwork const CLXAdNetworkBidMachine;
+extern CLXAdNetwork const CLXAdNetworkChartboost;
 extern CLXAdNetwork const CLXAdNetworkCloudX;
 extern CLXAdNetwork const CLXAdNetworkCloudXRenderer;
-extern CLXAdNetwork const CLXAdNetworkVungle;
+extern CLXAdNetwork const CLXAdNetworkDigitalTurbine;
+extern CLXAdNetwork const CLXAdNetworkGoogleAdManager;
+extern CLXAdNetwork const CLXAdNetworkGoogleWaterfall;
 extern CLXAdNetwork const CLXAdNetworkInMobi;
-extern CLXAdNetwork const CLXAdNetworkUnityAds;
+extern CLXAdNetwork const CLXAdNetworkLoopMe;
 extern CLXAdNetwork const CLXAdNetworkMagnite;
+extern CLXAdNetwork const CLXAdNetworkMeta;
+extern CLXAdNetwork const CLXAdNetworkMintegral;
+extern CLXAdNetwork const CLXAdNetworkMobileFuse;
 extern CLXAdNetwork const CLXAdNetworkMoloco;
+extern CLXAdNetwork const CLXAdNetworkPangle;
+extern CLXAdNetwork const CLXAdNetworkPubMatic;
+extern CLXAdNetwork const CLXAdNetworkTestBidder;
+extern CLXAdNetwork const CLXAdNetworkUnityAds;
 extern CLXAdNetwork const CLXAdNetworkVerve;
+extern CLXAdNetwork const CLXAdNetworkVungle;
+extern CLXAdNetwork const CLXAdNetworkYandex;
 
 /// All known ad networks.
 extern NSArray<CLXAdNetwork> *CLXAllAdNetworks(void);
