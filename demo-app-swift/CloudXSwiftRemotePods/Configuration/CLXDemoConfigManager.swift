@@ -40,17 +40,20 @@ class CLXDemoConfigManager {
     let currentConfig: CLXDemoConfig
     
     private init() {
-        // Production Configuration (SwiftDemoApp - bundle: cloudx.CloudXSwiftRemotePods)
+        // Production Configuration (shared with ObjC demo - bundle: cloudx.CloudXObjCRemotePods)
+        // Both demos share the same SSP-side appKey, ad units, and bundle ID — they're the
+        // same logical app, two language implementations. Only one can be installed per
+        // simulator at a time (uninstall the other before installing).
         self.currentConfig = CLXDemoConfig(
-            appKey: "xcQftcBSUmqzuv1LfET2o",
+            appKey: "ihtOXvp3X9JlMQ5p0_RYL",
             hashedUserId: "test-user-123",
-            bannerAdUnitId: "Ce5-ltAX5zFz5QJ3TzEjY",
-            mrecAdUnitId: "xMLHNFIkwieu2SLyeD0sQ",
-            interstitialAdUnitId: "rkw0ncj6mSphKtmnl8Cw_",
+            bannerAdUnitId: "LyPxKhBFiUCd1xMLYQhGc",
+            mrecAdUnitId: "EWaeXDSmKYbs220gM5hTv",
+            interstitialAdUnitId: "txZ7NmISq-MsuPH0ULKbD",
             nativeAdUnitId: "Q33RbPmBH-wix45Mu6--Z",
             nativeBannerAdUnitId: "-2_Lw2b4QTlu7x6tKZ6Ww",
-            rewardedAdUnitId: "WJje0XGqL5n56Sa8dlt8L",
-            rewardedInterstitialAdUnitId: "-"
+            rewardedAdUnitId: "um9Ek08ScJBWuzSMTyW3b",
+            rewardedInterstitialAdUnitId: "I-JRnXEQc2bG5dm1EWoZ6"
         )
     }
 }

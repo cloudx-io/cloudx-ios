@@ -1,0 +1,5 @@
+framework module CloudXDigitalTurbineAdapter {
+    umbrella header "CloudXDigitalTurbineAdapter.h"
+    export *
+    module * { export * }
+}

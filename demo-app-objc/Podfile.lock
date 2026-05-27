@@ -1,34 +1,63 @@
 PODS:
-  - CloudXCore (3.3.0-beta)
-  - CloudXInMobiAdapter (3.3.0-beta):
-    - CloudXCore (= 3.3.0-beta)
+  - ATOM-Standalone (3.9.0)
+  - CloudXCore (3.4.1)
+  - CloudXDigitalTurbineAdapter (3.4.1):
+    - CloudXCore (= 3.4.1)
+    - Fyber_Marketplace_SDK (< 9.0, >= 8.4.0)
+  - CloudXInMobiAdapter (3.4.1):
+    - CloudXCore (= 3.4.1)
     - InMobiSDK (< 12.0, >= 11.0.0)
-  - CloudXMagniteAdapter (3.3.0-beta):
-    - CloudXCore (= 3.3.0-beta)
-    - MagniteSDK (~> 0.0.8)
-  - CloudXMetaAdapter (3.3.0-beta):
-    - CloudXCore (= 3.3.0-beta)
+  - CloudXMagniteAdapter (3.4.1):
+    - CloudXCore (= 3.4.1)
+    - MagniteSDK (~> 1.0.0)
+  - CloudXMetaAdapter (3.4.1):
+    - CloudXCore (= 3.4.1)
     - FBAudienceNetwork (< 7.0, >= 6.15.1)
-  - CloudXMintegralAdapter (3.3.0-beta):
-    - CloudXCore (= 3.3.0-beta)
+  - CloudXMintegralAdapter (3.4.1):
+    - CloudXCore (= 3.4.1)
     - MintegralAdSDK (~> 8.0)
     - MintegralAdSDK/BidBannerAd (~> 8.0)
+    - MintegralAdSDK/BidNativeAdvancedAd (~> 8.0)
     - MintegralAdSDK/BidNewInterstitialAd (~> 8.0)
     - MintegralAdSDK/BidRewardVideoAd (~> 8.0)
-  - CloudXMolocoAdapter (3.3.0-beta):
-    - CloudXCore (= 3.3.0-beta)
+  - CloudXMolocoAdapter (3.4.1):
+    - CloudXCore (= 3.4.1)
     - MolocoSDKiOS (~> 4.6.0)
-  - CloudXRenderer (3.3.0-beta):
-    - CloudXCore (= 3.3.0-beta)
-  - CloudXUnityAdsAdapter (3.3.0-beta):
-    - CloudXCore (= 3.3.0-beta)
-    - UnityAds (~> 4.17.0)
-  - CloudXVungleAdapter (3.3.0-beta):
-    - CloudXCore (= 3.3.0-beta)
+  - CloudXRenderer (3.4.1):
+    - CloudXCore (= 3.4.1)
+  - CloudXUnityAdsAdapter (3.4.1):
+    - CloudXCore (= 3.4.1)
+    - UnityAds (< 5.0, >= 4.17.0)
+  - CloudXVerveAdapter (3.4.1):
+    - CloudXCore (= 3.4.1)
+    - HyBid (= 3.8.0)
+  - CloudXVungleAdapter (3.4.1):
+    - CloudXCore (= 3.4.1)
     - VungleAds (< 8.0, >= 7.4.0)
   - FBAudienceNetwork (6.21.1)
+  - Fyber_Marketplace_SDK (8.4.7)
+  - HyBid (3.8.0):
+    - HyBid/ATOM (= 3.8.0)
+    - HyBid/Banner (= 3.8.0)
+    - HyBid/Core (= 3.8.0)
+    - HyBid/FullScreen (= 3.8.0)
+    - HyBid/Native (= 3.8.0)
+    - HyBid/RewardedVideo (= 3.8.0)
+  - HyBid/ATOM (3.8.0):
+    - ATOM-Standalone
+    - HyBid/Core
+  - HyBid/Banner (3.8.0):
+    - HyBid/Core
+  - HyBid/Core (3.8.0)
+  - HyBid/FullScreen (3.8.0):
+    - HyBid/Core
+  - HyBid/Native (3.8.0):
+    - HyBid/Core
+  - HyBid/RewardedVideo (3.8.0):
+    - HyBid/Core
   - InMobiSDK (11.3.0)
-  - MagniteSDK (0.0.8)
+  - IronSourceAdQualitySDK (9.5.1)
+  - MagniteSDK (1.0.0)
   - MintegralAdSDK (8.1.3):
     - MintegralAdSDK/BannerAd (= 8.1.3)
     - MintegralAdSDK/BidBannerAd (= 8.1.3)
@@ -50,6 +79,9 @@ PODS:
     - MintegralAdSDK/InterstitialVideoAd
   - MintegralAdSDK/BidNativeAd (8.1.3):
     - MintegralAdSDK/NativeAd
+  - MintegralAdSDK/BidNativeAdvancedAd (8.1.3):
+    - MintegralAdSDK/BidNativeAd
+    - MintegralAdSDK/NativeAdvancedAd
   - MintegralAdSDK/BidNewInterstitialAd (8.1.3):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/NewInterstitialAd
@@ -59,38 +91,39 @@ PODS:
   - MintegralAdSDK/InterstitialVideoAd (8.1.3):
     - MintegralAdSDK/NativeAd
   - MintegralAdSDK/NativeAd (8.1.3)
+  - MintegralAdSDK/NativeAdvancedAd (8.1.3):
+    - MintegralAdSDK/NativeAd
   - MintegralAdSDK/NewInterstitialAd (8.1.3):
     - MintegralAdSDK/InterstitialVideoAd
     - MintegralAdSDK/NativeAd
   - MintegralAdSDK/RewardVideoAd (8.1.3):
     - MintegralAdSDK/NativeAd
   - MolocoSDKiOS (4.6.1)
-  - UnityAds (4.17.0)
+  - UnityAds (4.18.0):
+    - IronSourceAdQualitySDK (< 10.0.0)
   - VungleAds (7.7.3)
 
 DEPENDENCIES:
-  - CloudXCore (= 3.3.0-beta)
-  - CloudXInMobiAdapter (= 3.3.0-beta)
-  - CloudXMagniteAdapter (= 3.3.0-beta)
-  - CloudXMetaAdapter (= 3.3.0-beta)
-  - CloudXMintegralAdapter (= 3.3.0-beta)
-  - CloudXMolocoAdapter (from `../../cloudx-ios-private/adapter-moloco`)
-  - CloudXRenderer (= 3.3.0-beta)
-  - CloudXUnityAdsAdapter (= 3.3.0-beta)
-  - CloudXVungleAdapter (= 3.3.0-beta)
+  - CloudXCore (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/core/CloudXCore.podspec`)
+  - CloudXDigitalTurbineAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-digitalturbine/CloudXDigitalTurbineAdapter.podspec`)
+  - CloudXInMobiAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-inmobi/CloudXInMobiAdapter.podspec`)
+  - CloudXMagniteAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-magnite/CloudXMagniteAdapter.podspec`)
+  - CloudXMetaAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-meta/CloudXMetaAdapter.podspec`)
+  - CloudXMintegralAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-mintegral/CloudXMintegralAdapter.podspec`)
+  - CloudXMolocoAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-moloco/CloudXMolocoAdapter.podspec`)
+  - CloudXRenderer (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/renderer-cloudx/CloudXRenderer.podspec`)
+  - CloudXUnityAdsAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-unityads/CloudXUnityAdsAdapter.podspec`)
+  - CloudXVerveAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-verve/CloudXVerveAdapter.podspec`)
+  - CloudXVungleAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-vungle/CloudXVungleAdapter.podspec`)
 
 SPEC REPOS:
   trunk:
-    - CloudXCore
-    - CloudXInMobiAdapter
-    - CloudXMagniteAdapter
-    - CloudXMetaAdapter
-    - CloudXMintegralAdapter
-    - CloudXRenderer
-    - CloudXUnityAdsAdapter
-    - CloudXVungleAdapter
+    - ATOM-Standalone
     - FBAudienceNetwork
+    - Fyber_Marketplace_SDK
+    - HyBid
     - InMobiSDK
+    - IronSourceAdQualitySDK
     - MagniteSDK
     - MintegralAdSDK
     - MolocoSDKiOS
@@ -98,27 +131,53 @@ SPEC REPOS:
     - VungleAds
 
 EXTERNAL SOURCES:
+  CloudXCore:
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/core/CloudXCore.podspec
+  CloudXDigitalTurbineAdapter:
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-digitalturbine/CloudXDigitalTurbineAdapter.podspec
+  CloudXInMobiAdapter:
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-inmobi/CloudXInMobiAdapter.podspec
+  CloudXMagniteAdapter:
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-magnite/CloudXMagniteAdapter.podspec
+  CloudXMetaAdapter:
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-meta/CloudXMetaAdapter.podspec
+  CloudXMintegralAdapter:
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-mintegral/CloudXMintegralAdapter.podspec
   CloudXMolocoAdapter:
-    :path: "../../cloudx-ios-private/adapter-moloco"
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-moloco/CloudXMolocoAdapter.podspec
+  CloudXRenderer:
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/renderer-cloudx/CloudXRenderer.podspec
+  CloudXUnityAdsAdapter:
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-unityads/CloudXUnityAdsAdapter.podspec
+  CloudXVerveAdapter:
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-verve/CloudXVerveAdapter.podspec
+  CloudXVungleAdapter:
+    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-vungle/CloudXVungleAdapter.podspec
 
 SPEC CHECKSUMS:
-  CloudXCore: 07d9f13cc067206f9b8f02aaea799989d223ca49
-  CloudXInMobiAdapter: 89b403c3ffcaea3eeec8171978f6611e1fee1ce6
-  CloudXMagniteAdapter: cf3fe81e13e9200f303e5e9b9eb2b917b83215cd
-  CloudXMetaAdapter: 50ee3d3b3345908d12f3db911e2db72d4f0ce164
-  CloudXMintegralAdapter: 10a30f42ff8816cceb0b42bec4eb3183bb19f4c0
-  CloudXMolocoAdapter: 4fe867236693d30296d4026a0f0521f3e2564309
-  CloudXRenderer: 4badfe66d2b61214d5340b0260f17a1ae5da5fba
-  CloudXUnityAdsAdapter: df8f64b7dfe41b46577316343e2daab2f7152bde
-  CloudXVungleAdapter: 0b8ebf4f2df5e70e3fcafe4117a90013b21b0435
+  ATOM-Standalone: cd8bed8eb43e48d0f2e778aa0db893cb7f8ceb93
+  CloudXCore: 71ff6e882e704d630d613529a49422e683cdd800
+  CloudXDigitalTurbineAdapter: 7e135f1d9dd234be69528cf39eb48177a7a37903
+  CloudXInMobiAdapter: a9e931a12d135ff6a36bf65c2403b33fe88eb529
+  CloudXMagniteAdapter: c0bd0ddebb73ae515adc0b01ff9c08be04ef27cd
+  CloudXMetaAdapter: c84eb19a0418b847e58639b97d8ed4852e2836df
+  CloudXMintegralAdapter: 7467e56699eb95715a224496a8f40ddc34b588dc
+  CloudXMolocoAdapter: 450c4c3474684df8ab73c43ef3bbc408dab14422
+  CloudXRenderer: adbfa9c1138d3b6c67e3436f608cc301d0bc1745
+  CloudXUnityAdsAdapter: 3932c103689e6c575935c30792d57a90e7fdae5f
+  CloudXVerveAdapter: af89a4ab1e818711147140f12a73694c9d297d41
+  CloudXVungleAdapter: f7e19c202d3a828157e9fabcbc3ebae03b09309a
   FBAudienceNetwork: 85d18a65c9e35bc426bd4664cf3ae2a1172d7b60
+  Fyber_Marketplace_SDK: 1a880b530921ddf07a74982e163ab56eaf90e932
+  HyBid: 4357f0aac2388cd3c940f750e4f7ea6f06881541
   InMobiSDK: a25c208dcc6fc6d9b228f34a4643712f37923208
-  MagniteSDK: 3011272e7d1d155691d170319b85187cb51ce4f7
+  IronSourceAdQualitySDK: d3f89c7eb4afc6b6c45fc3d83d64789a9977148f
+  MagniteSDK: edfce03a6207c856681cc3355a7e6124c977ae61
   MintegralAdSDK: 0858525ba50c372960c98cd0151921d69907d08d
   MolocoSDKiOS: e68458b4a01e1580662ab849669b7190bfe93fa9
-  UnityAds: adbe0d522fd14b8298c5e159164fc43396165843
+  UnityAds: 841571b44ea0c0adff40fabf2112f3c4a96a5db6
   VungleAds: 58cb2d034ab1f455b9c2fb7ec8bdbcd82cf0ca70
 
-PODFILE CHECKSUM: 5690337a627a4c097fe0ac34f3089bf97bab398a
+PODFILE CHECKSUM: a2f2478bddca7ae5c28284e463b91c605793ea91
 
 COCOAPODS: 1.16.2

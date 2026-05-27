@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.4.1] - 2026-05-27
+
+### Added
+- **Digital Turbine Adapter** — New `CloudXDigitalTurbineAdapter` supporting Banner, MREC, Interstitial, Rewarded, and Native ad formats. Install: `pod 'CloudXDigitalTurbineAdapter', '~> 3.4.1'`. Backed by `Fyber_Marketplace_SDK >= 8.4.0, < 9.0`.
+
+### Fixed
+- **Duplicate `didLoadAd` / `didShowAd` callbacks on banner refresh** — When a partner adapter SDK fired its load or impression callback more than once for the same ad, the publisher delegate could receive duplicate `didLoadAd` / `didShowAd` callbacks. The first callback is now treated as canonical and subsequent re-fires from the same adapter are dropped, so the publisher surface emits exactly one load and one impression per ad.
+
+---
+
 ## [3.4.0] - 2026-05-22
 
 ### Added
