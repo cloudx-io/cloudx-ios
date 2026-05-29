@@ -1,0 +1,5 @@
+framework module CloudXGoogleWaterfallAdapter {
+    umbrella header "CloudXGoogleWaterfallAdapter.h"
+    export *
+    module * { export * }
+}

@@ -6,9 +6,10 @@ import PackageDescription
 //
 // Ships only components whose third-party SDKs have official SPM support:
 //   - CloudXCore
-//   - CloudXMetaAdapter      (requires github.com/facebook/FBAudienceNetwork)
-//   - CloudXVungleAdapter    (requires github.com/Vungle/VungleAdsSDK-SwiftPackageManager)
-//   - CloudXMintegralAdapter (requires github.com/Mintegral-official/MintegralAdSDK-Swift-Package)
+//   - CloudXMetaAdapter            (requires github.com/facebook/FBAudienceNetwork)
+//   - CloudXVungleAdapter          (requires github.com/Vungle/VungleAdsSDK-SwiftPackageManager)
+//   - CloudXMintegralAdapter       (requires github.com/Mintegral-official/MintegralAdSDK-Swift-Package)
+//   - CloudXGoogleWaterfallAdapter (requires github.com/googleads/swift-package-manager-google-mobile-ads)
 //
 // NOT included (use CocoaPods instead — CocoaPods+SPM hybrid is supported):
 //   - CloudXInMobiAdapter (no official InMobiSDK SPM)
@@ -28,27 +29,33 @@ let package = Package(
         .library(name: "CloudXMetaAdapter", targets: ["CloudXMetaAdapter"]),
         .library(name: "CloudXVungleAdapter", targets: ["CloudXVungleAdapter"]),
         .library(name: "CloudXMintegralAdapter", targets: ["CloudXMintegralAdapter"]),
+        .library(name: "CloudXGoogleWaterfallAdapter", targets: ["CloudXGoogleWaterfallAdapter"]),
     ],
     targets: [
         .binaryTarget(
             name: "CloudXCore",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.1/CloudXCore.xcframework.zip",
-            checksum: "96f99ca98b0654a66a64bc7021a7a0e19e05704a3ee100a6498a72323024ba23"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.2/CloudXCore.xcframework.zip",
+            checksum: "c71654949333d34b61e41c34ba4ebeef60bd7ee9264d848ca605f66296267f50"
         ),
         .binaryTarget(
             name: "CloudXMetaAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.1/CloudXMetaAdapter.xcframework.zip",
-            checksum: "b10aeecbc24e6fc3a66d06560f08e6156d4d1f3bd50e4e42f42febe0c2360fe4"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.2/CloudXMetaAdapter.xcframework.zip",
+            checksum: "79b90535a7cce144a23a3deee330464ac8184543a5b9e474ce54a7f6854f090c"
         ),
         .binaryTarget(
             name: "CloudXVungleAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.1/CloudXVungleAdapter.xcframework.zip",
-            checksum: "5064a0c3ff6eef8905587efd31d852b6cfb9e9168c68ce7774a2a69e0ee7f1c8"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.2/CloudXVungleAdapter.xcframework.zip",
+            checksum: "ade7c67cb29cc5a9af35f390a88c3e14aa32b9760177a7be0f1297f89c770a3b"
         ),
         .binaryTarget(
             name: "CloudXMintegralAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.1/CloudXMintegralAdapter.xcframework.zip",
-            checksum: "83d41c4753efd97d0b2f67cf63d43b2f6d52fa756fd93868d553fc90a2c2ea66"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.2/CloudXMintegralAdapter.xcframework.zip",
+            checksum: "12b29a31f651f73ea27b88c3fa005e9db680c91a1b180e4652b8a1e05a6662af"
+        ),
+        .binaryTarget(
+            name: "CloudXGoogleWaterfallAdapter",
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.2/CloudXGoogleWaterfallAdapter.xcframework.zip",
+            checksum: "cf4d57ef42c7dadd75c4234d6f6ea6bdb673fb0669dfeb50599a2ca1bc309b2a"
         ),
     ]
 )

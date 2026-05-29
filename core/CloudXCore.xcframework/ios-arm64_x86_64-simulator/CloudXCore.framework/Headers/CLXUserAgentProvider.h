@@ -25,8 +25,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CLXUserAgentProvider : NSObject
 
-/** Process-wide singleton. */
+/** Process-wide singleton — the only supported entry point for production callers. */
 + (instancetype)shared;
+
+/// Direct construction is unsupported. Use `+shared`. (Tests construct
+/// instances via the internal initializer in CLXUserAgentProvider+Internal.h.)
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 /**
  * Resolves the WKWebView User-Agent on the main thread and caches the result.
