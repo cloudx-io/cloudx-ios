@@ -107,6 +107,13 @@ CLX_PUBLIC_ADAPTER
 /// method is the post-load terminal-failure shape.
 - (void)bannerDidFailAfterLoad:(CLXAdapterBanner *)banner error:(NSError *)error;
 
+/// Called when the adapter tracked an impression and has per-impression extras
+/// to report (e.g. realized revenue keys: @c revenue (dollars), @c currencyCode).
+/// Adapters that report impression-level revenue call this instead of
+/// @c impressionBanner:. The wrapper treats a nil/absent @c extraInfo
+/// identically to @c impressionBanner:.
+- (void)impressionBanner:(CLXAdapterBanner *)banner extraInfo:(nullable NSDictionary *)extraInfo;
+
 @end
 
 NS_ASSUME_NONNULL_END

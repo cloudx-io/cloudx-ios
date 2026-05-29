@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.4.2] - 2026-05-29
+
+### Added
+- **Google Waterfall Adapter** — New `CloudXGoogleWaterfallAdapter` supporting Banner (320×50) and MREC (300×250) ad formats. Install via CocoaPods (`pod 'CloudXGoogleWaterfallAdapter', '~> 3.4.2'`) or Swift Package Manager (`CloudXGoogleWaterfallAdapter` product). Backed by `Google-Mobile-Ads-SDK 12.14.0`; requires a `GADApplicationIdentifier` entry in your Info.plist. SPM consumers must also add the Google Mobile Ads SPM package (`github.com/googleads/swift-package-manager-google-mobile-ads`).
+
+---
+
 ## [3.4.1] - 2026-05-27
 
 ### Added
