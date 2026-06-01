@@ -1,0 +1,5 @@
+{
+        "data": "{\"meta\":{},\"body\":{\"id\":\"86e3ac\",\"type\":\"View\",\"width\":\"match_parent\",\"height\":\"match_parent\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\",\"children\":[{\"height\":\"match_parent\",\"id\":\"aac627\",\"alignItems\":\"flex_start\",\"width\":\"match_parent\",\"children\":[{\"height\":\"match_parent\",\"id\":\"f7fb43\",\"src\":\"${image[0].url}\",\"width\":\"match_parent\",\"type\":\"Image\",\"scaleMode\":\"fit\",\"flexShrink\":0,\"visibility\":\"${xAdInfo.isVideoImageMode ?'hidden':'visible' }\"},{\"height\":\"match_parent\",\"id\":\"75242f\",\"src\":\"${video.video_url}\",\"width\":\"match_parent\",\"autoplay\":true,\"type\":\"Video\",\"visibility\":\"${xAdInfo.isVideoImageMode ? 'visible':'hidden' }\"}],\"flexDirection\":\"column\",\"type\":\"View\",\"enableRatio\":false}]}}",
+        "id": "400001965",
+        "md5": "1748d7db6c5feba0e27386dbd5afb2cd"
+      }
