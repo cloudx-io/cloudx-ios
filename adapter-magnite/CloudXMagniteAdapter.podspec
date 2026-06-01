@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXMagniteAdapter'
-  s.version = '3.4.2'
+  s.version = '3.4.3'
   s.summary          = 'CloudX Magnite Adapter - Static Framework'
   s.description      = 'Magnite adapter for CloudX iOS SDK - binary distribution. Supports Banner, Interstitial, and Rewarded formats via MagniteSDK (waterfall-only).'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-magnite/CloudXMagniteAdapter.xcframework'
 
   # Dependencies
-  s.dependency 'CloudXCore', '3.4.2'
+  s.dependency 'CloudXCore', '3.4.3'
   s.dependency 'MagniteSDK', '~> 1.0.0'
 
   s.frameworks = ['AVFoundation', 'AdSupport', 'CoreGraphics', 'CoreMedia', 'CoreTelephony', 'Foundation', 'JavaScriptCore', 'QuartzCore', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']
