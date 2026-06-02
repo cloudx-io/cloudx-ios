@@ -2,8 +2,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// Starts the Google Mobile Ads SDK and the prefetch worker for the provisioned
-/// `googleWaterfallPlacements`. Banner + MREC only.
 @interface CLXGoogleWaterfallInitializer : CLXAdNetworkInitializer
 
 @property (nonatomic, copy, readonly) NSString *network;
