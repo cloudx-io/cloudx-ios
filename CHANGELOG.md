@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.4.3] - 2026-06-01
+
+### Changed
+- **DigitalTurbine adapter — broader Fyber Marketplace SDK compatibility** — `CloudXDigitalTurbineAdapter` now accepts `Fyber_Marketplace_SDK` from `8.0.0` (previously required `>= 8.4.0`), so you can adopt the adapter without forcing a Fyber SDK upgrade. Banner, MREC, Interstitial, and Rewarded work across the full 8.x line; native fill remains available on Fyber SDK 8.4.0+.
+
+### Fixed
+- **App Store submission rejection caused by the `itms-services` URL scheme** — Some publishers received an App Store static-analysis rejection because the compiled SDK binary contained the `itms-services` scheme. The scheme has been removed; legitimate App Store redirect creatives still resolve normally, with no change to clickthrough behavior.
+- **SDK initialization could fail for some accounts** — Fixed an issue where SDK initialization could fail for publisher accounts that have no organization identifier. Initialization now completes normally for these accounts.
+
+---
+
 ## [3.4.2] - 2026-05-29
 
 ### Added

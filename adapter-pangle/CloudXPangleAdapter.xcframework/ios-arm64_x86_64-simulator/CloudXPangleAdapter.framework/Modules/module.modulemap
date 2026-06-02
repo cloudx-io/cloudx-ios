@@ -1,0 +1,18 @@
+framework module CloudXPangleAdapter {
+    umbrella header "CloudXPangleAdapter.h"
+
+    export *
+    module * { export * }
+
+    // Required frameworks
+    link framework "Foundation"
+    link framework "UIKit"
+    link framework "WebKit"
+    link framework "AVFoundation"
+    link framework "CoreMedia"
+    link framework "AudioToolbox"
+    link framework "CFNetwork"
+    link framework "CoreGraphics"
+    link framework "SystemConfiguration"
+    link framework "StoreKit"
+}
