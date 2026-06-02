@@ -3,18 +3,19 @@ platform :ios, '13.0'
 target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore', '~> 3.4.2'
-  pod 'CloudXRenderer', '~> 3.4.2'
-  pod 'CloudXMetaAdapter', '~> 3.4.2'
-  pod 'CloudXVungleAdapter', '~> 3.4.2'
-  pod 'CloudXInMobiAdapter', '~> 3.4.2'
-  pod 'CloudXMintegralAdapter', '~> 3.4.2'
-  pod 'CloudXUnityAdsAdapter', '~> 3.4.2'
-  pod 'CloudXMagniteAdapter', '~> 3.4.2'
-  pod 'CloudXMolocoAdapter', '~> 3.4.2'
-  pod 'CloudXVerveAdapter', '~> 3.4.2'
-  pod 'CloudXDigitalTurbineAdapter', '~> 3.4.2'
-  pod 'CloudXGoogleWaterfallAdapter', '~> 3.4.2'
+  pod 'CloudXCore', '~> 3.4.4'
+  pod 'CloudXRenderer', '~> 3.4.4'
+  pod 'CloudXMetaAdapter', '~> 3.4.4'
+  pod 'CloudXVungleAdapter', '~> 3.4.4'
+  pod 'CloudXInMobiAdapter', '~> 3.4.4'
+  pod 'CloudXMintegralAdapter', '~> 3.4.4'
+  pod 'CloudXUnityAdsAdapter', '~> 3.4.4'
+  pod 'CloudXMagniteAdapter', '~> 3.4.4'
+  pod 'CloudXMolocoAdapter', '~> 3.4.4'
+  pod 'CloudXVerveAdapter', '~> 3.4.4'
+  pod 'CloudXDigitalTurbineAdapter', '~> 3.4.4'
+  pod 'CloudXGoogleWaterfallAdapter', '~> 3.4.4'
+  pod 'CloudXPangleAdapter', '~> 3.4.4'
 
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths
