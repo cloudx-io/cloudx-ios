@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.4.3] - 2026-06-01
 
+### Added
+- **Pangle Adapter** — New `CloudXPangleAdapter` supporting Banner/MREC, Interstitial, and Rewarded ad formats. Install via CocoaPods (`pod 'CloudXPangleAdapter', '~> 3.4.3'`). Backed by the Pangle (ByteDance) SDK `Ads-Global ~> 7.9.0`.
+
 ### Changed
 - **DigitalTurbine adapter — broader Fyber Marketplace SDK compatibility** — `CloudXDigitalTurbineAdapter` now accepts `Fyber_Marketplace_SDK` from `8.0.0` (previously required `>= 8.4.0`), so you can adopt the adapter without forcing a Fyber SDK upgrade. Banner, MREC, Interstitial, and Rewarded work across the full 8.x line; native fill remains available on Fyber SDK 8.4.0+.
 
