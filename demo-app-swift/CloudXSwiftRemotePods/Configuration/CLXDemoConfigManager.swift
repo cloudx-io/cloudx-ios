@@ -40,19 +40,30 @@ class CLXDemoConfigManager {
     let currentConfig: CLXDemoConfig
     
     private init() {
+        // QA can pin a specific app key / ad unit id at launch via
+        // `simctl launch ... -DemoApp.<Key> <value>` (NSArgumentDomain). Unset ->
+        // the hardcoded defaults. Read once; nothing is written, so overrides
+        // never persist across launches.
+        let defaults = UserDefaults.standard
+        func overrideOrDefault(_ key: String, _ fallback: String) -> String {
+            let value = defaults.string(forKey: key) ?? ""
+            return value.isEmpty ? fallback : value
+        }
+        NSLog("%@", "📱 [DemoApp] launch overrides: appKey=\(defaults.string(forKey: "DemoApp.AppKey") ?? "(none)") banner=\(defaults.string(forKey: "DemoApp.BannerAdUnitId") ?? "(none)") mrec=\(defaults.string(forKey: "DemoApp.MrecAdUnitId") ?? "(none)") interstitial=\(defaults.string(forKey: "DemoApp.InterstitialAdUnitId") ?? "(none)") rewarded=\(defaults.string(forKey: "DemoApp.RewardedAdUnitId") ?? "(none)")")
+
         // Production Configuration (shared with ObjC demo - bundle: cloudx.CloudXObjCRemotePods)
         // Both demos share the same SSP-side appKey, ad units, and bundle ID — they're the
         // same logical app, two language implementations. Only one can be installed per
         // simulator at a time (uninstall the other before installing).
         self.currentConfig = CLXDemoConfig(
-            appKey: "ihtOXvp3X9JlMQ5p0_RYL",
+            appKey: overrideOrDefault("DemoApp.AppKey", "ihtOXvp3X9JlMQ5p0_RYL"),
             hashedUserId: "test-user-123",
-            bannerAdUnitId: "LyPxKhBFiUCd1xMLYQhGc",
-            mrecAdUnitId: "EWaeXDSmKYbs220gM5hTv",
-            interstitialAdUnitId: "txZ7NmISq-MsuPH0ULKbD",
+            bannerAdUnitId: overrideOrDefault("DemoApp.BannerAdUnitId", "LyPxKhBFiUCd1xMLYQhGc"),
+            mrecAdUnitId: overrideOrDefault("DemoApp.MrecAdUnitId", "EWaeXDSmKYbs220gM5hTv"),
+            interstitialAdUnitId: overrideOrDefault("DemoApp.InterstitialAdUnitId", "txZ7NmISq-MsuPH0ULKbD"),
             nativeAdUnitId: "Q33RbPmBH-wix45Mu6--Z",
             nativeBannerAdUnitId: "-2_Lw2b4QTlu7x6tKZ6Ww",
-            rewardedAdUnitId: "um9Ek08ScJBWuzSMTyW3b",
+            rewardedAdUnitId: overrideOrDefault("DemoApp.RewardedAdUnitId", "um9Ek08ScJBWuzSMTyW3b"),
             rewardedInterstitialAdUnitId: "I-JRnXEQc2bG5dm1EWoZ6"
         )
     }
