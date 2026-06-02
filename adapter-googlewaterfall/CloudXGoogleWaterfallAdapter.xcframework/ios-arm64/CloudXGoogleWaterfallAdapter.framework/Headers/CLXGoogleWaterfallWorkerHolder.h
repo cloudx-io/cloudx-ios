@@ -4,8 +4,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// Module-global holder so the serve adapter and bid token source can reach the
-/// worker the initializer built. Mirrors Android WorkerHolder.
 @interface CLXGoogleWaterfallWorkerHolder : NSObject
 
 + (nullable CLXGoogleWaterfallPrefetchWorker *)current;

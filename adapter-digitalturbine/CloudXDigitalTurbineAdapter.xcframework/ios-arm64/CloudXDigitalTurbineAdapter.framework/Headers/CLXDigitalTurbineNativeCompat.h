@@ -21,8 +21,16 @@
 // Discriminator: DTXNativeImageContentController.h ships with the native feature
 // and exists only in 8.4.0+. When it is absent, native is compiled out and
 // CLXDigitalTurbineNativeFactory returns nil (DT just does not fill native there).
+// The release ships a prebuilt STATIC xcframework, where this compile-time gate is
+// baked in at CloudX build time — a binary that bundles native (which references
+// Fyber 8.4.0+ symbols such as IANativeAdSpot) can only link on 8.4.0+. So the
+// release build defines CLX_DT_NATIVE_AVAILABLE=0 (see build-xcframework.sh) to ship
+// a native-free binary that honors the >= 8.0.0 floor. The #ifndef lets that build
+// override win; source builds fall through to the __has_include default below.
+#ifndef CLX_DT_NATIVE_AVAILABLE
 #if __has_include(<IASDKCore/DTXNativeImageContentController.h>)
 #define CLX_DT_NATIVE_AVAILABLE 1
 #else
 #define CLX_DT_NATIVE_AVAILABLE 0
+#endif
 #endif

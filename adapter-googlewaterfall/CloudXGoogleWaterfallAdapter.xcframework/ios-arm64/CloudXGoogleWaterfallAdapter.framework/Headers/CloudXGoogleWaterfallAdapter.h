@@ -20,9 +20,6 @@ __attribute__((visibility("default"))) void CloudXGoogleWaterfallAdapterRegister
 @interface CloudXGoogleWaterfallAdapter : NSObject
 @end
 
-// Banner + MREC are the only served formats. Fullscreen factories exist but
-// fail closed (see the interstitial/rewarded adapters) so the factory surface
-// matches sibling adapters; the SSP never routes fullscreen here.
 #import "CLXGoogleWaterfallBanner.h"
 #import "CLXGoogleWaterfallBannerFactory.h"
 #import "CLXGoogleWaterfallInterstitial.h"

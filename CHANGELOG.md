@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.4.4] - 2026-06-02
+
+### Fixed
+- **Digital Turbine adapter failed to link on Fyber Marketplace SDK below 8.4.0** — Although 3.4.3 advertised Digital Turbine support down to Fyber `8.0.0`, the shipped adapter binary still failed to link for apps resolving a Fyber SDK below `8.4.0`. The adapter binary now links cleanly across the full `8.x` line — Banner, MREC, Interstitial, and Rewarded work on Fyber `8.0.0`+. Native fill remains available on Fyber SDK `8.4.0`+.
+- **Google Waterfall — occasional lost fills on slow mediation responses** — Fixed an issue where a Google Waterfall ad could be discarded when its mediation cascade took longer than expected to respond, even though the ad ultimately filled. Slow-but-successful responses are now delivered, improving Google Waterfall fill reliability.
+
+---
+
 ## [3.4.3] - 2026-06-01
 
 ### Changed
