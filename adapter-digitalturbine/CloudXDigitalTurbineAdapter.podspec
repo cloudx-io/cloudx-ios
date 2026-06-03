@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXDigitalTurbineAdapter'
-  s.version = '3.4.4'
+  s.version = '3.4.5'
   s.summary          = 'CloudX Digital Turbine Adapter - Static Framework'
   s.description      = 'Digital Turbine / Fyber adapter for CloudX iOS SDK - binary distribution. Supports Banner, MREC, Interstitial, Rewarded, and Native ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'adapter-digitalturbine/CloudXDigitalTurbineAdapter.xcframework'
 
-  s.dependency 'CloudXCore', '3.4.4'
+  s.dependency 'CloudXCore', '3.4.5'
   s.dependency 'Fyber_Marketplace_SDK', '>= 8.0.0', '< 9.0'
 
   s.frameworks = ['AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit']

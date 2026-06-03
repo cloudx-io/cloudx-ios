@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.4.5] - 2026-06-03
+
+### Fixed
+- **Digital Turbine adapter — works alongside another SDK that already initialized the shared Fyber Marketplace SDK** — When a co-resident SDK calls `IASDKCore` init first, the adapter now detects the running singleton and proceeds without re-initializing, preventing the other integration from receiving a cancelled-init error. Bidding continues through the shared bidding manager. Publishers running CloudX alongside another mediation SDK that also uses the Fyber Marketplace SDK should upgrade to this release.
+- **InMobi adapter — native ads are now available** — InMobi native (standalone Native, Native-in-Banner 320x50, Native-in-MREC 300x250) is production-enabled. Requires `InMobiSDK >= 11.2.0`.
+- **HTML banner creatives with tracker pixels no longer rejected** — A renderer content-error gate was misclassifying standard ad-tracking pixels as failed creative assets, causing some HTML banner creatives to report `CLXErrorCodeLoadFailed` (Code 304) and never call `bannerDidLoad:`. The gate is now scoped to video asset failures only.
+
+---
+
 ## [3.4.4] - 2026-06-02
 
 ### Fixed
