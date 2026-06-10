@@ -9,8 +9,7 @@
          interstitialAdUnitId:(NSString *)interstitialAdUnitId
                nativeAdUnitId:(NSString *)nativeAdUnitId
          nativeBannerAdUnitId:(NSString *)nativeBannerAdUnitId
-             rewardedAdUnitId:(NSString *)rewardedAdUnitId
-   rewardedInterstitialAdUnitId:(NSString *)rewardedInterstitialAdUnitId {
+             rewardedAdUnitId:(NSString *)rewardedAdUnitId {
     
     self = [super init];
     if (self) {
@@ -22,7 +21,6 @@
         _nativeAdUnitId = [nativeAdUnitId copy];
         _nativeBannerAdUnitId = [nativeBannerAdUnitId copy];
         _rewardedAdUnitId = [rewardedAdUnitId copy];
-        _rewardedInterstitialAdUnitId = [rewardedInterstitialAdUnitId copy];
     }
     return self;
 }
@@ -68,8 +66,7 @@
             interstitialAdUnitId:overrideOrDefault(@"DemoApp.InterstitialAdUnitId", @"txZ7NmISq-MsuPH0ULKbD")
             nativeAdUnitId:@"Q33RbPmBH-wix45Mu6--Z"
             nativeBannerAdUnitId:@"-2_Lw2b4QTlu7x6tKZ6Ww"
-            rewardedAdUnitId:overrideOrDefault(@"DemoApp.RewardedAdUnitId", @"um9Ek08ScJBWuzSMTyW3b")
-            rewardedInterstitialAdUnitId:@"I-JRnXEQc2bG5dm1EWoZ6"];
+            rewardedAdUnitId:overrideOrDefault(@"DemoApp.RewardedAdUnitId", @"um9Ek08ScJBWuzSMTyW3b")];
     }
     return self;
 }

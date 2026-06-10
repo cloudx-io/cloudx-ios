@@ -9,7 +9,6 @@ class CLXDemoConfig {
     let nativeAdUnitId: String
     let nativeBannerAdUnitId: String
     let rewardedAdUnitId: String
-    let rewardedInterstitialAdUnitId: String
     
     init(appKey: String,
          hashedUserId: String,
@@ -18,8 +17,7 @@ class CLXDemoConfig {
          interstitialAdUnitId: String,
          nativeAdUnitId: String,
          nativeBannerAdUnitId: String,
-         rewardedAdUnitId: String,
-         rewardedInterstitialAdUnitId: String) {
+         rewardedAdUnitId: String) {
         
         self.appKey = appKey
         self.hashedUserId = hashedUserId
@@ -29,7 +27,6 @@ class CLXDemoConfig {
         self.nativeAdUnitId = nativeAdUnitId
         self.nativeBannerAdUnitId = nativeBannerAdUnitId
         self.rewardedAdUnitId = rewardedAdUnitId
-        self.rewardedInterstitialAdUnitId = rewardedInterstitialAdUnitId
     }
 }
 
@@ -63,8 +60,7 @@ class CLXDemoConfigManager {
             interstitialAdUnitId: overrideOrDefault("DemoApp.InterstitialAdUnitId", "txZ7NmISq-MsuPH0ULKbD"),
             nativeAdUnitId: "Q33RbPmBH-wix45Mu6--Z",
             nativeBannerAdUnitId: "-2_Lw2b4QTlu7x6tKZ6Ww",
-            rewardedAdUnitId: overrideOrDefault("DemoApp.RewardedAdUnitId", "um9Ek08ScJBWuzSMTyW3b"),
-            rewardedInterstitialAdUnitId: "I-JRnXEQc2bG5dm1EWoZ6"
+            rewardedAdUnitId: overrideOrDefault("DemoApp.RewardedAdUnitId", "um9Ek08ScJBWuzSMTyW3b")
         )
     }
 }
