@@ -28,12 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly) NSString *network;
 
 /**
- * Checks if the Moloco SDK is initialized and ready for use
- * @return YES if initialized, NO otherwise
- */
-+ (BOOL)isInitialized;
-
-/**
  * Gets the current Moloco SDK version
  * @return SDK version string
  */

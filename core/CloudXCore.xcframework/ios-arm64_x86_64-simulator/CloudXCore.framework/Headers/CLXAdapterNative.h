@@ -32,9 +32,6 @@ CLX_PUBLIC_ADAPTER
 
 @property (nonatomic, strong, nullable) id<CLXAdapterNativeDelegate> delegate;
 
-/// Adapter SDK version, or an empty string when the adapter does not expose one.
-- (NSString *)sdkVersion;
-
 /// Loads the native ad. Subclass MUST override.
 - (void)load;
 

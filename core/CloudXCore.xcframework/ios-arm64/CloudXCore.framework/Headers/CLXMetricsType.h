@@ -53,6 +53,7 @@ extern NSString * const CLXMetricsTypeMethodSetDoNotSell;     // "method_set_do_
  */
 extern NSString * const CLXMetricsTypeRendererNavigationDenied;  // "method_renderer_navigation_denied"
 extern NSString * const CLXMetricsTypeRendererMRAIDCloseRejected; // "method_renderer_mraid_close_rejected"
+extern NSString * const CLXMetricsTypeRendererMRAIDCustomCloseIgnored; // "method_renderer_mraid_custom_close_ignored"
 extern NSString * const CLXMetricsTypeRendererMRAIDUnloadRejected; // "method_renderer_mraid_unload_rejected"
 extern NSString * const CLXMetricsTypeRendererMRAIDOpenDenied;    // "method_renderer_mraid_open_denied"
 extern NSString * const CLXMetricsTypeRendererBridgeRejected;     // "method_renderer_bridge_rejected"
@@ -145,6 +146,29 @@ extern NSString * const CLXMetricsTypeRendererOMIDImpressionFireFailure; // "met
 // This means the renderer was released before didLoadBanner: or failToLoad:
 // reached the publisher - a leak from the publisher's perspective.
 extern NSString * const CLXMetricsTypeRendererBannerLeak; // "method_renderer_banner_leak"
+
+/**
+ * Fullscreen lifecycle metrics (M2.2+)
+ *
+ * Per-format counterparts to CLXMetricsTypeRendererBannerLeak. Emitted when a
+ * fullscreen renderer dealloc occurs without a terminal delegate callback
+ * (leak) or when -presentViewController:animated:completion: completes after
+ * teardown (present_failed). Reward-side constants are reserved for the
+ * follow-up rewarded renderer PR; CLXRendererMetricAuditTests guards against
+ * premature emission.
+ */
+extern NSString * const CLXMetricsTypeFullscreenInterstitialLeak;          // "fullscreen_interstitial_leak"
+extern NSString * const CLXMetricsTypeFullscreenRewardedLeak;              // "fullscreen_rewarded_leak"
+// present_failed counters fire from the format subclass's
+// notifyDidFailToShowWithError: override and UNDERCOUNT relative to the generic
+// `renderer_render_failed`: the destroyed-during-present path inside
+// CLXCoreFullscreenRenderer.showFromViewController:'s completion block records
+// renderer_render_failed directly and never invokes notify*, so the two
+// surfaces are not strict supersets. Use renderer_render_failed for the total.
+extern NSString * const CLXMetricsTypeFullscreenInterstitialPresentFailed; // "fullscreen_interstitial_present_failed"
+extern NSString * const CLXMetricsTypeFullscreenRewardedPresentFailed;     // "fullscreen_rewarded_present_failed"
+extern NSString * const CLXMetricsTypeFullscreenRewardEarned;              // "fullscreen_reward_earned"
+extern NSString * const CLXMetricsTypeFullscreenRewardForfeit;             // "fullscreen_reward_forfeit"
 
 /**
  * Utility class for metrics type validation and categorization

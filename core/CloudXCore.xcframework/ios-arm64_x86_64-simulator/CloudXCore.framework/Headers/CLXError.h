@@ -423,11 +423,11 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     CLXErrorCodeAdapterDisplayFailed = 621,
 
     /**
-     * The ad network SDK did not complete initialization within the configured timeout
-     * (server-configurable per adapter). During SDK init this is tracked internally via
-     * metrics and not surfaced to the publisher. May reach the publisher via
-     * @c didFailToLoadAd:error: if a subsequent load attempt fails because the adapter
-     * never finished initializing.
+     * Retained for wire/backward compatibility. No longer emitted from adapter
+     * initialization: the per-adapter deadline is now a soft timeout that releases
+     * the SDK init gate without recording a failure, leaving the adapter to finish
+     * in the background. The code and its mappings are kept so existing consumers and
+     * backend/dashboard keys continue to resolve.
      *
      * Publisher action: May indicate a slow network or unresponsive ad network SDK.
      * Check device connectivity and adapter logs.

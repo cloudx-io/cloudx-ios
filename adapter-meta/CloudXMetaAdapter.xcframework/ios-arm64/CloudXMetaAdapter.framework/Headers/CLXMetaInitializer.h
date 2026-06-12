@@ -10,7 +10,6 @@
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
 @property (nonatomic, copy, readonly) NSString *network;
 
-+ (BOOL)isInitialized;
 + (NSString *)sdkVersion;
 
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config 

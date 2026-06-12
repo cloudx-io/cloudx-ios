@@ -70,6 +70,7 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
               storedImpressionId:(NSString *)storedImpressionId
             localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters
                       impModel:(nullable CLXConfigImpressionModel *)impModel
+                       auctionId:(NSString *)auctionId
                       successWin:(BOOL)successWin
                    correlationId:(NSString *)correlationId
                       completion:(void (^)(CLXBidAdSourceResponse * _Nullable response, NSError * _Nullable error))completion;

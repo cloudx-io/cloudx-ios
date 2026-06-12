@@ -26,10 +26,30 @@ typedef NS_ENUM(NSInteger, SDKConfigKnownAdapterName) {
 @property (nonatomic, strong) NSString *networkName;
 
 /**
- * Server-configurable per-adapter initialization timeout in milliseconds.
- * 0 means no timeout (unlimited wait). Parsed from the @c initTimeoutMs JSON field.
+ * Server-configurable per-adapter soft initialization deadline in milliseconds.
+ * When the deadline elapses, SDK init stops waiting on this adapter but the adapter
+ * keeps initializing in the background and joins later auctions once it settles.
+ * Parsed from the @c softInitTimeoutMs JSON field; the parser resolves a 5000ms
+ * default when the field is absent or non-positive, so this is always a concrete
+ * positive deadline by the time initialization reads it.
  */
-@property (nonatomic, assign) NSInteger initTimeoutMs;
+@property (nonatomic, assign) NSInteger softInitTimeoutMs;
+
+/**
+ * The soft init deadline (ms) applied when the server sends no positive value.
+ * Single source of truth for the default so the parser and the init loop can't drift.
+ */
++ (NSInteger)defaultSoftTimeoutMs;
+
+/**
+ * Resolves a raw network name to the mapped name the SDK keys readiness and token
+ * sources by. The single source of truth for network-name aliasing, so callers that
+ * hold only a name string (e.g. the auction coordinator's readiness check) and callers
+ * that hold a bidder instance both resolve through the same logic and can't drift.
+ * @param name The raw network name as configured.
+ * @return The mapped network name, or @c name unchanged when no alias applies.
+ */
++ (NSString *)mappedNetworkNameForName:(NSString *)name;
 
 - (instancetype)initWithBidderInitData:(NSDictionary<NSString *, id> *)bidderInitData
                     networkName:(NSString *)networkName;

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXRenderer'
-  s.version = '3.4.4'
+  s.version = '3.4.5'
   s.summary          = 'CloudX Renderer Framework - Dynamic Framework'
   s.description      = 'Rendering engine for CloudX iOS SDK - binary distribution as dynamic framework'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'renderer-cloudx/CloudXRenderer.xcframework'
   
   # Dependencies
-  s.dependency 'CloudXCore', '3.4.4'
+  s.dependency 'CloudXCore', '3.4.5'
   
   s.frameworks = ['Foundation', 'UIKit', 'WebKit', 'AVFoundation', 'AVKit']
   s.weak_frameworks = ['SafariServices']

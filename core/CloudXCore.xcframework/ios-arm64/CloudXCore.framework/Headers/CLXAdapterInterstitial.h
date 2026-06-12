@@ -20,15 +20,14 @@ NS_ASSUME_NONNULL_BEGIN
  * Abstract base class for interstitial adapters.
  *
  * Subclass per ad network. Required overrides: @c -load,
- * @c -showFromViewController:, @c -destroy. Subclasses populate @c _bidID and
- * either update @c _isReady or override @c -isReady to report SDK readiness.
+ * @c -showFromViewController:, @c -destroy. Subclasses update @c _isReady or
+ * override @c -isReady to report SDK readiness.
  * The @c delegate retain-cycle break must happen in @c -destroy.
  */
 CLX_PUBLIC_ADAPTER
 @interface CLXAdapterInterstitial : NSObject <CLXDestroyable> {
 @protected
     id<CLXAdapterInterstitialDelegate> _Nullable _delegate;
-    NSString *_bidID;
     BOOL _isReady;
 }
 
@@ -36,9 +35,6 @@ CLX_PUBLIC_ADAPTER
 /// Strong to keep the callback chain alive through the ad lifecycle.
 /// Cycle is broken in @c -destroy.
 @property (nonatomic, strong, nullable) id<CLXAdapterInterstitialDelegate> delegate;
-
-/// Bid id from bid response.
-@property (nonatomic, copy, readonly) NSString *bidID;
 
 /// Whether the ad is ready to be shown.
 @property (nonatomic, assign, readonly) BOOL isReady;
