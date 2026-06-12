@@ -1,41 +1,57 @@
 PODS:
+  - Ads-Global (7.9.1.3):
+    - Ads-Global/BUAdSDK (= 7.9.1.3)
+  - Ads-Global/BUAdSDK (7.9.1.3):
+    - Ads-Global/PangleSDK
+    - Ads-Global/TikTokBusinessSDK
+  - Ads-Global/PangleSDK (7.9.1.3)
+  - Ads-Global/TikTokBusinessSDK (7.9.1.3)
   - ATOM-Standalone (3.9.0)
-  - CloudXCore (3.4.1)
-  - CloudXDigitalTurbineAdapter (3.4.1):
-    - CloudXCore (= 3.4.1)
-    - Fyber_Marketplace_SDK (< 9.0, >= 8.4.0)
-  - CloudXInMobiAdapter (3.4.1):
-    - CloudXCore (= 3.4.1)
-    - InMobiSDK (< 12.0, >= 11.0.0)
-  - CloudXMagniteAdapter (3.4.1):
-    - CloudXCore (= 3.4.1)
+  - CloudXCore (3.4.5)
+  - CloudXDigitalTurbineAdapter (3.4.5):
+    - CloudXCore (= 3.4.5)
+    - Fyber_Marketplace_SDK (< 9.0, >= 8.0.0)
+  - CloudXGoogleWaterfallAdapter (3.4.5):
+    - CloudXCore (= 3.4.5)
+    - Google-Mobile-Ads-SDK (= 12.14.0)
+  - CloudXInMobiAdapter (3.4.5):
+    - CloudXCore (= 3.4.5)
+    - InMobiSDK (< 12.0, >= 11.2.0)
+  - CloudXMagniteAdapter (3.4.5):
+    - CloudXCore (= 3.4.5)
     - MagniteSDK (~> 1.0.0)
-  - CloudXMetaAdapter (3.4.1):
-    - CloudXCore (= 3.4.1)
+  - CloudXMetaAdapter (3.4.5):
+    - CloudXCore (= 3.4.5)
     - FBAudienceNetwork (< 7.0, >= 6.15.1)
-  - CloudXMintegralAdapter (3.4.1):
-    - CloudXCore (= 3.4.1)
+  - CloudXMintegralAdapter (3.4.5):
+    - CloudXCore (= 3.4.5)
     - MintegralAdSDK (~> 8.0)
     - MintegralAdSDK/BidBannerAd (~> 8.0)
     - MintegralAdSDK/BidNativeAdvancedAd (~> 8.0)
     - MintegralAdSDK/BidNewInterstitialAd (~> 8.0)
     - MintegralAdSDK/BidRewardVideoAd (~> 8.0)
-  - CloudXMolocoAdapter (3.4.1):
-    - CloudXCore (= 3.4.1)
+  - CloudXMolocoAdapter (3.4.5):
+    - CloudXCore (= 3.4.5)
     - MolocoSDKiOS (~> 4.6.0)
-  - CloudXRenderer (3.4.1):
-    - CloudXCore (= 3.4.1)
-  - CloudXUnityAdsAdapter (3.4.1):
-    - CloudXCore (= 3.4.1)
+  - CloudXPangleAdapter (3.4.5):
+    - Ads-Global (~> 7.9.0)
+    - CloudXCore (= 3.4.5)
+  - CloudXRenderer (3.4.5):
+    - CloudXCore (= 3.4.5)
+  - CloudXUnityAdsAdapter (3.4.5):
+    - CloudXCore (= 3.4.5)
     - UnityAds (< 5.0, >= 4.17.0)
-  - CloudXVerveAdapter (3.4.1):
-    - CloudXCore (= 3.4.1)
+  - CloudXVerveAdapter (3.4.5):
+    - CloudXCore (= 3.4.5)
     - HyBid (= 3.8.0)
-  - CloudXVungleAdapter (3.4.1):
-    - CloudXCore (= 3.4.1)
+  - CloudXVungleAdapter (3.4.5):
+    - CloudXCore (= 3.4.5)
     - VungleAds (< 8.0, >= 7.4.0)
   - FBAudienceNetwork (6.21.1)
   - Fyber_Marketplace_SDK (8.4.7)
+  - Google-Mobile-Ads-SDK (12.14.0):
+    - GoogleUserMessagingPlatform (>= 1.1)
+  - GoogleUserMessagingPlatform (3.1.0)
   - HyBid (3.8.0):
     - HyBid/ATOM (= 3.8.0)
     - HyBid/Banner (= 3.8.0)
@@ -56,71 +72,89 @@ PODS:
   - HyBid/RewardedVideo (3.8.0):
     - HyBid/Core
   - InMobiSDK (11.3.0)
-  - IronSourceAdQualitySDK (9.5.1)
+  - IronSourceAdQualitySDK (9.6.0)
   - MagniteSDK (1.0.0)
-  - MintegralAdSDK (8.1.3):
-    - MintegralAdSDK/BannerAd (= 8.1.3)
-    - MintegralAdSDK/BidBannerAd (= 8.1.3)
-    - MintegralAdSDK/BidInterstitialVideoAd (= 8.1.3)
-    - MintegralAdSDK/BidNativeAd (= 8.1.3)
-    - MintegralAdSDK/BidNewInterstitialAd (= 8.1.3)
-    - MintegralAdSDK/BidRewardVideoAd (= 8.1.3)
-    - MintegralAdSDK/InterstitialVideoAd (= 8.1.3)
-    - MintegralAdSDK/NativeAd (= 8.1.3)
-    - MintegralAdSDK/NewInterstitialAd (= 8.1.3)
-    - MintegralAdSDK/RewardVideoAd (= 8.1.3)
-  - MintegralAdSDK/BannerAd (8.1.3):
+  - MintegralAdSDK (8.1.5):
+    - MintegralAdSDK/BannerAd (= 8.1.5)
+    - MintegralAdSDK/BidBannerAd (= 8.1.5)
+    - MintegralAdSDK/BidInterstitialVideoAd (= 8.1.5)
+    - MintegralAdSDK/BidNativeAd (= 8.1.5)
+    - MintegralAdSDK/BidNewInterstitialAd (= 8.1.5)
+    - MintegralAdSDK/BidRewardVideoAd (= 8.1.5)
+    - MintegralAdSDK/InterstitialVideoAd (= 8.1.5)
+    - MintegralAdSDK/NativeAd (= 8.1.5)
+    - MintegralAdSDK/NewInterstitialAd (= 8.1.5)
+    - MintegralAdSDK/RewardVideoAd (= 8.1.5)
+  - MintegralAdSDK/BannerAd (8.1.5):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/BidBannerAd (8.1.3):
+  - MintegralAdSDK/BidBannerAd (8.1.5):
     - MintegralAdSDK/BannerAd
     - MintegralAdSDK/BidNativeAd
-  - MintegralAdSDK/BidInterstitialVideoAd (8.1.3):
+  - MintegralAdSDK/BidInterstitialVideoAd (8.1.5):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/InterstitialVideoAd
-  - MintegralAdSDK/BidNativeAd (8.1.3):
+  - MintegralAdSDK/BidNativeAd (8.1.5):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/BidNativeAdvancedAd (8.1.3):
+  - MintegralAdSDK/BidNativeAdvancedAd (8.1.5):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/NativeAdvancedAd
-  - MintegralAdSDK/BidNewInterstitialAd (8.1.3):
+  - MintegralAdSDK/BidNewInterstitialAd (8.1.5):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/NewInterstitialAd
-  - MintegralAdSDK/BidRewardVideoAd (8.1.3):
+  - MintegralAdSDK/BidRewardVideoAd (8.1.5):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/RewardVideoAd
-  - MintegralAdSDK/InterstitialVideoAd (8.1.3):
+  - MintegralAdSDK/InterstitialVideoAd (8.1.5):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/NativeAd (8.1.3)
-  - MintegralAdSDK/NativeAdvancedAd (8.1.3):
+  - MintegralAdSDK/NativeAd (8.1.5)
+  - MintegralAdSDK/NativeAdvancedAd (8.1.5):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/NewInterstitialAd (8.1.3):
+  - MintegralAdSDK/NewInterstitialAd (8.1.5):
     - MintegralAdSDK/InterstitialVideoAd
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/RewardVideoAd (8.1.3):
+  - MintegralAdSDK/RewardVideoAd (8.1.5):
     - MintegralAdSDK/NativeAd
   - MolocoSDKiOS (4.6.1)
-  - UnityAds (4.18.0):
+  - UnityAds (4.18.1):
     - IronSourceAdQualitySDK (< 10.0.0)
-  - VungleAds (7.7.3)
+  - VungleAds (7.7.4)
 
 DEPENDENCIES:
-  - CloudXCore (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/core/CloudXCore.podspec`)
-  - CloudXDigitalTurbineAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-digitalturbine/CloudXDigitalTurbineAdapter.podspec`)
-  - CloudXInMobiAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-inmobi/CloudXInMobiAdapter.podspec`)
-  - CloudXMagniteAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-magnite/CloudXMagniteAdapter.podspec`)
-  - CloudXMetaAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-meta/CloudXMetaAdapter.podspec`)
-  - CloudXMintegralAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-mintegral/CloudXMintegralAdapter.podspec`)
-  - CloudXMolocoAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-moloco/CloudXMolocoAdapter.podspec`)
-  - CloudXRenderer (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/renderer-cloudx/CloudXRenderer.podspec`)
-  - CloudXUnityAdsAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-unityads/CloudXUnityAdsAdapter.podspec`)
-  - CloudXVerveAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-verve/CloudXVerveAdapter.podspec`)
-  - CloudXVungleAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-vungle/CloudXVungleAdapter.podspec`)
+  - CloudXCore (~> 3.4.5)
+  - CloudXDigitalTurbineAdapter (~> 3.4.5)
+  - CloudXGoogleWaterfallAdapter (~> 3.4.5)
+  - CloudXInMobiAdapter (~> 3.4.5)
+  - CloudXMagniteAdapter (~> 3.4.5)
+  - CloudXMetaAdapter (~> 3.4.5)
+  - CloudXMintegralAdapter (~> 3.4.5)
+  - CloudXMolocoAdapter (~> 3.4.5)
+  - CloudXPangleAdapter (~> 3.4.5)
+  - CloudXRenderer (~> 3.4.5)
+  - CloudXUnityAdsAdapter (~> 3.4.5)
+  - CloudXVerveAdapter (~> 3.4.5)
+  - CloudXVungleAdapter (~> 3.4.5)
 
 SPEC REPOS:
   trunk:
+    - Ads-Global
     - ATOM-Standalone
+    - CloudXCore
+    - CloudXDigitalTurbineAdapter
+    - CloudXGoogleWaterfallAdapter
+    - CloudXInMobiAdapter
+    - CloudXMagniteAdapter
+    - CloudXMetaAdapter
+    - CloudXMintegralAdapter
+    - CloudXMolocoAdapter
+    - CloudXPangleAdapter
+    - CloudXRenderer
+    - CloudXUnityAdsAdapter
+    - CloudXVerveAdapter
+    - CloudXVungleAdapter
     - FBAudienceNetwork
     - Fyber_Marketplace_SDK
+    - Google-Mobile-Ads-SDK
+    - GoogleUserMessagingPlatform
     - HyBid
     - InMobiSDK
     - IronSourceAdQualitySDK
@@ -130,54 +164,35 @@ SPEC REPOS:
     - UnityAds
     - VungleAds
 
-EXTERNAL SOURCES:
-  CloudXCore:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/core/CloudXCore.podspec
-  CloudXDigitalTurbineAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-digitalturbine/CloudXDigitalTurbineAdapter.podspec
-  CloudXInMobiAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-inmobi/CloudXInMobiAdapter.podspec
-  CloudXMagniteAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-magnite/CloudXMagniteAdapter.podspec
-  CloudXMetaAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-meta/CloudXMetaAdapter.podspec
-  CloudXMintegralAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-mintegral/CloudXMintegralAdapter.podspec
-  CloudXMolocoAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-moloco/CloudXMolocoAdapter.podspec
-  CloudXRenderer:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/renderer-cloudx/CloudXRenderer.podspec
-  CloudXUnityAdsAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-unityads/CloudXUnityAdsAdapter.podspec
-  CloudXVerveAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-verve/CloudXVerveAdapter.podspec
-  CloudXVungleAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-3.4.1/adapter-vungle/CloudXVungleAdapter.podspec
-
 SPEC CHECKSUMS:
+  Ads-Global: 5d66442ebf73301114809e28a4d8606e98bf40ab
   ATOM-Standalone: cd8bed8eb43e48d0f2e778aa0db893cb7f8ceb93
-  CloudXCore: 71ff6e882e704d630d613529a49422e683cdd800
-  CloudXDigitalTurbineAdapter: 7e135f1d9dd234be69528cf39eb48177a7a37903
-  CloudXInMobiAdapter: a9e931a12d135ff6a36bf65c2403b33fe88eb529
-  CloudXMagniteAdapter: c0bd0ddebb73ae515adc0b01ff9c08be04ef27cd
-  CloudXMetaAdapter: c84eb19a0418b847e58639b97d8ed4852e2836df
-  CloudXMintegralAdapter: 7467e56699eb95715a224496a8f40ddc34b588dc
-  CloudXMolocoAdapter: 450c4c3474684df8ab73c43ef3bbc408dab14422
-  CloudXRenderer: adbfa9c1138d3b6c67e3436f608cc301d0bc1745
-  CloudXUnityAdsAdapter: 3932c103689e6c575935c30792d57a90e7fdae5f
-  CloudXVerveAdapter: af89a4ab1e818711147140f12a73694c9d297d41
-  CloudXVungleAdapter: f7e19c202d3a828157e9fabcbc3ebae03b09309a
+  CloudXCore: 060bf662ef472e21767924276f72c6b29de693b2
+  CloudXDigitalTurbineAdapter: 47b475b78e8a2719c69f8cc6f58e192f945abb21
+  CloudXGoogleWaterfallAdapter: 5973f73f2daf42d1c665a93d5a37e37fa9c6d5ab
+  CloudXInMobiAdapter: a3853bd52e95fe261ac3632c32d42f41df8bc82c
+  CloudXMagniteAdapter: 3253e694ff9db214a5e252f1849a27911afc58aa
+  CloudXMetaAdapter: 833a649bc572d2e25e19e604cf3d45c45ffa5289
+  CloudXMintegralAdapter: b2b6e6fa923a2f7d40a032bdafd63164c3392716
+  CloudXMolocoAdapter: 1db54068873ad49e1a5e38e26c2c314ec3ecc4a6
+  CloudXPangleAdapter: f87d1fe0a064252dd787ae573ff85427df8ac3af
+  CloudXRenderer: 943802f845170d1f21d57af482521c22616fbefb
+  CloudXUnityAdsAdapter: 842e4d11b2f2516e6e5d5c6abde72f41515e787c
+  CloudXVerveAdapter: 8a8edb648a8de821da5e2874ba331fddc73481ae
+  CloudXVungleAdapter: 67f912300cd1335a0a4dd107cb556c4a46d69615
   FBAudienceNetwork: 85d18a65c9e35bc426bd4664cf3ae2a1172d7b60
   Fyber_Marketplace_SDK: 1a880b530921ddf07a74982e163ab56eaf90e932
+  Google-Mobile-Ads-SDK: 4534fd2dfcd3f705c5485a6633c5188d03d4eed2
+  GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
   HyBid: 4357f0aac2388cd3c940f750e4f7ea6f06881541
   InMobiSDK: a25c208dcc6fc6d9b228f34a4643712f37923208
-  IronSourceAdQualitySDK: d3f89c7eb4afc6b6c45fc3d83d64789a9977148f
+  IronSourceAdQualitySDK: 3723b551e1c0b2d0f026deee385d9ef4b2d41cc8
   MagniteSDK: edfce03a6207c856681cc3355a7e6124c977ae61
-  MintegralAdSDK: 0858525ba50c372960c98cd0151921d69907d08d
+  MintegralAdSDK: 9e98161b5c5afdc7f5effe4f3969dd1cf0430ed1
   MolocoSDKiOS: e68458b4a01e1580662ab849669b7190bfe93fa9
-  UnityAds: 841571b44ea0c0adff40fabf2112f3c4a96a5db6
-  VungleAds: 58cb2d034ab1f455b9c2fb7ec8bdbcd82cf0ca70
+  UnityAds: 07379b63b1044dcad98b3092319166fd6f2cfda4
+  VungleAds: 77bad219e9e4b34bf43ab2518bf2fac72b86100b
 
-PODFILE CHECKSUM: a2f2478bddca7ae5c28284e463b91c605793ea91
+PODFILE CHECKSUM: cd85c1f7929c6c17a0eecd74e9bb3bc42214982d
 
 COCOAPODS: 1.16.2
