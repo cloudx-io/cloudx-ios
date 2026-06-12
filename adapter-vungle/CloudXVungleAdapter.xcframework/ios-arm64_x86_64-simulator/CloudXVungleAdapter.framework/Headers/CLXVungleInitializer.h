@@ -28,16 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly) NSString *network;
 
 /**
- * Checks if the Vungle SDK is initialized and ready for use
- * @return YES if initialized, NO otherwise
- */
-+ (BOOL)isInitialized;
-
-/**
- * Factory method to create a new initializer instance
- * @return New initializer instance
- */
-/**
  * Gets the current Vungle SDK version
  * @return SDK version string
  */

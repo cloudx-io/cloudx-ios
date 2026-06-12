@@ -181,6 +181,9 @@ typedef NS_ENUM(NSInteger, CLXOpenRTBMarkupType) {
 
 // MARK: - Main Bid Response
 @interface CLXBidResponse : NSObject
+/// Canonicalized at the bid-source boundary to the client-minted bid-request id so all
+/// observability surfaces share one auction id. The SSP echoes the request id into the raw
+/// `BidResponse.id`, so this normally already matches; the stamp guarantees it regardless.
 @property (nonatomic, copy, nullable) NSString *id;
 @property (nonatomic, copy, nullable) NSString *bidid;
 @property (nonatomic, strong) NSArray<CLXBidResponseSeatBid *> *seatbid;

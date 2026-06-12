@@ -33,28 +33,28 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "CloudXCore",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.4/CloudXCore.xcframework.zip",
-            checksum: "e4f764467aa9137bb7914e06efe90d28c6bfa1f78e677172ce971f1774ca7e50"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.5/CloudXCore.xcframework.zip",
+            checksum: "45a78dc6a58a844ec33fab853642d823bddd0c16d929a89c66c1c30113f0a99f"
         ),
         .binaryTarget(
             name: "CloudXMetaAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.4/CloudXMetaAdapter.xcframework.zip",
-            checksum: "1e7de4d78f40f3f4bdf0590a21be7a2bdba3fe8af708aeabeac04275586340fc"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.5/CloudXMetaAdapter.xcframework.zip",
+            checksum: "5819a786e213636396d08126051b4f26322ffd00c41a5957813a0b9b14176a6b"
         ),
         .binaryTarget(
             name: "CloudXVungleAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.4/CloudXVungleAdapter.xcframework.zip",
-            checksum: "94ad82c5924bb0beffbffa65156fcfc2542bf45694e875ce5001aa7de613bd10"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.5/CloudXVungleAdapter.xcframework.zip",
+            checksum: "8e9f08572cd7a4a036d55999d695646d4c667cbeb561b2b7a3b8cf7cd9de9a2b"
         ),
         .binaryTarget(
             name: "CloudXMintegralAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.4/CloudXMintegralAdapter.xcframework.zip",
-            checksum: "c672214d1819b0565ea74127188df7f01acac7c8d01506b422310775ed470061"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.5/CloudXMintegralAdapter.xcframework.zip",
+            checksum: "fc16d8cc198053e934a5aef0adaa479b5875c9b79915fc15ae643b325529d375"
         ),
         .binaryTarget(
             name: "CloudXGoogleWaterfallAdapter",
-            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.4/CloudXGoogleWaterfallAdapter.xcframework.zip",
-            checksum: "076ad495e725750d43edacef54fb5020321f6fc4c8773c419b23f3c1b891a57f"
+            url: "https://github.com/cloudx-io/cloudx-ios/releases/download/v3.4.5/CloudXGoogleWaterfallAdapter.xcframework.zip",
+            checksum: "5dece9297c987d4dc92cda5b156f0c8686ec5f4aa3b1e11071961b66b0a33ea3"
         ),
     ]
 )

@@ -59,12 +59,6 @@ CLX_PUBLIC_ADAPTER
 /// Subclass MUST nil @c _delegate to break the retain cycle.
 - (void)destroy;
 
-/// Indicates whether the banner view can dynamically resize to fill its container.
-/// - YES: Banner is flexible and will expand to container width (e.g., Meta banners)
-/// - NO: Banner is fixed-size and should be centered (e.g., Vungle 320x50 banners)
-/// Default implementation returns NO (fixed-size). Override to opt in.
-- (BOOL)clx_isFlexibleSize;
-
 @end
 
 /**

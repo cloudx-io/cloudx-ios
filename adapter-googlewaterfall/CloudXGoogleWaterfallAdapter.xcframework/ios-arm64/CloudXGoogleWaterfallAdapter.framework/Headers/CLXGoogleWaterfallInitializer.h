@@ -6,7 +6,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy, readonly) NSString *network;
 
-+ (BOOL)isInitialized;
 + (NSString *)sdkVersion;
 
 - (void)initializeWithConfig:(nullable CLXBidderConfig *)config

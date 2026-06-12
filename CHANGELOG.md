@@ -13,6 +13,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.4.5] - 2026-06-12
+
+### Added
+- **InMobi native ads** — `CloudXInMobiAdapter` now serves Native creatives, both standalone (via `CLXNativeAdLoader`) and native-in-banner / native-in-MREC. Requires `InMobiSDK >= 11.2.0` (the adapter's minimum was raised from `11.0.0`).
+- **Vungle standalone native ads** — `CloudXVungleAdapter` now serves standalone Native creatives via `CLXNativeAdLoader` (native-in-banner / native-in-MREC was already supported).
+- **HTML interstitials on the CloudX renderer** — The CloudX renderer now supports fullscreen HTML interstitial creatives with MRAID 3.0, alongside the existing HTML banner / MREC support. Rollout is controlled server-side; no integration change is required.
+
+### Changed
+- **Slow ad network SDKs no longer delay CloudX SDK initialization** — Adapter initialization now uses a soft per-network timeout: if an ad network SDK is slow to initialize, CloudX SDK init completes without it and the network automatically joins later auctions once it finishes initializing. Previously a slow network SDK could block init. Networks that have not finished initializing are excluded from auctions they cannot serve, which can improve fill reliability during app startup.
+
+### Fixed
+- **Digital Turbine adapter no longer conflicts with another mediation SDK initializing the Fyber SDK** — If your app runs CloudX alongside another mediation SDK that initializes the shared Fyber Marketplace SDK first, the CloudX adapter now detects this and defers instead of re-initializing — previously this could cancel the other SDK's initialization. For the smoothest startup, initialize the other mediation SDK first, wait for its completion callback, then initialize CloudX.
+- **Some valid HTML banner creatives were rejected by the renderer** — Fixed an issue where HTML banner / MREC creatives containing failed tracker pixels (e.g. some Media.net creatives) were misclassified as broken and not displayed. These creatives now render normally.
+- **Native ad reliability improvements on Meta and Moloco** — Meta native ads now validate the loaded ad before delivery and register all asset views (title, body, icon, media, advertiser) for impression and click tracking, not just the CTA button (also applies to Vungle and Verve native-in-banner). Moloco native ads are no longer delivered when the underlying ad is not renderable.
+
+### Removed
+- **Adapter-integration APIs** — Removed from the adapter-facing surface: `clx_isFlexibleSize` (banner adapters), `+isInitialized` (adapter initializers), and per-instance `sdkVersion` (native adapters). These APIs had no function for app integrations; standard publisher integrations are unaffected.
+
+---
+
 ## [3.4.4] - 2026-06-02
 
 ### Fixed

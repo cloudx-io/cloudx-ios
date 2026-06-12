@@ -10,12 +10,9 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXBidderConfig;
 
 /// Abstract base class for ad network initializers.
-/// Subclass MUST override @c +isInitialized and @c -initializeWithConfig:testMode:completion:.
+/// Subclass MUST override @c -initializeWithConfig:testMode:completion:.
 CLX_PUBLIC_ADAPTER
 @interface CLXAdNetworkInitializer : NSObject
-
-/// Whether the ad network SDK is initialized.
-+ (BOOL)isInitialized;
 
 + (instancetype)createInstance;
 

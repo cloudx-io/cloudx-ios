@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXMolocoAdapter'
-  s.version = '3.4.4'
+  s.version = '3.4.5'
   s.summary          = 'CloudX Moloco Adapter - Static Framework'
   s.description      = 'Moloco adapter for CloudX iOS SDK - binary distribution. Supports Banner, MREC, Interstitial, Rewarded, and Native ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'adapter-moloco/CloudXMolocoAdapter.xcframework'
 
-  s.dependency 'CloudXCore', '3.4.4'
+  s.dependency 'CloudXCore', '3.4.5'
   s.dependency 'MolocoSDKiOS', '~> 4.6.0'
 
   s.frameworks = ['AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']

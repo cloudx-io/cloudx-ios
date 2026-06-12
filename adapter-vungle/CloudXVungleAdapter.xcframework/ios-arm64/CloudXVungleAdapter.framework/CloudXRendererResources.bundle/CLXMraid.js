@@ -566,9 +566,15 @@ var mraid = (function() {
       if (aoc === true || aoc === false) {
         orientationProperties.allowOrientationChange = aoc;
       }
+      // Match case-insensitively so a creative using "Portrait"/"LANDSCAPE" still
+      // locks as intended; normalize to the canonical lowercase value the native
+      // side expects. Unknown values keep the existing forceOrientation.
       var fo = properties.forceOrientation;
-      if (fo === 'landscape' || fo === 'portrait' || fo === 'none') {
-        orientationProperties.forceOrientation = fo;
+      if (typeof fo === 'string') {
+        var normalizedFo = fo.toLowerCase();
+        if (normalizedFo === 'landscape' || normalizedFo === 'portrait' || normalizedFo === 'none') {
+          orientationProperties.forceOrientation = normalizedFo;
+        }
       }
       callNative('onOrientationPropertiesChanged', { properties: JSON.stringify(orientationProperties) });
     },
@@ -624,6 +630,10 @@ var mraid = (function() {
     useCustomClose: function(useCustomClose) {
       mraidLog('warn', 'useCustomClose() is deprecated in MRAID 3.0 and ignored by this SDK');
       onError('useCustomClose is not supported.', 'useCustomClose');
+      // Observe-only native ping: lets the SDK count how often creatives still
+      // request custom close (informs network communication). Behavior is
+      // unchanged — the host always supplies its own close button.
+      callNative('useCustomClose');
     },
     
     // useCustomClose is the last public method — internal functions live on _internal below
@@ -701,9 +711,28 @@ window.mraid = mraid;
 // defaultPosition / screenSize / maxSize / viewability.
 
 // ============================================================
-// Content Error Monitoring
-// Detects video/image load failures and reports to native SDK
-// Prevents stuck black screens when creative media URLs are broken
+// Content Error Monitoring (video-only)
+//
+// Why video-only: <img> error events are not a reliable signal of a blank
+// creative. Every modern DSP creative ships 5-15+ ancillary measurement /
+// sync / tracker pixels that routinely 404 in the wild (geo blocks, ad
+// blockers, vendor outages, expired sync tokens). Heuristics to tell
+// "the visible creative image" apart from "an ancillary tracker pixel"
+// were tried (declared dimensions, bounding-rect size, computed
+// display/visibility/opacity) and proved unreliable — a production DSP
+// banner shipped a tracker pixel that survived every check and
+// tripped the load gate against a creative that rendered correctly. The
+// classifier could be tightened indefinitely; that is a maintenance hole,
+// not a heuristic.
+//
+// <video> is structurally different: DSPs do not ship tracker-pixel
+// videos. A <video> or <source> firing its error event genuinely means
+// the user sees a stalled / blank creative. That signal is preserved.
+//
+// The blank-slot-billing case the original (image-inclusive) gate
+// targeted needs a different signal anyway — paint detection or
+// viewability-after-N-seconds without didImpression — not an image-error
+// counter on the JS bridge.
 // ============================================================
 (function() {
   var reportedErrors = {}; // Prevent duplicate reports
@@ -719,12 +748,17 @@ window.mraid = mraid;
     }
   }
 
+  // Cross-layer contract: the native gate
+  // (CLXCoreMRAIDManager.handleContentError:) latches on the "video"
+  // prefix of `mediaType`. Keep both in lockstep — drift silently stops
+  // the gate from rejecting blank video slots.
   function reportContentError(mediaType, src, error) {
     var key = mediaType + ':' + src;
     if (reportedErrors[key]) return; // Already reported
     reportedErrors[key] = true;
 
-    console.error('[CloudX] Content error: ' + mediaType + ' failed to load: ' + safeContentErrorURLDescription(src));
+    console.error('[CloudX] Content error: ' +
+                  mediaType + ' failed to load: ' + safeContentErrorURLDescription(src));
     if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.mraid) {
       window.webkit.messageHandlers.mraid.postMessage({
         action: 'contentError',
@@ -735,7 +769,6 @@ window.mraid = mraid;
     }
   }
 
-  // Monitor video errors
   function setupVideoMonitoring() {
     var videos = document.querySelectorAll('video');
     videos.forEach(function(video) {
@@ -755,7 +788,6 @@ window.mraid = mraid;
         reportContentError('video', video.src || video.currentSrc, errorMsg);
       });
 
-      // Also monitor source elements inside video
       var sources = video.querySelectorAll('source');
       sources.forEach(function(source) {
         source.addEventListener('error', function(e) {
@@ -765,45 +797,20 @@ window.mraid = mraid;
     });
   }
 
-  // Monitor image errors
-  function setupImageMonitoring() {
-    var images = document.querySelectorAll('img');
-    images.forEach(function(img) {
-      if (img._clxErrorMonitored) return;
-      img._clxErrorMonitored = true;
-
-      img.addEventListener('error', function(e) {
-        reportContentError('image', img.src, 'Image failed to load');
-      });
-
-      // Check if image already failed (error happened before listener added)
-      if (img.complete && img.naturalWidth === 0 && img.src) {
-        reportContentError('image', img.src, 'Image failed to load (already failed)');
-      }
-    });
-  }
-
-  // Setup monitoring when DOM is ready and on mutations
-  function setupMonitoring() {
-    setupVideoMonitoring();
-    setupImageMonitoring();
-  }
-
-  // Initial setup
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupMonitoring);
+    document.addEventListener('DOMContentLoaded', setupVideoMonitoring);
   } else {
-    setupMonitoring();
+    setupVideoMonitoring();
   }
 
-  // Watch for dynamically added media elements
+  // Watch for dynamically added <video> elements (VAST creatives commonly
+  // insert the player after the main document parses).
   var observer = new MutationObserver(function(mutations) {
     var shouldCheck = mutations.some(function(m) {
       return m.addedNodes.length > 0;
     });
     if (shouldCheck) {
       setupVideoMonitoring();
-      setupImageMonitoring();
     }
   });
   observer.observe(document.body || document.documentElement, {
