@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
 
   # Dependencies
   s.dependency 'CloudXCore', '3.4.5'
-  s.dependency 'MagniteSDK', '~> 1.0.0'
+  s.dependency 'MagniteSDK', '>= 1.0.0', '< 2.0'
 
   s.frameworks = ['AVFoundation', 'AdSupport', 'CoreGraphics', 'CoreMedia', 'CoreTelephony', 'Foundation', 'JavaScriptCore', 'QuartzCore', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']
   s.weak_frameworks = ['AppTrackingTransparency']

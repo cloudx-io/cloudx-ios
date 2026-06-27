@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-moloco/CloudXMolocoAdapter.xcframework'
 
   s.dependency 'CloudXCore', '3.4.5'
-  s.dependency 'MolocoSDKiOS', '~> 4.6.0'
+  s.dependency 'MolocoSDKiOS', '>= 4.6.0', '< 5.0'
 
   s.frameworks = ['AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']
 
