@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-pangle/CloudXPangleAdapter.xcframework'
 
   s.dependency 'CloudXCore', '3.4.5'
-  s.dependency 'Ads-Global', '~> 7.9.0'
+  s.dependency 'Ads-Global', '>= 7.9.0', '< 8.0'
 
   s.frameworks = ['AVFoundation', 'AdSupport', 'AudioToolbox', 'CFNetwork', 'CoreGraphics', 'CoreMedia', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']
 
