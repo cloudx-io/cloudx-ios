@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-verve/CloudXVerveAdapter.xcframework'
 
   s.dependency 'CloudXCore', '3.4.6'
-  s.dependency 'HyBid', '= 3.8.0'
+  s.dependency 'HyBid', '>= 3.8.0', '< 4.0'
 
   s.frameworks = ['AVFoundation', 'AdSupport', 'CoreFoundation', 'CoreAudio', 'CoreGraphics', 'CoreMedia', 'CoreTelephony', 'Foundation', 'JavaScriptCore', 'QuartzCore', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']
   s.weak_frameworks = ['AppTrackingTransparency']

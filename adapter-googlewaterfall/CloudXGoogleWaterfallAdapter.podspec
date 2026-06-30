@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-googlewaterfall/CloudXGoogleWaterfallAdapter.xcframework'
 
   s.dependency 'CloudXCore', '3.4.6'
-  s.dependency 'Google-Mobile-Ads-SDK', '12.14.0'
+  s.dependency 'Google-Mobile-Ads-SDK', '>= 12.14.0', '< 13.0'
 
   s.frameworks = ['AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']
   s.weak_frameworks = ['GoogleMobileAds']
