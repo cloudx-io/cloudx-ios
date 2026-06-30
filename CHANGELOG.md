@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.4.6] - 2026-06-29
+
+### Changed
+- **`CloudXMolocoAdapter` now supports the full MolocoSDK 4.x line** — The adapter's `MolocoSDKiOS` requirement was widened from `~> 4.6.0` (which only allowed 4.6.x) to `>= 4.6.0, < 5.0`. You can now adopt newer Moloco SDK releases (4.7.0, 4.8.0, and later 4.x), which resolves a CocoaPods dependency conflict that could block integration on some apps.
+
+### Fixed
+- **Rare crash when an ad finished loading** — Fixed a rare crash that could occur when a banner or fullscreen (interstitial / rewarded) ad finished loading. Affected ads now load and report their result reliably.
+- **Duplicate banner impressions after a no-fill refresh** — Fixed an issue where a banner whose auto-refresh returned no bid could re-display the previously shown creative and count additional impressions. A refresh that returns no bid now shows nothing and reports no impression, keeping impression counts accurate.
+
+---
+
 ## [3.4.5] - 2026-06-12
 
 ### Added
