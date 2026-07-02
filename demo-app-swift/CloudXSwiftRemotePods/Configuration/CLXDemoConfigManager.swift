@@ -55,12 +55,12 @@ class CLXDemoConfigManager {
         self.currentConfig = CLXDemoConfig(
             appKey: overrideOrDefault("DemoApp.AppKey", "ihtOXvp3X9JlMQ5p0_RYL"),
             hashedUserId: "test-user-123",
-            bannerAdUnitId: overrideOrDefault("DemoApp.BannerAdUnitId", "LyPxKhBFiUCd1xMLYQhGc"),
-            mrecAdUnitId: overrideOrDefault("DemoApp.MrecAdUnitId", "EWaeXDSmKYbs220gM5hTv"),
-            interstitialAdUnitId: overrideOrDefault("DemoApp.InterstitialAdUnitId", "txZ7NmISq-MsuPH0ULKbD"),
-            nativeAdUnitId: "Q33RbPmBH-wix45Mu6--Z",
+            bannerAdUnitId: overrideOrDefault("DemoApp.BannerAdUnitId", "1pfZEjeYFB31WGsaRMIOE"),
+            mrecAdUnitId: overrideOrDefault("DemoApp.MrecAdUnitId", "f3vNAyybeLZw3tmrLDnfp"),
+            interstitialAdUnitId: overrideOrDefault("DemoApp.InterstitialAdUnitId", "SKva576GixtRW5DL_jS_D"),
+            nativeAdUnitId: "5NN7ZlBorm4ZoRkL6bsz9",
             nativeBannerAdUnitId: "-2_Lw2b4QTlu7x6tKZ6Ww",
-            rewardedAdUnitId: overrideOrDefault("DemoApp.RewardedAdUnitId", "um9Ek08ScJBWuzSMTyW3b")
+            rewardedAdUnitId: overrideOrDefault("DemoApp.RewardedAdUnitId", "jKOcqM-eHbGBwg76RQmsA")
         )
     }
 }
