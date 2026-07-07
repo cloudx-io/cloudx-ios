@@ -1,19 +1,19 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXUnityAdsAdapter'
-  s.version = '3.4.6'
+  s.version = '4.18.1.0'
   s.summary          = 'CloudX Unity Ads Adapter - Static Framework'
   s.description      = 'Unity Ads adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
   s.license          = { :type => 'Business Source License 1.1' }
   s.author           = { 'CloudX' => 'support@cloudx.io' }
-  s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "v#{s.version}" }
+  s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "adapter-unityads/#{s.version}" }
 
   s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'adapter-unityads/CloudXUnityAdsAdapter.xcframework'
 
   # Dependencies
-  s.dependency 'CloudXCore', '3.4.6'
-  s.dependency 'UnityAds', '>= 4.17.0', '< 5.0'
+  s.dependency 'CloudXCore', '>= 3.5.0'
+  s.dependency 'UnityAds', '= 4.18.1'
 
   s.frameworks = ['Foundation', 'UIKit', 'WebKit', 'AVFoundation', 'CoreMedia',
                    'AudioToolbox', 'CFNetwork', 'CoreGraphics', 'CoreTelephony',

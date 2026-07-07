@@ -1,21 +1,23 @@
 //
-//  CLXUnityAdsInterstitial.h
+//  CLXUnityAdsAdView.h
 //  CloudXUnityAdsAdapter
 //
 
 #import <Foundation/Foundation.h>
 #import <UnityAds/UnityAds.h>
-#import <CloudXCore/CLXAdapterInterstitial.h>
+#import <CloudXCore/CLXAdapterAdView.h>
 #import <CloudXCore/CLXAdapterLogger.h>
+#import <CloudXCore/CLXBannerType.h>
 #import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXUnityAdsInterstitial : CLXAdapterInterstitial <UADSInterstitialShowDelegate>
+@interface CLXUnityAdsAdView : CLXAdapterAdView <UADSBannerAdDelegate>
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                      placementName:(nullable NSString *)placementName
+                              type:(CLXBannerType)type
                             logger:(id<CLXAdapterLogger>)logger;
 
 @end
