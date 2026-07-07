@@ -4,6 +4,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CloudXCore/CLXAdapterInterstitial.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 #import <HyBid/HyBid.h>
 
 #if __has_include(<HyBid/HyBid-Swift.h>)
@@ -18,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                         adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID;
+                            logger:(id<CLXAdapterLogger>)logger;
 
 @end
 

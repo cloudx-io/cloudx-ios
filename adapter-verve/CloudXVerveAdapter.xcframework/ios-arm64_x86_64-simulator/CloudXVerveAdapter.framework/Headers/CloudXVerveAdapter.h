@@ -4,9 +4,6 @@
 
 #import <Foundation/Foundation.h>
 
-FOUNDATION_EXPORT double CloudXVerveAdapterVersionNumber;
-FOUNDATION_EXPORT const unsigned char CloudXVerveAdapterVersionString[];
-
 __attribute__((visibility("default"))) void CloudXVerveAdapterRegister(void);
 
 @interface CloudXVerveAdapter : NSObject
@@ -16,10 +13,10 @@ __attribute__((visibility("default"))) void CloudXVerveAdapterRegister(void);
 #import "CLXVerveMetadataProvider.h"
 #import "CLXVervePrivacyHandler.h"
 #import "CLXVerveInitializer.h"
-#import "CLXVerveBidTokenSource.h"
+#import "CLXVerveBidderSignalsProvider.h"
 #import "CLXVerveErrorHandler.h"
-#import "CLXVerveBanner.h"
-#import "CLXVerveBannerFactory.h"
+#import "CLXVerveAdView.h"
+#import "CLXVerveAdViewFactory.h"
 #import "CLXVerveInterstitial.h"
 #import "CLXVerveInterstitialFactory.h"
 #import "CLXVerveRewarded.h"

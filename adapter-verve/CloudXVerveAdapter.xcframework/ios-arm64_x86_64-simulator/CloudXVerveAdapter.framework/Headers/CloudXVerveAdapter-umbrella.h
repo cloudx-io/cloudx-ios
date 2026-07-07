@@ -10,9 +10,9 @@
 #endif
 #endif
 
-#import "CLXVerveBanner.h"
-#import "CLXVerveBannerFactory.h"
-#import "CLXVerveBidTokenSource.h"
+#import "CLXVerveAdView.h"
+#import "CLXVerveAdViewFactory.h"
+#import "CLXVerveBidderSignalsProvider.h"
 #import "CloudXVerveAdapter.h"
 #import "CLXVerveAdapterVersion.h"
 #import "CLXVerveMetadataProvider.h"
