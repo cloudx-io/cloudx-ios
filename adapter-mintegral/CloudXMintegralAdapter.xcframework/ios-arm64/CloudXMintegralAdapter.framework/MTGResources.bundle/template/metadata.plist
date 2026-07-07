@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>https://local.com/sct/ios/8.0.7/260430/customWebview.zip</key>
+	<dict>
+		<key>path</key>
+		<string>customWebview</string>
+		<key>name</key>
+		<string>customWebview</string>
+	</dict>
+	<key>https://local.com/sct/ios/8.0.1/1111/ecPlayable.zip</key>
+	<dict>
+		<key>key</key>
+		<string>ecPlayable</string>
+		<key>name</key>
+		<string>ecPlayable</string>
+	</dict>
+	<key>https://local.com/sct/ios/8.0.4/260123/ec404.zip</key>
+	<dict>
+		<key>name</key>
+		<string>ec404</string>
+		<key>path</key>
+		<string>ec404</string>
+	</dict>
+	<key>https://local.com/sct/ios/8.0.1/1111/video904.zip</key>
+	<dict>
+		<key>path</key>
+		<string>video904</string>
+		<key>name</key>
+		<string>video904</string>
+	</dict>
+	<key>https://local.com/sct/ios/8.0.7/260511/big201.zip</key>
+	<dict>
+		<key>path</key>
+		<string>big201</string>
+		<key>name</key>
+		<string>big201</string>
+	</dict>
+</dict>
+</plist>
