@@ -5,11 +5,8 @@
 //  Created by CloudX Team.
 //
 
-#if __has_include(<CloudXCore/CloudXCore.h>)
-#import <CloudXCore/CloudXCore.h>
-#else
-@import CloudXCore;
-#endif
+#import <CloudXCore/CLXAdapterPrivacyHandler.h>
+#import <CloudXCore/CLXAdapterPrivacyParams.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @brief Forwards resolved privacy signals to the Unity Ads SDK via UADSMetaData.
  * @discussion Unity Ads is not a registered TCF vendor and does not read IAB
  *             strings from NSUserDefaults. The CloudX core SDK resolves IAB/CMP
- *             signals and manual publisher consent into CLXAdapterPrivacySettings,
+ *             signals and manual publisher consent into CLXAdapterPrivacyParams,
  *             then pushes to this handler. This handler forwards the pre-resolved
  *             consent to gdpr.consent and privacy.consent metadata keys.
  */
