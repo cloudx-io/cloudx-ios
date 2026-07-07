@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXVerveAdapter'
-  s.version = '3.8.0.0'
+  s.version = '3.9.0.0'
   s.summary          = 'CloudX Verve Adapter - Static Framework'
   s.description      = 'Verve adapter for CloudX iOS SDK - binary distribution. Supports Banner, MREC, Interstitial, Rewarded, and Native ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-verve/CloudXVerveAdapter.xcframework'
 
   s.dependency 'CloudXCore', '>= 3.5.0'
-  s.dependency 'HyBid', '= 3.8.0'
+  s.dependency 'HyBid', '= 3.9.0'
 
   s.frameworks = ['AVFoundation', 'AdSupport', 'CoreFoundation', 'CoreAudio', 'CoreGraphics', 'CoreMedia', 'CoreTelephony', 'Foundation', 'JavaScriptCore', 'QuartzCore', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']
   s.weak_frameworks = ['AppTrackingTransparency']
