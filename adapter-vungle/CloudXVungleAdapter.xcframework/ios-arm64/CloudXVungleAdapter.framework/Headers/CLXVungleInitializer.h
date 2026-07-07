@@ -3,11 +3,7 @@
 //  CloudXVungleAdapter
 //
 
-#if __has_include(<CloudXCore/CloudXCore.h>)
-#import <CloudXCore/CloudXCore.h>
-#else
-@import CloudXCore;
-#endif
+#import <CloudXCore/CLXAdapterInitializer.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Initializer for the Vungle advertising network adapter.
  * Handles SDK initialization, configuration, and state management.
  */
-@interface CLXVungleInitializer : CLXAdNetworkInitializer
+@interface CLXVungleInitializer : CLXAdapterInitializer
 
 /**
  * SDK version of the Vungle SDK
@@ -32,16 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @return SDK version string
  */
 + (NSString *)sdkVersion;
-
-/**
- * Initializes the Vungle SDK with the provided configuration
- * @param config The bidder configuration containing App ID and other settings
- * @param testMode Whether test mode is enabled (from server deviceConfig)
- * @param completion Completion block called with success/failure result
- */
-- (void)initializeWithConfig:(nullable CLXBidderConfig *)config 
-                    testMode:(BOOL)testMode
-                  completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
 
 @end
 

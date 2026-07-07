@@ -6,11 +6,9 @@
 #import <Foundation/Foundation.h>
 #import <VungleAdsSDK/VungleAdsSDK.h>
 
-#if __has_include(<CloudXCore/CloudXCore.h>)
-#import <CloudXCore/CloudXCore.h>
-#else
-@import CloudXCore;
-#endif
+#import <CloudXCore/CLXAdapterInterstitial.h>
+#import <CloudXCore/CLXAdapterLogger.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -51,15 +49,14 @@ NS_ASSUME_NONNULL_BEGIN
  * @param bidPayload The bid payload for programmatic ads (nil for waterfall)
  * @param placementID The Vungle placement ID (nullable - validation deferred to load())
  * @param adUnitName The CloudX placement name for error messages (nullable)
- * @param bidID The CloudX bid ID
- * @param delegate The CloudX adapter delegate
+ * @param logger The CloudX adapter logger
  * @return Initialized interstitial adapter
  * @since 1.4.0 adUnitName parameter added for better error messages
  */
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
-                     adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID;
+                        adUnitName:(nullable NSString *)adUnitName
+                            logger:(id<CLXAdapterLogger>)logger;
 
 /**
  * Loads the interstitial ad

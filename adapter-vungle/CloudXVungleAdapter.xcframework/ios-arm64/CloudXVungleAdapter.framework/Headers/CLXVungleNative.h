@@ -6,11 +6,9 @@
 #import <Foundation/Foundation.h>
 #import <VungleAdsSDK/VungleAdsSDK.h>
 
-#if __has_include(<CloudXCore/CloudXCore.h>)
-#import <CloudXCore/CloudXCore.h>
-#else
-@import CloudXCore;
-#endif
+#import <CloudXCore/CLXAdapterLogger.h>
+#import <CloudXCore/CLXAdapterNative.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -26,8 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                         adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID
-                   bidExpirationMs:(NSInteger)bidExpirationMs NS_DESIGNATED_INITIALIZER;
+                            logger:(id<CLXAdapterLogger>)logger NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
 
