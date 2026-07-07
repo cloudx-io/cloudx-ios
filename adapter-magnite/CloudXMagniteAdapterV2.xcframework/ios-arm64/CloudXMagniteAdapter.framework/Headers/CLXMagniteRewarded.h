@@ -1,0 +1,60 @@
+//
+//  CLXMagniteRewarded.h
+//  CloudXMagniteAdapter
+//
+
+#import <Foundation/Foundation.h>
+
+#import <CloudXCore/CLXAdapterLogger.h>
+#import <CloudXCore/CLXAdapterRewarded.h>
+#import <CloudXCore/CLXAdapterLogger.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+/**
+ * Magnite rewarded adapter implementing CloudX adapter protocol.
+ * Manages the lifecycle of Magnite rewarded ads including loading, showing, and reward handling.
+ */
+@interface CLXMagniteRewarded : CLXAdapterRewarded
+
+/**
+ * SDK version of the Magnite SDK
+ */
+/**
+ * Network name identifier
+ */
+/**
+ * Magnite placement ID for this ad
+ */
+@property (nonatomic, copy, readonly) NSString *placementID;
+
+/**
+ * CloudX ad unit name for error messages and logging.
+ */
+@property (nonatomic, copy, readonly, nullable) NSString *adUnitName;
+
+/**
+ * Initializes a new Magnite rewarded adapter
+ * @param bidPayload Ad markup from bid response (nil for waterfall, non-nil for bidding)
+ * @param placementID The Magnite placement ID (nullable - validation deferred to load())
+ * @param adUnitName The CloudX placement name for error messages (nullable)
+ * @return Initialized rewarded adapter
+ */
+- (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
+                       placementID:(nullable NSString *)placementID
+                        adUnitName:(nullable NSString *)adUnitName
+                            logger:(id<CLXAdapterLogger>)logger;
+
+/**
+ * Loads the rewarded ad
+ */
+/**
+ * Shows the rewarded ad from the specified view controller
+ * @param viewController The view controller to present from
+ */
+/**
+ * Destroys the adapter and cleans up resources
+ */
+@end
+
+NS_ASSUME_NONNULL_END
