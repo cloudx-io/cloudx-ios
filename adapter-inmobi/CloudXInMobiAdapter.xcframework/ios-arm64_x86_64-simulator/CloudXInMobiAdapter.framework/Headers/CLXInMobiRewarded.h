@@ -7,7 +7,9 @@
 
 #import <Foundation/Foundation.h>
 #import <InMobiSDK/InMobiSDK.h>
-#import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXAdapterLogger.h>
+#import <CloudXCore/CLXAdapterRewarded.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -16,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithBidPayload:(nullable NSData *)bidPayload
                        placementID:(long long)placementID
                      adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID;
+                            logger:(id<CLXAdapterLogger>)logger;
 
 @end
 

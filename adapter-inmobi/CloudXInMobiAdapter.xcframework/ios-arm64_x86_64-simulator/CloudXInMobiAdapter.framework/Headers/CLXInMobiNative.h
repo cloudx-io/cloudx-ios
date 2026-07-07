@@ -5,7 +5,9 @@
 
 #import <Foundation/Foundation.h>
 #import <InMobiSDK/InMobiSDK-Swift.h>
-#import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXAdapterLogger.h>
+#import <CloudXCore/CLXAdapterNative.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,9 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithBidPayload:(nullable NSData *)bidPayload
                        placementID:(long long)placementID
                         adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID
-                   bidExpirationMs:(NSInteger)bidExpirationMs
-              localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters NS_DESIGNATED_INITIALIZER;
+              localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters
+                            logger:(id<CLXAdapterLogger>)logger NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
 

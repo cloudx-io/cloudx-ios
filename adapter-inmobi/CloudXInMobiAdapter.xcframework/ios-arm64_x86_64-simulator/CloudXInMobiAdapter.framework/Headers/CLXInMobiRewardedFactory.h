@@ -6,7 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXAdapterRewardedFactory.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
