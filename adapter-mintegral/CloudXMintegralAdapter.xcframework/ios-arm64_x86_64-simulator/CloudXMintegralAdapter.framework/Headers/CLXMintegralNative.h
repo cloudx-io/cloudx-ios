@@ -8,6 +8,7 @@
 #import <MTGSDKNativeAdvanced/MTGNativeAdvancedAd.h>
 #import <MTGSDKNativeAdvanced/MTGNativeAdvancedAdDelegate.h>
 #import <CloudXCore/CLXAdapterNative.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,7 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
  * detects this via `[CLXMintegralNativeAd isSelfRendered] == YES` and uses
  * the view directly instead of assembling a template.
  *
- * Bidding-only: waterfall is not supported in the native-in-banner pipeline.
+ * Bidding-only: loads via `loadAdWithBidToken:` with the auction's bid payload.
+ * An empty payload fails fast — there is no waterfall fallback, so the adapter
+ * can never serve demand CloudX didn't auction.
  */
 @interface CLXMintegralNative : CLXAdapterNative <MTGNativeAdvancedAdDelegate>
 
@@ -27,9 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
                        placementID:(NSString *)placementID
                             unitID:(NSString *)unitID
                         adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID
                             adSize:(CGSize)adSize
-              localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters NS_DESIGNATED_INITIALIZER;
+              localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters
+                            logger:(id<CLXAdapterLogger>)logger NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
 

@@ -4,6 +4,7 @@
 #import <MTGSDKReward/MTGRewardAdManager.h>
 #import <MTGSDK/MTGRewardAdInfo.h>
 #import <CloudXCore/CLXAdapterRewarded.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,8 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
                        placementID:(NSString *)placementID
                      adUnitName:(nullable NSString *)adUnitName
                             unitID:(NSString *)unitID
-                             bidID:(NSString *)bidID
-                     playVideoMute:(BOOL)playVideoMute;
+                     playVideoMute:(BOOL)playVideoMute
+                            logger:(id<CLXAdapterLogger>)logger;
 
 @end
 
