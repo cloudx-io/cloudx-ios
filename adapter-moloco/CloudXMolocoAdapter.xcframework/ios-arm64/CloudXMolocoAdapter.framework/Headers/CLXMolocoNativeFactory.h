@@ -5,11 +5,7 @@
 
 #import <Foundation/Foundation.h>
 
-#if __has_include(<CloudXCore/CloudXCore.h>)
-#import <CloudXCore/CloudXCore.h>
-#else
-@import CloudXCore;
-#endif
+#import <CloudXCore/CLXAdapterNativeFactory.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

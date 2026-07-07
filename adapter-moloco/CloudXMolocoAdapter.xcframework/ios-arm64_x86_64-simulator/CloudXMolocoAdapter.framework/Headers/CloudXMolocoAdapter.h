@@ -7,12 +7,6 @@
 
 #import <Foundation/Foundation.h>
 
-//! Project version number for CloudXMolocoAdapter.
-FOUNDATION_EXPORT double CloudXMolocoAdapterVersionNumber;
-
-//! Project version string for CloudXMolocoAdapter.
-FOUNDATION_EXPORT const unsigned char CloudXMolocoAdapterVersionString[];
-
 // Registration function for static frameworks
 __attribute__((visibility("default"))) void CloudXMolocoAdapterRegister(void);
 
@@ -26,12 +20,12 @@ __attribute__((visibility("default"))) void CloudXMolocoAdapterRegister(void);
 #import "CLXMolocoMetadataProvider.h"
 #import "CLXMolocoPrivacyHandler.h"
 
-// Public headers - Bid Token Source
-#import "CLXMolocoBidTokenSource.h"
+// Public headers - Bidder Signals Provider
+#import "CLXMolocoBidderSignalsProvider.h"
 
 // Public headers - Banner / MREC
-#import "CLXMolocoBanner.h"
-#import "CLXMolocoBannerFactory.h"
+#import "CLXMolocoAdView.h"
+#import "CLXMolocoAdViewFactory.h"
 
 // Public headers - Interstitial
 #import "CLXMolocoInterstitial.h"
