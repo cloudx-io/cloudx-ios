@@ -1,9 +1,9 @@
-#import <CloudXCore/CLXAdapterRewarded.h>
+#import <CloudXCore/CLXAdapterInterstitial.h>
 #import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXGoogleWaterfallRewarded : CLXAdapterRewarded
+@interface CLXGoogleWaterfallAppOpen : CLXAdapterInterstitial
 
 - (instancetype)initWithAdm:(NSString *)adm
                      extras:(nullable NSDictionary<NSString *, NSString *> *)extras

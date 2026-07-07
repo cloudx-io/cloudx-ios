@@ -1,14 +1,12 @@
-#import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXAdapterRewarded.h>
+#import <CloudXCore/CLXAdapterRewardedFactory.h>
+#import <CloudXCore/CLXAdapterRewardedParams.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXGoogleWaterfallRewardedFactory : CLXAdapterRewardedFactory
 
-- (nullable CLXAdapterRewarded *)createWithAdId:(NSString *)adId
-                                          bidId:(NSString *)bidId
-                                            adm:(NSString *)adm
-                                         extras:(NSDictionary<NSString *, NSString *> *)extras
-                                     adUnitName:(nullable NSString *)adUnitName;
+- (nullable CLXAdapterRewarded *)createWithParams:(CLXAdapterRewardedParams *)params;
 
 @end
 
