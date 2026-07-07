@@ -1,0 +1,97 @@
+# Post release notes to the #shipped Slack channel.
+#
+# Trigger: a GitHub Release is PUBLISHED in this repo. Per the release runbook
+# (cloudx-ios-private/release/sdk_releases.md §6), releases are created only
+# after the pods are live on CocoaPods trunk, CDN propagation is confirmed,
+# and the Blocky smoke test has installed from public trunk — so this
+# notification inherits that timing and can never announce an uninstallable
+# version. Draft releases do not fire this; publishing one does.
+#
+# The message body is the release's own notes (the changelog summary the
+# runbook puts in the release body). #sdk-releases is separately notified by
+# the Slack GitHub app's release subscription; this workflow only covers
+# #shipped.
+#
+# Requires the SLACK_SHIPPED_WEBHOOK_URL repo secret: a Slack incoming-webhook
+# URL bound to the #shipped channel.
+
+name: 'Notify #shipped'
+
+on:
+  release:
+    types: [published]
+  # Manual smoke test for the webhook/secret wiring — posts a clearly-marked
+  # test message to #shipped. Run once after setting SLACK_SHIPPED_WEBHOOK_URL
+  # so a broken webhook is discovered now, not on release day.
+  workflow_dispatch:
+
+jobs:
+  notify-shipped:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post release notes to #shipped
+        # Test-mode fallbacks live in the script (keyed on EVENT_NAME), not in
+        # `${{ ... || '...' }}` defaults: an unquoted `#` inside a plain YAML
+        # scalar starts a comment, which previously truncated the expression
+        # mid-`${{` and made GitHub reject the whole workflow file as invalid.
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SHIPPED_WEBHOOK_URL }}
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_NAME: ${{ github.event.release.name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "::error::SLACK_SHIPPED_WEBHOOK_URL secret is not set — create a Slack incoming webhook for #shipped and add it as a repo secret."
+            exit 1
+          fi
+
+          # Slack blocks cap section text at 3000 chars; truncate long bodies
+          # with a pointer back to the full release notes.
+          python3 - <<'PY' > payload.json
+          import json, os
+
+          is_test = os.environ.get("EVENT_NAME") == "workflow_dispatch"
+          name = os.environ.get("RELEASE_NAME") or os.environ.get("RELEASE_TAG") or "release"
+          tag = os.environ.get("RELEASE_TAG", "")
+          url = os.environ.get("RELEASE_URL", "")
+          body = os.environ.get("RELEASE_BODY", "").strip() or "_No release notes provided._"
+          if is_test:
+              name = "[TEST] shipped-notify wiring check"
+              tag = "no-tag-manual-test"
+              url = "https://github.com/cloudx-io/cloudx-ios/actions"
+              body = (
+                  "This is a manual test of the #shipped webhook wiring "
+                  "(workflow_dispatch). If you can read this, the integration works — "
+                  "real messages will carry release changelogs."
+              )
+          limit = 2800
+          if len(body) > limit:
+              body = body[:limit] + f"\n\n… truncated — <{url}|full release notes>"
+
+          payload = {
+              "text": f"Shipped: {name} ({tag})",
+              "blocks": [
+                  {
+                      "type": "header",
+                      "text": {"type": "plain_text", "text": f"Shipped: {name}", "emoji": True},
+                  },
+                  {
+                      "type": "section",
+                      "text": {"type": "mrkdwn", "text": f"*Tag:* `{tag}` — <{url}|release page>"},
+                  },
+                  {"type": "divider"},
+                  {
+                      "type": "section",
+                      "text": {"type": "mrkdwn", "text": body},
+                  },
+              ],
+          }
+          print(json.dumps(payload))
+          PY
+
+          curl --fail-with-body -sS -X POST \
+            -H 'Content-Type: application/json' \
+            --data @payload.json \
+            "$SLACK_WEBHOOK_URL"
