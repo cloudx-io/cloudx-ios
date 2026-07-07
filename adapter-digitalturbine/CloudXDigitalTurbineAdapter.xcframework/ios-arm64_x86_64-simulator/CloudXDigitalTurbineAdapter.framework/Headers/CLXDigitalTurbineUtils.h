@@ -4,10 +4,11 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class CLXLogger;
+@protocol CLXAdapterLogger;
 
 /**
  * Helpers for translating CloudX server-side provisioning into spot identifiers
@@ -23,7 +24,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (NSString *)resolveSpotID:(NSDictionary<NSString *, NSString *> *)extras
                fallbackAdId:(NSString *)adId
-                     logger:(CLXLogger *)logger;
+                     logger:(id<CLXAdapterLogger>)logger;
+
+/**
+ * Resolves the canonical placement spot ID from server extras without legacy
+ * fallbacks.
+ */
++ (nullable NSString *)resolveSpotIDFromExtras:(NSDictionary<NSString *, id> *)extras;
 
 /**
  * Resolves the per-load video mute preference from server extras.
@@ -34,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
  * should treat `nil` as "no override" and leave the SDK at its current mute
  * state, matching the Android adapter's convention.
  */
-+ (nullable NSNumber *)isMutedFromExtras:(NSDictionary<NSString *, NSString *> *)extras;
++ (nullable NSNumber *)isMutedFromExtras:(NSDictionary<NSString *, id> *)extras;
 
 @end
 

@@ -23,7 +23,7 @@ typedef NS_ENUM(NSInteger, CLXDTInitState) {
     kCLXDTInitStateCompleted,
 };
 
-/// The action `initializeWithConfig:` should take for a given input. Kept
+/// The action `initializeWithParams:` should take for a given input. Kept
 /// separate from its side effects (queue hops, SDK calls, completion firing) so
 /// the branch selection is a pure function that can be unit-tested directly
 /// without driving the third-party SDK singleton.
@@ -39,7 +39,7 @@ typedef NS_ENUM(NSInteger, CLXDTInitDecision) {
 
 /// Pure init-state-machine decision. No globals, no IASDKCore, no queue — the
 /// inputs fully determine the result. The imperative shell in
-/// `initializeWithConfig:` gathers the inputs and performs the side effects for
+/// `initializeWithParams:` gathers the inputs and performs the side effects for
 /// the returned decision.
 ///
 /// @param state The current init lifecycle state.

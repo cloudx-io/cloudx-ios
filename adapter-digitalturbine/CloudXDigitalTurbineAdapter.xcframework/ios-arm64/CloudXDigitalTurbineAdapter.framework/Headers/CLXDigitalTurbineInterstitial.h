@@ -4,7 +4,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXAdapterInterstitial.h>
+#import <CloudXCore/CLXAdapterLogger.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -13,8 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithBidPayload:(NSString *)bidPayload
                             spotID:(nullable NSString *)spotID
                         adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID
-                           isMuted:(nullable NSNumber *)isMuted;
+                           isMuted:(nullable NSNumber *)isMuted
+                            logger:(id<CLXAdapterLogger>)logger;
 
 @end
 

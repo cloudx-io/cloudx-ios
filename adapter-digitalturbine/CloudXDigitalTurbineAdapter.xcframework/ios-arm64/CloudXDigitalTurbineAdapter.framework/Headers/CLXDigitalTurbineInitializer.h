@@ -3,25 +3,21 @@
 //  CloudXDigitalTurbineAdapter
 //
 
-#import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXAdapterInitializer.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Bootstraps the underlying Digital Turbine SDK from CloudX server-side
- * provisioning. Reads `app_id` from `CLXBidderConfig.initializationData` and
- * routes the completion through CloudX's `CLXAdNetworkInitializer` contract.
+ * provisioning. Reads `app_id` from adapter initialization params and
+ * routes the completion through CloudX's `CLXAdapterInitializer` contract.
  */
-@interface CLXDigitalTurbineInitializer : CLXAdNetworkInitializer
+@interface CLXDigitalTurbineInitializer : CLXAdapterInitializer
 
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
 @property (nonatomic, copy, readonly) NSString *network;
 
 + (NSString *)sdkVersion;
-
-- (void)initializeWithConfig:(nullable CLXBidderConfig *)config
-                    testMode:(BOOL)testMode
-                  completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
 
 @end
 
