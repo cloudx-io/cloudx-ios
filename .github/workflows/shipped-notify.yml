@@ -20,6 +20,10 @@ name: Notify #shipped
 on:
   release:
     types: [published]
+  # Manual smoke test for the webhook/secret wiring — posts a clearly-marked
+  # test message to #shipped. Run once after setting SLACK_SHIPPED_WEBHOOK_URL
+  # so a broken webhook is discovered now, not on release day.
+  workflow_dispatch:
 
 jobs:
   notify-shipped:
@@ -28,10 +32,10 @@ jobs:
       - name: Post release notes to #shipped
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SHIPPED_WEBHOOK_URL }}
-          RELEASE_NAME: ${{ github.event.release.name }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-          RELEASE_URL: ${{ github.event.release.html_url }}
-          RELEASE_BODY: ${{ github.event.release.body }}
+          RELEASE_NAME: ${{ github.event.release.name || '[TEST] shipped-notify wiring check' }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || 'no-tag-manual-test' }}
+          RELEASE_URL: ${{ github.event.release.html_url || github.server_url }}
+          RELEASE_BODY: ${{ github.event.release.body || 'This is a manual test of the #shipped webhook wiring (workflow_dispatch). If you can read this, the integration works — real messages will carry release changelogs.' }}
         run: |
           if [ -z "$SLACK_WEBHOOK_URL" ]; then
             echo "::error::SLACK_SHIPPED_WEBHOOK_URL secret is not set — create a Slack incoming webhook for #shipped and add it as a repo secret."
