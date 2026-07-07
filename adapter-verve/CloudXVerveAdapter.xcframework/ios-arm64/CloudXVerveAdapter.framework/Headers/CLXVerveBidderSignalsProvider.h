@@ -3,11 +3,11 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CLXAdapterBannerFactory.h>
+#import <CloudXCore/CLXAdapterBidderSignalsProvider.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXVerveBannerFactory : CLXAdapterBannerFactory
+@interface CLXVerveBidderSignalsProvider : CLXAdapterBidderSignalsProvider
 @end
 
 NS_ASSUME_NONNULL_END

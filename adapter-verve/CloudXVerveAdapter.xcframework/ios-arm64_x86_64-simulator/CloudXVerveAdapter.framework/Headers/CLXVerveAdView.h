@@ -3,18 +3,19 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CLXAdapterBanner.h>
+#import <CloudXCore/CLXAdapterAdView.h>
 #import <CloudXCore/CLXBannerType.h>
 #import <HyBid/HyBid.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXVerveBanner : CLXAdapterBanner <HyBidAdViewDelegate>
+@interface CLXVerveAdView : CLXAdapterAdView <HyBidAdViewDelegate>
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                         adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID
-                              type:(CLXBannerType)type;
+                              type:(CLXBannerType)type
+                            logger:(id<CLXAdapterLogger>)logger;
 
 @end
 

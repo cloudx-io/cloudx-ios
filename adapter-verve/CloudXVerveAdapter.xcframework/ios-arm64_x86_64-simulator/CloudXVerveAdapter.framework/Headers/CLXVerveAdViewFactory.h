@@ -3,11 +3,11 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CLXBidTokenSource.h>
+#import <CloudXCore/CLXAdapterAdViewFactory.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXVerveBidTokenSource : CLXBidTokenSource
+@interface CLXVerveAdViewFactory : CLXAdapterAdViewFactory
 @end
 
 NS_ASSUME_NONNULL_END
