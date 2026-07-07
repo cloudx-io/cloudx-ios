@@ -1,5 +1,5 @@
 //
-//  CLXPangleBanner.h
+//  CLXPangleAppOpen.h
 //  CloudXPangleAdapter
 //
 
@@ -15,23 +15,23 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Pangle banner adapter.
+ * Pangle app open adapter.
  *
- * Manages the lifecycle of Pangle banner/MREC ads including loading, showing,
- * and cleanup.
+ * Backs the CloudX app-open format with Pangle's dedicated `PAGLAppOpenAd`.
+ * Manages the lifecycle of Pangle app open ads including loading, showing,
+ * and cleanup. App open reuses the interstitial adapter contract, so this
+ * subclasses CLXAdapterInterstitial.
  */
-@interface CLXPangleBanner : CLXAdapterBanner <PAGBannerAdDelegate>
+@interface CLXPangleAppOpen : CLXAdapterInterstitial <PAGLAppOpenAdDelegate>
 
 @property (nonatomic, copy, readonly) NSString *placementID;
 @property (nonatomic, copy, readonly, nullable) NSString *adUnitName;
-@property (nonatomic, assign, readonly) CLXBannerType bannerType;
 @property (nonatomic, copy, nullable) NSString *bidPayload;
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                         adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID
-                              type:(CLXBannerType)type;
+                            logger:(id<CLXAdapterLogger>)logger;
 
 @end
 
