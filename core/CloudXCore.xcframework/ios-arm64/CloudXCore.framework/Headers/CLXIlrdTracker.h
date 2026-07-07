@@ -7,25 +7,22 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class CLXIlrdService;
-@protocol CLXIlrdNetworkServiceProtocol;
+@class CLXEventTelemetryTracker;
 
 /**
- * Collects ILRD impression events from CLXIlrdService, enriches them with SDK identity
- * and CX auction data, then sends them to the backend via CLXIlrdNetworkService.
+ * Collects ILRD impression events from CLXIlrdService and reports them as
+ * adRevenue telemetry events. SDK identity rides the telemetry envelope; CX
+ * auction correlation rides the sealed auction token when a no-fill auction
+ * preceded the mediator impression.
  *
  * Observes CLXAuctionResultNotification to track no-fill auctions per ad format.
- * When an ILRD impression arrives for a format that had a no-fill, the event is
- * enriched with cxAuctionId and cxAdUnitId (one-shot, then consumed).
+ * When an ILRD impression arrives for a format that had a no-fill, the event
+ * carries that auction's sealed token (one-shot, then consumed).
  */
 @interface CLXIlrdTracker : NSObject
 
-- (instancetype)initWithAppKey:(NSString *)appKey
-                     accountId:(NSString *)accountId
-                     sessionId:(NSString *)sessionId
-                    sdkVersion:(NSString *)sdkVersion
-                   endpointUrl:(NSString *)endpointUrl
-                   ilrdService:(CLXIlrdService *)ilrdService
-                networkService:(id<CLXIlrdNetworkServiceProtocol>)networkService;
+- (instancetype)initWithIlrdService:(CLXIlrdService *)ilrdService
+              eventTelemetryTracker:(CLXEventTelemetryTracker *)eventTelemetryTracker;
 
 - (void)start;
 - (void)stop;

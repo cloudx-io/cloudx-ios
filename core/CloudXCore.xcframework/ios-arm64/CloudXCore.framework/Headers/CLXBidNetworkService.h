@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol CLXBidNetworkService <NSObject>
 
-/** POSTs the v2 SignalPayload with `X-CloudX-Payload-Version: 2`. */
+/** POSTs the v2 SignalPayload with `X-CloudX-Payload-Version: 3` (telemetry-only event contract). */
 - (void)sendBidRequestWithPayload:(CLXBidRequestPayload *)payload
                            appKey:(NSString *)appKey
                           timeout:(NSTimeInterval)timeout

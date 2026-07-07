@@ -1,0 +1,261 @@
+<!doctype html>
+<!--
+  CloudX VAST WebView video harness (iOS).
+
+  Mirrors the Android harness `sdk/src/main/assets/cloudx_vast_video.html`
+  (iab CloudX-Android #406 / #407) byte-identically EXCEPT the JS bridge
+  call site at `post()`: Android exposes the bridge as a JavascriptInterface
+  global (`window[bridgeName]`); WKWebView exposes it as a WKScriptMessageHandler
+  under `window.webkit.messageHandlers[bridgeName]`. The anti-abuse JS
+  (rate-pin, snap-back, suppressed pause/seek, native-only start) is
+  preserved verbatim — that hardening is what keeps a creative-injected
+  script from cheating past the video.
+
+  Tokens substituted at load time by CLXCoreFullscreenStaticContainerViewController:
+    {{VIDEO_URL}}        - file:// or http:// URL to the pre-downloaded media
+    {{MUTED_ATTRIBUTE}}  - 'muted' or '' depending on player_config.audio.muted_by_default
+    {{BRIDGE_NAME}}      - the WKScriptMessageHandler name (default "cloudxVastBridge")
+
+  Anything not in this set must remain JS literal; the engine validates the
+  rendered HTML before injection.
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+  video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+</style>
+</head>
+<body>
+<video id="cloudx-video" src="{{VIDEO_URL}}" playsinline {{MUTED_ATTRIBUTE}}></video>
+<script>
+(function () {
+  'use strict';
+
+  var video = document.getElementById('cloudx-video');
+  var bridgeName = '{{BRIDGE_NAME}}';
+
+  function post(payload) {
+    /*
+     * iOS-specific bridge access: WKWebView exposes script-message handlers
+     * under `window.webkit.messageHandlers[name]`. The bridge is registered
+     * by CLXCoreVASTBridge with a fixed name; the engine substitutes that
+     * name for {{BRIDGE_NAME}} at load time. Falls back to a no-op if the
+     * bridge somehow is not registered (e.g., unit-test harness loading the
+     * page without WKUserContentController hookup) — never throw, because a
+     * thrown exception inside an event handler cascades into the player and
+     * stalls playback.
+     */
+    try {
+      var handlers = window.webkit && window.webkit.messageHandlers;
+      var bridge = handlers && handlers[bridgeName];
+      if (bridge && bridge.postMessage) {
+        bridge.postMessage(JSON.stringify(payload));
+      }
+    } catch (_e) { /* no-op: bridge unavailable */ }
+  }
+
+  /*
+   * Anti-abuse hardening: pausing, seeking, and playback-rate changes are explicitly no-opped so
+   * a user cannot cheat past the video. The only legitimate pause/resume entry points are the
+   * native window.__cloudxVast hooks below (UIViewController viewWillDisappear/viewDidAppear
+   * and UIApplication background/foreground transitions).
+   */
+  var nativePauseRequested = false;
+  var startRequested = false;
+  var lastPlayhead = 0;
+  var lastAdoptedAt = performance.now();
+  var seekSinceAdoption = false;
+
+  video.controls = false;
+  video.disablePictureInPicture = true;
+  video.setAttribute('controlsList', 'nodownload noplaybackrate nofullscreen');
+  document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  video.addEventListener('ratechange', function () {
+    if (video.playbackRate !== 1) { video.playbackRate = 1; }
+  });
+
+  /*
+   * Snap any non-organic jump back to the last legitimate playhead. Checked on BOTH seeking and
+   * seeked: a fast local-file seek can complete before the seeking handler's correction lands,
+   * whatever the event ordering on a given WebView build.
+   */
+  function enforcePlayhead() {
+    seekSinceAdoption = true;
+    if (Math.abs(video.currentTime - lastPlayhead) > 1) {
+      video.currentTime = lastPlayhead;
+    }
+  }
+  video.addEventListener('seeking', enforcePlayhead);
+  video.addEventListener('seeked', enforcePlayhead);
+
+  /*
+   * Every play() that must succeed for the ad to stay healthy reports its rejection: a video
+   * stuck paused with no signal would otherwise hang until the escape-hatch close.
+   */
+  function playGuarded(p) {
+    if (p && p.catch) { p.catch(playbackBlocked); }
+  }
+
+  video.addEventListener('pause', function () {
+    if (video.ended) { return; }
+    if (nativePauseRequested) {
+      post({ event: 'pause' });
+      return;
+    }
+    /* Non-native pause (user/creative initiated): revert immediately, report nothing on success. */
+    playGuarded(video.play());
+  });
+
+  window.__cloudxVast = {
+    /*
+     * The only legitimate playback start. The harness never self-starts -- it is loaded while
+     * the WebView is still detached (the SDK load phase), where a self-start would fire
+     * START/quartile beacons (and play audio) before the ad is on screen. The engine sends this
+     * only once the container is visible (CLXRendererRewarded.onAdVisible). Idempotent.
+     *
+     * Note: an off-screen WebView is gated here, not in JS -- a detached-but-not-paused iOS
+     * WKWebView keeps rendering, so document.hidden / requestAnimationFrame both report visible
+     * and cannot detect "off screen" from the page. The on-screen guarantee is the engine's.
+     */
+    start: function () {
+      if (startRequested) { return; }
+      startRequested = true;
+      startWhenMetadataReady();
+    },
+    pause: function () {
+      nativePauseRequested = true;
+      video.pause();
+    },
+    resume: function () {
+      /* Resume is an un-pause/retry, never a start: a no-op until start() was requested. */
+      if (!startRequested) { return; }
+      nativePauseRequested = false;
+      playGuarded(video.play());
+    },
+    /* Introspection for the SDK's device test suite; never creative-reachable (SDK-authored page). */
+    state: function () {
+      return JSON.stringify({
+        t: video.currentTime,
+        r: video.playbackRate,
+        p: video.paused,
+        lp: lastPlayhead,
+        sk: video.seeking,
+        sl: video.seekable.length
+      });
+    }
+  };
+
+  video.addEventListener('durationchange', function () {
+    if (isFinite(video.duration) && video.duration > 0) {
+      post({ event: 'durationKnown', duration: video.duration });
+    }
+  });
+
+  video.addEventListener('playing', function () {
+    nativePauseRequested = false;
+    post({ event: 'playing' });
+  });
+
+  video.addEventListener('timeupdate', function () {
+    /*
+     * Adopt only organic progress as the legitimate playhead -- the snap-back target must never
+     * become a rogue seek's destination (a completed seek reports seeking === false, so that
+     * flag alone cannot tell organic ticks from seek landings). Organic means: forward, and
+     * either (a) no faster than elapsed wall time allows (the rate is pinned to 1; allowance
+     * capped so a long pause's accumulated wall time cannot legitimize a big jump), or (b) any
+     * size, when no seek event has fired since the last adoption -- every seek (rogue or
+     * corrective) fires 'seeking', so a large delta without one can only be a timeupdate gap
+     * (jank/throttling) and refusing it would desync this guard permanently.
+     */
+    var positionDelta = video.currentTime - lastPlayhead;
+    var wallDeltaSeconds = (performance.now() - lastAdoptedAt) / 1000;
+    var allowanceSeconds = Math.min(wallDeltaSeconds, 5) + 1;
+    if (!video.seeking && positionDelta >= 0 &&
+        (positionDelta <= allowanceSeconds || !seekSinceAdoption)) {
+      lastPlayhead = video.currentTime;
+      lastAdoptedAt = performance.now();
+      seekSinceAdoption = false;
+    }
+    /*
+     * Report the adopted playhead, not the raw currentTime: on organic ticks the block above
+     * already set lastPlayhead = currentTime, so legitimate quartiles are unchanged; on a rejected
+     * rogue tick (a system-media seek the snap-back is about to revert) this reports the last
+     * legitimate position so native quartile latching cannot be inflated by a seek we reject.
+     */
+    post({ event: 'timeupdate', position: lastPlayhead, duration: video.duration || 0 });
+  });
+
+  video.addEventListener('ended', function () {
+    post({ event: 'ended' });
+  });
+
+  video.addEventListener('volumechange', function () {
+    post({ event: 'volumechange', volume: video.volume, muted: video.muted });
+  });
+
+  video.addEventListener('waiting', function () {
+    post({ event: 'bufferstart' });
+  });
+
+  video.addEventListener('canplaythrough', function () {
+    post({ event: 'bufferfinish' });
+  });
+
+  video.addEventListener('error', function () {
+    var mediaError = video.error;
+    post({
+      event: 'error',
+      code: mediaError ? mediaError.code : 0,
+      message: mediaError && mediaError.message ? mediaError.message : 'media error'
+    });
+  });
+
+  /*
+   * Start playback explicitly (no autoplay attribute, no self-start) so a blocked unmuted
+   * autoplay is observable: fall back to a muted start once, reporting the state change; if
+   * even that is blocked, surface a media error instead of hanging silently. Playback begins
+   * only on the native start() request above -- the harness document is loaded while the
+   * WebView is still detached (during the SDK load phase), and starting there would fire
+   * START/quartile beacons (or trip the autoplay policy) before the ad is on screen.
+   */
+  function playbackBlocked(err) {
+    /*
+     * Carry the real rejection name: NotAllowedError = autoplay policy (or an occluded page),
+     * NotSupportedError = the source itself failed -- very different failures upstream.
+     */
+    var name = err && err.name ? err.name : 'unknown';
+    post({ event: 'error', code: 0, message: 'autoplay-blocked:' + name });
+  }
+
+  function startPlayback() {
+    var attempt = video.play();
+    if (attempt && attempt.catch) {
+      attempt.catch(function (err) {
+        if (!video.muted) {
+          video.muted = true;
+          var retry = video.play();
+          if (retry && retry.catch) {
+            retry.catch(playbackBlocked);
+          }
+        } else {
+          playbackBlocked(err);
+        }
+      });
+    }
+  }
+
+  function startWhenMetadataReady() {
+    if (video.readyState >= 1) {
+      startPlayback();
+    } else {
+      video.addEventListener('loadedmetadata', startPlayback, { once: true });
+    }
+  }
+})();
+</script>
+</body>
+</html>

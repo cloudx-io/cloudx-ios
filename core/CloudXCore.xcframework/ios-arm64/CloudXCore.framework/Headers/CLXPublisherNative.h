@@ -17,8 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXBidAdSourceResponse;
 @class CLXBidResponseBid;
 
-@protocol CLXAdEventReporting;
-@class CLXBidTokenSource;
+@class CLXAdapterBidderSignalsProvider;
 @class CLXAdapterNativeFactory;
 @protocol CLXPublisherNativeDelegate;
 
@@ -36,9 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
                     nativeType:(CLXNativeTemplate)nativeType
                       impModel:(nullable CLXConfigImpressionModel *)impModel
                    adFactories:(NSDictionary<NSString *, CLXAdapterNativeFactory *> *)adFactories
-               bidTokenSources:(NSDictionary<NSString *, CLXBidTokenSource *> *)bidTokenSources
-             bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
-              reportingService:(id<CLXAdEventReporting>)reportingService;
+               bidderSignalsProviders:(NSDictionary<NSString *, CLXAdapterBidderSignalsProvider *> *)bidderSignalsProviders
+             bidRequestTimeout:(NSTimeInterval)bidRequestTimeout;
 
 - (void)load;
 - (void)destroyCurrentAd;

@@ -9,6 +9,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXAdapterLoadParams.h>
 #import <CloudXCore/CLXDestroyable.h>
 #import <CloudXCore/CLXExport.h>
 
@@ -33,33 +34,41 @@ CLX_PUBLIC_ADAPTER
 @property (nonatomic, strong, nullable) id<CLXAdapterNativeDelegate> delegate;
 
 /// Loads the native ad. Subclass MUST override.
-- (void)load;
+- (void)loadWithParams:(CLXAdapterLoadParams *)loadParams;
 
 /// Destroys the adapter and breaks the retain cycle by nilling the delegate.
 /// Subclass MUST override.
 - (void)destroy;
+
+/**
+ * Called after a native ad loaded through the banner/MREC bridge has been
+ * inserted into its CLXBannerAdView container.
+ *
+ * Default: no-op. Override only for native adapters whose SDK requires an
+ * explicit post-container-attach lifecycle signal when native is rendered in
+ * an ad-view slot.
+ */
+- (void)onAttachedToAdViewContainer;
 
 @end
 
 /**
  * Delegate through which native adapters report lifecycle events to the core SDK.
  *
- * Required callbacks must be called by every adapter. Optional callbacks are only
- * expected from adapters whose underlying SDK provides the corresponding event.
- * The core SDK checks @c respondsToSelector: before forwarding optional callbacks
- * to the publisher, so adapters may safely call them without coordination.
+ * Required callbacks must be implemented by every delegate. Adapters call the
+ * lifecycle event that matches the underlying SDK signal.
  */
 @protocol CLXAdapterNativeDelegate <NSObject>
 
-- (void)didLoadNativeAd:(CLXNativeAd *)nativeAd extraInfo:(nullable NSDictionary<NSString *, id> *)extraInfo;
-- (void)didFailToLoadNativeAdWithError:(nullable NSError *)error;
-- (void)didDisplayNativeAdWithExtraInfo:(nullable NSDictionary<NSString *, id> *)extraInfo;
-- (void)didClickNativeAd;
-
-@optional
+- (void)didLoadNativeAd:(CLXNativeAd *)nativeAd extras:(NSDictionary<NSString *, id> *)extras;
+- (void)didFailToLoadNativeAdWithError:(nullable NSError *)error extras:(NSDictionary<NSString *, id> *)extras;
+- (void)didDisplayNativeAd:(NSDictionary<NSString *, id> *)extras;
+- (void)didClickNativeAd:(NSDictionary<NSString *, id> *)extras;
+/// The network expired the native ad before it was rendered.
+- (void)didExpireNativeAd:(NSDictionary<NSString *, id> *)extras;
 
 /// User hid or reported the ad via the network's opt-out control (e.g., AdChoices).
-- (void)didCloseNativeAd;
+- (void)didCloseNativeAd:(NSDictionary<NSString *, id> *)extras;
 
 @end
 

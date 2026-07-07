@@ -9,24 +9,21 @@
 
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CloudXCore.h>
-#import <CloudXCore/CLXAdapterBanner.h>
 #import <CloudXCore/CLXBanner.h>
 #import <CloudXCore/CLXBannerAdView.h>
-#import <CloudXCore/CLXAdapterBannerFactory.h>
+#import <CloudXCore/CLXAdapterAdViewFactory.h>
 #import <CloudXCore/CLXBannerType.h>
 #import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
-#import <CloudXCore/CLXBidTokenSource.h>
+#import <CloudXCore/CLXAdapterBidderSignalsProvider.h>
 #import <CloudXCore/CLXBannerDelegate.h>
 #import <CloudXCore/CLXSettings.h>
-#import <CloudXCore/CLXAdNetworkFactories.h>
 #import <CloudXCore/CLXAdRevenueDelegate.h>
 
 @class CLXEnvironmentConfig;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol CLXAdEventReporting;
 
 /**
  * PublisherBanner implements the CloudXBanner protocol and handles banner ad loading,
@@ -75,16 +72,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) BOOL hasPendingRefresh;
 
 /**
- * The currently displayed banner adapter.
- */
-@property (nonatomic, strong, readonly, nullable) CLXAdapterBanner * bannerOnScreen;
-
-/**
- * The prefetched banner adapter waiting to be displayed.
- */
-@property (nonatomic, strong, readonly, nullable) CLXAdapterBanner * prefetchedBanner;
-
-/**
  * The ad unit ID for this banner.
  */
 @property (nonatomic, copy, readonly) NSString *adUnitId;
@@ -99,9 +86,8 @@ NS_ASSUME_NONNULL_BEGIN
  * @param bannerType The type of banner
  * @param impModel The impression model (nil if SDK not initialized, will be created on load)
  * @param adFactories Dictionary of banner ad factories (injected for testability, falls back to CloudXCore if empty)
- * @param bidTokenSources Dictionary of bid token sources (injected for testability, falls back to CloudXCore if empty)
+ * @param bidderSignalsProviders Dictionary of bidder signals providers (injected for testability, falls back to CloudXCore if empty)
  * @param bidRequestTimeout Timeout in seconds for bid requests (0 = use session default)
- * @param reportingService The reporting service
  * @param settings The settings instance for configuration (injected for testability)
  * @return Initialized PublisherBanner instance
  */
@@ -112,10 +98,9 @@ NS_ASSUME_NONNULL_BEGIN
                                delegate:(nullable id<CLXBannerDelegate>)delegate
                              bannerType:(CLXBannerType)bannerType
                                impModel:(nullable CLXConfigImpressionModel *)impModel
-                              adFactories:(NSDictionary<NSString *, CLXAdapterBannerFactory *> *)adFactories
-                           bidTokenSources:(NSDictionary<NSString *, CLXBidTokenSource *> *)bidTokenSources
+                              adFactories:(NSDictionary<NSString *, CLXAdapterAdViewFactory *> *)adFactories
+                           bidderSignalsProviders:(NSDictionary<NSString *, CLXAdapterBidderSignalsProvider *> *)bidderSignalsProviders
                         bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
-                         reportingService:(id<CLXAdEventReporting>)reportingService
                               settings:(CLXSettings *)settings;
 
 /**
@@ -132,4 +117,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END

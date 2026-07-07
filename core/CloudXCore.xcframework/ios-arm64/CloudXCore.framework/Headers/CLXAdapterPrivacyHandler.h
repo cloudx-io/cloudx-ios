@@ -4,13 +4,13 @@
 
 /**
  * @file CLXAdapterPrivacyHandler.h
- * @brief Abstract base class for adapter-specific privacy settings handling
+ * @brief Abstract base class for adapter-specific privacy params handling
  */
 
 #import <Foundation/Foundation.h>
 #import <CloudXCore/CLXExport.h>
 
-@class CLXAdapterPrivacySettings;
+@class CLXAdapterPrivacyParams;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,12 +19,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Subclass MUST override @c -updatePrivacySettings:.
  * The CLXAdapterPrivacyForwarder discovers handlers via NSClassFromString
- * and calls @c -updatePrivacySettings: when settings change.
+ * and calls @c -updatePrivacySettings: when privacy state changes.
  */
 CLX_PUBLIC_ADAPTER
 @interface CLXAdapterPrivacyHandler : NSObject
 
-- (void)updatePrivacySettings:(CLXAdapterPrivacySettings *)settings;
+- (void)updatePrivacySettings:(CLXAdapterPrivacyParams *)params;
 
 @end
 

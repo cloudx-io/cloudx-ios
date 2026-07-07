@@ -48,7 +48,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Test and lifecycle keys
 #define kCLXCoreCurrentStateKey @"CLXCore_currentState"
-#define kCLXCoreReportingServiceKey @"CLXCore_reportingService"
 #define kCLXCoreCampaignIdKey @"CLXCore_campaignId"
 #define kCLXCoreTestModeKey @"CLXCore_testMode"
 #define kCLXCoreVisualDebuggingKey @"CLXCore_visualDebugging"

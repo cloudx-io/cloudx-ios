@@ -9,6 +9,8 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXAdapterLoadParams.h>
+#import <CloudXCore/CLXAdapterShowParams.h>
 #import <CloudXCore/CLXDestroyable.h>
 #import <CloudXCore/CLXExport.h>
 
@@ -40,10 +42,10 @@ CLX_PUBLIC_ADAPTER
 @property (nonatomic, assign, readonly) BOOL isReady;
 
 /// Loads the adapter interstitial. Subclass MUST override.
-- (void)load;
+- (void)loadWithParams:(CLXAdapterLoadParams *)loadParams;
 
 /// Shows the adapter interstitial. Subclass MUST override.
-- (void)showFromViewController:(UIViewController *)viewController;
+- (void)showWithParams:(CLXAdapterShowParams *)showParams;
 
 /// Destroys the adapter and breaks the retain cycle by nilling the delegate.
 /// Subclass MUST override.
@@ -51,17 +53,22 @@ CLX_PUBLIC_ADAPTER
 
 @end
 
-/// Delegate for the interstitial adapter.
+/**
+ * Delegate for the interstitial adapter.
+ *
+ * The @c extras parameter is reserved for adapter-provided callback metadata.
+ * Adapters must pass an empty dictionary (@c @{}) when no metadata is available.
+ */
 @protocol CLXAdapterInterstitialDelegate <NSObject>
 
-- (void)didLoadWithInterstitial:(CLXAdapterInterstitial *)interstitial;
-- (void)didFailToLoadWithInterstitial:(CLXAdapterInterstitial *)interstitial error:(NSError *)error;
-- (void)didShowWithInterstitial:(CLXAdapterInterstitial *)interstitial;
-- (void)didFailToShowWithInterstitial:(CLXAdapterInterstitial *)interstitial error:(NSError *)error;
-- (void)impressionWithInterstitial:(CLXAdapterInterstitial *)interstitial;
-- (void)didCloseWithInterstitial:(CLXAdapterInterstitial *)interstitial;
-- (void)clickWithInterstitial:(CLXAdapterInterstitial *)interstitial;
-- (void)expiredWithInterstitial:(CLXAdapterInterstitial *)interstitial;
+- (void)didLoadInterstitial:(NSDictionary<NSString *, id> *)extras;
+- (void)didFailToLoadInterstitialWithError:(NSError *)error extras:(NSDictionary<NSString *, id> *)extras;
+- (void)didDisplayInterstitial:(NSDictionary<NSString *, id> *)extras;
+- (void)didFailToDisplayInterstitialWithError:(NSError *)error extras:(NSDictionary<NSString *, id> *)extras;
+- (void)didTrackInterstitialImpression:(NSDictionary<NSString *, id> *)extras;
+- (void)didHideInterstitial:(NSDictionary<NSString *, id> *)extras;
+- (void)didClickInterstitial:(NSDictionary<NSString *, id> *)extras;
+- (void)didExpireInterstitial:(NSDictionary<NSString *, id> *)extras;
 
 @end
 

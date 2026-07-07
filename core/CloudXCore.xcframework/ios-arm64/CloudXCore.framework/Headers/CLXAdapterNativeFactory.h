@@ -10,6 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXExport.h>
+#import <CloudXCore/CLXAdapterNativeParams.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -26,21 +27,22 @@ NS_ASSUME_NONNULL_BEGIN
  */
 CLX_PUBLIC_ADAPTER FOUNDATION_EXPORT NSString * const CLXNativeContainerTargetSizeKey;
 
+/**
+ * Key in `localExtraParameters` whose value is an NSNumber BOOL.
+ * YES means the native adapter is being used to back a banner/MREC ad-view
+ * container rather than the standalone publisher-native surface.
+ */
+CLX_PUBLIC_ADAPTER FOUNDATION_EXPORT NSString * const CLXIsNativeAdViewKey;
+
 /// Abstract base class for native adapter factories.
-/// Subclass MUST override @c -createWithAdId:bidId:adm:extras:adUnitName:bidExpirationMs:localExtraParameters:.
+/// Subclass MUST override @c -createWithParams:.
 /// The wrapper attaches itself as the adapter's delegate after construction.
 CLX_PUBLIC_ADAPTER
 @interface CLXAdapterNativeFactory : NSObject
 
 + (instancetype)createInstance;
 
-- (nullable CLXAdapterNative *)createWithAdId:(NSString *)adId
-                                         bidId:(NSString *)bidId
-                                           adm:(NSString *)adm
-                                        extras:(NSDictionary<NSString *, NSString *> *)extras
-                                    adUnitName:(nullable NSString *)adUnitName
-                               bidExpirationMs:(NSInteger)bidExpirationMs
-                          localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters;
+- (nullable CLXAdapterNative *)createWithParams:(CLXAdapterNativeParams *)params;
 
 @end
 

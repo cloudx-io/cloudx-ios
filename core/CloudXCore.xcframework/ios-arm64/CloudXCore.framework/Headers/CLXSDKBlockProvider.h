@@ -10,9 +10,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Single source of truth for [CLXSDKBlock] construction. Init request, bid request,
- * and any future surface (arbiter, telemetry envelope) all build the same
- * block from the same providers — building inline at each call site invites field
- * drift between surfaces.
+ * and the telemetry envelope all build the same block from the same providers —
+ * building inline at each call site invites field drift between surfaces.
  *
  * Immutable after construction; safe to share across threads after init. UIScreen /
  * UIDevice values are snapshotted inside init via a main-thread dispatch when the

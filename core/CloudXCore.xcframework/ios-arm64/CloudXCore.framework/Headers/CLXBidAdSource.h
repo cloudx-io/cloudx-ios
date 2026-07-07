@@ -8,14 +8,12 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CLXBidTokenSource.h>
+#import <CloudXCore/CLXAdapterBidderSignalsProvider.h>
 #import <CloudXCore/CLXSDKConfigAdUnit.h>
 #import <CloudXCore/CLXConfigImpressionModel.h>
-#import <CloudXCore/CLXAdNetworkFactories.h>
 #import <CloudXCore/CLXError.h>
 
 @class CLXBidResponseBid, CLXBidResponse, CLXAd, CLXEnvironmentConfig;
-@protocol CLXAdEventReporting;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -97,10 +95,9 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
  * @param hasCloseButton Whether the ad has a close button
  * @param publisherID Publisher identifier
  * @param adType Type of ad
- * @param bidTokenSources Dictionary of bid token sources by adapter name
+ * @param bidderSignalsProviders Dictionary of bidder signals providers by adapter name
  * @param nativeAdRequirements Native ad requirements (optional)
  * @param bidRequestTimeout Timeout in seconds for HTTP request and OpenRTB tmax (0 = use session default)
- * @param reportingService Reporting service for events
  * @param createBidAd Block to create bid ads
  * @return Initialized bid ad source
  */
@@ -110,10 +107,9 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
                  hasCloseButton:(BOOL)hasCloseButton
                    publisherID:(NSString *)publisherID
                         adType:(NSInteger)adType
-                bidTokenSources:(NSDictionary<NSString *, CLXBidTokenSource *> *)bidTokenSources
+                bidderSignalsProviders:(NSDictionary<NSString *, CLXAdapterBidderSignalsProvider *> *)bidderSignalsProviders
          nativeAdRequirements:(nullable id)nativeAdRequirements
             bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
-               reportingService:(id<CLXAdEventReporting>)reportingService
                    createBidAd:(id _Nullable (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString * _Nullable burl, BOOL hasCloseButton, NSString *network, NSNumber * _Nullable mtype, NSError * _Nullable * _Nullable error))createBidAd;
 
 /**
@@ -124,11 +120,10 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
  * @param hasCloseButton Whether the ad has a close button
  * @param publisherID Publisher identifier
  * @param adType Type of ad
- * @param bidTokenSources Dictionary of bid token sources by adapter name
+ * @param bidderSignalsProviders Dictionary of bidder signals providers by adapter name
  * @param nativeAdRequirements Native ad requirements (optional)
  * @param bidRequestTimeout Timeout in seconds for HTTP request and OpenRTB tmax (0 = use session default)
  * @param arbiterEnabled Whether bid requests should opt into encrypted CloudX bid payloads for arbiter.
- * @param reportingService Reporting service for events
  * @param createBidAd Block to create bid ads
  * @return Initialized bid ad source
  */
@@ -138,11 +133,10 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
                  hasCloseButton:(BOOL)hasCloseButton
                    publisherID:(NSString *)publisherID
                         adType:(NSInteger)adType
-                bidTokenSources:(NSDictionary<NSString *, CLXBidTokenSource *> *)bidTokenSources
+                bidderSignalsProviders:(NSDictionary<NSString *, CLXAdapterBidderSignalsProvider *> *)bidderSignalsProviders
          nativeAdRequirements:(nullable id)nativeAdRequirements
             bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
                 arbiterEnabled:(BOOL)arbiterEnabled
-               reportingService:(id<CLXAdEventReporting>)reportingService
                    createBidAd:(id _Nullable (^)(NSString *adId, NSString *bidId, NSString *adm, NSDictionary<NSString *, NSString *> *adapterExtras, NSString * _Nullable burl, BOOL hasCloseButton, NSString *network, NSNumber * _Nullable mtype, NSError * _Nullable * _Nullable error))createBidAd;
 
 @end

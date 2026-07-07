@@ -12,7 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
  * userInfo keys: CLXAuctionResultAdTypeKey (NSNumber wrapping CLXAdType),
  *                CLXAuctionResultAuctionIdKey (NSString),
  *                CLXAuctionResultAdUnitIdKey (NSString),
- *                CLXAuctionResultFilledKey (NSNumber wrapping BOOL).
+ *                CLXAuctionResultFilledKey (NSNumber wrapping BOOL),
+ *                CLXAuctionResultAuctionPayloadKey (NSString, optional sealed auction token).
  */
 FOUNDATION_EXPORT NSNotificationName const CLXAuctionResultNotification;
 
@@ -24,5 +25,8 @@ FOUNDATION_EXPORT NSString *const CLXAuctionResultAuctionIdKey;
 FOUNDATION_EXPORT NSString *const CLXAuctionResultAdUnitIdKey;
 /** userInfo key for filled flag (NSNumber wrapping BOOL). */
 FOUNDATION_EXPORT NSString *const CLXAuctionResultFilledKey;
+
+/// Sealed auction telemetry token for the auction; absent when the response carried none.
+FOUNDATION_EXPORT NSString *const CLXAuctionResultAuctionPayloadKey;
 
 NS_ASSUME_NONNULL_END

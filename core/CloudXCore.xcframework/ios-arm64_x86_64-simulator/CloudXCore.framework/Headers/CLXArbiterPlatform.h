@@ -33,6 +33,11 @@ CLX_PUBLIC
 @property (class, nonatomic, strong, readonly) CLXArbiterPlatform *pubMatic NS_SWIFT_NAME(pubMatic);
 
 /**
+ * Custom arbiter input for a mediation platform not modeled by a dedicated factory.
+ */
+@property (class, nonatomic, strong, readonly) CLXArbiterPlatform *custom NS_SWIFT_NAME(custom);
+
+/**
  * No bid candidates were supplied for the arbiter.
  */
 @property (class, nonatomic, strong, readonly) CLXArbiterPlatform *none NS_SWIFT_NAME(none);

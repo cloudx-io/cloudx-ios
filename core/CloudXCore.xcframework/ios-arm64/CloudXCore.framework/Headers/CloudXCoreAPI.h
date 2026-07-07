@@ -21,12 +21,14 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 @protocol CLXBannerDelegate;
 @protocol CLXInterstitialDelegate;
 @protocol CLXRewardedDelegate;
+@protocol CLXAppOpenDelegate;
 
 @class CLXBannerAdView;
 @class CLXSDKConfigResponse;
 @class CLXSDKConfigAdUnit;
 @class CLXInterstitial;
 @class CLXRewarded;
+@class CLXAppOpen;
 @class CLXNativeAdLoader;
 
 typedef void (^CLXArbiterCompletion)(CLXArbiterResult *result);
@@ -187,6 +189,15 @@ CLX_PUBLIC
  */
 - (nullable CLXRewarded *)createRewardedWithAdUnitId:(NSString *)adUnitId
     NS_SWIFT_NAME(createRewarded(adUnitId:));
+
+/**
+ * Create an app open ad
+ * @param adUnitId The ad unit ID. This should match the ad unit name in the CloudX dashboard
+ * @return A CLXAppOpen object
+ * @discussion Set the delegate property on the returned object to receive ad events
+ */
+- (nullable CLXAppOpen *)createAppOpenWithAdUnitId:(NSString *)adUnitId
+    NS_SWIFT_NAME(createAppOpen(adUnitId:));
 
 /**
  * Create a native ad loader

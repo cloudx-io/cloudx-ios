@@ -10,6 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXExport.h>
+#import <CloudXCore/CLXAdapterRewardedParams.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -22,11 +23,7 @@ CLX_PUBLIC_ADAPTER
 
 + (instancetype)createInstance;
 
-- (nullable CLXAdapterRewarded *)createWithAdId:(NSString *)adId
-                                          bidId:(NSString *)bidId
-                                            adm:(NSString *)adm
-                                         extras:(NSDictionary<NSString *, NSString *> *)extras
-                                     adUnitName:(nullable NSString *)adUnitName;
+- (nullable CLXAdapterRewarded *)createWithParams:(CLXAdapterRewardedParams *)params;
 
 @end
 

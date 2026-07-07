@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 #import <CloudXCore/CLXExport.h>
 
 @class CLXAd;
@@ -27,7 +28,7 @@ typedef NS_ENUM(NSInteger, CLXLogEmoji) {
 };
 
 CLX_PUBLIC_ADAPTER
-@interface CLXLogger : NSObject
+@interface CLXLogger : NSObject <CLXAdapterLogger>
 
 + (instancetype)shared;
 

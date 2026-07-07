@@ -9,6 +9,8 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CloudXCore/CLXAdapterLoadParams.h>
+#import <CloudXCore/CLXAdapterShowParams.h>
 #import <CloudXCore/CLXDestroyable.h>
 #import <CloudXCore/CLXExport.h>
 
@@ -40,11 +42,10 @@ CLX_PUBLIC_ADAPTER
 @property (nonatomic, assign, readonly) BOOL isReady;
 
 /// Loads the rewarded adapter. Subclass MUST override.
-- (void)load;
+- (void)loadWithParams:(CLXAdapterLoadParams *)loadParams;
 
 /// Shows the rewarded adapter. Subclass MUST override.
-/// @param viewController View controller from which the rewarded ad is shown.
-- (void)showFromViewController:(UIViewController *)viewController;
+- (void)showWithParams:(CLXAdapterShowParams *)showParams;
 
 /// Destroys the adapter and breaks the retain cycle by nilling the delegate.
 /// Subclass MUST override.
@@ -56,50 +57,44 @@ CLX_PUBLIC_ADAPTER
 @protocol CLXAdapterRewardedDelegate <NSObject>
 
 /// Called when the adapter has loaded the rewarded.
-/// @param rewarded The rewarded adapter that was loaded.
-- (void)didLoadWithRewarded:(CLXAdapterRewarded *)rewarded;
+/// @param extras Additional adapter-provided callback details.
+- (void)didLoadRewarded:(NSDictionary<NSString *, id> *)extras;
 
 /// Called when the adapter failed to load the rewarded.
-/// @param rewarded The rewarded adapter that failed to load.
 /// @param error The error that caused the failure.
-- (void)didFailToLoadWithRewarded:(CLXAdapterRewarded *)rewarded error:(NSError *)error;
+/// @param extras Additional adapter-provided callback details.
+- (void)didFailToLoadRewardedWithError:(NSError *)error extras:(NSDictionary<NSString *, id> *)extras;
 
 /// Called when the adapter has shown the rewarded.
-/// @param rewarded The rewarded adapter that was shown.
-- (void)didShowWithRewarded:(CLXAdapterRewarded *)rewarded;
+/// @param extras Additional adapter-provided callback details.
+- (void)didDisplayRewarded:(NSDictionary<NSString *, id> *)extras;
 
 /// Called when the adapter has tracked impression.
-/// @param rewarded The rewarded adapter that was shown.
-- (void)impressionWithRewarded:(CLXAdapterRewarded *)rewarded;
+/// @param extras Additional adapter-provided callback details.
+- (void)didTrackRewardedImpression:(NSDictionary<NSString *, id> *)extras;
 
 /// Called when the adapter has closed the rewarded.
-/// @param rewarded The rewarded adapter that was closed.
-- (void)didCloseWithRewarded:(CLXAdapterRewarded *)rewarded;
+/// @param extras Additional adapter-provided callback details.
+- (void)didHideRewarded:(NSDictionary<NSString *, id> *)extras;
 
 /// Called when the adapter failed to show the rewarded.
-/// @param rewarded The rewarded adapter that failed to show.
 /// @param error The error that caused the failure.
-- (void)didFailToShowWithRewarded:(CLXAdapterRewarded *)rewarded error:(NSError *)error;
+/// @param extras Additional adapter-provided callback details.
+- (void)didFailToDisplayRewardedWithError:(NSError *)error extras:(NSDictionary<NSString *, id> *)extras;
 
 /// Called when the adapter has tracked click.
-/// @param rewarded The rewarded adapter that was clicked.
-- (void)clickWithRewarded:(CLXAdapterRewarded *)rewarded;
+/// @param extras Additional adapter-provided callback details.
+- (void)didClickRewarded:(NSDictionary<NSString *, id> *)extras;
 
 /// Called when the adapter expired the rewarded.
-/// @param rewarded The rewarded adapter that expired.
-- (void)expiredWithRewarded:(CLXAdapterRewarded *)rewarded;
-
-/// Deprecated — use the amount/label form below.
-/// @param rewarded The rewarded adapter that triggered the reward.
-- (void)userRewardWithRewarded:(CLXAdapterRewarded *)rewarded;
-
-@optional
+/// @param extras Additional adapter-provided callback details.
+- (void)didExpireRewarded:(NSDictionary<NSString *, id> *)extras;
 
 /// Called when the adapter rewarded the user with reward details.
-/// @param rewarded The rewarded adapter that triggered the reward.
 /// @param amount The reward amount from the ad network (0 if not provided).
 /// @param label The reward label/currency from the ad network (nil if not provided).
-- (void)userRewardWithRewarded:(CLXAdapterRewarded *)rewarded amount:(NSInteger)amount label:(nullable NSString *)label;
+/// @param extras Additional adapter-provided callback details.
+- (void)didRewardUserWithAmount:(NSInteger)amount label:(nullable NSString *)label extras:(NSDictionary<NSString *, id> *)extras;
 
 @end
 

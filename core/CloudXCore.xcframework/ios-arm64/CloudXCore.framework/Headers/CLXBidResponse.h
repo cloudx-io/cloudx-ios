@@ -138,6 +138,9 @@ typedef NS_ENUM(NSInteger, CLXOpenRTBMarkupType) {
 @property (nonatomic, assign) NSInteger h;
 /// OpenRTB media type for this bid. See `CLXOpenRTBMarkupType`.
 @property (nonatomic, strong, nullable) NSNumber *mtype;
+/// OpenRTB 2.x `bid.exp` - bid time-to-live in seconds. 0 when absent.
+/// Surfaced so renderer-side TTL handling can log + enforce expiry.
+@property (nonatomic, assign) NSInteger exp;
 @property (nonatomic, copy, nullable) NSDictionary *rawJSON;
 @end
 
@@ -151,6 +154,9 @@ typedef NS_ENUM(NSInteger, CLXOpenRTBMarkupType) {
 @interface CLXBidResponseAuction : NSObject
 @property (nonatomic, strong, nullable) CLXBidResponseCloudXAuction *auction;
 @property (nonatomic, copy, nullable) NSString *serverVersion;
+/// Sealed auction token at the response level; also propagated onto each bid's
+/// ext.cloudx. Kept here so a no-fill response (no bids) still exposes it.
+@property (nonatomic, copy, nullable) NSString *auctionTelemetryPayload;
 @property (nonatomic, copy, nullable) NSString *arbiterAuctionPayload;
 
 - (NSDictionary *)toDictionary;
