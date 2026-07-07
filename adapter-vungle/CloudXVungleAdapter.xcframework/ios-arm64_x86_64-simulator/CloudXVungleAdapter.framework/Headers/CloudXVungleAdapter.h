@@ -7,12 +7,6 @@
 
 #import <Foundation/Foundation.h>
 
-//! Project version number for CloudXVungleAdapter.
-FOUNDATION_EXPORT double CloudXVungleAdapterVersionNumber;
-
-//! Project version string for CloudXVungleAdapter.
-FOUNDATION_EXPORT const unsigned char CloudXVungleAdapterVersionString[];
-
 // Registration function for static frameworks
 __attribute__((visibility("default"))) void CloudXVungleAdapterRegister(void);
 
@@ -21,12 +15,11 @@ __attribute__((visibility("default"))) void CloudXVungleAdapterRegister(void);
 @end
 
 // Public headers - Base Infrastructure
-#import "CLXVungleErrorHandler.h"
 #import "CLXVungleInitializer.h"
 #import "CLXVungleAdapterVersion.h"
 
-// Public headers - Bid Token Source
-#import "CLXVungleBidTokenSource.h"
+// Public headers - Bidder Signals Provider
+#import "CLXVungleBidderSignalsProvider.h"
 
 // Public headers - Interstitial
 #import "CLXVungleInterstitial.h"
@@ -37,8 +30,8 @@ __attribute__((visibility("default"))) void CloudXVungleAdapterRegister(void);
 #import "CLXVungleRewardedFactory.h"
 
 // Public headers - Banner
-#import "CLXVungleBanner.h"
-#import "CLXVungleBannerFactory.h"
+#import "CLXVungleAdView.h"
+#import "CLXVungleAdViewFactory.h"
 
 // Public headers - Native
 #import "CLXVungleNative.h"

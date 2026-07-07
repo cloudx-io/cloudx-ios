@@ -6,11 +6,8 @@
 #import <UIKit/UIKit.h>
 #import <VungleAdsSDK/VungleAdsSDK.h>
 
-#if __has_include(<CloudXCore/CloudXCore.h>)
 #import <CloudXCore/CLXNativeAd.h>
-#else
-@import CloudXCore;
-#endif
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -72,7 +69,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, nullable) id<CLXVungleNativeAdapting> vungleNative;
 
-- (instancetype)initWithVungleNative:(id<CLXVungleNativeAdapting>)vungleNative;
+- (instancetype)initWithVungleNative:(id<CLXVungleNativeAdapting>)vungleNative
+                            logger:(id<CLXAdapterLogger>)logger;
 
 @end
 
