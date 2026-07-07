@@ -21,6 +21,7 @@ typedef NS_ENUM(NSInteger, CLXAdFormat) {
     CLXAdFormatInterstitial = 2,
     CLXAdFormatRewarded = 3,
     CLXAdFormatNative = 4,
+    CLXAdFormatAppOpen = 5,
 };
 
 NS_ASSUME_NONNULL_END

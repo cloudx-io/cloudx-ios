@@ -57,7 +57,7 @@ CLX_PUBLIC
 @property (nonatomic, readonly, nullable) NSNumber *revenue;
 
 /**
- * The ad format type (banner, mrec, interstitial, rewarded, native)
+ * The ad format type (banner, mrec, interstitial, rewarded, native, app open)
  */
 @property (nonatomic, readonly) CLXAdFormat adFormat;
 

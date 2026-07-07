@@ -7,7 +7,7 @@
 //  be exported from the CloudXCore.framework binary.
 //
 //  CLX_PUBLIC            — publisher-facing API (CLXBanner, CLXInterstitial, …)
-//  CLX_PUBLIC_ADAPTER    — adapter-facing API (CLXAdapterBanner, factories, …)
+//  CLX_PUBLIC_ADAPTER    — adapter-facing API (CLXAdapterAdView, factories, …)
 //  CLX_INTERNAL_TESTING  — exported only for internal demo/test harness; not
 //                          sanctioned for publisher or adapter consumption
 //

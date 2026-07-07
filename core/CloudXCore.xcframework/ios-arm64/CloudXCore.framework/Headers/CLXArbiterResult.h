@@ -21,6 +21,14 @@ CLX_PUBLIC
 @property (nonatomic, strong, readonly) CLXArbiterPlatform *platform;
 
 /**
+ * Human-readable platform name for the selected bid.
+ *
+ * For dedicated bid types this matches platform.name. For custom bids, this is
+ * the originating mediator's name from the submitted custom bid.
+ */
+@property (nonatomic, copy, readonly) NSString *platformName;
+
+/**
  * Identifier of the bid selected by the arbiter, or nil when platform is NONE.
  */
 @property (nonatomic, copy, readonly, nullable) NSString *bidId;

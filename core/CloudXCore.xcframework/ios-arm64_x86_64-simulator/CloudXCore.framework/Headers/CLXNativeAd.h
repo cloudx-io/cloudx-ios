@@ -91,8 +91,6 @@ CLX_PUBLIC
 - (BOOL)prepareForInteractionClickableViews:(NSArray<UIView *> *)clickableViews
                               withContainer:(UIView *)container;
 
-- (BOOL)shouldPrepareViewForInteractionOnMainThread;
-
 - (BOOL)isContainerClickable;
 
 /**
@@ -108,6 +106,24 @@ CLX_PUBLIC
  * Default: NO.
  */
 - (BOOL)isSelfRendered;
+
+/**
+ * Whether the adapter's media view must stay visible on-screen for its
+ * impression to fire.
+ *
+ * Some partner SDKs key impression viewability on the registered media view
+ * actually being on-screen. In the space-constrained 320x50 compact banner
+ * template, CloudX otherwise collapses the media host to reclaim room for the
+ * title and CTA — which would stop such adapters from ever registering an
+ * impression (and paying revenue) in that slot. Override to YES to force a
+ * visible media thumbnail in the compact banner layout.
+ *
+ * Only affects the compact banner (320x50) template; larger templates render a
+ * full media area for every adapter regardless of this value.
+ *
+ * Default: NO.
+ */
+- (BOOL)requiresVisibleMediaViewForImpression;
 
 - (void)performClick;
 

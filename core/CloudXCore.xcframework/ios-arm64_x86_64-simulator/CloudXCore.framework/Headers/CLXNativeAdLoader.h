@@ -4,6 +4,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CloudXCore/CLXExport.h>
+#import <CloudXCore/CLXAdapterNativeVideoOptions.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -11,33 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXNativeAdView;
 @protocol CLXNativeAdDelegate;
 @protocol CLXAdRevenueDelegate;
-
-/**
- * @brief localExtraParameters key disabling fullscreen on video taps.
- * @discussion Adapter-tier. Set via `-setLocalExtraParameterForKey:value:`
- *             with `@YES`/`@NO`. Honored by adapters that support native
- *             video playback; silently ignored by adapters that do not.
- */
-CLX_PUBLIC_ADAPTER
-extern NSString *const CLXNativeVideoDisableFullScreenKey;
-
-/**
- * @brief localExtraParameters key starting native video playback unmuted.
- * @discussion Adapter-tier. Set via `-setLocalExtraParameterForKey:value:`
- *             with `@YES`/`@NO`. Honored by adapters that support native
- *             video playback; silently ignored by adapters that do not.
- */
-CLX_PUBLIC_ADAPTER
-extern NSString *const CLXNativeVideoStartUnmutedKey;
-
-/**
- * @brief localExtraParameters key hiding media controls on native video.
- * @discussion Adapter-tier. Set via `-setLocalExtraParameterForKey:value:`
- *             with `@YES`/`@NO`. Honored by adapters that support native
- *             video playback; silently ignored by adapters that do not.
- */
-CLX_PUBLIC_ADAPTER
-extern NSString *const CLXNativeVideoHideMediaControlsKey;
 
 /**
  * Loads and manages native ads for a single ad unit.

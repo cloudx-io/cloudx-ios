@@ -17,7 +17,8 @@ typedef NS_ENUM(NSInteger, CLXAdType) {
     CLXAdTypeRewarded = 1,
     CLXAdTypeBanner = 2,
     CLXAdTypeMrec = 3,
-    CLXAdTypeNative = 4
+    CLXAdTypeNative = 4,
+    CLXAdTypeAppOpen = 5
 };
 
 NS_ASSUME_NONNULL_END

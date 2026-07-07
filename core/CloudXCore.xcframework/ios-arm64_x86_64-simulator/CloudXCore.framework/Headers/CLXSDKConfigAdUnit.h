@@ -14,6 +14,7 @@ typedef NS_ENUM(NSInteger, SDKConfigAdType) {
     SDKConfigAdTypeInterstitial,
     SDKConfigAdTypeRewarded,
     SDKConfigAdTypeNative,
+    SDKConfigAdTypeAppOpen,
     SDKConfigAdTypeUnknown
 };
 
@@ -25,6 +26,7 @@ typedef NS_ENUM(NSInteger, SDKConfigAdType) {
 @property (nonatomic, readonly) NSTimeInterval bidRequestTimeoutSeconds;  // Derived from bidResponseTimeoutMs
 @property (nonatomic, assign) int64_t adLoadTimeoutMs;
 @property (nonatomic, assign) int64_t bannerRefreshRateMs;
+@property (nonatomic, assign) BOOL bannerAutoRefreshDisabled;
 @property (nonatomic, assign) SDKConfigAdType type;
 @property (nonatomic, assign) BOOL hasCloseButton;
 @property (nonatomic, assign) BOOL arbiterEnabled;

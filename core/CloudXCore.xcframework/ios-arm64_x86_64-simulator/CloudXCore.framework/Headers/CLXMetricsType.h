@@ -29,6 +29,7 @@ extern NSString * const CLXMetricsTypeNetworkTimeToFirstAd; // "network_call_tim
 extern NSString * const CLXMetricsTypeMethodSdkInit;           // "method_init"
 extern NSString * const CLXMetricsTypeMethodCreateBanner;     // "method_create_banner"
 extern NSString * const CLXMetricsTypeMethodCreateInterstitial; // "method_create_interstitial"
+extern NSString * const CLXMetricsTypeMethodCreateAppOpen;    // "method_create_app_open"
 extern NSString * const CLXMetricsTypeMethodCreateRewarded;   // "method_create_rewarded"
 extern NSString * const CLXMetricsTypeMethodCreateMrec;       // "method_create_mrec"
 extern NSString * const CLXMetricsTypeMethodCreateNative;     // "method_create_native"
@@ -85,7 +86,53 @@ extern NSString * const CLXMetricsTypeRendererMRAIDResizeError;        // "rende
 extern NSString * const CLXMetricsTypeRendererClickLatency;            // "renderer_click_latency_ms"
 extern NSString * const CLXMetricsTypeRendererClickBlocked;            // "renderer_click_blocked"
 extern NSString * const CLXMetricsTypeRendererClickDestination;        // "renderer_click_destination"
+// Clickthrough resolved no App Store identity (reason "no_app_id") or the
+// product sheet failed to load (reason "load_failed") and the click was
+// served by the openURL: fallback instead. This counter is the production
+// dataset for the sheet-only (strict) decision: it measures exactly the
+// clicks strict mode would drop.
+extern NSString * const CLXMetricsTypeRendererStoreKitFallback;        // "renderer_storekit_fallback"
 extern NSString * const CLXMetricsTypeRendererVASTUnfiredEvent;        // "renderer_vast_unfired_event"
+/// VAST tracking pixel dropped. The reason field carries the drop reason —
+/// the wire vocabulary is `https_required` / `url_length_exceeded` /
+/// `invalid_url` / `disallowed_scheme` (rejected pre-flight at fire time) plus
+/// `http_failure` (transport error / non-2xx reported post-request), for
+/// cross-platform parity with Android's `renderer_vast_tracker_dropped`
+/// (CXD-2414 hardened tracker). One emit per drop; not gated by the dedupe set
+/// (the dedupe is for "fired once" — drops don't count toward the fired-once
+/// invariant).
+extern NSString * const CLXMetricsTypeRendererVASTTrackerDropped;      // "renderer_vast_tracker_dropped"
+
+// Creative-rejection diagnostics for the open creative pool. The renderer can
+// receive arbitrary VAST; these surface *why* a creative was rejected so a
+// silent render failure becomes an attributable one.
+//
+// `renderer_vast_parse_error` — the VAST document could not be turned into a
+// usable response. The reason field carries the cause: `empty_vast` (no ADM),
+// `oversize_adm` (ADM/body over the size cap), `malformed_xml` (XML parse
+// failure), `version_unsupported` (VAST version outside 2.0-4.3), `no_ad`
+// (parsed but no usable <Ad>). Wrapper/network resolution failures do NOT
+// emit this metric — they carry their VAST code via renderer_vast_error_code.
+extern NSString * const CLXMetricsTypeRendererVASTParseError;          // "renderer_vast_parse_error"
+// `renderer_vast_error_code` — the standard VAST error code mapped at the
+// failure chokepoint, carried in the reason field as the decimal code
+// (e.g. "303"). Fires for every VAST load failure, so the reason histogram is
+// the full VAST error-code distribution.
+extern NSString * const CLXMetricsTypeRendererVASTErrorCode;           // "renderer_vast_error_code"
+// `renderer_no_compatible_media` — the VAST parsed but no playable media file
+// matched the device. The reason field carries the cause: `no_linear_creative`,
+// `no_supported_media` (incl. VPAID-only, IAB 403), `invalid_media_url`.
+extern NSString * const CLXMetricsTypeRendererNoCompatibleMedia;       // "renderer_no_compatible_media"
+// `renderer_unsupported_format` — a CloudX-rendered (embedded renderer) bid was
+// dropped through the waterfall because the embedded renderer cannot serve its
+// ad type or declared crtype. The reason field carries the cause:
+// `native` (no embedded native renderer), `rewarded_<crtype>` for a non-VAST
+// rewarded bid (e.g. `rewarded_html`, `rewarded_none` — rewarded supports VAST
+// only), or `crtype_<value>` for an unsupported declared crtype. This is the
+// observability surface for formats intentionally not served by the embedded
+// renderer; a non-zero rate quantifies the dropped traffic that a future
+// renderer would need to cover.
+extern NSString * const CLXMetricsTypeRendererUnsupportedFormat;       // "renderer_unsupported_format"
 extern NSString * const CLXMetricsTypeRendererLoadSuccess;             // "renderer_load_success"
 extern NSString * const CLXMetricsTypeRendererLoadFailed;              // "renderer_load_failed"
 extern NSString * const CLXMetricsTypeRendererRenderSuccess;           // "renderer_render_success"
@@ -135,15 +182,16 @@ extern NSString * const CLXMetricsTypeRendererOMIDConfigurationFailed; // "metho
 extern NSString * const CLXMetricsTypeRendererOMIDContextFailed;       // "method_renderer_omid_context_failed"
 extern NSString * const CLXMetricsTypeRendererOMIDSessionFailed;       // "method_renderer_omid_session_failed"
 extern NSString * const CLXMetricsTypeRendererOMIDAdEventsFailed;      // "method_renderer_omid_ad_events_failed"
+extern NSString * const CLXMetricsTypeRendererOMIDMediaEventsFailed;   // "method_renderer_omid_media_events_failed"
 
 // Per-impression OMID fire failure. Emitted from the renderer when the
 // viewability tracker hits the MRC threshold but OMID's impressionOccurred
-// call fails. impressionBanner: still fires; this metric is the system of
+// call fails. didTrackAdViewImpression: still fires; this metric is the system of
 // record for the OMID side dropping the impression.
 extern NSString * const CLXMetricsTypeRendererOMIDImpressionFireFailure; // "method_renderer_omid_impression_fire_failure"
 
-// CLXCoreRendererBanner dealloc with no terminal delegate callback observed.
-// This means the renderer was released before didLoadBanner: or failToLoad:
+// CLXCoreRendererAdView dealloc with no terminal delegate callback observed.
+// This means the renderer was released before didLoadAdView: or failToLoad:
 // reached the publisher - a leak from the publisher's perspective.
 extern NSString * const CLXMetricsTypeRendererBannerLeak; // "method_renderer_banner_leak"
 
@@ -158,6 +206,7 @@ extern NSString * const CLXMetricsTypeRendererBannerLeak; // "method_renderer_ba
  * premature emission.
  */
 extern NSString * const CLXMetricsTypeFullscreenInterstitialLeak;          // "fullscreen_interstitial_leak"
+extern NSString * const CLXMetricsTypeFullscreenAppOpenLeak;               // "fullscreen_app_open_leak"
 extern NSString * const CLXMetricsTypeFullscreenRewardedLeak;              // "fullscreen_rewarded_leak"
 // present_failed counters fire from the format subclass's
 // notifyDidFailToShowWithError: override and UNDERCOUNT relative to the generic
@@ -166,6 +215,7 @@ extern NSString * const CLXMetricsTypeFullscreenRewardedLeak;              // "f
 // renderer_render_failed directly and never invokes notify*, so the two
 // surfaces are not strict supersets. Use renderer_render_failed for the total.
 extern NSString * const CLXMetricsTypeFullscreenInterstitialPresentFailed; // "fullscreen_interstitial_present_failed"
+extern NSString * const CLXMetricsTypeFullscreenAppOpenPresentFailed;      // "fullscreen_app_open_present_failed"
 extern NSString * const CLXMetricsTypeFullscreenRewardedPresentFailed;     // "fullscreen_rewarded_present_failed"
 extern NSString * const CLXMetricsTypeFullscreenRewardEarned;              // "fullscreen_reward_earned"
 extern NSString * const CLXMetricsTypeFullscreenRewardForfeit;             // "fullscreen_reward_forfeit"

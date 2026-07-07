@@ -4,7 +4,7 @@
 
 /**
  * @file CLXFullscreenAdDelegate.h
- * @brief Fullscreen ad delegate protocol for interstitial and rewarded ads
+ * @brief Fullscreen ad delegate protocol for interstitial, rewarded, and app open ads
  */
 
 #import <Foundation/Foundation.h>
@@ -16,7 +16,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Protocol for fullscreen ad delegates (interstitial and rewarded).
+ * Protocol for fullscreen ad delegates (interstitial, rewarded, and app open).
  * Extends CLXAdDelegate with display lifecycle callbacks.
  *
  * @note Threading contract: see `CLXAdDelegate`. All callbacks (inherited and

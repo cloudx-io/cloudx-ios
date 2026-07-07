@@ -24,6 +24,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXAuctionBidManager : NSObject
 
 /**
+ * Shared bid-state instance. Bids are registered at bid-source time and read
+ * back by the publisher classes when they build the impression event's
+ * bidOutcomes set.
+ */
++ (instancetype)shared;
+
+/**
  * Adds a bid to the auction tracking
  * @param auctionId The auction identifier
  * @param bid The bid to track
@@ -50,27 +57,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setBidWinner:(NSString *)auctionId winningBidId:(NSString *)winningBidId;
 
 /**
- * Gets a specific bid from an auction
+ * Builds the impression event's bidOutcomes entries for an auction.
  * @param auctionId The auction identifier
- * @param bidId The bid identifier
- * @return The bid object, or nil if not found
+ * @param winningBidId The bid that served
+ * @return One entry per tracked bid with a sealed token: the winner is served,
+ *         bids that failed to load are failedLoad, the rest are loadedNotShown.
  */
-- (nullable CLXBidResponseBid *)getBid:(NSString *)auctionId bidId:(NSString *)bidId;
-
-/**
- * Gets the loss reason for a specific bid
- * @param auctionId The auction identifier
- * @param bidId The bid identifier
- * @return The loss reason, or nil if not set
- */
-- (nullable NSNumber *)getBidLossReason:(NSString *)auctionId bidId:(NSString *)bidId;
-
-/**
- * Gets the winning bid price for an auction
- * @param auctionId The auction identifier
- * @return The winning bid price, or 0.0 if no winner set
- */
-- (double)getLoadedBidPrice:(NSString *)auctionId;
+- (NSArray<NSDictionary<NSString *, NSString *> *> *)bidOutcomesForAuction:(NSString *)auctionId
+                                                              winningBidId:(NSString *)winningBidId;
 
 /**
  * Clears all data for a specific auction

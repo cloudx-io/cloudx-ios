@@ -64,6 +64,15 @@ NS_ASSUME_NONNULL_BEGIN
                                               adUnits:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)adUnits;
 
 /**
+ * Validates that an app open ad unit exists and has the correct type.
+ * @param adUnitId The ID of the ad unit to validate
+ * @param adUnits Dictionary of available ad units (name -> CLXSDKConfigAdUnit)
+ * @return Validation result with ad unit or detailed error
+ */
++ (CLXAdUnitValidationResult *)validateAppOpenAdUnit:(NSString *)adUnitId
+                                             adUnits:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)adUnits;
+
+/**
  * Validates that a banner ad unit exists and has the correct type.
  * @param adUnitId The ID of the ad unit to validate
  * @param adUnits Dictionary of available ad units (name -> CLXSDKConfigAdUnit)

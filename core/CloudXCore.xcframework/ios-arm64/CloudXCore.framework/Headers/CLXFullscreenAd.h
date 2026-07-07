@@ -4,7 +4,7 @@
 
 /**
  * @file CLXFullscreenAd.h
- * @brief Protocol for fullscreen ad formats (interstitial, rewarded)
+ * @brief Protocol for fullscreen ad formats (interstitial, rewarded, app open)
  */
 
 #import <Foundation/Foundation.h>
@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Protocol for fullscreen ad formats that require explicit show() gating.
- * This protocol is used by interstitial and rewarded ads which need isReady
+ * This protocol is used by interstitial, rewarded, and app open ads which need isReady
  * to determine when show() can be called.
  *
  * Note: Load state is communicated via delegate callbacks, matching the Android SDK.

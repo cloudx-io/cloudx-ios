@@ -86,8 +86,6 @@ CLX_INTERNAL_TESTING
 // 2. Endpoints (required)
 @property (nonatomic, copy) NSString *auctionEndpointURL;
 @property (nonatomic, copy) NSString *impressionTrackerURL;
-@property (nonatomic, copy) NSString *winLossNotificationURL;
-@property (nonatomic, copy, nullable) NSString *ilrdEndpointURL;
 @property (nonatomic, copy, nullable) NSString *arbiterEndpointURL;
 @property (nonatomic, assign) NSInteger arbiterTimeoutMs;
 
@@ -102,6 +100,7 @@ CLX_INTERNAL_TESTING
 @property (nonatomic, copy, nullable) NSString *sdkErrorEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sdkMetricsEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sdkLogEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkAdRevenueEndpointURL;
 
 // CXD-1176: adapter-lifecycle observability events flow through the metrics
 // pipeline (single `sdkMetricsEndpointURL` + server-side allow-list in
@@ -128,13 +127,10 @@ CLX_INTERNAL_TESTING
 
 // 4. Tracking (required)
 @property (nonatomic, strong) NSArray<NSString *> *tracking;
-@property (nonatomic, strong) NSDictionary<NSString *, NSString *> *winLossNotificationPayloadConfig;
 
 // 5. Optional Config
 @property (nonatomic, strong, nullable) CLXMetricsConfig *metricsConfig;
 @property (nonatomic, strong, nullable) CLXSDKConfigDeviceConfig *deviceConfig;
-/// Raw JSON response for dynamic field resolution (used by TrackingFieldResolver)
-@property (nonatomic, strong, nullable) NSDictionary *rawJSON;
 
 /// SDK init network call latency in milliseconds (for metrics tracking)
 @property (nonatomic, assign) NSInteger sdkInitLatencyMs;

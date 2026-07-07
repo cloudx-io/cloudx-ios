@@ -4,12 +4,11 @@
 
 /**
  * @file CLXPublisherFullscreenAdBase.h
- * @brief Base class for fullscreen ad implementations (interstitial and rewarded)
+ * @brief Base class for fullscreen ad implementations (interstitial, rewarded, and app open)
  */
 
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXFullscreenAd.h>
-#import <CloudXCore/CLXAdEventReporting.h>
 
 @class CLXSDKConfigAdUnit;
 @class CLXAdNetworkFactories;
@@ -18,7 +17,7 @@
 @class CLXBidAdSourceResponse;
 @class CLXAd;
 @class CLXError;
-@class CLXBidTokenSource;
+@class CLXAdapterBidderSignalsProvider;
 @class CLXAdapterInterstitial;
 @class CLXAdapterRewarded;
 
@@ -26,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Base class containing all shared logic for fullscreen ads.
- * Subclasses must implement abstract methods to specialize behavior for interstitial vs rewarded.
+ * Subclasses must implement abstract methods to specialize behavior for interstitial, rewarded, and app open.
  */
 @interface CLXPublisherFullscreenAdBase : NSObject <CLXFullscreenAd>
 
@@ -38,9 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
  * @param rewardedCallbackUrl The rewarded callback URL
  * @param impModel The impression model (nil if SDK not initialized, will be created on load)
  * @param adFactories The ad network factories
- * @param bidTokenSources Dictionary of bid token sources
+ * @param bidderSignalsProviders Dictionary of bidder signals providers
  * @param bidRequestTimeout Timeout in seconds for bid requests (0 = use session default)
- * @param reportingService The reporting service
  * @param settings The settings instance
  */
 - (instancetype)initWithAdUnit:(nullable CLXSDKConfigAdUnit *)adUnit
@@ -49,9 +47,8 @@ NS_ASSUME_NONNULL_BEGIN
               rewardedCallbackUrl:(nullable NSString *)rewardedCallbackUrl
                          impModel:(nullable CLXConfigImpressionModel *)impModel
                       adFactories:(nullable CLXAdNetworkFactories *)adFactories
-                  bidTokenSources:(NSDictionary<NSString *, CLXBidTokenSource *> *)bidTokenSources
+                  bidderSignalsProviders:(NSDictionary<NSString *, CLXAdapterBidderSignalsProvider *> *)bidderSignalsProviders
                bidRequestTimeout:(NSTimeInterval)bidRequestTimeout
-                reportingService:(id<CLXAdEventReporting>)reportingService
                         settings:(CLXSettings *)settings;
 
 /**

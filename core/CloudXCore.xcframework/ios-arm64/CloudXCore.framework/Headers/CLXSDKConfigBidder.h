@@ -15,12 +15,7 @@ typedef NS_ENUM(NSInteger, SDKConfigKnownAdapterName) {
     SDKConfigKnownAdapterNameCloudX
 };
 
-@protocol CLXBidderConfig <NSObject>
-- (NSDictionary<NSString *, id> *)getInitData;
-@property (nonatomic, readonly) NSString *networkName;
-@end
-
-@interface CLXSDKConfigBidder : NSObject <CLXBidderConfig>
+@interface CLXSDKConfigBidder : NSObject
 
 @property (nonatomic, strong) NSDictionary<NSString *, id> *bidderInitData;
 @property (nonatomic, strong) NSString *networkName;

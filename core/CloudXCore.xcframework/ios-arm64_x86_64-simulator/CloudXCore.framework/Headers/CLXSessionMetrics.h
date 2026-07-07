@@ -39,6 +39,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// Rewarded ad impression count
 @property (nonatomic, assign, readonly) float rewardedDepth;
 
+/// App open ad impression count
+@property (nonatomic, assign, readonly) float appOpenDepth;
+
 /// Session duration in seconds since first impression
 @property (nonatomic, assign, readonly) float durationSeconds;
 
@@ -51,6 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param fullDepth Fullscreen impression count
  * @param nativeDepth Native impression count
  * @param rewardedDepth Rewarded impression count
+ * @param appOpenDepth App open impression count
  * @param durationSeconds Session duration in seconds
  * @return Initialized session metrics instance
  */
@@ -60,6 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
                     fullDepth:(float)fullDepth
                   nativeDepth:(float)nativeDepth
                 rewardedDepth:(float)rewardedDepth
+                 appOpenDepth:(float)appOpenDepth
               durationSeconds:(float)durationSeconds NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
