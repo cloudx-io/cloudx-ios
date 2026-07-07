@@ -1,0 +1,5 @@
+framework module CloudXMobileFuseAdapter {
+    umbrella header "CloudXMobileFuseAdapter.h"
+    export *
+    module * { export * }
+}

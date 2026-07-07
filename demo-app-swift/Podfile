@@ -15,6 +15,10 @@ target 'CloudXSwiftRemotePods' do
   pod 'CloudXDigitalTurbineAdapter', '~> 8.4.8.0'
   pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.0'
   pod 'CloudXPangleAdapter', '~> 7.9.1.3.0'
+  # Wave 3 (fast-follow) — uncomment once these pods are published to CocoaPods trunk.
+  # Deferred pending their QA-environment setup (SSP bidder + pool seeding).
+  # pod 'CloudXMobileFuseAdapter', '~> 1.11.0.0'
+  # pod 'CloudXTaurusXAdapter', '~> 1.18.1.0'
 
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths
