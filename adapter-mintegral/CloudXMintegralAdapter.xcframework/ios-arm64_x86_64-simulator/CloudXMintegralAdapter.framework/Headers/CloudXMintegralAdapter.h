@@ -1,8 +1,5 @@
 #import <Foundation/Foundation.h>
 
-FOUNDATION_EXPORT double CloudXMintegralAdapterVersionNumber;
-FOUNDATION_EXPORT const unsigned char CloudXMintegralAdapterVersionString[];
-
 __attribute__((visibility("default"))) void CloudXMintegralAdapterRegister(void);
 
 // Adapter registration class
@@ -10,11 +7,13 @@ __attribute__((visibility("default"))) void CloudXMintegralAdapterRegister(void)
 @end
 
 #import "CLXMintegralInitializer.h"
-#import "CLXMintegralBidTokenSource.h"
-#import "CLXMintegralBanner.h"
-#import "CLXMintegralBannerFactory.h"
+#import "CLXMintegralBidderSignalsProvider.h"
+#import "CLXMintegralAdView.h"
+#import "CLXMintegralAdViewFactory.h"
 #import "CLXMintegralInterstitial.h"
 #import "CLXMintegralInterstitialFactory.h"
+#import "CLXMintegralAppOpen.h"
+#import "CLXMintegralAppOpenFactory.h"
 #import "CLXMintegralRewarded.h"
 #import "CLXMintegralRewardedFactory.h"
 #import "CLXMintegralNative.h"

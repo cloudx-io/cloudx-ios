@@ -6,8 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
-@class CLXLogger;
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -40,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @param extras The adapter_extras dictionary from bid.ext.cloudx.adapter_extras
  * @param adId Fallback ad ID parameter (may be placementID_unitID format)
- * @param bidIdParam The bidId parameter from the factory method
+ * @param bidIdParam Fallback bid ID parameter
  * @param logger Logger for debug output
  * @return CLXMintegralIDResult containing placementID, unitID, and bidID
  *
@@ -62,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (CLXMintegralIDResult *)extractIDsFromExtras:(nullable NSDictionary *)extras
                                           adId:(nullable NSString *)adId
                                     bidIdParam:(nullable NSString *)bidIdParam
-                                        logger:(nullable CLXLogger *)logger;
+                                        logger:(nullable id<CLXAdapterLogger>)logger;
 
 @end
 
