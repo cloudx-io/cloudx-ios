@@ -3,17 +3,13 @@
 //  CloudXMetaAdapter
 //
 
-#import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXAdapterInitializer.h>
 
-@interface CLXMetaInitializer : CLXAdNetworkInitializer
+@interface CLXMetaInitializer : CLXAdapterInitializer
 
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
 @property (nonatomic, copy, readonly) NSString *network;
 
 + (NSString *)sdkVersion;
-
-- (void)initializeWithConfig:(nullable CLXBidderConfig *)config 
-                    testMode:(BOOL)testMode
-                  completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
 
 @end 

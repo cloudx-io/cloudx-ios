@@ -3,6 +3,7 @@
  */
 
 #import <CloudXCore/CLXNativeAd.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 #import <FBAudienceNetwork/FBAudienceNetwork.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -17,7 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak, nullable) id<CLXAdapterNativeDelegate> adapterDelegate;
 
 - (instancetype)initWithFBNativeAd:(FBNativeAdBase *)fbNativeAd
-              localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters;
+              localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters
+                            logger:(id<CLXAdapterLogger>)logger;
 
 @end
 
