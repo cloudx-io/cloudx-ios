@@ -8,7 +8,7 @@
 #if __has_include(<CloudXCore/CLXAdapterMetadataProvider.h>)
 #import <CloudXCore/CLXAdapterMetadataProvider.h>
 #else
-#import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXAdapterMetadataProvider.h>
 #endif
 
 NS_ASSUME_NONNULL_BEGIN

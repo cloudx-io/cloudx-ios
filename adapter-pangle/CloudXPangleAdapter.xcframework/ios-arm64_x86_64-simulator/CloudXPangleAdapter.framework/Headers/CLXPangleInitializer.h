@@ -3,11 +3,7 @@
 //  CloudXPangleAdapter
 //
 
-#if __has_include(<CloudXCore/CloudXCore.h>)
-#import <CloudXCore/CloudXCore.h>
-#else
-@import CloudXCore;
-#endif
+#import <CloudXCore/CLXAdapterInitializer.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Initializer for the Pangle (ByteDance) advertising network adapter.
  * Handles SDK initialization, configuration, and state management.
  */
-@interface CLXPangleInitializer : CLXAdNetworkInitializer
+@interface CLXPangleInitializer : CLXAdapterInitializer
 
 @property (nonatomic, copy, readonly) NSString *sdkVersion;
 @property (nonatomic, copy, readonly) NSString *network;
@@ -30,8 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// Placements map stashed during init: CloudX ad unit ID → Pangle placement ID.
 + (NSDictionary<NSString *, NSString *> *)storedPlacements;
 
-/// First placement ID from the stashed map (used for bid token collection).
-+ (nullable NSString *)firstPlacementId;
+/// Pangle placement ID for a CloudX ad unit ID, or @c nil when the stashed
+/// map has no entry for it. Used by bidder-signals collection so each auction's
+/// token carries the slot that belongs to the ad unit being requested.
++ (nullable NSString *)placementIdForAdUnitId:(NSString *)adUnitId;
 
 /// Resolve placement ID: checks @c serverExtras[@"placement_id"] first,
 /// falls back to the stashed map keyed by @c adUnitId.
