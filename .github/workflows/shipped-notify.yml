@@ -15,7 +15,7 @@
 # Requires the SLACK_SHIPPED_WEBHOOK_URL repo secret: a Slack incoming-webhook
 # URL bound to the #shipped channel.
 
-name: Notify #shipped
+name: 'Notify #shipped'
 
 on:
   release:
@@ -30,12 +30,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Post release notes to #shipped
+        # Test-mode fallbacks live in the script (keyed on EVENT_NAME), not in
+        # `${{ ... || '...' }}` defaults: an unquoted `#` inside a plain YAML
+        # scalar starts a comment, which previously truncated the expression
+        # mid-`${{` and made GitHub reject the whole workflow file as invalid.
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SHIPPED_WEBHOOK_URL }}
-          RELEASE_NAME: ${{ github.event.release.name || '[TEST] shipped-notify wiring check' }}
-          RELEASE_TAG: ${{ github.event.release.tag_name || 'no-tag-manual-test' }}
-          RELEASE_URL: ${{ github.event.release.html_url || github.server_url }}
-          RELEASE_BODY: ${{ github.event.release.body || 'This is a manual test of the #shipped webhook wiring (workflow_dispatch). If you can read this, the integration works — real messages will carry release changelogs.' }}
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_NAME: ${{ github.event.release.name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+          RELEASE_BODY: ${{ github.event.release.body }}
         run: |
           if [ -z "$SLACK_WEBHOOK_URL" ]; then
             echo "::error::SLACK_SHIPPED_WEBHOOK_URL secret is not set — create a Slack incoming webhook for #shipped and add it as a repo secret."
@@ -47,10 +52,20 @@ jobs:
           python3 - <<'PY' > payload.json
           import json, os
 
-          name = os.environ.get("RELEASE_NAME") or os.environ.get("RELEASE_TAG", "release")
+          is_test = os.environ.get("EVENT_NAME") == "workflow_dispatch"
+          name = os.environ.get("RELEASE_NAME") or os.environ.get("RELEASE_TAG") or "release"
           tag = os.environ.get("RELEASE_TAG", "")
           url = os.environ.get("RELEASE_URL", "")
           body = os.environ.get("RELEASE_BODY", "").strip() or "_No release notes provided._"
+          if is_test:
+              name = "[TEST] shipped-notify wiring check"
+              tag = "no-tag-manual-test"
+              url = "https://github.com/cloudx-io/cloudx-ios/actions"
+              body = (
+                  "This is a manual test of the #shipped webhook wiring "
+                  "(workflow_dispatch). If you can read this, the integration works — "
+                  "real messages will carry release changelogs."
+              )
           limit = 2800
           if len(body) > limit:
               body = body[:limit] + f"\n\n… truncated — <{url}|full release notes>"
