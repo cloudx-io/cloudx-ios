@@ -13,6 +13,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.5.0] - 2026-07-07
+
+Adapters now version independently of `CloudXCore`. Each adapter pod uses `<network-sdk-version>.<adapter-revision>` (e.g. `pod 'CloudXVungleAdapter', '~> 7.7.4.0'`) and is tied to one exact network SDK version per release. `CloudXCore` continues on SDK semver (`pod 'CloudXCore', '~> 3.5'`).
+
+### Breaking Changes
+- **Adapter pods no longer share the `CloudXCore` version.** Existing pins on the old unified line (`~> 3.4`, `~> 3.x`) will not resolve new adapter releases. Update each adapter pin independently, for example `pod 'CloudXMintegralAdapter', '~> 8.1.5.0'`.
+- **`CloudXMagniteAdapterV2` replaces `CloudXMagniteAdapter` for independent versioning.** Install `pod 'CloudXMagniteAdapterV2', '~> 1.0.0.0'` to move to the new version line; the legacy `CloudXMagniteAdapter` pod remains available on the old unified line if you're not ready to migrate. No source changes required either way — the import name is unchanged.
+- **`CloudXRenderer` is no longer a separate pod.** Its functionality is built into `CloudXCore`; remove any direct `CloudXRenderer` dependency from your Podfile.
+
+### Added
+- **App Open ad format** — New `CLXAppOpen` ad class (with `CLXAppOpenDelegate`) for full-screen ads shown while your app is loading or returning to the foreground. Create with `createAppOpen(adUnitId:)` (`createAppOpenWithAdUnitId:` in Objective-C). Supported on the Google Waterfall, Mintegral, Pangle, and Vungle adapters.
+- **VAST video interstitials and rewarded on the CloudX renderer** — The CloudX renderer now serves VAST video interstitial and rewarded creatives, with Open Measurement (OMID) video measurement. Rollout is controlled server-side; no integration change is required.
+- **HTML rewarded on the CloudX renderer** — HTML rewarded creatives now render through the CloudX renderer, completing the fullscreen HTML support introduced for interstitials in 3.4.5. Server-side rollout; no integration change required.
+- **Native ads on Mintegral, Pangle, and Verve** — These adapters now serve Native creatives, both standalone (via `CLXNativeAdLoader`) and native-in-banner / native-in-MREC. Native is now available across Meta, Vungle, InMobi, Moloco, Digital Turbine, Mintegral, Pangle, and Verve.
+- **In-app App Store sheet for install-ad clickthroughs** — Tapping an install-campaign ad now opens an in-app App Store product sheet instead of leaving your app, for CloudX-rendered creatives that declare the advertised app. Falls back to the previous behavior (opening the App Store app) when the sheet can't be shown.
+- **Fullscreen HTML interstitial clickthrough** — Fullscreen HTML interstitials rendered by the CloudX renderer now navigate on tap.
+- **`CloudXMagniteAdapterV2` 1.0.0.0** — the new independent-versioned Magnite pod. Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.0.0'`. Backed by MagniteSDK 1.0.0.
+
+### Changed — Adapter releases
+- **Vungle** `CloudXVungleAdapter` → `~> 7.7.4.0` (VungleAds 7.7.4).
+- **Mintegral** `CloudXMintegralAdapter` → `~> 8.1.5.0` (MintegralAdSDK 8.1.5).
+- **Unity Ads** `CloudXUnityAdsAdapter` → `~> 4.19.0.0` (UnityAds 4.19.0).
+- **Verve** `CloudXVerveAdapter` → `~> 3.9.0.0` (HyBid 3.9.0).
+- **Digital Turbine** `CloudXDigitalTurbineAdapter` → `~> 8.4.8.0` (Fyber Marketplace SDK 8.4.8).
+- **Google Waterfall** `CloudXGoogleWaterfallAdapter` → `~> 13.6.0.0` (Google Mobile Ads SDK 13.6.0 — a major-version upgrade from 12.x).
+- **InMobi** `CloudXInMobiAdapter` → `~> 11.3.0.0` (InMobiSDK 11.3.0).
+- **Meta** `CloudXMetaAdapter` → `~> 6.21.1.0` (FBAudienceNetwork 6.21.1).
+- **Moloco** `CloudXMolocoAdapter` → `~> 4.8.0.0` (MolocoSDKiOS 4.8.0).
+- **Pangle** `CloudXPangleAdapter` → `~> 7.9.1.3.0` (Ads-Global 7.9.1.3).
+
+### Fixed
+- **Some bidders were not billed for certain banner impressions** — Fixed a case where impressions from a native ad rendered inside a banner slot (via the native-in-banner bridge) could be reported without the bidder win/billing notice, so the bidder was never billed even though the impression was counted. Affected native-in-banner rendering paths (for example Moloco). Impressions are now billed correctly in all cases.
+- **Native ads in a banner or MREC slot could report their impression too early** — Fixed an issue where a native ad rendered in a banner or MREC slot (Moloco) could fire its impression before the ad view was actually inserted and visible, especially when preloading off-screen. Impressions now report at the correct time.
+- **Stuck fullscreen ad after a rendering crash** — If the web content behind a fullscreen ad crashed after the ad loaded, the user could be left on a stuck fullscreen. The ad now closes automatically and delivers the close callback.
+- **Native ads in banner slots could miss impressions with compact layouts** — Fixed an issue where a native ad rendered in a banner slot with the compact template could display without registering an impression.
+
+### Removed
+- **`CloudXRenderer` standalone pod** — merged into `CloudXCore`. See Breaking Changes above.
+
+---
+
 ## [3.4.6] - 2026-06-29
 
 ### Changed
