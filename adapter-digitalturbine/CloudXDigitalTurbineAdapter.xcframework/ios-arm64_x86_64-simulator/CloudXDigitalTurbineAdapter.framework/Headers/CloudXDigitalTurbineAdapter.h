@@ -7,16 +7,13 @@
 
 #import <Foundation/Foundation.h>
 
-FOUNDATION_EXPORT double CloudXDigitalTurbineAdapterVersionNumber;
-FOUNDATION_EXPORT const unsigned char CloudXDigitalTurbineAdapterVersionString[];
-
 __attribute__((visibility("default"))) void CloudXDigitalTurbineAdapterRegister(void);
 
 @interface CloudXDigitalTurbineAdapter : NSObject
 @end
 
-#import "CLXDigitalTurbineBanner.h"
-#import "CLXDigitalTurbineBannerFactory.h"
+#import "CLXDigitalTurbineAdView.h"
+#import "CLXDigitalTurbineAdViewFactory.h"
 #import "CLXDigitalTurbineInterstitial.h"
 #import "CLXDigitalTurbineInterstitialFactory.h"
 #import "CLXDigitalTurbineRewarded.h"
@@ -25,7 +22,7 @@ __attribute__((visibility("default"))) void CloudXDigitalTurbineAdapterRegister(
 #import "CLXDigitalTurbineNativeFactory.h"
 #import "CLXDigitalTurbineNativeAd.h"
 #import "CLXDigitalTurbineInitializer.h"
-#import "CLXDigitalTurbineBidTokenSource.h"
+#import "CLXDigitalTurbineBidderSignalsProvider.h"
 #import "CLXDigitalTurbinePrivacyHandler.h"
 #import "CLXDigitalTurbineErrorHandler.h"
 #import "CLXDigitalTurbineUtils.h"

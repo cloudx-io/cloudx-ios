@@ -1,10 +1,10 @@
 //
-//  CLXDigitalTurbineBidTokenSource.h
+//  CLXDigitalTurbineBidderSignalsProvider.h
 //  CloudXDigitalTurbineAdapter
 //
 
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CLXBidTokenSource.h>
+#import <CloudXCore/CLXAdapterBidderSignalsProvider.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Token acquisition runs on a background queue to avoid blocking the main
  * thread if the third-party SDK serializes the call internally.
  */
-@interface CLXDigitalTurbineBidTokenSource : CLXBidTokenSource
+@interface CLXDigitalTurbineBidderSignalsProvider : CLXAdapterBidderSignalsProvider
 
 + (instancetype)sharedInstance;
 

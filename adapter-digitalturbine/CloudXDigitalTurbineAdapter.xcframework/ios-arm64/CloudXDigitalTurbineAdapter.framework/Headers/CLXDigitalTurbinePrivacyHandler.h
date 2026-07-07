@@ -3,11 +3,7 @@
 //  CloudXDigitalTurbineAdapter
 //
 
-#if __has_include(<CloudXCore/CloudXCore.h>)
-#import <CloudXCore/CloudXCore.h>
-#else
-@import CloudXCore;
-#endif
+#import <CloudXCore/CLXAdapterPrivacyHandler.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
