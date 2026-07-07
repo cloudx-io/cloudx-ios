@@ -29,7 +29,7 @@ Adapters now version independently of `CloudXCore`. Each adapter pod uses `<netw
 - **Native ads on Mintegral, Pangle, and Verve** — These adapters now serve Native creatives, both standalone (via `CLXNativeAdLoader`) and native-in-banner / native-in-MREC. Native is now available across Meta, Vungle, InMobi, Moloco, Digital Turbine, Mintegral, Pangle, and Verve.
 - **In-app App Store sheet for install-ad clickthroughs** — Tapping an install-campaign ad now opens an in-app App Store product sheet instead of leaving your app, for CloudX-rendered creatives that declare the advertised app. Falls back to the previous behavior (opening the App Store app) when the sheet can't be shown.
 - **Fullscreen HTML interstitial clickthrough** — Fullscreen HTML interstitials rendered by the CloudX renderer now navigate on tap.
-- **`CloudXMagniteAdapterV2` 1.0.0.0** — the new independent-versioned Magnite pod. Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.0.0'`. Backed by MagniteSDK 1.0.0.
+- **`CloudXMagniteAdapterV2` 1.0.0.1** — the new independent-versioned Magnite pod. Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.0.0'`. Backed by MagniteSDK 1.0.0.
 
 ### Changed — Adapter releases
 - **Vungle** `CloudXVungleAdapter` → `~> 7.7.4.0` (VungleAds 7.7.4).
