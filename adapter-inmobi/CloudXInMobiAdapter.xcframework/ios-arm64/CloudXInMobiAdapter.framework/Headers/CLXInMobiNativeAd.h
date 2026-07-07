@@ -6,11 +6,8 @@
 #import <UIKit/UIKit.h>
 #import <InMobiSDK/InMobiSDK-Swift.h>
 
-#if __has_include(<CloudXCore/CloudXCore.h>)
 #import <CloudXCore/CLXNativeAd.h>
-#else
-@import CloudXCore;
-#endif
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -66,7 +63,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) id<CLXInMobiNativeAdapting> imNative;
 
 - (instancetype)initWithIMNative:(id<CLXInMobiNativeAdapting>)imNative
-            localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters;
+            localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters
+                            logger:(id<CLXAdapterLogger>)logger;
 
 @end
 

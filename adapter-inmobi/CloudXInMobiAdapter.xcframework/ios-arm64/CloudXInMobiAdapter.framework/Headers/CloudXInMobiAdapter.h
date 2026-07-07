@@ -7,12 +7,6 @@
 
 #import <Foundation/Foundation.h>
 
-//! Project version number for CloudXInMobiAdapter.
-FOUNDATION_EXPORT double CloudXInMobiAdapterVersionNumber;
-
-//! Project version string for CloudXInMobiAdapter.
-FOUNDATION_EXPORT const unsigned char CloudXInMobiAdapterVersionString[];
-
 // Registration function for static frameworks
 __attribute__((visibility("default"))) void CloudXInMobiAdapterRegister(void);
 
@@ -20,8 +14,8 @@ __attribute__((visibility("default"))) void CloudXInMobiAdapterRegister(void);
 @interface CloudXInMobiAdapter : NSObject
 @end
 
-#import "CLXInMobiBanner.h"
-#import "CLXInMobiBannerFactory.h"
+#import "CLXInMobiAdView.h"
+#import "CLXInMobiAdViewFactory.h"
 #import "CLXInMobiInterstitial.h"
 #import "CLXInMobiInterstitialFactory.h"
 #import "CLXInMobiRewarded.h"
@@ -30,7 +24,7 @@ __attribute__((visibility("default"))) void CloudXInMobiAdapterRegister(void);
 #import "CLXInMobiNativeFactory.h"
 #import "CLXInMobiNativeAd.h"
 #import "CLXInMobiInitializer.h"
-#import "CLXInMobiBidTokenSource.h"
+#import "CLXInMobiBidderSignalsProvider.h"
 #import "CLXInMobiAdapterVersion.h"
 
 
