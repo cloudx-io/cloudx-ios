@@ -23,7 +23,6 @@ Adapters now version independently of `CloudXCore`. Each adapter pod uses `<netw
 - **`CloudXRenderer` is no longer a separate pod.** Its functionality is built into `CloudXCore`; remove any direct `CloudXRenderer` dependency from your Podfile.
 
 ### Added
-- **App Open ad format** — New `CLXAppOpen` ad class (with `CLXAppOpenDelegate`) for full-screen ads shown while your app is loading or returning to the foreground. Create with `createAppOpen(adUnitId:)` (`createAppOpenWithAdUnitId:` in Objective-C). Supported on the Google Waterfall, Mintegral, Pangle, and Vungle adapters.
 - **VAST video interstitials and rewarded on the CloudX renderer** — The CloudX renderer now serves VAST video interstitial and rewarded creatives, with Open Measurement (OMID) video measurement. Rollout is controlled server-side; no integration change is required.
 - **HTML rewarded on the CloudX renderer** — HTML rewarded creatives now render through the CloudX renderer, completing the fullscreen HTML support introduced for interstitials in 3.4.5. Server-side rollout; no integration change required.
 - **Native ads on Mintegral, Pangle, and Verve** — These adapters now serve Native creatives, both standalone (via `CLXNativeAdLoader`) and native-in-banner / native-in-MREC. Native is now available across Meta, Vungle, InMobi, Moloco, Digital Turbine, Mintegral, Pangle, and Verve.
