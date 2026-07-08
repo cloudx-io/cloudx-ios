@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## MobileFuse adapter 1.11.0.0 - 2026-07-08
+
+### Added
+- **MobileFuse adapter** — New `CloudXMobileFuseAdapter` serving Banner, MREC, Interstitial, and Rewarded. Install: `pod 'CloudXMobileFuseAdapter', '~> 1.11.0.0'`. Backed by MobileFuse SDK 1.11.0; requires `CloudXCore >= 3.5.0`.
+
+---
+
 ## [3.5.0] - 2026-07-07
 
 Adapters now version independently of `CloudXCore`. Each adapter pod uses `<network-sdk-version>.<adapter-revision>` (e.g. `pod 'CloudXVungleAdapter', '~> 7.7.4.0'`) and is tied to one exact network SDK version per release. `CloudXCore` continues on SDK semver (`pod 'CloudXCore', '~> 3.5'`).
