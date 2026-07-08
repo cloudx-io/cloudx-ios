@@ -28,6 +28,15 @@ on:
 jobs:
   notify-shipped:
     runs-on: ubuntu-latest
+    # #shipped gets ONE message per release wave: the core SDK release, whose
+    # body lists every adapter shipped in the wave. Adapter releases (tag
+    # `adapter-<name>/<version>`) publish alongside it but must NOT each post to
+    # #shipped — that would spam the channel with one message per adapter.
+    # #sdk-releases (Slack GitHub-app subscription) still fires for every
+    # release; only this #shipped post is scoped to the core release.
+    # workflow_dispatch (manual wiring test) has an empty release tag, so the
+    # guard lets it through.
+    if: ${{ github.event.release.tag_name == '' || !startsWith(github.event.release.tag_name, 'adapter-') }}
     steps:
       - name: Post release notes to #shipped
         # Test-mode fallbacks live in the script (keyed on EVENT_NAME), not in
