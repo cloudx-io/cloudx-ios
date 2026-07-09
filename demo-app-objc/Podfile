@@ -15,9 +15,11 @@ target 'CloudXObjCRemotePods' do
   pod 'CloudXDigitalTurbineAdapter', '~> 8.4.8.0'
   pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.0'
   pod 'CloudXPangleAdapter', '~> 7.9.1.3.0'
-  # Wave 3 (fast-follow) — uncomment once these pods are published to CocoaPods trunk.
-  # Deferred pending their QA-environment setup (SSP bidder + pool seeding).
-  # pod 'CloudXMobileFuseAdapter', '~> 1.11.0.0'
+  pod 'CloudXMobileFuseAdapter', '~> 1.11.0.0'
+  # TaurusX held back: QA gate failed (TaurusX demand dark for the iOS test app
+  # since 2026-06-26 — NoBid from both US and JP geos despite a healthy device
+  # pipeline). Uncomment once TaurusX-side placement status is resolved and the
+  # pod is published to trunk.
   # pod 'CloudXTaurusXAdapter', '~> 1.18.1.0'
 
   target 'CloudXObjCRemotePodsTests' do
