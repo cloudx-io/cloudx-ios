@@ -5,18 +5,16 @@
 
 #import <Foundation/Foundation.h>
 #import <UnityAds/UnityAds.h>
-#import <CloudXCore/CLXAdapterLogger.h>
-#import <CloudXCore/CLXAdapterRewarded.h>
-#import <CloudXCore/CLXAdapterLogger.h>
+#import <CloudXCore/CloudXCore.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXUnityAdsRewarded : CLXAdapterRewarded <UADSRewardedShowDelegate>
+@interface CLXUnityAdsRewarded : CLXAdapterRewarded <UnityAdsLoadDelegate, UnityAdsShowDelegate>
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                      placementName:(nullable NSString *)placementName
-                            logger:(id<CLXAdapterLogger>)logger;
+                             bidID:(NSString *)bidID;
 
 @end
 

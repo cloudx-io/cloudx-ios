@@ -1,8 +1,6 @@
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CLXAdapterLogger.h>
 #import <GoogleMobileAds/GoogleMobileAds.h>
 #import "CLXGoogleWaterfallFillState.h"
-#import "CLXGoogleWaterfallAdLoader.h"
 
 @class CLXGoogleWaterfallFillEntry;
 
@@ -16,7 +14,7 @@ typedef NS_ENUM(NSInteger, CLXGoogleWaterfallControllerState) {
     CLXGoogleWaterfallControllerStatePermanentFail,
 };
 
-@interface CLXGoogleWaterfallPlacementController : NSObject
+@interface CLXGoogleWaterfallPlacementController : NSObject <GADBannerViewDelegate>
 
 @property (nonatomic, strong, readonly) CLXGoogleWaterfallPlacementConfig *config;
 @property (nonatomic, assign, readonly) CLXGoogleWaterfallControllerState state;
@@ -24,16 +22,15 @@ typedef NS_ENUM(NSInteger, CLXGoogleWaterfallControllerState) {
 @property (nonatomic, assign, readonly) uint64_t backoffNextAttemptAtMs;
 
 - (instancetype)initWithConfig:(CLXGoogleWaterfallPlacementConfig *)config
-                adLoaderFactory:(id<CLXGoogleWaterfallAdLoader> (^)(CLXGoogleWaterfallPlacementConfig *config))adLoaderFactory
+                  adViewFactory:(GADBannerView *(^)(CLXGoogleWaterfallPlacementConfig *config))adViewFactory
                           queue:(dispatch_queue_t)queue
-                          clock:(uint64_t (^)(void))clock
-                         logger:(id<CLXAdapterLogger>)logger NS_DESIGNATED_INITIALIZER;
+                          clock:(uint64_t (^)(void))clock NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 
 - (void)startLoad;
 - (void)markLoadTimedOut;
 - (void)markBackoffElapsed;
-- (nullable id)acquire;
+- (nullable GADBannerView *)acquire;
 - (nullable CLXGoogleWaterfallFillEntry *)currentFillEntry;
 - (void)pause;
 - (void)resume;
