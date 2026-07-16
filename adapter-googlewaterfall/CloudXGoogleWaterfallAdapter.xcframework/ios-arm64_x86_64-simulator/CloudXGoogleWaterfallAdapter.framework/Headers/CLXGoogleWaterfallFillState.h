@@ -7,10 +7,6 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSInteger, CLXGoogleWaterfallPlacementFormat) {
     CLXGoogleWaterfallPlacementFormatBanner = 0,
     CLXGoogleWaterfallPlacementFormatMrec = 1,
-    CLXGoogleWaterfallPlacementFormatInterstitial = 2,
-    CLXGoogleWaterfallPlacementFormatRewarded = 3,
-    CLXGoogleWaterfallPlacementFormatNative = 4,
-    CLXGoogleWaterfallPlacementFormatAppOpen = 5,
 };
 
 BOOL CLXGoogleWaterfallPlacementFormatFromString(NSString * _Nullable s, CLXGoogleWaterfallPlacementFormat *outFormat);
@@ -33,22 +29,20 @@ BOOL CLXGoogleWaterfallPlacementFormatFromString(NSString * _Nullable s, CLXGoog
 @interface CLXGoogleWaterfallFillEntry : NSObject
 @property (nonatomic, copy, readonly) NSString *adUnitId;
 @property (nonatomic, assign, readonly) CLXGoogleWaterfallPlacementFormat format;
+@property (nonatomic, copy, readonly) NSArray<NSString *> *probesTriggered;
 @property (nonatomic, copy, readonly, nullable) NSString *winnerSourceName;
 @property (nonatomic, copy, readonly, nullable) NSString *winnerInstanceName;
 @property (nonatomic, copy, readonly, nullable) NSString *mediationGroupName;
-@property (nonatomic, copy, readonly, nullable) NSString *creativeId;
-@property (nonatomic, copy, readonly, nullable) NSString *responseId;
 
 - (instancetype)initWithAdUnitId:(NSString *)adUnitId
                           format:(CLXGoogleWaterfallPlacementFormat)format
+                 probesTriggered:(NSArray<NSString *> *)probesTriggered
                 winnerSourceName:(nullable NSString *)winnerSourceName
               winnerInstanceName:(nullable NSString *)winnerInstanceName
-              mediationGroupName:(nullable NSString *)mediationGroupName
-                      creativeId:(nullable NSString *)creativeId
-                      responseId:(nullable NSString *)responseId NS_DESIGNATED_INITIALIZER;
+              mediationGroupName:(nullable NSString *)mediationGroupName NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 
-- (NSDictionary<NSString *, id> *)toJSONObjectWithRealizedEcpm:(double)realizedEcpm;
+- (NSDictionary<NSString *, id> *)toJSONObject;
 @end
 
 NS_ASSUME_NONNULL_END

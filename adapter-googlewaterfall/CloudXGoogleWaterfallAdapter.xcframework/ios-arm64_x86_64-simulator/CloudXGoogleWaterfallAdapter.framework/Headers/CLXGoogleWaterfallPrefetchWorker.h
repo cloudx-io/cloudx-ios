@@ -1,8 +1,7 @@
 #import <Foundation/Foundation.h>
-#import <CloudXCore/CLXAdapterLogger.h>
 #import "CLXGoogleWaterfallFillState.h"
-#import "CLXGoogleWaterfallAdLoader.h"
 
+@class GADBannerView;
 @class CLXGoogleWaterfallFillEntry;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -10,15 +9,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXGoogleWaterfallPrefetchWorker : NSObject
 
 - (instancetype)initWithPlacements:(NSArray<CLXGoogleWaterfallPlacementConfig *> *)placements
-                   adLoaderFactory:(id<CLXGoogleWaterfallAdLoader> (^)(CLXGoogleWaterfallPlacementConfig *config))adLoaderFactory
-                            logger:(id<CLXAdapterLogger>)logger;
+                     adViewFactory:(GADBannerView *(^)(CLXGoogleWaterfallPlacementConfig *config))adViewFactory NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)initWithPlacements:(NSArray<CLXGoogleWaterfallPlacementConfig *> *)placements
-                   adLoaderFactory:(id<CLXGoogleWaterfallAdLoader> (^)(CLXGoogleWaterfallPlacementConfig *config))adLoaderFactory
+                     adViewFactory:(GADBannerView *(^)(CLXGoogleWaterfallPlacementConfig *config))adViewFactory
                              queue:(dispatch_queue_t)queue
                              clock:(uint64_t (^)(void))clock
-                      tickInterval:(NSTimeInterval)tickInterval
-                            logger:(id<CLXAdapterLogger>)logger NS_DESIGNATED_INITIALIZER;
+                      tickInterval:(NSTimeInterval)tickInterval;
 - (instancetype)init NS_UNAVAILABLE;
 
 - (void)start;
@@ -27,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSArray<CLXGoogleWaterfallFillEntry *> *)snapshotFills;
 
-- (nullable id)acquireForLoad:(NSString *)adUnitId;
+- (nullable GADBannerView *)acquireForLoad:(NSString *)adUnitId;
 
 - (BOOL)hasAdUnit:(NSString *)adUnitId;
 

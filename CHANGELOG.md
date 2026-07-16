@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Off-line adapter releases (-core34) - 2026-07-16
+
+Off-line builds of three adapters for publishers still on `CloudXCore` 3.4.x. Each works with `CloudXCore` 3.4.5 or 3.4.6 and is **not** compatible with `CloudXCore` 3.5.x.
+
+- **Google Waterfall** — `pod 'CloudXGoogleWaterfallAdapter', '13.0.0.0-core34'`. Backed by Google Mobile Ads SDK 13.0.0. Requires `CloudXCore >= 3.4.6, < 3.5` (works with 3.4.6, not 3.5.x).
+- **Unity Ads** — `pod 'CloudXUnityAdsAdapter', '4.16.5.0-core34'`. Backed by UnityAds 4.16.5. Requires `CloudXCore >= 3.4.5, < 3.5` (works with 3.4.5/3.4.6, not 3.5.x). Reward is granted on completed ad watch; UnityAds 4.16.5 provides no ad-expiry callback, so expired creatives are not signaled.
+- **Moloco** — `pod 'CloudXMolocoAdapter', '4.3.0.0-core34'`. Backed by MolocoSDKiOS 4.3.0. Requires `CloudXCore >= 3.4.5, < 3.5` (works with 3.4.5/3.4.6, not 3.5.x).
+
+---
+
 ## MobileFuse adapter 1.11.0.0 - 2026-07-08
 
 ### Added
