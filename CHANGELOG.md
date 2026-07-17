@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-*No unreleased changes*
+### Added
+- **AppsFlyer ad-revenue integration** — New `CloudXAppsFlyerIntegration` pod automatically forwards impression-level ad revenue for every CloudX-won impression (Banner, MREC, Interstitial, Rewarded, Native, App Open) to AppsFlyer. Add `pod 'CloudXAppsFlyerIntegration'` to your Podfile; the module self-registers with `CloudXCore` at load — no publisher glue code — and stays inert if your app doesn't use AppsFlyer. Requires `AppsFlyerFramework >= 6.15.0`: the integrated `logAdRevenue` API was introduced in AppsFlyer SDK 6.15.0, and AppsFlyer 6.14.x and below use a separate legacy AdRevenue connector that this module does not consume. If an older AppsFlyer is linked at runtime, the module logs a skip and never crashes.
 
 ---
 
