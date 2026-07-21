@@ -2,7 +2,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXGoogleWaterfallInterstitialFactory : CLXAdapterInterstitialFactory
+@interface CLXGoogleWaterfallAppOpenFactory : CLXAdapterInterstitialFactory
 @end
 
 NS_ASSUME_NONNULL_END
