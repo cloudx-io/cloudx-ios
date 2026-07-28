@@ -43,6 +43,8 @@ CLX_INTERNAL_TESTING
  */
 - (void)initializeSDKWithAppKey:(NSString *)appKey completion:(void (^)(CLXSDKConfigResponse * _Nullable config, NSError * _Nullable error))completion;
 
+- (nullable CLXSDKConfigResponse *)parseConfigFromJSONData:(NSData *)data error:(NSError **)outError;
+
 @end
 
 NS_ASSUME_NONNULL_END 

@@ -221,6 +221,13 @@ extern NSString * const CLXMetricsTypeFullscreenRewardEarned;              // "f
 extern NSString * const CLXMetricsTypeFullscreenRewardForfeit;             // "fullscreen_reward_forfeit"
 
 /**
+ * Ad-revenue fan-out counter. An ad-revenue delegate (per-ad, publisher-added global, or a
+ * connector module such as AppsFlyer) threw during dispatch; the failure is isolated and
+ * reported under this name. Matches Android's `ad_revenue_listener_error`.
+ */
+extern NSString * const CLXMetricsTypeAdRevenueListenerError;               // "ad_revenue_listener_error"
+
+/**
  * Utility class for metrics type validation and categorization
  */
 @interface CLXMetricsType : NSObject

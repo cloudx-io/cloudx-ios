@@ -138,6 +138,8 @@ CLX_INTERNAL_TESTING
 /** Server timestamp in epoch millis from init response serverTimeMs field (for trusted clock sync). 0 if unavailable. */
 @property (nonatomic, assign) long long serverTimestampMillis;
 
+@property (nonatomic, copy, nullable) NSString *rawJSON;
+
 - (instancetype)init;
 @end
 
@@ -221,6 +223,8 @@ CLX_INTERNAL_TESTING
 @property (nonatomic, assign) NSInteger test;
 /// Whether debug logging should be enabled for this device
 @property (nonatomic, assign) BOOL debug;
+@property (nonatomic, assign) BOOL optimisticLoadingEnabled;
+@property (nonatomic, assign) BOOL cachedInitEnabled;
 - (instancetype)init;
 @end
 

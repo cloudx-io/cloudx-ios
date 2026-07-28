@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
  * When present, indicates the target container size for native-in-banner rendering
  * (e.g., 320x50 compact banner or 300x250 MREC).
  *
- * Populated by CLXNativeBannerBridge before invoking a native factory on the
+ * Populated by CLXNativeAdViewBridge before invoking a native factory on the
  * banner/MREC path. Adapters that need size at init time (e.g., Mintegral) must
  * read this value. Adapters that do not may ignore it.
  */
