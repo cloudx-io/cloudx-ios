@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Google Waterfall adapter 12.14.0.1 - 2026-07-29
+
+### Fixed
+- **Prefetched Google ads could be shown after they expired (12.14.0 compatibility line)** — Backport of the 13.6.0.1 fix for apps pinned to Google Mobile Ads SDK 12.14.0. Prefetched fills now expire per Google's documented ad-expiry windows — 4 hours for App Open, 1 hour for all other formats (`CLXGoogleWaterfallFillTtlMsForFormat`) — and are proactively refreshed in the background shortly before expiry, preventing blank or failed renders from stale prefetched ads. Install: `pod 'CloudXGoogleWaterfallAdapter', '12.14.0.1'`. Backed by Google Mobile Ads SDK 12.14.0; requires `CloudXCore >= 3.5.0`. Prefer `~> 13.6.0.1` unless you must stay on 12.14.0.
+
+---
+
 ## [Unreleased]
 
 *No unreleased changes*
