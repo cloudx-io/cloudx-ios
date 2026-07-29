@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Google Waterfall adapter 12.14.0.1 - 2026-07-29
 
 ### Fixed
-- **Prefetched Google ads could be shown after they expired (12.14.0 compatibility line)** — Backport of the 13.6.0.1 fix for apps pinned to Google Mobile Ads SDK 12.14.0. Prefetched fills now expire per Google's documented ad-expiry windows — 4 hours for App Open, 1 hour for all other formats (`CLXGoogleWaterfallFillTtlMsForFormat`) — and are proactively refreshed in the background shortly before expiry, preventing blank or failed renders from stale prefetched ads. Install: `pod 'CloudXGoogleWaterfallAdapter', '12.14.0.1'`. Backed by Google Mobile Ads SDK 12.14.0; requires `CloudXCore >= 3.5.0`. Prefer `~> 13.6.0.1` unless you must stay on 12.14.0.
+- **Prefetched Google ads could be shown after expiring (12.14.0)** — Backport of the 13.6.0.1 fix for Google Mobile Ads SDK 12.14.0; fills now expire and refresh before stale, preventing blank renders. Install: `pod 'CloudXGoogleWaterfallAdapter', '12.14.0.1'`; requires `CloudXCore >= 3.5.0`.
 
 ---
 
@@ -25,24 +25,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Install: `pod 'CloudXCore', '~> 3.6'`
 
 ### Added
-- **Impression-level revenue reporting from your mediation platform** — You can now forward paid events from the mediation platform you run to CloudX with `-[CloudXCore reportRevenueData:]` (`reportRevenueData(_:)` in Swift), passing a `CLXRevenueData` built via `CLXRevenueDataBuilder`. Identify the source with a `CLXRevenuePlatform`: `CLXRevenuePlatformAdMob`, `CLXRevenuePlatformInMobi`, and `CLXRevenuePlatformTopOn` are built in, and `CLXRevenuePlatformCustom(@"...")` (`CLXRevenuePlatform.custom(_:)` in Swift) covers any other platform. Call it once per paid event — on AdMob, for example, from your `GADPaidEventListener`, since AdMob has no global impression bus. Returns `YES` when the report is accepted, and `NO` when the SDK is not initialized, ad-revenue tracking is disabled, or the platform is unsupported. Revenue precision is expressed with `CLXRevenuePrecision` (`exact`, `estimated`, `publisherDefined`, `undefined`), modeled as an open type so future precision values do not break existing integrations.
-- **App-wide ad-revenue delegate** — `+[CloudXCore addAdRevenueDelegate:]` and `+[CloudXCore removeAdRevenueDelegate:]` (`addAdRevenueDelegate(_:)` / `removeAdRevenueDelegate(_:)` in Swift) let you receive impression-level revenue for every CloudX-won impression from a single `CLXAdRevenueDelegate`, instead of wiring a `revenueDelegate` on each ad object. Multiple delegates are supported, registering the same instance twice is a no-op, and callbacks are delivered on the main queue. Both methods are thread-safe and may be called before SDK initialization. Use this to forward CloudX revenue to any MMP or analytics destination you choose.
-- **AppsFlyer ad-revenue connector** — The new `CloudXAppsFlyerConnector` pod forwards impression-level revenue for every CloudX-won impression (Banner, MREC, Interstitial, Rewarded, Native, App Open) to AppsFlyer, built on the ad-revenue delegate above. Install: `pod 'CloudXAppsFlyerConnector', '~> 1.0.0'`. Adding the pod is the only integration step — the connector registers itself at load and is inert when the pod is not linked. Requires `AppsFlyerFramework >= 6.15.0`, which is where AppsFlyer's integrated ad-revenue API shipped; 6.14.x and earlier are not supported by this connector.
-- **Adjust ad-revenue connector** — The new `CloudXAdjustConnector` pod forwards impression-level revenue for every CloudX-won impression (Banner, MREC, Interstitial, Rewarded, Native, App Open) to Adjust, built on the same ad-revenue delegate. Install: `pod 'CloudXAdjustConnector', '~> 1.0.0'`. Adding the pod is the only integration step — the connector registers itself at load and is inert when the pod is not linked. Ad unit and placement map onto Adjust's `adRevenueUnit` and `adRevenuePlacement` fields; ad format and network placement arrive as the `ad_type` and `network_placement` callback parameters, with format values matching the Android connector so a format groups into one bucket across platforms. Requires `Adjust >= 5.0.0`.
+- **Report impression-level revenue from your own mediation platform** — Forward paid events to CloudX with `reportRevenueData(_:)`. AdMob, InMobi, and TopOn are built in.
+- **App-wide ad-revenue delegate** — Receive impression-level revenue for every CloudX-won impression from one `CLXAdRevenueDelegate` instead of per ad. Register with `addAdRevenueDelegate(_:)`.
+- **AppsFlyer ad-revenue connector** — Forward CloudX impression revenue to AppsFlyer. Install: `pod 'CloudXAppsFlyerConnector', '~> 1.0.0'`. Requires `AppsFlyerFramework >= 6.15.0`.
+- **Adjust ad-revenue connector** — Forward CloudX impression revenue to Adjust. Install: `pod 'CloudXAdjustConnector', '~> 1.0.0'`. Requires `Adjust >= 5.0.0`.
 
 ### Fixed
-- **Banner and MREC creatives could render blank on the CloudX renderer** — Banner and MREC creatives served by the CloudX renderer could fail to build on a slot's first load and after a refresh, surfacing as a blank impression. These creatives now render correctly.
-- **HTML rewarded creatives were rejected on the CloudX renderer** — The CloudX renderer accepted only VAST rewarded creatives, so HTML rewarded ads failed to load. HTML rewarded creatives now render.
+- **Banner and MREC creatives could render blank on the CloudX renderer** — Creatives could fail on first load and after refresh, surfacing as blank impressions. They now render correctly.
+- **HTML rewarded creatives were rejected on the CloudX renderer** — The renderer accepted only VAST rewarded creatives, so HTML rewarded ads failed to load. HTML rewarded creatives now render.
 
 ### Removed
-- **Seven internal headers are no longer in the `CloudXCore.h` umbrella header** — `CLXBannerTimerService.h`, `CLXPublisherBanner.h`, and the impression-level revenue implementation headers `CLXAlIlrd.h`, `CLXIlrdProvider.h`, `CLXIlrdService.h`, `CLXIlrdTracker.h`, and `CLXLpIlrd.h`. All declare internal classes the umbrella exposed by mistake; none was ever exported by the framework, so none could be linked against in any 3.x release and no working integration is affected. Report impression-level revenue through `-[CloudXCore reportRevenueData:]` and the public revenue types instead.
+- **Internal headers removed from the `CloudXCore.h` umbrella** — Internal implementation headers were removed from the umbrella; none was linkable, so no integration is affected. Report revenue through `reportRevenueData(_:)` and the public revenue types.
 
 ---
 
 ## Google Waterfall adapter 13.6.0.1 - 2026-07-21
 
 ### Fixed
-- **Prefetched Google ads could be shown after they expired** — Prefetched fills now expire per Google's documented ad-expiry windows — 4 hours for App Open, 1 hour for all other formats (`CLXGoogleWaterfallFillTtlMsForFormat`) — and are proactively refreshed in the background shortly before expiry, preventing blank or failed renders from stale prefetched ads. Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.1'`. Backed by Google Mobile Ads SDK 13.6.0; requires `CloudXCore >= 3.5.0`.
+- **Prefetched Google ads could be shown after they expired** — Prefetched fills now expire and refresh in the background before going stale, preventing blank renders. Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.1'`. Requires `CloudXCore >= 3.5.0`.
 
 ---
 
@@ -69,16 +69,16 @@ Adapters now version independently of `CloudXCore`. Each adapter pod uses `<netw
 
 ### Breaking Changes
 - **Adapter pods no longer share the `CloudXCore` version.** Existing pins on the old unified line (`~> 3.4`, `~> 3.x`) will not resolve new adapter releases. Update each adapter pin independently, for example `pod 'CloudXMintegralAdapter', '~> 8.1.5.0'`.
-- **`CloudXMagniteAdapterV2` replaces `CloudXMagniteAdapter` for independent versioning.** Install `pod 'CloudXMagniteAdapterV2', '~> 1.0.0.0'` to move to the new version line; the legacy `CloudXMagniteAdapter` pod remains available on the old unified line if you're not ready to migrate. No source changes required either way — the import name is unchanged.
+- **`CloudXMagniteAdapterV2` replaces `CloudXMagniteAdapter` for independent versioning.** Install `pod 'CloudXMagniteAdapterV2', '~> 1.0.0.0'` to move to the new version line; the legacy pod remains on the old line. No source changes — the import name is unchanged.
 - **`CloudXRenderer` is no longer a separate pod.** Its functionality is built into `CloudXCore`; remove any direct `CloudXRenderer` dependency from your Podfile.
 
 ### Added
-- **App Open ad format** — New `CLXAppOpen` ad class (with `CLXAppOpenDelegate`) for full-screen ads shown while your app is loading or returning to the foreground. Create with `createAppOpen(adUnitId:)` (`createAppOpenWithAdUnitId:` in Objective-C). Supported on the Google Waterfall, Mintegral, Pangle, and Vungle adapters.
+- **App Open ad format** — New `CLXAppOpen` ad class for full-screen ads shown while your app loads or returns to the foreground. Create with `createAppOpen(adUnitId:)`. Supported on the Google Waterfall, Mintegral, Pangle, and Vungle adapters.
 - **VAST video interstitials and rewarded on the CloudX renderer** — The CloudX renderer now serves VAST video interstitial and rewarded creatives, with Open Measurement (OMID) video measurement. Rollout is controlled server-side; no integration change is required.
 - **HTML rewarded on the CloudX renderer** — HTML rewarded creatives now render through the CloudX renderer, completing the fullscreen HTML support introduced for interstitials in 3.4.5. Server-side rollout; no integration change required.
-- **Native ads on Digital Turbine, Mintegral, Pangle, Verve, and Google Waterfall** — These adapters now serve Native creatives, both standalone (via `CLXNativeAdLoader`) and native-in-banner / native-in-MREC. Native is now available across Meta, Vungle, InMobi, Moloco, Digital Turbine, Mintegral, Pangle, Verve, and Google Waterfall.
+- **Native ads on Digital Turbine, Mintegral, Pangle, Verve, and Google Waterfall** — These adapters now serve Native creatives, standalone and native-in-banner / native-in-MREC.
 - **Google Waterfall — Interstitial and Rewarded** — `CloudXGoogleWaterfallAdapter` now serves fullscreen Interstitial and Rewarded creatives, in addition to Banner, MREC, Native, and App Open.
-- **In-app App Store sheet for install-ad clickthroughs** — Tapping an install-campaign ad now opens an in-app App Store product sheet instead of leaving your app, for CloudX-rendered creatives that declare the advertised app. Falls back to the previous behavior (opening the App Store app) when the sheet can't be shown.
+- **In-app App Store sheet for install-ad clickthroughs** — Tapping an install-campaign ad now opens an in-app App Store product sheet instead of leaving your app, for CloudX-rendered creatives that declare the advertised app.
 - **Fullscreen HTML interstitial clickthrough** — Fullscreen HTML interstitials rendered by the CloudX renderer now navigate on tap.
 - **`CloudXMagniteAdapterV2` 1.0.0.1** — the new independent-versioned Magnite pod. Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.0.0'`. Backed by MagniteSDK 1.0.0.
 
@@ -95,8 +95,8 @@ Adapters now version independently of `CloudXCore`. Each adapter pod uses `<netw
 - **Pangle** `CloudXPangleAdapter` → `~> 7.9.1.3.0` (Ads-Global 7.9.1.3).
 
 ### Fixed
-- **Some bidders were not billed for certain banner impressions** — Fixed a case where impressions from a native ad rendered inside a banner slot (via the native-in-banner bridge) could be reported without the bidder win/billing notice, so the bidder was never billed even though the impression was counted. Affected native-in-banner rendering paths (for example Moloco). Impressions are now billed correctly in all cases.
-- **Native ads in a banner or MREC slot could report their impression too early** — Fixed an issue where a native ad rendered in a banner or MREC slot (Moloco) could fire its impression before the ad view was actually inserted and visible, especially when preloading off-screen. Impressions now report at the correct time.
+- **Some bidders were not billed for certain banner impressions** — Native ads rendered in a banner slot (native-in-banner) could be counted without the bidder billing notice, so the bidder was never billed. Impressions are now billed correctly in all cases.
+- **Native ads in a banner or MREC slot could report their impression too early** — A native ad in a banner or MREC slot could fire its impression before the ad view was actually visible, especially when preloading off-screen. Impressions now report at the correct time.
 - **Stuck fullscreen ad after a rendering crash** — If the web content behind a fullscreen ad crashed after the ad loaded, the user could be left on a stuck fullscreen. The ad now closes automatically and delivers the close callback.
 - **Native ads in banner slots could miss impressions with compact layouts** — Fixed an issue where a native ad rendered in a banner slot with the compact template could display without registering an impression.
 
@@ -108,11 +108,11 @@ Adapters now version independently of `CloudXCore`. Each adapter pod uses `<netw
 ## [3.4.6] - 2026-06-29
 
 ### Changed
-- **`CloudXMolocoAdapter` now supports the full MolocoSDK 4.x line** — The adapter's `MolocoSDKiOS` requirement was widened from `~> 4.6.0` (which only allowed 4.6.x) to `>= 4.6.0, < 5.0`. You can now adopt newer Moloco SDK releases (4.7.0, 4.8.0, and later 4.x), which resolves a CocoaPods dependency conflict that could block integration on some apps.
+- **`CloudXMolocoAdapter` now supports the full MolocoSDK 4.x line** — The `MolocoSDKiOS` requirement was widened from `~> 4.6.0` to `>= 4.6.0, < 5.0`, so you can adopt newer 4.x Moloco SDK releases. This resolves a CocoaPods dependency conflict that could block integration.
 
 ### Fixed
 - **Rare crash when an ad finished loading** — Fixed a rare crash that could occur when a banner or fullscreen (interstitial / rewarded) ad finished loading. Affected ads now load and report their result reliably.
-- **Duplicate banner impressions after a no-fill refresh** — Fixed an issue where a banner whose auto-refresh returned no bid could re-display the previously shown creative and count additional impressions. A refresh that returns no bid now shows nothing and reports no impression, keeping impression counts accurate.
+- **Duplicate banner impressions after a no-fill refresh** — A banner whose auto-refresh returned no bid could re-display the previous creative and count extra impressions. A no-bid refresh now shows nothing and reports no impression.
 
 ---
 
@@ -124,23 +124,23 @@ Adapters now version independently of `CloudXCore`. Each adapter pod uses `<netw
 - **HTML interstitials on the CloudX renderer** — The CloudX renderer now supports fullscreen HTML interstitial creatives with MRAID 3.0, alongside the existing HTML banner / MREC support. Rollout is controlled server-side; no integration change is required.
 
 ### Changed
-- **Slow ad network SDKs no longer delay CloudX SDK initialization** — Adapter initialization now uses a soft per-network timeout: if an ad network SDK is slow to initialize, CloudX SDK init completes without it and the network automatically joins later auctions once it finishes initializing. Previously a slow network SDK could block init. Networks that have not finished initializing are excluded from auctions they cannot serve, which can improve fill reliability during app startup.
+- **Slow ad network SDKs no longer delay CloudX SDK initialization** — A slow network SDK no longer blocks init; CloudX completes without it and the network joins later auctions once ready. Networks not yet initialized are excluded from auctions they cannot serve.
 
 ### Fixed
-- **Digital Turbine adapter no longer conflicts with another mediation SDK initializing the Fyber SDK** — If your app runs CloudX alongside another mediation SDK that initializes the shared Fyber Marketplace SDK first, the CloudX adapter now detects this and defers instead of re-initializing — previously this could cancel the other SDK's initialization. For the smoothest startup, initialize the other mediation SDK first, wait for its completion callback, then initialize CloudX.
+- **Digital Turbine adapter no longer conflicts with another mediation SDK initializing the Fyber SDK** — If another mediation SDK initializes the shared Fyber SDK first, the CloudX adapter now defers instead of re-initializing. For smooth startup, initialize the other SDK first, then CloudX.
 - **Some valid HTML banner creatives were rejected by the renderer** — Fixed an issue where HTML banner / MREC creatives containing failed tracker pixels (e.g. some Media.net creatives) were misclassified as broken and not displayed. These creatives now render normally.
-- **Native ad reliability improvements on Meta and Moloco** — Meta native ads now validate the loaded ad before delivery and register all asset views (title, body, icon, media, advertiser) for impression and click tracking, not just the CTA button (also applies to Vungle and Verve native-in-banner). Moloco native ads are no longer delivered when the underlying ad is not renderable.
+- **Native ad reliability improvements on Meta and Moloco** — Meta native ads now validate the loaded ad and register all asset views for impression and click tracking, not just the CTA. Moloco native ads are no longer delivered when the underlying ad is not renderable.
 
 ### Removed
-- **Adapter-integration APIs** — Removed from the adapter-facing surface: `clx_isFlexibleSize` (banner adapters), `+isInitialized` (adapter initializers), and per-instance `sdkVersion` (native adapters). These APIs had no function for app integrations; standard publisher integrations are unaffected.
+- **Adapter-integration APIs** — Removed `clx_isFlexibleSize`, `+isInitialized`, and per-instance `sdkVersion` from the adapter-facing surface. These had no function for app integrations; standard publisher integrations are unaffected.
 
 ---
 
 ## [3.4.4] - 2026-06-02
 
 ### Fixed
-- **Digital Turbine adapter failed to link on Fyber Marketplace SDK below 8.4.0** — Although 3.4.3 advertised Digital Turbine support down to Fyber `8.0.0`, the shipped adapter binary still failed to link for apps resolving a Fyber SDK below `8.4.0`. The adapter binary now links cleanly across the full `8.x` line — Banner, MREC, Interstitial, and Rewarded work on Fyber `8.0.0`+. Native fill remains available on Fyber SDK `8.4.0`+.
-- **Google Waterfall — occasional lost fills on slow mediation responses** — Fixed an issue where a Google Waterfall ad could be discarded when its mediation cascade took longer than expected to respond, even though the ad ultimately filled. Slow-but-successful responses are now delivered, improving Google Waterfall fill reliability.
+- **Digital Turbine adapter failed to link on Fyber Marketplace SDK below 8.4.0** — The adapter binary failed to link on a Fyber SDK below `8.4.0`. It now links across the full `8.x` line — Banner, MREC, Interstitial, and Rewarded work on Fyber `8.0.0`+; native fill remains on `8.4.0`+.
+- **Google Waterfall — occasional lost fills on slow mediation responses** — A Google Waterfall ad could be discarded when its mediation cascade responded slowly, even though it ultimately filled. Slow-but-successful responses are now delivered, improving fill reliability.
 
 ---
 
@@ -150,10 +150,10 @@ Adapters now version independently of `CloudXCore`. Each adapter pod uses `<netw
 - **Pangle Adapter** — New `CloudXPangleAdapter` supporting Banner/MREC, Interstitial, and Rewarded ad formats. Install via CocoaPods (`pod 'CloudXPangleAdapter', '~> 3.4.3'`). Backed by the Pangle (ByteDance) SDK `Ads-Global ~> 7.9.0`.
 
 ### Changed
-- **DigitalTurbine adapter — broader Fyber Marketplace SDK compatibility** — `CloudXDigitalTurbineAdapter` now accepts `Fyber_Marketplace_SDK` from `8.0.0` (previously required `>= 8.4.0`), so you can adopt the adapter without forcing a Fyber SDK upgrade. Banner, MREC, Interstitial, and Rewarded work across the full 8.x line; native fill remains available on Fyber SDK 8.4.0+.
+- **DigitalTurbine adapter — broader Fyber Marketplace SDK compatibility** — `CloudXDigitalTurbineAdapter` now accepts `Fyber_Marketplace_SDK` from `8.0.0` (previously `>= 8.4.0`). Banner, MREC, Interstitial, and Rewarded work across the full 8.x line; native fill remains on Fyber SDK 8.4.0+.
 
 ### Fixed
-- **App Store submission rejection caused by the `itms-services` URL scheme** — Some publishers received an App Store static-analysis rejection because the compiled SDK binary contained the `itms-services` scheme. The scheme has been removed; legitimate App Store redirect creatives still resolve normally, with no change to clickthrough behavior.
+- **App Store submission rejection caused by the `itms-services` URL scheme** — Some publishers received an App Store static-analysis rejection because the SDK binary contained the `itms-services` scheme. The scheme has been removed; legitimate store redirect creatives still resolve normally.
 - **SDK initialization could fail for some accounts** — Fixed an issue where SDK initialization could fail for publisher accounts that have no organization identifier. Initialization now completes normally for these accounts.
 
 ---
@@ -161,7 +161,7 @@ Adapters now version independently of `CloudXCore`. Each adapter pod uses `<netw
 ## [3.4.2] - 2026-05-29
 
 ### Added
-- **Google Waterfall Adapter** — New `CloudXGoogleWaterfallAdapter` supporting Banner (320×50) and MREC (300×250) ad formats. Install via CocoaPods (`pod 'CloudXGoogleWaterfallAdapter', '~> 3.4.2'`) or Swift Package Manager (`CloudXGoogleWaterfallAdapter` product). Backed by `Google-Mobile-Ads-SDK 12.14.0`; requires a `GADApplicationIdentifier` entry in your Info.plist. SPM consumers must also add the Google Mobile Ads SPM package (`github.com/googleads/swift-package-manager-google-mobile-ads`).
+- **Google Waterfall Adapter** — New `CloudXGoogleWaterfallAdapter` supporting Banner (320×50) and MREC (300×250). Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 3.4.2'` or SPM. Backed by `Google-Mobile-Ads-SDK 12.14.0`; requires a `GADApplicationIdentifier` in your Info.plist.
 
 ---
 
@@ -171,7 +171,7 @@ Adapters now version independently of `CloudXCore`. Each adapter pod uses `<netw
 - **Digital Turbine Adapter** — New `CloudXDigitalTurbineAdapter` supporting Banner, MREC, Interstitial, Rewarded, and Native ad formats. Install: `pod 'CloudXDigitalTurbineAdapter', '~> 3.4.1'`. Backed by `Fyber_Marketplace_SDK >= 8.4.0, < 9.0`.
 
 ### Fixed
-- **Duplicate `didLoadAd` / `didShowAd` callbacks on banner refresh** — When a partner adapter SDK fired its load or impression callback more than once for the same ad, the publisher delegate could receive duplicate `didLoadAd` / `didShowAd` callbacks. The first callback is now treated as canonical and subsequent re-fires from the same adapter are dropped, so the publisher surface emits exactly one load and one impression per ad.
+- **Duplicate `didLoadAd` / `didShowAd` callbacks on banner refresh** — When a partner adapter SDK fired its load or impression callback more than once, publishers could receive duplicates. The first callback is now canonical and re-fires are dropped, so one load and one impression emit per ad.
 
 ---
 
@@ -182,12 +182,12 @@ Adapters now version independently of `CloudXCore`. Each adapter pod uses `<netw
 - **Moloco Adapter** — New `CloudXMolocoAdapter` (Banner, MREC, Interstitial, Rewarded, Native). Install: `pod 'CloudXMolocoAdapter', '~> 3.4.0'`. Backed by MolocoSDKiOS `~> 4.6.0`.
 - **Non-SDK CloudX-rendered HTML banner and MREC with MRAID 3.0** — HTML banner and MREC creatives can now be served through the CloudX renderer, with MRAID 3.0 support.
 - **Native-in-banner and native-in-MREC support** — Native creatives can be served into banner or MREC slots on Meta, Vungle, and Moloco.
-- **Per-request extras across all ad-format APIs** — New `setExtraParameter:value:` API on `CLXBanner` / `CLXBannerAdView`, `CLXFullscreenAd` (interstitial + rewarded), and `CLXNativeAdLoader` lets publishers attach arbitrary per-request metadata to outgoing bid requests, including reserved `minFloor` (single-round) and `minFloors` (per-round) keys for publisher-defined bid floors. Supported value types: `NSString`, `NSNumber`, `NSArray`, `NSDictionary`. Banner refreshes pick up the current stored values on each auction.
+- **Per-request extras across all ad-format APIs** — New `setExtraParameter:value:` API on `CLXBanner` / `CLXBannerAdView`, `CLXFullscreenAd`, and `CLXNativeAdLoader` attaches per-request metadata to bid requests, including reserved `minFloor` and `minFloors` floor keys.
 - **`CLXAd.adValues` property** — New read-only `NSDictionary<NSString *, NSString *>` exposing SDK-defined loaded-ad metadata. Values may be absent depending on ad format and network.
 
 ### Changed
 - **UnityAds adapter version range** — Widened to accept Unity Ads 4.x patch releases (`>= 4.17.0`, `< 5.0`) so publishers can adopt newer Unity Ads SDK fixes without waiting for an adapter release.
-- **Publisher delegate main-queue threading is now documented contract** — All `CLXAdDelegate` callbacks (and protocols that extend it) and `CLXAdRevenueDelegate` callbacks deliver on the main queue and may fire inline relative to the SDK call that triggered them. No runtime change; re-entrant delegate implementations are unaffected.
+- **Publisher delegate main-queue threading is now documented contract** — All `CLXAdDelegate` and `CLXAdRevenueDelegate` callbacks deliver on the main queue and may fire inline relative to the SDK call that triggered them. No runtime change; re-entrant delegate implementations are unaffected.
 
 ### Fixed
 - **Native ad memory leak during long sessions** — Long-lived publisher integrations that load many native ads no longer accumulate retained observers across native ad refresh cycles.
