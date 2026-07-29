@@ -31,6 +31,9 @@
 
 // Configuration
 #import <CloudXCore/CLXInitializationConfiguration.h>
+#import <CloudXCore/CLXRevenueData.h>
+#import <CloudXCore/CLXRevenuePlatform.h>
+#import <CloudXCore/CLXRevenuePrecision.h>
 #import <CloudXCore/CLXSettings.h>
 #import <CloudXCore/CLXPrivacyConsent.h>
 #import <CloudXCore/CLXConsentProvider.h>
@@ -140,12 +143,10 @@
 #import <CloudXCore/CLXAdUnitValidator.h>
 
 // Additional exported SDK headers
-#import <CloudXCore/CLXAlIlrd.h>
 #import <CloudXCore/CLXAppLifecycleMonitor.h>
 #import <CloudXCore/CLXAuctionBidManager.h>
 #import <CloudXCore/CLXAuctionResult.h>
 #import <CloudXCore/CLXBackgroundTimer.h>
-#import <CloudXCore/CLXBannerTimerService.h>
 #import <CloudXCore/CLXBaseEvent.h>
 #import <CloudXCore/CLXBaseNetworkService.h>
 #import <CloudXCore/CLXBidAdSource.h>
@@ -157,21 +158,16 @@
 #import <CloudXCore/CLXEventType.h>
 #import <CloudXCore/CLXGeoInfo.h>
 #import <CloudXCore/CLXGeoLocationService.h>
-#import <CloudXCore/CLXIlrdProvider.h>
-#import <CloudXCore/CLXIlrdService.h>
-#import <CloudXCore/CLXIlrdTracker.h>
 #import <CloudXCore/CLXInitService.h>
 #import <CloudXCore/CLXKeyValueState.h>
 #import <CloudXCore/CLXLegacyTrackerSnapshot.h>
 #import <CloudXCore/CLXLiveInitService.h>
 #import <CloudXCore/CLXLogEntry.h>
 #import <CloudXCore/CLXLogStore.h>
-#import <CloudXCore/CLXLpIlrd.h>
 #import <CloudXCore/CLXMetricsConfig.h>
 #import <CloudXCore/CLXMetricsEvent.h>
 #import <CloudXCore/CLXMetricsType.h>
 #import <CloudXCore/CLXPrivacyBlock.h>
-#import <CloudXCore/CLXPublisherBanner.h>
 #import <CloudXCore/CLXPublisherNative.h>
 #import <CloudXCore/CLXReachabilityService.h>
 #import <CloudXCore/CLXSDKBlock.h>

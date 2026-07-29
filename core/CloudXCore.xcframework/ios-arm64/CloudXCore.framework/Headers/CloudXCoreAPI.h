@@ -21,6 +21,7 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 @protocol CLXBannerDelegate;
 @protocol CLXInterstitialDelegate;
 @protocol CLXRewardedDelegate;
+@protocol CLXAdRevenueDelegate;
 @protocol CLXAppOpenDelegate;
 
 @class CLXBannerAdView;
@@ -30,6 +31,7 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 @class CLXRewarded;
 @class CLXAppOpen;
 @class CLXNativeAdLoader;
+@class CLXRevenueData;
 
 typedef void (^CLXArbiterCompletion)(CLXArbiterResult *result);
 
@@ -219,6 +221,20 @@ CLX_PUBLIC
                       completion:(CLXArbiterCompletion)completion
     NS_SWIFT_NAME(arbiter(with:completion:));
 
+/**
+ * Reports a publisher-supplied impression revenue event into the ILRD pipeline,
+ * emitted as adRevenue telemetry.
+ *
+ * Publishers forward paid events from any mediation platform via this
+ * method. Returns YES if accepted into the pipeline; NO if the SDK isn't
+ * initialized, adRevenue tracking is disabled, or the platform name is blank.
+ * Non-throwing and safe to call from a paid-event callback.
+ *
+ * @param data The impression revenue and metadata to report.
+ */
+- (BOOL)reportRevenueData:(CLXRevenueData *)data
+    NS_SWIFT_NAME(reportRevenueData(_:));
+
 #pragma mark - Visual Debugging
 
 /**
@@ -308,6 +324,32 @@ CLX_PUBLIC
  * @endcode
  */
 + (void)setDoNotSell:(nullable NSNumber *)doNotSell;
+
+#pragma mark - Ad Revenue Integrations (MMP)
+
+/**
+ * Register a global ad-revenue delegate that receives every CloudX-won impression.
+ *
+ * This is the general, publisher-facing surface (mirrors Android's `CloudX.addAdRevenueListener`):
+ * publishers, analytics SDKs, and `CloudX<Mmp>Integration` modules alike can observe revenue without
+ * wiring a per-ad `revenueDelegate`. It reuses the same `CLXAdRevenueDelegate` protocol as the per-ad
+ * callback. Multiple delegates are supported; registering the same instance twice is a no-op.
+ *
+ * @param delegate The delegate to register. Ignored if nil.
+ * @discussion Thread-safe and safe to call before SDK initialization (e.g. from a module's `+load`).
+ * Delivered on the main queue; a delegate that throws is caught and isolated so it cannot break the
+ * ad flow or other delegates. Inert until at least one delegate is registered.
+ */
++ (void)addAdRevenueDelegate:(id<CLXAdRevenueDelegate>)delegate
+    NS_SWIFT_NAME(addAdRevenueDelegate(_:));
+
+/**
+ * Remove a delegate previously registered with `addAdRevenueDelegate:` (identity match). No-op if it
+ * was never registered. Thread-safe.
+ * @param delegate The delegate to remove. Ignored if nil.
+ */
++ (void)removeAdRevenueDelegate:(id<CLXAdRevenueDelegate>)delegate
+    NS_SWIFT_NAME(removeAdRevenueDelegate(_:));
 
 @end
 
