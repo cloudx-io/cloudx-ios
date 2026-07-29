@@ -6,7 +6,7 @@ PODS:
     - Ads-Global/TikTokBusinessSDK
   - Ads-Global/PangleSDK (7.9.1.3)
   - Ads-Global/TikTokBusinessSDK (7.9.1.3)
-  - CloudXCore (3.5.0)
+  - CloudXCore (3.6.0)
   - CloudXDigitalTurbineAdapter (8.4.8.0):
     - CloudXCore (>= 3.5.0)
     - Fyber_Marketplace_SDK (= 8.4.8)
@@ -125,7 +125,7 @@ PODS:
   - VungleAds (7.7.4)
 
 DEPENDENCIES:
-  - CloudXCore (~> 3.5.0)
+  - CloudXCore (~> 3.6.0)
   - CloudXDigitalTurbineAdapter (~> 8.4.8.0)
   - CloudXGoogleWaterfallAdapter (~> 13.6.0.0)
   - CloudXInMobiAdapter (~> 11.3.0.0)
@@ -172,7 +172,7 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   Ads-Global: 5d66442ebf73301114809e28a4d8606e98bf40ab
-  CloudXCore: 376046793f06b4fa925b47ebe18d7e63931beaeb
+  CloudXCore: 3b01d9bb72b5a3e2bacfbc3507b0677ed392f4c6
   CloudXDigitalTurbineAdapter: 0c37b4f298913b3a5611ef1f6a65aa50bd4bb9a9
   CloudXGoogleWaterfallAdapter: e2326c444c3a1879b17b0d28f32ca0b453e172b9
   CloudXInMobiAdapter: e8ce09e5ebad78dc10ddf1ec1991af8896d6c72c
@@ -200,6 +200,6 @@ SPEC CHECKSUMS:
   UnityCoherenceLib: d9be08c5b9c2880cb220c7ecd643f97ebda422b7
   VungleAds: 77bad219e9e4b34bf43ab2518bf2fac72b86100b
 
-PODFILE CHECKSUM: 42feebe8b073374f5e76ad1f3c2e5d21505228db
+PODFILE CHECKSUM: be8d7950b533288f16ef6d8d14efc9078585c41f
 
 COCOAPODS: 1.16.2
