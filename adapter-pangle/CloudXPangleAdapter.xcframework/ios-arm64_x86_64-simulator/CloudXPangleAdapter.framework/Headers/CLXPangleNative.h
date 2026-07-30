@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Pangle native ad adapter (loader). Loads a `PAGLNativeAd` and delivers a
 /// `CLXPangleNativeAd` to the CloudX native pipeline (standalone native or, via
-/// `CLXNativeBannerBridge`, native-in-banner / native-in-MREC).
+/// `CLXNativeAdViewBridge`, native-in-banner / native-in-MREC).
 @interface CLXPangleNative : CLXAdapterNative
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
