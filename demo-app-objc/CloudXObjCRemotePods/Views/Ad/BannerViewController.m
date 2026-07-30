@@ -296,6 +296,24 @@
     [self updateStatusUIWithState:AdStateNoAd];
 }
 
+#pragma mark - QA Negative Path
+
+/**
+ * @brief QA-only: abandons the banner WITHOUT calling -destroy.
+ * @discussion Reproduces the publisher mistake this scenario exists to catch.
+ * `removeFromSuperview` + nil drops every strong owner so the SDK's ad view
+ * deallocs; omitting -destroy is deliberate, since destroying would exercise
+ * the normal teardown path and prove nothing. Reachable only through the
+ * deep-link router — do NOT copy this as integration practice.
+ */
+- (void)abandonBannerAd {
+    [self.bannerAd removeFromSuperview];
+    self.bannerAd = nil;
+    self.isLoading = NO;
+    self.receivedCallbacks = AdCallbackEventNone;
+    [self updateStatusUIWithState:AdStateNoAd];
+}
+
 #pragma mark - CLXBannerDelegate
 - (void)didLoadAd:(CLXAd *)ad {
     [[DemoAppLogger sharedInstance] logAdEvent:@"✅ Banner didLoadAd" ad:ad];

@@ -93,6 +93,17 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
         }
     }
 
+    // MARK: - QA Negative Path
+
+    // Nil for formats with no abandon hook — the engine reads nil as
+    // "this mode is not supported for this format."
+    func abandonSelector(forFormat format: String) -> Selector? {
+        switch format {
+        case "banner":                return NSSelectorFromString("abandonBannerAd")
+        default:                      return nil
+        }
+    }
+
     // MARK: - Ad State
 
     func hasReceivedCallback(_ event: CLXTestCallback, forVC vc: UIViewController) -> Bool {
