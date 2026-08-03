@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **`CloudXAppsFlyerConnector` 6.15.0.0** — Forwards CloudX ad revenue to AppsFlyer automatically, once per won impression, all formats. Install: `pod 'CloudXAppsFlyerConnector', '~> 6.15.0.0'`. Requires `CloudXCore >= 3.6.0` and your existing AppsFlyer integration.
+- **Removed pre-release symbols** — `CloudXAppsFlyerConnectorVersionNumber` and `CloudXAppsFlyerConnectorVersionString` were dropped before first publication; `CLXAppsFlyerConnectorVersion` reports the version. No consumer impact.
 
 ## Google Waterfall adapter 12.14.0.1 - 2026-07-29
 
