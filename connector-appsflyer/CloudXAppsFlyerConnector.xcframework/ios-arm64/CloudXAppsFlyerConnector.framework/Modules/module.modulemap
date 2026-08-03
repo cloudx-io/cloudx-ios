@@ -1,0 +1,5 @@
+framework module CloudXAppsFlyerConnector {
+    umbrella header "CloudXAppsFlyerConnector.h"
+    export *
+    module * { export * }
+}
