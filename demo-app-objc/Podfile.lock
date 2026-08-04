@@ -1,11 +1,11 @@
 PODS:
-  - Ads-Global (7.9.1.3):
-    - Ads-Global/BUAdSDK (= 7.9.1.3)
-  - Ads-Global/BUAdSDK (7.9.1.3):
+  - Ads-Global (8.2.0.7):
+    - Ads-Global/BUAdSDK (= 8.2.0.7)
+  - Ads-Global/BUAdSDK (8.2.0.7):
     - Ads-Global/PangleSDK
     - Ads-Global/TikTokBusinessSDK
-  - Ads-Global/PangleSDK (7.9.1.3)
-  - Ads-Global/TikTokBusinessSDK (7.9.1.3)
+  - Ads-Global/PangleSDK (8.2.0.7)
+  - Ads-Global/TikTokBusinessSDK (8.2.0.7)
   - CloudXCore (3.6.0)
   - CloudXDigitalTurbineAdapter (8.4.8.0):
     - CloudXCore (>= 3.5.0)
@@ -36,8 +36,8 @@ PODS:
   - CloudXMolocoAdapter (4.8.0.0):
     - CloudXCore (>= 3.5.0)
     - MolocoSDKiOS (= 4.8.0)
-  - CloudXPangleAdapter (7.9.1.3.0):
-    - Ads-Global (= 7.9.1.3)
+  - CloudXPangleAdapter (8.2.0.7.0):
+    - Ads-Global (= 8.2.0.7)
     - CloudXCore (>= 3.5.0)
   - CloudXUnityAdsAdapter (4.19.0.0):
     - CloudXCore (>= 3.5.0)
@@ -134,7 +134,7 @@ DEPENDENCIES:
   - CloudXMintegralAdapter (~> 8.1.5.0)
   - CloudXMobileFuseAdapter (~> 1.11.0.0)
   - CloudXMolocoAdapter (~> 4.8.0.0)
-  - CloudXPangleAdapter (~> 7.9.1.3.0)
+  - CloudXPangleAdapter (~> 8.2.0.7.0)
   - CloudXUnityAdsAdapter (~> 4.19.0.0)
   - CloudXVerveAdapter (~> 3.9.0.0)
   - CloudXVungleAdapter (~> 7.7.4.0)
@@ -171,7 +171,7 @@ SPEC REPOS:
     - VungleAds
 
 SPEC CHECKSUMS:
-  Ads-Global: 5d66442ebf73301114809e28a4d8606e98bf40ab
+  Ads-Global: c4da8b23232e80b87ac55964da167ba589502f6b
   CloudXCore: 3b01d9bb72b5a3e2bacfbc3507b0677ed392f4c6
   CloudXDigitalTurbineAdapter: 0c37b4f298913b3a5611ef1f6a65aa50bd4bb9a9
   CloudXGoogleWaterfallAdapter: e2326c444c3a1879b17b0d28f32ca0b453e172b9
@@ -181,7 +181,7 @@ SPEC CHECKSUMS:
   CloudXMintegralAdapter: d7062e0d5a4512feb405c2deda6ae544962ee7b2
   CloudXMobileFuseAdapter: ca409a65c5929dedfbda9ba6c0a235a8c691ad2f
   CloudXMolocoAdapter: 9fac672e3e527e5785c4c5f4c8023b2e4a04f655
-  CloudXPangleAdapter: 41d08769d137b51becf9424039b56c7081079055
+  CloudXPangleAdapter: 38f85e9c8df8b1823f7a8e563c1a82cf90801f74
   CloudXUnityAdsAdapter: 1a74f0fb02a6faecce20e2b340818205aab23f17
   CloudXVerveAdapter: e2be0ed38595681731c6105a05dde34888447c93
   CloudXVungleAdapter: f9c41d7fc80bb576ec31e2466cb6e8c0183eb713
@@ -200,6 +200,6 @@ SPEC CHECKSUMS:
   UnityCoherenceLib: d9be08c5b9c2880cb220c7ecd643f97ebda422b7
   VungleAds: 77bad219e9e4b34bf43ab2518bf2fac72b86100b
 
-PODFILE CHECKSUM: f20907d633bb21e0c87f71299db7f82fee615b0c
+PODFILE CHECKSUM: 1897991d2817d30a5dc4cac29db5c7e8d3fc08f0
 
 COCOAPODS: 1.16.2
