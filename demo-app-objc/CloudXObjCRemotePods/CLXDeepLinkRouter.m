@@ -92,6 +92,15 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
     return nil;
 }
 
+#pragma mark - QA Negative Path
+
+// Nil for formats with no abandon hook — the engine reads nil as
+// "this mode is not supported for this format."
+- (nullable SEL)abandonSelectorForFormat:(NSString *)format {
+    if ([format isEqualToString:@"banner"])                return @selector(abandonBannerAd);
+    return nil;
+}
+
 #pragma mark - Ad State
 
 - (BOOL)hasReceivedCallback:(CLXTestCallback)event forVC:(UIViewController *)vc {

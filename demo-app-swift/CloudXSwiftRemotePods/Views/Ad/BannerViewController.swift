@@ -217,6 +217,23 @@ class BannerViewController: BaseAdViewController {
         updateStatusUI(state: .noAd)
     }
 
+    // MARK: - QA Negative Path
+
+    /// QA-only: abandons the banner WITHOUT calling `destroy()`.
+    ///
+    /// Reproduces the publisher mistake this scenario exists to catch.
+    /// `removeFromSuperview` + nil drops every strong owner so the SDK's ad view
+    /// deallocs; omitting `destroy()` is deliberate, since destroying would
+    /// exercise the normal teardown path and prove nothing. Reachable only
+    /// through the deep-link router — do NOT copy this as integration practice.
+    @objc private func abandonBannerAd() {
+        bannerAd?.removeFromSuperview()
+        bannerAd = nil
+        isLoading = false
+        receivedCallbacks = []
+        updateStatusUI(state: .noAd)
+    }
+
     override func adViewForClickTesting() -> UIView? { bannerAd ?? deferredBannerAd }
 }
 
