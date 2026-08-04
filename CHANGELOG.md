@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## TaurusX adapter 1.18.1.0 - 2026-08-03
+
+### Added
+- **TaurusX adapter released** — `CloudXTaurusXAdapter` 1.18.1.0 (`TaurusxAdsSDK = 1.18.1`, requires `CloudXCore >= 3.5.0`). Supports Banner, MREC, Interstitial, Rewarded, and Native ads. Install: `pod 'CloudXTaurusXAdapter', '~> 1.18.1.0'`.
+
+---
+
 ## Pangle adapter 8.2.0.7.0 - 2026-07-30
 
 ### Changed

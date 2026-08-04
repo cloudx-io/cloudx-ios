@@ -58,8 +58,8 @@ class CLXDemoConfigManager {
             bannerAdUnitId: overrideOrDefault("DemoApp.BannerAdUnitId", "1pfZEjeYFB31WGsaRMIOE"),
             mrecAdUnitId: overrideOrDefault("DemoApp.MrecAdUnitId", "f3vNAyybeLZw3tmrLDnfp"),
             interstitialAdUnitId: overrideOrDefault("DemoApp.InterstitialAdUnitId", "SKva576GixtRW5DL_jS_D"),
-            nativeAdUnitId: "5NN7ZlBorm4ZoRkL6bsz9",
-            nativeBannerAdUnitId: "-2_Lw2b4QTlu7x6tKZ6Ww",
+            nativeAdUnitId: overrideOrDefault("DemoApp.NativeAdUnitId", "5NN7ZlBorm4ZoRkL6bsz9"),
+            nativeBannerAdUnitId: overrideOrDefault("DemoApp.NativeBannerAdUnitId", "-2_Lw2b4QTlu7x6tKZ6Ww"),
             rewardedAdUnitId: overrideOrDefault("DemoApp.RewardedAdUnitId", "jKOcqM-eHbGBwg76RQmsA")
         )
     }
