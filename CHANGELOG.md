@@ -14,6 +14,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Adjust connector 5.0.0.0 - 2026-08-04
+
+### Added
+- **`CloudXAdjustConnector` 5.0.0.0** — Forwards CloudX ad revenue to Adjust automatically, once per won impression, all formats. Install: `pod 'CloudXAdjustConnector', '~> 5.0.0.0'`. Requires `CloudXCore >= 3.6.0` and your existing Adjust integration (`Adjust >= 5.0.0`).
+- **Removed pre-release symbols** — `CloudXAdjustConnectorVersionNumber` and `CloudXAdjustConnectorVersionString` were dropped before first publication; `CLXAdjustConnectorVersion` reports the version. No consumer impact.
+
+---
+
 ## Pangle adapter 8.2.0.7.0 - 2026-07-30
 
 ### Changed
