@@ -16,9 +16,7 @@ target 'CloudXSwiftRemotePods' do
   pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.0'
   pod 'CloudXPangleAdapter', '~> 8.2.0.7.0'
   pod 'CloudXMobileFuseAdapter', '~> 1.11.0.0'
-  # TaurusX 1.18.1.0 released 2026-08-03 (demand outage resolved). Uncomment
-  # once the pod is visible on the CocoaPods CDN (post-publish flip PR).
-  # pod 'CloudXTaurusXAdapter', '~> 1.18.1.0'
+  pod 'CloudXTaurusXAdapter', '~> 1.18.1.0'
 
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths
