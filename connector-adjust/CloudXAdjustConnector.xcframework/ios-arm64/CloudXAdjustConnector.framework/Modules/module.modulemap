@@ -1,0 +1,5 @@
+framework module CloudXAdjustConnector {
+    umbrella header "CloudXAdjustConnector.h"
+    export *
+    module * { export * }
+}
