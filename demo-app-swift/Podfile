@@ -16,10 +16,8 @@ target 'CloudXSwiftRemotePods' do
   pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.0'
   pod 'CloudXPangleAdapter', '~> 7.9.1.3.0'
   pod 'CloudXMobileFuseAdapter', '~> 1.11.0.0'
-  # TaurusX held back: QA gate failed (TaurusX demand dark for the iOS test app
-  # since 2026-06-26 — NoBid from both US and JP geos despite a healthy device
-  # pipeline). Uncomment once TaurusX-side placement status is resolved and the
-  # pod is published to trunk.
+  # TaurusX 1.18.1.0 released 2026-08-03 (demand outage resolved). Uncomment
+  # once the pod is visible on the CocoaPods CDN (post-publish flip PR).
   # pod 'CloudXTaurusXAdapter', '~> 1.18.1.0'
 
   target 'CloudXSwiftRemotePodsTests' do
