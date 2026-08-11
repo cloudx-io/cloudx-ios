@@ -34,6 +34,18 @@ CLX_PUBLIC_ADAPTER FOUNDATION_EXPORT NSString * const CLXNativeContainerTargetSi
  */
 CLX_PUBLIC_ADAPTER FOUNDATION_EXPORT NSString * const CLXIsNativeAdViewKey;
 
+/**
+ * Key in `localExtraParameters` whose value is an opaque parsed OpenRTB
+ * Native 1.2 adm object. Set by CLXNativeAdViewBridge when the banner path has
+ * already parsed the adm at creation time (the creation-time parse guard) so
+ * the embedded CloudX native renderer factory can reuse it via
+ * `initWithParsedAd:` instead of re-parsing. Only the in-core
+ * CLXCoreRendererNativeFactory consumes this key; third-party factories
+ * ignore it. Absent on the third-party native-in-banner path (no creation-time
+ * parse runs there).
+ */
+CLX_PUBLIC_ADAPTER FOUNDATION_EXPORT NSString * const CLXNativeParsedAdKey;
+
 /// Abstract base class for native adapter factories.
 /// Subclass MUST override @c -createWithParams:.
 /// The wrapper attaches itself as the adapter's delegate after construction.

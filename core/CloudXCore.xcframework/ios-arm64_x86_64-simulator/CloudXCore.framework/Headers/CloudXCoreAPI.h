@@ -226,9 +226,13 @@ CLX_PUBLIC
  * emitted as adRevenue telemetry.
  *
  * Publishers forward paid events from any mediation platform via this
- * method. Returns YES if accepted into the pipeline; NO if the SDK isn't
- * initialized, adRevenue tracking is disabled, or the platform name is blank.
- * Non-throwing and safe to call from a paid-event callback.
+ * method. Returns YES if the data was used — either accepted into the ILRD
+ * pipeline, or, when adRevenue tracking is not enabled by the server config,
+ * recorded as a realized price for later pricing. Returns NO if it was dropped,
+ * because the SDK isn't initialized, the platform name is blank, or nothing
+ * consumed the event. Acceptance is not a delivery guarantee — reporting itself
+ * is fire-and-forget async. Non-throwing and safe to call from a paid-event
+ * callback.
  *
  * @param data The impression revenue and metadata to report.
  */
