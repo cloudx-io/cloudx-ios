@@ -22,6 +22,9 @@ typedef NSString *CLXRevenuePlatform NS_STRING_ENUM;
 /** AdMob (Google Mobile Ads). */
 CLX_PUBLIC FOUNDATION_EXPORT CLXRevenuePlatform const CLXRevenuePlatformAdMob;
 
+/** Google Ad Manager. */
+CLX_PUBLIC FOUNDATION_EXPORT CLXRevenuePlatform const CLXRevenuePlatformGAM;
+
 /** InMobi mediation. */
 CLX_PUBLIC FOUNDATION_EXPORT CLXRevenuePlatform const CLXRevenuePlatformInMobi;
 

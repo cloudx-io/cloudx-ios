@@ -12,7 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Supported V0 bid inputs expose revenue data for SDK-side fallback selection.
  * The fallback path normalizes supported bid types to per-impression USD before comparing:
- * CloudX and LevelPlay revenue are already per-impression USD; PubMatic price is USD eCPM / CPM.
+ * CloudX and LevelPlay revenue are already per-impression USD; PubMatic price is USD eCPM / CPM;
+ * AdMob and Google Ad Manager use the publisher-supplied manual price, else the last realized
+ * eCPM for that ad unit.
  * The request payload still preserves each platform's native field names so the backend can apply
  * platform-specific interpretation.
  */
@@ -93,6 +95,64 @@ CLX_PUBLIC
  */
 + (instancetype)pubMaticBidWithPrice:(double)price
     NS_SWIFT_NAME(pubMatic(price:));
+
+/**
+ * Creates an AdMob bid candidate.
+ *
+ * No price is required: CloudX prices the bid from revenue previously reported for this
+ * ad unit through reportRevenueData.
+ *
+ * @param adUnitId AdMob ad unit id the bid would fill.
+ * @param networkName Winning ad network within AdMob, when available. Defaults to "admob".
+ * @param manualRevenuePerImpressionUSD Publisher-supplied per-impression USD revenue. This is
+ * not a CPM. Overrides the revenue CloudX has recorded for this ad unit. Zero is honored as a
+ * real price; negative and non-finite values are ignored with a warning, leaving the bid
+ * priced from recorded revenue instead.
+ * @param extras Optional platform metadata. Null/blank keys and non-string values are
+ * dropped before storage.
+ */
++ (instancetype)adMobBidWithAdUnitId:(NSString *)adUnitId
+                         networkName:(nullable NSString *)networkName
+       manualRevenuePerImpressionUSD:(nullable NSNumber *)manualRevenuePerImpressionUSD
+                              extras:(nullable NSDictionary<NSString *, NSString *> *)extras
+    NS_SWIFT_NAME(adMob(adUnitId:networkName:manualRevenuePerImpressionUSD:extras:));
+
+/**
+ * Creates an AdMob bid candidate priced from previously reported revenue for this ad unit.
+ */
++ (instancetype)adMobBidWithAdUnitId:(NSString *)adUnitId
+    NS_SWIFT_NAME(adMob(adUnitId:));
+
+/**
+ * @brief Creates a Google Ad Manager bid candidate.
+ *
+ * No price is required: CloudX prices the bid from revenue previously reported for this
+ * ad unit through reportRevenueData.
+ *
+ * @param adUnitId Google Ad Manager ad unit id the bid would fill.
+ * @param networkName Winning ad network within Google Ad Manager, when available. Defaults to "gam".
+ * @param manualRevenuePerImpressionUSD Publisher-supplied per-impression USD revenue. This is
+ * not a CPM. Overrides the revenue CloudX has recorded for this ad unit. Zero is honored as a
+ * real price; negative and non-finite values are ignored with a warning, leaving the bid
+ * priced from recorded revenue instead.
+ * @param extras Optional platform metadata. Null/blank keys and non-string values are
+ * dropped before storage.
+ * @return A Google Ad Manager bid candidate.
+ */
++ (instancetype)gamBidWithAdUnitId:(NSString *)adUnitId
+                       networkName:(nullable NSString *)networkName
+     manualRevenuePerImpressionUSD:(nullable NSNumber *)manualRevenuePerImpressionUSD
+                            extras:(nullable NSDictionary<NSString *, NSString *> *)extras
+    NS_SWIFT_NAME(gam(adUnitId:networkName:manualRevenuePerImpressionUSD:extras:));
+
+/**
+ * @brief Creates a Google Ad Manager bid candidate priced from previously reported revenue
+ * for this ad unit.
+ * @param adUnitId Google Ad Manager ad unit id the bid would fill.
+ * @return A Google Ad Manager bid candidate with no manual price, default network name and no extras.
+ */
++ (instancetype)gamBidWithAdUnitId:(NSString *)adUnitId
+    NS_SWIFT_NAME(gam(adUnitId:));
 
 /**
  * Creates a bid candidate from any mediation platform not covered by a dedicated factory.

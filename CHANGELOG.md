@@ -48,6 +48,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.7.0] - 2026-08-11
+
+Install: `pod 'CloudXCore', '~> 3.7'`
+
+### Added
+- **AdMob and Google Ad Manager bids in the Trusted Arbiter** — New `CLXArbiterBid` factories `adMob(adUnitId:)` and `gam(adUnitId:)`, no price required: CloudX prices the bid from revenue reported via `reportRevenueData`. Optional per-impression USD override.
+- **`CLXRevenuePlatformGAM`** — Report Google Ad Manager revenue through `reportRevenueData`; GAM paid events now also feed arbiter bid pricing.
+
+### Changed
+- **Adapter-facing `CLXBidRoute` native routing** — Headers used by CloudX adapters gained native routing support (`CLXBidRoute`, `CLXNativeParsedAdKey`). Internal to CloudX adapters; no publisher action needed.
+
+### Fixed
+- **Core-only integrations initialize again** — Apps integrating `CloudXCore` with no adapter pods failed to initialize (error 201) and could not run auctions. Both now work.
+- **Banner and MREC views no longer leak** — Auto-refreshing inline ad views could be retained for the rest of the session, causing unbounded memory growth in long-running apps. They now release correctly.
+- **Releasing an ad without `destroy()` now cleans up** — Dropping your last reference to an ad object without calling `destroy()` now tears down the ad and its resources; previously they leaked silently.
+- **Rare crash during ad cleanup fixed** — A narrow internal race could abort the process while an ad's resources were being released.
+- **Portrait native creatives render at their reported aspect ratio** — Vertical (e.g. 9:16) creatives in the SDK native template no longer appear letterboxed in a landscape box. The template view for a portrait creative is now taller (320x548 instead of 320x250).
+- **No-bid auctions no longer log at ERROR** — A normal no-bid outcome now logs at DEBUG, so error logs and crash-tooling alerts only reflect genuine failures.
+
+---
+
 ## [3.6.0] - 2026-07-28
 
 Install: `pod 'CloudXCore', '~> 3.6'`
