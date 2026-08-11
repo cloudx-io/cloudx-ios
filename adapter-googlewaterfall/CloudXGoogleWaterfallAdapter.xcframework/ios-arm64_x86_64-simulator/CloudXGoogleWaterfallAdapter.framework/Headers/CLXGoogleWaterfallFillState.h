@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import "CLXGoogleWaterfallGamSupport.h"
 
 @class GADBannerView;
 
@@ -22,9 +23,11 @@ uint64_t CLXGoogleWaterfallFillTtlMsForFormat(CLXGoogleWaterfallPlacementFormat 
 @interface CLXGoogleWaterfallPlacementConfig : NSObject
 @property (nonatomic, copy, readonly) NSString *adUnitId;
 @property (nonatomic, assign, readonly) CLXGoogleWaterfallPlacementFormat format;
+@property (nonatomic, assign, readonly) CLXGoogleWaterfallPlacementType type;
 
 - (instancetype)initWithAdUnitId:(NSString *)adUnitId
-                          format:(CLXGoogleWaterfallPlacementFormat)format NS_DESIGNATED_INITIALIZER;
+                          format:(CLXGoogleWaterfallPlacementFormat)format
+                            type:(CLXGoogleWaterfallPlacementType)type NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 
 + (NSArray<CLXGoogleWaterfallPlacementConfig *> *)placementsFromArray:(nullable NSArray *)array;
@@ -35,6 +38,7 @@ uint64_t CLXGoogleWaterfallFillTtlMsForFormat(CLXGoogleWaterfallPlacementFormat 
 @interface CLXGoogleWaterfallFillEntry : NSObject
 @property (nonatomic, copy, readonly) NSString *adUnitId;
 @property (nonatomic, assign, readonly) CLXGoogleWaterfallPlacementFormat format;
+@property (nonatomic, assign, readonly) CLXGoogleWaterfallPlacementType type;
 @property (nonatomic, copy, readonly, nullable) NSString *winnerSourceName;
 @property (nonatomic, copy, readonly, nullable) NSString *winnerInstanceName;
 @property (nonatomic, copy, readonly, nullable) NSString *mediationGroupName;
@@ -43,6 +47,7 @@ uint64_t CLXGoogleWaterfallFillTtlMsForFormat(CLXGoogleWaterfallPlacementFormat 
 
 - (instancetype)initWithAdUnitId:(NSString *)adUnitId
                           format:(CLXGoogleWaterfallPlacementFormat)format
+                            type:(CLXGoogleWaterfallPlacementType)type
                 winnerSourceName:(nullable NSString *)winnerSourceName
               winnerInstanceName:(nullable NSString *)winnerInstanceName
               mediationGroupName:(nullable NSString *)mediationGroupName
@@ -50,7 +55,7 @@ uint64_t CLXGoogleWaterfallFillTtlMsForFormat(CLXGoogleWaterfallPlacementFormat 
                       responseId:(nullable NSString *)responseId NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 
-- (NSDictionary<NSString *, id> *)toJSONObjectWithRealizedEcpm:(double)realizedEcpm;
+- (NSDictionary<NSString *, id> *)toJSONObject;
 @end
 
 NS_ASSUME_NONNULL_END

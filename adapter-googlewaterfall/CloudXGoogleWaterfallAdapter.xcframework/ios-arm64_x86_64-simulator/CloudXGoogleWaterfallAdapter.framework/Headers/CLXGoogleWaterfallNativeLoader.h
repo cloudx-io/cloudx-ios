@@ -4,7 +4,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXGoogleWaterfallNativeLoader : NSObject <CLXGoogleWaterfallAdLoader>
-- (instancetype)initWithAdUnitId:(NSString *)adUnitId NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithAdUnitId:(NSString *)adUnitId
+                 requestProvider:(CLXGoogleWaterfallRequestProvider)requestProvider
+    NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 @end
 
