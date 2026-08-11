@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Google Waterfall adapter 13.6.0.2 - 2026-08-11
+
+### Added
+- **Google Ad Manager demand** — `CLXGoogleWaterfallPlacementTypeGam` placements load via the GAM request surface (banner, MREC, interstitial); revenue measured from realized GAM revenue history. Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.2'`; requires `CloudXCore >= 3.7.0`.
+
+### Changed
+- **Realized-price bookkeeping moved into `CloudXCore`** — The adapter's `CLXGoogleWaterfallRealizedPriceStore` header is removed; `CloudXCore` 3.7.0 now keeps this history using the same storage keys. No publisher action needed.
+
+---
+
+## Google Waterfall adapter 12.14.0.2 - 2026-08-11
+
+### Added
+- **Google Ad Manager demand (12.14.0)** — Same support as 13.6.0.2 (`CLXGoogleWaterfallPlacementTypeGam` placements; `CLXGoogleWaterfallRealizedPriceStore` now in core), for Google Mobile Ads SDK 12.14.0. Install: `pod 'CloudXGoogleWaterfallAdapter', '12.14.0.2'`; requires `CloudXCore >= 3.7.0`.
+
+---
+
 ## TaurusX adapter 1.18.1.0 - 2026-08-03
 
 ### Added
