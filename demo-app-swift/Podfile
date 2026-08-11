@@ -3,7 +3,7 @@ platform :ios, '13.0'
 target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore', '~> 3.6.0'
+  pod 'CloudXCore', '~> 3.7.0'
   pod 'CloudXMetaAdapter', '~> 6.21.1.0'
   pod 'CloudXVungleAdapter', '~> 7.7.4.0'
   pod 'CloudXInMobiAdapter', '~> 11.3.0.0'
