@@ -7,6 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXGoogleWaterfallFullscreenLoader : NSObject <CLXGoogleWaterfallAdLoader>
 - (instancetype)initWithAdUnitId:(NSString *)adUnitId
+                 requestProvider:(CLXGoogleWaterfallRequestProvider)requestProvider
                        loadBlock:(void (^)(NSString *adUnitId, GADRequest *request,
                                            void (^completion)(id _Nullable ad, NSError *_Nullable error)))loadBlock
     NS_DESIGNATED_INITIALIZER;

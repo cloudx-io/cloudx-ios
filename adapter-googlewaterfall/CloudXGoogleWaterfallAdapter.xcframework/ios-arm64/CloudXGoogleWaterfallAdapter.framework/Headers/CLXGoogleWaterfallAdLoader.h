@@ -1,6 +1,8 @@
 #import <Foundation/Foundation.h>
+#import "CLXGoogleWaterfallGamSupport.h"
 
 @class GADResponseInfo;
+@class GADRequest;
 @protocol CLXGoogleWaterfallAdLoader;
 
 NS_ASSUME_NONNULL_BEGIN

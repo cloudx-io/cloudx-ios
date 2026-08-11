@@ -5,7 +5,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CLXGoogleWaterfallAdViewLoader : NSObject <CLXGoogleWaterfallAdLoader, GADBannerViewDelegate>
-- (instancetype)initWithBannerView:(GADBannerView *)bannerView NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithBannerView:(GADBannerView *)bannerView
+                   requestProvider:(CLXGoogleWaterfallRequestProvider)requestProvider
+    NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 @end
 

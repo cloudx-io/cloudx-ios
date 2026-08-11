@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXGoogleWaterfallAdapter'
-  s.version = '13.6.0.1'
+  s.version = '12.14.0.2'
   s.summary          = 'CloudX Google Waterfall Adapter - Static Framework'
   s.description      = 'Google Waterfall adapter for CloudX iOS SDK - binary distribution. Supports Banner (320x50) and MREC (300x250) ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -11,8 +11,8 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'adapter-googlewaterfall/CloudXGoogleWaterfallAdapter.xcframework'
 
-  s.dependency 'CloudXCore', '>= 3.5.0'
-  s.dependency 'Google-Mobile-Ads-SDK', '= 13.6.0'
+  s.dependency 'CloudXCore', '>= 3.7.0'
+  s.dependency 'Google-Mobile-Ads-SDK', '= 12.14.0'
 
   s.frameworks = ['AVFoundation', 'AVKit', 'AdSupport', 'CoreGraphics', 'CoreLocation', 'CoreTelephony', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']
   s.weak_frameworks = ['GoogleMobileAds']
