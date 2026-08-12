@@ -5,7 +5,8 @@
 
 #import <Foundation/Foundation.h>
 #import <UnityAds/UnityAds.h>
-#import <CloudXCore/CloudXCore.h>
+#import <CloudXCore/CLXAdapterInterstitial.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                      placementName:(nullable NSString *)placementName
-                             bidID:(NSString *)bidID;
+                            logger:(id<CLXAdapterLogger>)logger;
 
 @end
 
