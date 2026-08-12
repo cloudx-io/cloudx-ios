@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXUnityAdsAdapter'
-  s.version = '4.16.5.0-core34'
+  s.version = '4.16.6.0'
   s.summary          = 'CloudX Unity Ads Adapter - Static Framework'
   s.description      = 'Unity Ads adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -12,8 +12,8 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-unityads/CloudXUnityAdsAdapter.xcframework'
 
   # Dependencies
-  s.dependency 'CloudXCore', '>= 3.4.5', '< 3.5'
-  s.dependency 'UnityAds', '= 4.16.5'
+  s.dependency 'CloudXCore', '>= 3.5.0'
+  s.dependency 'UnityAds', '= 4.16.6'
 
   s.frameworks = ['Foundation', 'UIKit', 'WebKit', 'AVFoundation', 'CoreMedia',
                    'AudioToolbox', 'CFNetwork', 'CoreGraphics', 'CoreTelephony',

@@ -18,10 +18,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXUnityAdsErrorHandler : NSObject
 
 /// Maps a fullscreen load failure (`UnityAdsLoadError` enum + message) to a `CLXError`.
-+ (CLXError *)toCloudXErrorFromLoadError:(UnityAdsLoadError)error message:(NSString *)message;
++ (CLXError *)toCloudXErrorFromLoadError:(UnityAdsLoadError)error message:(nullable NSString *)message;
 
 /// Maps a fullscreen show failure (`UnityAdsShowError` enum + message) to a `CLXError`.
-+ (CLXError *)toCloudXErrorFromShowError:(UnityAdsShowError)error message:(NSString *)message;
++ (CLXError *)toCloudXErrorFromShowError:(UnityAdsShowError)error message:(nullable NSString *)message;
 
 /// Maps a banner failure (`UADSBannerError`, an NSError subclass) to a `CLXError`.
 + (CLXError *)toCloudXErrorFromBannerError:(nullable UADSBannerError *)error;
