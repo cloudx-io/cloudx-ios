@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Meta adapter 6.22.0.0 - 2026-08-12
+
+Install: `pod 'CloudXMetaAdapter', '~> 6.22.0.0'`
+
+### Changed
+- **Requires iOS 15** — Certified with Meta Audience Network 6.22.0, which requires iOS 15.0. Apps that still support iOS 13 or 14 should stay on `CloudXMetaAdapter 6.21.1.0`, which keeps working with the current CloudX SDK and every other network.
+- **New Meta ad formats** — Audience Network 6.22 adds eCommerce and catalog formats, chained ads on iOS, and playable improvements. Meta serves these; no integration change is needed beyond updating the adapter.
+
+---
+
 ## Google Waterfall adapter 13.6.0.2 - 2026-08-11
 
 ### Added
