@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  * which is a fully composed UIView. Title/body/icon/CTA are not populated because
  * the Mintegral SDK renders them internally.
  *
- * `isSelfRendered` returns YES — this is the signal CLXNativeBannerBridge reads
+ * `isSelfRendered` returns YES — this is the signal CLXNativeAdViewBridge reads
  * to bypass template assembly and use the returned mediaView directly.
  * `isContainerClickable` is also YES because the composed view handles its own
  * click registration; the two signals happen to align for Mintegral but are
