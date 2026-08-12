@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXPangleAdapter'
-  s.version = '8.2.0.7.0'
+  s.version = '7.8.5.8.0'
   s.summary          = 'CloudX Pangle Adapter - Static Framework'
   s.description      = 'Pangle (ByteDance) adapter for CloudX iOS SDK - binary distribution. Supports Banner/MREC, Interstitial, Rewarded, Native, and App Open ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-pangle/CloudXPangleAdapter.xcframework'
 
   s.dependency 'CloudXCore', '>= 3.5.0'
-  s.dependency 'Ads-Global', '= 8.2.0.7'
+  s.dependency 'Ads-Global', '= 7.8.5.8'
 
   s.frameworks = ['AVFoundation', 'AdSupport', 'AudioToolbox', 'CFNetwork', 'CoreGraphics', 'CoreMedia', 'Foundation', 'StoreKit', 'SystemConfiguration', 'UIKit', 'WebKit']
 
