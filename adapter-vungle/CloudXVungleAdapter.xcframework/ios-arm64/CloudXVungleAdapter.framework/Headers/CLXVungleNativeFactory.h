@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Discovered by `CLXAdapterFactoryResolver` via the class name
  * `CLXVungleNativeFactory` under the `CloudXVungleAdapter` namespace. Registered
- * in `CLXAdNetworkFactories.native` and invoked by `CLXNativeBannerBridge` when
+ * in `CLXAdNetworkFactories.native` and invoked by `CLXNativeAdViewBridge` when
  * a Vungle bid with native `mtype` is routed through the banner pipeline.
  */
 @interface CLXVungleNativeFactory : CLXAdapterNativeFactory
