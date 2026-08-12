@@ -4,6 +4,7 @@
 //
 
 #import <CloudXCore/CLXNativeAd.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 #import <MolocoSDK/MolocoSDK-Swift.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -17,7 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) id<MolocoNativeAd> molocoNativeAd;
 
 - (instancetype)initWithMolocoNativeAd:(id<MolocoNativeAd>)molocoNativeAd
-                                assets:(id<MolocoNativeAdAssests>)assets;
+                                assets:(id<MolocoNativeAdAssests>)assets
+              handleImpressionInPrepare:(BOOL)handleImpressionInPrepare
+                                logger:(id<CLXAdapterLogger>)logger;
 
 @end
 

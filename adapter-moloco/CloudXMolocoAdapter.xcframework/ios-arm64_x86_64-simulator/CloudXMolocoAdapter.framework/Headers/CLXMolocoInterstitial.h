@@ -7,11 +7,9 @@
 #import <UIKit/UIKit.h>
 #import <MolocoSDK/MolocoSDK-Swift.h>
 
-#if __has_include(<CloudXCore/CloudXCore.h>)
-#import <CloudXCore/CloudXCore.h>
-#else
-@import CloudXCore;
-#endif
+#import <CloudXCore/CLXAdapterInterstitial.h>
+#import <CloudXCore/CLXAdapterLogger.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -30,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
                         adUnitName:(nullable NSString *)adUnitName
-                             bidID:(NSString *)bidID;
+                            logger:(id<CLXAdapterLogger>)logger;
 
 @end
 
