@@ -13,9 +13,9 @@ PODS:
   - CloudXGoogleWaterfallAdapter (13.6.0.0):
     - CloudXCore (>= 3.5.0)
     - Google-Mobile-Ads-SDK (= 13.6.0)
-  - CloudXInMobiAdapter (11.3.0.0):
+  - CloudXInMobiAdapter (11.4.1.0):
     - CloudXCore (>= 3.5.0)
-    - InMobiSDK (= 11.3.0)
+    - InMobiSDK (= 11.4.1)
   - CloudXMagniteAdapterV2 (1.0.0.1):
     - CloudXCore (>= 3.5.0)
     - MagniteSDK (= 1.0.0)
@@ -71,7 +71,7 @@ PODS:
     - HyBid/Core
   - HyBid/RewardedVideo (3.9.0):
     - HyBid/Core
-  - InMobiSDK (11.3.0)
+  - InMobiSDK (11.4.1)
   - IronSourceAdQualitySDK (9.8.0)
   - MagniteSDK (1.0.0)
   - MintegralAdSDK (8.1.5):
@@ -134,7 +134,7 @@ DEPENDENCIES:
   - CloudXCore (~> 3.7.0)
   - CloudXDigitalTurbineAdapter (~> 8.4.8.0)
   - CloudXGoogleWaterfallAdapter (~> 13.6.0.0)
-  - CloudXInMobiAdapter (~> 11.3.0.0)
+  - CloudXInMobiAdapter (~> 11.4.1.0)
   - CloudXMagniteAdapterV2 (~> 1.0.0.0)
   - CloudXMetaAdapter (~> 6.21.1.0)
   - CloudXMintegralAdapter (~> 8.1.5.0)
@@ -184,7 +184,7 @@ SPEC CHECKSUMS:
   CloudXCore: afb57eb624a12b4db7988eef214d1a470236b7bd
   CloudXDigitalTurbineAdapter: 0c37b4f298913b3a5611ef1f6a65aa50bd4bb9a9
   CloudXGoogleWaterfallAdapter: e2326c444c3a1879b17b0d28f32ca0b453e172b9
-  CloudXInMobiAdapter: e8ce09e5ebad78dc10ddf1ec1991af8896d6c72c
+  CloudXInMobiAdapter: 280563b1b05dc9f5efbc6ca9d4a25d71b8fd24a8
   CloudXMagniteAdapterV2: 34ce9688705675c6c9354fa5e09ffe1fff86df64
   CloudXMetaAdapter: b45b5bd8a6fd1f95c118084fb09e1e3194c41c45
   CloudXMintegralAdapter: d7062e0d5a4512feb405c2deda6ae544962ee7b2
@@ -200,7 +200,7 @@ SPEC CHECKSUMS:
   Google-Mobile-Ads-SDK: 6e501ace4af8d63e967bd45497c8b2b05821163d
   GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
   HyBid: c0bb109f5d6e9005456565391a330a915535b8f8
-  InMobiSDK: a25c208dcc6fc6d9b228f34a4643712f37923208
+  InMobiSDK: 45b8b7e2af6e241b028b94c63b3d1d6113a12945
   IronSourceAdQualitySDK: 4a35860414765500aafbddb7635ef50862052acf
   MagniteSDK: edfce03a6207c856681cc3355a7e6124c977ae61
   MintegralAdSDK: 9e98161b5c5afdc7f5effe4f3969dd1cf0430ed1
@@ -211,6 +211,6 @@ SPEC CHECKSUMS:
   UnityCoherenceLib: d9be08c5b9c2880cb220c7ecd643f97ebda422b7
   VungleAds: 77bad219e9e4b34bf43ab2518bf2fac72b86100b
 
-PODFILE CHECKSUM: 6a4f6ef8ac8d0f46e64d42837dabd469f659892f
+PODFILE CHECKSUM: 538649a45738b279eacb7f3c4241b90333a39324
 
 COCOAPODS: 1.17.0
