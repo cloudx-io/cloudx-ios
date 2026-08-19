@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Factory producing InMobi native adapters (`CLXInMobiNative`).
  *
  * Auto-discovered by `CLXAdapterFactoryResolver` and registered in
- * `CLXAdNetworkFactories.native`. Invoked by `CLXNativeBannerBridge` when an
+ * `CLXAdNetworkFactories.native`. Invoked by `CLXNativeAdViewBridge` when an
  * InMobi bid with native `mtype` is routed through the banner pipeline.
  */
 @interface CLXInMobiNativeFactory : CLXAdapterNativeFactory
