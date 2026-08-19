@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## InMobi adapter 11.4.1.0 - 2026-08-18
+
+Install: `pod 'CloudXInMobiAdapter', '~> 11.4.1.0'`
+
+### Changed
+- **Improved audio handling for MRAID 3 creatives** — Certified with InMobiSDK 11.4.1, which resolves cases where an ad could interrupt audio your app was already playing.
+- **No integration change required** — `CloudXCore >= 3.5.0` and iOS 13.0 are unchanged from `11.3.0.0`.
+
+---
+
 ## Meta adapter 6.22.0.0 - 2026-08-12
 
 Install: `pod 'CloudXMetaAdapter', '~> 6.22.0.0'`
