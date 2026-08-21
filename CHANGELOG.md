@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Google Waterfall adapter 13.6.0.3 - 2026-08-21
+
+Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.3'`
+
+### Changed
+- **Fullscreen ads now prefetch through Google's ad-preloading API** — Interstitial, rewarded, and app-open ads are preloaded by the Google Mobile Ads SDK, not the adapter; `CLXGoogleWaterfallFullscreenLoader` is removed. Banner, MREC, and native are unchanged, and no publisher action is needed.
+- **Requires Google Mobile Ads SDK 13.6.0 exactly** — The preloading API is only available on that version, so the adapter pins it. Requires `CloudXCore >= 3.7.0`.
+
+---
+
 ## InMobi adapter 11.4.1.0 - 2026-08-18
 
 Install: `pod 'CloudXInMobiAdapter', '~> 11.4.1.0'`
