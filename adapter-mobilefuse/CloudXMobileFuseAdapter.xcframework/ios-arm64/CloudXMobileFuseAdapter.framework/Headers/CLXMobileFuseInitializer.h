@@ -21,10 +21,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isTestMode;
 
 /**
- * Returns the MobileFuse network SDK version string.
- * The first call resolves the value on the main queue to avoid the UIKit
- * main-thread checker warning that fires when MobileFuse internally reads
- * `[UIApplication applicationState]` off the main thread.
+ * Returns the cached MobileFuse network SDK version string, falling back to the network SDK
+ * version this adapter pins when it has not yet been primed. Never returns an empty string.
+ * Never blocks and never hops to the main queue, so it is safe to call from latency-sensitive
+ * paths and from arbitrary threads.
  */
 + (NSString *)sdkVersion;
 
