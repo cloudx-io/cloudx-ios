@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## MobileFuse adapter 1.11.0.1 - 2026-08-24
+
+Install: `pod 'CloudXMobileFuseAdapter', '~> 1.11.0.1'`
+
+### Fixed
+- **Reading the MobileFuse SDK version no longer blocks the calling thread** — Removes a stall on the bid-token path. MobileFuseSDK 1.11.0 and `CloudXCore >= 3.5.0` are unchanged.
+
+---
+
 ## Google Waterfall adapter 13.6.0.3 - 2026-08-21
 
 Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.3'`

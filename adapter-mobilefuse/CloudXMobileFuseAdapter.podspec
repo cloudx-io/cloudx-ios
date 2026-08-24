@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXMobileFuseAdapter'
-  s.version = '1.11.0.0'
+  s.version = '1.11.0.1'
   s.summary          = 'CloudX MobileFuse Adapter - Static Framework'
   s.description      = 'MobileFuse adapter for CloudX iOS SDK - binary distribution. Supports Banner, MREC, Interstitial, Rewarded, and Native ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
