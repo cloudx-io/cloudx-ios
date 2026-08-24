@@ -104,6 +104,26 @@ Install: `pod 'CloudXMetaAdapter', '~> 6.22.0.0'`
 
 ---
 
+## [3.8.0] - 2026-08-24
+
+Install: `pod 'CloudXCore', '~> 3.8'`
+
+### Added
+- **Inline banner and MREC videos start muted** — Video creatives in banner and MREC placements now begin playback muted; a creative can only unmute through a user-initiated tap on its own controls.
+- **AppLovin MAX Post Bid revenue correlation** — For publishers running CloudX in Post Bid mode, ILRD revenue from MAX impressions that win above a CloudX floor is now correlated with the CloudX auction. Enabled by a server-delivered flag on `CLXSDKConfigAdUnit`; no integration change needed.
+
+### Changed
+- **SDK configuration now served from `sdk.cloudx.io`** — The SDK fetches its configuration from the unified `sdk.cloudx.io` host and warms that connection at `initialize` for a faster first auction. If your network environment allowlists SDK domains, add `sdk.cloudx.io`.
+
+### Fixed
+- **Revenue and click callbacks always delivered** — Ads with incomplete bid metadata could serve and earn while the revenue and click callbacks were silently skipped. These callbacks now always fire, so your ILRD matches CloudX reporting.
+- **Calling `load()` on a visible banner no longer leaks the replaced ad** — Publisher-driven banner/MREC refresh via `load()` leaked the previous ad's web view and media resources for the rest of the session. The replaced ad now tears down correctly.
+- **Video impressions tracked when viewability measurement fails to start** — Some VAST video ads rendered and played but were never counted as impressions. They now bill and fire their tracking beacons correctly.
+- **Long tracking URLs no longer dropped** — VAST tracking beacons with URLs up to 10KB now fire; previously URLs over 2KB were silently dropped.
+- **Faster handling of concurrent network responses** — Network completions are no longer processed one at a time, so one slow response can no longer delay other finished requests during init and bidding.
+
+---
+
 ## [3.7.0] - 2026-08-11
 
 Install: `pod 'CloudXCore', '~> 3.7'`
