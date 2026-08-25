@@ -101,6 +101,7 @@ CLX_INTERNAL_TESTING
 @property (nonatomic, copy, nullable) NSString *sdkMetricsEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sdkLogEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sdkAdRevenueEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkGamAuctionResultEndpointURL;
 
 // CXD-1176: adapter-lifecycle observability events flow through the metrics
 // pipeline (single `sdkMetricsEndpointURL` + server-side allow-list in
@@ -224,8 +225,11 @@ CLX_INTERNAL_TESTING
 /// Whether debug logging should be enabled for this device
 @property (nonatomic, assign) BOOL debug;
 @property (nonatomic, assign) BOOL optimisticLoadingEnabled;
+/// Revert lever for the inline-video mute policy, not an opt-in feature: defaults
+/// to YES so the policy stays active unless the server explicitly disables it.
+@property (nonatomic, assign) BOOL inlineVideoMuteEnabled;
 @property (nonatomic, assign) BOOL cachedInitEnabled;
 - (instancetype)init;
 @end
 
-NS_ASSUME_NONNULL_END 
+NS_ASSUME_NONNULL_END
