@@ -58,6 +58,12 @@ extern NSString * const CLXMetricsTypeRendererMRAIDCustomCloseIgnored; // "metho
 extern NSString * const CLXMetricsTypeRendererMRAIDUnloadRejected; // "method_renderer_mraid_unload_rejected"
 extern NSString * const CLXMetricsTypeRendererMRAIDOpenDenied;    // "method_renderer_mraid_open_denied"
 extern NSString * const CLXMetricsTypeRendererBridgeRejected;     // "method_renderer_bridge_rejected"
+// Inline (banner/MREC) video unmute attempted without a trusted control
+// activation. Emitted from the mute user-script via the dedicated
+// `clxInlineVideoMute` script-message handler when the `muted` setter
+// wrapper denies an unmute. Deduped per video element in JS so a creative
+// looping `video.muted = false` cannot flood telemetry.
+extern NSString * const CLXMetricsTypeRendererInlineVideoUnmuteDenied; // "method_renderer_inline_video_unmute_denied"
 
 extern NSString * const CLXMetricsTypeRendererHTMLLoad;           // "renderer_html_load_ms"
 extern NSString * const CLXMetricsTypeRendererVideoTTFF;          // "renderer_video_ttff_ms"
@@ -226,6 +232,17 @@ extern NSString * const CLXMetricsTypeFullscreenRewardForfeit;             // "f
  * reported under this name. Matches Android's `ad_revenue_listener_error`.
  */
 extern NSString * const CLXMetricsTypeAdRevenueListenerError;               // "ad_revenue_listener_error"
+
+/**
+ * Fires whenever a publisher delegate load callback delivers an identity-only
+ * fallback ad (no network/revenue metadata) instead of a complete one. The
+ * `reason` field carries `<call site>:<trigger>` — the call site names where
+ * in the load path the fallback happened (e.g. `banner_load`,
+ * `fullscreen_create`, `native_expire`) and the trigger is the classification
+ * from `+[CLXAd clx_incompletenessReasonForBid:]` (`no_bid_snapshot`,
+ * `missing_ext_envelope`, or `unresolved_network`).
+ */
+extern NSString * const CLXMetricsTypeIdentityOnlyAdEmitted;                // "identity_only_ad_emitted"
 
 /**
  * Utility class for metrics type validation and categorization

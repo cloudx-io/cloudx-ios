@@ -30,6 +30,7 @@ typedef NS_ENUM(NSInteger, SDKConfigAdType) {
 @property (nonatomic, assign) SDKConfigAdType type;
 @property (nonatomic, assign) BOOL hasCloseButton;
 @property (nonatomic, assign) BOOL arbiterEnabled;
+@property (nonatomic, assign) BOOL postBidEnabled;
 @property (nonatomic, copy, nullable) NSString *firstImpressionPlacementSuffix;
 @property (nonatomic, assign) NSInteger firstImpressionLoopIndexStart;
 @property (nonatomic, assign) NSInteger firstImpressionLoopIndexEnd;
