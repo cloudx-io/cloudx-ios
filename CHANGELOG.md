@@ -109,11 +109,11 @@ Install: `pod 'CloudXMetaAdapter', '~> 6.22.0.0'`
 Install: `pod 'CloudXCore', '~> 3.8'`
 
 ### Added
-- **Inline banner and MREC videos start muted** — Video creatives in banner and MREC placements now begin playback muted; a creative can only unmute through a user-initiated tap on its own controls.
-- **AppLovin MAX Post Bid revenue correlation** — For publishers running CloudX in Post Bid mode, ILRD revenue from MAX impressions that win above a CloudX floor is now correlated with the CloudX auction. Enabled by a server-delivered flag on `CLXSDKConfigAdUnit`; no integration change needed.
+- **Video in banner and MREC ads now starts muted** — Video creatives in banner and MREC placements begin playback muted; a creative can only unmute in response to a user tap on its own controls.
+- **AppLovin MAX Post Bid revenue correlation** — For publishers running CloudX in Post Bid mode, ILRD revenue from MAX impressions that win above a CloudX floor is now correlated with the CloudX auction. Enabled by server configuration; no integration change needed.
 
 ### Changed
-- **SDK configuration now served from `sdk.cloudx.io`** — The SDK fetches its configuration from the unified `sdk.cloudx.io` host and warms that connection at `initialize` for a faster first auction. If your network environment allowlists SDK domains, add `sdk.cloudx.io`.
+- **Integration-facing header additions** — `CLXSDKConfigAdUnit` gained a server-populated Post Bid flag. Internal to CloudX integrations; no publisher action needed.
 
 ### Fixed
 - **Revenue and click callbacks always delivered** — Ads with incomplete bid metadata could serve and earn while the revenue and click callbacks were silently skipped. These callbacks now always fire, so your ILRD matches CloudX reporting.
