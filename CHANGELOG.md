@@ -16,6 +16,17 @@ Install: `pod 'CloudXMobileFuseAdapter', '~> 1.11.0.1'`
 
 ---
 
+## Google Waterfall adapter 12.14.0.3 - 2026-08-26
+
+Install: `pod 'CloudXGoogleWaterfallAdapter', '12.14.0.3'`
+
+Compatibility-line release for apps pinned to Google Mobile Ads SDK 12.14.0. New integrations should use the 13.6.0.x line.
+
+### Changed
+- **Google adapter startup no longer delays CloudX SDK initialization** — Same change as 13.6.0.4, for Google Mobile Ads SDK 12.14.0. Requires `CloudXCore` 3.7.0 or newer.
+
+---
+
 ## Google Waterfall adapter 13.6.0.4 - 2026-08-26
 
 Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.4'`
