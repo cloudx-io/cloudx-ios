@@ -1,0 +1,5 @@
+framework module CloudXGAMPrebid {
+    umbrella header "CloudXGAMPrebid.h"
+    export *
+    module * { export * }
+}
