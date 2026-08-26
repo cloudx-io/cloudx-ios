@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## GAM Prebid integration 1.0.0 - 2026-08-26
+
+Install: `pod 'CloudXGAMPrebid', '~> 1.0'`
+
+### Added
+- First release, for publishers who run Google Ad Manager as their primary ad server. Run a CloudX auction, attach the returned key-values to your own GAM request, and let GAM decide. Banner, MREC, interstitial, rewarded and native are supported.
+- Requires CloudXCore >= 3.8.0 and Google Mobile Ads SDK 13.x (`~> 13.0`). GMA is weak-linked — your app supplies and initializes it, and the pod is never bundled with a copy.
+- Calling `notifyGamResponse:` on every GAM load success and `notifyGamRequestFailed` on every failure is required. Skip either and the auction settles on its TTL as an expiry, losing the real outcome and the GAM response id that joins it to your Ad Manager reporting.
+- A GAM load that resolves to a different ad no longer tears down the creative GAM is still displaying, and a loss between dispatch and show no longer fails the pending fullscreen ad. Dispatch is validated before the ad is claimed (`CLXGamTokenRegistry`, `CLXGamAdFormat`).
+
+---
+
 ## MobileFuse adapter 1.11.0.1 - 2026-08-24
 
 Install: `pod 'CloudXMobileFuseAdapter', '~> 1.11.0.1'`
