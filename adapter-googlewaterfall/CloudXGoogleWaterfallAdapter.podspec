@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXGoogleWaterfallAdapter'
-  s.version = '13.6.0.3'
+  s.version = '13.6.0.4'
   s.summary          = 'CloudX Google Waterfall Adapter - Static Framework'
   s.description      = 'Google Waterfall adapter for CloudX iOS SDK - binary distribution. Supports Banner (320x50) and MREC (300x250) ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'

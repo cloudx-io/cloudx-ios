@@ -16,6 +16,17 @@ Install: `pod 'CloudXMobileFuseAdapter', '~> 1.11.0.1'`
 
 ---
 
+## Google Waterfall adapter 13.6.0.4 - 2026-08-26
+
+Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.4'`
+
+### Changed
+- **Google adapter startup no longer delays CloudX SDK initialization** — The Google Mobile Ads SDK now starts in the background instead of holding up your `initialize` call. A missing `GADApplicationIdentifier` in your Info.plist still fails initialization straight away.
+- **An ad requested in the moment right after initialization may no-fill once** — Google demand is ready as soon as its background start finishes. A request landing before then returns a fast no-fill for that one request instead of waiting, and the next request is served normally.
+- **Requires Google Mobile Ads SDK 13.6.0 exactly** — Requires `CloudXCore` 3.7.0 or newer.
+
+---
+
 ## Google Waterfall adapter 13.6.0.3 - 2026-08-21
 
 Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.3'`
