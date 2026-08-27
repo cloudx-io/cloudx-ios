@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Singular connector 12.6.0.0 - 2026-08-26
+
+### Added
+- **`CloudXSingularConnector` 12.6.0.0** — Forwards CloudX ad revenue to Singular automatically, once per won impression, all formats. Install: `pod 'CloudXSingularConnector', '~> 12.6.0.0'`. Requires `CloudXCore >= 3.6.0` and your existing Singular integration (`Singular-SDK >= 12.6.0`).
+- **Reports `CloudX` as the ad platform** — The winning bidder rides in the network-name field, and ad-format names match the Android connector, so cross-platform Singular reports group into one bucket per format.
+
+---
+
 ## GAM Prebid integration 1.0.0 - 2026-08-26
 
 Install: `pod 'CloudXGAMPrebid', '~> 1.0'`
