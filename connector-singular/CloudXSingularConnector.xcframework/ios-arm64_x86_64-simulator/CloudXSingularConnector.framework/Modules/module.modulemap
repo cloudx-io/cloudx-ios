@@ -1,0 +1,5 @@
+framework module CloudXSingularConnector {
+    umbrella header "CloudXSingularConnector.h"
+    export *
+    module * { export * }
+}
