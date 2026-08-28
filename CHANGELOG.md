@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Mintegral adapter 8.1.3.0 - 2026-08-28
+
+Install: `pod 'CloudXMintegralAdapter', '8.1.3.0'`
+
+Compatibility-line release for apps pinned to MintegralAdSDK 8.1.3. New integrations should use the 8.1.5.x line.
+
+### Changed
+- **Backport of the 8.1.5.0 adapter for MintegralAdSDK 8.1.3** — Same Banner, MREC, Interstitial, Rewarded, Native and App Open support, built against MintegralAdSDK 8.1.3. Requires `CloudXCore >= 3.5.0`.
+
+---
+
 ## TaurusX adapter 1.18.2.0 - 2026-08-28
 
 Install: `pod 'CloudXTaurusXAdapter', '~> 1.18.2.0'`
