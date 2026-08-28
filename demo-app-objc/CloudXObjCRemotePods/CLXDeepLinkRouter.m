@@ -20,6 +20,8 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
             @"mrec":                   @"MRECViewController",
             @"interstitial":           @"InterstitialViewController",
             @"rewarded":               @"RewardedViewController",
+
+            @"app-open":               @"AppOpenViewController",
             @"native":                 @"NativeMenuViewController",
         };
     });
@@ -69,11 +71,12 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
 #pragma mark - Format Configuration
 
 - (NSArray<NSString *> *)supportedFormats {
-    return @[@"banner", @"mrec", @"interstitial", @"rewarded", @"native"];
+    return @[@"banner", @"mrec", @"interstitial", @"app-open", @"rewarded", @"native"];
 }
 
 - (BOOL)isFullscreenFormat:(NSString *)format {
     return [format isEqualToString:@"interstitial"] ||
+           [format isEqualToString:@"app-open"] ||
            [format isEqualToString:@"rewarded"];
 }
 
@@ -82,6 +85,8 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
     if ([format isEqualToString:@"mrec"])                  return @selector(loadMRECAd);
     if ([format isEqualToString:@"interstitial"])           return @selector(loadInterstitialAd);
     if ([format isEqualToString:@"rewarded"])               return @selector(loadRewardedAd);
+
+    if ([format isEqualToString:@"app-open"])               return @selector(loadAppOpenAd);
     if ([format isEqualToString:@"native"])                 return @selector(loadNativeAd);
     return nil;
 }
@@ -89,6 +94,8 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
 - (nullable SEL)showSelectorForFormat:(NSString *)format {
     if ([format isEqualToString:@"interstitial"])           return @selector(showInterstitialAd);
     if ([format isEqualToString:@"rewarded"])               return @selector(showRewardedAd);
+
+    if ([format isEqualToString:@"app-open"])               return @selector(showAppOpenAd);
     return nil;
 }
 

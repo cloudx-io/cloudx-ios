@@ -12,6 +12,7 @@ enum DeepLinkRouter {
         "mrec":                  "MRECViewController",
         "interstitial":          "InterstitialViewController",
         "rewarded":              "RewardedViewController",
+        "app-open":              "AppOpenViewController",
         "native":                "NativeMenuViewController",
     ]
 
@@ -67,11 +68,11 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
     // MARK: - Format Configuration
 
     func supportedFormats() -> [String] {
-        ["banner", "mrec", "interstitial", "rewarded", "native"]
+        ["banner", "mrec", "interstitial", "app-open", "rewarded", "native"]
     }
 
     func isFullscreenFormat(_ format: String) -> Bool {
-        format == "interstitial" || format == "rewarded"
+        format == "interstitial" || format == "app-open" || format == "rewarded"
     }
 
     func loadSelector(forFormat format: String) -> Selector? {
@@ -80,6 +81,7 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
         case "mrec":                  return NSSelectorFromString("loadMRECAd")
         case "interstitial":          return NSSelectorFromString("loadInterstitialAd")
         case "rewarded":              return NSSelectorFromString("loadRewardedAd")
+        case "app-open":              return NSSelectorFromString("loadAppOpenAd")
         case "native":                return NSSelectorFromString("loadNativeAd")
         default:                      return nil
         }
@@ -89,6 +91,7 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
         switch format {
         case "interstitial":          return NSSelectorFromString("showInterstitialAd")
         case "rewarded":              return NSSelectorFromString("showRewardedAd")
+        case "app-open":              return NSSelectorFromString("showAppOpenAd")
         default:                      return nil
         }
     }

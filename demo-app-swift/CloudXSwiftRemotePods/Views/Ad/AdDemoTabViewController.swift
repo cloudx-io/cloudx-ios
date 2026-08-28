@@ -24,6 +24,9 @@ class AdDemoTabViewController: UITabBarController {
         
         let rewardedVC = RewardedViewController()
         rewardedVC.tabBarItem = UITabBarItem(title: "Rewarded", image: UIImage(systemName: "star"), tag: 3)
+
+        let appOpenVC = AppOpenViewController()
+        appOpenVC.tabBarItem = UITabBarItem(title: "App Open", image: UIImage(systemName: "app"), tag: 8)
         
         let mrecVC = MRECViewController()
         mrecVC.tabBarItem = UITabBarItem(title: "MREC", image: UIImage(systemName: "rectangle.3.group"), tag: 4)
@@ -43,6 +46,7 @@ class AdDemoTabViewController: UITabBarController {
             UINavigationController(rootViewController: bannerVC),
             UINavigationController(rootViewController: interstitialVC),
             UINavigationController(rootViewController: rewardedVC),
+            UINavigationController(rootViewController: appOpenVC),
             UINavigationController(rootViewController: mrecVC),
             UINavigationController(rootViewController: nativeVC),
             UINavigationController(rootViewController: keyValueVC),
