@@ -27,6 +27,34 @@ Install: `pod 'CloudXTaurusXAdapter', '~> 1.18.2.0'`
 
 ---
 
+## Meta adapter 6.20.1.0 - 2026-08-28
+
+### Changed
+- **Audience Network 6.20.1 compatibility line** — For apps pinned to Audience Network 6.20.1; keeps iOS 13. Native video options and AdChoices close reporting are unavailable at this version. Install: `pod 'CloudXMetaAdapter', '6.20.1.0'`; requires `CloudXCore >= 3.5.0`.
+
+---
+
+## Vungle adapter 7.6.3.0 - 2026-08-28
+
+### Changed
+- **VungleAds 7.6.3 compatibility line** — For apps pinned to VungleAds 7.6.3. No behavioral difference from the current line. Install: `pod 'CloudXVungleAdapter', '7.6.3.0'`; requires `CloudXCore >= 3.5.0`.
+
+---
+
+## Unity Ads adapter 4.16.3.0 - 2026-08-28
+
+### Changed
+- **UnityAds 4.16.3 compatibility line** — For apps pinned to UnityAds 4.16.3. `CLXUnityAdsRewarded` grants its reward on show completion, and ad expiry callbacks are unavailable. Install: `pod 'CloudXUnityAdsAdapter', '4.16.3.0'`; requires `CloudXCore >= 3.5.0`.
+
+---
+
+## Mintegral adapter 8.0.3.0 - 2026-08-28
+
+### Changed
+- **Mintegral 8.0.3 compatibility line** — For apps pinned to Mintegral 8.0.3. No behavioral difference from the current line. Install: `pod 'CloudXMintegralAdapter', '8.0.3.0'`; requires `CloudXCore >= 3.5.0`.
+
+---
+
 ## Singular connector 12.6.0.0 - 2026-08-26
 
 ### Added
