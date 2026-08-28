@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## TaurusX adapter 1.18.2.0 - 2026-08-28
+
+Install: `pod 'CloudXTaurusXAdapter', '~> 1.18.2.0'`
+
+### Changed
+- **Certified with TaurusX SDK 1.18.2** — Updates the bundled TaurusX SDK from 1.18.1. No integration change is required: `CloudXCore >= 3.5.0` and iOS 13.0 are unchanged from `1.18.1.0`, and the supported formats (Banner, MREC, Interstitial, Rewarded, Native) are unchanged.
+
+---
+
 ## Singular connector 12.6.0.0 - 2026-08-26
 
 ### Added
