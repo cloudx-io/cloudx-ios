@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXTaurusXAdapter'
-  s.version = '1.18.1.0'
+  s.version = '1.18.2.0'
   s.summary          = 'CloudX TaurusX Adapter - Static Framework'
   s.description      = 'TaurusX adapter for CloudX iOS SDK - binary distribution. Supports Banner, MREC, Interstitial, Rewarded, and Native ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'adapter-taurusx/CloudXTaurusXAdapter.xcframework'
   s.dependency 'CloudXCore', '>= 3.5.0'
-  s.dependency 'TaurusxAdsSDK', '= 1.18.1'
+  s.dependency 'TaurusxAdsSDK', '= 1.18.2'
   s.frameworks = ['AdSupport', 'AppTrackingTransparency', 'Foundation', 'StoreKit', 'UIKit', 'WebKit']
   s.requires_arc = true
   s.static_framework = true
