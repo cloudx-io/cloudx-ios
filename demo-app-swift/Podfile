@@ -3,7 +3,10 @@ platform :ios, '13.0'
 target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static
 
-  pod 'CloudXCore', :path => '../core'
+  # The published 3.8.0 binary, resolved through this repo's podspec (its vendored
+  # xcframework path is repo-root-relative, so a bare :path => '../core' resolves to
+  # core/core/… and yields an empty pod).
+  pod 'CloudXCore', :podspec => '../core/CloudXCore.podspec'
   pod 'CloudXMetaAdapter', '~> 6.21.1.0'
   pod 'CloudXVungleAdapter', '~> 7.7.4.0'
   pod 'CloudXInMobiAdapter', '~> 11.4.1.0'

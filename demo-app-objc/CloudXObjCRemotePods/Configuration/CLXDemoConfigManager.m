@@ -9,7 +9,8 @@
          interstitialAdUnitId:(NSString *)interstitialAdUnitId
                nativeAdUnitId:(NSString *)nativeAdUnitId
          nativeBannerAdUnitId:(NSString *)nativeBannerAdUnitId
-             rewardedAdUnitId:(NSString *)rewardedAdUnitId {
+             rewardedAdUnitId:(NSString *)rewardedAdUnitId
+              appOpenAdUnitId:(NSString *)appOpenAdUnitId {
     
     self = [super init];
     if (self) {
@@ -21,6 +22,7 @@
         _nativeAdUnitId = [nativeAdUnitId copy];
         _nativeBannerAdUnitId = [nativeBannerAdUnitId copy];
         _rewardedAdUnitId = [rewardedAdUnitId copy];
+        _appOpenAdUnitId = [appOpenAdUnitId copy];
     }
     return self;
 }
@@ -66,7 +68,9 @@
             interstitialAdUnitId:overrideOrDefault(@"DemoApp.InterstitialAdUnitId", @"SKva576GixtRW5DL_jS_D")
             nativeAdUnitId:overrideOrDefault(@"DemoApp.NativeAdUnitId", @"5NN7ZlBorm4ZoRkL6bsz9")
             nativeBannerAdUnitId:overrideOrDefault(@"DemoApp.NativeBannerAdUnitId", @"-2_Lw2b4QTlu7x6tKZ6Ww")
-            rewardedAdUnitId:overrideOrDefault(@"DemoApp.RewardedAdUnitId", @"jKOcqM-eHbGBwg76RQmsA")];
+            rewardedAdUnitId:overrideOrDefault(@"DemoApp.RewardedAdUnitId", @"jKOcqM-eHbGBwg76RQmsA")
+            // gw-admob-appopen — the permanent Google Waterfall app-open unit the QA fleet pins.
+            appOpenAdUnitId:overrideOrDefault(@"DemoApp.AppOpenAdUnitId", @"cRjP5EAPNyIOKMFG3u2YE")];
     }
     return self;
 }

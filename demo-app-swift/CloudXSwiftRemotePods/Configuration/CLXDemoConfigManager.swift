@@ -9,6 +9,7 @@ class CLXDemoConfig {
     let nativeAdUnitId: String
     let nativeBannerAdUnitId: String
     let rewardedAdUnitId: String
+    let appOpenAdUnitId: String
     
     init(appKey: String,
          hashedUserId: String,
@@ -17,7 +18,8 @@ class CLXDemoConfig {
          interstitialAdUnitId: String,
          nativeAdUnitId: String,
          nativeBannerAdUnitId: String,
-         rewardedAdUnitId: String) {
+         rewardedAdUnitId: String,
+         appOpenAdUnitId: String) {
         
         self.appKey = appKey
         self.hashedUserId = hashedUserId
@@ -27,6 +29,7 @@ class CLXDemoConfig {
         self.nativeAdUnitId = nativeAdUnitId
         self.nativeBannerAdUnitId = nativeBannerAdUnitId
         self.rewardedAdUnitId = rewardedAdUnitId
+        self.appOpenAdUnitId = appOpenAdUnitId
     }
 }
 
@@ -60,7 +63,9 @@ class CLXDemoConfigManager {
             interstitialAdUnitId: overrideOrDefault("DemoApp.InterstitialAdUnitId", "SKva576GixtRW5DL_jS_D"),
             nativeAdUnitId: overrideOrDefault("DemoApp.NativeAdUnitId", "5NN7ZlBorm4ZoRkL6bsz9"),
             nativeBannerAdUnitId: overrideOrDefault("DemoApp.NativeBannerAdUnitId", "-2_Lw2b4QTlu7x6tKZ6Ww"),
-            rewardedAdUnitId: overrideOrDefault("DemoApp.RewardedAdUnitId", "jKOcqM-eHbGBwg76RQmsA")
+            rewardedAdUnitId: overrideOrDefault("DemoApp.RewardedAdUnitId", "jKOcqM-eHbGBwg76RQmsA"),
+            // gw-admob-appopen — the permanent Google Waterfall app-open unit the QA fleet pins.
+            appOpenAdUnitId: overrideOrDefault("DemoApp.AppOpenAdUnitId", "cRjP5EAPNyIOKMFG3u2YE")
         )
     }
 }

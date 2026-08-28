@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4304660232FB6017F7F0D18A /* AppOpenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2B71D2A655E7F1E380B7759 /* AppOpenViewController.m */; };
 		4D1BF4C5F92675642717F5C8 /* Pods_CloudXObjCRemotePods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EFCC9FCA13563A8D80AF7B8 /* Pods_CloudXObjCRemotePods.framework */; };
 		DB1A3479B80CC9ABA45AB57F /* Pods_CloudXObjCRemotePodsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D4FCB786F453EE8973683F /* Pods_CloudXObjCRemotePodsTests.framework */; };
 		E74CDA6447A608850B5827D0 /* Pods_CloudXObjCRemotePods_CloudXObjCRemotePodsUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C1495C456E32020A2DBFA7B /* Pods_CloudXObjCRemotePods_CloudXObjCRemotePodsUITests.framework */; };
@@ -41,6 +42,8 @@
 		A0D4FCB786F453EE8973683F /* Pods_CloudXObjCRemotePodsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CloudXObjCRemotePodsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A40458EC3AD631AE6B12F446 /* Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests.debug.xcconfig"; path = "Target Support Files/Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests/Pods-CloudXObjCRemotePods-CloudXObjCRemotePodsUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		A6314066CA80434B916D0F56 /* Pods-CloudXObjCRemotePods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXObjCRemotePods.release.xcconfig"; path = "Target Support Files/Pods-CloudXObjCRemotePods/Pods-CloudXObjCRemotePods.release.xcconfig"; sourceTree = "<group>"; };
+		B2B71D2A655E7F1E380B7759 /* AppOpenViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = AppOpenViewController.m; sourceTree = "<group>"; };
+		E5CB8B7D3B426782BBDBDCF5 /* AppOpenViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = AppOpenViewController.h; sourceTree = "<group>"; };
 		F89B8145BA2DAF534CF75E9B /* Pods-CloudXObjCRemotePods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CloudXObjCRemotePods.debug.xcconfig"; path = "Target Support Files/Pods-CloudXObjCRemotePods/Pods-CloudXObjCRemotePods.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -116,6 +119,7 @@
 				1967EE322DDFC83700D3E27F /* Products */,
 				1A95DEE5D516B0EB1661FFE3 /* Pods */,
 				93F63A86B0AD57454300B3CF /* Frameworks */,
+				EC720A67BD53014D4A7446A7 /* CloudXObjCRemotePods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -142,6 +146,15 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		4FC3887524CAC5EA076E4382 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				E0E93322D765256DE0AFCE0D /* Ad */,
+			);
+			name = Views;
+			path = Views;
+			sourceTree = "<group>";
+		};
 		93F63A86B0AD57454300B3CF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -150,6 +163,25 @@
 				A0D4FCB786F453EE8973683F /* Pods_CloudXObjCRemotePodsTests.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E0E93322D765256DE0AFCE0D /* Ad */ = {
+			isa = PBXGroup;
+			children = (
+				E5CB8B7D3B426782BBDBDCF5 /* AppOpenViewController.h */,
+				B2B71D2A655E7F1E380B7759 /* AppOpenViewController.m */,
+			);
+			name = Ad;
+			path = Ad;
+			sourceTree = "<group>";
+		};
+		EC720A67BD53014D4A7446A7 /* CloudXObjCRemotePods */ = {
+			isa = PBXGroup;
+			children = (
+				4FC3887524CAC5EA076E4382 /* Views */,
+			);
+			name = CloudXObjCRemotePods;
+			path = CloudXObjCRemotePods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -433,6 +465,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4304660232FB6017F7F0D18A /* AppOpenViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
