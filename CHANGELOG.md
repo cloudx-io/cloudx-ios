@@ -162,7 +162,9 @@ Install: `pod 'CloudXMetaAdapter', '~> 6.22.0.0'`
 
 ## [Unreleased]
 
-*No unreleased changes*
+### Added
+- **Global ad-revenue delegate** — New `+[CloudXCore addAdRevenueDelegate:]` / `removeAdRevenueDelegate:` API registers a global `CLXAdRevenueDelegate` that fires for every CloudX-won impression across all ad objects and formats — the surface analytics and MMP SDKs attach to, with no per-ad wiring.
+- **AppsFlyer ad-revenue connector** — New `CloudXAppsFlyerConnector` pod automatically forwards impression-level ad revenue for every CloudX-won impression (Banner, MREC, Interstitial, Rewarded, Native, App Open) to AppsFlyer. Add `pod 'CloudXAppsFlyerConnector'` to your Podfile; the module self-registers onto the global ad-revenue delegate at load — no publisher glue code — and stays inert if your app doesn't use AppsFlyer. Requires `CloudXCore >= 3.6.0` and `AppsFlyerFramework >= 6.15.0`: the integrated `logAdRevenue` API was introduced in AppsFlyer SDK 6.15.0, and AppsFlyer 6.14.x and below use a separate legacy AdRevenue connector that this module does not consume. If an older AppsFlyer is linked at runtime, the module logs a skip and never crashes.
 
 ---
 
