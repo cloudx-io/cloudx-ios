@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXMintegralAdapter'
-  s.version = '8.1.3.0'
+  s.version = '8.0.3.0'
   s.summary          = 'CloudX Mintegral Adapter - Static Framework'
   s.description      = 'Mintegral adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -13,12 +13,12 @@ Pod::Spec.new do |s|
 
   # Dependencies
   s.dependency 'CloudXCore', '>= 3.5.0'
-  s.dependency 'MintegralAdSDK', '= 8.1.3'
-  s.dependency 'MintegralAdSDK/BidBannerAd', '= 8.1.3'
-  s.dependency 'MintegralAdSDK/BidNewInterstitialAd', '= 8.1.3'
-  s.dependency 'MintegralAdSDK/BidRewardVideoAd', '= 8.1.3'
-  s.dependency 'MintegralAdSDK/BidNativeAdvancedAd', '= 8.1.3'
-  s.dependency 'MintegralAdSDK/BidSplashAd', '= 8.1.3'
+  s.dependency 'MintegralAdSDK', '= 8.0.3'
+  s.dependency 'MintegralAdSDK/BidBannerAd', '= 8.0.3'
+  s.dependency 'MintegralAdSDK/BidNewInterstitialAd', '= 8.0.3'
+  s.dependency 'MintegralAdSDK/BidRewardVideoAd', '= 8.0.3'
+  s.dependency 'MintegralAdSDK/BidNativeAdvancedAd', '= 8.0.3'
+  s.dependency 'MintegralAdSDK/BidSplashAd', '= 8.0.3'
 
   s.frameworks = ['Foundation', 'UIKit', 'AdSupport', 'CoreGraphics', 'CoreTelephony', 'SystemConfiguration', 'AVFoundation', 'CoreMedia', 'QuartzCore', 'StoreKit', 'WebKit']
   s.weak_frameworks = ['AppTrackingTransparency']
