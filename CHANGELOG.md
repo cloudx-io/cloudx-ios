@@ -51,7 +51,10 @@ Install: `pod 'CloudXTaurusXAdapter', '~> 1.18.2.0'`
 ## Mintegral adapter 8.0.3.0 - 2026-08-28
 
 ### Changed
-- **Mintegral 8.0.3 compatibility line** — For apps pinned to Mintegral 8.0.3. No behavioral difference from the current line. Install: `pod 'CloudXMintegralAdapter', '8.0.3.0'`; requires `CloudXCore >= 3.5.0`.
+- **Mintegral 8.0.3 compatibility line** — For apps pinned to Mintegral 8.0.3. Install: `pod 'CloudXMintegralAdapter', '8.0.3.0'`; requires `CloudXCore >= 3.5.0`.
+
+### Known issues
+- **App Open is not recommended with this adapter** — Mintegral rejects the app open presentation in some host apps, so the ad does not appear and no revenue or dismissal callback is delivered. Banner, MREC, interstitial, rewarded and native are unaffected. Use another network for App Open.
 
 ---
 
