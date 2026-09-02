@@ -16,7 +16,7 @@ typedef NS_ENUM(NSInteger, CLXGoogleWaterfallPlacementFormat) {
 
 BOOL CLXGoogleWaterfallPlacementFormatFromString(NSString * _Nullable s, CLXGoogleWaterfallPlacementFormat *outFormat);
 
-uint64_t CLXGoogleWaterfallFillTtlMs(void);
+uint64_t CLXGoogleWaterfallFillTtlMsForFormat(CLXGoogleWaterfallPlacementFormat format);
 
 #pragma mark - PlacementConfig
 

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Google Waterfall adapter 12.12.0.0 - 2026-09-02
+
+Install: `pod 'CloudXGoogleWaterfallAdapter', '12.12.0.0'`
+
+Compatibility-line release for apps pinned to Google Mobile Ads SDK 12.12.0. New integrations should use the 13.6.0.x line.
+
+### Added
+- **Compatibility-line release for Google Mobile Ads SDK 12.12.0** — The 12.14.0.3 adapter rebuilt against Google Mobile Ads SDK 12.12.0; same feature set, no source change. Requires `CloudXCore` 3.7.0 or newer.
+
+---
+
 ## Mintegral adapter 8.1.3.0 - 2026-08-28
 
 Install: `pod 'CloudXMintegralAdapter', '8.1.3.0'`
