@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Moloco adapter 4.7.0.0 - 2026-09-06
+
+Install: `pod 'CloudXMolocoAdapter', '4.7.0.0'`
+
+Compatibility-line release for apps pinned to MolocoSDKiOS 4.7.0. New integrations should use the 4.8.0.x line.
+
+### Added
+- **Compatibility-line release for MolocoSDKiOS 4.7.0** — The 4.8.0.0 adapter rebuilt against MolocoSDKiOS 4.7.0; same feature set, no source change. Requires `CloudXCore >= 3.5.0`.
+
+---
+
 ## Google Waterfall adapter 12.12.0.0 - 2026-09-02
 
 Install: `pod 'CloudXGoogleWaterfallAdapter', '12.12.0.0'`
