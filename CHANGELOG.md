@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Moloco adapter 4.7.0.0 - 2026-09-07
+
+Install: `pod 'CloudXMolocoAdapter', '4.7.0.0'`
+
+Compatibility-line release for apps pinned to MolocoSDKiOS 4.7.0. New integrations should use the 4.8.0.x line.
+
+### Added
+- **Compatibility-line release for MolocoSDKiOS 4.7.0** — The current adapter rebuilt against MolocoSDKiOS 4.7.0; same Banner, MREC, Interstitial, Rewarded and Native support, no source change. Requires `CloudXCore >= 3.5.0`.
+
+---
+
 ## Pangle adapter 8.1.0.6.0 - 2026-09-07
 
 Install: `pod 'CloudXPangleAdapter', '8.1.0.6.0'`
