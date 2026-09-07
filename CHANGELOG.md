@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Pangle adapter 8.1.0.7.0 - 2026-09-07
+
+Install: `pod 'CloudXPangleAdapter', '8.1.0.7.0'`
+
+Compatibility-line release for apps pinned to Pangle Ads-Global 8.1.0.7. New integrations should use the 8.2.0.7.x line.
+
+### Added
+- **Compatibility-line release for Pangle Ads-Global 8.1.0.7** — The 8.2.0.7.0 adapter rebuilt against Ads-Global 8.1.0.7; same feature set, no source change. Requires `CloudXCore >= 3.5.0`.
+
+---
+
 ## Google Waterfall adapter 12.12.0.0 - 2026-09-02
 
 Install: `pod 'CloudXGoogleWaterfallAdapter', '12.12.0.0'`
