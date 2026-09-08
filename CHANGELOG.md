@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Vungle adapter 7.7.6.0 - 2026-09-08
+
+Install: `pod 'CloudXVungleAdapter', '7.7.6.0'`
+
+### Changed
+- **Bumped the Vungle adapter to 7.7.6.0 (network SDK 7.7.6)** — Certified against VungleAds 7.7.6. Banner, MREC, Interstitial, Rewarded, Native and App Open support is unchanged, and no adapter source changed. Install: `pod 'CloudXVungleAdapter', '7.7.6.0'`; requires `CloudXCore >= 3.5.0`.
+
+---
+
 ## Moloco adapter 4.7.0.0 - 2026-09-07
 
 Install: `pod 'CloudXMolocoAdapter', '4.7.0.0'`

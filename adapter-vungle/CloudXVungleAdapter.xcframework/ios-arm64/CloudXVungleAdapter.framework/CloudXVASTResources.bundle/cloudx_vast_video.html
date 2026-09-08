@@ -136,12 +136,16 @@
       nativePauseRequested = false;
       playGuarded(video.play());
     },
+    setMuted: function (muted) {
+      video.muted = !!muted;
+    },
     /* Introspection for the SDK's device test suite; never creative-reachable (SDK-authored page). */
     state: function () {
       return JSON.stringify({
         t: video.currentTime,
         r: video.playbackRate,
         p: video.paused,
+        m: video.muted,
         lp: lastPlayhead,
         sk: video.seeking,
         sl: video.seekable.length
