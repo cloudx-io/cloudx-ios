@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Mintegral adapter 8.1.6.0 - 2026-09-08
+
+Install: `pod 'CloudXMintegralAdapter', '8.1.6.0'`
+
+### Changed
+- **MintegralAdSDK `= 8.1.5` → `= 8.1.6`** — Certified with Mintegral SDK 8.1.6, for apps pinned to that exact version. All six `MintegralAdSDK` subspec pins move together. No adapter source changed; the same formats and the `CloudXCore >= 3.5.0` floor are unchanged.
+
+---
+
 ## Vungle adapter 7.7.6.0 - 2026-09-08
 
 Install: `pod 'CloudXVungleAdapter', '7.7.6.0'`
