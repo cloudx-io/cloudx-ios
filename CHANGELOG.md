@@ -1,7 +1,7 @@
 # CloudX iOS SDK Changelog
 
 Release notes live at https://docs.cloudx.io/en/ios/changelog.
-Adapter release notes live on each adapter page under https://docs.cloudx.io/en/ios/adapters.
+Adapter release notes live on each adapter page, linked from https://docs.cloudx.io/en/ios/integration.
 
 ---
 
