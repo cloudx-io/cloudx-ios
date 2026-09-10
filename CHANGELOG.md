@@ -1,9 +1,11 @@
 # CloudX iOS SDK Changelog
 
-All notable changes to the CloudX iOS SDK will be documented in this file.
+Release notes live at https://docs.cloudx.io/en/ios/changelog.
+Adapter release notes live on each adapter page under https://docs.cloudx.io/en/ios/adapters.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+---
+
+Entries below this line are historical and no longer updated.
 
 ---
 
