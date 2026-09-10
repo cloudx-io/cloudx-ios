@@ -39,6 +39,7 @@
 #import <CloudXCore/CLXConsentProvider.h>
 #import <CloudXCore/CLXSDKConfig.h>
 #import <CloudXCore/CLXSDKRaceSafetyConfig.h>
+#import <CloudXCore/CLXSDKAdCacheConfig.h>
 #import <CloudXCore/CLXSDKConfigAdUnit.h>
 
 // Ad Base

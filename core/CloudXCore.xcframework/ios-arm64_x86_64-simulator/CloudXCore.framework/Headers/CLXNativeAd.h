@@ -91,6 +91,18 @@ CLX_PUBLIC
 - (BOOL)prepareForInteractionClickableViews:(NSArray<UIView *> *)clickableViews
                               withContainer:(UIView *)container;
 
+/**
+ * @brief Whether interaction preparation must run on the main thread.
+ *
+ * Reserved preparation-thread policy hook. Core currently performs native
+ * preparation synchronously on the main thread. A future asynchronous
+ * preparation contract may honor an adapter's off-main preference without
+ * blocking another queue.
+ *
+ * Default: YES.
+ */
+- (BOOL)shouldPrepareViewForInteractionOnMainThread;
+
 - (BOOL)isContainerClickable;
 
 /**

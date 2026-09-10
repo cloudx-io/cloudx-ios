@@ -94,8 +94,9 @@ CLX_PUBLIC
 /**
  * Render a previously loaded ad into a view (for late-binding flow).
  * @param adView The native ad view to render into
- * @param ad The ad to render (must have been received via didLoadNativeAd:forAd:)
- * @return YES if rendering succeeded, NO if the ad is expired or invalid
+ * @param ad The exact current ad received from this loader via didLoadNativeAd:forAd:.
+ * @return YES if rendering succeeded. Returns NO after the loader or ad is destroyed,
+ *         or when the ad is expired, replaced, or was loaded by another loader.
  */
 - (BOOL)renderNativeAdView:(CLXNativeAdView *)adView withAd:(CLXAd *)ad;
 

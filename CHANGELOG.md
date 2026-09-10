@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.9.0] - 2026-09-10
+
+Install: `pod 'CloudXCore', '~> 3.9'`
+
+### Breaking Changes
+- **A third simultaneous `load()` on one ad unit is now rejected** — Two concurrent publisher-triggered loads per ad unit is the new default ceiling. A third fails through `didFailToLoadAd:`. Contact CloudX to raise the limit for your account.
+- **`load()` during a fullscreen ad no longer fails** — A load requested while an interstitial, rewarded or app-open ad is on screen now waits and starts when that ad is dismissed. Remove any retry logic that handled the old immediate failure.
+- **Manual banner `load()` is ignored while auto-refresh is running** — With auto-refresh on and an ad already showing, `load()` runs no auction and fires no delegate callback; a warning is logged instead. Call `stopAutoRefresh` first to drive refresh yourself.
+
+### Added
+- **Video creatives now render inline in banner and MREC slots** — Inline video plays in the ad slot through a dedicated renderer. It starts muted and plays only while the slot is genuinely visible. Auto-refresh pauses until playback finishes.
+- **Optional ad caching and warm preload** — A won but unshown ad can survive its ad object being destroyed and serve to the next object for the same ad unit, and an impression can start fetching the next ad. Both are off unless CloudX enables them for your account.
+- **`shouldPrepareViewForInteractionOnMainThread` on `CLXNativeAd`** — Override it on a custom native ad to declare whether view preparation must run on the main thread. It defaults to `YES`, which matches existing behaviour.
+
+### Changed
+- **Faster first bid on a cold start** — Bid tokens are now collected as each adapter finishes initializing, rather than when the first auction runs, so the first ad request returns sooner. Measured 230–272 ms faster time-to-first-bid.
+- **Auto-refresh disabled by CloudX stays disabled** — When auto-refresh is turned off for an ad unit on the CloudX side, `startAutoRefresh()` no longer re-enables it. `load()` still works, and pausing or resuming with `stopAutoRefresh()` is unaffected.
+- **Banners refresh only while actually visible** — A banner that is hidden, fully transparent, zero-sized or outside the visible window stops requesting new ads until it is on screen again. Expect fewer load requests and a higher impression rate per load.
+- **The generated native template view is sized from the creative** — A native template view now derives its height from the creative's aspect ratio and the width you give it, not a fixed 320x250. Read the height from `-sizeThatFits:`; a hardcoded height clips the ad.
+- **A fixed-size native template is still available** — `+[CLXNativeAdView viewFromAd:withTemplate:]` with `medium_template` is unchanged and still returns exactly 320x250.
+
+### Fixed
+- **Banner auto-refresh resumes after a brief interruption** — Control Center, an incoming call or a Face ID prompt could stop a banner's auto-refresh for the rest of the session. Refresh now resumes when your app becomes active again.
+- **Fullscreen ads present correctly when a modal is already open** — `showFromViewController:` now resolves the topmost view controller instead of failing. Ads are never presented over system UI such as alerts or share sheets, and the rejection reason is reported.
+- **Test-mode sessions no longer report revenue** — A test session fills at placeholder prices, so those figures are no longer sent to your revenue callback or forwarded to your attribution provider. Live sessions are unaffected.
+- **Your requested native template now reaches the auction** — The native template you request is sent in the bid request, so bidders can return a creative that matches it. Previously the request was dropped before it left the SDK.
+
+---
+
 ## Mintegral adapter 8.1.6.0 - 2026-09-08
 
 Install: `pod 'CloudXMintegralAdapter', '8.1.6.0'`

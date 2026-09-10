@@ -83,6 +83,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Starts auto-refresh for the banner ad.
+ *
+ * Resumes auto-refresh after a stopAutoRefresh call. Has no effect when auto-refresh is
+ * disabled for this ad unit by server configuration: that setting outranks the publisher,
+ * and the call is ignored with a warning. Use load to request an ad on such an ad unit.
  */
 - (void)startAutoRefresh;
 

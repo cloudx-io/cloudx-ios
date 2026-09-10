@@ -87,6 +87,11 @@ CLX_PUBLIC
  * Delegates to the underlying ad instance.
  * It should be called once after the banner is created.
  * Banner will be automatically reloaded after each show based on placement settings.
+ * After the first ad is live, manual reloads only work while auto-refresh is
+ * disabled: while an auto-refresh cycle is live the SDK owns refresh pacing and
+ * further load calls are ignored, with a warning logged — no delegate callback
+ * fires and no auction is attempted. Call stopAutoRefresh first to drive reloads
+ * manually.
  */
 - (void)load;
 
@@ -130,12 +135,17 @@ CLX_PUBLIC
 /**
  * Starts auto-refresh for the banner ad.
  * Auto-refresh will continue based on the placement configuration until stopped.
+ *
+ * Resumes auto-refresh after a stopAutoRefresh call. Has no effect when auto-refresh is
+ * disabled for this ad unit by server configuration: that setting outranks the publisher,
+ * and the call is ignored with a warning. Use load to request an ad on such an ad unit.
  */
 - (void)startAutoRefresh;
 
 /**
  * Stops auto-refresh for the banner ad.
  * The banner will no longer automatically refresh until startAutoRefresh is called again.
+ * While auto-refresh is stopped, load may be called to reload the banner manually.
  */
 - (void)stopAutoRefresh;
 

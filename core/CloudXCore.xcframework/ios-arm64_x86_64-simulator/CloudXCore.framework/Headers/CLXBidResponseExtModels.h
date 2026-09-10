@@ -17,11 +17,9 @@
  *   - Leaf scalars (BOOL flags on Render and AutoStore) are always emitted so
  *     parse → marshal → reparse preserves the value, including `false`.
  *   - Optional nested containers (PlayerConfig.audio/close/skip/dec/cta,
- *     Render.autoStore/playerConfig) are emitted only when set or non-default
- *     because their primitive types cannot distinguish "absent" from
- *     "default-valued"; this matches the convention of the surrounding fields
- *     within each class. The trade-off is documented at each call site, and
- *     the round-trip test in `CLXAdaptercodeResolutionTests` pins the behavior.
+ *     Render.autoStore/playerConfig) are emitted only when set or non-default.
+ *     PlayerConfig audio preserves an explicitly provided value, including
+ *     `muted_by_default: false`.
  *   - Optional strings (provider, ctaText, orientation, etc.) are emitted only
  *     when non-nil.
  */
@@ -120,9 +118,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * @brief Marshals this config back to a JSON-equivalent dictionary.
- * @return A dictionary containing only the fields whose primitive types signal "set":
- *         delays > 0, mutedByDefault == YES, non-nil decConfig/ctaText/orientation.
- *         See the file-level emission convention for the absent-vs-default trade-off.
+ * @return A dictionary containing only set fields: delays > 0, explicitly
+ *         provided mutedByDefault, and non-nil decConfig/ctaText/orientation.
  */
 - (NSDictionary *)toDictionary;
 

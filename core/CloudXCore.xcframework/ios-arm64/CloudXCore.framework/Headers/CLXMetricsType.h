@@ -37,6 +37,35 @@ extern NSString * const CLXMetricsTypeMethodSetHashedUserId;  // "method_set_has
 extern NSString * const CLXMetricsTypeMethodSetUserKeyValues; // "method_set_user_key_values"
 extern NSString * const CLXMetricsTypeMethodSetAppKeyValues;  // "method_set_app_key_values"
 extern NSString * const CLXMetricsTypeMethodBannerRefresh;    // "method_banner_refresh"
+
+/**
+ * Banner refresh-clock suspend/resume, as a matched pair.
+ *
+ * Only app-state transitions are reported here, because only those can leave
+ * the clock stopped with no way back — the CXD-3709 failure. A suspend with no
+ * matching resume is the anomaly; everything else would dilute that count.
+ *
+ * Deliberately excludes two things. A deliberate stop() has no resume by
+ * definition and fires on every inline-VAST start and every banner destroy, so
+ * counting it would make the metric a session-volume proxy. A visibility skip
+ * re-arms the countdown every interval and is reported separately below.
+ */
+extern NSString * const CLXMetricsTypeBannerRefreshSuspended; // "banner_refresh_suspended"
+extern NSString * const CLXMetricsTypeBannerRefreshResumed;   // "banner_refresh_resumed"
+
+extern NSString * const CLXBannerRefreshReasonResignActive;   // "resign_active"
+extern NSString * const CLXBannerRefreshReasonAppActive;      // "app_active"
+
+/**
+ * A refresh tick the visibility gate suppressed.
+ *
+ * A counter, not half of a pair: the countdown re-arms, so this recurs every
+ * interval while the banner is hidden and never has a matching resume. It
+ * measures how much refresh CXD-3710's gate suppresses — the "loads down"
+ * half of that change's expected effect.
+ */
+extern NSString * const CLXMetricsTypeBannerRefreshSkipped;   // "banner_refresh_skipped"
+extern NSString * const CLXBannerRefreshReasonNotVisible;     // "not_visible"
 extern NSString * const CLXMetricsTypeMethodSetHasUserConsent; // "method_set_has_user_consent"
 extern NSString * const CLXMetricsTypeMethodSetDoNotSell;     // "method_set_do_not_sell"
 
@@ -243,6 +272,20 @@ extern NSString * const CLXMetricsTypeAdRevenueListenerError;               // "
  * `missing_ext_envelope`, or `unresolved_network`).
  */
 extern NSString * const CLXMetricsTypeIdentityOnlyAdEmitted;                // "identity_only_ad_emitted"
+
+/**
+ * A loaded ad reached the end of its life. Fires whether or not the creative was ever
+ * rendered, so `everDisplayed` must be read first: only `false` rows describe an ad the
+ * user never saw. `appForegrounded` then separates those — `true` means the app was in
+ * front the whole time and the publisher never showed the ad ("the moment never came"),
+ * `false` means the user had already left. `source` names what was observed, not an
+ * inferred cause. Matches Android's `ad_expired`.
+ */
+extern NSString * const CLXMetricsTypeAdExpired;                            // "ad_expired"
+
+/** Wire codes for `ad_expired`'s `source` field. Server-side contract — do not rename. */
+extern NSString * const CLXAdExpiredSourceNativeTimerElapsed;               // "native_timer_elapsed"
+extern NSString * const CLXAdExpiredSourceFullscreenStaleOnReload;          // "fullscreen_stale_on_reload"
 
 /**
  * Utility class for metrics type validation and categorization

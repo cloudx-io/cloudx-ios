@@ -42,6 +42,18 @@ typedef NS_ENUM(NSInteger, SDKConfigAdType) {
 @property (nonatomic, assign) NSInteger rewardAmount;
 @property (nonatomic, copy, nullable) NSString *rewardCurrency;
 
+// Warm-ad-cache (destroy-keeps-fill) per-ad-unit knobs (CXD-3096). Default OFF:
+// `adCacheEnabled` is NO and `cacheTtlMs` is 0 so an unconfigured ad unit keeps
+// today's destroy behavior. When `adCacheEnabled` is YES, a destroyed ad object
+// holding an unshown, unexpired fill deposits its fill bundle into the ad unit's
+// `CLXAdUnitCoordinator` instead of tearing it down; the next `load()` for the
+// same ad-unit ID adopts it synchronously. `preloadEnabled` and
+// `maxConcurrentLoads` are parsed and stored now; consumed in later phases.
+@property (nonatomic, assign) BOOL adCacheEnabled;
+@property (nonatomic, assign) int64_t cacheTtlMs;
+@property (nonatomic, assign) BOOL preloadEnabled;
+@property (nonatomic, assign) NSInteger maxConcurrentLoads;
+
 - (instancetype)init;
 - (NSString *)ilrdDescription;
 

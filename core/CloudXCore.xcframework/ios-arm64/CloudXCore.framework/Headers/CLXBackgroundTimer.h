@@ -40,6 +40,17 @@ NS_ASSUME_NONNULL_BEGIN
                                    queueLabel:(NSString *)queueLabel;
 
 /**
+ * Whether the timer is currently running (resumed rather than suspended).
+ *
+ * CXD-3709: the suspend/resume pair is driven by app-state notifications, so
+ * whether the clock is actually ticking is observable behaviour worth being
+ * able to read — not just an internal detail. It also lets the telemetry
+ * report only real transitions: those notifications fire whether or not a
+ * countdown was live.
+ */
+@property (nonatomic, readonly, getter=isRunning) BOOL running;
+
+/**
  * Resume the timer
  */
 - (void)resume;

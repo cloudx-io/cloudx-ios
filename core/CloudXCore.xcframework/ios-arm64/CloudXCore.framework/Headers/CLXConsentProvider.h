@@ -23,6 +23,18 @@ extern NSString * const kIABGPP_GppString;
 extern NSString * const kIABGPP_GppSID;
 
 /**
+ * @brief Posted on the default notification center when the publisher (or an
+ *        IAB CMP) updates GPP consent through this provider's setters
+ *        (-setGppString: / -setGppSid:). This provider exposes no TCF setter, so
+ *        TCF- or defaults-driven consent changes do NOT post this notification.
+ *        Observers that must drop consent-stale state — e.g. the per-ad-unit
+ *        fill inventory (CXD-3096), which must not hand off a fill whose
+ *        targeting was computed under the prior consent regime — flush on
+ *        this notification. Posted on the main queue.
+ */
+FOUNDATION_EXPORT NSString * const CLXPrivacyConsentDidChangeNotification;
+
+/**
  * @class CLXConsentProvider
  * @brief Service for GPP consent string parsing and management
  * @discussion Provides GPP framework integration with support for US-CA and US-National sections
