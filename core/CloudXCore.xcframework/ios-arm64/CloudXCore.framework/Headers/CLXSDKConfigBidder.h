@@ -23,7 +23,7 @@ typedef NS_ENUM(NSInteger, SDKConfigKnownAdapterName) {
 /**
  * Server-configurable per-adapter soft initialization deadline in milliseconds.
  * When the deadline elapses, SDK init stops waiting on this adapter but the adapter
- * keeps initializing in the background and joins later auctions once it settles.
+ * keeps initializing in the background and joins later auctions once its init concludes.
  * Parsed from the @c softInitTimeoutMs JSON field; the parser resolves a 5000ms
  * default when the field is absent or non-positive, so this is always a concrete
  * positive deadline by the time initialization reads it.

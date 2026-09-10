@@ -34,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CLXRemoteLogConfig;
 @class CLXSDKRaceSafetyConfig;
 @class CLXSDKConfigDeviceConfig;
+@class CLXSDKAdCacheConfig;
 
 @interface CLXSDKConfig : NSObject
 
@@ -101,7 +102,28 @@ CLX_INTERNAL_TESTING
 @property (nonatomic, copy, nullable) NSString *sdkMetricsEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sdkLogEndpointURL;
 @property (nonatomic, copy, nullable) NSString *sdkAdRevenueEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkCrashEndpointURL;
+@property (nonatomic, assign) BOOL iosMetricKitCrashReportingEnabled;
 @property (nonatomic, copy, nullable) NSString *sdkGamAuctionResultEndpointURL;
+
+// 2b-v. Server kill switches for speculative bid-token work. Both default to NO, so a
+// payload that says nothing leaves the SDK collecting every token live under the asking
+// request's own bound — the behaviour from before the token store existed, and the safe
+// side of the rollout.
+//
+// `tokenPrefetchEnabled` gates every speculative background ask: the prefetch triggered as
+// an adapter's init starts, and the ask fired when an after-init adapter reports ready.
+// Neither is on a request's critical path, so switching them off costs latency, never fills.
+//
+// `tokenRefillEnabled` gates the refill that repopulates spent store slots after a bid
+// request has been sent. Off means a taken token is simply gone until the next request
+// collects one live.
+//
+// Off does NOT change which bidders gate init — that stays derived from token strategy
+// alone, so an on-init-start bidder still holds the init gate and its token is collected
+// live by the requests that need it.
+@property (nonatomic, assign) BOOL tokenPrefetchEnabled;
+@property (nonatomic, assign) BOOL tokenRefillEnabled;
 
 // CXD-1176: adapter-lifecycle observability events flow through the metrics
 // pipeline (single `sdkMetricsEndpointURL` + server-side allow-list in
@@ -121,6 +143,13 @@ CLX_INTERNAL_TESTING
 // remain off and the SDK keeps its legacy synchronous destroy + immediate VC-assignment
 // behavior. See CLXSDKRaceSafetyConfig for per-field semantics.
 @property (nonatomic, strong, nullable) CLXSDKRaceSafetyConfig *raceSafetyConfig;
+
+// 2b-v. Server-driven warm-ad-cache global kill-switch envelope (CXD-3096).
+// Nil when the server omits `adCacheConfig` so the SDK keeps its default
+// (enabled = NO = today's byte-identical destroy behavior). When present,
+// `enabled` gates the destroy-keeps-fill feature globally; each ad unit still
+// opts in via `CLXSDKConfigAdUnit.adCacheEnabled`.
+@property (nonatomic, strong, nullable) CLXSDKAdCacheConfig *adCacheConfig;
 
 // 3. Core Config (required)
 @property (nonatomic, strong) NSArray<CLXSDKConfigBidder *> *bidders;
@@ -229,6 +258,17 @@ CLX_INTERNAL_TESTING
 /// to YES so the policy stays active unless the server explicitly disables it.
 @property (nonatomic, assign) BOOL inlineVideoMuteEnabled;
 @property (nonatomic, assign) BOOL cachedInitEnabled;
+/// App-wide fallback for the per-ad-unit concurrent publisher-load cap (CXD-3101).
+/// 0 means "fall through to the SDK default (2)"; a value > 0 is the cap. Each ad
+/// unit's own `maxConcurrentLoads` (on CLXSDKConfigAdUnit) overrides this when > 0.
+@property (nonatomic, assign) NSInteger maxConcurrentLoadsPerAdUnit;
+
+/// Server-driven gate for OMID ad-session creation on inline (non-fullscreen)
+/// VAST video. Defaults to NO (fail-closed): an absent/null/malformed value and
+/// any server that does not yet know about the flag both produce suppressed
+/// inline OMID. Fullscreen VAST and display/HTML/MRAID OMID are unaffected by
+/// this flag — it gates only the inline-video placement.
+@property (nonatomic, assign) BOOL omidInlineVideoEnabled;
 - (instancetype)init;
 @end
 

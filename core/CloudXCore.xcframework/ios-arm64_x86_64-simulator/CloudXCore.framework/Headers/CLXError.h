@@ -227,6 +227,19 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
      */
     CLXErrorCodeLoadFailed = 304,
 
+    /**
+     * @c load was rejected because the ad unit already has its configured maximum number
+     * of concurrent publisher-triggered loads in flight. The cap is per ad-unit ID, resolved
+     * from the ad unit's @c maxConcurrentLoads, then @c deviceConfig.maxConcurrentLoadsPerAdUnit,
+     * then the SDK default. Delivered via @c didFailToLoadAd:error: exactly once per rejected
+     * @c load call (the SDK emits a @c load_rejected_concurrency occurrence metric alongside it).
+     *
+     * Publisher action: Wait for an in-flight load for this ad unit to reach a terminal
+     * outcome (success / failure / destroy) before calling @c load again, or raise the
+     * cap in the CloudX dashboard.
+     */
+    CLXErrorCodeLoadRejectedTooManyConcurrentLoads = 306,
+
     // MARK: Ad Display (400–499)
 
     /**

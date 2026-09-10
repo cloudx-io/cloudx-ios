@@ -18,6 +18,10 @@ CLX_PUBLIC_ADAPTER
 /// Bid markup provided by the winning bid.
 @property (nonatomic, copy, readonly) NSString *adm;
 
+/// Whether the requested native template requires a primary media asset.
+/// Medium/MREC templates require media; small/320x50 templates do not.
+@property (nonatomic, assign, readonly) BOOL requiresMainMedia;
+
 @end
 
 NS_ASSUME_NONNULL_END

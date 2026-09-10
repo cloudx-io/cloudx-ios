@@ -14,6 +14,7 @@
 #import <CloudXCore/CLXExport.h>
 
 @protocol CLXAdapterAdViewDelegate;
+@protocol CLXAdapterAdViewPlaybackDelegate;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -44,6 +45,9 @@ CLX_PUBLIC_ADAPTER
 /// Cycle is broken in @c -destroy.
 @property (nonatomic, strong, nullable) id<CLXAdapterAdViewDelegate> delegate;
 
+/// Optional lifecycle delegate for adapters that suspend host refresh while media plays.
+@property (nonatomic, weak, nullable) id<CLXAdapterAdViewPlaybackDelegate> playbackDelegate;
+
 /// Loads the ad view. Subclass MUST override.
 - (void)loadWithParams:(CLXAdapterLoadParams *)loadParams;
 
@@ -60,6 +64,22 @@ CLX_PUBLIC_ADAPTER
  * when the publisher preloads while the banner view is off-screen.
  */
 - (void)onAttachedToAdViewContainer;
+
+@end
+
+/**
+ * Generic playback lifecycle for ad-view adapters with finite media.
+ */
+@protocol CLXAdapterAdViewPlaybackDelegate <NSObject>
+
+/// Called after media playback is confirmed.
+- (void)adapterAdViewDidStartPlayback:(CLXAdapterAdView *)adapter;
+
+/// Called after media playback completes normally.
+- (void)adapterAdViewDidCompletePlayback:(CLXAdapterAdView *)adapter;
+
+/// Called when the adapter terminates before playback completes.
+- (void)adapterAdViewDidTerminatePlayback:(CLXAdapterAdView *)adapter;
 
 @end
 
