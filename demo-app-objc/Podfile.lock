@@ -6,7 +6,7 @@ PODS:
     - Ads-Global/TikTokBusinessSDK
   - Ads-Global/PangleSDK (8.2.0.7)
   - Ads-Global/TikTokBusinessSDK (8.2.0.7)
-  - CloudXCore (3.8.0)
+  - CloudXCore (3.9.0)
   - CloudXDigitalTurbineAdapter (8.4.8.0):
     - CloudXCore (>= 3.5.0)
     - Fyber_Marketplace_SDK (= 8.4.8)
@@ -184,7 +184,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Ads-Global: c4da8b23232e80b87ac55964da167ba589502f6b
-  CloudXCore: 6ef15e3b6cc62ad445e220c46897c21758a2ab35
+  CloudXCore: a6479247b499278e66faaf05a8cdb6f8fec3a1ee
   CloudXDigitalTurbineAdapter: 0c37b4f298913b3a5611ef1f6a65aa50bd4bb9a9
   CloudXGoogleWaterfallAdapter: e2326c444c3a1879b17b0d28f32ca0b453e172b9
   CloudXInMobiAdapter: 280563b1b05dc9f5efbc6ca9d4a25d71b8fd24a8
