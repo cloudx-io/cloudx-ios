@@ -36,6 +36,17 @@ Install: `pod 'CloudXCore', '~> 3.9'`
 
 ---
 
+## Vungle adapter 7.7.1.0 - 2026-09-11
+
+Install: `pod 'CloudXVungleAdapter', '7.7.1.0'`
+
+Compatibility-line release for apps pinned to Vungle Ads SDK 7.7.1. New integrations should use the 7.7.6.x line.
+
+### Added
+- **Compatibility-line release for Vungle Ads SDK 7.7.1** — The 7.7.6.0 adapter rebuilt against Vungle Ads SDK 7.7.1; same Banner, MREC, Interstitial, Rewarded, Native and App Open support, no source change. Requires `CloudXCore >= 3.5.0`.
+
+---
+
 ## Unity Ads adapter 4.17.0.0 - 2026-09-11
 
 Install: `pod 'CloudXUnityAdsAdapter', '4.17.0.0'`
