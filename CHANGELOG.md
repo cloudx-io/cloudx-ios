@@ -36,6 +36,17 @@ Install: `pod 'CloudXCore', '~> 3.9'`
 
 ---
 
+## Unity Ads adapter 4.17.0.0 - 2026-09-11
+
+Install: `pod 'CloudXUnityAdsAdapter', '4.17.0.0'`
+
+Compatibility-line release for apps pinned to Unity Ads 4.17.0. New integrations should use the 4.19.0.x line.
+
+### Added
+- **Compatibility-line release for Unity Ads 4.17.0** — The 4.19.0.0 adapter rebuilt against Unity Ads 4.17.0; same Banner, MREC, Interstitial and Rewarded support, ad-expiry callbacks available, no source change. This line pulls no transitive dependencies of its own. Requires `CloudXCore >= 3.5.0`.
+
+---
+
 ## Mintegral adapter 8.1.6.0 - 2026-09-08
 
 Install: `pod 'CloudXMintegralAdapter', '8.1.6.0'`
