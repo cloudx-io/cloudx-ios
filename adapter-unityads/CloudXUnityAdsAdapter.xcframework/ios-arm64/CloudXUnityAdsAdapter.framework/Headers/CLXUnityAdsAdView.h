@@ -8,10 +8,11 @@
 #import <CloudXCore/CLXAdapterAdView.h>
 #import <CloudXCore/CLXAdapterLogger.h>
 #import <CloudXCore/CLXBannerType.h>
+#import <CloudXCore/CLXAdapterLogger.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CLXUnityAdsAdView : CLXAdapterAdView <UADSBannerViewDelegate>
+@interface CLXUnityAdsAdView : CLXAdapterAdView <UADSBannerAdDelegate>
 
 - (instancetype)initWithBidPayload:(nullable NSString *)bidPayload
                        placementID:(nullable NSString *)placementID
