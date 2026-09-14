@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Moloco adapter 4.10.0.0 - 2026-09-14
+
+Install: `pod 'CloudXMolocoAdapter', '~> 4.10.0.0'`
+
+### Changed
+
+- **Certified with Moloco SDK 4.10.0** — Updates MolocoSDKiOS from 4.9.1 to 4.10.0. No integration change is required; `CloudXCore >= 3.5.0` and iOS 13.0 requirements are unchanged.
+
+---
+
 ## Moloco adapter 4.9.1.0 - 2026-09-14
 
 Install: `pod 'CloudXMolocoAdapter', '~> 4.9.1.0'`
