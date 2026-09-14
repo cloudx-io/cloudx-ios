@@ -1,11 +1,11 @@
 PODS:
-  - Ads-Global (8.2.0.7):
-    - Ads-Global/BUAdSDK (= 8.2.0.7)
-  - Ads-Global/BUAdSDK (8.2.0.7):
+  - Ads-Global (8.2.0.8):
+    - Ads-Global/BUAdSDK (= 8.2.0.8)
+  - Ads-Global/BUAdSDK (8.2.0.8):
     - Ads-Global/PangleSDK
     - Ads-Global/TikTokBusinessSDK
-  - Ads-Global/PangleSDK (8.2.0.7)
-  - Ads-Global/TikTokBusinessSDK (8.2.0.7)
+  - Ads-Global/PangleSDK (8.2.0.8)
+  - Ads-Global/TikTokBusinessSDK (8.2.0.8)
   - CloudXCore (3.9.0)
   - CloudXDigitalTurbineAdapter (8.4.8.0):
     - CloudXCore (>= 3.5.0)
@@ -36,8 +36,8 @@ PODS:
   - CloudXMolocoAdapter (4.8.0.0):
     - CloudXCore (>= 3.5.0)
     - MolocoSDKiOS (= 4.8.0)
-  - CloudXPangleAdapter (8.2.0.7.0):
-    - Ads-Global (= 8.2.0.7)
+  - CloudXPangleAdapter (8.2.0.8.0):
+    - Ads-Global (= 8.2.0.8)
     - CloudXCore (>= 3.5.0)
   - CloudXTaurusXAdapter (1.18.1.0):
     - CloudXCore (>= 3.5.0)
@@ -140,7 +140,7 @@ DEPENDENCIES:
   - CloudXMintegralAdapter (~> 8.1.5.0)
   - CloudXMobileFuseAdapter (~> 1.11.0.0)
   - CloudXMolocoAdapter (~> 4.8.0.0)
-  - CloudXPangleAdapter (~> 8.2.0.7.0)
+  - CloudXPangleAdapter (~> 8.2.0.8.0)
   - CloudXTaurusXAdapter (~> 1.18.1.0)
   - CloudXUnityAdsAdapter (~> 4.19.0.0)
   - CloudXVerveAdapter (~> 3.9.0.0)
@@ -183,7 +183,7 @@ EXTERNAL SOURCES:
     :podspec: "../core/CloudXCore.podspec"
 
 SPEC CHECKSUMS:
-  Ads-Global: c4da8b23232e80b87ac55964da167ba589502f6b
+  Ads-Global: 7dd75131d597ce5ab04f696b2da5909d5bc8f63f
   CloudXCore: a6479247b499278e66faaf05a8cdb6f8fec3a1ee
   CloudXDigitalTurbineAdapter: 0c37b4f298913b3a5611ef1f6a65aa50bd4bb9a9
   CloudXGoogleWaterfallAdapter: e2326c444c3a1879b17b0d28f32ca0b453e172b9
@@ -193,7 +193,7 @@ SPEC CHECKSUMS:
   CloudXMintegralAdapter: d7062e0d5a4512feb405c2deda6ae544962ee7b2
   CloudXMobileFuseAdapter: ca409a65c5929dedfbda9ba6c0a235a8c691ad2f
   CloudXMolocoAdapter: 9fac672e3e527e5785c4c5f4c8023b2e4a04f655
-  CloudXPangleAdapter: 38f85e9c8df8b1823f7a8e563c1a82cf90801f74
+  CloudXPangleAdapter: ed15333e1847b2b8a0c6bf6f572f5d01502cc6d5
   CloudXTaurusXAdapter: 109ce1a76500952bb4bf7cb30c320ffff6904e96
   CloudXUnityAdsAdapter: 1a74f0fb02a6faecce20e2b340818205aab23f17
   CloudXVerveAdapter: e2be0ed38595681731c6105a05dde34888447c93
@@ -214,6 +214,6 @@ SPEC CHECKSUMS:
   UnityCoherenceLib: d9be08c5b9c2880cb220c7ecd643f97ebda422b7
   VungleAds: 77bad219e9e4b34bf43ab2518bf2fac72b86100b
 
-PODFILE CHECKSUM: cb1705b8969eca8d13b018242cdc7975a801644e
+PODFILE CHECKSUM: 3172baac510cb50f6b07285a248c8604a828fdd1
 
-COCOAPODS: 1.17.0
+COCOAPODS: 1.16.2
