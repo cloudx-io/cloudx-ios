@@ -9,12 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Pangle adapter 8.2.0.8.0 - 2026-09-14
 
-Install: `pod 'CloudXPangleAdapter', '8.2.0.8.0'`
+Install: `pod 'CloudXPangleAdapter', '~> 8.2.0.8.0'`
 
 ### Changed
 
-- Certified with Pangle SDK 8.2.0.8.
-- Requires minimum CloudX SDK version be 3.5.0.
+- **Certified with Pangle SDK 8.2.0.8** — Updates Ads-Global from 8.2.0.7 to 8.2.0.8. No integration change is required; `CloudXCore >= 3.5.0` and iOS 13.0 requirements are unchanged.
 
 ---
 
