@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Pangle adapter 8.2.0.8.0 - 2026-09-14
 
+Install: `pod 'CloudXPangleAdapter', '8.2.0.8.0'`
+
+### Changed
+
 - Certified with Pangle SDK 8.2.0.8.
 - Requires minimum CloudX SDK version be 3.5.0.
 
