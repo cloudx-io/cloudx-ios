@@ -7,9 +7,9 @@ PODS:
   - Ads-Global/PangleSDK (8.2.0.8)
   - Ads-Global/TikTokBusinessSDK (8.2.0.8)
   - CloudXCore (3.9.0)
-  - CloudXDigitalTurbineAdapter (8.4.8.0):
+  - CloudXDigitalTurbineAdapter (8.4.10.0):
     - CloudXCore (>= 3.5.0)
-    - Fyber_Marketplace_SDK (= 8.4.8)
+    - Fyber_Marketplace_SDK (= 8.4.10)
   - CloudXGoogleWaterfallAdapter (13.6.0.0):
     - CloudXCore (>= 3.5.0)
     - Google-Mobile-Ads-SDK (= 13.6.0)
@@ -52,7 +52,7 @@ PODS:
     - CloudXCore (>= 3.5.0)
     - VungleAds (= 7.7.4)
   - FBAudienceNetwork (6.21.1)
-  - Fyber_Marketplace_SDK (8.4.8)
+  - Fyber_Marketplace_SDK (8.4.10)
   - Google-Mobile-Ads-SDK (13.6.0):
     - GoogleUserMessagingPlatform (>= 1.1)
   - GoogleUserMessagingPlatform (3.1.0)
@@ -132,7 +132,7 @@ PODS:
 
 DEPENDENCIES:
   - CloudXCore (from `../core/CloudXCore.podspec`)
-  - CloudXDigitalTurbineAdapter (~> 8.4.8.0)
+  - CloudXDigitalTurbineAdapter (~> 8.4.10.0)
   - CloudXGoogleWaterfallAdapter (~> 13.6.0.0)
   - CloudXInMobiAdapter (~> 11.4.1.0)
   - CloudXMagniteAdapterV2 (~> 1.0.0.0)
@@ -185,7 +185,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Ads-Global: 7dd75131d597ce5ab04f696b2da5909d5bc8f63f
   CloudXCore: a6479247b499278e66faaf05a8cdb6f8fec3a1ee
-  CloudXDigitalTurbineAdapter: 0c37b4f298913b3a5611ef1f6a65aa50bd4bb9a9
+  CloudXDigitalTurbineAdapter: 07b22a6921e908ccf5e60c8de78e210ee277c494
   CloudXGoogleWaterfallAdapter: e2326c444c3a1879b17b0d28f32ca0b453e172b9
   CloudXInMobiAdapter: 280563b1b05dc9f5efbc6ca9d4a25d71b8fd24a8
   CloudXMagniteAdapterV2: 34ce9688705675c6c9354fa5e09ffe1fff86df64
@@ -199,7 +199,7 @@ SPEC CHECKSUMS:
   CloudXVerveAdapter: e2be0ed38595681731c6105a05dde34888447c93
   CloudXVungleAdapter: f9c41d7fc80bb576ec31e2466cb6e8c0183eb713
   FBAudienceNetwork: 85d18a65c9e35bc426bd4664cf3ae2a1172d7b60
-  Fyber_Marketplace_SDK: ebf29e2fd31f1045cbf28244f558076335ddfd25
+  Fyber_Marketplace_SDK: 7352f0f095d42e68437ad3b7e66e0f7f97a987fc
   Google-Mobile-Ads-SDK: 6e501ace4af8d63e967bd45497c8b2b05821163d
   GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
   HyBid: c0bb109f5d6e9005456565391a330a915535b8f8
@@ -214,6 +214,6 @@ SPEC CHECKSUMS:
   UnityCoherenceLib: d9be08c5b9c2880cb220c7ecd643f97ebda422b7
   VungleAds: 77bad219e9e4b34bf43ab2518bf2fac72b86100b
 
-PODFILE CHECKSUM: f7b4f626fdaef73e0c60481ad238603f8ff82bb4
+PODFILE CHECKSUM: 315da80f0e9703ee08ea5f11d2a2469a498ebd7e
 
 COCOAPODS: 1.16.2
