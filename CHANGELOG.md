@@ -27,6 +27,16 @@ Install: `pod 'CloudXUnityAdsAdapter', '~> 4.20.0.0'`
 
 ---
 
+## AppLovin adapter 13.6.3.0 - 2026-09-15
+
+Install: `pod 'CloudXAppLovinAdapter', '~> 13.6.3.0'`
+
+### Added
+
+- **First AppLovin MAX auction adapter release** — Supports Interstitial, Rewarded, App Open, and Native auction ads with AppLovinSDK 13.6.3 and CloudXCore >= 3.9.0. Banner/MREC remain disabled server-side until their rollout gate is cleared.
+
+---
+
 ## Google Waterfall adapter 13.9.0.0 - 2026-09-14
 
 Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 13.9.0.0'`

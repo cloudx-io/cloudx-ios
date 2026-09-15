@@ -1,0 +1,5 @@
+framework module CloudXAppLovinAdapter {
+    umbrella header "CloudXAppLovinAdapter.h"
+    export *
+    module * { export * }
+}
