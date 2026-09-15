@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Google Waterfall adapter 13.7.0.0 - 2026-09-14
+
+Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 13.7.0.0'`
+
+### Changed
+
+- **Certified with Google Mobile Ads SDK 13.7.0** — Updates Google Mobile Ads SDK from 13.6.0 to 13.7.0. `CloudXCore >= 3.7.0` and iOS 13.0 requirements are unchanged.
+
+### Fixed
+
+- Manually integrated adapters now enforce the existing CloudXCore 3.7.0 minimum.
+
+---
+
 ## [3.9.1] - 2026-09-14
 
 Install: `pod 'CloudXCore', '~> 3.9'`
