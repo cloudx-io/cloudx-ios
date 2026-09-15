@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## AppLovin adapter 13.6.3.0 - 2026-09-15
+
+Install: `pod 'CloudXAppLovinAdapter', '~> 13.6.3.0'`
+
+### Added
+
+- **First AppLovin MAX auction adapter release** — Supports Interstitial, Rewarded, App Open, and Native auction ads with AppLovinSDK 13.6.3 and CloudXCore >= 3.9.1. Banner/MREC remain server-gated.
+
+---
+
 ## Google Waterfall adapter 13.9.0.0 - 2026-09-14
 
 Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 13.9.0.0'`
