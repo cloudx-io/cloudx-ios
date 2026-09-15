@@ -1,4 +1,4 @@
-platform :ios, '13.0'
+platform :ios, '15.0'
 
 target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static
@@ -15,7 +15,7 @@ target 'CloudXSwiftRemotePods' do
   pod 'CloudXMagniteAdapterV2', '~> 1.0.0.0'
   pod 'CloudXMolocoAdapter', '~> 4.8.0.0'
   pod 'CloudXVerveAdapter', '~> 3.9.0.0'
-  pod 'CloudXDigitalTurbineAdapter', '~> 8.4.8.0'
+  pod 'CloudXDigitalTurbineAdapter', '~> 8.4.10.0'
   pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.0'
   pod 'CloudXPangleAdapter', '~> 8.2.0.8.0'
   pod 'CloudXMobileFuseAdapter', '~> 1.11.0.0'
