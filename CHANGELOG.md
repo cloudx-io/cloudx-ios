@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Unity Ads adapter 4.20.0.0 - 2026-09-15
+
+Install: `pod 'CloudXUnityAdsAdapter', '~> 4.20.0.0'`
+
+### Changed
+
+- **Certified with UnityAds 4.20.0** — Updates UnityAds from 4.19.0 to 4.20.0. `CloudXCore >= 3.5.0` and iOS 13.0 requirements are unchanged.
+
+---
+
 ## Google Waterfall adapter 13.9.0.0 - 2026-09-14
 
 Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 13.9.0.0'`
