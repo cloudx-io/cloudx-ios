@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  * test double and keeps the dependency inverted on the abstraction rather than
  * the concrete SDK type.
  *
- * IASDKCore 8.4.7 exposes the following surface on `IANativeAdAssets`:
+ * IASDKCore 8.4.10 exposes the following surface on `IANativeAdAssets`:
  *   adTitle, adDescription, callToActionText, appIcon, mediaView,
  *   mediaAspectRatio, registerViewForInteraction:mediaView:iconView:clickableViews:
  *

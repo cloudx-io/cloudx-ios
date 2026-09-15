@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Digital Turbine adapter 8.4.10.0 - 2026-09-14
+
+Install: `pod 'CloudXDigitalTurbineAdapter', '~> 8.4.10.0'`
+
+### Changed
+
+- **Certified with Fyber_Marketplace_SDK 8.4.10** — Updates the Digital Turbine SDK from 8.4.8 to 8.4.10, including improved click handling. Requires iOS 15.0+ and Xcode 26.1+; `CloudXCore >= 3.5.0` is unchanged.
+
+---
+
 ## Moloco adapter 4.10.0.0 - 2026-09-14
 
 Install: `pod 'CloudXMolocoAdapter', '~> 4.10.0.0'`
