@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.9.1] - 2026-09-14
+
+Install: `pod 'CloudXCore', '~> 3.9'`
+
+### Changed
+
+- **Global ad-revenue delegates and MMP connectors no longer receive duplicate mediation-stack revenue** when the server marks a bidder as SDK-reported. Per-ad revenue delegates and CloudX impression events are unchanged.
+
+### Fixed
+
+- **Rewarded and other fullscreen callbacks now use the placement and custom data from the accepted show.** Consecutive rewarded ads no longer reuse missing or stale attribution.
+
+---
+
 ## Digital Turbine adapter 8.4.10.0 - 2026-09-14
 
 Install: `pod 'CloudXDigitalTurbineAdapter', '~> 8.4.10.0'`

@@ -343,6 +343,11 @@ CLX_PUBLIC
  * @discussion Thread-safe and safe to call before SDK initialization (e.g. from a module's `+load`).
  * Delivered on the main queue; a delegate that throws is caught and isolated so it cannot break the
  * ad flow or other delegates. Inert until at least one delegate is registered.
+ *
+ * Not fired for impressions won by a bidder whose own SDK reports revenue to the app's MMPs
+ * directly — mediation stacks such as AppLovin MAX and the Google waterfall — since forwarding
+ * those would double count. Which bidders those are is server-configured. A per-ad
+ * `revenueDelegate` is unaffected and still receives every impression.
  */
 + (void)addAdRevenueDelegate:(id<CLXAdRevenueDelegate>)delegate
     NS_SWIFT_NAME(addAdRevenueDelegate(_:));
