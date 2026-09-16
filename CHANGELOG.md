@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Magnite adapter 1.0.0.2 - 2026-09-16
+
+Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.0.2'`
+
+### Added
+
+- **Magnite Native ads** — Adds standalone Native auction and waterfall support with MagniteSDK 1.0.0. Banner, MREC, Interstitial, and Rewarded support is unchanged. Requires `CloudXCore >= 3.9.0`.
+
+### Fixed
+
+- **Rejected fullscreen shows no longer report a display** — Prevents Interstitial and Rewarded from emitting `didDisplay` after Magnite synchronously rejects the show.
+
+---
+
 ## Unity Ads adapter 4.20.1.0 - 2026-09-15
 
 Install: `pod 'CloudXUnityAdsAdapter', '~> 4.20.1.0'`
