@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## BIGO Ads adapter 5.3.0.0 - 2026-09-17
+
+Install: `pod 'CloudXBigoAdapter', '~> 5.3.0.0'`
+
+### Added
+
+- **First public BIGO Ads adapter release** — Supports Banner, MREC, Interstitial, and Rewarded with BigoADS 5.3.0. Requires `CloudXCore >= 3.9.0`.
+
+---
+
 ## Magnite adapter 1.0.0.2 - 2026-09-16
 
 Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.0.2'`
