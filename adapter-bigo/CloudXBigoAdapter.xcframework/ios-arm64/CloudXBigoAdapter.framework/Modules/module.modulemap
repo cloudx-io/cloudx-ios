@@ -1,0 +1,6 @@
+framework module CloudXBigoAdapter {
+  umbrella header "CloudXBigoAdapter.h"
+
+  export *
+  module * { export * }
+}
