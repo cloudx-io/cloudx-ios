@@ -31,3 +31,8 @@ __attribute__((visibility("default"))) void CloudXMagniteAdapterRegister(void);
 // Public headers - Banner
 #import "CLXMagniteAdView.h"
 #import "CLXMagniteAdViewFactory.h"
+
+// Public headers - Native
+#import "CLXMagniteNative.h"
+#import "CLXMagniteNativeAd.h"
+#import "CLXMagniteNativeFactory.h"

@@ -1,8 +1,8 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXMagniteAdapterV2'
-  s.version = '1.0.0.1'
+  s.version = '1.0.0.2'
   s.summary          = 'CloudX Magnite Adapter (independent versioning) - Static Framework'
-  s.description      = 'Magnite adapter for CloudX iOS SDK - binary distribution. Supports Banner, MREC, Interstitial, and Rewarded formats via MagniteSDK. Independent-versioned successor to CloudXMagniteAdapter, which remains on the legacy unified version line.'
+  s.description      = 'Magnite adapter for CloudX iOS SDK - binary distribution. Supports Banner, MREC, Interstitial, Rewarded, and Native formats via MagniteSDK. Independent-versioned successor to CloudXMagniteAdapter, which remains on the legacy unified version line.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
   s.license          = { :type => 'Business Source License 1.1' }
   s.author           = { 'CloudX' => 'support@cloudx.io' }
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-magnite/CloudXMagniteAdapterV2/CloudXMagniteAdapter.xcframework'
 
   # Dependencies
-  s.dependency 'CloudXCore', '>= 3.5.0'
+  s.dependency 'CloudXCore', '>= 3.9.0'
   s.dependency 'MagniteSDK', '= 1.0.0'
 
   s.frameworks = ['Foundation', 'UIKit', 'WebKit', 'AVFoundation', 'CoreMedia', 'CoreGraphics', 'CoreTelephony', 'SystemConfiguration', 'StoreKit', 'AdSupport', 'JavaScriptCore', 'QuartzCore', 'CoreFoundation', 'CoreAudio']
