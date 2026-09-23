@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  PrivacyInfo.xcprivacy
+  CloudXBigoAdapter
+
+  Declarations describe CloudXBigoAdapter itself. The bundled network SDK ships its own manifest
+  and declares its own collection; do not restate it here.
+
+  NSPrivacyTracking / NSPrivacyTrackingDomains are intentionally omitted, matching every
+  major mediator. Verified by ios/scripts/verify-privacy-manifests.sh.
+-->
+<plist version="1.0">
+<dict>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array/>
+</dict>
+</plist>

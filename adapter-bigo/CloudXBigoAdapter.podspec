@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXBigoAdapter'
-  s.version          = '5.3.0.0'
+  s.version          = '6.1.0.0'
   s.summary          = 'CloudX BIGO Ads Adapter - Static Framework'
   s.description      = 'BIGO Ads server-bidding adapter for CloudX iOS SDK - binary distribution. Supports Banner, MREC, Interstitial, and Rewarded ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'adapter-bigo/CloudXBigoAdapter.xcframework'
 
   s.dependency 'CloudXCore', '>= 3.9.0'
-  s.dependency 'BigoADS', '= 5.3.0'
+  s.dependency 'BigoADS', '= 6.1.0'
 
   s.frameworks = ['Foundation', 'UIKit']
 
