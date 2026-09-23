@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## BIGO Ads adapter 6.1.0.0 - 2026-09-23
+
+Install: `pod 'CloudXBigoAdapter', '~> 6.1.0.0'`
+
+### Changed
+
+- **Certified with BigoADS 6.1.0** — Updates BigoADS from 5.3.0 to 6.1.0. `CloudXCore >= 3.9.0` and iOS 13.0 requirements are unchanged.
+
+### Fixed
+
+- **Privacy manifest included** — The adapter xcframework now ships its own Apple privacy manifest.
+
+---
+
 ## BIGO Ads adapter 5.3.0.0 - 2026-09-17
 
 Install: `pod 'CloudXBigoAdapter', '~> 5.3.0.0'`
