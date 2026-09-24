@@ -13,7 +13,7 @@ Install: `pod 'CloudXCore', '~> 3.10'`
 
 ### Added
 
-- **Mediation Debugger** — Call `+[CloudXCore showMediationDebugger]` after initialization to open an in-app screen showing each installed adapter's status, privacy signals, and configured ad units. Returns `NO` and shows nothing before initialization completes.
+- **Mediation Debugger** — Call `+[CloudXCore showMediationDebugger]` after initialization to open an in-app screen showing each installed adapter's status, privacy signals, and configured ad units. Returns `NO` and shows nothing until `CLXSDKInitializedNotification` has posted.
 
 - **Advertiser-requested App Store surfaces on fullscreen video** — When a bid requests it, a video ad can open the in-app App Store sheet on skip or close, or show Apple's App Store overlay during playback. Users stay in your app.
 
@@ -33,11 +33,13 @@ Install: `pod 'CloudXCore', '~> 3.10'`
 
 - **CloudXCore privacy manifest updated** — It now declares file-timestamp API use and crash-data collection.
 
+- **Internal SDK headers changed** — Headers used by CloudX adapters and the SDK itself changed (`CLXMediatorInitializer`, `CLXBidAdSource`, `CLXBidResponse`, `CLXSessionMetricsTracker`, `CLXInitHostPin`). Internal to CloudX; no publisher action needed.
+
 ### Fixed
 
 - **Calling initialize twice no longer starts two initializations.** A second call waits for the first attempt to finish.
 
-- **Ads can no longer open an advertiser page or report a click without a user tap.** Known limitation: VoiceOver activation of links inside ads is not supported in this release.
+- **Ads can no longer open an advertiser page or report a click without a user tap.**
 
 - **The built-in native template no longer shows an empty media area or a blank button** when the ad does not supply them.
 
