@@ -6,8 +6,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CLXMediatorConfiguration : NSObject
 @property (nonatomic, copy, readonly) NSString *mediatorName;
 @property (nonatomic, copy, readonly, getter=mediatorInitData) NSDictionary<NSString *, id> *initData;
+/// Server-driven hard deadline for this mediator's initialization callback, in
+/// milliseconds. Nil means no SDK-owned deadline (parity with Android).
+@property (nonatomic, strong, readonly, nullable) NSNumber *hardInitTimeoutMs;
 - (instancetype)initWithMediatorName:(NSString *)mediatorName
-                            initData:(NSDictionary<NSString *, id> *)initData NS_DESIGNATED_INITIALIZER;
+                            initData:(NSDictionary<NSString *, id> *)initData
+                    hardInitTimeoutMs:(nullable NSNumber *)hardInitTimeoutMs NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 @end
 

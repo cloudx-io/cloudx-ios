@@ -77,6 +77,13 @@ CLX_PUBLIC
  * @discussion This is the preferred initialization method. Use CLXInitializationConfiguration
  * to configure the SDK before initialization.
  *
+ * Initialization runs at most once at a time. A call made while an earlier call is still
+ * initializing does not start another attempt: on success every waiting caller completes with
+ * success; on failure the caller that started the attempt receives the error and the next waiting
+ * caller drives one fresh attempt, completing with that one's outcome. A call made after a
+ * successful initialization completes immediately. A call whose app key is nil or empty fails
+ * immediately without starting or joining an attempt.
+ *
  * Example:
  * @code
  * CLXInitializationConfiguration *config =
@@ -267,6 +274,28 @@ CLX_PUBLIC
  */
 + (BOOL)isVisualDebuggingEnabled;
 
+#pragma mark - Mediation Debugger
+
+/**
+ * @brief Opens the CloudX Mediation Debugger.
+ * @discussion An in-app screen listing every installed adapter with its versions and
+ * integration status, and the SDK configuration: initialization status, privacy, ad units.
+ * Intended for development and QA builds. Requires an initialized SDK: the adapters, server
+ * configuration and ad units the screen reports do not exist before initialization. Presented
+ * on the current top view controller, which the SDK resolves itself. Callable from any thread;
+ * the presentation itself happens on the main thread.
+ * @return YES when the SDK is initialized and the screen was requested. NO when the SDK is not
+ * initialized, in which case nothing is presented.
+ *
+ * Example:
+ * @code
+ * if (![CloudXCore showMediationDebugger]) {
+ *     NSLog(@"Initialize the CloudX SDK before opening the Mediation Debugger.");
+ * }
+ * @endcode
+ */
++ (BOOL)showMediationDebugger NS_SWIFT_NAME(showMediationDebugger());
+
 #pragma mark - Logging Control
 
 /**
@@ -348,6 +377,10 @@ CLX_PUBLIC
  * directly — mediation stacks such as AppLovin MAX and the Google waterfall — since forwarding
  * those would double count. Which bidders those are is server-configured. A per-ad
  * `revenueDelegate` is unaffected and still receives every impression.
+ *
+ * In a test-mode session the delegate still fires for the same impressions it would in production,
+ * with an ad whose `revenue` is @0 and `revenuePrecision` is "undefined", so the integration can be
+ * checked on a test device.
  */
 + (void)addAdRevenueDelegate:(id<CLXAdRevenueDelegate>)delegate
     NS_SWIFT_NAME(addAdRevenueDelegate(_:));

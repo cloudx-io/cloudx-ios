@@ -26,7 +26,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class CLXDoubleEndCardConfig, CLXPlayerConfig, CLXAutoStoreConfig;
+@class CLXDoubleEndCardConfig, CLXPlayerConfig, CLXAutoStoreConfig, CLXSKOverlayConfig;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -57,6 +57,56 @@ NS_ASSUME_NONNULL_BEGIN
  * @brief Marshals this config back to a JSON-equivalent dictionary.
  * @return A dictionary containing only the non-nil string fields. Empty if every field was nil.
  */
+- (NSDictionary *)toDictionary;
+
+@end
+
+#pragma mark - SKOverlay Config
+
+/**
+ * StoreKit overlay configuration from `bid.ext.skadn.skoverlay`.
+ *
+ * Unlike the rest of this file, this block is **DSP-supplied**: it is the IAB
+ * SKAdNetwork extension shape, not an SSP-injected placement setting, so it
+ * lives under `skadn` rather than `cloudx.render`. DSPs send it today and the
+ * exchange preserves it, which is why SKOverlay needs no schema work.
+ *
+ * Delay semantics follow the IAB convention and are NOT interchangeable:
+ *   -1  disables the overlay for that phase
+ *    0  presents immediately when the phase begins
+ *   >0  presents that many seconds into the phase
+ */
+@interface CLXSKOverlayConfig : NSObject
+
+/// Screen position. 0 = bottom, 1 = bottom-raised. Out-of-range values resolve
+/// to bottom rather than throwing — a malformed position must not cost the
+/// impression.
+@property (nonatomic, assign, readonly) NSInteger position;
+
+/// Whether the user may dismiss the overlay. Absent means dismissible.
+@property (nonatomic, assign, readonly) BOOL dismissible;
+
+/// Seconds into video playback before presenting. -1 disables during video.
+@property (nonatomic, assign, readonly) NSTimeInterval videoDelay;
+
+/// Seconds into the end card before presenting. -1 disables on the end card.
+@property (nonatomic, assign, readonly) NSTimeInterval companionDelay;
+
+/// Seconds before the overlay self-dismisses. -1 leaves it up for the phase.
+@property (nonatomic, assign, readonly) NSTimeInterval skDismissDelay;
+
+/// YES when either phase opts in, i.e. there is anything to schedule.
+@property (nonatomic, assign, readonly) BOOL isEnabled;
+
+/**
+ * @brief Constructs an immutable CLXSKOverlayConfig from a parsed JSON dictionary.
+ * @param dictionary The `skoverlay` sub-object from `bid.ext.skadn`. May be `nil`
+ *                   or any non-NSDictionary type — both produce a `nil` return.
+ * @return A new instance, or `nil` if `dictionary` is malformed.
+ */
++ (nullable instancetype)configFromDictionary:(nullable NSDictionary *)dictionary;
+
+/// @brief Marshals this config back to a JSON-equivalent dictionary.
 - (NSDictionary *)toDictionary;
 
 @end

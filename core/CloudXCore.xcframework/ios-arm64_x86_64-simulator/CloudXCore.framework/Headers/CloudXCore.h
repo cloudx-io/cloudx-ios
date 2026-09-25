@@ -137,6 +137,18 @@
 #import <CloudXCore/CLXAdapterPrivacyParams.h>
 #import <CloudXCore/CLXPrivacyConsentResolver.h>
 
+// =============================================================================
+// MARK: - MEDIATOR MODULE DEVELOPMENT
+// =============================================================================
+
+#import <CloudXCore/CLXMediatorTypes.h>
+#import <CloudXCore/CLXMediatorParams.h>
+#import <CloudXCore/CLXMediatorInitializer.h>
+#import <CloudXCore/CLXMediatorPrivacyHandler.h>
+#import <CloudXCore/CLXMediatorMetadataProvider.h>
+#import <CloudXCore/CLXInterstitialMediator.h>
+#import <CloudXCore/CLXRewardedMediator.h>
+
 // Utilities
 #import <CloudXCore/CLXLogger.h>
 #import <CloudXCore/CLXSystemInformation.h>

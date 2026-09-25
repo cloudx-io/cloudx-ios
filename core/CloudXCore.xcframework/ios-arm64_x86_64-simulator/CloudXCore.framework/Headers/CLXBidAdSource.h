@@ -46,6 +46,16 @@ typedef NS_ENUM(NSInteger, CLXBidAdSourceError) {
 @property (nonatomic, copy, readonly) id _Nullable (^createBidAd)(NSError * _Nullable * _Nullable);
 @property (nonatomic, strong, readonly, nullable) CLXAd *clxAd;
 
+/**
+ * Continuous-clock instant the auction result arrived — the anchor OpenRTB
+ * `bid.exp` is measured from.
+ *
+ * Stamped where the auction result lands, before the waterfall hop and the
+ * init-concluded wait inside it. Both of those can take real time, and time
+ * spent there must count against the bid's window rather than extend it.
+ */
+@property (nonatomic, assign, readonly) NSTimeInterval bidResponseReceivedAt;
+
 - (instancetype)initWithPrice:(double)price
                    auctionId:(nullable NSString *)auctionId
                       dealId:(nullable NSString *)dealId

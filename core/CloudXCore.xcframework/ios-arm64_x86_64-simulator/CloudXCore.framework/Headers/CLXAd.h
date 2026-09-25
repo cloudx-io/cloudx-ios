@@ -52,7 +52,14 @@ CLX_PUBLIC
 @property (nonatomic, readonly, nullable) NSString *networkPlacement;
 
 /**
- * Revenue information for this ad impression
+ * Revenue for this ad impression, in USD, per impression (not CPM).
+ *
+ * For a CloudX bid this is the bid-time estimate of what the impression will pay,
+ * and `revenuePrecision` is "estimated". When the ad source reports impression-level
+ * revenue of its own — today the Google AdMob / Ad Manager and AppLovin MAX
+ * adapters — this is that realized value instead, and
+ * `revenuePrecision` carries the precision the source reported, or "undefined"
+ * when the source reported a precision the SDK does not recognize.
  */
 @property (nonatomic, readonly, nullable) NSNumber *revenue;
 
@@ -88,8 +95,13 @@ CLX_PUBLIC
 @property (nonatomic, strong, nullable) CLXNativeAd *nativeAd;
 
 /**
- * Precision of the revenue value.
- * Possible values: "exact", "estimated", "publisher_defined", "undefined", ""
+ * Precision of the `revenue` value.
+ *
+ * "estimated" for a CloudX bid-time figure. For an ad source that reports
+ * impression-level revenue, the precision that source reported, as one of
+ * "exact", "estimated", "publisher_defined", or "undefined". Sources report
+ * precision either as a numeric code or as the token itself; a precision the
+ * SDK does not recognize, or one the source left empty, is "undefined".
  */
 @property (nonatomic, copy, nullable) NSString *revenuePrecision;
 

@@ -34,6 +34,17 @@ CLX_PUBLIC_ADAPTER
 /// Returns the top-most presented view controller from the key window, or nil in extensions/background.
 @property (class, nonatomic, readonly, nullable) UIViewController *topViewController;
 
+/**
+ * Whether the app is currently in the background, so a latch that must answer
+ * "was the app in front while this ad lived?" can start from the truth rather
+ * than from an optimistic NO.
+ *
+ * Reads `applicationState` on the main thread. NO in an extension, where there
+ * is no app state to speak of, and NO when called off the main thread rather
+ * than blocking a caller on a hop.
+ */
+@property (class, nonatomic, readonly) BOOL isBackgrounded;
+
 @end
 
 NS_ASSUME_NONNULL_END
