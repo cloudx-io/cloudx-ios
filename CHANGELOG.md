@@ -29,11 +29,7 @@ Install: `pod 'CloudXCore', '~> 3.10'`
 
 - **`CLXAd.revenue` reports realized impression revenue** when the serving network provides it, with a matching `revenuePrecision`. Otherwise the auction estimate is reported with precision `"estimated"`.
 
-- **More resilient initialization** — When device DNS blocks or times out the configuration request, initialization retries through a secure DNS fallback.
-
 - **CloudXCore privacy manifest updated** — It now declares file-timestamp API use and crash-data collection.
-
-- **Internal SDK headers changed** — Headers used by CloudX adapters and the SDK itself changed (`CLXMediatorInitializer`, `CLXBidAdSource`, `CLXBidResponse`, `CLXSessionMetricsTracker`, `CLXInitHostPin`). Internal to CloudX; no publisher action needed.
 
 ### Fixed
 
