@@ -25,7 +25,7 @@ Install: `pod 'CloudXCore', '~> 3.10'`
 
 - **Ads honor the advertiser's expiry** — Showing an expired fullscreen ad fails with `CLXErrorCodeAdapterAdExpired` (616); check `isReady` before showing. A native ad that was already shown no longer receives an expiry callback.
 
-- **Test mode delivers zero-revenue callbacks** — Revenue callbacks now fire on test devices with `revenue` 0 and `revenuePrecision` `"undefined"` instead of being withheld, so you can verify your revenue wiring.
+- **Revenue callbacks now fire in test mode** — They were previously withheld on test devices; now they fire so you can verify your revenue wiring. Test-mode callbacks report `revenue` 0 and `revenuePrecision` `"undefined"`.
 
 - **`CLXAd.revenue` reports realized impression revenue** when the serving network provides it, with a matching `revenuePrecision`. Otherwise the auction estimate is reported with precision `"estimated"`.
 
