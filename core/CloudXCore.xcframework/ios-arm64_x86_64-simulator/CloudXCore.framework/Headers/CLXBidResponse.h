@@ -27,6 +27,8 @@ typedef NS_ENUM(NSInteger, CLXOpenRTBMarkupType) {
     CLXOpenRTBMarkupTypeNative = 4,
 };
 
+@class CLXSKOverlayConfig;
+
 // MARK: - SKAdNetwork Fidelity
 @interface CLXBidResponseSKAdFidelity : NSObject
 @property (nonatomic, assign) NSInteger fidelity;
@@ -48,6 +50,9 @@ typedef NS_ENUM(NSInteger, CLXOpenRTBMarkupType) {
 @property (nonatomic, copy) NSString *sourceapp;
 @property (nonatomic, copy, nullable) NSString *timestamp;
 @property (nonatomic, copy, nullable) NSString *signature;
+/// `skadn.skoverlay` — DSP-supplied StoreKit overlay configuration. Nil when
+/// the bid does not ask for an overlay.
+@property (nonatomic, strong, nullable) CLXSKOverlayConfig *skoverlay;
 @end
 
 // MARK: - CloudX Meta

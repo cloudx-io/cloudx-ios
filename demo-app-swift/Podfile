@@ -1,25 +1,26 @@
-platform :ios, '13.0'
+platform :ios, '15.0'
 
 target 'CloudXSwiftRemotePods' do
   use_frameworks! :linkage => :static
 
-  # The published 3.8.0 binary, resolved through this repo's podspec (its vendored
+  # Published CloudXCore binary, resolved through this repo's podspec (its vendored
   # xcframework path is repo-root-relative, so a bare :path => '../core' resolves to
   # core/core/… and yields an empty pod).
   pod 'CloudXCore', :podspec => '../core/CloudXCore.podspec'
-  pod 'CloudXMetaAdapter', '~> 6.21.1.0'
-  pod 'CloudXVungleAdapter', '~> 7.7.4.0'
+  pod 'CloudXMetaAdapter', '~> 6.22.0.0'
+  pod 'CloudXVungleAdapter', '~> 7.7.6.0'
   pod 'CloudXInMobiAdapter', '~> 11.4.1.0'
-  pod 'CloudXMintegralAdapter', '~> 8.1.5.0'
-  pod 'CloudXUnityAdsAdapter', '~> 4.19.0.0'
-  pod 'CloudXMagniteAdapterV2', '~> 1.0.0.0'
-  pod 'CloudXMolocoAdapter', '~> 4.8.0.0'
+  pod 'CloudXMintegralAdapter', '~> 8.1.6.0'
+  pod 'CloudXUnityAdsAdapter', '~> 4.20.1.0'
+  pod 'CloudXMagniteAdapterV2', '~> 1.0.0.2'
+  pod 'CloudXMolocoAdapter', '~> 4.10.0.0'
   pod 'CloudXVerveAdapter', '~> 3.9.0.0'
-  pod 'CloudXDigitalTurbineAdapter', '~> 8.4.8.0'
-  pod 'CloudXGoogleWaterfallAdapter', '~> 13.6.0.0'
-  pod 'CloudXPangleAdapter', '~> 8.2.0.8.0'
-  pod 'CloudXMobileFuseAdapter', '~> 1.11.0.0'
-  pod 'CloudXTaurusXAdapter', '~> 1.18.1.0'
+  pod 'CloudXDigitalTurbineAdapter', '~> 8.4.10.0'
+  pod 'CloudXGoogleWaterfallAdapter', '~> 13.9.0.0'
+  pod 'CloudXPangleAdapter', '~> 8.3.0.6.0'
+  pod 'CloudXMobileFuseAdapter', '~> 1.11.0.1'
+  pod 'CloudXTaurusXAdapter', '~> 1.18.2.0'
+  pod 'CloudXBigoAdapter', '~> 6.1.0.0'
 
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths

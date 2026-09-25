@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.10.0] - 2026-09-24
+
+Install: `pod 'CloudXCore', '~> 3.10'`
+
+### Added
+
+- **Mediation Debugger** — Call `+[CloudXCore showMediationDebugger]` after initialization to see each adapter's status, privacy signals and ad units, load a test ad for any ad unit, and request test mode for the next launch. Returns `NO` until `CLXSDKInitializedNotification` has posted.
+
+- **Advertiser-requested App Store surfaces on fullscreen video** — When a bid requests it, a video ad can open the in-app App Store sheet on skip or close, or show Apple's App Store overlay during playback. Users stay in your app.
+
+- **Multi-card end cards** — Fullscreen video ads can show a sequence of end cards. Closing a card advances to the next one before the ad closes.
+
+### Changed
+
+- **Fullscreen video clicks open the App Store inside your app** instead of leaving it. Click callbacks now fire only for real user clicks.
+
+- **Ads honor the advertiser's expiry** — Showing an expired fullscreen ad fails with `CLXErrorCodeAdapterAdExpired` (616); check `isReady` before showing. A native ad that was already shown no longer receives an expiry callback.
+
+- **Test mode delivers zero-revenue callbacks** — Revenue callbacks now fire on test devices with `revenue` 0 and `revenuePrecision` `"undefined"` instead of being withheld, so you can verify your revenue wiring.
+
+- **`CLXAd.revenue` reports realized impression revenue** when the serving network provides it, with a matching `revenuePrecision`. Otherwise the auction estimate is reported with precision `"estimated"`.
+
+- **More resilient initialization** — When device DNS blocks or times out the configuration request, initialization retries through a secure DNS fallback.
+
+- **CloudXCore privacy manifest updated** — It now declares file-timestamp API use and crash-data collection.
+
+- **Internal SDK headers changed** — Headers used by CloudX adapters and the SDK itself changed (`CLXMediatorInitializer`, `CLXBidAdSource`, `CLXBidResponse`, `CLXSessionMetricsTracker`, `CLXInitHostPin`). Internal to CloudX; no publisher action needed.
+
+### Fixed
+
+- **Calling initialize twice no longer starts two initializations.** A second call waits for the first attempt to finish.
+
+- **Ads can no longer open an advertiser page or report a click without a user tap.**
+
+- **The built-in native template no longer shows an empty media area or a blank button** when the ad does not supply them.
+
+- **With the ad cache enabled, a native ad destroyed before it was shown is reused** by the next load while it is still valid.
+
+- **Improved fill from demand partners that rejected every request after the first in a session.**
+
+---
+
 ## BIGO Ads adapter 6.1.0.0 - 2026-09-23
 
 Install: `pod 'CloudXBigoAdapter', '~> 6.1.0.0'`

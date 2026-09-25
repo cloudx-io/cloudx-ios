@@ -59,6 +59,8 @@ typedef NS_ENUM(NSInteger, CLXLossReason) {
  *   @c NO_FILL (302) instead. During SDK initialization, individual adapter init failures are
  *   not surfaced to the publisher — the SDK tracks them via metrics, and the publisher receives
  *   a successful initialization callback as long as at least one adapter succeeds.
+ * - @b 700–799: Mediator errors — from external mediator modules during initialization, load,
+ *   or display operations.
  *
  * Renderer-internal failures (e.g. blank-creative pixel-scan failures, invalid VAST media
  * files, embedded renderer not yet wired) are surfaced through the existing public codes
@@ -464,7 +466,19 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
      *
      * Publisher action: None - the SDK reports failure via the standard load callback.
      */
-    CLXErrorCodeRendererTerminated = 624
+    CLXErrorCodeRendererTerminated = 624,
+
+    // MARK: Mediator (700–799)
+
+    CLXErrorCodeMediatorInternalError = 700,
+    CLXErrorCodeMediatorNoFill = 701,
+    CLXErrorCodeMediatorInvalidConfiguration = 702,
+    CLXErrorCodeMediatorInvalidServerExtras = 703,
+    CLXErrorCodeMediatorInitializationError = 704,
+    CLXErrorCodeMediatorAdNotReady = 705,
+    CLXErrorCodeMediatorTimeout = 706,
+    CLXErrorCodeMediatorNoConnection = 707,
+    CLXErrorCodeMediatorDisplayFailed = 708
 };
 
 /**

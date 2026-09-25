@@ -127,6 +127,17 @@ extern NSString * const CLXMetricsTypeRendererClickDestination;        // "rende
 // dataset for the sheet-only (strict) decision: it measures exactly the
 // clicks strict mode would drop.
 extern NSString * const CLXMetricsTypeRendererStoreKitFallback;        // "renderer_storekit_fallback"
+// App Store product sheet funnel. Reason is `<outcome>_<intent>`: outcome one
+// of requested / presented / load_failed / busy / dismissed, intent tap or
+// automatic (AutoStore).
+extern NSString * const CLXMetricsTypeRendererStoreKitSheet;           // "renderer_storekit_sheet"
+// AutoStore funnel. Reason: requested_skip / requested_close /
+// requested_endcard / presented /
+// load_failed / busy / skipped_no_app / skipped_no_presenter.
+extern NSString * const CLXMetricsTypeRendererAutoStore;               // "renderer_autostore"
+// SKOverlay funnel. Reason: requested / presented / failed /
+// dismissed_by_user / dismissed.
+extern NSString * const CLXMetricsTypeRendererSKOverlay;               // "renderer_skoverlay"
 extern NSString * const CLXMetricsTypeRendererVASTUnfiredEvent;        // "renderer_vast_unfired_event"
 /// VAST tracking pixel dropped. The reason field carries the drop reason —
 /// the wire vocabulary is `https_required` / `url_length_exceeded` /
@@ -274,18 +285,22 @@ extern NSString * const CLXMetricsTypeAdRevenueListenerError;               // "
 extern NSString * const CLXMetricsTypeIdentityOnlyAdEmitted;                // "identity_only_ad_emitted"
 
 /**
- * A loaded ad reached the end of its life. Fires whether or not the creative was ever
- * rendered, so `everDisplayed` must be read first: only `false` rows describe an ad the
- * user never saw. `appForegrounded` then separates those — `true` means the app was in
- * front the whole time and the publisher never showed the ad ("the moment never came"),
- * `false` means the user had already left. `source` names what was observed, not an
- * inferred cause. Matches Android's `ad_expired`.
+ * A loaded ad the user never saw reached the end of its life. An ad that impressed
+ * terminates on the impression instead, so every row here describes a wasted fill.
+ * `appForegrounded` says whether the app was in front when the ad's life ended —
+ * `true` means the publisher had the chance and never took it ("the moment never
+ * came"), `false` means the user had already left. `source` names what was observed,
+ * not an inferred cause. `ad_format` already carries the format, so the sources are
+ * not format-prefixed. Matches Android's `ad_expired`.
  */
 extern NSString * const CLXMetricsTypeAdExpired;                            // "ad_expired"
 
 /** Wire codes for `ad_expired`'s `source` field. Server-side contract — do not rename. */
-extern NSString * const CLXAdExpiredSourceNativeTimerElapsed;               // "native_timer_elapsed"
-extern NSString * const CLXAdExpiredSourceFullscreenStaleOnReload;          // "fullscreen_stale_on_reload"
+extern NSString * const CLXAdExpiredSourceTimerElapsed;                     // "timer_elapsed"
+extern NSString * const CLXAdExpiredSourceStaleOnReload;                    // "stale_on_reload"
+extern NSString * const CLXAdExpiredSourceLoadPastDeadline;                 // "load_past_deadline"
+extern NSString * const CLXAdExpiredSourceShowPastDeadline;                 // "show_past_deadline"
+extern NSString * const CLXAdExpiredSourceAdoptionPastDeadline;             // "adoption_past_deadline"
 
 /**
  * Utility class for metrics type validation and categorization

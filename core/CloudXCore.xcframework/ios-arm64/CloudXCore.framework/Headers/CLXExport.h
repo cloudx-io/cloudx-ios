@@ -8,10 +8,11 @@
 //
 //  CLX_PUBLIC            — publisher-facing API (CLXBanner, CLXInterstitial, …)
 //  CLX_PUBLIC_ADAPTER    — adapter-facing API (CLXAdapterAdView, factories, …)
+//  CLX_PUBLIC_MEDIATOR   — mediator-module-facing API
 //  CLX_INTERNAL_TESTING  — exported only for internal demo/test harness; not
-//                          sanctioned for publisher or adapter consumption
+//                          sanctioned for publisher, adapter, or module consumption
 //
-//  All three macros expand to the same attribute — the distinction is
+//  All four macros expand to the same attribute — the distinction is
 //  author intent and reviewer signal. The Clang linker cannot distinguish
 //  consumer type. Mirrors Android's public / @RestrictTo(LIBRARY_GROUP)
 //  / internal visibility model, with an extra iOS-only tier because the
@@ -23,6 +24,7 @@
 
 #define CLX_PUBLIC            __attribute__((visibility("default")))
 #define CLX_PUBLIC_ADAPTER    __attribute__((visibility("default")))
+#define CLX_PUBLIC_MEDIATOR   __attribute__((visibility("default")))
 #define CLX_INTERNAL_TESTING  __attribute__((visibility("default")))
 
 #endif /* CLXExport_h */
