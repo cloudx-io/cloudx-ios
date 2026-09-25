@@ -15,13 +15,13 @@ Install: `pod 'CloudXCore', '~> 3.10'`
 
 - **Mediation Debugger** — Call `+[CloudXCore showMediationDebugger]` after initialization to see each adapter's status, privacy signals and ad units, load a test ad for any ad unit, and request test mode for the next launch. Returns `NO` until `CLXSDKInitializedNotification` has posted.
 
-- **App Store surfaces on fullscreen video** — A video ad can open the in-app App Store sheet on skip or close, or show Apple's App Store overlay during playback. Users stay in your app.
+- **App Store surfaces on fullscreen video** — CloudX-rendered video ads can open the in-app App Store sheet on skip or close, or show Apple's App Store overlay during playback. Users stay in your app.
 
-- **Multi-card end cards** — Fullscreen video ads can show a sequence of end cards. Closing a card advances to the next one before the ad closes.
+- **Multi-card end cards** — CloudX-rendered fullscreen video ads can show a sequence of end cards. Closing a card advances to the next one before the ad closes.
 
 ### Changed
 
-- **Fullscreen video clicks open the App Store inside your app** instead of leaving it. Click callbacks now fire only for real user clicks.
+- **CloudX-rendered fullscreen video clicks open the App Store inside your app** instead of leaving it. Click callbacks now fire only for real user clicks.
 
 - **Ads honor the advertiser's expiry** — Showing an expired fullscreen ad fails with `CLXErrorCodeAdapterAdExpired` (616); check `isReady` before showing. A native ad that was already shown no longer receives an expiry callback.
 
@@ -39,7 +39,7 @@ Install: `pod 'CloudXCore', '~> 3.10'`
 
 - **Calling initialize twice no longer starts two initializations.** A second call waits for the first attempt to finish.
 
-- **Ads can no longer open an advertiser page or report a click without a user tap.**
+- **CloudX-rendered ads can no longer open an advertiser page or report a click without a user tap.**
 
 - **The built-in native template no longer shows an empty media area or a blank button** when the ad does not supply them.
 
