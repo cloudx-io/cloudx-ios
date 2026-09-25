@@ -15,7 +15,7 @@ Install: `pod 'CloudXCore', '~> 3.10'`
 
 - **Mediation Debugger** — Call `+[CloudXCore showMediationDebugger]` after initialization to see each adapter's status, privacy signals and ad units, load a test ad for any ad unit, and request test mode for the next launch. Returns `NO` until `CLXSDKInitializedNotification` has posted.
 
-- **Advertiser-requested App Store surfaces on fullscreen video** — When a bid requests it, a video ad can open the in-app App Store sheet on skip or close, or show Apple's App Store overlay during playback. Users stay in your app.
+- **App Store surfaces on fullscreen video** — A video ad can open the in-app App Store sheet on skip or close, or show Apple's App Store overlay during playback. Users stay in your app.
 
 - **Multi-card end cards** — Fullscreen video ads can show a sequence of end cards. Closing a card advances to the next one before the ad closes.
 
