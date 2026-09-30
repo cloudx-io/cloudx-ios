@@ -19,6 +19,8 @@ final class FirstLookViewController: UIViewController {
     private static let retryBaseDelay: TimeInterval = 2
     private static let retryMaxDelay: TimeInterval = 60
     private static let retryMaxShift = 5
+    // Same bound as DemoAppLogger, so a screen left open through the retry loop cannot grow without limit.
+    private static let logLineLimit = 500
 
     private let initializationStatusLabel = UILabel()
     private let interstitialStatusLabel = UILabel()
@@ -31,6 +33,7 @@ final class FirstLookViewController: UIViewController {
     private var initializationTimeoutWork: DispatchWorkItem?
     private var retryWork: DispatchWorkItem?
     private var retryCount = 0
+    private var logLines: [String] = []
     private var logObserver: NSObjectProtocol?
 
     deinit {
@@ -89,7 +92,10 @@ final class FirstLookViewController: UIViewController {
         ])
     }
 
-    /** Appends every demo log line as it is written, so the screen shows what the sources report. */
+    /**
+     * Shows every demo log line as it is written, so the screen shows what the sources report.
+     * Keeps the last `logLineLimit` lines and re-renders from that buffer.
+     */
     private func observeLogs() {
         logObserver = NotificationCenter.default.addObserver(
             forName: DemoAppLogger.didAppendEntry,
@@ -98,7 +104,11 @@ final class FirstLookViewController: UIViewController {
         ) { [weak self] notification in
             guard let self = self,
                   let entry = notification.userInfo?[DemoAppLogger.entryUserInfoKey] as? DemoAppLogEntry else { return }
-            self.logTextView.text.append("\(entry.formattedTimestamp) \(entry.message)\n")
+            self.logLines.append("\(entry.formattedTimestamp) \(entry.message)")
+            if self.logLines.count > Self.logLineLimit {
+                self.logLines.removeFirst(self.logLines.count - Self.logLineLimit)
+            }
+            self.logTextView.text = self.logLines.joined(separator: "\n")
             let end = NSRange(location: self.logTextView.text.utf16.count, length: 0)
             self.logTextView.scrollRangeToVisible(end)
         }
