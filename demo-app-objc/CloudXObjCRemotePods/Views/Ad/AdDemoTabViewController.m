@@ -1,6 +1,5 @@
 #import "AdDemoTabViewController.h"
-#import <AppTrackingTransparency/AppTrackingTransparency.h>
-#import "DemoAppLogger.h"
+#import "AppTrackingPermission.h"
 #import "InitInternalViewController.h"
 #import "BannerViewController.h"
 #import "InterstitialViewController.h"
@@ -17,7 +16,7 @@
     [super viewDidLoad];
 
     // Request App Tracking Transparency permission
-    [self requestAppTrackingTransparencyPermission];
+    [AppTrackingPermission requestWithCompletion:nil];
 
     // Create view controllers
     InitInternalViewController *initInternalVC = [[InitInternalViewController alloc] init];
@@ -65,32 +64,6 @@
 - (void)selectTabIndex:(NSUInteger)index {
     if (index < self.viewControllers.count) {
         self.selectedIndex = index;
-    }
-}
-
-- (void)requestAppTrackingTransparencyPermission {
-    // iOS 14+ ATT compliance
-    if (@available(iOS 14, *)) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:^(ATTrackingManagerAuthorizationStatus status) {
-                switch (status) {
-                    case ATTrackingManagerAuthorizationStatusAuthorized:
-                        [[DemoAppLogger sharedInstance] logMessage:@"App Tracking authorized"];
-                        break;
-                    case ATTrackingManagerAuthorizationStatusDenied:
-                        [[DemoAppLogger sharedInstance] logMessage:@"App Tracking denied"];
-                        break;
-                    case ATTrackingManagerAuthorizationStatusNotDetermined:
-                        [[DemoAppLogger sharedInstance] logMessage:@"App Tracking not determined"];
-                        break;
-                    case ATTrackingManagerAuthorizationStatusRestricted:
-                        [[DemoAppLogger sharedInstance] logMessage:@"App Tracking restricted"];
-                        break;
-                    default:
-                        break;
-                }
-            }];
-        });
     }
 }
 
