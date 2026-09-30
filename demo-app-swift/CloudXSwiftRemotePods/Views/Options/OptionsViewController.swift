@@ -4,7 +4,8 @@ import UIKit
  * Demo-only launch screen that picks which demo flow to enter. It makes no SDK calls.
  * General opens the CloudX integration demo (`AdDemoTabViewController`). First Look
  * (`FirstLookViewController`) demonstrates a CloudX-first interstitial with an AdMob fallback.
- * Arbiter/TPA is a placeholder, so its button is disabled.
+ * Arbiter/TPA (`ArbiterViewController`) loads CloudX and AdMob in parallel and lets Trusted
+ * Arbiter pick the interstitial to show.
  *
  * The screen is replaced as the window's root once a flow is picked, so it only shows again
  * when the app starts from scratch.
@@ -33,6 +34,11 @@ final class OptionsViewController: UIViewController {
         replaceRoot(of: window, with: UINavigationController(rootViewController: FirstLookViewController()))
     }
 
+    /** Opens the Arbiter/TPA demo in `window`, replacing whatever is shown there. */
+    static func openArbiter(in window: UIWindow) {
+        replaceRoot(of: window, with: UINavigationController(rootViewController: ArbiterViewController()))
+    }
+
     private static func replaceRoot(of window: UIWindow, with viewController: UIViewController) {
         viewController.loadViewIfNeeded()
         UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve) {
@@ -50,11 +56,12 @@ final class OptionsViewController: UIViewController {
         titleLabel.font = .boldSystemFont(ofSize: 32)
         titleLabel.textAlignment = .center
 
-        let generalButton = makeButton(title: "General", enabled: true)
+        let generalButton = makeButton(title: "General")
         generalButton.addTarget(self, action: #selector(generalTapped), for: .touchUpInside)
-        let firstLookButton = makeButton(title: "First Look", enabled: true)
+        let firstLookButton = makeButton(title: "First Look")
         firstLookButton.addTarget(self, action: #selector(firstLookTapped), for: .touchUpInside)
-        let arbiterButton = makeButton(title: "Arbiter/TPA", enabled: false)
+        let arbiterButton = makeButton(title: "Arbiter/TPA")
+        arbiterButton.addTarget(self, action: #selector(arbiterTapped), for: .touchUpInside)
 
         let buttonStack = UIStackView(arrangedSubviews: [generalButton, firstLookButton, arbiterButton])
         buttonStack.axis = .vertical
@@ -90,15 +97,19 @@ final class OptionsViewController: UIViewController {
         Self.openFirstLook(in: window)
     }
 
-    private func makeButton(title: String, enabled: Bool) -> UIButton {
+    @objc private func arbiterTapped() {
+        guard let window = view.window else { return }
+        DemoAppLogger.sharedInstance.logMessage("Opening the Arbiter/TPA demo")
+        Self.openArbiter(in: window)
+    }
+
+    private func makeButton(title: String) -> UIButton {
         let button = UIButton(type: .custom)
         button.setTitle(title, for: .normal)
         button.setTitleColor(Self.buttonTitleColor, for: .normal)
         button.titleLabel?.font = .boldSystemFont(ofSize: 20)
         button.backgroundColor = Self.buttonBackgroundColor
         button.layer.cornerRadius = 8
-        button.isEnabled = enabled
-        button.alpha = enabled ? 1 : 0.5
         button.heightAnchor.constraint(greaterThanOrEqualToConstant: 60).isActive = true
         return button
     }

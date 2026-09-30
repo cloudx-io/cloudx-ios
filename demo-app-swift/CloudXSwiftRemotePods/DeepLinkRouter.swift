@@ -184,12 +184,12 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
     private func resolveTabViewController() -> AdDemoTabViewController? {
         guard let window = keyWindow else { return nil }
         /*
-         * A fresh launch shows the Options screen and First Look has no tabs. Harness routes always
-         * target the General demo, so either root is replaced by it.
+         * A fresh launch shows the Options screen, and the First Look and Arbiter/TPA screens have no
+         * tabs. Harness routes always target the General demo, so any of these roots is replaced by it.
          */
         let rootVC = window.rootViewController
-        if rootVC is OptionsViewController
-            || (rootVC as? UINavigationController)?.viewControllers.first is FirstLookViewController {
+        let flowRoot = (rootVC as? UINavigationController)?.viewControllers.first
+        if rootVC is OptionsViewController || flowRoot is FirstLookViewController || flowRoot is ArbiterViewController {
             return OptionsViewController.openGeneral(in: window)
         }
         if let tabVC = window.rootViewController as? AdDemoTabViewController {

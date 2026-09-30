@@ -1,5 +1,6 @@
 #import "OptionsViewController.h"
 #import "AdDemoTabViewController.h"
+#import "ArbiterViewController.h"
 #import "DemoAppLogger.h"
 #import "FirstLookViewController.h"
 
@@ -21,6 +22,12 @@ static UIColor *ColorFromHex(NSUInteger hex) {
 + (void)openFirstLookInWindow:(UIWindow *)window {
     UINavigationController *navigationController =
         [[UINavigationController alloc] initWithRootViewController:[[FirstLookViewController alloc] init]];
+    [self replaceRootOfWindow:window withViewController:navigationController];
+}
+
++ (void)openArbiterInWindow:(UIWindow *)window {
+    UINavigationController *navigationController =
+        [[UINavigationController alloc] initWithRootViewController:[[ArbiterViewController alloc] init]];
     [self replaceRootOfWindow:window withViewController:navigationController];
 }
 
@@ -49,11 +56,12 @@ static UIColor *ColorFromHex(NSUInteger hex) {
     titleLabel.font = [UIFont boldSystemFontOfSize:32];
     titleLabel.textAlignment = NSTextAlignmentCenter;
 
-    UIButton *generalButton = [self makeButtonWithTitle:@"General" enabled:YES];
+    UIButton *generalButton = [self makeButtonWithTitle:@"General"];
     [generalButton addTarget:self action:@selector(generalTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIButton *firstLookButton = [self makeButtonWithTitle:@"First Look" enabled:YES];
+    UIButton *firstLookButton = [self makeButtonWithTitle:@"First Look"];
     [firstLookButton addTarget:self action:@selector(firstLookTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIButton *arbiterButton = [self makeButtonWithTitle:@"Arbiter/TPA" enabled:NO];
+    UIButton *arbiterButton = [self makeButtonWithTitle:@"Arbiter/TPA"];
+    [arbiterButton addTarget:self action:@selector(arbiterTapped) forControlEvents:UIControlEventTouchUpInside];
 
     UIStackView *buttonStack = [[UIStackView alloc] initWithArrangedSubviews:@[generalButton, firstLookButton, arbiterButton]];
     buttonStack.axis = UILayoutConstraintAxisVertical;
@@ -96,15 +104,22 @@ static UIColor *ColorFromHex(NSUInteger hex) {
     [OptionsViewController openFirstLookInWindow:window];
 }
 
-- (UIButton *)makeButtonWithTitle:(NSString *)title enabled:(BOOL)enabled {
+- (void)arbiterTapped {
+    UIWindow *window = self.view.window;
+    if (!window) {
+        return;
+    }
+    [[DemoAppLogger sharedInstance] logMessage:@"Opening the Arbiter/TPA demo"];
+    [OptionsViewController openArbiterInWindow:window];
+}
+
+- (UIButton *)makeButtonWithTitle:(NSString *)title {
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     [button setTitle:title forState:UIControlStateNormal];
     [button setTitleColor:ColorFromHex(0x323232) forState:UIControlStateNormal];
     button.titleLabel.font = [UIFont boldSystemFontOfSize:20];
     button.backgroundColor = ColorFromHex(0xF6F6F6);
     button.layer.cornerRadius = 8;
-    button.enabled = enabled;
-    button.alpha = enabled ? 1 : 0.5;
     [button.heightAnchor constraintGreaterThanOrEqualToConstant:60].active = YES;
     return button;
 }

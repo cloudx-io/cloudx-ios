@@ -9,6 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly) NSString *bannerAdUnitId;
 @property (nonatomic, copy, readonly) NSString *mrecAdUnitId;
 @property (nonatomic, copy, readonly) NSString *interstitialAdUnitId;
+@property (nonatomic, copy, readonly) NSString *arbiterInterstitialAdUnitId;
 @property (nonatomic, copy, readonly) NSString *nativeAdUnitId;
 @property (nonatomic, copy, readonly) NSString *nativeBannerAdUnitId;
 @property (nonatomic, copy, readonly) NSString *rewardedAdUnitId;
@@ -19,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
                bannerAdUnitId:(NSString *)bannerAdUnitId
                  mrecAdUnitId:(NSString *)mrecAdUnitId
          interstitialAdUnitId:(NSString *)interstitialAdUnitId
+  arbiterInterstitialAdUnitId:(NSString *)arbiterInterstitialAdUnitId
                nativeAdUnitId:(NSString *)nativeAdUnitId
          nativeBannerAdUnitId:(NSString *)nativeBannerAdUnitId
              rewardedAdUnitId:(NSString *)rewardedAdUnitId
