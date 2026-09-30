@@ -4,9 +4,9 @@ AI-powered mobile advertising for iOS.
 
 **[Integration Guide →](https://docs.cloudx.io/en/ios/integration)**
 
-## Demo app
+## Demo apps
 
-[`demo-app-swift/`](demo-app-swift/) is a Swift app that integrates the SDK and its network adapters. It opens on an Options screen that picks a demo flow:
+[`demo-app-swift/`](demo-app-swift/) and [`demo-app-objc/`](demo-app-objc/) are the same demo in Swift and Objective-C. Each integrates the SDK and its network adapters and opens on an Options screen that picks a demo flow:
 
 ```
 Options  ──  General      ──>  the CloudX integration demo
@@ -17,7 +17,7 @@ Options  ──  General      ──>  the CloudX integration demo
 General has an Init tab that initializes the SDK, Banner, Interstitial and Rewarded on the other bottom tabs, and App Open, MREC, Native, Key-Values and Settings under More. The Options screen makes no SDK calls and closes once you pick a flow, so it shows again only when the app starts from scratch.
 
 ```sh
-cd demo-app-swift
+cd demo-app-swift   # or demo-app-objc
 pod install
-open CloudXSwiftRemotePods.xcworkspace
+open *.xcworkspace
 ```
