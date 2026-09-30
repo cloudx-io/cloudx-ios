@@ -183,6 +183,10 @@ private final class Adapter: NSObject, CLXTestHarnessApp {
 
     private func resolveTabViewController() -> AdDemoTabViewController? {
         guard let window = keyWindow else { return nil }
+        // A fresh launch shows the Options screen; harness routes always target the General demo.
+        if window.rootViewController is OptionsViewController {
+            return OptionsViewController.openGeneral(in: window)
+        }
         if let tabVC = window.rootViewController as? AdDemoTabViewController {
             return tabVC
         }
