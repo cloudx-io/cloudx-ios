@@ -1,5 +1,4 @@
 import UIKit
-import AppTrackingTransparency
 
 class AdDemoTabViewController: UITabBarController {
 
@@ -14,7 +13,7 @@ class AdDemoTabViewController: UITabBarController {
         super.viewDidLoad()
 
         // Request App Tracking Transparency permission
-        requestAppTrackingTransparencyPermission()
+        AppTrackingPermission.request(completion: nil)
 
         // Create view controllers
         let initInternalVC = InitInternalViewController()
@@ -56,27 +55,5 @@ class AdDemoTabViewController: UITabBarController {
             UINavigationController(rootViewController: keyValueVC),
             UINavigationController(rootViewController: settingsVC)
         ]
-    }
-
-    private func requestAppTrackingTransparencyPermission() {
-        // iOS 14+ ATT compliance
-        if #available(iOS 14, *) {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                ATTrackingManager.requestTrackingAuthorization { status in
-                    switch status {
-                    case .authorized:
-                        DemoAppLogger.sharedInstance.logMessage("App Tracking authorized")
-                    case .denied:
-                        DemoAppLogger.sharedInstance.logMessage("App Tracking denied")
-                    case .notDetermined:
-                        DemoAppLogger.sharedInstance.logMessage("App Tracking not determined")
-                    case .restricted:
-                        DemoAppLogger.sharedInstance.logMessage("App Tracking restricted")
-                    @unknown default:
-                        break
-                    }
-                }
-            }
-        }
     }
 }

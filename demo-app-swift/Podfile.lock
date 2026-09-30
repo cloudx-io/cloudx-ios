@@ -148,6 +148,7 @@ DEPENDENCIES:
   - CloudXUnityAdsAdapter (~> 4.20.1.0)
   - CloudXVerveAdapter (~> 3.9.0.0)
   - CloudXVungleAdapter (~> 7.7.6.0)
+  - Google-Mobile-Ads-SDK
 
 SPEC REPOS:
   trunk:
@@ -219,6 +220,6 @@ SPEC CHECKSUMS:
   UnityCoherenceLib: d9be08c5b9c2880cb220c7ecd643f97ebda422b7
   VungleAds: 3b73c5e680c4c956ade61f3b0791e9b270914548
 
-PODFILE CHECKSUM: b9d189859f9ce463bd53f7932300a07e1221d4c3
+PODFILE CHECKSUM: 9346de51756542ca0e19966a702ce029603dda0b
 
 COCOAPODS: 1.17.0

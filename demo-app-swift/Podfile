@@ -22,6 +22,9 @@ target 'CloudXSwiftRemotePods' do
   pod 'CloudXTaurusXAdapter', '~> 1.18.2.0'
   pod 'CloudXBigoAdapter', '~> 6.1.0.0'
 
+  # The First Look flow calls Google Mobile Ads directly. CloudXGoogleWaterfallAdapter pins its version.
+  pod 'Google-Mobile-Ads-SDK'
+
   target 'CloudXSwiftRemotePodsTests' do
     inherit! :search_paths
   end

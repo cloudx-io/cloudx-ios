@@ -18,7 +18,11 @@ struct DemoAppLogEntry {
 
 class DemoAppLogger {
     static let sharedInstance = DemoAppLogger()
-    
+
+    /// Posted on the main queue after every appended entry, with the entry under `entryUserInfoKey`.
+    static let didAppendEntry = Notification.Name("DemoAppLoggerDidAppendEntry")
+    static let entryUserInfoKey = "entry"
+
     private var logs: [DemoAppLogEntry] = []
     private let logQueue = DispatchQueue(label: "com.cloudx.demo.logger", qos: .utility)
     
@@ -40,6 +44,14 @@ class DemoAppLogger {
             // Keep only the last 500 logs to prevent memory issues
             if self.logs.count > 500 {
                 self.logs.removeFirst()
+            }
+
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(
+                    name: DemoAppLogger.didAppendEntry,
+                    object: nil,
+                    userInfo: [DemoAppLogger.entryUserInfoKey: entry]
+                )
             }
         }
     }
