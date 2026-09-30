@@ -24,8 +24,9 @@ final class OptionsViewController: UIViewController {
     static func openGeneral(in window: UIWindow) -> AdDemoTabViewController {
         let tabViewController = AdDemoTabViewController()
         tabViewController.loadViewIfNeeded()
-        window.rootViewController = tabViewController
-        UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: nil)
+        UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve) {
+            window.rootViewController = tabViewController
+        }
         return tabViewController
     }
 
