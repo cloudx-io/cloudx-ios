@@ -1,6 +1,7 @@
 #import "OptionsViewController.h"
 #import "AdDemoTabViewController.h"
 #import "DemoAppLogger.h"
+#import "FirstLookViewController.h"
 
 static UIColor *ColorFromHex(NSUInteger hex) {
     return [UIColor colorWithRed:((hex >> 16) & 0xFF) / 255.0
@@ -13,15 +14,25 @@ static UIColor *ColorFromHex(NSUInteger hex) {
 
 + (AdDemoTabViewController *)openGeneralInWindow:(UIWindow *)window {
     AdDemoTabViewController *tabViewController = [[AdDemoTabViewController alloc] init];
-    [tabViewController loadViewIfNeeded];
+    [self replaceRootOfWindow:window withViewController:tabViewController];
+    return tabViewController;
+}
+
++ (void)openFirstLookInWindow:(UIWindow *)window {
+    UINavigationController *navigationController =
+        [[UINavigationController alloc] initWithRootViewController:[[FirstLookViewController alloc] init]];
+    [self replaceRootOfWindow:window withViewController:navigationController];
+}
+
++ (void)replaceRootOfWindow:(UIWindow *)window withViewController:(UIViewController *)viewController {
+    [viewController loadViewIfNeeded];
     [UIView transitionWithView:window
                       duration:0.3
                        options:UIViewAnimationOptionTransitionCrossDissolve
                     animations:^{
-        window.rootViewController = tabViewController;
+        window.rootViewController = viewController;
     }
                     completion:nil];
-    return tabViewController;
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
@@ -40,7 +51,8 @@ static UIColor *ColorFromHex(NSUInteger hex) {
 
     UIButton *generalButton = [self makeButtonWithTitle:@"General" enabled:YES];
     [generalButton addTarget:self action:@selector(generalTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIButton *firstLookButton = [self makeButtonWithTitle:@"First Look" enabled:NO];
+    UIButton *firstLookButton = [self makeButtonWithTitle:@"First Look" enabled:YES];
+    [firstLookButton addTarget:self action:@selector(firstLookTapped) forControlEvents:UIControlEventTouchUpInside];
     UIButton *arbiterButton = [self makeButtonWithTitle:@"Arbiter/TPA" enabled:NO];
 
     UIStackView *buttonStack = [[UIStackView alloc] initWithArrangedSubviews:@[generalButton, firstLookButton, arbiterButton]];
@@ -73,6 +85,15 @@ static UIColor *ColorFromHex(NSUInteger hex) {
     }
     [[DemoAppLogger sharedInstance] logMessage:@"Opening the General demo"];
     [OptionsViewController openGeneralInWindow:window];
+}
+
+- (void)firstLookTapped {
+    UIWindow *window = self.view.window;
+    if (!window) {
+        return;
+    }
+    [[DemoAppLogger sharedInstance] logMessage:@"Opening the First Look demo"];
+    [OptionsViewController openFirstLookInWindow:window];
 }
 
 - (UIButton *)makeButtonWithTitle:(NSString *)title enabled:(BOOL)enabled {

@@ -1,6 +1,9 @@
 #import "DemoAppLogger.h"
 #import <CloudXCore/CloudXCore.h>
 
+NSNotificationName const DemoAppLoggerDidAppendEntryNotification = @"DemoAppLoggerDidAppendEntry";
+NSString * const DemoAppLoggerEntryUserInfoKey = @"entry";
+
 @implementation DemoAppLogEntry
 
 - (instancetype)initWithMessage:(NSString *)message {
@@ -57,6 +60,12 @@
         if (self.logs.count > 500) {
             [self.logs removeObjectAtIndex:0];
         }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:DemoAppLoggerDidAppendEntryNotification
+                                                                object:nil
+                                                              userInfo:@{DemoAppLoggerEntryUserInfoKey: entry}];
+        });
     });
 }
 

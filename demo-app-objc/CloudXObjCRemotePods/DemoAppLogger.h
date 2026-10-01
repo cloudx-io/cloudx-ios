@@ -12,6 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithMessage:(NSString *)message;
 @end
 
+/// Posted on the main queue after every appended entry, with the entry under DemoAppLoggerEntryUserInfoKey.
+extern NSNotificationName const DemoAppLoggerDidAppendEntryNotification;
+extern NSString * const DemoAppLoggerEntryUserInfoKey;
+
 @interface DemoAppLogger : NSObject
 
 + (instancetype)sharedInstance;

@@ -3,6 +3,7 @@
 #if __has_include(<CloudXTestHarness/CLXTestHarness.h>)
 #import "AdDemoTabViewController.h"
 #import "BaseAdViewController.h"
+#import "FirstLookViewController.h"
 #import "NativeViewController.h"
 #import "OptionsViewController.h"
 #import "DemoAppLogger.h"
@@ -202,8 +203,13 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
     UIWindow *window = [self keyWindow];
     UIViewController *rootVC = window.rootViewController;
 
-    // A fresh launch shows the Options screen; harness routes always target the General demo.
-    if ([rootVC isKindOfClass:[OptionsViewController class]]) {
+    /*
+     * A fresh launch shows the Options screen and First Look has no tabs. Harness routes always
+     * target the General demo, so either root is replaced by it.
+     */
+    BOOL isFirstLookRoot = [rootVC isKindOfClass:[UINavigationController class]] &&
+        [((UINavigationController *)rootVC).viewControllers.firstObject isKindOfClass:[FirstLookViewController class]];
+    if ([rootVC isKindOfClass:[OptionsViewController class]] || isFirstLookRoot) {
         return [OptionsViewController openGeneralInWindow:window];
     }
     if ([rootVC isKindOfClass:[AdDemoTabViewController class]]) {
