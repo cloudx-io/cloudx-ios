@@ -7,10 +7,7 @@
 
 #import "AppDelegate.h"
 #import <CloudXCore/CloudXCore.h>
-#import <AppTrackingTransparency/AppTrackingTransparency.h>
-#import <AdSupport/AdSupport.h>
-#import "DemoAppLogger.h"
-#import "AdDemoTabViewController.h"
+#import "OptionsViewController.h"
 #import "CLXDeepLinkRouter.h"
 
 @interface AppDelegate ()
@@ -21,54 +18,27 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    
+
     // Enable verbose logging for demo app
     [CloudXCore setMinLogLevel:CLXLogLevelVerbose];
     [CloudXCore setLoggingEmojisEnabled:YES];
     [CloudXCore setLoggingTimestampsEnabled:YES];
-    
-    // Request App Tracking Transparency permission
-    [self requestAppTrackingTransparencyPermission];
-    
-    // Set up window with AdDemoTabViewController (the real UI)
+
+    /*
+     * The Options screen picks the demo flow and makes no SDK calls. General
+     * (AdDemoTabViewController) requests App Tracking Transparency when it opens.
+     */
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    self.window.rootViewController = [[AdDemoTabViewController alloc] init];
+    self.window.rootViewController = [[OptionsViewController alloc] init];
     [self.window makeKeyAndVisible];
-    
+
     [CLXDeepLinkRouter handleLaunchArguments];
-    
+
     return YES;
 }
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
     return [CLXDeepLinkRouter handleURL:url];
 }
-
-- (void)requestAppTrackingTransparencyPermission {
-    // iOS 14+ ATT compliance
-    if (@available(iOS 14, *)) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:^(ATTrackingManagerAuthorizationStatus status) {
-                switch (status) {
-                    case ATTrackingManagerAuthorizationStatusAuthorized:
-                        [[DemoAppLogger sharedInstance] logMessage:@"App Tracking authorized"];
-                        break;
-                    case ATTrackingManagerAuthorizationStatusDenied:
-                        [[DemoAppLogger sharedInstance] logMessage:@"App Tracking denied"];
-                        break;
-                    case ATTrackingManagerAuthorizationStatusNotDetermined:
-                        [[DemoAppLogger sharedInstance] logMessage:@"App Tracking not determined"];
-                        break;
-                    case ATTrackingManagerAuthorizationStatusRestricted:
-                        [[DemoAppLogger sharedInstance] logMessage:@"App Tracking restricted"];
-                        break;
-                    default:
-                        break;
-                }
-            }];
-        });
-    }
-}
-
 
 @end

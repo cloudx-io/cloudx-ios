@@ -4,6 +4,7 @@
 #import "AdDemoTabViewController.h"
 #import "BaseAdViewController.h"
 #import "NativeViewController.h"
+#import "OptionsViewController.h"
 #import "DemoAppLogger.h"
 #import <CloudXTestHarness/CLXTestHarness.h>
 
@@ -201,6 +202,10 @@ static NSDictionary<NSString *, NSString *> *classNameMap(void) {
     UIWindow *window = [self keyWindow];
     UIViewController *rootVC = window.rootViewController;
 
+    // A fresh launch shows the Options screen; harness routes always target the General demo.
+    if ([rootVC isKindOfClass:[OptionsViewController class]]) {
+        return [OptionsViewController openGeneralInWindow:window];
+    }
     if ([rootVC isKindOfClass:[AdDemoTabViewController class]]) {
         return (AdDemoTabViewController *)rootVC;
     }
