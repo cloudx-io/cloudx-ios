@@ -14,6 +14,7 @@ Install: `pod 'CloudXMintegralAdapter', '8.1.6.1'`
 ### Fixed
 
 - Corrected the Mintegral adapter framework bundle version to prevent App Store validation errors. MintegralAdSDK remains 8.1.6. Install: `pod 'CloudXMintegralAdapter', '~> 8.1.6.1'`.
+- **Privacy manifest included** — The adapter framework now ships its own Apple privacy manifest.
 
 ---
 
