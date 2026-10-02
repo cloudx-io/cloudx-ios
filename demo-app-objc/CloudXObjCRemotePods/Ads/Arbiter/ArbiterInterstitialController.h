@@ -48,9 +48,10 @@ typedef void (^ArbiterEventHandler)(ArbiterEvent *event);
  * and the app carries on without an ad. Call `load` after an ad closes to start the next round; it
  * reloads only the platform that has no fill.
  *
- * AdMob bids carry no price. CloudX prices them from the revenue this controller forwards after
- * every AdMob impression through `-[CloudXCore reportRevenueData:]`, so that forwarding is a
- * required part of the integration, not analytics.
+ * AdMob bids carry no price unless `adMobManualRevenuePerImpressionUSD` sets one. CloudX prices them
+ * from the revenue this controller forwards after every AdMob impression through
+ * `-[CloudXCore reportRevenueData:]`, so that forwarding is a required part of the integration, not
+ * analytics. The demo sets a manual price only from a launch override, for testing.
  *
  * Pass NO for `cloudXAvailable` when CloudX initialization failed or did not answer. AdMob is then
  * the only candidate and wins each round here, without a call into an SDK that is not initialized.
@@ -61,6 +62,7 @@ typedef void (^ArbiterEventHandler)(ArbiterEvent *event);
 - (instancetype)initWithViewController:(UIViewController *)viewController
                         cloudXAdUnitId:(NSString *)cloudXAdUnitId
                          adMobAdUnitId:(NSString *)adMobAdUnitId
+    adMobManualRevenuePerImpressionUSD:(nullable NSNumber *)adMobManualRevenuePerImpressionUSD
                        cloudXAvailable:(BOOL)cloudXAvailable
                                onEvent:(ArbiterEventHandler)onEvent NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;

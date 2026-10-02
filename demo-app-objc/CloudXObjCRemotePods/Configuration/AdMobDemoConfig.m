@@ -12,4 +12,19 @@
     return adUnitId;
 }
 
++ (nullable NSNumber *)manualRevenuePerImpressionUSD {
+    static NSNumber *price;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSString *text = [[NSUserDefaults standardUserDefaults] stringForKey:@"DemoApp.AdMobManualRevenuePerImpressionUSD"];
+        if (!text) return;
+        NSScanner *scanner = [NSScanner scannerWithString:text];
+        double value = 0;
+        if ([scanner scanDouble:&value] && scanner.isAtEnd && isfinite(value) && value >= 0) {
+            price = @(value);
+        }
+    });
+    return price;
+}
+
 @end

@@ -63,6 +63,7 @@
         initWithViewController:self
                 cloudXAdUnitId:[CLXDemoConfigManager sharedManager].currentConfig.arbiterInterstitialAdUnitId
                  adMobAdUnitId:AdMobDemoConfig.interstitialAdUnitId
+    adMobManualRevenuePerImpressionUSD:AdMobDemoConfig.manualRevenuePerImpressionUSD
                cloudXAvailable:cloudXAvailable
                        onEvent:^(ArbiterEvent *event) {
         [weakSelf onArbiterEvent:event];

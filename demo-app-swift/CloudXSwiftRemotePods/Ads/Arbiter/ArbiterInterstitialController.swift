@@ -30,9 +30,10 @@ enum ArbiterEvent {
  * and the app carries on without an ad. Call `load()` after an ad closes to start the next round;
  * it reloads only the platform that has no fill.
  *
- * AdMob bids carry no price. CloudX prices them from the revenue this controller forwards after
- * every AdMob impression through `CloudXCore.shared.reportRevenueData(_:)`, so that forwarding is a
- * required part of the integration, not analytics.
+ * AdMob bids carry no price unless `adMobManualRevenuePerImpressionUSD` sets one. CloudX prices them
+ * from the revenue this controller forwards after every AdMob impression through
+ * `CloudXCore.shared.reportRevenueData(_:)`, so that forwarding is a required part of the
+ * integration, not analytics. The demo sets a manual price only from a launch override, for testing.
  *
  * Pass false for `cloudXAvailable` when CloudX initialization failed or did not answer. AdMob is
  * then the only candidate and wins each round here, without a call into an SDK that is not
@@ -45,6 +46,7 @@ final class ArbiterInterstitialController: NSObject {
 
     private weak var viewController: UIViewController?
     private let adMobAdUnitId: String
+    private let adMobManualRevenuePerImpressionUSD: NSNumber?
     private let onEvent: (ArbiterEvent) -> Void
 
     /*
@@ -76,15 +78,20 @@ final class ArbiterInterstitialController: NSObject {
         viewController: UIViewController,
         cloudXAdUnitId: String,
         adMobAdUnitId: String,
+        adMobManualRevenuePerImpressionUSD: NSNumber?,
         cloudXAvailable: Bool,
         onEvent: @escaping (ArbiterEvent) -> Void
     ) {
         self.viewController = viewController
         self.adMobAdUnitId = adMobAdUnitId
+        self.adMobManualRevenuePerImpressionUSD = adMobManualRevenuePerImpressionUSD
         self.onEvent = onEvent
         cloudXInterstitial = cloudXAvailable ? CloudXCore.shared.createInterstitial(adUnitId: cloudXAdUnitId) : nil
         cloudXSettled = cloudXInterstitial == nil
         super.init()
+        if let price = adMobManualRevenuePerImpressionUSD {
+            DemoAppLogger.sharedInstance.logMessage("AdMob bids carry a manual price of \(price) USD per impression")
+        }
         if cloudXAvailable && cloudXInterstitial == nil {
             DemoAppLogger.sharedInstance.logMessage("CloudX interstitial unavailable; AdMob only")
         }
@@ -202,7 +209,7 @@ final class ArbiterInterstitialController: NSObject {
             bids.append(CLXArbiterBid.adMob(
                 adUnitId: adMobAdUnitId,
                 networkName: ad.responseInfo.loadedAdNetworkResponseInfo?.adSourceName ?? "admob",
-                manualRevenuePerImpressionUSD: nil,
+                manualRevenuePerImpressionUSD: adMobManualRevenuePerImpressionUSD,
                 extras: nil
             ))
         }

@@ -51,6 +51,7 @@ final class ArbiterViewController: UIViewController {
             viewController: self,
             cloudXAdUnitId: CLXDemoConfigManager.sharedManager.currentConfig.arbiterInterstitialAdUnitId,
             adMobAdUnitId: AdMobDemoConfig.interstitialAdUnitId,
+            adMobManualRevenuePerImpressionUSD: AdMobDemoConfig.manualRevenuePerImpressionUSD,
             cloudXAvailable: cloudXAvailable,
             onEvent: { [weak self] event in self?.onArbiterEvent(event) }
         )

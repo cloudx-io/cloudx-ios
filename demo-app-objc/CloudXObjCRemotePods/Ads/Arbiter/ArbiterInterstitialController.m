@@ -33,6 +33,7 @@ static CFTimeInterval const kAdMobAdTimeToLive = 60 * 60;
 @interface ArbiterInterstitialController () <CLXInterstitialDelegate, GADFullScreenContentDelegate>
 @property (nonatomic, weak, nullable) UIViewController *viewController;
 @property (nonatomic, copy) NSString *adMobAdUnitId;
+@property (nonatomic, strong, nullable) NSNumber *adMobManualRevenuePerImpressionUSD;
 @property (nonatomic, copy) ArbiterEventHandler onEvent;
 
 /*
@@ -66,15 +67,21 @@ static CFTimeInterval const kAdMobAdTimeToLive = 60 * 60;
 - (instancetype)initWithViewController:(UIViewController *)viewController
                         cloudXAdUnitId:(NSString *)cloudXAdUnitId
                          adMobAdUnitId:(NSString *)adMobAdUnitId
+    adMobManualRevenuePerImpressionUSD:(nullable NSNumber *)adMobManualRevenuePerImpressionUSD
                        cloudXAvailable:(BOOL)cloudXAvailable
                                onEvent:(ArbiterEventHandler)onEvent {
     self = [super init];
     if (self) {
         _viewController = viewController;
         _adMobAdUnitId = [adMobAdUnitId copy];
+        _adMobManualRevenuePerImpressionUSD = adMobManualRevenuePerImpressionUSD;
         _onEvent = [onEvent copy];
         _cloudXInterstitial = cloudXAvailable ? [[CloudXCore shared] createInterstitialWithAdUnitId:cloudXAdUnitId] : nil;
         _cloudXSettled = _cloudXInterstitial == nil;
+        if (adMobManualRevenuePerImpressionUSD) {
+            [[DemoAppLogger sharedInstance] logMessage:[NSString stringWithFormat:
+                @"AdMob bids carry a manual price of %@ USD per impression", adMobManualRevenuePerImpressionUSD]];
+        }
         if (cloudXAvailable && !_cloudXInterstitial) {
             [[DemoAppLogger sharedInstance] logMessage:@"CloudX interstitial unavailable; AdMob only"];
         }
@@ -187,7 +194,7 @@ static CFTimeInterval const kAdMobAdTimeToLive = 60 * 60;
         NSString *networkName = adMobAd.responseInfo.loadedAdNetworkResponseInfo.adSourceName ?: @"admob";
         [bids addObject:[CLXArbiterBid adMobBidWithAdUnitId:self.adMobAdUnitId
                                                 networkName:networkName
-                              manualRevenuePerImpressionUSD:nil
+                              manualRevenuePerImpressionUSD:self.adMobManualRevenuePerImpressionUSD
                                                      extras:nil]];
     }
     if (bids.count == 0) {
