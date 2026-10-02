@@ -6,6 +6,7 @@ class CLXDemoConfig {
     let bannerAdUnitId: String
     let mrecAdUnitId: String
     let interstitialAdUnitId: String
+    let arbiterInterstitialAdUnitId: String
     let nativeAdUnitId: String
     let nativeBannerAdUnitId: String
     let rewardedAdUnitId: String
@@ -16,6 +17,7 @@ class CLXDemoConfig {
          bannerAdUnitId: String,
          mrecAdUnitId: String,
          interstitialAdUnitId: String,
+         arbiterInterstitialAdUnitId: String,
          nativeAdUnitId: String,
          nativeBannerAdUnitId: String,
          rewardedAdUnitId: String,
@@ -26,6 +28,7 @@ class CLXDemoConfig {
         self.bannerAdUnitId = bannerAdUnitId
         self.mrecAdUnitId = mrecAdUnitId
         self.interstitialAdUnitId = interstitialAdUnitId
+        self.arbiterInterstitialAdUnitId = arbiterInterstitialAdUnitId
         self.nativeAdUnitId = nativeAdUnitId
         self.nativeBannerAdUnitId = nativeBannerAdUnitId
         self.rewardedAdUnitId = rewardedAdUnitId
@@ -49,7 +52,7 @@ class CLXDemoConfigManager {
             let value = defaults.string(forKey: key) ?? ""
             return value.isEmpty ? fallback : value
         }
-        NSLog("%@", "📱 [DemoApp] launch overrides: appKey=\(defaults.string(forKey: "DemoApp.AppKey") ?? "(none)") banner=\(defaults.string(forKey: "DemoApp.BannerAdUnitId") ?? "(none)") mrec=\(defaults.string(forKey: "DemoApp.MrecAdUnitId") ?? "(none)") interstitial=\(defaults.string(forKey: "DemoApp.InterstitialAdUnitId") ?? "(none)") rewarded=\(defaults.string(forKey: "DemoApp.RewardedAdUnitId") ?? "(none)")")
+        NSLog("%@", "📱 [DemoApp] launch overrides: appKey=\(defaults.string(forKey: "DemoApp.AppKey") ?? "(none)") banner=\(defaults.string(forKey: "DemoApp.BannerAdUnitId") ?? "(none)") mrec=\(defaults.string(forKey: "DemoApp.MrecAdUnitId") ?? "(none)") interstitial=\(defaults.string(forKey: "DemoApp.InterstitialAdUnitId") ?? "(none)") arbiterInterstitial=\(defaults.string(forKey: "DemoApp.ArbiterInterstitialAdUnitId") ?? "(none)") rewarded=\(defaults.string(forKey: "DemoApp.RewardedAdUnitId") ?? "(none)")")
 
         // Production Configuration (shared with ObjC demo - bundle: cloudx.CloudXObjCRemotePods)
         // Both demos share the same SSP-side appKey, ad units, and bundle ID — they're the
@@ -61,6 +64,8 @@ class CLXDemoConfigManager {
             bannerAdUnitId: overrideOrDefault("DemoApp.BannerAdUnitId", "1pfZEjeYFB31WGsaRMIOE"),
             mrecAdUnitId: overrideOrDefault("DemoApp.MrecAdUnitId", "f3vNAyybeLZw3tmrLDnfp"),
             interstitialAdUnitId: overrideOrDefault("DemoApp.InterstitialAdUnitId", "SKva576GixtRW5DL_jS_D"),
+            // demo-interstitial-1, the interstitial with Trusted Arbiter enabled for this app key.
+            arbiterInterstitialAdUnitId: overrideOrDefault("DemoApp.ArbiterInterstitialAdUnitId", "txZ7NmISq-MsuPH0ULKbD"),
             nativeAdUnitId: overrideOrDefault("DemoApp.NativeAdUnitId", "5NN7ZlBorm4ZoRkL6bsz9"),
             nativeBannerAdUnitId: overrideOrDefault("DemoApp.NativeBannerAdUnitId", "-2_Lw2b4QTlu7x6tKZ6Ww"),
             rewardedAdUnitId: overrideOrDefault("DemoApp.RewardedAdUnitId", "jKOcqM-eHbGBwg76RQmsA"),

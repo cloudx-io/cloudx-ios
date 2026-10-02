@@ -7,6 +7,7 @@
                bannerAdUnitId:(NSString *)bannerAdUnitId
                  mrecAdUnitId:(NSString *)mrecAdUnitId
          interstitialAdUnitId:(NSString *)interstitialAdUnitId
+  arbiterInterstitialAdUnitId:(NSString *)arbiterInterstitialAdUnitId
                nativeAdUnitId:(NSString *)nativeAdUnitId
          nativeBannerAdUnitId:(NSString *)nativeBannerAdUnitId
              rewardedAdUnitId:(NSString *)rewardedAdUnitId
@@ -19,6 +20,7 @@
         _bannerAdUnitId = [bannerAdUnitId copy];
         _mrecAdUnitId = [mrecAdUnitId copy];
         _interstitialAdUnitId = [interstitialAdUnitId copy];
+        _arbiterInterstitialAdUnitId = [arbiterInterstitialAdUnitId copy];
         _nativeAdUnitId = [nativeAdUnitId copy];
         _nativeBannerAdUnitId = [nativeBannerAdUnitId copy];
         _rewardedAdUnitId = [rewardedAdUnitId copy];
@@ -52,11 +54,12 @@
             NSString *value = [defaults stringForKey:key];
             return (value.length > 0) ? value : fallback;
         };
-        NSLog(@"📱 [DemoApp] launch overrides: appKey=%@ banner=%@ mrec=%@ interstitial=%@ rewarded=%@",
+        NSLog(@"📱 [DemoApp] launch overrides: appKey=%@ banner=%@ mrec=%@ interstitial=%@ arbiterInterstitial=%@ rewarded=%@",
               [defaults stringForKey:@"DemoApp.AppKey"] ?: @"(none)",
               [defaults stringForKey:@"DemoApp.BannerAdUnitId"] ?: @"(none)",
               [defaults stringForKey:@"DemoApp.MrecAdUnitId"] ?: @"(none)",
               [defaults stringForKey:@"DemoApp.InterstitialAdUnitId"] ?: @"(none)",
+              [defaults stringForKey:@"DemoApp.ArbiterInterstitialAdUnitId"] ?: @"(none)",
               [defaults stringForKey:@"DemoApp.RewardedAdUnitId"] ?: @"(none)");
 
         // Production Configuration (ObjCDemoApp - bundle: cloudx.CloudXObjCRemotePods)
@@ -66,6 +69,8 @@
             bannerAdUnitId:overrideOrDefault(@"DemoApp.BannerAdUnitId", @"1pfZEjeYFB31WGsaRMIOE")
             mrecAdUnitId:overrideOrDefault(@"DemoApp.MrecAdUnitId", @"f3vNAyybeLZw3tmrLDnfp")
             interstitialAdUnitId:overrideOrDefault(@"DemoApp.InterstitialAdUnitId", @"SKva576GixtRW5DL_jS_D")
+            // demo-interstitial-1, the interstitial with Trusted Arbiter enabled for this app key.
+            arbiterInterstitialAdUnitId:overrideOrDefault(@"DemoApp.ArbiterInterstitialAdUnitId", @"txZ7NmISq-MsuPH0ULKbD")
             nativeAdUnitId:overrideOrDefault(@"DemoApp.NativeAdUnitId", @"5NN7ZlBorm4ZoRkL6bsz9")
             nativeBannerAdUnitId:overrideOrDefault(@"DemoApp.NativeBannerAdUnitId", @"-2_Lw2b4QTlu7x6tKZ6Ww")
             rewardedAdUnitId:overrideOrDefault(@"DemoApp.RewardedAdUnitId", @"jKOcqM-eHbGBwg76RQmsA")
