@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Mintegral adapter 8.1.6.1 - Unreleased
 
-Install: `pod 'CloudXMintegralAdapter', '8.1.6.1'`
+Install: `pod 'CloudXMintegralAdapter', '~> 8.1.6.1'`
 
 ### Fixed
 
