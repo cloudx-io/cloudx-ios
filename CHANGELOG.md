@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Mintegral adapter 8.1.6.1 - Unreleased
+
+Install: `pod 'CloudXMintegralAdapter', '~> 8.1.6.1'`
+
+### Fixed
+
+- Corrected the Mintegral adapter framework bundle version to prevent App Store validation errors. MintegralAdSDK remains 8.1.6. Install: `pod 'CloudXMintegralAdapter', '~> 8.1.6.1'`.
+- **Privacy manifest included** — The adapter framework now ships its own Apple privacy manifest.
+
+---
+
 ## [3.10.0] - 2026-09-24
 
 Install: `pod 'CloudXCore', '~> 3.10'`
