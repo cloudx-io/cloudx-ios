@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXMintegralAdapter'
-  s.version = '8.1.6.0'
+  s.version = '8.1.6.1'
   s.summary          = 'CloudX Mintegral Adapter - Static Framework'
   s.description      = 'Mintegral adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'

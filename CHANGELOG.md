@@ -7,13 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## Moloco adapter 4.11.0.0 - 2026-10-02
+## Moloco adapter 4.11.0.0 - 2026-10-06
 
 Install: `pod 'CloudXMolocoAdapter', '~> 4.11.0.0'`
 
 ### Changed
 
 - **Certified with Moloco SDK 4.11.0** — Updates MolocoSDKiOS from 4.10.0 to 4.11.0. No integration change is required; `CloudXCore >= 3.5.0` and iOS 13.0 requirements are unchanged.
+
+---
+
+## Mintegral adapter 8.1.6.1 - Unreleased
+
+Install: `pod 'CloudXMintegralAdapter', '~> 8.1.6.1'`
+
+### Fixed
+
+- Corrected the Mintegral adapter framework bundle version to prevent App Store validation errors. MintegralAdSDK remains 8.1.6. Install: `pod 'CloudXMintegralAdapter', '~> 8.1.6.1'`.
+- **Privacy manifest included** — The adapter framework now ships its own Apple privacy manifest.
 
 ---
 
