@@ -17,7 +17,7 @@ Install: `pod 'CloudXMolocoAdapter', '~> 4.11.0.0'`
 
 ---
 
-## Mintegral adapter 8.1.6.1 - Unreleased
+## Mintegral adapter 8.1.6.1 - 2026-10-06
 
 Install: `pod 'CloudXMintegralAdapter', '~> 8.1.6.1'`
 
