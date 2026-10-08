@@ -37,9 +37,9 @@ PODS:
   - CloudXMobileFuseAdapter (1.11.0.1):
     - CloudXCore (>= 3.5.0)
     - MobileFuseSDK (= 1.11.0)
-  - CloudXMolocoAdapter (4.11.0.0):
+  - CloudXMolocoAdapter (4.11.1.0):
     - CloudXCore (>= 3.5.0)
-    - MolocoSDKiOS (= 4.11.0)
+    - MolocoSDKiOS (= 4.11.1)
   - CloudXPangleAdapter (8.3.0.6.0):
     - Ads-Global (= 8.3.0.6)
     - CloudXCore (>= 3.5.0)
@@ -123,7 +123,7 @@ PODS:
   - MintegralAdSDK/SplashAd (8.1.6):
     - MintegralAdSDK/NativeAd
   - MobileFuseSDK (1.11.0)
-  - MolocoSDKiOS (4.11.0)
+  - MolocoSDKiOS (4.11.1)
   - TaurusxAdsSDK (1.18.2):
     - TaurusxAdsSDK/TaurusxAds (= 1.18.2)
   - TaurusxAdsSDK/TaurusxAds (1.18.2)
@@ -142,7 +142,7 @@ DEPENDENCIES:
   - CloudXMetaAdapter (~> 6.22.0.0)
   - CloudXMintegralAdapter (~> 8.1.6.1)
   - CloudXMobileFuseAdapter (~> 1.11.0.1)
-  - CloudXMolocoAdapter (~> 4.11.0.0)
+  - CloudXMolocoAdapter (~> 4.11.1.0)
   - CloudXPangleAdapter (~> 8.3.0.6.0)
   - CloudXTaurusXAdapter (~> 1.18.2.0)
   - CloudXUnityAdsAdapter (~> 4.20.1.0)
@@ -199,7 +199,7 @@ SPEC CHECKSUMS:
   CloudXMetaAdapter: 10c2d1a7abef1f118b8c48968e4e60439b66f2d3
   CloudXMintegralAdapter: ecefe8a74d9465da4c62b29faf132262a88b4d9d
   CloudXMobileFuseAdapter: 70187afa6989e369c10b66a7e173b19dbe4a8593
-  CloudXMolocoAdapter: f7fe8c458b5293518ab976db57d2ff569281a1ed
+  CloudXMolocoAdapter: fd4af83a2ea15b137ad173066d00342bb77d6b7e
   CloudXPangleAdapter: 5c3afb3f82404cf8ed11d014ade15773de774252
   CloudXTaurusXAdapter: 5f0129bd95751697aebfe0a8bb25d0adabfb89fc
   CloudXUnityAdsAdapter: 4c3113ae49c781a44245515fdc69b30ec5fe2708
@@ -214,12 +214,12 @@ SPEC CHECKSUMS:
   MagniteSDK: edfce03a6207c856681cc3355a7e6124c977ae61
   MintegralAdSDK: b8fbfe18eacde1eb4f5c0e388c3769503ed5d4fa
   MobileFuseSDK: 08da0fcba90e7c208e2817f6964ff4f15bd6f285
-  MolocoSDKiOS: b670dd64a158542d52dbc54abbd7fd7e1631187c
+  MolocoSDKiOS: f55c53033aaf1ed43975ca14e76362efd8f96caa
   TaurusxAdsSDK: 02cab82069bddbb22455dec35e171ab99115f6bf
   UnityAds: 70ddc29f85c2e26967afca937e5379118f435747
   UnityCoherenceLib: d9be08c5b9c2880cb220c7ecd643f97ebda422b7
   VungleAds: 3b73c5e680c4c956ade61f3b0791e9b270914548
 
-PODFILE CHECKSUM: 13f986aa8db880edd0ed71324f24bb4ebb085deb
+PODFILE CHECKSUM: 92d71aad45ae7e697ee2a403f9b0edef6612f82c
 
 COCOAPODS: 1.17.0
