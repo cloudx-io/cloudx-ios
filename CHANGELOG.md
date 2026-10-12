@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Magnite adapter 1.0.4.0 - 2026-10-09
+
+Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.4.0'`
+
+### Changed
+
+- **Certified with MagniteSDK 1.0.4** — Updates MagniteSDK from 1.0.0 to 1.0.4. No integration change is required; `CloudXCore >= 3.9.0` and iOS 13.0 requirements are unchanged.
+
+---
+
 ## Moloco adapter 4.11.1.0 - 2026-10-08
 
 Install: `pod 'CloudXMolocoAdapter', '~> 4.11.1.0'`
