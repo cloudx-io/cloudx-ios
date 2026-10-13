@@ -64,8 +64,6 @@ Install: `pod 'CloudXCore', '~> 3.11'`
 
 - **Banners without a configured refresh interval refresh every 30 seconds** on every load path.
 
-- **CloudX-rendered ads load more reliably on networks that block ad domains.** Video, images and tracking requests retry once through a backup DNS lookup after a DNS or connection failure.
-
 ### Fixed
 
 - **Built-in native templates keep their title and body text readable in dark mode.**
