@@ -292,6 +292,13 @@ extern NSString * const CLXMetricsTypeIdentityOnlyAdEmitted;                // "
  * came"), `false` means the user had already left. `source` names what was observed,
  * not an inferred cause. `ad_format` already carries the format, so the sources are
  * not format-prefixed. Matches Android's `ad_expired`.
+ *
+ * Pairing with loss 205 is an emit-time property only: each row is recorded in
+ * the same call, gate and attribution as an expiry loss 205, and each expiry
+ * loss the SDK writes off records one row. It is not a 1:1 guarantee in the
+ * data — loss events persist and retry, metrics do not — and one 205 is
+ * deliberately not counted: a partner LOAD failure mapped to 616 reaches 205
+ * through the loss-reason mapper with no row, because that bid never loaded.
  */
 extern NSString * const CLXMetricsTypeAdExpired;                            // "ad_expired"
 
@@ -301,6 +308,7 @@ extern NSString * const CLXAdExpiredSourceStaleOnReload;                    // "
 extern NSString * const CLXAdExpiredSourceLoadPastDeadline;                 // "load_past_deadline"
 extern NSString * const CLXAdExpiredSourceShowPastDeadline;                 // "show_past_deadline"
 extern NSString * const CLXAdExpiredSourceAdoptionPastDeadline;             // "adoption_past_deadline"
+extern NSString * const CLXAdExpiredSourceDestroyPastDeadline;              // "destroy_past_deadline"
 
 /**
  * Utility class for metrics type validation and categorization

@@ -105,6 +105,9 @@ CLX_INTERNAL_TESTING
 @property (nonatomic, copy, nullable) NSString *sdkCrashEndpointURL;
 @property (nonatomic, assign) BOOL iosMetricKitCrashReportingEnabled;
 @property (nonatomic, copy, nullable) NSString *sdkGamAuctionResultEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkOrchestrationStartEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkMediatorAttemptEndpointURL;
+@property (nonatomic, copy, nullable) NSString *sdkOrchestratorSelectionEndpointURL;
 
 // 2b-v. Server kill switches for speculative bid-token work. Both default to NO, so a
 // payload that says nothing leaves the SDK collecting every token live under the asking
@@ -124,6 +127,22 @@ CLX_INTERNAL_TESTING
 // live by the requests that need it.
 @property (nonatomic, assign) BOOL tokenPrefetchEnabled;
 @property (nonatomic, assign) BOOL tokenRefillEnabled;
+
+// Applies background-refresh configs and auction config envelopes in session. Defaults to NO.
+@property (nonatomic, assign) BOOL inSessionConfigApplyEnabled;
+
+/*
+ * Reward-callback timing. YES tells an adapter that holds the network's earned reward until its
+ * own close callback to forward it at the grant instead, so an ad the user never closes still
+ * pays. Reaches the adapter through localExtras; an adapter that already forwards at the grant is
+ * unaffected. Defaults to NO, which is the timing that shipped before this switch existed.
+ *
+ * COLD, unlike every other behavioral switch here: it is pinned to the generation that
+ * initialized the session, so one session is one A/B arm and a readout cannot straddle both
+ * timings. The cost is no in-session kill switch -- turning it off takes effect at the next cold
+ * start -- which is accepted for a flag rolled out per app through an experiment.
+ */
+@property (nonatomic, assign) BOOL rewardOnGrantEnabled;
 
 // CXD-1176: adapter-lifecycle observability events flow through the metrics
 // pipeline (single `sdkMetricsEndpointURL` + server-side allow-list in

@@ -48,6 +48,10 @@
 #import <CloudXCore/CLXAdDelegate.h>
 #import <CloudXCore/CLXFullscreenAdDelegate.h>
 #import <CloudXCore/CLXAdRevenueDelegate.h>
+#import <CloudXCore/CLXAdQualityGate.h>
+#import <CloudXCore/CLXAdQualityRequest.h>
+#import <CloudXCore/CLXAdQualityVerdict.h>
+#import <CloudXCore/CLXAdQualityError.h>
 #import <CloudXCore/CLXDestroyable.h>
 
 // Banner
@@ -94,6 +98,7 @@
 
 // Adapter Protocols
 #import <CloudXCore/CLXAdNetwork.h>
+#import <CloudXCore/CLXNetworkAdObjectProviding.h>
 #import <CloudXCore/CLXAdapterAdView.h>
 #import <CloudXCore/CLXAdapterAdViewFactory.h>
 #import <CloudXCore/CLXAdapterRewarded.h>
@@ -147,6 +152,8 @@
 #import <CloudXCore/CLXMediatorPrivacyHandler.h>
 #import <CloudXCore/CLXMediatorMetadataProvider.h>
 #import <CloudXCore/CLXInterstitialMediator.h>
+#import <CloudXCore/CLXAdViewMediator.h>
+#import <CloudXCore/CLXNativeMediator.h>
 #import <CloudXCore/CLXRewardedMediator.h>
 
 // Utilities

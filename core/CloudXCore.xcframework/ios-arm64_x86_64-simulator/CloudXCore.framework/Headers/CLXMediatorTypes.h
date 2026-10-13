@@ -47,7 +47,7 @@ CLX_PUBLIC_MEDIATOR
 
 /**
  * Returns nil for missing required values, unsupported ad formats, or invalid revenue.
- * V1 accepts interstitial and rewarded formats and finite, non-negative revenue.
+ * Accepts interstitial, rewarded, app-open, banner, MREC, and native formats and finite, non-negative revenue.
  * An empty revenuePrecision means precision is unavailable and is preserved.
  */
 - (nullable instancetype)initWithAdFormat:(CLXAdFormat)adFormat

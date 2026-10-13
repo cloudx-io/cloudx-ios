@@ -23,6 +23,7 @@ FOUNDATION_EXPORT NSString * const CLXSDKInitializedNotification;
 @protocol CLXRewardedDelegate;
 @protocol CLXAdRevenueDelegate;
 @protocol CLXAppOpenDelegate;
+@protocol CLXAdQualityGate;
 
 @class CLXBannerAdView;
 @class CLXSDKConfigResponse;
@@ -392,6 +393,36 @@ CLX_PUBLIC
  */
 + (void)removeAdRevenueDelegate:(id<CLXAdRevenueDelegate>)delegate
     NS_SWIFT_NAME(removeAdRevenueDelegate(_:));
+
+#pragma mark - Ad Quality Gate
+
+/**
+ * Register the ad-quality gate — a single, vendor-neutral participant that
+ * inspects every loaded ad before the publisher is told it loaded and may veto
+ * ("block") it. A blocked ad is routed into the existing adapter-load-failure
+ * path with a @c CLXAdQualityError, so waterfall / refresh / teardown machinery
+ * runs unchanged.
+ *
+ * Only one gate is consulted per ad (not a delegate list). Pass nil to clear the
+ * current gate. When no gate is registered, ad loading is a zero-overhead
+ * passthrough (no allocation, no dispatch).
+ *
+ * The gate's @c evaluateAd:completion: may be invoked on any thread; core
+ * enforces a per-request timeout (default 3.0s) and fails open on expiry. See
+ * the @c CLXAdQualityGate protocol for the full threading and lifecycle contract.
+ *
+ * @param gate The gate to register, or nil to clear. Thread-safe.
+ * @discussion Safe to call before SDK initialization (e.g. from a module's
+ * @c +load). Inert until a gate is registered.
+ */
++ (void)setAdQualityGate:(nullable id<CLXAdQualityGate>)gate
+    NS_SWIFT_NAME(setAdQualityGate(_:));
+
+/**
+ * The currently-registered ad-quality gate, or nil when none is set. Thread-safe.
+ * @return The registered gate, or nil.
+ */
++ (nullable id<CLXAdQualityGate>)adQualityGate;
 
 @end
 

@@ -3,6 +3,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol CLXOrchestratorAttemptDescriptor <NSObject>
+@property (nonatomic, copy, readonly) NSString *mediatorName;
+@property (nonatomic, copy, readonly) NSString *mediatorDisplayName;
+@property (nonatomic, copy, readonly) NSDictionary<NSString *, id> *adUnitData;
+@property (nonatomic, strong, readonly, nullable) NSNumber *timeoutMs;
+@end
+
 @interface CLXMediatorConfiguration : NSObject
 @property (nonatomic, copy, readonly) NSString *mediatorName;
 @property (nonatomic, copy, readonly, getter=mediatorInitData) NSDictionary<NSString *, id> *initData;
@@ -15,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 @end
 
-@interface CLXMediatorAttempt : NSObject
+@interface CLXMediatorAttempt : NSObject <CLXOrchestratorAttemptDescriptor>
 @property (nonatomic, copy, readonly) NSString *mediatorName;
 @property (nonatomic, copy, readonly) NSString *mediatorDisplayName;
 @property (nonatomic, copy, readonly) NSDictionary<NSString *, id> *adUnitData;
@@ -27,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 @end
 
-@interface CLXPostBidAttempt : NSObject
+@interface CLXPostBidAttempt : NSObject <CLXOrchestratorAttemptDescriptor>
 @property (nonatomic, copy, readonly) NSString *mediatorName;
 @property (nonatomic, copy, readonly) NSString *mediatorDisplayName;
 @property (nonatomic, copy, readonly) NSDictionary<NSString *, id> *adUnitData;
