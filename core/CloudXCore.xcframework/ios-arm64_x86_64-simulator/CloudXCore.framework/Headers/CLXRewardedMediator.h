@@ -57,6 +57,11 @@ CLX_PUBLIC_MEDIATOR
 @property (nonatomic, assign, readonly) CLXMediatorThreadRequirement loadThreadRequirement;
 @property (nonatomic, assign, readonly) CLXMediatorThreadRequirement showThreadRequirement;
 
+/**
+ * Core can request a load before module initialization succeeds, including after
+ * its startup deadline. The module must check runtime readiness and report a
+ * load failure if it is not ready. A later attempt can succeed without reinitialization.
+ */
 - (void)loadWithParams:(CLXMediatorLoadParams *)params;
 - (void)showWithParams:(CLXMediatorShowParams *)params;
 - (void)destroy;

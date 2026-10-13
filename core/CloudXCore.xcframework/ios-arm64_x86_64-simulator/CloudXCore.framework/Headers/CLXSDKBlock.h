@@ -38,6 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
     session-age / time-to-first-ad metrics, which are computed on a sleep-EXCLUDING base — do not
     subtract those from this value. */
 @property (nonatomic, copy, nullable) NSNumber *appUptimeWallMs;
+/** Init reached CloudX only through the pinned lookup this process. Omitted from JSON when NO. */
+@property (nonatomic, assign) BOOL dnsFiltered;
 
 - (NSDictionary *)json;
 

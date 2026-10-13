@@ -24,6 +24,15 @@ CLX_PUBLIC_MEDIATOR
 @end
 
 /**
+ * @brief Creates app-open attempts using the interstitial lifecycle contract.
+ * A distinct factory lets Core discover app-open support without substituting
+ * an interstitial placement. Returned ad information must use CLXAdFormatAppOpen.
+ */
+CLX_PUBLIC_MEDIATOR
+@interface CLXAppOpenMediatorFactory : CLXInterstitialMediatorFactory
+@end
+
+/**
  * Base class for one interstitial mediator load attempt.
  *
  * One object represents one load attempt. A load must produce one terminal
@@ -56,6 +65,11 @@ CLX_PUBLIC_MEDIATOR
 @property (nonatomic, assign, readonly) CLXMediatorThreadRequirement loadThreadRequirement;
 @property (nonatomic, assign, readonly) CLXMediatorThreadRequirement showThreadRequirement;
 
+/**
+ * Core can request a load before module initialization succeeds, including after
+ * its startup deadline. The module must check runtime readiness and report a
+ * load failure if it is not ready. A later attempt can succeed without reinitialization.
+ */
 - (void)loadWithParams:(CLXMediatorLoadParams *)params;
 - (void)showWithParams:(CLXMediatorShowParams *)params;
 - (void)destroy;

@@ -91,8 +91,7 @@ NS_ASSUME_NONNULL_BEGIN
                                           adUnits:(NSDictionary<NSString *, CLXSDKConfigAdUnit *> *)adUnits;
 
 /**
- * Validates that a native ad unit exists. Native ads don't have a specific type in the config,
- * so this only validates existence.
+ * Validates that a native ad unit exists and is of type native.
  * @param adUnitId The ID of the ad unit to validate
  * @param adUnits Dictionary of available ad units (name -> CLXSDKConfigAdUnit)
  * @return Validation result with ad unit or detailed error

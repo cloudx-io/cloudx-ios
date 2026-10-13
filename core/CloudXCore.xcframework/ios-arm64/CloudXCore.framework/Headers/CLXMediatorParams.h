@@ -5,6 +5,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <CloudXCore/CLXAdapterLogger.h>
+#import <CloudXCore/CLXBannerType.h>
 #import <CloudXCore/CLXExport.h>
 #import <CloudXCore/CLXMediatorTypes.h>
 
@@ -62,6 +63,19 @@ CLX_PUBLIC_MEDIATOR
 
 @end
 
+/** Parameters used to create one banner or MREC mediator attempt. */
+CLX_PUBLIC_MEDIATOR
+@interface CLXAdViewMediatorParams : CLXMediatorParams
+@property (nonatomic, copy, readonly) NSString *adUnitId;
+@property (nonatomic, assign, readonly) CLXBannerType bannerType;
+@end
+
+/** Parameters used to create one native mediator attempt. */
+CLX_PUBLIC_MEDIATOR
+@interface CLXNativeMediatorParams : CLXMediatorParams
+@property (nonatomic, copy, readonly) NSString *adUnitId;
+@end
+
 /** Parameters for a mediator load operation. */
 CLX_PUBLIC_MEDIATOR
 @interface CLXMediatorLoadParams : NSObject
@@ -71,6 +85,20 @@ CLX_PUBLIC_MEDIATOR
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
+@end
+
+/** Placement and custom data are supplied at load time because ad views have no show operation. */
+CLX_PUBLIC_MEDIATOR
+@interface CLXAdViewMediatorLoadParams : CLXMediatorLoadParams
+@property (nonatomic, copy, readonly, nullable) NSString *placement;
+@property (nonatomic, copy, readonly, nullable) NSString *customData;
+@end
+
+/** Placement and custom data are supplied at load time because native ads have no show operation. */
+CLX_PUBLIC_MEDIATOR
+@interface CLXNativeMediatorLoadParams : CLXMediatorLoadParams
+@property (nonatomic, copy, readonly, nullable) NSString *placement;
+@property (nonatomic, copy, readonly, nullable) NSString *customData;
 @end
 
 /** Parameters for a mediator show operation. */

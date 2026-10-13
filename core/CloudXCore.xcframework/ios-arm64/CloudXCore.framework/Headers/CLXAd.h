@@ -52,6 +52,18 @@ CLX_PUBLIC
 @property (nonatomic, readonly, nullable) NSString *networkPlacement;
 
 /**
+ * The mediation system that selected this ad.
+ * Direct CloudX ads and CloudX ads selected by the Orchestrator use `cloudx`.
+ */
+@property (nonatomic, copy, readonly) NSString *mediatorName;
+
+/**
+ * The ad-unit identifier used by the mediation system.
+ * CloudX ads use `adUnitId`; external ads use their configured mediator unit.
+ */
+@property (nonatomic, copy, readonly, nullable) NSString *mediatorAdUnitId;
+
+/**
  * Revenue for this ad impression, in USD, per impression (not CPM).
  *
  * For a CloudX bid this is the bid-time estimate of what the impression will pay,

@@ -10,7 +10,7 @@ PODS:
   - CloudXBigoAdapter (6.1.0.0):
     - BigoADS (= 6.1.0)
     - CloudXCore (>= 3.9.0)
-  - CloudXCore (3.10.0)
+  - CloudXCore (3.11.0)
   - CloudXDigitalTurbineAdapter (8.4.10.0):
     - CloudXCore (>= 3.5.0)
     - Fyber_Marketplace_SDK (= 8.4.10)
@@ -20,9 +20,9 @@ PODS:
   - CloudXInMobiAdapter (11.4.1.0):
     - CloudXCore (>= 3.5.0)
     - InMobiSDK (= 11.4.1)
-  - CloudXMagniteAdapterV2 (1.0.0.2):
+  - CloudXMagniteAdapterV2 (1.0.4.0):
     - CloudXCore (>= 3.9.0)
-    - MagniteSDK (= 1.0.0)
+    - MagniteSDK (= 1.0.4)
   - CloudXMetaAdapter (6.22.0.0):
     - CloudXCore (>= 3.5.0)
     - FBAudienceNetwork (= 6.22.0)
@@ -76,7 +76,7 @@ PODS:
   - HyBid/RewardedVideo (3.9.0):
     - HyBid/Core
   - InMobiSDK (11.4.1)
-  - MagniteSDK (1.0.0)
+  - MagniteSDK (1.0.4)
   - MintegralAdSDK (8.1.6):
     - MintegralAdSDK/BannerAd (= 8.1.6)
     - MintegralAdSDK/BidBannerAd (= 8.1.6)
@@ -138,7 +138,7 @@ DEPENDENCIES:
   - CloudXDigitalTurbineAdapter (~> 8.4.10.0)
   - CloudXGoogleWaterfallAdapter (~> 13.9.0.0)
   - CloudXInMobiAdapter (~> 11.4.1.0)
-  - CloudXMagniteAdapterV2 (~> 1.0.0.2)
+  - CloudXMagniteAdapterV2 (~> 1.0.4.0)
   - CloudXMetaAdapter (~> 6.22.0.0)
   - CloudXMintegralAdapter (~> 8.1.6.1)
   - CloudXMobileFuseAdapter (~> 1.11.0.1)
@@ -191,11 +191,11 @@ SPEC CHECKSUMS:
   Ads-Global: 7de80a4e99c131e16ecf7b4e3c154e435362e312
   BigoADS: 77e52c0881e33b1edd4893c40c7c0d118f06d88c
   CloudXBigoAdapter: 3c1037e4ece5b21c1dda15f622d0abcfc78540b8
-  CloudXCore: 50794f0a0aa9ef544551e31efac2576403dfd610
+  CloudXCore: 7038457a9de00303fa6e83438cc78479d2ab30d4
   CloudXDigitalTurbineAdapter: 07b22a6921e908ccf5e60c8de78e210ee277c494
   CloudXGoogleWaterfallAdapter: 24c9a45277c7af542c09c7da0f9e54ac273f0714
   CloudXInMobiAdapter: 280563b1b05dc9f5efbc6ca9d4a25d71b8fd24a8
-  CloudXMagniteAdapterV2: a8e14597e4bdb23b6ee16785491cc2473fd582f4
+  CloudXMagniteAdapterV2: e6943786761f2003be4706eb440befabcd7d8b8a
   CloudXMetaAdapter: 10c2d1a7abef1f118b8c48968e4e60439b66f2d3
   CloudXMintegralAdapter: ecefe8a74d9465da4c62b29faf132262a88b4d9d
   CloudXMobileFuseAdapter: 70187afa6989e369c10b66a7e173b19dbe4a8593
@@ -211,7 +211,7 @@ SPEC CHECKSUMS:
   GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
   HyBid: c0bb109f5d6e9005456565391a330a915535b8f8
   InMobiSDK: 45b8b7e2af6e241b028b94c63b3d1d6113a12945
-  MagniteSDK: edfce03a6207c856681cc3355a7e6124c977ae61
+  MagniteSDK: 3788038b0e8edce9d14532651f633d8ce7188999
   MintegralAdSDK: b8fbfe18eacde1eb4f5c0e388c3769503ed5d4fa
   MobileFuseSDK: 08da0fcba90e7c208e2817f6964ff4f15bd6f285
   MolocoSDKiOS: f55c53033aaf1ed43975ca14e76362efd8f96caa
@@ -220,6 +220,6 @@ SPEC CHECKSUMS:
   UnityCoherenceLib: d9be08c5b9c2880cb220c7ecd643f97ebda422b7
   VungleAds: 3b73c5e680c4c956ade61f3b0791e9b270914548
 
-PODFILE CHECKSUM: 92d71aad45ae7e697ee2a403f9b0edef6612f82c
+PODFILE CHECKSUM: d6af3b32313c352fd33ae7024618fe1a8d90a906
 
 COCOAPODS: 1.17.0
