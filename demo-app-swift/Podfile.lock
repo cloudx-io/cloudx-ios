@@ -11,19 +11,19 @@ PODS:
     - BigoADS (= 6.1.0)
     - CloudXCore (>= 3.9.0)
   - CloudXCore (3.11.0)
-  - CloudXDigitalTurbineAdapter (8.4.10.0):
+  - CloudXDigitalTurbineAdapter (8.4.10.1):
     - CloudXCore (>= 3.5.0)
     - Fyber_Marketplace_SDK (= 8.4.10)
   - CloudXGoogleWaterfallAdapter (13.9.0.0):
     - CloudXCore (>= 3.7.0)
     - Google-Mobile-Ads-SDK (= 13.9.0)
-  - CloudXInMobiAdapter (11.4.1.0):
+  - CloudXInMobiAdapter (11.4.1.1):
     - CloudXCore (>= 3.5.0)
     - InMobiSDK (= 11.4.1)
-  - CloudXMagniteAdapterV2 (1.0.4.0):
+  - CloudXMagniteAdapterV2 (1.0.4.1):
     - CloudXCore (>= 3.9.0)
     - MagniteSDK (= 1.0.4)
-  - CloudXMetaAdapter (6.22.0.0):
+  - CloudXMetaAdapter (6.22.0.1):
     - CloudXCore (>= 3.5.0)
     - FBAudienceNetwork (= 6.22.0)
   - CloudXMintegralAdapter (8.1.6.1):
@@ -34,25 +34,25 @@ PODS:
     - MintegralAdSDK/BidNewInterstitialAd (= 8.1.6)
     - MintegralAdSDK/BidRewardVideoAd (= 8.1.6)
     - MintegralAdSDK/BidSplashAd (= 8.1.6)
-  - CloudXMobileFuseAdapter (1.11.0.1):
+  - CloudXMobileFuseAdapter (1.11.0.2):
     - CloudXCore (>= 3.5.0)
     - MobileFuseSDK (= 1.11.0)
-  - CloudXMolocoAdapter (4.11.1.0):
+  - CloudXMolocoAdapter (4.11.1.1):
     - CloudXCore (>= 3.5.0)
     - MolocoSDKiOS (= 4.11.1)
-  - CloudXPangleAdapter (8.3.0.6.0):
+  - CloudXPangleAdapter (8.3.0.6.1):
     - Ads-Global (= 8.3.0.6)
     - CloudXCore (>= 3.5.0)
-  - CloudXTaurusXAdapter (1.18.2.0):
+  - CloudXTaurusXAdapter (1.18.2.1):
     - CloudXCore (>= 3.5.0)
     - TaurusxAdsSDK (= 1.18.2)
-  - CloudXUnityAdsAdapter (4.20.1.0):
+  - CloudXUnityAdsAdapter (4.20.1.1):
     - CloudXCore (>= 3.5.0)
     - UnityAds (= 4.20.1)
-  - CloudXVerveAdapter (3.9.0.0):
+  - CloudXVerveAdapter (3.9.0.1):
     - CloudXCore (>= 3.5.0)
     - HyBid (= 3.9.0)
-  - CloudXVungleAdapter (7.7.6.0):
+  - CloudXVungleAdapter (7.7.6.1):
     - CloudXCore (>= 3.5.0)
     - VungleAds (= 7.7.6)
   - FBAudienceNetwork (6.22.0)
@@ -135,19 +135,19 @@ PODS:
 DEPENDENCIES:
   - CloudXBigoAdapter (~> 6.1.0.0)
   - CloudXCore (from `../core/CloudXCore.podspec`)
-  - CloudXDigitalTurbineAdapter (~> 8.4.10.0)
+  - CloudXDigitalTurbineAdapter (~> 8.4.10.1)
   - CloudXGoogleWaterfallAdapter (~> 13.9.0.0)
-  - CloudXInMobiAdapter (~> 11.4.1.0)
-  - CloudXMagniteAdapterV2 (~> 1.0.4.0)
-  - CloudXMetaAdapter (~> 6.22.0.0)
+  - CloudXInMobiAdapter (~> 11.4.1.1)
+  - CloudXMagniteAdapterV2 (~> 1.0.4.1)
+  - CloudXMetaAdapter (~> 6.22.0.1)
   - CloudXMintegralAdapter (~> 8.1.6.1)
-  - CloudXMobileFuseAdapter (~> 1.11.0.1)
-  - CloudXMolocoAdapter (~> 4.11.1.0)
-  - CloudXPangleAdapter (~> 8.3.0.6.0)
-  - CloudXTaurusXAdapter (~> 1.18.2.0)
-  - CloudXUnityAdsAdapter (~> 4.20.1.0)
-  - CloudXVerveAdapter (~> 3.9.0.0)
-  - CloudXVungleAdapter (~> 7.7.6.0)
+  - CloudXMobileFuseAdapter (~> 1.11.0.2)
+  - CloudXMolocoAdapter (~> 4.11.1.1)
+  - CloudXPangleAdapter (~> 8.3.0.6.1)
+  - CloudXTaurusXAdapter (~> 1.18.2.1)
+  - CloudXUnityAdsAdapter (~> 4.20.1.1)
+  - CloudXVerveAdapter (~> 3.9.0.1)
+  - CloudXVungleAdapter (~> 7.7.6.1)
   - Google-Mobile-Ads-SDK
 
 SPEC REPOS:
@@ -192,19 +192,19 @@ SPEC CHECKSUMS:
   BigoADS: 77e52c0881e33b1edd4893c40c7c0d118f06d88c
   CloudXBigoAdapter: 3c1037e4ece5b21c1dda15f622d0abcfc78540b8
   CloudXCore: 7038457a9de00303fa6e83438cc78479d2ab30d4
-  CloudXDigitalTurbineAdapter: 07b22a6921e908ccf5e60c8de78e210ee277c494
+  CloudXDigitalTurbineAdapter: 3a2efeb83c4b2b53a630e40d5026ef679b1388c5
   CloudXGoogleWaterfallAdapter: 24c9a45277c7af542c09c7da0f9e54ac273f0714
-  CloudXInMobiAdapter: 280563b1b05dc9f5efbc6ca9d4a25d71b8fd24a8
-  CloudXMagniteAdapterV2: e6943786761f2003be4706eb440befabcd7d8b8a
-  CloudXMetaAdapter: 10c2d1a7abef1f118b8c48968e4e60439b66f2d3
+  CloudXInMobiAdapter: 24eb5d17272ed43f428eaaf8e4b21be8b69e6451
+  CloudXMagniteAdapterV2: 01d19a14daa0b2f1b5265793338b00e9432ac465
+  CloudXMetaAdapter: 1031ce6f9d9897db138fc093b9485f99f14cf0a5
   CloudXMintegralAdapter: ecefe8a74d9465da4c62b29faf132262a88b4d9d
-  CloudXMobileFuseAdapter: 70187afa6989e369c10b66a7e173b19dbe4a8593
-  CloudXMolocoAdapter: fd4af83a2ea15b137ad173066d00342bb77d6b7e
-  CloudXPangleAdapter: 5c3afb3f82404cf8ed11d014ade15773de774252
-  CloudXTaurusXAdapter: 5f0129bd95751697aebfe0a8bb25d0adabfb89fc
-  CloudXUnityAdsAdapter: 4c3113ae49c781a44245515fdc69b30ec5fe2708
-  CloudXVerveAdapter: e2be0ed38595681731c6105a05dde34888447c93
-  CloudXVungleAdapter: 616c3770ae006c746954581f6c620e8f5faf9337
+  CloudXMobileFuseAdapter: b7373eb52c2ac6baa13146455bb4cd90d3da4c3e
+  CloudXMolocoAdapter: d55b70c921b3b96e770d0d326216882138dc90ac
+  CloudXPangleAdapter: c88bc76ad531b1ec28687e369f4fd7f7c7844870
+  CloudXTaurusXAdapter: fd18ec67f67cac06d9a9ac754e2f2cadda08955e
+  CloudXUnityAdsAdapter: 0c54e613795a26edeb96e633ebe20f07795f8dc9
+  CloudXVerveAdapter: dcb0c6c4e92d321605e47dad57a638e48619c065
+  CloudXVungleAdapter: 6d60d5c79a1964b51a76c8fd639a899bc20912a6
   FBAudienceNetwork: b05c65487114aa3bf3a68e865c60937a9fb03b69
   Fyber_Marketplace_SDK: 7352f0f095d42e68437ad3b7e66e0f7f97a987fc
   Google-Mobile-Ads-SDK: cec761d0da669c462bcc19cd16c747498b9f39f7
@@ -220,6 +220,6 @@ SPEC CHECKSUMS:
   UnityCoherenceLib: d9be08c5b9c2880cb220c7ecd643f97ebda422b7
   VungleAds: 3b73c5e680c4c956ade61f3b0791e9b270914548
 
-PODFILE CHECKSUM: 5fed2f66cdc4dffad7e71f8105a10d026f735184
+PODFILE CHECKSUM: 842c654412e0eaaea77d1ebe2db5af36995c910f
 
 COCOAPODS: 1.17.0
