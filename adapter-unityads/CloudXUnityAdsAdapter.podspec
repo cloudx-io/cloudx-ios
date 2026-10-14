@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXUnityAdsAdapter'
-  s.version = '4.20.1.0'
+  s.version = '4.20.1.1'
   s.summary          = 'CloudX Unity Ads Adapter - Static Framework'
   s.description      = 'Unity Ads adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'

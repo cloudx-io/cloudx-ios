@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXMolocoAdapter'
-  s.version = '4.11.1.0'
+  s.version = '4.11.1.1'
   s.summary          = 'CloudX Moloco Adapter - Static Framework'
   s.description      = 'Moloco adapter for CloudX iOS SDK - binary distribution. Supports Banner, MREC, Interstitial, Rewarded, and Native ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'

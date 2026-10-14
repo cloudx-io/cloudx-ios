@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXPangleAdapter'
-  s.version = '8.3.0.6.0'
+  s.version = '8.3.0.6.1'
   s.summary          = 'CloudX Pangle Adapter - Static Framework'
   s.description      = 'Pangle (ByteDance) adapter for CloudX iOS SDK - binary distribution. Supports Banner/MREC, Interstitial, Rewarded, Native, and App Open ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'

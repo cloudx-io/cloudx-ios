@@ -23,6 +23,7 @@
 #import "CLXVerveNative.h"
 #import "CLXVerveNativeAd.h"
 #import "CLXVerveNativeFactory.h"
+#import "CLXVerveRewarded+Internal.h"
 #import "CLXVerveRewarded.h"
 #import "CLXVerveRewardedFactory.h"
 #import "CLXVerveErrorHandler.h"
