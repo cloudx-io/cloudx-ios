@@ -102,7 +102,12 @@ class AppOpenViewController: BaseAdViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        resetAdState()
+        // Skip cleanup when a fullscreen ad is presented on top — the ad object must
+        // stay alive to receive show/click/close delegate callbacks. On a tab switch
+        // presentedViewController is nil, so cleanup proceeds normally.
+        if presentedViewController == nil {
+            resetAdState()
+        }
     }
     
     deinit {
