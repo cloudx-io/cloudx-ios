@@ -155,7 +155,7 @@ Install: `pod 'CloudXVungleAdapter', '~> 7.7.6.1'`
 
 - **Rewarded callback timing** — `didRewardUserForAd:withReward:` (Swift `didRewardUser(for:with:)`) can now fire as soon as the ad network grants the reward, instead of when the ad closes, when CloudX enables it. Takes effect with CloudXCore 3.11.0 or later.
 - **Vungle error codes** — Creative-download failures now report `CLXErrorCodeAdapterInternalError` (600) instead of `CLXErrorCodeAdapterInvalidLoadState` (602), and HTTP failures report `CLXErrorCodeAdapterServerError` (612). Update any handling of 602.
-- **No integration change required** — VungleAds 7.7.6 and `CloudXCore >= 3.5.0` are unchanged.
+- **Dependencies unchanged** — VungleAds 7.7.6 and `CloudXCore >= 3.5.0` stay the same.
 
 ### Fixed
 
