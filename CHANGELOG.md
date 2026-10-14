@@ -7,6 +7,162 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Digital Turbine adapter 8.4.10.1 - 2026-10-14
+
+Install: `pod 'CloudXDigitalTurbineAdapter', '~> 8.4.10.1'`
+
+### Changed
+
+- **Rewarded callback timing** — `didRewardUserForAd:withReward:` (Swift `didRewardUser(for:with:)`) can now fire as soon as the ad network grants the reward, instead of when the ad closes, when CloudX enables it. Takes effect with CloudXCore 3.11.0 or later.
+- **No integration change required** — Fyber Marketplace SDK 8.4.10 and `CloudXCore >= 3.5.0` are unchanged.
+
+### Fixed
+
+- **Privacy manifest included** — The adapter framework now ships its own Apple privacy manifest.
+
+---
+
+## InMobi adapter 11.4.1.1 - 2026-10-14
+
+Install: `pod 'CloudXInMobiAdapter', '~> 11.4.1.1'`
+
+### Changed
+
+- **Rewarded callback timing** — `didRewardUserForAd:withReward:` (Swift `didRewardUser(for:with:)`) can now fire as soon as the ad network grants the reward, instead of when the ad closes, when CloudX enables it. Takes effect with CloudXCore 3.11.0 or later.
+- **No integration change required** — InMobiSDK 11.4.1 and `CloudXCore >= 3.5.0` are unchanged.
+
+### Fixed
+
+- **Privacy manifest included** — The adapter framework now ships its own Apple privacy manifest.
+
+---
+
+## Magnite adapter 1.0.4.1 - 2026-10-14
+
+Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.4.1'`
+
+### Changed
+
+- **Rewarded callback timing** — `didRewardUserForAd:withReward:` (Swift `didRewardUser(for:with:)`) can now fire as soon as the ad network grants the reward, instead of when the ad closes, when CloudX enables it. Takes effect with CloudXCore 3.11.0 or later.
+- **No integration change required** — MagniteSDK 1.0.4 and `CloudXCore >= 3.9.0` are unchanged.
+
+---
+
+## Meta adapter 6.22.0.1 - 2026-10-14
+
+Install: `pod 'CloudXMetaAdapter', '~> 6.22.0.1'`
+
+### Changed
+
+- **Rewarded callback timing** — `didRewardUserForAd:withReward:` (Swift `didRewardUser(for:with:)`) can now fire as soon as the ad network grants the reward, instead of when the ad closes, when CloudX enables it. Takes effect with CloudXCore 3.11.0 or later.
+- **No integration change required** — Meta Audience Network SDK 6.22.0 and `CloudXCore >= 3.5.0` are unchanged.
+
+### Fixed
+
+- **Privacy manifest included** — The adapter framework now ships its own Apple privacy manifest.
+
+---
+
+## MobileFuse adapter 1.11.0.2 - 2026-10-14
+
+Install: `pod 'CloudXMobileFuseAdapter', '~> 1.11.0.2'`
+
+### Changed
+
+- **Rewarded callback timing** — `didRewardUserForAd:withReward:` (Swift `didRewardUser(for:with:)`) can now fire as soon as the ad network grants the reward, instead of when the ad closes, when CloudX enables it. Takes effect with CloudXCore 3.11.0 or later.
+- **No integration change required** — MobileFuse SDK 1.11.0 and `CloudXCore >= 3.5.0` are unchanged.
+
+### Fixed
+
+- **Privacy manifest included** — The adapter framework now ships its own Apple privacy manifest.
+
+---
+
+## Moloco adapter 4.11.1.1 - 2026-10-14
+
+Install: `pod 'CloudXMolocoAdapter', '~> 4.11.1.1'`
+
+### Changed
+
+- **Rewarded callback timing** — `didRewardUserForAd:withReward:` (Swift `didRewardUser(for:with:)`) can now fire as soon as the ad network grants the reward, instead of when the ad closes, when CloudX enables it. Takes effect with CloudXCore 3.11.0 or later.
+- **No integration change required** — MolocoSDKiOS 4.11.1 and `CloudXCore >= 3.5.0` are unchanged.
+
+---
+
+## Pangle adapter 8.3.0.6.1 - 2026-10-14
+
+Install: `pod 'CloudXPangleAdapter', '~> 8.3.0.6.1'`
+
+### Changed
+
+- **Rewarded callback timing** — `didRewardUserForAd:withReward:` (Swift `didRewardUser(for:with:)`) can now fire as soon as the ad network grants the reward, instead of when the ad closes, when CloudX enables it. Takes effect with CloudXCore 3.11.0 or later.
+- **No integration change required** — Pangle Ads-Global 8.3.0.6 and `CloudXCore >= 3.5.0` are unchanged.
+
+### Fixed
+
+- **Privacy manifest included** — The adapter framework now ships its own Apple privacy manifest.
+
+---
+
+## TaurusX adapter 1.18.2.1 - 2026-10-14
+
+Install: `pod 'CloudXTaurusXAdapter', '~> 1.18.2.1'`
+
+### Changed
+
+- **Rewarded callback timing** — `didRewardUserForAd:withReward:` (Swift `didRewardUser(for:with:)`) can now fire as soon as the ad network grants the reward, instead of when the ad closes, when CloudX enables it. Takes effect with CloudXCore 3.11.0 or later.
+- **No integration change required** — TaurusX SDK 1.18.2 and `CloudXCore >= 3.5.0` are unchanged.
+
+### Fixed
+
+- **Privacy manifest included** — The adapter framework now ships its own Apple privacy manifest.
+- Corrected the TaurusX adapter framework bundle version to prevent App Store validation errors.
+
+---
+
+## Unity Ads adapter 4.20.1.1 - 2026-10-14
+
+Install: `pod 'CloudXUnityAdsAdapter', '~> 4.20.1.1'`
+
+### Changed
+
+- **Rewarded callback timing** — `didRewardUserForAd:withReward:` (Swift `didRewardUser(for:with:)`) can now fire as soon as the ad network grants the reward, instead of when the ad closes, when CloudX enables it. Takes effect with CloudXCore 3.11.0 or later.
+- **Privacy manifest updated** — The adapter's privacy manifest no longer declares data collection or required-reason API use. The Unity Ads SDK still ships its own manifest.
+- **No integration change required** — UnityAds 4.20.1 and `CloudXCore >= 3.5.0` are unchanged.
+
+---
+
+## Verve adapter 3.9.0.1 - 2026-10-14
+
+Install: `pod 'CloudXVerveAdapter', '~> 3.9.0.1'`
+
+### Changed
+
+- **Rewarded callback timing** — `didRewardUserForAd:withReward:` (Swift `didRewardUser(for:with:)`) can now fire as soon as the ad network grants the reward, instead of when the ad closes, when CloudX enables it. Takes effect with CloudXCore 3.11.0 or later.
+- **No integration change required** — HyBid 3.9.0 and `CloudXCore >= 3.5.0` are unchanged.
+
+### Fixed
+
+- **Privacy manifest included** — The adapter framework now ships its own Apple privacy manifest.
+
+---
+
+## Vungle adapter 7.7.6.1 - 2026-10-14
+
+Install: `pod 'CloudXVungleAdapter', '~> 7.7.6.1'`
+
+### Changed
+
+- **Rewarded callback timing** — `didRewardUserForAd:withReward:` (Swift `didRewardUser(for:with:)`) can now fire as soon as the ad network grants the reward, instead of when the ad closes, when CloudX enables it. Takes effect with CloudXCore 3.11.0 or later.
+- **Vungle error codes** — Creative-download failures now report `CLXErrorCodeAdapterInternalError` (600) instead of `CLXErrorCodeAdapterInvalidLoadState` (602), and HTTP failures report `CLXErrorCodeAdapterServerError` (612). Update any handling of 602.
+- **No integration change required** — VungleAds 7.7.6 and `CloudXCore >= 3.5.0` are unchanged.
+
+### Fixed
+
+- **Privacy manifest included** — The adapter framework now ships its own Apple privacy manifest.
+
+---
+
 ## Magnite adapter 1.0.4.0 - 2026-10-09
 
 Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.4.0'`
