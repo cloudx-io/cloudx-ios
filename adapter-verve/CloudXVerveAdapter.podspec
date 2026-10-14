@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXVerveAdapter'
-  s.version = '3.9.0.0'
+  s.version = '3.9.0.1'
   s.summary          = 'CloudX Verve Adapter - Static Framework'
   s.description      = 'Verve adapter for CloudX iOS SDK - binary distribution. Supports Banner, MREC, Interstitial, Rewarded, and Native ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'

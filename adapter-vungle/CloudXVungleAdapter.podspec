@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXVungleAdapter'
-  s.version = '7.7.6.0'
+  s.version = '7.7.6.1'
   s.summary          = 'CloudX Vungle Adapter - Static Framework'
   s.description      = 'Vungle/Liftoff adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'

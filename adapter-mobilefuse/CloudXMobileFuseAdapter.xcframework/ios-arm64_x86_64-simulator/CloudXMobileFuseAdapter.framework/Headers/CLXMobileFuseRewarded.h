@@ -14,9 +14,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Rewarded adapter that wraps `MFRewardedAd`.
  *
- * Reward emission is deferred: -onUserEarnedReward: sets an internal flag,
- * and the reward delegate callback fires inside -onAdClosed: so the
- * publisher always sees `userReward` before `didClose`.
+ * The reward reaches the publisher at most once, before `didClose`: inside
+ * -onAdClosed: by default, or at -onUserEarnedReward: when the session's
+ * reward-on-grant switch is on.
  */
 @interface CLXMobileFuseRewarded : CLXAdapterRewarded <IMFAdCallbackReceiver>
 

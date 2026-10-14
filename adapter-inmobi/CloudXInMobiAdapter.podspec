@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXInMobiAdapter'
-  s.version = '11.4.1.0'
+  s.version = '11.4.1.1'
   s.summary          = 'CloudX InMobi Adapter - Static Framework'
   s.description      = 'InMobi adapter for CloudX iOS SDK - binary distribution'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'

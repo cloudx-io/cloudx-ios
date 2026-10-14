@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXMagniteAdapterV2'
-  s.version = '1.0.4.0'
+  s.version = '1.0.4.1'
   s.summary          = 'CloudX Magnite Adapter (independent versioning) - Static Framework'
   s.description      = 'Magnite adapter for CloudX iOS SDK - binary distribution. Supports Banner, MREC, Interstitial, Rewarded, and Native formats via MagniteSDK. Independent-versioned successor to CloudXMagniteAdapter, which remains on the legacy unified version line.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'

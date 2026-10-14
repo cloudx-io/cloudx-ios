@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXDigitalTurbineAdapter'
-  s.version = '8.4.10.0'
+  s.version = '8.4.10.1'
   s.summary          = 'CloudX Digital Turbine Adapter - Static Framework'
   s.description      = 'Digital Turbine / Fyber adapter for CloudX iOS SDK - binary distribution. Supports Banner, MREC, Interstitial, Rewarded, and Native ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
