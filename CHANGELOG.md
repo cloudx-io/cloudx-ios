@@ -44,37 +44,23 @@ Install: `pod 'CloudXCore', '~> 3.11'`
 
 ### Added
 
-- **Ad-quality gate** — Register a `CLXAdQualityGate` with `+[CloudXCore setAdQualityGate:]` to inspect each loaded ad and block it before `didLoadAd:`. A blocked load fails with `CLXAdQualityErrorBlocked`, and each `CLXAdQualityRequest` can revoke an ad that is already showing.
+- **Rewarded callback timing** — CloudX can now control when rewarded ads deliver the reward: when the ad network grants it, or when the ad closes. Granting at grant time means a user who never closes the ad still gets the reward. This takes effect with the adapter updates shipping next.
 
-- **Mediation details on `CLXAd`** — `mediatorName` reports which mediation system selected the ad (`cloudx` for CloudX ads), and `mediatorAdUnitId` reports that system's ad-unit ID.
+- **Share from the Mediation Debugger** — The Mediation Debugger can share a plain-text report for support requests.
 
-- **Contracts for CloudX adapter and mediation modules** — `CLXAppOpenMediatorFactory`, `CLXAdViewMediator`, `CLXNativeMediator` and a start-permission method on `CLXAdapterLoadParams` support CloudX's own modules. Your app does not call them.
-
-- **Share from the Mediation Debugger** — A Share action sends a plain-text report of your app, privacy signals, networks and ad units, ready to paste into a support request.
-
-- **Startup warm-up** — CloudXCore prepares part of initialization at launch, before you call `initialize`. This includes one request to the CloudX init host that carries no identifiers. Set `CloudXStartupWarmDisabled` to `true` in Info.plist to turn it off.
+- **Startup warm-up** — Part of initialization now runs at app launch, including one request to the CloudX init host that carries no identifiers. Opt out with `CloudXStartupWarmDisabled` in Info.plist.
 
 ### Changed
 
-- **Rewarded ads pay the reward configured for the ad unit.** A CloudX-served rewarded ad now pays the ad unit's configured reward amount and currency instead of the value the ad network reports. An ad unit with no configured reward pays 0.
+- **Rewarded ads pay the reward configured for the ad unit.** Rewarded ads now pay the reward amount and currency set on the ad unit in CloudX, instead of the value the ad network reports.
 
-- **Native loads check the ad unit's type.** Loading a native ad on an ad unit that isn't native, including through `CLXNativeAdLoader`, fails with `CLXErrorCodeInvalidAdUnit`.
-
-- **An expired cached native ad fails to load** with `CLXErrorCodeAdapterAdExpired` (616), instead of loading an ad that can no longer earn revenue.
-
-- **Banners without a configured refresh interval refresh every 30 seconds** on every load path.
-
-- **CloudX-rendered ads load more reliably on networks that block ad domains.** Video, images and tracking requests retry once through a backup DNS lookup after a DNS or connection failure.
+- **Banners without a configured refresh interval now refresh every 30 seconds.**
 
 ### Fixed
 
+- **Full-screen HTML ads no longer render at about a third of the screen.**
+
 - **Built-in native templates keep their title and body text readable in dark mode.**
-
-- **Full-screen HTML ads no longer render at about a third of the screen size.**
-
-- **The Google adapter no longer prefetches ads while your app is in the background.**
-
-- **The Mediation Debugger no longer names a CMP that it reports as missing.**
 
 ---
 
