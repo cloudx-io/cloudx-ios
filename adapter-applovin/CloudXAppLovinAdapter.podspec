@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXAppLovinAdapter'
-  s.version          = '13.6.3.0'
+  s.version          = '13.6.3.1'
   s.summary          = 'CloudX AppLovin MAX Adapter - Static Framework'
   s.description      = 'AppLovin MAX auction adapter for CloudX iOS SDK - binary distribution. Supports Interstitial, Rewarded, App Open, and Native ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '13.0'
   s.vendored_frameworks = 'adapter-applovin/CloudXAppLovinAdapter.xcframework'
 
-  s.dependency 'CloudXCore', '>= 3.9.0'
+  s.dependency 'CloudXCore', '>= 3.11.0'
   s.dependency 'AppLovinSDK', '= 13.6.3'
 
   s.frameworks = ['Foundation', 'UIKit']
