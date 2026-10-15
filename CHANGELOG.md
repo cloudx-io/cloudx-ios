@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Magnite adapter 1.0.4.2 - 2026-10-15
+
+Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.4.2'`
+
+### Fixed
+
+- **Launch crash when consent is set early** — Apps that set user consent or do-not-sell before CloudX finished initializing could crash on devices with 1.0.4.0 and 1.0.4.1. The adapter now holds those values and applies them once Magnite initializes.
+- **No integration change required** — 1.0.4.0 and 1.0.4.1 are withdrawn; update to 1.0.4.2. MagniteSDK 1.0.4 and `CloudXCore >= 3.9.0` are unchanged.
+
+---
+
 ## InMobi adapter 11.5.0.0 - 2026-10-15
 
 Install: `pod 'CloudXInMobiAdapter', '~> 11.5.0.0'`
@@ -73,6 +84,7 @@ Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.4.1'`
 
 ### Changed
 
+- **Withdrawn** — Can crash on devices when consent is set before initialization. Use 1.0.4.2 instead.
 - **Rewarded callback timing** — `didRewardUserForAd:withReward:` (Swift `didRewardUser(for:with:)`) can now fire as soon as the ad network grants the reward, instead of when the ad closes, when CloudX enables it. Takes effect with CloudXCore 3.11.0 or later.
 - **No integration change required** — MagniteSDK 1.0.4 and `CloudXCore >= 3.9.0` are unchanged.
 
@@ -199,6 +211,7 @@ Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.4.0'`
 
 ### Changed
 
+- **Withdrawn** — Can crash on devices when consent is set before initialization. Use 1.0.4.2 instead.
 - **Certified with MagniteSDK 1.0.4** — Updates MagniteSDK from 1.0.0 to 1.0.4. No integration change is required; `CloudXCore >= 3.9.0` and iOS 13.0 requirements are unchanged.
 
 ---
