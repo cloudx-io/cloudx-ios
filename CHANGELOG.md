@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## InMobi adapter 11.5.0.0 - 2026-10-15
+
+Install: `pod 'CloudXInMobiAdapter', '~> 11.5.0.0'`
+
+### Changed
+
+- **InMobi SDK 11.5.0** — Updates to InMobi SDK 11.5.0. The SDK pin is exact, so an app that pins InMobi SDK 11.4.1 through another integration cannot install this version alongside it. `CloudXCore >= 3.5.0` is unchanged.
+
+---
+
+## Mintegral adapter 8.1.7.0 - 2026-10-15
+
+Install: `pod 'CloudXMintegralAdapter', '~> 8.1.7.0'`
+
+### Changed
+
+- **Mintegral SDK 8.1.7** — Certified with Mintegral SDK 8.1.7. `CloudXCore >= 3.5.0` is unchanged.
+
+---
+
+## MobileFuse adapter 1.12.0.0 - 2026-10-15
+
+Install: `pod 'CloudXMobileFuseAdapter', '~> 1.12.0.0'`
+
+### Changed
+
+- **MobileFuse SDK 1.12.0** — Updates to MobileFuse SDK 1.12.0, which fixes a crash risk during bidding-token generation. `CloudXCore >= 3.5.0` is unchanged.
+
+---
+
 ## Digital Turbine adapter 8.4.10.1 - 2026-10-14
 
 Install: `pod 'CloudXDigitalTurbineAdapter', '~> 8.4.10.1'`
