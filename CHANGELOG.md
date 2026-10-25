@@ -7,6 +7,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Meta adapter 6.22.1.0 - 2026-10-25
+
+Install: `pod 'CloudXMetaAdapter', '~> 6.22.1.0'`
+
+### Changed
+
+- **Meta Audience Network SDK 6.22.1** — Certified with Meta Audience Network SDK 6.22.1. The SDK pin is exact, so an app that pins Audience Network 6.22.0 through another integration cannot install this version alongside it. `CloudXCore >= 3.5.0` is unchanged.
+
+---
+
+## Digital Turbine adapter 8.5.1.0 - 2026-10-25
+
+Install: `pod 'CloudXDigitalTurbineAdapter', '~> 8.5.1.0'`
+
+### Changed
+
+- **Digital Turbine SDK 8.5.1** — Updates to Digital Turbine SDK 8.5.1. The SDK pin is exact, so an app that pins Digital Turbine SDK 8.4.10 through another integration cannot install this version alongside it. `CloudXCore >= 3.5.0` is unchanged.
+
+---
+
+## Google waterfall adapter 13.11.0.0 - 2026-10-25
+
+Install: `pod 'CloudXGoogleWaterfallAdapter', '~> 13.11.0.0'`
+
+### Changed
+
+- **Google Mobile Ads SDK 13.11.0** — Updates to Google Mobile Ads SDK 13.11.0, which fixes a rare crash when a video ad is dismissed and a crash on mediated native ads. The SDK pin is exact. `CloudXCore >= 3.7.0` is unchanged.
+
+---
+
+## Pangle adapter 8.3.0.9.0 - 2026-10-25
+
+Install: `pod 'CloudXPangleAdapter', '~> 8.3.0.9.0'`
+
+### Changed
+
+- **Pangle SDK 8.3.0.9** — Updates to Pangle SDK 8.3.0.9. The SDK pin is exact, so an app that pins Pangle SDK 8.3.0.6 through another integration cannot install this version alongside it. `CloudXCore >= 3.5.0` is unchanged.
+
+---
+
+## Unity Ads adapter 4.21.0.0 - 2026-10-25
+
+Install: `pod 'CloudXUnityAdsAdapter', '~> 4.21.0.0'`
+
+### Changed
+
+- **Unity Ads SDK 4.21.0** — Updates to Unity Ads SDK 4.21.0, which improves initialization, ad loading and bidding-token performance. The SDK pin is exact. `CloudXCore >= 3.5.0` is unchanged.
+
+---
+
+## Vungle adapter 7.7.8.0 - 2026-10-25
+
+Install: `pod 'CloudXVungleAdapter', '~> 7.7.8.0'`
+
+### Changed
+
+- **Vungle SDK 7.7.8** — Updates to Vungle SDK 7.7.8, a bug-fix and stability release. The SDK pin is exact, so an app that pins Vungle SDK 7.7.6 through another integration cannot install this version alongside it. `CloudXCore >= 3.5.0` is unchanged.
+
+---
+
 ## Magnite adapter 1.0.4.2 - 2026-10-15
 
 Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.4.2'`
