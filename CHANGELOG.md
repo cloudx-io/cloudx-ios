@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## MobileFuse adapter 1.13.0.0 - 2026-10-25
+
+Install: `pod 'CloudXMobileFuseAdapter', '~> 1.13.0.0'`
+
+### Changed
+
+- **MobileFuse SDK 1.13.0** — Certified with MobileFuse SDK 1.13.0. Raises deployment target to iOS 15.0 to align with MobileFuseSDK. `CloudXCore >= 3.5.0` is unchanged.
+
+---
+
 ## Magnite adapter 1.0.4.2 - 2026-10-15
 
 Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.4.2'`
