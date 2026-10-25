@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
   s.license          = { :type => 'Business Source License 1.1' }
   s.author           = { 'CloudX' => 'support@cloudx.io' }
-  s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :branch => 'release-adapter-mobilefuse-1.13.0.0' }
+  s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "adapter-mobilefuse/#{s.version}" }
   s.ios.deployment_target = '15.0'
   s.vendored_frameworks = 'adapter-mobilefuse/CloudXMobileFuseAdapter.xcframework'
   s.dependency 'CloudXCore', '>= 3.5.0'

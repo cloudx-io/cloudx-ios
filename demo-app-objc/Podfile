@@ -18,7 +18,7 @@ target 'CloudXObjCRemotePods' do
   pod 'CloudXDigitalTurbineAdapter', '~> 8.4.10.1'
   pod 'CloudXGoogleWaterfallAdapter', '~> 13.9.0.0'
   pod 'CloudXPangleAdapter', '~> 8.3.0.6.1'
-  pod 'CloudXMobileFuseAdapter', '~> 1.11.0.2'
+  pod 'CloudXMobileFuseAdapter', :podspec => 'https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-adapter-mobilefuse-1.13.0.0/adapter-mobilefuse/CloudXMobileFuseAdapter.podspec'
   pod 'CloudXTaurusXAdapter', '~> 1.18.2.1'
   pod 'CloudXBigoAdapter', '~> 6.1.0.0'
 
