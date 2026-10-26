@@ -18,7 +18,7 @@ target 'CloudXSwiftRemotePods' do
   pod 'CloudXDigitalTurbineAdapter', '~> 8.5.1.0'
   pod 'CloudXGoogleWaterfallAdapter', '~> 13.11.0.0'
   pod 'CloudXPangleAdapter', '~> 8.3.0.9.0'
-  pod 'CloudXMobileFuseAdapter', '~> 1.11.0.2'
+  pod 'CloudXMobileFuseAdapter', '~> 1.13.0.0'
   pod 'CloudXTaurusXAdapter', '~> 1.18.2.1'
   pod 'CloudXBigoAdapter', '~> 6.1.0.0'
 

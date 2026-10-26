@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## MobileFuse adapter 1.13.0.0 - 2026-10-26
+
+Install: `pod 'CloudXMobileFuseAdapter', '~> 1.13.0.0'`
+
+### Changed
+
+- **MobileFuse SDK 1.13.0** — Updates to MobileFuse SDK 1.13.0. Requires iOS 15.0 or later (was 13.0), matching MobileFuse SDK 1.13.0. The SDK pin is exact. `CloudXCore >= 3.5.0` is unchanged.
+
+---
+
 ## Meta adapter 6.22.1.0 - 2026-10-25
 
 Install: `pod 'CloudXMetaAdapter', '~> 6.22.1.0'`
