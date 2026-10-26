@@ -34,9 +34,9 @@ PODS:
     - MintegralAdSDK/BidNewInterstitialAd (= 8.1.6)
     - MintegralAdSDK/BidRewardVideoAd (= 8.1.6)
     - MintegralAdSDK/BidSplashAd (= 8.1.6)
-  - CloudXMobileFuseAdapter (1.13.0.0):
+  - CloudXMobileFuseAdapter (1.11.0.2):
     - CloudXCore (>= 3.5.0)
-    - MobileFuseSDK (= 1.13.0)
+    - MobileFuseSDK (= 1.11.0)
   - CloudXMolocoAdapter (4.11.1.1):
     - CloudXCore (>= 3.5.0)
     - MolocoSDKiOS (= 4.11.1)
@@ -122,7 +122,7 @@ PODS:
     - MintegralAdSDK/NativeAd
   - MintegralAdSDK/SplashAd (8.1.6):
     - MintegralAdSDK/NativeAd
-  - MobileFuseSDK (1.13.0)
+  - MobileFuseSDK (1.11.0)
   - MolocoSDKiOS (4.11.1)
   - TaurusxAdsSDK (1.18.2):
     - TaurusxAdsSDK/TaurusxAds (= 1.18.2)
@@ -141,7 +141,7 @@ DEPENDENCIES:
   - CloudXMagniteAdapterV2 (~> 1.0.4.1)
   - CloudXMetaAdapter (~> 6.22.1.0)
   - CloudXMintegralAdapter (~> 8.1.6.1)
-  - CloudXMobileFuseAdapter (from `https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-adapter-mobilefuse-1.13.0.0/adapter-mobilefuse/CloudXMobileFuseAdapter.podspec`)
+  - CloudXMobileFuseAdapter (~> 1.11.0.2)
   - CloudXMolocoAdapter (~> 4.11.1.1)
   - CloudXPangleAdapter (~> 8.3.0.9.0)
   - CloudXTaurusXAdapter (~> 1.18.2.1)
@@ -161,6 +161,7 @@ SPEC REPOS:
     - CloudXMagniteAdapterV2
     - CloudXMetaAdapter
     - CloudXMintegralAdapter
+    - CloudXMobileFuseAdapter
     - CloudXMolocoAdapter
     - CloudXPangleAdapter
     - CloudXTaurusXAdapter
@@ -185,13 +186,6 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   CloudXCore:
     :podspec: "../core/CloudXCore.podspec"
-  CloudXMobileFuseAdapter:
-    :podspec: https://raw.githubusercontent.com/cloudx-io/cloudx-ios/release-adapter-mobilefuse-1.13.0.0/adapter-mobilefuse/CloudXMobileFuseAdapter.podspec
-
-CHECKOUT OPTIONS:
-  CloudXMobileFuseAdapter:
-    :commit: ac9013af6de279c8bafe345071fb43d48ae32bc6
-    :git: https://github.com/cloudx-io/cloudx-ios.git
 
 SPEC CHECKSUMS:
   Ads-Global: 4d99872117c52015b26f8953e76ab5b1bdcc9659
@@ -204,7 +198,7 @@ SPEC CHECKSUMS:
   CloudXMagniteAdapterV2: 01d19a14daa0b2f1b5265793338b00e9432ac465
   CloudXMetaAdapter: ded03f942b34365ac4ec27dd752030203460310f
   CloudXMintegralAdapter: ecefe8a74d9465da4c62b29faf132262a88b4d9d
-  CloudXMobileFuseAdapter: 590a6a4812204d4d00a2b9a3d048debe1389aa25
+  CloudXMobileFuseAdapter: b7373eb52c2ac6baa13146455bb4cd90d3da4c3e
   CloudXMolocoAdapter: d55b70c921b3b96e770d0d326216882138dc90ac
   CloudXPangleAdapter: 53ba1a92e802ae92b18aa78ebf69c8d6a00d5f91
   CloudXTaurusXAdapter: fd18ec67f67cac06d9a9ac754e2f2cadda08955e
@@ -219,13 +213,13 @@ SPEC CHECKSUMS:
   InMobiSDK: 45b8b7e2af6e241b028b94c63b3d1d6113a12945
   MagniteSDK: 3788038b0e8edce9d14532651f633d8ce7188999
   MintegralAdSDK: b8fbfe18eacde1eb4f5c0e388c3769503ed5d4fa
-  MobileFuseSDK: b87020e948482f089443118b4ff46303953f585e
+  MobileFuseSDK: 08da0fcba90e7c208e2817f6964ff4f15bd6f285
   MolocoSDKiOS: f55c53033aaf1ed43975ca14e76362efd8f96caa
   TaurusxAdsSDK: 02cab82069bddbb22455dec35e171ab99115f6bf
   UnityAds: caaccd3367f77a9a64b061404c5cc8eb2df20103
   UnityCoherenceLib: 9f7a49d0b53897b6627ad2ecf3b8369d015c66f4
   VungleAds: b35408054cb252a1c1df22cedbd0275ed116d79e
 
-PODFILE CHECKSUM: 17ab8965869213268435d266be9af76963484e61
+PODFILE CHECKSUM: 2949acbdc3c2a2e88f808de5527ea13d498e8372
 
 COCOAPODS: 1.17.0
