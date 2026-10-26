@@ -13,13 +13,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithSessionMetricsTracker:(CLXSessionMetricsTracker *)sessionMetricsTracker
                            configPayloadToken:(NSString *)configPayloadToken
                                       country:(NSString *)country
-                                    deviceIFA:(NSString *)deviceIFA
                                     deviceIFV:(nullable NSString *)deviceIFV;
 
 - (instancetype)initWithSessionMetricsTracker:(CLXSessionMetricsTracker *)sessionMetricsTracker
                            configPayloadToken:(NSString *)configPayloadToken
                                       country:(NSString *)country
-                                    deviceIFA:(NSString *)deviceIFA
                                     deviceIFV:(nullable NSString *)deviceIFV
                       adapterMetadataResolver:(CLXAdapterMetadataResolver *)adapterMetadataResolver NS_DESIGNATED_INITIALIZER;
 

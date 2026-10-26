@@ -48,6 +48,7 @@
 #import <CloudXCore/CLXAdDelegate.h>
 #import <CloudXCore/CLXFullscreenAdDelegate.h>
 #import <CloudXCore/CLXAdRevenueDelegate.h>
+#import <CloudXCore/CLXAdExpirationDelegate.h>
 #import <CloudXCore/CLXAdQualityGate.h>
 #import <CloudXCore/CLXAdQualityRequest.h>
 #import <CloudXCore/CLXAdQualityVerdict.h>
@@ -98,7 +99,6 @@
 
 // Adapter Protocols
 #import <CloudXCore/CLXAdNetwork.h>
-#import <CloudXCore/CLXNetworkAdObjectProviding.h>
 #import <CloudXCore/CLXAdapterAdView.h>
 #import <CloudXCore/CLXAdapterAdViewFactory.h>
 #import <CloudXCore/CLXAdapterRewarded.h>

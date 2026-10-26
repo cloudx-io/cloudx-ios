@@ -276,6 +276,8 @@ CLX_INTERNAL_TESTING
 /// Revert lever for the inline-video mute policy, not an opt-in feature: defaults
 /// to YES so the policy stays active unless the server explicitly disables it.
 @property (nonatomic, assign) BOOL inlineVideoMuteEnabled;
+/// Whether init may start from the last saved config. Defaults to YES; only an explicit
+/// server `false` disables it.
 @property (nonatomic, assign) BOOL cachedInitEnabled;
 /// App-wide fallback for the per-ad-unit concurrent publisher-load cap (CXD-3101).
 /// 0 means "fall through to the SDK default (2)"; a value > 0 is the cap. Each ad

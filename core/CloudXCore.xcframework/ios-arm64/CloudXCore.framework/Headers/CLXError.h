@@ -87,8 +87,8 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     /**
      * HTTP request failed with an I/O error (DNS failure, connection reset, SSL error, etc.).
      *
-     * Publisher action: Check device connectivity. If persistent, check for proxy/firewall
-     * blocking CloudX endpoints.
+     * Publisher action: Check device connectivity. SDK initialization retries it automatically.
+     * If persistent, check for proxy/firewall blocking CloudX endpoints.
      */
     CLXErrorCodeNetworkError = 100,
 
@@ -96,15 +96,15 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
      * HTTP request timed out before receiving a response.
      *
      * Publisher action: Check network conditions. May indicate slow connectivity or
-     * server-side latency.
+     * server-side latency. SDK initialization retries it automatically.
      */
     CLXErrorCodeNetworkTimeout = 101,
 
     /**
      * CloudX server returned HTTP 5xx.
      *
-     * Publisher action: Transient — retry happens automatically where applicable.
-     * If persistent, report to CloudX support.
+     * Publisher action: Transient. SDK initialization retries it automatically. If persistent,
+     * report to CloudX support.
      */
     CLXErrorCodeServerError = 102,
 
@@ -113,15 +113,15 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
      * Typically a malformed request.
      *
      * Publisher action: Check that the request is well-formed and the app key is correct.
-     * The SDK will not retry this request.
+     * SDK initialization retries it automatically.
      */
     CLXErrorCodeClientError = 103,
 
     /**
      * CloudX server returned HTTP 429.
      *
-     * Publisher action: App is being rate-limited. Reduce request frequency or contact
-     * CloudX support about limits.
+     * Publisher action: App is being rate-limited. SDK initialization retries it automatically.
+     * If persistent, contact CloudX support about limits.
      */
     CLXErrorCodeTooManyRequests = 104,
 
@@ -143,12 +143,14 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
     // MARK: Initialization (200–299)
 
     /**
-     * @c load or @c show was called before @c initializeWithConfiguration:completion: completed.
-     * Delivered via @c didFailToLoadAd:error: or @c didFailToDisplayAd:error:,
-     * @b not the initialization completion block.
+     * @c load or @c show was called when the SDK was not initialized: @c initializeWithConfiguration:completion:
+     * was never called, initialization failed, or a load queued during initialization waited longer
+     * than the ad unit's bid timeout. Delivered via @c didFailToLoadAd:error: or
+     * @c didFailToDisplayAd:error:, @b not the initialization completion block.
      *
-     * Publisher action: Wait for the initialization completion callback before creating
-     * or loading ads.
+     * Creating and loading ads before initialization completes is supported. Publisher action:
+     * call @c initializeWithConfiguration:completion: before loading, and retry the load later if
+     * it timed out while the device was offline. Initialization keeps retrying in the background.
      */
     CLXErrorCodeNotInitialized = 200,
 

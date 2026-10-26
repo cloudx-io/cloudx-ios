@@ -11,6 +11,7 @@
 #import <CloudXCore/CLXPublisherFullscreenAdBase.h>
 #import <CloudXCore/CLXRewardedDelegate.h>
 #import <CloudXCore/CLXAdRevenueDelegate.h>
+#import <CloudXCore/CLXAdExpirationDelegate.h>
 #import <CloudXCore/CLXExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -31,6 +32,11 @@ CLX_PUBLIC
  * Delegate that receives revenue events for the rewarded ad.
  */
 @property (nonatomic, weak, nullable) id<CLXAdRevenueDelegate> revenueDelegate;
+
+/**
+ * Delegate that receives expired-ad reload events for the rewarded ad.
+ */
+@property (nonatomic, weak, nullable) id<CLXAdExpirationDelegate> expirationDelegate;
 
 @end
 

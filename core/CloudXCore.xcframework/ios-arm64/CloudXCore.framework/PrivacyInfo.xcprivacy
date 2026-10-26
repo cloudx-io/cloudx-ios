@@ -21,14 +21,19 @@
 <dict>
 	<key>NSPrivacyCollectedDataTypes</key>
 	<array>
-		<!-- IDFA, read only when ATT authorises it (CLXAdTrackingService.m:35) -->
+		<!-- IDFA, read only when ATT authorises it (CLXAdTrackingService.m). Tracking is true
+		     because it reaches bidders for ad targeting: the init request sends it as
+		     privacy.deviceIFA (CLXSDKInitNetworkService.m), and the auction server sets
+		     device.ifa from the config token unless the privacy scrubber strips it. That is
+		     tracking as Apple defines it. This per-type flag only feeds the App Store privacy
+		     label; unlike the top-level NSPrivacyTracking key, it triggers no domain blocking. -->
 		<dict>
 			<key>NSPrivacyCollectedDataType</key>
 			<string>NSPrivacyCollectedDataTypeDeviceID</string>
 			<key>NSPrivacyCollectedDataTypeLinked</key>
 			<false/>
 			<key>NSPrivacyCollectedDataTypeTracking</key>
-			<false/>
+			<true/>
 			<key>NSPrivacyCollectedDataTypePurposes</key>
 			<array>
 				<string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
