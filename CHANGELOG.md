@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Verve adapter 3.9.3.0 - 2026-10-26
+
+Install: `pod 'CloudXVerveAdapter', '~> 3.9.3.0'`
+
+### Changed
+
+- **HyBid SDK 3.9.3** — Updates to HyBid SDK 3.9.3, which fixes two crashes and VAST end-card click tracking. The SDK pin is exact, so an app that pins HyBid 3.9.0 through another integration cannot install this version alongside it. `CloudXCore >= 3.5.0` is unchanged.
+
+---
+
 ## MobileFuse adapter 1.13.0.0 - 2026-10-26
 
 Install: `pod 'CloudXMobileFuseAdapter', '~> 1.13.0.0'`
