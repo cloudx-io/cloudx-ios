@@ -17,7 +17,7 @@ Install: `pod 'CloudXCore', '~> 3.12'`
 
 ### Changed
 
-- **Initialization retries on network errors** — A temporary network failure no longer fails initialization; the SDK keeps retrying and completes when it reaches CloudX. The completion is called only for permanent errors, such as an invalid app key.
+- **Initialization retries on network errors** — A temporary network failure no longer fails initialization; the SDK keeps retrying and completes when it reaches CloudX. The completion still runs once, with an error only for permanent failures such as an invalid app key.
 
 - **Initialization completion runs on the main queue.**
 
