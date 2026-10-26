@@ -41,14 +41,11 @@ typedef void (^CLXAdQualityRevokeHandler)(NSString * _Nullable reason);
  * one field not on the frozen context.
  *
  * The @c adObject is the most concrete loaded ad object reachable at the
- * load-success seam. When the adapter conforms to
- * @c CLXNetworkAdObjectProviding and returns a non-nil object, that underlying
- * partner SDK ad object is used: ad-quality engines that introspect the
- * partner's own ad type reject a CloudX wrapper as an invalid ad object.
- * Otherwise a per-format fallback applies: for banner / MREC the
- * publisher-facing container view that hosts the rendered ad (the inner
- * adapter-loaded view is not reliably reachable at this seam); for fullscreen
- * the adapter instance; for native the native ad object.
+ * load-success seam: for banner / MREC the publisher-facing container view
+ * that hosts the rendered ad (the inner adapter-loaded view is not reliably
+ * reachable at this seam); for fullscreen the adapter instance; for native the
+ * native ad object. A gate that needs the partner SDK's own ad object finds it
+ * from @c adapter.
  */
 CLX_PUBLIC
 @interface CLXAdQualityRequest : NSObject

@@ -8,12 +8,6 @@ CLX_PUBLIC
 
 + (instancetype)sharedInstance;
 
-// MARK: - IFA Configuration
-
-/// Retrieves the Identifier for Advertising (IFA) based on a priority system.
-/// Priority: UserDefaults override > Real device IDFA > Placeholder (if no IDFA available)
-- (NSString *)getIFA;
-
 // MARK: - Location Controls
 
 /// @deprecated No-op. Server-controlled.

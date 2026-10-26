@@ -72,18 +72,33 @@ CLX_PUBLIC
 /**
  * Initialize the SDK with a configuration object
  * @param configuration The initialization configuration
- * @param completion A completion handler called when initialization completes.
+ * @param completion A completion handler called on the main queue when initialization completes.
  *                   On success, sdkConfiguration is non-nil and error is nil.
  *                   On failure, sdkConfiguration is nil and error contains failure details.
  * @discussion This is the preferred initialization method. Use CLXInitializationConfiguration
  * to configure the SDK before initialization.
  *
  * Initialization runs at most once at a time. A call made while an earlier call is still
- * initializing does not start another attempt: on success every waiting caller completes with
- * success; on failure the caller that started the attempt receives the error and the next waiting
- * caller drives one fresh attempt, completing with that one's outcome. A call made after a
- * successful initialization completes immediately. A call whose app key is nil or empty fails
- * immediately without starting or joining an attempt.
+ * initializing does not start another attempt: it joins that one, and every waiting caller
+ * completes exactly once with its outcome. A call made after a successful initialization completes
+ * immediately. A call whose app key is nil or empty fails immediately without starting or joining
+ * an attempt.
+ *
+ * The completion always runs on the main queue. A call made on the main thread that completes
+ * immediately runs it before this method returns; otherwise it is dispatched to the main queue.
+ * isInitialized is already YES when a success completion runs.
+ *
+ * Temporary network failures do not complete initialization with an error. The SDK keeps
+ * initializing and retries automatically, sooner when connectivity returns or the app comes to the
+ * foreground, and completes once configuration arrives. A call made while it is retrying joins it
+ * and retries at once. The completion receives an error only for failures that retrying cannot fix,
+ * such as an invalid app key, the SDK being disabled for this app, or no adapters being present.
+ *
+ * Ads can be created and loaded before initialization completes. A load made while initialization
+ * is in progress waits for the first attempt. Once initialization has failed temporarily, the load
+ * waits up to the ad unit's bid timeout (10 seconds when no config is available yet), then fails
+ * with CLXErrorCodeNotInitialized; initialization keeps retrying. A load made before this method is
+ * ever called fails immediately.
  *
  * Example:
  * @code

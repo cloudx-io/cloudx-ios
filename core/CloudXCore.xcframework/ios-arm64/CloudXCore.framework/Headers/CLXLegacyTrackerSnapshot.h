@@ -12,7 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly) NSString *osVersion;     // → bidRequest.device.osv
 @property (nonatomic, copy, readonly) NSString *country;       // → bidRequest.device.geo.country
 @property (nonatomic, copy, readonly, nullable) NSString *deviceIFV; // → bidRequest.device.ext.ifv
-@property (nonatomic, copy, readonly) NSString *deviceIFA;     // → sdk.ifa via handleIfaField
 
 - (instancetype)initWithAuctionId:(NSString *)auctionId
                          adUnitId:(NSString *)adUnitId
@@ -20,8 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
                          deviceOS:(NSString *)deviceOS
                         osVersion:(NSString *)osVersion
                           country:(NSString *)country
-                        deviceIFV:(nullable NSString *)deviceIFV
-                        deviceIFA:(NSString *)deviceIFA;
+                        deviceIFV:(nullable NSString *)deviceIFV;
 
 @end
 

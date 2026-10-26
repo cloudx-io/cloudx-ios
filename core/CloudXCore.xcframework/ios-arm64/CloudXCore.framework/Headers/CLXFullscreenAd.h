@@ -22,6 +22,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Indicates whether the ad is ready to be displayed.
+ *
+ * For interstitial, rewarded and app open ads, a loaded ad whose bid has expired stays
+ * ready while the SDK loads its replacement, and can still be shown. If expired-ad reload
+ * is turned off for the ad unit in its server settings, the ad is not ready once its bid
+ * expires, and no replacement loads.
+ * Checking readiness resumes an idle-paused replacement asynchronously; this getter
+ * returns the current readiness immediately.
  */
 @property (nonatomic, readonly) BOOL isReady;
 

@@ -55,6 +55,10 @@ typedef NS_ENUM(NSInteger, SDKConfigAdType) {
 @property (nonatomic, assign) BOOL preloadEnabled;
 @property (nonatomic, assign) NSInteger maxConcurrentLoads;
 
+// Fullscreen expired-ad reload. Absent = enabled with no retries; retries clamp to 0...6.
+@property (nonatomic, assign) BOOL expiredAdReloadEnabled;
+@property (nonatomic, assign) NSInteger expiredAdReloadMaxRetries;
+
 - (instancetype)init;
 - (NSString *)ilrdDescription;
 

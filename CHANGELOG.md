@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.12.0] - 2026-10-27
+
+Install: `pod 'CloudXCore', '~> 3.12'`
+
+### Added
+
+- **Expired full-screen ads reload automatically** — Interstitial, rewarded and app-open ads that pass their expiry now load a replacement. Set the new `expirationDelegate` (`CLXAdExpirationDelegate`) to be told when the replacement is ready.
+
+### Changed
+
+- **Initialization retries on network errors** — A temporary network failure no longer fails initialization; the SDK keeps retrying and completes when it reaches CloudX. The completion is called only for permanent errors, such as an invalid app key.
+
+- **Initialization completion runs on the main queue.**
+
+- **Load before initialize fails** — A load made before `initializeWithConfiguration:completion:` was ever called now fails at once with `CLXErrorCodeNotInitialized`. Call `initialize` first.
+
+- **Privacy manifest declares the device ID as used for tracking** — CloudXCore's privacy manifest now marks the device ID (the IDFA, read only after ATT consent) as used for tracking. Review your App Store privacy label.
+
+### Fixed
+
+- **An auction with no bid reports `CLXErrorCodeNoFill` (302)** instead of `CLXErrorCodeInvalidResponse` (105).
+
+- **Banners and MRECs no longer refresh while the app is in the background.** A refresh that comes due resumes when the app returns.
+
+- **MobileFuse native ads load** with the MobileFuse adapter installed.
+
+### Removed
+
+- **`-[CLXSettings getIFA]` is removed.** The SDK reads the IDFA itself after ATT consent. Read the IDFA from `ASIdentifierManager` if your app needs it.
+
+- **`CLXNetworkAdObjectProviding`** — This adapter-facing protocol is removed. No CloudX adapter uses it, and apps need no change.
+
+---
+
 ## Verve adapter 3.9.3.0 - 2026-10-26
 
 Install: `pod 'CloudXVerveAdapter', '~> 3.9.3.0'`

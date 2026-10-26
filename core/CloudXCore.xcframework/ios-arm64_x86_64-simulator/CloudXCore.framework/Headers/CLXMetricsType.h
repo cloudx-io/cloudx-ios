@@ -22,6 +22,9 @@ extern NSString * const CLXMetricsTypeNetworkTimeout;      // "network_call_time
 extern NSString * const CLXMetricsTypeNetworkAdapterLoad;  // "network_call_adapter_load"
 extern NSString * const CLXMetricsTypeNetworkTimeToFirstAd; // "network_call_time_to_first_ad"
 
+/// One host-app foreground/background transition; direction in `reason`.
+extern NSString * const CLXMetricsTypeAppLifecycleTransition; // "app_lifecycle_transition"
+
 /**
  * Method call metrics types
  * Matches Android's sealed class Method(typeCode: String) : MetricsType(typeCode)
@@ -57,12 +60,25 @@ extern NSString * const CLXBannerRefreshReasonResignActive;   // "resign_active"
 extern NSString * const CLXBannerRefreshReasonAppActive;      // "app_active"
 
 /**
- * A refresh tick the visibility gate suppressed.
+ * The app was not active when a countdown was armed or a refresh came due.
  *
- * A counter, not half of a pair: the countdown re-arms, so this recurs every
- * interval while the banner is hidden and never has a matching resume. It
- * measures how much refresh CXD-3710's gate suppresses — the "loads down"
- * half of that change's expected effect.
+ * As a suspend reason: the countdown was armed while the app was not active
+ * (a load finished in the background, or the ad view was created there), so
+ * it is held until the app becomes active. It pairs with an `app_active`
+ * resume. As a skip reason: a refresh came due while the app was not active
+ * and is deferred until it becomes active.
+ */
+extern NSString * const CLXBannerRefreshReasonAppInactive;    // "app_inactive"
+
+/**
+ * A refresh the visibility or app-state gate suppressed.
+ *
+ * A counter, not half of a pair; it never has a matching resume. With
+ * `not_visible` it recurs every interval while the banner is hidden, because
+ * the countdown re-arms, and measures how much refresh CXD-3710's gate
+ * suppresses — the "loads down" half of that change's expected effect. With
+ * `app_inactive` it fires once per deferred refresh, because the deferred
+ * countdown is held until the app becomes active.
  */
 extern NSString * const CLXMetricsTypeBannerRefreshSkipped;   // "banner_refresh_skipped"
 extern NSString * const CLXBannerRefreshReasonNotVisible;     // "not_visible"
@@ -299,6 +315,10 @@ extern NSString * const CLXMetricsTypeIdentityOnlyAdEmitted;                // "
  * data — loss events persist and retry, metrics do not — and one 205 is
  * deliberately not counted: a partner LOAD failure mapped to 616 reaches 205
  * through the loss-reason mapper with no row, because that bid never loaded.
+ *
+ * Exception: with expired-ad reload on, a held fullscreen fill's `timer_elapsed` row
+ * means its bid deadline passed, not that it was discarded. The fill stays showable;
+ * its 205 follows only if it is later discarded unshown, and a shown one sends none.
  */
 extern NSString * const CLXMetricsTypeAdExpired;                            // "ad_expired"
 
@@ -309,6 +329,20 @@ extern NSString * const CLXAdExpiredSourceLoadPastDeadline;                 // "
 extern NSString * const CLXAdExpiredSourceShowPastDeadline;                 // "show_past_deadline"
 extern NSString * const CLXAdExpiredSourceAdoptionPastDeadline;             // "adoption_past_deadline"
 extern NSString * const CLXAdExpiredSourceDestroyPastDeadline;              // "destroy_past_deadline"
+
+/** The SDK's reload of a fullscreen ad whose bid deadline passed unshown: one row per reload cycle. */
+extern NSString * const CLXMetricsTypeExpiredAdReload;                      // "expired_ad_reload"
+
+/** Wire codes for `expired_ad_reload`'s `outcome` and `skipReason` fields. Server-side contract — do not rename. */
+extern NSString * const CLXExpiredAdReloadOutcomeFilled;                    // "filled"
+extern NSString * const CLXExpiredAdReloadOutcomeFailed;                    // "failed"
+extern NSString * const CLXExpiredAdReloadOutcomeCancelled;                 // "cancelled"
+extern NSString * const CLXExpiredAdReloadOutcomeSkipped;                   // "skipped"
+extern NSString * const CLXExpiredAdReloadSkipDisabled;                     // "disabled"
+extern NSString * const CLXExpiredAdReloadSkipDestroyed;                    // "destroyed"
+extern NSString * const CLXExpiredAdReloadSkipShowing;                      // "showing"
+extern NSString * const CLXExpiredAdReloadSkipLoadInFlight;                 // "load_in_flight"
+extern NSString * const CLXExpiredAdReloadSkipIdle;                         // "idle"
 
 /**
  * Utility class for metrics type validation and categorization
