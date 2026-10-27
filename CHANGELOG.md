@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## BidMachine adapter 3.8.2.0 - 2026-10-27
+
+Install: `pod 'CloudXBidMachineAdapter', '~> 3.8.2.0'`
+
+### Added
+
+- **First public BidMachine adapter release (beta)** - Supports Banner, MREC, Interstitial, and Rewarded with BidMachine SDK 3.8.2. Requires `CloudXCore >= 3.11.0`.
+
+---
+
 ## [3.12.0] - 2026-10-27
 
 Install: `pod 'CloudXCore', '~> 3.12'`
