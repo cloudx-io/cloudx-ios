@@ -13,7 +13,7 @@ Install: `pod 'CloudXBidMachineAdapter', '~> 3.8.2.0'`
 
 ### Added
 
-- **First public BidMachine adapter release (beta)** - Supports Banner, MREC, Interstitial, and Rewarded with BidMachine SDK 3.8.2. Requires `CloudXCore >= 3.11.0`.
+- **First public BidMachine adapter release (beta)** — Supports Banner, MREC, Interstitial, and Rewarded with BidMachine SDK 3.8.2. Requires `CloudXCore >= 3.11.0`.
 
 ---
 
