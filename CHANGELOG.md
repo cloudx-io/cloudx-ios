@@ -7,13 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## BidMachine adapter 3.8.2.0 - 2026-10-27
+## BidMachine adapter 3.8.2.0 - 2026-10-28
 
 Install: `pod 'CloudXBidMachineAdapter', '~> 3.8.2.0'`
 
 ### Added
 
 - **First public BidMachine adapter release (beta)** — Supports Banner, MREC, Interstitial, and Rewarded with BidMachine SDK 3.8.2. Requires `CloudXCore >= 3.11.0`.
+
+---
+
+## Mintegral adapter 8.1.7.1 - 2026-10-28
+
+Install: `pod 'CloudXMintegralAdapter', '~> 8.1.7.1'`
+
+### Fixed
+
+- **Native ads load** — Native, native banner and native MREC load through Mintegral's Custom Rendering bidding API. Before, every native load failed with error 21030102.
+
+### Changed
+
+- **Map Custom Rendering placements** — Auto Rendering (Native Advanced) placements no longer load. Manual installs use the `BidNativeAd` subspec instead of `BidNativeAdvancedAd`.
+
+- **`CLXMintegralNative` uses Custom Rendering** — The adapter's native classes now wrap Mintegral's Custom Rendering API. Apps that use the adapter through CloudX need no code change.
 
 ---
 

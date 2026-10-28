@@ -5,30 +5,40 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import <MTGSDKNativeAdvanced/MTGNativeAdvancedAd.h>
+#import <MTGSDK/MTGBidNativeAdManager.h>
+#import <MTGSDK/MTGCampaign.h>
+#import <MTGSDK/MTGMediaView.h>
+#import <MTGSDK/MTGAdChoicesView.h>
 #import <CloudXCore/CLXNativeAd.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Concrete `CLXNativeAd` wrapping a Mintegral `MTGNativeAdvancedAd` handle.
+ * Concrete `CLXNativeAd` wrapping Mintegral custom rendering native assets.
  *
- * Self-rendered: `mediaView` exposes the result of `-[MTGNativeAdvancedAd fetchAdView]`,
- * which is a fully composed UIView. Title/body/icon/CTA are not populated because
- * the Mintegral SDK renders them internally.
+ * Custom rendered: exposes discrete native assets (title, body, CTA, icon,
+ * mediaView, optionsView) so CloudX can assemble the ad using its standard
+ * native templates (standalone native, native-in-banner 320x50, native-in-MREC 300x250).
  *
- * `isSelfRendered` returns YES — this is the signal CLXNativeAdViewBridge reads
- * to bypass template assembly and use the returned mediaView directly.
- * `isContainerClickable` is also YES because the composed view handles its own
- * click registration; the two signals happen to align for Mintegral but are
- * independent in general.
+ * `isSelfRendered` returns NO — CloudX renders the template from assets.
+ * `isContainerClickable` returns NO — clicks are handled by Mintegral on the registered views.
  */
 @interface CLXMintegralNativeAd : CLXNativeAd
 
-@property (nonatomic, strong, nullable) MTGNativeAdvancedAd *mintegralAd;
+@property (nonatomic, strong, readonly) MTGCampaign *campaign;
+@property (nonatomic, strong, readonly, nullable) MTGBidNativeAdManager *adManager;
+@property (nonatomic, strong, readonly, nullable) MTGMediaView *mtgMediaView;
+@property (nonatomic, strong, readonly, nullable) MTGAdChoicesView *adChoicesView;
 
-- (instancetype)initWithMintegralAd:(MTGNativeAdvancedAd *)mintegralAd
-               localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters;
+- (instancetype)initWithCampaign:(MTGCampaign *)campaign
+                       adManager:(nullable MTGBidNativeAdManager *)adManager
+                       mediaView:(nullable MTGMediaView *)mediaView
+                     optionsView:(nullable MTGAdChoicesView *)optionsView
+            localExtraParameters:(nullable NSDictionary<NSString *, id> *)localExtraParameters NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)init NS_UNAVAILABLE;
+
+- (void)unregisterView;
 
 @end
 
