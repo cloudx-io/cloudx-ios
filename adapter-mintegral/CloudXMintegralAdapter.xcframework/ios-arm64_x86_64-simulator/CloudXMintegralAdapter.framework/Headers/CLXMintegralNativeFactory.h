@@ -13,9 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Discovered automatically by CLXAdapterFactoryResolver as `CLXMintegralNativeFactory`.
  *
- * Unlike the publisher-rendered networks (Meta/Vungle/InMobi/Moloco),
- * Mintegral is self-rendered via `fetchAdView`. The bridge detects this via
- * `[nativeAd isSelfRendered] == YES` and uses the returned view directly.
+ * Custom-rendered: loads discrete native assets via Mintegral's custom rendering
+ * bidding API so CloudX renders them using standard templates.
  */
 @interface CLXMintegralNativeFactory : CLXAdapterNativeFactory
 
