@@ -33,14 +33,14 @@ PODS:
   - CloudXMetaAdapter (6.22.1.0):
     - CloudXCore (>= 3.5.0)
     - FBAudienceNetwork (= 6.22.1)
-  - CloudXMintegralAdapter (8.1.7.1):
+  - CloudXMintegralAdapter (8.1.6.1):
     - CloudXCore (>= 3.5.0)
-    - MintegralAdSDK (= 8.1.7)
-    - MintegralAdSDK/BidBannerAd (= 8.1.7)
-    - MintegralAdSDK/BidNativeAd (= 8.1.7)
-    - MintegralAdSDK/BidNewInterstitialAd (= 8.1.7)
-    - MintegralAdSDK/BidRewardVideoAd (= 8.1.7)
-    - MintegralAdSDK/BidSplashAd (= 8.1.7)
+    - MintegralAdSDK (= 8.1.6)
+    - MintegralAdSDK/BidBannerAd (= 8.1.6)
+    - MintegralAdSDK/BidNativeAdvancedAd (= 8.1.6)
+    - MintegralAdSDK/BidNewInterstitialAd (= 8.1.6)
+    - MintegralAdSDK/BidRewardVideoAd (= 8.1.6)
+    - MintegralAdSDK/BidSplashAd (= 8.1.6)
   - CloudXMobileFuseAdapter (1.13.0.0):
     - CloudXCore (>= 3.5.0)
     - MobileFuseSDK (= 1.13.0)
@@ -84,45 +84,50 @@ PODS:
     - HyBid/Core
   - InMobiSDK (11.4.1)
   - MagniteSDK (1.0.4)
-  - MintegralAdSDK (8.1.7):
-    - MintegralAdSDK/BannerAd (= 8.1.7)
-    - MintegralAdSDK/BidBannerAd (= 8.1.7)
-    - MintegralAdSDK/BidInterstitialVideoAd (= 8.1.7)
-    - MintegralAdSDK/BidNativeAd (= 8.1.7)
-    - MintegralAdSDK/BidNewInterstitialAd (= 8.1.7)
-    - MintegralAdSDK/BidRewardVideoAd (= 8.1.7)
-    - MintegralAdSDK/InterstitialVideoAd (= 8.1.7)
-    - MintegralAdSDK/NativeAd (= 8.1.7)
-    - MintegralAdSDK/NewInterstitialAd (= 8.1.7)
-    - MintegralAdSDK/RewardVideoAd (= 8.1.7)
-  - MintegralAdSDK/BannerAd (8.1.7):
+  - MintegralAdSDK (8.1.6):
+    - MintegralAdSDK/BannerAd (= 8.1.6)
+    - MintegralAdSDK/BidBannerAd (= 8.1.6)
+    - MintegralAdSDK/BidInterstitialVideoAd (= 8.1.6)
+    - MintegralAdSDK/BidNativeAd (= 8.1.6)
+    - MintegralAdSDK/BidNewInterstitialAd (= 8.1.6)
+    - MintegralAdSDK/BidRewardVideoAd (= 8.1.6)
+    - MintegralAdSDK/InterstitialVideoAd (= 8.1.6)
+    - MintegralAdSDK/NativeAd (= 8.1.6)
+    - MintegralAdSDK/NewInterstitialAd (= 8.1.6)
+    - MintegralAdSDK/RewardVideoAd (= 8.1.6)
+  - MintegralAdSDK/BannerAd (8.1.6):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/BidBannerAd (8.1.7):
+  - MintegralAdSDK/BidBannerAd (8.1.6):
     - MintegralAdSDK/BannerAd
     - MintegralAdSDK/BidNativeAd
-  - MintegralAdSDK/BidInterstitialVideoAd (8.1.7):
+  - MintegralAdSDK/BidInterstitialVideoAd (8.1.6):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/InterstitialVideoAd
-  - MintegralAdSDK/BidNativeAd (8.1.7):
+  - MintegralAdSDK/BidNativeAd (8.1.6):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/BidNewInterstitialAd (8.1.7):
+  - MintegralAdSDK/BidNativeAdvancedAd (8.1.6):
+    - MintegralAdSDK/BidNativeAd
+    - MintegralAdSDK/NativeAdvancedAd
+  - MintegralAdSDK/BidNewInterstitialAd (8.1.6):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/NewInterstitialAd
-  - MintegralAdSDK/BidRewardVideoAd (8.1.7):
+  - MintegralAdSDK/BidRewardVideoAd (8.1.6):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/RewardVideoAd
-  - MintegralAdSDK/BidSplashAd (8.1.7):
+  - MintegralAdSDK/BidSplashAd (8.1.6):
     - MintegralAdSDK/BidNativeAd
     - MintegralAdSDK/SplashAd
-  - MintegralAdSDK/InterstitialVideoAd (8.1.7):
+  - MintegralAdSDK/InterstitialVideoAd (8.1.6):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/NativeAd (8.1.7)
-  - MintegralAdSDK/NewInterstitialAd (8.1.7):
+  - MintegralAdSDK/NativeAd (8.1.6)
+  - MintegralAdSDK/NativeAdvancedAd (8.1.6):
+    - MintegralAdSDK/NativeAd
+  - MintegralAdSDK/NewInterstitialAd (8.1.6):
     - MintegralAdSDK/InterstitialVideoAd
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/RewardVideoAd (8.1.7):
+  - MintegralAdSDK/RewardVideoAd (8.1.6):
     - MintegralAdSDK/NativeAd
-  - MintegralAdSDK/SplashAd (8.1.7):
+  - MintegralAdSDK/SplashAd (8.1.6):
     - MintegralAdSDK/NativeAd
   - MobileFuseSDK (1.13.0)
   - MolocoSDKiOS (4.11.1)
@@ -144,7 +149,7 @@ DEPENDENCIES:
   - CloudXInMobiAdapter (~> 11.4.1.1)
   - CloudXMagniteAdapterV2 (~> 1.0.4.1)
   - CloudXMetaAdapter (~> 6.22.1.0)
-  - CloudXMintegralAdapter (~> 8.1.7.1)
+  - CloudXMintegralAdapter (~> 8.1.6.1)
   - CloudXMobileFuseAdapter (~> 1.13.0.0)
   - CloudXMolocoAdapter (~> 4.11.1.1)
   - CloudXPangleAdapter (~> 8.3.0.9.0)
@@ -206,7 +211,7 @@ SPEC CHECKSUMS:
   CloudXInMobiAdapter: 24eb5d17272ed43f428eaaf8e4b21be8b69e6451
   CloudXMagniteAdapterV2: 01d19a14daa0b2f1b5265793338b00e9432ac465
   CloudXMetaAdapter: ded03f942b34365ac4ec27dd752030203460310f
-  CloudXMintegralAdapter: ed26027d519366c3583596a8e0294aa534759cfd
+  CloudXMintegralAdapter: ecefe8a74d9465da4c62b29faf132262a88b4d9d
   CloudXMobileFuseAdapter: bf19cfd5f36eaf9f53cb22b5a1570869faa617e8
   CloudXMolocoAdapter: d55b70c921b3b96e770d0d326216882138dc90ac
   CloudXPangleAdapter: 53ba1a92e802ae92b18aa78ebf69c8d6a00d5f91
@@ -221,7 +226,7 @@ SPEC CHECKSUMS:
   HyBid: ecfcce4bfb7b71dcf4e64ed74b8b45c85b5f79ab
   InMobiSDK: 45b8b7e2af6e241b028b94c63b3d1d6113a12945
   MagniteSDK: 3788038b0e8edce9d14532651f633d8ce7188999
-  MintegralAdSDK: 611e5c22c00dcb8305481ea3319e7d42ff3a37b7
+  MintegralAdSDK: b8fbfe18eacde1eb4f5c0e388c3769503ed5d4fa
   MobileFuseSDK: b87020e948482f089443118b4ff46303953f585e
   MolocoSDKiOS: f55c53033aaf1ed43975ca14e76362efd8f96caa
   OMSDK_Appodeal: a8140ec3e79872f39a3e52d3f279122fa9dfb245
@@ -230,6 +235,6 @@ SPEC CHECKSUMS:
   UnityCoherenceLib: 9f7a49d0b53897b6627ad2ecf3b8369d015c66f4
   VungleAds: b35408054cb252a1c1df22cedbd0275ed116d79e
 
-PODFILE CHECKSUM: 897c4829778aac24f0e8e4dc1e1262db235c083f
+PODFILE CHECKSUM: 4ccbd244f61445e232f337dd43fee5fc8833e4e3
 
 COCOAPODS: 1.17.0
