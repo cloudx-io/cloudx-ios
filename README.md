@@ -4,6 +4,12 @@ AI-powered mobile advertising for iOS.
 
 **[Integration Guide →](https://docs.cloudx.io/en/ios/integration)**
 
+## Swift Package Manager
+
+Each CloudX component ships as its own Swift package, for example `https://github.com/cloudx-io/cloudx-ios-swift-package-core.git`. The [Swift Package Manager guide](https://docs.cloudx.io/en/ios/swift-package-manager) lists every package and its latest version.
+
+The `Package.swift` in this repository is deprecated. It stays at CloudX iOS SDK 3.4.6 and receives no updates. Move to the per-component packages.
+
 ## Demo apps
 
 [`demo-app-swift/`](demo-app-swift/) and [`demo-app-objc/`](demo-app-objc/) are the same demo in Swift and Objective-C. Each integrates the SDK and its network adapters and opens on an Options screen that picks a demo flow:
