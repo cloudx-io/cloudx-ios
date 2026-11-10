@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## AppHarbr connector 1.38.3.0 - 2026-11-10
+
+Install: `pod 'CloudXAppHarbrConnector', '~> 1.38.3.0'`
+
+### Added
+
+- **First public AppHarbr connector release** — Runs AppHarbr ad-quality protection on CloudX ads, and ads AppHarbr blocks are not shown. Requires `CloudXCore >= 3.11.0` and your existing AppHarbr integration (`AppHarbrSDK >= 1.38.3`).
+
+---
+
 ## BidMachine adapter 3.8.2.0 - 2026-10-28
 
 Install: `pod 'CloudXBidMachineAdapter', '~> 3.8.2.0'`

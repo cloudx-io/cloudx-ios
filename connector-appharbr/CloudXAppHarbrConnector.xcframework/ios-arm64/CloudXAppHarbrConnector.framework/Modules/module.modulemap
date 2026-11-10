@@ -1,0 +1,5 @@
+framework module CloudXAppHarbrConnector {
+    umbrella header "CloudXAppHarbrConnector.h"
+    export *
+    module * { export * }
+}
