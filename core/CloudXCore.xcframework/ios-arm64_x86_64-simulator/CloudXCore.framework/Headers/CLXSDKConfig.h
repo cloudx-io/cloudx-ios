@@ -290,6 +290,10 @@ CLX_INTERNAL_TESTING
 /// inline OMID. Fullscreen VAST and display/HTML/MRAID OMID are unaffected by
 /// this flag — it gates only the inline-video placement.
 @property (nonatomic, assign) BOOL omidInlineVideoEnabled;
+
+/// Whether this device is registered as a test device in CX Dash. Turns on the Mediation
+/// Debugger gesture. nil when the server sent no JSON boolean, which leaves the gesture off.
+@property (nonatomic, strong, nullable) NSNumber *testDevice;
 - (instancetype)init;
 @end
 

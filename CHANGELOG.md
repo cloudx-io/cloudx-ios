@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.13.0] - 2026-11-11
+
+Install: `pod 'CloudXCore', '~> 3.13'`
+
+### Added
+
+- **Mediation Debugger bidder picker** — On a test device, pick one bidder in the Mediation Debugger and every CloudX load uses only that bidder until you reset it to "All bidders" or restart the app.
+
+- **Adapters get each network's own GDPR consent** — `CLXAdapterPrivacyParams` adds `networkHasUserConsent`, the consent CloudX resolves from your CMP for that network. Custom adapters should use it instead of `hasUserConsent` when they set a network SDK's GDPR consent.
+
+- **Fallback to the next bid** — When the winning network rejects or times out on a load, the SDK now tries the next-ranked bid in the same load instead of failing it.
+
+### Changed
+
+- **Full-screen `isReady` stays true until show** — Interstitial, rewarded and app-open ads report ready until shown or destroyed. If the network dropped the ad, `show()` now fails with `CLXErrorCodeAdapterAdNotReady` (608) instead of `CLXErrorCodeAdNotReady` (400).
+
+- **`show()` before initialization fails with `CLXErrorCodeNotInitialized` (200)** instead of `CLXErrorCodeAdNotReady` (400) on interstitial, rewarded and app-open ads.
+
+- **Full-screen impressions count when the ad is viewable** — CloudX-rendered full-screen ads count the impression once 50% of the ad is visible for one second, or two seconds of video play. A hidden or backgrounded ad no longer counts.
+
+- **Expired full-screen ads stay showable** — An expired interstitial, rewarded or app-open ad that the network still reports ready can still be shown while its replacement loads. Replacements no longer load while the app is in the background.
+
+- **Full-screen ads the network dropped in the background are replaced** — When enabled for an ad unit (`CLXSDKConfigAdUnit.foregroundPartnerCheckEnabled`, off by default), an interstitial, rewarded or app-open ad the network dropped while the app was in the background reloads on return.
+
+- **Refreshed full-screen video controls** — Video ads use a circular countdown and an icon Skip button. Interstitial video without its own skip time offers Skip after five seconds.
+
+### Deprecated
+
+- **`CLXMetricsTypeRendererVideoBuffering` and `CLXMetricsTypeRendererLongBuffering`** — The SDK never reported these values. They will be removed in a future release.
+
+### Fixed
+
+- **Crash fixes** — Fixed a crash when a network returned an unusual load error (3.11.0 and 3.12.0), a crash in the SDK's background timer, and a crash in the SDK's crash reporter on very large reports.
+
+- **Launch and exit watchdog terminations** — `initialize` on the main thread no longer waits on the keychain, and destroying ads while the app exits does less work on the main thread.
+
+- **`didHideAd` fires after the ad has fully closed**, so showing the next ad from `didHideAd` works.
+
+- **Video ads** — Taps on inline MREC video open the click-through, video the device cannot play falls back to another file at load, and time on the App Store sheet no longer counts as watch time.
+
+- **Full-screen callbacks** — A full-screen display failure sends exactly one failure callback, and rewarded HTML ads keep an earned reward when the ad is torn down.
+
+---
+
 ## AppHarbr connector 1.38.3.0 - 2026-11-10
 
 Install: `pod 'CloudXAppHarbrConnector', '~> 1.38.3.0'`

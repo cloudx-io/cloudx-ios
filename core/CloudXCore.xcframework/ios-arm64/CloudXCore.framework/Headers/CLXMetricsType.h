@@ -122,7 +122,8 @@ extern NSString * const CLXMetricsTypeRendererVideoStart;              // "rende
 extern NSString * const CLXMetricsTypeRendererVideoComplete;           // "renderer_video_complete"
 extern NSString * const CLXMetricsTypeRendererVideoSkip;               // "renderer_video_skip"
 extern NSString * const CLXMetricsTypeRendererVideoError;              // "renderer_video_error"
-extern NSString * const CLXMetricsTypeRendererVideoBuffering;          // "renderer_video_buffering_ms"
+extern NSString * const CLXMetricsTypeRendererVideoBuffering
+    __attribute__((deprecated("Never emitted: VAST media is fully downloaded before playback, so playback does not wait on the network. Will be removed in a future release."))); // "renderer_video_buffering_ms"
 extern NSString * const CLXMetricsTypeRendererHeavyAdDetected;         // "renderer_heavy_ad_detected"
 extern NSString * const CLXMetricsTypeRendererWebViewCreate;           // "renderer_webview_create_ms"
 extern NSString * const CLXMetricsTypeRendererCreativeSize;            // "renderer_creative_size_bytes"
@@ -229,7 +230,8 @@ extern NSString * const CLXMetricsTypeRendererStuckImpression;         // "rende
 extern NSString * const CLXMetricsTypeRendererStuckClose;              // "renderer_stuck_close"
 extern NSString * const CLXMetricsTypeRendererCloseBeforeImpression;   // "renderer_close_before_impression"
 extern NSString * const CLXMetricsTypeRendererDoubleShow;              // "renderer_double_show"
-extern NSString * const CLXMetricsTypeRendererLongBuffering;           // "renderer_long_buffering"
+extern NSString * const CLXMetricsTypeRendererLongBuffering
+    __attribute__((deprecated("Never emitted: VAST media is fully downloaded before playback, so playback does not wait on the network. Will be removed in a future release."))); // "renderer_long_buffering"
 extern NSString * const CLXMetricsTypeRendererMediaLoadFailure;        // "renderer_media_load_failure"
 extern NSString * const CLXMetricsTypeRendererEndCardShown;            // "renderer_end_card_shown"
 extern NSString * const CLXMetricsTypeRendererEndCardFailure;          // "renderer_end_card_failure"
@@ -329,6 +331,8 @@ extern NSString * const CLXAdExpiredSourceLoadPastDeadline;                 // "
 extern NSString * const CLXAdExpiredSourceShowPastDeadline;                 // "show_past_deadline"
 extern NSString * const CLXAdExpiredSourceAdoptionPastDeadline;             // "adoption_past_deadline"
 extern NSString * const CLXAdExpiredSourceDestroyPastDeadline;              // "destroy_past_deadline"
+extern NSString * const CLXAdExpiredSourceDeadAtShow;                       // "dead_at_show"
+extern NSString * const CLXAdExpiredSourcePartnerDroppedOnForeground;       // "partner_dropped_on_foreground"
 
 /** The SDK's reload of a fullscreen ad whose bid deadline passed unshown: one row per reload cycle. */
 extern NSString * const CLXMetricsTypeExpiredAdReload;                      // "expired_ad_reload"
@@ -338,11 +342,24 @@ extern NSString * const CLXExpiredAdReloadOutcomeFilled;                    // "
 extern NSString * const CLXExpiredAdReloadOutcomeFailed;                    // "failed"
 extern NSString * const CLXExpiredAdReloadOutcomeCancelled;                 // "cancelled"
 extern NSString * const CLXExpiredAdReloadOutcomeSkipped;                   // "skipped"
+extern NSString * const CLXExpiredAdReloadOutcomeDeferred;                  // "deferred"
 extern NSString * const CLXExpiredAdReloadSkipDisabled;                     // "disabled"
 extern NSString * const CLXExpiredAdReloadSkipDestroyed;                    // "destroyed"
 extern NSString * const CLXExpiredAdReloadSkipShowing;                      // "showing"
 extern NSString * const CLXExpiredAdReloadSkipLoadInFlight;                 // "load_in_flight"
 extern NSString * const CLXExpiredAdReloadSkipIdle;                         // "idle"
+
+/** A fullscreen show whose ad was found dead and recovered: one row per recovery, at its outcome. */
+extern NSString * const CLXMetricsTypeShowRecovery;                         // "show_recovery"
+
+/** Wire codes for `show_recovery`'s `outcome` and `source` fields. Server-side contract — do not rename. */
+extern NSString * const CLXShowRecoveryOutcomeShown;                        // "shown"
+extern NSString * const CLXShowRecoveryOutcomeTimedOut;                     // "timed_out"
+extern NSString * const CLXShowRecoveryOutcomeFailed;                       // "failed"
+extern NSString * const CLXShowRecoveryOutcomeBackgrounded;                 // "backgrounded"
+extern NSString * const CLXShowRecoveryOutcomeDestroyed;                    // "destroyed"
+extern NSString * const CLXShowRecoverySourceAuction;                       // "auction"
+extern NSString * const CLXShowRecoverySourceExpiredReload;                 // "expired_reload"
 
 /**
  * Utility class for metrics type validation and categorization

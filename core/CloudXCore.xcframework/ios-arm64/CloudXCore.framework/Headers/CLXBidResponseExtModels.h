@@ -30,6 +30,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#pragma mark - Decorative End Card Background
+
+@interface CLXEndCardBackgroundConfig : NSObject
+@property (nonatomic, copy, readonly) NSString *type;
+@property (nonatomic, copy, readonly, nullable) NSString *url;
+@property (nonatomic, copy, readonly, nullable) NSString *html;
++ (nullable instancetype)configFromDictionary:(nullable NSDictionary *)dictionary;
+- (NSDictionary *)toDictionary;
+@end
+
 #pragma mark - Double End Card Config
 
 /**
@@ -40,6 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CLXDoubleEndCardConfig : NSObject
 
+@property (nonatomic, strong, readonly, nullable) CLXEndCardBackgroundConfig *background;
 @property (nonatomic, copy, readonly, nullable) NSString *appIconURL;
 @property (nonatomic, copy, readonly, nullable) NSString *appName;
 @property (nonatomic, copy, readonly, nullable) NSString *ctaText;
@@ -117,6 +128,11 @@ NS_ASSUME_NONNULL_BEGIN
  * StoreKit auto-overlay behavior from ext.cloudx.render.auto_store.
  */
 @interface CLXAutoStoreConfig : NSObject
+/** @brief Optional automatic presentation phase and its foreground delay. */
+@property (nonatomic, copy, readonly, nullable) NSString *trigger;
+@property (nonatomic, copy, readonly, nullable) NSNumber *delaySeconds;
+/** @brief Accepted (`after_store` or `by_phase`) for compatibility; no longer changes behavior. The SKOverlay always follows its phase delays. */
+@property (nonatomic, copy, readonly, nullable) NSString *overlayMode;
 
 @property (nonatomic, assign, readonly) BOOL enabled;
 @property (nonatomic, assign, readonly) BOOL onSkip;
@@ -149,6 +165,10 @@ NS_ASSUME_NONNULL_BEGIN
  * the typed shape so later PRs can consume it without changing the DTO.
  */
 @interface CLXPlayerConfig : NSObject
+/** @brief Companion timing JSON, retained when malformed for fail-closed validation. */
+@property (nonatomic, copy, readonly, nullable) id companion;
+/** @brief Reward contract JSON (`player_config.reward`), retained as sent for fail-closed validation. */
+@property (nonatomic, copy, readonly, nullable) id reward;
 
 @property (nonatomic, assign, readonly) NSTimeInterval closeDelay;
 @property (nonatomic, assign, readonly) NSTimeInterval skipDelay;
