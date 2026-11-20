@@ -44,6 +44,16 @@ CLX_PUBLIC_ADAPTER
  */
 @property (nonatomic, strong, readonly, nullable) NSNumber *manualDoNotSell;
 
+/**
+ * @brief This network's own GDPR consent (nil = unknown, @YES = consented, @NO = not consented)
+ * @discussion The CloudX server resolves it at init from the CMP's TC string, for the network's
+ *             IAB vendor and personalised-ads purposes. @NO once the CMP's TC string changed since
+ *             init. nil when GDPR does not apply, now or at init, or init carried no TC string. hasUserConsent is consent for
+ *             CloudX's own vendor, so an adapter that writes GDPR consent into a network SDK's
+ *             app-wide state should use this instead.
+ */
+@property (nonatomic, strong, readonly, nullable) NSNumber *networkHasUserConsent;
+
 @end
 
 NS_ASSUME_NONNULL_END

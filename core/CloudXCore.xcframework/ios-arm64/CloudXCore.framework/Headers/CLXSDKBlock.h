@@ -8,6 +8,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Device-sourced wire signals. Mirrors server SDKBlock field-for-field. */
 @interface CLXSDKBlock : NSObject
+/** @brief Supported foreground VAST companion policy wire version. */
+@property (nonatomic, copy, nullable) NSNumber *vastCompanionPolicyVersion;
 
 @property (nonatomic, copy) NSString *appBundle;
 @property (nonatomic, copy, nullable) NSString *appVersion;

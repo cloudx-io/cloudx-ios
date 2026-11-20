@@ -29,7 +29,8 @@
 </style>
 </head>
 <body>
-<video id="cloudx-video" src="{{VIDEO_URL}}" playsinline {{MUTED_ATTRIBUTE}}></video>
+<!-- Keep browser-supplied poster artwork out of the native-controlled startup frame. -->
+<video id="cloudx-video" src="{{VIDEO_URL}}" poster="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNgYGAAAAAEAAH2FzhVAAAAAElFTkSuQmCC" playsinline {{MUTED_ATTRIBUTE}}></video>
 <script>
 (function () {
   'use strict';

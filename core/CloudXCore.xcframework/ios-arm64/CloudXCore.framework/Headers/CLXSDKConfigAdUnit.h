@@ -59,6 +59,9 @@ typedef NS_ENUM(NSInteger, SDKConfigAdType) {
 @property (nonatomic, assign) BOOL expiredAdReloadEnabled;
 @property (nonatomic, assign) NSInteger expiredAdReloadMaxRetries;
 
+// Partner drop check on return to foreground. Default NO.
+@property (nonatomic, assign) BOOL foregroundPartnerCheckEnabled;
+
 - (instancetype)init;
 - (NSString *)ilrdDescription;
 
