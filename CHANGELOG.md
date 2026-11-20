@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Magnite adapter 1.0.6.0 - 2026-11-20
+
+Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.6.0'`
+
+### Added
+
+- **Swift Package Manager** — Add `https://github.com/cloudx-io/cloudx-ios-swift-package-adapter-magnite.git` at version `1000600.0.0`. It installs CloudX Core and Magnite's Swift package.
+
+### Changed
+
+- **MagniteSDK 1.0.6** — Certified with MagniteSDK 1.0.6. `CloudXCore >= 3.9.0` is unchanged.
+
+### Fixed
+
+- **CMP opt-outs reach Magnite** — A do-not-sell signal from your consent management platform (GPP or US Privacy string) is now forwarded to Magnite. Before, only the value set with `setDoNotSell:` was.
+
+---
+
 ## [3.14.0-beta.1] - 2026-11-20
 
 **Beta: shared SDK core.** This release runs ad requests and ad management on a new SDK core, written in Rust and shared by Android and iOS. It standardizes behavior across the SDKs, reduces the latency of SDK operations, and lowers the memory overhead of requesting and managing ads. This first release has been tested in production in a limited capacity, so talk to your CloudX account manager before integrating it.
