@@ -48,6 +48,7 @@ CLX_PUBLIC_MEDIATOR
 /**
  * Returns nil for missing required values, unsupported ad formats, or invalid revenue.
  * Accepts interstitial, rewarded, app-open, banner, MREC, and native formats and finite, non-negative revenue.
+ * For native ads, an empty networkName means the mediator did not identify the network.
  * An empty revenuePrecision means precision is unavailable and is preserved.
  */
 - (nullable instancetype)initWithAdFormat:(CLXAdFormat)adFormat

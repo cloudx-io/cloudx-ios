@@ -131,7 +131,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** @brief Optional automatic presentation phase and its foreground delay. */
 @property (nonatomic, copy, readonly, nullable) NSString *trigger;
 @property (nonatomic, copy, readonly, nullable) NSNumber *delaySeconds;
-/** @brief Accepted (`after_store` or `by_phase`) for compatibility; no longer changes behavior. The SKOverlay always follows its phase delays. */
+/** @brief Accepted (`after_store` or `by_phase`) for compatibility; no longer changes behavior. */
 @property (nonatomic, copy, readonly, nullable) NSString *overlayMode;
 
 @property (nonatomic, assign, readonly) BOOL enabled;
@@ -228,9 +228,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * @brief Marshals this config back to a JSON-equivalent dictionary.
- * @return A dictionary with `provider` (when non-nil), `network_endcard` and
- *         `clickable_video` (always emitted so `false` survives round-trip),
- *         and the nested `auto_store` / `player_config` (when non-nil).
+ * @return A dictionary with `provider` (when non-nil), `network_endcard`
+ *         (always emitted so `false` survives round-trip), and the nested
+ *         `auto_store` / `player_config` (when non-nil). `clickable_video` is
+ *         emitted inside `player_config`, the only location that is read.
  */
 - (NSDictionary *)toDictionary;
 

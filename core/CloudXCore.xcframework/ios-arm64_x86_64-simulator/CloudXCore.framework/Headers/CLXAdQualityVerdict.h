@@ -42,7 +42,8 @@ CLX_PUBLIC
 
 /**
  * Convenience factory for a block verdict. Core routes the ad into the existing
- * adapter-load-failure path with a @c CLXAdQualityError carrying this reason.
+ * adapter-load-failure path with a @c CLXErrorDomain 307 error whose underlying
+ * @c CLXAdQualityError carries this reason.
  * @param reason The free-form reason for the block, or nil. Copied.
  * @return A non-nil block verdict with @c allowed == NO.
  */
