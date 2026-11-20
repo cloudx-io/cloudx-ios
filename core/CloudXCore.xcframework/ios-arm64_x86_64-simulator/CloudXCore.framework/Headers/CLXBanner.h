@@ -53,7 +53,9 @@ NS_ASSUME_NONNULL_BEGIN
  * and NSDictionary keyed by NSString. Pass nil to remove the key. Invalid
  * values are ignored and logged — they never fail ad loading.
  *
- * Reserved floor keys:
+ * Reserved pricing keys:
+ * - `googleEstimatedEcpm` — estimated USD CPM for an AdMob mediator fill.
+ *   Accepts a finite, nonnegative NSNumber or decimal NSString, including zero.
  * - `minFloor` — single-round publisher floor in USD CPM. Accepts an
  *   NSNumber or decimal NSString (e.g. `@"1.25"`).
  * - `minFloors` — per-round floor overrides. Accepts an NSArray of

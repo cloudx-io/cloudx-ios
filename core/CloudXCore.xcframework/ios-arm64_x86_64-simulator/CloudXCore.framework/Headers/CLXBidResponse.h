@@ -146,6 +146,9 @@ typedef NS_ENUM(NSInteger, CLXOpenRTBMarkupType) {
 /// OpenRTB 2.x `bid.exp` - bid time-to-live in seconds. 0 when absent.
 /// Surfaced so renderer-side TTL handling can log + enforce expiry.
 @property (nonatomic, assign) NSInteger exp;
+/// `ext.cloudx.hardexp`: `exp` is a hard deadline. A fullscreen ad past it is never shown, an idle
+/// one is written off, and its expiry and reload run in the background. Only a JSON true counts.
+@property (nonatomic, assign) BOOL hardExp;
 @property (nonatomic, copy, nullable) NSDictionary *rawJSON;
 @end
 
@@ -206,7 +209,7 @@ typedef NS_ENUM(NSInteger, CLXOpenRTBMarkupType) {
 - (NSArray<CLXBidResponseBid *> *)allBids;
 - (nullable CLXBidResponseBid *)findBidWithID:(NSString *)bidID;
 
-// Helper method to get all bids sorted by rank for waterfall loading (true Android parity)
+// All bids in response order; the engine walk orders them by rank.
 - (NSArray<CLXBidResponseBid *> *)getAllBidsForWaterfall;
 
 + (nullable instancetype)parseBidResponseFromDictionary:(NSDictionary *)dictionary;

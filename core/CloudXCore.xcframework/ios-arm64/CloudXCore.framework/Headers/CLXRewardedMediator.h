@@ -98,6 +98,21 @@ CLX_PUBLIC_MEDIATOR
 - (void)mediatorDidPayRewardedRevenue:(CLXMediatorAdInfo *)adInfo
                                 extras:(NSDictionary<NSString *, id> *)extras;
 
+@optional
+/**
+ * @brief Reports ad information that changed after the load completed.
+ *
+ * Not a second load: for example, the mediator replaced its cached ad. Core keeps the new
+ * values for later callbacks, for a show failure that Core reports itself, and for impression
+ * revenue matching. The publisher receives no callback for this event. Older Core versions
+ * do not implement it, so check respondsToSelector: before calling.
+ *
+ * @param adInfo The current ad information for the loaded ad.
+ * @param extras Immutable callback extras. May carry @c mediationAuctionId for the replacement.
+ */
+- (void)mediatorDidChangeRewardedAdInfo:(CLXMediatorAdInfo *)adInfo
+                                 extras:(NSDictionary<NSString *, id> *)extras;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -112,23 +112,24 @@ NS_ASSUME_NONNULL_BEGIN
                                    format:(NSString *)format;
 
 /**
- * Records a failed render/show attempt for a bidder in the current process's
- * session (CXD-3409 / CXD-3410 schema_version 3). Same counter family and
- * cap as the load-failure counterpart above, but tallied into `renderFailures`
- * and tagged `stage: "render"` rather than `"load"`. Render failures carry no
- * `timeoutMs` -- no load timeout governs a render attempt.
- *
- * @param bidder Wire name of the bidder. No-op if empty.
- * @param errorCode The CloudX integer error code, passed through opaquely.
- *                  Callers must not report NoFill (302) or AdapterNoFill (601).
- * @param latencyMs Show/render latency in integer milliseconds from the
- *                  monotonic clock.
- * @param format Wire format string, same source as the load-failure counterpart.
+ * Records a failed render/show attempt for a bidder.
  */
 - (void)recordBidderRenderFailureForBidder:(NSString *)bidder
                                   errorCode:(NSInteger)errorCode
                                   latencyMs:(NSInteger)latencyMs
-                                     format:(NSString *)format;
+                                     format:(NSString *)format
+    __deprecated_msg("Use reportRenderFailureForBidder:errorCode:wireCode:latencyMs:format: instead.");
+
+/**
+ * A failed render/show attempt, as facts. The engine decides whether it counts:
+ * no bidder and a no-fill (302, 601) do not; it records the wire code, else the
+ * public code.
+ */
+- (void)reportRenderFailureForBidder:(nullable NSString *)bidder
+                           errorCode:(NSInteger)errorCode
+                            wireCode:(NSInteger)wireCode
+                           latencyMs:(NSInteger)latencyMs
+                              format:(NSString *)format;
 
 /**
  * Records a successful load for a bidder. schema_version 3 changed this from

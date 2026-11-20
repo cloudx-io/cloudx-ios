@@ -105,9 +105,8 @@ CLX_PUBLIC
  * @param adUnitId AdMob ad unit id the bid would fill.
  * @param networkName Winning ad network within AdMob, when available. Defaults to "admob".
  * @param manualRevenuePerImpressionUSD Publisher-supplied per-impression USD revenue. This is
- * not a CPM. Overrides the revenue CloudX has recorded for this ad unit. Zero is honored as a
- * real price; negative and non-finite values are ignored with a warning, leaving the bid
- * priced from recorded revenue instead.
+ * not a CPM. Used only when greater than 0 and at most $1 per impression; otherwise the bid
+ * uses its realized or estimated price.
  * @param extras Optional platform metadata. Null/blank keys and non-string values are
  * dropped before storage.
  */
@@ -132,9 +131,8 @@ CLX_PUBLIC
  * @param adUnitId Google Ad Manager ad unit id the bid would fill.
  * @param networkName Winning ad network within Google Ad Manager, when available. Defaults to "gam".
  * @param manualRevenuePerImpressionUSD Publisher-supplied per-impression USD revenue. This is
- * not a CPM. Overrides the revenue CloudX has recorded for this ad unit. Zero is honored as a
- * real price; negative and non-finite values are ignored with a warning, leaving the bid
- * priced from recorded revenue instead.
+ * not a CPM. Used only when greater than 0 and at most $1 per impression; otherwise the bid
+ * uses its realized or estimated price.
  * @param extras Optional platform metadata. Null/blank keys and non-string values are
  * dropped before storage.
  * @return A Google Ad Manager bid candidate.

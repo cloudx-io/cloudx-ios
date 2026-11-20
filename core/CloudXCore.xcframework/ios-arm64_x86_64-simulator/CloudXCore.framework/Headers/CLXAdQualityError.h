@@ -16,12 +16,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Error domain for ad-quality gate decisions.
  *
- * Surfaced to publishers through the standard load-failure callback
- * (`didFailToLoadAd:error:` / `publisherNative:didFailToLoadWithError:`) when the
- * registered ad-quality gate vetoes an ad. The error rides the existing
- * adapter-load-failure pipeline unchanged so waterfall / refresh / teardown
- * machinery runs identically to a network load failure — only the domain and
- * code distinguish a gate veto from a network failure.
+ * When the registered ad-quality gate vetoes an ad, the standard load-failure
+ * callback (`didFailToLoadAd:error:` / `publisherNative:didFailToLoadWithError:`)
+ * receives a @c CLXErrorDomain error with code @c CLXErrorCodeAdQualityBlocked
+ * (307) whose underlying error (@c NSUnderlyingErrorKey) is in this domain.
  */
 CLX_PUBLIC
 extern NSString * const CLXAdQualityErrorDomain;
@@ -49,10 +47,8 @@ extern NSString * const CLXAdQualityErrorReasonKey;
  * An error in the @c CLXAdQualityErrorDomain, produced when the ad-quality gate
  * blocks an ad.
  *
- * Subclasses @c CLXError so it rides the existing load-failure conversion path
- * (`+[CLXError errorFromError:withFallbackCode:]` returns CLXError subclasses
- * as-is) without being re-wrapped into @c CLXErrorDomain — the publisher
- * observes the ad-quality domain and code directly.
+ * The publisher receives it as the underlying error of a @c CLXErrorDomain
+ * @c CLXErrorCodeAdQualityBlocked (307) load failure.
  */
 CLX_PUBLIC
 @interface CLXAdQualityError : CLXError
