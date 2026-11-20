@@ -2,21 +2,12 @@
 // Requires Xcode 15+
 import PackageDescription
 
-// CloudX iOS SDK — Swift Package Manager distribution
+// DEPRECATED: this package is frozen at CloudX iOS SDK 3.4.6 and receives no updates.
 //
-// Ships only components whose third-party SDKs have official SPM support:
-//   - CloudXCore
-//   - CloudXMetaAdapter      (requires github.com/facebook/FBAudienceNetwork)
-//   - CloudXVungleAdapter    (requires github.com/Vungle/VungleAdsSDK-SwiftPackageManager)
-//   - CloudXMintegralAdapter (requires github.com/Mintegral-official/MintegralAdSDK-Swift-Package)
-//   - CloudXGoogleWaterfallAdapter (requires github.com/googleads/swift-package-manager-google-mobile-ads)
-//
-// NOT included (use CocoaPods instead — CocoaPods+SPM hybrid is supported):
-//   - CloudXInMobiAdapter (no official InMobiSDK SPM)
-//   - CloudXUnityAdsAdapter (no official UnityAds SPM)
-//   - CloudXMagniteAdapter / CloudXMolocoAdapter / CloudXVerveAdapter (SPM not yet validated against the shipped binary)
-//   - CloudXPangleAdapter (underlying Pangle SDK has no official SPM — CocoaPods only)
-//   - CloudXRenderer (being merged into Core)
+// Each CloudX component now ships as its own Swift package, for example
+// https://github.com/cloudx-io/cloudx-ios-swift-package-core.git
+// The Swift Package Manager guide lists every package and its latest version:
+// https://docs.cloudx.io/en/ios/swift-package-manager
 
 let package = Package(
     name: "CloudX",
