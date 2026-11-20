@@ -7,7 +7,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * v2 SDK init request body. Wire shape `{id, sdk, privacy, forceTestMode?, adapters}` — block
+ * v2 SDK init request body. Wire shape `{id, sdk, privacy, forceTestMode?, adapters, mediators}` — block
  * field names match server's pkg/bidrequest/v2.SDKBlock and pkg/configpayload/v2.PrivacyBlock
  * verbatim. Adapters[] stays at root — init-only, no analog on bid/telemetry surfaces.
  *

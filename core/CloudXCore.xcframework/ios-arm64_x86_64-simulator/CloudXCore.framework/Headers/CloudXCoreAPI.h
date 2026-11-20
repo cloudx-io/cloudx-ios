@@ -415,8 +415,8 @@ CLX_PUBLIC
  * Register the ad-quality gate — a single, vendor-neutral participant that
  * inspects every loaded ad before the publisher is told it loaded and may veto
  * ("block") it. A blocked ad is routed into the existing adapter-load-failure
- * path with a @c CLXAdQualityError, so waterfall / refresh / teardown machinery
- * runs unchanged.
+ * path with a @c CLXErrorDomain 307 error whose underlying error is a
+ * @c CLXAdQualityError, so waterfall / refresh / teardown machinery runs unchanged.
  *
  * Only one gate is consulted per ad (not a delegate list). Pass nil to clear the
  * current gate. When no gate is registered, ad loading is a zero-overhead

@@ -242,7 +242,15 @@ typedef NS_ENUM(NSInteger, CLXErrorCode) {
      * outcome (success / failure / destroy) before calling @c load again, or raise the
      * cap in the CloudX dashboard.
      */
-    CLXErrorCodeLoadRejectedTooManyConcurrentLoads = 306,
+    CLXErrorCodeLoadRejectedTooManyConcurrentLoads = 305,
+
+    /**
+     * The registered ad-quality gate blocked the ad. The gate's @c CLXAdQualityError
+     * (with its reason) is the underlying error.
+     *
+     * Publisher action: None. The SDK reports it as a load failure; load again as usual.
+     */
+    CLXErrorCodeAdQualityBlocked = 307,
 
     // MARK: Ad Display (400–499)
 

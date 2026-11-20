@@ -8,6 +8,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly) NSString *mediatorDisplayName;
 @property (nonatomic, copy, readonly) NSDictionary<NSString *, id> *adUnitData;
 @property (nonatomic, strong, readonly, nullable) NSNumber *timeoutMs;
+@optional
+/// The entry's `mediatorAttemptTelemetryPayload`; empty when absent.
+@property (nonatomic, copy, readonly) NSString *telemetryPayload;
 @end
 
 @interface CLXMediatorConfiguration : NSObject
@@ -27,10 +30,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly) NSString *mediatorDisplayName;
 @property (nonatomic, copy, readonly) NSDictionary<NSString *, id> *adUnitData;
 @property (nonatomic, strong, readonly, nullable) NSNumber *timeoutMs;
+@property (nonatomic, copy, readonly) NSString *telemetryPayload;
 - (instancetype)initWithMediatorName:(NSString *)mediatorName
                  mediatorDisplayName:(NSString *)mediatorDisplayName
                           adUnitData:(NSDictionary<NSString *, id> *)adUnitData
-                           timeoutMs:(nullable NSNumber *)timeoutMs NS_DESIGNATED_INITIALIZER;
+                           timeoutMs:(nullable NSNumber *)timeoutMs;
+- (instancetype)initWithMediatorName:(NSString *)mediatorName
+                 mediatorDisplayName:(NSString *)mediatorDisplayName
+                          adUnitData:(NSDictionary<NSString *, id> *)adUnitData
+                           timeoutMs:(nullable NSNumber *)timeoutMs
+                    telemetryPayload:(nullable NSString *)telemetryPayload NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 @end
 
@@ -39,10 +48,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly) NSString *mediatorDisplayName;
 @property (nonatomic, copy, readonly) NSDictionary<NSString *, id> *adUnitData;
 @property (nonatomic, strong, readonly, nullable) NSNumber *timeoutMs;
+@property (nonatomic, copy, readonly) NSString *telemetryPayload;
 - (instancetype)initWithMediatorName:(NSString *)mediatorName
                  mediatorDisplayName:(NSString *)mediatorDisplayName
                           adUnitData:(NSDictionary<NSString *, id> *)adUnitData
-                           timeoutMs:(nullable NSNumber *)timeoutMs NS_DESIGNATED_INITIALIZER;
+                           timeoutMs:(nullable NSNumber *)timeoutMs;
+- (instancetype)initWithMediatorName:(NSString *)mediatorName
+                 mediatorDisplayName:(NSString *)mediatorDisplayName
+                          adUnitData:(NSDictionary<NSString *, id> *)adUnitData
+                           timeoutMs:(nullable NSNumber *)timeoutMs
+                    telemetryPayload:(nullable NSString *)telemetryPayload NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 @end
 
@@ -58,6 +73,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithGroups:(NSArray<CLXLoadGroup *> *)groups
                        postBid:(nullable CLXPostBidAttempt *)postBid NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
+/// The entry at the engine's attempt position (`postBid`, or group and entry index), or nil when this plan
+/// does not hold that attempt there. `name` nil is the CloudX attempt (the engine's case-insensitive
+/// `cloudx`); a mediator name and the payload must match exactly.
+- (nullable id<CLXOrchestratorAttemptDescriptor>)entryForEngineAttemptNamed:(nullable NSString *)name
+                                                                    payload:(nullable NSString *)payload
+                                                                    postBid:(BOOL)postBid
+                                                                 groupIndex:(NSInteger)groupIndex
+                                                                 entryIndex:(NSInteger)entryIndex;
 @end
 
 @interface CLXOrchestratorConfiguration : NSObject

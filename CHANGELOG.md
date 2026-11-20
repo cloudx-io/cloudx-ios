@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.14.0-beta.1] - 2026-11-20
+
+**Beta: shared SDK core.** This release runs ad requests and ad management on a new SDK core, written in Rust and shared by Android and iOS. It standardizes behavior across the SDKs, reduces the latency of SDK operations, and lowers the memory overhead of requesting and managing ads. This first release has been tested in production in a limited capacity, so talk to your CloudX account manager before integrating it.
+
+Beta pre-release. Adopt it by pinning this exact version; it is not picked up by version ranges such as `~> 3.13`. Available through CocoaPods only; Swift Package Manager is not supported for this beta.
+
+Install: `pod 'CloudXCore', '3.14.0-beta.1'`
+
+### Added
+
+- **Ad unit list after initialization** — `CLXSdkConfiguration.adUnitConfigurations` maps each CloudX ad unit ID in the session's configuration to a `CLXAdUnitConfiguration`. Before, the map was empty.
+
+### Changed
+
+- **Impressions count on render** — CloudX-rendered banners, MRECs and native ads count the impression once one pixel is on screen, full-screen ads when shown, and video once it starts playing on screen. Viewability is still measured but no longer delays the impression.
+
+- **`CLXErrorCodeLoadRejectedTooManyConcurrentLoads` is now 305** — The value was 306. The name is unchanged, so only code that compares the raw number must change.
+
+- **Ad-quality blocks report `CLXErrorCodeAdQualityBlocked` (307)** — The error is in `CLXErrorDomain`, with the gate's `CLXAdQualityError` as the underlying error. Before, you got the `CLXAdQualityError` itself.
+
+- **VAST load failures report `CLXErrorCodeAdapterInternalError` (600)** — The original VAST error is the underlying error. Before, some failures surfaced as unrelated codes such as `CLXErrorCodeAdNotReady` (400).
+
+- **`show()` while the ad is showing fails with `CLXErrorCodeAdAlreadyShowing` (401)** instead of `CLXErrorCodeAdNotReady` (400), on interstitial, rewarded and app-open ads.
+
+- **`load()` and `show()` after `destroy()` are ignored** — The SDK logs the call and sends no callback. Before, the delegate got a load or display failure.
+
+- **SDK core failure** — If the SDK core cannot start, loads and full-screen `show()` fail with `CLXErrorCodeInternalError` (0) and the message "SDK core unavailable".
+
+- **Hard-deadline full-screen ads** — An interstitial, rewarded or app-open ad whose bid sets a hard deadline is never shown past it. `show()` then fails with `CLXErrorCodeAdapterAdExpired` (616), and `isReady` stays true while a replacement loads. Other ads are unchanged.
+
+- **Unshown full-screen ads are reused** — An interstitial, rewarded or app-open ad that you destroy before `show()` is kept. The next ad on the same ad unit can load it without a new auction.
+
+### Fixed
+
+- **Blank ads from empty bids** — A bid with no ad markup is now refused instead of rendering a blank ad.
+
+- **Malformed bids** — A bid that lacks required CloudX data is now skipped on its own. Before, it failed the whole bid response, so valid bids in the same response were lost.
+
+- **App-open display failures** — `didFailToDisplayAd:error:` on app-open ads now reports the ad that failed, as interstitial and rewarded do.
+
+---
+
 ## [3.13.0] - 2026-11-11
 
 Install: `pod 'CloudXCore', '~> 3.13'`
