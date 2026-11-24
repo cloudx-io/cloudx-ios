@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## BIGO Ads adapter 6.2.0.0 - 2026-11-24
+
+Install: `pod 'CloudXBigoAdapter', '~> 6.2.0.0'`
+
+### Added
+
+- **Swift Package Manager** — Add `https://github.com/cloudx-io/cloudx-ios-swift-package-adapter-bigo.git` at version `6020000.0.0`. It installs CloudX Core and BIGO's Swift package.
+
+### Changed
+
+- **BigoADS 6.2.0** — Certified with BigoADS 6.2.0. `CloudXCore >= 3.9.0` is unchanged.
+
+### Fixed
+
+- **App Store upload** — The framework now reports a version App Store validation accepts.
+
+---
+
 ## Magnite adapter 1.0.6.0 - 2026-11-20
 
 Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.6.0'`

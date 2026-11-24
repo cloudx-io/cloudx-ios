@@ -20,7 +20,7 @@ target 'CloudXObjCRemotePods' do
   pod 'CloudXPangleAdapter', '~> 8.3.0.9.0'
   pod 'CloudXMobileFuseAdapter', '~> 1.13.0.0'
   pod 'CloudXTaurusXAdapter', '~> 1.18.2.1'
-  pod 'CloudXBigoAdapter', '~> 6.1.0.0'
+  pod 'CloudXBigoAdapter', '~> 6.2.0.0'
   pod 'CloudXBidMachineAdapter', '~> 3.8.2.0'
 
   # The First Look flow calls Google Mobile Ads directly. CloudXGoogleWaterfallAdapter pins its version.
