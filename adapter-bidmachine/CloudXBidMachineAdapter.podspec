@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CloudXBidMachineAdapter'
-  s.version          = '3.8.2.0'
+  s.version          = '4.0.0.0'
   s.summary          = 'CloudX BidMachine Adapter - Static Framework'
   s.description      = 'BidMachine server-bidding adapter for CloudX iOS SDK - binary distribution. Supports Banner, MREC, Interstitial, and Rewarded ad formats.'
   s.homepage         = 'https://github.com/cloudx-io/cloudx-ios'
@@ -8,11 +8,11 @@ Pod::Spec.new do |s|
   s.author           = { 'CloudX' => 'support@cloudx.io' }
   s.source           = { :git => 'https://github.com/cloudx-io/cloudx-ios.git', :tag => "adapter-bidmachine/#{s.version}" }
 
-  s.ios.deployment_target = '13.0'
+  s.ios.deployment_target = '15.0'
   s.vendored_frameworks = 'adapter-bidmachine/CloudXBidMachineAdapter.xcframework'
 
   s.dependency 'CloudXCore', '>= 3.11.0'
-  s.dependency 'BidMachine', '= 3.8.2'
+  s.dependency 'BidMachine', '= 4.0.0'
 
   s.frameworks = ['Foundation', 'UIKit']
 
