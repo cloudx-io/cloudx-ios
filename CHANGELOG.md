@@ -18,6 +18,17 @@ Install: `pod 'CloudXBidMachineAdapter', '~> 4.0.0.0'`
 
 ---
 
+## Moloco adapter 4.13.0.0 - 2026-11-24
+
+Install: `pod 'CloudXMolocoAdapter', '~> 4.13.0.0'`
+
+### Changed
+
+- **Certified with Moloco SDK 4.13.0** — Updates MolocoSDKiOS from 4.11.1 to 4.13.0. Native image ads now show Moloco's media view, which includes Moloco's ad badge. `CloudXCore >= 3.5.0` is unchanged.
+- **Custom native layouts** — For Moloco ads, `mainImage` is now `nil`. Show the ad's `mediaView` instead, and keep its bottom-left corner clear for Moloco's badge.
+
+---
+
 ## Magnite adapter 1.0.6.0 - 2026-11-20
 
 Install: `pod 'CloudXMagniteAdapterV2', '~> 1.0.6.0'`

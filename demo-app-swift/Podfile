@@ -13,7 +13,7 @@ target 'CloudXSwiftRemotePods' do
   pod 'CloudXMintegralAdapter', '~> 8.1.7.1'
   pod 'CloudXUnityAdsAdapter', '~> 4.21.0.0'
   pod 'CloudXMagniteAdapterV2', '~> 1.0.6.0'
-  pod 'CloudXMolocoAdapter', '~> 4.11.1.1'
+  pod 'CloudXMolocoAdapter', '~> 4.13.0.0'
   pod 'CloudXVerveAdapter', '~> 3.9.3.0'
   pod 'CloudXDigitalTurbineAdapter', '~> 8.5.1.0'
   pod 'CloudXGoogleWaterfallAdapter', '~> 13.11.0.0'
