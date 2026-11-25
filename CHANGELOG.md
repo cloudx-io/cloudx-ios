@@ -14,7 +14,7 @@ Install: `pod 'CloudXBidMachineAdapter', '~> 4.0.0.0'`
 ### Changed
 
 - **BidMachine SDK 4.0.0**: Certified with BidMachine SDK 4.0.0, which requires iOS 15.0. `CloudXCore >= 3.11.0` is unchanged.
-- **Do-not-sell**: `setDoNotSell:YES` now sets BidMachine's `nonPersonalized` flag, because SDK 4.0 removed its US Privacy setter. BidMachine still reads the US Privacy and GPP strings your consent management platform stores.
+- **Do-not-sell**: `setDoNotSell:@YES` now sets BidMachine's `nonPersonalized` flag, because SDK 4.0 removed its US Privacy setter. BidMachine still reads the US Privacy and GPP strings your consent management platform stores.
 
 ---
 
