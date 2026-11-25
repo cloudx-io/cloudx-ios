@@ -6,18 +6,18 @@ PODS:
     - Ads-Global/TikTokBusinessSDK
   - Ads-Global/PangleSDK (8.3.0.9)
   - Ads-Global/TikTokBusinessSDK (8.3.0.9)
-  - BidMachine (3.8.2):
-    - BidMachine/Static (= 3.8.2)
-  - BidMachine/Static (3.8.2):
-    - OMSDK_Appodeal/Static (= 1.6.3.1)
+  - BidMachine (4.0.0):
+    - BidMachine/Static (= 4.0.0)
+  - BidMachine/Static (4.0.0):
+    - OMSDK_Bidmachine/Static (= 1.6.11)
   - BigoADS (6.1.0)
-  - CloudXBidMachineAdapter (3.8.2.0):
-    - BidMachine (= 3.8.2)
+  - CloudXBidMachineAdapter (4.0.0.0):
+    - BidMachine (= 4.0.0)
     - CloudXCore (>= 3.11.0)
   - CloudXBigoAdapter (6.1.0.0):
     - BigoADS (= 6.1.0)
     - CloudXCore (>= 3.9.0)
-  - CloudXCore (3.13.0)
+  - CloudXCore (3.14.0-beta.1)
   - CloudXDigitalTurbineAdapter (8.5.1.0):
     - CloudXCore (>= 3.5.0)
     - Fyber_Marketplace_SDK (= 8.5.1)
@@ -27,9 +27,9 @@ PODS:
   - CloudXInMobiAdapter (11.4.1.1):
     - CloudXCore (>= 3.5.0)
     - InMobiSDK (= 11.4.1)
-  - CloudXMagniteAdapterV2 (1.0.4.1):
+  - CloudXMagniteAdapterV2 (1.0.6.0):
     - CloudXCore (>= 3.9.0)
-    - MagniteSDK (= 1.0.4)
+    - MagniteSDK (= 1.0.6)
   - CloudXMetaAdapter (6.22.1.0):
     - CloudXCore (>= 3.5.0)
     - FBAudienceNetwork (= 6.22.1)
@@ -44,9 +44,9 @@ PODS:
   - CloudXMobileFuseAdapter (1.13.0.0):
     - CloudXCore (>= 3.5.0)
     - MobileFuseSDK (= 1.13.0)
-  - CloudXMolocoAdapter (4.11.1.1):
+  - CloudXMolocoAdapter (4.13.0.0):
     - CloudXCore (>= 3.5.0)
-    - MolocoSDKiOS (= 4.11.1)
+    - MolocoSDKiOS (= 4.13.0)
   - CloudXPangleAdapter (8.3.0.9.0):
     - Ads-Global (= 8.3.0.9)
     - CloudXCore (>= 3.5.0)
@@ -83,7 +83,7 @@ PODS:
   - HyBid/RewardedVideo (3.9.3):
     - HyBid/Core
   - InMobiSDK (11.4.1)
-  - MagniteSDK (1.0.4)
+  - MagniteSDK (1.0.6)
   - MintegralAdSDK (8.1.7):
     - MintegralAdSDK/BannerAd (= 8.1.7)
     - MintegralAdSDK/BidBannerAd (= 8.1.7)
@@ -125,8 +125,8 @@ PODS:
   - MintegralAdSDK/SplashAd (8.1.7):
     - MintegralAdSDK/NativeAd
   - MobileFuseSDK (1.13.0)
-  - MolocoSDKiOS (4.11.1)
-  - OMSDK_Appodeal/Static (1.6.3.1)
+  - MolocoSDKiOS (4.13.0)
+  - OMSDK_Bidmachine/Static (1.6.11)
   - TaurusxAdsSDK (1.18.2):
     - TaurusxAdsSDK/TaurusxAds (= 1.18.2)
   - TaurusxAdsSDK/TaurusxAds (1.18.2)
@@ -136,17 +136,17 @@ PODS:
   - VungleAds (7.7.8)
 
 DEPENDENCIES:
-  - CloudXBidMachineAdapter (~> 3.8.2.0)
+  - CloudXBidMachineAdapter (~> 4.0.0.0)
   - CloudXBigoAdapter (~> 6.1.0.0)
   - CloudXCore (from `../core/CloudXCore.podspec`)
   - CloudXDigitalTurbineAdapter (~> 8.5.1.0)
   - CloudXGoogleWaterfallAdapter (~> 13.11.0.0)
   - CloudXInMobiAdapter (~> 11.4.1.1)
-  - CloudXMagniteAdapterV2 (~> 1.0.4.1)
+  - CloudXMagniteAdapterV2 (~> 1.0.6.0)
   - CloudXMetaAdapter (~> 6.22.1.0)
   - CloudXMintegralAdapter (~> 8.1.7.1)
   - CloudXMobileFuseAdapter (~> 1.13.0.0)
-  - CloudXMolocoAdapter (~> 4.11.1.1)
+  - CloudXMolocoAdapter (~> 4.13.0.0)
   - CloudXPangleAdapter (~> 8.3.0.9.0)
   - CloudXTaurusXAdapter (~> 1.18.2.1)
   - CloudXUnityAdsAdapter (~> 4.21.0.0)
@@ -184,7 +184,7 @@ SPEC REPOS:
     - MintegralAdSDK
     - MobileFuseSDK
     - MolocoSDKiOS
-    - OMSDK_Appodeal
+    - OMSDK_Bidmachine
     - TaurusxAdsSDK
     - UnityAds
     - UnityCoherenceLib
@@ -196,19 +196,19 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Ads-Global: 4d99872117c52015b26f8953e76ab5b1bdcc9659
-  BidMachine: 635d477279887bf672eb4ea10bb9a4fe5bc3039b
+  BidMachine: de24b743d1a1c85f3b2ca064643634b2a07b0c60
   BigoADS: 77e52c0881e33b1edd4893c40c7c0d118f06d88c
-  CloudXBidMachineAdapter: 66b244c91c9ed8b8d0932c04281b35df06d40bff
+  CloudXBidMachineAdapter: 926babb35bfa15a95af0e72c4a8f996995d194ca
   CloudXBigoAdapter: 3c1037e4ece5b21c1dda15f622d0abcfc78540b8
-  CloudXCore: cad10fa4f763b370515d4ab90af6cc4c6692968f
+  CloudXCore: c529d91260ce0c7cb957234f26efd145d182b2a8
   CloudXDigitalTurbineAdapter: ac8212515cb4c9c75dbe9c91f7d2a5b7f58cc353
   CloudXGoogleWaterfallAdapter: 635685e0b2712f7c12da2a5a5b69d2e2ad3bce55
   CloudXInMobiAdapter: 24eb5d17272ed43f428eaaf8e4b21be8b69e6451
-  CloudXMagniteAdapterV2: 01d19a14daa0b2f1b5265793338b00e9432ac465
+  CloudXMagniteAdapterV2: 1b37e7ca7ca01d2ea153e2848a64a50dc0a532e8
   CloudXMetaAdapter: ded03f942b34365ac4ec27dd752030203460310f
   CloudXMintegralAdapter: ed26027d519366c3583596a8e0294aa534759cfd
   CloudXMobileFuseAdapter: bf19cfd5f36eaf9f53cb22b5a1570869faa617e8
-  CloudXMolocoAdapter: d55b70c921b3b96e770d0d326216882138dc90ac
+  CloudXMolocoAdapter: a209778f10ebb846ec30de4cafb9392cf41b157f
   CloudXPangleAdapter: 53ba1a92e802ae92b18aa78ebf69c8d6a00d5f91
   CloudXTaurusXAdapter: fd18ec67f67cac06d9a9ac754e2f2cadda08955e
   CloudXUnityAdsAdapter: 2877f5cbcaf7f5f21d794e8dc768dda2540688a5
@@ -220,16 +220,16 @@ SPEC CHECKSUMS:
   GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
   HyBid: ecfcce4bfb7b71dcf4e64ed74b8b45c85b5f79ab
   InMobiSDK: 45b8b7e2af6e241b028b94c63b3d1d6113a12945
-  MagniteSDK: 3788038b0e8edce9d14532651f633d8ce7188999
+  MagniteSDK: 48fb5bfa1e2448c32aa756efb9cda3623933ddd5
   MintegralAdSDK: 611e5c22c00dcb8305481ea3319e7d42ff3a37b7
   MobileFuseSDK: b87020e948482f089443118b4ff46303953f585e
-  MolocoSDKiOS: f55c53033aaf1ed43975ca14e76362efd8f96caa
-  OMSDK_Appodeal: a8140ec3e79872f39a3e52d3f279122fa9dfb245
+  MolocoSDKiOS: 9f3e5e25b8073bd59838da33e4683a512dfe006c
+  OMSDK_Bidmachine: ac6b17699be2c1889d435ae281f7b05b5f321b4d
   TaurusxAdsSDK: 02cab82069bddbb22455dec35e171ab99115f6bf
   UnityAds: caaccd3367f77a9a64b061404c5cc8eb2df20103
   UnityCoherenceLib: 9f7a49d0b53897b6627ad2ecf3b8369d015c66f4
   VungleAds: b35408054cb252a1c1df22cedbd0275ed116d79e
 
-PODFILE CHECKSUM: 897c4829778aac24f0e8e4dc1e1262db235c083f
+PODFILE CHECKSUM: 623ba7cd2ea3e10bcfc5073c210b71f0bae007a1
 
 COCOAPODS: 1.17.0
